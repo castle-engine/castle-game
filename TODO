@@ -1,0 +1,40 @@
+- change the name --- there already exists game named "castle"!
+
+  "Castle in the rock"
+  "High castle"
+  "Castle above the mist" ?
+
+- Stage 2 (3 weeks): Jan 22nd - Feb 11th
+
+  Goal #1 (5 Points) - Make a basic playable game engine.
+    Give them all my sources (units).
+    Prepare base game castle.dpr
+    Add redouts/blackouts from szklane_lasy.
+
+  Goal #2 (5 Points) - Make a basic level editor.
+    write README about using blender, point them to kambi_vrml_examples.zip
+    (or give them kambi_vrml_examples.zip)
+
+  Goal #3 (5 Points) - Create a simple level with editor to test (and show off) the engine features.
+    (tell them: general demos and tests of the engine are in kambi_vrml_examples.zip;
+    make new level for this game -- at least start...).
+
+  Goal #4 (5 Points) - Include a basic documentation of user controls.
+    Add on F1 keypress, add somewhere clear note that F1 in game runs help screen.
+    Based on MatrixNavigation, so copy initial version from lets_take_a_walk.
+
+- Makefile to pack distro of my game (
+  remember to omit .svn subdirs,
+  private TODO file,
+  remember to add my general units (or give link to camelot sources)
+  remember to add svn log (with files, i.e. C-u svn log) of trunk,
+    say somewhere that this was developed as part of svn repository.
+  )
+
+- help (at least beta-testing and English text proofreading!):
+
+  Szymon, Ka¶ka, Grzegorz, Kozak, Herman,
+
+  Wojtkiewicz, Julia, Aga, Ba¶ka, Michalski, Rudy, Kaczmarek, Bednarz+Ula, Bila, Hasior, Kozio³, Staszek,
+
+  Justy¶
