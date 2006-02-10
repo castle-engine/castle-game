@@ -1,0 +1,20 @@
+"The Castle"
+Version 0.2.0
+
+--------------------
+Versioning
+
+Version numbers are 0.y.z, where "y" is a stage of PGD competition.
+So "version 0.2.0" is what I submit at the end of stage 2 of competition.
+"z" is a relase number (will be used in later stages when I will want
+to give this game to friends to actually test it before submitting to PGD).
+
+Later, when PGD competition will end and I will continue developing
+this game on my WWW page [http://www.camelot.homedns.org/~michalis/],
+I will switch to my normal versioning scheme
+[http://www.camelot.homedns.org/~michalis/versioning.php].
+
+--------------------
+Michalis Kamburelis
+http://www.camelot.homedns.org/~michalis/index.php
+<kambi@users.sourceforge.net> (or <michalis@camelot.homedns.org>)
