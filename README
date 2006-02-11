@@ -6,6 +6,27 @@ Press F1 after you run the game, you will get help including the list
 of all available keys.
 
 --------------------
+Sample level:
+
+Err... I wanted to prepare in Blender a new shiny first level of my game
+(castle_hall), but I didn't make it in time for stage 2 of PGD competition
+(I'll probably do it the next day, 2006-02-12 :). So I just placed here
+a sample level (basic_castle) that is actually combined from my old demo
+castle model, and I added night sky with moon that was used in
+my other toy-game (lets_take_a_walk).
+
+Looks good as a demo, but just bear in mind that this basic level is only for
+demo purposes, for the next stage it will be replaced with some great
+and beautiful and original level created especially for this game.
+
+If you want to see other models demonstrating my engine, see
+[http://www.camelot.homedns.org/~michalis/miscella/kambi_vrml_examples.zip]
+--- there are many testcases and demos of what can be expressed in VRML 1.0
+and what my engine can understand and render. See also
+[http://www.camelot.homedns.org/~michalis/view3dscene.php]
+that is my VRML 1.0 (and 3DS) viewer based on the same engine as this game.
+
+--------------------
 Window size:
 
 For now, the game may run in any resolution, windowed or fullscreen.

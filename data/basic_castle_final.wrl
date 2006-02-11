@@ -1,6 +1,18 @@
 #VRML V1.0 ascii
 
 Group{
+  Separator {
+    Rotation { rotation 1 0 0 1.57 }
+    Background {
+      backUrl "skies/sky_back.png"
+      bottomUrl "skies/sky_bottom.png"
+      frontUrl "skies/sky_front.png"
+      leftUrl "skies/sky_left.png"
+      rightUrl "skies/sky_right.png"
+      topUrl "skies/sky_top.png"
+    }
+  }
+
   PerspectiveCamera {
     position -1.981749057769775 -83.240951538085937 2.5
     orientation 0.999999940395355 0.000172845990164 -0.000172608604771 1.57080090045929

@@ -21,14 +21,6 @@
     Prepare base game castle.dpr
     Add redouts/blackouts from szklane_lasy.
 
-  Goal #2 (5 Points) - Make a basic level editor.
-    write README about using blender, point them to kambi_vrml_examples.zip
-    (or give them kambi_vrml_examples.zip)
-
-  Goal #3 (5 Points) - Create a simple level with editor to test (and show off) the engine features.
-    (tell them: general demos and tests of the engine are in kambi_vrml_examples.zip;
-    make new level for this game -- at least start...).
-
 - Makefile to pack distro of my game (
   remember to omit .svn subdirs,
   private TODO file,
