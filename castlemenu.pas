@@ -117,7 +117,7 @@ begin
       miSound:
         begin
           MessageOK(Glw,
-            'Report aboit initializing sound (OpenAL library):' +nl+
+            'Sound library (OpenAL) status:' +nl+
             nl+
             SoundInitializationReport +nl+
             nl+
