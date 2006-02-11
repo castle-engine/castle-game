@@ -1,0 +1,15 @@
+#VRML V1.0 ascii
+
+# Lights for castle_hall_final.wrl
+#
+# Are inside separate VRML file to give me some flexibility
+# and allow for some tricks. E.g. I will want these lights to light
+# not only the level, but also some monsters and objects etc.
+# That's why I don't define these lights in castle_hall_final.wrl
+
+Group {
+  PointLight { location  8 -8 10 color 0.2   0 0 }
+  PointLight { location  8  8 10 color   0 0.2 0 }
+  PointLight { location -8  8 10 color 0.2   0 0 }
+  PointLight { location -8 -8 10 color   0 0.2 0 }
+}
