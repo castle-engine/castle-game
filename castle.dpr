@@ -18,12 +18,14 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
+{$apptype GUI}
+
 program castle;
 
 uses GLWindow, SysUtils, KambiUtils,
-  ProgressUnit, ProgressConsole {TODO}, OpenAL, ALUtils,
+  ProgressUnit, ProgressGL, OpenAL, ALUtils,
   ParseParametersUnit, GLWinMessages, KambiGLUtils,
-  CastleWindow, CastleMenu, CastleLevel, CastlePlay;
+  CastleWindow, CastleMenu, CastleLevel, CastlePlay, CastleSound;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -75,24 +77,24 @@ begin
     ParseParameters(Options, OptionProc, nil);
 
     { init OpenAL }
-    { TODO -- console should not be needed }
     if WasParam_NoSound then
-     Writeln('Sound disabled by --no-sound command-line option') else
+      SoundInitializationReport :=
+        'Sound disabled by --no-sound command-line option' else
     if not TryBeginAL(false) then
-     Writeln('OpenAL initialization failed : ' +ALActivationErrorMessage +nl+
-             'SOUND IS DISABLED') else
-    begin
-     Writeln('OpenAL initialized, sound enabled');
-    end;
-
-    { TODO-fix this, use only GL progress.
-      Under Win32, program should not create console. }
-    Progress.UserInterface := ProgressConsoleInterface;
+      SoundInitializationReport :=
+        'OpenAL initialization failed : ' +ALActivationErrorMessage +nl+
+        'SOUND IS DISABLED' else
+      SoundInitializationReport :=
+        'OpenAL initialized, sound enabled';
 
     { init glwindow }
     Glw.Caption := 'The Castle';
     Glw.ResizeAllowed := raOnlyAtInit;
     Glw.Init;
+
+    { init progress }
+    ProgressGLInterface.Window := Glw;
+    Progress.UserInterface := ProgressGLInterface;
 
     ShowMenu;
   finally

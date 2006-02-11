@@ -30,16 +30,17 @@ implementation
 
 uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
-  OpenGLBmpFonts, VectorMath, CastleLevel, CastlePlay, Images,
-  BFNT_BitstreamVeraSans_Unit;
+  OpenGLBmpFonts, VectorMath, Images, BFNT_BitstreamVeraSans_Unit,
+  CastleLevel, CastlePlay, CastleSound;
 
 type
-  TMenuItem = (miReadDocs, miPlaySample, miQuit);
+  TMenuItem = (miReadDocs, miPlaySample, miSound, miQuit);
 
 const
   MenuNames: array[TMenuItem]of string = (
-    'Read controls description',
+    'Read short instructions',
     'Play sample level',
+    'Sound',
     'Quit');
 
 var
@@ -112,6 +113,21 @@ begin
           try
             PlayLevel(Level);
           finally Level.Free end;
+        end;
+      miSound:
+        begin
+          MessageOK(Glw,
+            'Report aboit initializing sound (OpenAL library):' +nl+
+            nl+
+            SoundInitializationReport +nl+
+            nl+
+            'TODO: for now, "The Castle" initializes OpenAL '+
+            'but it''s not used. It will be used in the future, '+
+            'and you will see here some controls to turn sound on/off '+
+            'and change sound volume. See my older demo, ' +
+            '[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php] '+
+            'if you want to see how I''m dealing with OpenAL.',
+            taLeft);
         end;
       miQuit: UserQuit := true;
       else raise EInternalError.Create('Menu item unknown');

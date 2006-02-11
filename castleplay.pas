@@ -96,15 +96,7 @@ begin
 
   Level.LightSet.RenderLights;
 
-  { TODO -- decide: either move some enables/disables below to Init/Close ?
-    Or leave them here for some reason ? Just like with lets_take_a_walk. }
-  glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
-
   Level.Scene.RenderFrustumOctree(Glw.NavWalker.Frustum);
-
-  glDisable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
 end;
 
 procedure Idle(Glwin: TGLWindow);
@@ -172,7 +164,9 @@ var
 begin
   Level := ALevel;
 
-  SavedMode := TGLMode.Create(glw, 0);
+  SavedMode := TGLMode.Create(glw,
+    { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
+    GL_ENABLE_BIT);
   try
     { init navigator }
     Glw.Navigator := TMatrixWalker.Create(TDummy.MatrixChanged);
@@ -198,6 +192,9 @@ begin
       Glw.EventResize;
 
       GameCancelled := false;
+
+      glEnable(GL_LIGHTING);
+      glEnable(GL_LIGHT0);
 
       MessageRectStipple := @ThreeQuartersStipple;
       try
