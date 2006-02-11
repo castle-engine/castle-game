@@ -4,6 +4,12 @@
   "High castle"
   "Castle above the mist" ?
 
+- block +/- keys.
+
+- prepare some background for VRML castle_hall, with starry sky!
+
+- check "program castle" source code.
+
 - Stage 2 (3 weeks): Jan 22nd - Feb 11th
 
   Goal #1 (5 Points) - Make a basic playable game engine.
@@ -31,6 +37,8 @@
     say somewhere that this was developed as part of svn repository.
   )
 
+- binary only distro doesn't need *.blend files.
+
 - help (at least beta-testing and English text proofreading!):
 
   Szymon, Ka¶ka, Grzegorz, Kozak, Herman,
@@ -38,3 +46,7 @@
   Wojtkiewicz, Julia, Aga, Ba¶ka, Michalski, Rudy, Kaczmarek, Bednarz+Ula, Bila, Hasior, Kozio³, Staszek,
 
   Justy¶
+
+--------------------
+On each stage, remember to:
+- inc VERSION in Makefile
