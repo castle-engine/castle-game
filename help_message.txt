@@ -1,6 +1,6 @@
 Available keys:
 
-(keys below are identical to keys available in my other program "view3dscene" in "Walk" mode):
+(keys below are a subset of keys available in my other program "view3dscene" in "Walk" mode):
 
 Basic keys:
   F1 = show this help
@@ -13,7 +13,6 @@ Basic keys:
   Z / X = strafe move left / right
 
 Additional keys:
-  + / - = Increase/Decrease moving speed (has effect on keys Up / Down, Insert / Delete, Z / X)
   Ctrl + Left / Right = rotate slower
   Ctrl + PageUp / PageDown = raise / bow your head slower
   F5 = save screen to file castle_<int>.png

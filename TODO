@@ -1,14 +1,18 @@
+- make menu, use this splash screen that I have
+
 - change the name --- there already exists game named "castle"!
 
   "Castle in the rock"
   "High castle"
   "Castle above the mist" ?
 
-- block +/- keys.
+- Insert / Delete should only work if in some "fly mode" etc.
+
+- sound configuration do -- allow turning sounds on/off from menu, allow volume control
 
 - prepare some background for VRML castle_hall, with starry sky!
 
-- check "program castle" source code.
+- remove base_castle, use castle_hall -- base_castle is just a testing model
 
 - Stage 2 (3 weeks): Jan 22nd - Feb 11th
 
@@ -25,10 +29,6 @@
     (tell them: general demos and tests of the engine are in kambi_vrml_examples.zip;
     make new level for this game -- at least start...).
 
-  Goal #4 (5 Points) - Include a basic documentation of user controls.
-    Add on F1 keypress, add somewhere clear note that F1 in game runs help screen.
-    Based on MatrixNavigation, so copy initial version from lets_take_a_walk.
-
 - Makefile to pack distro of my game (
   remember to omit .svn subdirs,
   private TODO file,
@@ -38,6 +38,8 @@
   )
 
 - binary only distro doesn't need *.blend files.
+
+- Do navigating with mouse, like in Quake
 
 - help (at least beta-testing and English text proofreading!):
 

@@ -1,3 +1,25 @@
+{
+  Copyright 2006 Michalis Kamburelis.
+
+  This file is part of "castle".
+
+  "castle" is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  "castle" is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with "castle"; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+}
+
+{ Playing the game. }
+
 unit CastlePlay;
 
 interface
@@ -14,7 +36,7 @@ implementation
 
 uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
-  MatrixNavigation, VectorMath;
+  MatrixNavigation, VectorMath, Boxes3d;
 
 var
   GameCancelled: boolean;
@@ -116,10 +138,10 @@ end;
 function MoveAllowed(Navigator: TMatrixWalker;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single): boolean;
 begin
-  Result := Level.Scene.DefaultTriangleOctree.MoveAllowed(
-    Navigator.CameraPos, ProposedNewPos, NewPos, Level.CameraRadius);
-  { TODO -- put some constraints here, like in lets_take_a_walk,
-    to not allow him to get outside of level box. }
+  Result :=
+    Box3dPointInside(ProposedNewPos, Level.Scene.BoundingBox) and
+    Level.Scene.DefaultTriangleOctree.MoveAllowed(
+      Navigator.CameraPos, ProposedNewPos, NewPos, Level.CameraRadius);
 end;
 
 type
@@ -145,10 +167,16 @@ begin
     { init navigator }
     Glw.Navigator := TMatrixWalker.Create(TDummy.MatrixChanged);
     try
-      Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
-      VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius * 2);
-      Glw.NavWalker.Init(CamPos, CamDir, CamUp);
+      { Init Glw.NavWalker properties }
+      Glw.NavWalker.RotateSpeed := 1;
+      Glw.NavWalker.Key_MoveSpeedInc := K_None; { turn key off }
+      Glw.NavWalker.Key_MoveSpeedDec := K_None; { turn key off }
       Glw.NavWalker.OnMoveAllowed := MoveAllowed;
+
+      { Init initial camera pos }
+      Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
+      VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius * 0.5);
+      Glw.NavWalker.Init(CamPos, CamDir, CamUp);
 
       SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
         nil, true, true, false, #0, #0, true, true);
@@ -156,7 +184,7 @@ begin
       Glw.OnIdle := Idle;
       Glw.OnTimer := Timer;
       Glw.OnKeyDown := KeyDown;
-      
+
       Glw.EventResize;
 
       GameCancelled := false;

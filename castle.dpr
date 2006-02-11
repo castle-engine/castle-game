@@ -98,8 +98,9 @@ begin
     Glw.Init;
 
     { TODO - this should be called from some menu }
-    Level := TCastleLevel.Create('castle_hall_final.wrl',
-      'castle_hall_lights.wrl');
+    Level := TCastleLevel.Create(
+      'basic_castle_final.wrl', 'basic_castle_lights.wrl'
+      { 'castle_hall_final.wrl', 'castle_hall_lights.wrl'});
     try
       PlayLevel(Level);
     finally Level.Free end;
