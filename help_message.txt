@@ -1,0 +1,20 @@
+Available keys:
+
+(keys below are identical to keys available in my other program "view3dscene" in "Walk" mode):
+
+Basic keys:
+  F1 = show this help
+  Escape = exit
+  Up / Down = move
+  Left / Right = rotate
+  PageUp / PageDown = raise / bow your head
+  Home = restore head raise to initial position (neutralize any effect of PageUp / PageDown)
+  Insert / Delete = fly up / down
+  Z / X = strafe move left / right
+
+Additional keys:
+  + / - = Increase/Decrease moving speed (has effect on keys Up / Down, Insert / Delete, Z / X)
+  Ctrl + Left / Right = rotate slower
+  Ctrl + PageUp / PageDown = raise / bow your head slower
+  F5 = save screen to file castle_<int>.png
+  Ctrl + F = toggle fullscreen mode

@@ -1,0 +1,27 @@
+#VRML V1.0 ascii
+
+Group {
+  PointLight { location  8 -8 10 color 0.2   0 0 }
+  PointLight { location  8  8 10 color   0 0.2 0 }
+  PointLight { location -8  8 10 color 0.2   0 0 }
+  PointLight { location -8 -8 10 color   0 0.2 0 }
+
+  PerspectiveCamera {
+    position -0.4293332695961 -11.719922065734863 0.234094008803368
+    orientation 0.999639809131622 -0.018973441794515 -0.018978551030159 1.571149468421936
+  }
+
+#   Separator {
+#     Rotation { rotation 1 0 0 1.57 }
+#     Background {
+#       backUrl "skies/sky_back.png"
+#       bottomUrl "skies/sky_bottom.png"
+#       frontUrl "skies/sky_front.png"
+#       leftUrl "skies/sky_left.png"
+#       rightUrl "skies/sky_right.png"
+#       topUrl "skies/sky_top.png"
+#     }
+#   }
+
+  WWWInline { name "castle_hall.wrl" }
+}
