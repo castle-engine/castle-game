@@ -1,8 +1,12 @@
+- test on Windows
+- Build binaries for Linux and Windows
+- prepare distro archives
+- upload to PGD
+
 - Stage 2 (3 weeks): Jan 22nd - Feb 11th
 
   Goal #1 (5 Points) - Make a basic playable game engine.
     Give them all my sources (units).
-    Prepare base game castle.dpr
 
 - Makefile to pack distro of my game (
   remember to omit .svn subdirs,
