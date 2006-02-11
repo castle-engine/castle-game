@@ -46,6 +46,8 @@ begin
   FScene := TVRMLFlatSceneGL.Create(
     LoadVRMLNode(ASceneFileName), true,
     roSeparateShapeStates{roSceneAsAWhole});
+  { TODO -- check later, maybe change GL_LINEAR_MIPMAP_LINEAR
+    so something simpler. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
 
   FCameraRadius := Box3dAvgSize(Scene.BoundingBox) * 0.015;
