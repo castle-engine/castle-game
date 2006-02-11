@@ -1,11 +1,8 @@
-- sound configuration do -- allow turning sounds on/off from menu, allow volume control
-
 - Stage 2 (3 weeks): Jan 22nd - Feb 11th
 
   Goal #1 (5 Points) - Make a basic playable game engine.
     Give them all my sources (units).
     Prepare base game castle.dpr
-    Add redouts/blackouts from szklane_lasy.
 
 - Makefile to pack distro of my game (
   remember to omit .svn subdirs,
@@ -19,6 +16,10 @@
 
 --------------------
 after stage 2:
+
+- Add redouts/blackouts from szklane_lasy.
+
+- sound configuration do -- allow turning sounds on/off from menu, allow volume control
 
 - remove base_castle, use castle_hall -- base_castle is just a testing model.
   Also remove the sky -- it's copied from lets_take_a_walk.
