@@ -20,9 +20,10 @@
 
 program castle;
 
-uses GLWindow, SysUtils, KambiUtils, CastleWindow, CastlePlay, CastleLevel,
+uses GLWindow, SysUtils, KambiUtils,
   ProgressUnit, ProgressConsole {TODO}, OpenAL, ALUtils,
-  ParseParametersUnit, GLWinMessages, KambiGLUtils;
+  ParseParametersUnit, GLWinMessages, KambiGLUtils,
+  CastleWindow, CastleMenu, CastleLevel, CastlePlay;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -65,8 +66,6 @@ end;
 
 { main -------------------------------------------------------------------- }
 
-var
-  Level: TCastleLevel;
 begin
   try
     { parse parameters }
@@ -90,20 +89,12 @@ begin
       Under Win32, program should not create console. }
     Progress.UserInterface := ProgressConsoleInterface;
 
-    { init GLWinMessages }
-    MessageRectStipple := @ThreeQuartersStipple;
-
     { init glwindow }
     Glw.Caption := 'The Castle';
+    Glw.ResizeAllowed := raOnlyAtInit;
     Glw.Init;
 
-    { TODO - this should be called from some menu }
-    Level := TCastleLevel.Create(
-      'basic_castle_final.wrl', 'basic_castle_lights.wrl'
-      { 'castle_hall_final.wrl', 'castle_hall_lights.wrl'});
-    try
-      PlayLevel(Level);
-    finally Level.Free end;
+    ShowMenu;
   finally
     EndAL;
   end;

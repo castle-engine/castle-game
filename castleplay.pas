@@ -26,6 +26,8 @@ interface
 
 uses CastleLevel;
 
+procedure ShowHelpMessage;
+
 procedure PlayLevel(ALevel: TCastleLevel);
 
 const
@@ -115,15 +117,6 @@ begin
 end;
 
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
-
-  procedure ShowHelpMessage;
-  const
-    HelpMessage = {$I help_message.inc};
-  begin
-    MessageOK(Glw, HelpMessage + nl +
-      SCamelotProgramHelpSuffix(DisplayProgramName, Version, false), taLeft);
-  end;
-
 begin
   case Key of
     K_F1: ShowHelpMessage;
@@ -153,6 +146,23 @@ class procedure TDummy.MatrixChanged(Navigator: TMatrixNavigator);
 begin
   Glw.PostRedisplay;
   alUpdateListener;
+end;
+
+
+procedure ShowHelpMessage;
+const
+  HelpMessage = {$I help_message.inc};
+begin
+  MessageOK(Glw, HelpMessage + nl +
+   DisplayProgramName + ' version ' + Version + '.' +nl+
+   'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
+   { TODO: later I will just use here SCamelotProgramHelpSuffix,
+     for now this program is not avail on camelot. }
+   {'See http://www.camelot.homedns.org/~michalis/ for latest versions' +
+   Iff(WrapLines, nl + ' ', '') +
+   ' of this program, sources, documentation etc.' +nl+}
+   'Compiled with ' + SCompilerDescription +'.',
+   taLeft);
 end;
 
 procedure PlayLevel(ALevel: TCastleLevel);
@@ -189,10 +199,14 @@ begin
 
       GameCancelled := false;
 
-      repeat
-        Glwm.ProcessMessage(true);
-      until GameCancelled;
+      MessageRectStipple := @ThreeQuartersStipple;
+      try
 
+        repeat
+          Glwm.ProcessMessage(true);
+        until GameCancelled;
+
+      finally MessageRectStipple := nil; end;
     finally FreeAndNil(Glw.Navigator); end;
   finally FreeAndNil(SavedMode); end;
 end;
