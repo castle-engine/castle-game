@@ -20,7 +20,7 @@
 
 program castle;
 
-uses GLWindow, SysUtils, KambiUtils, CastleWindow, CastlePlay, CastleLevel, 
+uses GLWindow, SysUtils, KambiUtils, CastleWindow, CastlePlay, CastleLevel,
   ProgressUnit, ProgressConsole {TODO}, OpenAL, ALUtils,
   ParseParametersUnit, GLWinMessages, KambiGLUtils;
 
@@ -41,24 +41,24 @@ procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
 begin
  case OptionNum of
   0: begin
-      InfoWrite(
-        'castle.' +nl+
-        nl+
-        'Options:' +nl+
-        HelpOptionHelp +nl+
-        VersionOptionHelp +nl+
-        OpenALOptionsHelp(true) +nl+
-        '  --no-sound            Turn off sound' +nl+
-        nl+
-        TGLWindow.ParseParametersHelp(StandardParseOptions, true) +nl+
-        nl+
-        SCamelotProgramHelpSuffix(DisplayProgramName, Version, true));
-      ProgramBreak;
+       InfoWrite(
+         'castle.' +nl+
+         nl+
+         'Options:' +nl+
+         HelpOptionHelp +nl+
+         VersionOptionHelp +nl+
+         OpenALOptionsHelp(true) +nl+
+         '  --no-sound            Turn off sound' +nl+
+         nl+
+         TGLWindow.ParseParametersHelp(StandardParseOptions, true) +nl+
+         nl+
+         SCamelotProgramHelpSuffix(DisplayProgramName, Version, true));
+       ProgramBreak;
      end;
   1: WasParam_NoSound := true;
   2: begin
-      Writeln(Version);
-      ProgramBreak;
+       Writeln(Version);
+       ProgramBreak;
      end;
  end;
 end;
@@ -90,18 +90,19 @@ begin
       Under Win32, program should not create console. }
     Progress.UserInterface := ProgressConsoleInterface;
 
-    { TODO - this should be called from some menu }
-    Level := TCastleLevel.Create('castle_hall_final.wrl', 'castle_hall_lights.wrl');
-    try
-      PlayLevel(Level);
-    finally Level.Free end;
-
     { init GLWinMessages }
     MessageRectStipple := @ThreeQuartersStipple;
 
-    { init glwindow & loop }
+    { init glwindow }
     Glw.Caption := 'The Castle';
-    Glw.InitLoop;
+    Glw.Init;
+
+    { TODO - this should be called from some menu }
+    Level := TCastleLevel.Create('castle_hall_final.wrl',
+      'castle_hall_lights.wrl');
+    try
+      PlayLevel(Level);
+    finally Level.Free end;
   finally
     EndAL;
   end;
