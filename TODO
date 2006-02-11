@@ -1,15 +1,16 @@
 - proofread and spellcheck README.
 
-- test building using distro made by `make dist'
+- possibly calling strip is needed ?
 
-- add section about installing and running this.
-  Write that jst run exe on Windows, create .castle.data or /usr//.... on Unix
+- under Linux and Windows:
+  - build debug exe from this dir, test
+  - build release exe from this dir, test
+  - make dist
+  - extract created dist
+  - test running from extracted created dist
+  - test building from extracted created dist (using `make build-xxx')
 
-- build and test relase binaries for Linux and Windows
-  Linux just tested. Test Windows.
-
-- prepare distro archives
-- upload to PGD
+- upload dist to PGD
 
 --------------------
 after stage 2:
@@ -18,9 +19,17 @@ after stage 2:
   it doesn't need many things, including all sources and *
   .blend and *.xcf (and some other internals in menu_bg)
 
-- Add redouts/blackouts from szklane_lasy.
+- Add spadanie to TMatrixWalker
+
+- Add redouts on spadanie,
+  prepare general engine to make blackouts.
+  Take this from szklane_lasy.
 
 - sound configuration do -- allow turning sounds on/off from menu, allow volume control
+
+  Add to "installing and running" in README:
+  Note that to hear sounds you should first install OpenAL
+  (see [http://www.camelot.homedns.org/~michalis/openal_notes.php#section_install]).
 
 - remove base_castle, use castle_hall -- base_castle is just a testing model.
   Also remove the sky -- it's copied from lets_take_a_walk.
