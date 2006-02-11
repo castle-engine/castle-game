@@ -1,5 +1,4 @@
 "The Castle"
-Version 0.2.0
 
 --------------------
 Versioning
@@ -13,6 +12,45 @@ Later, when PGD competition will end and I will continue developing
 this game on my WWW page [http://www.camelot.homedns.org/~michalis/],
 I will switch to my normal versioning scheme
 [http://www.camelot.homedns.org/~michalis/versioning.php].
+
+--------------------
+Creating levels, 3d objects for this game:
+
+The short instruction is:
+Use any 3d modeller able to create VRML 1.0 files.
+
+VRML 1.0 format has an official specification and my engine is capable
+of handling any VRML 1.0 valid files (actually, even more than that ---
+see [http://www.camelot.homedns.org/~michalis/kambi_vrml_extensions.php]).
+So my engine is not tied to any particular modelling program.
+
+My favourite 3d modeller is Blender, [http://www.blender3d.org/].
+It's open source, it's available for Linux (yeah, Windows too
+if you insist :), and it has an enormous set of features.
+Including good export to VRML 1.0, of course. There are no special
+rules for designing in Blender models for my engine --- just do whatever
+you like (and whatever can be exported to VRML 1.0).
+
+I often "wrap" (using WWWInline VRML construction) models produced by
+Blender inside some small VRML files written by hand.
+For example, data/castle_hall_final.wrl is a small VRML file that is
+maintained by hand. It sets up some things that were uncomfortable
+(or impossible, due to lacks of VRML 1.0 exporter) to set up from Blender,
+and includes data/castle_hall.wrl (by WWWInline { name "castle_hall.wrl" }).
+data/castle_hall.wrl file is simply exported from Blender version
+of data/castle_hall.blend.
+
+3DS notes: Actually, you can also export your models to 3DS instead
+of VRML 1.0. So if your favourite 3d modeller is not able to export
+to VRML 1.0 but it's able to export to 3DS --- you can use it too.
+But, since 3DS is a closed format, it will never be supported
+completely by my engine (just like by any other program, since everyone
+has to decode 3DS). In particular, *everything* that can be expressed
+in 3DS format and that is understood by me engine can also be expressed
+in VRML 1.0. But not vice-versa, i.e. there are some features that
+are available with my engine when using VRML 1.0 but that are not available
+when using 3DS. So the bottom line is: well, you can use 3DS format
+with my engine, it works OK, but VRML 1.0 format is just better :)
 
 --------------------
 Michalis Kamburelis
