@@ -1,25 +1,22 @@
-- test on Windows
-- Build binaries for Linux and Windows
+- proofread and spellcheck README.
+
+- test building using distro made by `make dist'
+
+- add section about installing and running this.
+  Write that jst run exe on Windows, create .castle.data or /usr//.... on Unix
+
+- build and test relase binaries for Linux and Windows
+  Linux just tested. Test Windows.
+
 - prepare distro archives
 - upload to PGD
 
-- Stage 2 (3 weeks): Jan 22nd - Feb 11th
-
-  Goal #1 (5 Points) - Make a basic playable game engine.
-    Give them all my sources (units).
-
-- Makefile to pack distro of my game (
-  remember to omit .svn subdirs,
-  private TODO file,
-  remember to add my general units (or give link to camelot sources)
-  remember to add svn log (with files, i.e. C-u svn log) of trunk,
-    say somewhere that this was developed as part of svn repository.
-  )
-
-- binary only distro doesn't need *.blend files.
-
 --------------------
 after stage 2:
+
+- prepare some binary only distro ?
+  it doesn't need many things, including all sources and *
+  .blend and *.xcf (and some other internals in menu_bg)
 
 - Add redouts/blackouts from szklane_lasy.
 
@@ -47,6 +44,6 @@ after stage 2:
 
   Justy¶
 
---------------------
-On each stage, remember to:
-- inc VERSION in Makefile
+- Makefile to pack distro of my game:
+  add at some point svn log (with files, i.e. C-u svn log) of trunk,
+  say somewhere that this was developed as part of svn repository.
