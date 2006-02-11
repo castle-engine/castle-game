@@ -1,7 +1,43 @@
 "The Castle"
 
 --------------------
-Versioning
+Keys:
+Press F1 after you run the game, you will get help including the list
+of all available keys.
+
+--------------------
+Window size:
+
+For now, the game may run in any resolution, windowed or fullscreen.
+By default, it runs in fullscreen using your current screen resolution.
+
+Suggested resolution is 800x600 (this is the resolution
+where menu background image will look best).
+In the future probably the game will be limited to some particular
+resolutions, to ensure that graphics look good.
+
+You can use command-line options described here
+[http://www.camelot.homedns.org/~michalis/opengl_options.php]
+to force some specific fullscreen or window size. For example:
+  castle --fullscreen-custom 800x600
+    This will always try to resize your screen resolution to 800x600
+    and then run in fullscreen mode.
+  castle --geometry 640x480
+    This will always run in windowed mode with window size 640x480.
+
+--------------------
+Sound:
+
+The game doesn't play any sounds for now, although all the sound engine
+using OpenAL is compiled in. Command-line options related to OpenAL
+are described here:
+[http://www.camelot.homedns.org/~michalis/openal_notes.php].
+
+As a demo that my OpenAL engine can work, see e.g. my old demo program
+[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php].
+
+--------------------
+Versioning:
 
 Version numbers are 0.y.z, where "y" is a stage of PGD competition.
 So "version 0.2.0" is what I submit at the end of stage 2 of competition.
