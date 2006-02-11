@@ -12,8 +12,9 @@ const
 
 implementation
 
-uses KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils, GLWinModes, OpenGLh,
-  KambiGLUtils, GLWinMessages, CastleWindow, MatrixNavigation, VectorMath;
+uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
+  GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
+  MatrixNavigation, VectorMath;
 
 var
   GameCancelled: boolean;
@@ -105,6 +106,10 @@ begin
   case Key of
     K_F1: ShowHelpMessage;
     K_F5: Glwin.SaveScreen(FnameAutoInc(DisplayProgramName + '_screen_%d.png'));
+    else
+      case C of
+        CharEscape: GameCancelled := true;
+      end;
   end;
 end;
 
@@ -137,28 +142,31 @@ begin
 
   SavedMode := TGLMode.Create(glw, 0);
   try
-    SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
-      nil, true, true, false,
-      #0, #0, true, true);
-
-    Glw.OnIdle := Idle;
-    Glw.OnTimer := Timer;
-    Glw.OnKeyDown := KeyDown;
-
     { init navigator }
     Glw.Navigator := TMatrixWalker.Create(TDummy.MatrixChanged);
-    Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
-    VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius * 2);
-    Glw.NavWalker.Init(CamPos, CamDir, CamUp);
-    Glw.NavWalker.OnMoveAllowed := MoveAllowed;
+    try
+      Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
+      VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius * 2);
+      Glw.NavWalker.Init(CamPos, CamDir, CamUp);
+      Glw.NavWalker.OnMoveAllowed := MoveAllowed;
 
-    GameCancelled := false;
+      SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
+        nil, true, true, false, #0, #0, true, true);
 
-    repeat
-      Glwm.ProcessMessage(true);
-    until GameCancelled;
+      Glw.OnIdle := Idle;
+      Glw.OnTimer := Timer;
+      Glw.OnKeyDown := KeyDown;
+      
+      Glw.EventResize;
 
-  finally SavedMode.Free; end;
+      GameCancelled := false;
+
+      repeat
+        Glwm.ProcessMessage(true);
+      until GameCancelled;
+
+    finally FreeAndNil(Glw.Navigator); end;
+  finally FreeAndNil(SavedMode); end;
 end;
 
 end.
