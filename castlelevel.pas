@@ -71,7 +71,7 @@ begin
     so something simpler. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
 
-  FCameraRadius := Box3dAvgSize(Scene.BoundingBox) * 0.015;
+  FCameraRadius := Box3dAvgSize(Scene.BoundingBox) * 0.007;
   FProjectionNear := CameraRadius * 0.75;
   FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
 
