@@ -146,15 +146,15 @@ const
   HelpMessage = {$I help_message.inc};
 begin
   MessageOK(Glw, HelpMessage + nl +
-   DisplayProgramName + ' version ' + Version + '.' +nl+
-   'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
-   { TODO: later I will just use here SCamelotProgramHelpSuffix,
-     for now this program is not avail on camelot. }
-   {'See http://www.camelot.homedns.org/~michalis/ for latest versions' +
-   Iff(WrapLines, nl + ' ', '') +
-   ' of this program, sources, documentation etc.' +nl+}
-   'Compiled with ' + SCompilerDescription +'.',
-   taLeft);
+    DisplayProgramName + ' version ' + Version + '.' +nl+
+    'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
+    { TODO: later I will just use here SCamelotProgramHelpSuffix,
+      for now this program is not avail on camelot. }
+    {'See http://www.camelot.homedns.org/~michalis/ for latest versions' +
+    Iff(WrapLines, nl + ' ', '') +
+    ' of this program, sources, documentation etc.' +nl+}
+    'Compiled with ' + SCompilerDescription +'.',
+    taLeft);
 end;
 
 procedure PlayLevel(ALevel: TCastleLevel);
@@ -172,7 +172,9 @@ begin
     Glw.Navigator := TMatrixWalker.Create(TDummy.MatrixChanged);
     try
       { Init Glw.NavWalker properties }
-      Glw.NavWalker.RotateSpeed := 1;
+      { TODO: hmm, this is useful only for newer nVidia drivers ?
+        but why ?
+        Glw.NavWalker.RotateSpeed := 1; }
       Glw.NavWalker.Key_MoveSpeedInc := K_None; { turn key off }
       Glw.NavWalker.Key_MoveSpeedDec := K_None; { turn key off }
       Glw.NavWalker.OnMoveAllowed := MoveAllowed;
