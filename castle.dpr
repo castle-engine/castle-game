@@ -25,7 +25,8 @@ program castle;
 uses GLWindow, SysUtils, KambiUtils,
   ProgressUnit, ProgressGL, OpenAL, ALUtils,
   ParseParametersUnit, GLWinMessages, KambiGLUtils,
-  CastleWindow, CastleMenu, CastleLevel, CastlePlay, CastleSound;
+  CastleWindow, CastleMenu, CastleLevel, CastlePlay, CastleSound,
+  KambiClassUtils;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -60,7 +61,7 @@ begin
      end;
   1: WasParam_NoSound := true;
   2: begin
-       Writeln(Version);
+       WritelnStr(Version);
        ProgramBreak;
      end;
  end;
