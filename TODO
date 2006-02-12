@@ -1,8 +1,5 @@
 - proofread and spellcheck README.
 
-- possibly calling strip is needed ?
-  Not really --- it doesn't improve so much.
-
 - under Linux and Windows:
   - build debug exe from this dir, test
   - build release exe from this dir, test
@@ -15,6 +12,14 @@
 
 --------------------
 after stage 2:
+
+- possibly calling strip is needed ?
+  Not really --- it doesn't improve so much.
+
+- Insert/Delete keys should work better
+  (they should move along HomeUp vector when RotateAroundHomeUp is true)
+
+- head "bobbing" (from szklane lasy) add
 
 - prepare some binary only distro ?
   it doesn't need many things, including all sources and *
