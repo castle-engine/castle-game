@@ -75,7 +75,7 @@ Each time before uploading PGD release:
       ln -s /tmp/ggg/castle/ ~/.castle.data
       ./castle
       rm -f ~/.castle.data
-      ln -s /win/mojepasy/openGL/castle/ ~/.castle.data
+      ln -s /win/mojepasy/openGL/castle/trunk/ ~/.castle.data
   - test building from extracted created dist (using `make build-xxx')
 
 ----------------------------------------
