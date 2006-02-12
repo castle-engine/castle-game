@@ -1,6 +1,7 @@
 - proofread and spellcheck README.
 
 - possibly calling strip is needed ?
+  Not really --- it doesn't improve so much.
 
 - under Linux and Windows:
   - build debug exe from this dir, test
