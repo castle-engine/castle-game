@@ -76,11 +76,13 @@ dist:
 	mkdir -p $(TMP_DIST_PATH)
 # Copy and clean castle/trunk/ directory
 	cp -R ../ $(TMP_DIST_PATH)
-	mv $(TMP_DIST_PATH)trunk/ $(TMP_DIST_PATH)castle/
+	mv $(TMP_DIST_PATH)trunk/ $(TMP_DIST_PATH)castle
 	make -C $(TMP_DIST_PATH)castle/ clean clean_private
 	areFilenamesLower $(TMP_DIST_PATH)castle/data/
-# Setup right permission of things in castle/trunk/
-# (because it's kept on FAT filesystem)
+# Add libpng and zlib for Windows
+	cp -f /win/mojewww/camelot/private/win32_libpng_and_zlib/* $(TMP_DIST_PATH)castle/
+# Setup right permissions of things (in castle/trunk/ and libpng/zlib)
+# (because they are kept on FAT filesystem)
 	find $(TMP_DIST_PATH) -type f -and -exec chmod 644 '{}' ';'
 	find $(TMP_DIST_PATH) -type d -and -exec chmod 755 '{}' ';'
 	find $(TMP_DIST_PATH) -type f -and -iname '*.sh' -and -exec chmod 755 '{}' ';'
@@ -90,8 +92,6 @@ dist:
 	cp /win/mojewww/camelot/src/pascal/units-src.tar.gz $(TMP_DIST_PATH)castle/
 	cd $(TMP_DIST_PATH)castle/; tar xzf units-src.tar.gz
 	rm -f $(TMP_DIST_PATH)castle/units-src.tar.gz
-# Add libpng and zlib for Windows
-	cp -f /win/mojewww/camelot/private/win32_libpng_and_zlib/* $(TMP_DIST_PATH)castle/
 # Pack things
 	cd $(TMP_DIST_PATH); tar czf castle-$(VERSION).tar.gz castle/
 	mv $(TMP_DIST_PATH)castle-$(VERSION).tar.gz .
