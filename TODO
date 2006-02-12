@@ -1,5 +1,3 @@
-- proofread and spellcheck README.
-
 - under Linux and Windows:
   - build debug exe from this dir, test
   - build release exe from this dir, test

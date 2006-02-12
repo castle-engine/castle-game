@@ -63,11 +63,11 @@ there at some point (probably right before PGD competition final deadline).
 Sample level included:
 
 Err... I wanted to prepare in Blender a new shiny first level of my game
-(castle_hall), but I didn't make it in time for stage 2 of PGD competition
-(I'll probably do it the next day, 2006-02-12 :). So I just placed here
-a sample level (basic_castle) that is actually combined from my old demo
-castle model, and I added night sky with moon that was used in
-my other toy-game (lets_take_a_walk).
+(castle_hall), but I will not make it in time for stage 2 of PGD competition.
+So I just placed here a sample level (basic_castle)
+that is actually combined from my old demo castle model,
+and I added night sky with moon that was used in
+my other toy-game (named "lets_take_a_walk").
 
 Looks good as a demo, but just bear in mind that this basic level is only for
 demo purposes, for the next stage it will be replaced with some great
@@ -77,8 +77,9 @@ If you want to see other models demonstrating my engine, see
 [http://www.camelot.homedns.org/~michalis/miscella/kambi_vrml_examples.zip]
 --- there are many testcases and demos of what can be expressed in VRML 1.0
 and what my engine can understand and render. See also
-[http://www.camelot.homedns.org/~michalis/view3dscene.php]
-that is my VRML 1.0 (and 3DS) viewer based on the same engine as this game.
+[http://www.camelot.homedns.org/~michalis/view3dscene.php] ---
+view3dscene is my VRML 1.0 (and 3DS) viewer based on the same engine as
+this game.
 
 --------------------
 Window size:
@@ -89,7 +90,7 @@ By default, it runs in fullscreen using your current screen resolution.
 Suggested resolution is 800x600 (this is the resolution
 where menu background image will look best).
 In the future probably the game will be limited to some particular
-resolutions, to ensure that graphics look good.
+resolutions, to ensure that 2D graphics look good.
 
 You can use command-line options described here
 [http://www.camelot.homedns.org/~michalis/opengl_options.php]
@@ -103,8 +104,9 @@ to force some specific fullscreen or window size. For example:
 --------------------
 Sound:
 
-The game doesn't play any sounds for now, although all the sound engine
-using OpenAL is compiled in. Instructions about installing OpenAL
+The game doesn't play any sounds for now, although all the sound units
+using OpenAL are compiled in and OpenAL is initialized.
+Instructions about installing OpenAL
 and command-line options related to OpenAL are described here:
 [http://www.camelot.homedns.org/~michalis/openal_notes.php].
 
@@ -138,7 +140,7 @@ So my engine is not tied to any particular modelling program.
 My favourite 3d modeller is Blender, [http://www.blender3d.org/].
 It's open source, it's available for Linux (yeah, Windows too
 if you insist :), and it has an enormous set of features.
-Including good export to VRML 1.0, of course. There are no special
+Including good export for VRML 1.0, of course. There are no special
 rules for designing in Blender models for my engine --- basically
 just do whatever you like (and whatever can be exported to VRML 1.0).
 Below I offer some hints.
@@ -181,10 +183,10 @@ of data/castle_hall.blend. Typical things that I write "by hand" are
   also on other objects (like enemies) that are not part of the level
   object.
 
-  (Also, while Blender exporter can export Blender lights,
+  (Also, while Blender exporter can export Blender lights to VRML,
   it doesn't allow me to use all features of VRML lights.)
 
-3DS notes: Actually, you can also export your models to 3DS instead
+3DS notes: Actually, you can also use models in 3DS format instead
 of VRML 1.0. So if your favourite 3d modelling program is not able to export
 to VRML 1.0 but it's able to export to 3DS --- you can use it too.
 But, since 3DS is a closed format, it will never be supported
@@ -192,21 +194,21 @@ completely by my engine (just like by any other program, since everyone
 has to decode 3DS). In particular, *everything* that can be expressed
 in 3DS format and that is understood by me engine can also be expressed
 in VRML 1.0. But not vice-versa, i.e. there are some features that
-are available with my engine when using VRML 1.0 but that are not available
+are available with my engine when using VRML 1.0 but are not available
 when using 3DS. So the bottom line is: well, you can use 3DS format
 with my engine, it works OK, but VRML 1.0 format is just better :)
 
 --------------------
 Creating levels, 3d objects for *this* game:
 
-Section below had general comments about how anyone can create
+Section above had general comments about how anyone can create
 levels and 3d objects that are useful for my VRML units.
 This section describes issues specific to the game "The Castle":
 
-- When you created new level and you want to play it:
+- When you create new level and you want to play it:
 
   All you have to do is to change the call to TCastleLevel.Create
-  in CastleMenu to use your VRML files. Specify there the filename
+  in castlemenu.pas to use your VRML files. Specify there the filename
   of VRML file without the lights and the filename of VRML file
   with only lights.
 
@@ -222,6 +224,8 @@ This section describes issues specific to the game "The Castle":
   but that's a brutal solution:) .)
 
 --------------------
+Have fun! All comments are welcome.
+
 Michalis Kamburelis
-http://www.camelot.homedns.org/~michalis/index.php
+http://www.camelot.homedns.org/~michalis/
 <kambi@users.sourceforge.net> (or <michalis@camelot.homedns.org>)
