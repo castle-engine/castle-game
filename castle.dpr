@@ -43,33 +43,45 @@ const
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
   const Argument: string; const SeparateArgs: TSeparateArgs; Data: Pointer);
 begin
- case OptionNum of
-  0: begin
-       InfoWrite(
-         'castle.' +nl+
-         nl+
-         'Options:' +nl+
-         HelpOptionHelp +nl+
-         VersionOptionHelp +nl+
-         OpenALOptionsHelp(true) +nl+
-         '  --no-sound            Turn off sound' +nl+
-         nl+
-         TGLWindow.ParseParametersHelp(StandardParseOptions, true) +nl+
-         nl+
-         SCamelotProgramHelpSuffix(DisplayProgramName, Version, true));
-       ProgramBreak;
-     end;
-  1: WasParam_NoSound := true;
-  2: begin
-       WritelnStr(Version);
-       ProgramBreak;
-     end;
- end;
+  case OptionNum of
+    0: begin
+         InfoWrite(
+           'castle.' +nl+
+           nl+
+           'Options:' +nl+
+           HelpOptionHelp +nl+
+           VersionOptionHelp +nl+
+           OpenALOptionsHelp(true) +nl+
+           '  --no-sound            Turn off sound' +nl+
+           nl+
+           TGLWindow.ParseParametersHelp(StandardParseOptions, true) +nl+
+           nl+
+           SCamelotProgramHelpSuffix(ApplicationName, Version, true));
+         ProgramBreak;
+       end;
+    1: WasParam_NoSound := true;
+    2: begin
+         WritelnStr(Version);
+         ProgramBreak;
+       end;
+  end;
+end;
+
+function MyGetApplicationName: string;
+begin
+  Result := 'castle';
 end;
 
 { main -------------------------------------------------------------------- }
 
 begin
+  { This is needed because
+    - I sometimes display ApplicationName for user, and under Windows
+      ParamStr(0) is ugly uppercased.
+    - ParamStr(0) is unsure for Unixes.
+    - ParamStr(0) is useless for upx executables. }
+  OnGetApplicationName := MyGetApplicationName;
+
   try
     { parse parameters }
     Glw.FullScreen := true; { by default we open in fullscreen }

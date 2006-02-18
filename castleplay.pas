@@ -32,7 +32,6 @@ procedure PlayLevel(ALevel: TCastleLevel);
 
 const
   Version = '0.2.0';
-  DisplayProgramName = 'castle';
 
 implementation
 
@@ -112,7 +111,7 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 begin
   case Key of
     K_F1: ShowHelpMessage;
-    K_F5: Glwin.SaveScreen(FnameAutoInc(DisplayProgramName + '_screen_%d.png'));
+    K_F5: Glwin.SaveScreen(FnameAutoInc(ApplicationName + '_screen_%d.png'));
     else
       case C of
         CharEscape: GameCancelled := true;
@@ -146,7 +145,7 @@ const
   HelpMessage = {$I help_message.inc};
 begin
   MessageOK(Glw, HelpMessage + nl +
-    DisplayProgramName + ' version ' + Version + '.' +nl+
+    ApplicationName + ' version ' + Version + '.' +nl+
     'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
     { TODO: later I will just use here SCamelotProgramHelpSuffix,
       for now this program is not avail on camelot. }
