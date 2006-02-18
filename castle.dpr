@@ -105,6 +105,7 @@ end.
 
 {
   Local Variables:
+  compile-command: "fpcdebug castle.dpr"
   kam-compile-release-command-win32: "clean_glwindow_unit; fpcrelease"
   kam-compile-release-command-unix: "clean_glwindow_unit; fpcrelease -dGLWINDOW_XLIB"
   End:
