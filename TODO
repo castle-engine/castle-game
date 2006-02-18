@@ -1,9 +1,6 @@
 --------------------
 after stage 2:
 
-- fix the problem with NVidia Linux -- rotations are too fast when nothing is seen!
-  It's supposed to check FpsCompSpeed and adjust to high speed, right ?!?!
-
 - possibly calling strip is needed ?
   Not really --- it doesn't improve so much.
 
@@ -50,8 +47,11 @@ after stage 2:
 
   Justy¶
 
+  Mama, Kornel, savage, advertise on "PGD screenshots" thread
+
 - Makefile to pack distro of my game:
   add at some point svn log (with files, i.e. C-u svn log) of trunk,
+  add svn log of units changes,
   say somewhere that this was developed as part of svn repository.
 
 ----------------------------------------
