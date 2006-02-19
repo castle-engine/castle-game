@@ -142,7 +142,7 @@ begin
   SavedMode := TGLMode.Create(glw, 0);
   try
     SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
-      nil, false, false, false, #0, #0, false, false);
+      nil, false, false, false, K_None, #0, false, false);
 
     Glw.OnKeyDown := KeyDown;
 

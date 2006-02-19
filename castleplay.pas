@@ -184,7 +184,7 @@ begin
       Glw.NavWalker.Init(CamPos, CamDir, CamUp);
 
       SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
-        nil, true, true, false, #0, #0, true, true);
+        nil, true, true, false, K_None, #0, true, true);
 
       Glw.OnIdle := Idle;
       Glw.OnTimer := Timer;
