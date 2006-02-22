@@ -4,9 +4,6 @@
   Goal #3 (5 Points) - Design a better level to test out new features.
   Goal #4 (5 Points) - Provide an 'exit' for the level.
 
-- Insert/Delete keys should work better
-  (they should move along HomeUp vector when RotateAroundHomeUp is true)
-
 - head "bobbing" (from szklane lasy) add
 
 - Add spadanie to TMatrixWalker
@@ -65,6 +62,9 @@ dist-making to-dos:
   add at some point svn log (with files, i.e. C-u svn log) of trunk,
   add svn log of units changes,
   say somewhere that this was developed as part of svn repository.
+
+  svn log -v file:///home/michal/svn/kambi-svn-repos/ \
+    castle/trunk kambi_pascal_units/trunk > ChangeLog
 
 ----------------------------------------
 Each time before uploading PGD release:
