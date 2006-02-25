@@ -171,9 +171,6 @@ begin
     Glw.Navigator := TMatrixWalker.Create(TDummy.MatrixChanged);
     try
       { Init Glw.NavWalker properties }
-      { TODO: hmm, this is useful only for newer nVidia drivers ?
-        but why ?
-        Glw.NavWalker.RotateSpeed := 1; }
       Glw.NavWalker.Key_MoveSpeedInc := K_None; { turn key off }
       Glw.NavWalker.Key_MoveSpeedDec := K_None; { turn key off }
       Glw.NavWalker.OnMoveAllowed := MoveAllowed;
