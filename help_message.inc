@@ -12,7 +12,8 @@
 '  PageUp / PageDown = raise / bow your head' + LineEnding + 
 '  Home = restore head raise to initial position (neutralize any effect of PageUp / PageDown)' + LineEnding + 
 '  Insert / Delete = fly up / down' + LineEnding + 
-'  Z / X = strafe move left / right' + LineEnding + 
+'  Comma / Period = strafe move left / right' + LineEnding + 
+'  A / Z = jump / crouch' + LineEnding + 
 '' + LineEnding + 
 'Additional keys:' + LineEnding + 
 '  Ctrl + Left / Right = rotate slower' + LineEnding + 

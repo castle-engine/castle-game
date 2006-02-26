@@ -10,7 +10,8 @@ Basic keys:
   PageUp / PageDown = raise / bow your head
   Home = restore head raise to initial position (neutralize any effect of PageUp / PageDown)
   Insert / Delete = fly up / down
-  Z / X = strafe move left / right
+  Comma / Period = strafe move left / right
+  A / Z = jump / crouch
 
 Additional keys:
   Ctrl + Left / Right = rotate slower
