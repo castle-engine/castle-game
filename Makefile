@@ -6,6 +6,9 @@
 # ------------------------------------------------------------
 # Various targets.
 
+# default: make sure that help_message.inc is up-to-date, and show info
+default: help_message.inc info
+
 VERSION := $(shell ./castle --version)
 
 info:
