@@ -32,15 +32,19 @@ type
     FScene: TVRMLFlatSceneGL;
     FLightSet: TVRMLLightSetGL;
     FCameraRadius: Single;
+    FCameraPreferredHeight: Single;
     FProjectionNear: Single;
     FProjectionFar: Single;
+    FNavigationSpeed: Single;
   public
     property Scene: TVRMLFlatSceneGL read FScene;
     property LightSet: TVRMLLightSetGL read FLightSet;
 
     property CameraRadius: Single read FCameraRadius;
+    property CameraPreferredHeight: Single read FCameraPreferredHeight;
     property ProjectionNear: Single read FProjectionNear;
     property ProjectionFar: Single read FProjectionFar;
+    property NavigationSpeed: Single read FNavigationSpeed;
 
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -62,16 +66,32 @@ constructor TCastleLevel.Create(const ASceneFileName, ALightSetFileName: string)
       FileName, false);
   end;
 
+var
+  NavigationNode: TNodeNavigationInfo;
 begin
   inherited Create;
 
   FScene := TVRMLFlatSceneGL.Create(
     LoadVRMLNode(ASceneFileName), true, roSeparateShapeStates);
   { TODO -- check later, maybe change GL_LINEAR_MIPMAP_LINEAR
-    so something simpler. }
+    to something simpler. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
 
-  FCameraRadius := Box3dAvgSize(Scene.BoundingBox) * 0.007;
+  NavigationNode := Scene.RootNode.TryFindNode(TNodeNavigationInfo, true)
+    as TNodeNavigationInfo;
+
+  if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
+    FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
+    FCameraRadius := Box3dAvgSize(Scene.BoundingBox) * 0.007;
+
+  if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
+    FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
+    FCameraPreferredHeight := FCameraRadius * 5;
+
+  if NavigationNode <> nil then
+    FNavigationSpeed := NavigationNode.FdSpeed.Value else
+    FNavigationSpeed := 1.0;
+
   FProjectionNear := CameraRadius * 0.75;
   FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
 

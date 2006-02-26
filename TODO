@@ -1,16 +1,20 @@
+- use gravity and head bobbing and jumping in "castle"
+  something is wrong --- I get "sharp bounces" on moving.
+  To be investigated tomorrow.
+
+- do "fly mode" in castle
+
+- Some kind of internal LevelCube is needed, like in malfunction
+
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
   Goal #2 (5 Points) - Add player pick-up items/weapons to engine.
   Goal #3 (5 Points) - Design a better level to test out new features.
   Goal #4 (5 Points) - Provide an 'exit' for the level.
 
-- head "bobbing" (from szklane lasy) add
-
-- Add spadanie to TMatrixWalker
-
 - Add redouts on spadanie,
   prepare general engine to make blackouts.
-  Take this from szklane_lasy.
+  Take this from malfunction.
 
 - sound configuration do -- allow turning sounds on/off from menu, allow volume control
 

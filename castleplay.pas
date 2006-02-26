@@ -120,12 +120,22 @@ begin
 end;
 
 function MoveAllowed(Navigator: TMatrixWalker;
-  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single): boolean;
+  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const BecauseOfGravity: boolean): boolean;
 begin
   Result :=
     Box3dPointInside(ProposedNewPos, Level.Scene.BoundingBox) and
     Level.Scene.DefaultTriangleOctree.MoveAllowed(
       Navigator.CameraPos, ProposedNewPos, NewPos, Level.CameraRadius);
+end;
+
+procedure GetCameraHeight(Navigator: TMatrixNavigator;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+begin
+  Level.Scene.DefaultTriangleOctree.GetCameraHeight(
+    TMatrixWalker(Navigator).CameraPos,
+    TMatrixWalker(Navigator).HomeCameraUp,
+    IsAboveTheGround, SqrHeightAboveTheGround);
 end;
 
 type
@@ -138,7 +148,6 @@ begin
   Glw.PostRedisplay;
   alUpdateListener;
 end;
-
 
 procedure ShowHelpMessage;
 const
@@ -174,11 +183,13 @@ begin
       Glw.NavWalker.Key_MoveSpeedInc := K_None; { turn key off }
       Glw.NavWalker.Key_MoveSpeedDec := K_None; { turn key off }
       Glw.NavWalker.OnMoveAllowed := MoveAllowed;
+      Glw.NavWalker.Gravity := true;
+      Glw.NavWalker.OnGetCameraHeight := GetCameraHeight;
 
       { Init initial camera pos }
       Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
-      VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius * 0.5);
-      Glw.NavWalker.Init(CamPos, CamDir, CamUp);
+      VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius * Level.NavigationSpeed);
+      Glw.NavWalker.Init(CamPos, CamDir, CamUp, Level.CameraPreferredHeight);
 
       SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
         nil, true, true, false, K_None, #0, true, true);
