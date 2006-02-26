@@ -188,8 +188,18 @@ begin
 
       { Init initial camera pos }
       Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
-      VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius * Level.NavigationSpeed);
+      VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius *
+        0.4 * { I multiply by 0.4 just to get the same thing
+        that view3dscene does at this time. }
+        Level.NavigationSpeed);
       Glw.NavWalker.Init(CamPos, CamDir, CamUp, Level.CameraPreferredHeight);
+
+      { tests:
+        InfoWrite(Format('%f %f %f %f',
+          [VectorLen(Glw.NavWalker.HomeCameraDir),
+          VectorLen(Glw.NavWalker.CameraDir),
+          Glw.NavWalker.CameraPreferredHeight,
+          Glw.NavWalker.MoveSpeed])); }
 
       SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
         nil, true, true, false, K_None, #0, true, true);

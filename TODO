@@ -1,6 +1,5 @@
-- use gravity and head bobbing and jumping in "castle"
-  something is wrong --- I get "sharp bounces" on moving.
-  To be investigated tomorrow.
+- use gravity and head bobbing and jumping in "castle".
+  Done. test! Adjust speed as necessary.
 
 - do "fly mode" in castle
 
