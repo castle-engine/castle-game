@@ -1,15 +1,22 @@
-- use gravity and head bobbing and jumping in "castle".
-  Done. test! Adjust speed as necessary.
-
-- do "fly mode" in castle
+- test gravity and jumping in castle. Adjust speed as necessary.
 
 - Some kind of internal LevelCube is needed, like in malfunction
+
+- remove base_castle, use castle_hall -- base_castle is just a testing model.
+  Also remove the sky -- it's copied from lets_take_a_walk.
+  Prepare a good starry sky for VRML castle_hall.
 
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
   Goal #2 (5 Points) - Add player pick-up items/weapons to engine.
   Goal #3 (5 Points) - Design a better level to test out new features.
   Goal #4 (5 Points) - Provide an 'exit' for the level.
+
+--------------------
+post stage 3:
+- use and test head bobbing in "castle".
+
+- do "fly mode" in castle
 
 - Add redouts on spadanie,
   prepare general engine to make blackouts.
@@ -20,10 +27,6 @@
   Add to "installing and running" in README:
   Note that to hear sounds you should first install OpenAL
   (see [http://www.camelot.homedns.org/~michalis/openal_notes.php#section_install]).
-
-- remove base_castle, use castle_hall -- base_castle is just a testing model.
-  Also remove the sky -- it's copied from lets_take_a_walk.
-  Prepare a good starry sky for VRML castle_hall.
 
 - change the name --- there already exists game named "castle"!
   And there is "Castle Adventure" !
