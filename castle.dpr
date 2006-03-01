@@ -32,13 +32,23 @@ uses GLWindow, SysUtils, KambiUtils,
 
 var
   WasParam_NoSound: boolean = false;
+  WasParam_NoScreenResize: boolean = false;
 
 const
-  Options: array[0..2]of TOption =
-  ((Short:'h'; Long: 'help'; Argument: oaNone),
-   (Short: #0; Long: 'no-sound'; Argument: oaNone),
-   (Short:'v'; Long: 'version'; Argument: oaNone)
+  Options: array[0..3]of TOption =
+  ( (Short:'h'; Long: 'help'; Argument: oaNone),
+    (Short: #0; Long: 'no-sound'; Argument: oaNone),
+    (Short:'v'; Long: 'version'; Argument: oaNone),
+    (Short:'n'; Long: 'no-screen-resize'; Argument: oaNone)
   );
+
+  RequiredScreenWidth = 800;
+  RequiredScreenHeight = 600;
+
+function RequiredScreenSize: string;
+begin
+  Result := Format('%d x %d', [RequiredScreenWidth, RequiredScreenHeight]);
+end;
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
   const Argument: string; const SeparateArgs: TSeparateArgs; Data: Pointer);
@@ -53,8 +63,11 @@ begin
            VersionOptionHelp +nl+
            OpenALOptionsHelp(true) +nl+
            '  --no-sound            Turn off sound' +nl+
-           nl+
-           TGLWindow.ParseParametersHelp(StandardParseOptions, true) +nl+
+           '  -n / --no-screen-resize' +nl+
+           '                        Do not try to resize the screen.' +nl+
+           '                        If your screen size is not ' +
+             RequiredScreenSize +nl+
+           '                        then will run in windowed mode.' +nl+
            nl+
            SCamelotProgramHelpSuffix(ApplicationName, Version, true));
          ProgramBreak;
@@ -64,6 +77,8 @@ begin
          WritelnStr(Version);
          ProgramBreak;
        end;
+    3: WasParam_NoScreenResize := true;
+    else raise EInternalError.Create('OptionProc');
   end;
 end;
 
@@ -84,10 +99,35 @@ begin
 
   try
     { parse parameters }
-    Glw.FullScreen := true; { by default we open in fullscreen }
-    Glw.ParseParameters(StandardParseOptions);
     OpenALOptionsParse;
     ParseParameters(Options, OptionProc, nil);
+
+    Glw.Width := RequiredScreenWidth;
+    Glw.Height := RequiredScreenHeight;
+    if WasParam_NoScreenResize then
+    begin
+      Glw.FullScreen :=
+        (Glwm.ScreenWidth = RequiredScreenWidth) and
+        (Glwm.ScreenHeight = RequiredScreenHeight);
+    end else
+    begin
+      Glw.FullScreen := true;
+      if (Glwm.ScreenWidth <> RequiredScreenWidth) or
+         (Glwm.ScreenHeight <> RequiredScreenHeight) then
+      begin
+        Glwm.VideoResize := true;
+        Glwm.VideoResizeWidth := RequiredScreenWidth;
+        Glwm.VideoResizeHeight := RequiredScreenHeight;
+
+        if Glwm.VideoResize then
+          if not Glwm.TryVideoChange then
+          begin
+            WarningWrite('Can''t change display settings to ' +
+              RequiredScreenSize + '. Will continue in windowed mode.');
+            Glw.FullScreen := false;
+          end;
+      end;
+    end;
 
     { init OpenAL }
     if WasParam_NoSound then

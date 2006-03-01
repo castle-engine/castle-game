@@ -84,22 +84,26 @@ this game.
 --------------------
 Window size:
 
-For now, the game may run in any resolution, windowed or fullscreen.
-By default, it runs in fullscreen using your current screen resolution.
+The game runs only in resolution 800x600.
 
-Suggested resolution is 800x600 (this is the resolution
-where menu background image will look best).
-In the future probably the game will be limited to some particular
-resolutions, to ensure that 2D graphics look good.
+Reasoning: My practice shows that it's simply too difficult to really make
+a game that looks perfect on any resolution, because any 2D graphics
+is highly tied to resolution it was prepared for. Scaling 2D graphics,
+even using really good algorithms, never results in optimal look.
+My game is 3D, but still there are elements displayed in 2D,
+so this still matters.
 
-You can use command-line options described here
-[http://www.camelot.homedns.org/~michalis/opengl_options.php]
-to force some specific fullscreen or window size. For example:
-  castle --fullscreen-custom 800x600
-    This will always try to resize your screen resolution to 800x600
-    and then run in fullscreen mode.
-  castle --geometry 640x480
-    This will always run in windowed mode with window size 640x480.
+If your current screen resolution is 800x600, the game will
+happily run in fullscreen. Otherwise the game will try to resize
+your screen to 800x600 first (on exit, the screen size will
+be restored to previous size). If this resizing will fail
+(for whatever reason, e.g. you have poor graphics driver),
+it will run in window sized 800x600.
+
+You can pass command-line option --no-screen-resize (short form: -n)
+to disable the automatic screen resizing. Then the game will
+run in fullscreen mode only if your current screen size is 800x600,
+otherwise it will run in window sized 800x600.
 
 --------------------
 Sound:
