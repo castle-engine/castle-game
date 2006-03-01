@@ -31,7 +31,7 @@ implementation
 uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   OpenGLBmpFonts, VectorMath, Images, BFNT_BitstreamVeraSans_Unit,
-  CastleLevel, CastlePlay, CastleSound;
+  CastleLevel, CastlePlay, CastleSound, CastlePlayer;
 
 type
   TMenuItem = (miReadDocs, miPlaySample, miSound, miQuit);
@@ -86,6 +86,7 @@ end;
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 var
   Level: TCastleLevel;
+  NewPlayer: TPlayer;
 begin
   case key of
     K_Up:
@@ -107,12 +108,15 @@ begin
       miReadDocs: ShowHelpMessage;
       miPlaySample:
         begin
-          Level := TCastleLevel.Create(
-            'basic_castle_final.wrl', 'basic_castle_lights.wrl'
-            {'castle_hall_final.wrl', 'castle_hall_lights.wrl'});
+          NewPlayer := TPlayer.Create;
           try
-            PlayLevel(Level);
-          finally Level.Free end;
+            Level := TCastleLevel.Create(
+              'basic_castle_final.wrl', 'basic_castle_lights.wrl'
+              {'castle_hall_final.wrl', 'castle_hall_lights.wrl'});
+            try
+              PlayLevel(Level, NewPlayer);
+            finally Level.Free end;
+          finally NewPlayer.Free end;
         end;
       miSound:
         begin

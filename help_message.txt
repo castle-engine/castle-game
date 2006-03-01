@@ -1,7 +1,5 @@
 Available keys:
 
-(keys below are a subset of keys available in my other program "view3dscene" in "Walk" mode):
-
 Basic keys:
   F1 = show this help
   Escape = exit
@@ -9,9 +7,10 @@ Basic keys:
   Left / Right = rotate
   PageUp / PageDown = raise / bow your head
   Home = restore head raise to initial position (neutralize any effect of PageUp / PageDown)
-  Insert / Delete = fly up / down
+  A / Z =
+    in "Fly mode" : fly up / down
+    not in "Fly mode" : jump / crouch
   Comma / Period = strafe move left / right
-  A / Z = jump / crouch
 
 Additional keys:
   Ctrl + Left / Right = rotate slower

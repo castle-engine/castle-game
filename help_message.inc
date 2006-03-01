@@ -2,8 +2,6 @@
 { DON'T EDIT -- this file was automatically generated from "help_message.txt" }
 'Available keys:' + LineEnding + 
 '' + LineEnding + 
-'(keys below are a subset of keys available in my other program "view3dscene" in "Walk" mode):' + LineEnding + 
-'' + LineEnding + 
 'Basic keys:' + LineEnding + 
 '  F1 = show this help' + LineEnding + 
 '  Escape = exit' + LineEnding + 
@@ -11,9 +9,10 @@
 '  Left / Right = rotate' + LineEnding + 
 '  PageUp / PageDown = raise / bow your head' + LineEnding + 
 '  Home = restore head raise to initial position (neutralize any effect of PageUp / PageDown)' + LineEnding + 
-'  Insert / Delete = fly up / down' + LineEnding + 
+'  A / Z =' + LineEnding + 
+'    in "Fly mode" : fly up / down' + LineEnding + 
+'    not in "Fly mode" : jump / crouch' + LineEnding + 
 '  Comma / Period = strafe move left / right' + LineEnding + 
-'  A / Z = jump / crouch' + LineEnding + 
 '' + LineEnding + 
 'Additional keys:' + LineEnding + 
 '  Ctrl + Left / Right = rotate slower' + LineEnding + 

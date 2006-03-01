@@ -39,6 +39,7 @@ uses SysUtils;
 
 initialization
   Glw := TGLWindowNavigated.Create;
+  Glw.OwnsNavigator := false;
 finalization
   FreeAndNil(Glw);
 end.

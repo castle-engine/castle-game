@@ -24,14 +24,19 @@ unit CastlePlay;
 
 interface
 
-uses CastleLevel;
+uses CastleLevel, CastlePlayer;
 
 procedure ShowHelpMessage;
 
-procedure PlayLevel(ALevel: TCastleLevel);
+procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
 
 const
   Version = '0.2.0';
+
+var
+  { Currently used player by PlayLevel. nil if PlayLevel doesn't work
+    right now. }
+  Player: TPlayer;
 
 implementation
 
@@ -52,13 +57,13 @@ begin
 end;
 
 { If ALActive then update listener POSITION and ORIENTATION
-  and GAIN based on Glw.NavWalker.Camera* }
+  and GAIN based on Player.Navigator.Camera* }
 procedure alUpdateListener;
 begin
   if ALActive then
   begin
-    alListenerVector3f(AL_POSITION, Glw.NavWalker.CameraPos);
-    alListenerOrientation(Glw.NavWalker.CameraDir, Glw.NavWalker.CameraUp);
+    alListenerVector3f(AL_POSITION, Player.Navigator.CameraPos);
+    alListenerOrientation(Player.Navigator.CameraDir, Player.Navigator.CameraUp);
   end;
 end;
 
@@ -69,7 +74,7 @@ procedure Resize(Glwin: TGLWindow);
     ProjectionMatrix: TMatrix4f;
   begin
     glGetFloatv(GL_PROJECTION_MATRIX, @ProjectionMatrix);
-    Glw.NavWalker.ProjectionMatrix := ProjectionMatrix;
+    Player.Navigator.ProjectionMatrix := ProjectionMatrix;
   end;
 
 begin
@@ -95,7 +100,7 @@ begin
 
   Level.LightSet.RenderLights;
 
-  Level.Scene.RenderFrustumOctree(Glw.NavWalker.Frustum);
+  Level.Scene.RenderFrustumOctree(Player.Navigator.Frustum);
 end;
 
 procedure Idle(Glwin: TGLWindow);
@@ -114,6 +119,9 @@ begin
     K_F5: Glwin.SaveScreen(FnameAutoInc(ApplicationName + '_screen_%d.png'));
     else
       case C of
+        { TODO --- this is just for test, in real game this shouldn't
+          be so easy to enter FlyMode (should require some item, spell etc.) }
+        'f': Player.FlyMode := not Player.FlyMode;
         CharEscape: GameCancelled := true;
       end;
   end;
@@ -165,68 +173,80 @@ begin
     taLeft);
 end;
 
-procedure PlayLevel(ALevel: TCastleLevel);
+procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
 var
   SavedMode: TGLMode;
   CamPos, CamDir, CamUp: TVector3Single;
 begin
   Level := ALevel;
-
-  SavedMode := TGLMode.Create(glw,
-    { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
-    GL_ENABLE_BIT);
+  Player := APlayer;
   try
-    { init navigator }
-    Glw.Navigator := TMatrixWalker.Create(TDummy.MatrixChanged);
+
+    SavedMode := TGLMode.Create(glw,
+      { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
+      GL_ENABLE_BIT);
     try
-      { Init Glw.NavWalker properties }
-      Glw.NavWalker.Key_MoveSpeedInc := K_None; { turn key off }
-      Glw.NavWalker.Key_MoveSpeedDec := K_None; { turn key off }
-      Glw.NavWalker.OnMoveAllowed := MoveAllowed;
-      Glw.NavWalker.Gravity := true;
-      Glw.NavWalker.OnGetCameraHeight := GetCameraHeight;
-
-      { Init initial camera pos }
-      Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
-      VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius *
-        0.4 * { I multiply by 0.4 just to get the same thing
-        that view3dscene does at this time. }
-        Level.NavigationSpeed);
-      Glw.NavWalker.Init(CamPos, CamDir, CamUp, Level.CameraPreferredHeight,
-        0.0 { Level.CameraPreferredHeight is already corrected if necessary,
-              so I pass here 0.0 instead of CameraRadius } );
-
-      { tests:
-        InfoWrite(Format('%f %f %f %f',
-          [VectorLen(Glw.NavWalker.HomeCameraDir),
-          VectorLen(Glw.NavWalker.CameraDir),
-          Glw.NavWalker.CameraPreferredHeight,
-          Glw.NavWalker.MoveSpeed])); }
-
-      SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
-        nil, true, true, false, K_None, #0, true, true);
-
-      Glw.OnIdle := Idle;
-      Glw.OnTimer := Timer;
-      Glw.OnKeyDown := KeyDown;
-
-      Glw.EventResize;
-
-      GameCancelled := false;
-
-      glEnable(GL_LIGHTING);
-      glEnable(GL_LIGHT0);
-
-      MessageRectStipple := @ThreeQuartersStipple;
+      { init navigator }
+      Glw.Navigator := Player.Navigator;
       try
+        { Init Player.Navigator properties }
+        Player.Navigator.OnMatrixChanged := TDummy.MatrixChanged;
+        Player.Navigator.OnMoveAllowed := MoveAllowed;
+        Player.Navigator.OnGetCameraHeight := GetCameraHeight;
 
-        repeat
-          Glwm.ProcessMessage(true);
-        until GameCancelled;
+        { Init initial camera pos }
+        Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
+        VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius *
+          0.4 * { I multiply by 0.4 just to get the same thing
+          that view3dscene does at this time. }
+          Level.NavigationSpeed);
+        Player.Navigator.Init(CamPos, CamDir, CamUp, Level.CameraPreferredHeight,
+          0.0 { Level.CameraPreferredHeight is already corrected if necessary,
+                so I pass here 0.0 instead of CameraRadius } );
 
-      finally MessageRectStipple := nil; end;
-    finally FreeAndNil(Glw.Navigator); end;
-  finally FreeAndNil(SavedMode); end;
+        { tests:
+          InfoWrite(Format('%f %f %f %f',
+            [VectorLen(Player.Navigator.HomeCameraDir),
+            VectorLen(Player.Navigator.CameraDir),
+            Player.Navigator.CameraPreferredHeight,
+            Player.Navigator.MoveSpeed])); }
+
+        SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
+          nil, true, true, false, K_None, #0, true, true);
+
+        Glw.OnIdle := Idle;
+        Glw.OnTimer := Timer;
+        Glw.OnKeyDown := KeyDown;
+
+        Glw.EventResize;
+
+        GameCancelled := false;
+
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+
+        MessageRectStipple := @ThreeQuartersStipple;
+        try
+
+          repeat
+            Glwm.ProcessMessage(true);
+          until GameCancelled;
+
+        finally MessageRectStipple := nil; end;
+      finally
+        Glw.Navigator := nil;
+        { Clear some Player.Navigator callbacks. }
+        Player.Navigator.OnMatrixChanged := nil;
+        Player.Navigator.OnMoveAllowed := nil;
+        Player.Navigator.OnGetCameraHeight := nil;
+      end;
+    finally FreeAndNil(SavedMode); end;
+
+  finally
+    { clear global vars, for safety }
+    Level := nil;
+    Player := nil;
+  end;
 end;
 
 end.

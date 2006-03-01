@@ -1,4 +1,4 @@
-- test gravity and jumping in castle. Adjust speed as necessary.
+- fly mode indicator on screen
 
 - Some kind of internal LevelCube is needed, like in malfunction
 
@@ -16,8 +16,6 @@
 post stage 3:
 - use and test head bobbing in "castle".
 
-- do "fly mode" in castle
-
 - Add redouts on spadanie,
   prepare general engine to make blackouts.
   Take this from malfunction.
@@ -34,8 +32,6 @@ post stage 3:
   "Castle in the rock"
   "High castle"
   "Castle above the mist" ?
-
-- Insert / Delete should only work if in some "fly mode" etc.
 
 - Do navigating with mouse, like in Quake
 
