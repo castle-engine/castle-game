@@ -192,7 +192,9 @@ begin
         0.4 * { I multiply by 0.4 just to get the same thing
         that view3dscene does at this time. }
         Level.NavigationSpeed);
-      Glw.NavWalker.Init(CamPos, CamDir, CamUp, Level.CameraPreferredHeight);
+      Glw.NavWalker.Init(CamPos, CamDir, CamUp, Level.CameraPreferredHeight,
+        0.0 { Level.CameraPreferredHeight is already corrected if necessary,
+              so I pass here 0.0 instead of CameraRadius } );
 
       { tests:
         InfoWrite(Format('%f %f %f %f',

@@ -14,8 +14,8 @@ Group{
   }
 
   NavigationInfo {
-    avatarSize [ 1.226, 6 ]
-    speed 0.5
+    avatarSize [ 1.226, 2 ]
+    speed 1.5
   }
 
   PerspectiveCamera {

@@ -56,7 +56,8 @@ type
 
 implementation
 
-uses SysUtils, OpenGLh, KambiUtils, Boxes3d, VRMLNodes, BackgroundGL;
+uses SysUtils, OpenGLh, KambiUtils, Boxes3d, VRMLNodes, BackgroundGL,
+  MatrixNavigation;
 
 constructor TCastleLevel.Create(const ASceneFileName, ALightSetFileName: string);
 
@@ -87,6 +88,8 @@ begin
   if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
     FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
     FCameraPreferredHeight := FCameraRadius * 5;
+  CorrectCameraPreferredHeight(FCameraPreferredHeight, CameraRadius,
+    DefaultCrouchHeight);
 
   if NavigationNode <> nil then
     FNavigationSpeed := NavigationNode.FdSpeed.Value else
