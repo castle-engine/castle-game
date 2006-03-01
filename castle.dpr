@@ -69,7 +69,7 @@ begin
              RequiredScreenSize +nl+
            '                        then will run in windowed mode.' +nl+
            nl+
-           SCamelotProgramHelpSuffix(ApplicationName, Version, true));
+           SProgramHelpSuffix);
          ProgramBreak;
        end;
     1: WasParam_NoSound := true;

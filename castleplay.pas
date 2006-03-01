@@ -28,6 +28,8 @@ uses CastleLevel, CastlePlayer;
 
 procedure ShowHelpMessage;
 
+function SProgramHelpSuffix: string;
+
 procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
 
 const
@@ -162,6 +164,13 @@ const
   HelpMessage = {$I help_message.inc};
 begin
   MessageOK(Glw, HelpMessage + nl +
+    SProgramHelpSuffix,
+    taLeft);
+end;
+
+function SProgramHelpSuffix: string;
+begin
+  Result :=
     ApplicationName + ' version ' + Version + '.' +nl+
     'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
     { TODO: later I will just use here SCamelotProgramHelpSuffix,
@@ -169,8 +178,7 @@ begin
     {'See http://www.camelot.homedns.org/~michalis/ for latest versions' +
     Iff(WrapLines, nl + ' ', '') +
     ' of this program, sources, documentation etc.' +nl+}
-    'Compiled with ' + SCompilerDescription +'.',
-    taLeft);
+    'Compiled with ' + SCompilerDescription +'.';
 end;
 
 procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
