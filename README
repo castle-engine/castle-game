@@ -252,6 +252,21 @@ Items:
 - Item up vector must be +Z.
 
 --------------------
+Used things:
+
+- Obviously, my 3d game engine in units/.
+  Also my view3dscene was often useful to see how VRMLs look
+  (independent of how they look when used in "The Castle").
+- Blender
+- GIMP
+- Terragen was used to create sky (see data/skies/).
+  This is the only non-open-source component I used... pity :(.
+  But I don't know of any (open-source or not) alternative to Terragen.
+- Some textures from public domain Golgotha textures.
+- Some post-processing of VRML models is done using EmacsLisp,
+  see data/kambi-castle-utils.el and data/items/models/Makefile
+
+--------------------
 Have fun! All comments are welcome.
 
 Michalis Kamburelis
