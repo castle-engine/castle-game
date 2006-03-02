@@ -60,13 +60,16 @@ implementation
 
 uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
-  MatrixNavigation, VectorMath, Boxes3d, TimeMessages;
+  MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images;
 
 var
   GameCancelled: boolean;
   Level: TCastleLevel;
   GameMessagesManager: TTimeMessagesManager;
   GLList_Draw2dBegin: TGLuint;
+  GLList_BlankIndicatorImage: TGLuint;
+  GLList_RedIndicatorImage: TGLuint;
+  GLList_BlueIndicatorImage: TGLuint;
 
 const
   ViewAngleDegX = 45.0;
@@ -107,11 +110,40 @@ begin
 end;
 
 procedure Draw2D(Draw2DData: Integer);
+const
+  IndicatorHeight = 120;
+  IndicatorMargin = 5;
+var
+  PlayerLifeMapped: Integer;
 begin
   glCallList(GLList_Draw2dBegin);
 
   GameMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
     Glw.Width, Glw.Height);
+
+  glRasterPos2i(IndicatorMargin, IndicatorMargin);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_BLEND);
+
+    PlayerLifeMapped :=
+      Round(MapRange(Player.Life, 0, Player.MaxLife, 0, IndicatorHeight));
+
+    { Note that Player.Life may be > Player.MaxLife, and
+      Player.Life may be < 0. }
+    if PlayerLifeMapped >= IndicatorHeight then
+      glCallList(GLList_RedIndicatorImage) else
+    if PlayerLifeMapped < 0 then
+      glCallList(GLList_BlankIndicatorImage) else
+    begin
+      glEnable(GL_SCISSOR_TEST);
+        glScissor(IndicatorMargin, IndicatorMargin, RequiredScreenWidth, PlayerLifeMapped);
+        glCallList(GLList_RedIndicatorImage);
+        glScissor(IndicatorMargin, IndicatorMargin + PlayerLifeMapped,
+          RequiredScreenWidth, RequiredScreenHeight);
+        glCallList(GLList_BlankIndicatorImage);
+      glDisable(GL_SCISSOR_TEST);
+    end;
+  glDisable(GL_BLEND);
 end;
 
 procedure Draw(Glwin: TGLWindow);
@@ -161,6 +193,9 @@ begin
         { TODO: some button visible in player's window to access this should be
           visible. }
         'm': ViewGameMessages;
+        { TODO: just for test: }
+        'l': Player.Life := Player.Life + 10;
+        'L': Player.Life := Player.Life - 10;
         CharEscape: GameCancelled := true;
       end;
   end;
@@ -269,6 +304,7 @@ begin
             Player.Navigator.CameraPreferredHeight,
             Player.Navigator.MoveSpeed])); }
 
+        { Note that this sets AutoRedisplay to true. }
         SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
           nil, true, true, false, K_None, #0, true, true);
 
@@ -323,6 +359,20 @@ begin
 end;
 
 procedure GLWindowInit(Glwin: TGLWindow);
+
+  function LoadScaleIndicatorToDisplayList(const BaseName: string): TGLuint;
+
+    function ScaleIndicatorFileName(const BaseName: string): string;
+    begin
+      Result := ProgramDataPath + 'data' + PathDelim +
+        'scale_indicator' + PathDelim + BaseName + '.png';
+    end;
+
+  begin
+    Result := LoadImageToDispList(
+      ScaleIndicatorFileName(BaseName), [TAlphaImage], [], 0, 0);
+  end;
+
 const
   { Note: this constant must be synchronized with
     GameMessagesManager.MaxMessagesCount }
@@ -352,11 +402,18 @@ begin
       end;
     glDisable(GL_BLEND);
   finally glEndList end;
+
+  GLList_BlankIndicatorImage := LoadScaleIndicatorToDisplayList('blank');
+  GLList_RedIndicatorImage := LoadScaleIndicatorToDisplayList('red');
+  GLList_BlueIndicatorImage := LoadScaleIndicatorToDisplayList('blue');
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);
 begin
   glFreeDisplayList(GLList_Draw2dBegin);
+  glFreeDisplayList(GLList_BlankIndicatorImage);
+  glFreeDisplayList(GLList_RedIndicatorImage);
+  glFreeDisplayList(GLList_BlueIndicatorImage);
 end;
 
 initialization
