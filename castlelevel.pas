@@ -36,6 +36,7 @@ type
     FProjectionNear: Single;
     FProjectionFar: Single;
     FNavigationSpeed: Single;
+    FTitle: string;
   public
     property Scene: TVRMLFlatSceneGL read FScene;
     property LightSet: TVRMLLightSetGL read FLightSet;
@@ -45,6 +46,10 @@ type
     property ProjectionNear: Single read FProjectionNear;
     property ProjectionFar: Single read FProjectionFar;
     property NavigationSpeed: Single read FNavigationSpeed;
+
+    { Title of the level, taken from WorldInfo node
+      or just basename of ASceneFileName. }
+    property Title: string read FTitle;
 
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -69,6 +74,7 @@ constructor TCastleLevel.Create(const ASceneFileName, ALightSetFileName: string)
 
 var
   NavigationNode: TNodeNavigationInfo;
+  WorldInfoNode: TNodeWorldInfo;
 begin
   inherited Create;
 
@@ -109,6 +115,16 @@ begin
 
   FLightSet := TVRMLLightSetGL.Create(LoadVRMLNode(ALightSetFileName),
     true, 1, -1);
+
+  WorldInfoNode := Scene.RootNode.TryFindNode(TNodeWorldInfo, true)
+    as TNodeWorldInfo;
+
+  { calculate FTitle }
+  FTitle := '';
+  if WorldInfoNode <> nil then
+    FTitle := WorldInfoNode.FdTitle.Value;
+  if FTitle = '' then
+    FTitle := ExtractFileName(DeleteFileExt(ASceneFileName));
 end;
 
 destructor TCastleLevel.Destroy;

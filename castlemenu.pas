@@ -34,12 +34,13 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer;
 
 type
-  TMenuItem = (miReadDocs, miPlaySample, miSound, miQuit);
+  TMenuItem = (miReadDocs, miPlaySample, miViewGameMessages, miSound, miQuit);
 
 const
   MenuNames: array[TMenuItem]of string = (
     'Read short instructions',
     'Play sample level',
+    'View last game messages',
     'Sound',
     'Quit');
 
@@ -108,6 +109,7 @@ begin
       miReadDocs: ShowHelpMessage;
       miPlaySample:
         begin
+          GameMessages.Clear;
           NewPlayer := TPlayer.Create;
           try
             Level := TCastleLevel.Create(
@@ -118,6 +120,7 @@ begin
             finally Level.Free end;
           finally NewPlayer.Free end;
         end;
+      miViewGameMessages: ViewGameMessages;
       miSound:
         begin
           MessageOK(Glw,

@@ -24,11 +24,13 @@ unit CastlePlay;
 
 interface
 
-uses CastleLevel, CastlePlayer;
+uses Classes, CastleLevel, CastlePlayer;
 
 procedure ShowHelpMessage;
 
 function SProgramHelpSuffix: string;
+
+procedure ViewGameMessages;
 
 procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
 
@@ -40,15 +42,30 @@ var
     right now. }
   Player: TPlayer;
 
+  { These are all messages passed to GameMessage.
+    Created / destroyed in this unit's initialization / finalization.
+    They are not broken (to fit into some particular line width).
+
+    You should clear this when new game starts or load this from file
+    when loading saved game.
+    When PlayLevel runs, you cannot modify it directly, you can change it
+    only by calling GameMessage. }
+  GameMessages: TStringList;
+
+{ Add message to GameMessages and (only if PlayLevel is running)
+  display it on the game screen. }
+procedure GameMessage(const S: string);
+
 implementation
 
 uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
-  MatrixNavigation, VectorMath, Boxes3d;
+  MatrixNavigation, VectorMath, Boxes3d, TimeMessages;
 
 var
   GameCancelled: boolean;
   Level: TCastleLevel;
+  GameMessagesManager: TTimeMessagesManager;
 
 const
   ViewAngleDegX = 45.0;
@@ -88,6 +105,14 @@ begin
   UpdateNavigatorProjectionMatrix;
 end;
 
+procedure Draw2D(Draw2DData: Integer);
+begin
+  glLoadIdentity;
+  glRasterPos2i(0, 0);
+  GameMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
+    Glw.Width, Glw.Height);
+end;
+
 procedure Draw(Glwin: TGLWindow);
 begin
   if Level.Scene.Background <> nil then
@@ -103,10 +128,18 @@ begin
   Level.LightSet.RenderLights;
 
   Level.Scene.RenderFrustumOctree(Player.Navigator.Frustum);
+
+  glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST); { not needed now, but in the future will be needed }
+    ProjectionGLPushPop(Draw2d, 0, Ortho2dProjMatrix(
+      0, RequiredScreenWidth, 0, RequiredScreenHeight));
+  glPopAttrib;
 end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
+  GameMessagesManager.Idle;
 end;
 
 procedure Timer(Glwin: TGLWindow);
@@ -122,8 +155,11 @@ begin
     else
       case C of
         { TODO --- this is just for test, in real game this shouldn't
-          be so easy to enter FlyMode (should require some item, spell etc.) }
-        'f': Player.FlyMode := not Player.FlyMode;
+          be so easy to enter FlyingMode (should require some item, spell etc.) }
+        'f': Player.FlyingMode := not Player.FlyingMode;
+        { TODO: some button visible in player's window to access this should be
+          visible. }
+        'm': ViewGameMessages;
         CharEscape: GameCancelled := true;
       end;
   end;
@@ -181,6 +217,19 @@ begin
     'Compiled with ' + SCompilerDescription +'.';
 end;
 
+procedure ViewGameMessages;
+var
+  SList: TStringList;
+begin
+  SList := TStringList.Create;
+  try
+    SList.Assign(GameMessages);
+    SList.Insert(0, Format('%d messages :', [GameMessages.Count]));
+    SList.Insert(1, '');
+    MessageOK(Glw, SList, taLeft);
+  finally SList.Free end;
+end;
+
 procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
 var
   SavedMode: TGLMode;
@@ -236,9 +285,16 @@ begin
         MessageRectStipple := @ThreeQuartersStipple;
         try
 
-          repeat
-            Glwm.ProcessMessage(true);
-          until GameCancelled;
+          GameMessagesManager := TTimeMessagesManager.Create(
+            Glw, hpMiddle, vpDown, Glw.Width);
+          try
+            { First GameMessage for this level. }
+            GameMessage('Loaded level "' + Level.Title + '"');
+
+            repeat
+              Glwm.ProcessMessage(true);
+            until GameCancelled;
+          finally FreeAndNil(GameMessagesManager) end;
 
         finally MessageRectStipple := nil; end;
       finally
@@ -257,4 +313,15 @@ begin
   end;
 end;
 
+procedure GameMessage(const S: string);
+begin
+  if GameMessagesManager <> nil then
+    GameMessagesManager.Show(S);
+  GameMessages.Insert(0, S);
+end;
+
+initialization
+  GameMessages := TStringList.Create;
+finalization
+  FreeAndNil(GameMessages);
 end.

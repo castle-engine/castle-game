@@ -10,9 +10,10 @@
 '  PageUp / PageDown = raise / bow your head' + LineEnding + 
 '  Home = restore head raise to initial position (neutralize any effect of PageUp / PageDown)' + LineEnding + 
 '  A / Z =' + LineEnding + 
-'    in "Fly mode" : fly up / down' + LineEnding + 
-'    not in "Fly mode" : jump / crouch' + LineEnding + 
+'    in "Flying mode" : fly up / down' + LineEnding + 
+'    not in "Flying mode" : jump / crouch' + LineEnding + 
 '  Comma / Period = strafe move left / right' + LineEnding + 
+'  M = view all messages' + LineEnding + 
 '' + LineEnding + 
 'Additional keys:' + LineEnding + 
 '  Ctrl + Left / Right = rotate slower' + LineEnding + 

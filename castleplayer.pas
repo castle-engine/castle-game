@@ -17,21 +17,22 @@ type
   private
     FLife: Single;
     FMaxLife: Single;
-    FFlyMode: boolean;
+    FFlyingMode: boolean;
     FNavigator: TMatrixWalker;
-    procedure SetFlyMode(const Value: boolean);
+    procedure SetFlyingMode(const Value: boolean);
+    procedure UpdateNavigatorFromFlyingMode;
   public
     constructor Create;
     destructor Destroy; override;
 
     property Life: Single read FLife write FLife default DefaultMaxLife;
     property MaxLife: Single read FMaxLife write FMaxLife default DefaultMaxLife;
-    property FlyMode: boolean read FFlyMode write SetFlyMode default false;
+    property FlyingMode: boolean read FFlyingMode write SetFlyingMode default false;
 
     { Each player object always has related Navigator object.
 
       Some things are synchronized between player properties and this
-      Navigator object --- e.g. player's FlyMode is synchronized
+      Navigator object --- e.g. player's FlyingMode is synchronized
       with Gravity and some Key_Xxx properties of this navigator.
       In general, this player object "cooperates" in various ways
       with it's Navigator object, that's why it was most comfortable
@@ -59,7 +60,7 @@ type
 
 implementation
 
-uses SysUtils, Keys;
+uses SysUtils, Keys, CastlePlay;
 
 constructor TPlayer.Create;
 begin
@@ -71,9 +72,7 @@ begin
   Navigator.Key_MoveSpeedInc := K_None; { turn key off }
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
 
-  { yes, trigger SetFlyMode. This will also update Navigator properties. }
-  FFlyMode := true;
-  FlyMode := false;
+  UpdateNavigatorFromFlyingMode;
 end;
 
 destructor TPlayer.Destroy;
@@ -82,26 +81,35 @@ begin
   inherited;
 end;
 
-procedure TPlayer.SetFlyMode(const Value: boolean);
+procedure TPlayer.UpdateNavigatorFromFlyingMode;
 begin
-  if FFlyMode <> Value then
+  Navigator.Gravity := not FlyingMode;
+  if FlyingMode then
   begin
-    FFlyMode := Value;
+    Navigator.Key_Jump := K_None;
+    Navigator.Key_Crouch := K_None;
+    Navigator.Key_UpMove := K_A;
+    Navigator.Key_DownMove := K_Z;
+  end else
+  begin
+    Navigator.Key_Jump := K_A;
+    Navigator.Key_Crouch := K_Z;
+    Navigator.Key_UpMove := K_None;
+    Navigator.Key_DownMove := K_None;
+  end;
+end;
 
-    Navigator.Gravity := not FlyMode;
-    if FlyMode then
-    begin
-      Navigator.Key_Jump := K_None;
-      Navigator.Key_Crouch := K_None;
-      Navigator.Key_UpMove := K_A;
-      Navigator.Key_DownMove := K_Z;
-    end else
-    begin
-      Navigator.Key_Jump := K_A;
-      Navigator.Key_Crouch := K_Z;
-      Navigator.Key_UpMove := K_None;
-      Navigator.Key_DownMove := K_None;
-    end;
+procedure TPlayer.SetFlyingMode(const Value: boolean);
+const
+  FlyingModeActivated: array[boolean] of string =
+  ( 'Flying mode OFF',
+    'Flying mode ON' );
+begin
+  if FFlyingMode <> Value then
+  begin
+    FFlyingMode := Value;
+    UpdateNavigatorFromFlyingMode;
+    GameMessage(FlyingModeActivated[FlyingMode]);
   end;
 end;
 

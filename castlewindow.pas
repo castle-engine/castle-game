@@ -33,9 +33,20 @@ var
   { @noAutoLinkHere }
   Glw: TGLWindowNavigated;
 
+const
+  RequiredScreenWidth = 800;
+  RequiredScreenHeight = 600;
+
+function RequiredScreenSize: string;
+
 implementation
 
 uses SysUtils;
+
+function RequiredScreenSize: string;
+begin
+  Result := Format('%d x %d', [RequiredScreenWidth, RequiredScreenHeight]);
+end;
 
 initialization
   Glw := TGLWindowNavigated.Create;

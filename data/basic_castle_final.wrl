@@ -18,6 +18,10 @@ Group{
     speed 1.5
   }
 
+  WorldInfo {
+    title "Sample castle level"
+  }
+
   PerspectiveCamera {
     position -1.981749057769775 -83.240951538085937 2.5
     orientation 0.999999940395355 0.000172845990164 -0.000172608604771 1.57080090045929

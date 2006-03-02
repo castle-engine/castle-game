@@ -42,14 +42,6 @@ const
     (Short:'n'; Long: 'no-screen-resize'; Argument: oaNone)
   );
 
-  RequiredScreenWidth = 800;
-  RequiredScreenHeight = 600;
-
-function RequiredScreenSize: string;
-begin
-  Result := Format('%d x %d', [RequiredScreenWidth, RequiredScreenHeight]);
-end;
-
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
   const Argument: string; const SeparateArgs: TSeparateArgs; Data: Pointer);
 begin

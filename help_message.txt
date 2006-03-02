@@ -8,9 +8,10 @@ Basic keys:
   PageUp / PageDown = raise / bow your head
   Home = restore head raise to initial position (neutralize any effect of PageUp / PageDown)
   A / Z =
-    in "Fly mode" : fly up / down
-    not in "Fly mode" : jump / crouch
+    in "Flying mode" : fly up / down
+    not in "Flying mode" : jump / crouch
   Comma / Period = strafe move left / right
+  M = view all messages
 
 Additional keys:
   Ctrl + Left / Right = rotate slower
