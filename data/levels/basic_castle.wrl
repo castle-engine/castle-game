@@ -1,7 +1,6 @@
 #VRML V1.0 ascii
 
 # Blender V2.0
-# Modified by some Kambi's Emacs' macros to transform VRML files from Blender
 
 # 'Switch' is used as a hack, to ensure it is not part of the drawing
 
@@ -17,7 +16,7 @@ Switch {
 	DEF Circle_001
 	Separator {
 		Texture2 {
-			filename textures/wood_clear.jpg
+			filename //../textures/wood_clear.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -664,7 +663,7 @@ Switch {
 	DEF MeshFosa
 	Separator {
 		Texture2 {
-			filename textures/water2.jpg
+			filename //../textures/water2.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -839,7 +838,7 @@ Switch {
 	DEF MeshGround
 	Separator {
 		Texture2 {
-			filename textures/grassfull.jpg
+			filename //../textures/grassfull.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -1009,7 +1008,7 @@ Switch {
 	DEF MeshGround_002
 	Separator {
 		Texture2 {
-			filename textures/grassfull.jpg
+			filename //../textures/grassfull.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -1050,7 +1049,7 @@ Switch {
 	DEF MeshGroundInside
 	Separator {
 		Texture2 {
-			filename textures/airbase_radar_panels.jpg
+			filename //../textures/airbase_radar_panels.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -1102,7 +1101,7 @@ Switch {
 	DEF MeshMostek
 	Separator {
 		Texture2 {
-			filename textures/misslescararm.jpg
+			filename //../textures/misslescararm.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -1181,7 +1180,7 @@ Switch {
 	DEF MeshMurek
 	Separator {
 		Texture2 {
-			filename textures/bricksmokesidebot.jpg
+			filename //../textures/bricksmokesidebot.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -1320,7 +1319,7 @@ Switch {
 	DEF MeshMurekWejscie
 	Separator {
 		Texture2 {
-			filename textures/bricksmokesidebot.jpg
+			filename //../textures/bricksmokesidebot.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -1629,10 +1628,6 @@ Switch {
 				 -1.402344 0.984375,
 				 0.226562 0.695312,
 				 -1.628906 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
 			]
 		}
 		IndexedFaceSet {
@@ -1767,7 +1762,7 @@ Switch {
 	DEF MeshWieza
 	Separator {
 		Texture2 {
-			filename textures/france_housered.jpg
+			filename //../textures/france_housered.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -2114,7 +2109,7 @@ Switch {
 	DEF Circle
 	Separator {
 		Texture2 {
-			filename textures/waterwall.jpg
+			filename //../textures/waterwall.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -2219,64 +2214,64 @@ Switch {
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
-				 0.000000 0.000000 0.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
 				 1.000000 1.000000 1.000000,
@@ -3571,22 +3566,6 @@ Switch {
 				 -0.564453 -0.169922,
 				 -0.564453 -1.164062,
 				 -0.277344 -1.164062,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
-				 0.000000 0.000000,
 			]
 		}
 		IndexedFaceSet {
@@ -4115,8 +4094,7 @@ Switch {
 
 # Visible Objects
 
-DEF StartingSeparator Separator {
-
+Separator {
 	Separator {
 		MatrixTransform {
 		matrix 

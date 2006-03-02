@@ -24,7 +24,8 @@ unit CastleLevel;
 
 interface
 
-uses VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d;
+uses VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
+  VRMLNodes, VRMLFields;
 
 type
   TCastleLevel = class
@@ -38,6 +39,7 @@ type
     FNavigationSpeed: Single;
     FTitle: string;
     FLevelBox: TBox3d;
+    procedure CorrectBlenderTexture2(Node: TVRMLNode);
   public
     property Scene: TVRMLFlatSceneGL read FScene;
     property LightSet: TVRMLLightSetGL read FLightSet;
@@ -65,15 +67,14 @@ type
 
 implementation
 
-uses SysUtils, OpenGLh, KambiUtils, VRMLNodes, BackgroundGL,
-  MatrixNavigation;
+uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, MatrixNavigation;
 
 constructor TCastleLevel.Create(const ASceneFileName, ALightSetFileName: string);
 
   function LoadVRMLNode(const FileName: string): TVRMLNode;
   begin
     Result := ParseVRMLFile(ProgramDataPath + 'data' + PathDelim +
-      FileName, false);
+      'levels' + PathDelim + FileName, false);
   end;
 
 var
@@ -88,6 +89,9 @@ begin
   { TODO -- check later, maybe change GL_LINEAR_MIPMAP_LINEAR
     to something simpler. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
+
+  Scene.RootNode.EnumNodes(TNodeTexture2, CorrectBlenderTexture2, false);
+  Scene.ChangedAll;
 
   { Calculate LevelBox.
     Remember that this may change Scene.BoundingBox (in case we remove
@@ -157,6 +161,15 @@ begin
   FreeAndNil(FLightSet);
   FreeAndNil(FScene);
   inherited;
+end;
+
+procedure TCastleLevel.CorrectBlenderTexture2(Node: TVRMLNode);
+var
+  TextureFileName: TSFString;
+begin
+  TextureFileName := (Node as TNodeTexture2).FdFileName;
+  if IsPrefix('//..', TextureFileName.Value) then
+    TextureFileName.Value := SEnding(TextureFileName.Value, 3);
 end;
 
 end.
