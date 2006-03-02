@@ -10,6 +10,11 @@
 
 --------------------
 post stage 3:
+- apply nice textures and materials to sword,
+  see http://mediawiki.blender.org/index.php/Manual/PartII/Basic_Mesh_Modelling
+
+- life text on indicator : Life / MaxLife
+
 - flying mode indicator on screen (for now, game message "flying mode on/off"
   will be enough)
 
