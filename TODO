@@ -15,10 +15,6 @@ post stage 3:
 - flying mode indicator on screen (for now, game message "flying mode on/off"
   will be enough)
 
-- game messages: to look good, there should be a darker (blended)
-  area on the bottom of the screen. Then yellow game messages will
-  be more visible.
-
 - use and test head bobbing in "castle".
 
 - Add redouts on spadanie,

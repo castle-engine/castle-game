@@ -106,9 +106,29 @@ begin
 end;
 
 procedure Draw2D(Draw2DData: Integer);
+const
+  { Note: this must be synchronized with GameMessagesManager.MaxMessagesCount }
+  DarkAreaHeight = 80;
+  DarkAreaFadeHeight = 20;
+  DarkAreaAlpha = 0.3;
+var
+  I: Integer;
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
+
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_BLEND);
+    glColor4f(0, 0, 0, DarkAreaAlpha);
+    glRecti(0, 0, RequiredScreenWidth, DarkAreaHeight);
+    for I := 0 to DarkAreaFadeHeight - 1 do
+    begin
+      glColor4f(0, 0, 0,
+        DarkAreaAlpha * (DarkAreaFadeHeight - 1 - I) / DarkAreaFadeHeight);
+      glRecti(0, DarkAreaHeight + I, RequiredScreenWidth, DarkAreaHeight + I + 1);
+    end;
+  glDisable(GL_BLEND);
+
   GameMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
     Glw.Width, Glw.Height);
 end;
@@ -288,6 +308,8 @@ begin
           GameMessagesManager := TTimeMessagesManager.Create(
             Glw, hpMiddle, vpDown, Glw.Width);
           try
+            GameMessagesManager.MaxMessagesCount := 4;
+
             { First GameMessage for this level. }
             GameMessage('Loaded level "' + Level.Title + '"');
 
