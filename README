@@ -227,6 +227,24 @@ This section describes issues specific to the game "The Castle":
   basic_castle_final.wrl and basic_castle_lights.wrl,
   but that's a brutal solution:) .)
 
+- WorldInfo.title field specifies level name, so you want to set
+  this to something nice for user.
+
+- When loading level, we search for node named 'LevelBox'.
+  Such node should be a parent of some shape (e.g. IndexedFaceSet)
+  node. (In other words: in Blender just add a mesh (usually a cube)
+  and name it 'LevelBox').
+
+  When such node is found, we calculate it's BoundingBox and remove
+  it from the scene. Calculated BoundingBox becomes Level.LevelBox
+  value. And Level.LevelBox is used to limit allowed player positions.
+  This can be used to disallow player to move to the very edge of
+  the level.
+
+  Usually you will add 'LevelBox' node using Blender, you can also
+  use my view3dscene --- see command
+  'Console -> Print scene bounding box as VRML node'.
+
 --------------------
 Have fun! All comments are welcome.
 

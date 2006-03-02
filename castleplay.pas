@@ -66,6 +66,7 @@ var
   GameCancelled: boolean;
   Level: TCastleLevel;
   GameMessagesManager: TTimeMessagesManager;
+  GLList_Draw2dBegin: TGLuint;
 
 const
   ViewAngleDegX = 45.0;
@@ -106,28 +107,8 @@ begin
 end;
 
 procedure Draw2D(Draw2DData: Integer);
-const
-  { Note: this must be synchronized with GameMessagesManager.MaxMessagesCount }
-  DarkAreaHeight = 80;
-  DarkAreaFadeHeight = 20;
-  DarkAreaAlpha = 0.3;
-var
-  I: Integer;
 begin
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
-
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_BLEND);
-    glColor4f(0, 0, 0, DarkAreaAlpha);
-    glRecti(0, 0, RequiredScreenWidth, DarkAreaHeight);
-    for I := 0 to DarkAreaFadeHeight - 1 do
-    begin
-      glColor4f(0, 0, 0,
-        DarkAreaAlpha * (DarkAreaFadeHeight - 1 - I) / DarkAreaFadeHeight);
-      glRecti(0, DarkAreaHeight + I, RequiredScreenWidth, DarkAreaHeight + I + 1);
-    end;
-  glDisable(GL_BLEND);
+  glCallList(GLList_Draw2dBegin);
 
   GameMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
     Glw.Width, Glw.Height);
@@ -190,7 +171,7 @@ function MoveAllowed(Navigator: TMatrixWalker;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result :=
-    Box3dPointInside(ProposedNewPos, Level.Scene.BoundingBox) and
+    Box3dPointInside(ProposedNewPos, Level.LevelBox) and
     Level.Scene.DefaultTriangleOctree.MoveAllowed(
       Navigator.CameraPos, ProposedNewPos, NewPos, Level.CameraRadius);
 end;
@@ -304,7 +285,6 @@ begin
 
         MessageRectStipple := @ThreeQuartersStipple;
         try
-
           GameMessagesManager := TTimeMessagesManager.Create(
             Glw, hpMiddle, vpDown, Glw.Width);
           try
@@ -342,8 +322,47 @@ begin
   GameMessages.Insert(0, S);
 end;
 
+procedure GLWindowInit(Glwin: TGLWindow);
+const
+  { Note: this constant must be synchronized with
+    GameMessagesManager.MaxMessagesCount }
+  DarkAreaHeight = 80;
+
+  DarkAreaFadeHeight = 20;
+  DarkAreaAlpha = 0.3;
+var
+  I: Integer;
+begin
+  { Calculate GLList_Draw2dBegin }
+  GLList_Draw2dBegin := glGenLists(1);
+  glNewList(GLList_Draw2dBegin, GL_COMPILE);
+  try
+    glLoadIdentity;
+    glRasterPos2i(0, 0);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+      glColor4f(0, 0, 0, DarkAreaAlpha);
+      glRecti(0, 0, RequiredScreenWidth, DarkAreaHeight);
+      for I := 0 to DarkAreaFadeHeight - 1 do
+      begin
+        glColor4f(0, 0, 0,
+          DarkAreaAlpha * (DarkAreaFadeHeight - 1 - I) / DarkAreaFadeHeight);
+        glRecti(0, DarkAreaHeight + I, RequiredScreenWidth, DarkAreaHeight + I + 1);
+      end;
+    glDisable(GL_BLEND);
+  finally glEndList end;
+end;
+
+procedure GLWindowClose(Glwin: TGLWindow);
+begin
+  glFreeDisplayList(GLList_Draw2dBegin);
+end;
+
 initialization
   GameMessages := TStringList.Create;
+  Glw.OnInitList.AppendItem(@GLWindowInit);
+  Glw.OnCloseList.AppendItem(@GLWindowClose);
 finalization
   FreeAndNil(GameMessages);
 end.

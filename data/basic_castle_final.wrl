@@ -27,5 +27,17 @@ Group{
     orientation 0.999999940395355 0.000172845990164 -0.000172608604771 1.57080090045929
   }
 
+  # Usually I'll define LevelBox using Blender, in this case I do it "by hand"
+  DEF LevelBox Separator {
+    Translation {
+      translation 0.283733367919922 3.240192413330078 31.009799957275391
+    }
+    Cube {
+      width 220
+      height 190
+      depth 120
+    }
+  }
+
   WWWInline { name "basic_castle.wrl" }
 }

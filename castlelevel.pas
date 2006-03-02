@@ -24,7 +24,7 @@ unit CastleLevel;
 
 interface
 
-uses VRMLFlatSceneGL, VRMLLightSetGL;
+uses VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d;
 
 type
   TCastleLevel = class
@@ -37,6 +37,7 @@ type
     FProjectionFar: Single;
     FNavigationSpeed: Single;
     FTitle: string;
+    FLevelBox: TBox3d;
   public
     property Scene: TVRMLFlatSceneGL read FScene;
     property LightSet: TVRMLLightSetGL read FLightSet;
@@ -46,6 +47,9 @@ type
     property ProjectionNear: Single read FProjectionNear;
     property ProjectionFar: Single read FProjectionFar;
     property NavigationSpeed: Single read FNavigationSpeed;
+
+    { Player position should always be within this box. }
+    property LevelBox: TBox3d read FLevelBox;
 
     { Title of the level, taken from WorldInfo node
       or just basename of ASceneFileName. }
@@ -61,7 +65,7 @@ type
 
 implementation
 
-uses SysUtils, OpenGLh, KambiUtils, Boxes3d, VRMLNodes, BackgroundGL,
+uses SysUtils, OpenGLh, KambiUtils, VRMLNodes, BackgroundGL,
   MatrixNavigation;
 
 constructor TCastleLevel.Create(const ASceneFileName, ALightSetFileName: string);
@@ -75,6 +79,7 @@ constructor TCastleLevel.Create(const ASceneFileName, ALightSetFileName: string)
 var
   NavigationNode: TNodeNavigationInfo;
   WorldInfoNode: TNodeWorldInfo;
+  LevelBoxIndex: Integer;
 begin
   inherited Create;
 
@@ -83,6 +88,26 @@ begin
   { TODO -- check later, maybe change GL_LINEAR_MIPMAP_LINEAR
     to something simpler. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
+
+  { Calculate LevelBox.
+    Remember that this may change Scene.BoundingBox (in case we remove
+    'LevelBox' from Scene. }
+  LevelBoxIndex := Scene.ShapeStates.IndexOfShapeWithParentNamed('LevelBox');
+  if LevelBoxIndex <> -1 then
+  begin
+    { When node with name 'LevelBox' is found, then we calculate our
+      LevelBox from this node (and we delete 'LevelBox' from the scene,
+      as it should not be visible).
+      This way we can comfortably set LevelBox from Blender. }
+    FLevelBox := Scene.ShapeStates[LevelBoxIndex].BoundingBox;
+    Scene.ShapeStates[LevelBoxIndex].ShapeNode.FreeRemovingFromAllParents;
+    Scene.ChangedAll;
+  end else
+  begin
+    { Set LevelBox to Scene.BoundingBox, and make maximum Z larger. }
+    FLevelBox := Scene.BoundingBox;
+    FLevelBox[1, 2] += 4 * (LevelBox[1, 2] - LevelBox[0, 2]);
+  end;
 
   NavigationNode := Scene.RootNode.TryFindNode(TNodeNavigationInfo, true)
     as TNodeNavigationInfo;
