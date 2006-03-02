@@ -209,6 +209,8 @@ Section above had general comments about how anyone can create
 levels and 3d objects that are useful for my VRML units.
 This section describes issues specific to the game "The Castle":
 
+Levels:
+
 - When you create new level and you want to play it:
 
   All you have to do is to change the call to TCastleLevel.Create
@@ -244,6 +246,10 @@ This section describes issues specific to the game "The Castle":
   Usually you will add 'LevelBox' node using Blender, you can also
   use my view3dscene --- see command
   'Console -> Print scene bounding box as VRML node'.
+
+Items:
+
+- Item up vector must be +Z.
 
 --------------------
 Have fun! All comments are welcome.
