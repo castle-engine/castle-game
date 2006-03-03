@@ -84,7 +84,7 @@ dist:
 	cp -R ../ $(TMP_DIST_PATH)
 	mv $(TMP_DIST_PATH)trunk/ $(TMP_DIST_PATH)castle
 	make -C $(TMP_DIST_PATH)castle/ clean clean_private
-	areFilenamesLower $(TMP_DIST_PATH)castle/data/
+	areFilenamesLower -i Makefile $(TMP_DIST_PATH)castle/data/
 # Add libpng and zlib for Windows
 	cp -f /win/mojewww/camelot/private/win32_libpng_and_zlib/* $(TMP_DIST_PATH)castle/
 # Setup right permissions of things (in castle/trunk/ and libpng/zlib)

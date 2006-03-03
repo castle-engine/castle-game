@@ -251,6 +251,39 @@ Items:
 
 - Item up vector must be +Z.
 
+- Item should be oriented such that:
+
+  Z = 0 plane is the base plane of the item. It will be aligned with the base
+  (i.e. lowest Z) of "stub" object placed on the level.
+
+  X = 0 and Y = 0 is the line around which object will rotate
+  when shown on the level. It will be aligned with the X, Y middle
+  of "stub" object placed on the level.
+
+  I had an idea to just automatically take item's bounding box,
+  it's middle X, Y and lowest Z and automatically adjust to this.
+  But this would disable some possible visual tricks.
+
+- Around the "stub" objects on the level:
+
+  You can place items on the level by placing a "stub" object
+  on the level with appropriate name.
+
+  When loading, I search for shape nodes that have a parent node
+  named like "Item_<item-kind-name>_<item-info>".
+  Where "<item-kind-name>" is "flaskred" or "sword" or any
+  other TItemKind.VRMLNodeName value (see CastleItems unit)
+  and "<item-info>" doesn't have any meaning (for now).
+
+  Such "stub" object is removed from the actual level and
+  instead I insert into level an item. Item's kind is determined
+  by "<item-kind-name>" above, item position is determined
+  by stub lowest Z and middle X,Y line (see above).
+
+  You can easily insert such "stub" with Blender --- just insert
+  any shape (I usually insert Cube, and set it's rendering to
+  "wireframe" in Blender), and then edit Blender's mesh name.
+
 --------------------
 Used things:
 

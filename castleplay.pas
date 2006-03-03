@@ -162,8 +162,15 @@ begin
 
   Level.Scene.RenderFrustumOctree(Player.Navigator.Frustum);
 
+
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
+
+    { Items just don't look good when they are lighted.
+      TODO: well, that's because I should make them better models...
+      better materials etc. }
+    Level.Items.Render;
+
     glDisable(GL_DEPTH_TEST); { not needed now, but in the future will be needed }
     ProjectionGLPushPop(Draw2d, 0, Ortho2dProjMatrix(
       0, RequiredScreenWidth, 0, RequiredScreenHeight));
@@ -173,6 +180,7 @@ end;
 procedure Idle(Glwin: TGLWindow);
 begin
   GameMessagesManager.Idle;
+  Level.Items.Idle(Glw.FpsCompSpeed);
 end;
 
 procedure Timer(Glwin: TGLWindow);

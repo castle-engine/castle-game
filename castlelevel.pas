@@ -25,7 +25,7 @@ unit CastleLevel;
 interface
 
 uses VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
-  VRMLNodes, VRMLFields;
+  VRMLNodes, VRMLFields, CastleItems;
 
 type
   TCastleLevel = class
@@ -39,8 +39,28 @@ type
     FNavigationSpeed: Single;
     FTitle: string;
     FLevelBox: TBox3d;
+    FItems: TItemsOnLevelList;
+
+    { Used only within constructor.
+      We will process the scene graph, and sometimes it's not comfortable
+      to remove the items while traversing --- so we will instead
+      put them on this list.
+
+      Be careful: never add here two nodes such that one may be parent
+      of another, otherwise freeing one could free the other one too
+      early. }
+    ItemsToRemove: TVRMLNodesList;
+
     procedure CorrectBlenderTexture2(Node: TVRMLNode);
+    procedure TraverseForItems(Node: TVRMLNode; State: TVRMLGraphTraverseState);
   public
+    { Load level from file, create octrees, prepare for OpenGL etc.
+      This uses ProgressUnit while loading creating octrees,
+      be sure to initialize Progress.UserInterface before calling this. }
+    constructor Create(const ASceneFileName, ALightSetFileName: string);
+
+    destructor Destroy; override;
+
     property Scene: TVRMLFlatSceneGL read FScene;
     property LightSet: TVRMLLightSetGL read FLightSet;
 
@@ -57,17 +77,16 @@ type
       or just basename of ASceneFileName. }
     property Title: string read FTitle;
 
-    { Load level from file, create octrees, prepare for OpenGL etc.
-      This uses ProgressUnit while loading creating octrees,
-      be sure to initialize Progress.UserInterface before calling this. }
-    constructor Create(const ASceneFileName, ALightSetFileName: string);
-
-    destructor Destroy; override;
+    { Items lying on the level.
+      These Items are owned by level object, so everything remaining
+      on this list when we will destroy level will be freed. }
+    property Items: TItemsOnLevelList read FItems;
   end;
 
 implementation
 
-uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, MatrixNavigation;
+uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, MatrixNavigation,
+  KambiClassUtils, VectorMath;
 
 constructor TCastleLevel.Create(const ASceneFileName, ALightSetFileName: string);
 
@@ -75,6 +94,14 @@ constructor TCastleLevel.Create(const ASceneFileName, ALightSetFileName: string)
   begin
     Result := ParseVRMLFile(ProgramDataPath + 'data' + PathDelim +
       'levels' + PathDelim + FileName, false);
+  end;
+
+  procedure RemoveItemsToRemove;
+  var
+    I: Integer;
+  begin
+    for I := 0 to ItemsToRemove.Count - 1 do
+      ItemsToRemove.Items[I].FreeRemovingFromAllParents;
   end;
 
 var
@@ -91,6 +118,15 @@ begin
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
 
   Scene.RootNode.EnumNodes(TNodeTexture2, CorrectBlenderTexture2, false);
+  Scene.ChangedAll;
+
+  { Initialize Items }
+  FItems := TItemsOnLevelList.Create;
+  ItemsToRemove := TVRMLNodesList.Create;
+  try
+    Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, TraverseForItems);
+    RemoveItemsToRemove;
+  finally ItemsToRemove.Free end;
   Scene.ChangedAll;
 
   { Calculate LevelBox.
@@ -160,6 +196,7 @@ destructor TCastleLevel.Destroy;
 begin
   FreeAndNil(FLightSet);
   FreeAndNil(FScene);
+  FreeWithContentsAndNil(FItems);
   inherited;
 end;
 
@@ -170,6 +207,63 @@ begin
   TextureFileName := (Node as TNodeTexture2).FdFileName;
   if IsPrefix('//..', TextureFileName.Value) then
     TextureFileName.Value := SEnding(TextureFileName.Value, 3);
+end;
+
+procedure TCastleLevel.TraverseForItems(Node: TVRMLNode;
+  State: TVRMLGraphTraverseState);
+
+  procedure CreateNewItem(const ItemNodeName: string);
+  var
+    ItemKind: TItemKind;
+    ItemKindEnd: Integer;
+    ItemKindVRMLNodeName, ItemInfo: string;
+    ItemStubBoundingBox: TBox3d;
+    ItemPosition: TVector3Single;
+  begin
+    ItemKindEnd := Pos('_', ItemNodeName);
+    if ItemKindEnd = 0 then
+    begin
+      ItemKindVRMLNodeName := ItemNodeName;
+      ItemInfo := '';
+    end else
+    begin
+      ItemKindVRMLNodeName := Copy(ItemNodeName, 1, ItemKindEnd - 1);
+      ItemInfo := SEnding(ItemNodeName, ItemKindEnd + 1);
+    end;
+
+    { ItemInfo is ignored for now, may be used later to encode something }
+
+    ItemKind := ItemKindWithVRMLNodeName(ItemKindVRMLNodeName);
+    if ItemKind = nil then
+      raise Exception.CreateFmt('Item kind with VRMLNodeName "%s" doesn''t exist',
+        [ItemKindVRMLNodeName]);
+
+    ItemStubBoundingBox := (Node as TNodeGeneralShape).BoundingBox(State);
+    ItemPosition[0] := (ItemStubBoundingBox[0, 0] + ItemStubBoundingBox[1, 0]) / 2;
+    ItemPosition[1] := (ItemStubBoundingBox[0, 1] + ItemStubBoundingBox[1, 1]) / 2;
+    ItemPosition[2] := ItemStubBoundingBox[0, 2];
+
+    FItems.Add(TItemOnLevel.Create(TItem.Create(ItemKind), ItemPosition));
+  end;
+
+const
+  ItemPrefix = 'Item_';
+var
+  ParentIndex: Integer;
+  Parent: TVRMLNode;
+begin
+  for ParentIndex := 0 to Node.ParentsCount - 1 do
+  begin
+    Parent := Node.Parents[ParentIndex];
+    if IsPrefix(ItemPrefix, Parent.NodeName) then
+    begin
+      CreateNewItem(SEnding(Parent.NodeName, Length(ItemPrefix) + 1));
+      { Don't remove Parent now --- will be removed.
+        This avoids problems with removing nodes while traversing. }
+      ItemsToRemove.Add(Parent);
+      Break;
+    end;
+  end;
 end;
 
 end.
