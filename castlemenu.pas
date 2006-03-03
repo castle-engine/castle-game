@@ -31,7 +31,7 @@ implementation
 uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   OpenGLBmpFonts, VectorMath, Images, BFNT_BitstreamVeraSans_Unit,
-  CastleLevel, CastlePlay, CastleSound, CastlePlayer;
+  CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp;
 
 type
   TMenuItem = (miReadDocs, miPlaySample, miViewGameMessages, miSound, miQuit);

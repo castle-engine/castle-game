@@ -26,16 +26,7 @@ interface
 
 uses Classes, CastleLevel, CastlePlayer;
 
-procedure ShowHelpMessage;
-
-function SProgramHelpSuffix: string;
-
-procedure ViewGameMessages;
-
 procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
-
-const
-  Version = '0.2.0';
 
 var
   { Currently used player by PlayLevel. nil if PlayLevel doesn't work
@@ -64,7 +55,8 @@ implementation
 
 uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
-  MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images;
+  MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
+  CastleHelp;
 
 var
   GameCancelled: boolean;
@@ -245,41 +237,6 @@ class procedure TDummy.MatrixChanged(Navigator: TMatrixNavigator);
 begin
   Glw.PostRedisplay;
   alUpdateListener;
-end;
-
-procedure ShowHelpMessage;
-const
-  HelpMessage = {$I help_message.inc};
-begin
-  MessageOK(Glw, HelpMessage + nl +
-    SProgramHelpSuffix,
-    taLeft);
-end;
-
-function SProgramHelpSuffix: string;
-begin
-  Result :=
-    ApplicationName + ' version ' + Version + '.' +nl+
-    'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
-    { TODO: later I will just use here SCamelotProgramHelpSuffix,
-      for now this program is not avail on camelot. }
-    {'See http://www.camelot.homedns.org/~michalis/ for latest versions' +
-    Iff(WrapLines, nl + ' ', '') +
-    ' of this program, sources, documentation etc.' +nl+}
-    'Compiled with ' + SCompilerDescription +'.';
-end;
-
-procedure ViewGameMessages;
-var
-  SList: TStringList;
-begin
-  SList := TStringList.Create;
-  try
-    SList.Assign(GameMessages);
-    SList.Insert(0, Format('%d messages :', [GameMessages.Count]));
-    SList.Insert(1, '');
-    MessageOK(Glw, SList, taLeft);
-  finally SList.Free end;
 end;
 
 procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);

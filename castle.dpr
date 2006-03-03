@@ -25,7 +25,7 @@ program castle;
 uses GLWindow, SysUtils, KambiUtils,
   ProgressUnit, ProgressGL, OpenAL, ALUtils,
   ParseParametersUnit, GLWinMessages, KambiGLUtils,
-  CastleWindow, CastleMenu, CastleLevel, CastlePlay, CastleSound,
+  CastleWindow, CastleMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils;
 
 { parsing parameters --------------------------------------------------------- }

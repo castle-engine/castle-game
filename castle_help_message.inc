@@ -1,5 +1,5 @@
 { -*- buffer-read-only: t -*- }
-{ DON'T EDIT -- this file was automatically generated from "help_message.txt" }
+{ DON'T EDIT -- this file was automatically generated from "castle_help_message.txt" }
 'Available keys:' + LineEnding + 
 '' + LineEnding + 
 'Basic keys:' + LineEnding + 
