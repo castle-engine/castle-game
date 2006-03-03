@@ -2,9 +2,7 @@
 { DON'T EDIT -- this file was automatically generated from "castle_help_message.txt" }
 'Available keys:' + LineEnding + 
 '' + LineEnding + 
-'Basic keys:' + LineEnding + 
-'  F1 = show this help' + LineEnding + 
-'  Escape = exit' + LineEnding + 
+'Basic movement keys:' + LineEnding + 
 '  Up / Down = move' + LineEnding + 
 '  Left / Right = rotate' + LineEnding + 
 '  PageUp / PageDown = raise / bow your head' + LineEnding + 
@@ -13,9 +11,12 @@
 '    in "Flying mode" : fly up / down' + LineEnding + 
 '    not in "Flying mode" : jump / crouch' + LineEnding + 
 '  Comma / Period = strafe move left / right' + LineEnding + 
-'  M = view all messages' + LineEnding + 
 '' + LineEnding + 
-'Additional keys:' + LineEnding + 
+'Other keys:' + LineEnding + 
+'  F1 = show this help' + LineEnding + 
+'  Escape = exit' + LineEnding + 
+'  M = view all messages' + LineEnding + 
+'  I = inventory show / hide' + LineEnding + 
 '  Ctrl + Left / Right = rotate slower' + LineEnding + 
 '  Ctrl + PageUp / PageDown = raise / bow your head slower' + LineEnding + 
 '  F5 = save screen to file castle_<int>.png' + LineEnding + 

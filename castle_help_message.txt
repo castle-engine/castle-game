@@ -1,8 +1,6 @@
 Available keys:
 
-Basic keys:
-  F1 = show this help
-  Escape = exit
+Basic movement keys:
   Up / Down = move
   Left / Right = rotate
   PageUp / PageDown = raise / bow your head
@@ -11,9 +9,12 @@ Basic keys:
     in "Flying mode" : fly up / down
     not in "Flying mode" : jump / crouch
   Comma / Period = strafe move left / right
-  M = view all messages
 
-Additional keys:
+Other keys:
+  F1 = show this help
+  Escape = exit
+  M = view all messages
+  I = inventory show / hide
   Ctrl + Left / Right = rotate slower
   Ctrl + PageUp / PageDown = raise / bow your head slower
   F5 = save screen to file castle_<int>.png

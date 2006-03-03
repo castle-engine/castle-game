@@ -58,6 +58,9 @@ uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
   CastleHelp;
 
+const
+  InventorySlotSize = 75;
+
 var
   GameCancelled: boolean;
   GameMessagesManager: TTimeMessagesManager;
@@ -65,6 +68,9 @@ var
   GLList_BlankIndicatorImage: TGLuint;
   GLList_RedIndicatorImage: TGLuint;
   GLList_BlueIndicatorImage: TGLuint;
+  GLList_DrawInventorySlot: TGLuint;
+  GLList_DrawInventory: TGLuint;
+  InventoryVisible: boolean;
 
 const
   ViewAngleDegX = 45.0;
@@ -139,6 +145,9 @@ begin
       glDisable(GL_SCISSOR_TEST);
     end;
   glDisable(GL_BLEND);
+
+  if InventoryVisible then
+    glCallList(GLList_DrawInventory);
 end;
 
 procedure Draw(Glwin: TGLWindow);
@@ -204,6 +213,7 @@ begin
         { TODO: just for test: }
         'l': Player.Life := Player.Life + 10;
         'L': Player.Life := Player.Life - 10;
+        'i': InventoryVisible := not InventoryVisible;
         CharEscape: GameCancelled := true;
       end;
   end;
@@ -334,17 +344,16 @@ end;
 
 procedure GLWindowInit(Glwin: TGLWindow);
 
-  function LoadScaleIndicatorToDisplayList(const BaseName: string): TGLuint;
+  function PlayerControlFileName(const BaseName: string): string;
+  begin
+    Result := ProgramDataPath + 'data' + PathDelim +
+      'player_controls' + PathDelim + BaseName;
+  end;
 
-    function ScaleIndicatorFileName(const BaseName: string): string;
-    begin
-      Result := ProgramDataPath + 'data' + PathDelim +
-        'scale_indicator' + PathDelim + BaseName + '.png';
-    end;
-
+  function LoadPlayerControlToDisplayList(const BaseName: string): TGLuint;
   begin
     Result := LoadImageToDispList(
-      ScaleIndicatorFileName(BaseName), [TAlphaImage], [], 0, 0);
+      PlayerControlFileName(BaseName), [TAlphaImage], [], 0, 0);
   end;
 
 const
@@ -377,14 +386,34 @@ begin
     glDisable(GL_BLEND);
   finally glEndList end;
 
-  GLList_BlankIndicatorImage := LoadScaleIndicatorToDisplayList('blank');
-  GLList_RedIndicatorImage := LoadScaleIndicatorToDisplayList('red');
-  GLList_BlueIndicatorImage := LoadScaleIndicatorToDisplayList('blue');
+  GLList_DrawInventorySlot := LoadPlayerControlToDisplayList('item_slot.png');
+
+  GLList_DrawInventory := glGenLists(1);
+  glNewList(GLList_DrawInventory, GL_COMPILE);
+  try
+    glLoadIdentity;
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+      for I := 0 to 7 do
+      begin
+        glRasterPos2i(RequiredScreenWidth - InventorySlotSize,
+          InventorySlotSize * I);
+        glCallList(GLList_DrawInventorySlot);
+      end;
+    glDisable(GL_BLEND);
+  finally glEndList end;
+
+  GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
+  GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
+  GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);
 begin
   glFreeDisplayList(GLList_Draw2dBegin);
+  glFreeDisplayList(GLList_DrawInventorySlot);
+  glFreeDisplayList(GLList_DrawInventory);
   glFreeDisplayList(GLList_BlankIndicatorImage);
   glFreeDisplayList(GLList_RedIndicatorImage);
   glFreeDisplayList(GLList_BlueIndicatorImage);
