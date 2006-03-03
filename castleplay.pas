@@ -56,7 +56,7 @@ implementation
 uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
-  CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_Unit;
+  CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit;
 
 var
   GameCancelled: boolean;
@@ -429,7 +429,7 @@ begin
   GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
   GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
 
-  InventoryNamesFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
+  InventoryNamesFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans_m10);
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);

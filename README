@@ -320,10 +320,16 @@ Items:
 Used things:
 
 - Obviously, my 3d game engine in units/.
-  Also my view3dscene was often useful to see how VRMLs look
-  (independent of how they look when used in "The Castle").
+  Also some of my other programs are used:
+  - view3dscene was often used to see how VRMLs look
+    (independent of how they look when used in "The Castle"),
+    and to generate some VRML pieces, and some other things...
+  - rayhunter was used to render items images, see data/items/images/
+  - font2pascal was used to generate font,
+    see bfnt_bitstreamverasans_m10_unit.pas and mk_fonts.sh
 - Blender
 - GIMP
+- ImageMagick
 - Terragen was used to create sky (see data/skies/).
   This is the only non-open-source component I used... pity :(.
   But I don't know of any (open-source or not) alternative to Terragen.
