@@ -264,6 +264,10 @@ Items:
   it's middle X, Y and lowest Z and automatically adjust to this.
   But this would disable some possible visual tricks.
 
+- Size of item model is exactly the size that will be used to display
+  it on level, so set this to look good. Sensible default
+  is size around 1.0.
+
 - Around the "stub" objects on the level:
 
   You can place items on the level by placing a "stub" object
