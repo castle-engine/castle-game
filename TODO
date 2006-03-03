@@ -24,6 +24,7 @@ post stage 3:
 
 - picking items with mouse (to get GameMessage like
   "You're looking at ... (e.g. some item short name etc.)"
+  This would allow me to show Quantity (that is not visible in the model...)
 
 - life text on indicator : Life / MaxLife
 

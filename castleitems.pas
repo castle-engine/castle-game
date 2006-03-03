@@ -35,9 +35,12 @@ type
     property ModelFileName: string read FModelFileName;
 
     { This will be used to refer to item kind from VRML models.
-      So this should be a valid VRML node name.
-      Also, this shouldn't contain '_' chars (we may use them
-      internally to encode other info in the same VRML node name). }
+
+      This should be a valid VRML node name.
+      Also, this mustn't contain '_' or '0' ... '9' chars (we may use them
+      internally to encode other info in the same VRML node name)
+      --- so actually this should only contain letters, 'a'..'z' and 'A'..'Z'.
+      Make this in 'CamelCase' to be consistent. }
     property VRMLNodeName: string read FVRMLNodeName;
 
     { Note that the first call to Scene will try to load model from
@@ -45,13 +48,20 @@ type
     function Scene: TVRMLFlatSceneGL;
   end;
 
+  { An item. Actually, this represents a collection of
+    "stacked" items that have the same properties --- see Quantity property. }
   TItem = class
   private
     FKind: TItemKind;
+    FQuantity: Cardinal;
   public
-    constructor Create(AKind: TItemKind);
+    constructor Create(AKind: TItemKind; AQuantity: Cardinal);
 
     property Kind: TItemKind read FKind;
+
+    { Quantity of this item.
+      This must always be >= 1. }
+    property Quantity: Cardinal read FQuantity write FQuantity;
   end;
 
   TItemOnLevel = class
@@ -153,10 +163,12 @@ end;
 
 { TItem ------------------------------------------------------------ }
 
-constructor TItem.Create(AKind: TItemKind);
+constructor TItem.Create(AKind: TItemKind; AQuantity: Cardinal);
 begin
   inherited Create;
   FKind := AKind;
+  FQuantity := AQuantity;
+  Assert(Quantity >= 1, 'Item''s Quantity must be >= 1');
 end;
 
 { TItemOnLevel ------------------------------------------------------------ }
@@ -261,8 +273,8 @@ begin
 
   CreatedItemKinds := TList.Create;
 
-  Sword := TItemKind.Create('sword.wrl', 'sword');
-  RedFlask := TItemKind.Create('flask_red_processed.wrl', 'flaskred');
+  Sword := TItemKind.Create('sword.wrl', 'Sword');
+  RedFlask := TItemKind.Create('flask_red_processed.wrl', 'FlaskRed');
 end;
 
 procedure DoFinalization;

@@ -82,7 +82,7 @@ type
       These Items are owned by level object, so everything remaining
       on this list when we will destroy level will be freed. }
     property Items: TItemsOnLevelList read FItems;
-    
+
     property Headlight: boolean read FHeadlight;
   end;
 
@@ -222,23 +222,29 @@ procedure TCastleLevel.TraverseForItems(Node: TVRMLNode;
   procedure CreateNewItem(const ItemNodeName: string);
   var
     ItemKind: TItemKind;
-    ItemKindEnd: Integer;
-    ItemKindVRMLNodeName, ItemInfo: string;
+    IgnoredBegin, ItemQuantityBegin: Integer;
+    ItemKindQuantity, ItemKindVRMLNodeName: string;
+    ItemQuantity: Cardinal;
     ItemStubBoundingBox: TBox3d;
     ItemPosition: TVector3Single;
   begin
-    ItemKindEnd := Pos('_', ItemNodeName);
-    if ItemKindEnd = 0 then
+    { Calculate ItemKindQuantity }
+    IgnoredBegin := Pos('_', ItemNodeName);
+    if IgnoredBegin = 0 then
+      ItemKindQuantity := ItemNodeName else
+      ItemKindQuantity := Copy(ItemNodeName, 1, IgnoredBegin - 1);
+
+    { Calculate ItemKindVRMLNodeName, ItemQuantity }
+    ItemQuantityBegin := CharsPos(['0'..'9'], ItemKindQuantity);
+    if ItemQuantityBegin = 0 then
     begin
-      ItemKindVRMLNodeName := ItemNodeName;
-      ItemInfo := '';
+      ItemKindVRMLNodeName := ItemKindQuantity;
+      ItemQuantity := 1;
     end else
     begin
-      ItemKindVRMLNodeName := Copy(ItemNodeName, 1, ItemKindEnd - 1);
-      ItemInfo := SEnding(ItemNodeName, ItemKindEnd + 1);
+      ItemKindVRMLNodeName := Copy(ItemKindQuantity, 1, ItemQuantityBegin - 1);
+      ItemQuantity := StrToInt(SEnding(ItemKindQuantity, ItemQuantityBegin));
     end;
-
-    { ItemInfo is ignored for now, may be used later to encode something }
 
     ItemKind := ItemKindWithVRMLNodeName(ItemKindVRMLNodeName);
     if ItemKind = nil then
@@ -250,11 +256,12 @@ procedure TCastleLevel.TraverseForItems(Node: TVRMLNode;
     ItemPosition[1] := (ItemStubBoundingBox[0, 1] + ItemStubBoundingBox[1, 1]) / 2;
     ItemPosition[2] := ItemStubBoundingBox[0, 2];
 
-    FItems.Add(TItemOnLevel.Create(TItem.Create(ItemKind), ItemPosition));
+    FItems.Add(TItemOnLevel.Create(TItem.Create(ItemKind, ItemQuantity),
+      ItemPosition));
   end;
 
 const
-  ItemPrefix = 'Item_';
+  ItemPrefix = 'Item';
 var
   ParentIndex: Integer;
   Parent: TVRMLNode;

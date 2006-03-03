@@ -660,7 +660,7 @@ Switch {
 			]
 		}
 	}
-	DEF Item_flaskred_1
+	DEF ItemFlaskRed2_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -685,7 +685,7 @@ Switch {
 			]
 		}
 	}
-	DEF Item_sword_1
+	DEF ItemSword_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -4153,7 +4153,7 @@ Separator {
 			1.000000 0.000000 -0.000000 0.000000
 			23.290609 -51.166893 1.135568 1.000000
 		}
-		USE Item_sword_1
+		USE ItemSword_1
 	}
 	Separator {
 		MatrixTransform {
@@ -4163,7 +4163,7 @@ Separator {
 			1.000000 0.000000 -0.000000 0.000000
 			-23.986443 -52.754677 1.135568 1.000000
 		}
-		USE Item_flaskred_1
+		USE ItemFlaskRed2_1
 	}
 	Separator {
 		MatrixTransform {
