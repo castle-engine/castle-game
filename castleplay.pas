@@ -162,15 +162,10 @@ begin
 
   Level.Scene.RenderFrustumOctree(Player.Navigator.Frustum);
 
+  Level.Items.Render;
 
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
-
-    { Items just don't look good when they are lighted.
-      TODO: well, that's because I should make them better models...
-      better materials etc. }
-    Level.Items.Render;
-
     glDisable(GL_DEPTH_TEST); { not needed now, but in the future will be needed }
     ProjectionGLPushPop(Draw2d, 0, Ortho2dProjMatrix(
       0, RequiredScreenWidth, 0, RequiredScreenHeight));
@@ -325,7 +320,8 @@ begin
         GameCancelled := false;
 
         glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
+        if Level.Headlight then
+          glEnable(GL_LIGHT0);
 
         MessageRectStipple := @ThreeQuartersStipple;
         try

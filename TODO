@@ -10,9 +10,15 @@
 
 - some alpha rect around the item's model ?
 
+- player must be able to pick items up,
+  and browse inventory,
+  and use items,
+  and equip items,
+  and drop items.
+
 --------------------
 post stage 3:
-- apply nice textures and materials to sword,
+- apply nice "strips" texture to handle of the sword,
   see http://mediawiki.blender.org/index.php/Manual/PartII/Basic_Mesh_Modelling
 
 - life text on indicator : Life / MaxLife

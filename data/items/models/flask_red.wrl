@@ -8,15 +8,15 @@ Separator {
 Switch {
 	DEF MatAlpha
 	Material {
-		diffuseColor 0.727481 0.727408 0.727408
-		specularColor 1.000000 1.000000 1.000000
+		diffuseColor 0.628384 0.628321 0.628321
+		specularColor 0.318703 0.318671 0.318671
 		shininess 0.500000 
 		transparency 0.532703 
 	}
 	DEF MatInside
 	Material {
 		diffuseColor 0.693784 0.094331 0.094331
-		specularColor 1.000000 1.000000 1.000000
+		specularColor 0.293929 0.293899 0.293899
 		shininess 0.500000 
 		transparency 0.111496 
 	}

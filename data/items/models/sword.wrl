@@ -6,10 +6,24 @@
 
 Separator {
 Switch {
-	DEF Material
+	DEF MatBlade
 	Material {
-		diffuseColor 0.800000 0.800000 0.800000
-		specularColor 1.000000 1.000000 1.000000
+		diffuseColor 0.812562 0.812481 0.812481
+		specularColor 0.490716 0.490716 0.490716
+		shininess 0.500000 
+		transparency 0.000000 
+	}
+	DEF MatHandle
+	Material {
+		diffuseColor 0.095523 0.806745 0.166475
+		specularColor 0.139137 0.043363 0.043363
+		shininess 0.500000 
+		transparency 0.000000 
+	}
+	DEF MatMiddle
+	Material {
+		diffuseColor 0.880000 0.890000 0.730000
+		specularColor 0.000000 0.000000 0.000000
 		shininess 0.500000 
 		transparency 0.000000 
 	}
@@ -61,6 +75,8 @@ Switch {
 				 -0.844764 4.811662 -0.757938,
 			]
 		}
+		USE MatMiddle
+
 		IndexedFaceSet {
 			coordIndex [
 				 4, 7, 6, 5, -1,
@@ -145,6 +161,8 @@ Switch {
 				 0.000000 -0.000000 12.000000,
 			]
 		}
+		USE MatBlade
+
 		IndexedFaceSet {
 			coordIndex [
 				 1, 0, 8, 9, -1,
@@ -309,7 +327,7 @@ Switch {
 				 0.000000 -1.407110 8.306562,
 			]
 		}
-		USE Material
+		USE MatHandle
 
 		IndexedFaceSet {
 			coordIndex [

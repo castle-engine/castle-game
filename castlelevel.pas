@@ -40,6 +40,7 @@ type
     FTitle: string;
     FLevelBox: TBox3d;
     FItems: TItemsOnLevelList;
+    FHeadlight: boolean;
 
     { Used only within constructor.
       We will process the scene graph, and sometimes it's not comfortable
@@ -81,6 +82,8 @@ type
       These Items are owned by level object, so everything remaining
       on this list when we will destroy level will be freed. }
     property Items: TItemsOnLevelList read FItems;
+    
+    property Headlight: boolean read FHeadlight;
   end;
 
 implementation
@@ -165,6 +168,10 @@ begin
   if NavigationNode <> nil then
     FNavigationSpeed := NavigationNode.FdSpeed.Value else
     FNavigationSpeed := 1.0;
+
+  if NavigationNode <> nil then
+    FHeadlight := NavigationNode.FdHeadlight.Value else
+    FHeadlight := false;
 
   FProjectionNear := CameraRadius * 0.75;
   FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
