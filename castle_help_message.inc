@@ -12,11 +12,17 @@
 '    not in "Flying mode" : jump / crouch' + LineEnding + 
 '  Comma / Period = strafe move left / right' + LineEnding + 
 '' + LineEnding + 
-'Other keys:' + LineEnding + 
+'Other important keys:' + LineEnding + 
 '  F1 = show this help' + LineEnding + 
 '  Escape = exit' + LineEnding + 
-'  M = view all messages' + LineEnding + 
 '  I = inventory show / hide' + LineEnding + 
+'  M = view all messages' + LineEnding + 
+'' + LineEnding + 
+'Testing (cheating) keys:' + LineEnding + 
+'  F = flying mode on/off' + LineEnding + 
+'  l / L = life increase/decrease' + LineEnding + 
+'' + LineEnding + 
+'Other keys:' + LineEnding + 
 '  Ctrl + Left / Right = rotate slower' + LineEnding + 
 '  Ctrl + PageUp / PageDown = raise / bow your head slower' + LineEnding + 
 '  F5 = save screen to file castle_<int>.png' + LineEnding + 

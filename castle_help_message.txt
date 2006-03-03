@@ -10,11 +10,17 @@ Basic movement keys:
     not in "Flying mode" : jump / crouch
   Comma / Period = strafe move left / right
 
-Other keys:
+Other important keys:
   F1 = show this help
   Escape = exit
-  M = view all messages
   I = inventory show / hide
+  M = view all messages
+
+Testing (cheating) keys:
+  F = flying mode on/off
+  l / L = life increase/decrease
+
+Other keys:
   Ctrl + Left / Right = rotate slower
   Ctrl + PageUp / PageDown = raise / bow your head slower
   F5 = save screen to file castle_<int>.png

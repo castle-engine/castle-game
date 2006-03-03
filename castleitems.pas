@@ -3,7 +3,7 @@ unit CastleItems;
 interface
 
 uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
-  KambiClassUtils;
+  KambiClassUtils, Images, OpenGLh;
 
 {$define read_interface}
 
@@ -30,8 +30,12 @@ type
     FScene: TVRMLFlatSceneGL;
     FVRMLNodeName: string;
     FName: string;
+    FImageFileName: string;
+    FImage: TImage;
+    FGLList_DrawImage: TGLuint;
   public
-    constructor Create(AModelFileName, AVRMLNodeName, AName: string);
+    constructor Create(const AModelFileName, AVRMLNodeName, AName,
+      AImageFileName: string);
     destructor Destroy; override;
 
     property ModelFileName: string read FModelFileName;
@@ -51,6 +55,18 @@ type
     { Note that the first call to Scene will try to load model from
       ModelFileName if it wasn't already loaded. }
     function Scene: TVRMLFlatSceneGL;
+
+    { This is a 2d image, to be used for inventory slots etc.
+      When you call this for the 1st time, the image will be loaded
+      from ImageFileName.
+
+      @noAutoLinkHere }
+    function Image: TImage;
+
+    property ImageFileName: string read FImageFileName;
+
+    { This is OpenGL display list to draw @link(Image). }
+    function GLList_DrawImage: TGLuint;
   end;
 
   { An item. Actually, this represents a collection of
@@ -140,7 +156,7 @@ function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
-  OpenGLh, KambiGLUtils, CastlePlay;
+  KambiGLUtils, CastlePlay;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -151,17 +167,20 @@ var
 
 { TItemKind ------------------------------------------------------------ }
 
-constructor TItemKind.Create(AModelFileName, AVRMLNodeName, AName: string);
+constructor TItemKind.Create(const AModelFileName, AVRMLNodeName, AName,
+  AImageFileName: string);
 begin
   inherited Create;
   FModelFileName := AModelFileName;
   FVRMLNodeName := AVRMLNodeName;
   FName := AName;
+  FImageFileName := AImageFileName;
   CreatedItemKinds.Add(Self);
 end;
 
 destructor TItemKind.Destroy;
 begin
+  FreeAndNil(FImage);
   FreeAndNil(FScene);
   inherited;
 end;
@@ -176,6 +195,22 @@ begin
       true, roSceneAsAWhole);
   end;
   Result := FScene;
+end;
+
+function TItemKind.Image: TImage;
+begin
+  if FImage = nil then
+    FImage := LoadImage(
+      ProgramDataPath + 'data' + PathDelim +
+      'items' + PathDelim + 'images' + PathDelim + ImageFileName, [], []);
+  Result := FImage;
+end;
+
+function TItemKind.GLList_DrawImage: TGLuint;
+begin
+  if FGLList_DrawImage = 0 then
+    FGLList_DrawImage := ImageDrawToDispList(Image);
+  Result := FGLList_DrawImage;
 end;
 
 { TItem ------------------------------------------------------------ }
@@ -306,9 +341,9 @@ begin
 
   CreatedItemKinds := TList.Create;
 
-  Sword := TItemKind.Create('sword.wrl', 'Sword', 'Sword');
+  Sword := TItemKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png');
   LifePotion := TItemKind.Create('flask_red_processed.wrl', 'LifePotion',
-    'Potion of Life');
+    'Potion of Life', 'flask_red.png');
 end;
 
 procedure DoFinalization;

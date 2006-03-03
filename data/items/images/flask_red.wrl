@@ -1,0 +1,12 @@
+#VRML V1.0 ascii
+
+Group {
+  PerspectiveCamera {
+    position 2.304904460906982 0.879132270812988 1.330720067024231
+    orientation 0.382674962282181 0.587182998657227 0.713285446166992 2.271310806274414
+  }
+  PointLight {
+    location 3 3 3
+  }
+  WWWInline { name "../models/flask_red_processed.wrl" }
+}

@@ -9,6 +9,7 @@
 # default: make sure that various files are up-to-date, and show info
 default: castle_help_message.inc info
 	$(MAKE) -C data/items/models/
+	$(MAKE) -C data/items/images/
 
 VERSION := $(shell ./castle --version)
 

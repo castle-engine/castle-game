@@ -303,6 +303,19 @@ Items:
   "wireframe" in Blender), and then edit Blender's mesh name
   as appropriate.
 
+- Prepare appropriate 2d image of item (to be shown in inventory slots etc.).
+  (Once I tried just automatically rendering models inside inventory slots
+  but this doesn't look good enough). You can do it however you like.
+
+  My preferred way is to use my raytracer, called rayhunter
+  ([http://www.camelot.homedns.org/~michalis/rayhunter.php]):
+  set up appropriate light and camera settings and then just render
+  item's model to the image. See data/items/images/.
+
+- Finally, to really add the item to the game add 1 line to
+  CastleItems units in DoInitialization call creating your
+  TItemKind instance.
+
 --------------------
 Used things:
 

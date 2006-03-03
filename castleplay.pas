@@ -56,10 +56,7 @@ implementation
 uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
-  CastleHelp;
-
-const
-  InventorySlotSize = 75;
+  CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_Unit;
 
 var
   GameCancelled: boolean;
@@ -68,9 +65,9 @@ var
   GLList_BlankIndicatorImage: TGLuint;
   GLList_RedIndicatorImage: TGLuint;
   GLList_BlueIndicatorImage: TGLuint;
-  GLList_DrawInventorySlot: TGLuint;
-  GLList_DrawInventory: TGLuint;
+  GLList_InventorySlot: TGLuint;
   InventoryVisible: boolean;
+  InventoryNamesFont: TGLBitmapFont_Abstract;
 
 const
   ViewAngleDegX = 45.0;
@@ -114,8 +111,15 @@ procedure Draw2D(Draw2DData: Integer);
 const
   IndicatorHeight = 120;
   IndicatorMargin = 5;
+
+  InventorySlotWidth = 100;
+  InventorySlotHeight = 100;
+  InventorySlotMargin = 2;
+  MaxInventorySlotsVisible = RequiredScreenHeight div InventorySlotHeight;
+
 var
-  PlayerLifeMapped: Integer;
+  PlayerLifeMapped, I, X, Y: Integer;
+  S: string;
 begin
   glCallList(GLList_Draw2dBegin);
 
@@ -147,7 +151,36 @@ begin
   glDisable(GL_BLEND);
 
   if InventoryVisible then
-    glCallList(GLList_DrawInventory);
+  begin
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+      for I := 0 to MaxInventorySlotsVisible - 1 do
+      begin
+        X := RequiredScreenWidth - InventorySlotWidth;
+        Y := InventorySlotHeight * (MaxInventorySlotsVisible - 1 - I);
+
+        glRasterPos2i(X, Y);
+        glCallList(GLList_InventorySlot);
+      end;
+    glDisable(GL_BLEND);
+
+    glAlphaFunc(GL_GREATER, 0.5);
+    glEnable(GL_ALPHA_TEST);
+      for I := 0 to Min(MaxInventorySlotsVisible - 1, Player.Items.Count - 1) do
+      begin
+        X := RequiredScreenWidth - InventorySlotWidth;
+        Y := InventorySlotHeight * (MaxInventorySlotsVisible - 1 - I);
+
+        glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
+        glCallList(Player.Items[I].Kind.GLList_DrawImage);
+
+        S := Player.Items[I].Kind.Name;
+        if Player.Items[I].Quantity <> 1 then
+          S += ' (' + IntToStr(Player.Items[I].Quantity) + ')';
+        InventoryNamesFont.Print(S);
+      end;
+    glDisable(GL_ALPHA_TEST);
+  end;
 end;
 
 procedure Draw(Glwin: TGLWindow);
@@ -207,12 +240,15 @@ begin
         { TODO --- this is just for test, in real game this shouldn't
           be so easy to enter FlyingMode (should require some item, spell etc.) }
         'f': Player.FlyingMode := not Player.FlyingMode;
+
         { TODO: some button visible in player's window to access this should be
           visible. }
         'm': ViewGameMessages;
+
         { TODO: just for test: }
         'l': Player.Life := Player.Life + 10;
         'L': Player.Life := Player.Life - 10;
+
         'i': InventoryVisible := not InventoryVisible;
         CharEscape: GameCancelled := true;
       end;
@@ -256,6 +292,7 @@ var
 begin
   Level := ALevel;
   Player := APlayer;
+  InventoryVisible := false;
   try
 
     SavedMode := TGLMode.Create(glw,
@@ -386,34 +423,21 @@ begin
     glDisable(GL_BLEND);
   finally glEndList end;
 
-  GLList_DrawInventorySlot := LoadPlayerControlToDisplayList('item_slot.png');
-
-  GLList_DrawInventory := glGenLists(1);
-  glNewList(GLList_DrawInventory, GL_COMPILE);
-  try
-    glLoadIdentity;
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-      for I := 0 to 7 do
-      begin
-        glRasterPos2i(RequiredScreenWidth - InventorySlotSize,
-          InventorySlotSize * I);
-        glCallList(GLList_DrawInventorySlot);
-      end;
-    glDisable(GL_BLEND);
-  finally glEndList end;
+  GLList_InventorySlot := LoadPlayerControlToDisplayList('item_slot.png');
 
   GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
   GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
   GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
+
+  InventoryNamesFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);
 begin
+  FreeAndNil(InventoryNamesFont);
+
   glFreeDisplayList(GLList_Draw2dBegin);
-  glFreeDisplayList(GLList_DrawInventorySlot);
-  glFreeDisplayList(GLList_DrawInventory);
+  glFreeDisplayList(GLList_InventorySlot);
   glFreeDisplayList(GLList_BlankIndicatorImage);
   glFreeDisplayList(GLList_RedIndicatorImage);
   glFreeDisplayList(GLList_BlueIndicatorImage);

@@ -135,6 +135,9 @@ var
 begin
   Items.Add(Item);
 
+  { TODO: Optional stacking (adding quantity with existing item) should occur here }
+  { TODO: Equiping weapon/armor if not wearing one should occur here }
+
   S := Format('You pick "%s"', [Item.Kind.Name]);
   if Item.Quantity <> 1 then
     S += Format(' (quantity %d)', [Item.Quantity]);
