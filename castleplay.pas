@@ -246,8 +246,8 @@ begin
         'm': ViewGameMessages;
 
         { TODO: just for test: }
-        'l': Player.Life := Player.Life + 10;
-        'L': Player.Life := Player.Life - 10;
+        'l': Player.Life := Min(Player.Life + 10, Player.MaxLife);
+        'L': Player.Life := Max(Player.Life - 10, 0);
 
         'i': InventoryVisible := not InventoryVisible;
         CharEscape: GameCancelled := true;
