@@ -8,8 +8,6 @@
   Goal #3 (5 Points) - Design a better level to test out new features.
   Goal #4 (5 Points) - Provide an 'exit' for the level.
 
-- some alpha rect around the item's model ?
-
 - player must be able to pick items up,
   and browse inventory,
   and use items,
@@ -20,6 +18,12 @@
 post stage 3:
 - apply nice "strips" texture to handle of the sword,
   see http://mediawiki.blender.org/index.php/Manual/PartII/Basic_Mesh_Modelling
+
+- some alpha rect around the item's model ?
+  test, although it seems that rotating is enough.
+
+- picking items with mouse (to get GameMessage like
+  "You're looking at ... (e.g. some item short name etc.)"
 
 - life text on indicator : Life / MaxLife
 
