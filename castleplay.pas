@@ -68,6 +68,7 @@ var
   GLList_InventorySlot: TGLuint;
   InventoryVisible: boolean;
   InventoryNamesFont: TGLBitmapFont_Abstract;
+  InventoryCurrentItem: Integer;
 
 const
   ViewAngleDegX = 45.0;
@@ -117,8 +118,15 @@ const
   InventorySlotMargin = 2;
   MaxInventorySlotsVisible = RequiredScreenHeight div InventorySlotHeight;
 
+  ItemSlotX = RequiredScreenWidth - InventorySlotWidth;
+
+  function ItemSlotY(I: Integer): Integer;
+  begin
+    Result := InventorySlotHeight * (MaxInventorySlotsVisible - 1 - I);
+  end;
+
 var
-  PlayerLifeMapped, I, X, Y: Integer;
+  PlayerLifeMapped, I, X, Y, MaxItemShown: Integer;
   S: string;
 begin
   glCallList(GLList_Draw2dBegin);
@@ -156,30 +164,53 @@ begin
     glEnable(GL_BLEND);
       for I := 0 to MaxInventorySlotsVisible - 1 do
       begin
-        X := RequiredScreenWidth - InventorySlotWidth;
-        Y := InventorySlotHeight * (MaxInventorySlotsVisible - 1 - I);
+        X := ItemSlotX;
+        Y := ItemSlotY(I);
 
         glRasterPos2i(X, Y);
         glCallList(GLList_InventorySlot);
       end;
     glDisable(GL_BLEND);
 
+    MaxItemShown := Min(MaxInventorySlotsVisible - 1, Player.Items.Count - 1);
+
     glAlphaFunc(GL_GREATER, 0.5);
     glEnable(GL_ALPHA_TEST);
-      for I := 0 to Min(MaxInventorySlotsVisible - 1, Player.Items.Count - 1) do
+      for I := 0 to MaxItemShown do
       begin
-        X := RequiredScreenWidth - InventorySlotWidth;
-        Y := InventorySlotHeight * (MaxInventorySlotsVisible - 1 - I);
+        X := ItemSlotX;
+        Y := ItemSlotY(I);
 
         glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
         glCallList(Player.Items[I].Kind.GLList_DrawImage);
-
-        S := Player.Items[I].Kind.Name;
-        if Player.Items[I].Quantity <> 1 then
-          S += ' (' + IntToStr(Player.Items[I].Quantity) + ')';
-        InventoryNamesFont.Print(S);
       end;
     glDisable(GL_ALPHA_TEST);
+
+    if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) and
+       (InventoryCurrentItem <= MaxItemShown) then
+    begin
+      glColor4f(0.8, 0.8, 0.8, 1);
+      DrawGLRectBorder(
+        ItemSlotX + InventorySlotMargin,
+        ItemSlotY(InventoryCurrentItem) + InventorySlotMargin,
+        ItemSlotX + InventorySlotWidth - InventorySlotMargin,
+        ItemSlotY(InventoryCurrentItem)
+          + InventorySlotHeight - InventorySlotMargin);
+    end;
+
+    glColor4f(1, 1, 0.5, 1);
+    for I := 0 to MaxItemShown do
+    begin
+      X := ItemSlotX;
+      Y := ItemSlotY(I);
+
+      glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
+
+      S := Player.Items[I].Kind.Name;
+      if Player.Items[I].Quantity <> 1 then
+        S += ' (' + IntToStr(Player.Items[I].Quantity) + ')';
+      InventoryNamesFont.Print(S);
+    end;
   end;
 end;
 
@@ -231,6 +262,19 @@ begin
 end;
 
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
+
+  procedure ChangeInventoryCurrentItem(Change: Integer);
+  begin
+    if Player.Items.Count = 0 then
+      InventoryCurrentItem := -1 else
+    if InventoryCurrentItem >= Player.Items.Count then
+      InventoryCurrentItem := Player.Items.Count - 1 else
+    if InventoryCurrentItem < 0 then
+      InventoryCurrentItem := 0 else
+      InventoryCurrentItem := ChangeIntCycle(
+        InventoryCurrentItem, Change, Player.Items.Count - 1);
+  end;
+
 begin
   case Key of
     K_F1: ShowHelpMessage;
@@ -250,6 +294,9 @@ begin
         'L': Player.Life := Max(Player.Life - 10, 0);
 
         'i': InventoryVisible := not InventoryVisible;
+        '[': ChangeInventoryCurrentItem(-1);
+        ']': ChangeInventoryCurrentItem(+1);
+
         CharEscape: GameCancelled := true;
       end;
   end;
@@ -293,6 +340,7 @@ begin
   Level := ALevel;
   Player := APlayer;
   InventoryVisible := false;
+  InventoryCurrentItem := 0;
   try
 
     SavedMode := TGLMode.Create(glw,

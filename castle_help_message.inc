@@ -16,6 +16,9 @@
 '  F1 = show this help' + LineEnding + 
 '  Escape = exit' + LineEnding + 
 '  I = inventory show / hide' + LineEnding + 
+'  [ / ] = select previous / next inventory item' + LineEnding + 
+'  d = drop selected inventory item' + LineEnding + 
+'  Enter = use (or equip) selected inventory item' + LineEnding + 
 '  M = view all messages' + LineEnding + 
 '' + LineEnding + 
 'Testing (cheating) keys:' + LineEnding + 

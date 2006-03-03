@@ -14,6 +14,9 @@ Other important keys:
   F1 = show this help
   Escape = exit
   I = inventory show / hide
+  [ / ] = select previous / next inventory item
+  d = drop selected inventory item
+  Enter = use (or equip) selected inventory item
   M = view all messages
 
 Testing (cheating) keys:
