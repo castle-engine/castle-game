@@ -66,6 +66,12 @@ type
     { This adds Item to Items, with appropriate GameMessage }
     procedure PickItem(Item: TItem);
 
+    { Drops given item. ItemIndex must be valid (between 0 and Items.Count - 1).
+      Returns nil if player somehow cancelled operation and nothing is dropped.
+      You *must* take care of returned TItem object (otherwise you will
+      get memory leak !). }
+    function DropItem(ItemIndex: Integer): TItem;
+
     { Calculates what can be considered "bounding box of the player",
       taking into account global Level.CameRadius. Use for collision
       detection etc. }
@@ -74,7 +80,8 @@ type
 
 implementation
 
-uses KambiClassUtils, SysUtils, Keys, CastlePlay;
+uses KambiClassUtils, SysUtils, Keys, CastlePlay, GLWinMessages,
+  CastleWindow, KambiUtils;
 
 constructor TPlayer.Create;
 begin
@@ -141,6 +148,47 @@ begin
   S := Format('You pick "%s"', [Item.Kind.Name]);
   if Item.Quantity <> 1 then
     S += Format(' (quantity %d)', [Item.Quantity]);
+  GameMessage(S);
+end;
+
+function TPlayer.DropItem(ItemIndex: Integer): TItem;
+var
+  SelectedItem: TItem;
+  DropQuantity: Cardinal;
+  S: string;
+begin
+  SelectedItem := Items[ItemIndex];
+
+  if SelectedItem.Quantity > 1 then
+  begin
+    DropQuantity := SelectedItem.Quantity;
+
+    if not MessageInputQueryCardinal(Glw,
+      Format('You have %d items "%s". How many of them do you want to drop ?',
+        [SelectedItem.Quantity, SelectedItem.Kind.Name]),
+      DropQuantity, taLeft) then
+      Exit(nil);
+
+    if not Between(DropQuantity, 1, SelectedItem.Quantity) then
+    begin
+      GameMessage(Format('You cannot drop %d items', [DropQuantity]));
+      Exit(nil);
+    end;
+  end else
+    DropQuantity := 1;
+
+  if DropQuantity = SelectedItem.Quantity then
+  begin
+    Result := SelectedItem;
+    Items.Delete(ItemIndex);
+  end else
+  begin
+    Result := SelectedItem.Split(DropQuantity);
+  end;
+
+  S := Format('You drop "%s"', [Result.Kind.Name]);
+  if Result.Quantity <> 1 then
+    S += Format(' (quantity %d)', [Result.Quantity]);
   GameMessage(S);
 end;
 

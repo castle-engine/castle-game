@@ -83,6 +83,14 @@ type
     { Quantity of this item.
       This must always be >= 1. }
     property Quantity: Cardinal read FQuantity write FQuantity;
+
+    { This splits item (with Quantity >= 2) into two items.
+      It returns newly created object with the same properties
+      as this object, and with Quantity set to QuantitySplit.
+      And it lowers our Quantity by QuantitySplit.
+
+      Always QuantitySplit must be >= 1 and < Quantity. }
+    function Split(QuantitySplit: Cardinal): TItem;
   end;
 
   TObjectsListItem_2 = TItem;
@@ -221,6 +229,16 @@ begin
   FKind := AKind;
   FQuantity := AQuantity;
   Assert(Quantity >= 1, 'Item''s Quantity must be >= 1');
+end;
+
+function TItem.Split(QuantitySplit: Cardinal): TItem;
+begin
+  Check(Between(Integer(QuantitySplit), 1, Quantity - 1),
+    'You must split >= 1 and less than current Quantity');
+
+  Result := TItem.Create(Kind, QuantitySplit);
+
+  FQuantity -= QuantitySplit;
 end;
 
 { TItemOnLevel ------------------------------------------------------------ }

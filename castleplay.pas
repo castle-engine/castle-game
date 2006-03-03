@@ -56,7 +56,8 @@ implementation
 uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
-  CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit;
+  CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
+  CastleItems;
 
 var
   GameCancelled: boolean;
@@ -275,6 +276,52 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
         InventoryCurrentItem, Change, Player.Items.Count - 1);
   end;
 
+  procedure DropItem;
+  var
+    DropppedItem: TItem;
+    DropPosition, PushVector: TVector3Single;
+    IsAboveTheGround: boolean;
+    SqrHeightAboveTheGround: Single;
+  begin
+    if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
+    begin
+      DropppedItem := Player.DropItem(InventoryCurrentItem);
+      if DropppedItem <> nil then
+      begin
+        { Calculate DropPosition.
+          TODO: this should be done better,
+          DropPosition should be always initialized to Player.Navigator.CameraPos
+          and then we should just let items to fall down on the ground. }
+        Player.Navigator.DoGetCameraHeight(IsAboveTheGround,
+          SqrHeightAboveTheGround);
+
+        if not IsAboveTheGround then
+          DropPosition := Player.Navigator.CameraPos else
+          DropPosition := VectorSubtract(Player.Navigator.CameraPos,
+            VectorAdjustToLength(Player.Navigator.HomeCameraUp,
+              Sqrt(SqrHeightAboveTheGround)));
+
+        { We must move the item a little before us to
+          1. show visually player that the item was dropped
+          2. to avoid automatically picking it again }
+        PushVector := Player.Navigator.CameraDir;
+        { I must adjust here PushVector, otherwise when player is looking
+          down he could be able to put item "inside the ground".
+          TODO: actually, I should just check collision of item with level,
+          to avoid "pushing item into the wall". }
+        if not VectorsParallel(PushVector, Player.Navigator.HomeCameraUp) then
+          MakeVectorsAngleOnTheirPlane(PushVector,
+            Player.Navigator.HomeCameraUp, 90);
+        VectorAddTo1st(DropPosition,
+          VectorAdjustToLength(PushVector,
+            Player.Navigator.RealCameraPreferredHeight));
+
+        Level.Items.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
+      end;
+    end else
+      GameMessage('Nothing to drop - select some item first');
+  end;
+
 begin
   case Key of
     K_F1: ShowHelpMessage;
@@ -296,7 +343,7 @@ begin
         'i': InventoryVisible := not InventoryVisible;
         '[': ChangeInventoryCurrentItem(-1);
         ']': ChangeInventoryCurrentItem(+1);
-
+        'd': DropItem;
         CharEscape: GameCancelled := true;
       end;
   end;
