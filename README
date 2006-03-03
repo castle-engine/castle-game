@@ -247,6 +247,12 @@ Levels:
   use my view3dscene --- see command
   'Console -> Print scene bounding box as VRML node'.
 
+- Levels must be oriented such that +Z is "up".
+  While all things in my general units are flexible
+  and allow any up vector to be used, I made in "The Castle" a couple
+  of assumptions that really need +Z to be up.
+  (like TItemOnLevel.PlayerCollision).
+
 Items:
 
 - Item up vector must be +Z.
@@ -275,14 +281,14 @@ Items:
 
   When loading, I search for shape nodes that have a parent node
   named like "Item<item-kind-name><quantity>_<ignored>".
-  Where "<item-kind-name>" is "FlaskRed" or "Sword" or any
+  Where "<item-kind-name>" is "LifePotion" or "Sword" or any
   other TItemKind.VRMLNodeName value (see CastleItems unit),
   "<quantity>" is, well, the integer quantity
   ("1" is assumed if "<quantity>" is omitted), and "<ignored>"
   is just anything that will be ignored (you can use this
-  to make object names in your model unique, 
+  to make object names in your model unique,
   which is obviously desirable).
-  
+
   Some reasoning about convention above: Blender's names
   have quite limited length, that's why CamelCase is used
   for "<item-kind-name>" and components are generally "glued"

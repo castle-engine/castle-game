@@ -42,6 +42,10 @@ var
     right now. }
   Player: TPlayer;
 
+  { Currently used level by PlayLevel. nil if PlayLevel doesn't work
+    right now. }
+  Level: TCastleLevel;
+
   { These are all messages passed to GameMessage.
     Created / destroyed in this unit's initialization / finalization.
     They are not broken (to fit into some particular line width).
@@ -64,7 +68,6 @@ uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
 
 var
   GameCancelled: boolean;
-  Level: TCastleLevel;
   GameMessagesManager: TTimeMessagesManager;
   GLList_Draw2dBegin: TGLuint;
   GLList_BlankIndicatorImage: TGLuint;
@@ -173,9 +176,19 @@ begin
 end;
 
 procedure Idle(Glwin: TGLWindow);
+var
+  PickItemIndex: Integer;
 begin
   GameMessagesManager.Idle;
   Level.Items.Idle(Glw.FpsCompSpeed);
+
+  PickItemIndex := Level.Items.PlayerCollision;
+  if PickItemIndex <> -1 then
+  begin
+    Player.PickItem(Level.Items[PickItemIndex].ExtractItem);
+    Level.Items.FreeAndNil(PickItemIndex);
+    Level.Items.Delete(PickItemIndex);
+  end;
 end;
 
 procedure Timer(Glwin: TGLWindow);

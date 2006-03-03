@@ -2,7 +2,8 @@ unit CastleItems;
 
 interface
 
-uses VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils, KambiClassUtils;
+uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
+  KambiClassUtils;
 
 {$define read_interface}
 
@@ -28,8 +29,9 @@ type
     FModelFileName: string;
     FScene: TVRMLFlatSceneGL;
     FVRMLNodeName: string;
+    FName: string;
   public
-    constructor Create(AModelFileName, AVRMLNodeName: string);
+    constructor Create(AModelFileName, AVRMLNodeName, AName: string);
     destructor Destroy; override;
 
     property ModelFileName: string read FModelFileName;
@@ -42,6 +44,9 @@ type
       --- so actually this should only contain letters, 'a'..'z' and 'A'..'Z'.
       Make this in 'CamelCase' to be consistent. }
     property VRMLNodeName: string read FVRMLNodeName;
+
+    { Nice name for user. }
+    property Name: string read FName;
 
     { Note that the first call to Scene will try to load model from
       ModelFileName if it wasn't already loaded. }
@@ -63,6 +68,10 @@ type
       This must always be >= 1. }
     property Quantity: Cardinal read FQuantity write FQuantity;
   end;
+
+  TObjectsListItem_2 = TItem;
+  {$I objectslist_2.inc}
+  TItemsList = TObjectsList_2;
 
   TItemOnLevel = class
   private
@@ -102,6 +111,9 @@ type
     procedure Render;
 
     procedure Idle(const CompSpeed: Single);
+
+    { This is Item.Kind.Scene.BoundingBox translated by our current Position. }
+    function BoundingBox: TBox3d;
   end;
 
   TObjectsListItem_1 = TItemOnLevel;
@@ -111,11 +123,14 @@ type
     procedure Render;
     { Call Idle for all items. }
     procedure Idle(const CompSpeed: Single);
+    { Check collision with all items, returns index of first collider
+      (or -1 if no collision). }
+    function PlayerCollision: Integer;
   end;
 
 var
   Sword: TItemKind;
-  RedFlask: TItemKind;
+  LifePotion: TItemKind;
 
 { Returns nil if not found. }
 function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
@@ -125,21 +140,23 @@ function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
-  OpenGLh, KambiGLUtils;
+  OpenGLh, KambiGLUtils, CastlePlay;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
+{$I objectslist_2.inc}
 
 var
   CreatedItemKinds: TList;
 
 { TItemKind ------------------------------------------------------------ }
 
-constructor TItemKind.Create(AModelFileName, AVRMLNodeName: string);
+constructor TItemKind.Create(AModelFileName, AVRMLNodeName, AName: string);
 begin
   inherited Create;
   FModelFileName := AModelFileName;
   FVRMLNodeName := AVRMLNodeName;
+  FName := AName;
   CreatedItemKinds.Add(Self);
 end;
 
@@ -194,8 +211,10 @@ end;
 
 function TItemOnLevel.PlayerCollision: boolean;
 begin
-  { TODO }
-  Result := false;
+  { I approximate both player and item as a bounding boxes.
+    This works quite good, and is "precise enough" :) }
+
+  Result := Boxes3dCollision(BoundingBox, Player.BoundingBox);
 end;
 
 procedure TItemOnLevel.Render;
@@ -210,6 +229,11 @@ end;
 procedure TItemOnLevel.Idle(const CompSpeed: Single);
 begin
   FRotation += 3 * CompSpeed;
+end;
+
+function TItemOnLevel.BoundingBox: TBox3d;
+begin
+  Result := Box3dTranslate(Item.Kind.Scene.BoundingBox, Position);
 end;
 
 { TItemsOnLevelList -------------------------------------------------- }
@@ -228,6 +252,15 @@ var
 begin
   for I := 0 to High do
     Items[I].Idle(CompSpeed);
+end;
+
+function TItemsOnLevelList.PlayerCollision: Integer;
+begin
+  { TODO: optimize this, to not calculate Player.BoundingBox for each item. }
+  for Result := 0 to High do
+    if Items[Result].PlayerCollision then
+      Exit;
+  Result := -1;
 end;
 
 { other global stuff --------------------------------------------------- }
@@ -273,8 +306,9 @@ begin
 
   CreatedItemKinds := TList.Create;
 
-  Sword := TItemKind.Create('sword.wrl', 'Sword');
-  RedFlask := TItemKind.Create('flask_red_processed.wrl', 'FlaskRed');
+  Sword := TItemKind.Create('sword.wrl', 'Sword', 'Sword');
+  LifePotion := TItemKind.Create('flask_red_processed.wrl', 'LifePotion',
+    'Potion of Life');
 end;
 
 procedure DoFinalization;

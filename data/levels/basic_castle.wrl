@@ -660,7 +660,7 @@ Switch {
 			]
 		}
 	}
-	DEF ItemFlaskRed2_1
+	DEF ItemLifePotion2_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -4163,7 +4163,7 @@ Separator {
 			1.000000 0.000000 -0.000000 0.000000
 			-23.986443 -52.754677 1.135568 1.000000
 		}
-		USE ItemFlaskRed2_1
+		USE ItemLifePotion2_1
 	}
 	Separator {
 		MatrixTransform {

@@ -2,7 +2,7 @@ unit CastlePlayer;
 
 interface
 
-uses MatrixNavigation;
+uses Boxes3d, MatrixNavigation, CastleItems;
 
 const
   DefaultMaxLife = 100;
@@ -19,6 +19,7 @@ type
     FMaxLife: Single;
     FFlyingMode: boolean;
     FNavigator: TMatrixWalker;
+    FItems: TItemsList;
     procedure SetFlyingMode(const Value: boolean);
     procedure UpdateNavigatorFromFlyingMode;
   public
@@ -28,6 +29,11 @@ type
     property Life: Single read FLife write FLife default DefaultMaxLife;
     property MaxLife: Single read FMaxLife write FMaxLife default DefaultMaxLife;
     property FlyingMode: boolean read FFlyingMode write SetFlyingMode default false;
+
+    { Do not add to this manually --- always use PickItem.
+      Items are owned by this class --- when destroing Items,
+      we also destroy all Items.Items[]. }
+    property Items: TItemsList read FItems;
 
     { Each player object always has related Navigator object.
 
@@ -56,17 +62,26 @@ type
       - Navigator.RotationOnlyMatrix, Matrixm, Frustum.
     }
     property Navigator: TMatrixWalker read FNavigator;
+
+    { This adds Item to Items, with appropriate GameMessage }
+    procedure PickItem(Item: TItem);
+
+    { Calculates what can be considered "bounding box of the player",
+      taking into account global Level.CameRadius. Use for collision
+      detection etc. }
+    function BoundingBox: TBox3d;
   end;
 
 implementation
 
-uses SysUtils, Keys, CastlePlay;
+uses KambiClassUtils, SysUtils, Keys, CastlePlay;
 
 constructor TPlayer.Create;
 begin
   inherited Create;
   FLife := DefaultMaxLife;
   FMaxLife := DefaultMaxLife;;
+  FItems := TItemsList.Create;
 
   FNavigator := TMatrixWalker.Create(nil);
   Navigator.Key_MoveSpeedInc := K_None; { turn key off }
@@ -78,6 +93,7 @@ end;
 destructor TPlayer.Destroy;
 begin
   FreeAndNil(FNavigator);
+  FreeWithContentsAndNil(FItems);
   inherited;
 end;
 
@@ -111,6 +127,36 @@ begin
     UpdateNavigatorFromFlyingMode;
     GameMessage(FlyingModeActivated[FlyingMode]);
   end;
+end;
+
+procedure TPlayer.PickItem(Item: TItem);
+var
+  S: string;
+begin
+  Items.Add(Item);
+
+  S := Format('You pick "%s"', [Item.Kind.Name]);
+  if Item.Quantity <> 1 then
+    S += Format(' (quantity %d)', [Item.Quantity]);
+  GameMessage(S);
+end;
+
+function TPlayer.BoundingBox: TBox3d;
+var
+  PlayerSize: Single;
+begin
+  Result[0] := Player.Navigator.CameraPos;
+  Result[1] := Player.Navigator.CameraPos;
+
+  PlayerSize := Level.CameraRadius;
+
+  Result[0, 0] -= PlayerSize;
+  Result[0, 1] -= PlayerSize;
+  Result[0, 2] -= Navigator.RealCameraPreferredHeight;
+
+  Result[1, 0] += PlayerSize;
+  Result[1, 1] += PlayerSize;
+  Result[1, 2] += Level.CameraRadius;
 end;
 
 end.
