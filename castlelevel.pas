@@ -18,7 +18,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{ TCastleLevel class. }
+{ TLevel class and some specialized descendants. }
 
 unit CastleLevel;
 
@@ -28,7 +28,7 @@ uses VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems;
 
 type
-  TCastleLevel = class
+  TLevel = class
   private
     FScene: TVRMLFlatSceneGL;
     FLightSet: TVRMLLightSetGL;
@@ -86,12 +86,18 @@ type
     property Headlight: boolean read FHeadlight;
   end;
 
+  TCastleHallLevel = class(TLevel)
+    constructor Create;
+  end;
+
 implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, MatrixNavigation,
   KambiClassUtils, VectorMath;
 
-constructor TCastleLevel.Create(const ASceneFileName, ALightSetFileName: string);
+{ TLevel --------------------------------------------------------------------- }
+
+constructor TLevel.Create(const ASceneFileName, ALightSetFileName: string);
 
   function LoadVRMLNode(const FileName: string): TVRMLNode;
   begin
@@ -199,7 +205,7 @@ begin
     FTitle := ExtractFileName(DeleteFileExt(ASceneFileName));
 end;
 
-destructor TCastleLevel.Destroy;
+destructor TLevel.Destroy;
 begin
   FreeAndNil(FLightSet);
   FreeAndNil(FScene);
@@ -207,7 +213,7 @@ begin
   inherited;
 end;
 
-procedure TCastleLevel.CorrectBlenderTexture2(Node: TVRMLNode);
+procedure TLevel.CorrectBlenderTexture2(Node: TVRMLNode);
 var
   TextureFileName: TSFString;
 begin
@@ -216,7 +222,7 @@ begin
     TextureFileName.Value := SEnding(TextureFileName.Value, 3);
 end;
 
-procedure TCastleLevel.TraverseForItems(Node: TVRMLNode;
+procedure TLevel.TraverseForItems(Node: TVRMLNode;
   State: TVRMLGraphTraverseState);
 
   procedure CreateNewItem(const ItemNodeName: string);
@@ -278,6 +284,13 @@ begin
       Break;
     end;
   end;
+end;
+
+{ TCastleHallLevel ----------------------------------------------------------- }
+
+constructor TCastleHallLevel.Create;
+begin
+  inherited Create('castle_hall_final.wrl', 'castle_hall_lights.wrl');
 end;
 
 end.

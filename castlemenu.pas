@@ -88,19 +88,17 @@ end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 
-  procedure NewGame(const ASceneFileName, ALightSetFileName: string);
+  procedure NewGame(Level: TLevel);
   var
-    Level: TCastleLevel;
     Player: TPlayer;
   begin
-    GameMessages.Clear;
-    Player := TPlayer.Create;
     try
-      Level := TCastleLevel.Create(ASceneFileName, ALightSetFileName);
+      GameMessages.Clear;
+      Player := TPlayer.Create;
       try
         PlayLevel(Level, Player);
-      finally Level.Free end;
-    finally Player.Free end;
+      finally Player.Free end;
+    finally Level.Free end;
   end;
 
 begin
@@ -122,8 +120,9 @@ begin
    K_Enter:
      case CurrentMenu of
       miReadDocs: ShowHelpMessage;
-      miPlaySample1: NewGame('basic_castle_final.wrl', 'basic_castle_lights.wrl');
-      miPlaySample2: NewGame('castle_hall_final.wrl', 'castle_hall_lights.wrl');
+      miPlaySample1: NewGame(
+        TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
+      miPlaySample2: NewGame(TCastleHallLevel.Create);
       miViewGameMessages: ViewGameMessages;
       miSound:
         begin

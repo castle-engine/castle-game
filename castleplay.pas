@@ -26,7 +26,7 @@ interface
 
 uses Classes, CastleLevel, CastlePlayer;
 
-procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
+procedure PlayLevel(ALevel: TLevel; APlayer: TPlayer);
 
 var
   { Currently used player by PlayLevel. nil if PlayLevel doesn't work
@@ -35,7 +35,7 @@ var
 
   { Currently used level by PlayLevel. nil if PlayLevel doesn't work
     right now. }
-  Level: TCastleLevel;
+  Level: TLevel;
 
   { These are all messages passed to GameMessage.
     Created / destroyed in this unit's initialization / finalization.
@@ -408,7 +408,7 @@ begin
   alUpdateListener;
 end;
 
-procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
+procedure PlayLevel(ALevel: TLevel; APlayer: TPlayer);
 const
   HeadlightPower = 0.5;
 var
