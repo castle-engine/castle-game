@@ -54,5 +54,5 @@ Group {
     title "Castle Hall"
   }
 
-  WWWInline { name "castle_hall.wrl" }
+  WWWInline { name "castle_hall_processed.wrl" }
 }
