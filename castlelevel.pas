@@ -24,7 +24,7 @@ unit CastleLevel;
 
 interface
 
-uses VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
+uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems;
 
 type
@@ -52,8 +52,9 @@ type
       early. }
     ItemsToRemove: TVRMLNodesList;
 
-    procedure CorrectBlenderTexture2(Node: TVRMLNode);
     procedure TraverseForItems(Node: TVRMLNode; State: TVRMLGraphTraverseState);
+
+    function LoadVRMLNode(const FileName: string): TVRMLNode;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -84,26 +85,37 @@ type
     property Items: TItemsOnLevelList read FItems;
 
     property Headlight: boolean read FHeadlight;
+
+    { Call this to render level things. Frustum is current player's frustum. }
+    procedure Render(const Frustum: TFrustum); virtual;
+
+    { Call this to allow level object to update some things,
+      animate level objects etc. }
+    procedure Idle(const CompSpeed: Single); virtual;
   end;
 
   TCastleHallLevel = class(TLevel)
+  private
+    ButtonPressed: boolean;
+    AnimationOpenDownRotation: Single;
+    Symbol_TL, Symbol_BL, Symbol_TR, Symbol_BR: TVRMLFlatSceneGL;
+  public
     constructor Create;
+    destructor Destroy; override;
+    procedure Render(const Frustum: TFrustum); override;
+    procedure Idle(const CompSpeed: Single); override;
   end;
+
+procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
 
 implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, MatrixNavigation,
-  KambiClassUtils, VectorMath;
+  KambiClassUtils;
 
 { TLevel --------------------------------------------------------------------- }
 
 constructor TLevel.Create(const ASceneFileName, ALightSetFileName: string);
-
-  function LoadVRMLNode(const FileName: string): TVRMLNode;
-  begin
-    Result := ParseVRMLFile(ProgramDataPath + 'data' + PathDelim +
-      'levels' + PathDelim + FileName, false);
-  end;
 
   procedure RemoveItemsToRemove;
   var
@@ -126,8 +138,7 @@ begin
     to something simpler. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
 
-  Scene.RootNode.EnumNodes(TNodeTexture2, CorrectBlenderTexture2, false);
-  Scene.ChangedAll;
+  SceneCorrectBlenderTexture2(Scene);
 
   { Initialize Items }
   FItems := TItemsOnLevelList.Create;
@@ -213,13 +224,10 @@ begin
   inherited;
 end;
 
-procedure TLevel.CorrectBlenderTexture2(Node: TVRMLNode);
-var
-  TextureFileName: TSFString;
+function TLevel.LoadVRMLNode(const FileName: string): TVRMLNode;
 begin
-  TextureFileName := (Node as TNodeTexture2).FdFileName;
-  if IsPrefix('//..', TextureFileName.Value) then
-    TextureFileName.Value := SEnding(TextureFileName.Value, 3);
+  Result := ParseVRMLFile(ProgramDataPath + 'data' + PathDelim +
+    'levels' + PathDelim + FileName, false);
 end;
 
 procedure TLevel.TraverseForItems(Node: TVRMLNode;
@@ -286,11 +294,107 @@ begin
   end;
 end;
 
+procedure TLevel.Render(const Frustum: TFrustum);
+begin
+  Scene.RenderFrustumOctree(Frustum);
+end;
+
+procedure TLevel.Idle(const CompSpeed: Single);
+begin
+  { Nothing to do in this class. }
+end;
+
 { TCastleHallLevel ----------------------------------------------------------- }
 
 constructor TCastleHallLevel.Create;
+
+  function LoadSymbol(const Suffix: string): TVRMLFlatSceneGL;
+  begin
+    Result := TVRMLFlatSceneGL.Create(LoadVRMLNode(
+      'castle_hall_symbol_' + Suffix + '_final.wrl'),
+      true, roSeparateShapeStates);
+    SceneCorrectBlenderTexture2(Result);
+  end;
+
 begin
   inherited Create('castle_hall_final.wrl', 'castle_hall_lights.wrl');
+  Symbol_TL := LoadSymbol('tl');
+  Symbol_BL := LoadSymbol('bl');
+  Symbol_TR := LoadSymbol('tr');
+  Symbol_BR := LoadSymbol('br');
+end;
+
+destructor TCastleHallLevel.Destroy;
+begin
+  FreeAndNil(Symbol_TL);
+  FreeAndNil(Symbol_BL);
+  FreeAndNil(Symbol_TR);
+  FreeAndNil(Symbol_BR);
+  inherited;
+end;
+
+procedure TCastleHallLevel.Render(const Frustum: TFrustum);
+
+  procedure RenderRotated(SymbolScene: TVRMLFlatSceneGL;
+    const RotationX, RotationY: Integer);
+  begin
+    glPushMatrix;
+      glRotatef(AnimationOpenDownRotation, RotationX, RotationY, 0);
+      SymbolScene.RenderFrustum(Frustum);
+    glPopMatrix;
+  end;
+
+begin
+  inherited;
+  if ButtonPressed then
+  begin
+    RenderRotated(Symbol_TL, +1, +1);
+    RenderRotated(Symbol_BL, +1, -1);
+    RenderRotated(Symbol_BR, -1, -1);
+    RenderRotated(Symbol_TR, -1, +1);
+  end else
+  begin
+    Symbol_TL.RenderFrustum(Frustum);
+    Symbol_BL.RenderFrustum(Frustum);
+    Symbol_TR.RenderFrustum(Frustum);
+    Symbol_BR.RenderFrustum(Frustum);
+  end;
+end;
+
+procedure TCastleHallLevel.Idle(const CompSpeed: Single);
+const
+  MaxAnimationOpenDownRotation = 75;
+begin
+  inherited;
+
+  if ButtonPressed and
+     (AnimationOpenDownRotation < MaxAnimationOpenDownRotation) then
+  begin
+    AnimationOpenDownRotation := Min(MaxAnimationOpenDownRotation,
+      AnimationOpenDownRotation + 7 * CompSpeed);
+  end;
+end;
+
+{ global things -------------------------------------------------------------- }
+
+type
+  TDummy = class
+    class procedure CorrectBlenderTexture2(Node: TVRMLNode);
+  end;
+
+class procedure TDummy.CorrectBlenderTexture2(Node: TVRMLNode);
+var
+  TextureFileName: TSFString;
+begin
+  TextureFileName := (Node as TNodeTexture2).FdFileName;
+  if IsPrefix('//..', TextureFileName.Value) then
+    TextureFileName.Value := SEnding(TextureFileName.Value, 3);
+end;
+
+procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
+begin
+  Scene.RootNode.EnumNodes(TNodeTexture2, TDummy.CorrectBlenderTexture2, false);
+  Scene.ChangedAll;
 end;
 
 end.

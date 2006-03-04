@@ -233,7 +233,7 @@ begin
 
   Level.LightSet.RenderLights;
 
-  Level.Scene.RenderFrustumOctree(Player.Navigator.Frustum);
+  Level.Render(Player.Navigator.Frustum);
 
   Level.Items.Render;
 
@@ -466,9 +466,9 @@ begin
         if Level.Headlight then
         begin
           glEnable(GL_LIGHT0);
-          glLightv(GL_LIGHT0, GL_DIFFUSE, 
+          glLightv(GL_LIGHT0, GL_DIFFUSE,
             Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
-          glLightv(GL_LIGHT0, GL_SPECULAR, 
+          glLightv(GL_LIGHT0, GL_SPECULAR,
             Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
         end;
 

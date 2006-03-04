@@ -98,7 +98,6 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
   (kam-add-material-for-mesh "MeshDome" "MatUnderTexture")
   (kam-add-material-for-mesh "MeshGround" "MatGround")
   (kam-add-material-for-mesh "MeshGroundDown" "MatGroundDown")
-  (kam-add-material-for-mesh "MeshSymbol" "MatUnderTexture")
   (kam-add-material-for-mesh "MeshTunnel" "MatUnderTexture")
   (kam-add-material-for-mesh "MeshTunnelAround" "MatUnderTexture")
   (write-file "castle_hall_processed.wrl")

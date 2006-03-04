@@ -283,6 +283,9 @@ Levels:
   of assumptions that really need +Z to be up.
   (like TItemOnLevel.PlayerCollision).
 
+- For more customized levels, you may want to derive new class
+  from TLevel and override there things you want.
+
 Items:
 
 - Item up vector must be +Z.
@@ -352,6 +355,10 @@ Items:
 - Finally, to really add the item to the game add 1 line to
   CastleItems units in DoInitialization call creating your
   TItemKind instance.
+
+- For some items you may be able to just reuse some existing TItemKind
+  class, for others you will want to derive new class from TItemKind
+  and override there things you want.
 
 --------------------
 Used things:
