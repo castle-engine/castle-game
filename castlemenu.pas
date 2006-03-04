@@ -34,12 +34,14 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp;
 
 type
-  TMenuItem = (miReadDocs, miPlaySample, miViewGameMessages, miSound, miQuit);
+  TMenuItem = (miReadDocs, miPlaySample1, miPlaySample2,
+    miViewGameMessages, miSound, miQuit);
 
 const
   MenuNames: array[TMenuItem]of string = (
     'Read short instructions',
-    'Play sample level',
+    'New game (Sample castle level)',
+    'New game (Castle Hall - new level for PGD stage 3)',
     'View last game messages',
     'Sound',
     'Quit');
@@ -85,9 +87,22 @@ begin
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
-var
-  Level: TCastleLevel;
-  NewPlayer: TPlayer;
+
+  procedure NewGame(const ASceneFileName, ALightSetFileName: string);
+  var
+    Level: TCastleLevel;
+    Player: TPlayer;
+  begin
+    GameMessages.Clear;
+    Player := TPlayer.Create;
+    try
+      Level := TCastleLevel.Create(ASceneFileName, ALightSetFileName);
+      try
+        PlayLevel(Level, Player);
+      finally Level.Free end;
+    finally Player.Free end;
+  end;
+
 begin
   case key of
     K_Up:
@@ -107,19 +122,8 @@ begin
    K_Enter:
      case CurrentMenu of
       miReadDocs: ShowHelpMessage;
-      miPlaySample:
-        begin
-          GameMessages.Clear;
-          NewPlayer := TPlayer.Create;
-          try
-            Level := TCastleLevel.Create(
-              'basic_castle_final.wrl', 'basic_castle_lights.wrl'
-              {'castle_hall_final.wrl', 'castle_hall_lights.wrl'});
-            try
-              PlayLevel(Level, NewPlayer);
-            finally Level.Free end;
-          finally NewPlayer.Free end;
-        end;
+      miPlaySample1: NewGame('basic_castle_final.wrl', 'basic_castle_lights.wrl');
+      miPlaySample2: NewGame('castle_hall_final.wrl', 'castle_hall_lights.wrl');
       miViewGameMessages: ViewGameMessages;
       miSound:
         begin

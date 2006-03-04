@@ -8,8 +8,13 @@
 # That's why I don't define these lights in castle_hall_final.wrl
 
 Group {
-  PointLight { location  8 -8 10 color 0.2   0 0 }
-  PointLight { location  8  8 10 color   0 0.2 0 }
-  PointLight { location -8  8 10 color 0.2   0 0 }
-  PointLight { location -8 -8 10 color   0 0.2 0 }
+  PointLight {
+    location -0.48424467735151117 2.030553575594324 5.9872039198498008
+    color 0.4 0.2 0.2
+  }
+
+  PointLight {
+    location -11.109210014343262 -36.451499938964844 88.175689697265625
+    color 0.4 0.4 0.4
+  }
 }

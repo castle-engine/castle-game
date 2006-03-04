@@ -90,6 +90,7 @@ dist-making to-dos:
 ----------------------------------------
 Each time before uploading PGD release:
 
+- make sure Version (in castlehelp.pas) is good
 - under Linux and Windows:
   - build debug exe from this dir, test
       make -C /win/mojepasy/units/ clean

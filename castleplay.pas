@@ -409,6 +409,8 @@ begin
 end;
 
 procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
+const
+  HeadlightPower = 0.2;
 var
   SavedMode: TGLMode;
   CamPos, CamDir, CamUp: TVector3Single;
@@ -462,7 +464,13 @@ begin
 
         glEnable(GL_LIGHTING);
         if Level.Headlight then
+        begin
           glEnable(GL_LIGHT0);
+          glLightv(GL_LIGHT0, GL_DIFFUSE, 
+            Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
+          glLightv(GL_LIGHT0, GL_SPECULAR, 
+            Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
+        end;
 
         MessageRectStipple := @ThreeQuartersStipple;
         try
