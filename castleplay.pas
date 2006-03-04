@@ -383,18 +383,14 @@ function MoveAllowed(Navigator: TMatrixWalker;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  Result :=
-    Box3dPointInside(ProposedNewPos, Level.LevelBox) and
-    Level.Scene.DefaultTriangleOctree.MoveAllowed(
-      Navigator.CameraPos, ProposedNewPos, NewPos, Level.CameraRadius);
+  Result := Level.MoveAllowed(Navigator,
+    ProposedNewPos, NewPos, BecauseOfGravity);
 end;
 
 procedure GetCameraHeight(Navigator: TMatrixNavigator;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 begin
-  Level.Scene.DefaultTriangleOctree.GetCameraHeight(
-    TMatrixWalker(Navigator).CameraPos,
-    TMatrixWalker(Navigator).HomeCameraUp,
+  Level.GetCameraHeight(Navigator,
     IsAboveTheGround, SqrHeightAboveTheGround);
 end;
 

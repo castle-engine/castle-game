@@ -25,7 +25,7 @@ unit CastleLevel;
 interface
 
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
-  VRMLNodes, VRMLFields, CastleItems;
+  VRMLNodes, VRMLFields, CastleItems, MatrixNavigation;
 
 type
   TLevel = class
@@ -86,6 +86,19 @@ type
 
     property Headlight: boolean read FHeadlight;
 
+    { MoveAllowed and GetCameraHeight perform collision detection
+      with the level.
+
+      @groupBegin }
+    function MoveAllowed(Navigator: TMatrixWalker;
+      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const BecauseOfGravity: boolean): boolean; virtual;
+
+    procedure GetCameraHeight(Navigator: TMatrixNavigator;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+      virtual;
+    { @groupEnd }
+
     { Call this to render level things. Frustum is current player's frustum. }
     procedure Render(const Frustum: TFrustum); virtual;
 
@@ -102,6 +115,15 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+
+    function MoveAllowed(Navigator: TMatrixWalker;
+      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const BecauseOfGravity: boolean): boolean; override;
+
+    procedure GetCameraHeight(Navigator: TMatrixNavigator;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+      override;
+
     procedure Render(const Frustum: TFrustum); override;
     procedure Idle(const CompSpeed: Single); override;
   end;
@@ -110,8 +132,7 @@ procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
 
 implementation
 
-uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, MatrixNavigation,
-  KambiClassUtils;
+uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils;
 
 { TLevel --------------------------------------------------------------------- }
 
@@ -294,6 +315,25 @@ begin
   end;
 end;
 
+function TLevel.MoveAllowed(Navigator: TMatrixWalker;
+  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const BecauseOfGravity: boolean): boolean;
+begin
+  Result :=
+    Box3dPointInside(ProposedNewPos, LevelBox) and
+    Scene.DefaultTriangleOctree.MoveAllowed(
+      Navigator.CameraPos, ProposedNewPos, NewPos, CameraRadius);
+end;
+
+procedure TLevel.GetCameraHeight(Navigator: TMatrixNavigator;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+begin
+  Scene.DefaultTriangleOctree.GetCameraHeight(
+    TMatrixWalker(Navigator).CameraPos,
+    TMatrixWalker(Navigator).HomeCameraUp,
+    IsAboveTheGround, SqrHeightAboveTheGround);
+end;
+
 procedure TLevel.Render(const Frustum: TFrustum);
 begin
   Scene.RenderFrustumOctree(Frustum);
@@ -313,7 +353,12 @@ constructor TCastleHallLevel.Create;
     Result := TVRMLFlatSceneGL.Create(LoadVRMLNode(
       'castle_hall_symbol_' + Suffix + '.wrl'),
       true, roSeparateShapeStates);
+
+    Result.Attrib_TextureMinFilter := Scene.Attrib_TextureMinFilter;
+
     SceneCorrectBlenderTexture2(Result);
+
+    Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
   end;
 
 begin
@@ -322,7 +367,6 @@ begin
   Symbol_BL := LoadSymbol('bl');
   Symbol_TR := LoadSymbol('tr');
   Symbol_BR := LoadSymbol('br');
-  {}ButtonPressed := true;
 end;
 
 destructor TCastleHallLevel.Destroy;
@@ -332,6 +376,68 @@ begin
   FreeAndNil(Symbol_TR);
   FreeAndNil(Symbol_BR);
   inherited;
+end;
+
+
+function TCastleHallLevel.MoveAllowed(Navigator: TMatrixWalker;
+  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const BecauseOfGravity: boolean): boolean;
+
+  function MakeSymbol(SymbolScene: TVRMLFlatSceneGL): boolean;
+  begin
+    Result := SymbolScene.DefaultTriangleOctree.MoveAllowedSimple(
+      Navigator.CameraPos, NewPos, CameraRadius);
+  end;
+
+begin
+  Result := inherited MoveAllowed(Navigator,
+    ProposedNewPos, NewPos, BecauseOfGravity);
+
+  if Result and (not ButtonPressed) then
+  begin
+    Result :=
+      MakeSymbol(Symbol_TL) and
+      MakeSymbol(Symbol_BL) and
+      MakeSymbol(Symbol_TR) and
+      MakeSymbol(Symbol_BR);
+  end;
+end;
+
+procedure TCastleHallLevel.GetCameraHeight(Navigator: TMatrixNavigator;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+
+  procedure MakeSymbol(SymbolScene: TVRMLFlatSceneGL);
+  var
+    IsAboveTheSymbol: boolean;
+    SqrHeightAboveTheSymbol: Single;
+  begin
+    SymbolScene.DefaultTriangleOctree.GetCameraHeight(
+      TMatrixWalker(Navigator).CameraPos,
+      TMatrixWalker(Navigator).HomeCameraUp,
+      IsAboveTheSymbol, SqrHeightAboveTheSymbol);
+
+    if IsAboveTheSymbol then
+    begin
+      if not IsAboveTheGround then
+      begin
+        IsAboveTheGround := IsAboveTheSymbol;
+        SqrHeightAboveTheGround := SqrHeightAboveTheSymbol;
+      end else
+        SqrHeightAboveTheGround :=
+          Min(SqrHeightAboveTheGround, SqrHeightAboveTheSymbol);
+    end;
+  end;
+
+begin
+  inherited GetCameraHeight(Navigator, IsAboveTheGround, SqrHeightAboveTheGround);
+
+  if not ButtonPressed then
+  begin
+    MakeSymbol(Symbol_TL);
+    MakeSymbol(Symbol_BL);
+    MakeSymbol(Symbol_TR);
+    MakeSymbol(Symbol_BR);
+  end;
 end;
 
 procedure TCastleHallLevel.Render(const Frustum: TFrustum);
@@ -382,10 +488,6 @@ begin
     AnimationOpenDownRotation := Min(MaxAnimationOpenDownRotation,
       AnimationOpenDownRotation + 0.1 * CompSpeed);
   end;
-  
-  {}if ButtonPressed and
-     (AnimationOpenDownRotation >= MaxAnimationOpenDownRotation) then
-    AnimationOpenDownRotation := 0;
 end;
 
 { global things -------------------------------------------------------------- }
