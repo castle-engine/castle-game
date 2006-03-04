@@ -1,11 +1,11 @@
-- level exit when jumps inside GroundDown
-
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
-  Goal #4 (5 Points) - Provide an 'exit' for the level.
 
 --------------------
 post stage 3:
+- the button should be above alpha sky, otherwise player doesn't actually
+  see that level entrance opens.
+
 - when moving forward with looking up, you get awful sharp vertical moves.
   Observed on castle_hall
 

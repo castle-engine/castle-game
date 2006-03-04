@@ -51,6 +51,8 @@ var
   display it on the game screen. }
 procedure GameMessage(const S: string);
 
+procedure LevelFinished(NextLevel: TLevel);
+
 implementation
 
 uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
@@ -60,7 +62,7 @@ uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   CastleItems, VRMLTriangleOctree;
 
 var
-  GameCancelled: boolean;
+  GameEnded: boolean;
   GameMessagesManager: TTimeMessagesManager;
   GLList_Draw2dBegin: TGLuint;
   GLList_BlankIndicatorImage: TGLuint;
@@ -350,6 +352,12 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       GameMessage('Nothing to use - select some item first');
   end;
 
+  procedure GameCancel;
+  begin
+    if MessageYesNo(Glw, 'Are you sure you want to end the game ?', taLeft) then
+      GameEnded := true;
+  end;
+
 begin
   case Key of
     K_F1: ShowHelpMessage;
@@ -374,7 +382,7 @@ begin
         'd': DropItem;
         CharEnter: UseItem;
 
-        CharEscape: GameCancelled := true;
+        CharEscape: GameCancel;
       end;
   end;
 end;
@@ -483,7 +491,7 @@ begin
 
         Glw.EventResize;
 
-        GameCancelled := false;
+        GameEnded := false;
 
         glEnable(GL_LIGHTING);
         if Level.Headlight then
@@ -507,7 +515,7 @@ begin
 
             repeat
               Glwm.ProcessMessage(true);
-            until GameCancelled;
+            until GameEnded;
           finally FreeAndNil(GameMessagesManager) end;
 
         finally MessageRectStipple := nil; end;
@@ -532,6 +540,19 @@ begin
   if GameMessagesManager <> nil then
     GameMessagesManager.Show(S);
   GameMessages.Insert(0, S);
+end;
+
+procedure LevelFinished(NextLevel: TLevel);
+begin
+  if NextLevel = nil then
+  begin
+    MessageOK(Glw, 'Level finished', taLeft);
+    GameEnded := true;
+  end else
+  begin
+    MessageOK(Glw, 'Next level: TODO');
+    GameEnded := true;
+  end;
 end;
 
 procedure GLWindowInit(Glwin: TGLWindow);

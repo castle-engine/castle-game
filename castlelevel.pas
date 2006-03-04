@@ -494,6 +494,9 @@ const
 begin
   inherited;
 
+  if Player.Navigator.CameraPos[2] < -7 then
+    LevelFinished(nil);
+
   if ButtonPressed and
      (AnimationOpenDownRotation < MaxAnimationOpenDownRotation) then
   begin
