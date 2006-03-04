@@ -23,6 +23,7 @@ type
     FEquippedWeapon: TItem;
     procedure SetFlyingMode(const Value: boolean);
     procedure UpdateNavigatorFromFlyingMode;
+    procedure SetEquippedWeapon(Value: TItem);
   public
     constructor Create;
     destructor Destroy; override;
@@ -101,8 +102,11 @@ type
 
       You can set this property only to some item existing on Items.
       When dropping items and current weapon will be dropped,
-      we will automatically set this back to nil. }
-    property EquippedWeapon: TItem read FEquippedWeapon write FEquippedWeapon;
+      DeleteItem will automatically set this back to nil.
+
+      When setting this property (to nil or non-nil) player may get
+      GameMessage about using/not using a weapon. }
+    property EquippedWeapon: TItem read FEquippedWeapon write SetEquippedWeapon;
   end;
 
 implementation
@@ -166,16 +170,25 @@ end;
 procedure TPlayer.PickItem(Item: TItem);
 var
   S: string;
+  StackIndex: Integer;
 begin
-  Items.Add(Item);
-
-  { TODO: Optional stacking (adding quantity with existing item) should occur here }
-  { TODO: Equiping weapon/armor if not wearing one should occur here }
-
   S := Format('You pick "%s"', [Item.Kind.Name]);
   if Item.Quantity <> 1 then
     S += Format(' (quantity %d)', [Item.Quantity]);
   GameMessage(S);
+
+  StackIndex := Items.Stackable(Item);
+  if StackIndex <> -1 then
+  begin
+    { Stack Item with existing item }
+    Items[StackIndex].Quantity := Items[StackIndex].Quantity + Item.Quantity;
+    FreeAndNil(Item);
+  end else
+    Items.Add(Item);
+
+  { Automatically equip the weapon. }
+  if (Item.Kind is TItemWeaponKind) and (EquippedWeapon = nil) then
+    EquippedWeapon := Item;
 end;
 
 function TPlayer.DropItem(ItemIndex: Integer): TItem;
@@ -224,10 +237,7 @@ begin
   Result := Items[ItemIndex];
   Items.Delete(ItemIndex);
   if Result = EquippedWeapon then
-  begin
-    FEquippedWeapon := nil;
-    GameMessage('You''re no longer using your weapon');
-  end;
+    EquippedWeapon := nil;
 end;
 
 function TPlayer.BoundingBox: TBox3d;
@@ -246,6 +256,18 @@ begin
   Result[1, 0] += PlayerSize;
   Result[1, 1] += PlayerSize;
   Result[1, 2] += Level.CameraRadius;
+end;
+
+procedure TPlayer.SetEquippedWeapon(Value: TItem);
+begin
+  if Value <> FEquippedWeapon then
+  begin
+    FEquippedWeapon := Value;
+    if EquippedWeapon = nil then
+      GameMessage('You''re no longer using your weapon') else
+      GameMessage(Format('You''re using weapon "%s" now',
+        [EquippedWeapon.Kind.Name]));
+  end;
 end;
 
 end.

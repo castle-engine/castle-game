@@ -140,6 +140,12 @@ type
       This must always be >= 1. }
     property Quantity: Cardinal read FQuantity write FQuantity;
 
+    { Stackable means that two items are equal and they can be summed
+      into one item by adding their Quantity values.
+      Practially this means that all properties
+      of both items are equal, with the exception of Quantity. }
+    function Stackable(Item: TItem): boolean;
+
     { This splits item (with Quantity >= 2) into two items.
       It returns newly created object with the same properties
       as this object, and with Quantity set to QuantitySplit.
@@ -151,7 +157,12 @@ type
 
   TObjectsListItem_2 = TItem;
   {$I objectslist_2.inc}
-  TItemsList = TObjectsList_2;
+  TItemsList = class(TObjectsList_2)
+    { This checks is Item "stackable" with any item on the list.
+      Returns index of item on the list that is stackable with given Item,
+      or -1 if none. }
+    function Stackable(Item: TItem): Integer;
+  end;
 
   TItemOnLevel = class
   private
@@ -297,6 +308,7 @@ end;
 
 destructor TItemWeaponKind.Destroy;
 begin
+  FreeAndNil(FScreenImage);
   inherited;
 end;
 
@@ -340,11 +352,7 @@ end;
 
 procedure TItemWeaponKind.Use(Item: TItem);
 begin
-  if Player.EquippedWeapon <> Item then
-  begin
-    Player.EquippedWeapon := Item;
-    GameMessage(Format('You''re using weapon "%s" now', [Name]));
-  end;
+  Player.EquippedWeapon := Item;
 end;
 
 { TItem ------------------------------------------------------------ }
@@ -357,6 +365,11 @@ begin
   Assert(Quantity >= 1, 'Item''s Quantity must be >= 1');
 end;
 
+function TItem.Stackable(Item: TItem): boolean;
+begin
+  Result := Item.Kind = Kind;
+end;
+
 function TItem.Split(QuantitySplit: Cardinal): TItem;
 begin
   Check(Between(Integer(QuantitySplit), 1, Quantity - 1),
@@ -365,6 +378,16 @@ begin
   Result := TItem.Create(Kind, QuantitySplit);
 
   FQuantity -= QuantitySplit;
+end;
+
+{ TItemsList ------------------------------------------------------------ }
+
+function TItemsList.Stackable(Item: TItem): Integer;
+begin
+  for Result := 0 to Count - 1 do
+    if Items[Result].Stackable(Item) then
+      Exit;
+  Result := -1;
 end;
 
 { TItemOnLevel ------------------------------------------------------------ }
