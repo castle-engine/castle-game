@@ -1,12 +1,9 @@
-- using red flask do
-
 - remove base_castle, use castle_hall -- base_castle is just a testing model.
   Also remove the sky -- it's copied from lets_take_a_walk.
   Prepare a good starry sky for VRML castle_hall.
 
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
-  Goal #2 (5 Points) - Add player pick-up items/weapons to engine.
   Goal #3 (5 Points) - Design a better level to test out new features.
   Goal #4 (5 Points) - Provide an 'exit' for the level.
 

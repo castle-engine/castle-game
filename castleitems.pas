@@ -86,6 +86,10 @@ type
     procedure Use(Item: TItem); virtual;
   end;
 
+  TItemPotionOfLifeKind = class(TItemKind)
+    procedure Use(Item: TItem); override;
+  end;
+
   TItemWeaponKind = class(TItemKind)
   private
     FScreenImageFileName: string;
@@ -291,6 +295,19 @@ end;
 procedure TItemKind.Use(Item: TItem);
 begin
   GameMessage('This item cannot be used');
+end;
+
+{ TItemPotionOfLifeKind ---------------------------------------------------- }
+
+procedure TItemPotionOfLifeKind.Use(Item: TItem);
+begin
+  if Player.Life < Player.MaxLife then
+  begin
+    Player.Life := Min(Player.Life + 50, Player.MaxLife);
+    GameMessage(Format('You drink "%s"', [Item.Kind.Name]));
+    Item.Quantity := Item.Quantity - 1;
+  end else
+    GameMessage('You feel quite alright, no need to waste this potion');
 end;
 
 { TItemWeaponKind ------------------------------------------------------------ }
@@ -511,8 +528,8 @@ begin
   Sword := TItemWeaponKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
     'sword.png', false, true);
 
-  LifePotion := TItemKind.Create('flask_red_processed.wrl', 'LifePotion',
-    'Potion of Life', 'flask_red.png');
+  LifePotion := TItemPotionOfLifeKind.Create('flask_red_processed.wrl',
+    'LifePotion', 'Potion of Life', 'flask_red.png');
 end;
 
 procedure DoFinalization;
