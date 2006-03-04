@@ -1,6 +1,4 @@
 - remove base_castle, use castle_hall -- base_castle is just a testing model.
-  Also remove the sky -- it's copied from lets_take_a_walk.
-  Prepare a good starry sky for VRML castle_hall.
 
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
@@ -9,6 +7,23 @@
 
 --------------------
 post stage 3:
+- when moving forward with looking up, you get awful sharp vertical moves.
+  Observed on castle_hall
+
+- Texture punch_through_symbols.jpg: cut this circle from the rest,
+  enlarge, add shome sharpness (and contrast, maybe even noise) using GIMP.
+  This symbol must be visible!
+
+- texture on TunnelAround is awfully deformed (squeezed) at some places...
+
+- remove the sky -- it's copied from lets_take_a_walk.
+  Prepare a good starry sky for VRML castle_hall.
+  Note that current castle_hall sky makes the effect of "window at the top of the dome" awkward, because the sky outside it actually not visible...
+
+  Current workaround: using stars.jpg sky:
+  Stolen from http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
+  right now, replace with something better and free.
+
 - player must be able to actually swing the EquippedWeapon,
   to hurt enemies etc.
 

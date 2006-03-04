@@ -14,13 +14,35 @@ Group {
 
   Separator {
     Rotation { rotation 1 0 0 1.57 }
+
     Background {
-      backUrl "../skies/sky_back.png"
-      bottomUrl "../skies/sky_bottom.png"
-      frontUrl "../skies/sky_front.png"
-      leftUrl "../skies/sky_left.png"
-      rightUrl "../skies/sky_right.png"
-      topUrl "../skies/sky_top.png"
+       backUrl "../skies/stars.jpg"
+       bottomUrl "../skies/stars.jpg"
+       frontUrl "../skies/stars.jpg"
+       leftUrl "../skies/stars.jpg"
+       rightUrl "../skies/stars.jpg"
+       topUrl "../skies/stars.jpg"
+
+#       backUrl "../skies/sky_back.png"
+#       bottomUrl "../skies/sky_bottom.png"
+#       frontUrl "../skies/sky_front.png"
+#       leftUrl "../skies/sky_left.png"
+#       rightUrl "../skies/sky_right.png"
+#       topUrl "../skies/sky_top.png"
+
+#       backUrl "../skies/sky_red_back.png"
+#       bottomUrl "../skies/sky_red_bottom.png"
+#       frontUrl "../skies/sky_red_front.png"
+#       leftUrl "../skies/sky_red_left.png"
+#       rightUrl "../skies/sky_red_right.png"
+#       topUrl "../skies/sky_red_top.png"
+
+#       backUrl "../skies/foggy_sky_back.png"
+#       bottomUrl "../skies/foggy_sky_bottom.png"
+#       frontUrl "../skies/foggy_sky_front.png"
+#       leftUrl "../skies/foggy_sky_left.png"
+#       rightUrl "../skies/foggy_sky_right.png"
+#       topUrl "../skies/foggy_sky_top.png"
     }
   }
 
