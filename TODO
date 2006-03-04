@@ -1,4 +1,11 @@
-- remove base_castle, use castle_hall -- base_castle is just a testing model.
+- fix: when picking second potion, acc viol
+
+- pushing the red button (it should go down)
+  on click
+
+- animation of MeshSymbol moving and disappearing
+
+- level exit when jumps inside GroundDown
 
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
@@ -67,6 +74,8 @@ post stage 3:
   "Castle above the mist" ?
 
 - Do navigating with mouse, like in Quake
+
+- remove base_castle (or make it hidden ?) --- this was just a testing level.
 
 - help (at least beta-testing and English text proofreading!):
 
