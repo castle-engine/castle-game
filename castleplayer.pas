@@ -20,6 +20,7 @@ type
     FFlyingMode: boolean;
     FNavigator: TMatrixWalker;
     FItems: TItemsList;
+    FEquippedWeapon: TItem;
     procedure SetFlyingMode(const Value: boolean);
     procedure UpdateNavigatorFromFlyingMode;
   public
@@ -30,9 +31,14 @@ type
     property MaxLife: Single read FMaxLife write FMaxLife default DefaultMaxLife;
     property FlyingMode: boolean read FFlyingMode write SetFlyingMode default false;
 
-    { Do not add to this manually --- always use PickItem.
+    { Inventory, items owned by the player.
+
+      Do not add to this manually --- always use PickItem.
       Items are owned by this class --- when destroing Items,
-      we also destroy all Items.Items[]. }
+      we also destroy all Items.Items[].
+
+      Do not directly delete from this list --- always use
+      DropItem or DeleteItem. }
     property Items: TItemsList read FItems;
 
     { Each player object always has related Navigator object.
@@ -72,10 +78,31 @@ type
       get memory leak !). }
     function DropItem(ItemIndex: Integer): TItem;
 
+    { Deletes given item from the list. Note that this is different
+      than DropItem: it's more low-level, which means that
+
+      1. it doesn't ask or care about item's quantity --- it will always
+         delete it as a whole, no matter what quantity is has
+      2. it doesn't do any nice GameMessage that you dropped an item.
+
+      However, it does check whether the deleted item was EquippedWeapon
+      and if it was, it will set EquippedWeapon to nil and give to player
+      a message that he's no longer using that weapon. }
+    function DeleteItem(ItemIndex: Integer): TItem;
+
     { Calculates what can be considered "bounding box of the player",
       taking into account global Level.CameRadius. Use for collision
       detection etc. }
     function BoundingBox: TBox3d;
+
+    { Weapon the player is using right now, or nil if none.
+
+      EquippedWeapon.Kind must be TItemWeaponKind.
+
+      You can set this property only to some item existing on Items.
+      When dropping items and current weapon will be dropped,
+      we will automatically set this back to nil. }
+    property EquippedWeapon: TItem read FEquippedWeapon write FEquippedWeapon;
   end;
 
 implementation
@@ -180,7 +207,7 @@ begin
   if DropQuantity = SelectedItem.Quantity then
   begin
     Result := SelectedItem;
-    Items.Delete(ItemIndex);
+    DeleteItem(ItemIndex);
   end else
   begin
     Result := SelectedItem.Split(DropQuantity);
@@ -190,6 +217,17 @@ begin
   if Result.Quantity <> 1 then
     S += Format(' (quantity %d)', [Result.Quantity]);
   GameMessage(S);
+end;
+
+function TPlayer.DeleteItem(ItemIndex: Integer): TItem;
+begin
+  Result := Items[ItemIndex];
+  Items.Delete(ItemIndex);
+  if Result = EquippedWeapon then
+  begin
+    FEquippedWeapon := nil;
+    GameMessage('You''re no longer using your weapon');
+  end;
 end;
 
 function TPlayer.BoundingBox: TBox3d;

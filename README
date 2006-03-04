@@ -1,6 +1,30 @@
 "The Castle"
 
 --------------------
+PGD stage 3 short notes:
+
+- Items: this is the only thing I've done that was required for stage 3.
+  You can pick items (just walk on them),
+  browse your items (keys: i, [, ]),
+  drop (key: d),
+  equip and use (key: enter; unequipping happens automatically on drop).
+
+  Items are "stackable", i.e. when you own two or more items
+  of the same kind, they are displayed like one item with quantity N.
+  Picking and dropping handle this appropriately (when dropping you
+  can drop only part of owned items).
+
+  See below in this file for description how you can design new
+  items for this game.
+
+  TODO: Things remaining to be done about items are:
+  - You can't swing your weapon right now and hurt anyone
+    (especially because there are no enemies right now...).
+  - More items should be added, right now there are only 2.
+    Well, this is 3D game, so I think that the lack of "thousands
+    of item kinds" is acceptable.
+
+--------------------
 Installing and running:
 
 - For Linux:
@@ -274,7 +298,7 @@ Items:
   it on level, so set this to look good. Sensible default
   is size around 1.0.
 
-- Around the "stub" objects on the level:
+- About the "stub" objects on the level:
 
   You can place items on the level by placing a "stub" object
   on the level with appropriate name.
@@ -311,6 +335,13 @@ Items:
   ([http://www.camelot.homedns.org/~michalis/rayhunter.php]):
   set up appropriate light and camera settings and then just render
   item's model to the image. See data/items/images/.
+
+- If this is a weapon, then additionally you want to prepare what I call
+  a ScreenImage of this weapon --- this will be displayed on player's
+  screen when it's equipped. See data/items/equipped/.
+
+  Once again, you can do this image however you like.
+  I used rayhunter to render screen for sword.
 
 - Finally, to really add the item to the game add 1 line to
   CastleItems units in DoInitialization call creating your

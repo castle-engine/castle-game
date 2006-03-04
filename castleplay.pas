@@ -130,6 +130,10 @@ var
   PlayerLifeMapped, I, X, Y, MaxItemShown: Integer;
   S: string;
 begin
+  if Player.EquippedWeapon <> nil then
+    glCallList((Player.EquippedWeapon.Kind as TItemWeaponKind).
+      GLList_DrawScreenImage);
+
   glCallList(GLList_Draw2dBegin);
 
   GameMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
@@ -322,6 +326,29 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       GameMessage('Nothing to drop - select some item first');
   end;
 
+  procedure UseItem;
+  var
+    UsedItem: TItem;
+    UsedItemIndex: Integer;
+  begin
+    if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
+    begin
+      UsedItem := Player.Items[InventoryCurrentItem];
+      UsedItem.Kind.Use(UsedItem);
+      if UsedItem.Quantity = 0 then
+      begin
+        { Note that I don't delete here using
+          Player.Items.Delete(InventoryCurrentItem);,
+          because indexes on Player.Items could change because
+          of TItemKind.Use call. }
+        UsedItemIndex := Player.Items.IndexOf(UsedItem);
+        if UsedItemIndex <> -1 then
+          Player.DeleteItem(UsedItemIndex).Free;
+      end;
+    end else
+      GameMessage('Nothing to use - select some item first');
+  end;
+
 begin
   case Key of
     K_F1: ShowHelpMessage;
@@ -344,6 +371,8 @@ begin
         '[': ChangeInventoryCurrentItem(-1);
         ']': ChangeInventoryCurrentItem(+1);
         'd': DropItem;
+        CharEnter: UseItem;
+
         CharEscape: GameCancelled := true;
       end;
   end;

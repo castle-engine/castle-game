@@ -10,6 +10,7 @@
 default: castle_help_message.inc info
 	$(MAKE) -C data/items/models/
 	$(MAKE) -C data/items/images/
+	$(MAKE) -C data/items/equipped/
 
 VERSION := $(shell ./castle --version)
 

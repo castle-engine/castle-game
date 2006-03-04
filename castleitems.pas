@@ -8,6 +8,8 @@ uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
 {$define read_interface}
 
 type
+  TItem = class;
+
   { Kind of item.
 
     Design question: Maybe it's better making TSword a descendant of TItem,
@@ -67,6 +69,60 @@ type
 
     { This is OpenGL display list to draw @link(Image). }
     function GLList_DrawImage: TGLuint;
+
+    { Use this item.
+
+      In this class, this just prints a message "this item cannot be used".
+
+      Implementation of this method can assume that Item is one of
+      player's owned Items. Implementation of this method can change
+      Item instance properties, including Quantity.
+      As a very special exception, implementation of this method
+      is allowed to set Quantity of Item to 0.
+
+      Caller of this method should always be prepared to immediately
+      handle the "Quantity = 0" situation by freeing given item,
+      removing it from any list etc. }
+    procedure Use(Item: TItem); virtual;
+  end;
+
+  TItemWeaponKind = class(TItemKind)
+  private
+    FScreenImageFileName: string;
+    FScreenImage: TImage;
+    FGLList_DrawScreenImage: TGLuint;
+    FScreenImageAlignLeft: boolean;
+    FScreenImageAlignBottom : boolean;
+  public
+    constructor Create(const AModelFileName, AVRMLNodeName, AName,
+      AImageFileName, AScreenImageFileName: string;
+      AScreenImageAlignLeft, AScreenImageAlignBottom: boolean);
+    destructor Destroy; override;
+
+    { Because whole screen is quite large, we want our ScreenImage
+      to be much smaller. So I can't simply cover whole screen with
+      ScreenImage --- instead these properties tell me where to
+      put the ScreenImage on the screen. }
+    property ScreenImageAlignLeft: boolean read FScreenImageAlignLeft;
+    property ScreenImageAlignBottom: boolean read FScreenImageAlignBottom;
+
+    { "Screen image" will be displayed on player's screen when this
+      item will be equipped.
+
+      GLList_DrawScreenImage will draw the image temporarily
+      turning on alpha test.
+      It will be displayed with alpha test,
+      so it's OK to use sharp alpha channel on this image.
+
+      GLList_DrawScreenImage changes raster position and current matrix.
+
+      @groupBegin }
+    property ScreenImageFileName: string read FScreenImageFileName;
+    function ScreenImage: TImage;
+    function GLList_DrawScreenImage: TGLuint;
+    { @groupEnd }
+
+    procedure Use(Item: TItem); override;
   end;
 
   { An item. Actually, this represents a collection of
@@ -221,6 +277,76 @@ begin
   Result := FGLList_DrawImage;
 end;
 
+procedure TItemKind.Use(Item: TItem);
+begin
+  GameMessage('This item cannot be used');
+end;
+
+{ TItemWeaponKind ------------------------------------------------------------ }
+
+constructor TItemWeaponKind.Create(const AModelFileName, AVRMLNodeName, AName,
+  AImageFileName, AScreenImageFileName: string;
+  AScreenImageAlignLeft, AScreenImageAlignBottom: boolean);
+begin
+  inherited Create(AModelFileName, AVRMLNodeName, AName,
+    AImageFileName);
+  FScreenImageFileName := AScreenImageFileName;
+  FScreenImageAlignLeft := AScreenImageAlignLeft;
+  FScreenImageAlignBottom := AScreenImageAlignBottom;
+end;
+
+destructor TItemWeaponKind.Destroy;
+begin
+  inherited;
+end;
+
+function TItemWeaponKind.ScreenImage: TImage;
+begin
+  if FScreenImage = nil then
+    FScreenImage := LoadImage(
+      ProgramDataPath + 'data' + PathDelim +
+      'items' + PathDelim + 'equipped' + PathDelim + ScreenImageFileName, [], []);
+  Result := FScreenImage;
+end;
+
+function TItemWeaponKind.GLList_DrawScreenImage: TGLuint;
+var
+  X, Y: Integer;
+begin
+  if FGLList_DrawScreenImage = 0 then
+  begin
+    FGLList_DrawScreenImage := glGenLists(1);
+    glNewList(FGLList_DrawScreenImage, GL_COMPILE);
+    try
+      if ScreenImageAlignLeft then
+        X := 0 else
+        X := RequiredScreenWidth - ScreenImage.Width;
+      if ScreenImageAlignBottom then
+        Y := 0 else
+        Y := RequiredScreenHeight - ScreenImage.Height;
+
+      glLoadIdentity;
+      glRasterPos2i(X, Y);
+
+      glPushAttrib(GL_COLOR_BUFFER_BIT);
+        glAlphaFunc(GL_GREATER, 0.5);
+        glEnable(GL_ALPHA_TEST);
+          ImageDraw(ScreenImage);
+      glPopAttrib;
+    finally glEndList end;
+  end;
+  Result := FGLList_DrawScreenImage;
+end;
+
+procedure TItemWeaponKind.Use(Item: TItem);
+begin
+  if Player.EquippedWeapon <> Item then
+  begin
+    Player.EquippedWeapon := Item;
+    GameMessage(Format('You''re using weapon "%s" now', [Name]));
+  end;
+end;
+
 { TItem ------------------------------------------------------------ }
 
 constructor TItem.Create(AKind: TItemKind; AQuantity: Cardinal);
@@ -359,7 +485,9 @@ begin
 
   CreatedItemKinds := TList.Create;
 
-  Sword := TItemKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png');
+  Sword := TItemWeaponKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
+    'sword.png', false, true);
+
   LifePotion := TItemKind.Create('flask_red_processed.wrl', 'LifePotion',
     'Potion of Life', 'flask_red.png');
 end;

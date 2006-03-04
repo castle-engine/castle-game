@@ -1,3 +1,6 @@
+- using red flask do,
+  stacking on picking do
+
 - remove base_castle, use castle_hall -- base_castle is just a testing model.
   Also remove the sky -- it's copied from lets_take_a_walk.
   Prepare a good starry sky for VRML castle_hall.
@@ -8,12 +11,11 @@
   Goal #3 (5 Points) - Design a better level to test out new features.
   Goal #4 (5 Points) - Provide an 'exit' for the level.
 
-- player must be able to:
-  and use items,
-  and equip items.
-
 --------------------
 post stage 3:
+- player must be able to actually swing the EquippedWeapon,
+  to hurt enemies etc.
+
 - rename flask_red filenames everywhere to life_potion
 
 - inventory should be able to scroll, when more than MaxInventorySlots items
