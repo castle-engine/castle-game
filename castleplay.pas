@@ -410,7 +410,7 @@ end;
 
 procedure PlayLevel(ALevel: TCastleLevel; APlayer: TPlayer);
 const
-  HeadlightPower = 0.2;
+  HeadlightPower = 0.5;
 var
   SavedMode: TGLMode;
   CamPos, CamDir, CamUp: TVector3Single;
