@@ -183,6 +183,7 @@ begin
     { Stack Item with existing item }
     Items[StackIndex].Quantity := Items[StackIndex].Quantity + Item.Quantity;
     FreeAndNil(Item);
+    Item := Items[StackIndex];
   end else
     Items.Add(Item);
 
