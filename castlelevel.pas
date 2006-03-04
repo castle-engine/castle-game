@@ -311,7 +311,7 @@ constructor TCastleHallLevel.Create;
   function LoadSymbol(const Suffix: string): TVRMLFlatSceneGL;
   begin
     Result := TVRMLFlatSceneGL.Create(LoadVRMLNode(
-      'castle_hall_symbol_' + Suffix + '_final.wrl'),
+      'castle_hall_symbol_' + Suffix + '.wrl'),
       true, roSeparateShapeStates);
     SceneCorrectBlenderTexture2(Result);
   end;
@@ -322,6 +322,7 @@ begin
   Symbol_BL := LoadSymbol('bl');
   Symbol_TR := LoadSymbol('tr');
   Symbol_BR := LoadSymbol('br');
+  {}ButtonPressed := true;
 end;
 
 destructor TCastleHallLevel.Destroy;
@@ -336,11 +337,19 @@ end;
 procedure TCastleHallLevel.Render(const Frustum: TFrustum);
 
   procedure RenderRotated(SymbolScene: TVRMLFlatSceneGL;
-    const RotationX, RotationY: Integer);
+    const RotationX, RotationY, TranslationX, TranslationY: Integer);
+  const
+    SymbolSize = 30;
   begin
     glPushMatrix;
+      glTranslatef(+TranslationX * SymbolSize, +TranslationY * SymbolSize, 0);
       glRotatef(AnimationOpenDownRotation, RotationX, RotationY, 0);
-      SymbolScene.RenderFrustum(Frustum);
+      glTranslatef(-TranslationX * SymbolSize, -TranslationY * SymbolSize, 0);
+      { SymbolScene BoundingBox doesn't account for transformations abovem
+        so we can't do here RenderFrustum, because this could make false
+        results (objects could be visible, but RenderFrustum would not
+        render it). So below we do normal Render. }
+      SymbolScene.Render(nil);
     glPopMatrix;
   end;
 
@@ -348,10 +357,10 @@ begin
   inherited;
   if ButtonPressed then
   begin
-    RenderRotated(Symbol_TL, +1, +1);
-    RenderRotated(Symbol_BL, +1, -1);
-    RenderRotated(Symbol_BR, -1, -1);
-    RenderRotated(Symbol_TR, -1, +1);
+    RenderRotated(Symbol_TL, +1, +1, -1, +1);
+    RenderRotated(Symbol_BL, -1, +1, -1, -1);
+    RenderRotated(Symbol_BR, -1, -1, +1, -1);
+    RenderRotated(Symbol_TR, +1, -1, +1, +1);
   end else
   begin
     Symbol_TL.RenderFrustum(Frustum);
@@ -371,8 +380,12 @@ begin
      (AnimationOpenDownRotation < MaxAnimationOpenDownRotation) then
   begin
     AnimationOpenDownRotation := Min(MaxAnimationOpenDownRotation,
-      AnimationOpenDownRotation + 7 * CompSpeed);
+      AnimationOpenDownRotation + 0.1 * CompSpeed);
   end;
+  
+  {}if ButtonPressed and
+     (AnimationOpenDownRotation >= MaxAnimationOpenDownRotation) then
+    AnimationOpenDownRotation := 0;
 end;
 
 { global things -------------------------------------------------------------- }

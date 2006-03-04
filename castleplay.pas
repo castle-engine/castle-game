@@ -250,6 +250,7 @@ var
   PickItemIndex: Integer;
 begin
   GameMessagesManager.Idle;
+  Level.Idle(Glw.FpsCompSpeed);
   Level.Items.Idle(Glw.FpsCompSpeed);
 
   PickItemIndex := Level.Items.PlayerCollision;

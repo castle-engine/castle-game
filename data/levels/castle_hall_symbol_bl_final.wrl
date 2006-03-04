@@ -1,6 +1,0 @@
-#VRML V1.0 ascii
-
-Group {
-  Scale { scaleFactor 5 5 5 }
-  WWWInline { name "castle_hall_symbol_bl.wrl" }
-}
