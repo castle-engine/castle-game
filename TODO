@@ -1,12 +1,7 @@
-- pushing the red button (it should go down) on click
-
-- animation of MeshSymbol moving and disappearing
-
 - level exit when jumps inside GroundDown
 
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
-  Goal #3 (5 Points) - Design a better level to test out new features.
   Goal #4 (5 Points) - Provide an 'exit' for the level.
 
 --------------------

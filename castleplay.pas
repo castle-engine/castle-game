@@ -57,7 +57,7 @@ uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
   CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
-  CastleItems;
+  CastleItems, VRMLTriangleOctree;
 
 var
   GameCancelled: boolean;
@@ -379,6 +379,31 @@ begin
   end;
 end;
 
+procedure MouseDown(Glwin: TGLWindow; Btn: TMouseButton);
+var
+  Ray0, RayVector, Intersection: TVector3Single;
+  IntersectItemIndex: integer;
+begin
+  if Btn = mbLeft then
+  begin
+    Ray0 := Glw.NavWalker.CameraPos;
+    RayVector := PrimaryRay(Glwin.MouseX, Glwin.Height - Glwin.MouseY,
+      Glwin.Width, Glwin.Height,
+      Glw.NavWalker.CameraPos, Glw.NavWalker.CameraDir, Glw.NavWalker.CameraUp,
+      ViewAngleDegX, ViewAngleDegY);
+
+    IntersectItemIndex :=
+      Level.Scene.DefaultTriangleOctree.RayCollision(
+        Intersection, Ray0, RayVector, true, NoItemIndex, false);
+
+    if IntersectItemIndex <> NoItemIndex then
+    begin
+      Level.ItemPicked(Level.Scene.DefaultTriangleOctree.OctreeItems.
+        Items[IntersectItemIndex]);
+    end;
+  end;
+end;
+
 function MoveAllowed(Navigator: TMatrixWalker;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
@@ -454,6 +479,7 @@ begin
         Glw.OnIdle := Idle;
         Glw.OnTimer := Timer;
         Glw.OnKeyDown := KeyDown;
+        Glw.OnMouseDown := MouseDown;
 
         Glw.EventResize;
 

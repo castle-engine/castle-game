@@ -25,7 +25,8 @@ unit CastleLevel;
 interface
 
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
-  VRMLNodes, VRMLFields, CastleItems, MatrixNavigation;
+  VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
+  VRMLTriangleOctree;
 
 type
   TLevel = class
@@ -105,6 +106,9 @@ type
     { Call this to allow level object to update some things,
       animate level objects etc. }
     procedure Idle(const CompSpeed: Single); virtual;
+
+    { Call this when player picked some item on the level. }
+    procedure ItemPicked(const Item: TOctreeItem); virtual;
   end;
 
   TCastleHallLevel = class(TLevel)
@@ -126,13 +130,16 @@ type
 
     procedure Render(const Frustum: TFrustum); override;
     procedure Idle(const CompSpeed: Single); override;
+
+    procedure ItemPicked(const Item: TOctreeItem); override;
   end;
 
 procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
 
 implementation
 
-uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils;
+uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
+  CastlePlay;
 
 { TLevel --------------------------------------------------------------------- }
 
@@ -344,6 +351,11 @@ begin
   { Nothing to do in this class. }
 end;
 
+procedure TLevel.ItemPicked(const Item: TOctreeItem);
+begin
+  { Nothing to do in this class. }
+end;
+
 { TCastleHallLevel ----------------------------------------------------------- }
 
 constructor TCastleHallLevel.Create;
@@ -487,6 +499,19 @@ begin
   begin
     AnimationOpenDownRotation := Min(MaxAnimationOpenDownRotation,
       AnimationOpenDownRotation + 0.1 * CompSpeed);
+  end;
+end;
+
+procedure TCastleHallLevel.ItemPicked(const Item: TOctreeItem);
+begin
+  if Item.State.LastNodes.Material.NodeName = 'MatButton' then
+  begin
+    if ButtonPressed then
+      GameMessage('Button is already pressed') else
+    begin
+      ButtonPressed := true;
+      GameMessage('You press the button. Level exit is uncovered');
+    end;
   end;
 end;
 
