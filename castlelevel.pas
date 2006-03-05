@@ -472,7 +472,6 @@ procedure TCastleHallLevel.Render(const Frustum: TFrustum);
   end;
 
 begin
-  inherited;
   if ButtonPressed then
   begin
     RenderRotated(Symbol_TL, +1, +1, -1, +1);
@@ -486,6 +485,10 @@ begin
     Symbol_TR.RenderFrustum(Frustum);
     Symbol_BR.RenderFrustum(Frustum);
   end;
+
+  { Note that we render Symbol before inherited, i.e. before rendering
+    real level --- to allow alpha objects on level to be rendered as last. }
+  inherited;
 end;
 
 procedure TCastleHallLevel.Idle(const CompSpeed: Single);
