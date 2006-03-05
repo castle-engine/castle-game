@@ -46,10 +46,6 @@ Group {
     }
   }
 
-  Scale {
-    scaleFactor 5 5 5
-  }
-
   WorldInfo {
     title "Castle Hall"
   }
