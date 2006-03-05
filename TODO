@@ -1,10 +1,7 @@
-- castle_hall: RoofLine could be textured ?
-
-- test stage 3 entry with Mama
-
-- Stage 3: Feb 12th - Mar 4th
-  Goal #1 (5 Points) - Add basic enemies to game engine.
-
+--------------------
+castle_hall todos:
+- RoofLine could be textured ?
+- stairs do, move button there
 - the button should be above alpha sky, otherwise player doesn't actually
   see that level entrance opens.
 
@@ -25,6 +22,8 @@
   Stolen from http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
   right now, replace with something better and free.
 
+--------------------
+items todos:
 - player must be able to actually swing the EquippedWeapon,
   to hurt enemies etc.
 
@@ -42,6 +41,16 @@
 - picking items with mouse (to get GameMessage like
   "You're looking at ... (e.g. some item short name etc.)"
   This would allow me to show Quantity (that is not visible in the model...)
+
+--------------------
+- test stage 3 entry with Mama
+
+- Stage 4: Add A Boss System -- 25th Mar, 2006
+    * 10 Points -- Add a boss to your level that you fight to finish the level.
+    * 10 Points -- Basic 'game over' death sequence. Player must be able to die.
+
+- Stage 3: Feb 12th - Mar 4th
+  Goal #1 (5 Points) - Add basic enemies to game engine.
 
 - life text on indicator : Life / MaxLife
 
