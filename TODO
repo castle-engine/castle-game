@@ -6,13 +6,14 @@
 - the button should be above alpha sky, otherwise player doesn't actually
   see that level entrance opens.
 
+  maybe force camera pos and dir to the predetermined position to show
+  him the animation ?
+
 - the button should not be "clickable" from any distance
 
 - Texture punch_through_symbols.jpg: cut this circle from the rest,
   enlarge, add shome sharpness (and contrast, maybe even noise) using GIMP.
   This symbol must be visible!
-
-- texture on TunnelAround is awfully deformed (squeezed) at some places...
 
 - remove the sky -- it's copied from lets_take_a_walk.
   Prepare a good starry sky for VRML castle_hall.
