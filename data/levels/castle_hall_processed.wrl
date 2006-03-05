@@ -34,6 +34,13 @@ Switch {
 		shininess 0.500000 
 		transparency 0.000000 
 	}
+	DEF MatRoofLine
+	Material {
+		diffuseColor 0.880000 0.890000 0.730000
+		specularColor 0.000000 0.000000 0.000000
+		shininess 0.500000 
+		transparency 0.000000 
+	}
 	DEF MatUnderTexture
 	Material {
 		diffuseColor 0.800000 0.800000 0.800000
@@ -4051,6 +4058,8 @@ Switch {
 				 0.000000 9.000000 9.000000,
 			]
 		}
+		USE MatRoofLine
+
 		IndexedFaceSet {
 			coordIndex [
 				 16, 0, 1, -1,
@@ -11143,6 +11152,16 @@ Switch {
 
 	# Hidden Objects, in invisible layers
 
+	Separator {
+		MatrixTransform {
+		matrix 
+			-0.000000 5.000000 0.000000 0.000000
+			0.000000 0.000000 5.000000 0.000000
+			5.000000 0.000000 -0.000000 0.000000
+			-5.111888 -50.405384 0.036833 1.000000
+		}
+		USE MeshStairs
+	}
 }
 
 # Visible Objects
@@ -11167,16 +11186,6 @@ Separator {
 			0.000000 0.000000 0.000000 1.000000
 		}
 		USE LevelBox
-	}
-	Separator {
-		MatrixTransform {
-		matrix 
-			-0.000000 5.000000 0.000000 0.000000
-			0.000000 0.000000 5.000000 0.000000
-			5.000000 0.000000 -0.000000 0.000000
-			-5.111888 -50.405384 0.036833 1.000000
-		}
-		USE MeshStairs
 	}
 	Separator {
 		MatrixTransform {

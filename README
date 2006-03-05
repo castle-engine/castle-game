@@ -68,9 +68,18 @@ Sample levels included:
 
 "Castle hall" : this is the level made for PGD stage 3.
   It's not finished yet (of course :) ), but it exists and there is level exit.
+
   Walkthrough: there is a red button that you should "push" (click with mouse)
   and then take a look at the main hall --- you will see some
   animation and level exit will be revealed.
+
+  In a final version, this button will be on the glass roof
+  (the thing hanging in the middle of the level), and stairs
+  will lead to this roof. But stairs are not modelled now, so I just placed
+  the red button on the other side of the corridor for now...
+
+  Still you can use "f" key (toggles "flying mode", in the final game
+  this will require some item, spell etc.) to stand on the glass roof.
 
 If you want to see other models demonstrating my engine, see
 [http://www.camelot.homedns.org/~michalis/miscella/kambi_vrml_examples.zip]
