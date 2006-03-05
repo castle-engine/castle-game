@@ -59,7 +59,7 @@ uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
   CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
-  CastleItems, VRMLTriangleOctree;
+  CastleItems, VRMLTriangleOctree, RaysWindow;
 
 var
   GameEnded: boolean;
@@ -78,7 +78,8 @@ const
 
 function ViewAngleDegY: Single;
 begin
-  Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX, Glw.Height / Glw.Width);
+  Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX,
+    Glw.Height / Glw.Width);
 end;
 
 { If ALActive then update listener POSITION and ORIENTATION
@@ -393,11 +394,7 @@ var
 begin
   if Btn = mbLeft then
   begin
-    Ray0 := Glw.NavWalker.CameraPos;
-    RayVector := PrimaryRay(Glwin.MouseX, Glwin.Height - Glwin.MouseY,
-      Glwin.Width, Glwin.Height,
-      Glw.NavWalker.CameraPos, Glw.NavWalker.CameraDir, Glw.NavWalker.CameraUp,
-      ViewAngleDegX, ViewAngleDegY);
+    Glw.MousePickedRay(ViewAngleDegX, ViewAngleDegY, Ray0, RayVector);
 
     IntersectItemIndex :=
       Level.Scene.DefaultTriangleOctree.RayCollision(
