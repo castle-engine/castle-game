@@ -55,7 +55,7 @@ procedure LevelFinished(NextLevel: TLevel);
 
 implementation
 
-uses SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
+uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
   CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
@@ -388,22 +388,66 @@ begin
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Btn: TMouseButton);
+type
+  { TODO: This will be expanded with at least poEnemy in the future. }
+  TPickedObjectType = (poNone, poLevel, poItem);
 var
-  Ray0, RayVector, Intersection: TVector3Single;
-  IntersectItemIndex: integer;
+  Ray0, RayVector: TVector3Single;
+  LevelCollisionIndex, ItemCollisionIndex, I: integer;
+  IntersectionDistance, ThisIntersectionDistance: Single;
+  PickedObjectType: TPickedObjectType;
 begin
   if Btn = mbLeft then
   begin
     Glw.MousePickedRay(ViewAngleDegX, ViewAngleDegY, Ray0, RayVector);
 
-    IntersectItemIndex :=
-      Level.Scene.DefaultTriangleOctree.RayCollision(
-        Intersection, Ray0, RayVector, true, NoItemIndex, false);
+    { Picking is not an often called procedure, so I can freely normalize
+      here to get exact distance to picked object in IntersectionDistance. }
+    NormalizeTo1st(RayVector);
 
-    if IntersectItemIndex <> NoItemIndex then
+    IntersectionDistance := MaxSingle;
+    PickedObjectType := poNone;
+
+    { Now start picking, by doing various tests for collisions between
+      Ray0 and RayVector. The pick that has smallest IntersectionDistance
+      "wins". }
+
+    { Collision with Level.Scene }
+    LevelCollisionIndex := Level.Scene.DefaultTriangleOctree.RayCollision(
+      ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex, false);
+    if (LevelCollisionIndex <> NoItemIndex) and
+       ( (PickedObjectType = poNone) or
+         (ThisIntersectionDistance < IntersectionDistance) ) then
     begin
-      Level.ItemPicked(Level.Scene.DefaultTriangleOctree.OctreeItems.
-        Items[IntersectItemIndex]);
+      PickedObjectType := poLevel;
+      IntersectionDistance := ThisIntersectionDistance;
+    end;
+
+    { Collision with Level.Items }
+    for I := 0 to Level.Items.Count - 1 do
+      if TryBoxRayClosestIntersection(ThisIntersectionDistance,
+           Level.Items[I].BoundingBox, Ray0, RayVector) and
+         ( (PickedObjectType = poNone) or
+           (ThisIntersectionDistance < IntersectionDistance)
+         ) then
+      begin
+        ItemCollisionIndex := I;
+        PickedObjectType := poItem;
+        IntersectionDistance := ThisIntersectionDistance;
+      end;
+
+    { End. Now call appropriate picked notifier. }
+    case PickedObjectType of
+      poLevel:
+        begin
+          Level.TrianglePicked(IntersectionDistance,
+            Level.Scene.DefaultTriangleOctree.OctreeItems.
+              Items[LevelCollisionIndex]);
+        end;
+      poItem:
+        begin
+          Level.Items[ItemCollisionIndex].ItemPicked(IntersectionDistance);
+        end;
     end;
   end;
 end;

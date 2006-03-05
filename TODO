@@ -38,10 +38,6 @@ items todos:
 - some alpha rect around the item's model ?
   test, although it seems that rotating is enough.
 
-- picking items with mouse (to get GameMessage like
-  "You're looking at ... (e.g. some item short name etc.)"
-  This would allow me to show Quantity (that is not visible in the model...)
-
 --------------------
 - test stage 3 entry with Mama
 

@@ -209,6 +209,12 @@ type
 
     { This is Item.Kind.Scene.BoundingBox translated by our current Position. }
     function BoundingBox: TBox3d;
+
+    { Call this when user clicked on the item.
+      This will do some GameMessage describing the item
+      (may depend on Distance --- when it's too far, player may not
+      be able to exactly tell what the item is). }
+    procedure ItemPicked(const Distance: Single);
   end;
 
   TObjectsListItem_1 = TItemOnLevel;
@@ -453,6 +459,22 @@ end;
 function TItemOnLevel.BoundingBox: TBox3d;
 begin
   Result := Box3dTranslate(Item.Kind.Scene.BoundingBox, Position);
+end;
+
+procedure TItemOnLevel.ItemPicked(const Distance: Single);
+const
+  VisibleItemDistance = 60.0;
+var
+  S: string;
+begin
+  if Distance <= VisibleItemDistance then
+  begin
+    S := Format('You see an item "%s"', [Item.Kind.Name]);
+    if Item.Quantity <> 1 then
+      S += Format(' (quantity %d)', [Item.Quantity]);
+    GameMessage(S);
+  end else
+    GameMessage('You see some item, but it''s too far to tell exactly what it is');
 end;
 
 { TItemsOnLevelList -------------------------------------------------- }

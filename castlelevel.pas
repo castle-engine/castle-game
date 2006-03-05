@@ -107,8 +107,10 @@ type
       animate level objects etc. }
     procedure Idle(const CompSpeed: Single); virtual;
 
-    { Call this when player picked some item on the level. }
-    procedure ItemPicked(const Item: TOctreeItem); virtual;
+    { Call this when player picked some triangle on the level.
+      Distance is the exact distance to picked point. }
+    procedure TrianglePicked(const Distance: Single;
+      const Item: TOctreeItem); virtual;
   end;
 
   TCastleHallLevel = class(TLevel)
@@ -131,7 +133,7 @@ type
     procedure Render(const Frustum: TFrustum); override;
     procedure Idle(const CompSpeed: Single); override;
 
-    procedure ItemPicked(const Item: TOctreeItem); override;
+    procedure TrianglePicked(const Distance: Single; const Item: TOctreeItem); override;
   end;
 
 procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
@@ -351,7 +353,7 @@ begin
   { Nothing to do in this class. }
 end;
 
-procedure TLevel.ItemPicked(const Item: TOctreeItem);
+procedure TLevel.TrianglePicked(const Distance: Single; const Item: TOctreeItem);
 begin
   { Nothing to do in this class. }
 end;
@@ -508,7 +510,8 @@ begin
   end;
 end;
 
-procedure TCastleHallLevel.ItemPicked(const Item: TOctreeItem);
+procedure TCastleHallLevel.TrianglePicked(const Distance: Single;
+  const Item: TOctreeItem);
 begin
   if Item.State.LastNodes.Material.NodeName = 'MatButton' then
   begin

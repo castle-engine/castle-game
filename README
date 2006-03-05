@@ -17,12 +17,14 @@ PGD competition stage 3 short notes:
   See below in this file for description how you can design new
   items for this game.
 
+  After stage 3: You can point with your mouse at item lying on the level,
+  this tells you the name and quantity of visible object.
+  (of course, if object is too far, you will not be able to tell it exactly).
+
   TODO: Things remaining to be done about items are:
   - You can't swing your weapon right now and hurt anyone
     (especially because there are no enemies right now...).
   - More items should be added, right now there are only 2.
-  - Pointing at the items with the mouse should output some
-    info about the item lying on the ground and it's quantity.
 
 - New level and level exit:
   Yes. See section "Sample levels included" below.
