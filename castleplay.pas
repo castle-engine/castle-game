@@ -310,15 +310,14 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
         { We must move the item a little before us to
           1. show visually player that the item was dropped
-          2. to avoid automatically picking it again }
-        PushVector := Player.Navigator.CameraDir;
-        { I must adjust here PushVector, otherwise when player is looking
+          2. to avoid automatically picking it again
+
+          Note that I take PushVector from CameraDirInHomePlane,
+          not from CameraDir, otherwise when player is looking
           down he could be able to put item "inside the ground".
           TODO: actually, I should just check collision of item with level,
           to avoid "pushing item into the wall". }
-        if not VectorsParallel(PushVector, Player.Navigator.HomeCameraUp) then
-          MakeVectorsAngleOnTheirPlane(PushVector,
-            Player.Navigator.HomeCameraUp, 90);
+        PushVector := Player.Navigator.CameraDirInHomePlane;
         VectorAddTo1st(DropPosition,
           VectorAdjustToLength(PushVector,
             Player.Navigator.RealCameraPreferredHeight));

@@ -1,15 +1,12 @@
+- test stage 3 entry with Mama
+
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
 
---------------------
-post stage 3:
 - the button should be above alpha sky, otherwise player doesn't actually
   see that level entrance opens.
-  
-- the button should not be "clickable" from any distance
 
-- when moving forward with looking up, you get awful sharp vertical moves.
-  Observed on castle_hall
+- the button should not be "clickable" from any distance
 
 - Texture punch_through_symbols.jpg: cut this circle from the rest,
   enlarge, add shome sharpness (and contrast, maybe even noise) using GIMP.
