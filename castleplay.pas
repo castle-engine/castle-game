@@ -394,10 +394,10 @@ end;
 procedure MouseDown(Glwin: TGLWindow; Btn: TMouseButton);
 type
   { TODO: This will be expanded with at least poEnemy in the future. }
-  TPickedObjectType = (poNone, poLevel, poItem);
+  TPickedObjectType = (poNone, poLevel, poItem, poSpecialObject);
 var
   Ray0, RayVector: TVector3Single;
-  LevelCollisionIndex, ItemCollisionIndex, I: integer;
+  LevelCollisionIndex, ItemCollisionIndex, SpecialObjectIndex, I: integer;
   IntersectionDistance, ThisIntersectionDistance: Single;
   PickedObjectType: TPickedObjectType;
 begin
@@ -440,6 +440,18 @@ begin
         IntersectionDistance := ThisIntersectionDistance;
       end;
 
+    { Collision with Level.SpecialObjects }
+    SpecialObjectIndex := Level.SpecialObjectsTryPick(
+      ThisIntersectionDistance, Ray0, RayVector);
+    if (SpecialObjectIndex <> -1) and
+       ( (PickedObjectType = poNone) or
+         (ThisIntersectionDistance < IntersectionDistance)
+       ) then
+    begin
+      PickedObjectType := poSpecialObject;
+      IntersectionDistance := ThisIntersectionDistance;
+    end;
+
     { End. Now call appropriate picked notifier. }
     case PickedObjectType of
       poLevel:
@@ -451,6 +463,11 @@ begin
       poItem:
         begin
           Level.Items[ItemCollisionIndex].ItemPicked(IntersectionDistance);
+        end;
+      poSpecialObject:
+        begin
+          Level.SpecialObjectPicked(
+            IntersectionDistance, SpecialObjectIndex);
         end;
     end;
   end;
@@ -464,7 +481,7 @@ begin
     ProposedNewPos, NewPos, BecauseOfGravity);
 end;
 
-procedure GetCameraHeight(Navigator: TMatrixNavigator;
+procedure GetCameraHeight(Navigator: TMatrixWalker;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 begin
   Level.GetCameraHeight(Navigator,

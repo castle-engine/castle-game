@@ -95,7 +95,7 @@ type
       const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean; virtual;
 
-    procedure GetCameraHeight(Navigator: TMatrixNavigator;
+    procedure GetCameraHeight(Navigator: TMatrixWalker;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
       virtual;
     { @groupEnd }
@@ -111,13 +111,32 @@ type
       Distance is the exact distance to picked point. }
     procedure TrianglePicked(const Distance: Single;
       const Item: TOctreeItem); virtual;
+
+    { Override this to allow player to pick some additional objects,
+      not contained in @link(Scene). Ray0 and RayVector describe picking
+      ray, RayVector is always normalized (i.e. has length 1).
+      If there was a pick: set IntersectionDistance and return
+      something >= 0. Otherwise return -1.
+
+      Returned index will be passed to SpecialObjectPicked.
+      In the future, TLevel may show some property like SpecialObjects
+      that will allow to explicitly enumerate special objects. }
+    function SpecialObjectsTryPick(var IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single): Integer; virtual;
+
+    { Override this to take some action when some special object was picked.
+      This will be called only if you overriden also SpecialObjectsTryPick. }
+    procedure SpecialObjectPicked(const Distance: Single;
+      SpecialObjectIndex: Integer); virtual;
   end;
 
   TCastleHallLevel = class(TLevel)
   private
     ButtonPressed: boolean;
     AnimationOpenDownRotation: Single;
+    AnimationButtonPress: Single;
     Symbol_TL, Symbol_BL, Symbol_TR, Symbol_BR: TVRMLFlatSceneGL;
+    Button: TVRMLFlatSceneGL;
   public
     constructor Create;
     destructor Destroy; override;
@@ -126,14 +145,18 @@ type
       const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean; override;
 
-    procedure GetCameraHeight(Navigator: TMatrixNavigator;
+    procedure GetCameraHeight(Navigator: TMatrixWalker;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
       override;
 
     procedure Render(const Frustum: TFrustum); override;
     procedure Idle(const CompSpeed: Single); override;
 
-    procedure TrianglePicked(const Distance: Single; const Item: TOctreeItem); override;
+    function SpecialObjectsTryPick(var IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single): Integer; override;
+
+    procedure SpecialObjectPicked(const Distance: Single;
+      SpecialObjectIndex: Integer); override;
   end;
 
 procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
@@ -141,7 +164,7 @@ procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
 implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
-  CastlePlay;
+  CastlePlay, KambiGLUtils;
 
 { TLevel --------------------------------------------------------------------- }
 
@@ -334,12 +357,11 @@ begin
       Navigator.CameraPos, ProposedNewPos, NewPos, CameraRadius);
 end;
 
-procedure TLevel.GetCameraHeight(Navigator: TMatrixNavigator;
+procedure TLevel.GetCameraHeight(Navigator: TMatrixWalker;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 begin
   Scene.DefaultTriangleOctree.GetCameraHeight(
-    TMatrixWalker(Navigator).CameraPos,
-    TMatrixWalker(Navigator).HomeCameraUp,
+    Navigator.CameraPos, Navigator.HomeCameraUp,
     IsAboveTheGround, SqrHeightAboveTheGround);
 end;
 
@@ -354,6 +376,18 @@ begin
 end;
 
 procedure TLevel.TrianglePicked(const Distance: Single; const Item: TOctreeItem);
+begin
+  { Nothing to do in this class. }
+end;
+
+function TLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single): Integer;
+begin
+  Result := -1;
+end;
+
+procedure TLevel.SpecialObjectPicked(const Distance: Single;
+  SpecialObjectIndex: Integer);
 begin
   { Nothing to do in this class. }
 end;
@@ -377,21 +411,28 @@ constructor TCastleHallLevel.Create;
 
 begin
   inherited Create('castle_hall_final.wrl', 'castle_hall_lights.wrl');
+
   Symbol_TL := LoadSymbol('tl');
   Symbol_BL := LoadSymbol('bl');
   Symbol_TR := LoadSymbol('tr');
   Symbol_BR := LoadSymbol('br');
+
+  Button := TVRMLFlatSceneGL.Create(LoadVRMLNode('castle_hall_button.wrl'),
+    true, roSeparateShapeStates);
+  Button.DefaultTriangleOctree := Button.CreateTriangleOctree('');
+
+  AnimationButtonPress := 1.0;
 end;
 
 destructor TCastleHallLevel.Destroy;
 begin
+  FreeAndNil(Button);
   FreeAndNil(Symbol_TL);
   FreeAndNil(Symbol_BL);
   FreeAndNil(Symbol_TR);
   FreeAndNil(Symbol_BR);
   inherited;
 end;
-
 
 function TCastleHallLevel.MoveAllowed(Navigator: TMatrixWalker;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
@@ -407,6 +448,10 @@ begin
   Result := inherited MoveAllowed(Navigator,
     ProposedNewPos, NewPos, BecauseOfGravity);
 
+  Result := Result and
+    Button.DefaultTriangleOctree.MoveAllowedSimple(
+      Navigator.CameraPos, NewPos, CameraRadius);
+
   if Result and (not ButtonPressed) then
   begin
     Result :=
@@ -417,28 +462,27 @@ begin
   end;
 end;
 
-procedure TCastleHallLevel.GetCameraHeight(Navigator: TMatrixNavigator;
+procedure TCastleHallLevel.GetCameraHeight(Navigator: TMatrixWalker;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 
-  procedure MakeSymbol(SymbolScene: TVRMLFlatSceneGL);
+  procedure MakeBonusScene(BonusScene: TVRMLFlatSceneGL);
   var
-    IsAboveTheSymbol: boolean;
-    SqrHeightAboveTheSymbol: Single;
+    IsAboveTheBonusScene: boolean;
+    SqrHeightAboveTheBonusScene: Single;
   begin
-    SymbolScene.DefaultTriangleOctree.GetCameraHeight(
-      TMatrixWalker(Navigator).CameraPos,
-      TMatrixWalker(Navigator).HomeCameraUp,
-      IsAboveTheSymbol, SqrHeightAboveTheSymbol);
+    BonusScene.DefaultTriangleOctree.GetCameraHeight(
+      Navigator.CameraPos, Navigator.HomeCameraUp,
+      IsAboveTheBonusScene, SqrHeightAboveTheBonusScene);
 
-    if IsAboveTheSymbol then
+    if IsAboveTheBonusScene then
     begin
       if not IsAboveTheGround then
       begin
-        IsAboveTheGround := IsAboveTheSymbol;
-        SqrHeightAboveTheGround := SqrHeightAboveTheSymbol;
+        IsAboveTheGround := IsAboveTheBonusScene;
+        SqrHeightAboveTheGround := SqrHeightAboveTheBonusScene;
       end else
         SqrHeightAboveTheGround :=
-          Min(SqrHeightAboveTheGround, SqrHeightAboveTheSymbol);
+          Min(SqrHeightAboveTheGround, SqrHeightAboveTheBonusScene);
     end;
   end;
 
@@ -447,11 +491,13 @@ begin
 
   if not ButtonPressed then
   begin
-    MakeSymbol(Symbol_TL);
-    MakeSymbol(Symbol_BL);
-    MakeSymbol(Symbol_TR);
-    MakeSymbol(Symbol_BR);
+    MakeBonusScene(Symbol_TL);
+    MakeBonusScene(Symbol_BL);
+    MakeBonusScene(Symbol_TR);
+    MakeBonusScene(Symbol_BR);
   end;
+
+  MakeBonusScene(Button);
 end;
 
 procedure TCastleHallLevel.Render(const Frustum: TFrustum);
@@ -473,6 +519,25 @@ procedure TCastleHallLevel.Render(const Frustum: TFrustum);
     glPopMatrix;
   end;
 
+  procedure RenderButtonScaled;
+  var
+    Translation: TVector3Single;
+  begin
+    Translation[0] := 0;
+    Translation[1] := 0;
+    Translation[2] := Button.BoundingBox[0, 2];
+
+    glPushMatrix;
+      glTranslatev(Translation);
+      glScalef(1, 1, AnimationButtonPress);
+      glTranslatev(VectorNegate(Translation));
+      { Scaling of Button will always make it smaller,
+        so it's BoundingBox is OK, even though we do glScale above.
+        So we can call RenderFrustum below. }
+      Button.RenderFrustum(Frustum);
+    glPopMatrix;
+  end;
+
 begin
   if ButtonPressed then
   begin
@@ -488,6 +553,10 @@ begin
     Symbol_BR.RenderFrustum(Frustum);
   end;
 
+  if ButtonPressed then
+    RenderButtonScaled else
+    Button.RenderFrustum(Frustum);
+
   { Note that we render Symbol before inherited, i.e. before rendering
     real level --- to allow alpha objects on level to be rendered as last. }
   inherited;
@@ -496,35 +565,61 @@ end;
 procedure TCastleHallLevel.Idle(const CompSpeed: Single);
 const
   MaxAnimationOpenDownRotation = 75;
+  MinAnimationButtonPress = 0.5;
 begin
   inherited;
 
-  if Player.Navigator.CameraPos[2] < -7 then
+  if Player.Navigator.CameraPos[2] < -20 then
     LevelFinished(nil);
 
-  if ButtonPressed and
-     (AnimationOpenDownRotation < MaxAnimationOpenDownRotation) then
+  if ButtonPressed then
   begin
-    AnimationOpenDownRotation := Min(MaxAnimationOpenDownRotation,
-      AnimationOpenDownRotation + 0.1 * CompSpeed);
+    if AnimationButtonPress > MinAnimationButtonPress then
+    begin
+      AnimationButtonPress := Max(MinAnimationButtonPress,
+        AnimationButtonPress - 0.02 * CompSpeed);
+    end else
+    begin
+      if AnimationOpenDownRotation < MaxAnimationOpenDownRotation then
+        AnimationOpenDownRotation := Min(MaxAnimationOpenDownRotation,
+          AnimationOpenDownRotation + 0.1 * CompSpeed);
+    end;
   end;
 end;
 
-procedure TCastleHallLevel.TrianglePicked(const Distance: Single;
-  const Item: TOctreeItem);
+function TCastleHallLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single): Integer;
 begin
-  if Item.State.LastNodes.Material.NodeName = 'MatButton' then
+  Result := inherited SpecialObjectsTryPick(
+    IntersectionDistance, Ray0, RayVector);
+
+  if Button.DefaultTriangleOctree.RayCollision(
+    IntersectionDistance, Ray0, RayVector, true, NoItemIndex,
+    false) <> NoItemIndex then
   begin
-    if Distance < 10.0 then
-    begin
-      if ButtonPressed then
-        GameMessage('Button is already pressed') else
+    Result := 0;
+  end;
+end;
+
+procedure TCastleHallLevel.SpecialObjectPicked(const Distance: Single;
+  SpecialObjectIndex: Integer);
+begin
+  inherited;
+
+  case SpecialObjectIndex of
+    0:
       begin
-        ButtonPressed := true;
-        GameMessage('You press the button. Level exit is uncovered');
+        if Distance < 10.0 then
+        begin
+          if ButtonPressed then
+            GameMessage('Button is already pressed') else
+          begin
+            ButtonPressed := true;
+            GameMessage('You press the button. Level exit is uncovered');
+          end;
+        end else
+          GameMessage('You see a button. You cannot reach it from here');
       end;
-    end else
-      GameMessage('You see a button. You cannot reach it from here');
   end;
 end;
 

@@ -1,8 +1,5 @@
 --------------------
 castle_hall todos:
-- symbol texture: there is black border visible on one side, on the other
-  side border remains in red area. Fix.
-
 - remove the sky -- it's copied from lets_take_a_walk.
   Prepare a good starry sky for VRML castle_hall.
   Note that current castle_hall sky makes the effect of "window at the top of the dome" awkward, because the sky outside it actually not visible...
