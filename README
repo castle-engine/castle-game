@@ -194,23 +194,24 @@ Below I offer some hints.
 
 I often "wrap" (using WWWInline VRML construction) models produced by
 Blender inside some small VRML files written by hand.
-For example, data/castle_hall_final.wrl is a small VRML file that is
+For example, data/levels/castle_hall_final.wrl is a small VRML file that is
 maintained by hand. It sets up some things that were uncomfortable
 (or impossible, due to lacks of VRML 1.0 exporter) to set up from Blender,
-and includes data/castle_hall.wrl (by WWWInline { name "castle_hall.wrl" }).
-data/castle_hall.wrl file is simply exported from Blender version
-of data/castle_hall.blend. Typical things that I write "by hand" are
+and includes (using WWWInline node) other VRML file
+(data/levels/castle_hall_processed.wrl in this case) that defines geometry,
+materials and textures of the level.
 
-- Background node
+Typical things that I write "by hand" are
 
-  (Background nodes were introduced in VRML 2, but I implemented them
-  for VRML 1 also. So Blender exporter is not able to export Blender's
-  World properties to VRML Background node. So I just write
-  Background node by hand.)
+- Background, NavigationInfo, WorldInfo nodes
+
+  These nodes were introduced in VRML 2 (although I implemented them
+  for VRML 1 also). So Blender exporter to VRML 1 does not write
+  these nodes. So I just write them by hand.
 
 - PerspectiveCamera node
 
-  (Blender exports camera settings, but in an uncomfortable
+  Blender exports camera settings, but in an uncomfortable
   format (as a transformation, instead of as VRML camera node).
   This is OK for simple viewing of VRML models, but it's not OK
   if you want to "tweak" VRML models. In particular, it's bad
@@ -225,13 +226,20 @@ of data/castle_hall.blend. Typical things that I write "by hand" are
 - Light nodes
 
   I usually write light nodes in a separate VRML file
-  (that contains only light nodes; see e.g. data/castle_hall_lights.wrl).
+  (that contains only light nodes; see e.g. data/levels/castle_hall_lights.wrl).
   This is comfortable, because I usually want to use level lights
   also on other objects (like enemies) that are not part of the level
   object.
 
   (Also, while Blender exporter can export Blender lights to VRML,
   it doesn't allow me to use all features of VRML lights.)
+
+Moreover, I sometimes want to post-process VRML files generated from
+Blender. I use EmacsLisp macros for this (since this is a great language
+for text operations, and it's built in my favourite editor :) ).
+For example data/levels/castle_hall.wrl in VRML file
+exported from Blender (from data/levels/castle_hall.blend),
+and it's processed to data/levels/castle_hall_processed.wrl.
 
 3DS notes: Actually, you can also use models in 3DS format instead
 of VRML 1.0. So if your favourite 3d modelling program is not able to export
@@ -256,21 +264,21 @@ Levels:
 
 - When you create new level and you want to play it:
 
-  All you have to do is to change the call to TCastleLevel.Create
-  in castlemenu.pas to use your VRML files. Specify there the filename
+  Basically all you have to do is to add the call to NewGame
+  in castlemenu.pas to use your VRML file. Specify there the filename
   of VRML file without the lights and the filename of VRML file
   with only lights.
 
   (If it's too tiresome for you to recompile castle,
-  you can also change the TCastleLevel.Create call
+  you can also change the NewGame call
   to include some generic VRML file that always looks like
     WWWInline { name "xxx.wrl" }
   Then you will not have to recompile castle, instead you
   will just need to update the "xxx" in this generic file.
 
   Of course you can also just override my current files,
-  basic_castle_final.wrl and basic_castle_lights.wrl,
-  but that's a brutal solution:) .)
+  castle_hall_final.wrl and castle_hall_lights.wrl,
+  but that's a brutal solution :) ).
 
 - WorldInfo.title field specifies level name, so you want to set
   this to something nice for user.
@@ -295,6 +303,16 @@ Levels:
   and allow any up vector to be used, I made in "The Castle" a couple
   of assumptions that really need +Z to be up.
   (like TItemOnLevel.PlayerCollision).
+
+- All levels should keep the same general sizes. In other words,
+  it's *not good* to just make your new level of arbitrary
+  size and then set player's avatarSize such that things "look sensible".
+  Why ? Because I place items and enemies on the level.
+  So size of all these various models must match.
+
+  In other words: just make sure you use "avatarSize [ 1, 2 ]"
+  in your level. And force yourself to design a level that "fits"
+  such avatarSize.
 
 - For more customized levels, you may want to derive new class
   from TLevel and override there things you want.
