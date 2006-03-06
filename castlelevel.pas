@@ -515,12 +515,16 @@ procedure TCastleHallLevel.TrianglePicked(const Distance: Single;
 begin
   if Item.State.LastNodes.Material.NodeName = 'MatButton' then
   begin
-    if ButtonPressed then
-      GameMessage('Button is already pressed') else
+    if Distance < 10.0 then
     begin
-      ButtonPressed := true;
-      GameMessage('You press the button. Level exit is uncovered');
-    end;
+      if ButtonPressed then
+        GameMessage('Button is already pressed') else
+      begin
+        ButtonPressed := true;
+        GameMessage('You press the button. Level exit is uncovered');
+      end;
+    end else
+      GameMessage('You see a button. You cannot reach it from here');
   end;
 end;
 

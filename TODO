@@ -8,8 +8,6 @@ castle_hall todos:
   maybe force camera pos and dir to the predetermined position to show
   him the animation ?
 
-- the button should not be "clickable" from any distance
-
 - Texture punch_through_symbols.jpg: cut this circle from the rest,
   enlarge, add shome sharpness (and contrast, maybe even noise) using GIMP.
   This symbol must be visible!
