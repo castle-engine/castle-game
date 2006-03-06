@@ -145,13 +145,19 @@ begin
   end;
 end;
 
+procedure CloseQuery(Glwin: TGLWindow);
+begin
+  if MessageYesNo(glwin, 'Are you sure you want to quit ?') then
+    UserQuit := true;
+end;
+
 procedure ShowMenu;
 var
   SavedMode: TGLMode;
 begin
   SavedMode := TGLMode.Create(glw, 0);
   try
-    SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
+    SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
       nil, false, false, false, K_None, #0, false, false);
 
     Glw.OnKeyDown := KeyDown;

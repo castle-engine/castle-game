@@ -270,6 +270,12 @@ begin
   if ALActive then CheckAL('game loop (check in OnTimer)');
 end;
 
+procedure GameCancel;
+begin
+  if MessageYesNo(Glw, 'Are you sure you want to end the game ?', taLeft) then
+    GameEnded := true;
+end;
+
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
   procedure ChangeInventoryCurrentItem(Change: Integer);
@@ -356,12 +362,6 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       GameMessage('Nothing to use - select some item first');
   end;
 
-  procedure GameCancel;
-  begin
-    if MessageYesNo(Glw, 'Are you sure you want to end the game ?', taLeft) then
-      GameEnded := true;
-  end;
-
 begin
   case Key of
     K_F1: ShowHelpMessage;
@@ -389,6 +389,11 @@ begin
         CharEscape: GameCancel;
       end;
   end;
+end;
+
+procedure CloseQuery(Glwin: TGLWindow);
+begin
+  GameCancel;
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Btn: TMouseButton);
@@ -542,7 +547,7 @@ begin
             Player.Navigator.MoveSpeed])); }
 
         { Note that this sets AutoRedisplay to true. }
-        SetStandardGLWindowState(Glw, Draw, nil{TODO CloseQuery}, Resize,
+        SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
           nil, true, true, false, K_None, #0, true, true);
 
         Glw.OnIdle := Idle;
