@@ -8,5 +8,5 @@ Group {
   PointLight {
     location 3 3 3
   }
-  WWWInline { name "../models/flask_red_processed.wrl" }
+  WWWInline { name "../models/life_potion_processed.wrl" }
 }

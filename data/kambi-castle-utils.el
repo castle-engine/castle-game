@@ -103,7 +103,7 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
   (write-file "castle_hall_processed.wrl")
 )
 
-(defun kam-process-flask-red ()
+(defun kam-process-life-potion ()
   (interactive)
 
   (kam-simple-replace-buffer "Material {
@@ -121,5 +121,5 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
 		MaterialBinding { value PER_VERTEX_INDEXED }"
                 "USE MatInside")
   (kam-fix-blender-filename)
-  (write-file "flask_red_processed.wrl")
+  (write-file "life_potion_processed.wrl")
 )
