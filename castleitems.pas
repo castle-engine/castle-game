@@ -503,7 +503,9 @@ end;
 function TItemOnLevel.PlayerCollision: boolean;
 begin
   { I approximate both player and item as a bounding boxes.
-    This works quite good, and is "precise enough" :) }
+    This works quite good, and is "precise enough" :)
+    Note: remember to change TItemsOnLevelList.PlayerCollision
+    accordingly if I ever change implementation of this. }
 
   Result := Boxes3dCollision(BoundingBox, Player.BoundingBox);
 end;
@@ -565,10 +567,15 @@ begin
 end;
 
 function TItemsOnLevelList.PlayerCollision: Integer;
+var
+  PlayerBoundingBox: TBox3d;
 begin
-  { TODO: optimize this, to not calculate Player.BoundingBox for each item. }
+  { Instead of just calling TItemOnLevel.PlayerCollision,
+    this is optimized a little: it calculates Player.BoundingBox
+    only once. }
+  PlayerBoundingBox := Player.BoundingBox;
   for Result := 0 to High do
-    if Items[Result].PlayerCollision then
+    if Boxes3dCollision(Items[Result].BoundingBox, PlayerBoundingBox) then
       Exit;
   Result := -1;
 end;
