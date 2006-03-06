@@ -21,8 +21,6 @@ items todos:
 - player must be able to actually swing the EquippedWeapon,
   to hurt enemies etc.
 
-- rename flask_red filenames everywhere to life_potion
-
 - inventory should be able to scroll, when more than MaxInventorySlots items
   are available.
 

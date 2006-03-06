@@ -550,8 +550,8 @@ begin
   Sword := TItemWeaponKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
     'sword.png', false, true);
 
-  LifePotion := TItemPotionOfLifeKind.Create('flask_red_processed.wrl',
-    'LifePotion', 'Potion of Life', 'flask_red.png');
+  LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
+    'LifePotion', 'Potion of Life', 'life_potion.png');
 end;
 
 procedure DoFinalization;

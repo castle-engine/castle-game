@@ -1,6 +1,6 @@
-flask_red_processed.wrl: flask_red.wrl
-	emacs --batch -l ../../kambi-castle-utils.el flask_red.wrl \
+life_potion_processed.wrl: life_potion.wrl
+	emacs --batch -l ../../kambi-castle-utils.el life_potion.wrl \
 	  -f kam-process-flask-red
 
 clean:
-	rm -f flask_red_processed.wrl
+	rm -f life_potion_processed.wrl

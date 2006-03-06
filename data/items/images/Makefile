@@ -1,15 +1,15 @@
-ALL_OUTPUTS := sword.png flask_red.png
+ALL_OUTPUTS := sword.png life_potion.png
 
 all: $(ALL_OUTPUTS)
 
 RAYHUNTER_CALL := rayhunter classic 3 95 95
 
-sword.png: ../models/sword.wrl
-	$(RAYHUNTER_CALL) sword.wrl $@
+sword.png: sword.wrl ../models/sword.wrl
+	$(RAYHUNTER_CALL) $< $@
 	convert $@ -transparent black $@
 
-flask_red.png: ../models/flask_red_processed.wrl
-	$(RAYHUNTER_CALL) flask_red.wrl $@
+life_potion.png: life_potion.wrl ../models/life_potion_processed.wrl
+	$(RAYHUNTER_CALL) $< $@
 	convert $@ -transparent black $@
 
 clean:
