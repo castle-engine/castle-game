@@ -187,8 +187,11 @@ begin
 
   FScene := TVRMLFlatSceneGL.Create(
     LoadVRMLNode(ASceneFileName), true, roSeparateShapeStates);
-  { TODO -- check later, maybe change GL_LINEAR_MIPMAP_LINEAR
-    to something simpler. }
+
+  { This is the slowest one, but it looks perfect.
+    In fact, it's not so very slow on my system, so I think that
+    this can be the default.
+    Maybe it the future I'll make some configuration option to control this. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
 
   SceneCorrectBlenderTexture2(Scene);
