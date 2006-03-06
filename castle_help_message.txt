@@ -19,6 +19,11 @@ Other important keys:
   Enter = use (or equip) selected inventory item
   M = view all messages
 
+Mouse:
+  left mouse click on anything =
+    show information about pointed item on the level,
+    or use pointed device (press button, move switch etc.)
+
 Testing (cheating) keys:
   F = flying mode on/off
   l / L = life increase/decrease

@@ -21,6 +21,11 @@
 '  Enter = use (or equip) selected inventory item' + LineEnding + 
 '  M = view all messages' + LineEnding + 
 '' + LineEnding + 
+'Mouse:' + LineEnding + 
+'  left mouse click on anything =' + LineEnding + 
+'    show information about pointed item on the level,' + LineEnding + 
+'    or use pointed device (press button, move switch etc.)' + LineEnding + 
+'' + LineEnding + 
 'Testing (cheating) keys:' + LineEnding + 
 '  F = flying mode on/off' + LineEnding + 
 '  l / L = life increase/decrease' + LineEnding + 
