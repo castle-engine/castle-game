@@ -35,6 +35,8 @@ type
     FImageFileName: string;
     FImage: TImage;
     FGLList_DrawImage: TGLuint;
+    FBoundingBoxRotated: TBox3d;
+    FBoundingBoxRotatedCalculated: boolean;
   public
     constructor Create(const AModelFileName, AVRMLNodeName, AName,
       AImageFileName: string);
@@ -84,6 +86,10 @@ type
       handle the "Quantity = 0" situation by freeing given item,
       removing it from any list etc. }
     procedure Use(Item: TItem); virtual;
+
+    { This returns Scene.BoundingBox enlarged a little (along X and Y)
+      to account the fact that Scene may be rotated around +Z vector. }
+    function BoundingBoxRotated: TBox3d;
   end;
 
   TItemPotionOfLifeKind = class(TItemKind)
@@ -202,12 +208,19 @@ type
     { Render the item, on current Position with current rotation etc.
       Current matrix should be modelview, this pushes/pops matrix state
       (so it 1. needs one place on matrix stack,
-      2. doesn't modify current matrix). }
-    procedure Render;
+      2. doesn't modify current matrix).
+
+      Pass current viewing Frustum to allow optimizing this
+      (when item for sure is not within Frustum, we don't have
+      to push it to OpenGL). }
+    procedure Render(const Frustum: TFrustum);
 
     procedure Idle(const CompSpeed: Single);
 
-    { This is Item.Kind.Scene.BoundingBox translated by our current Position. }
+    { This returns BoundingBox of this item, taking into account
+      it's current Position and the fact that items constantly rotate
+      (around local +Z). So it's actually Item.Kind.Scene.BoundingBox translated
+      and enlarged as appropriate. }
     function BoundingBox: TBox3d;
 
     { Call this when user clicked on the item.
@@ -221,7 +234,7 @@ type
   {$I objectslist_1.inc}
   TItemsOnLevelList = class(TObjectsList_1)
     { Call Render for all items. }
-    procedure Render;
+    procedure Render(const Frustum: TFrustum);
     { Call Idle for all items. }
     procedure Idle(const CompSpeed: Single);
     { Check collision with all items, returns index of first collider
@@ -301,6 +314,38 @@ end;
 procedure TItemKind.Use(Item: TItem);
 begin
   GameMessage('This item cannot be used');
+end;
+
+function TItemKind.BoundingBoxRotated: TBox3d;
+var
+  HorizontalSize: Single;
+begin
+  if not FBoundingBoxRotatedCalculated then
+  begin
+    FBoundingBoxRotated := Scene.BoundingBox;
+
+    { Note that I *cannot* assume below that Scene.BoundingBox
+      middle point is (0, 0, 0). So I just take the largest distance
+      from point (0, 0) to any corner of the Box (distance 2D,
+      only horizontally) and this tells me the horizontal sizes of the
+      bounding box.
+
+      This hurts a little (because of 1 call to Sqrt),
+      that's why results of this function are cached if FBoundingBoxRotated. }
+    HorizontalSize := Max(Max(
+      VectorLenSqr(Vector2Single(FBoundingBoxRotated[0, 0], FBoundingBoxRotated[0, 1])),
+      VectorLenSqr(Vector2Single(FBoundingBoxRotated[1, 0], FBoundingBoxRotated[0, 1])),
+      VectorLenSqr(Vector2Single(FBoundingBoxRotated[1, 0], FBoundingBoxRotated[1, 1]))),
+      VectorLenSqr(Vector2Single(FBoundingBoxRotated[0, 0], FBoundingBoxRotated[1, 1])));
+    HorizontalSize := Sqrt(HorizontalSize);
+    FBoundingBoxRotated[0, 0] := -HorizontalSize;
+    FBoundingBoxRotated[0, 1] := -HorizontalSize;
+    FBoundingBoxRotated[1, 0] := +HorizontalSize;
+    FBoundingBoxRotated[1, 1] := +HorizontalSize;
+
+    FBoundingBoxRotatedCalculated := true;
+  end;
+  Result := FBoundingBoxRotated;
 end;
 
 { TItemPotionOfLifeKind ---------------------------------------------------- }
@@ -442,13 +487,16 @@ begin
   Result := Boxes3dCollision(BoundingBox, Player.BoundingBox);
 end;
 
-procedure TItemOnLevel.Render;
+procedure TItemOnLevel.Render(const Frustum: TFrustum);
 begin
-  glPushMatrix;
-    glTranslatev(Position);
-    glRotatev(FRotation, UnitVector3Single[2]);
-    Item.Kind.Scene.Render(nil);
-  glPopMatrix;
+  if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
+  begin
+    glPushMatrix;
+      glTranslatev(Position);
+      glRotatev(FRotation, UnitVector3Single[2]);
+      Item.Kind.Scene.Render(nil);
+    glPopMatrix;
+  end;
 end;
 
 procedure TItemOnLevel.Idle(const CompSpeed: Single);
@@ -458,7 +506,7 @@ end;
 
 function TItemOnLevel.BoundingBox: TBox3d;
 begin
-  Result := Box3dTranslate(Item.Kind.Scene.BoundingBox, Position);
+  Result := Box3dTranslate(Item.Kind.BoundingBoxRotated, Position);
 end;
 
 procedure TItemOnLevel.ItemPicked(const Distance: Single);
@@ -479,12 +527,12 @@ end;
 
 { TItemsOnLevelList -------------------------------------------------- }
 
-procedure TItemsOnLevelList.Render;
+procedure TItemsOnLevelList.Render(const Frustum: TFrustum);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    Items[I].Render;
+    Items[I].Render(Frustum);
 end;
 
 procedure TItemsOnLevelList.Idle(const CompSpeed: Single);

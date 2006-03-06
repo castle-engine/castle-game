@@ -238,7 +238,7 @@ begin
 
   Level.Render(Player.Navigator.Frustum);
 
-  Level.Items.Render;
+  Level.Items.Render(Player.Navigator.Frustum);
 
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
@@ -290,6 +290,7 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
     DropPosition, PushVector: TVector3Single;
     IsAboveTheGround: boolean;
     SqrHeightAboveTheGround: Single;
+    PushVectorLength: Single;
   begin
     if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
@@ -319,9 +320,12 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
           TODO: actually, I should just check collision of item with level,
           to avoid "pushing item into the wall". }
         PushVector := Player.Navigator.CameraDirInHomePlane;
-        VectorAddTo1st(DropPosition,
-          VectorAdjustToLength(PushVector,
-            Player.Navigator.RealCameraPreferredHeight));
+        PushVectorLength := Max(
+          Player.Navigator.RealCameraPreferredHeight,
+          Box3dSizeX(DropppedItem.Kind.BoundingBoxRotated) * 2,
+          Box3dSizeY(DropppedItem.Kind.BoundingBoxRotated) * 2);
+        VectorAdjustToLengthTo1st(PushVector, PushVectorLength);
+        VectorAddTo1st(DropPosition, PushVector);
 
         Level.Items.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
       end;
