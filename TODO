@@ -1,7 +1,5 @@
 --------------------
 castle_hall todos:
-- RoofLine could be textured ?
-
 - symbol texture: there is black border visible on one side, on the other
   side border remains in red area. Fix.
 
