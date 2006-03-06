@@ -564,7 +564,7 @@ end;
 
 procedure TCastleHallLevel.Idle(const CompSpeed: Single);
 const
-  MaxAnimationOpenDownRotation = 75;
+  MaxAnimationOpenDownRotation = 80;
   MinAnimationButtonPress = 0.5;
 begin
   inherited;
