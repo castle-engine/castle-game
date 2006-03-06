@@ -417,6 +417,8 @@ Graphics:
 - Some textures from public domain Golgotha textures.
 - Some post-processing of VRML models is done using EmacsLisp,
   see data/kambi-castle-utils.el and data/items/models/Makefile
+- stars.jpg from
+  http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
 
 --------------------
 Have fun! All comments are welcome.

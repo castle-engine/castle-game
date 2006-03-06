@@ -372,11 +372,8 @@ begin
           be so easy to enter FlyingMode (should require some item, spell etc.) }
         'f': Player.FlyingMode := not Player.FlyingMode;
 
-        { TODO: some button visible in player's window to access this should be
-          visible. }
         'm': ViewGameMessages;
 
-        { TODO: just for test: }
         'l': Player.Life := Min(Player.Life + 10, Player.MaxLife);
         'L': Player.Life := Max(Player.Life - 10, 0);
 
