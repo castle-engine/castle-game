@@ -1,7 +1,12 @@
 --------------------
 castle_hall todos:
 - RoofLine could be textured ?
-- stairs do, move button there
+
+- stairs: texture and materials
+
+- symbol texture: there is black border visible on one side, on the other
+  side border remains in red area. Fix.
+
 - the button should be above alpha sky, otherwise player doesn't actually
   see that level entrance opens.
 
