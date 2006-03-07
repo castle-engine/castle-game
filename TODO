@@ -25,9 +25,6 @@ items todos:
 
 - life text on indicator : Life / MaxLife
 
-- flying mode indicator on screen (for now, game message "flying mode on/off"
-  will be enough)
-
 - use and test head bobbing in "castle".
 
 - Add redouts on spadanie,
