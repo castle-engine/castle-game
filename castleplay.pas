@@ -263,6 +263,13 @@ begin
     Level.Items.FreeAndNil(PickItemIndex);
     Level.Items.Delete(PickItemIndex);
   end;
+  
+  if (not Level.HintButtonShown) and
+     Box3dPointInside(Player.Navigator.CameraPos, Level.HintButtonBox) then
+  begin
+    GameMessage('Hint: you can press this red button by clicking with mouse on it');
+    Level.HintButtonShown := true;
+  end;
 end;
 
 procedure Timer(Glwin: TGLWindow);

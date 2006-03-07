@@ -41,6 +41,31 @@ Switch {
 		shininess 0.500000 
 		transparency 0.000000 
 	}
+	DEF HintButtonBox
+	Separator {
+		Coordinate3 {
+			point [
+				 10.154007 -3.012728 -1.115825,
+				 10.154007 3.012727 -1.115825,
+				 -10.154011 3.012726 -1.115825,
+				 -10.154003 -3.012729 -1.115825,
+				 10.154011 -3.012726 4.115825,
+				 10.154001 3.012729 4.115825,
+				 -10.154013 3.012726 4.115825,
+				 -10.154007 -3.012727 4.115825,
+			]
+		}
+		IndexedFaceSet {
+			coordIndex [
+				 0, 1, 2, 3, -1,
+				 4, 7, 6, 5, -1,
+				 0, 4, 5, 1, -1,
+				 1, 5, 6, 2, -1,
+				 2, 6, 7, 3, -1,
+				 4, 0, 3, 7, -1,
+			]
+		}
+	}
 	DEF ItemLifePotion_1
 	Separator {
 		Coordinate3 {
@@ -11365,6 +11390,16 @@ Switch {
 # Visible Objects
 
 Separator {
+	Separator {
+		MatrixTransform {
+		matrix 
+			1.000000 0.000000 0.000000 0.000000
+			0.000000 1.000000 0.000000 0.000000
+			0.000000 0.000000 1.000000 0.000000
+			1.261548 0.028220 12.577392 1.000000
+		}
+		USE HintButtonBox
+	}
 	Separator {
 		MatrixTransform {
 		matrix 

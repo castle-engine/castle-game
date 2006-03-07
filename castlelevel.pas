@@ -53,9 +53,20 @@ type
       early. }
     ItemsToRemove: TVRMLNodesList;
 
+    FHintButtonBox: TBox3d;
+    FHintButtonShown: boolean;
+
     procedure TraverseForItems(Node: TVRMLNode; State: TVRMLGraphTraverseState);
 
     function LoadVRMLNode(const FileName: string): TVRMLNode;
+  protected
+    { This will be called from our constructor before initializing
+      our octrees. You can override this to do here some operations
+      that change the Scene.RootNode (e.g. you can do here tricks like
+      extracting some specific objects like HintButtonBox).
+      Be very cautious what you do here --- remember that this is called
+      while TLevel.Create constructor did not finish it's work yet ! }
+    procedure ChangeLevelScene; virtual;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -75,6 +86,16 @@ type
 
     { Player position should always be within this box. }
     property LevelBox: TBox3d read FLevelBox;
+
+    { HintButtonBox, see README for meaning of this.
+      This will be empty if level does not contain HintButtonBox. }
+    property HintButtonBox: TBox3d read FHintButtonBox;
+
+    { HintButtonShown is considered to be part of the level.
+      This means that player will get second "hint: you can press the button..."
+      message on second level --- I think that it's good. }
+    property HintButtonShown: boolean
+      read FHintButtonShown write FHintButtonShown;
 
     { Title of the level, taken from WorldInfo node
       or just basename of ASceneFileName. }
@@ -178,10 +199,30 @@ constructor TLevel.Create(const ASceneFileName, ALightSetFileName: string);
       ItemsToRemove.Items[I].FreeRemovingFromAllParents;
   end;
 
+  { See README for description of LevelBox and HintButtonBox trick.
+    Remember that this may change Scene.BoundingBox (in case we will
+    find and remove the node from Scene). }
+  function RemoveBoxNode(var Box: TBox3d; const NodeName: string): boolean;
+  var
+    BoxNodeIndex: Integer;
+  begin
+    BoxNodeIndex := Scene.ShapeStates.IndexOfShapeWithParentNamed(NodeName);
+    Result := BoxNodeIndex <> -1;
+    if Result then
+    begin
+      { When node with name NodeName is found, then we calculate our
+        Box from this node (and we delete this node from the scene,
+        as it should not be visible).
+        This way we can comfortably set such boxes from Blender. }
+      Box := Scene.ShapeStates[BoxNodeIndex].BoundingBox;
+      Scene.ShapeStates[BoxNodeIndex].ShapeNode.FreeRemovingFromAllParents;
+      Scene.ChangedAll;
+    end;
+  end;
+
 var
   NavigationNode: TNodeNavigationInfo;
   WorldInfoNode: TNodeWorldInfo;
-  LevelBoxIndex: Integer;
 begin
   inherited Create;
 
@@ -205,25 +246,18 @@ begin
   finally ItemsToRemove.Free end;
   Scene.ChangedAll;
 
-  { Calculate LevelBox.
-    Remember that this may change Scene.BoundingBox (in case we remove
-    'LevelBox' from Scene. }
-  LevelBoxIndex := Scene.ShapeStates.IndexOfShapeWithParentNamed('LevelBox');
-  if LevelBoxIndex <> -1 then
-  begin
-    { When node with name 'LevelBox' is found, then we calculate our
-      LevelBox from this node (and we delete 'LevelBox' from the scene,
-      as it should not be visible).
-      This way we can comfortably set LevelBox from Blender. }
-    FLevelBox := Scene.ShapeStates[LevelBoxIndex].BoundingBox;
-    Scene.ShapeStates[LevelBoxIndex].ShapeNode.FreeRemovingFromAllParents;
-    Scene.ChangedAll;
-  end else
+  ChangeLevelScene;
+
+  { Calculate LevelBox. }
+  if not RemoveBoxNode(FLevelBox, 'LevelBox') then
   begin
     { Set LevelBox to Scene.BoundingBox, and make maximum Z larger. }
     FLevelBox := Scene.BoundingBox;
     FLevelBox[1, 2] += 4 * (LevelBox[1, 2] - LevelBox[0, 2]);
   end;
+
+  if not RemoveBoxNode(FHintButtonBox, 'HintButtonBox') then
+    FHintButtonBox := EmptyBox3d;
 
   NavigationNode := Scene.RootNode.TryFindNode(TNodeNavigationInfo, true)
     as TNodeNavigationInfo;
@@ -278,6 +312,11 @@ begin
   FreeAndNil(FScene);
   FreeWithContentsAndNil(FItems);
   inherited;
+end;
+
+procedure TLevel.ChangeLevelScene;
+begin
+  { Nothing to do in this class. }
 end;
 
 function TLevel.LoadVRMLNode(const FileName: string): TVRMLNode;
