@@ -117,31 +117,32 @@ begin
           CurrentMenu := Succ(CurrentMenu);
         Glw.PostRedisplay;
       end;
-   K_Enter:
-     case CurrentMenu of
-      miReadDocs: ShowHelpMessage;
-      miPlaySample1: NewGame(
-        TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
-      miPlaySample2: NewGame(TCastleHallLevel.Create);
-      miViewGameMessages: ViewGameMessages;
-      miSound:
-        begin
-          MessageOK(Glw,
-            'Sound library (OpenAL) status:' +nl+
-            nl+
-            SoundInitializationReport +nl+
-            nl+
-            'TODO: for now, "The Castle" initializes OpenAL '+
-            'but it''s not used. It will be used in the future, '+
-            'and you will see here some controls to turn sound on/off '+
-            'and change sound volume. See my older demo, ' +
-            '[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php] '+
-            'if you want to see how I''m dealing with OpenAL.',
-            taLeft);
-        end;
-      miQuit: UserQuit := true;
-      else raise EInternalError.Create('Menu item unknown');
-     end;
+    K_Enter:
+      case CurrentMenu of
+       miReadDocs: ShowHelpMessage;
+       miPlaySample1: NewGame(
+         TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
+       miPlaySample2: NewGame(TCastleHallLevel.Create);
+       miViewGameMessages: ViewGameMessages;
+       miSound:
+         begin
+           MessageOK(Glw,
+             'Sound library (OpenAL) status:' +nl+
+             nl+
+             SoundInitializationReport +nl+
+             nl+
+             'TODO: for now, "The Castle" initializes OpenAL '+
+             'but it''s not used. It will be used in the future, '+
+             'and you will see here some controls to turn sound on/off '+
+             'and change sound volume. See my older demo, ' +
+             '[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php] '+
+             'if you want to see how I''m dealing with OpenAL.',
+             taLeft);
+         end;
+       miQuit: UserQuit := true;
+       else raise EInternalError.Create('Menu item unknown');
+      end;
+    K_F5: SaveScreen;
   end;
 end;
 

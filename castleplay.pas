@@ -53,6 +53,9 @@ procedure GameMessage(const S: string);
 
 procedure LevelFinished(NextLevel: TLevel);
 
+{ Saves a screen, causing also appropriate GameMessage. }
+procedure SaveScreen;
+
 implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
@@ -346,7 +349,7 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 begin
   case Key of
     K_F1: ShowHelpMessage;
-    K_F5: Glwin.SaveScreen(FnameAutoInc(ApplicationName + '_screen_%d.png'));
+    K_F5: SaveScreen;
     else
       case C of
         'm': ViewGameMessages;
@@ -593,6 +596,15 @@ begin
     MessageOK(Glw, 'Next level: TODO');
     GameEnded := true;
   end;
+end;
+
+procedure SaveScreen;
+var
+  FileName: string;
+begin
+  FileName := FnameAutoInc(ApplicationName + '_screen_%d.png');
+  Glw.SaveScreen(FileName);
+  GameMessage('Screen saved to ' + FileName);
 end;
 
 procedure GLWindowInit(Glwin: TGLWindow);
