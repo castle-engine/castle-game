@@ -1,36 +1,8 @@
 "The Castle"
 
 --------------------
-PGD competition stage 3 short notes:
-
-- Items: done.
-  You can pick items (just walk on them),
-  browse your items (keys: i, [, ]),
-  drop (key: d),
-  equip and use (key: enter; unequipping happens automatically on drop).
-
-  Items are "stackable", i.e. when you own two or more items
-  of the same kind, they are displayed like one item with quantity N.
-  Picking and dropping handle this appropriately (when dropping you
-  can drop only part of owned items).
-
-  See below in this file for description how you can design new
-  items for this game.
-
-  After stage 3: You can point with your mouse at item lying on the level,
-  this tells you the name and quantity of visible object.
-  (of course, if object is too far, you will not be able to tell it exactly).
-
-  TODO: Things remaining to be done about items are:
-  - You can't swing your weapon right now and hurt anyone
-    (especially because there are no enemies right now...).
-  - More items should be added, right now there are only 2.
-
-- New level and level exit:
-  Yes. See section "Sample levels included" below.
-
-- Enemies: not done (not enough time...)
-  So I guess that I should get only 15 points for stage 3...
+PGD competition stage 4 short notes:
+TODO.
 
 --------------------
 Installing and running:
@@ -172,6 +144,30 @@ Later, when PGD competition will end and I will continue developing
 this game on my WWW page [http://www.camelot.homedns.org/~michalis/],
 I will switch to my normal versioning scheme
 [http://www.camelot.homedns.org/~michalis/versioning.php].
+
+--------------------
+Items in the game:
+
+You can pick items (just walk on them), browse your items (keys: i, [, ]),
+drop (key: d), equip and use (key: enter). When you have no weapon equipped,
+then new picked weapon will be automatically equipped.
+Unequipping happens automatically on drop.
+
+Items are "stackable", i.e. when you own two or more items
+of the same kind, they are displayed like one item with quantity N.
+Picking and dropping handle this appropriately (when dropping you
+can drop only part of owned items).
+
+You can point with your mouse at item lying on the level,
+this tells you the name and quantity of visible object.
+(of course, if object is too far, you will not be able to tell it exactly).
+
+As I'm writing this (2006-03-07), there are 3 items: the sword,
+the potion of life and the scroll of flying. More items will
+be added if only time will allow..
+
+See below in this file for description how you can design new
+items for this game.
 
 --------------------
 Creating levels, 3d objects for my games:

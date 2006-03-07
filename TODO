@@ -2,6 +2,7 @@
 items todos:
 - player must be able to actually swing the EquippedWeapon,
   to hurt enemies etc.
+  (especially because there are no enemies right now...).
 
 - inventory should be able to scroll, when more than MaxInventorySlots items
   are available.
