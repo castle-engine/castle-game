@@ -38,11 +38,11 @@ type
   private
     FLife: Single;
     FMaxLife: Single;
-    FFlyingMode: boolean;
     FNavigator: TMatrixWalker;
     FItems: TItemsList;
     FEquippedWeapon: TItem;
-    procedure SetFlyingMode(const Value: boolean);
+    FFlyingModeTimeOut: Single; { > 0 means he's flying. In seconds. }
+    function GetFlyingMode: boolean;
     procedure UpdateNavigatorFromFlyingMode;
     procedure SetEquippedWeapon(Value: TItem);
   public
@@ -51,7 +51,13 @@ type
 
     property Life: Single read FLife write FLife default DefaultMaxLife;
     property MaxLife: Single read FMaxLife write FMaxLife default DefaultMaxLife;
-    property FlyingMode: boolean read FFlyingMode write SetFlyingMode default false;
+
+    property FlyingMode: boolean read GetFlyingMode;
+
+    { Start FlyingMode, for TimeOut time (TimeOut time is in seconds).
+      After TimeOut time, flying mode will stop.
+      Call this only with TimeOut > 0. }
+    procedure FlyingModeTimeoutBegin(const TimeOut: Single);
 
     { Inventory, items owned by the player.
 
@@ -128,12 +134,29 @@ type
       When setting this property (to nil or non-nil) player may get
       GameMessage about using/not using a weapon. }
     property EquippedWeapon: TItem read FEquippedWeapon write SetEquippedWeapon;
+
+    { Render 2D things of player. }
+    procedure Render2D;
+
+    { Adjust some things based on passing time.
+      For now, this is for things like FlyingModeTimeout to "wear out". }
+    procedure Idle(const CompSpeed: Single);
   end;
 
 implementation
 
-uses KambiClassUtils, SysUtils, Keys, CastlePlay, GLWinMessages,
-  CastleWindow, KambiUtils;
+uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
+  CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
+  BFNT_BitstreamVeraSans_Unit, OpenGLh, GLWindow, KambiGLUtils,
+  Images, VectorMath;
+
+var
+  PlayerInfoFont: TGLBitmapFont;
+  GLList_BlankIndicatorImage: TGLuint;
+  GLList_RedIndicatorImage: TGLuint;
+  GLList_BlueIndicatorImage: TGLuint;
+
+{ TPlayer -------------------------------------------------------------------- }
 
 constructor TPlayer.Create;
 begin
@@ -174,18 +197,23 @@ begin
   end;
 end;
 
-procedure TPlayer.SetFlyingMode(const Value: boolean);
-const
-  FlyingModeActivated: array[boolean] of string =
-  ( 'Flying mode OFF',
-    'Flying mode ON' );
+function TPlayer.GetFlyingMode: boolean;
 begin
-  if FFlyingMode <> Value then
-  begin
-    FFlyingMode := Value;
-    UpdateNavigatorFromFlyingMode;
-    GameMessage(FlyingModeActivated[FlyingMode]);
-  end;
+  Result := FFlyingModeTimeOut > 0;
+end;
+
+procedure TPlayer.FlyingModeTimeoutBegin(const TimeOut: Single);
+begin
+  if FFlyingModeTimeOut <= 0 then
+    GameMessage('You start flying');
+
+  { It's possible that FlyingModeTimeoutBegin is called when
+    FFlyingModeTimeOut is already > 0. In this case, we set
+    FFlyingModeTimeOut to maximum of current FFlyingModeTimeOut and TimeOut
+    --- i.e. the effect that will allow player to fly longer wins. }
+  FFlyingModeTimeOut := Max(FFlyingModeTimeOut, TimeOut);
+
+  UpdateNavigatorFromFlyingMode;
 end;
 
 procedure TPlayer.PickItem(Item: TItem);
@@ -292,4 +320,100 @@ begin
   end;
 end;
 
+procedure TPlayer.Render2D;
+
+  procedure RenderLifeIndicator;
+  const
+    IndicatorHeight = 120;
+    IndicatorMargin = 5;
+  var
+    PlayerLifeMapped: Integer;
+  begin
+    glRasterPos2i(IndicatorMargin, IndicatorMargin);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
+      PlayerLifeMapped :=
+        Round(MapRange(Player.Life, 0, Player.MaxLife, 0, IndicatorHeight));
+
+      { Note that Player.Life may be > Player.MaxLife, and
+        Player.Life may be < 0. }
+      if PlayerLifeMapped >= IndicatorHeight then
+        glCallList(GLList_RedIndicatorImage) else
+      if PlayerLifeMapped < 0 then
+        glCallList(GLList_BlankIndicatorImage) else
+      begin
+        glEnable(GL_SCISSOR_TEST);
+          glScissor(IndicatorMargin, IndicatorMargin, RequiredScreenWidth, PlayerLifeMapped);
+          glCallList(GLList_RedIndicatorImage);
+          glScissor(IndicatorMargin, IndicatorMargin + PlayerLifeMapped,
+            RequiredScreenWidth, RequiredScreenHeight);
+          glCallList(GLList_BlankIndicatorImage);
+        glDisable(GL_SCISSOR_TEST);
+      end;
+    glDisable(GL_BLEND);
+  end;
+
+begin
+  RenderLifeIndicator;
+
+  if FlyingMode then
+  begin
+    glColorv(White3Single);
+    glRasterPos2i(0, RequiredScreenHeight -
+      PlayerInfoFont.RowHeight - 5 { margin });
+    PlayerInfoFont.Print(Format('Flying (%d more seconds)',
+      [Floor(FFlyingModeTimeout)]));
+  end;
+end;
+
+procedure TPlayer.Idle(const CompSpeed: Single);
+begin
+  if FFlyingModeTimeOut > 0 { FlyingMode } then
+  begin
+    FFlyingModeTimeOut := FFlyingModeTimeOut - CompSpeed / 50;
+    if FFlyingModeTimeOut <= 0 { not FlyingMode } then
+    begin
+      GameMessage('You''re no longer flying');
+      UpdateNavigatorFromFlyingMode;
+    end;
+  end;
+end;
+
+{ GLWindow init / close ------------------------------------------------------ }
+
+procedure GLWindowInit(Glwin: TGLWindow);
+
+  function PlayerControlFileName(const BaseName: string): string;
+  begin
+    Result := ProgramDataPath + 'data' + PathDelim +
+      'player_controls' + PathDelim + BaseName;
+  end;
+
+  function LoadPlayerControlToDisplayList(const BaseName: string): TGLuint;
+  begin
+    Result := LoadImageToDispList(
+      PlayerControlFileName(BaseName), [TAlphaImage], [], 0, 0);
+  end;
+
+begin
+  GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
+  GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
+  GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
+
+  PlayerInfoFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
+end;
+
+procedure GLWindowClose(Glwin: TGLWindow);
+begin
+  FreeAndNil(PlayerInfoFont);
+
+  glFreeDisplayList(GLList_BlankIndicatorImage);
+  glFreeDisplayList(GLList_RedIndicatorImage);
+  glFreeDisplayList(GLList_BlueIndicatorImage);
+end;
+
+initialization
+  Glw.OnInitList.AppendItem(@GLWindowInit);
+  Glw.OnCloseList.AppendItem(@GLWindowClose);
 end.

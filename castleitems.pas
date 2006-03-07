@@ -453,7 +453,9 @@ end;
 
 procedure TItemScrollOfFlyingKind.Use(Item: TItem);
 begin
-  { TODO }
+  GameMessage(Format('You cast spell from "%s"', [Item.Kind.Name]));
+  Player.FlyingModeTimeoutBegin(30.0);
+  Item.Quantity := Item.Quantity - 1;
 end;
 
 { TItem ------------------------------------------------------------ }

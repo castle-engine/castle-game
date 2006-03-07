@@ -65,9 +65,6 @@ var
   GameEnded: boolean;
   GameMessagesManager: TTimeMessagesManager;
   GLList_Draw2dBegin: TGLuint;
-  GLList_BlankIndicatorImage: TGLuint;
-  GLList_RedIndicatorImage: TGLuint;
-  GLList_BlueIndicatorImage: TGLuint;
   GLList_InventorySlot: TGLuint;
   InventoryVisible: boolean;
   InventoryNamesFont: TGLBitmapFont_Abstract;
@@ -114,9 +111,6 @@ end;
 
 procedure Draw2D(Draw2DData: Integer);
 const
-  IndicatorHeight = 120;
-  IndicatorMargin = 5;
-
   InventorySlotWidth = 100;
   InventorySlotHeight = 100;
   InventorySlotMargin = 2;
@@ -130,7 +124,7 @@ const
   end;
 
 var
-  PlayerLifeMapped, I, X, Y, MaxItemShown: Integer;
+  I, X, Y, MaxItemShown: Integer;
   S: string;
 begin
   if Player.EquippedWeapon <> nil then
@@ -142,29 +136,7 @@ begin
   GameMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
     Glw.Width, Glw.Height);
 
-  glRasterPos2i(IndicatorMargin, IndicatorMargin);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_BLEND);
-
-    PlayerLifeMapped :=
-      Round(MapRange(Player.Life, 0, Player.MaxLife, 0, IndicatorHeight));
-
-    { Note that Player.Life may be > Player.MaxLife, and
-      Player.Life may be < 0. }
-    if PlayerLifeMapped >= IndicatorHeight then
-      glCallList(GLList_RedIndicatorImage) else
-    if PlayerLifeMapped < 0 then
-      glCallList(GLList_BlankIndicatorImage) else
-    begin
-      glEnable(GL_SCISSOR_TEST);
-        glScissor(IndicatorMargin, IndicatorMargin, RequiredScreenWidth, PlayerLifeMapped);
-        glCallList(GLList_RedIndicatorImage);
-        glScissor(IndicatorMargin, IndicatorMargin + PlayerLifeMapped,
-          RequiredScreenWidth, RequiredScreenHeight);
-        glCallList(GLList_BlankIndicatorImage);
-      glDisable(GL_SCISSOR_TEST);
-    end;
-  glDisable(GL_BLEND);
+  Player.Render2D;
 
   if InventoryVisible then
   begin
@@ -263,13 +235,15 @@ begin
     Level.Items.FreeAndNil(PickItemIndex);
     Level.Items.Delete(PickItemIndex);
   end;
-  
+
   if (not Level.HintButtonShown) and
      Box3dPointInside(Player.Navigator.CameraPos, Level.HintButtonBox) then
   begin
     GameMessage('Hint: you can press this red button by clicking with mouse on it');
     Level.HintButtonShown := true;
   end;
+
+  Player.Idle(Glw.FpsCompSpeed);
 end;
 
 procedure Timer(Glwin: TGLWindow);
@@ -375,10 +349,6 @@ begin
     K_F5: Glwin.SaveScreen(FnameAutoInc(ApplicationName + '_screen_%d.png'));
     else
       case C of
-        { TODO --- this is just for test, in real game this shouldn't
-          be so easy to enter FlyingMode (should require some item, spell etc.) }
-        'f': Player.FlyingMode := not Player.FlyingMode;
-
         'm': ViewGameMessages;
 
         'l': Player.Life := Min(Player.Life + 10, Player.MaxLife);
@@ -671,10 +641,6 @@ begin
 
   GLList_InventorySlot := LoadPlayerControlToDisplayList('item_slot.png');
 
-  GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
-  GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
-  GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
-
   InventoryNamesFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans_m10);
 end;
 
@@ -684,9 +650,6 @@ begin
 
   glFreeDisplayList(GLList_Draw2dBegin);
   glFreeDisplayList(GLList_InventorySlot);
-  glFreeDisplayList(GLList_BlankIndicatorImage);
-  glFreeDisplayList(GLList_RedIndicatorImage);
-  glFreeDisplayList(GLList_BlueIndicatorImage);
 end;
 
 initialization
