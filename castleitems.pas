@@ -156,6 +156,10 @@ type
     procedure Use(Item: TItem); override;
   end;
 
+  TItemScrollOfFlyingKind = class(TItemKind)
+    procedure Use(Item: TItem); override;
+  end;
+
   { An item. Actually, this represents a collection of
     "stacked" items that have the same properties --- see Quantity property. }
   TItem = class
@@ -266,6 +270,7 @@ type
 var
   Sword: TItemKind;
   LifePotion: TItemKind;
+  ScrollOfFlying: TItemKind;
 
 { Returns nil if not found. }
 function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
@@ -442,6 +447,13 @@ end;
 procedure TItemWeaponKind.Use(Item: TItem);
 begin
   Player.EquippedWeapon := Item;
+end;
+
+{ TItemScrollOfFlyingKind ---------------------------------------------------- }
+
+procedure TItemScrollOfFlyingKind.Use(Item: TItem);
+begin
+  { TODO }
 end;
 
 { TItem ------------------------------------------------------------ }
@@ -628,6 +640,9 @@ begin
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
     'LifePotion', 'Potion of Life', 'life_potion.png');
+
+  ScrollOfFlying := TItemScrollOfFlyingKind.Create('scroll_final.wrl',
+    'ScrFlying', 'Scroll Of Flying', 'scroll.png');
 end;
 
 procedure DoFinalization;
