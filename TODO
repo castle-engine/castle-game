@@ -1,3 +1,12 @@
+Mama test results:
+
+- MesssageOK : exit with Escape possible too
+  or maybe: show [Enter] key always ?
+- key names  : bold, key meaning = not bold
+- mouse moves: pick up item just by walking on them
+- RoofLine: maybe remove all ?
+- look up/down: block at some angle, to not allow player look too high
+
 --------------------
 items todos:
 - player must be able to actually swing the EquippedWeapon,
@@ -14,8 +23,6 @@ items todos:
   test, although it seems that rotating is enough.
 
 --------------------
-- test stage 3 entry with Mama
-
 - Stage 4: Add A Boss System -- 25th Mar, 2006
     * 10 Points -- Add a boss to your level that you fight to finish the level.
     * 10 Points -- Basic 'game over' death sequence. Player must be able to die.
