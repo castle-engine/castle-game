@@ -1,5 +1,6 @@
 Available keys:
 
+--------------------
 Basic movement keys:
   Up / Down = move
   Left / Right = rotate
@@ -10,25 +11,37 @@ Basic movement keys:
     not in "Flying mode" : jump / crouch
   Comma / Period = strafe move left / right
 
+--------------------
 Other important keys:
   F1 = show this help
   Escape = exit
-  I = inventory show / hide
-  [ / ] = select previous / next inventory item
-  d = drop selected inventory item
-  Enter = use (or equip) selected inventory item
   M = view all messages
 
+--------------------
+Commands related to items:
+  Note that you can pick items lying on the ground just by walking on them.
+
+  I = inventory show / hide
+  [ / ] = select previous / next inventory item
+  D = drop selected inventory item
+  Enter = use (or equip) selected inventory item
+
+  Note that the items are automatically unequipped when you drop them.
+
+--------------------
 Mouse:
   left mouse click on anything =
     show information about pointed item on the level,
     or use pointed device (press button, move switch etc.)
 
+--------------------
 Testing (cheating) keys:
-  F = flying mode on/off
-  l / L = life increase/decrease
+  L / Shift + L = life increase/decrease
 
+--------------------
 Other keys:
   Ctrl + Left / Right = rotate slower
   Ctrl + PageUp / PageDown = raise / bow your head slower
   F5 = save screen to file castle_<int>.png
+
+--------------------

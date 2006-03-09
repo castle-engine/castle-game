@@ -2,6 +2,7 @@
 { DON'T EDIT -- this file was automatically generated from "castle_help_message.txt" }
 'Available keys:' + LineEnding + 
 '' + LineEnding + 
+'--------------------' + LineEnding + 
 'Basic movement keys:' + LineEnding + 
 '  Up / Down = move' + LineEnding + 
 '  Left / Right = rotate' + LineEnding + 
@@ -12,26 +13,38 @@
 '    not in "Flying mode" : jump / crouch' + LineEnding + 
 '  Comma / Period = strafe move left / right' + LineEnding + 
 '' + LineEnding + 
+'--------------------' + LineEnding + 
 'Other important keys:' + LineEnding + 
 '  F1 = show this help' + LineEnding + 
 '  Escape = exit' + LineEnding + 
-'  I = inventory show / hide' + LineEnding + 
-'  [ / ] = select previous / next inventory item' + LineEnding + 
-'  d = drop selected inventory item' + LineEnding + 
-'  Enter = use (or equip) selected inventory item' + LineEnding + 
 '  M = view all messages' + LineEnding + 
 '' + LineEnding + 
+'--------------------' + LineEnding + 
+'Commands related to items:' + LineEnding + 
+'  Note that you can pick items lying on the ground just by walking on them.' + LineEnding + 
+'' + LineEnding + 
+'  I = inventory show / hide' + LineEnding + 
+'  [ / ] = select previous / next inventory item' + LineEnding + 
+'  D = drop selected inventory item' + LineEnding + 
+'  Enter = use (or equip) selected inventory item' + LineEnding + 
+'' + LineEnding + 
+'  Note that the items are automatically unequipped when you drop them.' + LineEnding + 
+'' + LineEnding + 
+'--------------------' + LineEnding + 
 'Mouse:' + LineEnding + 
 '  left mouse click on anything =' + LineEnding + 
 '    show information about pointed item on the level,' + LineEnding + 
 '    or use pointed device (press button, move switch etc.)' + LineEnding + 
 '' + LineEnding + 
+'--------------------' + LineEnding + 
 'Testing (cheating) keys:' + LineEnding + 
-'  F = flying mode on/off' + LineEnding + 
-'  l / L = life increase/decrease' + LineEnding + 
+'  L / Shift + L = life increase/decrease' + LineEnding + 
 '' + LineEnding + 
+'--------------------' + LineEnding + 
 'Other keys:' + LineEnding + 
 '  Ctrl + Left / Right = rotate slower' + LineEnding + 
 '  Ctrl + PageUp / PageDown = raise / bow your head slower' + LineEnding + 
 '  F5 = save screen to file castle_<int>.png' + LineEnding + 
+'' + LineEnding + 
+'--------------------' + LineEnding + 
 ''
