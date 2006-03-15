@@ -1,7 +1,21 @@
 Mama test results:
 
-- key names  : bold, key meaning = not bold
+- key names : bold, key meaning = not bold
 - RoofLine: maybe remove all ?
+
+- test on high resolution screen (19'' etc.) --- do I have this problem
+  with screen refresh rate that Eric talkes about ?
+
+  I can implement refresh changes on Windows, like in GLScene:
+    /win/mojepasy/delphi/units/not_kambi/GLScene/newest/Source/GLScreen.pas
+  see SetFullscreenMode:
+
+      if displayFrequency>0 then begin
+         dmFields:=dmFields or DM_DISPLAYFREQUENCY;
+         if displayFrequency>vVideoModes[ModeIndex].MaxFrequency then
+            displayFrequency:=vVideoModes[ModeIndex].MaxFrequency;
+         dmDisplayFrequency:=displayFrequency;
+      end;
 
 --------------------
 items todos:
