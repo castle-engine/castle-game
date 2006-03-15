@@ -1,21 +1,4 @@
-Mama test results:
-
-- key names : bold, key meaning = not bold
-- RoofLine: maybe remove all ?
-
-- test on high resolution screen (19'' etc.) --- do I have this problem
-  with screen refresh rate that Eric talkes about ?
-
-  I can implement refresh changes on Windows, like in GLScene:
-    /win/mojepasy/delphi/units/not_kambi/GLScene/newest/Source/GLScreen.pas
-  see SetFullscreenMode:
-
-      if displayFrequency>0 then begin
-         dmFields:=dmFields or DM_DISPLAYFREQUENCY;
-         if displayFrequency>vVideoModes[ModeIndex].MaxFrequency then
-            displayFrequency:=vVideoModes[ModeIndex].MaxFrequency;
-         dmDisplayFrequency:=displayFrequency;
-      end;
+- display FPS on game screen (displaying it on window caption is not really useful, since it's hidden in fullscreen...)
 
 --------------------
 items todos:
@@ -48,6 +31,20 @@ items todos:
   prepare general engine to make blackouts.
   Take this from malfunction.
 
+- test on high resolution screen (19'' etc.) --- do I have this problem
+  with screen refresh rate that Eric talkes about ?
+
+  I can implement refresh changes on Windows, like in GLScene:
+    /win/mojepasy/delphi/units/not_kambi/GLScene/newest/Source/GLScreen.pas
+  see SetFullscreenMode:
+
+      if displayFrequency>0 then begin
+         dmFields:=dmFields or DM_DISPLAYFREQUENCY;
+         if displayFrequency>vVideoModes[ModeIndex].MaxFrequency then
+            displayFrequency:=vVideoModes[ModeIndex].MaxFrequency;
+         dmDisplayFrequency:=displayFrequency;
+      end;
+
 - sound configuration do -- allow turning sounds on/off from menu, allow volume control
 
   Add to "installing and running" in README:
@@ -69,11 +66,13 @@ items todos:
   ("i" - inventory on/off, "m" - messages).
 
 - l / L keys are only for testing purposes !
-  f is also only for testing ?
 
 - remove base_castle (or make it hidden ?),
   together with it's sky (this was copied from lets_take_a_walk),
   --- this was just a testing level.
+
+- key names: bold, key meaning = not bold
+  This is a nice Mama idea, but it will require changing GLWinMessages implementation, so probably will not be done for PGD compo.
 
 - mail to author of
   http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
@@ -88,6 +87,31 @@ items todos:
   Justy¶
 
   Mama, Kornel, savage, advertise on "PGD screenshots" thread
+
+----------------------------------------
+Preview of "The Castle"
+
+This is a preview of my new game, "The Castle". I'm developing it for <a href="http://pascalgamedevelopment.com/">PascalGameDevelopemnt</a> "The Big Boss" competition that ends on 7 May 2006. Everyone (who managed to get to this "secret" page) is welcome to download it and try.
+
+... download links, installing instructions as for lets_take_a_walk ...
+
+Help needed :
+
+1. Feedback
+
+<a href="michalis@ca...">Yeah, I really need your feedback.</a> Any kind of feedback is useful. This includes:
+
+- Bug reports. If anything goes wrong, I obviously want to know about it. Describe how to reproduce the bug &mdash; i.e. what you did, what happened, and what you expected to happen. If you think that something works strange, this also qualifies as a bug. If some text inside README file is unclear, this also qualifies as a bug.
+
+  Note that this game requires rather good graphic card available. If the game is awfully slow, then (probably) it's not a bug --- it's just the way it is, and I will not be able to help much. Make sure you have absolutely newest drivers (including OpenGL library) for your graphic card.
+
+- Features. Do you think that anything should be added ? Maybe something should be changed ? Any ideas may be useful here --- new key / mouse commands, changing the behavior of present commands, displaying some things in a different way, etc.
+
+  There are some features that I plan to implement --- like sounds in game, sound configuration from the menu, key shortcuts redefining from the menu, some display properties changing from the menu. And of course new levels, new items, new monsters. Still, exact ideas for new levels, items and monsters are most welcome (see also below for #Creating new levels, items and monsters).
+
+2. Creating new levels, items and monsters
+
+Inside the game archive, in the file called README, I described how you can create new levels, items or monsters for this game. This requires some knowledge of a 3d modelling program (I use <a href="www.blender3d.org">Blender</a>). Any help with designing new levels, items and monsters will be greatly appreciated (and you will be mentioned in CREDITS file etc.).
 
 ----------------------------------------
 dist-making to-dos:
