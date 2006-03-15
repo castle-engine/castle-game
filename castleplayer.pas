@@ -148,7 +148,7 @@ implementation
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   BFNT_BitstreamVeraSans_Unit, OpenGLh, GLWindow, KambiGLUtils,
-  Images, VectorMath;
+  Images, VectorMath, KambiFilesUtils;
 
 var
   PlayerInfoFont: TGLBitmapFont;

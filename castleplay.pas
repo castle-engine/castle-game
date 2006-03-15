@@ -62,7 +62,8 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
   CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
-  CastleItems, VRMLTriangleOctree, RaysWindow;
+  CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
+  KambiFilesUtils;
 
 var
   GameEnded: boolean;

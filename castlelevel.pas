@@ -185,7 +185,7 @@ procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
 implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
-  CastlePlay, KambiGLUtils;
+  CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils;
 
 { TLevel --------------------------------------------------------------------- }
 

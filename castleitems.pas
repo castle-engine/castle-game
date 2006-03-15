@@ -280,7 +280,7 @@ function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
-  KambiGLUtils, CastlePlay;
+  KambiGLUtils, CastlePlay, KambiFilesUtils;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
