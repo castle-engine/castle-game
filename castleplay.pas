@@ -70,7 +70,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
-  KambiFilesUtils;
+  KambiFilesUtils, CastleKeys;
 
 var
   GameEnded: boolean;
@@ -422,10 +422,27 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       GameMessage(SDeadMessage);
   end;
 
+  procedure MaybeDeadMessage;
+  begin
+    if Player.Dead then
+      GameMessage(SDeadMessage);
+  end;
+
 begin
   case Key of
     K_F1: ShowHelpMessage;
     K_F5: SaveScreen;
+    CastleKey_UpMove: MaybeDeadMessage;
+    CastleKey_DownMove: MaybeDeadMessage;
+    CastleKey_Forward: MaybeDeadMessage;
+    CastleKey_Backward: MaybeDeadMessage;
+    CastleKey_LeftRot: MaybeDeadMessage;
+    CastleKey_RightRot: MaybeDeadMessage;
+    CastleKey_LeftStrafe: MaybeDeadMessage;
+    CastleKey_RightStrafe: MaybeDeadMessage;
+    CastleKey_UpRotate: MaybeDeadMessage;
+    CastleKey_DownRotate: MaybeDeadMessage;
+    CastleKey_HomeUp: MaybeDeadMessage;
     else
       case C of
         'm': ViewGameMessages;

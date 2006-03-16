@@ -76,6 +76,10 @@ type
     BlackOutIntensity: TGLfloat;
     BlackOutColor: TVector3f;
 
+    { This updates Navigator properties.
+      Call this always when FlyingMode and Dead changes. }
+    procedure UpdateNavigator;
+
     procedure FalledDown(Navigator: TMatrixWalker; const FallenHeight: Single);
     procedure SetLife(const Value: Single);
   public
@@ -95,7 +99,7 @@ type
     { Cancel FlyingMode. Useful if you're in the FlyingMode that will
       automatically wear off, but you don't want to wait and you
       want to cancel flying *now*. Ignored if not in FlyingMode.
-      
+
       Note that while you can call this when Dead, this will
       be always ignored (because when Dead, FlyingMode is always false). }
     procedure CancelFlying;
@@ -202,7 +206,7 @@ implementation
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, VectorMath, KambiFilesUtils,
-  CastleSound;
+  CastleSound, CastleKeys;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -222,6 +226,11 @@ begin
   Navigator.Key_MoveSpeedInc := K_None; { turn key off }
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
   Navigator.OnFalledDown := FalledDown;
+
+  { Although it will be called in every OnIdle anyway,
+    we also call it here to be sure that right after TPlayer constructor
+    finished, Navigator has already good values. }
+  UpdateNavigator;
 end;
 
 destructor TPlayer.Destroy;
@@ -431,52 +440,57 @@ begin
       RequiredScreenWidth, RequiredScreenHeight);
 end;
 
-procedure TPlayer.Idle(const CompSpeed: Single);
+{ This updates Navigator properties.
+  Call this always when FlyingMode and Dead changes. }
+procedure TPlayer.UpdateNavigator;
+begin
+  Navigator.Gravity := not FlyingMode;
 
-  procedure UpdateNavigatorFromFlyingMode;
+  if Dead then
   begin
-    Navigator.Gravity := not FlyingMode;
+    Navigator.Key_Jump := K_None;
+    Navigator.Key_Crouch := K_None;
+    Navigator.Key_UpMove := K_None;
+    Navigator.Key_DownMove := K_None;
+
+    Navigator.Key_Forward := K_None;
+    Navigator.Key_Backward := K_None;
+    Navigator.Key_LeftRot := K_None;
+    Navigator.Key_RightRot := K_None;
+    Navigator.Key_LeftStrafe := K_None;
+    Navigator.Key_RightStrafe := K_None;
+    Navigator.Key_UpRotate := K_None;
+    Navigator.Key_DownRotate := K_None;
+    Navigator.Key_HomeUp := K_None;
+  end else
+  begin
     if FlyingMode then
     begin
       Navigator.Key_Jump := K_None;
       Navigator.Key_Crouch := K_None;
-      Navigator.Key_UpMove := K_A;
-      Navigator.Key_DownMove := K_Z;
+      Navigator.Key_UpMove := CastleKey_UpMove;
+      Navigator.Key_DownMove := CastleKey_DownMove;
     end else
     begin
-      Navigator.Key_Jump := K_A;
-      Navigator.Key_Crouch := K_Z;
+      Navigator.Key_Jump := CastleKey_UpMove;
+      Navigator.Key_Crouch := CastleKey_DownMove;
       Navigator.Key_UpMove := K_None;
       Navigator.Key_DownMove := K_None;
     end;
-  end;
 
-  procedure UpdateNavigatorFromDead;
-  begin
-    { Navigator.Gravity is already set by UpdateNavigatorFromFlyingMode
-      to true (because FlyingMode is always false when Player.Dead). }
-    if Player.Dead then
-    begin
-      { Set all moving keys to K_None.
-        Note that once the player is dead, he cannot be alive again,
-        so I do not have to care here about setting keys to appropriate
-        values when not Player.Dead. }
-      Navigator.Key_Forward := K_None;
-      Navigator.Key_Backward := K_None;
-      Navigator.Key_RightRot := K_None;
-      Navigator.Key_LeftRot := K_None;
-      Navigator.Key_RightStrafe := K_None;
-      Navigator.Key_LeftStrafe := K_None;
-      Navigator.Key_UpRotate := K_None;
-      Navigator.Key_DownRotate := K_None;
-      Navigator.Key_UpMove := K_None;
-      Navigator.Key_DownMove := K_None;
-      Navigator.Key_HomeUp := K_None;
-      Navigator.Key_Jump := K_None;
-      Navigator.Key_Crouch := K_None;
-    end;
+    Navigator.Key_Forward := CastleKey_Forward;
+    Navigator.Key_Backward := CastleKey_Backward;
+    Navigator.Key_LeftRot := CastleKey_LeftRot;
+    Navigator.Key_RightRot := CastleKey_RightRot;
+    Navigator.Key_LeftStrafe := CastleKey_LeftStrafe;
+    Navigator.Key_RightStrafe := CastleKey_RightStrafe;
+    Navigator.Key_UpRotate := CastleKey_UpRotate;
+    Navigator.Key_DownRotate := CastleKey_DownRotate;
+    Navigator.Key_HomeUp := CastleKey_HomeUp;
   end;
+end;
 
+procedure TPlayer.Idle(const CompSpeed: Single);
 begin
   if FlyingMode then
   begin
@@ -487,8 +501,7 @@ begin
     end;
   end;
 
-  UpdateNavigatorFromFlyingMode;
-  UpdateNavigatorFromDead;
+  UpdateNavigator;
 
   if BlackOutIntensity > 0 then
     BlackOutIntensity -= 0.04 * Glw.FpsCompSpeed;
