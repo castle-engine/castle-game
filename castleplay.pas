@@ -24,7 +24,7 @@ unit CastlePlay;
 
 interface
 
-uses Classes, CastleLevel, CastlePlayer;
+uses Classes, CastleLevel, CastlePlayer, OpenGLFonts;
 
 procedure PlayLevel(ALevel: TLevel; APlayer: TPlayer);
 
@@ -56,12 +56,19 @@ procedure LevelFinished(NextLevel: TLevel);
 { Saves a screen, causing also appropriate GameMessage. }
 procedure SaveScreen;
 
+var
+  { These fonts can be used globally by anything in this game.
+    They are initialized in Glw.OnInit and finalized in Glw.OnClose in this unit. }
+  Font_BFNT_BitstreamVeraSans_m10: TGLBitmapFont_Abstract;
+  Font_BFNT_BitstreamVeraSans: TGLBitmapFont_Abstract;
+
 implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
-  CastleHelp, OpenGLFonts, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
+  CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
+  BFNT_BitstreamVeraSans_Unit,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils;
 
@@ -71,8 +78,12 @@ var
   GLList_Draw2dBegin: TGLuint;
   GLList_InventorySlot: TGLuint;
   InventoryVisible: boolean;
-  InventoryNamesFont: TGLBitmapFont_Abstract;
   InventoryCurrentItem: Integer;
+  ShowDebugInfo: boolean;
+
+  DisplayFpsUpdateTick: TMilisecTime;
+  DisplayFpsFrameTime: Single;
+  DisplayFpsRealTime: Single;
 
 const
   ViewAngleDegX = 45.0;
@@ -193,8 +204,29 @@ begin
       S := Player.Items[I].Kind.Name;
       if Player.Items[I].Quantity <> 1 then
         S += ' (' + IntToStr(Player.Items[I].Quantity) + ')';
-      InventoryNamesFont.Print(S);
+      Font_BFNT_BitstreamVeraSans_m10.Print(S);
     end;
+  end;
+
+  if ShowDebugInfo then
+  begin
+    glColorv(Vector3Single(0.7, 0.7, 0.7));
+    glRasterPos2i(0, RequiredScreenHeight -
+      Font_BFNT_BitstreamVeraSans.RowHeight * 2 - 10 { margin });
+
+    { Don't display precise Glw.FpsFrameTime and Glw.FpsRealTime
+      each time --- this would cause too much move for player.
+      Instead, display DisplayFpsXxxTime that are updated each second. }
+    if (DisplayFpsUpdateTick = 0) or
+       (TimeTickDiff(DisplayFpsUpdateTick, GetTickCount) >= 1000) then
+    begin
+      DisplayFpsUpdateTick := GetTickCount;
+      DisplayFpsFrameTime := Glw.FpsFrameTime;
+      DisplayFpsRealTime := Glw.FpsRealTime;
+    end;
+
+    Font_BFNT_BitstreamVeraSans.Print(
+      Format('FPS : %f (real : %f)', [DisplayFpsFrameTime, DisplayFpsRealTime]));
   end;
 end;
 
@@ -355,9 +387,12 @@ begin
       case C of
         'm': ViewGameMessages;
 
+        { debug things }
         'l': Player.Life := Min(Player.Life + 10, Player.MaxLife);
         'L': Player.Life := Max(Player.Life - 10, 0);
+        '`': ShowDebugInfo := not ShowDebugInfo;
 
+        { items-related things }
         'i': InventoryVisible := not InventoryVisible;
         '[': ChangeInventoryCurrentItem(-1);
         ']': ChangeInventoryCurrentItem(+1);
@@ -526,7 +561,8 @@ begin
 
         { Note that this sets AutoRedisplay to true. }
         SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
-          nil, true, true, false, K_None, #0, true, true);
+          nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
+          K_None, #0, { FpsShowOnCaption } false, { UseNavigator } true);
 
         Glw.OnIdle := Idle;
         Glw.OnTimer := Timer;
@@ -654,12 +690,14 @@ begin
 
   GLList_InventorySlot := LoadPlayerControlToDisplayList('item_slot.png');
 
-  InventoryNamesFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans_m10);
+  Font_BFNT_BitstreamVeraSans_m10 := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans_m10);
+  Font_BFNT_BitstreamVeraSans     := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);
 begin
-  FreeAndNil(InventoryNamesFont);
+  FreeAndNil(Font_BFNT_BitstreamVeraSans);
+  FreeAndNil(Font_BFNT_BitstreamVeraSans_m10);
 
   glFreeDisplayList(GLList_Draw2dBegin);
   glFreeDisplayList(GLList_InventorySlot);
@@ -667,6 +705,7 @@ end;
 
 initialization
   GameMessages := TStringList.Create;
+  ShowDebugInfo := false;
   Glw.OnInitList.AppendItem(@GLWindowInit);
   Glw.OnCloseList.AppendItem(@GLWindowClose);
 finalization

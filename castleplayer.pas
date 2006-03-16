@@ -147,11 +147,9 @@ implementation
 
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
-  BFNT_BitstreamVeraSans_Unit, OpenGLh, GLWindow, KambiGLUtils,
-  Images, VectorMath, KambiFilesUtils;
+  OpenGLh, GLWindow, KambiGLUtils, Images, VectorMath, KambiFilesUtils;
 
 var
-  PlayerInfoFont: TGLBitmapFont;
   GLList_BlankIndicatorImage: TGLuint;
   GLList_RedIndicatorImage: TGLuint;
   GLList_BlueIndicatorImage: TGLuint;
@@ -361,8 +359,8 @@ begin
   begin
     glColorv(White3Single);
     glRasterPos2i(0, RequiredScreenHeight -
-      PlayerInfoFont.RowHeight - 5 { margin });
-    PlayerInfoFont.Print(Format('Flying (%d more seconds)',
+      Font_BFNT_BitstreamVeraSans.RowHeight - 5 { margin });
+    Font_BFNT_BitstreamVeraSans.Print(Format('Flying (%d more seconds)',
       [Floor(FFlyingModeTimeout)]));
   end;
 end;
@@ -400,14 +398,10 @@ begin
   GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
   GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
   GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
-
-  PlayerInfoFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);
 begin
-  FreeAndNil(PlayerInfoFont);
-
   glFreeDisplayList(GLList_BlankIndicatorImage);
   glFreeDisplayList(GLList_RedIndicatorImage);
   glFreeDisplayList(GLList_BlueIndicatorImage);

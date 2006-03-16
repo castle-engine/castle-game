@@ -42,6 +42,7 @@
 '' + LineEnding + 
 '--------------------' + LineEnding + 
 'Other keys:' + LineEnding + 
+'  ` (backquote) = FPS show / hide' + LineEnding + 
 '  Ctrl + Left / Right = rotate slower' + LineEnding + 
 '  Ctrl + PageUp / PageDown = raise / bow your head slower' + LineEnding + 
 '  F5 = save screen to file castle_<int>.png' + LineEnding + 

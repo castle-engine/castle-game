@@ -40,6 +40,7 @@ Testing (cheating) keys:
 
 --------------------
 Other keys:
+  ` (backquote) = FPS show / hide
   Ctrl + Left / Right = rotate slower
   Ctrl + PageUp / PageDown = raise / bow your head slower
   F5 = save screen to file castle_<int>.png

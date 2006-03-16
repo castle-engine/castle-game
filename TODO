@@ -1,5 +1,3 @@
-- display FPS on game screen (displaying it on window caption is not really useful, since it's hidden in fullscreen...)
-
 --------------------
 items todos:
 - player must be able to actually swing the EquippedWeapon,
