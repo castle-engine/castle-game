@@ -399,6 +399,8 @@ begin
         'd': DropItem;
         CharEnter: UseItem;
 
+        'c': Player.CancelFlying;
+
         CharEscape: GameCancel;
       end;
   end;

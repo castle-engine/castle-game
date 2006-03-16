@@ -40,6 +40,7 @@ Testing (cheating) keys:
 
 --------------------
 Other keys:
+  C = cancel flying (useful only if you want to stop flying before flying spell will automatically wear off)
   ` (backquote) = FPS show / hide
   Ctrl + Left / Right = rotate slower
   Ctrl + PageUp / PageDown = raise / bow your head slower

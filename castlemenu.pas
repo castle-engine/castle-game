@@ -41,7 +41,7 @@ type
 const
   MenuNames: array[TMenuItem]of string = (
     'Read short instructions',
-    'New game (Sample castle level)',
+    'New game (Tower - just a test level)',
     'New game (Castle Hall - new level for PGD stage 3)',
     'View last game messages',
     'Sound',

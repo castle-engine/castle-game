@@ -21,8 +21,6 @@ items todos:
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
 
-- life text on indicator : Life / MaxLife
-
 - Add redouts on spadanie,
   prepare general engine to make blackouts.
   Take this from malfunction.

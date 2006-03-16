@@ -42,6 +42,7 @@
 '' + LineEnding + 
 '--------------------' + LineEnding + 
 'Other keys:' + LineEnding + 
+'  C = cancel flying (useful only if you want to stop flying before flying spell will automatically wear off)' + LineEnding + 
 '  ` (backquote) = FPS show / hide' + LineEnding + 
 '  Ctrl + Left / Right = rotate slower' + LineEnding + 
 '  Ctrl + PageUp / PageDown = raise / bow your head slower' + LineEnding + 

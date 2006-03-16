@@ -59,6 +59,11 @@ type
       Call this only with TimeOut > 0. }
     procedure FlyingModeTimeoutBegin(const TimeOut: Single);
 
+    { Cancel FlyingMode. Useful if you're in the FlyingMode that will
+      automatically wear off, but you don't want to wait and you
+      want to cancel flying *now*. Ignored if not in FlyingMode. }
+    procedure CancelFlying;
+
     { Inventory, items owned by the player.
 
       Do not add to this manually --- always use PickItem.
@@ -214,6 +219,16 @@ begin
   UpdateNavigatorFromFlyingMode;
 end;
 
+procedure TPlayer.CancelFlying;
+begin
+  if FFlyingModeTimeOut > 0 { FlyingMode } then
+  begin
+    FFlyingModeTimeOut := 0;
+    GameMessage('You''re no longer flying');
+    UpdateNavigatorFromFlyingMode;
+  end;
+end;
+
 procedure TPlayer.PickItem(Item: TItem);
 var
   S: string;
@@ -323,9 +338,12 @@ procedure TPlayer.Render2D;
   procedure RenderLifeIndicator;
   const
     IndicatorHeight = 120;
+    IndicatorWidth = 40;
     IndicatorMargin = 5;
   var
     PlayerLifeMapped: Integer;
+    LifeTextPosition: Integer;
+    LifeText: string;
   begin
     glRasterPos2i(IndicatorMargin, IndicatorMargin);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -349,7 +367,16 @@ procedure TPlayer.Render2D;
           glCallList(GLList_BlankIndicatorImage);
         glDisable(GL_SCISSOR_TEST);
       end;
+
     glDisable(GL_BLEND);
+
+    glColorv(Vector3Single(0.8, 0.8, 0.8));
+    LifeText := Format('%d', [Round(Life)]);
+    LifeTextPosition := IndicatorMargin +
+      (IndicatorWidth - Font_BFNT_BitstreamVeraSans.TextWidth(LifeText)) div 2;
+    MaxTo1st(LifeTextPosition, IndicatorMargin);
+    glRasterPos2i(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2);
+    Font_BFNT_BitstreamVeraSans.Print(LifeText);
   end;
 
 begin
