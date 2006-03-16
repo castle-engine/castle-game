@@ -459,6 +459,8 @@ begin
   if FallenHeight > 4 then
     Life := Life - Max(0,
       (FallenHeight / 1.5) * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
+
+  { Tests: GameMessage(Format('Falled down from %f', [FallenHeight])); }
 end;
 
 procedure TPlayer.SetLife(const Value: Single);
