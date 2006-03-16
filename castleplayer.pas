@@ -33,7 +33,34 @@ type
 
     Note that this is designed in such way that it doesn't require current
     game to actually run. This means that various things like view saved player,
-    edit initial player before game starts etc. are possible. }
+    edit initial player before game starts etc. are possible.
+
+    ------------------------------------------------------------
+    Notes about dying:
+
+    Dead player actually behaves (from the point
+    of view of this class...) much like alive player. This means that
+    e.g. dead player still has a Navigator, and it's CameraPos may still
+    change (e.g. because player was killed when he was flying, or player
+    corpse lays on some moving object of the level). It just cannot change
+    because of player keys like up/down/rotate etc.
+    This class automatically takes care of all things related to dying.
+
+    Code using this class should just make sure to not do some
+    forbidden things when player is dead --- right now this includes:
+    @unorderedList(
+      @item Calling PickItem, DeleteItem, DropItem and generally modifying Items.
+      @item(Increasing Life (further decreasing Life is OK).
+        Note that this means that once Player is Dead, (s)he cannot
+        be alive again.)
+      @item Changing EquippedWeapon.
+    )
+
+    Some other things in other units are also forbidden, see there for docs.
+    In general, my strategy is that "if some method doesn't explicitly
+    state that Player must be alive to call it --- then I'm allowed
+    to call this method even when Player is Dead".
+  }
   TPlayer = class
   private
     FLife: Single;
@@ -43,7 +70,6 @@ type
     FEquippedWeapon: TItem;
     FFlyingModeTimeOut: Single; { > 0 means he's flying. In seconds. }
     function GetFlyingMode: boolean;
-    procedure UpdateNavigatorFromFlyingMode;
     procedure SetEquippedWeapon(Value: TItem);
 
     { blackout things }
@@ -68,7 +94,10 @@ type
 
     { Cancel FlyingMode. Useful if you're in the FlyingMode that will
       automatically wear off, but you don't want to wait and you
-      want to cancel flying *now*. Ignored if not in FlyingMode. }
+      want to cancel flying *now*. Ignored if not in FlyingMode.
+      
+      Note that while you can call this when Dead, this will
+      be always ignored (because when Dead, FlyingMode is always false). }
     procedure CancelFlying;
 
     { Inventory, items owned by the player.
@@ -163,6 +192,9 @@ type
     { Shortcut for BlackOut with red color.
       @noAutoLinkHere }
     procedure RedOut;
+
+    { Just a shortcut for Life <= 0. }
+    function Dead: boolean;
   end;
 
 implementation
@@ -190,8 +222,6 @@ begin
   Navigator.Key_MoveSpeedInc := K_None; { turn key off }
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
   Navigator.OnFalledDown := FalledDown;
-
-  UpdateNavigatorFromFlyingMode;
 end;
 
 destructor TPlayer.Destroy;
@@ -201,27 +231,9 @@ begin
   inherited;
 end;
 
-procedure TPlayer.UpdateNavigatorFromFlyingMode;
-begin
-  Navigator.Gravity := not FlyingMode;
-  if FlyingMode then
-  begin
-    Navigator.Key_Jump := K_None;
-    Navigator.Key_Crouch := K_None;
-    Navigator.Key_UpMove := K_A;
-    Navigator.Key_DownMove := K_Z;
-  end else
-  begin
-    Navigator.Key_Jump := K_A;
-    Navigator.Key_Crouch := K_Z;
-    Navigator.Key_UpMove := K_None;
-    Navigator.Key_DownMove := K_None;
-  end;
-end;
-
 function TPlayer.GetFlyingMode: boolean;
 begin
-  Result := FFlyingModeTimeOut > 0;
+  Result := (FFlyingModeTimeOut > 0) and (not Dead);
 end;
 
 procedure TPlayer.FlyingModeTimeoutBegin(const TimeOut: Single);
@@ -234,17 +246,14 @@ begin
     FFlyingModeTimeOut to maximum of current FFlyingModeTimeOut and TimeOut
     --- i.e. the effect that will allow player to fly longer wins. }
   FFlyingModeTimeOut := Max(FFlyingModeTimeOut, TimeOut);
-
-  UpdateNavigatorFromFlyingMode;
 end;
 
 procedure TPlayer.CancelFlying;
 begin
-  if FFlyingModeTimeOut > 0 { FlyingMode } then
+  if FlyingMode then
   begin
     FFlyingModeTimeOut := 0;
     GameMessage('You''re no longer flying');
-    UpdateNavigatorFromFlyingMode;
   end;
 end;
 
@@ -415,21 +424,71 @@ begin
   end;
 
   glLoadIdentity;
-  DrawGLBlackOutRect(BlackOutColor, BlackOutIntensity, 0, 0,
-    RequiredScreenWidth, RequiredScreenHeight);
+  if Dead then
+    DrawGLBlackOutRect(Red3Single, 1.0, 0, 0,
+      RequiredScreenWidth, RequiredScreenHeight) else
+    DrawGLBlackOutRect(BlackOutColor, BlackOutIntensity, 0, 0,
+      RequiredScreenWidth, RequiredScreenHeight);
 end;
 
 procedure TPlayer.Idle(const CompSpeed: Single);
-begin
-  if FFlyingModeTimeOut > 0 { FlyingMode } then
+
+  procedure UpdateNavigatorFromFlyingMode;
   begin
-    FFlyingModeTimeOut := FFlyingModeTimeOut - CompSpeed / 50;
-    if FFlyingModeTimeOut <= 0 { not FlyingMode } then
+    Navigator.Gravity := not FlyingMode;
+    if FlyingMode then
     begin
-      GameMessage('You''re no longer flying');
-      UpdateNavigatorFromFlyingMode;
+      Navigator.Key_Jump := K_None;
+      Navigator.Key_Crouch := K_None;
+      Navigator.Key_UpMove := K_A;
+      Navigator.Key_DownMove := K_Z;
+    end else
+    begin
+      Navigator.Key_Jump := K_A;
+      Navigator.Key_Crouch := K_Z;
+      Navigator.Key_UpMove := K_None;
+      Navigator.Key_DownMove := K_None;
     end;
   end;
+
+  procedure UpdateNavigatorFromDead;
+  begin
+    { Navigator.Gravity is already set by UpdateNavigatorFromFlyingMode
+      to true (because FlyingMode is always false when Player.Dead). }
+    if Player.Dead then
+    begin
+      { Set all moving keys to K_None.
+        Note that once the player is dead, he cannot be alive again,
+        so I do not have to care here about setting keys to appropriate
+        values when not Player.Dead. }
+      Navigator.Key_Forward := K_None;
+      Navigator.Key_Backward := K_None;
+      Navigator.Key_RightRot := K_None;
+      Navigator.Key_LeftRot := K_None;
+      Navigator.Key_RightStrafe := K_None;
+      Navigator.Key_LeftStrafe := K_None;
+      Navigator.Key_UpRotate := K_None;
+      Navigator.Key_DownRotate := K_None;
+      Navigator.Key_UpMove := K_None;
+      Navigator.Key_DownMove := K_None;
+      Navigator.Key_HomeUp := K_None;
+      Navigator.Key_Jump := K_None;
+      Navigator.Key_Crouch := K_None;
+    end;
+  end;
+
+begin
+  if FlyingMode then
+  begin
+    FFlyingModeTimeOut := FFlyingModeTimeOut - CompSpeed / 50;
+    if not FlyingMode then
+    begin
+      GameMessage('You''re no longer flying');
+    end;
+  end;
+
+  UpdateNavigatorFromFlyingMode;
+  UpdateNavigatorFromDead;
 
   if BlackOutIntensity > 0 then
     BlackOutIntensity -= 0.04 * Glw.FpsCompSpeed;
@@ -465,12 +524,22 @@ end;
 
 procedure TPlayer.SetLife(const Value: Single);
 begin
+  if (Life > 0) and (Value <= 0) then
+  begin
+    GameMessage('You die');
+    Sound(stPlayerDies);
+  end else
   if (Life - Value) > 10 then
   begin
     RedOut;
     Sound(stPlayerSuddenPain);
   end;
   FLife := Value;
+end;
+
+function TPlayer.Dead: boolean;
+begin
+  Result := Life <= 0;
 end;
 
 { GLWindow init / close ------------------------------------------------------ }

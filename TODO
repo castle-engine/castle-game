@@ -1,3 +1,8 @@
+- on player dead
+  - move his CameraUp to be horizontal,
+  - change his CameraPreferredHeight to be lower (but remember
+    to keep CorrectCameraPreferredHeight, you can turn HeadBobbing := 0
+    and CrouchHeight := 1 for this.)
 --------------------
 items todos:
 - player must be able to actually swing the EquippedWeapon,

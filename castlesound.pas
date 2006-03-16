@@ -34,6 +34,7 @@ type
     stPlayerCastFlyingSpell,
     stPlayerPickItem,
     stPlayerDropItem,
+    stPlayerDies,
     { equipping items sounds }
     stEquippingSword,
     { level objects sounds }

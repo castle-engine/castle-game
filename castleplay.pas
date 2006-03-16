@@ -88,6 +88,8 @@ var
 const
   ViewAngleDegX = 45.0;
 
+  SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
+
 function ViewAngleDegY: Single;
 begin
   Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX,
@@ -125,35 +127,24 @@ begin
 end;
 
 procedure Draw2D(Draw2DData: Integer);
-const
-  InventorySlotWidth = 100;
-  InventorySlotHeight = 100;
-  InventorySlotMargin = 2;
-  MaxInventorySlotsVisible = RequiredScreenHeight div InventorySlotHeight;
 
-  ItemSlotX = RequiredScreenWidth - InventorySlotWidth;
+  procedure DoDrawInventory;
+  const
+    InventorySlotWidth = 100;
+    InventorySlotHeight = 100;
+    InventorySlotMargin = 2;
+    MaxInventorySlotsVisible = RequiredScreenHeight div InventorySlotHeight;
 
-  function ItemSlotY(I: Integer): Integer;
-  begin
-    Result := InventorySlotHeight * (MaxInventorySlotsVisible - 1 - I);
-  end;
+    ItemSlotX = RequiredScreenWidth - InventorySlotWidth;
 
-var
-  I, X, Y, MaxItemShown: Integer;
-  S: string;
-begin
-  if Player.EquippedWeapon <> nil then
-    glCallList((Player.EquippedWeapon.Kind as TItemWeaponKind).
-      GLList_DrawScreenImage);
+    function ItemSlotY(I: Integer): Integer;
+    begin
+      Result := InventorySlotHeight * (MaxInventorySlotsVisible - 1 - I);
+    end;
 
-  glCallList(GLList_Draw2dBegin);
-
-  GameMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
-    Glw.Width, Glw.Height);
-
-  Player.Render2D;
-
-  if InventoryVisible then
+  var
+    I, X, Y, MaxItemShown: Integer;
+    S: string;
   begin
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
@@ -208,7 +199,7 @@ begin
     end;
   end;
 
-  if ShowDebugInfo then
+  procedure DoShowDebugInfo;
   begin
     glColorv(Vector3Single(0.7, 0.7, 0.7));
     glRasterPos2i(0, RequiredScreenHeight -
@@ -228,6 +219,35 @@ begin
     Font_BFNT_BitstreamVeraSans.Print(
       Format('FPS : %f (real : %f)', [DisplayFpsFrameTime, DisplayFpsRealTime]));
   end;
+
+  procedure DoShowDeadInfo;
+  begin
+    glColorv(Vector3Single(1, 0, 0));
+    glRasterPos2i(0, RequiredScreenHeight -
+      Font_BFNT_BitstreamVeraSans.RowHeight * 3 - 15 { margin });
+    Font_BFNT_BitstreamVeraSans.Print(SDeadMessage);
+  end;
+
+begin
+  if Player.EquippedWeapon <> nil then
+    glCallList((Player.EquippedWeapon.Kind as TItemWeaponKind).
+      GLList_DrawScreenImage);
+
+  glCallList(GLList_Draw2dBegin);
+
+  GameMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
+    Glw.Width, Glw.Height);
+
+  if InventoryVisible then
+    DoDrawInventory;
+
+  if ShowDebugInfo then
+    DoShowDebugInfo;
+
+  if Player.Dead then
+    DoShowDeadInfo;
+
+  Player.Render2D;
 end;
 
 procedure Draw(Glwin: TGLWindow);
@@ -264,12 +284,15 @@ begin
   Level.Idle(Glw.FpsCompSpeed);
   Level.Items.Idle(Glw.FpsCompSpeed);
 
-  PickItemIndex := Level.Items.PlayerCollision;
-  if PickItemIndex <> -1 then
+  if not Player.Dead then
   begin
-    Player.PickItem(Level.Items[PickItemIndex].ExtractItem);
-    Level.Items.FreeAndNil(PickItemIndex);
-    Level.Items.Delete(PickItemIndex);
+    PickItemIndex := Level.Items.PlayerCollision;
+    if PickItemIndex <> -1 then
+    begin
+      Player.PickItem(Level.Items[PickItemIndex].ExtractItem);
+      Level.Items.FreeAndNil(PickItemIndex);
+      Level.Items.Delete(PickItemIndex);
+    end;
   end;
 
   if (not Level.HintButtonShown) and
@@ -289,7 +312,8 @@ end;
 
 procedure GameCancel;
 begin
-  if MessageYesNo(Glw, 'Are you sure you want to end the game ?', taLeft) then
+  if Player.Dead or
+    MessageYesNo(Glw, 'Are you sure you want to end the game ?', taLeft) then
     GameEnded := true;
 end;
 
@@ -315,6 +339,12 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
     SqrHeightAboveTheGround: Single;
     PushVectorLength: Single;
   begin
+    if Player.Dead then
+    begin
+      GameMessage(SDeadMessage);
+      Exit;
+    end;
+
     if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
       DropppedItem := Player.DropItem(InventoryCurrentItem);
@@ -361,6 +391,12 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
     UsedItem: TItem;
     UsedItemIndex: Integer;
   begin
+    if Player.Dead then
+    begin
+      GameMessage(SDeadMessage);
+      Exit;
+    end;
+
     if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
       UsedItem := Player.Items[InventoryCurrentItem];
@@ -379,6 +415,13 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       GameMessage('Nothing to use - select some item first');
   end;
 
+  procedure CancelFlying;
+  begin
+    if not Player.Dead then
+      Player.CancelFlying else
+      GameMessage(SDeadMessage);
+  end;
+
 begin
   case Key of
     K_F1: ShowHelpMessage;
@@ -388,7 +431,9 @@ begin
         'm': ViewGameMessages;
 
         { debug things }
-        'l': Player.Life := Min(Player.Life + 10, Player.MaxLife);
+        'l': if not Player.Dead then
+               Player.Life := Min(Player.Life + 10, Player.MaxLife) else
+               GameMessage(SDeadMessage);
         'L': Player.Life := Max(Player.Life - 10, 0);
         '`': ShowDebugInfo := not ShowDebugInfo;
 
@@ -399,7 +444,7 @@ begin
         'd': DropItem;
         CharEnter: UseItem;
 
-        'c': Player.CancelFlying;
+        'c': CancelFlying;
 
         CharEscape: GameCancel;
       end;
@@ -423,6 +468,12 @@ var
 begin
   if Btn = mbLeft then
   begin
+    if Player.Dead then
+    begin
+      GameMessage(SDeadMessage);
+      Exit;
+    end;
+
     Glw.MousePickedRay(ViewAngleDegX, ViewAngleDegY, Ray0, RayVector);
 
     { Picking is not an often called procedure, so I can freely normalize

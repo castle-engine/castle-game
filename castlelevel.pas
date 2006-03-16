@@ -146,7 +146,10 @@ type
       const Ray0, RayVector: TVector3Single): Integer; virtual;
 
     { Override this to take some action when some special object was picked.
-      This will be called only if you overriden also SpecialObjectsTryPick. }
+      This will be called only if you overriden also SpecialObjectsTryPick.
+
+      Never call this when Player is Dead. Implementation of this may
+      assume that Player is not Dead. }
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer); virtual;
   end;

@@ -102,6 +102,9 @@ type
       Item instance properties, including Quantity.
       As a very special exception, implementation of this method
       is allowed to set Quantity of Item to 0.
+      
+      Never call this method when Player.Dead. Implementation of this
+      method may assume that Player is not Dead.
 
       Caller of this method should always be prepared to immediately
       handle the "Quantity = 0" situation by freeing given item,
