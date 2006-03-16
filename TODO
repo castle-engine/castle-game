@@ -1,3 +1,6 @@
+- Add redouts on spadanie,
+  prepare general engine to make blackouts.
+  Take this from malfunction.
 --------------------
 items todos:
 - player must be able to actually swing the EquippedWeapon,
@@ -7,12 +10,6 @@ items todos:
 - inventory should be able to scroll, when more than MaxInventorySlots items
   are available.
 
-- apply nice "strips" texture to handle of the sword,
-  see http://mediawiki.blender.org/index.php/Manual/PartII/Basic_Mesh_Modelling
-
-- some alpha rect around the item's model ?
-  test, although it seems that rotating is enough.
-
 --------------------
 - Stage 4: Add A Boss System -- 25th Mar, 2006
     * 10 Points -- Add a boss to your level that you fight to finish the level.
@@ -21,10 +18,7 @@ items todos:
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
 
-- Add redouts on spadanie,
-  prepare general engine to make blackouts.
-  Take this from malfunction.
-
+--------------------
 - test on high resolution screen (19'' etc.) --- do I have this problem
   with screen refresh rate that Eric talkes about ?
 
@@ -71,6 +65,12 @@ items todos:
 - mail to author of
   http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
   : permission to use stars.jpg in my game ?
+
+- apply nice "strips" texture to handle of the sword,
+  see http://mediawiki.blender.org/index.php/Manual/PartII/Basic_Mesh_Modelling
+
+- some alpha rect around the item's model ?
+  test, although it seems that rotating is enough.
 
 - help (at least beta-testing and English text proofreading!):
 
