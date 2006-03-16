@@ -270,7 +270,7 @@ begin
     FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
     FCameraPreferredHeight := FCameraRadius * 5;
   CorrectCameraPreferredHeight(FCameraPreferredHeight, CameraRadius,
-    DefaultCrouchHeight);
+    DefaultCrouchHeight, DefaultHeadBobbing);
 
   if NavigationNode <> nil then
     FNavigationSpeed := NavigationNode.FdSpeed.Value else
