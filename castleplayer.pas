@@ -23,7 +23,7 @@ unit CastlePlayer;
 
 interface
 
-uses Boxes3d, MatrixNavigation, CastleItems;
+uses Boxes3d, MatrixNavigation, CastleItems, OpenGLh;
 
 const
   DefaultMaxLife = 100;
@@ -45,11 +45,18 @@ type
     function GetFlyingMode: boolean;
     procedure UpdateNavigatorFromFlyingMode;
     procedure SetEquippedWeapon(Value: TItem);
+
+    { blackout things }
+    BlackOutIntensity: TGLfloat;
+    BlackOutColor: TVector3f;
+
+    procedure FalledDown(Navigator: TMatrixWalker; const FallenHeight: Single);
+    procedure SetLife(const Value: Single);
   public
     constructor Create;
     destructor Destroy; override;
 
-    property Life: Single read FLife write FLife default DefaultMaxLife;
+    property Life: Single read FLife write SetLife default DefaultMaxLife;
     property MaxLife: Single read FMaxLife write FMaxLife default DefaultMaxLife;
 
     property FlyingMode: boolean read GetFlyingMode;
@@ -146,13 +153,24 @@ type
     { Adjust some things based on passing time.
       For now, this is for things like FlyingModeTimeout to "wear out". }
     procedure Idle(const CompSpeed: Single);
+
+    { Make blackout with given Color (so it's not really a "black"out,
+      it's fadeout + fadein with given Color; e.g. pass here red
+      to get "redout").
+      @noAutoLinkHere }
+    procedure BlackOut(const Color: TVector3f);
+
+    { Shortcut for BlackOut with red color.
+      @noAutoLinkHere }
+    procedure RedOut;
   end;
 
 implementation
 
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
-  OpenGLh, GLWindow, KambiGLUtils, Images, VectorMath, KambiFilesUtils;
+  GLWindow, KambiGLUtils, Images, VectorMath, KambiFilesUtils,
+  CastleSound;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -171,6 +189,7 @@ begin
   FNavigator := TMatrixWalker.Create(nil);
   Navigator.Key_MoveSpeedInc := K_None; { turn key off }
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
+  Navigator.OnFalledDown := FalledDown;
 
   UpdateNavigatorFromFlyingMode;
 end;
@@ -239,6 +258,8 @@ begin
     S += Format(' (quantity %d)', [Item.Quantity]);
   GameMessage(S);
 
+  Sound(stPlayerPickItem);
+
   StackIndex := Items.Stackable(Item);
   if StackIndex <> -1 then
   begin
@@ -293,6 +314,8 @@ begin
   if Result.Quantity <> 1 then
     S += Format(' (quantity %d)', [Result.Quantity]);
   GameMessage(S);
+
+  Sound(stPlayerDropItem);
 end;
 
 function TPlayer.DeleteItem(ItemIndex: Integer): TItem;
@@ -390,6 +413,10 @@ begin
     Font_BFNT_BitstreamVeraSans.Print(Format('Flying (%d more seconds)',
       [Floor(FFlyingModeTimeout)]));
   end;
+
+  glLoadIdentity;
+  DrawGLBlackOutRect(BlackOutColor, BlackOutIntensity, 0, 0,
+    RequiredScreenWidth, RequiredScreenHeight);
 end;
 
 procedure TPlayer.Idle(const CompSpeed: Single);
@@ -403,6 +430,45 @@ begin
       UpdateNavigatorFromFlyingMode;
     end;
   end;
+
+  if BlackOutIntensity > 0 then
+    BlackOutIntensity -= 0.04 * Glw.FpsCompSpeed;
+end;
+
+procedure TPlayer.BlackOut(const Color: TVector3f);
+begin
+  BlackOutColor := Color;
+  BlackOutIntensity := 1;
+end;
+
+procedure TPlayer.RedOut;
+begin
+  BlackOut(Red3Single);
+end;
+
+procedure TPlayer.FalledDown(Navigator: TMatrixWalker;
+  const FallenHeight: Single);
+begin
+  { Reasoning behind this formula:
+    found by looking at various level parts:
+    height 150 should take approx 100 life,
+    height < 4 should not take any damage,
+    height 20 should take some damage (that can cause redout but not deadly).
+
+    I'm adding some randomness. }
+  if FallenHeight > 4 then
+    Life := Life - Max(0,
+      (FallenHeight / 1.5) * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
+end;
+
+procedure TPlayer.SetLife(const Value: Single);
+begin
+  if (Life - Value) > 10 then
+  begin
+    RedOut;
+    Sound(stPlayerSuddenPain);
+  end;
+  FLife := Value;
 end;
 
 { GLWindow init / close ------------------------------------------------------ }

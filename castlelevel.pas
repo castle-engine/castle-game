@@ -658,6 +658,7 @@ begin
           begin
             ButtonPressed := true;
             GameMessage('You press the button. Level exit is uncovered');
+            { TODO: sound: symbol moving stCastleHallSymbolMoving }
           end;
         end else
           GameMessage('You see a button. You cannot reach it from here');

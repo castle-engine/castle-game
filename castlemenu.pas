@@ -109,6 +109,7 @@ begin
         if CurrentMenu = Low(CurrentMenu) then
           CurrentMenu := High(CurrentMenu) else
           CurrentMenu := Pred(CurrentMenu);
+        { TODO: sound: stMenuMove }
         Glw.PostRedisplay;
       end;
     K_Down:
@@ -116,6 +117,7 @@ begin
         if CurrentMenu = High(CurrentMenu) then
           CurrentMenu := Low(CurrentMenu) else
           CurrentMenu := Succ(CurrentMenu);
+        { TODO: sound: stMenuMove }
         Glw.PostRedisplay;
       end;
     K_Enter:

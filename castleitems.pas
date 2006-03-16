@@ -24,7 +24,7 @@ unit CastleItems;
 interface
 
 uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
-  KambiClassUtils, Images, OpenGLh;
+  KambiClassUtils, Images, OpenGLh, CastleSound;
 
 {$define read_interface}
 
@@ -124,10 +124,12 @@ type
     FGLList_DrawScreenImage: TGLuint;
     FScreenImageAlignLeft: boolean;
     FScreenImageAlignBottom : boolean;
+    FEquippingSound: TSoundType;
   public
     constructor Create(const AModelFileName, AVRMLNodeName, AName,
       AImageFileName, AScreenImageFileName: string;
-      AScreenImageAlignLeft, AScreenImageAlignBottom: boolean);
+      AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
+      AEquippingSound: TSoundType);
     destructor Destroy; override;
 
     { Because whole screen is quite large, we want our ScreenImage
@@ -152,6 +154,10 @@ type
     function ScreenImage: TImage;
     function GLList_DrawScreenImage: TGLuint;
     { @groupEnd }
+
+    { Sound to make on equipping. Each weapon can have it's own
+      equipping sound. }
+    property EquippingSound: TSoundType read FEquippingSound;
 
     procedure Use(Item: TItem); override;
   end;
@@ -383,6 +389,7 @@ begin
     Player.Life := Min(Player.Life + 50, Player.MaxLife);
     GameMessage(Format('You drink "%s"', [Item.Kind.Name]));
     Item.Quantity := Item.Quantity - 1;
+    Sound(stPlayerPotionDrink);
   end else
     GameMessage('You feel quite alright, no need to waste this potion');
 end;
@@ -391,13 +398,15 @@ end;
 
 constructor TItemWeaponKind.Create(const AModelFileName, AVRMLNodeName, AName,
   AImageFileName, AScreenImageFileName: string;
-  AScreenImageAlignLeft, AScreenImageAlignBottom: boolean);
+  AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
+  AEquippingSound: TSoundType);
 begin
   inherited Create(AModelFileName, AVRMLNodeName, AName,
     AImageFileName);
   FScreenImageFileName := AScreenImageFileName;
   FScreenImageAlignLeft := AScreenImageAlignLeft;
   FScreenImageAlignBottom := AScreenImageAlignBottom;
+  FEquippingSound := AEquippingSound;
 end;
 
 destructor TItemWeaponKind.Destroy;
@@ -447,6 +456,7 @@ end;
 procedure TItemWeaponKind.Use(Item: TItem);
 begin
   Player.EquippedWeapon := Item;
+  Sound(EquippingSound);
 end;
 
 { TItemScrollOfFlyingKind ---------------------------------------------------- }
@@ -456,6 +466,7 @@ begin
   GameMessage(Format('You cast spell from "%s"', [Item.Kind.Name]));
   Player.FlyingModeTimeoutBegin(30.0);
   Item.Quantity := Item.Quantity - 1;
+  Sound(stPlayerCastFlyingSpell);
 end;
 
 { TItem ------------------------------------------------------------ }
@@ -638,7 +649,7 @@ begin
   CreatedItemKinds := TList.Create;
 
   Sword := TItemWeaponKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
-    'sword.png', false, true);
+    'sword.png', false, true, stEquippingSword);
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
     'LifePotion', 'Potion of Life', 'life_potion.png');

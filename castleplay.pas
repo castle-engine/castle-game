@@ -493,7 +493,25 @@ begin
   end;
 end;
 
-function MoveAllowed(Navigator: TMatrixWalker;
+type
+  TDummy = class
+    class procedure MatrixChanged(Navigator: TMatrixNavigator);
+
+    class function MoveAllowed(Navigator: TMatrixWalker;
+      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const BecauseOfGravity: boolean): boolean;
+
+    class procedure GetCameraHeight(Navigator: TMatrixWalker;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+  end;
+
+class procedure TDummy.MatrixChanged(Navigator: TMatrixNavigator);
+begin
+  Glw.PostRedisplay;
+  alUpdateListener;
+end;
+
+class function TDummy.MoveAllowed(Navigator: TMatrixWalker;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
@@ -501,22 +519,11 @@ begin
     ProposedNewPos, NewPos, BecauseOfGravity);
 end;
 
-procedure GetCameraHeight(Navigator: TMatrixWalker;
+class procedure TDummy.GetCameraHeight(Navigator: TMatrixWalker;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 begin
   Level.GetCameraHeight(Navigator,
     IsAboveTheGround, SqrHeightAboveTheGround);
-end;
-
-type
-  TDummy = class
-    class procedure MatrixChanged(Navigator: TMatrixNavigator);
-  end;
-
-class procedure TDummy.MatrixChanged(Navigator: TMatrixNavigator);
-begin
-  Glw.PostRedisplay;
-  alUpdateListener;
 end;
 
 procedure PlayLevel(ALevel: TLevel; APlayer: TPlayer);
@@ -541,8 +548,8 @@ begin
       try
         { Init Player.Navigator properties }
         Player.Navigator.OnMatrixChanged := TDummy.MatrixChanged;
-        Player.Navigator.OnMoveAllowed := MoveAllowed;
-        Player.Navigator.OnGetCameraHeight := GetCameraHeight;
+        Player.Navigator.OnMoveAllowed := TDummy.MoveAllowed;
+        Player.Navigator.OnGetCameraHeight := TDummy.GetCameraHeight;
 
         { Init initial camera pos }
         Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
@@ -644,6 +651,7 @@ begin
   FileName := FnameAutoInc(ApplicationName + '_screen_%d.png');
   Glw.SaveScreen(FileName);
   GameMessage('Screen saved to ' + FileName);
+  { TODO: sound: stSaveScreen }
 end;
 
 procedure GLWindowInit(Glwin: TGLWindow);

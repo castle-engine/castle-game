@@ -26,6 +26,31 @@ interface
 var
   SoundInitializationReport: string;
 
+type
+  TSoundType = (
+    { player sounds }
+    stPlayerSuddenPain,
+    stPlayerPotionDrink,
+    stPlayerCastFlyingSpell,
+    stPlayerPickItem,
+    stPlayerDropItem,
+    { equipping items sounds }
+    stEquippingSword,
+    { level objects sounds }
+    stCastleHallSymbolMoving,
+    { others }
+    stMenuMove,
+    stSaveScreen);
+
+{ Play given sound. This should be used to play sounds
+  that are not spatial actually, i.e. have no place in 3D space. }
+procedure Sound(SoundType: TSoundType);
+
 implementation
+
+procedure Sound(SoundType: TSoundType);
+begin
+  { TODO }
+end;
 
 end.
