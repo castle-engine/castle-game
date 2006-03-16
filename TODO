@@ -1,4 +1,3 @@
-- fix: when casually walking around castle_hall, when climbing stairs (on basic_castle and castle_hall) he gets some life loss! This shouldn't be caused...
 --------------------
 items todos:
 - player must be able to actually swing the EquippedWeapon,
