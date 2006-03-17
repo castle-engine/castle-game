@@ -33,27 +33,19 @@ for your graphics card installed.
 --------------------
 Sample levels included:
 
-"Sample castle level" : this is a simple level submitted for PGD stage 2.
-  This is actually combined from my old demo castle model,
+"Tower" : initially it was named "Sample castle level" and was a simple
+  level submitted for PGD stage 2.
+  This was actually combined from my old demo castle model,
   and I added night sky with moon that was used in
   my other toy-game (named "lets_take_a_walk").
-  Looks good as a demo, but it was not really intended to be used in this game,
+  Looked good as a demo, but it was not really intended to be used in this game,
   I just added this for stage 2.
+  Before stage 4 deadline, I changed it a lot, but it's still
+  just a testing level.
 
 "Castle hall" : this is the level made for PGD stage 3.
-  It's not finished yet (of course :) ), but it exists and there is level exit.
-
-  Walkthrough: there is a red button that you should "push" (click with mouse)
-  and then take a look at the main hall --- you will see some
-  animation and level exit will be revealed.
-
-  In a final version, this button will be on the glass roof
-  (the thing hanging in the middle of the level), and stairs
-  will lead to this roof. But stairs are not modelled now, so I just placed
-  the red button on the other side of the corridor for now...
-
-  Still you can use "f" key (toggles "flying mode", in the final game
-  this will require some item, spell etc.) to stand on the glass roof.
+  Walkthrough: just find and click the red button and level exit will be
+  revealed.
 
 If you want to see other models demonstrating my engine, see
 [http://www.camelot.homedns.org/~michalis/miscella/kambi_vrml_examples.zip]
