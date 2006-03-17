@@ -10,7 +10,6 @@ items todos:
 --------------------
 - Stage 4: Add A Boss System -- 25th Mar, 2006
     * 10 Points -- Add a boss to your level that you fight to finish the level.
-    * 10 Points -- Basic 'game over' death sequence. Player must be able to die.
 
 - Stage 3: Feb 12th - Mar 4th
   Goal #1 (5 Points) - Add basic enemies to game engine.
