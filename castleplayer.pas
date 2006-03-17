@@ -541,6 +541,9 @@ begin
   begin
     GameMessage('You die');
     Sound(stPlayerDies);
+    Navigator.HeadBobbing := 0.0;
+    Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01;
+    Navigator.FallOnTheGround;
   end else
   if (Life - Value) > 10 then
   begin
