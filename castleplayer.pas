@@ -142,8 +142,11 @@ type
     }
     property Navigator: TMatrixWalker read FNavigator;
 
-    { This adds Item to Items, with appropriate GameMessage }
-    procedure PickItem(Item: TItem);
+    { This adds Item to Items, with appropriate GameMessage.
+      Returns index inside Items to this item (note that this
+      may be actually an index to some other TItem instance
+      that was stacked with given Item). }
+    function PickItem(Item: TItem): Integer;
 
     { Drops given item. ItemIndex must be valid (between 0 and Items.Count - 1).
       Returns nil if player somehow cancelled operation and nothing is dropped.
@@ -266,10 +269,9 @@ begin
   end;
 end;
 
-procedure TPlayer.PickItem(Item: TItem);
+function TPlayer.PickItem(Item: TItem): Integer;
 var
   S: string;
-  StackIndex: Integer;
 begin
   S := Format('You pick "%s"', [Item.Kind.Name]);
   if Item.Quantity <> 1 then
@@ -278,15 +280,18 @@ begin
 
   Sound(stPlayerPickItem);
 
-  StackIndex := Items.Stackable(Item);
-  if StackIndex <> -1 then
+  Result := Items.Stackable(Item);
+  if Result <> -1 then
   begin
     { Stack Item with existing item }
-    Items[StackIndex].Quantity := Items[StackIndex].Quantity + Item.Quantity;
+    Items[Result].Quantity := Items[Result].Quantity + Item.Quantity;
     FreeAndNil(Item);
-    Item := Items[StackIndex];
+    Item := Items[Result];
   end else
+  begin
     Items.Add(Item);
+    Result := Items.High;
+  end;
 
   { Automatically equip the weapon. }
   if (Item.Kind is TItemWeaponKind) and (EquippedWeapon = nil) then

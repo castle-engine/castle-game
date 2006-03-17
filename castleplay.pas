@@ -76,9 +76,27 @@ var
   GameEnded: boolean;
   GameMessagesManager: TTimeMessagesManager;
   GLList_Draw2dBegin: TGLuint;
+
   GLList_InventorySlot: TGLuint;
   InventoryVisible: boolean;
+  { Note: while we try to always sensibly update InventoryCurrentItem,
+    to keep the assumptions that
+    1. Player.Items.Count = 0 => InventoryCurrentItem = -1
+    2. Player.Items.Count > 0 =>
+       InventoryCurrentItem between 0 and Player.Items.Count - 1
+
+    but you should *nowhere* depend on these assuptions.
+    That's because I want to allow myself freedom to modify Items
+    in various situations, so InventoryCurrentItem can become
+    invalid in many situations.
+
+    So every code should check that
+    - If InventoryCurrentItem between 0 and Player.Items.Count - 1
+      that InventoryCurrentItem is selected
+    - Else no item is selected (possibly Player.Items.Count = 0,
+      possibly not) }
   InventoryCurrentItem: Integer;
+
   ShowDebugInfo: boolean;
 
   DisplayFpsUpdateTick: TMilisecTime;
@@ -278,7 +296,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 var
-  PickItemIndex: Integer;
+  PickItemIndex, PlayerItemIndex: Integer;
 begin
   GameMessagesManager.Idle;
   Level.Idle(Glw.FpsCompSpeed);
@@ -289,9 +307,13 @@ begin
     PickItemIndex := Level.Items.PlayerCollision;
     if PickItemIndex <> -1 then
     begin
-      Player.PickItem(Level.Items[PickItemIndex].ExtractItem);
+      PlayerItemIndex := Player.PickItem(Level.Items[PickItemIndex].ExtractItem);
       Level.Items.FreeAndNil(PickItemIndex);
       Level.Items.Delete(PickItemIndex);
+
+      { update InventoryCurrentItem. }
+      if not Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
+        InventoryCurrentItem := PlayerItemIndex;
     end;
   end;
 
@@ -331,6 +353,15 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
         InventoryCurrentItem, Change, Player.Items.Count - 1);
   end;
 
+  procedure UpdateInventoryCurrentItemAfterDelete;
+  begin
+    { update InventoryCurrentItem.
+      Note that if Player.Items.Count = 0 now, then this will
+      correctly set InventoryCurrentItem to -1. }
+    if InventoryCurrentItem >= Player.Items.Count then
+      InventoryCurrentItem := Player.Items.Count - 1;
+  end;
+
   procedure DropItem;
   var
     DropppedItem: TItem;
@@ -350,6 +381,8 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       DropppedItem := Player.DropItem(InventoryCurrentItem);
       if DropppedItem <> nil then
       begin
+        UpdateInventoryCurrentItemAfterDelete;
+
         { Calculate DropPosition.
           TODO: this should be done better,
           DropPosition should be always initialized to Player.Navigator.CameraPos
@@ -411,6 +444,8 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
         if UsedItemIndex <> -1 then
           Player.DeleteItem(UsedItemIndex).Free;
       end;
+
+      UpdateInventoryCurrentItemAfterDelete;
     end else
       GameMessage('Nothing to use - select some item first');
   end;
@@ -604,7 +639,7 @@ begin
   Level := ALevel;
   Player := APlayer;
   InventoryVisible := false;
-  InventoryCurrentItem := 0;
+  InventoryCurrentItem := -1;
   try
 
     SavedMode := TGLMode.Create(glw,
