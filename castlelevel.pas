@@ -183,8 +183,6 @@ type
       SpecialObjectIndex: Integer); override;
   end;
 
-procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
-
 implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
@@ -237,8 +235,6 @@ begin
     this can be the default.
     Maybe it the future I'll make some configuration option to control this. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
-
-  SceneCorrectBlenderTexture2(Scene);
 
   { Initialize Items }
   FItems := TItemsOnLevelList.Create;
@@ -448,8 +444,6 @@ constructor TCastleHallLevel.Create;
       true, roSeparateShapeStates);
 
     Result.Attrib_TextureMinFilter := Scene.Attrib_TextureMinFilter;
-
-    SceneCorrectBlenderTexture2(Result);
 
     Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
   end;
@@ -667,28 +661,6 @@ begin
           GameMessage('You see a button. You cannot reach it from here');
       end;
   end;
-end;
-
-{ global things -------------------------------------------------------------- }
-
-type
-  TDummy = class
-    class procedure CorrectBlenderTexture2(Node: TVRMLNode);
-  end;
-
-class procedure TDummy.CorrectBlenderTexture2(Node: TVRMLNode);
-var
-  TextureFileName: TSFString;
-begin
-  TextureFileName := (Node as TNodeTexture2).FdFileName;
-  if IsPrefix('//..', TextureFileName.Value) then
-    TextureFileName.Value := SEnding(TextureFileName.Value, 3);
-end;
-
-procedure SceneCorrectBlenderTexture2(Scene: TVRMLFlatScene);
-begin
-  Scene.RootNode.EnumNodes(TNodeTexture2, TDummy.CorrectBlenderTexture2, false);
-  Scene.ChangedAll;
 end;
 
 end.
