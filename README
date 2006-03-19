@@ -390,27 +390,47 @@ Code:
 - My 3d game engine in units/. You can treat this engine as
   part of this game (I'm actually extending it while developing
   this game...), but it's generally useful.
+  See [http://www.camelot.homedns.org/~michalis/sources.php]
+
 - My font2pascal was used to generate font,
   see bfnt_bitstreamverasans_m10_unit.pas and mk_fonts.sh
-- FPC, of course
+
+- FPC, of course.
+  See [http://www.freepascal.org/]
 
 Graphics:
 - Some of my other programs are used:
+
   - view3dscene was often used to see how VRMLs look
     (independent of how they look when used in "The Castle"),
     and to generate some VRML pieces, and some other things...
-  - rayhunter was used to render items images, see data/items/images/
+    See [http://www.camelot.homedns.org/~michalis/view3dscene.php]
+
+  - rayhunter was used to render items images, see data/items/images/.
+    See [http://www.camelot.homedns.org/~michalis/rayhunter.php]
+
 - Blender
+  See [http://www.blender3d.org/]
+
 - GIMP
+  See [http://www.gimp.org/]
+
 - ImageMagick
+  See [http://www.imagemagick.org/script/index.php]
+
 - Terragen was used to create sky (see data/skies/).
   This is the only non-open-source component I used... pity :(.
   But I don't know of any (open-source or not) alternative to Terragen.
-- Some textures from public domain Golgotha textures.
+  See [http://www.planetside.co.uk/terragen/]
+
+- Many textures from public domain Golgotha textures.
+  See [http://www.vb3d.com/Textures.html]
+
 - Some post-processing of VRML models is done using EmacsLisp,
   see data/kambi-castle-utils.el and data/items/models/Makefile
+
 - stars.jpg from
-  http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
+  [http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm]
 
 --------------------
 Have fun! All comments are welcome.
