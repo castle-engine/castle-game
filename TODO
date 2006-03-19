@@ -7,11 +7,6 @@
 
 Highest priority goals for stage 4:
 
-- animating of textured objects must be better (Texture2 nodes
-  and VRMLOpenGLRendered must be shared by scenes of the same
-  GLAnimation) --- add demo for this to 3dmodels/examples/models/,
-  write about this in last_update.php
-
 - design basic monster (see papers), animate it
 
 - design moving AI and attacking AI for this monster
