@@ -95,30 +95,8 @@ Highest priority goals for stage 4:
 
   Mama, Kornel, savage, advertise on "PGD screenshots" thread
 
-----------------------------------------
-Preview of "The Castle"
-
-This is a preview of my new game, "The Castle". I'm developing it for <a href="http://pascalgamedevelopment.com/">PascalGameDevelopemnt</a> "The Big Boss" competition that ends on 7 May 2006. Everyone (who managed to get to this "secret" page) is welcome to download it and try.
-
-... download links, installing instructions as for lets_take_a_walk ...
-
-Help needed :
-
-1. Feedback
-
-<a href="michalis@ca...">Yeah, I really need your feedback.</a> Any kind of feedback is useful. This includes:
-
-- Bug reports. If anything goes wrong, I obviously want to know about it. Describe how to reproduce the bug &mdash; i.e. what you did, what happened, and what you expected to happen. If you think that something works strange, this also qualifies as a bug. If some text inside README file is unclear, this also qualifies as a bug.
-
-  Note that this game requires rather good graphic card available. If the game is awfully slow, then (probably) it's not a bug --- it's just the way it is, and I will not be able to help much. Make sure you have absolutely newest drivers (including OpenGL library) for your graphic card.
-
-- Features. Do you think that anything should be added ? Maybe something should be changed ? Any ideas may be useful here --- new key / mouse commands, changing the behavior of present commands, displaying some things in a different way, etc.
-
-  There are some features that I plan to implement --- like sounds in game, sound configuration from the menu, key shortcuts redefining from the menu, some display properties changing from the menu. And of course new levels, new items, new monsters. Still, exact ideas for new levels, items and monsters are most welcome (see also below for #Creating new levels, items and monsters).
-
-2. Creating new levels, items and monsters
-
-Inside the game archive, in the file called README, I described how you can create new levels, items or monsters for this game. This requires some knowledge of a 3d modelling program (I use <a href="www.blender3d.org">Blender</a>). Any help with designing new levels, items and monsters will be greatly appreciated (and you will be mentioned in CREDITS file etc.).
+  Preparations in
+  mojewww/camelot/e966ccd7cb2e6a5f3798ec26d81d7310/
 
 ----------------------------------------
 dist-making to-dos:
