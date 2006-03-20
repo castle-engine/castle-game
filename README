@@ -383,6 +383,35 @@ Items:
   class, for others you will want to derive new class from TItemKind
   and override there things you want.
 
+Creatures (enemies etc.):
+- Several notes about items apply also to creatures:
+
+  - Up vector must be +Z.
+    Moreover, for creatures: the looking direction
+    (i.e. whatever should be considered the "front" of the creature)
+    should be +X.
+
+  - Z = 0 is the base plane (ground) of the creature
+  - X = 0 and Y = 0 is the middle of the creature on XY plane
+
+  - Size of creature's model as rendered in the game is exactly
+    the size of it's model. A good reference is player's camera
+    height: 2. So creatures have generally height around 2.
+
+  - Like with items, initial creatures positions can be set
+    by placing a "stubs" on the level. Name of stub object is like
+    "Crea<creature-kind-name>_<ignored>".
+    Creature position is determined by stub lowest Z and
+    middle X,Y line.
+    Moreover, for creatures: initial creature direction
+    is determined by TODO.
+
+  - To really add the creature to the game add 1 line to
+    CastleCreatures unit in DoInitialization call creating your
+    TCreatureKind instance.
+
+  - For most creatures you will want to derive new TCreatureKind subclass.
+
 --------------------
 Used things:
 

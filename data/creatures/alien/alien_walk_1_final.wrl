@@ -1,0 +1,8 @@
+#VRML V1.0 ascii
+
+Group {
+  ShapeHints {
+    creaseAngle 2
+  }
+  WWWInline { name "alien_walk_1.wrl" }
+}
