@@ -9,7 +9,18 @@ Highest priority goals for stage 4:
 
 - design basic monster (see papers), animate it
 
+  StandAnimation:
+    demo_animation alien_still_final.wrl 0 alien_still_final.wrl 1
+  StandToWalkAnimation:
+    demo_animation alien_still_final.wrl 0 alien_walk_1_final.wrl 1
+  WalkAnimation:
+    demo_animation alien_walk_1_final.wrl 0 alien_walk_2_final.wrl 1 alien_walk_1_final.wrl 2
+  AttackAnimation:
+    demo_animation alien_still_final.wrl 0 alien_attack_2_final.wrl 1 alien_attack_1_final.wrl 2 alien_still_final.wrl 3
+
 - design moving AI and attacking AI for this monster
+
+- finish all about Creatures described in README, finish CastleCreatures
 
 - player must be able to actually swing the EquippedWeapon,
   to hurt enemies etc.
@@ -89,7 +100,7 @@ Highest priority goals for stage 4:
   Justy¶
 
   Mama, Kornel, savage, advertise on "PGD screenshots" thread
-  
+
   kole¿anka Agi z Guinessa
 
   Preparations in
