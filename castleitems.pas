@@ -102,7 +102,7 @@ type
       Item instance properties, including Quantity.
       As a very special exception, implementation of this method
       is allowed to set Quantity of Item to 0.
-      
+
       Never call this method when Player.Dead. Implementation of this
       method may assume that Player is not Dead.
 
@@ -114,6 +114,9 @@ type
     { This returns Scene.BoundingBox enlarged a little (along X and Y)
       to account the fact that Scene may be rotated around +Z vector. }
     function BoundingBoxRotated: TBox3d;
+
+    { Free any association with current OpenGL context. }
+    procedure CloseGL; virtual;
   end;
 
   TItemPotionOfLifeKind = class(TItemKind)
@@ -383,6 +386,12 @@ begin
   Result := FBoundingBoxRotated;
 end;
 
+procedure TItemKind.CloseGL;
+begin
+  if FScene <> nil then
+    FScene.CloseGL;
+end;
+
 { TItemPotionOfLifeKind ---------------------------------------------------- }
 
 procedure TItemPotionOfLifeKind.Use(Item: TItem);
@@ -640,8 +649,7 @@ begin
   if CreatedItemKinds <> nil then
   begin
     for I := 0 to CreatedItemKinds.Count - 1 do
-      if TItemKind(CreatedItemKinds.Items[I]).FScene <> nil then
-        TItemKind(CreatedItemKinds.Items[I]).FScene.CloseGL;
+      TItemKind(CreatedItemKinds.Items[I]).CloseGL;
   end;
 end;
 
