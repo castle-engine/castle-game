@@ -1,8 +1,6 @@
 #VRML V1.0 ascii
 
 Group {
-  ShapeHints {
-    creaseAngle 2
-  }
+  WWWInline { name "alien_header.wrl" separate FALSE }
   WWWInline { name "alien_attack_2.wrl" }
 }
