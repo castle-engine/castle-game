@@ -10,7 +10,7 @@ Highest priority goals for stage 4:
 - design basic monster (see papers), animate it
 
   StandAnimation:
-    demo_animation alien_still_final.wrl 0 alien_still_final.wrl 1
+    demo_animation alien_still_final.wrl 0
   StandToWalkAnimation:
     demo_animation alien_still_final.wrl 0 alien_walk_1_final.wrl 1 --no-loop
   WalkAnimation:
