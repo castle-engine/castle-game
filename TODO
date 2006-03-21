@@ -12,11 +12,11 @@ Highest priority goals for stage 4:
   StandAnimation:
     demo_animation alien_still_final.wrl 0 alien_still_final.wrl 1
   StandToWalkAnimation:
-    demo_animation alien_still_final.wrl 0 alien_walk_1_final.wrl 1
+    demo_animation alien_still_final.wrl 0 alien_walk_1_final.wrl 1 --no-loop
   WalkAnimation:
-    demo_animation alien_walk_1_final.wrl 0 alien_walk_2_final.wrl 1 alien_walk_1_final.wrl 2
+    demo_animation alien_walk_1_final.wrl 0 alien_walk_2_final.wrl 1 --backwards
   AttackAnimation:
-    demo_animation alien_still_final.wrl 0 alien_attack_2_final.wrl 1 alien_attack_1_final.wrl 2 alien_still_final.wrl 3
+    demo_animation alien_still_final.wrl 0 alien_attack_2_final.wrl 1 alien_attack_1_final.wrl 2 alien_still_final.wrl 3 --no-loop
 
 - design moving AI and attacking AI for this monster
 
