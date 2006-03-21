@@ -410,7 +410,9 @@ Creatures (enemies etc.):
     CastleCreatures unit in DoInitialization call creating your
     TCreatureKind instance.
 
-  - For most creatures you will want to derive new TCreatureKind subclass.
+  - For some creatures you may be able to just reuse some existing TCreatureKind
+    descendant, for others you will want to derive new class from TCreatureKind
+    and override there things you want.
 
 --------------------
 Used things:

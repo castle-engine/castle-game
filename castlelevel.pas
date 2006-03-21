@@ -26,7 +26,7 @@ interface
 
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
-  VRMLTriangleOctree;
+  VRMLTriangleOctree, CastleCreatures;
 
 type
   TLevel = class
@@ -59,6 +59,10 @@ type
     procedure TraverseForItems(Node: TVRMLNode; State: TVRMLGraphTraverseState);
 
     function LoadVRMLNode(const FileName: string): TVRMLNode;
+
+    FCreatures: TCreaturesList;
+    procedure TraverseForCreatures(Node: TVRMLNode;
+      State: TVRMLGraphTraverseState);
   protected
     { This will be called from our constructor before initializing
       our octrees. You can override this to do here some operations
@@ -105,6 +109,10 @@ type
       These Items are owned by level object, so everything remaining
       on this list when we will destroy level will be freed. }
     property Items: TItemsOnLevelList read FItems;
+
+    { Creatures on the level. Note that objects on this list are owned
+      by level object. }
+    property Creatures: TCreaturesList read FCreatures;
 
     property Headlight: boolean read FHeadlight;
 
@@ -159,6 +167,9 @@ type
     ButtonPressed: boolean;
     AnimationOpenDownRotation: Single;
     AnimationButtonPress: Single;
+    { TODO: now that TVRMLGLAnimation class is great,
+      I should convert this to use Symbol (only 1 object and model needed)
+      and Button as TVRMLGLAnimation. }
     Symbol_TL, Symbol_BL, Symbol_TR, Symbol_BR: TVRMLFlatSceneGL;
     Button: TVRMLFlatSceneGL;
   public
@@ -198,6 +209,7 @@ constructor TLevel.Create(const ASceneFileName, ALightSetFileName: string);
   begin
     for I := 0 to ItemsToRemove.Count - 1 do
       ItemsToRemove.Items[I].FreeRemovingFromAllParents;
+    Scene.ChangedAll;
   end;
 
   { See README for description of LevelBox and HintButtonBox trick.
@@ -236,14 +248,18 @@ begin
     Maybe it the future I'll make some configuration option to control this. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
 
-  { Initialize Items }
-  FItems := TItemsOnLevelList.Create;
   ItemsToRemove := TVRMLNodesList.Create;
   try
+    { Initialize Items }
+    FItems := TItemsOnLevelList.Create;
     Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, TraverseForItems);
+
+    { Initialize Creatures }
+    FCreatures := TCreaturesList.Create;
+    Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, TraverseForCreatures);
+
     RemoveItemsToRemove;
   finally ItemsToRemove.Free end;
-  Scene.ChangedAll;
 
   ChangeLevelScene;
 
@@ -310,6 +326,7 @@ begin
   FreeAndNil(FLightSet);
   FreeAndNil(FScene);
   FreeWithContentsAndNil(FItems);
+  FreeWithContentsAndNil(FCreatures);
   inherited;
 end;
 
@@ -380,7 +397,53 @@ begin
     if IsPrefix(ItemPrefix, Parent.NodeName) then
     begin
       CreateNewItem(SEnding(Parent.NodeName, Length(ItemPrefix) + 1));
-      { Don't remove Parent now --- will be removed.
+      { Don't remove Parent now --- will be removed later.
+        This avoids problems with removing nodes while traversing. }
+      ItemsToRemove.Add(Parent);
+      Break;
+    end;
+  end;
+end;
+
+procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
+  State: TVRMLGraphTraverseState);
+
+  procedure CreateNewCreature(const CreatureNodeName: string);
+  var
+    StubBoundingBox: TBox3d;
+    CreaturePosition, CreatureDirection: TVector3Single;
+    CreatureMaxLife: Single;
+  begin
+    StubBoundingBox := (Node as TNodeGeneralShape).BoundingBox(State);
+    CreaturePosition[0] := (StubBoundingBox[0, 0] + StubBoundingBox[1, 0]) / 2;
+    CreaturePosition[1] := (StubBoundingBox[0, 1] + StubBoundingBox[1, 1]) / 2;
+    CreaturePosition[2] := StubBoundingBox[0, 2];
+
+    { TODO --- CreatureDirection configurable }
+    CreatureDirection := Vector3Single(1, 0, 0);
+
+    { TODO --- CreatureMaxLife configurable }
+    CreatureMaxLife := 100;
+
+    { TODO --- TWalkAttackCreature, Alien configurable }
+
+    FCreatures.Add(TWalkAttackCreature.Create(Alien, CreaturePosition,
+      CreatureDirection, CreatureMaxLife));
+  end;
+
+const
+  CreaturePrefix = 'Crea';
+var
+  ParentIndex: Integer;
+  Parent: TVRMLNode;
+begin
+  for ParentIndex := 0 to Node.ParentsCount - 1 do
+  begin
+    Parent := Node.Parents[ParentIndex];
+    if IsPrefix(CreaturePrefix, Parent.NodeName) then
+    begin
+      CreateNewCreature(SEnding(Parent.NodeName, Length(CreaturePrefix) + 1));
+      { Don't remove Parent now --- will be removed later.
         This avoids problems with removing nodes while traversing. }
       ItemsToRemove.Add(Parent);
       Break;

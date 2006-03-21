@@ -286,6 +286,8 @@ begin
 
   Level.Items.Render(Player.Navigator.Frustum);
 
+  Level.Creatures.Render(Player.Navigator.Frustum);
+
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST); { not needed now, but in the future will be needed }
@@ -301,6 +303,7 @@ begin
   GameMessagesManager.Idle;
   Level.Idle(Glw.FpsCompSpeed);
   Level.Items.Idle(Glw.FpsCompSpeed);
+  Level.Creatures.Idle(Glw.FpsCompSpeed);
 
   if not Player.Dead then
   begin

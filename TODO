@@ -7,18 +7,7 @@
 
 Highest priority goals for stage 4:
 
-- design basic monster (see papers), animate it
-
-  StandAnimation:
-    demo_animation alien_still_final.wrl 0
-  StandToWalkAnimation:
-    demo_animation alien_still_final.wrl 0 alien_walk_1_final.wrl 1 --no-loop
-  WalkAnimation:
-    demo_animation alien_walk_1_final.wrl 0 alien_walk_2_final.wrl 1 --backwards
-  AttackAnimation:
-    demo_animation alien_still_final.wrl 0 alien_attack_2_final.wrl 1 alien_attack_1_final.wrl 2 alien_still_final.wrl 3 --no-loop
-
-- design moving AI and attacking AI for this monster
+- design moving AI and attacking AI for alien
 
 - finish all about Creatures described in README, finish CastleCreatures
 
@@ -32,6 +21,16 @@ Highest priority goals for stage 4:
 - then do first boss
 
 --------------------
+- loading animations takes some time.
+  Move it later, load them while OpenGL progress can be displayed.
+  Also PrepareRender of them.
+  Also `make' hurts because of that (because even trivial castle --version
+  loads the animation...)
+
+- "shrink" spell (that was *coool* in DUKE 3D !)
+  "freeze" (it's from DUKE 3D also)
+  "fry"
+
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim ? Look how much it adds to AirBlast !)
 
@@ -108,6 +107,25 @@ Highest priority goals for stage 4:
 
   Preparations in
   mojewww/camelot/e966ccd7cb2e6a5f3798ec26d81d7310/
+
+- some things for menu:
+
+  sound:
+    Music: on/off [on]
+    Music volume: (slider)
+    Sound: on/off [on]
+    Sound volume: (slider)
+
+  graphics:
+    Allow resizing the screen at startup: on/off [on]
+    Texture minification quality: (opengl options)
+    Texture magnification quality: (opengl options)
+    Blending: (for attrib_blending somewhere)
+
+  keyboard:
+    All keys configurable here.
+
+  load game, save game abilities.
 
 ----------------------------------------
 dist-making to-dos:
