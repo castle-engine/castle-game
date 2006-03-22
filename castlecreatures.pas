@@ -23,17 +23,20 @@ unit CastleCreatures;
 interface
 
 uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
-  VRMLGLAnimationInfo;
+  VRMLGLAnimationInfo, VRMLFlatSceneGL;
 
 {$define read_interface}
-
-const
-  LoadAnimationSteps = 5;
 
 type
   TCreatureKind = class
   public
     constructor Create;
+
+    { Prepare anything needed when starting new game.
+      It can call Progress.Step PrepareRenderSteps times. }
+    procedure PrepareRender; virtual;
+
+    function PrepareRenderSteps: Cardinal; virtual;
 
     { Free any association with current OpenGL context. }
     procedure CloseGL; virtual;
@@ -42,13 +45,15 @@ type
   TObjectsListItem_2 = TCreatureKind;
   {$I objectslist_2.inc}
   TCreaturesKindsList = class(TObjectsList_2)
-    { Calls LoadAnimations for all items.
+    { Calls PrepareRender for all items.
       This does Progress.Init, Step, Fini. }
-    procedure LoadAnimations;
+    procedure PrepareRender;
   end;
 
   { This is a TCreatureKind that has simple states:
-    standing stil, walking (aka running), performing an attack and dying. }
+    standing stil, walking (aka running), performing an attack and dying.
+    Note that you should specify all animation times in seconds
+    (just like Level.AnimationTime). }
   TWalkAttackCreatureKind = class(TCreatureKind)
   private
     FStandAnimation: TVRMLGLAnimation;
@@ -75,32 +80,42 @@ type
     destructor Destroy; override;
 
     { Make all TVRMLGLAnimation properties non-nil. I.e. load them from their
-      XxxInfo counterparts. It will call Progress.Step LoadAnimationSteps times. }
-    procedure LoadAnimations;
+      XxxInfo counterparts. }
+    procedure PrepareRender; override;
+
+    function PrepareRenderSteps: Cardinal; override;
 
     procedure CloseGL; override;
 
     { This is an animation of standing still.
+      Beginning must be on time 0.
       Beginning and end of it must glue together. }
     property StandAnimation: TVRMLGLAnimation read FStandAnimation;
 
     { This is an animation when he changes from standing still to walking.
-      It's frame 0 must glue with frame 0 of StandAnimation,
-      it's last frame must glue with frame 0 of WalkAnimation. }
+      Beginning must be on time 0.
+      It's beginnig must glue with beginning of StandAnimation,
+      it's ending must glue with beginning of WalkAnimation. }
     property StandToWalkAnimation: TVRMLGLAnimation read FStandToWalkAnimation;
 
     { This is an animation of walking.
+      Beginning must be on time 0.
       Beginning and end of it must glue together. }
     property WalkAnimation: TVRMLGLAnimation read FWalkAnimation;
 
     { This is an animation of attacking.
+      Beginning must be on time 0.
       If AttacksWhenWalking then beginning and end of it must glue
       with frame 0 of WalkAnimation.
       Else beginning and end of it must glue
       with frame 0 of StandAnimation. }
     property AttackAnimation: TVRMLGLAnimation read FAttackAnimation;
 
-    { This is an animation of dying. }
+    { This is an animation of dying.
+      Beginning must be on time 0.
+      Beginning should *more-or-less* look like any point of the stand/attack/walk
+      animations. Note that we can display this animation infinitely,
+      so it must work good after Time > it's TimeEnd. }
     property DyingAnimation: TVRMLGLAnimation read FDyingAnimation;
 
     { See @link(AttackAnimation). }
@@ -116,6 +131,9 @@ type
     FLife: Single;
     FMaxLife: Single;
   public
+    { Constructor. Note for AnimationTime: usually I will take
+      AnimationTime from global Level.AnimationTime, but in the case of
+      constructor it's safer to just take it as param. }
     constructor Create(AKind: TCreatureKind;
       const APosition: TVector3Single;
       const ADirection: TVector3Single;
@@ -135,7 +153,9 @@ type
 
     procedure Render(const Frustum: TFrustum); virtual; abstract;
 
-    procedure Idle(const CompSpeed, AnimationTime: Single); virtual; abstract;
+    procedure Idle(const CompSpeed: Single); virtual; abstract;
+
+    function CurrentScene: TVRMLFlatSceneGL; virtual; abstract;
 
     { This is the position of the (0, 0, 0) point of creature model
       (or rather, currently used model! Creatures are animated after all). }
@@ -149,23 +169,26 @@ type
   {$I objectslist_1.inc}
   TCreaturesList = class(TObjectsList_1)
     procedure Render(const Frustum: TFrustum);
-    procedure Idle(const CompSpeed, AnimationTime: Single);
+    procedure Idle(const CompSpeed: Single);
   end;
 
-  TWalkAttackCreatureState = (wasStand, wasStandToWalk, wasWalk,
-    wasAttack, wasDying);
+  TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying);
 
   { This is TCreature that has a kind always of TWalkAttackCreatureKind. }
   TWalkAttackCreature = class(TCreature)
   private
     FState: TWalkAttackCreatureState;
-    StateChangeTime: Single; { last FState change time, taken from AnimationTime. }
+    { last FState change time, taken from Level.AnimationTime. }
+    StateChangeTime: Single;
   public
     constructor Create(AKind: TCreatureKind;
       const APosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
       const AnimationTime: Single);
+
+    { Shortcut for TWalkAttackCreatureKind(Kind). }
+    function WAKind: TWalkAttackCreatureKind;
 
     property State: TWalkAttackCreatureState read FState
       default wasStand;
@@ -174,7 +197,9 @@ type
 
     procedure Render(const Frustum: TFrustum); override;
 
-    procedure Idle(const CompSpeed, AnimationTime: Single); override;
+    procedure Idle(const CompSpeed: Single); override;
+
+    function CurrentScene: TVRMLFlatSceneGL; override;
   end;
 
 var
@@ -186,8 +211,8 @@ var
 
 implementation
 
-uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow, VRMLFlatSceneGL,
-  VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit;
+uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow,
+  VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -201,6 +226,16 @@ begin
   CreaturesKinds.Add(Self);
 end;
 
+procedure TCreatureKind.PrepareRender;
+begin
+  { Nothing to do in this class. }
+end;
+
+function TCreatureKind.PrepareRenderSteps: Cardinal;
+begin
+  Result := 0;
+end;
+
 procedure TCreatureKind.CloseGL;
 begin
   { Nothing to do in this class. }
@@ -208,19 +243,23 @@ end;
 
 { TCreaturesKindsList -------------------------------------------------------- }
 
-procedure TCreaturesKindsList.LoadAnimations;
+procedure TCreaturesKindsList.PrepareRender;
 var
   I: Integer;
+  PrepareRenderSteps: Cardinal;
 begin
+  PrepareRenderSteps := 0;
+  for I := 0 to High do
+    PrepareRenderSteps +=  Items[I].PrepareRenderSteps;
+
   { I'm turning UseDescribePosition to false, because it's confusing for
-    the user (because each creature is conted as LoadAnimationSteps steps. }
+    the user (because each creature is conted as PrepareRenderSteps steps. }
   Progress.UseDescribePosition := false;
   try
-    Progress.Init(LoadAnimationSteps * Count, 'Loading creatures');
+    Progress.Init(PrepareRenderSteps, 'Loading creatures');
     try
       for I := 0 to High do
-        if Items[I] is TWalkAttackCreatureKind then
-          TWalkAttackCreatureKind(Items[I]).LoadAnimations;
+        Items[I].PrepareRender;
     finally Progress.Fini; end;
   finally Progress.UseDescribePosition := true; end;
 end;
@@ -260,13 +299,15 @@ begin
   inherited;
 end;
 
-procedure TWalkAttackCreatureKind.LoadAnimations;
+procedure TWalkAttackCreatureKind.PrepareRender;
 
   procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
     AnimInfo: TVRMLGLAnimationInfo);
   begin
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
+    Progress.Step;
+    Anim.PrepareRender(false, true);
     Progress.Step;
   end;
 
@@ -276,6 +317,11 @@ begin
   CreateIfNeeded(FWalkAnimation       , FWalkAnimationInfo       );
   CreateIfNeeded(FAttackAnimation     , FAttackAnimationInfo     );
   CreateIfNeeded(FDyingAnimation      , FDyingAnimationInfo      );
+end;
+
+function TWalkAttackCreatureKind.PrepareRenderSteps: Cardinal;
+begin
+  Result := 10;
 end;
 
 procedure TWalkAttackCreatureKind.CloseGL;
@@ -316,12 +362,12 @@ begin
     Items[I].Render(Frustum);
 end;
 
-procedure TCreaturesList.Idle(const CompSpeed, AnimationTime: Single);
+procedure TCreaturesList.Idle(const CompSpeed: Single);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    Items[I].Idle(CompSpeed, AnimationTime);
+    Items[I].Idle(CompSpeed);
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -333,32 +379,61 @@ constructor TWalkAttackCreature.Create(AKind: TCreatureKind;
   const AnimationTime: Single);
 begin
   inherited Create(AKind, APosition, ADirection, AMaxLife, AnimationTime);
-  FState := wasStand;
+  FState := wasWalk;
   StateChangeTime := AnimationTime;
+end;
+
+function TWalkAttackCreature.WAKind: TWalkAttackCreatureKind;
+begin
+  Result := TWalkAttackCreatureKind(Kind);
 end;
 
 function TWalkAttackCreature.BoundingBox: TBox3d;
 begin
-  { TODO } Result := EmptyBox3d;
+  { TODO: take into account Direction }
+  Result := Box3dTranslate(CurrentScene.BoundingBox, Position);
 end;
 
 procedure TWalkAttackCreature.Render(const Frustum: TFrustum);
 begin
-  if { TODO FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) } true then
+  if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
   begin
     glPushMatrix;
       glTranslatev(Position);
       { TODO: take into account Direction }
-      { TODO: choose animation type wisely (basing on State),
-        and animation time wisely (helping with Idle) }
-      TWalkAttackCreatureKind(Kind).StandAnimation.Scenes[0].Render(nil);
+      CurrentScene.Render(nil);
     glPopMatrix;
   end;
 end;
 
-procedure TWalkAttackCreature.Idle(const CompSpeed, AnimationTime: Single);
+procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 begin
-  { TODO }
+  { TODO: change FState, change Direction, change Position }
+end;
+
+function TWalkAttackCreature.CurrentScene: TVRMLFlatSceneGL;
+var
+  StateTime: Single;
+begin
+  { Time from the change to this state. }
+  StateTime := Level.AnimationTime - StateChangeTime;
+
+  case FState of
+    wasStand:
+      Result := WAKind.StandAnimation.SceneFromTime(StateTime);
+    wasWalk:
+      if StateTime < WAKind.StandToWalkAnimation.TimeEnd then
+        Result := WAKind.StandToWalkAnimation.SceneFromTime(StateTime) else
+        Result := WAKind.WalkAnimation.SceneFromTime(
+          StateTime - WAKind.StandToWalkAnimation.TimeEnd);
+      { TODO: transition from walk to stand smooth }
+    wasAttack:
+      { TODO: transition from walk/stand to attack and back smooth }
+      Result := WAKind.AttackAnimation.SceneFromTime(StateTime);
+    wasDying:
+      Result := WAKind.AttackAnimation.SceneFromTime(StateTime);
+    else raise EInternalError.Create('FState ?');
+  end;
 end;
 
 { initialization / finalization ---------------------------------------------- }
@@ -411,19 +486,19 @@ begin
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_still_final.wrl'),
         AlienFileName('alien_walk_1_final.wrl') ],
-      [ 0, 1 ],
+      [ 0, 0.5 ],
       AnimScenesPerTime, AnimOptimization, false, false),
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_walk_1_final.wrl'),
         AlienFileName('alien_walk_2_final.wrl') ],
-      [ 0, 1 ],
+      [ 0, 0.5 ],
       AnimScenesPerTime, AnimOptimization, true, true),
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_still_final.wrl'),
         AlienFileName('alien_attack_2_final.wrl'),
         AlienFileName('alien_attack_1_final.wrl'),
         AlienFileName('alien_still_final.wrl') ],
-      [ 0, 1, 2, 3 ],
+      [ 0, 0.3, 0.6, 1.0 ],
       AnimScenesPerTime, AnimOptimization, false, false),
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_still_final.wrl') ],

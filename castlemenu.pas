@@ -95,7 +95,7 @@ procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
     Player: TPlayer;
   begin
     try
-      CreaturesKinds.LoadAnimations;
+      CreaturesKinds.PrepareRender;
       GameMessages.Clear;
       Player := TPlayer.Create;
       try

@@ -303,7 +303,7 @@ begin
   GameMessagesManager.Idle;
   Level.Idle(Glw.FpsCompSpeed);
   Level.Items.Idle(Glw.FpsCompSpeed);
-  Level.Creatures.Idle(Glw.FpsCompSpeed, Level.AnimationTime);
+  Level.Creatures.Idle(Glw.FpsCompSpeed);
 
   if not Player.Dead then
   begin

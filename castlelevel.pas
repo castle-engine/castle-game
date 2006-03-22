@@ -334,7 +334,7 @@ begin
 
   Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
     (ProjectionNear, ProjectionFar);
-  Scene.PrepareRender(true);
+  Scene.PrepareRender(true, true);
 
   FLightSet := TVRMLLightSetGL.Create(LoadVRMLNode(ALightSetFileName),
     true, 1, -1);
