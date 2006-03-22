@@ -63,6 +63,10 @@ type
     FCreatures: TCreaturesList;
     procedure TraverseForCreatures(Node: TVRMLNode;
       State: TVRMLGraphTraverseState);
+
+    FHomeCameraPos: TVector3Single;
+    FHomeCameraDir: TVector3Single;
+    FHomeCameraUp: TVector3Single;
   protected
     { This will be called from our constructor before initializing
       our octrees. You can override this to do here some operations
@@ -120,14 +124,26 @@ type
       with the level.
 
       @groupBegin }
-    function MoveAllowed(Navigator: TMatrixWalker;
+    function MoveAllowed(const CameraPos: TVector3Single;
       const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean; virtual;
 
-    procedure GetCameraHeight(Navigator: TMatrixWalker;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
       virtual;
     { @groupEnd }
+
+    { NavigatorMoveAllowed and NavigatorGetCameraHeight just
+      call appropriate non-navigator methods above.
+      Use these to perform collision detection between Navigator and the level.
+
+      @groupBegin }
+    function NavigatorMoveAllowed(Navigator: TMatrixWalker;
+      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const BecauseOfGravity: boolean): boolean;
+
+    procedure NavigatorGetCameraHeight(Navigator: TMatrixWalker;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 
     { Call this to render level things. Frustum is current player's frustum. }
     procedure Render(const Frustum: TFrustum); virtual;
@@ -160,6 +176,10 @@ type
       assume that Player is not Dead. }
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer); virtual;
+
+    property HomeCameraPos: TVector3Single read FHomeCameraPos;
+    property HomeCameraDir: TVector3Single read FHomeCameraDir;
+    property HomeCameraUp: TVector3Single read FHomeCameraUp;
   end;
 
   TCastleHallLevel = class(TLevel)
@@ -176,11 +196,11 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    function MoveAllowed(Navigator: TMatrixWalker;
+    function MoveAllowed(const CameraPos: TVector3Single;
       const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean; override;
 
-    procedure GetCameraHeight(Navigator: TMatrixWalker;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
       override;
 
@@ -319,6 +339,13 @@ begin
     FTitle := WorldInfoNode.FdTitle.Value;
   if FTitle = '' then
     FTitle := ExtractFileName(DeleteFileExt(ASceneFileName));
+
+  { calculate HomeCameraPos, HomeCameraDir, HomeCameraUp. }
+  Scene.GetPerspectiveCamera(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
+  VectorAdjustToLengthTo1st(FHomeCameraDir, CameraRadius *
+    0.4 * { I multiply by 0.4 just to get the same thing
+    that view3dscene does at this time. }
+    NavigationSpeed);
 end;
 
 destructor TLevel.Destroy;
@@ -451,22 +478,37 @@ begin
   end;
 end;
 
-function TLevel.MoveAllowed(Navigator: TMatrixWalker;
+function TLevel.MoveAllowed(const CameraPos: TVector3Single;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result :=
     Box3dPointInside(ProposedNewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveAllowed(
-      Navigator.CameraPos, ProposedNewPos, NewPos, CameraRadius);
+      CameraPos, ProposedNewPos, NewPos, CameraRadius);
 end;
 
-procedure TLevel.GetCameraHeight(Navigator: TMatrixWalker;
+procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 begin
   Scene.DefaultTriangleOctree.GetCameraHeight(
-    Navigator.CameraPos, Navigator.HomeCameraUp,
+    CameraPos, HomeCameraUp,
     IsAboveTheGround, SqrHeightAboveTheGround);
+end;
+
+function TLevel.NavigatorMoveAllowed(Navigator: TMatrixWalker;
+  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const BecauseOfGravity: boolean): boolean;
+begin
+  Result := MoveAllowed(Navigator.CameraPos, ProposedNewPos, NewPos,
+    BecauseOfGravity);
+end;
+
+procedure TLevel.NavigatorGetCameraHeight(Navigator: TMatrixWalker;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+begin
+  GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
+    SqrHeightAboveTheGround);
 end;
 
 procedure TLevel.Render(const Frustum: TFrustum);
@@ -536,23 +578,23 @@ begin
   inherited;
 end;
 
-function TCastleHallLevel.MoveAllowed(Navigator: TMatrixWalker;
+function TCastleHallLevel.MoveAllowed(const CameraPos: TVector3Single;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 
   function MakeSymbol(SymbolScene: TVRMLFlatSceneGL): boolean;
   begin
     Result := SymbolScene.DefaultTriangleOctree.MoveAllowedSimple(
-      Navigator.CameraPos, NewPos, CameraRadius);
+      CameraPos, NewPos, CameraRadius);
   end;
 
 begin
-  Result := inherited MoveAllowed(Navigator,
+  Result := inherited MoveAllowed(CameraPos,
     ProposedNewPos, NewPos, BecauseOfGravity);
 
   Result := Result and
     Button.DefaultTriangleOctree.MoveAllowedSimple(
-      Navigator.CameraPos, NewPos, CameraRadius);
+      CameraPos, NewPos, CameraRadius);
 
   if Result and (not ButtonPressed) then
   begin
@@ -564,7 +606,7 @@ begin
   end;
 end;
 
-procedure TCastleHallLevel.GetCameraHeight(Navigator: TMatrixWalker;
+procedure TCastleHallLevel.GetCameraHeight(const CameraPos: TVector3Single;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 
   procedure MakeBonusScene(BonusScene: TVRMLFlatSceneGL);
@@ -573,7 +615,7 @@ procedure TCastleHallLevel.GetCameraHeight(Navigator: TMatrixWalker;
     SqrHeightAboveTheBonusScene: Single;
   begin
     BonusScene.DefaultTriangleOctree.GetCameraHeight(
-      Navigator.CameraPos, Navigator.HomeCameraUp,
+      CameraPos, HomeCameraUp,
       IsAboveTheBonusScene, SqrHeightAboveTheBonusScene);
 
     if IsAboveTheBonusScene then
@@ -589,7 +631,7 @@ procedure TCastleHallLevel.GetCameraHeight(Navigator: TMatrixWalker;
   end;
 
 begin
-  inherited GetCameraHeight(Navigator, IsAboveTheGround, SqrHeightAboveTheGround);
+  inherited GetCameraHeight(CameraPos, IsAboveTheGround, SqrHeightAboveTheGround);
 
   if not ButtonPressed then
   begin

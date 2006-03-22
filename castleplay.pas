@@ -602,13 +602,6 @@ end;
 type
   TDummy = class
     class procedure MatrixChanged(Navigator: TMatrixNavigator);
-
-    class function MoveAllowed(Navigator: TMatrixWalker;
-      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
-      const BecauseOfGravity: boolean): boolean;
-
-    class procedure GetCameraHeight(Navigator: TMatrixWalker;
-      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
   end;
 
 class procedure TDummy.MatrixChanged(Navigator: TMatrixNavigator);
@@ -617,27 +610,11 @@ begin
   alUpdateListener;
 end;
 
-class function TDummy.MoveAllowed(Navigator: TMatrixWalker;
-  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
-  const BecauseOfGravity: boolean): boolean;
-begin
-  Result := Level.MoveAllowed(Navigator,
-    ProposedNewPos, NewPos, BecauseOfGravity);
-end;
-
-class procedure TDummy.GetCameraHeight(Navigator: TMatrixWalker;
-  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
-begin
-  Level.GetCameraHeight(Navigator,
-    IsAboveTheGround, SqrHeightAboveTheGround);
-end;
-
 procedure PlayLevel(ALevel: TLevel; APlayer: TPlayer);
 const
   HeadlightPower = 0.5;
 var
   SavedMode: TGLMode;
-  CamPos, CamDir, CamUp: TVector3Single;
 begin
   Level := ALevel;
   Player := APlayer;
@@ -654,16 +631,12 @@ begin
       try
         { Init Player.Navigator properties }
         Player.Navigator.OnMatrixChanged := TDummy.MatrixChanged;
-        Player.Navigator.OnMoveAllowed := TDummy.MoveAllowed;
-        Player.Navigator.OnGetCameraHeight := TDummy.GetCameraHeight;
+        Player.Navigator.OnMoveAllowed := Level.NavigatorMoveAllowed;
+        Player.Navigator.OnGetCameraHeight := Level.NavigatorGetCameraHeight;
 
         { Init initial camera pos }
-        Level.Scene.GetPerspectiveCamera(CamPos, CamDir, CamUp);
-        VectorAdjustToLengthTo1st(CamDir, Level.CameraRadius *
-          0.4 * { I multiply by 0.4 just to get the same thing
-          that view3dscene does at this time. }
-          Level.NavigationSpeed);
-        Player.Navigator.Init(CamPos, CamDir, CamUp, Level.CameraPreferredHeight,
+        Player.Navigator.Init(Level.HomeCameraPos, Level.HomeCameraDir,
+          Level.HomeCameraUp, Level.CameraPreferredHeight,
           0.0 { Level.CameraPreferredHeight is already corrected if necessary,
                 so I pass here 0.0 instead of CameraRadius } );
 
