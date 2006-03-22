@@ -67,6 +67,8 @@ type
     FHomeCameraPos: TVector3Single;
     FHomeCameraDir: TVector3Single;
     FHomeCameraUp: TVector3Single;
+
+    FAnimationTime: Single;
   protected
     { This will be called from our constructor before initializing
       our octrees. You can override this to do here some operations
@@ -151,6 +153,10 @@ type
     { Call this to allow level object to update some things,
       animate level objects etc. }
     procedure Idle(const CompSpeed: Single); virtual;
+
+    { This is the time of the level, in seconds. Time 0 when level is created.
+      This is updated in our Idle. }
+    property AnimationTime: Single read FAnimationTime;
 
     { Call this when player picked some triangle on the level.
       Distance is the exact distance to picked point. }
@@ -261,6 +267,9 @@ begin
 
   FScene := TVRMLFlatSceneGL.Create(
     LoadVRMLNode(ASceneFileName), true, roSeparateShapeStates);
+
+  { initialize FAnimationTime. Must be initialized before creating creatures. }
+  FAnimationTime := 0.0;
 
   { This is the slowest one, but it looks perfect.
     In fact, it's not so very slow on my system, so I think that
@@ -455,7 +464,7 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
     { TODO --- TWalkAttackCreature, Alien configurable }
 
     FCreatures.Add(TWalkAttackCreature.Create(Alien, CreaturePosition,
-      CreatureDirection, CreatureMaxLife));
+      CreatureDirection, CreatureMaxLife, AnimationTime));
   end;
 
 const
@@ -518,7 +527,7 @@ end;
 
 procedure TLevel.Idle(const CompSpeed: Single);
 begin
-  { Nothing to do in this class. }
+  FAnimationTime += CompSpeed / 50;
 end;
 
 procedure TLevel.TrianglePicked(const Distance: Single; const Item: TOctreeItem);

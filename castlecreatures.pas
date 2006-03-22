@@ -119,7 +119,8 @@ type
     constructor Create(AKind: TCreatureKind;
       const APosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AMaxLife: Single);
+      const AMaxLife: Single;
+      const AnimationTime: Single);
 
     { Current Life. Initially set from MaxLife.
       TODO: check when setting Life, optionally then change state to dying
@@ -134,7 +135,7 @@ type
 
     procedure Render(const Frustum: TFrustum); virtual; abstract;
 
-    procedure Idle(const CompSpeed: Single); virtual; abstract;
+    procedure Idle(const CompSpeed, AnimationTime: Single); virtual; abstract;
 
     { This is the position of the (0, 0, 0) point of creature model
       (or rather, currently used model! Creatures are animated after all). }
@@ -148,7 +149,7 @@ type
   {$I objectslist_1.inc}
   TCreaturesList = class(TObjectsList_1)
     procedure Render(const Frustum: TFrustum);
-    procedure Idle(const CompSpeed: Single);
+    procedure Idle(const CompSpeed, AnimationTime: Single);
   end;
 
   TWalkAttackCreatureState = (wasStand, wasStandToWalk, wasWalk,
@@ -158,11 +159,13 @@ type
   TWalkAttackCreature = class(TCreature)
   private
     FState: TWalkAttackCreatureState;
+    StateChangeTime: Single; { last FState change time, taken from AnimationTime. }
   public
     constructor Create(AKind: TCreatureKind;
       const APosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AMaxLife: Single);
+      const AMaxLife: Single;
+      const AnimationTime: Single);
 
     property State: TWalkAttackCreatureState read FState
       default wasStand;
@@ -171,7 +174,7 @@ type
 
     procedure Render(const Frustum: TFrustum); override;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed, AnimationTime: Single); override;
   end;
 
 var
@@ -290,7 +293,8 @@ end;
 constructor TCreature.Create(AKind: TCreatureKind;
   const APosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AMaxLife: Single);
+  const AMaxLife: Single;
+  const AnimationTime: Single);
 begin
   inherited Create;
 
@@ -312,12 +316,12 @@ begin
     Items[I].Render(Frustum);
 end;
 
-procedure TCreaturesList.Idle(const CompSpeed: Single);
+procedure TCreaturesList.Idle(const CompSpeed, AnimationTime: Single);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    Items[I].Idle(CompSpeed);
+    Items[I].Idle(CompSpeed, AnimationTime);
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -325,10 +329,12 @@ end;
 constructor TWalkAttackCreature.Create(AKind: TCreatureKind;
   const APosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AMaxLife: Single);
+  const AMaxLife: Single;
+  const AnimationTime: Single);
 begin
-  inherited Create(AKind, APosition, ADirection, AMaxLife);
+  inherited Create(AKind, APosition, ADirection, AMaxLife, AnimationTime);
   FState := wasStand;
+  StateChangeTime := AnimationTime;
 end;
 
 function TWalkAttackCreature.BoundingBox: TBox3d;
@@ -350,7 +356,7 @@ begin
   end;
 end;
 
-procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
+procedure TWalkAttackCreature.Idle(const CompSpeed, AnimationTime: Single);
 begin
   { TODO }
 end;
