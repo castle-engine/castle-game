@@ -1,4 +1,6 @@
 --------------------
+Must-have before next stage:
+
 - Stage 4: Add A Boss System -- 25th Mar, 2006
     * 10 Points -- Add a boss to your level that you fight to finish the level.
 
@@ -21,11 +23,17 @@ Highest priority goals for stage 4:
 - then do first boss
 
 --------------------
+Would-be-nice before next stage:
+
 - loading animations takes some time.
   Move it later, load them while OpenGL progress can be displayed.
   Also PrepareRender of them.
   Also `make' hurts because of that (because even trivial castle --version
   loads the animation...)
+
+--------------------
+- shadow under the creatures would be nice (sgk_shadows should allow
+  me to this super-nicely)
 
 - "shrink" spell (that was *coool* in DUKE 3D !)
   "freeze" (it's from DUKE 3D also)
