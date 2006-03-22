@@ -32,7 +32,8 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   OpenGLBmpFonts, VectorMath, Images, BFNT_BitstreamVeraSans_Unit,
   KambiFilesUtils,
-  CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp;
+  CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
+  CastleCreatures;
 
 type
   TMenuItem = (miReadDocs, miPlaySample1, miPlaySample2,
@@ -94,6 +95,7 @@ procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
     Player: TPlayer;
   begin
     try
+      CreaturesKinds.LoadAnimations;
       GameMessages.Clear;
       Player := TPlayer.Create;
       try

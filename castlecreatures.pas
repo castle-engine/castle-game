@@ -22,9 +22,13 @@ unit CastleCreatures;
 
 interface
 
-uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils;
+uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
+  VRMLGLAnimationInfo;
 
 {$define read_interface}
+
+const
+  LoadAnimationSteps = 5;
 
 type
   TCreatureKind = class
@@ -33,6 +37,14 @@ type
 
     { Free any association with current OpenGL context. }
     procedure CloseGL; virtual;
+  end;
+
+  TObjectsListItem_2 = TCreatureKind;
+  {$I objectslist_2.inc}
+  TCreaturesKindsList = class(TObjectsList_2)
+    { Calls LoadAnimations for all items.
+      This does Progress.Init, Step, Fini. }
+    procedure LoadAnimations;
   end;
 
   { This is a TCreatureKind that has simple states:
@@ -44,16 +56,27 @@ type
     FWalkAnimation: TVRMLGLAnimation;
     FAttackAnimation: TVRMLGLAnimation;
     FDyingAnimation: TVRMLGLAnimation;
+
+    FStandAnimationInfo: TVRMLGLAnimationInfo;
+    FStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
+    FWalkAnimationInfo: TVRMLGLAnimationInfo;
+    FAttackAnimationInfo: TVRMLGLAnimationInfo;
+    FDyingAnimationInfo: TVRMLGLAnimationInfo;
+
     FAttacksWhenWalking: boolean;
   public
     constructor Create(
-      AStandAnimation: TVRMLGLAnimation;
-      AStandToWalkAnimation: TVRMLGLAnimation;
-      AWalkAnimation: TVRMLGLAnimation;
-      AAttackAnimation: TVRMLGLAnimation;
-      ADyingAnimation: TVRMLGLAnimation);
+      AStandAnimationInfo: TVRMLGLAnimationInfo;
+      AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
+      AWalkAnimationInfo: TVRMLGLAnimationInfo;
+      AAttackAnimationInfo: TVRMLGLAnimationInfo;
+      ADyingAnimationInfo: TVRMLGLAnimationInfo);
 
     destructor Destroy; override;
+
+    { Make all TVRMLGLAnimation properties non-nil. I.e. load them from their
+      XxxInfo counterparts. It will call Progress.Step LoadAnimationSteps times. }
+    procedure LoadAnimations;
 
     procedure CloseGL; override;
 
@@ -152,6 +175,8 @@ type
   end;
 
 var
+  CreaturesKinds: TCreaturesKindsList;
+
   Alien: TWalkAttackCreatureKind;
 
 {$undef read_interface}
@@ -159,13 +184,11 @@ var
 implementation
 
 uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow, VRMLFlatSceneGL,
-  VRMLNodes, KambiFilesUtils, KambiGLUtils;
+  VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
-
-var
-  CreaturesKinds: TList;
+{$I objectslist_2.inc}
 
 { TCreatureKind -------------------------------------------------------------- }
 
@@ -180,21 +203,41 @@ begin
   { Nothing to do in this class. }
 end;
 
+{ TCreaturesKindsList -------------------------------------------------------- }
+
+procedure TCreaturesKindsList.LoadAnimations;
+var
+  I: Integer;
+begin
+  { I'm turning UseDescribePosition to false, because it's confusing for
+    the user (because each creature is conted as LoadAnimationSteps steps. }
+  Progress.UseDescribePosition := false;
+  try
+    Progress.Init(LoadAnimationSteps * Count, 'Loading creatures');
+    try
+      for I := 0 to High do
+        if Items[I] is TWalkAttackCreatureKind then
+          TWalkAttackCreatureKind(Items[I]).LoadAnimations;
+    finally Progress.Fini; end;
+  finally Progress.UseDescribePosition := true; end;
+end;
+
 { TWalkAttackCreatureKind ---------------------------------------------------- }
 
 constructor TWalkAttackCreatureKind.Create(
-  AStandAnimation: TVRMLGLAnimation;
-  AStandToWalkAnimation: TVRMLGLAnimation;
-  AWalkAnimation: TVRMLGLAnimation;
-  AAttackAnimation: TVRMLGLAnimation;
-  ADyingAnimation: TVRMLGLAnimation);
+  AStandAnimationInfo: TVRMLGLAnimationInfo;
+  AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
+  AWalkAnimationInfo: TVRMLGLAnimationInfo;
+  AAttackAnimationInfo: TVRMLGLAnimationInfo;
+  ADyingAnimationInfo: TVRMLGLAnimationInfo);
 begin
   inherited Create;
-  FStandAnimation := AStandAnimation;
-  FStandToWalkAnimation := AStandToWalkAnimation;
-  FWalkAnimation := AWalkAnimation;
-  FAttackAnimation := AAttackAnimation;
-  FDyingAnimation := ADyingAnimation;
+
+  FStandAnimationInfo := AStandAnimationInfo;
+  FStandToWalkAnimationInfo := AStandToWalkAnimationInfo;
+  FWalkAnimationInfo := AWalkAnimationInfo;
+  FAttackAnimationInfo := AAttackAnimationInfo;
+  FDyingAnimationInfo := ADyingAnimationInfo;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -204,7 +247,32 @@ begin
   FreeAndNil(FWalkAnimation);
   FreeAndNil(FAttackAnimation);
   FreeAndNil(FDyingAnimation);
+
+  FreeAndNil(FStandAnimationInfo);
+  FreeAndNil(FStandToWalkAnimationInfo);
+  FreeAndNil(FWalkAnimationInfo);
+  FreeAndNil(FAttackAnimationInfo);
+  FreeAndNil(FDyingAnimationInfo);
+
   inherited;
+end;
+
+procedure TWalkAttackCreatureKind.LoadAnimations;
+
+  procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
+    AnimInfo: TVRMLGLAnimationInfo);
+  begin
+    if Anim = nil then
+      Anim := AnimInfo.CreateAnimation;
+    Progress.Step;
+  end;
+
+begin
+  CreateIfNeeded(FStandAnimation      , FStandAnimationInfo      );
+  CreateIfNeeded(FStandToWalkAnimation, FStandToWalkAnimationInfo);
+  CreateIfNeeded(FWalkAnimation       , FWalkAnimationInfo       );
+  CreateIfNeeded(FAttackAnimation     , FAttackAnimationInfo     );
+  CreateIfNeeded(FDyingAnimation      , FDyingAnimationInfo      );
 end;
 
 procedure TWalkAttackCreatureKind.CloseGL;
@@ -313,48 +381,48 @@ const
   AnimScenesPerTime = 100;
   AnimOptimization = roSceneAsAWhole;
 
-  function LoadCreatureModel(const FileName: string): TVRMLNode;
+  function CreatureFileName(const FileName: string): string;
   begin
-    Result := ParseVRMLFile(ProgramDataPath + 'data' + PathDelim +
-      'creatures' + PathDelim + FileName, false);
+    Result := ProgramDataPath + 'data' + PathDelim +
+      'creatures' + PathDelim + FileName;
   end;
 
-  function LoadAlienModel(const FileName: string): TVRMLNode;
+  function AlienFileName(const FileName: string): string;
   begin
-    Result := LoadCreatureModel('alien' + PathDelim + FileName);
+    Result := CreatureFileName('alien' + PathDelim + FileName);
   end;
 
 begin
   Glw.OnCloseList.AppendItem(@GLWindowClose);
 
-  CreaturesKinds := TList.Create;
+  CreaturesKinds := TCreaturesKindsList.Create;
 
   Alien := TWalkAttackCreatureKind.Create(
-    TVRMLGLAnimation.Create(
-      [ LoadAlienModel('alien_still_final.wrl') ],
+    TVRMLGLAnimationInfo.Create(
+      [ AlienFileName('alien_still_final.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization),
-    TVRMLGLAnimation.Create(
-      [ LoadAlienModel('alien_still_final.wrl'),
-        LoadAlienModel('alien_walk_1_final.wrl') ],
+      AnimScenesPerTime, AnimOptimization, true, true),
+    TVRMLGLAnimationInfo.Create(
+      [ AlienFileName('alien_still_final.wrl'),
+        AlienFileName('alien_walk_1_final.wrl') ],
       [ 0, 1 ],
       AnimScenesPerTime, AnimOptimization, false, false),
-    TVRMLGLAnimation.Create(
-      [ LoadAlienModel('alien_walk_1_final.wrl'),
-        LoadAlienModel('alien_walk_2_final.wrl') ],
+    TVRMLGLAnimationInfo.Create(
+      [ AlienFileName('alien_walk_1_final.wrl'),
+        AlienFileName('alien_walk_2_final.wrl') ],
       [ 0, 1 ],
       AnimScenesPerTime, AnimOptimization, true, true),
-    TVRMLGLAnimation.Create(
-      [ LoadAlienModel('alien_still_final.wrl'),
-        LoadAlienModel('alien_attack_2_final.wrl'),
-        LoadAlienModel('alien_attack_1_final.wrl'),
-        LoadAlienModel('alien_still_final.wrl') ],
+    TVRMLGLAnimationInfo.Create(
+      [ AlienFileName('alien_still_final.wrl'),
+        AlienFileName('alien_attack_2_final.wrl'),
+        AlienFileName('alien_attack_1_final.wrl'),
+        AlienFileName('alien_still_final.wrl') ],
       [ 0, 1, 2, 3 ],
       AnimScenesPerTime, AnimOptimization, false, false),
-    TVRMLGLAnimation.Create(
-      [ LoadAlienModel('alien_still_final.wrl') ],
+    TVRMLGLAnimationInfo.Create(
+      [ AlienFileName('alien_still_final.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization)
+      AnimScenesPerTime, AnimOptimization, false, false)
       { TODO -- dying animation }
     );
 end;

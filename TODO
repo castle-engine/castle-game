@@ -25,11 +25,7 @@ Highest priority goals for stage 4:
 --------------------
 Would-be-nice before next stage:
 
-- loading animations takes some time.
-  Move it later, load them while OpenGL progress can be displayed.
-  Also PrepareRender of them.
-  Also `make' hurts because of that (because even trivial castle --version
-  loads the animation...)
+- Do PrepareRender on animations when loading them.
 
 --------------------
 - shadow under the creatures would be nice (sgk_shadows should allow
