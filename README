@@ -27,8 +27,15 @@ Some general notes about command-line options understood by all my
 programs are here:
 [http://www.camelot.homedns.org/~michalis/common_options.php].
 
-For good performance you need also good OpenGL drivers
-for your graphics card installed.
+--------------------
+Requirements:
+
+In short: good graphics card, with good OpenGL drivers installed.
+In case of doubt, be sure to install newest drivers from your
+graphics card manufacturer.
+
+Also you should have at least 256 MB available memory.
+Preferably at least 512 MB to be on the "really safe side".
 
 --------------------
 Sample levels included:
