@@ -34,6 +34,8 @@ Would-be-nice before next stage:
   "fry"
   "throw back" (throws all enemies slightly backward)
 
+- check with gprof, maybe I can speed up "loading creatures" process ?
+
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim ? Look how much it adds to AirBlast !)
 
