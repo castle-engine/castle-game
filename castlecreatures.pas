@@ -51,7 +51,7 @@ type
   end;
 
 const
-  DefaultMoveSpeed = 1.0;
+  DefaultMoveSpeed = 0.3;
 
 type
   { This is a TCreatureKind that has simple states:
@@ -75,6 +75,7 @@ type
     FAttacksWhenWalking: boolean;
     FMoveSpeed: Single;
     FFlying: boolean;
+    FCameraRadius: Single;
   public
     constructor Create(
       AStandAnimationInfo: TVRMLGLAnimationInfo;
@@ -138,6 +139,10 @@ type
       to Level.HomeCameraUp), and it falls down when Position is above
       the ground. }
     property Flying: boolean read FFlying default false;
+
+    { Camera radius when moving. Initialized in PrepareRender,
+      from StandAnimation.Scenes[0].BoundingBox. You can adjust it. }
+    property CameraRadius: Single read FCameraRadius write FCameraRadius;
   end;
 
   TCreature = class
@@ -178,9 +183,22 @@ type
       (or rather, currently used model! Creatures are animated after all). }
     property LegsPosition: TVector3Single read FLegsPosition write FLegsPosition;
 
+    { Just a shortcut for CurrentScene.BoundingBox[1, 2].
+      Note that while CurrentScene may change, this also may change. }
+    function Height: Single;
+
     { This is the position of the head. Actually, it's the place where
-      (0, 0, max) point of creatures bounding box currently is
-      (i.e., translated by Position). }
+      (0, 0, Height) point of creatures bounding box currently is
+      (i.e., translated by LegsPosition).
+
+      Note that all collision detection (MoveAllowed, GetCameraHeight)
+      should be done using HeadPosition, and then appropriately translated
+      back to LegsPosition. Why ? Because this avoids the problems
+      of collisions with ground objects. Legs are (for creatures that
+      are not Flying and have already fallen down on the ground) on the
+      same level as the ground, so checking collisions versus LegsPosition
+      is always vulnerable to accidentaly finding collision between LegsPosition
+      and the ground. }
     function HeadPosition: TVector3Single;
 
     { Direction the creature is facing.
@@ -340,12 +358,22 @@ procedure TWalkAttackCreatureKind.PrepareRender;
     Progress.Step;
   end;
 
+var
+  Box: TBox3d;
 begin
   CreateIfNeeded(FStandAnimation      , FStandAnimationInfo      );
   CreateIfNeeded(FStandToWalkAnimation, FStandToWalkAnimationInfo);
   CreateIfNeeded(FWalkAnimation       , FWalkAnimationInfo       );
   CreateIfNeeded(FAttackAnimation     , FAttackAnimationInfo     );
   CreateIfNeeded(FDyingAnimation      , FDyingAnimationInfo      );
+
+  Box := StandAnimation.Scenes[0].BoundingBox;
+
+  FCameraRadius := Sqrt(Max(Max(
+    VectorLenSqr(Vector2Single(Box[0, 0], Box[0, 1])),
+    VectorLenSqr(Vector2Single(Box[1, 0], Box[0, 1])),
+    VectorLenSqr(Vector2Single(Box[1, 0], Box[1, 1]))),
+    VectorLenSqr(Vector2Single(Box[0, 0], Box[1, 1]))));
 end;
 
 function TWalkAttackCreatureKind.PrepareRenderSteps: Cardinal;
@@ -381,10 +409,15 @@ begin
   FLife := MaxLife;
 end;
 
+function TCreature.Height: Single;
+begin
+  Result := CurrentScene.BoundingBox[1, 2];
+end;
+
 function TCreature.HeadPosition: TVector3Single;
 begin
   Result := LegsPosition;
-  Result[2] += CurrentScene.BoundingBox[1, 2];
+  Result[2] += Height;
 end;
 
 { TCreatures ----------------------------------------------------------------- }
@@ -462,6 +495,32 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     Result := Level.SegmentCollision(HeadPosition, Player.Navigator.CameraPos);
   end;
 
+  procedure DoWalk;
+  var
+    OldHeadPosition, NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
+  begin
+    { TODO: change Direction, i.e. rotate to actually point at player.
+      Use Flying. }
+
+    OldHeadPosition := HeadPosition;
+    ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
+      VectorScale(Direction, WAKind.MoveSpeed));
+
+    if Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
+      NewHeadPosition, false, WAKind.CameraRadius) then
+    begin
+      FLegsPosition := NewHeadPosition;
+      FLegsPosition[2] -= Height;
+
+      if not SeesPlayer then
+        SetState(wasStand) else
+      if AttackAllowed then
+        SetState(wasAttack);
+    end else
+      { Seek alt way. }
+      SetState(wasStand);
+  end;
+
 begin
   { TODO: as you see, actually AttacksWhenWalking is not used when going
     to wasAttack state. It's used only when going out from wasAttack state.
@@ -478,17 +537,7 @@ begin
           SetState(wasAttack) else
           SetState(wasWalk);
       end;
-    wasWalk:
-      begin
-        { TODO: change Direction, change LegsPosition, i.e. do the actual walking.
-          Use MoveSpeed.
-          Use Flying. }
-
-        if not SeesPlayer then
-          SetState(wasStand) else
-        if AttackAllowed then
-          SetState(wasAttack);
-      end;
+    wasWalk: DoWalk;
     wasAttack:
       begin
         { TODO: at some time when attacking, something should happen:
