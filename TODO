@@ -11,7 +11,7 @@ Highest priority goals for stage 4:
 
 - design moving AI and attacking AI for alien
 
-- finish all about Creatures described in README, finish CastleCreatures
+- finish CastleCreatures
 
 - player must be able to actually swing the EquippedWeapon,
   to hurt enemies etc.
