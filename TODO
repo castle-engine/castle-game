@@ -25,7 +25,13 @@ Highest priority goals for stage 4:
 --------------------
 Would-be-nice before next stage:
 
+- alien model anim must be changed: the corpse must actualy move while walking !
+  Otherwise the effect is like "the legs walking, but the corpse is just
+  floating constantly"
+
 --------------------
+- put some vertical crates around GlassPrison on basic_castle
+
 - shadow under the creatures would be nice (sgk_shadows should allow
   me to this super-nicely)
 

@@ -122,11 +122,19 @@ type
 
     property Headlight: boolean read FHeadlight;
 
-    { SegmentCollision, MoveAllowed and GetCameraHeight perform
+    { LineOfSight, MoveAllowed and GetCameraHeight perform
       collision detection with the level.
 
+      Note that MoveAllowed and GetCameraHeight treat transparent
+      objects as others --- i.e., they collide.
+
+      But LineOfSight checks just collision between segment (Pos1, Pos2)
+      and it *does ignore transparent materials*. This means that
+      e.g. creatures can see through glass --- even though they
+      can't walk through it.
+
       @groupBegin }
-    function SegmentCollision(const Pos1, Pos2: TVector3Single): boolean;
+    function LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
       virtual;
 
     function MoveAllowed(const CameraPos: TVector3Single;
@@ -213,7 +221,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    function SegmentCollision(const Pos1, Pos2: TVector3Single): boolean;
+    function LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
       override;
 
     function MoveAllowed(const CameraPos: TVector3Single;
@@ -510,11 +518,12 @@ begin
   end;
 end;
 
-function TLevel.SegmentCollision(
+function TLevel.LineOfSight(
   const Pos1, Pos2: TVector3Single): boolean;
 begin
   Result := Scene.DefaultTriangleOctree.SegmentCollision(
-    Pos1, Pos2, false, NoItemIndex, false) = NoItemIndex;
+    Pos1, Pos2, false, NoItemIndex, false,
+    TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex;
 end;
 
 function TLevel.MoveAllowed(const CameraPos: TVector3Single;
@@ -618,13 +627,14 @@ begin
   inherited;
 end;
 
-function TCastleHallLevel.SegmentCollision(
+function TCastleHallLevel.LineOfSight(
   const Pos1, Pos2: TVector3Single): boolean;
 
   function MakeSymbol(SymbolScene: TVRMLFlatSceneGL): boolean;
   begin
     Result := SymbolScene.DefaultTriangleOctree.SegmentCollision(
-      Pos1, Pos2, false, NoItemIndex, false) = NoItemIndex;
+      Pos1, Pos2, false, NoItemIndex, false,
+      TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex;
   end;
 
 begin
@@ -632,7 +642,8 @@ begin
 
   Result := Result and
     (Button.DefaultTriangleOctree.SegmentCollision(
-      Pos1, Pos2, false, NoItemIndex, false) = NoItemIndex);
+      Pos1, Pos2, false, NoItemIndex, false,
+      TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex);
 
   if Result and (not ButtonPressed) then
   begin

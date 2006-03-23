@@ -51,7 +51,7 @@ type
   end;
 
 const
-  DefaultMoveSpeed = 0.3;
+  DefaultMoveSpeed = 0.2;
 
 type
   { This is a TCreatureKind that has simple states:
@@ -223,6 +223,11 @@ type
 
     { last FState change time, taken from Level.AnimationTime. }
     StateChangeTime: Single;
+
+    { Returns BoundingBox, assuming that LegsPosition and Direction are
+      as specified here. }
+    function BoundingBoxAssuming(
+      const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
   public
     constructor Create(AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
@@ -462,19 +467,41 @@ begin
   StateChangeTime := Level.AnimationTime;
 end;
 
+function TWalkAttackCreature.BoundingBoxAssuming(
+  const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
+begin
+  { TODO: take into account AssumeDirection }
+  Result := Box3dTranslate(CurrentScene.BoundingBox, AssumeLegsPosition);
+end;
+
 function TWalkAttackCreature.BoundingBox: TBox3d;
 begin
-  { TODO: take into account Direction }
-  Result := Box3dTranslate(CurrentScene.BoundingBox, LegsPosition);
+  Result := BoundingBoxAssuming(LegsPosition, Direction);
 end;
 
 procedure TWalkAttackCreature.Render(const Frustum: TFrustum);
+var
+  GoodCameraUp: TVector3Single;
 begin
   if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
   begin
     glPushMatrix;
-      glTranslatev(LegsPosition);
-      { TODO: take into account Direction }
+
+      GoodCameraUp := UnitVector3Single[2];
+      { If not Flying, then we know that GoodCameraUp is already
+        orthogonal to Direction. }
+      if WAKind.Flying then
+        MakeVectorsOrthoOnTheirPlane(GoodCameraUp, Direction);
+
+      { Note that actually I could do here TransformToCoordsNoScaleMatrix,
+        as obviously I don't want any scaling. But in this case I know
+        that Direction length = 1 and GoodCameraUp = 1 (so their product
+        length is also = 1), so no need to do
+        TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
+        on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
+      glMultMatrix(TransformToCoordsMatrix(LegsPosition,
+        Direction, VectorProduct(GoodCameraUp, Direction), GoodCameraUp));
+
       CurrentScene.Render(nil);
     glPopMatrix;
   end;
@@ -492,33 +519,112 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
   function SeesPlayer: boolean;
   begin
-    Result := Level.SegmentCollision(HeadPosition, Player.Navigator.CameraPos);
+    Result := Level.LineOfSight(HeadPosition, Player.Navigator.CameraPos);
   end;
 
   procedure DoWalk;
   var
-    OldHeadPosition, NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
-  begin
-    { TODO: change Direction, i.e. rotate to actually point at player.
-      Use Flying. }
+    PlayerBoundingBox: TBox3d;
 
-    OldHeadPosition := HeadPosition;
-    ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
-      VectorScale(Direction, WAKind.MoveSpeed));
-
-    if Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
-      NewHeadPosition, false, WAKind.CameraRadius) then
+    { TODO: do also collision detection when *player* moves. }
+    function PlayerVSCreatureCollision(const AssumeHeadPosition: TVector3Single):
+      boolean;
+    var
+      AssumeLegsPosition: TVector3Single;
     begin
-      FLegsPosition := NewHeadPosition;
-      FLegsPosition[2] -= Height;
+      AssumeLegsPosition := AssumeHeadPosition;
+      AssumeLegsPosition[2] -= Height;
+      Result := Boxes3dCollision(
+        BoundingBoxAssuming(AssumeLegsPosition, Direction), PlayerBoundingBox);
+    end;
 
-      if not SeesPlayer then
-        SetState(wasStand) else
-      if AttackAllowed then
-        SetState(wasAttack);
-    end else
-      { Seek alt way. }
+  const
+    AngleRadChangeSpeed = 1.0;
+    MaxAngleToMoveForward = Pi / 3 { 60 degrees };
+  var
+    OldHeadPosition, NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
+    DirectionToPlayer: TVector3Single;
+    AngleRadBetweenGoodDirection, AngleRadChange: Single;
+  begin
+    { calculate DirectionToPlayer }
+    DirectionToPlayer := VectorSubtract(Player.Navigator.CameraPos, HeadPosition);
+    if not WAKind.Flying then
+      MakeVectorsOrthoOnTheirPlane(DirectionToPlayer, Level.HomeCameraUp);
+
+    PlayerBoundingBox := Player.BoundingBox;
+
+    { If creature is ideally under/above the player and if creature can't
+      move vertically, then there is no way to get to the player.
+      So there is no sense in moving or rotating creature now. }
+    if (not WAKind.Flying) and
+       { I initially wanted to check this like
+         VectorsParallel(DirectionToPlayer, Level.HomeCameraUp)
+         (before "fixing" DirectionToPlayer to be horizontal).
+         But this was not a good solution --- DirectionToPlayer, like HeadPosition,
+         is too "sensitive" to rounding errors, and VectorsParallel was returning
+         false when I wanted it to return true.
+         Using Boxes3dXYCollision below is a better solution --- faster,
+         and it's not sensitive to any float inaccuracy. }
+       Boxes3dXYCollision(BoundingBox, PlayerBoundingBox) then
+    begin
       SetState(wasStand);
+      Exit;
+    end;
+
+    AngleRadBetweenGoodDirection := AngleRadBetweenVectors(DirectionToPlayer,
+      Direction);
+
+    { If AngleRadBetweenGoodDirection is too large, there is not much point
+      in moving in given direction anyway. We should just change our Direction. }
+    if AngleRadBetweenGoodDirection < MaxAngleToMoveForward then
+    begin
+      OldHeadPosition := HeadPosition;
+      ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
+        VectorScale(Direction, WAKind.MoveSpeed * CompSpeed));
+
+      if Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
+        NewHeadPosition, false, WAKind.CameraRadius) and
+        (not PlayerVSCreatureCollision(NewHeadPosition)) then
+      begin
+        FLegsPosition := NewHeadPosition;
+        FLegsPosition[2] -= Height;
+      end else
+      begin
+        { TODO: Seek alt way here, instead of just giving up. }
+        SetState(wasStand);
+        Exit;
+      end;
+    end;
+
+    if not VectorsParallel(DirectionToPlayer, Direction) then
+    begin
+      { Rotate Direction, to be closer to DirectionToPlayer }
+
+      { calculate AngleRadChange }
+      AngleRadChange := AngleRadChangeSpeed * CompSpeed;
+      MinTo1st(AngleRadChange, AngleRadBetweenGoodDirection);
+      if VectorProduct(Direction, DirectionToPlayer)[2] < 0 then
+        AngleRadChange := -AngleRadChange;
+
+      MakeVectorsAngleRadOnTheirPlane(Direction, DirectionToPlayer,
+        AngleRadChange);
+
+      { From time to time it's good to fix Direction, to make sure it's
+        1. normalized,
+        2. and orthogonal to HomeCameraUp if not Flying
+        Otherwise rounding errors could accumulate and cause some nasty things.
+
+        Actually, I didn't observed anything bad caused by the above,
+        but I'm safeguarding anyway, for safety. }
+      if not WAKind.Flying then
+        MakeVectorsOrthoOnTheirPlane(Direction, Level.HomeCameraUp);
+      NormalizeTo1st(Direction);
+    end;
+
+    if not SeesPlayer then
+      SetState(wasStand) else
+    if AttackAllowed then
+      SetState(wasAttack);
   end;
 
 begin
