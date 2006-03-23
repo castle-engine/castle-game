@@ -122,29 +122,35 @@ type
 
     property Headlight: boolean read FHeadlight;
 
-    { MoveAllowed and GetCameraHeight perform collision detection
-      with the level.
+    { SegmentCollision, MoveAllowed and GetCameraHeight perform
+      collision detection with the level.
 
       @groupBegin }
+    function SegmentCollision(const Pos1, Pos2: TVector3Single): boolean;
+      virtual;
+
     function MoveAllowed(const CameraPos: TVector3Single;
       const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
-      const BecauseOfGravity: boolean): boolean; virtual;
+      const BecauseOfGravity: boolean;
+      const MovingObjectCameraRadius: Single): boolean; virtual;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
       virtual;
     { @groupEnd }
 
-    { NavigatorMoveAllowed and NavigatorGetCameraHeight just
-      call appropriate non-navigator methods above.
-      Use these to perform collision detection between Navigator and the level.
+    { PlayerMoveAllowed and PlayerGetCameraHeight just
+      call appropriate non-player methods above.
+      They use Navigator.CameraPos, and they use level's CameraRadius
+      (i.e. they assume that it's the player who's moving).
+      Use these to perform collision detection between player and the level.
 
       @groupBegin }
-    function NavigatorMoveAllowed(Navigator: TMatrixWalker;
+    function PlayerMoveAllowed(Navigator: TMatrixWalker;
       const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
 
-    procedure NavigatorGetCameraHeight(Navigator: TMatrixWalker;
+    procedure PlayerGetCameraHeight(Navigator: TMatrixWalker;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 
     { Call this to render level things. Frustum is current player's frustum. }
@@ -202,9 +208,13 @@ type
     constructor Create;
     destructor Destroy; override;
 
+    function SegmentCollision(const Pos1, Pos2: TVector3Single): boolean;
+      override;
+
     function MoveAllowed(const CameraPos: TVector3Single;
       const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
-      const BecauseOfGravity: boolean): boolean; override;
+      const BecauseOfGravity: boolean;
+      const MovingObjectCameraRadius: Single): boolean; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
@@ -487,14 +497,22 @@ begin
   end;
 end;
 
+function TLevel.SegmentCollision(
+  const Pos1, Pos2: TVector3Single): boolean;
+begin
+  Result := Scene.DefaultTriangleOctree.SegmentCollision(
+    Pos1, Pos2, false, NoItemIndex, false) = NoItemIndex;
+end;
+
 function TLevel.MoveAllowed(const CameraPos: TVector3Single;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
-  const BecauseOfGravity: boolean): boolean;
+  const BecauseOfGravity: boolean;
+  const MovingObjectCameraRadius: Single): boolean;
 begin
   Result :=
     Box3dPointInside(ProposedNewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveAllowed(
-      CameraPos, ProposedNewPos, NewPos, CameraRadius);
+      CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius);
 end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
@@ -505,15 +523,15 @@ begin
     IsAboveTheGround, SqrHeightAboveTheGround);
 end;
 
-function TLevel.NavigatorMoveAllowed(Navigator: TMatrixWalker;
+function TLevel.PlayerMoveAllowed(Navigator: TMatrixWalker;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result := MoveAllowed(Navigator.CameraPos, ProposedNewPos, NewPos,
-    BecauseOfGravity);
+    BecauseOfGravity, CameraRadius);
 end;
 
-procedure TLevel.NavigatorGetCameraHeight(Navigator: TMatrixWalker;
+procedure TLevel.PlayerGetCameraHeight(Navigator: TMatrixWalker;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 begin
   GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
@@ -587,23 +605,49 @@ begin
   inherited;
 end;
 
+function TCastleHallLevel.SegmentCollision(
+  const Pos1, Pos2: TVector3Single): boolean;
+
+  function MakeSymbol(SymbolScene: TVRMLFlatSceneGL): boolean;
+  begin
+    Result := SymbolScene.DefaultTriangleOctree.SegmentCollision(
+      Pos1, Pos2, false, NoItemIndex, false) = NoItemIndex;
+  end;
+
+begin
+  Result := inherited;
+
+  Result := Result and
+    (Button.DefaultTriangleOctree.SegmentCollision(
+      Pos1, Pos2, false, NoItemIndex, false) = NoItemIndex);
+
+  if Result and (not ButtonPressed) then
+  begin
+    Result :=
+      MakeSymbol(Symbol_TL) and
+      MakeSymbol(Symbol_BL) and
+      MakeSymbol(Symbol_TR) and
+      MakeSymbol(Symbol_BR);
+  end;
+end;
+
 function TCastleHallLevel.MoveAllowed(const CameraPos: TVector3Single;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
-  const BecauseOfGravity: boolean): boolean;
+  const BecauseOfGravity: boolean;
+  const MovingObjectCameraRadius: Single): boolean;
 
   function MakeSymbol(SymbolScene: TVRMLFlatSceneGL): boolean;
   begin
     Result := SymbolScene.DefaultTriangleOctree.MoveAllowedSimple(
-      CameraPos, NewPos, CameraRadius);
+      CameraPos, NewPos, MovingObjectCameraRadius);
   end;
 
 begin
-  Result := inherited MoveAllowed(CameraPos,
-    ProposedNewPos, NewPos, BecauseOfGravity);
+  Result := inherited;
 
   Result := Result and
     Button.DefaultTriangleOctree.MoveAllowedSimple(
-      CameraPos, NewPos, CameraRadius);
+      CameraPos, NewPos, MovingObjectCameraRadius);
 
   if Result and (not ButtonPressed) then
   begin

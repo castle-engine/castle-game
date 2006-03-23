@@ -178,6 +178,8 @@ type
   TWalkAttackCreature = class(TCreature)
   private
     FState: TWalkAttackCreatureState;
+    procedure SetState(Value: TWalkAttackCreatureState);
+
     { last FState change time, taken from Level.AnimationTime. }
     StateChangeTime: Single;
   public
@@ -379,13 +381,19 @@ constructor TWalkAttackCreature.Create(AKind: TCreatureKind;
   const AnimationTime: Single);
 begin
   inherited Create(AKind, APosition, ADirection, AMaxLife, AnimationTime);
-  FState := wasWalk;
+  FState := wasStand;
   StateChangeTime := AnimationTime;
 end;
 
 function TWalkAttackCreature.WAKind: TWalkAttackCreatureKind;
 begin
   Result := TWalkAttackCreatureKind(Kind);
+end;
+
+procedure TWalkAttackCreature.SetState(Value: TWalkAttackCreatureState);
+begin
+  FState := Value;
+  StateChangeTime := Level.AnimationTime;
 end;
 
 function TWalkAttackCreature.BoundingBox: TBox3d;
@@ -407,8 +415,60 @@ begin
 end;
 
 procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
+
+  { Is attack allowed. Assumes that creature sees the player. }
+  function AttackAllowed: boolean;
+  begin
+    { TODO: from last attack more than MinDelayBetweenAttacks lasted,
+      and Player.Navigator.CameraPos is closer than AttackDistance }
+    Result := false;
+  end;
+
+  function SeesPlayer: boolean;
+  begin
+    Result := Level.SegmentCollision(Position, Player.Navigator.CameraPos);
+  end;
+
 begin
-  { TODO: change FState, change Direction, change Position }
+  { TODO: as you see, actually AttacksWhenWalking is not used when going
+    to wasAttack state. It's used only when going out from wasAttack state.
+    Fix, or change docs. }
+
+  { TODO: gravity should drag monsters down.
+    Falling down should cause them some life loss. }
+
+  case FState of
+    wasStand:
+      if SeesPlayer then
+      begin
+        if AttackAllowed then
+          SetState(wasAttack) else
+          SetState(wasWalk);
+      end;
+    wasWalk:
+      begin
+        { TODO: change Direction, change Position, i.e. do the actual walking }
+        if not SeesPlayer then
+          SetState(wasStand) else
+        if AttackAllowed then
+          SetState(wasAttack);
+      end;
+    wasAttack:
+      begin
+        { TODO: at some time when attacking, something should happen:
+          - maybe some missile should be created (at current Position
+            and Direction)
+          - maybe player should lose some life (in this case, I should
+            check once again here that player is close enough) }
+
+        if StateChangeTime > WAKind.AttackAnimation.TimeEnd then
+          if WAKind.AttacksWhenWalking then
+            SetState(wasWalk) else
+            SetState(wasStand);
+      end;
+    wasDying: ;
+    else raise EInternalError.Create('FState ?');
+  end;
 end;
 
 function TWalkAttackCreature.CurrentScene: TVRMLFlatSceneGL;
@@ -431,7 +491,7 @@ begin
       { TODO: transition from walk/stand to attack and back smooth }
       Result := WAKind.AttackAnimation.SceneFromTime(StateTime);
     wasDying:
-      Result := WAKind.AttackAnimation.SceneFromTime(StateTime);
+      Result := WAKind.DyingAnimation.SceneFromTime(StateTime);
     else raise EInternalError.Create('FState ?');
   end;
 end;
@@ -459,7 +519,7 @@ end;
 
 procedure DoInitialization;
 const
-  AnimScenesPerTime = 100;
+  AnimScenesPerTime = 30;
   AnimOptimization = roSceneAsAWhole;
 
   function CreatureFileName(const FileName: string): string;

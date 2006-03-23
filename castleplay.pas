@@ -631,8 +631,8 @@ begin
       try
         { Init Player.Navigator properties }
         Player.Navigator.OnMatrixChanged := TDummy.MatrixChanged;
-        Player.Navigator.OnMoveAllowed := Level.NavigatorMoveAllowed;
-        Player.Navigator.OnGetCameraHeight := Level.NavigatorGetCameraHeight;
+        Player.Navigator.OnMoveAllowed := Level.PlayerMoveAllowed;
+        Player.Navigator.OnGetCameraHeight := Level.PlayerGetCameraHeight;
 
         { Init initial camera pos }
         Player.Navigator.Init(Level.HomeCameraPos, Level.HomeCameraDir,

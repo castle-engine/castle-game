@@ -32,6 +32,7 @@ Would-be-nice before next stage:
 - "shrink" spell (that was *coool* in DUKE 3D !)
   "freeze" (it's from DUKE 3D also)
   "fry"
+  "throw back" (throws all enemies slightly backward)
 
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim ? Look how much it adds to AirBlast !)
@@ -123,6 +124,8 @@ Would-be-nice before next stage:
     Texture minification quality: (opengl options)
     Texture magnification quality: (opengl options)
     Blending: (for attrib_blending somewhere)
+    Animation smoothness: (slider: between 10 and 100)
+      (for AnimScenesPerUnit in CastleCreatures)
 
   keyboard:
     All keys configurable here.
