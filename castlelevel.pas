@@ -191,6 +191,11 @@ type
 
     property HomeCameraPos: TVector3Single read FHomeCameraPos;
     property HomeCameraDir: TVector3Single read FHomeCameraDir;
+
+    { Actually, this must be (0, 0, 1) for this game.
+      Some things in this game are prepared to handle any
+      HomeCameraUp value --- some not (for simplicity, and sometimes
+      code efficiency). }
     property HomeCameraUp: TVector3Single read FHomeCameraUp;
   end;
 
@@ -365,6 +370,14 @@ begin
     0.4 * { I multiply by 0.4 just to get the same thing
     that view3dscene does at this time. }
     NavigationSpeed);
+
+  if not VectorsEqual(Normalized(HomeCameraUp),
+    Vector3Single(0, 0, 1), 0.001) then
+    raise EInternalError.CreateFmt(
+      'Initial camera up vector must be +Z, but is %s',
+      [ VectorToRawStr(Normalized(HomeCameraUp)) ]) else
+    { Make HomeCameraUp = (0, 0, 1) more "precisely" }
+    FHomeCameraUp := Vector3Single(0, 0, 1);
 end;
 
 destructor TLevel.Destroy;

@@ -50,6 +50,10 @@ type
     procedure PrepareRender;
   end;
 
+const
+  DefaultMoveSpeed = 1.0;
+
+type
   { This is a TCreatureKind that has simple states:
     standing stil, walking (aka running), performing an attack and dying.
     Note that you should specify all animation times in seconds
@@ -69,6 +73,8 @@ type
     FDyingAnimationInfo: TVRMLGLAnimationInfo;
 
     FAttacksWhenWalking: boolean;
+    FMoveSpeed: Single;
+    FFlying: boolean;
   public
     constructor Create(
       AStandAnimationInfo: TVRMLGLAnimationInfo;
@@ -121,12 +127,23 @@ type
     { See @link(AttackAnimation). }
     property AttacksWhenWalking: boolean
       read FAttacksWhenWalking write FAttacksWhenWalking default false;
+
+    { This is moving speed --- how much Direction vector will be scaled
+      when moving in wasWalk. }
+    property MoveSpeed: Single read FMoveSpeed write FMoveSpeed
+      default DefaultMoveSpeed;
+
+    { If @true, then the creature flies. Otherwise it always tries to move only
+      horizontally (which also means that Direction is always orthogonal
+      to Level.HomeCameraUp), and it falls down when Position is above
+      the ground. }
+    property Flying: boolean read FFlying default false;
   end;
 
   TCreature = class
   private
     FKind: TCreatureKind;
-    FPosition: TVector3Single;
+    FLegsPosition: TVector3Single;
     FDirection: TVector3Single;
     FLife: Single;
     FMaxLife: Single;
@@ -135,7 +152,7 @@ type
       AnimationTime from global Level.AnimationTime, but in the case of
       constructor it's safer to just take it as param. }
     constructor Create(AKind: TCreatureKind;
-      const APosition: TVector3Single;
+      const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
       const AnimationTime: Single);
@@ -159,9 +176,15 @@ type
 
     { This is the position of the (0, 0, 0) point of creature model
       (or rather, currently used model! Creatures are animated after all). }
-    property Position: TVector3Single read FPosition write FPosition;
+    property LegsPosition: TVector3Single read FLegsPosition write FLegsPosition;
 
-    { Direction the creature is facing. }
+    { This is the position of the head. Actually, it's the place where
+      (0, 0, max) point of creatures bounding box currently is
+      (i.e., translated by Position). }
+    function HeadPosition: TVector3Single;
+
+    { Direction the creature is facing.
+      It always must be normalized. }
     property Direction: TVector3Single read FDirection write FDirection;
   end;
 
@@ -184,7 +207,7 @@ type
     StateChangeTime: Single;
   public
     constructor Create(AKind: TCreatureKind;
-      const APosition: TVector3Single;
+      const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
       const AnimationTime: Single);
@@ -282,6 +305,10 @@ begin
   FWalkAnimationInfo := AWalkAnimationInfo;
   FAttackAnimationInfo := AAttackAnimationInfo;
   FDyingAnimationInfo := ADyingAnimationInfo;
+
+  FAttacksWhenWalking := false;
+  MoveSpeed := DefaultMoveSpeed;
+  FFlying := false;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -339,7 +366,7 @@ end;
 { TCreature ------------------------------------------------------------------ }
 
 constructor TCreature.Create(AKind: TCreatureKind;
-  const APosition: TVector3Single;
+  const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AMaxLife: Single;
   const AnimationTime: Single);
@@ -347,11 +374,17 @@ begin
   inherited Create;
 
   FKind := AKind;
-  FPosition := APosition;
+  FLegsPosition := ALegsPosition;
   FDirection := ADirection;
   FMaxLife := AMaxLife;
 
   FLife := MaxLife;
+end;
+
+function TCreature.HeadPosition: TVector3Single;
+begin
+  Result := LegsPosition;
+  Result[2] += CurrentScene.BoundingBox[1, 2];
 end;
 
 { TCreatures ----------------------------------------------------------------- }
@@ -375,12 +408,12 @@ end;
 { TWalkAttackCreature -------------------------------------------------------- }
 
 constructor TWalkAttackCreature.Create(AKind: TCreatureKind;
-  const APosition: TVector3Single;
+  const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AMaxLife: Single;
   const AnimationTime: Single);
 begin
-  inherited Create(AKind, APosition, ADirection, AMaxLife, AnimationTime);
+  inherited Create(AKind, ALegsPosition, ADirection, AMaxLife, AnimationTime);
   FState := wasStand;
   StateChangeTime := AnimationTime;
 end;
@@ -399,7 +432,7 @@ end;
 function TWalkAttackCreature.BoundingBox: TBox3d;
 begin
   { TODO: take into account Direction }
-  Result := Box3dTranslate(CurrentScene.BoundingBox, Position);
+  Result := Box3dTranslate(CurrentScene.BoundingBox, LegsPosition);
 end;
 
 procedure TWalkAttackCreature.Render(const Frustum: TFrustum);
@@ -407,7 +440,7 @@ begin
   if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
   begin
     glPushMatrix;
-      glTranslatev(Position);
+      glTranslatev(LegsPosition);
       { TODO: take into account Direction }
       CurrentScene.Render(nil);
     glPopMatrix;
@@ -426,7 +459,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
   function SeesPlayer: boolean;
   begin
-    Result := Level.SegmentCollision(Position, Player.Navigator.CameraPos);
+    Result := Level.SegmentCollision(HeadPosition, Player.Navigator.CameraPos);
   end;
 
 begin
@@ -434,7 +467,7 @@ begin
     to wasAttack state. It's used only when going out from wasAttack state.
     Fix, or change docs. }
 
-  { TODO: gravity should drag monsters down.
+  { TODO: When not Flying, gravity should drag monsters down.
     Falling down should cause them some life loss. }
 
   case FState of
@@ -447,7 +480,10 @@ begin
       end;
     wasWalk:
       begin
-        { TODO: change Direction, change Position, i.e. do the actual walking }
+        { TODO: change Direction, change LegsPosition, i.e. do the actual walking.
+          Use MoveSpeed.
+          Use Flying. }
+
         if not SeesPlayer then
           SetState(wasStand) else
         if AttackAllowed then
@@ -456,8 +492,8 @@ begin
     wasAttack:
       begin
         { TODO: at some time when attacking, something should happen:
-          - maybe some missile should be created (at current Position
-            and Direction)
+          - maybe some missile should be created (somewhere between
+            HeadPosition and LegsPosition. Missile has Direction.)
           - maybe player should lose some life (in this case, I should
             check once again here that player is close enough) }
 
