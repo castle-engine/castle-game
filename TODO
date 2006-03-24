@@ -9,16 +9,13 @@ Must-have before next stage:
 
 Highest priority goals for stage 4:
 
-- design moving AI and attacking AI for alien
-
-- finish CastleCreatures
+- CastleCreatures high priority todos:
+  TODO -- dying animation
+  TODO: check when setting Life, optionally then change state to dying
 
 - player must be able to actually swing the EquippedWeapon,
   to hurt enemies etc.
   (especially because there are no enemies right now...).
-
-- some effects: blood explode when player hits monster,
-  separate animation of monster dying.
 
 - then do first boss
 
@@ -42,9 +39,13 @@ Would-be-nice before next stage:
 
 - animation when creature is hurt
 
-- creatures still can climb high (almost-vertical) walls
-
 --------------------
+- creatures still can climb high (almost-vertical) walls.
+  This is not so very noticeable now, because there are no high walls
+  now, and creatures' AI doesn't let them fall into deep pits now.
+
+- some effects: blood explode when player hits monster.
+
 - creature that attacks from short-range (swordsman, golem etc.)
 
 - I really don't like the "alien" model. It's generally nice,

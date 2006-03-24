@@ -300,6 +300,15 @@ type
     { Direction the creature is facing.
       It always must be normalized. }
     property Direction: TVector3Single read FDirection write FDirection;
+
+    { When this function returns true, the creature will be removed
+      from Level.Creatures list (this will be done in game's OnIdle,
+      right before calling Idle of all the creatures).
+
+      In this class this returns always false. Yes, this means that
+      even dead creatures *may* still exist on level (e.g. to
+      show DyingAnimation, or missile's explosion animation etc.) }
+    function RemoveMeFromLevel: boolean; virtual;
   end;
 
   TObjectsListItem_1 = TCreature;
@@ -307,6 +316,9 @@ type
   TCreaturesList = class(TObjectsList_1)
     procedure Render(const Frustum: TFrustum);
     procedure Idle(const CompSpeed: Single);
+    { Remove from this list all creatures that return
+      RemoveMeFromLevel = @true. }
+    procedure RemoveFromLevel;
   end;
 
   TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying);
@@ -368,6 +380,10 @@ type
 
   { This is TCreature that has a kind always of TMissileCreatureKind. }
   TMissileCreature = class(TCreature)
+  private
+    procedure ExplodeCore;
+    procedure ExplodeWithPlayer;
+    procedure ExplodeWithLevel;
   public
     { Shortcut for TMissileCreatureKind(Kind). }
     function MissileKind: TMissileCreatureKind;
@@ -376,7 +392,7 @@ type
 
     function CurrentScene: TVRMLFlatSceneGL; override;
 
-    procedure Explode;
+    function RemoveMeFromLevel: boolean; override;
   end;
 
 var
@@ -768,6 +784,11 @@ begin
     DoGravity;
 end;
 
+function TCreature.RemoveMeFromLevel: boolean;
+begin
+  Result := false;
+end;
+
 { TCreatures ----------------------------------------------------------------- }
 
 procedure TCreaturesList.Render(const Frustum: TFrustum);
@@ -784,6 +805,16 @@ var
 begin
   for I := 0 to High do
     Items[I].Idle(CompSpeed);
+end;
+
+procedure TCreaturesList.RemoveFromLevel;
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+    if Items[I].RemoveMeFromLevel then
+      FreeAndNil(I);
+  DeleteAll(nil);
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -823,16 +854,39 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
   { Is attack allowed. Assumes that creature sees the player. }
   function AttackAllowed: boolean;
+  const
+    MaxAngleToAttack = Pi / 6 { 30 degrees };
+  var
+    AngleRadBetweenTheDirectionToPlayer: Single;
   begin
     Result := (Level.AnimationTime - LastAttackTime >
       WAKind.MinDelayBetweenAttacks) and
       (PointsDistanceSqr(Player.Navigator.CameraPos, HeadPosition) <=
       Sqr(WAKind.AttackDistance));
+
+    if Result then
+    begin
+      { Calculate and check AngleRadBetweenTheDirectionToPlayer. }
+      AngleRadBetweenTheDirectionToPlayer := AngleRadBetweenVectors(
+        VectorSubtract(Player.Navigator.CameraPos, HeadPosition),
+        Direction);
+      Result := AngleRadBetweenTheDirectionToPlayer <= MaxAngleToAttack;
+    end;
   end;
 
   function SeesPlayer: boolean;
   begin
     Result := Level.LineOfSight(HeadPosition, Player.Navigator.CameraPos);
+  end;
+
+  procedure DoStand;
+  begin
+    if SeesPlayer then
+    begin
+      if AttackAllowed then
+        SetState(wasAttack) else
+        SetState(wasWalk);
+    end;
   end;
 
   procedure DoWalk;
@@ -893,7 +947,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
     { If AngleRadBetweenGoodDirection is too large, there is not much point
       in moving in given direction anyway. We should just change our Direction. }
-    if AngleRadBetweenGoodDirection < MaxAngleToMoveForward then
+    if AngleRadBetweenGoodDirection <= MaxAngleToMoveForward then
     begin
       OldHeadPosition := HeadPosition;
       ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
@@ -979,13 +1033,7 @@ begin
   inherited;
 
   case FState of
-    wasStand:
-      if SeesPlayer then
-      begin
-        if AttackAllowed then
-          SetState(wasAttack) else
-          SetState(wasWalk);
-      end;
+    wasStand: DoStand;
     wasWalk: DoWalk;
     wasAttack: DoAttack;
     wasDying: ;
@@ -1031,7 +1079,8 @@ begin
 
   Missile := TMissileCreature.Create(BallMissile,
     VLerp(FiringMissileHeight, LegsPosition, HeadPosition),
-    Direction, 1.0 { doesn't matter }, Level.AnimationTime);
+    Normalized(VectorSubtract(Player.Navigator.CameraPos, HeadPosition)),
+    1.0 { MaxLife of missile doesn't matter }, Level.AnimationTime);
 
   Level.Creatures.Add(Missile);
 end;
@@ -1053,12 +1102,16 @@ begin
     VectorScale(Direction, MissileKind.MoveSpeed * CompSpeed));
 
   if Level.MoveAllowedSimple(LegsPosition, NewLegsPosition,
-    false, Kind.CameraRadius) and
-    (not LegsCollisionWithPlayer(NewLegsPosition)) then
+    false, Kind.CameraRadius) then
   begin
     FLegsPosition := NewLegsPosition;
   end else
-    Explode;
+    ExplodeWithLevel;
+
+  if LegsCollisionWithPlayer(LegsPosition) then
+    ExplodeWithPlayer;
+
+  { TODO: if collides with other creature, explode also there. }
 end;
 
 function TMissileCreature.CurrentScene: TVRMLFlatSceneGL;
@@ -1066,12 +1119,29 @@ begin
   Result := MissileKind.Animation.SceneFromTime(Level.AnimationTime);
 end;
 
-procedure TMissileCreature.Explode;
+function TMissileCreature.RemoveMeFromLevel: boolean;
+begin
+  { TODO: do some missile explosion animation for some missiles. }
+  Result := Life <= 0.0;
+end;
+
+procedure TMissileCreature.ExplodeCore;
 begin
   { TODO: sound of hit/explosion, from MissileKind.ExplosionSound }
-  { TODO: wound player if collides }
-  { TODO: wound creatures if collide }
-  GameMessage('bum');
+  { TODO: for some missiles, their explosion may hurt everyone around.
+    So do here additional checks for collision and hurt player and creatures. }
+  Life := 0.0;
+end;
+
+procedure TMissileCreature.ExplodeWithPlayer;
+begin
+  ExplodeCore;
+  Player.Life := Player.Life - 20 - Random(20);
+end;
+
+procedure TMissileCreature.ExplodeWithLevel;
+begin
+  ExplodeCore;
 end;
 
 { initialization / finalization ---------------------------------------------- }

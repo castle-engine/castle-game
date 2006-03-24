@@ -304,6 +304,7 @@ begin
   Level.Idle(Glw.FpsCompSpeed);
   Level.Items.Idle(Glw.FpsCompSpeed);
   Level.Creatures.Idle(Glw.FpsCompSpeed);
+  Level.Creatures.RemoveFromLevel;
 
   if not Player.Dead then
   begin
