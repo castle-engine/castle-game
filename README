@@ -421,6 +421,10 @@ Creatures (enemies etc.):
     descendant, for others you will want to derive new class from TCreatureKind
     and override there things you want.
 
+- For testing various animations of creatures (and adjusting their time
+  parameters) you can use my demo_animation program
+  (see units/3dmodels.gl/examples/demo_animation.dpr).
+
 --------------------
 Used things:
 
