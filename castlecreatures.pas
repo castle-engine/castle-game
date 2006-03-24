@@ -31,11 +31,14 @@ type
   TCreatureKind = class
   private
     FFlying: boolean;
+    FCameraRadius: Single;
   public
     constructor Create;
 
     { Prepare anything needed when starting new game.
-      It can call Progress.Step PrepareRenderSteps times. }
+      It can call Progress.Step PrepareRenderSteps times.
+      In this class, PrepareRender initializes CameraRadius from CurrentScene
+      (so you may need to call "inherited" at the *end* in subclasses). }
     procedure PrepareRender; virtual;
 
     function PrepareRenderSteps: Cardinal; virtual;
@@ -48,6 +51,12 @@ type
       to Level.HomeCameraUp), and it falls down when Position is above
       the ground. }
     property Flying: boolean read FFlying default false;
+
+    { Camera radius when moving. By default it's 0.
+      You should initialize it to something larger, for collision detection.
+      You can do it in PrepareRender. }
+    property CameraRadius: Single read FCameraRadius write FCameraRadius
+      default 0;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -82,7 +91,6 @@ type
 
     FAttacksWhenWalking: boolean;
     FMoveSpeed: Single;
-    FCameraRadius: Single;
   public
     constructor Create(
       AStandAnimationInfo: TVRMLGLAnimationInfo;
@@ -140,10 +148,6 @@ type
       when moving in wasWalk. }
     property MoveSpeed: Single read FMoveSpeed write FMoveSpeed
       default DefaultMoveSpeed;
-
-    { Camera radius when moving. Initialized in PrepareRender,
-      from StandAnimation.Scenes[0].BoundingBox. You can adjust it. }
-    property CameraRadius: Single read FCameraRadius write FCameraRadius;
   end;
 
   TCreature = class
@@ -167,6 +171,15 @@ type
       as specified here. }
     function BoundingBoxAssuming(
       const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
+
+    { This checks collision with Player.BoundingBox, assuming that HeadPosition
+      (and implied LegsPosition) is as given. }
+    function CollisionWithPlayer(
+      const AssumeHeadPosition: TVector3Single): boolean;
+
+    { For gravity work. }
+    FallingDownStartHeight: Single;
+    FIsFallingDown: boolean;
   public
     { Constructor. Note for AnimationTime: usually I will take
       AnimationTime from global Level.AnimationTime, but in the case of
@@ -369,27 +382,21 @@ procedure TWalkAttackCreatureKind.PrepareRender;
     Progress.Step;
   end;
 
-var
-  Box: TBox3d;
 begin
+  inherited;
+
   CreateIfNeeded(FStandAnimation      , FStandAnimationInfo      );
   CreateIfNeeded(FStandToWalkAnimation, FStandToWalkAnimationInfo);
   CreateIfNeeded(FWalkAnimation       , FWalkAnimationInfo       );
   CreateIfNeeded(FAttackAnimation     , FAttackAnimationInfo     );
   CreateIfNeeded(FDyingAnimation      , FDyingAnimationInfo      );
 
-  Box := StandAnimation.Scenes[0].BoundingBox;
-
-  FCameraRadius := Sqrt(Max(Max(
-    VectorLenSqr(Vector2Single(Box[0, 0], Box[0, 1])),
-    VectorLenSqr(Vector2Single(Box[1, 0], Box[0, 1])),
-    VectorLenSqr(Vector2Single(Box[1, 0], Box[1, 1]))),
-    VectorLenSqr(Vector2Single(Box[0, 0], Box[1, 1]))));
+  CameraRadius := Box3dXYRadius(StandAnimation.Scenes[0].BoundingBox);
 end;
 
 function TWalkAttackCreatureKind.PrepareRenderSteps: Cardinal;
 begin
-  Result := 10;
+  Result := (inherited PrepareRenderSteps) + 10;
 end;
 
 procedure TWalkAttackCreatureKind.CloseGL;
@@ -481,10 +488,115 @@ begin
   end;
 end;
 
-procedure TCreature.Idle(const CompSpeed: Single);
+function TCreature.CollisionWithPlayer(
+  const AssumeHeadPosition: TVector3Single): boolean;
+var
+  AssumeLegsPosition: TVector3Single;
 begin
-  { TODO: When not Flying, gravity should drag monsters down.
-    Falling down should cause them some life loss. }
+  AssumeLegsPosition := AssumeHeadPosition;
+  AssumeLegsPosition[2] -= Height;
+  Result := Boxes3dCollision(
+    BoundingBoxAssuming(AssumeLegsPosition, Direction), Player.BoundingBox);
+end;
+
+procedure TCreature.Idle(const CompSpeed: Single);
+
+  procedure DoGravity;
+
+    procedure FalledDown;
+    var
+      FallenHeight, LifeLoss: Single;
+    begin
+      FallenHeight := FallingDownStartHeight - LegsPosition[2];
+      LifeLoss := Max(0,
+        (FallenHeight / 1.5) * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
+      Life := Life - LifeLoss;
+      GameMessage(Format('Creature fallen down from %f, lost %f life',
+        [FallenHeight, LifeLoss]));
+    end;
+
+  var
+    OldHeadPosition: TVector3Single;
+
+    function MoveVertical(const Distance: Single): boolean;
+    var
+      NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
+    begin
+      ProposedNewHeadPosition := OldHeadPosition;
+      ProposedNewHeadPosition[2] += Distance;
+
+      Result := Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
+        NewHeadPosition, true, Kind.CameraRadius) and
+        (not CollisionWithPlayer(NewHeadPosition));
+
+      if Result then
+      begin
+        FLegsPosition := NewHeadPosition;
+        FLegsPosition[2] -= Height;
+      end;
+    end;
+
+  const
+    FallingDownSpeed = 1.0;
+    { Beware: GrowingUpSpeed is not only a graphical effect. Too large
+      GrowingUpSpeed will allow creature to climb walls that are at high
+      (almost-vertical) angle. }
+    GrowingUpSpeed = 0.1;
+    { HeightMargin is used to safeguard against floating point inaccuracy.
+      Without this, creature would too often be considered "falling down"
+      or "growing up". }
+    HeightMargin = 1.01;
+  var
+    IsAboveTheGround: boolean;
+    SqrHeightAboveTheGround, HeightAboveTheGround: Single;
+    OldIsFallingDown: boolean;
+  begin
+    { Gravity does it's work here.
+      This is extremely simplified version of Gravity work in MatrixNavigation.
+      (simplified, because creature doesn't need all these effects). }
+
+    { Note that also here we do collision detection using HeadPosition,
+      not LegsPosition. See HeadPosition docs for reasoning. }
+
+    OldIsFallingDown := FIsFallingDown;
+    OldHeadPosition := HeadPosition;
+
+    Level.GetCameraHeight(OldHeadPosition, IsAboveTheGround,
+      SqrHeightAboveTheGround);
+    { We will need it anyway. OK, I'll pay this Sqrt. }
+    HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
+
+    if (not IsAboveTheGround) or
+      (HeightAboveTheGround > Height * HeightMargin) then
+    begin
+      { Fall down }
+      if not FIsFallingDown then
+        FallingDownStartHeight := LegsPosition[2];
+
+      FIsFallingDown := true;
+      if not MoveVertical(-Min(FallingDownSpeed * CompSpeed,
+        HeightAboveTheGround - Height)) then
+        FIsFallingDown := false;
+    end else
+    begin
+      FIsFallingDown := false;
+
+      if IsAboveTheGround and
+        (HeightAboveTheGround < Height / HeightMargin) then
+      begin
+        { Growing up }
+        MoveVertical(Min(GrowingUpSpeed * CompSpeed,
+          Height - HeightAboveTheGround));
+      end;
+    end;
+
+    if OldIsFallingDown and (not FIsFallingDown) then
+      FalledDown;
+  end;
+
+begin
+  if not Kind.Flying then
+    DoGravity;
 end;
 
 { TCreatures ----------------------------------------------------------------- }
@@ -545,21 +657,6 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
   end;
 
   procedure DoWalk;
-  var
-    PlayerBoundingBox: TBox3d;
-
-    { TODO: do also collision detection when *player* moves. }
-    function PlayerVSCreatureCollision(const AssumeHeadPosition: TVector3Single):
-      boolean;
-    var
-      AssumeLegsPosition: TVector3Single;
-    begin
-      AssumeLegsPosition := AssumeHeadPosition;
-      AssumeLegsPosition[2] -= Height;
-      Result := Boxes3dCollision(
-        BoundingBoxAssuming(AssumeLegsPosition, Direction), PlayerBoundingBox);
-    end;
-
   const
     AngleRadChangeSpeed = 0.1;
     MaxAngleToMoveForward = Pi / 3 { 60 degrees };
@@ -570,10 +667,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
   begin
     { calculate DirectionToPlayer }
     DirectionToPlayer := VectorSubtract(Player.Navigator.CameraPos, HeadPosition);
-    if not WAKind.Flying then
+    if not Kind.Flying then
       MakeVectorsOrthoOnTheirPlane(DirectionToPlayer, Level.HomeCameraUp);
-
-    PlayerBoundingBox := Player.BoundingBox;
 
     { If creature is ideally under/above the player and if creature can't
       move vertically, then there is no way to get to the player.
@@ -587,7 +682,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
          false when I wanted it to return true.
          Using Boxes3dXYCollision below is a better solution --- faster,
          and it's not sensitive to any float inaccuracy. }
-       Boxes3dXYCollision(BoundingBox, PlayerBoundingBox) then
+       Boxes3dXYCollision(BoundingBox, Player.BoundingBox) then
     begin
       SetState(wasStand);
       Exit;
@@ -605,8 +700,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         VectorScale(Direction, WAKind.MoveSpeed * CompSpeed));
 
       if Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
-        NewHeadPosition, false, WAKind.CameraRadius) and
-        (not PlayerVSCreatureCollision(NewHeadPosition)) then
+        NewHeadPosition, false, Kind.CameraRadius) and
+        (not CollisionWithPlayer(NewHeadPosition)) then
       begin
         FLegsPosition := NewHeadPosition;
         FLegsPosition[2] -= Height;
