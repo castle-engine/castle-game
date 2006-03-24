@@ -752,10 +752,20 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
         VectorScale(Direction, WAKind.MoveSpeed * CompSpeed));
 
-      if Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
+      if
+        { First check to not step into some deep fall.
+          Note that I'm not using here NewHeadPosition
+          (that will be calculated later by Level.MoveAllowed)
+          or ProposedNewHeadPosition, because they are too close
+          to OldHeadPosition to be good to test against.
+          I'm calculating here where I would get after 1 second
+          (WAKind.MoveSpeed * 50). }
+        (not TooHighAboveTheGround(VectorAdd(OldHeadPosition,
+          VectorScale(Direction, WAKind.MoveSpeed * 50)))) and
+
+        Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
         NewHeadPosition, false, Kind.CameraRadius) and
-        (not CollisionWithPlayer(NewHeadPosition)) and
-        (not TooHighAboveTheGround(NewHeadPosition)) then
+        (not CollisionWithPlayer(NewHeadPosition)) then
       begin
         FLegsPosition := NewHeadPosition;
         FLegsPosition[2] -= Height;

@@ -38,10 +38,6 @@ Would-be-nice before next stage:
 
 - creatures still can climb high (almost-vertical) walls
 
-- AI preventing creatures from stepping somewhere where they will fall
-  doesn't work good enough. See basic_castle: creature still at some
-  point steps into the pit and falls down.
-
 --------------------
 - I really don't like the "alien" model. It's generally nice,
   but it doesn't fit this game, and I just can't texture it appropriately.
