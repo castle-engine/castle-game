@@ -43,7 +43,6 @@ type
     { Free any association with current OpenGL context. }
     procedure CloseGL; virtual;
 
-
     { If @true, then the creature flies. Otherwise it always tries to move only
       horizontally (which means that Direction is always orthogonal
       to Level.HomeCameraUp), and it falls down when Position is above
@@ -154,6 +153,15 @@ type
     FDirection: TVector3Single;
     FLife: Single;
     FMaxLife: Single;
+
+    { Return matrix that takes into account current LegsPosition and Direction.
+      Multiply CurrentScene geometry by this matrix to get current geometry. }
+    function SceneTransform: TMatrix4Single;
+
+    { Like SceneTransform, but assumes that LegsPosition and Direction
+      is as specified. }
+    function SceneTransformAssuming(
+      const AssumeLegsPosition, AssumeDirection: TVector3Single): TMatrix4Single;
 
     { Returns BoundingBox, assuming that LegsPosition and Direction are
       as specified here. }
@@ -423,11 +431,38 @@ begin
   Result[2] += Height;
 end;
 
+function TCreature.SceneTransformAssuming(
+  const AssumeLegsPosition, AssumeDirection: TVector3Single): TMatrix4Single;
+var
+  GoodCameraUp: TVector3Single;
+begin
+  GoodCameraUp := UnitVector3Single[2];
+  { If not Flying, then we know that GoodCameraUp is already
+    orthogonal to AssumeDirection. }
+  if Kind.Flying then
+    MakeVectorsOrthoOnTheirPlane(GoodCameraUp, AssumeDirection);
+
+  { Note that actually I could do here TransformToCoordsNoScaleMatrix,
+    as obviously I don't want any scaling. But in this case I know
+    that AssumeDirection length = 1 and GoodCameraUp = 1 (so their product
+    length is also = 1), so no need to do
+    TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
+    on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
+
+  Result := TransformToCoordsMatrix(AssumeLegsPosition,
+    AssumeDirection, VectorProduct(GoodCameraUp, AssumeDirection), GoodCameraUp);
+end;
+
+function TCreature.SceneTransform: TMatrix4Single;
+begin
+  Result := SceneTransformAssuming(LegsPosition, Direction);
+end;
+
 function TCreature.BoundingBoxAssuming(
   const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
 begin
-  { TODO: take into account AssumeDirection }
-  Result := Box3dTranslate(CurrentScene.BoundingBox, AssumeLegsPosition);
+  Result := BoundingBoxTransform(CurrentScene.BoundingBox,
+    SceneTransformAssuming(AssumeLegsPosition, AssumeDirection));
 end;
 
 function TCreature.BoundingBox: TBox3d;
@@ -436,28 +471,11 @@ begin
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum);
-var
-  GoodCameraUp: TVector3Single;
 begin
   if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
   begin
     glPushMatrix;
-
-      GoodCameraUp := UnitVector3Single[2];
-      { If not Flying, then we know that GoodCameraUp is already
-        orthogonal to Direction. }
-      if Kind.Flying then
-        MakeVectorsOrthoOnTheirPlane(GoodCameraUp, Direction);
-
-      { Note that actually I could do here TransformToCoordsNoScaleMatrix,
-        as obviously I don't want any scaling. But in this case I know
-        that Direction length = 1 and GoodCameraUp = 1 (so their product
-        length is also = 1), so no need to do
-        TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
-        on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
-      glMultMatrix(TransformToCoordsMatrix(LegsPosition,
-        Direction, VectorProduct(GoodCameraUp, Direction), GoodCameraUp));
-
+      glMultMatrix(SceneTransform);
       CurrentScene.Render(nil);
     glPopMatrix;
   end;
