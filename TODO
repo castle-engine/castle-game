@@ -30,6 +30,8 @@ Highest priority goals for stage 4:
 --------------------
 Would-be-nice before next stage:
 
+- non-moving creature (just shooting etc.)
+
 - alien model anim must be changed: the corpse must actualy move while walking !
   Otherwise the effect is like "the legs walking, but the corpse is just
   floating constantly"
@@ -39,6 +41,8 @@ Would-be-nice before next stage:
 - creatures still can climb high (almost-vertical) walls
 
 --------------------
+- creature that attacks from short-range (swordsman, golem etc.)
+
 - I really don't like the "alien" model. It's generally nice,
   but it doesn't fit this game, and I just can't texture it appropriately.
   The basic model was just taken from www.3dcafe.com when I realized that
