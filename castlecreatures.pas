@@ -50,7 +50,7 @@ type
       horizontally (which means that Direction is always orthogonal
       to Level.HomeCameraUp), and it falls down when Position is above
       the ground. }
-    property Flying: boolean read FFlying default false;
+    property Flying: boolean read FFlying write FFlying default false;
 
     { Camera radius when moving. By default it's 0.
       You should initialize it to something larger, for collision detection.
@@ -71,6 +71,7 @@ const
   DefaultMoveSpeed = 0.2;
   DefaultMinDelayBetweenAttacks = 5.0;
   DefaultAttackDistance = 50.0;
+  DefaultMissileMoveSpeed = 1.0;
 
 type
   { This is a TCreatureKind that has simple states:
@@ -95,6 +96,7 @@ type
     FMoveSpeed: Single;
     FMinDelayBetweenAttacks: Single;
     FAttackDistance: Single;
+    FActualAttackTime: Single;
   public
     constructor Create(
       AStandAnimationInfo: TVRMLGLAnimationInfo;
@@ -167,6 +169,45 @@ type
     property AttackDistance: Single
       read FAttackDistance write FAttackDistance
       default DefaultAttackDistance;
+
+    { This is the time point within AttackAnimation
+      at which ActualAttack method will be called.
+      Note that actually ActualAttack may be called a *very little* later
+      (hopefully it shouldn't be noticeable to the player). }
+    property ActualAttackTime: Single
+      read FActualAttackTime write FActualAttackTime default 0.0;
+  end;
+
+  { This is a missile. As you can see, this is also treated as a creature
+    --- it's just a very dumb creature, that just moves into the given
+    direction and explodes on any collision. }
+  TMissileCreatureKind = class(TCreatureKind)
+  private
+    FAnimation: TVRMLGLAnimation;
+    FAnimationInfo: TVRMLGLAnimationInfo;
+    FMoveSpeed: Single;
+  public
+    constructor Create(AAnimationInfo: TVRMLGLAnimationInfo);
+    destructor Destroy; override;
+
+    procedure PrepareRender; override;
+    function PrepareRenderSteps: Cardinal; override;
+    procedure CloseGL; override;
+
+    { Missile uses the same animation all the time.
+      In the simplest case, you can just place here a single scene. }
+    property Animation: TVRMLGLAnimation read FAnimation;
+
+    { This is moving speed --- how much Direction vector will be scaled
+      when moving. }
+    property MoveSpeed: Single read FMoveSpeed write FMoveSpeed
+      default DefaultMissileMoveSpeed;
+
+    { Missile must be generally considered as Flying, otherwise
+      it doesn't have much sense... Don't set Flying to false
+      for this class (because TMissileCreature may depend on it and never
+      cares to keep Direction horizontal). }
+    property Flying default true;
   end;
 
   TCreature = class
@@ -177,6 +218,10 @@ type
     FLife: Single;
     FMaxLife: Single;
 
+    { For gravity work. }
+    FallingDownStartHeight: Single;
+    FIsFallingDown: boolean;
+  protected
     { Return matrix that takes into account current LegsPosition and Direction.
       Multiply CurrentScene geometry by this matrix to get current geometry. }
     function SceneTransform: TMatrix4Single;
@@ -193,12 +238,11 @@ type
 
     { This checks collision with Player.BoundingBox, assuming that HeadPosition
       (and implied LegsPosition) is as given. }
-    function CollisionWithPlayer(
+    function HeadCollisionWithPlayer(
       const AssumeHeadPosition: TVector3Single): boolean;
 
-    { For gravity work. }
-    FallingDownStartHeight: Single;
-    FIsFallingDown: boolean;
+    function LegsCollisionWithPlayer(
+      const AssumeLegsPosition: TVector3Single): boolean;
   public
     { Constructor. Note for AnimationTime: usually I will take
       AnimationTime from global Level.AnimationTime, but in the case of
@@ -240,13 +284,17 @@ type
       (i.e., translated by LegsPosition).
 
       Note that all collision detection (MoveAllowed, GetCameraHeight)
+      when not Flying
       should be done using HeadPosition, and then appropriately translated
       back to LegsPosition. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
       are not Flying and have already fallen down on the ground) on the
       same level as the ground, so checking collisions versus LegsPosition
       is always vulnerable to accidentaly finding collision between LegsPosition
-      and the ground. }
+      and the ground.
+
+      For Flying creatures this is not a problem, they can use LegsPosition
+      surrounded by CameraRadius for collision detection. }
     function HeadPosition: TVector3Single;
 
     { Direction the creature is facing.
@@ -274,6 +322,9 @@ type
 
     { time of last FState change to wasAttack, taken from Level.AnimationTime. }
     LastAttackTime: Single;
+    { Set to true each time you enter wasAttack, set back to false
+      if ActualAttack was called. }
+    ActualAttackDone: boolean;
   public
     constructor Create(AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
@@ -290,12 +341,50 @@ type
     procedure Idle(const CompSpeed: Single); override;
 
     function CurrentScene: TVRMLFlatSceneGL; override;
+
+    { This is the method where you must actually do your attack
+      --- fire a missile, lower player's life etc.
+
+      This happens in the middle of AttackAnimation,
+      see also ActualAttackTime. Of course you should use
+      current creature LegsPosition, HeadPosition, Direction
+      etc. to determine things like missile starting position
+      and direction.
+
+      If creature is doing some short-range attack
+      you can also just lower here player's Life. Remember in this
+      case to check that player is close enough; in general situation,
+      you can't depend that player is still within AttackDistance
+      --- if ActualAttackTime is large, then player had some time
+      to back off between AttackAnimation was started and ActualAttack
+      is called. }
+    procedure ActualAttack; virtual; abstract;
+  end;
+
+  TBallThrowerCreature = class(TWalkAttackCreature)
+  public
+    procedure ActualAttack; override;
+  end;
+
+  { This is TCreature that has a kind always of TMissileCreatureKind. }
+  TMissileCreature = class(TCreature)
+  public
+    { Shortcut for TMissileCreatureKind(Kind). }
+    function MissileKind: TMissileCreatureKind;
+
+    procedure Idle(const CompSpeed: Single); override;
+
+    function CurrentScene: TVRMLFlatSceneGL; override;
+
+    procedure Explode;
   end;
 
 var
   CreaturesKinds: TCreaturesKindsList;
 
   Alien: TWalkAttackCreatureKind;
+
+  BallMissile: TMissileCreatureKind;
 
 {$undef read_interface}
 
@@ -435,6 +524,53 @@ begin
   if DyingAnimation <> nil then DyingAnimation.CloseGL;
 end;
 
+{ TMissileCreatureKind ---------------------------------------------------- }
+
+constructor TMissileCreatureKind.Create(
+  AAnimationInfo: TVRMLGLAnimationInfo);
+begin
+  inherited Create;
+  FAnimationInfo := AAnimationInfo;
+  Flying := true;
+  FMoveSpeed := DefaultMissileMoveSpeed;
+end;
+
+destructor TMissileCreatureKind.Destroy;
+begin
+  FreeAndNil(FAnimation);
+  FreeAndNil(FAnimationInfo);
+  inherited;
+end;
+
+procedure TMissileCreatureKind.PrepareRender;
+
+  procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
+    AnimInfo: TVRMLGLAnimationInfo);
+  begin
+    if Anim = nil then
+      Anim := AnimInfo.CreateAnimation;
+    Progress.Step;
+    Anim.PrepareRender(false, true);
+    Progress.Step;
+  end;
+
+begin
+  inherited;
+  CreateIfNeeded(FAnimation, FAnimationInfo);
+  CameraRadius := Box3dXYRadius(Animation.Scenes[0].BoundingBox);
+end;
+
+function TMissileCreatureKind.PrepareRenderSteps: Cardinal;
+begin
+  Result := (inherited PrepareRenderSteps) + 2;
+end;
+
+procedure TMissileCreatureKind.CloseGL;
+begin
+  inherited;
+  if Animation <> nil then Animation.CloseGL;
+end;
+
 { TCreature ------------------------------------------------------------------ }
 
 constructor TCreature.Create(AKind: TCreatureKind;
@@ -514,13 +650,20 @@ begin
   end;
 end;
 
-function TCreature.CollisionWithPlayer(
+function TCreature.HeadCollisionWithPlayer(
   const AssumeHeadPosition: TVector3Single): boolean;
 var
   AssumeLegsPosition: TVector3Single;
 begin
   AssumeLegsPosition := AssumeHeadPosition;
   AssumeLegsPosition[2] -= Height;
+  Result := Boxes3dCollision(
+    BoundingBoxAssuming(AssumeLegsPosition, Direction), Player.BoundingBox);
+end;
+
+function TCreature.LegsCollisionWithPlayer(
+  const AssumeLegsPosition: TVector3Single): boolean;
+begin
   Result := Boxes3dCollision(
     BoundingBoxAssuming(AssumeLegsPosition, Direction), Player.BoundingBox);
 end;
@@ -537,8 +680,8 @@ procedure TCreature.Idle(const CompSpeed: Single);
       LifeLoss := Max(0,
         (FallenHeight / 1.5) * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
       Life := Life - LifeLoss;
-      GameMessage(Format('Creature fallen down from %f, lost %f life',
-        [FallenHeight, LifeLoss]));
+      { Tests: GameMessage(Format('Creature fallen down from %f, lost %f life',
+        [FallenHeight, LifeLoss])); }
     end;
 
   var
@@ -553,7 +696,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
 
       Result := Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
         NewHeadPosition, true, Kind.CameraRadius) and
-        (not CollisionWithPlayer(NewHeadPosition));
+        (not HeadCollisionWithPlayer(NewHeadPosition));
 
       if Result then
       begin
@@ -668,7 +811,11 @@ begin
     FState := Value;
     StateChangeTime := Level.AnimationTime;
     if FState = wasAttack then
+    begin
+      { TODO: do a sound here, from WAKind.AttackSound }
       LastAttackTime := StateChangeTime;
+      ActualAttackDone := false;
+    end;
   end;
 end;
 
@@ -765,7 +912,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
         Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
         NewHeadPosition, false, Kind.CameraRadius) and
-        (not CollisionWithPlayer(NewHeadPosition)) then
+        (not HeadCollisionWithPlayer(NewHeadPosition)) then
       begin
         FLegsPosition := NewHeadPosition;
         FLegsPosition[2] -= Height;
@@ -806,6 +953,24 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       SetState(wasAttack);
   end;
 
+  procedure DoAttack;
+  var
+    StateTime: Single;
+  begin
+    StateTime := Level.AnimationTime - StateChangeTime;
+
+    if (not ActualAttackDone) and (StateTime >= WAKind.ActualAttackTime) then
+    begin
+      ActualAttackDone := true;
+      ActualAttack;
+    end;
+
+    if StateTime > WAKind.AttackAnimation.TimeEnd then
+      if WAKind.AttacksWhenWalking then
+        SetState(wasWalk) else
+        SetState(wasStand);
+  end;
+
 begin
   { TODO: as you see, actually AttacksWhenWalking is not used when going
     to wasAttack state. It's used only when going out from wasAttack state.
@@ -822,20 +987,7 @@ begin
           SetState(wasWalk);
       end;
     wasWalk: DoWalk;
-    wasAttack:
-      begin
-        { TODO: at some time when attacking, something should happen:
-          - maybe some missile should be created (somewhere between
-            HeadPosition and LegsPosition. Missile has Direction.)
-          - maybe player should lose some life (in this case, I should
-            check once again here that player is close enough) }
-
-        if Level.AnimationTime - StateChangeTime >
-          WAKind.AttackAnimation.TimeEnd then
-          if WAKind.AttacksWhenWalking then
-            SetState(wasWalk) else
-            SetState(wasStand);
-      end;
+    wasAttack: DoAttack;
     wasDying: ;
     else raise EInternalError.Create('FState ?');
   end;
@@ -864,6 +1016,62 @@ begin
       Result := WAKind.DyingAnimation.SceneFromTime(StateTime);
     else raise EInternalError.Create('FState ?');
   end;
+end;
+
+{ TBallThrowerCreature ------------------------------------------------------- }
+
+procedure TBallThrowerCreature.ActualAttack;
+const
+  FiringMissileHeight = 0.6;
+var
+  Missile: TMissileCreature;
+begin
+  { TODO: do a sound here, from WAKind.ActualAttackSound.
+    Or maybe Missile.Kind.FiringSound ? }
+
+  Missile := TMissileCreature.Create(BallMissile,
+    VLerp(FiringMissileHeight, LegsPosition, HeadPosition),
+    Direction, 1.0 { doesn't matter }, Level.AnimationTime);
+
+  Level.Creatures.Add(Missile);
+end;
+
+{ TMissileCreature ----------------------------------------------------------- }
+
+function TMissileCreature.MissileKind: TMissileCreatureKind;
+begin
+  Result := TMissileCreatureKind(Kind);
+end;
+
+procedure TMissileCreature.Idle(const CompSpeed: Single);
+var
+  NewLegsPosition: TVector3Single;
+begin
+  inherited;
+
+  NewLegsPosition := VectorAdd(LegsPosition,
+    VectorScale(Direction, MissileKind.MoveSpeed * CompSpeed));
+
+  if Level.MoveAllowedSimple(LegsPosition, NewLegsPosition,
+    false, Kind.CameraRadius) and
+    (not LegsCollisionWithPlayer(NewLegsPosition)) then
+  begin
+    FLegsPosition := NewLegsPosition;
+  end else
+    Explode;
+end;
+
+function TMissileCreature.CurrentScene: TVRMLFlatSceneGL;
+begin
+  Result := MissileKind.Animation.SceneFromTime(Level.AnimationTime);
+end;
+
+procedure TMissileCreature.Explode;
+begin
+  { TODO: sound of hit/explosion, from MissileKind.ExplosionSound }
+  { TODO: wound player if collides }
+  { TODO: wound creatures if collide }
+  GameMessage('bum');
 end;
 
 { initialization / finalization ---------------------------------------------- }
@@ -935,6 +1143,15 @@ begin
       [ 0 ],
       AnimScenesPerTime, AnimOptimization, false, false)
       { TODO -- dying animation }
+    );
+  Alien.ActualAttackTime := 0.4;
+
+  BallMissile := TMissileCreatureKind.Create(
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('ball_missile' + PathDelim + 'ball_missile_1_final.wrl'),
+        CreatureFileName('ball_missile' + PathDelim + 'ball_missile_2_final.wrl') ],
+      [ 0, 0.5 ],
+      AnimScenesPerTime, AnimOptimization, true, false)
     );
 end;
 

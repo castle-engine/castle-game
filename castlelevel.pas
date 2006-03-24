@@ -142,6 +142,11 @@ type
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean; virtual;
 
+    function MoveAllowedSimple(const CameraPos: TVector3Single;
+      const NewPos: TVector3Single;
+      const BecauseOfGravity: boolean;
+      const MovingObjectCameraRadius: Single): boolean;
+
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
       virtual;
@@ -494,7 +499,7 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
 
     { TODO --- TWalkAttackCreature, Alien configurable }
 
-    FCreatures.Add(TWalkAttackCreature.Create(Alien, CreaturePosition,
+    FCreatures.Add(TBallThrowerCreature.Create(Alien, CreaturePosition,
       CreatureDirection, CreatureMaxLife, AnimationTime));
   end;
 
@@ -535,6 +540,22 @@ begin
     Box3dPointInside(ProposedNewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveAllowed(
       CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius);
+end;
+
+function TLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
+  const NewPos: TVector3Single;
+  const BecauseOfGravity: boolean;
+  const MovingObjectCameraRadius: Single): boolean;
+var
+  ResultingNewPos: TVector3Single;
+begin
+  { TODO: simple implementation. I should rather call
+    Scene.DefaultTriangleOctree.MoveAllowedSimple here,
+    to not waste time. This means that MoveAllowedSimple will
+    also have to be overriden. }
+  Result := MoveAllowed(CameraPos, NewPos, ResultingNewPos,
+    BecauseOfGravity, MovingObjectCameraRadius) and
+    VectorsPerfectlyEqual(NewPos, ResultingNewPos);
 end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;

@@ -23,9 +23,13 @@ Highest priority goals for stage 4:
 - then do first boss
 
 - do also collision detection with creatures when *player* moves.
+
   Maybe player is able to "push" the creatures ?
   (add this fact to key-bindings then. Write also that you can
   push your creatures to force them to fall from high.)
+
+  This must depend on the creature. E.g. for missiles, collision
+  results in Explode.
 
 --------------------
 Would-be-nice before next stage:

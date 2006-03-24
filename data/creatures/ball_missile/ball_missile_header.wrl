@@ -4,7 +4,7 @@ Group {
   ShapeHints {
     creaseAngle 2
   }
-#   Scale {
-#     scaleFactor 2 2 2
-#   }
+  Scale {
+    scaleFactor 0.1 0.1 0.1
+  }
 }
