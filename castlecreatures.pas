@@ -29,6 +29,8 @@ uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
 
 type
   TCreatureKind = class
+  private
+    FFlying: boolean;
   public
     constructor Create;
 
@@ -40,6 +42,13 @@ type
 
     { Free any association with current OpenGL context. }
     procedure CloseGL; virtual;
+
+
+    { If @true, then the creature flies. Otherwise it always tries to move only
+      horizontally (which means that Direction is always orthogonal
+      to Level.HomeCameraUp), and it falls down when Position is above
+      the ground. }
+    property Flying: boolean read FFlying default false;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -74,7 +83,6 @@ type
 
     FAttacksWhenWalking: boolean;
     FMoveSpeed: Single;
-    FFlying: boolean;
     FCameraRadius: Single;
   public
     constructor Create(
@@ -134,12 +142,6 @@ type
     property MoveSpeed: Single read FMoveSpeed write FMoveSpeed
       default DefaultMoveSpeed;
 
-    { If @true, then the creature flies. Otherwise it always tries to move only
-      horizontally (which also means that Direction is always orthogonal
-      to Level.HomeCameraUp), and it falls down when Position is above
-      the ground. }
-    property Flying: boolean read FFlying default false;
-
     { Camera radius when moving. Initialized in PrepareRender,
       from StandAnimation.Scenes[0].BoundingBox. You can adjust it. }
     property CameraRadius: Single read FCameraRadius write FCameraRadius;
@@ -152,6 +154,11 @@ type
     FDirection: TVector3Single;
     FLife: Single;
     FMaxLife: Single;
+
+    { Returns BoundingBox, assuming that LegsPosition and Direction are
+      as specified here. }
+    function BoundingBoxAssuming(
+      const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
   public
     { Constructor. Note for AnimationTime: usually I will take
       AnimationTime from global Level.AnimationTime, but in the case of
@@ -171,11 +178,11 @@ type
 
     property Kind: TCreatureKind read FKind;
 
-    function BoundingBox: TBox3d; virtual; abstract;
+    function BoundingBox: TBox3d; virtual;
 
-    procedure Render(const Frustum: TFrustum); virtual; abstract;
+    procedure Render(const Frustum: TFrustum); virtual;
 
-    procedure Idle(const CompSpeed: Single); virtual; abstract;
+    procedure Idle(const CompSpeed: Single); virtual;
 
     function CurrentScene: TVRMLFlatSceneGL; virtual; abstract;
 
@@ -223,11 +230,6 @@ type
 
     { last FState change time, taken from Level.AnimationTime. }
     StateChangeTime: Single;
-
-    { Returns BoundingBox, assuming that LegsPosition and Direction are
-      as specified here. }
-    function BoundingBoxAssuming(
-      const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
   public
     constructor Create(AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
@@ -240,10 +242,6 @@ type
 
     property State: TWalkAttackCreatureState read FState
       default wasStand;
-
-    function BoundingBox: TBox3d; override;
-
-    procedure Render(const Frustum: TFrustum); override;
 
     procedure Idle(const CompSpeed: Single); override;
 
@@ -425,6 +423,52 @@ begin
   Result[2] += Height;
 end;
 
+function TCreature.BoundingBoxAssuming(
+  const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
+begin
+  { TODO: take into account AssumeDirection }
+  Result := Box3dTranslate(CurrentScene.BoundingBox, AssumeLegsPosition);
+end;
+
+function TCreature.BoundingBox: TBox3d;
+begin
+  Result := BoundingBoxAssuming(LegsPosition, Direction);
+end;
+
+procedure TCreature.Render(const Frustum: TFrustum);
+var
+  GoodCameraUp: TVector3Single;
+begin
+  if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
+  begin
+    glPushMatrix;
+
+      GoodCameraUp := UnitVector3Single[2];
+      { If not Flying, then we know that GoodCameraUp is already
+        orthogonal to Direction. }
+      if Kind.Flying then
+        MakeVectorsOrthoOnTheirPlane(GoodCameraUp, Direction);
+
+      { Note that actually I could do here TransformToCoordsNoScaleMatrix,
+        as obviously I don't want any scaling. But in this case I know
+        that Direction length = 1 and GoodCameraUp = 1 (so their product
+        length is also = 1), so no need to do
+        TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
+        on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
+      glMultMatrix(TransformToCoordsMatrix(LegsPosition,
+        Direction, VectorProduct(GoodCameraUp, Direction), GoodCameraUp));
+
+      CurrentScene.Render(nil);
+    glPopMatrix;
+  end;
+end;
+
+procedure TCreature.Idle(const CompSpeed: Single);
+begin
+  { TODO: When not Flying, gravity should drag monsters down.
+    Falling down should cause them some life loss. }
+end;
+
 { TCreatures ----------------------------------------------------------------- }
 
 procedure TCreaturesList.Render(const Frustum: TFrustum);
@@ -465,46 +509,6 @@ procedure TWalkAttackCreature.SetState(Value: TWalkAttackCreatureState);
 begin
   FState := Value;
   StateChangeTime := Level.AnimationTime;
-end;
-
-function TWalkAttackCreature.BoundingBoxAssuming(
-  const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
-begin
-  { TODO: take into account AssumeDirection }
-  Result := Box3dTranslate(CurrentScene.BoundingBox, AssumeLegsPosition);
-end;
-
-function TWalkAttackCreature.BoundingBox: TBox3d;
-begin
-  Result := BoundingBoxAssuming(LegsPosition, Direction);
-end;
-
-procedure TWalkAttackCreature.Render(const Frustum: TFrustum);
-var
-  GoodCameraUp: TVector3Single;
-begin
-  if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
-  begin
-    glPushMatrix;
-
-      GoodCameraUp := UnitVector3Single[2];
-      { If not Flying, then we know that GoodCameraUp is already
-        orthogonal to Direction. }
-      if WAKind.Flying then
-        MakeVectorsOrthoOnTheirPlane(GoodCameraUp, Direction);
-
-      { Note that actually I could do here TransformToCoordsNoScaleMatrix,
-        as obviously I don't want any scaling. But in this case I know
-        that Direction length = 1 and GoodCameraUp = 1 (so their product
-        length is also = 1), so no need to do
-        TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
-        on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
-      glMultMatrix(TransformToCoordsMatrix(LegsPosition,
-        Direction, VectorProduct(GoodCameraUp, Direction), GoodCameraUp));
-
-      CurrentScene.Render(nil);
-    glPopMatrix;
-  end;
 end;
 
 procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
@@ -614,9 +618,9 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         2. and orthogonal to HomeCameraUp if not Flying
         Otherwise rounding errors could accumulate and cause some nasty things.
 
-        Actually, I didn't observed anything bad caused by the above,
+        Actually, I didn't observe anything bad caused by the above,
         but I'm safeguarding anyway, for safety. }
-      if not WAKind.Flying then
+      if not Kind.Flying then
         MakeVectorsOrthoOnTheirPlane(Direction, Level.HomeCameraUp);
       NormalizeTo1st(Direction);
     end;
@@ -632,8 +636,7 @@ begin
     to wasAttack state. It's used only when going out from wasAttack state.
     Fix, or change docs. }
 
-  { TODO: When not Flying, gravity should drag monsters down.
-    Falling down should cause them some life loss. }
+  inherited;
 
   case FState of
     wasStand:
