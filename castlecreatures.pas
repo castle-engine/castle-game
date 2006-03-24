@@ -657,6 +657,27 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
   end;
 
   procedure DoWalk;
+
+    { Don't be stupid, and don't walk where you see you will fall down. }
+    function TooHighAboveTheGround(const NewHeadPosition: TVector3Single):
+      boolean;
+    const
+      MaxHeightAcceptableToFall = 2.0;
+    var
+      IsAboveTheGround: boolean;
+      SqrHeightAboveTheGround: Single;
+    begin
+      Result := false;
+      if not Kind.Flying then
+      begin
+        Level.GetCameraHeight(NewHeadPosition, IsAboveTheGround,
+          SqrHeightAboveTheGround);
+        if (not IsAboveTheGround) or
+          (SqrHeightAboveTheGround > Sqr(MaxHeightAcceptableToFall + Height)) then
+          Result := true;
+      end;
+    end;
+
   const
     AngleRadChangeSpeed = 0.1;
     MaxAngleToMoveForward = Pi / 3 { 60 degrees };
@@ -701,7 +722,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
       if Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
         NewHeadPosition, false, Kind.CameraRadius) and
-        (not CollisionWithPlayer(NewHeadPosition)) then
+        (not CollisionWithPlayer(NewHeadPosition)) and
+        (not TooHighAboveTheGround(NewHeadPosition)) then
       begin
         FLegsPosition := NewHeadPosition;
         FLegsPosition[2] -= Height;

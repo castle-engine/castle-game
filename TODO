@@ -23,6 +23,9 @@ Highest priority goals for stage 4:
 - then do first boss
 
 - do also collision detection with creatures when *player* moves.
+  Maybe player is able to "push" the creatures ?
+  (add this fact to key-bindings then. Write also that you can
+  push your creatures to force them to fall from high.)
 
 --------------------
 Would-be-nice before next stage:
@@ -30,6 +33,14 @@ Would-be-nice before next stage:
 - alien model anim must be changed: the corpse must actualy move while walking !
   Otherwise the effect is like "the legs walking, but the corpse is just
   floating constantly"
+
+- animation when creature is hurt
+
+- creatures still can climb high (almost-vertical) walls
+
+- AI preventing creatures from stepping somewhere where they will fall
+  doesn't work good enough. See basic_castle: creature still at some
+  point steps into the pit and falls down.
 
 --------------------
 - put some vertical crates around GlassPrison on basic_castle
@@ -40,7 +51,8 @@ Would-be-nice before next stage:
 - "shrink" spell (that was *coool* in DUKE 3D !)
   "freeze" (it's from DUKE 3D also)
   "fry"
-  "throw back" (throws all enemies slightly backward)
+  "throw back" (throws all enemies slightly backward --- this is also useful
+     for player to actually see that monsters get hurt when falling from high)
 
 - check with gprof, maybe I can speed up "loading creatures" process ?
 
