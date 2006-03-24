@@ -69,6 +69,8 @@ type
 
 const
   DefaultMoveSpeed = 0.2;
+  DefaultMinDelayBetweenAttacks = 5.0;
+  DefaultAttackDistance = 50.0;
 
 type
   { This is a TCreatureKind that has simple states:
@@ -91,6 +93,8 @@ type
 
     FAttacksWhenWalking: boolean;
     FMoveSpeed: Single;
+    FMinDelayBetweenAttacks: Single;
+    FAttackDistance: Single;
   public
     constructor Create(
       AStandAnimationInfo: TVRMLGLAnimationInfo;
@@ -148,6 +152,21 @@ type
       when moving in wasWalk. }
     property MoveSpeed: Single read FMoveSpeed write FMoveSpeed
       default DefaultMoveSpeed;
+
+    { Minimum delay between one attack and the other, in seconds.
+      Note that actually setting this to 0 doesn't do much ---
+      because minumum delay will still be bounded by the duration
+      of AttackAnimation. }
+    property MinDelayBetweenAttacks: Single
+      read FMinDelayBetweenAttacks write FMinDelayBetweenAttacks
+      default DefaultMinDelayBetweenAttacks;
+
+    { Maximum distance between player and creature to allow creature
+      to start attack. More precisely, this is measured between
+      Player.Navigator.CameraPos and creature's HeadPosition. }
+    property AttackDistance: Single
+      read FAttackDistance write FAttackDistance
+      default DefaultAttackDistance;
   end;
 
   TCreature = class
@@ -192,7 +211,8 @@ type
 
     { Current Life. Initially set from MaxLife.
       TODO: check when setting Life, optionally then change state to dying
-      for WalkAttackCreature. }
+      for WalkAttackCreature. Also creature should make some sound.
+      Also dead creatures should be at some point removed from the level? }
     property Life: Single read FLife write FLife;
 
     property MaxLife: Single read FMaxLife write FMaxLife;
@@ -251,6 +271,9 @@ type
 
     { last FState change time, taken from Level.AnimationTime. }
     StateChangeTime: Single;
+
+    { time of last FState change to wasAttack, taken from Level.AnimationTime. }
+    LastAttackTime: Single;
   public
     constructor Create(AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
@@ -291,6 +314,7 @@ constructor TCreatureKind.Create;
 begin
   inherited Create;
   CreaturesKinds.Add(Self);
+  FFlying := false;
 end;
 
 procedure TCreatureKind.PrepareRender;
@@ -350,7 +374,9 @@ begin
 
   FAttacksWhenWalking := false;
   MoveSpeed := DefaultMoveSpeed;
-  FFlying := false;
+
+  FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
+  FAttackDistance := DefaultAttackDistance;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -637,8 +663,13 @@ end;
 
 procedure TWalkAttackCreature.SetState(Value: TWalkAttackCreatureState);
 begin
-  FState := Value;
-  StateChangeTime := Level.AnimationTime;
+  if FState <> Value then
+  begin
+    FState := Value;
+    StateChangeTime := Level.AnimationTime;
+    if FState = wasAttack then
+      LastAttackTime := StateChangeTime;
+  end;
 end;
 
 procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
@@ -646,9 +677,10 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
   { Is attack allowed. Assumes that creature sees the player. }
   function AttackAllowed: boolean;
   begin
-    { TODO: from last attack more than MinDelayBetweenAttacks lasted,
-      and Player.Navigator.CameraPos is closer than AttackDistance }
-    Result := false;
+    Result := (Level.AnimationTime - LastAttackTime >
+      WAKind.MinDelayBetweenAttacks) and
+      (PointsDistanceSqr(Player.Navigator.CameraPos, HeadPosition) <=
+      Sqr(WAKind.AttackDistance));
   end;
 
   function SeesPlayer: boolean;
@@ -788,7 +820,8 @@ begin
           - maybe player should lose some life (in this case, I should
             check once again here that player is close enough) }
 
-        if StateChangeTime > WAKind.AttackAnimation.TimeEnd then
+        if Level.AnimationTime - StateChangeTime >
+          WAKind.AttackAnimation.TimeEnd then
           if WAKind.AttacksWhenWalking then
             SetState(wasWalk) else
             SetState(wasStand);
