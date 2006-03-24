@@ -561,7 +561,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     end;
 
   const
-    AngleRadChangeSpeed = 1.0;
+    AngleRadChangeSpeed = 0.1;
     MaxAngleToMoveForward = Pi / 3 { 60 degrees };
   var
     OldHeadPosition, NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
@@ -625,11 +625,9 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       { calculate AngleRadChange }
       AngleRadChange := AngleRadChangeSpeed * CompSpeed;
       MinTo1st(AngleRadChange, AngleRadBetweenGoodDirection);
-      if VectorProduct(Direction, DirectionToPlayer)[2] < 0 then
-        AngleRadChange := -AngleRadChange;
 
-      MakeVectorsAngleRadOnTheirPlane(Direction, DirectionToPlayer,
-        AngleRadChange);
+      Direction := RotatePointAroundAxisRad(AngleRadChange, Direction,
+        VectorProduct(Direction, DirectionToPlayer));
 
       { From time to time it's good to fix Direction, to make sure it's
         1. normalized,
