@@ -43,6 +43,15 @@ Would-be-nice before next stage:
   point steps into the pit and falls down.
 
 --------------------
+- I really don't like the "alien" model. It's generally nice,
+  but it doesn't fit this game, and I just can't texture it appropriately.
+  The basic model was just taken from www.3dcafe.com when I realized that
+  I don't have time to make some really nice creature model before
+  stage 4 deadline.
+
+  So this creature model is scheduled to be removed and replaced by something
+  better after stage 4 deadline.
+
 - put some vertical crates around GlassPrison on basic_castle
 
 - shadow under the creatures would be nice (sgk_shadows should allow
