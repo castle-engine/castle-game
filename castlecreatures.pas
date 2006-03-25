@@ -70,9 +70,9 @@ type
 const
   DefaultMoveSpeed = 0.2;
   DefaultMinDelayBetweenAttacks = 5.0;
-  DefaultAttackDistance = 50.0;
-  DefaultMissileMoveSpeed = 1.0;
-  DefaultMaxKnockedBackDistance = 6.0;
+  DefaultAttackDistance = 50.0 * 0.7;
+  DefaultMissileMoveSpeed = 1.0 * 0.7;
+  DefaultMaxKnockedBackDistance = 6.0 * 0.7;
 
 type
   { This is a TCreatureKind that has simple states:
@@ -749,8 +749,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
       FallenHeight := FallingDownStartHeight - LegsPosition[2];
       if FallenHeight > 1.0 then
       begin
-        LifeLoss := Max(0,
-          (FallenHeight / 1.5) * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
+        LifeLoss := Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
         Life := Life - LifeLoss;
         LastAttackDirection := ZeroVector3Single;
         { Tests: GameMessage(Format('Creature fallen down from %f, lost %f life',
@@ -1032,7 +1031,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     function TooHighAboveTheGround(const NewHeadPosition: TVector3Single):
       boolean;
     const
-      MaxHeightAcceptableToFall = 2.0;
+      MaxHeightAcceptableToFall = 2.0 * 0.7;
     var
       IsAboveTheGround: boolean;
       SqrHeightAboveTheGround: Single;
@@ -1136,7 +1135,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
   procedure DoHurt;
   const
-    KnockedBackSpeed = 1.0;
+    KnockedBackSpeed = 1.0 * 0.7;
   var
     StateTime: Single;
     OldHeadPosition, ProposedNewHeadPosition, NewHeadPosition: TVector3Single;
@@ -1449,7 +1448,7 @@ begin
       AnimScenesPerTime, AnimOptimization, false, true)
     );
   Werewolf.ActualAttackTime := 0.5;
-  Werewolf.AttackDistance := 6.0;
+  Werewolf.AttackDistance := 6.0 * 0.7;
   Werewolf.MinDelayBetweenAttacks := 2.0;
 
   BallMissile := TMissileCreatureKind.Create(

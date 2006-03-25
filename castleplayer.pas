@@ -563,16 +563,8 @@ end;
 procedure TPlayer.FalledDown(Navigator: TMatrixWalker;
   const FallenHeight: Single);
 begin
-  { Reasoning behind this formula:
-    found by looking at various level parts:
-    height 150 should take approx 100 life,
-    height < 4 should not take any damage,
-    height 20 should take some damage (that can cause redout but not deadly).
-
-    I'm adding some randomness. }
   if FallenHeight > 4 then
-    Life := Life - Max(0,
-      (FallenHeight / 1.5) * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
+    Life := Life - Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
 
   { Tests: GameMessage(Format('Falled down from %f', [FallenHeight])); }
 end;

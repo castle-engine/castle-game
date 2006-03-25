@@ -367,7 +367,7 @@ begin
 
   { Fix HomeCameraDir length. Uses CameraRadius and NavigationSpeed. }
   VectorAdjustToLengthTo1st(FHomeCameraDir, CameraRadius *
-    0.4 * { I multiply by 0.4 just to get the same thing
+    0.8 * { I multiply just to get the same thing
     that view3dscene does at this time. }
     NavigationSpeed);
 

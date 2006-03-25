@@ -7,7 +7,7 @@ Group {
   }
 
   NavigationInfo {
-    avatarSize [ 1, 2 ]
+    avatarSize [ 0.5, 2 ]
     speed 2
     headlight TRUE
   }

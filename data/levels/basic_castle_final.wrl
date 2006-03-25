@@ -14,8 +14,8 @@ Group{
   }
 
   NavigationInfo {
-    avatarSize [ 1.226, 2 ]
-    speed 1.5
+    avatarSize [ 0.5, 2 ]
+    speed 2
     headlight TRUE
   }
 
@@ -24,7 +24,7 @@ Group{
   }
 
   PerspectiveCamera {
-    position -1.983016014099121 -135.45912170410156 -1.249465584754944
+    position -1.3881112099 -94.8213851929 -0.8746259093
     orientation 0.999027609825134 0.031415648758411 0.030929347500205 1.571789145469666
   }
 

@@ -10,4 +10,8 @@ Group {
   # workaround it here. TODO: fix it better, i.e. just rotate blend
   # model and regenerate VRML files.
   Rotation { rotation 0 0 1 1.5707963268 }
+
+  Scale {
+    scaleFactor 0.7 0.7 0.7
+  }
 }
