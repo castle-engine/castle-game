@@ -158,6 +158,8 @@ type
       (i.e. they assume that it's the player who's moving).
       Use these to perform collision detection between player and the level.
 
+      In addition, PlayerMoveAllowed checks collisions with Creatures.
+
       @groupBegin }
     function PlayerMoveAllowed(Navigator: TMatrixWalker;
       const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
@@ -615,9 +617,38 @@ end;
 function TLevel.PlayerMoveAllowed(Navigator: TMatrixWalker;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
+var
+  I: Integer;
+  PlayerOldBoundingBox, PlayerNewBoundingBox: TBox3d;
 begin
   Result := MoveAllowed(Navigator.CameraPos, ProposedNewPos, NewPos,
     BecauseOfGravity, CameraRadius);
+
+  if Result then
+  begin
+    { check collision Player <-> Creatures here.
+
+      What's the reasoning behind PlayerOldBoundingBox and checking for
+      "not Boxes3dCollision(PlayerOldBoundingBox, Creatures[I].BoundingBox)" ?
+      That's because some parts of AI of TCreature are poor and not always
+      check for collision with player, e.g. when Animation changes
+      and effectively CurrentScene.BoundingBox changes.
+      Collision detection in such cases is not easy (because it's not known
+      what should we do on collision --- we can't just pause the animation...).
+      Anyway, because creature can enter into the collision with player,
+      player must not "get stuck" with this creature (because any potential
+      move collides with this creature), that's why I need
+      PlayerOldBoundingBox here. }
+    PlayerOldBoundingBox := Player.BoundingBox;
+    PlayerNewBoundingBox := Player.BoundingBoxAssuming(NewPos);
+    for I := 0 to Creatures.High do
+    begin
+      if (not (Creatures[I] is TMissileCreature) { TODO: not clean } ) and
+        Boxes3dCollision(PlayerNewBoundingBox, Creatures[I].BoundingBox) and
+        (not Boxes3dCollision(PlayerOldBoundingBox, Creatures[I].BoundingBox)) then
+        Exit(false);
+    end;
+  end;
 end;
 
 procedure TLevel.PlayerGetCameraHeight(Navigator: TMatrixWalker;

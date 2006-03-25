@@ -14,18 +14,14 @@ Would-be-nice before next stage:
 
 - creature<->creature collision is also needed
 
-- do also collision detection with creatures when *player* moves.
-
-  Maybe player is able to "push" the creatures ?
-  (add this fact to key-bindings then. Write also that you can
-  push your creatures to force them to fall from high.)
-
-  This must depend on the creature. E.g. for missiles, collision
-  results in Explode.
+- weapon-less attack (does knockback + small damage)
 
 - non-moving creature (just shooting etc.)
 
 --------------------
+- At the end of castle_hall, this doesn't look good now.
+  Usually player suddenly kills Werewolf and suddenly he falls down.
+
 - avoiding falling down sometimes doesn't work like it should.
   I think that I know why: I check where the creature will be after
   2 secs, but what if there is a pit between 2 secs and current pos ?

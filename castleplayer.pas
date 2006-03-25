@@ -23,7 +23,7 @@ unit CastlePlayer;
 
 interface
 
-uses Boxes3d, MatrixNavigation, CastleItems, OpenGLh;
+uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh;
 
 const
   DefaultMaxLife = 100;
@@ -179,6 +179,9 @@ type
       a message that he's no longer using that weapon. }
     function DeleteItem(ItemIndex: Integer): TItem;
 
+    { Like BoundingBox, but assumes that Navigator.CameraPos is as specified. }
+    function BoundingBoxAssuming(const AssumeCameraPos: TVector3Single): TBox3d;
+
     { Calculates what can be considered "bounding box of the player",
       taking into account global Level.CameRadius. Use for collision
       detection etc. }
@@ -231,7 +234,7 @@ implementation
 
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
-  GLWindow, KambiGLUtils, Images, VectorMath, KambiFilesUtils,
+  GLWindow, KambiGLUtils, Images, KambiFilesUtils,
   CastleSound, CastleKeys, VRMLGLAnimation;
 
 var
@@ -373,12 +376,13 @@ begin
     EquippedWeapon := nil;
 end;
 
-function TPlayer.BoundingBox: TBox3d;
+function TPlayer.BoundingBoxAssuming(const AssumeCameraPos: TVector3Single):
+  TBox3d;
 var
   PlayerSize: Single;
 begin
-  Result[0] := Player.Navigator.CameraPos;
-  Result[1] := Player.Navigator.CameraPos;
+  Result[0] := AssumeCameraPos;
+  Result[1] := AssumeCameraPos;
 
   PlayerSize := Level.CameraRadius;
 
@@ -389,6 +393,11 @@ begin
   Result[1, 0] += PlayerSize;
   Result[1, 1] += PlayerSize;
   Result[1, 2] += Level.CameraRadius;
+end;
+
+function TPlayer.BoundingBox: TBox3d;
+begin
+  Result := BoundingBoxAssuming(Player.Navigator.CameraPos);
 end;
 
 procedure TPlayer.SetEquippedWeapon(Value: TItem);
