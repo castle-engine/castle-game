@@ -1252,7 +1252,10 @@ end;
 procedure TWerewolfCreature.ActualAttack;
 begin
   { TODO: do a sound here, from WAKind.ActualAttackSound. }
-  { TODO: short-range attack do here }
+
+  if Boxes3dCollision(Box3dTranslate(BoundingBox, Direction),
+    Player.BoundingBox) then
+    Player.Life := Player.Life - 20 - Random(20);
 end;
 
 { TMissileCreature ----------------------------------------------------------- }
