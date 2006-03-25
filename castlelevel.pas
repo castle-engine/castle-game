@@ -215,7 +215,9 @@ type
   TCastleHallLevel = class(TLevel)
   private
     ButtonPressed: boolean;
-    AnimationOpenDownRotation: Single;
+    SymbolOpened: boolean;
+    WerewolfUnleashed: boolean;
+    AnimationOpenSymbolRotation: Single;
     AnimationButtonPress: Single;
     { TODO: now that TVRMLGLAnimation class is great,
       I should convert this to use Symbol (only 1 object and model needed)
@@ -246,6 +248,8 @@ type
 
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer); override;
+
+    procedure OpenSymbol;
   end;
 
 implementation
@@ -708,7 +712,7 @@ begin
       Pos1, Pos2, false, NoItemIndex, false,
       TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex);
 
-  if Result and (not ButtonPressed) then
+  if Result and (not SymbolOpened) then
   begin
     Result :=
       MakeSymbol(Symbol_TL) and
@@ -736,7 +740,7 @@ begin
     Button.DefaultTriangleOctree.MoveAllowedSimple(
       CameraPos, NewPos, MovingObjectCameraRadius);
 
-  if Result and (not ButtonPressed) then
+  if Result and (not SymbolOpened) then
   begin
     Result :=
       MakeSymbol(Symbol_TL) and
@@ -773,7 +777,7 @@ procedure TCastleHallLevel.GetCameraHeight(const CameraPos: TVector3Single;
 begin
   inherited GetCameraHeight(CameraPos, IsAboveTheGround, SqrHeightAboveTheGround);
 
-  if not ButtonPressed then
+  if not SymbolOpened then
   begin
     MakeBonusScene(Symbol_TL);
     MakeBonusScene(Symbol_BL);
@@ -793,7 +797,7 @@ procedure TCastleHallLevel.Render(const Frustum: TFrustum);
   begin
     glPushMatrix;
       glTranslatef(+TranslationX * SymbolSize, +TranslationY * SymbolSize, 0);
-      glRotatef(AnimationOpenDownRotation, RotationX, RotationY, 0);
+      glRotatef(AnimationOpenSymbolRotation, RotationX, RotationY, 0);
       glTranslatef(-TranslationX * SymbolSize, -TranslationY * SymbolSize, 0);
       { SymbolScene BoundingBox doesn't account for transformations abovem
         so we can't do here RenderFrustum, because this could make false
@@ -823,7 +827,7 @@ procedure TCastleHallLevel.Render(const Frustum: TFrustum);
   end;
 
 begin
-  if ButtonPressed then
+  if SymbolOpened then
   begin
     RenderRotated(Symbol_TL, +1, +1, -1, +1);
     RenderRotated(Symbol_BL, -1, +1, -1, -1);
@@ -848,7 +852,7 @@ end;
 
 procedure TCastleHallLevel.Idle(const CompSpeed: Single);
 const
-  MaxAnimationOpenDownRotation = 80;
+  MaxAnimationOpenSymbolRotation = 80;
   MinAnimationButtonPress = 0.5;
 begin
   inherited;
@@ -863,11 +867,21 @@ begin
       AnimationButtonPress := Max(MinAnimationButtonPress,
         AnimationButtonPress - 0.02 * CompSpeed);
     end else
+    if not WerewolfUnleashed then
     begin
-      if AnimationOpenDownRotation < MaxAnimationOpenDownRotation then
-        AnimationOpenDownRotation := Min(MaxAnimationOpenDownRotation,
-          AnimationOpenDownRotation + 0.1 * CompSpeed);
+      WerewolfUnleashed := true;
+      { TODO: sound of werewolf howling here }
+      Creatures.Add(TWerewolfCreature.Create(Werewolf,
+        Vector3Single(-1.86, -20.48, 2.33),
+        Vector3Single(0, 1, 0), 500, AnimationTime));
     end;
+  end;
+
+  if SymbolOpened then
+  begin
+    if AnimationOpenSymbolRotation < MaxAnimationOpenSymbolRotation then
+      AnimationOpenSymbolRotation := Min(MaxAnimationOpenSymbolRotation,
+        AnimationOpenSymbolRotation + 0.1 * CompSpeed);
   end;
 end;
 
@@ -899,13 +913,19 @@ begin
             GameMessage('Button is already pressed') else
           begin
             ButtonPressed := true;
-            GameMessage('You press the button. Level exit is uncovered');
+            GameMessage('You press the button');
+            GameMessage('Suddenly you hear a wolf howling somewhere near...');
             { TODO: sound: symbol moving stCastleHallSymbolMoving }
           end;
         end else
           GameMessage('You see a button. You cannot reach it from here');
       end;
   end;
+end;
+
+procedure TCastleHallLevel.OpenSymbol;
+begin
+  SymbolOpened := true;
 end;
 
 end.

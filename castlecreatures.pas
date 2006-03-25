@@ -419,6 +419,8 @@ type
   end;
 
   TWerewolfCreature = class(TWalkAttackCreature)
+  protected
+    procedure SetLife(const Value: Single); override;
   public
     procedure ActualAttack; override;
   end;
@@ -452,7 +454,8 @@ var
 implementation
 
 uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow,
-  VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay;
+  VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
+  CastleLevel;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -1256,6 +1259,17 @@ begin
   if Boxes3dCollision(Box3dTranslate(BoundingBox, Direction),
     Player.BoundingBox) then
     Player.Life := Player.Life - 20 - Random(20);
+end;
+
+procedure TWerewolfCreature.SetLife(const Value: Single);
+begin
+  if (Life > 0.0) and (Value <= 0.0) and (Level is TCastleHallLevel) then
+  begin
+    GameMessage('Level exit is uncovered');
+    TCastleHallLevel(Level).OpenSymbol;
+  end;
+
+  inherited;
 end;
 
 { TMissileCreature ----------------------------------------------------------- }
