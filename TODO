@@ -1,26 +1,18 @@
 --------------------
 Must-have before next stage:
 
-- Stage 4: Add A Boss System -- 25th Mar, 2006
-    * 10 Points -- Add a boss to your level that you fight to finish the level.
-
-- Stage 3: Feb 12th - Mar 4th
-  Goal #1 (5 Points) - Add basic enemies to game engine.
-
-Highest priority goals for stage 4:
-
 --------------------
 Would-be-nice before next stage:
 
+- At the end of castle_hall, this doesn't look good now.
+  Usually player suddenly kills Werewolf and suddenly he falls down.
+
+--------------------
 - creature<->creature collision is also needed
 
 - weapon-less attack (does knockback + small damage)
 
 - non-moving creature (just shooting etc.)
-
---------------------
-- At the end of castle_hall, this doesn't look good now.
-  Usually player suddenly kills Werewolf and suddenly he falls down.
 
 - avoiding falling down sometimes doesn't work like it should.
   I think that I know why: I check where the creature will be after

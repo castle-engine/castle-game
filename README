@@ -2,7 +2,28 @@
 
 --------------------
 PGD competition stage 4 short notes:
-- death sequence: yes
+- death sequence: yes.
+
+- enemies, boss: yes.
+
+  Actually I have only 2 enemies, one of which is the 1st boss. Not too much,
+  but preparing each enemy is quite a work (even if I get static 3d models
+  from other sources) --- all the animations of walk, attack, etc.
+  Actually there is a 3rd enemy, the ball_missile that is casted
+  by the "alien-like" creature. This missile is considered a special
+  kind of enemy by the code.
+
+  Still there are many things remaining to be done for enemies.
+  Some of the more important ones:
+  - More enemies attacks.
+  - Nice 3d effects (lighting-like things, explosions etc.).
+  - Creature vs other creature collision is needed.
+  - Models of the two current creatures need to be improved.
+    Model of "alien" creature will probably be just removed and replaced
+    by something else.
+  - Shadows under creatures.
+  - AI must be smarter in many cases.
+  - And, most of all, just do more creatures.
 
 --------------------
 Installing and running:
@@ -51,8 +72,8 @@ Sample levels included:
   just a testing level.
 
 "Castle hall" : this is the level made for PGD stage 3.
-  Walkthrough: just find and click the red button and level exit will be
-  revealed.
+  Walkthrough: find and click the red button. Kill the boss.
+  Level exit will be revealed.
 
 If you want to see other models demonstrating my engine, see
 [http://www.camelot.homedns.org/~michalis/miscella/kambi_vrml_examples.zip]
