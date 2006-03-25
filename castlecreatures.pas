@@ -1255,8 +1255,8 @@ procedure TWerewolfCreature.ActualAttack;
 begin
   { TODO: do a sound here, from WAKind.ActualAttackSound. }
 
-  if Boxes3dCollision(Box3dTranslate(BoundingBox, Direction),
-    Player.BoundingBox) then
+  if Boxes3dCollision(Box3dTranslate(BoundingBox,
+    VectorScale(Direction, WAKind.AttackDistance)), Player.BoundingBox) then
     Player.Life := Player.Life - 20 - Random(20);
 end;
 
