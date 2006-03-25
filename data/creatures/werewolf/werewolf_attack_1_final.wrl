@@ -1,7 +1,6 @@
 #VRML V1.0 ascii
 
 Group {
-  Translation { translation 0 0 0 }
   WWWInline { name "werewolf_header.wrl" separate FALSE }
   WWWInline { name "werewolf_attack_1.wrl" }
 }

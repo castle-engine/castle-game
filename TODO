@@ -12,9 +12,6 @@ Highest priority goals for stage 4:
 --------------------
 Would-be-nice before next stage:
 
-- werewolf hands should also move when werewolf walks
-  (so change walk_2 frame).
-
 - creature<->creature collision is also needed
 
 - do also collision detection with creatures when *player* moves.

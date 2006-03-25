@@ -1,17 +1,6 @@
 #VRML V1.0 ascii
 
 Group {
-  # werewolf_walk_2.wrl is actually already translated a little,
-  # to avoid the bad effect of "legs are moving and the corpse
-  # is moving with constant speed".
-  # But it's translated too little to be noticeable in the game,
-  # that's why here I translate it a little more.
-  #
-  # TODO: this is yet another thing that should be written in .blend
-  # file, not in this VRML, I just don't have time now to deal
-  # with it properly.
-  Translation { translation +1 0 0 }
-
   WWWInline { name "werewolf_header.wrl" separate FALSE }
   WWWInline { name "werewolf_walk_2.wrl" }
 }
