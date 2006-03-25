@@ -603,7 +603,7 @@ begin
     if Boxes3dCollision(C.BoundingBox, WeaponBoundingBox) then
     begin
       { TODO: some "throw back" for creature here ? }
-      C.Life := C.Life - 40 - Random(40);
+      C.Life := C.Life - 20 - Random(20);
       C.LastAttackDirection := Player.Navigator.CameraDir;
     end;
   end;
