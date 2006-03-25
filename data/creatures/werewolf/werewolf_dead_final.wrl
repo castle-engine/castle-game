@@ -1,0 +1,6 @@
+#VRML V1.0 ascii
+
+Group {
+  WWWInline { name "werewolf_header.wrl" separate FALSE }
+  WWWInline { name "werewolf_dead.wrl" }
+}
