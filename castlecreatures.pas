@@ -85,12 +85,14 @@ type
     FWalkAnimation: TVRMLGLAnimation;
     FAttackAnimation: TVRMLGLAnimation;
     FDyingAnimation: TVRMLGLAnimation;
+    FHurtAnimation: TVRMLGLAnimation;
 
     FStandAnimationInfo: TVRMLGLAnimationInfo;
     FStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
     FWalkAnimationInfo: TVRMLGLAnimationInfo;
     FAttackAnimationInfo: TVRMLGLAnimationInfo;
     FDyingAnimationInfo: TVRMLGLAnimationInfo;
+    FHurtAnimationInfo: TVRMLGLAnimationInfo;
 
     FAttacksWhenWalking: boolean;
     FMoveSpeed: Single;
@@ -103,7 +105,8 @@ type
       AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
       AWalkAnimationInfo: TVRMLGLAnimationInfo;
       AAttackAnimationInfo: TVRMLGLAnimationInfo;
-      ADyingAnimationInfo: TVRMLGLAnimationInfo);
+      ADyingAnimationInfo: TVRMLGLAnimationInfo;
+      AHurtAnimationInfo: TVRMLGLAnimationInfo);
 
     destructor Destroy; override;
 
@@ -145,6 +148,14 @@ type
       animations. Note that we can display this animation infinitely,
       so it must work good after Time > it's TimeEnd. }
     property DyingAnimation: TVRMLGLAnimation read FDyingAnimation;
+
+    { Animation when the creature will be hurt.
+      Beginning must be on time 0.
+      Beginning and end should *more-or-less* look like
+      any point of the stand/attack/walk animations.
+      Note that this animation will not loop, it will be played
+      for TimeDurationWithBack time. }
+    property HurtAnimation: TVRMLGLAnimation read FHurtAnimation;
 
     { See @link(AttackAnimation). }
     property AttacksWhenWalking: boolean
@@ -217,11 +228,12 @@ type
     FDirection: TVector3Single;
     FLife: Single;
     FMaxLife: Single;
+    FLastAttackDirection: TVector3Single;
+    procedure SetLastAttackDirection(const Value: TVector3Single);
 
     { For gravity work. }
     FallingDownStartHeight: Single;
     FIsFallingDown: boolean;
-    procedure SetLife(const Value: Single);
   protected
     { Return matrix that takes into account current LegsPosition and Direction.
       Multiply CurrentScene geometry by this matrix to get current geometry. }
@@ -244,6 +256,8 @@ type
 
     function LegsCollisionWithPlayer(
       const AssumeLegsPosition: TVector3Single): boolean;
+
+    procedure SetLife(const Value: Single); virtual;
   public
     { Constructor. Note for AnimationTime: usually I will take
       AnimationTime from global Level.AnimationTime, but in the case of
@@ -310,6 +324,15 @@ type
 
     { Shortcut for Life <= 0. }
     function Dead: boolean;
+
+    { Each time you decrease life of this creature, set this property.
+      This is the direction from where the attack came.
+      You can set this to (0, 0, 0) if there was no specific direction
+      of attack.
+
+      On set, this vector will be normalized. }
+    property LastAttackDirection: TVector3Single
+      read FLastAttackDirection write SetLastAttackDirection;
   end;
 
   TObjectsListItem_1 = TCreature;
@@ -322,7 +345,7 @@ type
     procedure RemoveFromLevel;
   end;
 
-  TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying);
+  TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying, wasHurt);
 
   { This is TCreature that has a kind always of TWalkAttackCreatureKind. }
   TWalkAttackCreature = class(TCreature)
@@ -338,6 +361,8 @@ type
     { Set to true each time you enter wasAttack, set back to false
       if ActualAttack was called. }
     ActualAttackDone: boolean;
+  protected
+    procedure SetLife(const Value: Single); override;
   public
     constructor Create(AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
@@ -468,7 +493,8 @@ constructor TWalkAttackCreatureKind.Create(
   AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
   AWalkAnimationInfo: TVRMLGLAnimationInfo;
   AAttackAnimationInfo: TVRMLGLAnimationInfo;
-  ADyingAnimationInfo: TVRMLGLAnimationInfo);
+  ADyingAnimationInfo: TVRMLGLAnimationInfo;
+  AHurtAnimationInfo: TVRMLGLAnimationInfo);
 begin
   inherited Create;
 
@@ -477,6 +503,7 @@ begin
   FWalkAnimationInfo := AWalkAnimationInfo;
   FAttackAnimationInfo := AAttackAnimationInfo;
   FDyingAnimationInfo := ADyingAnimationInfo;
+  FHurtAnimationInfo := AHurtAnimationInfo;
 
   FAttacksWhenWalking := false;
   MoveSpeed := DefaultMoveSpeed;
@@ -492,12 +519,14 @@ begin
   FreeAndNil(FWalkAnimation);
   FreeAndNil(FAttackAnimation);
   FreeAndNil(FDyingAnimation);
+  FreeAndNil(FHurtAnimation);
 
   FreeAndNil(FStandAnimationInfo);
   FreeAndNil(FStandToWalkAnimationInfo);
   FreeAndNil(FWalkAnimationInfo);
   FreeAndNil(FAttackAnimationInfo);
   FreeAndNil(FDyingAnimationInfo);
+  FreeAndNil(FHurtAnimationInfo);
 
   inherited;
 end;
@@ -522,13 +551,14 @@ begin
   CreateIfNeeded(FWalkAnimation       , FWalkAnimationInfo       );
   CreateIfNeeded(FAttackAnimation     , FAttackAnimationInfo     );
   CreateIfNeeded(FDyingAnimation      , FDyingAnimationInfo      );
+  CreateIfNeeded(FHurtAnimation       , FHurtAnimationInfo       );
 
   CameraRadius := Box3dXYRadius(StandAnimation.Scenes[0].BoundingBox);
 end;
 
 function TWalkAttackCreatureKind.PrepareRenderSteps: Cardinal;
 begin
-  Result := (inherited PrepareRenderSteps) + 10;
+  Result := (inherited PrepareRenderSteps) + 12;
 end;
 
 procedure TWalkAttackCreatureKind.CloseGL;
@@ -539,6 +569,7 @@ begin
   if WalkAnimation <> nil then WalkAnimation.CloseGL;
   if AttackAnimation <> nil then AttackAnimation.CloseGL;
   if DyingAnimation <> nil then DyingAnimation.CloseGL;
+  if HurtAnimation <> nil then HurtAnimation.CloseGL;
 end;
 
 { TMissileCreatureKind ---------------------------------------------------- }
@@ -694,11 +725,15 @@ procedure TCreature.Idle(const CompSpeed: Single);
       FallenHeight, LifeLoss: Single;
     begin
       FallenHeight := FallingDownStartHeight - LegsPosition[2];
-      LifeLoss := Max(0,
-        (FallenHeight / 1.5) * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
-      Life := Life - LifeLoss;
-      { Tests: GameMessage(Format('Creature fallen down from %f, lost %f life',
-        [FallenHeight, LifeLoss])); }
+      if FallenHeight > 1.0 then
+      begin
+        LifeLoss := Max(0,
+          (FallenHeight / 1.5) * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
+        Life := Life - LifeLoss;
+        LastAttackDirection := ZeroVector3Single;
+        { Tests: GameMessage(Format('Creature fallen down from %f, lost %f life',
+          [FallenHeight, LifeLoss])); }
+      end;
     end;
 
   var
@@ -802,6 +837,11 @@ end;
 function TCreature.Dead: boolean;
 begin
   Result := Life <= 0;
+end;
+
+procedure TCreature.SetLastAttackDirection(const Value: TVector3Single);
+begin
+  FLastAttackDirection := Normalized(Value);
 end;
 
 { TCreatures ----------------------------------------------------------------- }
@@ -1040,6 +1080,32 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         SetState(wasStand);
   end;
 
+  procedure DoHurt;
+  const
+    HurtMoveSpeed = 1.0;
+  var
+    StateTime: Single;
+    OldHeadPosition, ProposedNewHeadPosition, NewHeadPosition: TVector3Single;
+  begin
+    StateTime := Level.AnimationTime - StateChangeTime;
+
+    if StateTime > WAKind.HurtAnimation.TimeDurationWithBack then
+      SetState(wasStand) else
+    begin
+      OldHeadPosition := HeadPosition;
+      ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
+        VectorScale(LastAttackDirection, HurtMoveSpeed * CompSpeed));
+
+      if Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
+        NewHeadPosition, false, Kind.CameraRadius) and
+        (not HeadCollisionWithPlayer(NewHeadPosition)) then
+      begin
+        FLegsPosition := NewHeadPosition;
+        FLegsPosition[2] -= Height;
+      end;
+    end;
+  end;
+
 begin
   { TODO: as you see, actually AttacksWhenWalking is not used when going
     to wasAttack state. It's used only when going out from wasAttack state.
@@ -1055,6 +1121,7 @@ begin
     wasWalk: DoWalk;
     wasAttack: DoAttack;
     wasDying: ;
+    wasHurt: DoHurt;
     else raise EInternalError.Create('FState ?');
   end;
 end;
@@ -1080,8 +1147,17 @@ begin
       Result := WAKind.AttackAnimation.SceneFromTime(StateTime);
     wasDying:
       Result := WAKind.DyingAnimation.SceneFromTime(StateTime);
+    wasHurt:
+      Result := WAKind.HurtAnimation.SceneFromTime(StateTime);
     else raise EInternalError.Create('FState ?');
   end;
+end;
+
+procedure TWalkAttackCreature.SetLife(const Value: Single);
+begin
+  if Value < Life then
+    SetState(wasHurt);
+  inherited;
 end;
 
 { TBallThrowerCreature ------------------------------------------------------- }
@@ -1149,7 +1225,13 @@ begin
   { TODO: sound of hit/explosion, from MissileKind.ExplosionSound }
   { TODO: for some missiles, their explosion may hurt everyone around.
     So do here additional checks for collision and hurt player and creatures. }
+
   Life := 0.0;
+
+  { Actually in this case setting LastAttackDirection is not really needed
+    (TMissileCreature doesn't use it anyway), but I'm doing it for
+    consistency. }
+  LastAttackDirection := ZeroVector3Single;
 end;
 
 procedure TMissileCreature.ExplodeWithPlayer;
@@ -1231,8 +1313,13 @@ begin
       [ AlienFileName('alien_still_final.wrl'),
         AlienFileName('alien_dying_1_final.wrl'),
         AlienFileName('alien_dying_2_final.wrl') ],
-      [ 0.0, 0.5, 1.0 ],
-      AnimScenesPerTime, AnimOptimization, false, false)
+      [ 0.0, 0.1, 0.5 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
+    TVRMLGLAnimationInfo.Create(
+      [ AlienFileName('alien_still_final.wrl'),
+        AlienFileName('alien_dying_1_final.wrl') ],
+      [ 0.0, 0.1 ],
+      AnimScenesPerTime, AnimOptimization, false, true)
     );
   Alien.ActualAttackTime := 0.4;
 
