@@ -1,7 +1,8 @@
 Available keys:
 
 --------------------
-Basic movement keys:
+Basic keys:
+  Ctrl = attack
   Up / Down = move
   Left / Right = rotate
   PageUp / PageDown = raise / bow your head
@@ -10,12 +11,6 @@ Basic movement keys:
     in "Flying mode" : fly up / down
     not in "Flying mode" : jump / crouch
   Comma / Period = strafe move left / right
-
---------------------
-Other important keys:
-  F1 = show this help
-  Escape = exit
-  M = view all messages
 
 --------------------
 Commands related to items:
@@ -29,6 +24,15 @@ Commands related to items:
   Note that the items are automatically unequipped when you drop them.
 
 --------------------
+Other keys:
+  F1 = show this help
+  Escape = exit game
+  M = view all messages
+  C = cancel flying (useful only if you want to stop flying before flying spell will automatically wear off)
+  ` (backquote) = FPS show / hide
+  F5 = save screen to file castle_<int>.png
+
+--------------------
 Mouse:
   left mouse click on anything =
     show information about pointed item on the level,
@@ -37,11 +41,5 @@ Mouse:
 --------------------
 Testing (cheating) keys:
   L / Shift + L = life increase/decrease
-
---------------------
-Other keys:
-  C = cancel flying (useful only if you want to stop flying before flying spell will automatically wear off)
-  ` (backquote) = FPS show / hide
-  F5 = save screen to file castle_<int>.png
 
 --------------------

@@ -221,6 +221,7 @@ type
     { For gravity work. }
     FallingDownStartHeight: Single;
     FIsFallingDown: boolean;
+    procedure SetLife(const Value: Single);
   protected
     { Return matrix that takes into account current LegsPosition and Direction.
       Multiply CurrentScene geometry by this matrix to get current geometry. }
@@ -253,11 +254,8 @@ type
       const AMaxLife: Single;
       const AnimationTime: Single);
 
-    { Current Life. Initially set from MaxLife.
-      TODO: check when setting Life, optionally then change state to dying
-      for WalkAttackCreature. Also creature should make some sound.
-      Also dead creatures should be at some point removed from the level? }
-    property Life: Single read FLife write FLife;
+    { Current Life. Initially set from MaxLife. }
+    property Life: Single read FLife write SetLife;
 
     property MaxLife: Single read FMaxLife write FMaxLife;
 
@@ -309,6 +307,9 @@ type
       even dead creatures *may* still exist on level (e.g. to
       show DyingAnimation, or missile's explosion animation etc.) }
     function RemoveMeFromLevel: boolean; virtual;
+
+    { Shortcut for Life <= 0. }
+    function Dead: boolean;
   end;
 
   TObjectsListItem_1 = TCreature;
@@ -789,6 +790,20 @@ begin
   Result := false;
 end;
 
+procedure TCreature.SetLife(const Value: Single);
+begin
+  if (Life - Value) > MaxLife / 10 then
+  begin
+    { TODO; Sound(SoundCreatureSuddenPain); }
+  end;
+  FLife := Value;
+end;
+
+function TCreature.Dead: boolean;
+begin
+  Result := Life <= 0;
+end;
+
 { TCreatures ----------------------------------------------------------------- }
 
 procedure TCreaturesList.Render(const Frustum: TFrustum);
@@ -1032,6 +1047,9 @@ begin
 
   inherited;
 
+  if Dead then
+    SetState(wasDying);
+
   case FState of
     wasStand: DoStand;
     wasWalk: DoWalk;
@@ -1071,6 +1089,7 @@ end;
 procedure TBallThrowerCreature.ActualAttack;
 const
   FiringMissileHeight = 0.6;
+  MissileDefaultLife = 1.0;
 var
   Missile: TMissileCreature;
 begin
@@ -1080,7 +1099,7 @@ begin
   Missile := TMissileCreature.Create(BallMissile,
     VLerp(FiringMissileHeight, LegsPosition, HeadPosition),
     Normalized(VectorSubtract(Player.Navigator.CameraPos, HeadPosition)),
-    1.0 { MaxLife of missile doesn't matter }, Level.AnimationTime);
+    MissileDefaultLife, Level.AnimationTime);
 
   Level.Creatures.Add(Missile);
 end;
@@ -1209,10 +1228,11 @@ begin
       [ 0, 0.3, 0.6, 1.0 ],
       AnimScenesPerTime, AnimOptimization, false, false),
     TVRMLGLAnimationInfo.Create(
-      [ AlienFileName('alien_still_final.wrl') ],
-      [ 0 ],
+      [ AlienFileName('alien_still_final.wrl'),
+        AlienFileName('alien_dying_1_final.wrl'),
+        AlienFileName('alien_dying_2_final.wrl') ],
+      [ 0.0, 0.5, 1.0 ],
       AnimScenesPerTime, AnimOptimization, false, false)
-      { TODO -- dying animation }
     );
   Alien.ActualAttackTime := 0.4;
 

@@ -5,6 +5,6 @@ Group {
     creaseAngle 2
   }
   Scale {
-    scaleFactor 2 2 2
+    scaleFactor 2.5 2.5 2.5
   }
 }

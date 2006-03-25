@@ -3,7 +3,8 @@
 'Available keys:' + LineEnding + 
 '' + LineEnding + 
 '--------------------' + LineEnding + 
-'Basic movement keys:' + LineEnding + 
+'Basic keys:' + LineEnding + 
+'  Ctrl = attack' + LineEnding + 
 '  Up / Down = move' + LineEnding + 
 '  Left / Right = rotate' + LineEnding + 
 '  PageUp / PageDown = raise / bow your head' + LineEnding + 
@@ -12,12 +13,6 @@
 '    in "Flying mode" : fly up / down' + LineEnding + 
 '    not in "Flying mode" : jump / crouch' + LineEnding + 
 '  Comma / Period = strafe move left / right' + LineEnding + 
-'' + LineEnding + 
-'--------------------' + LineEnding + 
-'Other important keys:' + LineEnding + 
-'  F1 = show this help' + LineEnding + 
-'  Escape = exit' + LineEnding + 
-'  M = view all messages' + LineEnding + 
 '' + LineEnding + 
 '--------------------' + LineEnding + 
 'Commands related to items:' + LineEnding + 
@@ -31,6 +26,15 @@
 '  Note that the items are automatically unequipped when you drop them.' + LineEnding + 
 '' + LineEnding + 
 '--------------------' + LineEnding + 
+'Other keys:' + LineEnding + 
+'  F1 = show this help' + LineEnding + 
+'  Escape = exit game' + LineEnding + 
+'  M = view all messages' + LineEnding + 
+'  C = cancel flying (useful only if you want to stop flying before flying spell will automatically wear off)' + LineEnding + 
+'  ` (backquote) = FPS show / hide' + LineEnding + 
+'  F5 = save screen to file castle_<int>.png' + LineEnding + 
+'' + LineEnding + 
+'--------------------' + LineEnding + 
 'Mouse:' + LineEnding + 
 '  left mouse click on anything =' + LineEnding + 
 '    show information about pointed item on the level,' + LineEnding + 
@@ -39,12 +43,6 @@
 '--------------------' + LineEnding + 
 'Testing (cheating) keys:' + LineEnding + 
 '  L / Shift + L = life increase/decrease' + LineEnding + 
-'' + LineEnding + 
-'--------------------' + LineEnding + 
-'Other keys:' + LineEnding + 
-'  C = cancel flying (useful only if you want to stop flying before flying spell will automatically wear off)' + LineEnding + 
-'  ` (backquote) = FPS show / hide' + LineEnding + 
-'  F5 = save screen to file castle_<int>.png' + LineEnding + 
 '' + LineEnding + 
 '--------------------' + LineEnding + 
 ''

@@ -148,6 +148,7 @@ type
     FEquippingSound: TSoundType;
     FAttackAnimation: TVRMLGLAnimation;
     FAttackAnimationInfo: TVRMLGLAnimationInfo;
+    FActualAttackTime: Single;
   public
     { Constryctor. You can pass
       AAttackAnimationInfo = nil to get
@@ -198,6 +199,20 @@ type
     function PrepareRenderSteps: Cardinal; override;
 
     procedure CloseGL; override;
+
+    { This is the time point within AttackAnimation
+      at which ActualAttack method will be called.
+      Note that actually ActualAttack may be called a *very little* later
+      (hopefully it shouldn't be noticeable to the player). }
+    property ActualAttackTime: Single
+      read FActualAttackTime write FActualAttackTime default 0.0;
+
+    procedure ActualAttack(Item: TItem); virtual; abstract;
+  end;
+
+  TItemSwordKind = class(TItemWeaponKind)
+  public
+    procedure ActualAttack(Item: TItem); override;
   end;
 
   TItemScrollOfFlyingKind = class(TItemKind)
@@ -314,7 +329,7 @@ type
 var
   ItemsKinds: TItemKindsList;
 
-  Sword: TItemKind;
+  Sword: TItemSwordKind;
   LifePotion: TItemKind;
   ScrollOfFlying: TItemKind;
 
@@ -326,7 +341,8 @@ function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
-  KambiGLUtils, CastlePlay, KambiFilesUtils, ProgressUnit;
+  KambiGLUtils, CastlePlay, KambiFilesUtils, ProgressUnit,
+  CastleCreatures;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -569,6 +585,29 @@ begin
   if AttackAnimation <> nil then AttackAnimation.CloseGL;
 end;
 
+{ TItemSwordKind ------------------------------------------------------------- }
+
+procedure TItemSwordKind.ActualAttack(Item: TItem);
+var
+  WeaponBoundingBox: TBox3d;
+  I: Integer;
+  C: TCreature;
+begin
+  WeaponBoundingBox := Box3dTranslate(Player.BoundingBox,
+    VectorAdjustToLength(Player.Navigator.CameraDir, 1.0));
+  { Tests: Writeln('WeaponBoundingBox is ', Box3dToNiceStr(WeaponBoundingBox)); }
+  for I := 0 to Level.Creatures.High do
+  begin
+    C := Level.Creatures[I];
+    { Tests: Writeln('Creature bbox is ', Box3dToNiceStr(C.BoundingBox)); }
+    if Boxes3dCollision(C.BoundingBox, WeaponBoundingBox) then
+    begin
+      { TODO: some "throw back" for creature here ? }
+      C.Life := C.Life - 40 - Random(40);
+    end;
+  end;
+end;
+
 { TItemScrollOfFlyingKind ---------------------------------------------------- }
 
 procedure TItemScrollOfFlyingKind.Use(Item: TItem);
@@ -764,13 +803,14 @@ begin
 
   ItemsKinds := TItemKindsList.Create;
 
-  Sword := TItemWeaponKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
+  Sword := TItemSwordKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
     'sword.png', false, true, stEquippingSword,
     TVRMLGLAnimationInfo.Create(
       [ SwordAnimFileName('sword_1.wrl'),
         SwordAnimFileName('sword_2.wrl') ],
       [ 0, 0.5 ],
       30, roSceneAsAWhole, false, false));
+  Sword.ActualAttackTime := MapRange(0.0, -1.0, +0.7, 0.0, 0.5);
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
     'LifePotion', 'Potion of Life', 'life_potion.png');

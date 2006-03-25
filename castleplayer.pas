@@ -83,10 +83,18 @@ type
     procedure FalledDown(Navigator: TMatrixWalker; const FallenHeight: Single);
     procedure SetLife(const Value: Single);
 
-    { This means that weapon AttackAnimation is being done. }
+    { This means that weapon AttackAnimation is being done.
+      This also means that EquippedWeapon <> nil. }
     Attacking: boolean;
     { If Attacking, then this is time of attack start, from Level.AnimationTime. }
     AttackStartTime: Single;
+    { If Attacking, then this says whether EquippedWeapon.Kind.ActualAttack
+      was already called. }
+    ActualAttackDone: boolean;
+
+    { Shortcut for TItemWeaponKind(EquippedWeapon.Kind).
+      Call this only when EquippedWeapon <> nil. }
+    function EquippedWeaponKind: TItemWeaponKind;
   public
     constructor Create;
     destructor Destroy; override;
@@ -390,8 +398,11 @@ begin
     FEquippedWeapon := Value;
     if EquippedWeapon = nil then
       GameMessage('You''re no longer using your weapon') else
+    begin
       GameMessage(Format('You''re using weapon "%s" now',
         [EquippedWeapon.Kind.Name]));
+      Assert(EquippedWeapon.Kind is TItemWeaponKind);
+    end;
 
     { Any attack done with previous weapon must be stopped now. }
     Attacking := false;
@@ -529,6 +540,13 @@ begin
 
   if BlackOutIntensity > 0 then
     BlackOutIntensity -= 0.04 * Glw.FpsCompSpeed;
+
+  if Attacking and (not ActualAttackDone) and (Level.AnimationTime -
+    AttackStartTime >= EquippedWeaponKind.ActualAttackTime) then
+  begin
+    ActualAttackDone := true;
+    EquippedWeaponKind.ActualAttack(EquippedWeapon);
+  end;
 end;
 
 procedure TPlayer.BlackOut(const Color: TVector3f);
@@ -591,6 +609,7 @@ begin
       { TODO: sound of attack }
       AttackStartTime := Level.AnimationTime;
       Attacking := true;
+      ActualAttackDone := false;
     end else
       { TODO: maybe I should allow him to do some "punch" / "kick" here ? }
       GameMessage('No weapon equipped');
@@ -600,7 +619,7 @@ end;
 procedure TPlayer.RenderWeapon2D;
 begin
   if (EquippedWeapon <> nil) and (not Attacking) then
-    glCallList((EquippedWeapon.Kind as TItemWeaponKind).GLList_DrawScreenImage);
+    glCallList(EquippedWeaponKind.GLList_DrawScreenImage);
 end;
 
 procedure TPlayer.RenderAttack;
@@ -611,7 +630,7 @@ begin
   if Attacking then
   begin
     AttackTime := Level.AnimationTime - AttackStartTime;
-    Anim := (EquippedWeapon.Kind as TItemWeaponKind).AttackAnimation;
+    Anim := EquippedWeaponKind.AttackAnimation;
     if AttackTime <= Anim.TimeEnd then
     begin
       glClear(GL_DEPTH_BUFFER_BIT);
@@ -620,6 +639,11 @@ begin
     end else
       Attacking := false;
   end;
+end;
+
+function TPlayer.EquippedWeaponKind: TItemWeaponKind;
+begin
+  Result := TItemWeaponKind(EquippedWeapon.Kind);
 end;
 
 { GLWindow init / close ------------------------------------------------------ }
