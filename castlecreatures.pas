@@ -934,10 +934,60 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     Result := Level.LineOfSight(HeadPosition, Player.Navigator.CameraPos);
   end;
 
+  procedure CalculateDirectionToPlayer(var DirectionToPlayer: TVector3Single;
+    var AngleRadBetweenGoodDirection: Single);
+  begin
+    { calculate DirectionToPlayer }
+    DirectionToPlayer := VectorSubtract(Player.Navigator.CameraPos, HeadPosition);
+    if not Kind.Flying then
+      MakeVectorsOrthoOnTheirPlane(DirectionToPlayer, Level.HomeCameraUp);
+
+    { calculate AngleRadBetweenGoodDirection }
+    AngleRadBetweenGoodDirection := AngleRadBetweenVectors(DirectionToPlayer,
+      Direction);
+  end;
+
+  procedure RotateDirectionToFacePlayer(const DirectionToPlayer: TVector3Single;
+    const AngleRadBetweenGoodDirection: Single);
+  const
+    AngleRadChangeSpeed = 0.1;
+  var
+    AngleRadChange: Single;
+  begin
+    if not VectorsParallel(DirectionToPlayer, Direction) then
+    begin
+      { Rotate Direction, to be closer to DirectionToPlayer }
+
+      { calculate AngleRadChange }
+      AngleRadChange := AngleRadChangeSpeed * CompSpeed;
+      MinTo1st(AngleRadChange, AngleRadBetweenGoodDirection);
+
+      Direction := RotatePointAroundAxisRad(AngleRadChange, Direction,
+        VectorProduct(Direction, DirectionToPlayer));
+
+      { From time to time it's good to fix Direction, to make sure it's
+        1. normalized,
+        2. and orthogonal to HomeCameraUp if not Flying
+        Otherwise rounding errors could accumulate and cause some nasty things.
+
+        Actually, I didn't observe anything bad caused by the above,
+        but I'm safeguarding anyway, for safety. }
+      if not Kind.Flying then
+        MakeVectorsOrthoOnTheirPlane(FDirection, Level.HomeCameraUp);
+      NormalizeTo1st(FDirection);
+    end;
+  end;
+
   procedure DoStand;
+  var
+    DirectionToPlayer: TVector3Single;
+    AngleRadBetweenGoodDirection: Single;
   begin
     if SeesPlayer then
     begin
+      CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
+      RotateDirectionToFacePlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
+
       if AttackAllowed then
         SetState(wasAttack) else
         SetState(wasWalk);
@@ -967,18 +1017,12 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     end;
 
   const
-    AngleRadChangeSpeed = 0.1;
     MaxAngleToMoveForward = Pi / 3 { 60 degrees };
   var
     OldHeadPosition, NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
     DirectionToPlayer: TVector3Single;
-    AngleRadBetweenGoodDirection, AngleRadChange: Single;
+    AngleRadBetweenGoodDirection: Single;
   begin
-    { calculate DirectionToPlayer }
-    DirectionToPlayer := VectorSubtract(Player.Navigator.CameraPos, HeadPosition);
-    if not Kind.Flying then
-      MakeVectorsOrthoOnTheirPlane(DirectionToPlayer, Level.HomeCameraUp);
-
     { If creature is ideally under/above the player and if creature can't
       move vertically, then there is no way to get to the player.
       So there is no sense in moving or rotating creature now. }
@@ -997,8 +1041,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       Exit;
     end;
 
-    AngleRadBetweenGoodDirection := AngleRadBetweenVectors(DirectionToPlayer,
-      Direction);
+    CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
 
     { If AngleRadBetweenGoodDirection is too large, there is not much point
       in moving in given direction anyway. We should just change our Direction. }
@@ -1033,28 +1076,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       end;
     end;
 
-    if not VectorsParallel(DirectionToPlayer, Direction) then
-    begin
-      { Rotate Direction, to be closer to DirectionToPlayer }
-
-      { calculate AngleRadChange }
-      AngleRadChange := AngleRadChangeSpeed * CompSpeed;
-      MinTo1st(AngleRadChange, AngleRadBetweenGoodDirection);
-
-      Direction := RotatePointAroundAxisRad(AngleRadChange, Direction,
-        VectorProduct(Direction, DirectionToPlayer));
-
-      { From time to time it's good to fix Direction, to make sure it's
-        1. normalized,
-        2. and orthogonal to HomeCameraUp if not Flying
-        Otherwise rounding errors could accumulate and cause some nasty things.
-
-        Actually, I didn't observe anything bad caused by the above,
-        but I'm safeguarding anyway, for safety. }
-      if not Kind.Flying then
-        MakeVectorsOrthoOnTheirPlane(Direction, Level.HomeCameraUp);
-      NormalizeTo1st(Direction);
-    end;
+    RotateDirectionToFacePlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
 
     if not SeesPlayer then
       SetState(wasStand) else
@@ -1155,7 +1177,7 @@ end;
 
 procedure TWalkAttackCreature.SetLife(const Value: Single);
 begin
-  if Value < Life then
+  if (not Dead) and (Value < Life) then
     SetState(wasHurt);
   inherited;
 end;
