@@ -24,7 +24,8 @@ unit CastleItems;
 interface
 
 uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
-  KambiClassUtils, Images, OpenGLh, CastleSound;
+  KambiClassUtils, Images, OpenGLh, CastleSound,
+  VRMLGLAnimation, VRMLGLAnimationInfo;
 
 {$define read_interface}
 
@@ -115,8 +116,22 @@ type
       to account the fact that Scene may be rotated around +Z vector. }
     function BoundingBoxRotated: TBox3d;
 
+    { Prepare anything needed when starting new game.
+      It can call Progress.Step PrepareRenderSteps times. }
+    procedure PrepareRender; virtual;
+
+    function PrepareRenderSteps: Cardinal; virtual;
+
     { Free any association with current OpenGL context. }
     procedure CloseGL; virtual;
+  end;
+
+  TObjectsListItem_3 = TItemKind;
+  {$I objectslist_3.inc}
+  TItemKindsList = class(TObjectsList_3)
+    { Calls PrepareRender for all items.
+      This does Progress.Init, Step, Fini. }
+    procedure PrepareRender;
   end;
 
   TItemPotionOfLifeKind = class(TItemKind)
@@ -131,11 +146,17 @@ type
     FScreenImageAlignLeft: boolean;
     FScreenImageAlignBottom : boolean;
     FEquippingSound: TSoundType;
+    FAttackAnimation: TVRMLGLAnimation;
+    FAttackAnimationInfo: TVRMLGLAnimationInfo;
   public
+    { Constryctor. You can pass
+      AAttackAnimationInfo = nil to get
+      AAttackAnimation = nil. }
     constructor Create(const AModelFileName, AVRMLNodeName, AName,
       AImageFileName, AScreenImageFileName: string;
       AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
-      AEquippingSound: TSoundType);
+      AEquippingSound: TSoundType;
+      AAttackAnimationInfo: TVRMLGLAnimationInfo);
     destructor Destroy; override;
 
     { Because whole screen is quite large, we want our ScreenImage
@@ -165,7 +186,18 @@ type
       equipping sound. }
     property EquippingSound: TSoundType read FEquippingSound;
 
+    { This is an animation of attack with this weapon.
+      TimeBegin must be 0. }
+    property AttackAnimation: TVRMLGLAnimation
+      read FAttackAnimation;
+
     procedure Use(Item: TItem); override;
+
+    procedure PrepareRender; override;
+
+    function PrepareRenderSteps: Cardinal; override;
+
+    procedure CloseGL; override;
   end;
 
   TItemScrollOfFlyingKind = class(TItemKind)
@@ -280,6 +312,8 @@ type
   end;
 
 var
+  ItemsKinds: TItemKindsList;
+
   Sword: TItemKind;
   LifePotion: TItemKind;
   ScrollOfFlying: TItemKind;
@@ -292,14 +326,12 @@ function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
-  KambiGLUtils, CastlePlay, KambiFilesUtils;
+  KambiGLUtils, CastlePlay, KambiFilesUtils, ProgressUnit;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
 {$I objectslist_2.inc}
-
-var
-  CreatedItemKinds: TList;
+{$I objectslist_3.inc}
 
 { TItemKind ------------------------------------------------------------ }
 
@@ -311,7 +343,7 @@ begin
   FVRMLNodeName := AVRMLNodeName;
   FName := AName;
   FImageFileName := AImageFileName;
-  CreatedItemKinds.Add(Self);
+  ItemsKinds.Add(Self);
 end;
 
 destructor TItemKind.Destroy;
@@ -386,10 +418,43 @@ begin
   Result := FBoundingBoxRotated;
 end;
 
+procedure TItemKind.PrepareRender;
+begin
+  Scene.PrepareRender(false, true);
+end;
+
+function TItemKind.PrepareRenderSteps: Cardinal;
+begin
+  Result := 1;
+end;
+
 procedure TItemKind.CloseGL;
 begin
   if FScene <> nil then
     FScene.CloseGL;
+end;
+
+{ TItemKindsList ------------------------------------------------------------- }
+
+procedure TItemKindsList.PrepareRender;
+var
+  I: Integer;
+  PrepareRenderSteps: Cardinal;
+begin
+  PrepareRenderSteps := 0;
+  for I := 0 to High do
+    PrepareRenderSteps +=  Items[I].PrepareRenderSteps;
+
+  { I'm turning UseDescribePosition to false, because it's confusing for
+    the user (because each item is conted as PrepareRenderSteps steps. }
+  Progress.UseDescribePosition := false;
+  try
+    Progress.Init(PrepareRenderSteps, 'Loading items');
+    try
+      for I := 0 to High do
+        Items[I].PrepareRender;
+    finally Progress.Fini; end;
+  finally Progress.UseDescribePosition := true; end;
 end;
 
 { TItemPotionOfLifeKind ---------------------------------------------------- }
@@ -411,7 +476,8 @@ end;
 constructor TItemWeaponKind.Create(const AModelFileName, AVRMLNodeName, AName,
   AImageFileName, AScreenImageFileName: string;
   AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
-  AEquippingSound: TSoundType);
+  AEquippingSound: TSoundType;
+  AAttackAnimationInfo: TVRMLGLAnimationInfo);
 begin
   inherited Create(AModelFileName, AVRMLNodeName, AName,
     AImageFileName);
@@ -419,10 +485,13 @@ begin
   FScreenImageAlignLeft := AScreenImageAlignLeft;
   FScreenImageAlignBottom := AScreenImageAlignBottom;
   FEquippingSound := AEquippingSound;
+  FAttackAnimationInfo := AAttackAnimationInfo;
 end;
 
 destructor TItemWeaponKind.Destroy;
 begin
+  FreeAndNil(FAttackAnimation);
+  FreeAndNil(FAttackAnimationInfo);
   FreeAndNil(FScreenImage);
   inherited;
 end;
@@ -469,6 +538,35 @@ procedure TItemWeaponKind.Use(Item: TItem);
 begin
   Player.EquippedWeapon := Item;
   Sound(EquippingSound);
+end;
+
+procedure TItemWeaponKind.PrepareRender;
+
+  procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
+    AnimInfo: TVRMLGLAnimationInfo);
+  begin
+    if (AnimInfo <> nil) and (Anim = nil) then
+      Anim := AnimInfo.CreateAnimation;
+    Progress.Step;
+    if Anim <> nil then
+      Anim.PrepareRender(false, true);
+    Progress.Step;
+  end;
+
+begin
+  inherited;
+  CreateIfNeeded(FAttackAnimation, FAttackAnimationInfo);
+end;
+
+function TItemWeaponKind.PrepareRenderSteps: Cardinal;
+begin
+  Result := (inherited PrepareRenderSteps) + 2;
+end;
+
+procedure TItemWeaponKind.CloseGL;
+begin
+  inherited;
+  if AttackAnimation <> nil then AttackAnimation.CloseGL;
 end;
 
 { TItemScrollOfFlyingKind ---------------------------------------------------- }
@@ -623,9 +721,9 @@ function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 var
   I: Integer;
 begin
-  for I := 0 to CreatedItemKinds.Count - 1 do
+  for I := 0 to ItemsKinds.Count - 1 do
   begin
-    Result := TItemKind(CreatedItemKinds.Items[I]);
+    Result := ItemsKinds.Items[I];
     if Result.VRMLNodeName = VRMLNodeName then
       Exit;
   end;
@@ -638,29 +736,41 @@ procedure GLWindowClose(Glwin: TGLWindow);
 var
   I: Integer;
 begin
-  { In fact, CreatedItemKinds will always be nil here, because
+  { In fact, ItemsKinds will always be nil here, because
     GLWindowClose will be called from CastleWindow unit finalization
     that will be done after this unit's finalization (DoFinalization).
 
     That's OK --- DoFinalization already freed
-    every item on CreatedItemKinds.Items, and this implicitly did CloseGL,
+    every item on ItemsKinds, and this implicitly did CloseGL,
     so everything is OK. }
 
-  if CreatedItemKinds <> nil then
+  if ItemsKinds <> nil then
   begin
-    for I := 0 to CreatedItemKinds.Count - 1 do
-      TItemKind(CreatedItemKinds.Items[I]).CloseGL;
+    for I := 0 to ItemsKinds.Count - 1 do
+      ItemsKinds[I].CloseGL;
   end;
 end;
 
 procedure DoInitialization;
+
+  function SwordAnimFileName(const ModelFileName: string): string;
+  begin
+    Result := ProgramDataPath + 'data' + PathDelim +
+      'items' + PathDelim + 'attack_animations' + PathDelim + ModelFileName;
+  end;
+
 begin
   Glw.OnCloseList.AppendItem(@GLWindowClose);
 
-  CreatedItemKinds := TList.Create;
+  ItemsKinds := TItemKindsList.Create;
 
   Sword := TItemWeaponKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
-    'sword.png', false, true, stEquippingSword);
+    'sword.png', false, true, stEquippingSword,
+    TVRMLGLAnimationInfo.Create(
+      [ SwordAnimFileName('sword_1.wrl'),
+        SwordAnimFileName('sword_2.wrl') ],
+      [ 0, 0.5 ],
+      30, roSceneAsAWhole, false, false));
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
     'LifePotion', 'Potion of Life', 'life_potion.png');
@@ -670,12 +780,8 @@ begin
 end;
 
 procedure DoFinalization;
-var
-  I: Integer;
 begin
-  for I := 0 to CreatedItemKinds.Count - 1 do
-    TItemKind(CreatedItemKinds.Items[I]).Free;
-  FreeAndNil(CreatedItemKinds);
+  FreeWithContentsAndNil(ItemsKinds);
 end;
 
 initialization

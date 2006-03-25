@@ -53,7 +53,7 @@ type
       @item(Increasing Life (further decreasing Life is OK).
         Note that this means that once Player is Dead, (s)he cannot
         be alive again.)
-      @item Changing EquippedWeapon.
+      @item Changing EquippedWeapon, calling Attack.
     )
 
     Some other things in other units are also forbidden, see there for docs.
@@ -82,6 +82,11 @@ type
 
     procedure FalledDown(Navigator: TMatrixWalker; const FallenHeight: Single);
     procedure SetLife(const Value: Single);
+
+    { This means that weapon AttackAnimation is being done. }
+    Attacking: boolean;
+    { If Attacking, then this is time of attack start, from Level.AnimationTime. }
+    AttackStartTime: Single;
   public
     constructor Create;
     destructor Destroy; override;
@@ -183,8 +188,11 @@ type
       GameMessage about using/not using a weapon. }
     property EquippedWeapon: TItem read FEquippedWeapon write SetEquippedWeapon;
 
-    { Render 2D things of player. }
+    { Render 2D things (but not weapon) of the player. }
     procedure Render2D;
+
+    { Render 2D weapon of the player. }
+    procedure RenderWeapon2D;
 
     { Adjust some things based on passing time.
       For now, this is for things like FlyingModeTimeout to "wear out". }
@@ -202,6 +210,13 @@ type
 
     { Just a shortcut for Life <= 0. }
     function Dead: boolean;
+
+    procedure Attack;
+
+    { This will render player's weapon attacking.
+      This is a 3D rendering. Note that this may clear depth buffer
+      and set matrix to identity. }
+    procedure RenderAttack;
   end;
 
 implementation
@@ -209,7 +224,7 @@ implementation
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, VectorMath, KambiFilesUtils,
-  CastleSound, CastleKeys;
+  CastleSound, CastleKeys, VRMLGLAnimation;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -228,6 +243,7 @@ begin
   FNavigator := TMatrixWalker.Create(nil);
   Navigator.Key_MoveSpeedInc := K_None; { turn key off }
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
+  Navigator.AllowSlowerRotations := false;
   Navigator.OnFalledDown := FalledDown;
 
   { Although it will be called in every OnIdle anyway,
@@ -376,6 +392,9 @@ begin
       GameMessage('You''re no longer using your weapon') else
       GameMessage(Format('You''re using weapon "%s" now',
         [EquippedWeapon.Kind.Name]));
+
+    { Any attack done with previous weapon must be stopped now. }
+    Attacking := false;
   end;
 end;
 
@@ -561,6 +580,46 @@ end;
 function TPlayer.Dead: boolean;
 begin
   Result := Life <= 0;
+end;
+
+procedure TPlayer.Attack;
+begin
+  if not Attacking then
+  begin
+    if EquippedWeapon <> nil then
+    begin
+      { TODO: sound of attack }
+      AttackStartTime := Level.AnimationTime;
+      Attacking := true;
+    end else
+      { TODO: maybe I should allow him to do some "punch" / "kick" here ? }
+      GameMessage('No weapon equipped');
+  end;
+end;
+
+procedure TPlayer.RenderWeapon2D;
+begin
+  if (EquippedWeapon <> nil) and (not Attacking) then
+    glCallList((EquippedWeapon.Kind as TItemWeaponKind).GLList_DrawScreenImage);
+end;
+
+procedure TPlayer.RenderAttack;
+var
+  AttackTime: Single;
+  Anim: TVRMLGLAnimation;
+begin
+  if Attacking then
+  begin
+    AttackTime := Level.AnimationTime - AttackStartTime;
+    Anim := (EquippedWeapon.Kind as TItemWeaponKind).AttackAnimation;
+    if AttackTime <= Anim.TimeEnd then
+    begin
+      glClear(GL_DEPTH_BUFFER_BIT);
+      glLoadIdentity;
+      Anim.SceneFromTime(AttackTime).Render(nil);
+    end else
+      Attacking := false;
+  end;
 end;
 
 { GLWindow init / close ------------------------------------------------------ }

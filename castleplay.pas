@@ -247,9 +247,7 @@ procedure Draw2D(Draw2DData: Integer);
   end;
 
 begin
-  if Player.EquippedWeapon <> nil then
-    glCallList((Player.EquippedWeapon.Kind as TItemWeaponKind).
-      GLList_DrawScreenImage);
+  Player.RenderWeapon2D;
 
   glCallList(GLList_Draw2dBegin);
 
@@ -287,6 +285,8 @@ begin
   Level.Items.Render(Player.Navigator.Frustum);
 
   Level.Creatures.Render(Player.Navigator.Frustum);
+
+  Player.RenderAttack;
 
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
@@ -467,10 +467,18 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       GameMessage(SDeadMessage);
   end;
 
+  procedure DoAttack;
+  begin
+    if not Player.Dead then
+      Player.Attack else
+      GameMessage(SDeadMessage);
+  end;
+
 begin
   case Key of
     K_F1: ShowHelpMessage;
     K_F5: SaveScreen;
+    CastleKey_Attack: DoAttack;
     CastleKey_UpMove: MaybeDeadMessage;
     CastleKey_DownMove: MaybeDeadMessage;
     CastleKey_Forward: MaybeDeadMessage;

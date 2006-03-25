@@ -31,6 +31,9 @@ Highest priority goals for stage 4:
 --------------------
 Would-be-nice before next stage:
 
+- right now pressing Ctrl blocks rotations and moves (because of
+  ModsDown = [] in MatrixNavigation). Fix.
+
 - non-moving creature (just shooting etc.)
 
 - alien model anim must be changed: the corpse must actualy move while walking !
@@ -40,6 +43,12 @@ Would-be-nice before next stage:
 - animation when creature is hurt
 
 --------------------
+- various kinds of swinging the sword, with various animations.
+  Also they can yield various damage and various hit chances.
+
+- Take TItemKind and TCreatureKind PrepareRender, PrepareRenderSteps, CloseGL
+  into one base class, like TGLLoading or something like that.
+
 - creatures still can climb high (almost-vertical) walls.
   This is not so very noticeable now, because there are no high walls
   now, and creatures' AI doesn't let them fall into deep pits now.
@@ -70,11 +79,27 @@ Would-be-nice before next stage:
 
 - check with gprof, maybe I can speed up "loading creatures" process ?
 
+  Maybe it's sometimes a good idea to not create separate display
+  list for each frame. Instead, it two scenes share the same RootNode
+  and differ e.g. only in CurrentMatrix states, then I can use
+  one display list and do glPushMatrix,MultMatrix,render,PopMatrix.
+  This could save some loading time for e.g. ball_missile anim
+  (but not for alien animations, as they change geometry).
+
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim ? Look how much it adds to AirBlast !)
 
 - second weapon, crossbow/bow, that requires another item in your inventory
   (bolts/arrows)
+
+  When you hold attack key, arrow/bolt appears on your bow/crossbow
+  and you're holding the bow. There is also a crosshair (circle target area)
+  that "trembles", because your hands are trembling.
+
+  You shoot when you release Ctrl key. The longer you held Ctrl,
+  the more power has the arrow (more velocity), but also the trembling
+  of your crosshair (and it's circle) is larger, so your accuracy
+  is lower.
 
 - inventory should be able to scroll, when more than MaxInventorySlots items
   are available.
@@ -92,6 +117,8 @@ Would-be-nice before next stage:
             displayFrequency:=vVideoModes[ModeIndex].MaxFrequency;
          dmDisplayFrequency:=displayFrequency;
       end;
+
+  I can do this in my TGLWindow.VideoChange.
 
 - sound configuration do -- allow turning sounds on/off from menu, allow volume control
 

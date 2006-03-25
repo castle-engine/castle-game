@@ -4,7 +4,7 @@ unit CastleKeys;
 
 interface
 
-uses MatrixNavigation;
+uses Keys, MatrixNavigation;
 
 const
   CastleKey_UpMove = WalkerDefaultKey_Jump;
@@ -18,6 +18,7 @@ const
   CastleKey_UpRotate = WalkerDefaultKey_UpRotate;
   CastleKey_DownRotate = WalkerDefaultKey_DownRotate;
   CastleKey_HomeUp = WalkerDefaultKey_HomeUp;
+  CastleKey_Attack = K_Ctrl;
 
 implementation
 
