@@ -419,9 +419,8 @@ type
   end;
 
   TWerewolfCreature = class(TWalkAttackCreature)
-  protected
-    procedure SetLife(const Value: Single); override;
   public
+    procedure Idle(const CompSpeed: Single); override;
     procedure ActualAttack; override;
   end;
 
@@ -1088,10 +1087,10 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
           (that will be calculated later by Level.MoveAllowed)
           or ProposedNewHeadPosition, because they are too close
           to OldHeadPosition to be good to test against.
-          I'm calculating here where I would get after 1 second
-          (WAKind.MoveSpeed * 50). }
+          I'm calculating here where I would get after 0.2 second
+          (WAKind.MoveSpeed * 0.2 * 50). }
         (not TooHighAboveTheGround(VectorAdd(OldHeadPosition,
-          VectorScale(Direction, WAKind.MoveSpeed * 50)))) and
+          VectorScale(Direction, WAKind.MoveSpeed * 0.2 * 50)))) and
 
         Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
         NewHeadPosition, false, Kind.CameraRadius) and
@@ -1260,15 +1259,17 @@ begin
     Player.Life := Player.Life - 20 - Random(20);
 end;
 
-procedure TWerewolfCreature.SetLife(const Value: Single);
+procedure TWerewolfCreature.Idle(const CompSpeed: Single);
 begin
-  if (Life > 0.0) and (Value <= 0.0) and (Level is TCastleHallLevel) then
-  begin
-    GameMessage('Level exit is uncovered');
-    TCastleHallLevel(Level).OpenSymbol;
-  end;
-
   inherited;
+
+  if (FState = wasDying) and
+    (Level.AnimationTime - StateChangeTime >
+      WAKind.DyingAnimation.TimeEnd + 5
+      { + 5 seconds, to allow player look at the dead werewolf }) then
+  begin
+    LevelFinished(nil);
+  end;
 end;
 
 { TMissileCreature ----------------------------------------------------------- }

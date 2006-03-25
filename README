@@ -2,16 +2,17 @@
 
 --------------------
 PGD competition stage 4 short notes:
-- death sequence: yes.
+- Death sequence: yes.
 
-- enemies, boss: yes.
+- Enemies, boss: yes.
+  Boss appears at the end of "Castle Hall".
 
   Actually I have only 2 enemies, one of which is the 1st boss. Not too much,
   but preparing each enemy is quite a work (even if I get static 3d models
-  from other sources) --- all the animations of walk, attack, etc.
+  from other places) --- all the animations of walk, attack, being hurt etc.
   Actually there is a 3rd enemy, the ball_missile that is casted
-  by the "alien-like" creature. This missile is considered a special
-  kind of enemy by the code.
+  by the "alien-like" creature. This missile is treated by the code
+  pretty much like any another creature.
 
   Still there are many things remaining to be done for enemies.
   Some of the more important ones:

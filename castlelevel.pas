@@ -218,7 +218,6 @@ type
   private
     ButtonPressed: boolean;
     SymbolOpened: boolean;
-    WerewolfUnleashed: boolean;
     AnimationOpenSymbolRotation: Single;
     AnimationButtonPress: Single;
     { TODO: now that TVRMLGLAnimation class is great,
@@ -250,8 +249,6 @@ type
 
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer); override;
-
-    procedure OpenSymbol;
   end;
 
 implementation
@@ -888,9 +885,6 @@ const
 begin
   inherited;
 
-  if Player.Navigator.CameraPos[2] < -20 then
-    LevelFinished(nil);
-
   if ButtonPressed then
   begin
     if AnimationButtonPress > MinAnimationButtonPress then
@@ -898,12 +892,12 @@ begin
       AnimationButtonPress := Max(MinAnimationButtonPress,
         AnimationButtonPress - 0.02 * CompSpeed);
     end else
-    if not WerewolfUnleashed then
+    if not SymbolOpened then
     begin
-      WerewolfUnleashed := true;
+      SymbolOpened := true;
       { TODO: sound of werewolf howling here }
       Creatures.Add(TWerewolfCreature.Create(Werewolf,
-        Vector3Single(-1.86, -20.48, 2.33),
+        Vector3Single(0, 0, 0),
         Vector3Single(0, 1, 0), 500, AnimationTime));
     end;
   end;
@@ -952,11 +946,6 @@ begin
           GameMessage('You see a button. You cannot reach it from here');
       end;
   end;
-end;
-
-procedure TCastleHallLevel.OpenSymbol;
-begin
-  SymbolOpened := true;
 end;
 
 end.
