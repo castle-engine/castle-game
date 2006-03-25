@@ -390,6 +390,11 @@ Items:
   class, for others you will want to derive new class from TItemKind
   and override there things you want.
 
+- For technical reasons, whole item should use either *only transparent
+  materials* or *only non-transparent materials*. Otherwise rendering
+  in some special cases could get wrong.
+  TODO: in the future you will have to mark it at creation of TItemKind.
+
 Creatures (enemies etc.):
 - Several notes about items apply also to creatures:
 
@@ -410,8 +415,12 @@ Creatures (enemies etc.):
     "Crea<creature-kind-name>_<ignored>".
     Creature position is determined by stub lowest Z and
     middle X,Y line.
+
     Moreover, for creatures: initial creature direction
-    is determined by TODO.
+    is determined by ... TODO: right now starting creature direction
+    just points into player starting position.
+    This is more-or-less sensible, usually.
+    But it's meant to be comfortably configurable in scene file in the future.
 
   - To really add the creature to the game add 1 line to
     CastleCreatures unit in DoInitialization call creating your
@@ -420,6 +429,13 @@ Creatures (enemies etc.):
   - For some creatures you may be able to just reuse some existing TCreatureKind
     descendant, for others you will want to derive new class from TCreatureKind
     and override there things you want.
+
+    TODO: right now you may also need to add some code to
+    TLevel.TraverseForCreatures inside CastleLevel unit.
+    This is unhandy and will be fixed after stage 4 deadline.
+
+  - Whole creature should use either *only transparent
+    materials* or *only non-transparent materials*.
 
 - For testing various animations of creatures (and adjusting their time
   parameters) you can use my demo_animation program

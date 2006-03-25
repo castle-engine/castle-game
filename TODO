@@ -9,10 +9,16 @@ Must-have before next stage:
 
 Highest priority goals for stage 4:
 
-- then do first boss
+- werewolf walk anim also looks funny, corpse doesn't move! But it should!
+
+- make werewolf a boss for "Castle Hall" level
+
+- werewolf must be able to hurt player
 
 --------------------
 Would-be-nice before next stage:
+
+- creature<->creature collision is also needed
 
 - do also collision detection with creatures when *player* moves.
 
@@ -26,6 +32,11 @@ Would-be-nice before next stage:
 - non-moving creature (just shooting etc.)
 
 --------------------
+- avoiding falling down sometimes doesn't work like it should.
+  I think that I know why: I check where the creature will be after
+  2 secs, but what if there is a pit between 2 secs and current pos ?
+  Fix by checking everything *along the 2 secs way*.
+
 - right now pressing Ctrl blocks rotations and moves (because of
   ModsDown = [] in MatrixNavigation). Fix.
 
@@ -152,6 +163,12 @@ Would-be-nice before next stage:
 
 - some alpha rect around the item's model ?
   test, although it seems that rotating is enough.
+
+- Not bad creature models from www.3dcafe.com:
+
+  horror/abom
+  anatomy_people/creature
+  anatomy_people/vampire
 
 - help (at least beta-testing and English text proofreading!):
 

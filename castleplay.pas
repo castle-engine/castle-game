@@ -280,11 +280,21 @@ begin
 
   Level.LightSet.RenderLights;
 
-  Level.Render(Player.Navigator.Frustum);
+  { Rendering order of Creatures, Items and Level:
+    You know the problem. We must first render all non-transparent objects,
+    then all transparent objects. Otherwise transparent objects
+    (that must be rendered without updating depth buffer) could get brutally
+    covered by non-transparent objects (that are in fact further away from
+    the camera). So we first render all non-transparent creatures and items,
+    then the level, then all transparent creatures and items.
 
-  Level.Items.Render(Player.Navigator.Frustum);
+    TODO: actually, right now I workaround this by first rendering
+    creatures (there is no transparent creature), then level,
+    then items (there is a transparent item --- life potion). }
 
   Level.Creatures.Render(Player.Navigator.Frustum);
+  Level.Render(Player.Navigator.Frustum);
+  Level.Items.Render(Player.Navigator.Frustum);
 
   Player.RenderAttack;
 

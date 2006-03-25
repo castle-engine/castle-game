@@ -305,6 +305,12 @@ begin
     Maybe it the future I'll make some configuration option to control this. }
   Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
 
+  { Calculate HomeCameraPos, HomeCameraDir, HomeCameraUp.
+    Must be done before initializing creatures, as they right now
+    use HomeCameraPos. FHomeCameraDir, FHomeCameraUp will be
+    actually changed later in this procedure. }
+  Scene.GetPerspectiveCamera(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
+
   ItemsToRemove := TVRMLNodesList.Create;
   try
     { Initialize Items }
@@ -355,6 +361,21 @@ begin
   FProjectionNear := CameraRadius * 0.75;
   FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
 
+  { Fix HomeCameraDir length. Uses CameraRadius and NavigationSpeed. }
+  VectorAdjustToLengthTo1st(FHomeCameraDir, CameraRadius *
+    0.4 * { I multiply by 0.4 just to get the same thing
+    that view3dscene does at this time. }
+    NavigationSpeed);
+
+  { Check and fix HomeCameraUp. }
+  if not VectorsEqual(Normalized(HomeCameraUp),
+    Vector3Single(0, 0, 1), 0.001) then
+    raise EInternalError.CreateFmt(
+      'Initial camera up vector must be +Z, but is %s',
+      [ VectorToRawStr(Normalized(HomeCameraUp)) ]) else
+    { Make HomeCameraUp = (0, 0, 1) more "precisely" }
+    FHomeCameraUp := Vector3Single(0, 0, 1);
+
   Scene.DefaultTriangleOctree :=
     Scene.CreateTriangleOctree('Building triangle octree');
   Scene.DefaultShapeStateOctree :=
@@ -376,21 +397,6 @@ begin
     FTitle := WorldInfoNode.FdTitle.Value;
   if FTitle = '' then
     FTitle := ExtractFileName(DeleteFileExt(ASceneFileName));
-
-  { calculate HomeCameraPos, HomeCameraDir, HomeCameraUp. }
-  Scene.GetPerspectiveCamera(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
-  VectorAdjustToLengthTo1st(FHomeCameraDir, CameraRadius *
-    0.4 * { I multiply by 0.4 just to get the same thing
-    that view3dscene does at this time. }
-    NavigationSpeed);
-
-  if not VectorsEqual(Normalized(HomeCameraUp),
-    Vector3Single(0, 0, 1), 0.001) then
-    raise EInternalError.CreateFmt(
-      'Initial camera up vector must be +Z, but is %s',
-      [ VectorToRawStr(Normalized(HomeCameraUp)) ]) else
-    { Make HomeCameraUp = (0, 0, 1) more "precisely" }
-    FHomeCameraUp := Vector3Single(0, 0, 1);
 end;
 
 destructor TLevel.Destroy;
@@ -485,22 +491,58 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
     StubBoundingBox: TBox3d;
     CreaturePosition, CreatureDirection: TVector3Single;
     CreatureMaxLife: Single;
+    CreatureKind: TCreatureKind;
+    CreatureKindName: string;
+    Creature: TCreature;
+    IgnoredBegin: Integer;
   begin
+    { calculate CreatureKindName }
+    IgnoredBegin := Pos('_', CreatureNodeName);
+    if IgnoredBegin = 0 then
+      CreatureKindName := CreatureNodeName else
+      CreatureKindName := Copy(CreatureNodeName, 1, IgnoredBegin - 1);
+
+    { calculate CreaturePosition }
     StubBoundingBox := (Node as TNodeGeneralShape).BoundingBox(State);
     CreaturePosition[0] := (StubBoundingBox[0, 0] + StubBoundingBox[1, 0]) / 2;
     CreaturePosition[1] := (StubBoundingBox[0, 1] + StubBoundingBox[1, 1]) / 2;
     CreaturePosition[2] := StubBoundingBox[0, 2];
 
-    { TODO --- CreatureDirection configurable }
-    CreatureDirection := Vector3Single(1, 0, 0);
+    { calculate CreatureKind }
+    { TODO --- this is not nice, such things should be done withing
+      CastleCreatures unit using some virtual methods of each TCreatureKind. }
+    if CreatureKindName = 'Alien' then
+      CreatureKind := Alien else
+    if CreatureKindName = 'Werewolf' then
+      CreatureKind := Werewolf else
+      raise Exception.CreateFmt('Not existing creature kind name "%s"',
+        [CreatureKindName]);
 
-    { TODO --- CreatureMaxLife configurable }
-    CreatureMaxLife := 100;
+    { calculate CreatureDirection }
+    { TODO --- CreatureDirection configurable.
+      Right now, it just points to the player start pos --- this is
+      more-or-less sensible, usually. }
+    CreatureDirection := VectorSubtract(HomeCameraPos, CreaturePosition);
+    if not CreatureKind.Flying then
+      MakeVectorsOrthoOnTheirPlane(CreatureDirection, HomeCameraUp);
+    NormalizeTo1st(CreatureDirection);
 
-    { TODO --- TWalkAttackCreature, Alien configurable }
+    { calculate CreatureMaxLife, Creature }
+    if CreatureKind = Alien then
+    begin
+      CreatureMaxLife := 100;
+      Creature := TBallThrowerCreature.Create(CreatureKind, CreaturePosition,
+        CreatureDirection, CreatureMaxLife, AnimationTime);
+    end else
+    if CreatureKind = Werewolf then
+    begin
+      CreatureMaxLife := 500;
+      Creature := TWerewolfCreature.Create(CreatureKind, CreaturePosition,
+        CreatureDirection, CreatureMaxLife, AnimationTime);
+    end else
+      raise EInternalError.Create('CreatureKind = ?');
 
-    FCreatures.Add(TBallThrowerCreature.Create(Alien, CreaturePosition,
-      CreatureDirection, CreatureMaxLife, AnimationTime));
+    FCreatures.Add(Creature);
   end;
 
 const

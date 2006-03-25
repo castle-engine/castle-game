@@ -72,6 +72,7 @@ const
   DefaultMinDelayBetweenAttacks = 5.0;
   DefaultAttackDistance = 50.0;
   DefaultMissileMoveSpeed = 1.0;
+  DefaultMaxKnockedBackDistance = 6.0;
 
 type
   { This is a TCreatureKind that has simple states:
@@ -99,6 +100,7 @@ type
     FMinDelayBetweenAttacks: Single;
     FAttackDistance: Single;
     FActualAttackTime: Single;
+    FMaxKnockedBackDistance: Single;
   public
     constructor Create(
       AStandAnimationInfo: TVRMLGLAnimationInfo;
@@ -187,6 +189,15 @@ type
       (hopefully it shouldn't be noticeable to the player). }
     property ActualAttackTime: Single
       read FActualAttackTime write FActualAttackTime default 0.0;
+
+    { When this creature is knocked back by something (i.e. goes to wasHurt
+      state), then it's forced to move in general LastAttackDirection
+      for the time HurtAnimation.TimeDurationWithBack, until
+      HurtAnimation (and wasHurt state) ends, or until it was forced to move
+      by MaxKnockedBackDistance. }
+    property MaxKnockedBackDistance: Single
+      read FMaxKnockedBackDistance write FMaxKnockedBackDistance
+      default DefaultMaxKnockedBackDistance;
   end;
 
   { This is a missile. As you can see, this is also treated as a creature
@@ -361,6 +372,9 @@ type
     { Set to true each time you enter wasAttack, set back to false
       if ActualAttack was called. }
     ActualAttackDone: boolean;
+
+    { Set to 0 each time FState changes to wasHurt }
+    KnockedBackDistance: Single;
   protected
     procedure SetLife(const Value: Single); override;
   public
@@ -404,6 +418,11 @@ type
     procedure ActualAttack; override;
   end;
 
+  TWerewolfCreature = class(TWalkAttackCreature)
+  public
+    procedure ActualAttack; override;
+  end;
+
   { This is TCreature that has a kind always of TMissileCreatureKind. }
   TMissileCreature = class(TCreature)
   private
@@ -425,7 +444,7 @@ var
   CreaturesKinds: TCreaturesKindsList;
 
   Alien: TWalkAttackCreatureKind;
-
+  Werewolf: TWalkAttackCreatureKind;
   BallMissile: TMissileCreatureKind;
 
 {$undef read_interface}
@@ -507,9 +526,9 @@ begin
 
   FAttacksWhenWalking := false;
   MoveSpeed := DefaultMoveSpeed;
-
   FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
   FAttackDistance := DefaultAttackDistance;
+  FMaxKnockedBackDistance := DefaultMaxKnockedBackDistance;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -896,11 +915,16 @@ begin
   begin
     FState := Value;
     StateChangeTime := Level.AnimationTime;
-    if FState = wasAttack then
-    begin
-      { TODO: do a sound here, from WAKind.AttackSound }
-      LastAttackTime := StateChangeTime;
-      ActualAttackDone := false;
+    { Some states require special initialization here. }
+    case FState of
+      wasAttack:
+        begin
+          { TODO: do a sound here, from WAKind.AttackSound }
+          LastAttackTime := StateChangeTime;
+          ActualAttackDone := false;
+        end;
+      wasHurt:
+        KnockedBackDistance := 0.0;
     end;
   end;
 end;
@@ -918,6 +942,11 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       WAKind.MinDelayBetweenAttacks) and
       (PointsDistanceSqr(Player.Navigator.CameraPos, HeadPosition) <=
       Sqr(WAKind.AttackDistance));
+
+    { GameMessage(Format('dist is now %f (sqr is %f), needed sqr is %f',
+      [ PointsDistance(Player.Navigator.CameraPos, HeadPosition),
+        PointsDistanceSqr(Player.Navigator.CameraPos, HeadPosition),
+        Sqr(WAKind.AttackDistance) ])); }
 
     if Result then
     begin
@@ -1104,19 +1133,35 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
   procedure DoHurt;
   const
-    HurtMoveSpeed = 1.0;
+    KnockedBackSpeed = 1.0;
   var
     StateTime: Single;
     OldHeadPosition, ProposedNewHeadPosition, NewHeadPosition: TVector3Single;
+    CurrentKnockBackDistance: Single;
   begin
     StateTime := Level.AnimationTime - StateChangeTime;
 
     if StateTime > WAKind.HurtAnimation.TimeDurationWithBack then
       SetState(wasStand) else
+    if KnockedBackDistance <= WAKind.MaxKnockedBackDistance then
     begin
       OldHeadPosition := HeadPosition;
+
+      { Calculate CurrentKnockBackDistance, update KnockedBackDistance }
+      CurrentKnockBackDistance := KnockedBackSpeed * CompSpeed;
+      if CurrentKnockBackDistance >
+        WAKind.MaxKnockedBackDistance - KnockedBackDistance then
+      begin
+        CurrentKnockBackDistance :=
+          WAKind.MaxKnockedBackDistance - KnockedBackDistance;
+        KnockedBackDistance := WAKind.MaxKnockedBackDistance;
+      end else
+      begin
+        KnockedBackDistance += CurrentKnockBackDistance;
+      end;
+
       ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
-        VectorScale(LastAttackDirection, HurtMoveSpeed * CompSpeed));
+        VectorScale(LastAttackDirection, CurrentKnockBackDistance));
 
       if Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
         NewHeadPosition, false, Kind.CameraRadius) and
@@ -1200,6 +1245,14 @@ begin
     MissileDefaultLife, Level.AnimationTime);
 
   Level.Creatures.Add(Missile);
+end;
+
+{ TWerewolfCreature ---------------------------------------------------------- }
+
+procedure TWerewolfCreature.ActualAttack;
+begin
+  { TODO: do a sound here, from WAKind.ActualAttackSound. }
+  { TODO: short-range attack do here }
 end;
 
 { TMissileCreature ----------------------------------------------------------- }
@@ -1344,6 +1397,43 @@ begin
       AnimScenesPerTime, AnimOptimization, false, true)
     );
   Alien.ActualAttackTime := 0.4;
+
+  Werewolf := TWalkAttackCreatureKind.Create(
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, true, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
+        CreatureFileName('werewolf' + PathDelim + 'werewolf_walk_2_final.wrl') ],
+      [ 0, 0.5 ],
+      AnimScenesPerTime, AnimOptimization, true, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
+        CreatureFileName('werewolf' + PathDelim + 'werewolf_attack_1_final.wrl'),
+        CreatureFileName('werewolf' + PathDelim + 'werewolf_attack_2_final.wrl'),
+        CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
+      [ 0, 0.3, 0.6, 1.0 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
+        CreatureFileName('werewolf' + PathDelim + 'werewolf_hurt_final.wrl'),
+        CreatureFileName('werewolf' + PathDelim + 'werewolf_dead_final.wrl') ],
+      [ 0.0, 0.3, 0.8 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
+        CreatureFileName('werewolf' + PathDelim + 'werewolf_hurt_final.wrl') ],
+      [ 0.0, 0.3 ],
+      AnimScenesPerTime, AnimOptimization, false, true)
+    );
+  Werewolf.ActualAttackTime := 0.5;
+  Werewolf.AttackDistance := 6.0;
+  Werewolf.MinDelayBetweenAttacks := 2.0;
 
   BallMissile := TMissileCreatureKind.Create(
     TVRMLGLAnimationInfo.Create(

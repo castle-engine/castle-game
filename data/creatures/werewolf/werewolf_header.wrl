@@ -4,4 +4,10 @@ Group {
   ShapeHints {
     creaseAngle 2
   }
+
+  # I accidentaly designed the model to be oriented to -Y, while it should
+  # be +X. I don't have time to fix .blend model now, so I'll just
+  # workaround it here. TODO: fix it better, i.e. just rotate blend
+  # model and regenerate VRML files.
+  Rotation { rotation 0 0 1 1.5707963268 }
 }
