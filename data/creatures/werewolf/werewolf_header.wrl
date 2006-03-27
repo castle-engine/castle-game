@@ -2,7 +2,7 @@
 
 Group {
   ShapeHints {
-    creaseAngle 2
+    creaseAngle 4 # > Pi
   }
 
   # I accidentaly designed the model to be oriented to -Y, while it should
