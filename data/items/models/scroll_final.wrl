@@ -2,7 +2,7 @@
 
 Group {
   ShapeHints {
-    creaseAngle 2
+    creaseAngle 4 # > Pi
   }
   WWWInline { name "scroll.wrl" }
 }
