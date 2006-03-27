@@ -65,9 +65,7 @@ Would-be-nice before next stage:
   "throw back" (throws all enemies slightly backward --- this is also useful
      for player to actually see that monsters get hurt when falling from high)
 
-- check with gprof, maybe I can speed up "loading creatures" process ?
-
-  Maybe it's sometimes a good idea to not create separate display
+- Maybe it's sometimes a good idea to not create separate display
   list for each frame. Instead, it two scenes share the same RootNode
   and differ e.g. only in CurrentMatrix states, then I can use
   one display list and do glPushMatrix,MultMatrix,render,PopMatrix.
