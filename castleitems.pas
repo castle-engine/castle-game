@@ -437,6 +437,7 @@ end;
 procedure TItemKind.PrepareRender;
 begin
   Scene.PrepareRender(false, true);
+  Progress.Step;
 end;
 
 function TItemKind.PrepareRenderSteps: Cardinal;
