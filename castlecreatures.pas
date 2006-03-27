@@ -932,6 +932,14 @@ end;
 
 procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
+  { TODO: instead of using SeesPlayer, make him use
+    HasLastSeenPlayer and LastSeenPlayer position, and go into
+    that direction. This should be smarter.
+    When SeesPlayer, he just does
+      HasLastSeenPlayer := true;
+      LastSeenPlayer := Player.Navigator.CameraPos;
+  }
+
   { Is attack allowed. Assumes that creature sees the player. }
   function AttackAllowed: boolean;
   const
