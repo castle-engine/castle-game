@@ -51,9 +51,7 @@ begin
   Items.Add('View last game messages');
   Items.Add('End game');
 
-  Position := Vector2Single(Glw.Width * 50 div 640, Glw.Height * 350 div 480);
-
-  FixItemsAreas;
+  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TCastleGameMenu.CurrentItemSelected;

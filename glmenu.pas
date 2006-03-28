@@ -3,7 +3,7 @@ unit GLMenu;
 interface
 
 uses Classes, OpenGLBmpFonts, BFNT_BitstreamVeraSans_Unit, VectorMath, Areas,
-  GLWindow;
+  GLWindow, OpenGLh;
 
 const
   DefaultGLMenuKeyNextItem = K_Down;
@@ -33,6 +33,15 @@ type
     procedure Draw; override;
   end;
 
+  { How TGLMenu.Position will be interpreted. }
+  TPositionRelative = (
+    { Position (0, 0) means that menu will be in lower-left corner
+      of the screen. Other positions will move menu appropriately. }
+    prZero,
+    { Position (0, 0) means that menu will be in the middle
+      of the screen. Other positions will move menu appropriately. }
+    prMiddle);
+
   { A menu displayed in OpenGL.
 
     Note that all 2d positions and sizes for this class are interpreted
@@ -47,10 +56,13 @@ type
     FItems: TStringList;
     FCurrentItem: Integer;
     FPosition: TVector2Single;
+    FPositionRelativeX: TPositionRelative;
+    FPositionRelativeY: TPositionRelative;
     Areas: TDynAreaArray;
     FKeyNextItem: TKey;
     FKeyPreviousItem: TKey;
     FKeySelectItem: TKey;
+    GLList_DrawFadeRect: TGLuint;
     function GetCurrentItem: Integer;
     procedure SetCurrentItem(const Value: Integer);
     { Initializes private as well as global required things. }
@@ -59,7 +71,14 @@ type
     constructor Create;
     destructor Destroy; override;
 
+    { Position of the lower-left corner of the menu. }
     property Position: TVector2Single read FPosition write FPosition;
+
+    property PositionRelativeX: TPositionRelative
+      read FPositionRelativeX write FPositionRelativeX default prMiddle;
+
+    property PositionRelativeY: TPositionRelative
+      read FPositionRelativeY write FPositionRelativeY default prMiddle;
 
     property Items: TStringList read FItems;
 
@@ -92,7 +111,7 @@ type
       - MouseMove or
       - MouseDown
       You can call this only while OpenGL context is initialized. }
-    procedure FixItemsAreas;
+    procedure FixItemsAreas(const WindowWidth, WindowHeight: Cardinal);
 
     procedure Draw;
 
@@ -132,7 +151,7 @@ var
 
 implementation
 
-uses SysUtils, OpenGLh, KambiUtils, KambiGLUtils;
+uses SysUtils, KambiUtils, KambiGLUtils;
 
 { TGLMenuFloatSlider --------------------------------------------------------- }
 
@@ -158,6 +177,9 @@ begin
   FItems := TStringList.Create;
   FCurrentItem := 0;
   Areas := TDynAreaArray.Create;
+
+  FPositionRelativeX := prMiddle;
+  FPositionRelativeY := prMiddle;
 
   KeyNextItem := DefaultGLMenuKeyNextItem;
   KeyPreviousItem := DefaultGLMenuKeyPreviousItem;
@@ -228,41 +250,100 @@ end;
 
 procedure TGLMenu.CloseGL;
 begin
-  { Nothing to do here right now. }
+  glFreeDisplayList(GLList_DrawFadeRect);
 end;
 
-procedure TGLMenu.FixItemsAreas;
+procedure TGLMenu.FixItemsAreas(const WindowWidth, WindowHeight: Cardinal);
+const
+  AllItemsAreaMargin = 30;
 var
   I: Integer;
+  MaxItemWidth, ItemWidth: Single;
+  PositionXMove, PositionYMove: Single;
+  AllItemsArea: TArea;
 begin
   InitGL;
 
+  { calculate Areas Widths and Heights and MaxItemWidth }
+
   Areas.Count := 0;
+  MaxItemWidth := 0.0;
   for I := 0 to Items.Count - 1 do
   begin
-    Areas.AppendItem(Area(
-      Position[0],
-      Position[1] - Ord(I) * (MenuFont.RowHeight + 10) - MenuFont.Descend,
-      MenuFont.TextWidth(Items[I]),
-      MenuFont.Descend + MenuFont.RowHeight, 0));
+    ItemWidth := MenuFont.TextWidth(Items[I]);
+    MaxTo1st(MaxItemWidth, ItemWidth);
+    Areas.AppendItem(Area(0, 0, ItemWidth,
+      MenuFont.Descend + MenuFont.RowHeight));
   end;
+
+  { calculate AllItemsArea Width and Height }
+
+  AllItemsArea.Width := MaxItemWidth;
+  AllItemsArea.Height := (MenuFont.RowHeight + 10) * Areas.Count;
+
+  AllItemsArea.Width += 2 * AllItemsAreaMargin;
+  AllItemsArea.Height += 2 * AllItemsAreaMargin;
+
+  { Now take into account Position, PositionRelativeX and PositionRelativeY,
+    and calculate PositionXMove, PositionYMove }
+
+  case PositionRelativeX of
+    prZero: PositionXMove := 0;
+    prMiddle: PositionXMove := (WindowWidth - AllItemsArea.Width) / 2;
+    else raise EInternalError.Create('PositionRelativeX = ?');
+  end;
+  PositionXMove += Position[0];
+
+  case PositionRelativeY of
+    prZero: PositionYMove := 0;
+    prMiddle: PositionYMove := (WindowHeight - AllItemsArea.Height) / 2;
+    else raise EInternalError.Create('PositionRelativeY = ?');
+  end;
+  PositionYMove += Position[1];
+
+  { Calculate positions of all areas. }
+
+  for I := 0 to Areas.High do
+  begin
+    Areas[I].X0 := PositionXMove + AllItemsAreaMargin;
+    Areas[I].Y0 := PositionYMove + AllItemsAreaMargin
+      + (Areas.High - I) * (MenuFont.RowHeight + 10);
+  end;
+  AllItemsArea.X0 := PositionXMove;
+  AllItemsArea.Y0 := PositionYMove;
+
+  { calculate GLList_DrawFadeRect }
+
+  if GLList_DrawFadeRect = 0 then
+    GLList_DrawFadeRect := glGenLists(1);
+  glNewList(GLList_DrawFadeRect, GL_COMPILE);
+  try
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+      glColor4f(0, 0, 0, 0.4);
+      glRectf(AllItemsArea.X0, AllItemsArea.Y0,
+        AllItemsArea.X0 + AllItemsArea.Width,
+        AllItemsArea.Y0 + AllItemsArea.Height);
+    glDisable(GL_BLEND);
+  finally glEndList end;
 end;
 
 procedure TGLMenu.Draw;
 var
   I: Integer;
 begin
+  glCallList(GLList_DrawFadeRect);
+
   for I := 0 to Items.Count - 1 do
   begin
     glPushMatrix;
-      glTranslatef(Position[0],
-        Position[1] - Ord(I) * (MenuFont.RowHeight + 10), 0);
+      glTranslatef(Areas[I].X0, Areas[I].Y0 + MenuFont.Descend, 0);
 
       if I = CurrentItem then
       begin
-        glColorv(White3Single);
+{        glColorv(White3Single);
         DrawGLRectBorder(-10, -MenuFont.Descend,
-          MenuFont.TextWidth(Items[I]) + 10, MenuFont.RowHeight);
+          MenuFont.TextWidth(Items[I]) + 10, MenuFont.RowHeight);}
         glColorv(Yellow3Single);
       end else
         glColorv(White3Single);

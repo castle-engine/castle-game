@@ -33,7 +33,7 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
-  CastleCreatures, CastleItems, CastleGeneralMenu;
+  CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu;
 
 var
   UserQuit: boolean;
@@ -58,9 +58,11 @@ begin
   Items.Add('Sound');
   Items.Add('Quit');
 
-  Position := Vector2Single(Glw.Width * 50 div 640, Glw.Height * 350 div 480);
+  Position := Vector2Single(20, 210);
+  PositionRelativeX := prZero;
+  PositionRelativeY := prZero;
 
-  FixItemsAreas;
+  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TCastleMainMenu.CurrentItemSelected;
