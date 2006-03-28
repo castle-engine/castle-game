@@ -1,4 +1,4 @@
-Available keys:
+Keys available in game:
 
 --------------------
 Basic keys:
@@ -26,7 +26,7 @@ Commands related to items:
 --------------------
 Other keys:
   F1 = show this help
-  Escape = exit game
+  Escape = exit to game menu
   M = view all messages
   C = cancel flying (useful only if you want to stop flying before flying spell will automatically wear off)
   ` (backquote) = FPS show / hide

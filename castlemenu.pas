@@ -18,6 +18,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
+{ }
 unit CastleMenu;
 
 interface
@@ -32,23 +33,10 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
-  CastleCreatures, CastleItems, GLMenu;
+  CastleCreatures, CastleItems, CastleGeneralMenu;
 
 var
   UserQuit: boolean;
-
-{ TCastleMenu ---------------------------------------------------------------- }
-
-type
-  TCastleMenu = class(TGLMenu)
-    procedure CurrentItemChanged; override;
-  end;
-
-procedure TCastleMenu.CurrentItemChanged;
-begin
-  { TODO: sound: stMenuMove }
-  Glw.PostRedisplay;
-end;
 
 { TCastleMainMenu ------------------------------------------------------------ }
 
@@ -62,7 +50,7 @@ constructor TCastleMainMenu.Create;
 begin
   inherited Create;
 
-  Items.Add('Read short instructions');
+  Items.Add('Read instructions');
   Items.Add('New game (Tower - just a test level)');
   Items.Add('New game (Castle Hall - new level for PGD stage 3)');
   Items.Add('View last game messages');
@@ -201,6 +189,8 @@ begin
   finally FreeAndNil(SavedMode); end;
 end;
 
+{ initialization / finalization ---------------------------------------------- }
+
 procedure InitGLW(Glwin: TGLWindow);
 begin
   ListBgDraw := LoadImageToDispList(ProgramDataPath + 'data' +
@@ -213,7 +203,6 @@ end;
 procedure CloseGLW(Glwin: TGLWindow);
 begin
   FreeAndNil(MainMenu);
-  FreeAndNil(MenuFont);
 end;
 
 initialization

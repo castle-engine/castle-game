@@ -67,6 +67,13 @@ var
   Font_BFNT_BitstreamVeraSans_m10: TGLBitmapFont_Abstract;
   Font_BFNT_BitstreamVeraSans: TGLBitmapFont_Abstract;
 
+var
+  { Read-only from outside of this unit. }
+  GameEnded: boolean;
+
+{ Note that when Player.Dead, confirmation will never be required anyway. }
+procedure GameCancel(RequireConfirmation: boolean);
+
 implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
@@ -75,10 +82,9 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
-  KambiFilesUtils, CastleKeys;
+  KambiFilesUtils, CastleKeys, CastleGameMenu;
 
 var
-  GameEnded: boolean;
   GameMessagesManager: TTimeMessagesManager;
   GLList_Draw2dBegin: TGLuint;
 
@@ -303,7 +309,6 @@ begin
 
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST); { not needed now, but in the future will be needed }
     ProjectionGLPushPop(Draw2d, 0, Ortho2dProjMatrix(
       0, RequiredScreenWidth, 0, RequiredScreenHeight));
   glPopAttrib;
@@ -349,9 +354,10 @@ begin
   if ALActive then CheckAL('game loop (check in OnTimer)');
 end;
 
-procedure GameCancel;
+procedure GameCancel(RequireConfirmation: boolean);
 begin
   if Player.Dead or
+    (not RequireConfirmation) or
     MessageYesNo(Glw, 'Are you sure you want to end the game ?', taLeft) then
     GameEnded := true;
 end;
@@ -523,14 +529,14 @@ begin
 
         'c': CancelFlying;
 
-        CharEscape: GameCancel;
+        CharEscape: ShowGameMenu;
       end;
   end;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);
 begin
-  GameCancel;
+  GameCancel(true);
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Btn: TMouseButton);
@@ -754,6 +760,8 @@ begin
   GameMessage('Screen saved to ' + FileName);
   { TODO: sound: stSaveScreen }
 end;
+
+{ initialization / finalization ---------------------------------------------- }
 
 procedure GLWindowInit(Glwin: TGLWindow);
 

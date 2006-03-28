@@ -1,6 +1,6 @@
 { -*- buffer-read-only: t -*- }
 { DON'T EDIT -- this file was automatically generated from "castle_help_message.txt" }
-'Available keys:' + LineEnding + 
+'Keys available in game:' + LineEnding + 
 '' + LineEnding + 
 '--------------------' + LineEnding + 
 'Basic keys:' + LineEnding + 
@@ -28,7 +28,7 @@
 '--------------------' + LineEnding + 
 'Other keys:' + LineEnding + 
 '  F1 = show this help' + LineEnding + 
-'  Escape = exit game' + LineEnding + 
+'  Escape = exit to game menu' + LineEnding + 
 '  M = view all messages' + LineEnding + 
 '  C = cancel flying (useful only if you want to stop flying before flying spell will automatically wear off)' + LineEnding + 
 '  ` (backquote) = FPS show / hide' + LineEnding + 
