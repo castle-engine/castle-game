@@ -46,6 +46,7 @@ type
 
 procedure TCastleMenu.CurrentItemChanged;
 begin
+  { TODO: sound: stMenuMove }
   Glw.PostRedisplay;
 end;
 
@@ -154,20 +155,8 @@ end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  case key of
-    K_Up:
-      begin
-        MainMenu.PreviousItem;
-        { TODO: sound: stMenuMove }
-        Glw.PostRedisplay;
-      end;
-    K_Down:
-      begin
-        MainMenu.NextItem;
-        { TODO: sound: stMenuMove }
-        Glw.PostRedisplay;
-      end;
-    K_Enter: MainMenu.CurrentItemSelected;
+  MainMenu.KeyDown(Key, C);
+  case Key of
     K_F5: SaveScreen;
   end;
 end;

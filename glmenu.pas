@@ -5,6 +5,11 @@ interface
 uses Classes, OpenGLBmpFonts, BFNT_BitstreamVeraSans_Unit, VectorMath, Areas,
   GLWindow;
 
+const
+  DefaultGLMenuKeyNextItem = K_Down;
+  DefaultGLMenuKeyPreviousItem = K_Up;
+  DefaultGLMenuKeySelectItem = K_Enter;
+
 type
   { This is something that can be attached to some menu items of TGLMenu.
     For example, a slider --- see TGLMenuSlider. }
@@ -43,6 +48,9 @@ type
     FCurrentItem: Integer;
     FPosition: TVector2Single;
     Areas: TDynAreaArray;
+    FKeyNextItem: TKey;
+    FKeyPreviousItem: TKey;
+    FKeySelectItem: TKey;
     function GetCurrentItem: Integer;
     procedure SetCurrentItem(const Value: Integer);
     { Initializes private as well as global required things. }
@@ -66,7 +74,9 @@ type
       Changing this calls CurrentItemChanged automatically when needed. }
     property CurrentItem: Integer read GetCurrentItem write SetCurrentItem;
 
-    { These change CurrentItem as appropriate. }
+    { These change CurrentItem as appropriate.
+      Usually you will just let this class call it internally
+      (from MouseMove, KeyDown etc.) and will not need to call it yourself. }
     procedure NextItem;
     procedure PreviousItem;
 
@@ -85,6 +95,15 @@ type
     procedure FixItemsAreas;
 
     procedure Draw;
+
+    property KeyNextItem: TKey read FKeyNextItem write FKeyNextItem
+      default DefaultGLMenuKeyNextItem;
+    property KeyPreviousItem: TKey read FKeyPreviousItem write FKeyPreviousItem
+      default DefaultGLMenuKeyPreviousItem;
+    property KeySelectItem: TKey read FKeySelectItem write FKeySelectItem
+      default DefaultGLMenuKeySelectItem;
+
+    procedure KeyDown(Key: TKey; C: char);
 
     { Call this when user moves the mouse.
       NewX, NewY is in OpenGL 2d screen coordinates, so usually
@@ -139,6 +158,10 @@ begin
   FItems := TStringList.Create;
   FCurrentItem := 0;
   Areas := TDynAreaArray.Create;
+
+  KeyNextItem := DefaultGLMenuKeyNextItem;
+  KeyPreviousItem := DefaultGLMenuKeyPreviousItem;
+  KeySelectItem := DefaultGLMenuKeySelectItem;
 end;
 
 destructor TGLMenu.Destroy;
@@ -205,6 +228,7 @@ end;
 
 procedure TGLMenu.CloseGL;
 begin
+  { Nothing to do here right now. }
 end;
 
 procedure TGLMenu.FixItemsAreas;
@@ -247,6 +271,16 @@ begin
       MenuFont.Print(Items[I]);
     glPopMatrix;
   end;
+end;
+
+procedure TGLMenu.KeyDown(Key: TKey; C: char);
+begin
+  if Key = KeyPreviousItem then
+    PreviousItem else
+  if Key = KeyNextItem then
+    NextItem else
+  if Key = KeySelectItem then
+    CurrentItemSelected;
 end;
 
 procedure TGLMenu.MouseMove(const NewX, NewY: Single);
