@@ -5,6 +5,18 @@ Stage 5 (3 weeks): Mar 26th - Apr 15th
 Goal #1 (10 Points) - Engine must allow you to play more than one level per play. Design a minimum of 2 levels to be played by optional selection or in sequence.
 Goal #2 (10 Points) - Add basic menus, game options and settings.
 
+- Eric:
+There is something about the FOV and/or movement speed that made me feel somewhat queasy after some wandering around in the stage 3 level (not so much in the castle level, but it was more open).
+
+Half-life explains this:
+
+[http://developer.valvesoftware.com/wiki/Field_of_View]
+Note: Some people experience sickness with the FOV in Half-Life 2 which is set to 75 by default. This is mostly because the default FOV in other games is set to 90. If you are experiencing such problems in Half-Life 2, try to change the FOV to 90 using the command sv_cheats 1;fov 90 in the console.
+
+(FOV is vertical angle in Half-Life 2).
+
+[http://en.wikipedia.org/wiki/Half-Life_2_controversies_and_criticisms]
+
 --------------------
 Would-be-nice before next stage:
 

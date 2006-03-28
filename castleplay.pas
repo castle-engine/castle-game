@@ -56,6 +56,11 @@ procedure LevelFinished(NextLevel: TLevel);
 { Saves a screen, causing also appropriate GameMessage. }
 procedure SaveScreen;
 
+{ ViewAngleDegX and ViewAngleDegY specify field of view in the game. }
+const
+  ViewAngleDegX = 45.0;
+function ViewAngleDegY: Single;
+
 var
   { These fonts can be used globally by anything in this game.
     They are initialized in Glw.OnInit and finalized in Glw.OnClose in this unit. }
@@ -104,8 +109,6 @@ var
   DisplayFpsRealTime: Single;
 
 const
-  ViewAngleDegX = 45.0;
-
   SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
 
 function ViewAngleDegY: Single;

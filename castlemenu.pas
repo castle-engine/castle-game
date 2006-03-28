@@ -30,65 +30,51 @@ implementation
 
 uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
-  OpenGLBmpFonts, VectorMath, Images, BFNT_BitstreamVeraSans_Unit,
-  KambiFilesUtils,
+  VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
-  CastleCreatures, CastleItems;
-
-type
-  TMenuItem = (miReadDocs, miPlaySample1, miPlaySample2,
-    miViewGameMessages, miSound, miQuit);
-
-const
-  MenuNames: array[TMenuItem]of string = (
-    'Read short instructions',
-    'New game (Tower - just a test level)',
-    'New game (Castle Hall - new level for PGD stage 3)',
-    'View last game messages',
-    'Sound',
-    'Quit');
+  CastleCreatures, CastleItems, GLMenu;
 
 var
   UserQuit: boolean;
-  CurrentMenu: TMenuItem = Low(TMenuItem);
-  ListBgDraw: TGLuint;
-  MenuFont: TGLBitmapFont;
 
-procedure Resize(Glwin: TGLWindow);
-begin
-  ProjectionGLOrtho(0, Glwin.Width, 0, Glwin.Height);
-end;
+{ TCastleMenu ---------------------------------------------------------------- }
 
-procedure Draw(Glwin: TGLWindow);
-var
-  MI: TMenuItem;
-begin
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
-  glCallList(ListBgDraw);
-
-  glTranslatef(glw.width*50 div 640, glw.height*350 div 480, 0);
-  for MI := Low(MI) to High(MI) do
-  begin
-    glPushMatrix;
-      glTranslatef(0, -Ord(MI) * (MenuFont.RowHeight + 10), 0);
-
-      if MI = CurrentMenu then
-      begin
-        glColorv(White3Single);
-        DrawGLRectBorder(-10, -Menufont.Descend,
-          MenuFont.TextWidth(MenuNames[MI])+10, MenuFont.RowHeight);
-        glColorv(Yellow3Single);
-      end else
-        glColorv(White3Single);
-
-      glRasterPos2i(0, 0);
-      MenuFont.Print(MenuNames[MI]);
-    glPopMatrix;
+type
+  TCastleMenu = class(TGLMenu)
+    procedure CurrentItemChanged; override;
   end;
+
+procedure TCastleMenu.CurrentItemChanged;
+begin
+  Glw.PostRedisplay;
 end;
 
-procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
+{ TCastleMainMenu ------------------------------------------------------------ }
+
+type
+  TCastleMainMenu = class(TCastleMenu)
+    constructor Create;
+    procedure CurrentItemSelected; override;
+  end;
+
+constructor TCastleMainMenu.Create;
+begin
+  inherited Create;
+
+  Items.Add('Read short instructions');
+  Items.Add('New game (Tower - just a test level)');
+  Items.Add('New game (Castle Hall - new level for PGD stage 3)');
+  Items.Add('View last game messages');
+  Items.Add('Video');
+  Items.Add('Sound');
+  Items.Add('Quit');
+
+  Position := Vector2Single(Glw.Width * 50 div 640, Glw.Height * 350 div 480);
+
+  FixItemsAreas;
+end;
+
+procedure TCastleMainMenu.CurrentItemSelected;
 
   procedure NewGame(Level: TLevel);
   var
@@ -105,51 +91,95 @@ procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
     finally Level.Free end;
   end;
 
+  procedure ViewVideoInfo;
+  begin
+    MessageOK(Glw,
+      'Video information:' +nl+
+      nl+
+      Format('Field of view horizontal : %f', [ViewAngleDegX]) +nl+
+      Format('Field of view vertical : %f', [ViewAngleDegY]) +nl+
+      nl+
+      GLCapsString,
+      taLeft);
+  end;
+
+  procedure ViewSoundInfo;
+  begin
+    MessageOK(Glw,
+      'Sound library (OpenAL) status:' +nl+
+      nl+
+      SoundInitializationReport +nl+
+      nl+
+      'TODO: for now, "The Castle" initializes OpenAL '+
+      'but it''s not used. It will be used in the future, '+
+      'and you will see here some controls to turn sound on/off '+
+      'and change sound volume. See my older demo, ' +
+      '[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php] '+
+      'if you want to see how I''m dealing with OpenAL.',
+      taLeft);
+  end;
+
+begin
+  case CurrentItem of
+    0: ShowHelpMessage;
+    1: NewGame(
+         TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
+    2: NewGame(TCastleHallLevel.Create);
+    3: ViewGameMessages;
+    4: ViewVideoInfo;
+    5: ViewSoundInfo;
+    6: UserQuit := true;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+{ global things -------------------------------------------------------------- }
+
+var
+  MainMenu: TCastleMainMenu;
+  ListBgDraw: TGLuint;
+
+procedure Resize(Glwin: TGLWindow);
+begin
+  ProjectionGLOrtho(0, Glwin.Width, 0, Glwin.Height);
+end;
+
+procedure Draw(Glwin: TGLWindow);
+begin
+  glLoadIdentity;
+  glRasterPos2i(0, 0);
+  glCallList(ListBgDraw);
+  MainMenu.Draw;
+end;
+
+procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   case key of
     K_Up:
       begin
-        if CurrentMenu = Low(CurrentMenu) then
-          CurrentMenu := High(CurrentMenu) else
-          CurrentMenu := Pred(CurrentMenu);
+        MainMenu.PreviousItem;
         { TODO: sound: stMenuMove }
         Glw.PostRedisplay;
       end;
     K_Down:
       begin
-        if CurrentMenu = High(CurrentMenu) then
-          CurrentMenu := Low(CurrentMenu) else
-          CurrentMenu := Succ(CurrentMenu);
+        MainMenu.NextItem;
         { TODO: sound: stMenuMove }
         Glw.PostRedisplay;
       end;
-    K_Enter:
-      case CurrentMenu of
-       miReadDocs: ShowHelpMessage;
-       miPlaySample1: NewGame(
-         TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
-       miPlaySample2: NewGame(TCastleHallLevel.Create);
-       miViewGameMessages: ViewGameMessages;
-       miSound:
-         begin
-           MessageOK(Glw,
-             'Sound library (OpenAL) status:' +nl+
-             nl+
-             SoundInitializationReport +nl+
-             nl+
-             'TODO: for now, "The Castle" initializes OpenAL '+
-             'but it''s not used. It will be used in the future, '+
-             'and you will see here some controls to turn sound on/off '+
-             'and change sound volume. See my older demo, ' +
-             '[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php] '+
-             'if you want to see how I''m dealing with OpenAL.',
-             taLeft);
-         end;
-       miQuit: UserQuit := true;
-       else raise EInternalError.Create('Menu item unknown');
-      end;
+    K_Enter: MainMenu.CurrentItemSelected;
     K_F5: SaveScreen;
   end;
+end;
+
+procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
+begin
+  MainMenu.MouseMove(NewX, Glwin.Height - NewY);
+end;
+
+procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+begin
+  MainMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);
@@ -168,6 +198,8 @@ begin
       nil, false, false, false, K_None, #0, false, false);
 
     Glw.OnKeyDown := KeyDown;
+    Glw.OnMouseDown := MouseDown;
+    Glw.OnMouseMove := MouseMove;
 
     Glw.EventResize;
 
@@ -185,15 +217,18 @@ begin
   ListBgDraw := LoadImageToDispList(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'menu_bg.png',
     [TRGBImage], [], Glw.Width, Glw.Height);
-  MenuFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
+
+  MainMenu := TCastleMainMenu.Create;
 end;
 
-procedure CloseGLW(Flwin: TGLWindow);
+procedure CloseGLW(Glwin: TGLWindow);
 begin
+  FreeAndNil(MainMenu);
   FreeAndNil(MenuFont);
 end;
 
 initialization
- Glw.OnInitList.AppendItem(@InitGLW);
- Glw.OnCloseList.AppendItem(@CloseGLW);
+  Glw.OnInitList.AppendItem(@InitGLW);
+  Glw.OnCloseList.AppendItem(@CloseGLW);
+finalization
 end.
