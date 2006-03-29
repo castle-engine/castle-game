@@ -4,7 +4,9 @@
   do fog somewhere
 
 - cursor showing current menu item ?
-- dark blend at the back of GLWinMessages instead of this stipple ?
+
+- change "building octree ..." things to just "Loading level..." (without position).
+  That's better for user.
 
 --------------------
 Must-have before next stage:

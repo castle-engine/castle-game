@@ -118,10 +118,14 @@ var
 begin
   GLList_ScreenImage := Glw.SaveScreenToDispList;
   try
-    SavedMode := TGLMode.Create(Glw, GL_ENABLE_BIT);
+    SavedMode := TGLMode.Create(Glw, GL_ENABLE_BIT, true);
     try
       SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
         nil, false, false, false, K_None, #0, false, false);
+
+      { Otherwise messages don't look good, because the text is mixed
+        with the menu text. }
+      GLWinMessagesTheme.RectColor[3] := 1.0;
 
       Glw.OnKeyDown := KeyDown;
       Glw.OnMouseDown := MouseDown;

@@ -652,7 +652,7 @@ begin
 
     SavedMode := TGLMode.Create(glw,
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
-      GL_ENABLE_BIT);
+      GL_ENABLE_BIT, true);
     try
       { init navigator }
       Glw.Navigator := Player.Navigator;
@@ -699,22 +699,20 @@ begin
             Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
         end;
 
-        MessageRectStipple := @ThreeQuartersStipple;
+        GLWinMessagesTheme.RectColor[3] := 0.6;
+
+        GameMessagesManager := TTimeMessagesManager.Create(
+          Glw, hpMiddle, vpDown, Glw.Width);
         try
-          GameMessagesManager := TTimeMessagesManager.Create(
-            Glw, hpMiddle, vpDown, Glw.Width);
-          try
-            GameMessagesManager.MaxMessagesCount := 4;
+          GameMessagesManager.MaxMessagesCount := 4;
 
-            { First GameMessage for this level. }
-            GameMessage('Loaded level "' + Level.Title + '"');
+          { First GameMessage for this level. }
+          GameMessage('Loaded level "' + Level.Title + '"');
 
-            repeat
-              Glwm.ProcessMessage(true);
-            until GameEnded;
-          finally FreeAndNil(GameMessagesManager) end;
-
-        finally MessageRectStipple := nil; end;
+          repeat
+            Glwm.ProcessMessage(true);
+          until GameEnded;
+        finally FreeAndNil(GameMessagesManager) end;
       finally
         Glw.Navigator := nil;
         { Clear some Player.Navigator callbacks. }

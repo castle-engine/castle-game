@@ -171,7 +171,7 @@ procedure ShowMenu;
 var
   SavedMode: TGLMode;
 begin
-  SavedMode := TGLMode.Create(glw, 0);
+  SavedMode := TGLMode.Create(glw, 0, false);
   try
     SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
       nil, false, false, false, K_None, #0, false, false);
