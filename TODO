@@ -6,6 +6,15 @@
 
 - when player stops moving, head bobbing should go down automatically
 
+- when creature dies, the effect is not natural, player often feels
+  "stuck" and cannot move.
+  Maybe I should add creatures to GetCameraHeight ?
+
+- controls menu must be shown in the gamemenu too.
+
+- F1 should not anymore bring help.
+  Rename "help" to "Credits" or something like that.
+
 --------------------
 Must-have before next stage:
 
