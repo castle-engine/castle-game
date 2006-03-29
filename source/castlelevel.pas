@@ -380,9 +380,9 @@ begin
     FHomeCameraUp := Vector3Single(0, 0, 1);
 
   Scene.DefaultTriangleOctree :=
-    Scene.CreateTriangleOctree('Building triangle octree');
+    Scene.CreateTriangleOctree('Loading level (triangle octree)');
   Scene.DefaultShapeStateOctree :=
-    Scene.CreateShapeStateOctree('Building ShapeState octree');
+    Scene.CreateShapeStateOctree('Loading level (ShapeState octree)');
 
   Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
     (ProjectionNear, ProjectionFar);

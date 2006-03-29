@@ -140,6 +140,12 @@ begin
     { init progress }
     ProgressGLInterface.Window := Glw;
     Progress.UserInterface := ProgressGLInterface;
+    { I'm turning UseDescribePosition to false, because it's usually
+      confusing for the user.
+      E.g. each creature is conted as PrepareRenderSteps steps,
+      each item is conted as PrepareRenderSteps steps,
+      when loading levels user would have to know what an "octree" is. }
+    Progress.UseDescribePosition := false;
 
     ShowMenu;
   finally

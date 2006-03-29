@@ -5,9 +5,6 @@
 
 - cursor showing current menu item ?
 
-- change "building octree ..." things to just "Loading level..." (without position).
-  That's better for user.
-
 --------------------
 Must-have before next stage:
 

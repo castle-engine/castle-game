@@ -462,16 +462,11 @@ begin
   for I := 0 to High do
     PrepareRenderSteps +=  Items[I].PrepareRenderSteps;
 
-  { I'm turning UseDescribePosition to false, because it's confusing for
-    the user (because each item is conted as PrepareRenderSteps steps. }
-  Progress.UseDescribePosition := false;
+  Progress.Init(PrepareRenderSteps, 'Loading items');
   try
-    Progress.Init(PrepareRenderSteps, 'Loading items');
-    try
-      for I := 0 to High do
-        Items[I].PrepareRender;
-    finally Progress.Fini; end;
-  finally Progress.UseDescribePosition := true; end;
+    for I := 0 to High do
+      Items[I].PrepareRender;
+  finally Progress.Fini; end;
 end;
 
 { TItemPotionOfLifeKind ---------------------------------------------------- }

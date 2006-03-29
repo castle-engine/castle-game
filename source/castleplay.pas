@@ -699,7 +699,7 @@ begin
             Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
         end;
 
-        GLWinMessagesTheme.RectColor[3] := 0.6;
+        GLWinMessagesTheme.RectColor[3] := 0.4;
 
         GameMessagesManager := TTimeMessagesManager.Create(
           Glw, hpMiddle, vpDown, Glw.Width);
