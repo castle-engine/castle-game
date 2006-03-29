@@ -90,6 +90,8 @@ begin
   PositionRelativeX := prLowerBorder;
   PositionRelativeY := prLowerBorder;
 
+  DrawBackgroundRectangle := false;
+
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
@@ -149,6 +151,8 @@ begin
   Position := Vector2Single(20, 440);
   PositionRelativeX := prLowerBorder;
   PositionRelativeY := prHigherBorder;
+
+  DrawBackgroundRectangle := false;
 end;
 
 procedure TSubMenu.Draw;

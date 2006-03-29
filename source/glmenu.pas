@@ -124,6 +124,7 @@ type
     FNonCurrentItemColor: TVector3Single;
     MaxItemWidth: Single;
     FSpaceBetweenItems: Cardinal;
+    FDrawBackgroundRectangle: boolean;
     function GetCurrentItem: Integer;
     procedure SetCurrentItem(const Value: Integer);
   public
@@ -232,6 +233,10 @@ type
     property NonCurrentItemColor    : TVector3Single
       read FNonCurrentItemColor write FNonCurrentItemColor;
 
+    property DrawBackgroundRectangle: boolean
+      read FDrawBackgroundRectangle write FDrawBackgroundRectangle
+      default true;
+
     { Additional vertical space, in pixels, between menu items. }
     property SpaceBetweenItems: Cardinal
       read FSpaceBetweenItems write FSpaceBetweenItems
@@ -331,6 +336,7 @@ begin
   FNonCurrentItemColor := DefaultNonCurrentItemColor;
 
   FSpaceBetweenItems := DefaultSpaceBetweenItems;
+  FDrawBackgroundRectangle := true;
 end;
 
 destructor TGLMenu.Destroy;
@@ -501,7 +507,8 @@ var
   I: Integer;
   CurrentItemBorderColor: TVector3Single;
 begin
-  glCallList(GLList_DrawFadeRect);
+  if DrawBackgroundRectangle then
+    glCallList(GLList_DrawFadeRect);
 
   for I := 0 to Items.Count - 1 do
   begin
