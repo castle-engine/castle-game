@@ -19,13 +19,13 @@
 }
 
 { }
-unit CastleMenu;
+unit CastleStartMenu;
 
 interface
 
 { Show menu, ask user what to do, do what the user wants
   (e.g. load level and call PlayLevel), when user wants to quit -- return. }
-procedure ShowMenu;
+procedure ShowStartMenu;
 
 implementation
 
@@ -33,39 +33,66 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
-  CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu;
+  CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
+  OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit, OpenGLFonts;
 
-var
-  UserQuit: boolean;
-
-{ TCastleMainMenu ------------------------------------------------------------ }
+{ TCastleMenu descendants interface ------------------------------------------ }
 
 type
-  TCastleMainMenu = class(TCastleMenu)
+  TMainMenu = class(TCastleMenu)
     constructor Create;
     procedure CurrentItemSelected; override;
   end;
 
-constructor TCastleMainMenu.Create;
+  TSubMenu = class(TCastleMenu)
+    SubMenuTitle: string;
+    constructor Create;
+    procedure Draw; override;
+  end;
+
+  TKeyboardMenu = class(TSubMenu)
+    constructor Create;
+    procedure CurrentItemSelected; override;
+  end;
+
+  TVideoMenu = class(TSubMenu)
+    constructor Create;
+    procedure CurrentItemSelected; override;
+  end;
+
+{ ----------------------------------------------------------------------------
+  global vars (used by TCastleMenu descendants implementation) }
+
+var
+  UserQuit: boolean;
+  CurrentMenu: TCastleMenu;
+  MainMenu: TMainMenu;
+  KeyboardMenu: TKeyboardMenu;
+  VideoMenu: TVideoMenu;
+  SubMenuTitleFont: TGLBitmapFont_Abstract;
+
+{ TMainMenu ------------------------------------------------------------ }
+
+constructor TMainMenu.Create;
 begin
   inherited Create;
 
   Items.Add('Read instructions');
   Items.Add('New game (Tower - just a test level)');
   Items.Add('New game (Castle Hall - new level for PGD stage 3)');
-  Items.Add('View last game messages');
-  Items.Add('Video');
-  Items.Add('Sound');
+  Items.Add('Keyboard options');
+  Items.Add('Video options');
+  Items.Add('Sound options');
   Items.Add('Quit');
 
   Position := Vector2Single(20, 210);
-  PositionRelativeX := prZero;
-  PositionRelativeY := prZero;
+  PositionRelativeX := prLowerBorder;
+  PositionRelativeY := prLowerBorder;
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
-procedure TCastleMainMenu.CurrentItemSelected;
+procedure TMainMenu.CurrentItemSelected;
 
   procedure NewGame(Level: TLevel);
   var
@@ -80,18 +107,6 @@ procedure TCastleMainMenu.CurrentItemSelected;
         PlayLevel(Level, Player);
       finally Player.Free end;
     finally Level.Free end;
-  end;
-
-  procedure ViewVideoInfo;
-  begin
-    MessageOK(Glw,
-      'Video information:' +nl+
-      nl+
-      Format('Field of view horizontal : %f', [ViewAngleDegX]) +nl+
-      Format('Field of view vertical : %f', [ViewAngleDegY]) +nl+
-      nl+
-      GLCapsString,
-      taLeft);
   end;
 
   procedure ViewSoundInfo;
@@ -116,10 +131,89 @@ begin
     1: NewGame(
          TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
     2: NewGame(TCastleHallLevel.Create);
-    3: ViewGameMessages;
-    4: ViewVideoInfo;
+    3: CurrentMenu := KeyboardMenu;
+    4: CurrentMenu := VideoMenu;
     5: ViewSoundInfo;
     6: UserQuit := true;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+{ TSubMenu ------------------------------------------------------------- }
+
+constructor TSubMenu.Create;
+begin
+  inherited Create;
+
+  Position := Vector2Single(20, 440);
+  PositionRelativeX := prLowerBorder;
+  PositionRelativeY := prHigherBorder;
+end;
+
+procedure TSubMenu.Draw;
+begin
+  inherited;
+  glPushMatrix;
+    glTranslatef(Position[0], Position[1] - 20, 0);
+    glColorv(LightGray3Single);
+    glRasterPos2i(0, 0);
+    SubMenuTitleFont.Print(SubMenuTitle + ' :');
+  glPopMatrix;
+end;
+
+{ TKeyboardMenu ------------------------------------------------------------- }
+
+constructor TKeyboardMenu.Create;
+begin
+  inherited Create;
+
+  Items.Add('Back to main menu');
+
+  SubMenuTitle := 'Keyboard options';
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TKeyboardMenu.CurrentItemSelected;
+begin
+  case CurrentItem of
+    0: CurrentMenu := MainMenu;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+{ TVideoMenu ------------------------------------------------------------- }
+
+constructor TVideoMenu.Create;
+begin
+  inherited Create;
+
+  Items.Add('View video information');
+  Items.Add('Back to main menu');
+
+  SubMenuTitle := 'Video options';
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TVideoMenu.CurrentItemSelected;
+
+  procedure ViewVideoInfo;
+  begin
+    MessageOK(Glw,
+      'Video information:' +nl+
+      nl+
+      Format('Field of view horizontal : %f', [ViewAngleDegX]) +nl+
+      Format('Field of view vertical : %f', [ViewAngleDegY]) +nl+
+      nl+
+      GLCapsString,
+      taLeft);
+  end;
+
+begin
+  case CurrentItem of
+    0: ViewVideoInfo;
+    1: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -127,7 +221,6 @@ end;
 { global things -------------------------------------------------------------- }
 
 var
-  MainMenu: TCastleMainMenu;
   ListBgDraw: TGLuint;
 
 procedure Resize(Glwin: TGLWindow);
@@ -140,12 +233,12 @@ begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
   glCallList(ListBgDraw);
-  MainMenu.Draw;
+  CurrentMenu.Draw;
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  MainMenu.KeyDown(Key, C);
+  CurrentMenu.KeyDown(Key, C);
   case Key of
     K_F5: SaveScreen;
   end;
@@ -153,12 +246,17 @@ end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
 begin
-  MainMenu.MouseMove(NewX, Glwin.Height - NewY);
+  CurrentMenu.MouseMove(NewX, Glwin.Height - NewY);
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  MainMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
+  CurrentMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
+end;
+
+procedure Idle(Glwin: TGLWindow);
+begin
+  CurrentMenu.Idle(Glwin.FpsCompSpeed);
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);
@@ -167,7 +265,7 @@ begin
     UserQuit := true;
 end;
 
-procedure ShowMenu;
+procedure ShowStartMenu;
 var
   SavedMode: TGLMode;
 begin
@@ -179,6 +277,7 @@ begin
     Glw.OnKeyDown := KeyDown;
     Glw.OnMouseDown := MouseDown;
     Glw.OnMouseMove := MouseMove;
+    Glw.OnIdle := Idle;
 
     Glw.EventResize;
 
@@ -199,12 +298,20 @@ begin
     PathDelim + 'menu_bg' + PathDelim + 'menu_bg.png',
     [TRGBImage], [], Glw.Width, Glw.Height);
 
-  MainMenu := TCastleMainMenu.Create;
+  MainMenu := TMainMenu.Create;
+  VideoMenu := TVideoMenu.Create;
+  KeyboardMenu := TKeyboardMenu.Create;
+  CurrentMenu := MainMenu;
+  SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);
 begin
+  CurrentMenu := nil; { just for safety }
   FreeAndNil(MainMenu);
+  FreeAndNil(VideoMenu);
+  FreeAndNil(KeyboardMenu);
+  FreeAndNil(SubMenuTitleFont);
 end;
 
 initialization

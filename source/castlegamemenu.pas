@@ -107,6 +107,11 @@ begin
   GameMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
 end;
 
+procedure Idle(Glwin: TGLWindow);
+begin
+  GameMenu.Idle(Glwin.FpsCompSpeed);
+end;
+
 procedure CloseQuery(Glwin: TGLWindow);
 begin
   GameCancel(true);
@@ -130,6 +135,7 @@ begin
       Glw.OnKeyDown := KeyDown;
       Glw.OnMouseDown := MouseDown;
       Glw.OnMouseMove := MouseMove;
+      Glw.OnIdle := Idle;
 
       Glw.EventResize;
 

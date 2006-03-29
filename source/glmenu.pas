@@ -10,6 +10,11 @@ const
   DefaultGLMenuKeyPreviousItem = K_Up;
   DefaultGLMenuKeySelectItem = K_Enter;
 
+  DefaultCurrentItemBorderColor1: TVector3Single = (   1,    1,    1) { White3Single };
+  DefaultCurrentItemBorderColor2: TVector3Single = ( 0.5,  0.5,  0.5) { Gray3Single };
+  DefaultCurrentItemColor       : TVector3Single = (   1,    1,  0.3) { Yellow3Single };
+  DefaultNonCurrentItemColor    : TVector3Single = (   1,    1,    1) { White3Single };
+
 type
   { This is something that can be attached to some menu items of TGLMenu.
     For example, a slider --- see TGLMenuSlider. }
@@ -35,12 +40,17 @@ type
 
   { How TGLMenu.Position will be interpreted. }
   TPositionRelative = (
-    { Position (0, 0) means that menu will be in lower-left corner
-      of the screen. Other positions will move menu appropriately. }
-    prZero,
-    { Position (0, 0) means that menu will be in the middle
-      of the screen. Other positions will move menu appropriately. }
-    prMiddle);
+    { Position coordinate specifies position of the lower (or left,
+      depending whether it's applied to PositionRelativeX or PositionRelativeY)
+      border of the menu. }
+    prLowerBorder,
+    { Position coordinate = 0 means that menu will be in the middle
+      of the screen. Other positions will move menu appropriately
+      --- higher values to the up (or right), lower to the down (or left). }
+    prMiddle,
+    { Position coordinate specifies position of the upper (or right)
+      border of the menu. }
+    prHigherBorder);
 
   { A menu displayed in OpenGL.
 
@@ -63,6 +73,11 @@ type
     FKeyPreviousItem: TKey;
     FKeySelectItem: TKey;
     GLList_DrawFadeRect: TGLuint;
+    MenuAnimation: Single;
+    FCurrentItemBorderColor1: TVector3Single;
+    FCurrentItemBorderColor2: TVector3Single;
+    FCurrentItemColor: TVector3Single;
+    FNonCurrentItemColor: TVector3Single;
     function GetCurrentItem: Integer;
     procedure SetCurrentItem(const Value: Integer);
     { Initializes private as well as global required things. }
@@ -110,10 +125,12 @@ type
       - Draw or
       - MouseMove or
       - MouseDown
+      - KeyDown
+      - Idle
       You can call this only while OpenGL context is initialized. }
     procedure FixItemsAreas(const WindowWidth, WindowHeight: Cardinal);
 
-    procedure Draw;
+    procedure Draw; virtual;
 
     property KeyNextItem: TKey read FKeyNextItem write FKeyNextItem
       default DefaultGLMenuKeyNextItem;
@@ -132,13 +149,30 @@ type
 
     procedure MouseDown(const MouseX, MouseY: Single; Button: TMouseButton);
 
+    procedure Idle(const CompSpeed: Single);
+
     { Called when user will select CurrentItem, either with mouse
       or with keyboard. }
     procedure CurrentItemSelected; virtual;
 
-    { Called when CurrentItem changed, but *not* when CurrentItem
-      changed because of Items.Count changes. }
+    { Called when CurrentItem changed, or it's color changed.
+      But *not* when CurrentItem changed because of Items.Count changes. }
     procedure CurrentItemChanged; virtual;
+
+    { Default value is DefaultCurrentItemBorderColor1 }
+    property CurrentItemBorderColor1: TVector3Single
+      read FCurrentItemBorderColor1
+      write FCurrentItemBorderColor1;
+    { Default value is DefaultCurrentItemBorderColor2 }
+    property CurrentItemBorderColor2: TVector3Single
+      read FCurrentItemBorderColor2
+      write FCurrentItemBorderColor2;
+    { Default value is DefaultCurrentItemColor }
+    property CurrentItemColor       : TVector3Single
+      read FCurrentItemColor write FCurrentItemColor;
+    { Default value is DefaultNonCurrentItemColor }
+    property NonCurrentItemColor    : TVector3Single
+      read FNonCurrentItemColor write FNonCurrentItemColor;
   end;
 
 var
@@ -184,6 +218,11 @@ begin
   KeyNextItem := DefaultGLMenuKeyNextItem;
   KeyPreviousItem := DefaultGLMenuKeyPreviousItem;
   KeySelectItem := DefaultGLMenuKeySelectItem;
+
+  FCurrentItemBorderColor1 := DefaultCurrentItemBorderColor1;
+  FCurrentItemBorderColor2 := DefaultCurrentItemBorderColor2;
+  FCurrentItemColor := DefaultCurrentItemColor;
+  FNonCurrentItemColor := DefaultNonCurrentItemColor;
 end;
 
 destructor TGLMenu.Destroy;
@@ -288,18 +327,20 @@ begin
     and calculate PositionXMove, PositionYMove }
 
   case PositionRelativeX of
-    prZero: PositionXMove := 0;
-    prMiddle: PositionXMove := (WindowWidth - AllItemsArea.Width) / 2;
+    prLowerBorder: PositionXMove := Position[0];
+    prMiddle: PositionXMove :=
+      Position[0] + (WindowWidth - AllItemsArea.Width) / 2;
+    prHigherBorder: PositionXMove := Position[0] - AllItemsArea.Width;
     else raise EInternalError.Create('PositionRelativeX = ?');
   end;
-  PositionXMove += Position[0];
 
   case PositionRelativeY of
-    prZero: PositionYMove := 0;
-    prMiddle: PositionYMove := (WindowHeight - AllItemsArea.Height) / 2;
+    prLowerBorder: PositionYMove := Position[1];
+    prMiddle: PositionYMove :=
+      Position[1] + (WindowHeight - AllItemsArea.Height) / 2;
+    prHigherBorder: PositionYMove := Position[1] - AllItemsArea.Height;
     else raise EInternalError.Create('PositionRelativeY = ?');
   end;
-  PositionYMove += Position[1];
 
   { Calculate positions of all areas. }
 
@@ -329,25 +370,40 @@ begin
 end;
 
 procedure TGLMenu.Draw;
+const
+  CurrentItemBorderMargin = 5;
 var
   I: Integer;
+  CurrentItemBorderColor: TVector3Single;
 begin
   glCallList(GLList_DrawFadeRect);
 
   for I := 0 to Items.Count - 1 do
   begin
+    if I = CurrentItem then
+    begin
+      { Calculate CurrentItemBorderColor }
+      if MenuAnimation <= 0.5 then
+        CurrentItemBorderColor := VLerp(
+          MapRange(MenuAnimation, 0, 0.5, 0, 1),
+          CurrentItemBorderColor1, CurrentItemBorderColor2) else
+        CurrentItemBorderColor := VLerp(
+          MapRange(MenuAnimation, 0.5, 1, 0, 1),
+          CurrentItemBorderColor2, CurrentItemBorderColor1);
+
+      glColorv(CurrentItemBorderColor);
+      DrawGLRectBorder(
+        Areas[I].X0 - CurrentItemBorderMargin,
+        Areas[I].Y0,
+        Areas[I].X0 + Areas[I].Width + CurrentItemBorderMargin,
+        Areas[I].Y0 + Areas[I].Height);
+
+      glColorv(CurrentItemColor);
+    end else
+      glColorv(NonCurrentItemColor);
+
     glPushMatrix;
       glTranslatef(Areas[I].X0, Areas[I].Y0 + MenuFont.Descend, 0);
-
-      if I = CurrentItem then
-      begin
-{        glColorv(White3Single);
-        DrawGLRectBorder(-10, -MenuFont.Descend,
-          MenuFont.TextWidth(Items[I]) + 10, MenuFont.RowHeight);}
-        glColorv(Yellow3Single);
-      end else
-        glColorv(White3Single);
-
       glRasterPos2i(0, 0);
       MenuFont.Print(Items[I]);
     glPopMatrix;
@@ -386,6 +442,13 @@ begin
       CurrentItemSelected;
     end;
   end;
+end;
+
+procedure TGLMenu.Idle(const CompSpeed: Single);
+begin
+  MenuAnimation += 0.005 * CompSpeed;
+  MenuAnimation := Frac(MenuAnimation);
+  CurrentItemChanged;
 end;
 
 procedure TGLMenu.CurrentItemSelected;

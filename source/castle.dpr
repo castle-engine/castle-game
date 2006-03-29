@@ -25,7 +25,7 @@ program castle;
 uses GLWindow, SysUtils, KambiUtils,
   ProgressUnit, ProgressGL, OpenAL, ALUtils,
   ParseParametersUnit, GLWinMessages, KambiGLUtils,
-  CastleWindow, CastleMenu, CastleLevel, CastleHelp, CastleSound,
+  CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils;
 
 { parsing parameters --------------------------------------------------------- }
@@ -147,7 +147,7 @@ begin
       when loading levels user would have to know what an "octree" is. }
     Progress.UseDescribePosition := false;
 
-    ShowMenu;
+    ShowStartMenu;
   finally
     EndAL;
   end;
