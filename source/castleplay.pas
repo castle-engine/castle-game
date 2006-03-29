@@ -495,8 +495,7 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
 begin
   case Key of
-    K_F1: ShowHelpMessage;
-    K_F5: SaveScreen;
+    { Basic keys. }
     CastleKey_Attack: DoAttack;
     CastleKey_UpMove: MaybeDeadMessage;
     CastleKey_DownMove: MaybeDeadMessage;
@@ -509,25 +508,28 @@ begin
     CastleKey_UpRotate: MaybeDeadMessage;
     CastleKey_DownRotate: MaybeDeadMessage;
     CastleKey_HomeUp: MaybeDeadMessage;
+
+    { Items keys. }
+    CastleKey_InventoryShow: InventoryVisible := not InventoryVisible;
+    CastleKey_InventoryPrevious: ChangeInventoryCurrentItem(-1);
+    CastleKey_InventoryNext: ChangeInventoryCurrentItem(+1);
+    CastleKey_DropItem: DropItem;
+    CastleKey_UseItem: UseItem;
+
+    { Other keys. }
+    CastleKey_ShowHelp: ShowHelpMessage;
+    CastleKey_SaveScreen: SaveScreen;
+    CastleKey_ViewMessages: ViewGameMessages;
+    CastleKey_CancelFlying: CancelFlying;
+
     else
       case C of
-        'm': ViewGameMessages;
-
         { debug things }
         'l': if not Player.Dead then
                Player.Life := Min(Player.Life + 10, Player.MaxLife) else
                GameMessage(SDeadMessage);
         'L': Player.Life := Max(Player.Life - 10, 0);
         '`': ShowDebugInfo := not ShowDebugInfo;
-
-        { items-related things }
-        'i': InventoryVisible := not InventoryVisible;
-        '[': ChangeInventoryCurrentItem(-1);
-        ']': ChangeInventoryCurrentItem(+1);
-        'd': DropItem;
-        CharEnter: UseItem;
-
-        'c': CancelFlying;
 
         CharEscape: ShowGameMenu;
       end;

@@ -51,7 +51,22 @@ type
     procedure Draw; override;
   end;
 
-  TKeysMenu = class(TSubMenu)
+  TControlsMenu = class(TSubMenu)
+    constructor Create;
+    procedure CurrentItemSelected; override;
+  end;
+
+  TBasicControlsMenu = class(TSubMenu)
+    constructor Create;
+    procedure CurrentItemSelected; override;
+  end;
+
+  TItemsControlsMenu = class(TSubMenu)
+    constructor Create;
+    procedure CurrentItemSelected; override;
+  end;
+
+  TOtherControlsMenu = class(TSubMenu)
     constructor Create;
     procedure CurrentItemSelected; override;
   end;
@@ -68,7 +83,10 @@ var
   UserQuit: boolean;
   CurrentMenu: TCastleMenu;
   MainMenu: TMainMenu;
-  KeysMenu: TKeysMenu;
+  ControlsMenu: TControlsMenu;
+  BasicControlsMenu: TBasicControlsMenu;
+  ItemsControlsMenu: TItemsControlsMenu;
+  OtherControlsMenu: TOtherControlsMenu;
   VideoMenu: TVideoMenu;
   SubMenuTitleFont: TGLBitmapFont_Abstract;
 
@@ -81,7 +99,7 @@ begin
   Items.Add('Read instructions');
   Items.Add('New game (Tower - just a test level)');
   Items.Add('New game (Castle Hall - new level for PGD stage 3)');
-  Items.Add('Configure keys');
+  Items.Add('Configure controls');
   Items.Add('Video options');
   Items.Add('Sound options');
   Items.Add('Quit');
@@ -134,7 +152,7 @@ begin
     1: NewGame(
          TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
     2: NewGame(TCastleHallLevel.Create);
-    3: CurrentMenu := KeysMenu;
+    3: CurrentMenu := ControlsMenu;
     4: CurrentMenu := VideoMenu;
     5: ViewSoundInfo;
     6: UserQuit := true;
@@ -166,17 +184,43 @@ begin
   glPopMatrix;
 end;
 
-{ TKeysMenu ------------------------------------------------------------- }
+{ TControlsMenu ------------------------------------------------------------- }
 
-constructor TKeysMenu.Create;
+function KeyArgument(const Key: TKey): TGLMenuItemArgument;
+begin
+  Result := TGLMenuItemArgument.Create(
+    TGLMenuItemArgument.TextWidth('WWWWWWWWWWWW'));
+  Result.Value := KeyToStr(Key);
+end;
 
-  function KeyArgument(const Key: TKey): TGLMenuItemArgument;
-  begin
-    Result := TGLMenuItemArgument.Create(
-      TGLMenuItemArgument.TextWidth('WWWWWWWWWWWW'));
-    Result.Value := KeyToStr(Key);
+constructor TControlsMenu.Create;
+begin
+  inherited Create;
+
+  Items.Add('Basic controls');
+  Items.Add('Items controls');
+  Items.Add('Other controls');
+  Items.Add('Back to main menu');
+
+  SubMenuTitle := 'Configure controls';
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TControlsMenu.CurrentItemSelected;
+begin
+  case CurrentItem of
+    0: CurrentMenu := BasicControlsMenu;
+    1: CurrentMenu := ItemsControlsMenu;
+    2: CurrentMenu := OtherControlsMenu;
+    3: CurrentMenu := MainMenu;
+    else raise EInternalError.Create('Menu item unknown');
   end;
+end;
 
+{ TBasicControlsMenu ------------------------------------------------------------- }
+
+constructor TBasicControlsMenu.Create;
 begin
   inherited Create;
 
@@ -193,20 +237,103 @@ begin
   Items.AddObject('Jump (or fly up)', KeyArgument(CastleKey_UpMove));
   Items.AddObject('Crouch (or fly down)', KeyArgument(CastleKey_DownMove));
   Items.Add('Restore defaults');
-  Items.Add('Back to main menu');
+  Items.Add('Back to controls menu');
 
-  SubMenuTitle := 'Configure keys';
+  SubMenuTitle := 'Configure basic controls';
 
   SpaceBetweenItems := 2;
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
-procedure TKeysMenu.CurrentItemSelected;
+procedure TBasicControlsMenu.CurrentItemSelected;
 begin
   case CurrentItem of
     0..12: MessageOK(Glw, 'TODO: Not implemented yet');
-    13: CurrentMenu := MainMenu;
+    13: CurrentMenu := ControlsMenu;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+{ TItemsControlsMenu ------------------------------------------------------------- }
+
+{ TODO: when drawing this, show text:
+
+  Notes:
+  - you pick items lying on the ground just by walking on them.
+  - items are automatically unequipped when you drop them. }
+
+constructor TItemsControlsMenu.Create;
+begin
+  inherited Create;
+
+  Items.AddObject('Inventory show / hide', KeyArgument(CastleKey_InventoryShow));
+  Items.AddObject('Select previous inventory item', KeyArgument(CastleKey_InventoryPrevious));
+  Items.AddObject('Select next inventory item', KeyArgument(CastleKey_InventoryNext));
+  Items.AddObject('Use (or equip) selected inventory item', KeyArgument(CastleKey_UseItem));
+  Items.AddObject('Drop selected inventory item', KeyArgument(CastleKey_DropItem));
+  Items.Add('Restore defaults');
+  Items.Add('Back to controls menu');
+
+  SubMenuTitle := 'Configure items controls';
+
+  SpaceBetweenItems := 2;
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TItemsControlsMenu.CurrentItemSelected;
+begin
+  case CurrentItem of
+    0..5: MessageOK(Glw, 'TODO: Not implemented yet');
+    6: CurrentMenu := ControlsMenu;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+{ TOtherControlsMenu ------------------------------------------------------------- }
+
+{ TODO: when drawing this, show text:
+
+  Notes:
+  - cancel flying is useful only if you want to stop flying
+    before flying spell will automatically wear off
+
+  Escape = exit to game menu
+  ` (backquote) = FPS show / hide
+
+Mouse:
+  left mouse click on anything =
+    show information about pointed item on the level,
+    or use pointed device (press button, move switch etc.)
+
+Testing (cheating) keys:
+  L / Shift + L = life increase/decrease
+}
+
+constructor TOtherControlsMenu.Create;
+begin
+  inherited Create;
+
+  Items.AddObject('Show help', KeyArgument(CastleKey_ShowHelp));
+  Items.AddObject('View all messages', KeyArgument(CastleKey_ViewMessages));
+  Items.AddObject('Save screen', KeyArgument(CastleKey_SaveScreen));
+  Items.AddObject('Cancel flying', KeyArgument(CastleKey_CancelFlying));
+  Items.Add('Restore defaults');
+  Items.Add('Back to controls menu');
+
+  SubMenuTitle := 'Configure other controls';
+
+  SpaceBetweenItems := 2;
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TOtherControlsMenu.CurrentItemSelected;
+begin
+  case CurrentItem of
+    0..4: MessageOK(Glw, 'TODO: Not implemented yet');
+    5: CurrentMenu := ControlsMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -330,7 +457,10 @@ begin
 
   MainMenu := TMainMenu.Create;
   VideoMenu := TVideoMenu.Create;
-  KeysMenu := TKeysMenu.Create;
+  ControlsMenu := TControlsMenu.Create;
+  BasicControlsMenu := TBasicControlsMenu.Create;
+  ItemsControlsMenu := TItemsControlsMenu.Create;
+  OtherControlsMenu := TOtherControlsMenu.Create;
   CurrentMenu := MainMenu;
   SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
@@ -340,7 +470,10 @@ begin
   CurrentMenu := nil; { just for safety }
   FreeAndNil(MainMenu);
   FreeAndNil(VideoMenu);
-  FreeAndNil(KeysMenu);
+  FreeAndNil(ControlsMenu);
+  FreeAndNil(BasicControlsMenu);
+  FreeAndNil(ItemsControlsMenu);
+  FreeAndNil(OtherControlsMenu);
   FreeAndNil(SubMenuTitleFont);
 end;
 

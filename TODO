@@ -1,3 +1,6 @@
+- K_Left/RightBracket for winapi glwindow version
+  (otherwise it will not work in castle under Windows)
+
 - do weather (I have snow and rain from my szklane_lasy)
   do fog somewhere
 
