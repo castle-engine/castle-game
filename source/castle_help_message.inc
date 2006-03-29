@@ -4,15 +4,7 @@
 '' + LineEnding + 
 '--------------------' + LineEnding + 
 'Basic keys:' + LineEnding + 
-'  Ctrl = attack' + LineEnding + 
-'  Up / Down = move' + LineEnding + 
-'  Left / Right = rotate' + LineEnding + 
-'  PageUp / PageDown = raise / bow your head' + LineEnding + 
-'  Home = restore head raise to initial position (neutralize any effect of PageUp / PageDown)' + LineEnding + 
-'  A / Z =' + LineEnding + 
-'    in "Flying mode" : fly up / down' + LineEnding + 
-'    not in "Flying mode" : jump / crouch' + LineEnding + 
-'  Comma / Period = strafe move left / right' + LineEnding + 
+'  See menu "Configure keys"' + LineEnding + 
 '' + LineEnding + 
 '--------------------' + LineEnding + 
 'Commands related to items:' + LineEnding + 

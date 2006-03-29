@@ -15,11 +15,52 @@ const
   DefaultCurrentItemColor       : TVector3Single = (   1,    1,  0.3) { Yellow3Single };
   DefaultNonCurrentItemColor    : TVector3Single = (   1,    1,    1) { White3Single };
 
+  DefaultSpaceBetweenItems = 10;
+
 type
   { This is something that can be attached to some menu items of TGLMenu.
     For example, a slider --- see TGLMenuSlider. }
   TGLMenuItemAccessory = class
-    procedure Draw; virtual; abstract;
+  public
+    { Return the width you will need to display yourself.
+
+      Note that this will be asked only from FixItemsAreas
+      from TGLMenu. So for example TGLMenuItemArgument
+      is *not* supposed to return here something based on
+      current TGLMenuItemArgument.Value,
+      because we will not query GetWidth after every change of
+      TGLMenuItemArgument.Value. Instead, TGLMenuItemArgument
+      should return here the width of widest possible Value. }
+    function GetWidth(MenuFont: TGLBitmapFont): Single; virtual; abstract;
+
+    { Draw yourself. I don't pass here Width --- you know it from
+      your own GetWidth. }
+    procedure Draw(const X0, Y0, Height: Single); virtual; abstract;
+  end;
+
+  { This is TGLMenuItemAccessory that will just display
+    additional text (using some different color than Menu.CurrentItemColor)
+    after the menu item. The intention is that the Value will be changeable
+    by the user (while the basic item text remains constant).
+    For example Value may describe "on" / "off" state of something,
+    the name of some key currently assigned to some function etc. }
+  TGLMenuItemArgument = class(TGLMenuItemAccessory)
+  private
+    FMaximumValueWidth: Single;
+    FValue: string;
+  public
+    constructor Create(const AMaximumValueWidth: Single);
+
+    property Value: string read FValue write FValue;
+
+    property MaximumValueWidth: Single
+      read FMaximumValueWidth write FMaximumValueWidth;
+
+    { Calculate text width using font used by TGLMenuItemArgument. }
+    class function TextWidth(const Text: string): Single;
+
+    function GetWidth(MenuFont: TGLBitmapFont): Single; override;
+    procedure Draw(const X0, Y0, Height: Single); override;
   end;
 
   TGLMenuSlider = class(TGLMenuItemAccessory)
@@ -32,10 +73,13 @@ type
     FValue: Single;
   public
     constructor Create(const ABeginRange, AEndRange, AValue: Single);
+
     property BeginRange: Single read FBeginRange;
     property EndRange: Single read FEndRange;
     property Value: Single read FValue;
-    procedure Draw; override;
+
+    function GetWidth(MenuFont: TGLBitmapFont): Single; override;
+    procedure Draw(const X0, Y0, Height: Single); override;
   end;
 
   { How TGLMenu.Position will be interpreted. }
@@ -78,10 +122,10 @@ type
     FCurrentItemBorderColor2: TVector3Single;
     FCurrentItemColor: TVector3Single;
     FNonCurrentItemColor: TVector3Single;
+    MaxItemWidth: Single;
+    FSpaceBetweenItems: Cardinal;
     function GetCurrentItem: Integer;
     procedure SetCurrentItem(const Value: Integer);
-    { Initializes private as well as global required things. }
-    procedure InitGL;
   public
     constructor Create;
     destructor Destroy; override;
@@ -95,6 +139,13 @@ type
     property PositionRelativeY: TPositionRelative
       read FPositionRelativeY write FPositionRelativeY default prMiddle;
 
+    { Items of this menu.
+
+      Note that Objects of this class have special meaning: they must
+      be either nil or some TGLMenuItemAccessory instance
+      (different TGLMenuItemAccessory instance for each item).
+      When freeing this TGLMenu instance, note that we will also
+      free all Items.Objects. }
     property Items: TStringList read FItems;
 
     { When Items.Count <> 0, this is always some number
@@ -119,14 +170,21 @@ type
     procedure CloseGL;
 
     { You must call FixItemsAreas between last modification of
-      - Items and/or
-      - Position
-      and calling procedures
-      - Draw or
-      - MouseMove or
-      - MouseDown
-      - KeyDown
-      - Idle
+      @unorderedList(
+        @itemSpacing Compact
+        @item Items
+        @item Position
+        @item SpaceBetweenItems
+      )
+      and calling one of the procedures
+      @unorderedList(
+        @itemSpacing Compact
+        @item Draw
+        @item MouseMove
+        @item MouseDown
+        @item KeyDown
+        @item Idle
+      )
       You can call this only while OpenGL context is initialized. }
     procedure FixItemsAreas(const WindowWidth, WindowHeight: Cardinal);
 
@@ -173,6 +231,11 @@ type
     { Default value is DefaultNonCurrentItemColor }
     property NonCurrentItemColor    : TVector3Single
       read FNonCurrentItemColor write FNonCurrentItemColor;
+
+    { Additional vertical space, in pixels, between menu items. }
+    property SpaceBetweenItems: Cardinal
+      read FSpaceBetweenItems write FSpaceBetweenItems
+      default DefaultSpaceBetweenItems;
   end;
 
 var
@@ -187,6 +250,43 @@ implementation
 
 uses SysUtils, KambiUtils, KambiGLUtils;
 
+procedure MenuFontInit;
+begin
+  if MenuFont = nil then
+    MenuFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
+end;
+
+{ TGLMenuItemArgument -------------------------------------------------------- }
+
+constructor TGLMenuItemArgument.Create(const AMaximumValueWidth: Single);
+begin
+  inherited Create;
+  FMaximumValueWidth := AMaximumValueWidth;
+end;
+
+class function TGLMenuItemArgument.TextWidth(const Text: string): Single;
+begin
+  MenuFontInit;
+  Result := MenuFont.TextWidth(Text);
+end;
+
+function TGLMenuItemArgument.GetWidth(MenuFont: TGLBitmapFont);
+begin
+  Result := MaximumValueWidth;
+end;
+
+procedure TGLMenuItemArgument.Draw(const X0, Y0, Height: Single);
+begin
+  MenuFontInit;
+
+  glPushMatrix;
+    glTranslatef(X0, Y0 + MenuFont.Descend, 0);
+    glColorv(LightGreen3Single);
+    glRasterPos2i(0, 0);
+    MenuFont.Print(Value);
+  glPopMatrix;
+end;
+
 { TGLMenuFloatSlider --------------------------------------------------------- }
 
 constructor TGLMenuFloatSlider.Create(
@@ -198,7 +298,13 @@ begin
   FValue := AValue;
 end;
 
-procedure TGLMenuFloatSlider.Draw;
+function TGLMenuFloatSlider.GetWidth(MenuFont: TGLBitmapFont): Single;
+begin
+  Result := 0;
+  { TODO }
+end;
+
+procedure TGLMenuFloatSlider.Draw(const X0, Y0, Height: Single);
 begin
   { TODO }
 end;
@@ -223,12 +329,20 @@ begin
   FCurrentItemBorderColor2 := DefaultCurrentItemBorderColor2;
   FCurrentItemColor := DefaultCurrentItemColor;
   FNonCurrentItemColor := DefaultNonCurrentItemColor;
+
+  FSpaceBetweenItems := DefaultSpaceBetweenItems;
 end;
 
 destructor TGLMenu.Destroy;
+var
+  I: Integer;
 begin
   CloseGL;
+
+  for I := 0 to Items.Count - 1 do
+    Items.Objects[I].Free;
   FreeAndNil(FItems);
+
   FreeAndNil(Areas);
   inherited;
 end;
@@ -281,47 +395,58 @@ begin
   end;
 end;
 
-procedure TGLMenu.InitGL;
-begin
-  if MenuFont = nil then
-    MenuFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
-end;
-
 procedure TGLMenu.CloseGL;
 begin
   glFreeDisplayList(GLList_DrawFadeRect);
 end;
+
+const
+  MarginBeforeAccessory = 20;
 
 procedure TGLMenu.FixItemsAreas(const WindowWidth, WindowHeight: Cardinal);
 const
   AllItemsAreaMargin = 30;
 var
   I: Integer;
-  MaxItemWidth, ItemWidth: Single;
+  WholeItemWidth, MaxAccessoryWidth: Single;
   PositionXMove, PositionYMove: Single;
   AllItemsArea: TArea;
 begin
-  InitGL;
+  MenuFontInit;
 
-  { calculate Areas Widths and Heights and MaxItemWidth }
+  { calculate MaxItemWidth, MaxAccessoryWidth }
 
-  Areas.Count := 0;
   MaxItemWidth := 0.0;
+  MaxAccessoryWidth := 0.0;
   for I := 0 to Items.Count - 1 do
   begin
-    ItemWidth := MenuFont.TextWidth(Items[I]);
-    MaxTo1st(MaxItemWidth, ItemWidth);
-    Areas.AppendItem(Area(0, 0, ItemWidth,
-      MenuFont.Descend + MenuFont.RowHeight));
+    MaxTo1st(MaxItemWidth, MenuFont.TextWidth(Items[I]));
+    if Items.Objects[I] <> nil then
+      MaxTo1st(MaxAccessoryWidth,
+        TGLMenuItemAccessory(Items.Objects[I]).GetWidth(MenuFont));
   end;
 
   { calculate AllItemsArea Width and Height }
 
   AllItemsArea.Width := MaxItemWidth;
-  AllItemsArea.Height := (MenuFont.RowHeight + 10) * Areas.Count;
+  if MaxAccessoryWidth <> 0.0 then
+    AllItemsArea.Width += MarginBeforeAccessory + MaxAccessoryWidth;
+  AllItemsArea.Height := (MenuFont.RowHeight + SpaceBetweenItems) * Items.Count;
 
   AllItemsArea.Width += 2 * AllItemsAreaMargin;
   AllItemsArea.Height += 2 * AllItemsAreaMargin;
+
+  { calculate Areas Widths and Heights }
+
+  Areas.Count := 0;
+  for I := 0 to Items.Count - 1 do
+  begin
+    if MaxAccessoryWidth <> 0.0 then
+      WholeItemWidth := MaxItemWidth + MarginBeforeAccessory + MaxAccessoryWidth else
+      WholeItemWidth := MenuFont.TextWidth(Items[I]);
+    Areas.AppendItem(Area(0, 0, WholeItemWidth,
+      MenuFont.Descend + MenuFont.RowHeight));
+  end;
 
   { Now take into account Position, PositionRelativeX and PositionRelativeY,
     and calculate PositionXMove, PositionYMove }
@@ -348,7 +473,7 @@ begin
   begin
     Areas[I].X0 := PositionXMove + AllItemsAreaMargin;
     Areas[I].Y0 := PositionYMove + AllItemsAreaMargin
-      + (Areas.High - I) * (MenuFont.RowHeight + 10);
+      + (Areas.High - I) * (MenuFont.RowHeight + SpaceBetweenItems);
   end;
   AllItemsArea.X0 := PositionXMove;
   AllItemsArea.Y0 := PositionYMove;
@@ -407,6 +532,11 @@ begin
       glRasterPos2i(0, 0);
       MenuFont.Print(Items[I]);
     glPopMatrix;
+
+    if Items.Objects[I] <> nil then
+      TGLMenuItemAccessory(Items.Objects[I]).Draw(
+        Areas[I].X0 + MaxItemWidth + MarginBeforeAccessory,
+        Areas[I].Y0, Areas[I].Height);
   end;
 end;
 
@@ -446,7 +576,7 @@ end;
 
 procedure TGLMenu.Idle(const CompSpeed: Single);
 begin
-  MenuAnimation += 0.005 * CompSpeed;
+  MenuAnimation += 0.01 * CompSpeed;
   MenuAnimation := Frac(MenuAnimation);
   CurrentItemChanged;
 end;

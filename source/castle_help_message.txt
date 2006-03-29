@@ -2,15 +2,7 @@ Keys available in game:
 
 --------------------
 Basic keys:
-  Ctrl = attack
-  Up / Down = move
-  Left / Right = rotate
-  PageUp / PageDown = raise / bow your head
-  Home = restore head raise to initial position (neutralize any effect of PageUp / PageDown)
-  A / Z =
-    in "Flying mode" : fly up / down
-    not in "Flying mode" : jump / crouch
-  Comma / Period = strafe move left / right
+  See menu "Configure keys"
 
 --------------------
 Commands related to items:

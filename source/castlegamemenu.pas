@@ -126,7 +126,8 @@ begin
     SavedMode := TGLMode.Create(Glw, GL_ENABLE_BIT, true);
     try
       SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
-        nil, false, false, false, K_None, #0, false, false);
+        nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
+        false, K_None, #0, false, false);
 
       { Otherwise messages don't look good, because the text is mixed
         with the menu text. }

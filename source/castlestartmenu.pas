@@ -34,7 +34,8 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
-  OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit, OpenGLFonts;
+  OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit, OpenGLFonts,
+  CastleKeys, Keys;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -50,7 +51,7 @@ type
     procedure Draw; override;
   end;
 
-  TKeyboardMenu = class(TSubMenu)
+  TKeysMenu = class(TSubMenu)
     constructor Create;
     procedure CurrentItemSelected; override;
   end;
@@ -67,7 +68,7 @@ var
   UserQuit: boolean;
   CurrentMenu: TCastleMenu;
   MainMenu: TMainMenu;
-  KeyboardMenu: TKeyboardMenu;
+  KeysMenu: TKeysMenu;
   VideoMenu: TVideoMenu;
   SubMenuTitleFont: TGLBitmapFont_Abstract;
 
@@ -80,7 +81,7 @@ begin
   Items.Add('Read instructions');
   Items.Add('New game (Tower - just a test level)');
   Items.Add('New game (Castle Hall - new level for PGD stage 3)');
-  Items.Add('Keyboard options');
+  Items.Add('Configure keys');
   Items.Add('Video options');
   Items.Add('Sound options');
   Items.Add('Quit');
@@ -131,7 +132,7 @@ begin
     1: NewGame(
          TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
     2: NewGame(TCastleHallLevel.Create);
-    3: CurrentMenu := KeyboardMenu;
+    3: CurrentMenu := KeysMenu;
     4: CurrentMenu := VideoMenu;
     5: ViewSoundInfo;
     6: UserQuit := true;
@@ -161,23 +162,47 @@ begin
   glPopMatrix;
 end;
 
-{ TKeyboardMenu ------------------------------------------------------------- }
+{ TKeysMenu ------------------------------------------------------------- }
 
-constructor TKeyboardMenu.Create;
+constructor TKeysMenu.Create;
+
+  function KeyArgument(const Key: TKey): TGLMenuItemArgument;
+  begin
+    Result := TGLMenuItemArgument.Create(
+      TGLMenuItemArgument.TextWidth('WWWWWWWWWWWW'));
+    Result.Value := KeyToStr(Key);
+  end;
+
 begin
   inherited Create;
 
+  Items.AddObject('Attack', KeyArgument(CastleKey_Attack));
+  Items.AddObject('Move forward', KeyArgument(CastleKey_Forward));
+  Items.AddObject('Move backward', KeyArgument(CastleKey_Backward));
+  Items.AddObject('Turn left', KeyArgument(CastleKey_LeftRot));
+  Items.AddObject('Turn right', KeyArgument(CastleKey_RightRot));
+  Items.AddObject('Move left', KeyArgument(CastleKey_LeftStrafe));
+  Items.AddObject('Move right', KeyArgument(CastleKey_RightStrafe));
+  Items.AddObject('Loop up', KeyArgument(CastleKey_UpRotate));
+  Items.AddObject('Look down', KeyArgument(CastleKey_DownRotate));
+  Items.AddObject('Look straight', KeyArgument(CastleKey_HomeUp));
+  Items.AddObject('Jump (or fly up)', KeyArgument(CastleKey_UpMove));
+  Items.AddObject('Crouch (or fly down)', KeyArgument(CastleKey_DownMove));
+  Items.Add('Restore defaults');
   Items.Add('Back to main menu');
 
-  SubMenuTitle := 'Keyboard options';
+  SubMenuTitle := 'Configure keys';
+
+  SpaceBetweenItems := 2;
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
-procedure TKeyboardMenu.CurrentItemSelected;
+procedure TKeysMenu.CurrentItemSelected;
 begin
   case CurrentItem of
-    0: CurrentMenu := MainMenu;
+    0..12: MessageOK(Glw, 'TODO: Not implemented yet');
+    13: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -272,7 +297,8 @@ begin
   SavedMode := TGLMode.Create(glw, 0, false);
   try
     SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
-      nil, false, false, false, K_None, #0, false, false);
+      nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
+      false, K_None, #0, false, false);
 
     Glw.OnKeyDown := KeyDown;
     Glw.OnMouseDown := MouseDown;
@@ -300,7 +326,7 @@ begin
 
   MainMenu := TMainMenu.Create;
   VideoMenu := TVideoMenu.Create;
-  KeyboardMenu := TKeyboardMenu.Create;
+  KeysMenu := TKeysMenu.Create;
   CurrentMenu := MainMenu;
   SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
@@ -310,7 +336,7 @@ begin
   CurrentMenu := nil; { just for safety }
   FreeAndNil(MainMenu);
   FreeAndNil(VideoMenu);
-  FreeAndNil(KeyboardMenu);
+  FreeAndNil(KeysMenu);
   FreeAndNil(SubMenuTitleFont);
 end;
 
