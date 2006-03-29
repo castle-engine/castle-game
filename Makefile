@@ -7,7 +7,8 @@
 # Various targets.
 
 # default: make sure that various files are up-to-date, and show info
-default: castle_help_message.inc info
+default: info
+	$(MAKE) -C source/
 	$(MAKE) -C data/items/models/
 	$(MAKE) -C data/items/images/
 	$(MAKE) -C data/items/equipped/
@@ -28,17 +29,14 @@ info:
 # and that GLWindow unit uses proper backend).
 
 build-unix:
-	fpc -dRELEASE @kambi.cfg -dGLWINDOW_XLIB castle.dpr
+	cd source; \
+	  fpc -dRELEASE @kambi.cfg -dGLWINDOW_XLIB castle.dpr; \
+	  mv castle ../
 
 build-win32:
-	fpc -dRELEASE @kambi.cfg castle.dpr
-
-# Updating some files ----------------------------------------
-
-# Note about file_to_pascal_string: it's another program of mine,
-# you can get it from pasdoc [http://pasdoc.sourceforge.net/] sources.
-castle_help_message.inc: castle_help_message.txt
-	file_to_pascal_string castle_help_message.txt castle_help_message.inc
+	cd source; \
+	  fpc -dRELEASE @kambi.cfg castle.dpr; \
+	  mv castle.exe ../
 
 # ------------------------------------------------------------
 # Cleaning targets.
@@ -98,9 +96,9 @@ dist:
 	chmod 755 $(TMP_DIST_PATH)castle/castle
 # Copy and clean general units sources
 	cd /win/mojewww/camelot/private/update_archives/; ./update_pascal_src.sh units
-	cp /win/mojewww/camelot/src/pascal/units-src.tar.gz $(TMP_DIST_PATH)castle/
-	cd $(TMP_DIST_PATH)castle/; tar xzf units-src.tar.gz
-	rm -f $(TMP_DIST_PATH)castle/units-src.tar.gz
+	cp /win/mojewww/camelot/src/pascal/units-src.tar.gz $(TMP_DIST_PATH)castle/source/
+	cd $(TMP_DIST_PATH)castle/source/; tar xzf units-src.tar.gz
+	rm -f $(TMP_DIST_PATH)castle/source/units-src.tar.gz
 # Pack things
 	cd $(TMP_DIST_PATH); tar czf castle-$(VERSION).tar.gz castle/
 	mv $(TMP_DIST_PATH)castle-$(VERSION).tar.gz .
