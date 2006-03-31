@@ -105,9 +105,9 @@ begin
   Items.Add('Sound options');
   Items.Add('Quit');
 
-  Position := Vector2Single(20, 210);
+  Position := Vector2Single(20, 480);
   PositionRelativeX := prLowerBorder;
-  PositionRelativeY := prLowerBorder;
+  PositionRelativeY := prHigherBorder;
 
   DrawBackgroundRectangle := false;
 
