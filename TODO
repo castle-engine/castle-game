@@ -42,6 +42,9 @@ Note: Some people experience sickness with the FOV in Half-Life 2 which is set t
 Would-be-nice before next stage:
 
 --------------------
+- "The Gate" level:
+  - volumetric fog (like from malfunction) needed there
+
 - creature<->creature collision is also needed
 
 - weapon-less attack (does knockback + small damage)

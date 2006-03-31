@@ -97,6 +97,7 @@ begin
   inherited Create;
 
   Items.Add('Read instructions');
+  Items.Add('New game (The Gate - new level for PGD stage 4)');
   Items.Add('New game (Tower - just a test level)');
   Items.Add('New game (Castle Hall - new level for PGD stage 3)');
   Items.Add('Configure controls');
@@ -150,12 +151,14 @@ begin
   case CurrentItem of
     0: ShowHelpMessage;
     1: NewGame(
+         TLevel.Create('gate_final.wrl', 'gate_lights.wrl'));
+    2: NewGame(
          TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
-    2: NewGame(TCastleHallLevel.Create);
-    3: CurrentMenu := ControlsMenu;
-    4: CurrentMenu := VideoMenu;
-    5: ViewSoundInfo;
-    6: UserQuit := true;
+    3: NewGame(TCastleHallLevel.Create);
+    4: CurrentMenu := ControlsMenu;
+    5: CurrentMenu := VideoMenu;
+    6: ViewSoundInfo;
+    7: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

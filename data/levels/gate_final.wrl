@@ -1,0 +1,36 @@
+#VRML V1.0 ascii
+
+Group {
+  # Just for testing lights from view3dscene
+  # WWWInline { name "gate_lights.wrl" separate FALSE }
+
+  PerspectiveCamera {
+    position -69.042160034179687 -88.098213195800781 2.066509962081909
+    orientation 0.892337739467621 -0.319165647029877 -0.319165676832199 1.684461355209351
+  }
+
+  NavigationInfo {
+    avatarSize [ 0.5, 2 ]
+    speed 2
+    headlight TRUE
+  }
+
+  Separator {
+    Rotation { rotation 1 0 0 1.57 }
+
+    Background {
+      backUrl "../skies/sky_back.png"
+      bottomUrl "../skies/sky_bottom.png"
+      frontUrl "../skies/sky_front.png"
+      leftUrl "../skies/sky_left.png"
+      rightUrl "../skies/sky_right.png"
+      topUrl "../skies/sky_top.png"
+    }
+  }
+
+  WorldInfo {
+    title "The Gate"
+  }
+
+  WWWInline { name "gate.wrl" }
+}
