@@ -2,9 +2,6 @@
   glTexParameteri(pTarget, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
   when mipmap is not needed, and textures must be 2power of 2 for this!
 
-- K_Left/RightBracket for winapi glwindow version
-  (otherwise it will not work in castle under Windows)
-
 - do weather (I have snow and rain from my szklane_lasy)
   do fog somewhere
 
@@ -44,6 +41,8 @@ Would-be-nice before next stage:
 --------------------
 - "The Gate" level:
   - volumetric fog (like from malfunction) needed there
+  - intro under menu: camera floating around level with this fog ?
+  - walking up and down the stairs causes player to lose life
 
 - creature<->creature collision is also needed
 
