@@ -34,7 +34,7 @@ Would-be-nice before next stage:
 - "The Gate" level:
   - volumetric fog (like from malfunction) needed there
   - intro under menu: camera floating around level with this fog ?
-  - walking up and down the stairs causes player to lose life
+  - walking down the stairs and down the hill causes player to lose life
 
 - creature<->creature collision is also needed
 
