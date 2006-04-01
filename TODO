@@ -5,9 +5,8 @@
 
 - when creature dies, the effect is not natural, player often feels
   "stuck" and cannot move.
+  Sometimes I can walk "through" some creature, e.g. werewolf.
   Maybe I should add creatures to GetCameraHeight ?
-
-- controls menu must be shown in the gamemenu too.
 
 --------------------
 Must-have before next stage:

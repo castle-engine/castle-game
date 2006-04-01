@@ -34,40 +34,12 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
-  OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit, OpenGLFonts,
-  CastleKeys, Keys;
+  CastleControlsMenu;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
 type
   TMainMenu = class(TCastleMenu)
-    constructor Create;
-    procedure CurrentItemSelected; override;
-  end;
-
-  TSubMenu = class(TCastleMenu)
-    SubMenuTitle: string;
-    SubMenuAdditionalInfo: string;
-    constructor Create;
-    procedure Draw; override;
-  end;
-
-  TControlsMenu = class(TSubMenu)
-    constructor Create;
-    procedure CurrentItemSelected; override;
-  end;
-
-  TBasicControlsMenu = class(TSubMenu)
-    constructor Create;
-    procedure CurrentItemSelected; override;
-  end;
-
-  TItemsControlsMenu = class(TSubMenu)
-    constructor Create;
-    procedure CurrentItemSelected; override;
-  end;
-
-  TOtherControlsMenu = class(TSubMenu)
     constructor Create;
     procedure CurrentItemSelected; override;
   end;
@@ -84,12 +56,8 @@ var
   UserQuit: boolean;
   CurrentMenu: TCastleMenu;
   MainMenu: TMainMenu;
-  ControlsMenu: TControlsMenu;
-  BasicControlsMenu: TBasicControlsMenu;
-  ItemsControlsMenu: TItemsControlsMenu;
-  OtherControlsMenu: TOtherControlsMenu;
   VideoMenu: TVideoMenu;
-  SubMenuTitleFont: TGLBitmapFont_Abstract;
+  GLList_ScreenImage: TGLuint;
 
 { TMainMenu ------------------------------------------------------------ }
 
@@ -155,195 +123,11 @@ begin
     1: NewGame(
          TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
     2: NewGame(TCastleHallLevel.Create);
-    3: CurrentMenu := ControlsMenu;
+    3: ShowControlsMenu(GLList_ScreenImage, false, false);
     4: CurrentMenu := VideoMenu;
     5: ViewSoundInfo;
     6: ShowCreditsMessage;
     7: UserQuit := true;
-    else raise EInternalError.Create('Menu item unknown');
-  end;
-end;
-
-{ TSubMenu ------------------------------------------------------------- }
-
-constructor TSubMenu.Create;
-begin
-  inherited Create;
-
-  Position := Vector2Single(20, 440);
-  PositionRelativeX := prLowerBorder;
-  PositionRelativeY := prHigherBorder;
-
-  DrawBackgroundRectangle := false;
-end;
-
-procedure TSubMenu.Draw;
-begin
-  inherited;
-
-  glPushMatrix;
-    glTranslatef(Position[0], Position[1] - 20, 0);
-    glColorv(LightGray3Single);
-    glRasterPos2i(0, 0);
-    SubMenuTitleFont.Print(SubMenuTitle + ' :');
-  glPopMatrix;
-
-  if SubMenuAdditionalInfo <> '' then
-  begin
-    glPushMatrix;
-      glTranslatef(AllItemsArea.X0,
-        AllItemsArea.Y0 - SubMenuTitleFont.RowHeight, 0);
-      glColorv(LightGray3Single);
-      SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
-        RequiredScreenWidth - 2 * Round(AllItemsArea.X0), 0, 0, true, 0);
-    glPopMatrix;
-  end;
-end;
-
-{ TControlsMenu ------------------------------------------------------------- }
-
-function KeyArgument(const Key: TKey): TGLMenuItemArgument;
-begin
-  Result := TGLMenuItemArgument.Create(
-    TGLMenuItemArgument.TextWidth('WWWWWWWWWWWW'));
-  Result.Value := KeyToStr(Key);
-end;
-
-constructor TControlsMenu.Create;
-begin
-  inherited Create;
-
-  Items.Add('Basic controls');
-  Items.Add('Items controls');
-  Items.Add('Other controls');
-  Items.Add('Back to main menu');
-
-  SubMenuTitle := 'Configure controls';
-
-  FixItemsAreas(Glw.Width, Glw.Height);
-end;
-
-procedure TControlsMenu.CurrentItemSelected;
-begin
-  case CurrentItem of
-    0: CurrentMenu := BasicControlsMenu;
-    1: CurrentMenu := ItemsControlsMenu;
-    2: CurrentMenu := OtherControlsMenu;
-    3: CurrentMenu := MainMenu;
-    else raise EInternalError.Create('Menu item unknown');
-  end;
-end;
-
-{ TBasicControlsMenu ------------------------------------------------------------- }
-
-constructor TBasicControlsMenu.Create;
-begin
-  inherited Create;
-
-  Items.AddObject('Attack', KeyArgument(CastleKey_Attack));
-  Items.AddObject('Move forward', KeyArgument(CastleKey_Forward));
-  Items.AddObject('Move backward', KeyArgument(CastleKey_Backward));
-  Items.AddObject('Turn left', KeyArgument(CastleKey_LeftRot));
-  Items.AddObject('Turn right', KeyArgument(CastleKey_RightRot));
-  Items.AddObject('Move left', KeyArgument(CastleKey_LeftStrafe));
-  Items.AddObject('Move right', KeyArgument(CastleKey_RightStrafe));
-  Items.AddObject('Loop up', KeyArgument(CastleKey_UpRotate));
-  Items.AddObject('Look down', KeyArgument(CastleKey_DownRotate));
-  Items.AddObject('Look straight', KeyArgument(CastleKey_HomeUp));
-  Items.AddObject('Jump (or fly up)', KeyArgument(CastleKey_UpMove));
-  Items.AddObject('Crouch (or fly down)', KeyArgument(CastleKey_DownMove));
-  Items.Add('Restore defaults');
-  Items.Add('Back to controls menu');
-
-  SubMenuTitle := 'Configure basic controls';
-
-  SpaceBetweenItems := 2;
-
-  FixItemsAreas(Glw.Width, Glw.Height);
-end;
-
-procedure TBasicControlsMenu.CurrentItemSelected;
-begin
-  case CurrentItem of
-    0..12: MessageOK(Glw, 'TODO: Not implemented yet');
-    13: CurrentMenu := ControlsMenu;
-    else raise EInternalError.Create('Menu item unknown');
-  end;
-end;
-
-{ TItemsControlsMenu --------------------------------------------------------- }
-
-constructor TItemsControlsMenu.Create;
-begin
-  inherited Create;
-
-  Items.AddObject('Inventory show / hide', KeyArgument(CastleKey_InventoryShow));
-  Items.AddObject('Select previous inventory item', KeyArgument(CastleKey_InventoryPrevious));
-  Items.AddObject('Select next inventory item', KeyArgument(CastleKey_InventoryNext));
-  Items.AddObject('Use (or equip) selected inventory item', KeyArgument(CastleKey_UseItem));
-  Items.AddObject('Drop selected inventory item', KeyArgument(CastleKey_DropItem));
-  Items.Add('Restore defaults');
-  Items.Add('Back to controls menu');
-
-  SubMenuTitle := 'Configure items controls';
-
-  SubMenuAdditionalInfo :=
-    'Notes:' +nl+
-    '- You pick items lying on the ground just by walking on them.' +nl+
-    '- Items are automatically unequipped when you drop them.';
-
-  SpaceBetweenItems := 2;
-
-  FixItemsAreas(Glw.Width, Glw.Height);
-end;
-
-procedure TItemsControlsMenu.CurrentItemSelected;
-begin
-  case CurrentItem of
-    0..5: MessageOK(Glw, 'TODO: Not implemented yet');
-    6: CurrentMenu := ControlsMenu;
-    else raise EInternalError.Create('Menu item unknown');
-  end;
-end;
-
-{ TOtherControlsMenu ------------------------------------------------------------- }
-
-constructor TOtherControlsMenu.Create;
-begin
-  inherited Create;
-
-  Items.AddObject('View all messages', KeyArgument(CastleKey_ViewMessages));
-  Items.AddObject('Save screen', KeyArgument(CastleKey_SaveScreen));
-  Items.AddObject('Cancel flying', KeyArgument(CastleKey_CancelFlying));
-  Items.Add('Restore defaults');
-  Items.Add('Back to controls menu');
-
-  SubMenuTitle := 'Configure other controls';
-
-  SubMenuAdditionalInfo :=
-    'Non-configurable keys:' +nl+
-    '  Escape = exit to game menu' +nl+
-    '  ` (backquote) = FPS show / hide' +nl+
-    '  L / Shift + L = (cheating) life increase/decrease' +nl+
-    nl+
-    'Mouse:' +nl+
-    '  left mouse click on anything =' +nl+
-    '    show information about pointed item on the level,' +nl+
-    '    or use pointed device (press button, move switch etc.)' +nl+
-    nl+
-    'Note that the "Cancel flying" key is useful if you want to stop flying ' +
-    'before flying spell will automatically wear off.';
-
-  SpaceBetweenItems := 2;
-
-  FixItemsAreas(Glw.Width, Glw.Height);
-end;
-
-procedure TOtherControlsMenu.CurrentItemSelected;
-begin
-  case CurrentItem of
-    0..3: MessageOK(Glw, 'TODO: Not implemented yet');
-    4: CurrentMenu := ControlsMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -386,9 +170,6 @@ end;
 
 { global things -------------------------------------------------------------- }
 
-var
-  ListBgDraw: TGLuint;
-
 procedure Resize(Glwin: TGLWindow);
 begin
   ProjectionGLOrtho(0, Glwin.Width, 0, Glwin.Height);
@@ -398,7 +179,7 @@ procedure Draw(Glwin: TGLWindow);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
-  glCallList(ListBgDraw);
+  glCallList(GLList_ScreenImage);
   CurrentMenu.Draw;
 end;
 
@@ -415,9 +196,9 @@ begin
   CurrentMenu.MouseMove(NewX, Glwin.Height - NewY);
 end;
 
-procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  CurrentMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
+  CurrentMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
 end;
 
 procedure Idle(Glwin: TGLWindow);
@@ -442,7 +223,7 @@ begin
       false, K_None, #0, false, false);
 
     Glw.OnKeyDown := KeyDown;
-    Glw.OnMouseDown := MouseDown;
+    Glw.OnMouseUp := MouseUp;
     Glw.OnMouseMove := MouseMove;
     Glw.OnIdle := Idle;
 
@@ -461,18 +242,13 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  ListBgDraw := LoadImageToDispList(ProgramDataPath + 'data' +
+  GLList_ScreenImage := LoadImageToDispList(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'menu_bg.png',
     [TRGBImage], [], Glw.Width, Glw.Height);
 
   MainMenu := TMainMenu.Create;
   VideoMenu := TVideoMenu.Create;
-  ControlsMenu := TControlsMenu.Create;
-  BasicControlsMenu := TBasicControlsMenu.Create;
-  ItemsControlsMenu := TItemsControlsMenu.Create;
-  OtherControlsMenu := TOtherControlsMenu.Create;
   CurrentMenu := MainMenu;
-  SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);
@@ -480,11 +256,6 @@ begin
   CurrentMenu := nil; { just for safety }
   FreeAndNil(MainMenu);
   FreeAndNil(VideoMenu);
-  FreeAndNil(ControlsMenu);
-  FreeAndNil(BasicControlsMenu);
-  FreeAndNil(ItemsControlsMenu);
-  FreeAndNil(OtherControlsMenu);
-  FreeAndNil(SubMenuTitleFont);
 end;
 
 initialization

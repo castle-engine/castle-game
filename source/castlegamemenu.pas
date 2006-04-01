@@ -29,10 +29,12 @@ implementation
 
 uses SysUtils, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
-  VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu;
+  VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
+  CastleControlsMenu;
 
 var
   UserQuit: boolean;
+  GLList_ScreenImage: TGLuint;
 
 { TCastleGameMenu ------------------------------------------------------------ }
 
@@ -59,7 +61,7 @@ begin
   case CurrentItem of
     0: UserQuit := true;
     1: ViewGameMessages;
-    2: { TODO };
+    2: ShowControlsMenu(GLList_ScreenImage, true, true);
     3: GameCancel(false);
     else raise EInternalError.Create('Menu item unknown');
   end;
@@ -69,7 +71,6 @@ end;
 
 var
   GameMenu: TCastleGameMenu;
-  GLList_ScreenImage: TGLuint;
 
 procedure Resize(Glwin: TGLWindow);
 begin
@@ -102,9 +103,9 @@ begin
   GameMenu.MouseMove(NewX, Glwin.Height - NewY);
 end;
 
-procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  GameMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
+  GameMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
 end;
 
 procedure Idle(Glwin: TGLWindow);
@@ -134,7 +135,7 @@ begin
       GLWinMessagesTheme.RectColor[3] := 1.0;
 
       Glw.OnKeyDown := KeyDown;
-      Glw.OnMouseDown := MouseDown;
+      Glw.OnMouseUp := MouseUp;
       Glw.OnMouseMove := MouseMove;
       Glw.OnIdle := Idle;
 

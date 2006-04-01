@@ -183,7 +183,7 @@ type
         @itemSpacing Compact
         @item Draw
         @item MouseMove
-        @item MouseDown
+        @item MouseUp
         @item KeyDown
         @item Idle
       )
@@ -216,7 +216,7 @@ type
       have to flip the NewY like @code(Glwin.Height - NewY). }
     procedure MouseMove(const NewX, NewY: Single);
 
-    procedure MouseDown(const MouseX, MouseY: Single; Button: TMouseButton);
+    procedure MouseUp(const MouseX, MouseY: Single; Button: TMouseButton);
 
     procedure Idle(const CompSpeed: Single);
 
@@ -575,7 +575,7 @@ begin
     CurrentItem := NewItemIndex;
 end;
 
-procedure TGLMenu.MouseDown(const MouseX, MouseY: Single; Button: TMouseButton);
+procedure TGLMenu.MouseUp(const MouseX, MouseY: Single; Button: TMouseButton);
 var
   NewItemIndex: Integer;
 begin
