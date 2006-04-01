@@ -1,1 +1,2 @@
-# Nothing to do in this Makefile right now.
+default:
+	@echo 'Nothing to do in this Makefile right now'
