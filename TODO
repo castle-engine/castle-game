@@ -1,7 +1,3 @@
-- Fix mipmapping with sgis extension: don't forget to
-  glTexParameteri(pTarget, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
-  when mipmap is not needed, and textures must be 2power of 2 for this!
-
 - do weather (I have snow and rain from my szklane_lasy)
   do fog somewhere
 
