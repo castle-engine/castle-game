@@ -112,7 +112,8 @@ type
     FPosition: TVector2Single;
     FPositionRelativeX: TPositionRelative;
     FPositionRelativeY: TPositionRelative;
-    Areas: TDynAreaArray;
+    FAreas: TDynAreaArray;
+    FAllItemsArea: TArea;
     FKeyNextItem: TKey;
     FKeyPreviousItem: TKey;
     FKeySelectItem: TKey;
@@ -188,6 +189,15 @@ type
       )
       You can call this only while OpenGL context is initialized. }
     procedure FixItemsAreas(const WindowWidth, WindowHeight: Cardinal);
+
+    { These are initialized by FixItemsAreas.
+      They are absolutely read-only for the user of this class.
+      You can use them to do some graphic effects, when you e.g.
+      want to draw something on the screen that is somehow positioned
+      relative to some menu item or to whole menu area.
+      Note that AllItemsArea includes also some outside margin. }
+    property Areas: TDynAreaArray read FAreas;
+    property AllItemsArea: TArea read FAllItemsArea;
 
     procedure Draw; virtual;
 
@@ -321,7 +331,7 @@ begin
   inherited;
   FItems := TStringList.Create;
   FCurrentItem := 0;
-  Areas := TDynAreaArray.Create;
+  FAreas := TDynAreaArray.Create;
 
   FPositionRelativeX := prMiddle;
   FPositionRelativeY := prMiddle;
@@ -349,7 +359,7 @@ begin
     Items.Objects[I].Free;
   FreeAndNil(FItems);
 
-  FreeAndNil(Areas);
+  FreeAndNil(FAreas);
   inherited;
 end;
 
@@ -416,7 +426,6 @@ var
   I: Integer;
   WholeItemWidth, MaxAccessoryWidth: Single;
   PositionXMove, PositionYMove: Single;
-  AllItemsArea: TArea;
 begin
   MenuFontInit;
 
@@ -432,15 +441,15 @@ begin
         TGLMenuItemAccessory(Items.Objects[I]).GetWidth(MenuFont));
   end;
 
-  { calculate AllItemsArea Width and Height }
+  { calculate FAllItemsArea Width and Height }
 
-  AllItemsArea.Width := MaxItemWidth;
+  FAllItemsArea.Width := MaxItemWidth;
   if MaxAccessoryWidth <> 0.0 then
-    AllItemsArea.Width += MarginBeforeAccessory + MaxAccessoryWidth;
-  AllItemsArea.Height := (MenuFont.RowHeight + SpaceBetweenItems) * Items.Count;
+    FAllItemsArea.Width += MarginBeforeAccessory + MaxAccessoryWidth;
+  FAllItemsArea.Height := (MenuFont.RowHeight + SpaceBetweenItems) * Items.Count;
 
-  AllItemsArea.Width += 2 * AllItemsAreaMargin;
-  AllItemsArea.Height += 2 * AllItemsAreaMargin;
+  FAllItemsArea.Width += 2 * AllItemsAreaMargin;
+  FAllItemsArea.Height += 2 * AllItemsAreaMargin;
 
   { calculate Areas Widths and Heights }
 
@@ -460,16 +469,16 @@ begin
   case PositionRelativeX of
     prLowerBorder: PositionXMove := Position[0];
     prMiddle: PositionXMove :=
-      Position[0] + (WindowWidth - AllItemsArea.Width) / 2;
-    prHigherBorder: PositionXMove := Position[0] - AllItemsArea.Width;
+      Position[0] + (WindowWidth - FAllItemsArea.Width) / 2;
+    prHigherBorder: PositionXMove := Position[0] - FAllItemsArea.Width;
     else raise EInternalError.Create('PositionRelativeX = ?');
   end;
 
   case PositionRelativeY of
     prLowerBorder: PositionYMove := Position[1];
     prMiddle: PositionYMove :=
-      Position[1] + (WindowHeight - AllItemsArea.Height) / 2;
-    prHigherBorder: PositionYMove := Position[1] - AllItemsArea.Height;
+      Position[1] + (WindowHeight - FAllItemsArea.Height) / 2;
+    prHigherBorder: PositionYMove := Position[1] - FAllItemsArea.Height;
     else raise EInternalError.Create('PositionRelativeY = ?');
   end;
 
@@ -481,8 +490,8 @@ begin
     Areas[I].Y0 := PositionYMove + AllItemsAreaMargin
       + (Areas.High - I) * (MenuFont.RowHeight + SpaceBetweenItems);
   end;
-  AllItemsArea.X0 := PositionXMove;
-  AllItemsArea.Y0 := PositionYMove;
+  FAllItemsArea.X0 := PositionXMove;
+  FAllItemsArea.Y0 := PositionYMove;
 
   { calculate GLList_DrawFadeRect }
 
@@ -493,9 +502,9 @@ begin
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
       glColor4f(0, 0, 0, 0.4);
-      glRectf(AllItemsArea.X0, AllItemsArea.Y0,
-        AllItemsArea.X0 + AllItemsArea.Width,
-        AllItemsArea.Y0 + AllItemsArea.Height);
+      glRectf(FAllItemsArea.X0, FAllItemsArea.Y0,
+        FAllItemsArea.X0 + FAllItemsArea.Width,
+        FAllItemsArea.Y0 + FAllItemsArea.Height);
     glDisable(GL_BLEND);
   finally glEndList end;
 end;

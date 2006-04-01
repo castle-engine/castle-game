@@ -47,6 +47,7 @@ type
 
   TSubMenu = class(TCastleMenu)
     SubMenuTitle: string;
+    SubMenuAdditionalInfo: string;
     constructor Create;
     procedure Draw; override;
   end;
@@ -179,12 +180,24 @@ end;
 procedure TSubMenu.Draw;
 begin
   inherited;
+
   glPushMatrix;
     glTranslatef(Position[0], Position[1] - 20, 0);
     glColorv(LightGray3Single);
     glRasterPos2i(0, 0);
     SubMenuTitleFont.Print(SubMenuTitle + ' :');
   glPopMatrix;
+
+  if SubMenuAdditionalInfo <> '' then
+  begin
+    glPushMatrix;
+      glTranslatef(AllItemsArea.X0,
+        AllItemsArea.Y0 - SubMenuTitleFont.RowHeight, 0);
+      glColorv(LightGray3Single);
+      SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
+        RequiredScreenWidth - 2 * Round(AllItemsArea.X0), 0, 0, true, 0);
+    glPopMatrix;
+  end;
 end;
 
 { TControlsMenu ------------------------------------------------------------- }
@@ -258,13 +271,7 @@ begin
   end;
 end;
 
-{ TItemsControlsMenu ------------------------------------------------------------- }
-
-{ TODO: when drawing this, show text:
-
-  Notes:
-  - you pick items lying on the ground just by walking on them.
-  - items are automatically unequipped when you drop them. }
+{ TItemsControlsMenu --------------------------------------------------------- }
 
 constructor TItemsControlsMenu.Create;
 begin
@@ -279,6 +286,11 @@ begin
   Items.Add('Back to controls menu');
 
   SubMenuTitle := 'Configure items controls';
+
+  SubMenuAdditionalInfo :=
+    'Notes:' +nl+
+    '- You pick items lying on the ground just by walking on them.' +nl+
+    '- Items are automatically unequipped when you drop them.';
 
   SpaceBetweenItems := 2;
 
@@ -296,24 +308,6 @@ end;
 
 { TOtherControlsMenu ------------------------------------------------------------- }
 
-{ TODO: when drawing this, show text:
-
-  Notes:
-  - cancel flying is useful only if you want to stop flying
-    before flying spell will automatically wear off
-
-  Escape = exit to game menu
-  ` (backquote) = FPS show / hide
-
-Mouse:
-  left mouse click on anything =
-    show information about pointed item on the level,
-    or use pointed device (press button, move switch etc.)
-
-Testing (cheating) keys:
-  L / Shift + L = life increase/decrease
-}
-
 constructor TOtherControlsMenu.Create;
 begin
   inherited Create;
@@ -326,6 +320,20 @@ begin
   Items.Add('Back to controls menu');
 
   SubMenuTitle := 'Configure other controls';
+
+  SubMenuAdditionalInfo :=
+    'Non-configurable keys:' +nl+
+    '  Escape = exit to game menu' +nl+
+    '  ` (backquote) = FPS show / hide' +nl+
+    '  L / Shift + L = (cheating) life increase/decrease' +nl+
+    nl+
+    'Mouse:' +nl+
+    '  left mouse click on anything =' +nl+
+    '    show information about pointed item on the level,' +nl+
+    '    or use pointed device (press button, move switch etc.)' +nl+
+    nl+
+    'Note that the "Cancel flying" key is useful if you want to stop flying ' +
+    'before flying spell will automatically wear off.';
 
   SpaceBetweenItems := 2;
 
