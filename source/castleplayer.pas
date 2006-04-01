@@ -92,6 +92,8 @@ type
       was already called. }
     ActualAttackDone: boolean;
 
+    HintEscapeKeyShown: boolean;
+
     { Shortcut for TItemWeaponKind(EquippedWeapon.Kind).
       Call this only when EquippedWeapon <> nil. }
     function EquippedWeaponKind: TItemWeaponKind;
@@ -256,6 +258,8 @@ begin
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
   Navigator.AllowSlowerRotations := false;
   Navigator.OnFalledDown := FalledDown;
+
+  HintEscapeKeyShown := false;
 
   { Although it will be called in every OnIdle anyway,
     we also call it here to be sure that right after TPlayer constructor
@@ -555,6 +559,12 @@ begin
   begin
     ActualAttackDone := true;
     EquippedWeaponKind.ActualAttack(EquippedWeapon);
+  end;
+
+  if not HintEscapeKeyShown then
+  begin
+    HintEscapeKeyShown := true;
+    GameMessage('Hint: press "Escape" for game menu');
   end;
 end;
 
