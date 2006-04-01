@@ -97,13 +97,13 @@ constructor TMainMenu.Create;
 begin
   inherited Create;
 
-  Items.Add('Read instructions');
   Items.Add('New game (The Gate - new level for PGD stage 4)');
   Items.Add('New game (Tower - just a test level)');
   Items.Add('New game (Castle Hall - new level for PGD stage 3)');
   Items.Add('Configure controls');
   Items.Add('Video options');
   Items.Add('Sound options');
+  Items.Add('Credits');
   Items.Add('Quit');
 
   Position := Vector2Single(20, 480);
@@ -150,15 +150,15 @@ procedure TMainMenu.CurrentItemSelected;
 
 begin
   case CurrentItem of
-    0: ShowHelpMessage;
-    1: NewGame(
+    0: NewGame(
          TLevel.Create('gate_final.wrl', 'gate_lights.wrl'));
-    2: NewGame(
+    1: NewGame(
          TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
-    3: NewGame(TCastleHallLevel.Create);
-    4: CurrentMenu := ControlsMenu;
-    5: CurrentMenu := VideoMenu;
-    6: ViewSoundInfo;
+    2: NewGame(TCastleHallLevel.Create);
+    3: CurrentMenu := ControlsMenu;
+    4: CurrentMenu := VideoMenu;
+    5: ViewSoundInfo;
+    6: ShowCreditsMessage;
     7: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
@@ -312,7 +312,6 @@ constructor TOtherControlsMenu.Create;
 begin
   inherited Create;
 
-  Items.AddObject('Show help', KeyArgument(CastleKey_ShowHelp));
   Items.AddObject('View all messages', KeyArgument(CastleKey_ViewMessages));
   Items.AddObject('Save screen', KeyArgument(CastleKey_SaveScreen));
   Items.AddObject('Cancel flying', KeyArgument(CastleKey_CancelFlying));
@@ -343,8 +342,8 @@ end;
 procedure TOtherControlsMenu.CurrentItemSelected;
 begin
   case CurrentItem of
-    0..4: MessageOK(Glw, 'TODO: Not implemented yet');
-    5: CurrentMenu := ControlsMenu;
+    0..3: MessageOK(Glw, 'TODO: Not implemented yet');
+    4: CurrentMenu := ControlsMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

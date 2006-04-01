@@ -517,7 +517,6 @@ begin
     CastleKey_UseItem: UseItem;
 
     { Other keys. }
-    CastleKey_ShowHelp: ShowHelpMessage;
     CastleKey_SaveScreen: SaveScreen;
     CastleKey_ViewMessages: ViewGameMessages;
     CastleKey_CancelFlying: CancelFlying;

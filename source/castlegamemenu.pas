@@ -47,8 +47,8 @@ begin
   inherited Create;
 
   Items.Add('Back to game');
-  Items.Add('Read instructions');
   Items.Add('View last game messages');
+  Items.Add('Configure controls');
   Items.Add('End game');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -58,8 +58,8 @@ procedure TCastleGameMenu.CurrentItemSelected;
 begin
   case CurrentItem of
     0: UserQuit := true;
-    1: ShowHelpMessage;
-    2: ViewGameMessages;
+    1: ViewGameMessages;
+    2: { TODO };
     3: GameCancel(false);
     else raise EInternalError.Create('Menu item unknown');
   end;

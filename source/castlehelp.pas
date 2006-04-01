@@ -26,7 +26,7 @@ interface
 const
   Version = '0.4.0';
 
-procedure ShowHelpMessage;
+procedure ShowCreditsMessage;
 
 function SProgramHelpSuffix: string;
 
@@ -36,23 +36,24 @@ implementation
 
 uses SysUtils, Classes, GLWinMessages, CastleWindow, KambiUtils, CastlePlay;
 
-procedure ShowHelpMessage;
-const
-  HelpMessage = {$I castle_help_message.inc};
+procedure ShowCreditsMessage;
 begin
-  MessageOK(Glw, HelpMessage + nl + SProgramHelpSuffix, taLeft);
+  MessageOK(Glw, SProgramHelpSuffix, taLeft);
 end;
 
 function SProgramHelpSuffix: string;
 begin
   Result :=
     ApplicationName + ' version ' + Version + '.' +nl+
+    nl+
     'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
+    'http://www.camelot.homedns.org/~michalis/' +nl+
     { TODO: later I will just use here SCamelotProgramHelpSuffix,
       for now this program is not avail on camelot. }
     {'See http://www.camelot.homedns.org/~michalis/ for latest versions' +
     Iff(WrapLines, nl + ' ', '') +
     ' of this program, sources, documentation etc.' +nl+}
+    nl+
     'Compiled with ' + SCompilerDescription +'.';
 end;
 

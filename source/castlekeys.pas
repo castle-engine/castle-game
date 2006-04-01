@@ -31,7 +31,6 @@ const
 
   { Other keys. }
 
-  CastleKey_ShowHelp = K_F1;
   CastleKey_SaveScreen = K_F5;
   CastleKey_ViewMessages = K_M;
   CastleKey_CancelFlying = K_C;
