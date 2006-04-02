@@ -55,11 +55,12 @@ type
     stCastleHallSymbolMoving,
     { @groupEnd }
 
-    { Creatures.
+    { Creatures sounds.
       @groupBegin }
     stAlienSuddenPain,
     stWerewolfSuddenPain,
     stWerewolfAttackStart,
+    stBallMissileFired,
     { @groupEnd }
 
     { Others.

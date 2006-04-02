@@ -205,6 +205,9 @@ type
       read FMaxKnockedBackDistance write FMaxKnockedBackDistance
       default DefaultMaxKnockedBackDistance;
 
+    { This will be played at HeadPosition when entering wasAttack state.
+      Sometimes you may prefer to rather play a sound at ActualAttack
+      --- then just do it in overriden ActualAttack. }
     property SoundAttackStart: TSoundType
       read FSoundAttackStart write FSoundAttackStart default stNone;
   end;
@@ -1249,15 +1252,14 @@ const
 var
   Missile: TMissileCreature;
 begin
-  { TODO: do a sound here, from WAKind.ActualAttackSound.
-    Or maybe Missile.Kind.FiringSound ? }
-
   Missile := TMissileCreature.Create(BallMissile,
     VLerp(FiringMissileHeight, LegsPosition, HeadPosition),
     Normalized(VectorSubtract(Player.Navigator.CameraPos, HeadPosition)),
     MissileDefaultLife, Level.AnimationTime);
 
   Level.Creatures.Add(Missile);
+
+  Sound3d(stBallMissileFired, Missile.LegsPosition);
 end;
 
 { TWerewolfCreature ---------------------------------------------------------- }
