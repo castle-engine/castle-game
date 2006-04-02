@@ -34,13 +34,13 @@ type
 
 implementation
 
-uses SysUtils, GLWindow, CastleWindow;
+uses SysUtils, GLWindow, CastleWindow, CastleSound;
 
 { TCastleMenu ---------------------------------------------------------------- }
 
 procedure TCastleMenu.CurrentItemChanged;
 begin
-  { TODO: sound: stMenuMove }
+  Sound(stMenuCurrentItemChanged);
   Glw.PostRedisplay;
 end;
 

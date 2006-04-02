@@ -67,7 +67,7 @@ type
 
     { Others.
       @groupBegin }
-    stMenuMove,
+    stMenuCurrentItemChanged,
     stSaveScreen
     { @groupEnd });
 
