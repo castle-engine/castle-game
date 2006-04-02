@@ -82,7 +82,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
-  KambiFilesUtils, CastleKeys, CastleGameMenu;
+  KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound;
 
 var
   GameMessagesManager: TTimeMessagesManager;
@@ -757,7 +757,7 @@ begin
   FileName := FnameAutoInc(ApplicationName + '_screen_%d.png');
   Glw.SaveScreen(FileName);
   GameMessage('Screen saved to ' + FileName);
-  { TODO: sound: stSaveScreen }
+  Sound(stSaveScreen);
 end;
 
 { initialization / finalization ---------------------------------------------- }

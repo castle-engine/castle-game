@@ -617,7 +617,7 @@ begin
   begin
     if EquippedWeapon <> nil then
     begin
-      { TODO: sound of attack }
+      Sound(EquippedWeaponKind.SoundAttackStart);
       AttackStartTime := Level.AnimationTime;
       Attacking := true;
       ActualAttackDone := false;

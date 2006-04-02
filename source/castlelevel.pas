@@ -948,7 +948,6 @@ begin
             ButtonPressed := true;
             GameMessage('You press the button');
             GameMessage('Suddenly you hear a wolf howling somewhere near...');
-            { TODO: sound: symbol moving stCastleHallSymbolMoving }
           end;
         end else
           GameMessage('You see a button. You cannot reach it from here');

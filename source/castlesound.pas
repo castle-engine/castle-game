@@ -45,9 +45,10 @@ type
     stPlayerDies,
     { @groupEnd }
 
-    { Equipping items sounds.
+    { Items sounds.
       @groupBegin }
-    stEquippingSword,
+    stSwordEquipping,
+    stSwordAttackStart,
     { @groupEnd }
 
     { Level objects sounds.
@@ -57,11 +58,11 @@ type
 
     { Creatures sounds.
       @groupBegin }
-    stWerewolfHowling,
     stAlienSuddenPain,
     stWerewolfSuddenPain,
     stWerewolfAttackStart,
     stWerewolfActualAttackHit,
+    stWerewolfHowling,
     stBallMissileFired,
     stBallMissileExplode,
     { @groupEnd }

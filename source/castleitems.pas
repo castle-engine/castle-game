@@ -149,6 +149,7 @@ type
     FAttackAnimation: TVRMLGLAnimation;
     FAttackAnimationInfo: TVRMLGLAnimationInfo;
     FActualAttackTime: Single;
+    FSoundAttackStart: TSoundType;
   public
     { Constryctor. You can pass
       AAttackAnimationInfo = nil to get
@@ -207,7 +208,13 @@ type
     property ActualAttackTime: Single
       read FActualAttackTime write FActualAttackTime default 0.0;
 
+    { Perform real attack here.
+      This may mean hurting some creature within the range,
+      or shooting some missile. You can also play some sound here. }
     procedure ActualAttack(Item: TItem); virtual; abstract;
+
+    property SoundAttackStart: TSoundType
+      read FSoundAttackStart write FSoundAttackStart default stNone;
   end;
 
   TItemSwordKind = class(TItemWeaponKind)
@@ -801,13 +808,14 @@ begin
   ItemsKinds := TItemKindsList.Create;
 
   Sword := TItemSwordKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
-    'sword.png', false, true, stEquippingSword,
+    'sword.png', false, true, stSwordEquipping,
     TVRMLGLAnimationInfo.Create(
       [ SwordAnimFileName('sword_1.wrl'),
         SwordAnimFileName('sword_2.wrl') ],
       [ 0, 0.5 ],
       30, roSceneAsAWhole, false, false));
   Sword.ActualAttackTime := MapRange(0.0, -1.0, +0.7, 0.0, 0.5);
+  Sword.SoundAttackStart := stSwordAttackStart;
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
     'LifePotion', 'Potion of Life', 'life_potion.png');
