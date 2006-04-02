@@ -60,7 +60,9 @@ type
     stAlienSuddenPain,
     stWerewolfSuddenPain,
     stWerewolfAttackStart,
+    stWerewolfActualAttackHit,
     stBallMissileFired,
+    stBallMissileExplode,
     { @groupEnd }
 
     { Others.

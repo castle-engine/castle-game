@@ -220,6 +220,7 @@ type
     FAnimation: TVRMLGLAnimation;
     FAnimationInfo: TVRMLGLAnimationInfo;
     FMoveSpeed: Single;
+    FSoundExplosion: TSoundType;
   public
     constructor Create(AAnimationInfo: TVRMLGLAnimationInfo);
     destructor Destroy; override;
@@ -242,6 +243,9 @@ type
       for this class (because TMissileCreature may depend on it and never
       cares to keep Direction horizontal). }
     property Flying default true;
+
+    property SoundExplosion: TSoundType
+      read FSoundExplosion write FSoundExplosion default stNone;
   end;
 
   TCreature = class
@@ -1266,11 +1270,12 @@ end;
 
 procedure TWerewolfCreature.ActualAttack;
 begin
-  { TODO: do a sound here, from WAKind.ActualAttackSound. }
-
   if Boxes3dCollision(Box3dTranslate(BoundingBox,
     VectorScale(Direction, WAKind.AttackDistance)), Player.BoundingBox) then
+  begin
+    Sound3d(stWerewolfActualAttackHit, HeadPosition);
     Player.Life := Player.Life - 20 - Random(20);
+  end;
 end;
 
 procedure TWerewolfCreature.Idle(const CompSpeed: Single);
@@ -1328,9 +1333,10 @@ end;
 
 procedure TMissileCreature.ExplodeCore;
 begin
-  { TODO: sound of hit/explosion, from MissileKind.ExplosionSound }
   { TODO: for some missiles, their explosion may hurt everyone around.
     So do here additional checks for collision and hurt player and creatures. }
+
+  Sound3d(MissileKind.SoundExplosion, LegsPosition);
 
   Life := 0.0;
 
@@ -1476,6 +1482,7 @@ begin
       [ 0, 0.5 ],
       AnimScenesPerTime, AnimOptimization, true, false)
     );
+  BallMissile.SoundExplosion := stBallMissileExplode;
 end;
 
 procedure DoFinalization;
