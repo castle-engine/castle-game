@@ -100,7 +100,6 @@ type
     FDyingAnimationInfo: TVRMLGLAnimationInfo;
     FHurtAnimationInfo: TVRMLGLAnimationInfo;
 
-    FAttacksWhenWalking: boolean;
     FMoveSpeed: Single;
     FMinDelayBetweenAttacks: Single;
     FAttackDistance: Single;
@@ -145,10 +144,18 @@ type
 
     { This is an animation of attacking.
       Beginning must be on time 0.
-      If AttacksWhenWalking then beginning and end of it must glue
-      with frame 0 of WalkAnimation.
-      Else beginning and end of it must glue
-      with frame 0 of StandAnimation. }
+      Beginning and end of it should roughly glue with frames WalkAnimation
+      and StandAnimation.
+
+      I used to have here property like AttacksWhenWalking for the creature,
+      to indicate whether creature changes state like
+      "wasWalk -> wasAttack -> wasWalk" or
+      "wasStand -> wasAttack -> wasStand". But this wasn't good.
+      Intelligent creature sometimes attacks when walking (e.g. if it just
+      made the distance to the player closer) or when standing
+      (when the distance was already close enough). And after performing
+      the attack, the creature doesn't need to go back to state
+      before the attack. }
     property AttackAnimation: TVRMLGLAnimation read FAttackAnimation;
 
     { This is an animation of dying.
@@ -165,10 +172,6 @@ type
       Note that this animation will not loop, it will be played
       for TimeDurationWithBack time. }
     property HurtAnimation: TVRMLGLAnimation read FHurtAnimation;
-
-    { See @link(AttackAnimation). }
-    property AttacksWhenWalking: boolean
-      read FAttacksWhenWalking write FAttacksWhenWalking default false;
 
     { This is moving speed --- how much Direction vector will be scaled
       when moving in wasWalk. }
@@ -392,6 +395,9 @@ type
 
     { Set to 0 each time FState changes to wasHurt }
     KnockedBackDistance: Single;
+
+    HasLastSeenPlayer: boolean;
+    LastSeenPlayer: TVector3Single;
   protected
     procedure SetLife(const Value: Single); override;
   public
@@ -538,7 +544,6 @@ begin
   FDyingAnimationInfo := ADyingAnimationInfo;
   FHurtAnimationInfo := AHurtAnimationInfo;
 
-  FAttacksWhenWalking := false;
   MoveSpeed := DefaultMoveSpeed;
   FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
   FAttackDistance := DefaultAttackDistance;
@@ -943,26 +948,20 @@ begin
 end;
 
 procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
+var
+  SeesPlayer: boolean;
+  SqrDistanceToLastSeenPlayer: Single;
 
-  { TODO: instead of using SeesPlayer, make him use
-    HasLastSeenPlayer and LastSeenPlayer position, and go into
-    that direction. This should be smarter.
-    When SeesPlayer, he just does
-      HasLastSeenPlayer := true;
-      LastSeenPlayer := Player.Navigator.CameraPos;
-  }
-
-  { Is attack allowed. Assumes that creature sees the player. }
+  { Is attack allowed ? }
   function AttackAllowed: boolean;
   const
     MaxAngleToAttack = Pi / 6 { 30 degrees };
   var
     AngleRadBetweenTheDirectionToPlayer: Single;
   begin
-    Result := (Level.AnimationTime - LastAttackTime >
-      WAKind.MinDelayBetweenAttacks) and
-      (PointsDistanceSqr(Player.Navigator.CameraPos, HeadPosition) <=
-      Sqr(WAKind.AttackDistance));
+    Result := SeesPlayer and
+      (Level.AnimationTime - LastAttackTime > WAKind.MinDelayBetweenAttacks) and
+      (SqrDistanceToLastSeenPlayer <= Sqr(WAKind.AttackDistance));
 
     { GameMessage(Format('dist is now %f (sqr is %f), needed sqr is %f',
       [ PointsDistance(Player.Navigator.CameraPos, HeadPosition),
@@ -973,22 +972,18 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     begin
       { Calculate and check AngleRadBetweenTheDirectionToPlayer. }
       AngleRadBetweenTheDirectionToPlayer := AngleRadBetweenVectors(
-        VectorSubtract(Player.Navigator.CameraPos, HeadPosition),
+        VectorSubtract(LastSeenPlayer, HeadPosition),
         Direction);
       Result := AngleRadBetweenTheDirectionToPlayer <= MaxAngleToAttack;
     end;
   end;
 
-  function SeesPlayer: boolean;
-  begin
-    Result := Level.LineOfSight(HeadPosition, Player.Navigator.CameraPos);
-  end;
-
+  { Call this only when HasLastSeenPlayer }
   procedure CalculateDirectionToPlayer(var DirectionToPlayer: TVector3Single;
     var AngleRadBetweenGoodDirection: Single);
   begin
     { calculate DirectionToPlayer }
-    DirectionToPlayer := VectorSubtract(Player.Navigator.CameraPos, HeadPosition);
+    DirectionToPlayer := VectorSubtract(LastSeenPlayer, HeadPosition);
     if not Kind.Flying then
       MakeVectorsOrthoOnTheirPlane(DirectionToPlayer, Level.HomeCameraUp);
 
@@ -1028,19 +1023,67 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     end;
   end;
 
+  { Is it wanted to get closer to the LastSeenPlayer ?
+    And (if it's wanted) is it sensible to do this by moving
+    along current Direction ?
+    Call this only if HasLastSeenPlayer. }
+  function WantToWalk(const AngleRadBetweenGoodDirection: Single): boolean;
+  const
+    MaxAngleToMoveForward = Pi / 3 { 60 degrees };
+  begin
+    Result :=
+      { Is it wanted to get closer to the LastSeenPlayer ?
+
+        Yes --- only if it will help make AttackAllowed from false to true.
+        See AttackAllowed implementation.
+
+        If SeesPlayer and SqrDistanceToLastSeenPlayer is small enough,
+        there's no point in getting closer to the player. In fact, it would
+        be bad to get closer to player in this case, as this would allow
+        player to easier attack (shorter distance --- easier to reach with
+        short-range weapon, or easier to aim with long-range weapon). }
+      ( (not SeesPlayer) or
+        (SqrDistanceToLastSeenPlayer > Sqr(WAKind.AttackDistance))
+      ) and
+
+      { If AngleRadBetweenGoodDirection is too large, there is not much point
+        in moving in given direction anyway. We should just change our Direction. }
+      (AngleRadBetweenGoodDirection <= MaxAngleToMoveForward) and
+
+      { If creature is ideally under/above the player and if creature can't
+        move vertically, then there is no way to get to the player.
+        So there is no sense in moving or rotating creature now. }
+      ( WAKind.Flying or
+        { I initially wanted to check this like
+          VectorsParallel(DirectionToPlayer, Level.HomeCameraUp)
+          (before "fixing" DirectionToPlayer to be horizontal).
+          But this was not a good solution --- DirectionToPlayer, like HeadPosition,
+          is too "sensitive" to rounding errors, and VectorsParallel was returning
+          false when I wanted it to return true.
+          Using Boxes3dXYCollision below is a better solution --- faster,
+          and it's not sensitive to any float inaccuracy. }
+        (not Boxes3dXYCollision(BoundingBox,
+          Player.BoundingBoxAssuming(LastSeenPlayer)))
+      );
+  end;
+
   procedure DoStand;
   var
     DirectionToPlayer: TVector3Single;
     AngleRadBetweenGoodDirection: Single;
   begin
-    if SeesPlayer then
+    if HasLastSeenPlayer then
     begin
       CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
-      RotateDirectionToFacePlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
 
       if AttackAllowed then
         SetState(wasAttack) else
-        SetState(wasWalk);
+      if WantToWalk(AngleRadBetweenGoodDirection) then
+        SetState(wasWalk) else
+      begin
+        { Continue wasStand state }
+        RotateDirectionToFacePlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
+      end;
     end;
   end;
 
@@ -1066,36 +1109,21 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       end;
     end;
 
-  const
-    MaxAngleToMoveForward = Pi / 3 { 60 degrees };
   var
     OldHeadPosition, NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
     DirectionToPlayer: TVector3Single;
     AngleRadBetweenGoodDirection: Single;
   begin
-    { If creature is ideally under/above the player and if creature can't
-      move vertically, then there is no way to get to the player.
-      So there is no sense in moving or rotating creature now. }
-    if (not WAKind.Flying) and
-       { I initially wanted to check this like
-         VectorsParallel(DirectionToPlayer, Level.HomeCameraUp)
-         (before "fixing" DirectionToPlayer to be horizontal).
-         But this was not a good solution --- DirectionToPlayer, like HeadPosition,
-         is too "sensitive" to rounding errors, and VectorsParallel was returning
-         false when I wanted it to return true.
-         Using Boxes3dXYCollision below is a better solution --- faster,
-         and it's not sensitive to any float inaccuracy. }
-       Boxes3dXYCollision(BoundingBox, Player.BoundingBox) then
+    if not HasLastSeenPlayer then
     begin
+      { Nowhere to go; so just stay here. }
       SetState(wasStand);
       Exit;
     end;
 
     CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
 
-    { If AngleRadBetweenGoodDirection is too large, there is not much point
-      in moving in given direction anyway. We should just change our Direction. }
-    if AngleRadBetweenGoodDirection <= MaxAngleToMoveForward then
+    if WantToWalk(AngleRadBetweenGoodDirection) then
     begin
       OldHeadPosition := HeadPosition;
       ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
@@ -1124,12 +1152,15 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         SetState(wasStand);
         Exit;
       end;
+    end else
+    begin
+      { I don't want to walk anymore. So just stand stil. }
+      SetState(wasStand);
+      Exit;
     end;
 
     RotateDirectionToFacePlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
 
-    if not SeesPlayer then
-      SetState(wasStand) else
     if AttackAllowed then
       SetState(wasAttack);
   end;
@@ -1147,9 +1178,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     end;
 
     if StateTime > WAKind.AttackAnimation.TimeEnd then
-      if WAKind.AttacksWhenWalking then
-        SetState(wasWalk) else
-        SetState(wasStand);
+      { wasStand will quickly change to wasWalk if it will want to walk. }
+      SetState(wasStand);
   end;
 
   procedure DoHurt;
@@ -1195,14 +1225,26 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
   end;
 
 begin
-  { TODO: as you see, actually AttacksWhenWalking is not used when going
-    to wasAttack state. It's used only when going out from wasAttack state.
-    Fix, or change docs. }
-
   inherited;
 
   if Dead then
+  begin
     SetState(wasDying);
+    Exit;
+  end;
+
+  SeesPlayer := Level.LineOfSight(HeadPosition, Player.Navigator.CameraPos);
+  if SeesPlayer then
+  begin
+    HasLastSeenPlayer := true;
+    LastSeenPlayer := Player.Navigator.CameraPos;
+  end;
+
+  if HasLastSeenPlayer then
+  begin
+    SqrDistanceToLastSeenPlayer :=
+      PointsDistanceSqr(LastSeenPlayer, HeadPosition);
+  end;
 
   case FState of
     wasStand: DoStand;
@@ -1229,9 +1271,7 @@ begin
         Result := WAKind.StandToWalkAnimation.SceneFromTime(StateTime) else
         Result := WAKind.WalkAnimation.SceneFromTime(
           StateTime - WAKind.StandToWalkAnimation.TimeEnd);
-      { TODO: transition from walk to stand smooth }
     wasAttack:
-      { TODO: transition from walk/stand to attack and back smooth }
       Result := WAKind.AttackAnimation.SceneFromTime(StateTime);
     wasDying:
       Result := WAKind.DyingAnimation.SceneFromTime(StateTime);
@@ -1257,14 +1297,17 @@ const
 var
   Missile: TMissileCreature;
 begin
-  Missile := TMissileCreature.Create(BallMissile,
-    VLerp(FiringMissileHeight, LegsPosition, HeadPosition),
-    Normalized(VectorSubtract(Player.Navigator.CameraPos, HeadPosition)),
-    MissileDefaultLife, Level.AnimationTime);
+  if HasLastSeenPlayer then
+  begin
+    Missile := TMissileCreature.Create(BallMissile,
+      VLerp(FiringMissileHeight, LegsPosition, HeadPosition),
+      Normalized(VectorSubtract(LastSeenPlayer, HeadPosition)),
+      MissileDefaultLife, Level.AnimationTime);
 
-  Level.Creatures.Add(Missile);
+    Level.Creatures.Add(Missile);
 
-  Sound3d(stBallMissileFired, Missile.LegsPosition);
+    Sound3d(stBallMissileFired, Missile.LegsPosition);
+  end;
 end;
 
 { TWerewolfCreature ---------------------------------------------------------- }
