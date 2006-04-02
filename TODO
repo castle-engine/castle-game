@@ -61,6 +61,11 @@ Would-be-nice before next stage:
 - various kinds of swinging the sword, with various animations.
   Also they can yield various damage and various hit chances.
 
+- Smooth between various creature states.
+  I.e. expand the idea of StandToWalkAnimation, for every combination
+  and make it automatic.
+  Problem: long load times ("Loading creatures...") and memory consumption.
+
 - Take TItemKind and TCreatureKind PrepareRender, PrepareRenderSteps, CloseGL
   into one base class, like TGLLoading or something like that.
 
