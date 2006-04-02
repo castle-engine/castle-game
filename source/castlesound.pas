@@ -57,6 +57,7 @@ type
 
     { Creatures sounds.
       @groupBegin }
+    stWerewolfHowling,
     stAlienSuddenPain,
     stWerewolfSuddenPain,
     stWerewolfAttackStart,

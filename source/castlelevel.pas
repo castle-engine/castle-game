@@ -254,7 +254,8 @@ type
 implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
-  CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils;
+  CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
+  CastleSound;
 
 { TLevel --------------------------------------------------------------------- }
 
@@ -512,7 +513,7 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
     CreaturePosition[2] := StubBoundingBox[0, 2];
 
     { calculate CreatureKind }
-    { TODO --- this is not nice, such things should be done withing
+    { TODO --- this is not nice, such things should be done within
       CastleCreatures unit using some virtual methods of each TCreatureKind. }
     if CreatureKindName = 'Alien' then
       CreatureKind := Alien else
@@ -882,6 +883,7 @@ procedure TCastleHallLevel.Idle(const CompSpeed: Single);
 const
   MaxAnimationOpenSymbolRotation = 80;
   MinAnimationButtonPress = 0.5;
+  WerewolfStartPosition: TVector3Single = (0, 0, 0);
 begin
   inherited;
 
@@ -895,10 +897,16 @@ begin
     if not SymbolOpened then
     begin
       SymbolOpened := true;
-      { TODO: sound of werewolf howling here }
       Creatures.Add(TWerewolfCreature.Create(Werewolf,
-        Vector3Single(0, 0, 0),
+        WerewolfStartPosition,
         Vector3Single(0, 1, 0), 500, AnimationTime));
+
+      { Right now stCastleHallSymbolMoving and stWerewolfHowling
+        are actually played together and at the same position,
+        so I could merge them into one sound. But in the future
+        this may change, so I will not merge them. }
+      Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
+      Sound3d(stWerewolfHowling, WerewolfStartPosition);
     end;
   end;
 
