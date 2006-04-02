@@ -23,7 +23,7 @@ unit CastleCreatures;
 interface
 
 uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
-  VRMLGLAnimationInfo, VRMLFlatSceneGL;
+  VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound;
 
 {$define read_interface}
 
@@ -32,6 +32,7 @@ type
   private
     FFlying: boolean;
     FCameraRadius: Single;
+    FSoundSuddenPain: TSoundType;
   public
     constructor Create;
 
@@ -57,6 +58,9 @@ type
       You can do it in PrepareRender. }
     property CameraRadius: Single read FCameraRadius write FCameraRadius
       default 0;
+
+    property SoundSuddenPain: TSoundType
+      read FSoundSuddenPain write FSoundSuddenPain default stNone;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -101,6 +105,8 @@ type
     FAttackDistance: Single;
     FActualAttackTime: Single;
     FMaxKnockedBackDistance: Single;
+
+    FSoundAttackStart: TSoundType;
   public
     constructor Create(
       AStandAnimationInfo: TVRMLGLAnimationInfo;
@@ -198,6 +204,9 @@ type
     property MaxKnockedBackDistance: Single
       read FMaxKnockedBackDistance write FMaxKnockedBackDistance
       default DefaultMaxKnockedBackDistance;
+
+    property SoundAttackStart: TSoundType
+      read FSoundAttackStart write FSoundAttackStart default stNone;
   end;
 
   { This is a missile. As you can see, this is also treated as a creature
@@ -844,7 +853,7 @@ procedure TCreature.SetLife(const Value: Single);
 begin
   if (Life - Value) > MaxLife / 10 then
   begin
-    { TODO; Sound(SoundCreatureSuddenPain); }
+    Sound3d(Kind.SoundSuddenPain, HeadPosition);
   end;
   FLife := Value;
 end;
@@ -915,7 +924,7 @@ begin
     case FState of
       wasAttack:
         begin
-          { TODO: do a sound here, from WAKind.AttackSound }
+          Sound3d(WAKind.SoundAttackStart, HeadPosition);
           LastAttackTime := StateChangeTime;
           ActualAttackDone := false;
         end;
@@ -1417,6 +1426,7 @@ begin
       AnimScenesPerTime, AnimOptimization, false, true)
     );
   Alien.ActualAttackTime := 0.4;
+  Alien.SoundSuddenPain := stAlienSuddenPain;
 
   Werewolf := TWalkAttackCreatureKind.Create(
     TVRMLGLAnimationInfo.Create(
@@ -1454,6 +1464,8 @@ begin
   Werewolf.ActualAttackTime := 0.5;
   Werewolf.AttackDistance := 6.0 * 0.7;
   Werewolf.MinDelayBetweenAttacks := 2.0;
+  Werewolf.SoundSuddenPain := stWerewolfSuddenPain;
+  Werewolf.SoundAttackStart := stWerewolfAttackStart;
 
   BallMissile := TMissileCreatureKind.Create(
     TVRMLGLAnimationInfo.Create(

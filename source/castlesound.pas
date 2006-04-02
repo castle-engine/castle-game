@@ -23,35 +23,76 @@ unit CastleSound;
 
 interface
 
+uses VectorMath;
+
 var
   SoundInitializationReport: string;
 
 type
   TSoundType = (
-    { player sounds }
+    { Special sound type that indicates that there is actually none sound.
+      @link(Sound) and @link(Sound3d) will do nothing when called with
+      this sound type. }
+    stNone,
+
+    { Player sounds.
+      @groupBegin }
     stPlayerSuddenPain,
     stPlayerPotionDrink,
     stPlayerCastFlyingSpell,
     stPlayerPickItem,
     stPlayerDropItem,
     stPlayerDies,
-    { equipping items sounds }
+    { @groupEnd }
+
+    { Equipping items sounds.
+      @groupBegin }
     stEquippingSword,
-    { level objects sounds }
+    { @groupEnd }
+
+    { Level objects sounds.
+      @groupBegin }
     stCastleHallSymbolMoving,
-    { others }
+    { @groupEnd }
+
+    { Creatures.
+      @groupBegin }
+    stAlienSuddenPain,
+    stWerewolfSuddenPain,
+    stWerewolfAttackStart,
+    { @groupEnd }
+
+    { Others.
+      @groupBegin }
     stMenuMove,
-    stSaveScreen);
+    stSaveScreen
+    { @groupEnd });
 
 { Play given sound. This should be used to play sounds
-  that are not spatial actually, i.e. have no place in 3D space. }
+  that are not spatial actually, i.e. have no place in 3D space.
+  @noAutoLinkHere }
 procedure Sound(SoundType: TSoundType);
+
+{ Play given sound at appropriate position in 3D space.
+  @noAutoLinkHere }
+procedure Sound3d(SoundType: TSoundType; const Position: TVector3Single);
 
 implementation
 
 procedure Sound(SoundType: TSoundType);
 begin
-  { TODO }
+  if SoundType <> stNone then
+  begin
+    { TODO }
+  end;
+end;
+
+procedure Sound3d(SoundType: TSoundType; const Position: TVector3Single);
+begin
+  if SoundType <> stNone then
+  begin
+    { TODO }
+  end;
 end;
 
 end.
