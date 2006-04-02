@@ -978,37 +978,49 @@ var
     end;
   end;
 
-  { Call this only when HasLastSeenPlayer }
-  procedure CalculateDirectionToPlayer(var DirectionToPlayer: TVector3Single;
-    var AngleRadBetweenGoodDirection: Single);
+  procedure CalculateDirectionToTarget(
+    const Target: TVector3Single;
+    var DirectionToTarget: TVector3Single;
+    var AngleRadBetweenDirectionToTarget: Single);
   begin
-    { calculate DirectionToPlayer }
-    DirectionToPlayer := VectorSubtract(LastSeenPlayer, HeadPosition);
+    { calculate DirectionToTarget }
+    DirectionToTarget := VectorSubtract(Target, HeadPosition);
     if not Kind.Flying then
-      MakeVectorsOrthoOnTheirPlane(DirectionToPlayer, Level.HomeCameraUp);
+      MakeVectorsOrthoOnTheirPlane(DirectionToTarget, Level.HomeCameraUp);
 
-    { calculate AngleRadBetweenGoodDirection }
-    AngleRadBetweenGoodDirection := AngleRadBetweenVectors(DirectionToPlayer,
-      Direction);
+    { calculate AngleRadBetweenDirectionToTarget }
+    AngleRadBetweenDirectionToTarget :=
+      AngleRadBetweenVectors(DirectionToTarget, Direction);
   end;
 
-  procedure RotateDirectionToFacePlayer(const DirectionToPlayer: TVector3Single;
-    const AngleRadBetweenGoodDirection: Single);
+  { Call this only when HasLastSeenPlayer }
+  procedure CalculateDirectionToPlayer(var DirectionToPlayer: TVector3Single;
+    var AngleRadBetweenDirectionToTarget: Single);
+  begin
+    CalculateDirectionToTarget(LastSeenPlayer,
+      DirectionToPlayer, AngleRadBetweenDirectionToTarget);
+  end;
+
+  { This changes Direction to be closer to DirectionToTarget.
+    Note that it requires the value of AngleRadBetweenDirectionToTarget
+    effectively }
+  procedure RotateDirectionToFaceTarget(const DirectionToTarget: TVector3Single;
+    const AngleRadBetweenDirectionToTarget: Single);
   const
     AngleRadChangeSpeed = 0.1;
   var
     AngleRadChange: Single;
   begin
-    if not VectorsParallel(DirectionToPlayer, Direction) then
+    if not VectorsParallel(DirectionToTarget, Direction) then
     begin
-      { Rotate Direction, to be closer to DirectionToPlayer }
+      { Rotate Direction, to be closer to DirectionToTarget }
 
       { calculate AngleRadChange }
       AngleRadChange := AngleRadChangeSpeed * CompSpeed;
-      MinTo1st(AngleRadChange, AngleRadBetweenGoodDirection);
+      MinTo1st(AngleRadChange, AngleRadBetweenDirectionToTarget);
 
       Direction := RotatePointAroundAxisRad(AngleRadChange, Direction,
-        VectorProduct(Direction, DirectionToPlayer));
+        VectorProduct(Direction, DirectionToTarget));
 
       { From time to time it's good to fix Direction, to make sure it's
         1. normalized,
@@ -1027,7 +1039,7 @@ var
     And (if it's wanted) is it sensible to do this by moving
     along current Direction ?
     Call this only if HasLastSeenPlayer. }
-  function WantToWalk(const AngleRadBetweenGoodDirection: Single): boolean;
+  function WantToWalk(const AngleRadBetweenDirectionToPlayer: Single): boolean;
   const
     MaxAngleToMoveForward = Pi / 3 { 60 degrees };
   begin
@@ -1046,9 +1058,9 @@ var
         (SqrDistanceToLastSeenPlayer > Sqr(WAKind.AttackDistance))
       ) and
 
-      { If AngleRadBetweenGoodDirection is too large, there is not much point
+      { If AngleRadBetweenDirectionToPlayer is too large, there is not much point
         in moving in given direction anyway. We should just change our Direction. }
-      (AngleRadBetweenGoodDirection <= MaxAngleToMoveForward) and
+      (AngleRadBetweenDirectionToPlayer <= MaxAngleToMoveForward) and
 
       { If creature is ideally under/above the player and if creature can't
         move vertically, then there is no way to get to the player.
@@ -1070,66 +1082,66 @@ var
   procedure DoStand;
   var
     DirectionToPlayer: TVector3Single;
-    AngleRadBetweenGoodDirection: Single;
+    AngleRadBetweenDirectionToPlayer: Single;
   begin
     if HasLastSeenPlayer then
     begin
-      CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
+      CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenDirectionToPlayer);
 
       if AttackAllowed then
         SetState(wasAttack) else
-      if WantToWalk(AngleRadBetweenGoodDirection) then
+      if WantToWalk(AngleRadBetweenDirectionToPlayer) then
         SetState(wasWalk) else
       begin
         { Continue wasStand state }
-        RotateDirectionToFacePlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
+        RotateDirectionToFaceTarget(DirectionToPlayer,
+          AngleRadBetweenDirectionToPlayer);
       end;
     end;
   end;
 
   procedure DoWalk;
 
-    { Don't be stupid, and don't walk where you see you will fall down. }
-    function TooHighAboveTheGround(const NewHeadPosition: TVector3Single):
-      boolean;
-    const
-      MaxHeightAcceptableToFall = 2.0 * 0.7;
-    var
-      IsAboveTheGround: boolean;
-      SqrHeightAboveTheGround: Single;
-    begin
-      Result := false;
-      if not Kind.Flying then
+    { This performs the real move, which means that it changes LegsPosition
+      and HeadPosition along the Direction vector.
+
+      This doesn't check whether this is a sensible move, so use this
+      only if you know that the creature really wants to go in this Direction.
+
+      This checks only the basic (i.e. always wanted) things:
+      - Collision detection (with level, player and other creatures)
+      - For not Flying creatures, also the check to not fall down from high
+        is done. }
+    function MoveAlongTheDirection: boolean;
+
+      { Don't be stupid, and don't walk where you see you will fall down. }
+      function TooHighAboveTheGround(const NewHeadPosition: TVector3Single):
+        boolean;
+      const
+        MaxHeightAcceptableToFall = 2.0 * 0.7;
+      var
+        IsAboveTheGround: boolean;
+        SqrHeightAboveTheGround: Single;
       begin
-        Level.GetCameraHeight(NewHeadPosition, IsAboveTheGround,
-          SqrHeightAboveTheGround);
-        if (not IsAboveTheGround) or
-          (SqrHeightAboveTheGround > Sqr(MaxHeightAcceptableToFall + Height)) then
-          Result := true;
+        Result := false;
+        if not Kind.Flying then
+        begin
+          Level.GetCameraHeight(NewHeadPosition, IsAboveTheGround,
+            SqrHeightAboveTheGround);
+          if (not IsAboveTheGround) or
+            (SqrHeightAboveTheGround > Sqr(MaxHeightAcceptableToFall + Height)) then
+            Result := true;
+        end;
       end;
-    end;
 
-  var
-    OldHeadPosition, NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
-    DirectionToPlayer: TVector3Single;
-    AngleRadBetweenGoodDirection: Single;
-  begin
-    if not HasLastSeenPlayer then
-    begin
-      { Nowhere to go; so just stay here. }
-      SetState(wasStand);
-      Exit;
-    end;
-
-    CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
-
-    if WantToWalk(AngleRadBetweenGoodDirection) then
+    var
+      OldHeadPosition, NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
     begin
       OldHeadPosition := HeadPosition;
       ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
         VectorScale(Direction, WAKind.MoveSpeed * CompSpeed));
 
-      if
+      Result :=
         { First check to not step into some deep fall.
           Note that I'm not using here NewHeadPosition
           (that will be calculated later by Level.MoveAllowed)
@@ -1141,12 +1153,32 @@ var
           VectorScale(Direction, WAKind.MoveSpeed * 0.2 * 50)))) and
 
         Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
-        NewHeadPosition, false, Kind.CameraRadius) and
-        (not HeadCollisionWithPlayer(NewHeadPosition)) then
+          NewHeadPosition, false, Kind.CameraRadius) and
+        (not HeadCollisionWithPlayer(NewHeadPosition));
+
+      if Result then
       begin
         FLegsPosition := NewHeadPosition;
         FLegsPosition[2] -= Height;
-      end else
+      end;
+    end;
+
+  var
+    DirectionToPlayer: TVector3Single;
+    AngleRadBetweenDirectionToPlayer: Single;
+  begin
+    if not HasLastSeenPlayer then
+    begin
+      { Nowhere to go; so just stay here. }
+      SetState(wasStand);
+      Exit;
+    end;
+
+    CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenDirectionToPlayer);
+
+    if WantToWalk(AngleRadBetweenDirectionToPlayer) then
+    begin
+      if not MoveAlongTheDirection then
       begin
         { TODO: Seek alt way here, instead of just giving up. }
         SetState(wasStand);
@@ -1159,7 +1191,8 @@ var
       Exit;
     end;
 
-    RotateDirectionToFacePlayer(DirectionToPlayer, AngleRadBetweenGoodDirection);
+    RotateDirectionToFaceTarget(DirectionToPlayer,
+      AngleRadBetweenDirectionToPlayer);
 
     if AttackAllowed then
       SetState(wasAttack);
