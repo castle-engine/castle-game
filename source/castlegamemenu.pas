@@ -62,7 +62,17 @@ begin
     0: UserQuit := true;
     1: ViewGameMessages;
     2: ShowControlsMenu(GLList_ScreenImage, true, true);
-    3: GameCancel(false);
+    3:
+      { At first I did here GameCancel(false), but tests (with Mama)
+        show that it's too easy to select this and accidentaly
+        end the game.
+
+        In the future I should do here some question
+        like "Do you want to save the game before ending ?"
+        with answers "Save and end the game",
+        "Don't save and end the game",
+        "Cancel" }
+      GameCancel(true);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
