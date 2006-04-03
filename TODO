@@ -1,5 +1,5 @@
-- do weather (I have snow and rain from my szklane_lasy)
-  do fog somewhere
+--------------------
+- creature<->creature collision is also needed
 
 - when player stops moving, head bobbing should go down automatically
 
@@ -32,11 +32,11 @@ Would-be-nice before next stage:
 
 --------------------
 - "The Gate" level:
-  - volumetric fog (like from malfunction) needed there
+  - volumetric fog (like from malfunction) needed there. I also want to demonstrate fog in my engine...
   - intro under menu: camera floating around level with this fog ?
   - walking down the stairs and down the hill causes player to lose life
 
-- creature<->creature collision is also needed
+- do weather (I have snow and rain from my szklane_lasy, but they look poor...)
 
 - weapon-less attack (does knockback + small damage)
 
