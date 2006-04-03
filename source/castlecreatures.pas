@@ -78,6 +78,7 @@ const
   DefaultAttackDistance = 50.0 * 0.7;
   DefaultMissileMoveSpeed = 1.0 * 0.7;
   DefaultMaxKnockedBackDistance = 6.0 * 0.7;
+  DefaultLifeToRunAway = 0.3;
 
 type
   { This is a TCreatureKind that has simple states:
@@ -107,6 +108,7 @@ type
     FMaxKnockedBackDistance: Single;
 
     FSoundAttackStart: TSoundType;
+    FLifeToRunAway: Single;
   public
     constructor Create(
       AStandAnimationInfo: TVRMLGLAnimationInfo;
@@ -214,6 +216,12 @@ type
       --- then just do it in overriden ActualAttack. }
     property SoundAttackStart: TSoundType
       read FSoundAttackStart write FSoundAttackStart default stNone;
+
+    { If @code(Life <= MaxLife * LifeToRunAway) and distance to the
+      player is too short (shorter than AttackDistance / 4),
+      the creature runs away. }
+    property LifeToRunAway: Single
+      read FLifeToRunAway write FLifeToRunAway default DefaultLifeToRunAway;
   end;
 
   { This is a missile. As you can see, this is also treated as a creature
@@ -551,6 +559,7 @@ begin
   FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
   FAttackDistance := DefaultAttackDistance;
   FMaxKnockedBackDistance := DefaultMaxKnockedBackDistance;
+  FLifeToRunAway := DefaultLifeToRunAway;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -998,10 +1007,21 @@ var
 
   { Call this only when HasLastSeenPlayer }
   procedure CalculateDirectionToPlayer(var DirectionToPlayer: TVector3Single;
-    var AngleRadBetweenDirectionToTarget: Single);
+    var AngleRadBetweenDirectionToPlayer: Single);
   begin
     CalculateDirectionToTarget(LastSeenPlayer,
-      DirectionToPlayer, AngleRadBetweenDirectionToTarget);
+      DirectionToPlayer, AngleRadBetweenDirectionToPlayer);
+  end;
+
+  procedure CalculateDirectionFromPlayer(
+    var DirectionFromPlayer: TVector3Single;
+    var AngleRadBetweenDirectionFromPlayer: Single);
+  begin
+    CalculateDirectionToPlayer(
+      DirectionFromPlayer, AngleRadBetweenDirectionFromPlayer);
+    VectorNegateTo1st(DirectionFromPlayer);
+    AngleRadBetweenDirectionFromPlayer :=
+      Pi - AngleRadBetweenDirectionFromPlayer;
   end;
 
   { This changes Direction to be closer to DirectionToTarget.
@@ -1066,6 +1086,19 @@ var
       SqrDistanceToTarget <= Sqr(MinDistanceToTarget);
   end;
 
+  { Assuming that I want to walk in DesiredDirection direction,
+    is it sensible to do this by moving along current Direction ? }
+  function WantToWalkInDesiredDirection(
+    const AngleRadBetweenDesiredDirection: Single): boolean;
+  const
+    MaxAngleToMoveForward = Pi / 3 { 60 degrees };
+  begin
+    Result :=
+      { If AngleRadBetweenDesiredDirection is too large, there is not much point
+        in moving in given direction anyway. We should just change our Direction. }
+      (AngleRadBetweenDesiredDirection <= MaxAngleToMoveForward);
+  end;
+
   { Assuming that I want to get to Target position, is it sensible
     to do this by moving along current Direction ?
     This checks whether current Direction points roughly in the
@@ -1074,13 +1107,9 @@ var
   function WantToWalkToTarget(
     const Target: TVector3Single;
     const AngleRadBetweenDirectionToTarget: Single): boolean;
-  const
-    MaxAngleToMoveForward = Pi / 3 { 60 degrees };
   begin
     Result :=
-      { If AngleRadBetweenDirectionToTarget is too large, there is not much point
-        in moving in given direction anyway. We should just change our Direction. }
-      (AngleRadBetweenDirectionToTarget <= MaxAngleToMoveForward) and
+      WantToWalkInDesiredDirection(AngleRadBetweenDirectionToTarget) and
       { See comments in CloseEnoughToTarget for reasoning why this is needed. }
       (not CloseEnoughToTarget(Target));
   end;
@@ -1111,20 +1140,26 @@ var
           AngleRadBetweenDirectionToPlayer);
   end;
 
+  function WantToRunAway: boolean;
+  begin
+    Result := SeesPlayer and
+      (Life <= MaxLife * WAKind.LifeToRunAway) and
+      (SqrDistanceToLastSeenPlayer < Sqr(WAKind.AttackDistance / 4));
+  end;
+
   procedure DoStand;
   var
     DirectionToPlayer: TVector3Single;
     AngleRadBetweenDirectionToPlayer: Single;
   begin
-    { TODO: run away from the player if he's too close. }
-
     if HasLastSeenPlayer then
     begin
       CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenDirectionToPlayer);
 
       if AttackAllowed then
         SetState(wasAttack) else
-      if WantToWalkToPlayer(AngleRadBetweenDirectionToPlayer) then
+      if WantToRunAway or
+         WantToWalkToPlayer(AngleRadBetweenDirectionToPlayer) then
         SetState(wasWalk) else
       begin
         { Continue wasStand state }
@@ -1277,6 +1312,27 @@ var
           by RotateDirectionToFaceTarget below.
           So do nothing now. Just stay in wasWalk mode,
           and do RotateDirectionToFaceTarget below. }
+      end;
+
+      RotateDirectionToFaceTarget(DirectionToTarget,
+        AngleRadBetweenDirectionToTarget);
+    end else
+    if WantToRunAway then
+    begin
+      CalculateDirectionFromPlayer(DirectionToTarget,
+        AngleRadBetweenDirectionToTarget);
+
+      if WantToWalkInDesiredDirection(AngleRadBetweenDirectionToTarget) then
+      begin
+        if (not MoveAlongTheDirection) and
+           (AngleRadBetweenDirectionToTarget <=
+             AngleRadBetweenDirectionToTargetToResign) then
+        begin
+          { Maybe there exists some alternative way, not straight. Lets try. }
+          HasAlternativeTarget := true;
+          AlternativeTarget := CalculateAlternativeTarget;
+          Exit;
+        end;
       end;
 
       RotateDirectionToFaceTarget(DirectionToTarget,
@@ -1471,7 +1527,7 @@ begin
     VectorScale(Direction, WAKind.AttackDistance)), Player.BoundingBox) then
   begin
     Sound3d(stWerewolfActualAttackHit, HeadPosition);
-    Player.Life := Player.Life - 20 - Random(20);
+    Player.Life := Player.Life - 10 - Random(10);
   end;
 end;
 
@@ -1671,6 +1727,7 @@ begin
   Werewolf.MinDelayBetweenAttacks := 2.0;
   Werewolf.SoundSuddenPain := stWerewolfSuddenPain;
   Werewolf.SoundAttackStart := stWerewolfAttackStart;
+  Werewolf.LifeToRunAway := 0.1;
 
   BallMissile := TMissileCreatureKind.Create(
     TVRMLGLAnimationInfo.Create(
