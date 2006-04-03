@@ -189,21 +189,6 @@ Would-be-nice before next stage:
   anatomy_people/creature
   anatomy_people/vampire
 
-- help (at least beta-testing and English text proofreading!):
-
-  Szymon, Ka¶ka, Grzegorz, Kozak, Herman,
-
-  Wojtkiewicz, Julia, Aga, Ba¶ka, Michalski, Rudy, Kaczmarek, Bednarz+Ula, Bila, Hasior, Kozio³, Staszek,
-
-  Justy¶
-
-  Mama, Kornel, savage, advertise on "PGD screenshots" thread
-
-  kole¿anka Agi z Guinessa
-
-  Preparations in
-  mojewww/camelot/e966ccd7cb2e6a5f3798ec26d81d7310/
-
 - some things for menu:
 
   sound:
@@ -236,15 +221,6 @@ Would-be-nice before next stage:
 
 ----------------------------------------
 dist-making to-dos:
-
-- possibly calling strip is needed ?
-  Not really --- it doesn't improve so much.
-
-  I also tried enabling smartlinking -- again, doesn't improve so much.
-
-  I also tried calling upx. Works great, and exe size is reduced
-  greatly, but tar.gz distro size stays the same (because tar.gz
-  also compresses the same executables anyway).
 
 - prepare some binary only distro ?
   it doesn't need many things, including all sources and *

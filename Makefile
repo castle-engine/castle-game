@@ -60,7 +60,6 @@ clean:
 clean_private:
 	find . -type d '(' -iname '.svn' ')' -print \
 	     | xargs rm -Rf
-	rm -f TODO
 
 # ------------------------------------------------------------
 # Dist making.
