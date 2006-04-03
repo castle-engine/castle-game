@@ -69,9 +69,15 @@ Would-be-nice before next stage:
 - Take TItemKind and TCreatureKind PrepareRender, PrepareRenderSteps, CloseGL
   into one base class, like TGLLoading or something like that.
 
-- creatures still can climb high (almost-vertical) walls.
+- creatures can climb high (almost-vertical) walls.
+  Actually, player can climb almost-vertical walls too !
+
   This is not so very noticeable now, because there are no high walls
   now, and creatures' AI doesn't let them fall into deep pits now.
+
+  As a workaround, basic_castle's moat has now edges that are wider down,
+  so player and creatures are never able to climb up from the moat...
+  But that's still just a workaround.
 
 - some effects: blood explode when player hits monster.
 
@@ -213,11 +219,20 @@ Would-be-nice before next stage:
     Blending: (for attrib_blending somewhere)
     Animation smoothness: (slider: between 10 and 100)
       (for AnimScenesPerUnit in CastleCreatures)
+    Creature shadows: on/off [on]
 
   keyboard:
     All keys configurable here.
 
   load game, save game abilities.
+
+- Load / save game ability.
+
+  Place load in the start menu.
+  Place save in the game menu.
+  In the game menu, when asking before "End Game", do question
+  like "Do you want to save the game before ending ?"
+  with answers "Save and end the game", "Don't save and end the game", "Cancel".
 
 ----------------------------------------
 dist-making to-dos:
