@@ -398,6 +398,9 @@ type
 
     HasLastSeenPlayer: boolean;
     LastSeenPlayer: TVector3Single;
+
+    HasAlternativeTarget: boolean;
+    AlternativeTarget: TVector3Single;
   protected
     procedure SetLife(const Value: Single); override;
   public
@@ -1035,13 +1038,59 @@ var
     end;
   end;
 
+  function CloseEnoughToTarget(const Target: TVector3Single): boolean;
+  const
+    MinDistanceToTarget = 0.1;
+  var
+    SqrDistanceToTarget: Single;
+  begin
+    if WAKind.Flying then
+      SqrDistanceToTarget := PointsDistanceSqr(HeadPosition, Target) else
+      SqrDistanceToTarget := PointsDistanceXYSqr(HeadPosition, Target);
+    Result :=
+      { If creature is ideally at the target
+        (for not Flying creatures, this means "ideally under/above the target"),
+        then there is no way to get closer to the target.
+
+        We check this with some "epsilon" (MinDistanceToTarget), as usual, to
+
+        1. Avoid the unnecessary moving when HeadPosition is in fact
+           close enough to the target, but lack of floating precision
+           can't move it really ideally to Target.
+
+        2. In fact, it's not desirable to get exactly at (or under/above)
+           the target, because this could cause undesirable rotations
+           of the creature Direction (we usually try to make it in
+           the Target direction, so when we stand (almost) exactly
+           at Target, creature could try to stupidly rotate around itself). }
+      SqrDistanceToTarget <= Sqr(MinDistanceToTarget);
+  end;
+
+  { Assuming that I want to get to Target position, is it sensible
+    to do this by moving along current Direction ?
+    This checks whether current Direction points roughly in the
+    direction of the Target, and if were not already as close as possible
+    to Target. }
+  function WantToWalkToTarget(
+    const Target: TVector3Single;
+    const AngleRadBetweenDirectionToTarget: Single): boolean;
+  const
+    MaxAngleToMoveForward = Pi / 3 { 60 degrees };
+  begin
+    Result :=
+      { If AngleRadBetweenDirectionToTarget is too large, there is not much point
+        in moving in given direction anyway. We should just change our Direction. }
+      (AngleRadBetweenDirectionToTarget <= MaxAngleToMoveForward) and
+      { See comments in CloseEnoughToTarget for reasoning why this is needed. }
+      (not CloseEnoughToTarget(Target));
+  end;
+
   { Is it wanted to get closer to the LastSeenPlayer ?
     And (if it's wanted) is it sensible to do this by moving
     along current Direction ?
     Call this only if HasLastSeenPlayer. }
-  function WantToWalk(const AngleRadBetweenDirectionToPlayer: Single): boolean;
-  const
-    MaxAngleToMoveForward = Pi / 3 { 60 degrees };
+  function WantToWalkToPlayer(
+    const AngleRadBetweenDirectionToPlayer: Single): boolean;
   begin
     Result :=
       { Is it wanted to get closer to the LastSeenPlayer ?
@@ -1058,25 +1107,8 @@ var
         (SqrDistanceToLastSeenPlayer > Sqr(WAKind.AttackDistance))
       ) and
 
-      { If AngleRadBetweenDirectionToPlayer is too large, there is not much point
-        in moving in given direction anyway. We should just change our Direction. }
-      (AngleRadBetweenDirectionToPlayer <= MaxAngleToMoveForward) and
-
-      { If creature is ideally under/above the player and if creature can't
-        move vertically, then there is no way to get to the player.
-        So there is no sense in moving or rotating creature now. }
-      ( WAKind.Flying or
-        { I initially wanted to check this like
-          VectorsParallel(DirectionToPlayer, Level.HomeCameraUp)
-          (before "fixing" DirectionToPlayer to be horizontal).
-          But this was not a good solution --- DirectionToPlayer, like HeadPosition,
-          is too "sensitive" to rounding errors, and VectorsParallel was returning
-          false when I wanted it to return true.
-          Using Boxes3dXYCollision below is a better solution --- faster,
-          and it's not sensitive to any float inaccuracy. }
-        (not Boxes3dXYCollision(BoundingBox,
-          Player.BoundingBoxAssuming(LastSeenPlayer)))
-      );
+        WantToWalkToTarget(LastSeenPlayer,
+          AngleRadBetweenDirectionToPlayer);
   end;
 
   procedure DoStand;
@@ -1084,13 +1116,15 @@ var
     DirectionToPlayer: TVector3Single;
     AngleRadBetweenDirectionToPlayer: Single;
   begin
+    { TODO: run away from the player if he's too close. }
+
     if HasLastSeenPlayer then
     begin
       CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenDirectionToPlayer);
 
       if AttackAllowed then
         SetState(wasAttack) else
-      if WantToWalk(AngleRadBetweenDirectionToPlayer) then
+      if WantToWalkToPlayer(AngleRadBetweenDirectionToPlayer) then
         SetState(wasWalk) else
       begin
         { Continue wasStand state }
@@ -1135,10 +1169,10 @@ var
       end;
 
     var
-      OldHeadPosition, NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
+      OldHeadPosition, NewHeadPosition: TVector3Single;
     begin
       OldHeadPosition := HeadPosition;
-      ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
+      NewHeadPosition := VectorAdd(OldHeadPosition,
         VectorScale(Direction, WAKind.MoveSpeed * CompSpeed));
 
       Result :=
@@ -1152,8 +1186,20 @@ var
         (not TooHighAboveTheGround(VectorAdd(OldHeadPosition,
           VectorScale(Direction, WAKind.MoveSpeed * 0.2 * 50)))) and
 
-        Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
-          NewHeadPosition, false, Kind.CameraRadius) and
+        { MoveAllowed is free to just return true and set
+          NewHeadPosition to OldHeadPosition (or something very close)
+          instead of returning false. But this is not good for
+          MoveAlongTheDirection, as things using MoveAlongTheDirection
+          depend on the fact that MoveAlongTheDirection will return false
+          if no further way is possible.
+
+          That's why I use MoveAllowedSimple below.
+          Our trick with "AlternativeTarget" should handle
+          eventual problems with the track of creature, so MoveAllowed
+          should not be needed. }
+        Level.MoveAllowedSimple(OldHeadPosition, NewHeadPosition,
+          false, Kind.CameraRadius) and
+
         (not HeadCollisionWithPlayer(NewHeadPosition));
 
       if Result then
@@ -1163,36 +1209,110 @@ var
       end;
     end;
 
-  var
-    DirectionToPlayer: TVector3Single;
-    AngleRadBetweenDirectionToPlayer: Single;
-  begin
-    if not HasLastSeenPlayer then
+    function CalculateAlternativeTarget: TVector3Single;
+    const
+      RandomWalkDistance = 20;
     begin
-      { Nowhere to go; so just stay here. }
-      SetState(wasStand);
-      Exit;
+      Result := HeadPosition;
+      Result[0] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
+      Result[1] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
+      if WAKind.Flying then
+        Result[2] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
     end;
 
-    CalculateDirectionToPlayer(DirectionToPlayer, AngleRadBetweenDirectionToPlayer);
-
-    if WantToWalk(AngleRadBetweenDirectionToPlayer) then
+  const
+    ProbabilityToTryAnotherAlternativeTarget = 0.5;
+    AngleRadBetweenDirectionToTargetToResign = Pi / 180 { 1 degree };
+  var
+    DirectionToTarget: TVector3Single;
+    AngleRadBetweenDirectionToTarget: Single;
+  begin
+    if HasAlternativeTarget then
     begin
-      if not MoveAlongTheDirection then
+      if CloseEnoughToTarget(AlternativeTarget) then
       begin
-        { TODO: Seek alt way here, instead of just giving up. }
+        HasAlternativeTarget := false;
+        Exit;
+      end;
+
+      CalculateDirectionToTarget(AlternativeTarget,
+        DirectionToTarget, AngleRadBetweenDirectionToTarget);
+
+      if WantToWalkToTarget(AlternativeTarget,
+        AngleRadBetweenDirectionToTarget) then
+      begin
+        { Note that MoveAlongTheDirection returns false when
+          moving along the current Direction is not good.
+          But maybe moving along the DirectionToTarget is possible ?
+          So we shouldn't just resign from current AlternativeTarget
+          so fast --- maybe it's good, but we have to adjust
+          our Direction a little more. That's why I use
+          AngleRadBetweenDirectionToTargetToResign.
+
+          Note that for normal moving (i.e. toward LastSeenPlayer,
+          not AlternativeTarget) we in this case just change state
+          to wasStand, and this allows creature to rotate in wasStand
+          state. }
+        if (not MoveAlongTheDirection) and
+           (AngleRadBetweenDirectionToTarget <=
+             AngleRadBetweenDirectionToTargetToResign) then
+        begin
+          if Random <= ProbabilityToTryAnotherAlternativeTarget then
+          begin
+            { Try yet another alternative way. }
+            AlternativeTarget := CalculateAlternativeTarget;
+            Exit;
+          end else
+          begin
+            HasAlternativeTarget := false;
+            Exit;
+          end;
+        end;
+      end else
+      begin
+        { We know that WantToWalkToTarget may return false only because
+          were not directed enough for AlternativeTarget.
+          (because we already eliminated CloseEnoughToTarget case above).
+          In each DoWalk call we will gradually fix this,
+          by RotateDirectionToFaceTarget below.
+          So do nothing now. Just stay in wasWalk mode,
+          and do RotateDirectionToFaceTarget below. }
+      end;
+
+      RotateDirectionToFaceTarget(DirectionToTarget,
+        AngleRadBetweenDirectionToTarget);
+    end else
+    begin
+      if not HasLastSeenPlayer then
+      begin
+        { Nowhere to go; so just stay here. }
         SetState(wasStand);
         Exit;
       end;
-    end else
-    begin
-      { I don't want to walk anymore. So just stand stil. }
-      SetState(wasStand);
-      Exit;
-    end;
 
-    RotateDirectionToFaceTarget(DirectionToPlayer,
-      AngleRadBetweenDirectionToPlayer);
+      CalculateDirectionToPlayer(DirectionToTarget,
+        AngleRadBetweenDirectionToTarget);
+
+      if WantToWalkToPlayer(AngleRadBetweenDirectionToTarget) then
+      begin
+        if not MoveAlongTheDirection then
+        begin
+          { Not able to get to player this way ? Maybe there exists
+            some alternative way, not straight. Lets try. }
+          HasAlternativeTarget := true;
+          AlternativeTarget := CalculateAlternativeTarget;
+          Exit;
+        end;
+      end else
+      begin
+        { I don't want to walk anymore. So just stand stil. }
+        SetState(wasStand);
+        Exit;
+      end;
+
+      RotateDirectionToFaceTarget(DirectionToTarget,
+        AngleRadBetweenDirectionToTarget);
+    end;
 
     if AttackAllowed then
       SetState(wasAttack);
