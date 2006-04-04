@@ -81,7 +81,7 @@ dist:
 	rm -Rf $(TMP_DIST_PATH)
 	mkdir -p $(TMP_DIST_PATH)
 # Copy and clean castle/trunk/ directory
-	cp -R ../ $(TMP_DIST_PATH)
+	cp -R ../trunk/ $(TMP_DIST_PATH)
 	mv $(TMP_DIST_PATH)trunk/ $(TMP_DIST_PATH)castle
 	make -C $(TMP_DIST_PATH)castle/ clean clean_private
 	areFilenamesLower -i Makefile $(TMP_DIST_PATH)castle/data/
