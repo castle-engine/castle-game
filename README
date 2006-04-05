@@ -354,10 +354,13 @@ Levels:
     may change, so that any kind of closed shape will be allowed there
     and it will be stored and used precisely (not only as it's bounding box).
 
+    Remember that sectors are numbered starting from 0.
+
   - Shapes placed under the name Waypoint<index>_<ignored>
     are also removed from the real level in TLevel constructor.
     Middle point of bounding box of such shape determines
     waypoint's Posiiton.
+    Remember that waypoints are numbered starting from 0.
 
   - Sectors of waypoints (and reverse property, Waypoints
     of sectors) are automatically calculated, by looking for waypoints
@@ -369,9 +372,12 @@ Levels:
     it's arbitrarily assigned to any allowed sector.
     And for the rendering optimization, such sectors would work fine.
     However, for monster AI, sectors should not have any common
-    non-zero volume.
+    large non-zero volume.
 
-    So each sector should usually place waypoint's Position at it's border.
+    So in practice, each sector should usually place
+    waypoint's Position at it's border. Sectors may overlap but only
+    for a minimal distance (otherwise awkward movement may happen
+    when creature is in the common part).
 
   - You don't have to cover whole level with sectors.
     If some object (like player or creature) is not within any defined

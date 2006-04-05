@@ -421,6 +421,8 @@ end;
 
 destructor TLevel.Destroy;
 begin
+  FreeWithContentsAndNil(FSectors);
+  FreeWithContentsAndNil(FWaypoints);
   FreeAndNil(FLightSet);
   FreeAndNil(FScene);
   FreeWithContentsAndNil(FItems);
