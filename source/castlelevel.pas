@@ -26,7 +26,7 @@ interface
 
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
-  VRMLTriangleOctree, CastleCreatures;
+  VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints;
 
 type
   TLevel = class
@@ -69,6 +69,9 @@ type
     FHomeCameraUp: TVector3Single;
 
     FAnimationTime: Single;
+
+    FSectors: TSceneSectorsList;
+    FWaypoints: TSceneWaypointsList;
   protected
     { This will be called from our constructor before initializing
       our octrees. You can override this to do here some operations
@@ -212,6 +215,9 @@ type
       HomeCameraUp value --- some not (for simplicity, and sometimes
       code efficiency). }
     property HomeCameraUp: TVector3Single read FHomeCameraUp;
+
+    property Sectors: TSceneSectorsList read FSectors;
+    property Waypoints: TSceneWaypointsList read FWaypoints;
   end;
 
   TCastleHallLevel = class(TLevel)
@@ -291,6 +297,8 @@ constructor TLevel.Create(const ASceneFileName, ALightSetFileName: string);
     end;
   end;
 
+const
+  SectorsMargin = 0.5;
 var
   NavigationNode: TNodeNavigationInfo;
   WorldInfoNode: TNodeWorldInfo;
@@ -340,6 +348,14 @@ begin
 
   if not RemoveBoxNode(FHintButtonBox, 'HintButtonBox') then
     FHintButtonBox := EmptyBox3d;
+
+  { calculate Sectors and Waypoints }
+  FSectors := TSceneSectorsList.Create;
+  FWaypoints := TSceneWaypointsList.Create;
+  Waypoints.ExtractPositions(Scene.RootNode);
+  Sectors.ExtractBoundingBoxes(Scene.RootNode);
+  Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
+  Scene.ChangedAll;
 
   NavigationNode := Scene.RootNode.TryFindNode(TNodeNavigationInfo, true)
     as TNodeNavigationInfo;

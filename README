@@ -338,6 +338,77 @@ Levels:
 - For more customized levels, you may want to derive new class
   from TLevel and override there things you want.
 
+- Sectors and waypoints (aka portals) for the level:
+  - Shapes placed under the name Sector<index>_<ignored>
+    are removed from the real level in TLevel constructor.
+    The geometry of given sector is understood to be the sum
+    of all Sector<index> boxes.
+
+    Also VisibleSectors for each sector are coded in CastleLevel.pas unit.
+
+    For programmers: in cases when the sum of bounding boxes
+    is not flexible enough to define a geometry,
+    you can define any kind of geometry in Pascal code,
+    by overriding TSceneSector.IsPointInside.
+    In the future, treatment of the shape inside Sector<index>_<ignored>
+    may change, so that any kind of closed shape will be allowed there
+    and it will be stored and used precisely (not only as it's bounding box).
+
+  - Shapes placed under the name Waypoint<index>_<ignored>
+    are also removed from the real level in TLevel constructor.
+    Middle point of bounding box of such shape determines
+    waypoint's Posiiton.
+
+  - Sectors of waypoints (and reverse property, Waypoints
+    of sectors) are automatically calculated, by looking for waypoints
+    that have a Position that falls inside Sector's BoundingBoxes
+    enlarged by margin 0.5.
+
+    Note that sectors' BoundingBoxes need *not* be strictly separated.
+    When object (like player or creature) is within two sectors,
+    it's arbitrarily assigned to any allowed sector.
+    And for the rendering optimization, such sectors would work fine.
+    However, for monster AI, sectors should not have any common
+    non-zero volume.
+
+    So each sector should usually place waypoint's Position at it's border.
+
+  - You don't have to cover whole level with sectors.
+    If some object (like player or creature) is not within any defined
+    sector, it's considered to be inside the "implicit whole sector",
+    that is a little special. It's geometry is considered
+    infinte (every 3D point belongs to it, if it doesn't belong to any
+    of the explicitly defined scetors). VisibleSectors
+    is treated like filled with values "true"(so all other sectors
+    are assumed to be visible).
+
+    TODO:
+    Many methods in CastleLevel code accept SectorIndex parameter that
+    has index -1 -> this indicates this "implicit whole sector".
+    For ObjectPositionToSector, -1 is returned when Position is not
+    inside BoundingBoxes of any defined sector.
+
+  - Sectors and waypoints are used for 2 things:
+
+    TODO:
+    1. To speed up rendering: When player's CameraPos is within
+       a given sector (not -1), we have to render only the sectors
+       for which VisibleSectors is true.
+
+    TODO:
+    2. To make creature moving AI more intelligent:
+       If a creature wants to move from SectionBegin to SectorEnd,
+       and SectionBegin <> SectorEnd (and none of them is -1),
+       creature knows that it must pass through appropriate waypoints.
+
+    It's assumed that there will not be too many sectors on the level
+    (100 sectors is *really* around maximum. 10-20 is reasonable.)
+    So sectors are *not* (at least right now) stored in any "intelligent"
+    structure (like an octree) and creature moving AI uses
+    the simplest breadth-first search to find a satisfiable path
+    (no A* algorithm or anything; it's simply not needed for the kind of
+    sectors layouts that I will typically use).
+
 Items:
 
 - Item up vector must be +Z.

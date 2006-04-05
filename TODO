@@ -1,3 +1,5 @@
+- sectors and waypoints finish, see README for TO-DOs.
+
 --------------------
 - creature<->creature collision is also needed
 
@@ -36,91 +38,6 @@ Would-be-nice before next stage:
   - intro under menu: camera floating around level with this fog ?
   - walking down the stairs and down the hill causes player to lose life
 
-- Allow dividing level into sectors.
-
-  Text for README:
-
-  Sectors and waypoints (aka portals) for the level:
-  - Shapes placed under the name SectorBox_<ignored>
-    are removed from the real level in TLevel constructor.
-    A set of 1 or more SectorBox_xxx meshes determines a given level's Sector
-    BoundingBoxes, in the way coded in CastleLevel.pas unit.
-    Also VisibleSectors for each sector is coded in CastleLevel.pas unit.
-
-  - Shapes placed under the name WaypointBox<index>_<ignored>
-    are also removed from the real level in TLevel constructor.
-    Middle point of bounding box of such shape determines
-    waypoint's Posiiton.
-
-  - SectorsIndexes of waypoints (and reverse property, WaypointsIndexes
-    of sectors) are automatically calculated. Each sector must just include
-    given waypoint's Position within sector's BoundingBoxes.
-    Yes, this means that sectors' BoundingBoxes are *not* separated.
-    When object (like player or creature) is within two sectors,
-    it's arbitrarily assigned to any allowed sector.
-
-  - You don't have to cover whole level with sectors.
-    If some object (like player or creature) is not within any defined
-    sector, it's considered to be inside the "implicit whole sector",
-    whose
-    1. BoundingBoxes is considered infinite (every 3D point belongs to it)
-    2. VisibleSectors is all true (so all sectors are assumed to be visible)
-    3. WaypointsIndexes contains all indexes 0..Waypoints.High
-       (so all waypoints are accessible)
-
-    Many methods in CastleLevel code accept SectorIndex parameter that
-    has index -1 -> this indicates this "implicit whole sector".
-    For ObjectPositionToSector, -1 is returned when Position is not
-    inside BoundingBoxes of any defined sector.
-
-  - Sectors and waypoints are used for 2 things:
-
-    1. To speed up rendering: When player's CameraPos is within
-       a given sector (not -1), we have to render only the sectors
-       for which VisibleSectors is true.
-
-    2. To make creature moving AI more intelligent:
-       If a creature wants to move from SectionBegin to SectorEnd,
-       and SectionBegin <> SectorEnd (and yes, one of
-       SectionBegin or SectorEnd may be -1), creature knows that
-       it must pass through appropriate waypoints.
-
-    It's assumed that there will not be too many sectors on the level
-    (100 sectors is *really* around maximum. 10-20 is reasonable.)
-    So sectors are *not* (at least right now) stored in any "intelligent"
-    structure (like an octree) and creature moving AI uses
-    the simplest breadth-first search to find a satisfiable path
-    (no A* algorithm or anything; it's simply not needed for the kind of
-    sectors layouts that I will typically use).
-
-  Code for CastleLevel.pas:
-  TLevelWaypoint = class
-  public
-    Position: TVector3Single;
-
-    { Indexes of Level.Sectors that contain this waypoint. }
-    SectorsIndexes: TDynIntegerArray;
-  end;
-
-  TLevelSector = class
-  public
-    BoundingBoxes: TDynBox3dArray;
-
-    { Always non-nil with Count = Sectors.Count.
-      Always Sectors[I].VisibleSectors[I] = @true, i.e. the sector
-      is visible from itself. }
-    VisibleSectors: TDynBooleanArray;
-
-    { Indexes of Level.Waypoints that are included in this sector. }
-    WaypointsIndexes: TDynIntegerArray;
-  end;
-
-  TLevel =
-  ...
-    property Sectors: TDynLevelSectorsArray read Sectors;
-    property Waypoints: TDynLevelWaypointsArray read Sectors;
-  end;
-
 - do weather (I have snow and rain from my szklane_lasy, but they look poor...)
 
 - weapon-less attack (does knockback + small damage)
@@ -138,6 +55,9 @@ Would-be-nice before next stage:
 - alien model anim must be changed: the corpse must actualy move while walking !
   Otherwise the effect is like "the legs walking, but the corpse is just
   floating constantly"
+
+  Check out my sketch on "Kompresja danych" paper, pages 5 and 7,
+  maybe this will be useful after all.
 
 - ball_missile looks rather funny, too colorful.
   It must look like something fiery, or lighting, or just anything
