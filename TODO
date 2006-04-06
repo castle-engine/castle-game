@@ -2,9 +2,9 @@
   it get's hard to kill it when it's running...
   and it generally moves quite fast --- now, with walking through waypoints, it's quite deadly...
 
-- sectors and waypoints finish, see README for TO-DOs.
-- There must be a way to say that some sectors are not important
-  for AI for creatures with Flying.
+- Do Flying creature (Like a ghost ? Only blended things ? Would be nice...)
+  - There must be a way to say that some sectors are not important
+    for AI for creatures with Flying.
 
 --------------------
 - creature<->creature collision is also needed
@@ -43,6 +43,8 @@ Would-be-nice before next stage:
   - volumetric fog (like from malfunction) needed there. I also want to demonstrate fog in my engine...
   - intro under menu: camera floating around level with this fog ?
   - walking down the stairs and down the hill causes player to lose life
+
+- sectors and waypoints finish, see README for TO-DOs.
 
 - do weather (I have snow and rain from my szklane_lasy, but they look poor...)
 
