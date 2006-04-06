@@ -1,3 +1,7 @@
+- maybe slow down alien move ?
+  it get's hard to kill it when it's running...
+  and it generally moves quite fast --- now, with walking through waypoints, it's quite deadly...
+
 - sectors and waypoints finish, see README for TO-DOs.
 - There must be a way to say that some sectors are not important
   for AI for creatures with Flying.

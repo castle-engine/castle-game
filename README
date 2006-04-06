@@ -388,20 +388,19 @@ Levels:
     is treated like filled with values "true"(so all other sectors
     are assumed to be visible).
 
-    TODO:
-    Many methods in CastleLevel code accept SectorIndex parameter that
-    has index -1 -> this indicates this "implicit whole sector".
-    For ObjectPositionToSector, -1 is returned when Position is not
-    inside BoundingBoxes of any defined sector.
+    For programmers: SectorWithPoint returns nil when no sector found,
+    and this indicates such "implicit whole sector".
+    FindWay accepts SectorBegin and SectorEnd as nil
+    (and always returns then false).
 
   - Sectors and waypoints are used for 2 things:
 
-    TODO:
     1. To speed up rendering: When player's CameraPos is within
        a given sector (not -1), we have to render only the sectors
        for which VisibleSectors is true.
+       TODO: right now it's not used for to speed up rendering,
+       and VisibleSectors is ignored.
 
-    TODO:
     2. To make creature moving AI more intelligent:
        If a creature wants to move from SectionBegin to SectorEnd,
        and SectionBegin <> SectorEnd (and none of them is -1),
@@ -411,7 +410,7 @@ Levels:
     (100 sectors is *really* around maximum. 10-20 is reasonable.)
     So sectors are *not* (at least right now) stored in any "intelligent"
     structure (like an octree) and creature moving AI uses
-    the simplest breadth-first search to find a satisfiable path
+    the simplest search on the graph to find a satisfiable path
     (no A* algorithm or anything; it's simply not needed for the kind of
     sectors layouts that I will typically use).
 

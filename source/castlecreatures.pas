@@ -24,7 +24,7 @@ unit CastleCreatures;
 interface
 
 uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
-  VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound;
+  VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints;
 
 {$define read_interface}
 
@@ -348,6 +348,11 @@ type
       surrounded by CameraRadius for collision detection. }
     function HeadPosition: TVector3Single;
 
+    { Return the one of Level.Sectors that contains HeadPosition.
+      Nil if none. Yes, this is just a shortcut for
+      Level.Sectors.SectorWithPoint(HeadPosition). }
+    function HeadPositionSector: TSceneSector;
+
     { Direction the creature is facing.
       It always must be normalized. }
     property Direction: TVector3Single read FDirection write FDirection;
@@ -406,9 +411,14 @@ type
 
     HasLastSeenPlayer: boolean;
     LastSeenPlayer: TVector3Single;
+    LastSeenPlayerSector: TSceneSector;
 
     HasAlternativeTarget: boolean;
     AlternativeTarget: TVector3Single;
+
+    WaypointsSaved_Begin: TSceneSector;
+    WaypointsSaved_End: TSceneSector;
+    WaypointsSaved: TSceneWaypointsList;
   protected
     procedure SetLife(const Value: Single); override;
   public
@@ -417,6 +427,8 @@ type
       const ADirection: TVector3Single;
       const AMaxLife: Single;
       const AnimationTime: Single);
+
+    destructor Destroy; override;
 
     { Shortcut for TWalkAttackCreatureKind(Kind). }
     function WAKind: TWalkAttackCreatureKind;
@@ -893,6 +905,11 @@ begin
   FLastAttackDirection := Normalized(Value);
 end;
 
+function TCreature.HeadPositionSector: TSceneSector;
+begin
+  Result := Level.Sectors.SectorWithPoint(HeadPosition);
+end;
+
 { TCreatures ----------------------------------------------------------------- }
 
 procedure TCreaturesList.Render(const Frustum: TFrustum);
@@ -932,6 +949,13 @@ begin
   inherited Create(AKind, ALegsPosition, ADirection, AMaxLife, AnimationTime);
   FState := wasStand;
   StateChangeTime := AnimationTime;
+  WaypointsSaved := TSceneWaypointsList.Create;
+end;
+
+destructor TWalkAttackCreature.Destroy;
+begin
+  FreeAndNil(WaypointsSaved);
+  inherited;
 end;
 
 function TWalkAttackCreature.WAKind: TWalkAttackCreatureKind;
@@ -1114,12 +1138,11 @@ var
       (not CloseEnoughToTarget(Target));
   end;
 
-  { Is it wanted to get closer to the LastSeenPlayer ?
-    And (if it's wanted) is it sensible to do this by moving
-    along current Direction ?
-    Call this only if HasLastSeenPlayer. }
-  function WantToWalkToPlayer(
-    const AngleRadBetweenDirectionToPlayer: Single): boolean;
+  { This doesn't take into account current Direction,
+    it only looks at current Position and LastSeenPlayer position,
+    and asks "do I want to get closer" ?
+    Use only if HasLastSeenPlayer. }
+  function WantToShortenDistanceToPlayer: boolean;
   begin
     Result :=
       { Is it wanted to get closer to the LastSeenPlayer ?
@@ -1134,10 +1157,18 @@ var
         short-range weapon, or easier to aim with long-range weapon). }
       ( (not SeesPlayer) or
         (SqrDistanceToLastSeenPlayer > Sqr(WAKind.AttackDistance))
-      ) and
+      );
+  end;
 
-        WantToWalkToTarget(LastSeenPlayer,
-          AngleRadBetweenDirectionToPlayer);
+  { Is it wanted to get closer to the LastSeenPlayer ?
+    And (if it's wanted) is it sensible to do this by moving
+    along current Direction ?
+    Call this only if HasLastSeenPlayer. }
+  function WantToWalkToPlayer(
+    const AngleRadBetweenDirectionToPlayer: Single): boolean;
+  begin
+    Result := WantToShortenDistanceToPlayer and
+      WantToWalkToTarget(LastSeenPlayer, AngleRadBetweenDirectionToPlayer);
   end;
 
   function WantToRunAway: boolean;
@@ -1255,12 +1286,74 @@ var
         Result[2] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
     end;
 
+    { Go the way to LastSeenPlayer, *not* by using waypoints.
+      Assumes HasLastSeenPlayer. }
+    procedure WalkNormal;
+    var
+      DirectionToTarget: TVector3Single;
+      AngleRadBetweenDirectionToTarget: Single;
+    begin
+      CalculateDirectionToPlayer(DirectionToTarget,
+        AngleRadBetweenDirectionToTarget);
+
+      if WantToWalkToPlayer(AngleRadBetweenDirectionToTarget) then
+      begin
+        if not MoveAlongTheDirection then
+        begin
+          { Not able to get to player this way ? Maybe there exists
+            some alternative way, not straight. Lets try. }
+          HasAlternativeTarget := true;
+          AlternativeTarget := CalculateAlternativeTarget;
+          Exit;
+        end;
+      end else
+      begin
+        { I don't want to walk anymore. So just stand stil. }
+        SetState(wasStand);
+        Exit;
+      end;
+
+      RotateDirectionToFaceTarget(DirectionToTarget,
+        AngleRadBetweenDirectionToTarget);
+    end;
+
+    procedure WalkToWaypoint(const Target: TVector3Single);
+    var
+      DirectionToTarget: TVector3Single;
+      AngleRadBetweenDirectionToTarget: Single;
+    begin
+      CalculateDirectionToTarget(Target, DirectionToTarget,
+        AngleRadBetweenDirectionToTarget);
+
+      if WantToShortenDistanceToPlayer then
+      begin
+        if not MoveAlongTheDirection then
+        begin
+          { Not able to get to waypoint this way ? Maybe there exists
+            some alternative way, not straight. Lets try. }
+          HasAlternativeTarget := true;
+          AlternativeTarget := CalculateAlternativeTarget;
+          Exit;
+        end;
+      end else
+      begin
+        { I don't want to walk anymore. So just stand stil. }
+        SetState(wasStand);
+        Exit;
+      end;
+
+      RotateDirectionToFaceTarget(DirectionToTarget,
+        AngleRadBetweenDirectionToTarget);
+    end;
+
   const
     ProbabilityToTryAnotherAlternativeTarget = 0.5;
     AngleRadBetweenDirectionToTargetToResign = Pi / 180 { 1 degree };
   var
     DirectionToTarget: TVector3Single;
     AngleRadBetweenDirectionToTarget: Single;
+    HeadPositionSectorNow: TSceneSector;
+    UseWalkNormal: boolean;
   begin
     if HasAlternativeTarget then
     begin
@@ -1346,28 +1439,55 @@ var
         Exit;
       end;
 
-      CalculateDirectionToPlayer(DirectionToTarget,
-        AngleRadBetweenDirectionToTarget);
+      UseWalkNormal := true;
 
-      if WantToWalkToPlayer(AngleRadBetweenDirectionToTarget) then
+      HeadPositionSectorNow := HeadPositionSector;
+      if (HeadPositionSectorNow <> LastSeenPlayerSector) and
+         (HeadPositionSectorNow <> nil) and
+         (LastSeenPlayerSector <> nil) then
       begin
-        if not MoveAlongTheDirection then
+        { The way to LastSeenPlayer is using waypoints. }
+
+        { Recalculate WaypointsSaved.
+          Note that I recalculate only when HeadPositionSectorNow or
+          LastSeenPlayerSector changed. }
+        if (HeadPositionSectorNow <> WaypointsSaved_Begin) or
+           (LastSeenPlayerSector <> WaypointsSaved_End) then
         begin
-          { Not able to get to player this way ? Maybe there exists
-            some alternative way, not straight. Lets try. }
-          HasAlternativeTarget := true;
-          AlternativeTarget := CalculateAlternativeTarget;
-          Exit;
+          WaypointsSaved_Begin := HeadPositionSectorNow;
+          WaypointsSaved_End := LastSeenPlayerSector;
+          TSceneSectorsList.FindWay(WaypointsSaved_Begin, WaypointsSaved_End,
+            WaypointsSaved);
         end;
-      end else
-      begin
-        { I don't want to walk anymore. So just stand stil. }
-        SetState(wasStand);
-        Exit;
+
+        if WaypointsSaved.Count <> 0 then
+        begin
+          { There is a space around the waypoint that is within
+            more than one sector. SectorWithPoint will then answer
+            with any (it's not specified which) sector that has
+            given position. This is problematic, because this means
+            that the creature will be forced to go once again to the same
+            waypoint that it's already at... This way there could arise
+            a situation when the creature gets stuck at some waypoint,
+            because we constantly detect that it must pass through this
+            waypoint. The check for CloseEnoughToTarget below prevents this. }
+          if CloseEnoughToTarget(WaypointsSaved[0].Position) then
+          begin
+            if WaypointsSaved.Count > 1 then
+            begin
+              WalkToWaypoint(WaypointsSaved[1].Position);
+              UseWalkNormal := false;
+            end;
+          end else
+          begin
+            WalkToWaypoint(WaypointsSaved[0].Position);
+            UseWalkNormal := false;
+          end;
+        end;
       end;
 
-      RotateDirectionToFaceTarget(DirectionToTarget,
-        AngleRadBetweenDirectionToTarget);
+      if UseWalkNormal then
+        WalkNormal;
     end;
 
     if AttackAllowed then
@@ -1447,6 +1567,7 @@ begin
   begin
     HasLastSeenPlayer := true;
     LastSeenPlayer := Player.Navigator.CameraPos;
+    LastSeenPlayerSector := Player.CameraPosSector;
   end;
 
   if HasLastSeenPlayer then

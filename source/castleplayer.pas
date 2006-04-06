@@ -23,7 +23,8 @@ unit CastlePlayer;
 
 interface
 
-uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh;
+uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh,
+  VRMLSceneWaypoints;
 
 const
   DefaultMaxLife = 100;
@@ -156,6 +157,11 @@ type
       - Navigator.RotationOnlyMatrix, Matrixm, Frustum.
     }
     property Navigator: TMatrixWalker read FNavigator;
+
+    { Return the one of Level.Sectors that contains Navigator.CameraPos.
+      Nil if none. Yes, this is just a shortcut for
+      Level.Sectors.SectorWithPoint(Navigator.CameraPos). }
+    function CameraPosSector: TSceneSector;
 
     { This adds Item to Items, with appropriate GameMessage.
       Returns index inside Items to this item (note that this
@@ -655,6 +661,11 @@ end;
 function TPlayer.EquippedWeaponKind: TItemWeaponKind;
 begin
   Result := TItemWeaponKind(EquippedWeapon.Kind);
+end;
+
+function TPlayer.CameraPosSector: TSceneSector;
+begin
+  Result := Level.Sectors.SectorWithPoint(Navigator.CameraPos);
 end;
 
 { GLWindow init / close ------------------------------------------------------ }
