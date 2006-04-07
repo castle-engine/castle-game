@@ -24,7 +24,7 @@ unit CastlePlayer;
 interface
 
 uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh,
-  VRMLSceneWaypoints;
+  VRMLSceneWaypoints, CastleKeys;
 
 const
   DefaultMaxLife = 100;
@@ -78,7 +78,7 @@ type
     BlackOutColor: TVector3f;
 
     { This updates Navigator properties.
-      Call this always when FlyingMode and Dead changes. }
+      Call this always when FlyingMode or Dead or some key values change. }
     procedure UpdateNavigator;
 
     procedure FalledDown(Navigator: TMatrixWalker; const FallenHeight: Single);
@@ -98,6 +98,8 @@ type
     { Shortcut for TItemWeaponKind(EquippedWeapon.Kind).
       Call this only when EquippedWeapon <> nil. }
     function EquippedWeaponKind: TItemWeaponKind;
+
+    procedure KeyChanged(KeyConfiguration: TKeyConfiguration);
   public
     constructor Create;
     destructor Destroy; override;
@@ -243,7 +245,7 @@ implementation
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
-  CastleSound, CastleKeys, VRMLGLAnimation;
+  CastleSound, VRMLGLAnimation;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -267,6 +269,8 @@ begin
 
   HintEscapeKeyShown := false;
 
+  OnKeyChanged.AppendItem(KeyChanged);
+
   { Although it will be called in every OnIdle anyway,
     we also call it here to be sure that right after TPlayer constructor
     finished, Navigator has already good values. }
@@ -275,6 +279,9 @@ end;
 
 destructor TPlayer.Destroy;
 begin
+  if OnKeyChanged <> nil then
+    OnKeyChanged.DeleteFirstEqual(KeyChanged);
+
   FreeAndNil(FNavigator);
   FreeWithContentsAndNil(FItems);
   inherited;
@@ -494,8 +501,6 @@ begin
       RequiredScreenWidth, RequiredScreenHeight);
 end;
 
-{ This updates Navigator properties.
-  Call this always when FlyingMode and Dead changes. }
 procedure TPlayer.UpdateNavigator;
 begin
   Navigator.Gravity := not FlyingMode;
@@ -666,6 +671,11 @@ end;
 function TPlayer.CameraPosSector: TSceneSector;
 begin
   Result := Level.Sectors.SectorWithPoint(Navigator.CameraPos);
+end;
+
+procedure TPlayer.KeyChanged(KeyConfiguration: TKeyConfiguration);
+begin
+  UpdateNavigator;
 end;
 
 { GLWindow init / close ------------------------------------------------------ }

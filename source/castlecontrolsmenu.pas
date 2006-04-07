@@ -53,8 +53,11 @@ type
   TControlsSubMenu = class(TSubMenu)
   private
     FGroup: TKeyGroup;
+    procedure KeyChanged(KeyConfiguration: TKeyConfiguration);
   public
     constructor Create(AGroup: TKeyGroup);
+    destructor Destroy; override;
+
     property Group: TKeyGroup read FGroup;
     procedure CurrentItemSelected; override;
   end;
@@ -176,13 +179,42 @@ begin
   SpaceBetweenItems := 2;
 
   FixItemsAreas(Glw.Width, Glw.Height);
+
+  OnKeyChanged.AppendItem(KeyChanged);
+end;
+
+destructor TControlsSubMenu.Destroy;
+begin
+  if OnKeyChanged <> nil then
+    OnKeyChanged.DeleteFirstEqual(KeyChanged);
+  inherited;
 end;
 
 procedure TControlsSubMenu.CurrentItemSelected;
+var
+  KeyConfiguration, ConflictingKey: TKeyConfiguration;
+  NewKey: TKey;
 begin
   if Between(CurrentItem, 0, CastleGroupKeys[Group].High) then
   begin
-    MessageOK(Glw, 'TODO: Change key: Not implemented yet');
+    KeyConfiguration := CastleGroupKeys[Group].Items[CurrentItem];
+    NewKey := MessageKey(Glw, Format(
+      'Press the new key for "%s".' +nl+
+      'Press Escape to cancel.', [KeyConfiguration.Name]), '', taLeft);
+
+    if (NewKey <> K_Escape) and
+       { We silently ignore situation when NewKey = KeyConfiguration.Value.
+         This is meaningless, and otherwise would raise a message
+         that NewKey conflicts with KeyConfiguration. }
+       (NewKey <> KeyConfiguration.Value) then
+    begin
+      ConflictingKey := CastleAllKeys.SeekKeyByValue(NewKey);
+      if ConflictingKey <> nil then
+        MessageOK(Glw,
+          Format('Conflict: Key "%s" is already assigned to action "%s"',
+          [KeyToStr(NewKey), ConflictingKey.Name]), taLeft) else
+        KeyConfiguration.Value := NewKey;
+    end;
   end else
   if CurrentItem = CastleGroupKeys[Group].High + 1 then
   begin
@@ -193,6 +225,17 @@ begin
     CurrentMenu := ControlsMenu;
   end else
     raise EInternalError.Create('Menu item unknown');
+end;
+
+procedure TControlsSubMenu.KeyChanged(KeyConfiguration: TKeyConfiguration);
+var
+  I: Integer;
+begin
+  { Refresh key names displayed in the menu. }
+
+  for I := 0 to CastleGroupKeys[Group].High do
+    TGLMenuItemArgument(Items.Objects[I]).Value :=
+      KeyToStr(CastleGroupKeys[Group].Items[I].Value);
 end;
 
 { TBasicControlsMenu ------------------------------------------------------------- }

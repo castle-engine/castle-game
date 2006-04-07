@@ -1,5 +1,24 @@
-{ Keys of the game.
-  TODO: make keys configurable in game. }
+{
+  Copyright 2006 Michalis Kamburelis.
+
+  This file is part of "castle".
+
+  "castle" is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  "castle" is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with "castle"; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+}
+
+{ Keys of the game. }
 unit CastleKeys;
 
 interface
@@ -15,24 +34,41 @@ type
   private
     FName: string;
     FGroup: TKeyGroup;
-    FDefaultvalue: TKey;
+    FDefaultValue: TKey;
     FValue: TKey;
+    procedure SetValue(NewValue: TKey);
   public
     constructor Create(const AName: string;
       const AGroup: TKeyGroup;
-      const ADefaultvalue: TKey);
+      const ADefaultValue: TKey);
 
     property Name: string read FName;
     property Group: TKeyGroup read FGroup;
-    property Defaultvalue: TKey read FDefaultvalue;
+    property DefaultValue: TKey read FDefaultValue;
 
-    { Current key value. Initially equal to DefaultValue. }
-    property Value: TKey read FValue write FValue;
+    { Current key value. Initially equal to DefaultValue.
+      On every change of Value (not inside TKeyConfiguration
+      constructor), OnKeyChanged callbacks will be called. }
+    property Value: TKey read FValue write SetValue;
   end;
 
   TObjectsListItem_3 = TKeyConfiguration;
   {$I objectslist_3.inc}
   TKeyConfigurationsList = class(TObjectsList_3)
+  public
+    function SeekKeyByValue(KeyValue: TKey): TKeyConfiguration;
+  end;
+
+  TKeyChangedEvent = procedure (KeyConfiguration: TKeyConfiguration) of object;
+  PKeyChangedEvent = ^TKeyChangedEvent;
+
+  TDynArrayItem_1 = TKeyChangedEvent;
+  PDynArrayItem_1 = PKeyChangedEvent;
+  {$define DYNARRAY_1_IS_FUNCTION}
+  {$I dynarray_1.inc}
+  TDynKeyChangedEventArray = class(TDynArray_1)
+  public
+    procedure ExecuteAll(KeyConfiguration: TKeyConfiguration);
   end;
 
 var
@@ -65,8 +101,10 @@ var
   { List of all configurable keys.
     Will be created in initialization and freed in finalization of this unit.
     All TKeyConfiguration instances will automatically add to this. }
-  CastleKeys: TKeyConfigurationsList;
+  CastleAllKeys: TKeyConfigurationsList;
   CastleGroupKeys: array[TKeyGroup] of TKeyConfigurationsList;
+
+  OnKeyChanged: TDynKeyChangedEventArray;
 
 {$undef read_interface}
 
@@ -75,21 +113,57 @@ implementation
 uses SysUtils;
 
 {$define read_implementation}
+{$I dynarray_1.inc}
 {$I objectslist_3.inc}
+
+{ TKeyConfigurationsList ----------------------------------------------------- }
+
+function TKeyConfigurationsList.SeekKeyByValue(KeyValue: TKey): TKeyConfiguration;
+var
+  I: Integer;
+begin
+  for i := 0 to High do
+  begin
+    Result := Items[I];
+    if Result.Value = KeyValue then
+      Exit;
+  end;
+  Result := nil;
+end;
+
+{ TDynKeyChangedEventArray -------------------------------------------------- }
+
+procedure TDynKeyChangedEventArray.ExecuteAll(
+  KeyConfiguration: TKeyConfiguration);
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+    Items[I](KeyConfiguration);
+end;
 
 { TKeyConfiguration ---------------------------------------------------------- }
 
 constructor TKeyConfiguration.Create(const AName: string;
-  const AGroup: TKeyGroup; const ADefaultvalue: TKey);
+  const AGroup: TKeyGroup; const ADefaultValue: TKey);
 begin
   inherited Create;
   FName := AName;
   FGroup := AGroup;
-  FDefaultvalue := ADefaultvalue;
+  FDefaultValue := ADefaultValue;
   FValue := DefaultValue;
 
-  CastleKeys.Add(Self);
+  CastleAllKeys.Add(Self);
   CastleGroupKeys[Group].Add(Self);
+end;
+
+procedure TKeyConfiguration.SetValue(NewValue: TKey);
+begin
+  if Value <> NewValue then
+  begin
+    FValue := NewValue;
+    OnKeyChanged.ExecuteAll(Self);
+  end;
 end;
 
 { initialization / finalization ---------------------------------------------- }
@@ -98,7 +172,8 @@ procedure DoInitialization;
 var
   KeyGroup: TKeyGroup;
 begin
-  CastleKeys := TKeyConfigurationsList.Create;
+  OnKeyChanged := TDynKeyChangedEventArray.Create;
+  CastleAllKeys := TKeyConfigurationsList.Create;
 
   for KeyGroup := Low(KeyGroup) to High(KeyGroup) do
     CastleGroupKeys[KeyGroup] := TKeyConfigurationsList.Create;
@@ -140,7 +215,8 @@ begin
   for KeyGroup := Low(KeyGroup) to High(KeyGroup) do
     FreeAndNil(CastleGroupKeys[KeyGroup]);
 
-  FreeWithContentsAndNil(CastleKeys);
+  FreeWithContentsAndNil(CastleAllKeys);
+  FreeAndNil(OnKeyChanged);
 end;
 
 initialization

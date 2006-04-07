@@ -1,3 +1,7 @@
+- in game, in config controls, escape should go back to game.
+
+- keys must be saved and loaded to user config file.
+
 - Eric stage 4 comments answer:
 
     Level loading seems to be quite long given the relatively low complexity of meshes and textures, could be something to watch before levels become more complex.
