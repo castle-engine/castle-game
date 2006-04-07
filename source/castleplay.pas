@@ -494,44 +494,51 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
   end;
 
 begin
-  case Key of
-    { Basic keys. }
-    CastleKey_Attack: DoAttack;
-    CastleKey_UpMove: MaybeDeadMessage;
-    CastleKey_DownMove: MaybeDeadMessage;
-    CastleKey_Forward: MaybeDeadMessage;
-    CastleKey_Backward: MaybeDeadMessage;
-    CastleKey_LeftRot: MaybeDeadMessage;
-    CastleKey_RightRot: MaybeDeadMessage;
-    CastleKey_LeftStrafe: MaybeDeadMessage;
-    CastleKey_RightStrafe: MaybeDeadMessage;
-    CastleKey_UpRotate: MaybeDeadMessage;
-    CastleKey_DownRotate: MaybeDeadMessage;
-    CastleKey_HomeUp: MaybeDeadMessage;
+  { Basic keys. }
+  if Key = CastleKey_Attack.Value then
+    DoAttack else
+  if (Key = CastleKey_UpMove.Value) or
+     (Key = CastleKey_DownMove.Value) or
+     (Key = CastleKey_Forward.Value) or
+     (Key = CastleKey_Backward.Value) or
+     (Key = CastleKey_LeftRot.Value) or
+     (Key = CastleKey_RightRot.Value) or
+     (Key = CastleKey_LeftStrafe.Value) or
+     (Key = CastleKey_RightStrafe.Value) or
+     (Key = CastleKey_UpRotate.Value) or
+     (Key = CastleKey_DownRotate.Value) or
+     (Key = CastleKey_HomeUp.Value) then
+    MaybeDeadMessage else
 
-    { Items keys. }
-    CastleKey_InventoryShow: InventoryVisible := not InventoryVisible;
-    CastleKey_InventoryPrevious: ChangeInventoryCurrentItem(-1);
-    CastleKey_InventoryNext: ChangeInventoryCurrentItem(+1);
-    CastleKey_DropItem: DropItem;
-    CastleKey_UseItem: UseItem;
+  { Items keys. }
+  if Key = CastleKey_InventoryShow.Value then
+    InventoryVisible := not InventoryVisible else
+  if Key = CastleKey_InventoryPrevious.Value then
+    ChangeInventoryCurrentItem(-1) else
+  if Key = CastleKey_InventoryNext.Value then
+    ChangeInventoryCurrentItem(+1) else
+  if Key = CastleKey_DropItem.Value then
+    DropItem else
+  if Key = CastleKey_UseItem.Value then
+    UseItem else
 
-    { Other keys. }
-    CastleKey_SaveScreen: SaveScreen;
-    CastleKey_ViewMessages: ViewGameMessages;
-    CastleKey_CancelFlying: CancelFlying;
+  { Other keys. }
+  if Key = CastleKey_SaveScreen.Value then
+    SaveScreen else
+  if Key = CastleKey_ViewMessages.Value then
+    ViewGameMessages else
+  if Key = CastleKey_CancelFlying.Value then
+    CancelFlying else
 
-    else
-      case C of
-        { debug things }
-        'l': if not Player.Dead then
-               Player.Life := Min(Player.Life + 10, Player.MaxLife) else
-               GameMessage(SDeadMessage);
-        'L': Player.Life := Max(Player.Life - 10, 0);
-        '`': ShowDebugInfo := not ShowDebugInfo;
+  case C of
+    { debug things }
+    'l': if not Player.Dead then
+           Player.Life := Min(Player.Life + 10, Player.MaxLife) else
+           GameMessage(SDeadMessage);
+    'L': Player.Life := Max(Player.Life - 10, 0);
+    '`': ShowDebugInfo := not ShowDebugInfo;
 
-        CharEscape: ShowGameMenu;
-      end;
+    CharEscape: ShowGameMenu;
   end;
 end;
 

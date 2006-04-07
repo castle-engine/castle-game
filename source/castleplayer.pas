@@ -522,25 +522,25 @@ begin
     begin
       Navigator.Key_Jump := K_None;
       Navigator.Key_Crouch := K_None;
-      Navigator.Key_UpMove := CastleKey_UpMove;
-      Navigator.Key_DownMove := CastleKey_DownMove;
+      Navigator.Key_UpMove := CastleKey_UpMove.Value;
+      Navigator.Key_DownMove := CastleKey_DownMove.Value;
     end else
     begin
-      Navigator.Key_Jump := CastleKey_UpMove;
-      Navigator.Key_Crouch := CastleKey_DownMove;
+      Navigator.Key_Jump := CastleKey_UpMove.Value;
+      Navigator.Key_Crouch := CastleKey_DownMove.Value;
       Navigator.Key_UpMove := K_None;
       Navigator.Key_DownMove := K_None;
     end;
 
-    Navigator.Key_Forward := CastleKey_Forward;
-    Navigator.Key_Backward := CastleKey_Backward;
-    Navigator.Key_LeftRot := CastleKey_LeftRot;
-    Navigator.Key_RightRot := CastleKey_RightRot;
-    Navigator.Key_LeftStrafe := CastleKey_LeftStrafe;
-    Navigator.Key_RightStrafe := CastleKey_RightStrafe;
-    Navigator.Key_UpRotate := CastleKey_UpRotate;
-    Navigator.Key_DownRotate := CastleKey_DownRotate;
-    Navigator.Key_HomeUp := CastleKey_HomeUp;
+    Navigator.Key_Forward := CastleKey_Forward.Value;
+    Navigator.Key_Backward := CastleKey_Backward.Value;
+    Navigator.Key_LeftRot := CastleKey_LeftRot.Value;
+    Navigator.Key_RightRot := CastleKey_RightRot.Value;
+    Navigator.Key_LeftStrafe := CastleKey_LeftStrafe.Value;
+    Navigator.Key_RightStrafe := CastleKey_RightStrafe.Value;
+    Navigator.Key_UpRotate := CastleKey_UpRotate.Value;
+    Navigator.Key_DownRotate := CastleKey_DownRotate.Value;
+    Navigator.Key_HomeUp := CastleKey_HomeUp.Value;
   end;
 end;
 

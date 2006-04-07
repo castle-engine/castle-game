@@ -50,19 +50,25 @@ type
     procedure CurrentItemSelected; override;
   end;
 
-  TBasicControlsMenu = class(TSubMenu)
-    constructor Create;
+  TControlsSubMenu = class(TSubMenu)
+  private
+    FGroup: TKeyGroup;
+  public
+    constructor Create(AGroup: TKeyGroup);
+    property Group: TKeyGroup read FGroup;
     procedure CurrentItemSelected; override;
   end;
 
-  TItemsControlsMenu = class(TSubMenu)
+  TBasicControlsMenu = class(TControlsSubMenu)
     constructor Create;
-    procedure CurrentItemSelected; override;
   end;
 
-  TOtherControlsMenu = class(TSubMenu)
+  TItemsControlsMenu = class(TControlsSubMenu)
     constructor Create;
-    procedure CurrentItemSelected; override;
+  end;
+
+  TOtherControlsMenu = class(TControlsSubMenu)
+    constructor Create;
   end;
 
 { ----------------------------------------------------------------------------
@@ -117,20 +123,13 @@ end;
 
 { TControlsMenu ------------------------------------------------------------- }
 
-function KeyArgument(const Key: TKey): TGLMenuItemArgument;
-begin
-  Result := TGLMenuItemArgument.Create(
-    TGLMenuItemArgument.TextWidth('WWWWWWWWWWWW'));
-  Result.Value := KeyToStr(Key);
-end;
-
 constructor TControlsMenu.Create;
 begin
   inherited Create;
 
-  Items.Add('Basic controls');
-  Items.Add('Items controls');
-  Items.Add('Other controls');
+  Items.Add('Configure basic controls');
+  Items.Add('Configure items controls');
+  Items.Add('Configure other controls');
   Items.Add('Back to main menu');
 
   SubMenuTitle := 'Configure controls';
@@ -149,56 +148,67 @@ begin
   end;
 end;
 
-{ TBasicControlsMenu ------------------------------------------------------------- }
+{ TControlsSubMenu ----------------------------------------------------------- }
 
-constructor TBasicControlsMenu.Create;
+constructor TControlsSubMenu.Create(AGroup: TKeyGroup);
+
+  function KeyArgument(const Key: TKey): TGLMenuItemArgument;
+  begin
+    Result := TGLMenuItemArgument.Create(
+      TGLMenuItemArgument.TextWidth('WWWWWWWWWWWW'));
+    Result.Value := KeyToStr(Key);
+  end;
+
+var
+  I: Integer;
 begin
   inherited Create;
+  FGroup := AGroup;
 
-  Items.AddObject('Attack', KeyArgument(CastleKey_Attack));
-  Items.AddObject('Move forward', KeyArgument(CastleKey_Forward));
-  Items.AddObject('Move backward', KeyArgument(CastleKey_Backward));
-  Items.AddObject('Turn left', KeyArgument(CastleKey_LeftRot));
-  Items.AddObject('Turn right', KeyArgument(CastleKey_RightRot));
-  Items.AddObject('Move left', KeyArgument(CastleKey_LeftStrafe));
-  Items.AddObject('Move right', KeyArgument(CastleKey_RightStrafe));
-  Items.AddObject('Loop up', KeyArgument(CastleKey_UpRotate));
-  Items.AddObject('Look down', KeyArgument(CastleKey_DownRotate));
-  Items.AddObject('Look straight', KeyArgument(CastleKey_HomeUp));
-  Items.AddObject('Jump (or fly up)', KeyArgument(CastleKey_UpMove));
-  Items.AddObject('Crouch (or fly down)', KeyArgument(CastleKey_DownMove));
+  for I := 0 to CastleGroupKeys[Group].High do
+    Items.AddObject(
+      CastleGroupKeys[Group].Items[I].Name,
+      KeyArgument(CastleGroupKeys[Group].Items[I].Value));
+
   Items.Add('Restore defaults');
   Items.Add('Back to controls menu');
-
-  SubMenuTitle := 'Configure basic controls';
 
   SpaceBetweenItems := 2;
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
-procedure TBasicControlsMenu.CurrentItemSelected;
+procedure TControlsSubMenu.CurrentItemSelected;
 begin
-  case CurrentItem of
-    0..12: MessageOK(Glw, 'TODO: Not implemented yet');
-    13: CurrentMenu := ControlsMenu;
-    else raise EInternalError.Create('Menu item unknown');
-  end;
+  if Between(CurrentItem, 0, CastleGroupKeys[Group].High) then
+  begin
+    MessageOK(Glw, 'TODO: Change key: Not implemented yet');
+  end else
+  if CurrentItem = CastleGroupKeys[Group].High + 1 then
+  begin
+    MessageOK(Glw, 'TODO: Restore defaults: Not implemented yet');
+  end else
+  if CurrentItem = CastleGroupKeys[Group].High + 2 then
+  begin
+    CurrentMenu := ControlsMenu;
+  end else
+    raise EInternalError.Create('Menu item unknown');
+end;
+
+{ TBasicControlsMenu ------------------------------------------------------------- }
+
+constructor TBasicControlsMenu.Create;
+begin
+  inherited Create(kgBasic);
+
+  SubMenuTitle := 'Configure basic controls';
 end;
 
 { TItemsControlsMenu --------------------------------------------------------- }
 
 constructor TItemsControlsMenu.Create;
 begin
-  inherited Create;
-
-  Items.AddObject('Inventory show / hide', KeyArgument(CastleKey_InventoryShow));
-  Items.AddObject('Select previous inventory item', KeyArgument(CastleKey_InventoryPrevious));
-  Items.AddObject('Select next inventory item', KeyArgument(CastleKey_InventoryNext));
-  Items.AddObject('Use (or equip) selected inventory item', KeyArgument(CastleKey_UseItem));
-  Items.AddObject('Drop selected inventory item', KeyArgument(CastleKey_DropItem));
-  Items.Add('Restore defaults');
-  Items.Add('Back to controls menu');
+  inherited Create(kgItems);
 
   SubMenuTitle := 'Configure items controls';
 
@@ -206,32 +216,13 @@ begin
     'Notes:' +nl+
     '- You pick items lying on the ground just by walking on them.' +nl+
     '- Items are automatically unequipped when you drop them.';
-
-  SpaceBetweenItems := 2;
-
-  FixItemsAreas(Glw.Width, Glw.Height);
-end;
-
-procedure TItemsControlsMenu.CurrentItemSelected;
-begin
-  case CurrentItem of
-    0..5: MessageOK(Glw, 'TODO: Not implemented yet');
-    6: CurrentMenu := ControlsMenu;
-    else raise EInternalError.Create('Menu item unknown');
-  end;
 end;
 
 { TOtherControlsMenu ------------------------------------------------------------- }
 
 constructor TOtherControlsMenu.Create;
 begin
-  inherited Create;
-
-  Items.AddObject('View all messages', KeyArgument(CastleKey_ViewMessages));
-  Items.AddObject('Save screen', KeyArgument(CastleKey_SaveScreen));
-  Items.AddObject('Cancel flying', KeyArgument(CastleKey_CancelFlying));
-  Items.Add('Restore defaults');
-  Items.Add('Back to controls menu');
+  inherited Create(kgOther);
 
   SubMenuTitle := 'Configure other controls';
 
@@ -248,19 +239,6 @@ begin
     nl+
     'Note that the "Cancel flying" key is useful if you want to stop flying ' +
     'before flying spell will automatically wear off.';
-
-  SpaceBetweenItems := 2;
-
-  FixItemsAreas(Glw.Width, Glw.Height);
-end;
-
-procedure TOtherControlsMenu.CurrentItemSelected;
-begin
-  case CurrentItem of
-    0..3: MessageOK(Glw, 'TODO: Not implemented yet');
-    4: CurrentMenu := ControlsMenu;
-    else raise EInternalError.Create('Menu item unknown');
-  end;
 end;
 
 { global things -------------------------------------------------------------- }
