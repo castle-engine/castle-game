@@ -133,6 +133,7 @@ begin
   Items.Add('Configure basic controls');
   Items.Add('Configure items controls');
   Items.Add('Configure other controls');
+  Items.Add('Restore all keys to defaults');
   Items.Add('Back to main menu');
 
   SubMenuTitle := 'Configure controls';
@@ -146,7 +147,11 @@ begin
     0: CurrentMenu := BasicControlsMenu;
     1: CurrentMenu := ItemsControlsMenu;
     2: CurrentMenu := OtherControlsMenu;
-    3: UserQuit := true;
+    3: begin
+         CastleAllKeys.RestoreDefaults;
+         MessageOK(Glw, 'All keys restored to defaults.');
+       end;
+    4: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -173,7 +178,6 @@ begin
       CastleGroupKeys[Group].Items[I].Name,
       KeyArgument(CastleGroupKeys[Group].Items[I].Value));
 
-  Items.Add('Restore defaults');
   Items.Add('Back to controls menu');
 
   SpaceBetweenItems := 2;
@@ -217,10 +221,6 @@ begin
     end;
   end else
   if CurrentItem = CastleGroupKeys[Group].High + 1 then
-  begin
-    MessageOK(Glw, 'TODO: Restore defaults: Not implemented yet');
-  end else
-  if CurrentItem = CastleGroupKeys[Group].High + 2 then
   begin
     CurrentMenu := ControlsMenu;
   end else

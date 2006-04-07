@@ -57,6 +57,7 @@ type
   TKeyConfigurationsList = class(TObjectsList_3)
   public
     function SeekKeyByValue(KeyValue: TKey): TKeyConfiguration;
+    procedure RestoreDefaults;
   end;
 
   TKeyChangedEvent = procedure (KeyConfiguration: TKeyConfiguration) of object;
@@ -129,6 +130,14 @@ begin
       Exit;
   end;
   Result := nil;
+end;
+
+procedure TKeyConfigurationsList.RestoreDefaults;
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+    Items[I].Value := Items[I].DefaultValue;
 end;
 
 { TDynKeyChangedEventArray -------------------------------------------------- }
