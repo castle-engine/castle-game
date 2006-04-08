@@ -1,7 +1,3 @@
-- when testing new keys with glWinEvents, there appeared some "latency",
-  both with gtk and with xlib GLWindow backend. Investigate ?
-  Does something like this happen also in castle ?
-
 - in game, in config controls, escape should go back to game.
 
 - keys must be saved and loaded to user config file.
