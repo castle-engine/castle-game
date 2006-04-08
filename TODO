@@ -1,23 +1,51 @@
+- when testing new keys with glWinEvents, there appeared some "latency",
+  both with gtk and with xlib GLWindow backend. Investigate ?
+  Does something like this happen also in castle ?
+
+- GLWINDOW_WINAPI: implement handling of keys:
+
+  K_PrintScreen;
+  K_CapsLock;
+  K_ScrollLock;
+  K_NumLock;
+  K_Pause;
+  K_Numpad_0;
+  K_Numpad_1;
+  K_Numpad_2;
+  K_Numpad_3;
+  K_Numpad_4;
+  K_Numpad_5;
+  K_Numpad_6;
+  K_Numpad_7;
+  K_Numpad_8;
+  K_Numpad_9;
+  K_Numpad_End;
+  K_Numpad_Down;
+  K_Numpad_PageDown;
+  K_Numpad_Left;
+  K_Numpad_Begin;
+  K_Numpad_Right;
+  K_Numpad_Home;
+  K_Numpad_Up;
+  K_Numpad_PageUp;
+  K_Numpad_Insert;
+  K_Numpad_Delete;
+  K_Numpad_Enter;
+  K_Numpad_Multiply;
+  K_Numpad_Divide;
+  K_Apostrophe;
+  K_Semicolon;
+  K_Slash;
+  K_BackQuote;
+  K_Minus_NotNumpad;
+  K_Equal;
+  K_BackSlash;
+
 - in game, in config controls, escape should go back to game.
 
 - keys must be saved and loaded to user config file.
 
-- more keys must be added to TKey type:
-  K_Aposthrophe
-  K_Semicolon
-  K_Slash
-  K_Backquote
-  K_Minus_NotNumPad
-  K_Equal
-  K_Multiply
-  K_Slash_Numpad
-  K_Enter_Numpad
-  K_Backslash
-
-  With numlock off, numeric keys don't generate anything.
-  Keys like CapsLock, NumLock, ScrollLock, PrintScreen, Pause.
-
-  Because of using GLWinMessages, PageUp, PageDown, Home, End cannot be "catched"
+- Because of using GLWinMessages, PageUp, PageDown, Home, End cannot be "catched"
   and assigned.
 
 - Eric stage 4 comments answer:
