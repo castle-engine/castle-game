@@ -74,21 +74,9 @@ begin
   end;
 end;
 
-function MyGetApplicationName: string;
-begin
-  Result := 'castle';
-end;
-
 { main -------------------------------------------------------------------- }
 
 begin
-  { This is needed because
-    - I sometimes display ApplicationName for user, and under Windows
-      ParamStr(0) is ugly uppercased.
-    - ParamStr(0) is unsure for Unixes.
-    - ParamStr(0) is useless for upx executables. }
-  OnGetApplicationName := MyGetApplicationName;
-
   try
     { parse parameters }
     OpenALOptionsParse;
