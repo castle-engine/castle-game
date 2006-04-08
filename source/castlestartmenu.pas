@@ -34,7 +34,7 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
-  CastleControlsMenu;
+  CastleControlsMenu, CastleKeys;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -186,9 +186,8 @@ end;
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   CurrentMenu.KeyDown(Key, C);
-  case Key of
-    K_F5: SaveScreen;
-  end;
+  if Key = CastleKey_SaveScreen.Value then
+    SaveScreen;
 end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);

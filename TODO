@@ -2,6 +2,24 @@
 
 - keys must be saved and loaded to user config file.
 
+- more keys must be added to TKey type:
+  K_Aposthrophe
+  K_Semicolon
+  K_Slash
+  K_Backquote
+  K_Minus_NotNumPad
+  K_Equal
+  K_Multiply
+  K_Slash_Numpad
+  K_Enter_Numpad
+  K_Backslash
+
+  With numlock off, numeric keys don't generate anything.
+  Keys like CapsLock, NumLock, ScrollLock, PrintScreen, Pause.
+
+  Because of using GLWinMessages, PageUp, PageDown, Home, End cannot be "catched"
+  and assigned.
+
 - Eric stage 4 comments answer:
 
     Level loading seems to be quite long given the relatively low complexity of meshes and textures, could be something to watch before levels become more complex.

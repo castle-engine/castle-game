@@ -278,17 +278,19 @@ begin
     'Mouse:' +nl+
     '  left mouse click on anything =' +nl+
     '    show information about pointed item on the level,' +nl+
-    '    or use pointed device (press button, move switch etc.)' +nl+
+    '    or use pointed device (press button, move switch etc.)';
+
+    { Too much info, not needed, I think that player can figure this out:
     nl+
     'Note that the "Cancel flying" key is useful if you want to stop flying ' +
-    'before flying spell will automatically wear off.';
+    'before flying spell will automatically wear off.'; }
 end;
 
 { global things -------------------------------------------------------------- }
 
 const
   WholeAreaX0 = 10;
-  WholeAreaY0 = 20;
+  WholeAreaY0 = 80;
   WholeAreaX1 = 750;
   WholeAreaY1 = 450;
 
@@ -318,9 +320,8 @@ end;
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   CurrentMenu.KeyDown(Key, C);
-  case Key of
-    K_F5: SaveScreen;
-  end;
+  if Key = CastleKey_SaveScreen.Value then
+    SaveScreen;
 end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);

@@ -214,7 +214,7 @@ begin
   { Other keys. }
   CastleKey_ViewMessages := TKeyConfiguration.Create('View all messages', kgOther, K_M);
   CastleKey_SaveScreen := TKeyConfiguration.Create('Save screen', kgOther, K_F5);
-  CastleKey_CancelFlying := TKeyConfiguration.Create('Cancel flying', kgOther, K_C);
+  CastleKey_CancelFlying := TKeyConfiguration.Create('Cancel flying spell', kgOther, K_C);
 end;
 
 procedure DoFinalization;

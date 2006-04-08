@@ -30,7 +30,7 @@ implementation
 uses SysUtils, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
-  CastleControlsMenu;
+  CastleControlsMenu, CastleKeys;
 
 var
   UserQuit: boolean;
@@ -93,12 +93,10 @@ end;
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   GameMenu.KeyDown(Key, C);
-  case Key of
-    K_F5: SaveScreen;
-    else
-      case C of
-        CharEscape: UserQuit := true;
-      end;
+  if Key = CastleKey_SaveScreen.Value then
+    SaveScreen else
+  case C of
+    CharEscape: UserQuit := true;
   end;
 end;
 
