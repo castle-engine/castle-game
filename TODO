@@ -2,9 +2,6 @@
 
 - keys must be saved and loaded to user config file.
 
-- Because of using GLWinMessages, PageUp, PageDown, Home, End cannot be "catched"
-  and assigned.
-
 - Eric stage 4 comments answer:
 
     Level loading seems to be quite long given the relatively low complexity of meshes and textures, could be something to watch before levels become more complex.
