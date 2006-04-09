@@ -1,7 +1,10 @@
 - debug menu:
-  show all creatures (shows their kinds, life, maxlife)
-  create new create (choose a kind and new creature is created)
   alter creature kind's MoveSpeed
+
+  ChooseCreatureKind could be done nicer, by choosing using GLMenu.
+  Also some "Cancel" should be allowed.
+
+- decrease player speed (he's even faster than ball missile !)
 
 - Eric stage 4 comments answer:
 
@@ -134,9 +137,6 @@ Would-be-nice before next stage:
 
 - in game, in config controls, escape should go back to game.
 
-- in debug menu, when chaing player's Life, effect should be visible
-  immediately --- redraw game screen now.
-
 - put some vertical crates around GlassPrison on basic_castle
 
 - shadow under the creatures would be nice (sgk_shadows should allow
@@ -209,7 +209,7 @@ Would-be-nice before next stage:
   things with mouse and to show (as hints) their key shortcuts ?
   ("i" - inventory on/off, "m" - messages).
 
-- l / L keys are only for testing purposes !
+- debug menu is only for testing -- hide somehow at some point.
 
 - remove base_castle (or make it hidden ?),
   together with it's sky (this was copied from lets_take_a_walk),

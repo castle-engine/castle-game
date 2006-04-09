@@ -27,10 +27,10 @@ procedure ShowGameMenu;
 
 implementation
 
-uses SysUtils, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
+uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
-  CastleControlsMenu, CastleKeys;
+  CastleControlsMenu, CastleKeys, CastleCreatures;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -92,16 +92,90 @@ begin
   inherited Create;
 
   Items.Add('Player.Life := Player.MaxLife');
+  Items.Add('Show creatures on level info');
+  Items.Add('Add creature to level');
   Items.Add('Back to main menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TDebugMenu.CurrentItemSelected;
+
+  procedure PlayerMaxLife;
+  begin
+    if Player.Dead then
+      MessageOK(Glw, 'No can do. You are dead.', taLeft) else
+    begin
+      Player.Life := Player.MaxLife;
+      UserQuit := true;
+    end;
+  end;
+
+  procedure ShowLevelCreaturesInfo;
+  var
+    I: Integer;
+    S: TStringList;
+  begin
+    S := TStringList.Create;
+    try
+      S.Append(Format('%d creatures on level:', [Level.Creatures.Count]));
+      S.Append('Index: Kind, Position, Life / MaxLife');
+      S.Append('');
+
+      for I := 0 to Level.Creatures.High do
+        S.Append(Format('%d: %s, %s, %s / %s',
+          [ I, Level.Creatures[I].Kind.VRMLNodeName,
+            VectorToNiceStr(Level.Creatures[I].LegsPosition),
+            FloatToNiceStr(Level.Creatures[I].Life),
+            FloatToNiceStr(Level.Creatures[I].MaxLife) ]));
+
+      MessageOK(Glw, S, taLeft);
+    finally S.Free end;
+  end;
+
+  function ChooseCreatureKind: TCreatureKind;
+  var
+    I, ResultIndex: Integer;
+    S: TStringList;
+  begin
+    S := TStringList.Create;
+    try
+      S.Append('Choose creature kind number: ');
+      S.Append('');
+
+      for I := 0 to CreaturesKinds.High do
+        S.Append(Format('%d: %s',
+          [ I, CreaturesKinds[I].VRMLNodeName ]));
+
+      ResultIndex := Clamped(MessageInputCardinal(Glw, S.Text, taLeft, 0), 0,
+        CreaturesKinds.High);
+
+      Result := CreaturesKinds[ResultIndex];
+    finally S.Free end;
+  end;
+
+  procedure AddLevelCreature;
+  var
+    Position: TVector3Single;
+    Direction: TVector3Single;
+    Kind: TCreatureKind;
+  begin
+    Position := VectorAdd(Player.Navigator.CameraPos,
+      VectorAdjustToLength(Player.Navigator.CameraDir, 10));
+    Direction := Player.Navigator.CameraDir;
+    Kind := ChooseCreatureKind;
+    Level.Creatures.Add(
+      Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime));
+
+    UserQuit := true;
+  end;
+
 begin
   case CurrentItem of
-    0: Player.Life := Player.MaxLife;
-    1: CurrentMenu := GameMenu;
+    0: PlayerMaxLife;
+    1: ShowLevelCreaturesInfo;
+    2: AddLevelCreature;
+    3: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -175,6 +249,7 @@ begin
 
       Glw.EventResize;
 
+      CurrentMenu := GameMenu;
       UserQuit := false;
 
       glDisable(GL_LIGHTING);
