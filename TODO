@@ -1,9 +1,3 @@
-- debug menu:
-  alter creature kind's MoveSpeed
-
-  ChooseCreatureKind could be done nicer, by choosing using GLMenu.
-  Also some "Cancel" should be allowed.
-
 - decrease player speed (he's even faster than ball missile !)
 
 - Eric stage 4 comments answer:

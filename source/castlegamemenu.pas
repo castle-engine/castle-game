@@ -30,7 +30,7 @@ implementation
 uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
-  CastleControlsMenu, CastleKeys, CastleCreatures;
+  CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -94,6 +94,7 @@ begin
   Items.Add('Player.Life := Player.MaxLife');
   Items.Add('Show creatures on level info');
   Items.Add('Add creature to level');
+  Items.Add('Change creature kind MoveSpeed');
   Items.Add('Back to main menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -133,24 +134,20 @@ procedure TDebugMenu.CurrentItemSelected;
     finally S.Free end;
   end;
 
-  function ChooseCreatureKind: TCreatureKind;
+  function ChooseCreatureKind(var ChooseCreature: TCreatureKind): boolean;
   var
-    I, ResultIndex: Integer;
     S: TStringList;
+    I, ResultIndex: Integer;
   begin
     S := TStringList.Create;
     try
-      S.Append('Choose creature kind number: ');
-      S.Append('');
-
       for I := 0 to CreaturesKinds.High do
-        S.Append(Format('%d: %s',
-          [ I, CreaturesKinds[I].VRMLNodeName ]));
-
-      ResultIndex := Clamped(MessageInputCardinal(Glw, S.Text, taLeft, 0), 0,
-        CreaturesKinds.High);
-
-      Result := CreaturesKinds[ResultIndex];
+        S.Append('Creature ' + CreaturesKinds[I].VRMLNodeName);
+      S.Append('Cancel');
+      ResultIndex := ChooseByMenu(GLList_ScreenImage, S);
+      Result := ResultIndex <> CreaturesKinds.High + 1;
+      if Result then
+        ChooseCreature := CreaturesKinds[ResultIndex];
     finally S.Free end;
   end;
 
@@ -160,14 +157,45 @@ procedure TDebugMenu.CurrentItemSelected;
     Direction: TVector3Single;
     Kind: TCreatureKind;
   begin
-    Position := VectorAdd(Player.Navigator.CameraPos,
-      VectorAdjustToLength(Player.Navigator.CameraDir, 10));
-    Direction := Player.Navigator.CameraDir;
-    Kind := ChooseCreatureKind;
-    Level.Creatures.Add(
-      Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime));
+    if ChooseCreatureKind(Kind) then
+    begin
+      Position := VectorAdd(Player.Navigator.CameraPos,
+        VectorAdjustToLength(Player.Navigator.CameraDir, 10));
+      Direction := Player.Navigator.CameraDir;
 
-    UserQuit := true;
+      Level.Creatures.Add(
+        Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime));
+
+      UserQuit := true;
+    end;
+  end;
+
+  procedure ChangeCreatureKindMoveSpeed;
+  var
+    Kind: TCreatureKind;
+    MoveSpeed: Single;
+  begin
+    if ChooseCreatureKind(Kind) then
+    begin
+      if Kind is TWalkAttackCreatureKind then
+        MoveSpeed := (Kind as TWalkAttackCreatureKind).MoveSpeed else
+      if Kind is TMissileCreatureKind then
+        MoveSpeed := (Kind as TMissileCreatureKind).MoveSpeed else
+      begin
+        MessageOK(Glw, 'This creature kind has no MoveSpeed property', taLeft);
+        Exit;
+      end;
+
+      if MessageInputQuerySingle(Glw, 'Input new MoveSpeed for the creature:',
+        MoveSpeed, taLeft) then
+      begin
+        if Kind is TWalkAttackCreatureKind then
+          (Kind as TWalkAttackCreatureKind).MoveSpeed := MoveSpeed else
+        if Kind is TMissileCreatureKind then
+          (Kind as TMissileCreatureKind).MoveSpeed := MoveSpeed else
+          raise EInternalError.Create('Kind = ? 2006-04-09');
+      end;
+    end;
   end;
 
 begin
@@ -175,7 +203,8 @@ begin
     0: PlayerMaxLife;
     1: ShowLevelCreaturesInfo;
     2: AddLevelCreature;
-    3: CurrentMenu := GameMenu;
+    3: ChangeCreatureKindMoveSpeed;
+    4: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

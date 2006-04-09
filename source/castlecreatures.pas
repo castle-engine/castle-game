@@ -1774,7 +1774,8 @@ begin
   if (FState = wasDying) and
     (Level.AnimationTime - StateChangeTime >
       WAKind.DyingAnimation.TimeEnd + 5
-      { + 5 seconds, to allow player look at the dead werewolf }) then
+      { + 5 seconds, to allow player look at the dead werewolf }) and
+    (Level is TCastleHallLevel) then
   begin
     LevelFinished(nil);
   end;
