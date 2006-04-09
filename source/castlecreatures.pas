@@ -1969,6 +1969,7 @@ begin
   Werewolf.SoundAttackStart := stWerewolfAttackStart;
   Werewolf.LifeToRunAway := 0.1;
   Werewolf.DefaultMaxLife := 500.0;
+  Werewolf.MoveSpeed := 0.1;
 
   BallMissile := TMissileCreatureKind.Create(
     'BallMissile',

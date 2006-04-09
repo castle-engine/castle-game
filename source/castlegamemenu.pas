@@ -30,7 +30,8 @@ implementation
 uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
-  CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu;
+  CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
+  CastleItems;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -95,6 +96,7 @@ begin
   Items.Add('Show creatures on level info');
   Items.Add('Add creature to level');
   Items.Add('Change creature kind MoveSpeed');
+  Items.Add('Give me 20 instances of every possible item');
   Items.Add('Back to main menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -198,13 +200,23 @@ procedure TDebugMenu.CurrentItemSelected;
     end;
   end;
 
+  procedure GiveItems;
+  var
+    I: Integer;
+  begin
+    for I := 0 to ItemsKinds.High do
+      Player.PickItem(TItem.Create(ItemsKinds[I], 20));
+    UserQuit := true;
+  end;
+
 begin
   case CurrentItem of
     0: PlayerMaxLife;
     1: ShowLevelCreaturesInfo;
     2: AddLevelCreature;
     3: ChangeCreatureKindMoveSpeed;
-    4: CurrentMenu := GameMenu;
+    4: GiveItems;
+    5: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

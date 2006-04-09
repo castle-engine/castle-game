@@ -20,12 +20,6 @@
 
     - Good point, I changed line endings to DOS-style for README and TODO files. The rest if text files is not intended to be read by end-users, so I guess it's not a problem.
 
-- maybe slow down alien move ?
-  it get's hard to kill it when it's running...
-  and it generally moves quite fast --- now, with walking through waypoints, it's quite deadly...
-
-  maybe less damage also ?
-
 - Do Flying creature (Like a ghost ? Only blended things ? Would be nice...)
   - There must be a way to say that some sectors are not important
     for AI for creatures with Flying.
