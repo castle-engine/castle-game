@@ -24,7 +24,7 @@
 
   Finally, readme and text files are UNIX-style, which means notepad and common Windows text viewers won't display them correctly (okay for me, but be aware many end-users will be unable to view them correctly).
 
-    - Good point, I changed line endings to DOS-style for README and TODO files. The rest if text files is not intended to be read by end-users, so I guess it's not a problem.
+    - Good point, I can change line endings to DOS-style for README and TODO files. The rest of the text files is not intended to be read by end-users, so I guess it's not a problem.
 
 --------------------
 - creature<->creature collision is also needed

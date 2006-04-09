@@ -35,6 +35,8 @@ const
   DefaultGLMenuKeyNextItem = K_Down;
   DefaultGLMenuKeyPreviousItem = K_Up;
   DefaultGLMenuKeySelectItem = K_Enter;
+  DefaultGLMenuKeySliderIncrease = K_Right;
+  DefaultGLMenuKeySliderDecrease = K_Left;
 
   DefaultCurrentItemBorderColor1: TVector3Single = (   1,    1,    1) { White3Single };
   DefaultCurrentItemBorderColor2: TVector3Single = ( 0.5,  0.5,  0.5) { Gray3Single };
@@ -201,6 +203,8 @@ type
     FKeyNextItem: TKey;
     FKeyPreviousItem: TKey;
     FKeySelectItem: TKey;
+    FKeySliderDecrease: TKey;
+    FKeySliderIncrease: TKey;
     GLList_DrawFadeRect: TGLuint;
     MenuAnimation: Single;
     FCurrentItemBorderColor1: TVector3Single;
@@ -293,6 +297,12 @@ type
       default DefaultGLMenuKeyPreviousItem;
     property KeySelectItem: TKey read FKeySelectItem write FKeySelectItem
       default DefaultGLMenuKeySelectItem;
+    property KeySliderIncrease: TKey
+      read FKeySliderIncrease write FKeySliderIncrease
+      default DefaultGLMenuKeySliderIncrease;
+    property KeySliderDecrease: TKey
+      read FKeySliderDecrease write FKeySliderDecrease
+      default DefaultGLMenuKeySliderDecrease;
 
     procedure KeyDown(Key: TKey; C: char);
 
@@ -488,7 +498,7 @@ begin
 end;
 
 const
-  ImageSliderPositionMargin = 5;
+  ImageSliderPositionMargin = 2;
 
 procedure TGLMenuSlider.DrawSliderPosition(const Area: TArea;
   const Position: Single);
@@ -539,11 +549,6 @@ end;
 
 procedure TGLMenuFloatSlider.KeyDown(Key: TKey; C: char;
   ParentMenu: TGLMenu);
-const
-  { These consts will be changed to properties somewhere. }
-  KeyIncrease1 = K_Enter;
-  KeyIncrease2 = K_Right;
-  KeyDecrease = K_Left;
 var
   ValueChange: Single;
 begin
@@ -551,12 +556,20 @@ begin
   if Key <> K_None then
   begin
     ValueChange := (EndRange - BeginRange) / 100;
-    if (Key = KeyIncrease1) or (Key = KeyIncrease2) then
+
+    { KeySelectItem works just like KeySliderIncrease.
+      Why ? Because KeySelectItem does something with most menu items,
+      so user would be surprised if it doesn't work at all with slider
+      menu items. Increasing slider value seems like some sensible operation
+      to do on slider menu item. }
+
+    if (Key = ParentMenu.KeySelectItem) or
+       (Key = ParentMenu.KeySliderIncrease) then
     begin
       FValue := Min(EndRange, Value + ValueChange);
       ParentMenu.CurrentItemAccessoryValueChanged;
     end else
-    if Key = KeyDecrease then
+    if Key = ParentMenu.KeySliderDecrease then
     begin
       FValue := Max(BeginRange, Value - ValueChange);
       ParentMenu.CurrentItemAccessoryValueChanged;
@@ -604,6 +617,8 @@ begin
   KeyNextItem := DefaultGLMenuKeyNextItem;
   KeyPreviousItem := DefaultGLMenuKeyPreviousItem;
   KeySelectItem := DefaultGLMenuKeySelectItem;
+  KeySliderIncrease := DefaultGLMenuKeySliderIncrease;
+  KeySliderDecrease := DefaultGLMenuKeySliderDecrease;
 
   FCurrentItemBorderColor1 := DefaultCurrentItemBorderColor1;
   FCurrentItemBorderColor2 := DefaultCurrentItemBorderColor2;
