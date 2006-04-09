@@ -1,8 +1,3 @@
-- creature AI: AttackDistance separate to
-  PreferredAttackDistance and MaxAttackDistance.
-  Creature can attack from MaxAttackDistance, but prefers to get as close
-  as PreferredAttackDistance.
-
 - decrease player speed (he's even faster than ball missile !)
 
 - Eric stage 4 comments answer:

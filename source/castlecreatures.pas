@@ -35,7 +35,8 @@ const
 
   DefaultMoveSpeed = 0.2;
   DefaultMinDelayBetweenAttacks = 5.0;
-  DefaultAttackDistance = 50.0 * 0.7;
+  DefaultMaxAttackDistance = 50.0 * 0.7;
+  DefaultPreferredAttackDistance = 30.0 * 0.7;
   DefaultMissileMoveSpeed = 1.0 * 0.7;
   DefaultMaxKnockedBackDistance = 6.0 * 0.7;
   DefaultLifeToRunAway = 0.3;
@@ -144,7 +145,8 @@ type
 
     FMoveSpeed: Single;
     FMinDelayBetweenAttacks: Single;
-    FAttackDistance: Single;
+    FMaxAttackDistance: Single;
+    FPreferredAttackDistance: Single;
     FActualAttackTime: Single;
     FMaxKnockedBackDistance: Single;
 
@@ -233,9 +235,18 @@ type
     { Maximum distance between player and creature to allow creature
       to start attack. More precisely, this is measured between
       Player.Navigator.CameraPos and creature's HeadPosition. }
-    property AttackDistance: Single
-      read FAttackDistance write FAttackDistance
-      default DefaultAttackDistance;
+    property MaxAttackDistance: Single
+      read FMaxAttackDistance write FMaxAttackDistance
+      default DefaultMaxAttackDistance;
+
+    { This is the preferred distance between player and the creature
+      to perform the attack. This must always be <= MaxAttackDistance.
+      The idea is that the creature can attack player from MaxAttackDistance,
+      but still it will walk closer to the player --- until the distance
+      is PreferredAttackDistance. }
+    property PreferredAttackDistance: Single
+      read FPreferredAttackDistance write FPreferredAttackDistance
+      default DefaultPreferredAttackDistance;
 
     { This is the time point within AttackAnimation
       at which ActualAttack method will be called.
@@ -260,7 +271,7 @@ type
       read FSoundAttackStart write FSoundAttackStart default stNone;
 
     { If @code(Life <= MaxLife * LifeToRunAway) and distance to the
-      player is too short (shorter than AttackDistance / 4),
+      player is too short (shorter than MaxAttackDistance / 4),
       the creature runs away. }
     property LifeToRunAway: Single
       read FLifeToRunAway write FLifeToRunAway default DefaultLifeToRunAway;
@@ -517,7 +528,7 @@ type
       If creature is doing some short-range attack
       you can also just lower here player's Life. Remember in this
       case to check that player is close enough; in general situation,
-      you can't depend that player is still within AttackDistance
+      you can't depend that player is still within MaxAttackDistance
       --- if ActualAttackTime is large, then player had some time
       to back off between AttackAnimation was started and ActualAttack
       is called. }
@@ -653,7 +664,8 @@ begin
 
   MoveSpeed := DefaultMoveSpeed;
   FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
-  FAttackDistance := DefaultAttackDistance;
+  FMaxAttackDistance := DefaultMaxAttackDistance;
+  FPreferredAttackDistance := DefaultPreferredAttackDistance;
   FMaxKnockedBackDistance := DefaultMaxKnockedBackDistance;
   FLifeToRunAway := DefaultLifeToRunAway;
 end;
@@ -1113,12 +1125,7 @@ var
   begin
     Result := SeesPlayer and
       (Level.AnimationTime - LastAttackTime > WAKind.MinDelayBetweenAttacks) and
-      (SqrDistanceToLastSeenPlayer <= Sqr(WAKind.AttackDistance));
-
-    { GameMessage(Format('dist is now %f (sqr is %f), needed sqr is %f',
-      [ PointsDistance(Player.Navigator.CameraPos, HeadPosition),
-        PointsDistanceSqr(Player.Navigator.CameraPos, HeadPosition),
-        Sqr(WAKind.AttackDistance) ])); }
+      (SqrDistanceToLastSeenPlayer <= Sqr(WAKind.MaxAttackDistance));
 
     if Result then
     begin
@@ -1272,7 +1279,7 @@ var
         player to easier attack (shorter distance --- easier to reach with
         short-range weapon, or easier to aim with long-range weapon). }
       ( (not SeesPlayer) or
-        (SqrDistanceToLastSeenPlayer > Sqr(WAKind.AttackDistance))
+        (SqrDistanceToLastSeenPlayer > Sqr(WAKind.PreferredAttackDistance))
       );
   end;
 
@@ -1291,7 +1298,7 @@ var
   begin
     Result := SeesPlayer and
       (Life <= MaxLife * WAKind.LifeToRunAway) and
-      (SqrDistanceToLastSeenPlayer < Sqr(WAKind.AttackDistance / 4));
+      (SqrDistanceToLastSeenPlayer < Sqr(WAKind.MaxAttackDistance / 4));
   end;
 
   procedure DoStand;
@@ -1760,7 +1767,7 @@ end;
 procedure TWerewolfCreature.ActualAttack;
 begin
   if Boxes3dCollision(Box3dTranslate(BoundingBox,
-    VectorScale(Direction, WAKind.AttackDistance)), Player.BoundingBox) then
+    VectorScale(Direction, WAKind.MaxAttackDistance)), Player.BoundingBox) then
   begin
     Sound3d(stWerewolfActualAttackHit, HeadPosition);
     Player.Life := Player.Life - 10 - Random(10);
@@ -1839,7 +1846,7 @@ end;
 procedure TMissileCreature.ExplodeWithPlayer;
 begin
   ExplodeCore;
-  Player.Life := Player.Life - 20 - Random(20);
+  Player.Life := Player.Life - 10 - Random(10);
 end;
 
 procedure TMissileCreature.ExplodeWithLevel;
@@ -1924,7 +1931,6 @@ begin
       [ 0.0, 0.1 ],
       AnimScenesPerTime, AnimOptimization, false, true)
     );
-  Alien.AttackDistance := 30.0 * 0.7;
   Alien.ActualAttackTime := 0.4;
   Alien.SoundSuddenPain := stAlienSuddenPain;
   Alien.MoveSpeed := 0.1;
@@ -1964,7 +1970,8 @@ begin
       AnimScenesPerTime, AnimOptimization, false, true)
     );
   Werewolf.ActualAttackTime := 0.5;
-  Werewolf.AttackDistance := 6.0 * 0.7;
+  Werewolf.MaxAttackDistance := 6.0 * 0.7;
+  Werewolf.PreferredAttackDistance := Werewolf.MaxAttackDistance;
   Werewolf.MinDelayBetweenAttacks := 2.0;
   Werewolf.SoundSuddenPain := stWerewolfSuddenPain;
   Werewolf.SoundAttackStart := stWerewolfAttackStart;
