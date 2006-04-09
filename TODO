@@ -1,3 +1,8 @@
+- creature AI: AttackDistance separate to
+  PreferredAttackDistance and MaxAttackDistance.
+  Creature can attack from MaxAttackDistance, but prefers to get as close
+  as PreferredAttackDistance.
+
 - decrease player speed (he's even faster than ball missile !)
 
 - Eric stage 4 comments answer:
@@ -19,10 +24,6 @@
   Finally, readme and text files are UNIX-style, which means notepad and common Windows text viewers won't display them correctly (okay for me, but be aware many end-users will be unable to view them correctly).
 
     - Good point, I changed line endings to DOS-style for README and TODO files. The rest if text files is not intended to be read by end-users, so I guess it's not a problem.
-
-- Do Flying creature (Like a ghost ? Only blended things ? Would be nice...)
-  - There must be a way to say that some sectors are not important
-    for AI for creatures with Flying.
 
 --------------------
 - creature<->creature collision is also needed
@@ -62,6 +63,10 @@ Would-be-nice before next stage:
   - intro under menu: camera floating around level with this fog ?
   - walking down the stairs and down the hill causes player to lose life
 
+- Do Flying creature (Like a ghost ? Only blended things ? Would be nice...)
+  - There must be a way to say that some sectors are not important
+    for AI for creatures with Flying.
+
 - sectors and waypoints finish, see README for TO-DOs.
 
 - do weather (I have snow and rain from my szklane_lasy, but they look poor...)
@@ -77,13 +82,6 @@ Would-be-nice before next stage:
 
 - right now pressing Ctrl blocks rotations and moves (because of
   ModsDown = [] in MatrixNavigation). Fix.
-
-- alien model anim must be changed: the corpse must actualy move while walking !
-  Otherwise the effect is like "the legs walking, but the corpse is just
-  floating constantly"
-
-  Check out my sketch on "Kompresja danych" paper, pages 5 and 7,
-  maybe this will be useful after all.
 
 - ball_missile looks rather funny, too colorful.
   It must look like something fiery, or lighting, or just anything

@@ -1924,6 +1924,7 @@ begin
       [ 0.0, 0.1 ],
       AnimScenesPerTime, AnimOptimization, false, true)
     );
+  Alien.AttackDistance := 30.0 * 0.7;
   Alien.ActualAttackTime := 0.4;
   Alien.SoundSuddenPain := stAlienSuddenPain;
   Alien.MoveSpeed := 0.1;
