@@ -31,7 +31,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
-  CastleItems;
+  CastleItems, GLMenu;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -44,6 +44,7 @@ type
   TDebugMenu = class(TCastleMenu)
     constructor Create;
     procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -97,6 +98,8 @@ begin
   Items.Add('Add creature to level');
   Items.Add('Change creature kind MoveSpeed');
   Items.Add('Give me 20 instances of every possible item');
+  Items.AddObject('Set horizontal view angle',
+    TGLMenuFloatSlider.Create(30, 90, ViewAngleDegX));
   Items.Add('Back to main menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -216,8 +219,16 @@ begin
     2: AddLevelCreature;
     3: ChangeCreatureKindMoveSpeed;
     4: GiveItems;
-    5: CurrentMenu := GameMenu;
+    5: ;
+    6: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+procedure TDebugMenu.CurrentItemAccessoryValueChanged;
+begin
+  case CurrentItem of
+    5: { TODO };
   end;
 end;
 
@@ -249,7 +260,13 @@ end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
 begin
-  CurrentMenu.MouseMove(NewX, Glwin.Height - NewY);
+  CurrentMenu.MouseMove(NewX, Glwin.Height - NewY,
+    Glwin.MousePressed);
+end;
+
+procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+begin
+  CurrentMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
@@ -284,6 +301,7 @@ begin
       GLWinMessagesTheme.RectColor[3] := 1.0;
 
       Glw.OnKeyDown := KeyDown;
+      Glw.OnMouseDown := MouseDown;
       Glw.OnMouseUp := MouseUp;
       Glw.OnMouseMove := MouseMove;
       Glw.OnIdle := Idle;

@@ -49,6 +49,13 @@ type
     procedure CurrentItemSelected; override;
   end;
 
+  TSoundMenu = class(TSubMenu)
+    SoundVolumeSlider: TGLMenuFloatSlider;
+    constructor Create;
+    procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
+  end;
+
 { ----------------------------------------------------------------------------
   global vars (used by TCastleMenu descendants implementation) }
 
@@ -57,6 +64,7 @@ var
   CurrentMenu: TCastleMenu;
   MainMenu: TMainMenu;
   VideoMenu: TVideoMenu;
+  SoundMenu: TSoundMenu;
   GLList_ScreenImage: TGLuint;
 
 { TMainMenu ------------------------------------------------------------ }
@@ -100,22 +108,6 @@ procedure TMainMenu.CurrentItemSelected;
     finally Level.Free end;
   end;
 
-  procedure ViewSoundInfo;
-  begin
-    MessageOK(Glw,
-      'Sound library (OpenAL) status:' +nl+
-      nl+
-      SoundInitializationReport +nl+
-      nl+
-      'TODO: for now, "The Castle" initializes OpenAL '+
-      'but it''s not used. It will be used in the future, '+
-      'and you will see here some controls to turn sound on/off '+
-      'and change sound volume. See my older demo, ' +
-      '[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php] '+
-      'if you want to see how I''m dealing with OpenAL.',
-      taLeft);
-  end;
-
 begin
   case CurrentItem of
     0: NewGame(
@@ -125,7 +117,7 @@ begin
     2: NewGame(TCastleHallLevel.Create);
     3: ShowControlsMenu(GLList_ScreenImage, false, false);
     4: CurrentMenu := VideoMenu;
-    5: ViewSoundInfo;
+    5: CurrentMenu := SoundMenu;
     6: ShowCreditsMessage;
     7: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
@@ -168,6 +160,57 @@ begin
   end;
 end;
 
+{ TSoundMenu ------------------------------------------------------------- }
+
+constructor TSoundMenu.Create;
+begin
+  inherited Create;
+
+  SoundVolumeSlider := TGLMenuFloatSlider.Create(0, 1, SoundVolume);
+
+  Items.Add('View sound information');
+  Items.AddObject('Sound volume', SoundVolumeSlider);
+  Items.Add('Back to main menu');
+
+  SubMenuTitle := 'Sound options';
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TSoundMenu.CurrentItemSelected;
+
+  procedure ViewSoundInfo;
+  begin
+    MessageOK(Glw,
+      'Sound library (OpenAL) status:' +nl+
+      nl+
+      SoundInitializationReport +nl+
+      nl+
+      'TODO: for now, "The Castle" initializes OpenAL '+
+      'but it''s not used. It will be used in the future, '+
+      'and you will see here some controls to turn sound on/off '+
+      'and change sound volume. See my older demo, ' +
+      '[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php] '+
+      'if you want to see how I''m dealing with OpenAL.',
+      taLeft);
+  end;
+
+begin
+  case CurrentItem of
+    0: ViewSoundInfo;
+    1: ;
+    2: CurrentMenu := MainMenu;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+procedure TSoundMenu.CurrentItemAccessoryValueChanged;
+begin
+  case CurrentItem of
+    1: SoundVolume := SoundVolumeSlider.Value;
+  end;
+end;
+
 { global things -------------------------------------------------------------- }
 
 procedure Resize(Glwin: TGLWindow);
@@ -192,7 +235,13 @@ end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
 begin
-  CurrentMenu.MouseMove(NewX, Glwin.Height - NewY);
+  CurrentMenu.MouseMove(NewX, Glwin.Height - NewY,
+    Glwin.MousePressed);
+end;
+
+procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+begin
+  CurrentMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
@@ -222,6 +271,7 @@ begin
       false, K_None, #0, false, false);
 
     Glw.OnKeyDown := KeyDown;
+    Glw.OnMouseDown := MouseDown;
     Glw.OnMouseUp := MouseUp;
     Glw.OnMouseMove := MouseMove;
     Glw.OnIdle := Idle;
@@ -247,6 +297,7 @@ begin
 
   MainMenu := TMainMenu.Create;
   VideoMenu := TVideoMenu.Create;
+  SoundMenu := TSoundMenu.Create;
   CurrentMenu := MainMenu;
 end;
 
@@ -255,6 +306,7 @@ begin
   CurrentMenu := nil; { just for safety }
   FreeAndNil(MainMenu);
   FreeAndNil(VideoMenu);
+  FreeAndNil(SoundMenu);
 end;
 
 initialization

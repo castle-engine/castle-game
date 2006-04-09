@@ -79,7 +79,13 @@ end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
 begin
-  ChooseMenu.MouseMove(NewX, Glwin.Height - NewY);
+  ChooseMenu.MouseMove(NewX, Glwin.Height - NewY,
+    Glwin.MousePressed);
+end;
+
+procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+begin
+  ChooseMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
@@ -114,6 +120,7 @@ begin
       false, K_None, #0, false, false);
 
     Glw.OnKeyDown := KeyDown;
+    Glw.OnMouseDown := MouseDown;
     Glw.OnMouseUp := MouseUp;
     Glw.OnMouseMove := MouseMove;
     Glw.OnIdle := Idle;

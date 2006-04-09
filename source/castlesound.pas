@@ -18,6 +18,10 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
+{ For global property. In the future whole castle (and units/)
+  code will be in objfpc mode. }
+{$mode objfpc}
+
 { }
 unit CastleSound;
 
@@ -82,7 +86,15 @@ procedure Sound(SoundType: TSoundType);
   @noAutoLinkHere }
 procedure Sound3d(SoundType: TSoundType; const Position: TVector3Single);
 
+function GetSoundVolume: Single;
+procedure SetSoundVolume(const Value: Single);
+
+{ Sound volume. This must always be within 0..1 range. }
+property SoundVolume: Single read GetSoundVolume write SetSoundVolume;
+
 implementation
+
+uses CastleConfig;
 
 procedure Sound(SoundType: TSoundType);
 begin
@@ -100,4 +112,28 @@ begin
   end;
 end;
 
+const
+  DefaultSoundVolume = 0.5;
+
+var
+  FSoundVolume: Single;
+
+function GetSoundVolume: Single;
+begin
+  Result := FSoundVolume;
+end;
+
+procedure SetSoundVolume(const Value: Single);
+begin
+  if Value <> FSoundVolume then
+  begin
+    FSoundVolume := Value;
+    { TODO }
+  end;
+end;
+
+initialization
+  FSoundVolume := ConfigFile.GetValue('sound/volume', DefaultSoundVolume);
+finalization
+  ConfigFile.SetDeleteValue('sound/volume', SoundVolume, DefaultSoundVolume);
 end.

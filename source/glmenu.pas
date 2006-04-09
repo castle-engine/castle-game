@@ -1,3 +1,29 @@
+{
+  Copyright 2006 Michalis Kamburelis.
+
+  This file is part of "castle".
+
+  "castle" is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  "castle" is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with "castle"; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+}
+
+{ Menu displayed in OpenGL.
+
+  This unit is developed for "The Castle", but it's generally useful.
+  The only place that will have to be fixed when moving
+  this unit to general units/ is the LoadImage() paths in
+  ImageSliderInit. }
 unit GLMenu;
 
 interface
@@ -18,6 +44,8 @@ const
   DefaultSpaceBetweenItems = 10;
 
 type
+  TGLMenu = class;
+
   { This is something that can be attached to some menu items of TGLMenu.
     For example, a slider --- see TGLMenuSlider. }
   TGLMenuItemAccessory = class
@@ -33,9 +61,41 @@ type
       should return here the width of widest possible Value. }
     function GetWidth(MenuFont: TGLBitmapFont): Single; virtual; abstract;
 
-    { Draw yourself. I don't pass here Width --- you know it from
-      your own GetWidth. }
-    procedure Draw(const X0, Y0, Height: Single); virtual; abstract;
+    { Draw yourself. Note that Area.Width is for sure the same
+      as you returned in GetWidth. }
+    procedure Draw(const Area: TArea); virtual; abstract;
+
+    { This will be called if user will press a key when currently
+      selected item has this TGLMenuItemAccessory.
+
+      You can use ParentMenu to call
+      ParentMenu.CurrentItemAccessoryValueChanged. }
+    procedure KeyDown(Key: TKey; C: char;
+      ParentMenu: TGLMenu); virtual;
+
+    { This will be called if user will click mouse when currently
+      selected item has this TGLMenuItemAccessory.
+
+      This will be called only if MouseX and MouseY will be within
+      appropriate Area of this accessory. This Area is also
+      passed here, so you can e.g. calculate mouse position
+      relative to this accessory as (MouseX - Area.X0, MouseY - Area.Y0).
+
+      You can use ParentMenu to call
+      ParentMenu.CurrentItemAccessoryValueChanged. }
+    procedure MouseDown(const MouseX, MouseY: Single; Button: TMouseButton;
+      const Area: TArea; ParentMenu: TGLMenu); virtual;
+
+    { This will be called if user will move mouse over the currently selected
+      menu item and menu item will have this accessory.
+
+      Just like with MouseDown: This will be called only if NewX and NewY
+      will be within appropriate Area of accessory.
+      You can use ParentMenu to call
+      ParentMenu.CurrentItemAccessoryValueChanged. }
+    procedure MouseMove(const NewX, NewY: Single;
+      const MousePressed: TMouseButtons;
+      const Area: TArea; ParentMenu: TGLMenu); virtual;
   end;
 
   { This is TGLMenuItemAccessory that will just display
@@ -60,10 +120,21 @@ type
     class function TextWidth(const Text: string): Single;
 
     function GetWidth(MenuFont: TGLBitmapFont): Single; override;
-    procedure Draw(const X0, Y0, Height: Single); override;
+    procedure Draw(const Area: TArea); override;
   end;
 
   TGLMenuSlider = class(TGLMenuItemAccessory)
+  protected
+    procedure DrawSliderPosition(const Area: TArea; const Position: Single);
+
+    { This returns a value of Position (for DrawSliderPosition, so in range 0..1)
+      that would result in slider being drawn at XCoord screen position.
+      Takes Area as the area currently occupied by the whole slider. }
+    function XCoordToSliderPosition(const XCoord: Single;
+      const Area: TArea): Single;
+  public
+    function GetWidth(MenuFont: TGLBitmapFont): Single; override;
+    procedure Draw(const Area: TArea); override;
   end;
 
   TGLMenuFloatSlider = class(TGLMenuSlider)
@@ -76,10 +147,22 @@ type
 
     property BeginRange: Single read FBeginRange;
     property EndRange: Single read FEndRange;
-    property Value: Single read FValue;
 
-    function GetWidth(MenuFont: TGLBitmapFont): Single; override;
-    procedure Draw(const X0, Y0, Height: Single); override;
+    { Current value. When setting this property, always make sure
+      that it's within the allowed range. }
+    property Value: Single read FValue write FValue;
+
+    procedure Draw(const Area: TArea); override;
+
+    procedure KeyDown(Key: TKey; C: char;
+      ParentMenu: TGLMenu); override;
+
+    procedure MouseDown(const MouseX, MouseY: Single; Button: TMouseButton;
+      const Area: TArea; ParentMenu: TGLMenu); override;
+
+    procedure MouseMove(const NewX, NewY: Single;
+      const MousePressed: TMouseButtons;
+      const Area: TArea; ParentMenu: TGLMenu); override;
   end;
 
   { How TGLMenu.Position will be interpreted. }
@@ -113,6 +196,7 @@ type
     FPositionRelativeX: TPositionRelative;
     FPositionRelativeY: TPositionRelative;
     FAreas: TDynAreaArray;
+    FAccessoryAreas: TDynAreaArray;
     FAllItemsArea: TArea;
     FKeyNextItem: TKey;
     FKeyPreviousItem: TKey;
@@ -183,6 +267,7 @@ type
         @itemSpacing Compact
         @item Draw
         @item MouseMove
+        @item MouseDown
         @item MouseUp
         @item KeyDown
         @item Idle
@@ -198,6 +283,7 @@ type
       Note that AllItemsArea includes also some outside margin. }
     property Areas: TDynAreaArray read FAreas;
     property AllItemsArea: TArea read FAllItemsArea;
+    property AccessoryAreas: TDynAreaArray read FAccessoryAreas;
 
     procedure Draw; virtual;
 
@@ -214,8 +300,10 @@ type
       NewX, NewY is in OpenGL 2d screen coordinates, so usually
       (when you call this from TGLWindow.OnMouseMove) you will
       have to flip the NewY like @code(Glwin.Height - NewY). }
-    procedure MouseMove(const NewX, NewY: Single);
+    procedure MouseMove(const NewX, NewY: Single;
+      const MousePressed: TMouseButtons);
 
+    procedure MouseDown(const MouseX, MouseY: Single; Button: TMouseButton);
     procedure MouseUp(const MouseX, MouseY: Single; Button: TMouseButton);
 
     procedure Idle(const CompSpeed: Single);
@@ -224,9 +312,26 @@ type
       or with keyboard. }
     procedure CurrentItemSelected; virtual;
 
-    { Called when CurrentItem changed, or it's color changed.
-      But *not* when CurrentItem changed because of Items.Count changes. }
+    { This will be called when the TGLMenuItemAccessory assigned
+      to CurrentItem will signal that it's value changed
+      because of user interface actions (KeyDown, MouseDown etc.).
+
+      Note that this will not be called when you just set
+      Value of some property.
+
+      In this class this just calls SomethingChanged. }
+    procedure CurrentItemAccessoryValueChanged; virtual;
+
+    { Called when CurrentItem changed.
+      But *not* when CurrentItem changed because of Items.Count changes.
+      In this class this just calls SomethingChanged. }
     procedure CurrentItemChanged; virtual;
+
+    { Called when various things changed.
+      E.g. color of current item changed.
+      CurrentItemChanged also calls this.
+      Or some TGLMenuItemAccessory may call this when some value changed. }
+    procedure SomethingChanged; virtual;
 
     { Default value is DefaultCurrentItemBorderColor1 }
     property CurrentItemBorderColor1: TVector3Single
@@ -258,17 +363,78 @@ var
     that requires it. You can set this yourself or just let TGLMenu
     to set it.
 
-    YOU MUST RELEASE IT YOURSELF. Don't forget about it. }
+    YOU MUST RELEASE IT BY GLMenuCloseGL. Don't forget about it. }
   MenuFont: TGLBitmapFont;
+
+{ This releases some fonts, images, display lists that were created
+  during GLMenu lifetime when necessary. You must call this
+  when you ended using GLMenu things. }
+procedure GLMenuCloseGL;
 
 implementation
 
-uses SysUtils, KambiUtils, KambiGLUtils;
+uses SysUtils, KambiUtils, KambiGLUtils, Images, KambiFilesUtils;
 
 procedure MenuFontInit;
 begin
   if MenuFont = nil then
     MenuFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
+end;
+
+var
+  ImageSlider: TImage;
+  ImageSliderPosition: TImage;
+  GLList_ImageSlider: TGLuint;
+  GLList_ImageSliderPosition: TGLuint;
+
+procedure ImageSliderInit;
+begin
+  if ImageSlider = nil then
+    ImageSlider := LoadImage(ProgramDataPath + 'data' +
+      PathDelim + 'menu_bg' + PathDelim + 'menu_slider.png',
+      [TRGBImage], []);
+
+  if ImageSliderPosition = nil then
+    ImageSliderPosition := LoadImage(ProgramDataPath + 'data' +
+      PathDelim + 'menu_bg' + PathDelim + 'menu_slider_position.png',
+      [TRGBImage], []);
+
+  if GLList_ImageSlider = 0 then
+    GLList_ImageSlider := ImageDrawToDispList(ImageSlider);
+
+  if GLList_ImageSliderPosition = 0 then
+    GLList_ImageSliderPosition := ImageDrawToDispList(ImageSliderPosition);
+end;
+
+procedure GLMenuCloseGL;
+begin
+  FreeAndNil(MenuFont);
+  glFreeDisplayList(GLList_ImageSlider);
+  glFreeDisplayList(GLList_ImageSliderPosition);
+  FreeAndNil(ImageSlider);
+  FreeAndNil(ImageSliderPosition);
+end;
+
+{ TGLMenuItemAccessory ------------------------------------------------------ }
+
+procedure TGLMenuItemAccessory.KeyDown(Key: TKey; C: char;
+  ParentMenu: TGLMenu);
+begin
+  { Nothing to do in this class. }
+end;
+
+procedure TGLMenuItemAccessory.MouseDown(
+  const MouseX, MouseY: Single; Button: TMouseButton;
+  const Area: TArea; ParentMenu: TGLMenu);
+begin
+  { Nothing to do in this class. }
+end;
+
+procedure TGLMenuItemAccessory.MouseMove(const NewX, NewY: Single;
+  const MousePressed: TMouseButtons;
+  const Area: TArea; ParentMenu: TGLMenu);
+begin
+  { Nothing to do in this class. }
 end;
 
 { TGLMenuItemArgument -------------------------------------------------------- }
@@ -290,16 +456,68 @@ begin
   Result := MaximumValueWidth;
 end;
 
-procedure TGLMenuItemArgument.Draw(const X0, Y0, Height: Single);
+procedure TGLMenuItemArgument.Draw(const Area: TArea);
 begin
   MenuFontInit;
 
   glPushMatrix;
-    glTranslatef(X0, Y0 + MenuFont.Descend, 0);
+    glTranslatef(Area.X0, Area.Y0 + MenuFont.Descend, 0);
     glColorv(LightGreen3Single);
     glRasterPos2i(0, 0);
     MenuFont.Print(Value);
   glPopMatrix;
+end;
+
+{ TGLMenuSlider -------------------------------------------------------------- }
+
+function TGLMenuSlider.GetWidth(MenuFont: TGLBitmapFont): Single;
+begin
+  ImageSliderInit;
+  Result := ImageSlider.Width;
+end;
+
+procedure TGLMenuSlider.Draw(const Area: TArea);
+begin
+  ImageSliderInit;
+
+  glPushMatrix;
+    glTranslatef(Area.X0, Area.Y0 + (Area.Height - ImageSlider.Height) / 2, 0);
+    glRasterPos2i(0, 0);
+    glCallList(GLList_ImageSlider);
+  glPopMatrix;
+end;
+
+const
+  ImageSliderPositionMargin = 5;
+
+procedure TGLMenuSlider.DrawSliderPosition(const Area: TArea;
+  const Position: Single);
+begin
+  ImageSliderInit;
+
+  glPushMatrix;
+    glTranslatef(Area.X0 + ImageSliderPositionMargin +
+      MapRange(Position, 0, 1, 0,
+        ImageSlider.Width - 2 * ImageSliderPositionMargin -
+        ImageSliderPosition.Width),
+      Area.Y0 + (Area.Height - ImageSliderPosition.Height) / 2, 0);
+    glRasterPos2i(0, 0);
+    glCallList(GLList_ImageSliderPosition);
+  glPopMatrix;
+end;
+
+function TGLMenuSlider.XCoordToSliderPosition(
+  const XCoord: Single; const Area: TArea): Single;
+begin
+  { I subtract below ImageSliderPosition.Width div 2
+    because we want XCoord to be in the middle
+    of ImageSliderPosition, not on the left. }
+  Result := MapRange(XCoord - ImageSliderPosition.Width div 2,
+    Area.X0 + ImageSliderPositionMargin,
+    Area.X0 + ImageSlider.Width - 2 * ImageSliderPositionMargin -
+    ImageSliderPosition.Width, 0, 1);
+
+  Clamp(Result, 0, 1);
 end;
 
 { TGLMenuFloatSlider --------------------------------------------------------- }
@@ -313,15 +531,61 @@ begin
   FValue := AValue;
 end;
 
-function TGLMenuFloatSlider.GetWidth(MenuFont: TGLBitmapFont): Single;
+procedure TGLMenuFloatSlider.Draw(const Area: TArea);
 begin
-  Result := 0;
-  { TODO }
+  inherited;
+  DrawSliderPosition(Area, MapRange(Value, BeginRange, EndRange, 0, 1));
 end;
 
-procedure TGLMenuFloatSlider.Draw(const X0, Y0, Height: Single);
+procedure TGLMenuFloatSlider.KeyDown(Key: TKey; C: char;
+  ParentMenu: TGLMenu);
+const
+  { These consts will be changed to properties somewhere. }
+  KeyIncrease1 = K_Enter;
+  KeyIncrease2 = K_Right;
+  KeyDecrease = K_Left;
+var
+  ValueChange: Single;
 begin
-  { TODO }
+  { TODO: TGLMenuFloatSlider should rather get "smooth" changing of Value ? }
+  if Key <> K_None then
+  begin
+    ValueChange := (EndRange - BeginRange) / 100;
+    if (Key = KeyIncrease1) or (Key = KeyIncrease2) then
+    begin
+      FValue := Min(EndRange, Value + ValueChange);
+      ParentMenu.CurrentItemAccessoryValueChanged;
+    end else
+    if Key = KeyDecrease then
+    begin
+      FValue := Max(BeginRange, Value - ValueChange);
+      ParentMenu.CurrentItemAccessoryValueChanged;
+    end;
+  end;
+end;
+
+procedure TGLMenuFloatSlider.MouseDown(
+  const MouseX, MouseY: Single; Button: TMouseButton;
+  const Area: TArea; ParentMenu: TGLMenu);
+begin
+  if Button = mbLeft then
+  begin
+    FValue := MapRange(XCoordToSliderPosition(MouseX, Area), 0, 1,
+      BeginRange, EndRange);
+    ParentMenu.CurrentItemAccessoryValueChanged;
+  end;
+end;
+
+procedure TGLMenuFloatSlider.MouseMove(const NewX, NewY: Single;
+  const MousePressed: TMouseButtons;
+  const Area: TArea; ParentMenu: TGLMenu);
+begin
+  if mbLeft in MousePressed then
+  begin
+    FValue := MapRange(XCoordToSliderPosition(NewX, Area), 0, 1,
+      BeginRange, EndRange);
+    ParentMenu.CurrentItemAccessoryValueChanged;
+  end;
 end;
 
 { TGLMenu -------------------------------------------------------------------- }
@@ -332,6 +596,7 @@ begin
   FItems := TStringList.Create;
   FCurrentItem := 0;
   FAreas := TDynAreaArray.Create;
+  FAccessoryAreas := TDynAreaArray.Create;
 
   FPositionRelativeX := prMiddle;
   FPositionRelativeY := prMiddle;
@@ -359,6 +624,7 @@ begin
     Items.Objects[I].Free;
   FreeAndNil(FItems);
 
+  FreeAndNil(FAccessoryAreas);
   FreeAndNil(FAreas);
   inherited;
 end;
@@ -429,16 +695,22 @@ var
 begin
   MenuFontInit;
 
-  { calculate MaxItemWidth, MaxAccessoryWidth }
+  FAccessoryAreas.Count := Items.Count;
+
+  { calculate FAccessoryAreas[].Width, MaxItemWidth, MaxAccessoryWidth }
 
   MaxItemWidth := 0.0;
   MaxAccessoryWidth := 0.0;
   for I := 0 to Items.Count - 1 do
   begin
     MaxTo1st(MaxItemWidth, MenuFont.TextWidth(Items[I]));
+
     if Items.Objects[I] <> nil then
-      MaxTo1st(MaxAccessoryWidth,
-        TGLMenuItemAccessory(Items.Objects[I]).GetWidth(MenuFont));
+      FAccessoryAreas[I].Width :=
+        TGLMenuItemAccessory(Items.Objects[I]).GetWidth(MenuFont) else
+      FAccessoryAreas[I].Width := 0.0;
+
+    MaxTo1st(MaxAccessoryWidth, FAccessoryAreas[I].Width);
   end;
 
   { calculate FAllItemsArea Width and Height }
@@ -493,7 +765,15 @@ begin
   FAllItemsArea.X0 := PositionXMove;
   FAllItemsArea.Y0 := PositionYMove;
 
-  { calculate GLList_DrawFadeRect }
+  { Calculate FAccessoryAreas[].X0, Y0, Height }
+  for I := 0 to Areas.High do
+  begin
+    FAccessoryAreas[I].X0 := Areas[I].X0 + MaxItemWidth + MarginBeforeAccessory;
+    FAccessoryAreas[I].Y0 := Areas[I].Y0;
+    FAccessoryAreas[I].Height := Areas[I].Height;
+  end;
+
+  { Calculate GLList_DrawFadeRect }
 
   if GLList_DrawFadeRect = 0 then
     GLList_DrawFadeRect := glGenLists(1);
@@ -550,29 +830,64 @@ begin
     glPopMatrix;
 
     if Items.Objects[I] <> nil then
-      TGLMenuItemAccessory(Items.Objects[I]).Draw(
-        Areas[I].X0 + MaxItemWidth + MarginBeforeAccessory,
-        Areas[I].Y0, Areas[I].Height);
+      TGLMenuItemAccessory(Items.Objects[I]).Draw(FAccessoryAreas.Items[I]);
   end;
 end;
 
 procedure TGLMenu.KeyDown(Key: TKey; C: char);
+
+  procedure CurrentItemAccessoryKeyDown;
+  begin
+    if Items.Objects[CurrentItem] <> nil then
+    begin
+      TGLMenuItemAccessory(Items.Objects[CurrentItem]).KeyDown(
+        Key, C, Self);
+    end;
+  end;
+
 begin
   if Key = KeyPreviousItem then
     PreviousItem else
   if Key = KeyNextItem then
     NextItem else
   if Key = KeySelectItem then
+  begin
+    CurrentItemAccessoryKeyDown;
     CurrentItemSelected;
+  end else
+    CurrentItemAccessoryKeyDown;
 end;
 
-procedure TGLMenu.MouseMove(const NewX, NewY: Single);
+procedure TGLMenu.MouseMove(const NewX, NewY: Single;
+  const MousePressed: TMouseButtons);
 var
   NewItemIndex: Integer;
 begin
   NewItemIndex := Areas.FindArea(NewX, NewY);
   if NewItemIndex <> -1 then
-    CurrentItem := NewItemIndex;
+  begin
+    if NewItemIndex <> CurrentItem then
+      CurrentItem := NewItemIndex else
+    { If NewItemIndex = CurrentItem and NewItemIndex <> -1,
+      then user just moves mouse within current item.
+      So maybe we should call TGLMenuItemAccessory.MouseMove. }
+    if (Items.Objects[CurrentItem] <> nil) and
+       (PointInArea(NewX, NewY, FAccessoryAreas.Items[CurrentItem])) then
+      TGLMenuItemAccessory(Items.Objects[CurrentItem]).MouseMove(
+        NewX, NewY, MousePressed,
+        FAccessoryAreas.Items[CurrentItem], Self);
+  end;
+end;
+
+procedure TGLMenu.MouseDown(const MouseX, MouseY: Single; Button: TMouseButton);
+begin
+  if (CurrentItem <> -1) and
+     (Items.Objects[CurrentItem] <> nil) and
+     (PointInArea(MouseX, MouseY, FAccessoryAreas.Items[CurrentItem])) then
+  begin
+    TGLMenuItemAccessory(Items.Objects[CurrentItem]).MouseDown(
+      MouseX, MouseY, Button, FAccessoryAreas.Items[CurrentItem], Self);
+  end;
 end;
 
 procedure TGLMenu.MouseUp(const MouseX, MouseY: Single; Button: TMouseButton);
@@ -594,7 +909,7 @@ procedure TGLMenu.Idle(const CompSpeed: Single);
 begin
   MenuAnimation += 0.01 * CompSpeed;
   MenuAnimation := Frac(MenuAnimation);
-  CurrentItemChanged;
+  SomethingChanged;
 end;
 
 procedure TGLMenu.CurrentItemSelected;
@@ -603,6 +918,16 @@ begin
 end;
 
 procedure TGLMenu.CurrentItemChanged;
+begin
+  SomethingChanged;
+end;
+
+procedure TGLMenu.CurrentItemAccessoryValueChanged;
+begin
+  SomethingChanged;
+end;
+
+procedure TGLMenu.SomethingChanged;
 begin
   { Nothing to do in this class. }
 end;

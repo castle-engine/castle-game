@@ -30,6 +30,7 @@ type
     on each CurrentItem change. }
   TCastleMenu = class(TGLMenu)
     procedure CurrentItemChanged; override;
+    procedure SomethingChanged; override;
   end;
 
 implementation
@@ -40,7 +41,13 @@ uses SysUtils, GLWindow, CastleWindow, CastleSound;
 
 procedure TCastleMenu.CurrentItemChanged;
 begin
+  inherited;
   Sound(stMenuCurrentItemChanged);
+end;
+
+procedure TCastleMenu.SomethingChanged;
+begin
+  inherited;
   Glw.PostRedisplay;
 end;
 
@@ -48,7 +55,7 @@ end;
 
 procedure CloseGLW(Glwin: TGLWindow);
 begin
-  FreeAndNil(MenuFont);
+  GLMenuCloseGL;
 end;
 
 initialization
