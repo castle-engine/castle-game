@@ -28,14 +28,30 @@ uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
 
 {$define read_interface}
 
+const
+  { Default value for TCreatureKind.DefaultMaxLife.
+    Yes, it's not a typo, this identifier starts with "DefaultDefault". }
+  DefaultDefaultMaxLife = 100.0;
+
+  DefaultMoveSpeed = 0.2;
+  DefaultMinDelayBetweenAttacks = 5.0;
+  DefaultAttackDistance = 50.0 * 0.7;
+  DefaultMissileMoveSpeed = 1.0 * 0.7;
+  DefaultMaxKnockedBackDistance = 6.0 * 0.7;
+  DefaultLifeToRunAway = 0.3;
+
 type
+  TCreature = class;
+
   TCreatureKind = class
   private
     FFlying: boolean;
+    FVRMLNodeName: string;
     FCameraRadius: Single;
     FSoundSuddenPain: TSoundType;
+    FDefaultMaxLife: Single;
   public
-    constructor Create;
+    constructor Create(const AVRMLNodeName: string);
 
     { Prepare anything needed when starting new game.
       It can call Progress.Step PrepareRenderSteps times.
@@ -62,25 +78,50 @@ type
 
     property SoundSuddenPain: TSoundType
       read FSoundSuddenPain write FSoundSuddenPain default stNone;
+
+    { This will be used to refer to item kind from VRML models
+      (and from some other places too). }
+    property VRMLNodeName: string read FVRMLNodeName;
+
+    { This will be used by CreateDefaultCreature to initialize
+      MaxLife of the creature. Which means that not all instances
+      of TCreature with this Kind *must* have this MaxLife,
+      because you don't have to use CreateDefaultCreature to create
+      new creatures... It's just some default, "suggested" MaxLife
+      for this Kind. }
+    property DefaultMaxLife: Single
+      read FDefaultMaxLife write FDefaultMaxLife default DefaultDefaultMaxLife;
+
+    { This creates the "default creature instance" with Kind = Self.
+      This uses DefaultMaxLife. It uses the TCreature descendant
+      most suitable for this TCreatureKind.
+
+      Note that you don't have to use this function to create
+      creature instances with this Kind. You can freely create
+      TCreature instances on your own, using all flexibility.
+      (be careful though as some TCreature desdendants require
+      particular TCreatureKind descendants).
+      This function just serves as a comfortable way to create
+      creature instance as easily as possible. }
+    function CreateDefaultCreature(
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AnimationTime: Single): TCreature; virtual; abstract;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
   {$I objectslist_2.inc}
   TCreaturesKindsList = class(TObjectsList_2)
+  public
     { Calls PrepareRender for all items.
       This does Progress.Init, Step, Fini. }
     procedure PrepareRender;
+
+    { Find item with given VRMLNodeName.
+      @raises Exception if not found. }
+    function FindByVRMLNodeName(const AVRMLNodeName: string): TCreatureKind;
   end;
 
-const
-  DefaultMoveSpeed = 0.2;
-  DefaultMinDelayBetweenAttacks = 5.0;
-  DefaultAttackDistance = 50.0 * 0.7;
-  DefaultMissileMoveSpeed = 1.0 * 0.7;
-  DefaultMaxKnockedBackDistance = 6.0 * 0.7;
-  DefaultLifeToRunAway = 0.3;
-
-type
   { This is a TCreatureKind that has simple states:
     standing stil, walking (aka running), performing an attack and dying.
     Note that you should specify all animation times in seconds
@@ -111,6 +152,7 @@ type
     FLifeToRunAway: Single;
   public
     constructor Create(
+      const AVRMLNodeName: string;
       AStandAnimationInfo: TVRMLGLAnimationInfo;
       AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
       AWalkAnimationInfo: TVRMLGLAnimationInfo;
@@ -224,6 +266,22 @@ type
       read FLifeToRunAway write FLifeToRunAway default DefaultLifeToRunAway;
   end;
 
+  TBallThrowerCreatureKind = class(TWalkAttackCreatureKind)
+  public
+    function CreateDefaultCreature(
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AnimationTime: Single): TCreature; override;
+  end;
+
+  TWerewolfKind = class(TWalkAttackCreatureKind)
+  public
+    function CreateDefaultCreature(
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AnimationTime: Single): TCreature; override;
+  end;
+
   { This is a missile. As you can see, this is also treated as a creature
     --- it's just a very dumb creature, that just moves into the given
     direction and explodes on any collision. }
@@ -234,7 +292,9 @@ type
     FMoveSpeed: Single;
     FSoundExplosion: TSoundType;
   public
-    constructor Create(AAnimationInfo: TVRMLGLAnimationInfo);
+    constructor Create(
+      const AVRMLNodeName: string;
+      AAnimationInfo: TVRMLGLAnimationInfo);
     destructor Destroy; override;
 
     procedure PrepareRender; override;
@@ -258,6 +318,11 @@ type
 
     property SoundExplosion: TSoundType
       read FSoundExplosion write FSoundExplosion default stNone;
+
+    function CreateDefaultCreature(
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AnimationTime: Single): TCreature; override;
   end;
 
   TCreature = class
@@ -490,8 +555,8 @@ type
 var
   CreaturesKinds: TCreaturesKindsList;
 
-  Alien: TWalkAttackCreatureKind;
-  Werewolf: TWalkAttackCreatureKind;
+  Alien: TBallThrowerCreatureKind;
+  Werewolf: TWerewolfKind;
   BallMissile: TMissileCreatureKind;
 
 {$undef read_interface}
@@ -508,11 +573,13 @@ uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow,
 
 { TCreatureKind -------------------------------------------------------------- }
 
-constructor TCreatureKind.Create;
+constructor TCreatureKind.Create(const AVRMLNodeName: string);
 begin
   inherited Create;
-  CreaturesKinds.Add(Self);
+  FVRMLNodeName := AVRMLNodeName;
   FFlying := false;
+  FDefaultMaxLife := DefaultDefaultMaxLife;
+  CreaturesKinds.Add(Self);
 end;
 
 procedure TCreatureKind.PrepareRender;
@@ -548,9 +615,26 @@ begin
   finally Progress.Fini; end;
 end;
 
+function TCreaturesKindsList.FindByVRMLNodeName(
+  const AVRMLNodeName: string): TCreatureKind;
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+  begin
+    Result := Items[I];
+    if Result.VRMLNodeName = AVRMLNodeName then
+      Exit;
+  end;
+
+  raise Exception.CreateFmt('Not existing creature kind name "%s"',
+    [AVRMLNodeName]);
+end;
+
 { TWalkAttackCreatureKind ---------------------------------------------------- }
 
 constructor TWalkAttackCreatureKind.Create(
+  const AVRMLNodeName: string;
   AStandAnimationInfo: TVRMLGLAnimationInfo;
   AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
   AWalkAnimationInfo: TVRMLGLAnimationInfo;
@@ -558,7 +642,7 @@ constructor TWalkAttackCreatureKind.Create(
   ADyingAnimationInfo: TVRMLGLAnimationInfo;
   AHurtAnimationInfo: TVRMLGLAnimationInfo);
 begin
-  inherited Create;
+  inherited Create(AVRMLNodeName);
 
   FStandAnimationInfo := AStandAnimationInfo;
   FStandToWalkAnimationInfo := AStandToWalkAnimationInfo;
@@ -634,12 +718,35 @@ begin
   if HurtAnimation <> nil then HurtAnimation.CloseGL;
 end;
 
+{ TBallThrowerCreatureKind --------------------------------------------------- }
+
+function TBallThrowerCreatureKind.CreateDefaultCreature(
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AnimationTime: Single): TCreature;
+begin
+  Result := TBallThrowerCreature.Create(Self, ALegsPosition, ADirection,
+    DefaultMaxLife, AnimationTime);
+end;
+
+{ TWerewolfKind -------------------------------------------------------------- }
+
+function TWerewolfKind.CreateDefaultCreature(
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AnimationTime: Single): TCreature;
+begin
+  Result := TWerewolfCreature.Create(Self, ALegsPosition, ADirection,
+    DefaultMaxLife, AnimationTime);
+end;
+
 { TMissileCreatureKind ---------------------------------------------------- }
 
 constructor TMissileCreatureKind.Create(
+  const AVRMLNodeName: string;
   AAnimationInfo: TVRMLGLAnimationInfo);
 begin
-  inherited Create;
+  inherited Create(AVRMLNodeName);
   FAnimationInfo := AAnimationInfo;
   Flying := true;
   FMoveSpeed := DefaultMissileMoveSpeed;
@@ -679,6 +786,15 @@ procedure TMissileCreatureKind.CloseGL;
 begin
   inherited;
   if Animation <> nil then Animation.CloseGL;
+end;
+
+function TMissileCreatureKind.CreateDefaultCreature(
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AnimationTime: Single): TCreature;
+begin
+  Result := TMissileCreature.Create(Self, ALegsPosition, ADirection,
+    DefaultMaxLife, AnimationTime);
 end;
 
 { TCreature ------------------------------------------------------------------ }
@@ -1623,16 +1739,15 @@ end;
 procedure TBallThrowerCreature.ActualAttack;
 const
   FiringMissileHeight = 0.6;
-  MissileDefaultLife = 1.0;
 var
-  Missile: TMissileCreature;
+  Missile: TCreature;
 begin
   if HasLastSeenPlayer then
   begin
-    Missile := TMissileCreature.Create(BallMissile,
+    Missile := BallMissile.CreateDefaultCreature(
       VLerp(FiringMissileHeight, LegsPosition, HeadPosition),
       Normalized(VectorSubtract(LastSeenPlayer, HeadPosition)),
-      MissileDefaultLife, Level.AnimationTime);
+      Level.AnimationTime);
 
     Level.Creatures.Add(Missile);
 
@@ -1773,7 +1888,8 @@ begin
 
   CreaturesKinds := TCreaturesKindsList.Create;
 
-  Alien := TWalkAttackCreatureKind.Create(
+  Alien := TBallThrowerCreatureKind.Create(
+    'Alien',
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_still_final.wrl') ],
       [ 0 ],
@@ -1811,7 +1927,8 @@ begin
   Alien.SoundSuddenPain := stAlienSuddenPain;
   Alien.MoveSpeed := 0.1;
 
-  Werewolf := TWalkAttackCreatureKind.Create(
+  Werewolf := TWerewolfKind.Create(
+    'Werewolf',
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
       [ 0 ],
@@ -1850,8 +1967,10 @@ begin
   Werewolf.SoundSuddenPain := stWerewolfSuddenPain;
   Werewolf.SoundAttackStart := stWerewolfAttackStart;
   Werewolf.LifeToRunAway := 0.1;
+  Werewolf.DefaultMaxLife := 500.0;
 
   BallMissile := TMissileCreatureKind.Create(
+    'BallMissile',
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('ball_missile' + PathDelim + 'ball_missile_1_final.wrl'),
         CreatureFileName('ball_missile' + PathDelim + 'ball_missile_2_final.wrl') ],
@@ -1859,6 +1978,7 @@ begin
       AnimScenesPerTime, AnimOptimization, true, false)
     );
   BallMissile.SoundExplosion := stBallMissileExplode;
+  BallMissile.DefaultMaxLife := 1.0;
 end;
 
 procedure DoFinalization;

@@ -525,12 +525,8 @@ Creatures (enemies etc.):
     TCreatureKind instance.
 
   - For some creatures you may be able to just reuse some existing TCreatureKind
-    descendant, for others you will want to derive new class from TCreatureKind
-    and override there things you want.
-
-    TODO: right now you may also need to add some code to
-    TLevel.TraverseForCreatures inside CastleLevel unit.
-    This is unhandy and will be fixed after stage 4 deadline.
+    and TCreature descendants, for others you will want to derive
+    your own descendants.
 
   - Whole creature should use either *only transparent
     materials* or *only non-transparent materials*.

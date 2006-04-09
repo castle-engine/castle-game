@@ -512,7 +512,6 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
   var
     StubBoundingBox: TBox3d;
     CreaturePosition, CreatureDirection: TVector3Single;
-    CreatureMaxLife: Single;
     CreatureKind: TCreatureKind;
     CreatureKindName: string;
     Creature: TCreature;
@@ -531,14 +530,7 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
     CreaturePosition[2] := StubBoundingBox[0, 2];
 
     { calculate CreatureKind }
-    { TODO --- this is not nice, such things should be done within
-      CastleCreatures unit using some virtual methods of each TCreatureKind. }
-    if CreatureKindName = 'Alien' then
-      CreatureKind := Alien else
-    if CreatureKindName = 'Werewolf' then
-      CreatureKind := Werewolf else
-      raise Exception.CreateFmt('Not existing creature kind name "%s"',
-        [CreatureKindName]);
+    CreatureKind := CreaturesKinds.FindByVRMLNodeName(CreatureKindName);
 
     { calculate CreatureDirection }
     { TODO --- CreatureDirection configurable.
@@ -549,20 +541,9 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
       MakeVectorsOrthoOnTheirPlane(CreatureDirection, HomeCameraUp);
     NormalizeTo1st(CreatureDirection);
 
-    { calculate CreatureMaxLife, Creature }
-    if CreatureKind = Alien then
-    begin
-      CreatureMaxLife := 100;
-      Creature := TBallThrowerCreature.Create(CreatureKind, CreaturePosition,
-        CreatureDirection, CreatureMaxLife, AnimationTime);
-    end else
-    if CreatureKind = Werewolf then
-    begin
-      CreatureMaxLife := 500;
-      Creature := TWerewolfCreature.Create(CreatureKind, CreaturePosition,
-        CreatureDirection, CreatureMaxLife, AnimationTime);
-    end else
-      raise EInternalError.Create('CreatureKind = ?');
+    { calculate Creature }
+    Creature := CreatureKind.CreateDefaultCreature(CreaturePosition,
+      CreatureDirection, AnimationTime);
 
     FCreatures.Add(Creature);
   end;

@@ -1,3 +1,8 @@
+- debug menu:
+  show all creatures (shows their kinds, life, maxlife)
+  create new create (choose a kind and new creature is created)
+  alter creature kind's MoveSpeed
+
 - Eric stage 4 comments answer:
 
     Level loading seems to be quite long given the relatively low complexity of meshes and textures, could be something to watch before levels become more complex.
