@@ -103,6 +103,7 @@ var
   CastleKey_ViewMessages: TKeyConfiguration;
   CastleKey_SaveScreen: TKeyConfiguration;
   CastleKey_CancelFlying: TKeyConfiguration;
+  CastleKey_FPSShow: TKeyConfiguration;
 
   { List of all configurable keys.
     Will be created in initialization and freed in finalization of this unit.
@@ -241,6 +242,7 @@ begin
   CastleKey_ViewMessages := TKeyConfiguration.Create('View all messages', 'view_messages', kgOther, K_M);
   CastleKey_SaveScreen := TKeyConfiguration.Create('Save screen', 'save_screen', kgOther, K_F5);
   CastleKey_CancelFlying := TKeyConfiguration.Create('Cancel flying spell', 'cancel_flying', kgOther, K_C);
+  CastleKey_FPSShow := TKeyConfiguration.Create('FPS show / hide', 'fps_toggle', kgOther, K_BackQuote);
 
   CastleAllKeys.LoadFromConfigFile;
 end;

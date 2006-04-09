@@ -1809,6 +1809,7 @@ begin
     );
   Alien.ActualAttackTime := 0.4;
   Alien.SoundSuddenPain := stAlienSuddenPain;
+  Alien.MoveSpeed := 0.1;
 
   Werewolf := TWalkAttackCreatureKind.Create(
     TVRMLGLAnimationInfo.Create(

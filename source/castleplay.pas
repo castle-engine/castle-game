@@ -529,17 +529,12 @@ begin
     ViewGameMessages else
   if Key = CastleKey_CancelFlying.Value then
     CancelFlying else
+  if Key = CastleKey_FPSShow.Value then
+    ShowDebugInfo := not ShowDebugInfo else
 
-  case C of
-    { debug things }
-    'l': if not Player.Dead then
-           Player.Life := Min(Player.Life + 10, Player.MaxLife) else
-           GameMessage(SDeadMessage);
-    'L': Player.Life := Max(Player.Life - 10, 0);
-    '`': ShowDebugInfo := not ShowDebugInfo;
-
-    CharEscape: ShowGameMenu;
-  end;
+  { Fixed keys. }
+  if C = CharEscape then
+    ShowGameMenu;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);

@@ -270,10 +270,10 @@ begin
   SubMenuTitle := 'Configure other controls';
 
   SubMenuAdditionalInfo :=
-    'Non-configurable keys:' +nl+
-    '  Escape = exit to game menu' +nl+
-    '  ` (backquote) = FPS show / hide' +nl+
-    '  L / Shift + L = (cheating) life increase/decrease' +nl+
+    'Escape key:' +nl+
+    '  This can be used in game to exit to game menu.' +nl+
+    '  In many other cases it can be used to "exit".' +nl+
+    '  This key is not configurable.' +nl+
     nl+
     'Mouse:' +nl+
     '  left mouse click on anything =' +nl+

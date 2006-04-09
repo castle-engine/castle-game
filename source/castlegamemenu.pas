@@ -32,19 +32,32 @@ uses SysUtils, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleKeys;
 
-var
-  UserQuit: boolean;
-  GLList_ScreenImage: TGLuint;
-
-{ TCastleGameMenu ------------------------------------------------------------ }
+{ TCastleMenu descendants interface ------------------------------------------ }
 
 type
-  TCastleGameMenu = class(TCastleMenu)
+  TGameMenu = class(TCastleMenu)
     constructor Create;
     procedure CurrentItemSelected; override;
   end;
 
-constructor TCastleGameMenu.Create;
+  TDebugMenu = class(TCastleMenu)
+    constructor Create;
+    procedure CurrentItemSelected; override;
+  end;
+
+{ ----------------------------------------------------------------------------
+  global vars (used by TCastleMenu descendants implementation) }
+
+var
+  UserQuit: boolean;
+  GLList_ScreenImage: TGLuint;
+  CurrentMenu: TCastleMenu;
+  GameMenu: TGameMenu;
+  DebugMenu: TDebugMenu;
+
+{ TGameMenu ------------------------------------------------------------ }
+
+constructor TGameMenu.Create;
 begin
   inherited Create;
 
@@ -52,29 +65,48 @@ begin
   Items.Add('View last game messages');
   Items.Add('Configure controls');
   Items.Add('End game');
+  Items.Add('Debug (cheating) options');
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
-procedure TCastleGameMenu.CurrentItemSelected;
+procedure TGameMenu.CurrentItemSelected;
 begin
   case CurrentItem of
     0: UserQuit := true;
     1: ViewGameMessages;
     2: ShowControlsMenu(GLList_ScreenImage, true, true);
-    3:
-      { At first I did here GameCancel(false), but tests (with Mama)
-        show that it's too easy to select this and accidentaly
-        end the game. }
-      GameCancel(true);
+    3: { At first I did here GameCancel(false), but tests (with Mama)
+         show that it's too easy to select this and accidentaly
+         end the game. }
+       GameCancel(true);
+    4: CurrentMenu := DebugMenu;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+{ TDebugMenu ------------------------------------------------------------ }
+
+constructor TDebugMenu.Create;
+begin
+  inherited Create;
+
+  Items.Add('Player.Life := Player.MaxLife');
+  Items.Add('Back to main menu');
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TDebugMenu.CurrentItemSelected;
+begin
+  case CurrentItem of
+    0: Player.Life := Player.MaxLife;
+    1: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
 
 { global things -------------------------------------------------------------- }
-
-var
-  GameMenu: TCastleGameMenu;
 
 procedure Resize(Glwin: TGLWindow);
 begin
@@ -87,12 +119,12 @@ begin
   glRasterPos2i(0, 0);
   glCallList(GLList_ScreenImage);
 
-  GameMenu.Draw;
+  CurrentMenu.Draw;
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  GameMenu.KeyDown(Key, C);
+  CurrentMenu.KeyDown(Key, C);
   if Key = CastleKey_SaveScreen.Value then
     SaveScreen else
   case C of
@@ -102,17 +134,17 @@ end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
 begin
-  GameMenu.MouseMove(NewX, Glwin.Height - NewY);
+  CurrentMenu.MouseMove(NewX, Glwin.Height - NewY);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  GameMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
+  CurrentMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
 end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  GameMenu.Idle(Glwin.FpsCompSpeed);
+  CurrentMenu.Idle(Glwin.FpsCompSpeed);
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);
@@ -159,12 +191,16 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  GameMenu := TCastleGameMenu.Create;
+  GameMenu := TGameMenu.Create;
+  DebugMenu := TDebugMenu.Create;
+  CurrentMenu := GameMenu;
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);
 begin
+  CurrentMenu := nil;
   FreeAndNil(GameMenu);
+  FreeAndNil(DebugMenu);
 end;
 
 initialization

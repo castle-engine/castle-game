@@ -129,6 +129,9 @@ Would-be-nice before next stage:
 
 - in game, in config controls, escape should go back to game.
 
+- in debug menu, when chaing player's Life, effect should be visible
+  immediately --- redraw game screen now.
+
 - put some vertical crates around GlassPrison on basic_castle
 
 - shadow under the creatures would be nice (sgk_shadows should allow
