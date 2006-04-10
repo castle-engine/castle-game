@@ -86,11 +86,19 @@ procedure Sound(SoundType: TSoundType);
   @noAutoLinkHere }
 procedure Sound3d(SoundType: TSoundType; const Position: TVector3Single);
 
-function GetSoundVolume: Single;
-procedure SetSoundVolume(const Value: Single);
+function GetEffectsVolume: Single;
+procedure SetEffectsVolume(const Value: Single);
 
-{ Sound volume. This must always be within 0..1 range. }
-property SoundVolume: Single read GetSoundVolume write SetSoundVolume;
+{ Sound effects volume. This must always be within 0..1 range.
+  0.0 means that there are no effects (this case should be optimized). }
+property EffectsVolume: Single read GetEffectsVolume write SetEffectsVolume;
+
+function GetMusicVolume: Single;
+procedure SetMusicVolume(const Value: Single);
+
+{ Music volume. This must always be within 0..1 range.
+  0.0 means that there is no music (this case should be optimized).}
+property MusicVolume: Single read GetMusicVolume write SetMusicVolume;
 
 implementation
 
@@ -113,27 +121,49 @@ begin
 end;
 
 const
-  DefaultSoundVolume = 0.5;
+  DefaultEffectsVolume = 0.5;
 
 var
-  FSoundVolume: Single;
+  FEffectsVolume: Single;
 
-function GetSoundVolume: Single;
+function GetEffectsVolume: Single;
 begin
-  Result := FSoundVolume;
+  Result := FEffectsVolume;
 end;
 
-procedure SetSoundVolume(const Value: Single);
+procedure SetEffectsVolume(const Value: Single);
 begin
-  if Value <> FSoundVolume then
+  if Value <> FEffectsVolume then
   begin
-    FSoundVolume := Value;
+    FEffectsVolume := Value;
+    { TODO }
+  end;
+end;
+
+const
+  DefaultMusicVolume = 0.5;
+
+var
+  FMusicVolume: Single;
+
+function GetMusicVolume: Single;
+begin
+  Result := FMusicVolume;
+end;
+
+procedure SetMusicVolume(const Value: Single);
+begin
+  if Value <> FMusicVolume then
+  begin
+    FMusicVolume := Value;
     { TODO }
   end;
 end;
 
 initialization
-  FSoundVolume := ConfigFile.GetValue('sound/volume', DefaultSoundVolume);
+  FEffectsVolume := ConfigFile.GetValue('sound/effects/volume', DefaultEffectsVolume);
+  FMusicVolume   := ConfigFile.GetValue('sound/music/volume', DefaultMusicVolume);
 finalization
-  ConfigFile.SetDeleteValue('sound/volume', SoundVolume, DefaultSoundVolume);
+  ConfigFile.SetDeleteValue('sound/effects/volume', EffectsVolume, DefaultEffectsVolume);
+  ConfigFile.SetDeleteValue('sound/music/volume', MusicVolume, DefaultMusicVolume);
 end.

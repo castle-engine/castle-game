@@ -57,8 +57,14 @@ type
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
+  TSoundVolumeSlider = class(TGLMenuFloatSlider)
+    constructor Create(const Value: Single);
+    function ValueToStr(const AValue: Single): string; override;
+  end;
+
   TSoundMenu = class(TSubMenu)
-    SoundVolumeSlider: TGLMenuFloatSlider;
+    EffectsVolumeSlider: TSoundVolumeSlider;
+    MusicVolumeSlider: TSoundVolumeSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -242,16 +248,32 @@ begin
   end;
 end;
 
+{ TSoundVolumeSlider ---------------------------------------------------- }
+
+constructor TSoundVolumeSlider.Create(const Value: Single);
+begin
+  inherited Create(0, 1, Value);
+end;
+
+function TSoundVolumeSlider.ValueToStr(const AValue: Single): string;
+begin
+  if AValue = 0.0 then
+    Result := 'Off' else
+    Result := inherited ValueToStr(AValue);
+end;
+
 { TSoundMenu ------------------------------------------------------------- }
 
 constructor TSoundMenu.Create;
 begin
   inherited Create;
 
-  SoundVolumeSlider := TGLMenuFloatSlider.Create(0, 1, SoundVolume);
+  EffectsVolumeSlider := TSoundVolumeSlider.Create(EffectsVolume);
+  MusicVolumeSlider := TSoundVolumeSlider.Create(MusicVolume);
 
   Items.Add('View sound information');
-  Items.AddObject('Sound volume', SoundVolumeSlider);
+  Items.AddObject('Sound effects volume', EffectsVolumeSlider);
+  Items.AddObject('Music volume', MusicVolumeSlider);
   Items.Add('Back to main menu');
 
   SubMenuTitle := 'Sound options';
@@ -281,7 +303,8 @@ begin
   case CurrentItem of
     0: ViewSoundInfo;
     1: ;
-    2: CurrentMenu := MainMenu;
+    2: ;
+    3: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -289,7 +312,8 @@ end;
 procedure TSoundMenu.CurrentItemAccessoryValueChanged;
 begin
   case CurrentItem of
-    1: SoundVolume := SoundVolumeSlider.Value;
+    1: EffectsVolume := EffectsVolumeSlider.Value;
+    2: MusicVolume := MusicVolumeSlider.Value;
   end;
 end;
 

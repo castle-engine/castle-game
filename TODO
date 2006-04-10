@@ -121,7 +121,10 @@ Would-be-nice before next stage:
 - put some vertical crates around GlassPrison on basic_castle
 
 - shadow under the creatures would be nice (sgk_shadows should allow
-  me to this super-nicely)
+  me to this super-nicely).
+
+  For "Video options" menu add:
+    Creature shadows: on/off [on]
 
 - "shrink" spell (that was *coool* in DUKE 3D !)
   "freeze" (it's from DUKE 3D also)
@@ -214,16 +217,6 @@ Would-be-nice before next stage:
   horror/abom
   anatomy_people/creature
   anatomy_people/vampire
-
-- some things for menu:
-
-  sound:
-    Music: on/off [on]
-    Music volume: (slider)
-    Sound: on/off [on]
-
-  graphics:
-    Creature shadows: on/off [on]
 
 - Load / save game ability.
 
