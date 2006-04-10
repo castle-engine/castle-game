@@ -56,9 +56,11 @@ procedure LevelFinished(NextLevel: TLevel);
 { Saves a screen, causing also appropriate GameMessage. }
 procedure SaveScreen;
 
-{ ViewAngleDegX and ViewAngleDegY specify field of view in the game. }
-const
-  ViewAngleDegX = 45.0;
+{ ViewAngleDegX and ViewAngleDegY specify field of view in the game.
+  You can freely change ViewAngleDegX at runtime, just make sure
+  that our OnResize will be called after. }
+var
+  ViewAngleDegX: Single = 45.0;
 function ViewAngleDegY: Single;
 
 var
@@ -493,6 +495,15 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       GameMessage(SDeadMessage);
   end;
 
+  procedure DoGameMenu;
+  var
+    ViewAngleChanged: boolean;
+  begin
+    ShowGameMenu(ViewAngleChanged);
+    if ViewAngleChanged then
+      Glwin.EventResize;
+  end;
+
 begin
   { Basic keys. }
   if Key = CastleKey_Attack.Value then
@@ -534,7 +545,7 @@ begin
 
   { Fixed keys. }
   if C = CharEscape then
-    ShowGameMenu;
+    DoGameMenu;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);

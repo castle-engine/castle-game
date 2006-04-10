@@ -23,7 +23,7 @@ unit CastleGameMenu;
 
 interface
 
-procedure ShowGameMenu;
+procedure ShowGameMenu(out AViewAngleChanged: boolean);
 
 implementation
 
@@ -31,7 +31,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
-  CastleItems, GLMenu;
+  CastleItems, GLMenu, RaysWindow;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -41,7 +41,13 @@ type
     procedure CurrentItemSelected; override;
   end;
 
+  TViewAngleSlider = class(TGLMenuFloatSlider)
+    constructor Create;
+    function ValueToStr(const AValue: Single): string; override;
+  end;
+
   TDebugMenu = class(TCastleMenu)
+    ViewAngleSlider: TViewAngleSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -56,6 +62,7 @@ var
   CurrentMenu: TCastleMenu;
   GameMenu: TGameMenu;
   DebugMenu: TDebugMenu;
+  ViewAngleChanged: boolean;
 
 { TGameMenu ------------------------------------------------------------ }
 
@@ -87,19 +94,33 @@ begin
   end;
 end;
 
+{ TViewAngleSlider ----------------------------------------------------------- }
+
+constructor TViewAngleSlider.Create;
+begin
+  inherited Create(30, 90, ViewAngleDegX);
+end;
+
+function TViewAngleSlider.ValueToStr(const AValue: Single): string;
+begin
+  Result := Format('horiz %f, vert %f', [AValue,
+    AdjustViewAngleDegToAspectRatio(AValue, Glw.Height / Glw.Width)]);
+end;
+
 { TDebugMenu ------------------------------------------------------------ }
 
 constructor TDebugMenu.Create;
 begin
   inherited Create;
 
+  ViewAngleSlider := TViewAngleSlider.Create;
+
   Items.Add('Player.Life := Player.MaxLife');
   Items.Add('Show creatures on level info');
   Items.Add('Add creature to level');
   Items.Add('Change creature kind MoveSpeed');
   Items.Add('Give me 20 instances of every possible item');
-  Items.AddObject('Set horizontal view angle',
-    TGLMenuFloatSlider.Create(30, 90, ViewAngleDegX));
+  Items.AddObject('Set view angle', ViewAngleSlider);
   Items.Add('Back to main menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -228,7 +249,10 @@ end;
 procedure TDebugMenu.CurrentItemAccessoryValueChanged;
 begin
   case CurrentItem of
-    5: { TODO };
+    5: begin
+         ViewAngleDegX := ViewAngleSlider.Value;
+         ViewAngleChanged := true;
+       end;
   end;
 end;
 
@@ -284,10 +308,12 @@ begin
   GameCancel(true);
 end;
 
-procedure ShowGameMenu;
+procedure ShowGameMenu(out AViewAngleChanged: boolean);
 var
   SavedMode: TGLMode;
 begin
+  ViewAngleChanged := false;
+
   GLList_ScreenImage := Glw.SaveScreenToDispList;
   try
     SavedMode := TGLMode.Create(Glw, GL_ENABLE_BIT, true);
@@ -321,6 +347,8 @@ begin
 
     finally FreeAndNil(SavedMode); end;
   finally glFreeDisplayList(GLList_ScreenImage); end;
+
+  AViewAngleChanged := ViewAngleChanged;
 end;
 
 { initialization / finalization ---------------------------------------------- }
