@@ -369,12 +369,16 @@ type
   end;
 
 var
-  { It will be automatically initialized by any TGLMenu operation
-    that requires it. You can set this yourself or just let TGLMenu
+  { These fonts will be automatically initialized by any TGLMenu operation
+    that require them. You can set them yourself or just let TGLMenu
     to set it.
 
-    YOU MUST RELEASE IT BY GLMenuCloseGL. Don't forget about it. }
+    YOU MUST RELEASE THEM BY GLMenuCloseGL. Don't forget about it.
+
+    @groupBegin }
   MenuFont: TGLBitmapFont;
+  SliderFont: TGLBitmapFont;
+  { @groupEnd }
 
 { This releases some fonts, images, display lists that were created
   during GLMenu lifetime when necessary. You must call this
@@ -383,7 +387,14 @@ procedure GLMenuCloseGL;
 
 implementation
 
-uses SysUtils, KambiUtils, KambiGLUtils, Images, KambiFilesUtils;
+uses SysUtils, KambiUtils, KambiGLUtils, Images, KambiFilesUtils,
+  BFNT_BitstreamVeraSans_m10_Unit;
+
+procedure SliderFontInit;
+begin
+  if SliderFont = nil then
+    SliderFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans_m10);
+end;
 
 procedure MenuFontInit;
 begin
@@ -419,6 +430,7 @@ end;
 procedure GLMenuCloseGL;
 begin
   FreeAndNil(MenuFont);
+  FreeAndNil(SliderFont);
   glFreeDisplayList(GLList_ImageSlider);
   glFreeDisplayList(GLList_ImageSliderPosition);
   FreeAndNil(ImageSlider);
@@ -542,9 +554,24 @@ begin
 end;
 
 procedure TGLMenuFloatSlider.Draw(const Area: TArea);
+var
+  S: string;
 begin
   inherited;
+
   DrawSliderPosition(Area, MapRange(Value, BeginRange, EndRange, 0, 1));
+
+  SliderFontInit;
+
+  glPushMatrix;
+    S := Format('%f', [Value]);
+    glTranslatef(
+      Area.X0 + (Area.Width - SliderFont.TextWidth(S)) / 2,
+      Area.Y0 + (Area.Height - SliderFont.RowHeight) / 2, 0);
+    glColorv(Black3Single);
+    glRasterPos2i(0, 0);
+    SliderFont.Print(S);
+  glPopMatrix;
 end;
 
 procedure TGLMenuFloatSlider.KeyDown(Key: TKey; C: char;
