@@ -53,6 +53,14 @@ Note: Some people experience sickness with the FOV in Half-Life 2 which is set t
 Would-be-nice before next stage:
 
 --------------------
+- Enemies:
+  - More enemies attacks.
+  - Nice 3d effects (lighting-like things, explosions etc.).
+  - Models of the two current creatures need to be improved.
+    Model of "alien" creature will probably be just removed and replaced
+    by something else.
+  - Just add more creatures.
+
 - "The Gate" level:
   - volumetric fog (like from malfunction) needed there. I also want to demonstrate fog in my engine...
   - intro under menu: camera floating around level with this fog ?

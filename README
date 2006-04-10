@@ -1,30 +1,9 @@
 "The Castle"
 
 --------------------
-PGD competition stage 4 short notes:
-- Death sequence: yes.
-
-- Enemies, boss: yes.
-  Boss appears at the end of "Castle Hall".
-
-  Actually I have only 2 enemies, one of which is the 1st boss. Not too much,
-  but preparing each enemy is quite a work (even if I get static 3d models
-  from other places) --- all the animations of walk, attack, being hurt etc.
-  Actually there is a 3rd enemy, the ball_missile that is casted
-  by the "alien-like" creature. This missile is treated by the code
-  pretty much like any another creature.
-
-  Still there are many things remaining to be done for enemies.
-  Some of the more important ones:
-  - More enemies attacks.
-  - Nice 3d effects (lighting-like things, explosions etc.).
-  - Creature vs other creature collision is needed.
-  - Models of the two current creatures need to be improved.
-    Model of "alien" creature will probably be just removed and replaced
-    by something else.
-  - Shadows under creatures.
-  - AI must be smarter in many cases.
-  - And, most of all, just do more creatures.
+PGD competition stage 5 short notes:
+- Menus: done. Start menu and in-game menu (on Escape key).
+- New level: in progress...
 
 --------------------
 Installing and running:
