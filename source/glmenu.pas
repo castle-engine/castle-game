@@ -126,6 +126,8 @@ type
   end;
 
   TGLMenuSlider = class(TGLMenuItemAccessory)
+  private
+    FDisplayValue: boolean;
   protected
     procedure DrawSliderPosition(const Area: TArea; const Position: Single);
 
@@ -134,9 +136,19 @@ type
       Takes Area as the area currently occupied by the whole slider. }
     function XCoordToSliderPosition(const XCoord: Single;
       const Area: TArea): Single;
+
+    procedure DrawSliderText(const Area: TArea; const Text: string);
   public
+    constructor Create;
+
     function GetWidth(MenuFont: TGLBitmapFont): Single; override;
     procedure Draw(const Area: TArea); override;
+
+    { Should the Value be displayed as text ?
+      Usually useful --- but only if the Value has some meaning for the user.
+      If @true, then ValueToStr is used. }
+    property DisplayValue: boolean
+      read FDisplayValue write FDisplayValue default true;
   end;
 
   TGLMenuFloatSlider = class(TGLMenuSlider)
@@ -165,6 +177,41 @@ type
     procedure MouseMove(const NewX, NewY: Single;
       const MousePressed: TMouseButtons;
       const Area: TArea; ParentMenu: TGLMenu); override;
+
+    function ValueToStr(const AValue: Single): string; virtual;
+  end;
+
+  TGLMenuIntegerSlider = class(TGLMenuSlider)
+  private
+    FBeginRange: Integer;
+    FEndRange: Integer;
+    FValue: Integer;
+
+    function XCoordToValue(
+      const XCoord: Single; const Area: TArea): Integer;
+  public
+    constructor Create(const ABeginRange, AEndRange, AValue: Integer);
+
+    property BeginRange: Integer read FBeginRange;
+    property EndRange: Integer read FEndRange;
+
+    { Current value. When setting this property, always make sure
+      that it's within the allowed range. }
+    property Value: Integer read FValue write FValue;
+
+    procedure Draw(const Area: TArea); override;
+
+    procedure KeyDown(Key: TKey; C: char;
+      ParentMenu: TGLMenu); override;
+
+    procedure MouseDown(const MouseX, MouseY: Single; Button: TMouseButton;
+      const Area: TArea; ParentMenu: TGLMenu); override;
+
+    procedure MouseMove(const NewX, NewY: Single;
+      const MousePressed: TMouseButtons;
+      const Area: TArea; ParentMenu: TGLMenu); override;
+
+    function ValueToStr(const AValue: Integer): string; virtual;
   end;
 
   { How TGLMenu.Position will be interpreted. }
@@ -492,6 +539,12 @@ end;
 
 { TGLMenuSlider -------------------------------------------------------------- }
 
+constructor TGLMenuSlider.Create;
+begin
+  inherited;
+  FDisplayValue := true;
+end;
+
 function TGLMenuSlider.GetWidth(MenuFont: TGLBitmapFont): Single;
 begin
   ImageSliderInit;
@@ -542,6 +595,21 @@ begin
   Clamp(Result, 0, 1);
 end;
 
+procedure TGLMenuSlider.DrawSliderText(
+  const Area: TArea; const Text: string);
+begin
+  SliderFontInit;
+
+  glPushMatrix;
+    glTranslatef(
+      Area.X0 + (Area.Width - SliderFont.TextWidth(Text)) / 2,
+      Area.Y0 + (Area.Height - SliderFont.RowHeight) / 2, 0);
+    glColorv(Black3Single);
+    glRasterPos2i(0, 0);
+    SliderFont.Print(Text);
+  glPopMatrix;
+end;
+
 { TGLMenuFloatSlider --------------------------------------------------------- }
 
 constructor TGLMenuFloatSlider.Create(
@@ -554,24 +622,13 @@ begin
 end;
 
 procedure TGLMenuFloatSlider.Draw(const Area: TArea);
-var
-  S: string;
 begin
   inherited;
 
   DrawSliderPosition(Area, MapRange(Value, BeginRange, EndRange, 0, 1));
 
-  SliderFontInit;
-
-  glPushMatrix;
-    S := Format('%f', [Value]);
-    glTranslatef(
-      Area.X0 + (Area.Width - SliderFont.TextWidth(S)) / 2,
-      Area.Y0 + (Area.Height - SliderFont.RowHeight) / 2, 0);
-    glColorv(Black3Single);
-    glRasterPos2i(0, 0);
-    SliderFont.Print(S);
-  glPopMatrix;
+  if DisplayValue then
+    DrawSliderText(Area, ValueToStr(Value));
 end;
 
 procedure TGLMenuFloatSlider.KeyDown(Key: TKey; C: char;
@@ -626,6 +683,95 @@ begin
       BeginRange, EndRange);
     ParentMenu.CurrentItemAccessoryValueChanged;
   end;
+end;
+
+function TGLMenuFloatSlider.ValueToStr(const AValue: Single): string;
+begin
+  Result := Format('%f', [AValue]);
+end;
+
+{ TGLMenuIntegerSlider ------------------------------------------------------- }
+
+constructor TGLMenuIntegerSlider.Create(
+  const ABeginRange, AEndRange, AValue: Integer);
+begin
+  inherited Create;
+  FBeginRange := ABeginRange;
+  FEndRange := AEndRange;
+  FValue := AValue;
+end;
+
+procedure TGLMenuIntegerSlider.Draw(const Area: TArea);
+begin
+  inherited;
+
+  DrawSliderPosition(Area, MapRange(Value, BeginRange, EndRange, 0, 1));
+
+  if DisplayValue then
+    DrawSliderText(Area, ValueToStr(Value));
+end;
+
+procedure TGLMenuIntegerSlider.KeyDown(Key: TKey; C: char;
+  ParentMenu: TGLMenu);
+var
+  ValueChange: Integer;
+begin
+  if Key <> K_None then
+  begin
+    ValueChange := 1;
+
+    { KeySelectItem works just like KeySliderIncrease.
+      Reasoning: see TGLMenuFloatSlider. }
+
+    if (Key = ParentMenu.KeySelectItem) or
+       (Key = ParentMenu.KeySliderIncrease) then
+    begin
+      FValue := Min(EndRange, Value + ValueChange);
+      ParentMenu.CurrentItemAccessoryValueChanged;
+    end else
+    if Key = ParentMenu.KeySliderDecrease then
+    begin
+      FValue := Max(BeginRange, Value - ValueChange);
+      ParentMenu.CurrentItemAccessoryValueChanged;
+    end;
+  end;
+end;
+
+function TGLMenuIntegerSlider.XCoordToValue(
+  const XCoord: Single; const Area: TArea): Integer;
+begin
+  { We do additional Clamped over Round result to avoid any
+    change of floating-point errors due to lack of precision. }
+  Result := Clamped(Round(
+    MapRange(XCoordToSliderPosition(XCoord, Area), 0, 1,
+      BeginRange, EndRange)), BeginRange, EndRange);
+end;
+
+procedure TGLMenuIntegerSlider.MouseDown(
+  const MouseX, MouseY: Single; Button: TMouseButton;
+  const Area: TArea; ParentMenu: TGLMenu);
+begin
+  if Button = mbLeft then
+  begin
+    FValue := XCoordToValue(MouseX, Area);
+    ParentMenu.CurrentItemAccessoryValueChanged;
+  end;
+end;
+
+procedure TGLMenuIntegerSlider.MouseMove(const NewX, NewY: Single;
+  const MousePressed: TMouseButtons;
+  const Area: TArea; ParentMenu: TGLMenu);
+begin
+  if mbLeft in MousePressed then
+  begin
+    FValue := XCoordToValue(NewX, Area);
+    ParentMenu.CurrentItemAccessoryValueChanged;
+  end;
+end;
+
+function TGLMenuIntegerSlider.ValueToStr(const AValue: Integer): string;
+begin
+  Result := IntToStr(AValue);
 end;
 
 { TGLMenu -------------------------------------------------------------------- }

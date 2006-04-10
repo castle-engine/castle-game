@@ -221,21 +221,12 @@ Would-be-nice before next stage:
     Music: on/off [on]
     Music volume: (slider)
     Sound: on/off [on]
-    Sound volume: (slider)
 
   graphics:
     Allow resizing the screen at startup: on/off [on]
-    Texture minification quality: (opengl options)
-    Texture magnification quality: (opengl options)
-    Blending: (for attrib_blending somewhere)
     Animation smoothness: (slider: between 10 and 100)
       (for AnimScenesPerUnit in CastleCreatures)
     Creature shadows: on/off [on]
-
-  keyboard:
-    All keys configurable here.
-
-  load game, save game abilities.
 
 - Load / save game ability.
 

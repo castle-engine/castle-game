@@ -34,7 +34,7 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
-  CastleControlsMenu, CastleKeys;
+  CastleControlsMenu, CastleKeys, CastleTextureQuality;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -44,9 +44,16 @@ type
     procedure CurrentItemSelected; override;
   end;
 
+  TTextureMinificationQualitySlider = class(TGLMenuIntegerSlider)
+    constructor Create;
+    function ValueToStr(const AValue: Integer): string; override;
+  end;
+
   TVideoMenu = class(TSubMenu)
+    TextureMinificationQualitySlider: TGLMenuIntegerSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
   end;
 
   TSoundMenu = class(TSubMenu)
@@ -124,14 +131,43 @@ begin
   end;
 end;
 
+{ TTextureMinificationQualitySlider ------------------------------------------ }
+
+constructor TTextureMinificationQualitySlider.Create;
+begin
+  inherited Create(
+    Ord(Low(TTextureMinificationQuality)),
+    Ord(High(TTextureMinificationQuality)),
+    Ord(TextureMinificationQuality));
+end;
+
+function TTextureMinificationQualitySlider.ValueToStr(
+  const AValue: Integer): string;
+begin
+  Result := TextureMinificationQualityToStr[
+    TTextureMinificationQuality(AValue)];
+end;
+
 { TVideoMenu ------------------------------------------------------------- }
 
 constructor TVideoMenu.Create;
 begin
   inherited Create;
 
+  TextureMinificationQualitySlider := TTextureMinificationQualitySlider.Create;
+
   Items.Add('View video information');
+  Items.AddObject('Texture quality', TextureMinificationQualitySlider);
   Items.Add('Back to main menu');
+
+  { Resigned ideas for menu options:
+    - Texture magnification quality
+      Resigned, because magnification GL_NEAREST will look too awful
+      to be sensible.
+    - Blending (for Attrib_Blending somewhere)
+      Resigned, because without blending levels and items and creatures
+      will really look too bad to be sensible.
+  }
 
   SubMenuTitle := 'Video options';
 
@@ -155,8 +191,17 @@ procedure TVideoMenu.CurrentItemSelected;
 begin
   case CurrentItem of
     0: ViewVideoInfo;
-    1: CurrentMenu := MainMenu;
+    1: ;
+    2: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+procedure TVideoMenu.CurrentItemAccessoryValueChanged;
+begin
+  case CurrentItem of
+    1: TextureMinificationQuality :=
+      TTextureMinificationQuality(TextureMinificationQualitySlider.Value);
   end;
 end;
 

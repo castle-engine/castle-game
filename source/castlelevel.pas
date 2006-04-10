@@ -261,7 +261,7 @@ implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
-  CastleSound;
+  CastleSound, CastleTextureQuality;
 
 { TLevel --------------------------------------------------------------------- }
 
@@ -311,11 +311,8 @@ begin
   { initialize FAnimationTime. Must be initialized before creating creatures. }
   FAnimationTime := 0.0;
 
-  { This is the slowest one, but it looks perfect.
-    In fact, it's not so very slow on my system, so I think that
-    this can be the default.
-    Maybe it the future I'll make some configuration option to control this. }
-  Scene.Attrib_TextureMinFilter := GL_LINEAR_MIPMAP_LINEAR;
+  Scene.Attrib_TextureMinFilter :=
+    TextureMinificationQualityToGL[TextureMinificationQuality];
 
   { Calculate HomeCameraPos, HomeCameraDir, HomeCameraUp.
     Must be done before initializing creatures, as they right now
@@ -692,7 +689,8 @@ constructor TCastleHallLevel.Create;
       'castle_hall_symbol_' + Suffix + '.wrl'),
       true, roSeparateShapeStates);
 
-    Result.Attrib_TextureMinFilter := Scene.Attrib_TextureMinFilter;
+    Result.Attrib_TextureMinFilter :=
+      TextureMinificationQualityToGL[TextureMinificationQuality];
 
     Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
   end;
