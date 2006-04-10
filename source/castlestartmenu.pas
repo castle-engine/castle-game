@@ -156,6 +156,7 @@ begin
   inherited Create;
 
   TextureMinificationQualitySlider := TTextureMinificationQualitySlider.Create;
+
   AllowScreenResizeArgument := TGLMenuItemArgument.Create(
     TGLMenuItemArgument.TextWidth('WWW'));
   AllowScreenResizeArgument.Value := AllowScreenResizeToStr[AllowScreenResize];
@@ -166,12 +167,38 @@ begin
   Items.Add('Back to main menu');
 
   { Resigned ideas for menu options:
+
     - Texture magnification quality
       Resigned, because magnification GL_NEAREST will look too awful
       to be sensible.
+
     - Blending (for Attrib_Blending somewhere)
       Resigned, because without blending levels and items and creatures
       will really look too bad to be sensible.
+
+    - Creature animation smoothness
+      Resigned. I actually implemented it:
+
+        CreatureAnimationSlider: TGLMenuIntegerSlider;
+        CreatureAnimationSlider := TGLMenuIntegerSlider.Create(
+          MinCreatureAnimationScenesPerTime,
+          MaxCreatureAnimationScenesPerTime,
+          CreatureAnimationScenesPerTime);
+        Items.AddObject('Creature animation smoothness', CreatureAnimationSlider);
+        2: CreatureAnimationScenesPerTime := CreatureAnimationSlider.Value;
+
+      But I removed this implementation (ConfigFile setting stays,
+      so it's kind of a "hidden setting" that user can change
+      by manually editing .castle.conf file). Why ?
+
+      1. CastleCreatures implementation requires that the
+         program must be restarted for new CreatureAnimationScenesPerTime
+         value to take effect.
+
+      2. Contrary to my expectations, setting it to
+         MinCreatureAnimationScenesPerTime does *not* drastically
+         reduce "Loading creatures" time. So the setting is not so
+         meaningfull for the user.
   }
 
   SubMenuTitle := 'Video options';

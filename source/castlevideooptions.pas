@@ -57,11 +57,18 @@ var
 
 const
   DefaultAllowScreenResize = true;
-
   AllowScreenResizeToStr: array[boolean] of string = ('No', 'Yes');
 
 var
   AllowScreenResize: boolean;
+
+const
+  DefaultCreatureAnimationScenesPerTime = 30;
+  MinCreatureAnimationScenesPerTime = 10;
+  MaxCreatureAnimationScenesPerTime = 50;
+
+var
+  CreatureAnimationScenesPerTime: Cardinal;
 
 implementation
 
@@ -74,6 +81,9 @@ initialization
     Ord(DefaultTextureMinificationQuality)));
   AllowScreenResize := ConfigFile.GetValue(
     'video_options/allow_screen_resize', DefaultAllowScreenResize);
+  CreatureAnimationScenesPerTime := ConfigFile.GetValue(
+    'video_options/creature_animation_smoothness',
+    DefaultCreatureAnimationScenesPerTime);
 finalization
   ConfigFile.SetDeleteValue(
     'video_options/texture_minification_quality',
@@ -81,4 +91,7 @@ finalization
   ConfigFile.SetDeleteValue(
     'video_options/allow_screen_resize',
     AllowScreenResize, DefaultAllowScreenResize);
+  ConfigFile.SetDeleteValue(
+    'video_options/creature_animation_smoothness',
+    CreatureAnimationScenesPerTime, DefaultCreatureAnimationScenesPerTime);
 end.

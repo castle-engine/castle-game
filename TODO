@@ -223,8 +223,6 @@ Would-be-nice before next stage:
     Sound: on/off [on]
 
   graphics:
-    Animation smoothness: (slider: between 10 and 100)
-      (for AnimScenesPerUnit in CastleCreatures)
     Creature shadows: on/off [on]
 
 - Load / save game ability.

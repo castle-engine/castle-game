@@ -576,7 +576,7 @@ implementation
 
 uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
-  CastleLevel;
+  CastleLevel, CastleVideoOptions;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -1877,7 +1877,6 @@ end;
 
 procedure DoInitialization;
 const
-  AnimScenesPerTime = 30;
   AnimOptimization = roSceneAsAWhole;
 
   function CreatureFileName(const FileName: string): string;
@@ -1891,7 +1890,11 @@ const
     Result := CreatureFileName('alien' + PathDelim + FileName);
   end;
 
+var
+  AnimScenesPerTime: Cardinal;
 begin
+  AnimScenesPerTime := CreatureAnimationScenesPerTime;
+
   Glw.OnCloseList.AppendItem(@GLWindowClose);
 
   CreaturesKinds := TCreaturesKindsList.Create;
