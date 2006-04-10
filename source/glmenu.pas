@@ -922,6 +922,8 @@ begin
 end;
 
 procedure TGLMenu.MouseDown(const MouseX, MouseY: Single; Button: TMouseButton);
+var
+  NewItemIndex: Integer;
 begin
   if (CurrentItem <> -1) and
      (Items.Objects[CurrentItem] <> nil) and
@@ -930,12 +932,7 @@ begin
     TGLMenuItemAccessory(Items.Objects[CurrentItem]).MouseDown(
       MouseX, MouseY, Button, FAccessoryAreas.Items[CurrentItem], Self);
   end;
-end;
 
-procedure TGLMenu.MouseUp(const MouseX, MouseY: Single; Button: TMouseButton);
-var
-  NewItemIndex: Integer;
-begin
   if Button = mbLeft then
   begin
     NewItemIndex := Areas.FindArea(MouseX, MouseY);
@@ -945,6 +942,11 @@ begin
       CurrentItemSelected;
     end;
   end;
+end;
+
+procedure TGLMenu.MouseUp(const MouseX, MouseY: Single; Button: TMouseButton);
+begin
+  { Nothing to do here for now. }
 end;
 
 procedure TGLMenu.Idle(const CompSpeed: Single);

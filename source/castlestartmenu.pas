@@ -266,6 +266,8 @@ var
 begin
   SavedMode := TGLMode.Create(glw, 0, false);
   try
+    SavedMode.FakeMouseDown := false;
+
     SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
       nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
       false, K_None, #0, false, false);
