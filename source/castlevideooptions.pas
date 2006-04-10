@@ -18,8 +18,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{ }
-unit CastleTextureQuality;
+{ Variables and utilities for things in "Video options" menu. }
+unit CastleVideoOptions;
 
 interface
 
@@ -55,6 +55,14 @@ const
 var
   TextureMinificationQuality: TTextureMinificationQuality;
 
+const
+  DefaultAllowScreenResize = true;
+
+  AllowScreenResizeToStr: array[boolean] of string = ('No', 'Yes');
+
+var
+  AllowScreenResize: boolean;
+
 implementation
 
 uses CastleConfig;
@@ -62,10 +70,15 @@ uses CastleConfig;
 initialization
   TextureMinificationQuality := TTextureMinificationQuality(
     ConfigFile.GetValue(
-    'texture_minification_quality/value',
+    'video_options/texture_minification_quality',
     Ord(DefaultTextureMinificationQuality)));
+  AllowScreenResize := ConfigFile.GetValue(
+    'video_options/allow_screen_resize', DefaultAllowScreenResize);
 finalization
   ConfigFile.SetDeleteValue(
-    'texture_minification_quality/value',
+    'video_options/texture_minification_quality',
     Ord(TextureMinificationQuality), Ord(DefaultTextureMinificationQuality));
+  ConfigFile.SetDeleteValue(
+    'video_options/allow_screen_resize',
+    AllowScreenResize, DefaultAllowScreenResize);
 end.

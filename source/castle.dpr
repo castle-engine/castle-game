@@ -26,7 +26,7 @@ uses GLWindow, SysUtils, KambiUtils,
   ProgressUnit, ProgressGL, OpenAL, ALUtils,
   ParseParametersUnit, GLWinMessages, KambiGLUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
-  KambiClassUtils;
+  KambiClassUtils, CastleVideoOptions;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -84,7 +84,7 @@ begin
 
     Glw.Width := RequiredScreenWidth;
     Glw.Height := RequiredScreenHeight;
-    if WasParam_NoScreenResize then
+    if WasParam_NoScreenResize or (not AllowScreenResize) then
     begin
       Glw.FullScreen :=
         (Glwm.ScreenWidth = RequiredScreenWidth) and

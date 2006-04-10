@@ -140,6 +140,8 @@ You can pass command-line option --no-screen-resize (short form: -n)
 to disable the automatic screen resizing. Then the game will
 run in fullscreen mode only if your current screen size is 800x600,
 otherwise it will run in window sized 800x600.
+You can also set this from the main menu:
+"Video options -> Allow screen resize on startup".
 
 --------------------
 Sound:

@@ -223,7 +223,6 @@ Would-be-nice before next stage:
     Sound: on/off [on]
 
   graphics:
-    Allow resizing the screen at startup: on/off [on]
     Animation smoothness: (slider: between 10 and 100)
       (for AnimScenesPerUnit in CastleCreatures)
     Creature shadows: on/off [on]

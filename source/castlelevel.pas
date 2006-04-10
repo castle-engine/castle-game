@@ -261,7 +261,7 @@ implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
-  CastleSound, CastleTextureQuality;
+  CastleSound, CastleVideoOptions;
 
 { TLevel --------------------------------------------------------------------- }
 

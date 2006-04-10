@@ -34,7 +34,7 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
-  CastleControlsMenu, CastleKeys, CastleTextureQuality;
+  CastleControlsMenu, CastleKeys, CastleVideoOptions;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -51,6 +51,7 @@ type
 
   TVideoMenu = class(TSubMenu)
     TextureMinificationQualitySlider: TGLMenuIntegerSlider;
+    AllowScreenResizeArgument: TGLMenuItemArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -155,9 +156,13 @@ begin
   inherited Create;
 
   TextureMinificationQualitySlider := TTextureMinificationQualitySlider.Create;
+  AllowScreenResizeArgument := TGLMenuItemArgument.Create(
+    TGLMenuItemArgument.TextWidth('WWW'));
+  AllowScreenResizeArgument.Value := AllowScreenResizeToStr[AllowScreenResize];
 
   Items.Add('View video information');
   Items.AddObject('Texture quality', TextureMinificationQualitySlider);
+  Items.AddObject('Allow screen resize on startup', AllowScreenResizeArgument);
   Items.Add('Back to main menu');
 
   { Resigned ideas for menu options:
@@ -192,7 +197,12 @@ begin
   case CurrentItem of
     0: ViewVideoInfo;
     1: ;
-    2: CurrentMenu := MainMenu;
+    2: begin
+         AllowScreenResize := not AllowScreenResize;
+         AllowScreenResizeArgument.Value :=
+           AllowScreenResizeToStr[AllowScreenResize];
+       end;
+    3: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
