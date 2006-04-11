@@ -204,12 +204,26 @@ type
     function DeleteItem(ItemIndex: Integer): TItem;
 
     { Like BoundingBox, but assumes that Navigator.CameraPos is as specified. }
-    function BoundingBoxAssuming(const AssumeCameraPos: TVector3Single): TBox3d;
+    function BoundingBoxAssuming(const AssumeCameraPos: TVector3Single;
+      Tall: boolean = true): TBox3d;
 
     { Calculates what can be considered "bounding box of the player",
-      taking into account global Level.CameRadius. Use for collision
-      detection etc. }
-    function BoundingBox: TBox3d;
+      taking into account global Level.CameRadius around current CameraPos.
+      Use for collision detection etc.
+
+      If Tall then the returned box uses current camera height
+      (i.e. Navigator.RealCameraPreferredHeight).
+
+      If not Tall, then the box is just CameraRadius around
+      CameraPos, so it could be more accurately described
+      as a sphere with CameraRadius around CameraPos.
+      In this case, the box doesn't really represent player
+      (you can say that player's "legs" are not included in the box).
+      However, not Tall box can still be useful (e.g. when checking for
+      collision with creatures, because then the player will "grow"
+      anyway (using GetCameraHeight), so Navigator.RealCameraPreferredHeight
+      will be taken into account but in a different way. }
+    function BoundingBox(Tall: boolean = true): TBox3d;
 
     { Weapon the player is using right now, or nil if none.
 
@@ -410,8 +424,8 @@ begin
     EquippedWeapon := nil;
 end;
 
-function TPlayer.BoundingBoxAssuming(const AssumeCameraPos: TVector3Single):
-  TBox3d;
+function TPlayer.BoundingBoxAssuming(const AssumeCameraPos: TVector3Single;
+  Tall: boolean): TBox3d;
 var
   PlayerSize: Single;
 begin
@@ -422,16 +436,18 @@ begin
 
   Result[0, 0] -= PlayerSize;
   Result[0, 1] -= PlayerSize;
-  Result[0, 2] -= Navigator.RealCameraPreferredHeight;
+  if Tall then
+    Result[0, 2] -= Navigator.RealCameraPreferredHeight else
+    Result[0, 2] -= Level.CameraRadius;
 
   Result[1, 0] += PlayerSize;
   Result[1, 1] += PlayerSize;
   Result[1, 2] += Level.CameraRadius;
 end;
 
-function TPlayer.BoundingBox: TBox3d;
+function TPlayer.BoundingBox(Tall: boolean): TBox3d;
 begin
-  Result := BoundingBoxAssuming(Player.Navigator.CameraPos);
+  Result := BoundingBoxAssuming(Player.Navigator.CameraPos, Tall);
 end;
 
 procedure TPlayer.SetEquippedWeapon(Value: TItem);

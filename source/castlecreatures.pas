@@ -572,6 +572,9 @@ var
   Werewolf: TWerewolfKind;
   BallMissile: TMissileCreatureKind;
 
+  { You can set this to true for testing purposes. }
+  RenderBoundingBoxes: boolean = false;
+
 {$undef read_interface}
 
 implementation
@@ -887,6 +890,16 @@ begin
       glMultMatrix(SceneTransform);
       CurrentScene.Render(nil);
     glPopMatrix;
+
+    if RenderBoundingBoxes then
+    begin
+      glPushAttrib(GL_ENABLE_BIT);
+        glDisable(GL_LIGHTING);
+        glEnable(GL_DEPTH_TEST);
+        glColorv(Gray3Single);
+        DrawGLBoxWire(BoundingBox, 0, 0, 0, true);
+      glPopAttrib;
+    end;
   end;
 end;
 

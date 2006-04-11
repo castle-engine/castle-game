@@ -2,15 +2,15 @@
 
 - creature<->creature collision is also needed
 
-- when creature dies, the effect is not natural, player often feels
-  "stuck" and cannot move.
-  Maybe I should add creatures to GetCameraHeight ?
-
 - Sometimes I can walk "through" some creature, e.g. werewolf.
 
   That's because collisions between creatures/player check only
   point collisions, not segment between points. When moving fast
   (or low FPS count, so FpsCompSpeed large), this check can fail to work.
+
+  This can also be caused by hack TLevel.PlayerMoveAllowed
+  --- this hack allows the player to move "into" the creature !
+  Very bad !
 
   Same thing for player/items collision checking ?
 

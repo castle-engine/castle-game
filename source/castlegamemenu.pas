@@ -51,6 +51,7 @@ type
     RotationHorizontalSpeedSlider: TGLMenuFloatSlider;
     RotationVerticalSpeedSlider: TGLMenuFloatSlider;
     PlayerSpeedSlider: TGLMenuFloatSlider;
+    RenderBoundingBoxesArgument: TGLMenuItemArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -124,6 +125,10 @@ begin
   RotationVerticalSpeedSlider := TGLMenuFloatSlider.Create(0.5, 10, 1);
   PlayerSpeedSlider := TGLMenuFloatSlider.Create(0.1, 5, 1);
 
+  RenderBoundingBoxesArgument := TGLMenuItemArgument.Create(
+    TGLMenuItemArgument.TextWidth('WWW'));
+  RenderBoundingBoxesArgument.Value := BoolToStrYesNo[RenderBoundingBoxes];
+
   Items.Add('Player.Life := Player.MaxLife');
   Items.Add('Show creatures on level info');
   Items.Add('Add creature to level');
@@ -133,6 +138,8 @@ begin
   Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
   Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
   Items.AddObject('Set player speed', PlayerSpeedSlider);
+  Items.AddObject('Render creature bounding boxes',
+    RenderBoundingBoxesArgument);
   Items.Add('Back to game menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -256,7 +263,11 @@ begin
     6: ;
     7: ;
     8: ;
-    9: CurrentMenu := GameMenu;
+    9: begin
+         RenderBoundingBoxes := not RenderBoundingBoxes;
+         RenderBoundingBoxesArgument.Value := BoolToStrYesNo[RenderBoundingBoxes];
+       end;
+    10: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

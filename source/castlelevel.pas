@@ -619,21 +619,22 @@ begin
 
   if Result then
   begin
-    { check collision Player <-> Creatures here.
+    { Check collision Player <-> Creatures here.
 
-      What's the reasoning behind PlayerOldBoundingBox and checking for
-      "not Boxes3dCollision(PlayerOldBoundingBox, Creatures[I].BoundingBox)" ?
-      That's because some parts of AI of TCreature are poor and not always
-      check for collision with player, e.g. when Animation changes
-      and effectively CurrentScene.BoundingBox changes.
-      Collision detection in such cases is not easy (because it's not known
-      what should we do on collision --- we can't just pause the animation...).
-      Anyway, because creature can enter into the collision with player,
-      player must not "get stuck" with this creature (because any potential
-      move collides with this creature), that's why I need
-      PlayerOldBoundingBox here. }
-    PlayerOldBoundingBox := Player.BoundingBox;
-    PlayerNewBoundingBox := Player.BoundingBoxAssuming(NewPos);
+      Note that there is weakness in collision checking with creatures,
+      because when AnimationTime changes then effectively creature's
+      CurrentScene.BoundingBox changes, and there is no way how I can
+      check for collision there (what could I do ? Stop the animation ?
+      Throw the creature back ? None of this seems sensible...)
+      This means that we cannot prevent the situation where player
+      and creature bounding boxes collide.
+
+      That's the reasoning behind PlayerOldBoundingBox and checking for
+      "not Boxes3dCollision(PlayerOldBoundingBox, Creatures[I].BoundingBox)".
+      Player must not "get stuck" with this creature (because any potential
+      move collides with this creature). }
+    PlayerOldBoundingBox := Player.BoundingBox(false);
+    PlayerNewBoundingBox := Player.BoundingBoxAssuming(NewPos, false);
     for I := 0 to Creatures.High do
     begin
       if (not (Creatures[I] is TMissileCreature) { TODO: not clean } ) and
@@ -644,11 +645,51 @@ begin
   end;
 end;
 
+{ If the Point is inside the Box then it answers IsAboveTheBox := false. }
+procedure GetPointHeightAboveBox3d(const Point: TVector3Single;
+  const Box: TBox3d;
+  var IsAboveTheBox: boolean; var SqrHeightAboveTheBox: Single);
+begin
+  { We use here the assumption that HomeCameraUp is (0, 0, 1). }
+
+  IsAboveTheBox := (not IsEmptyBox3d(Box)) and
+    (Box[0, 0] <= Point[0]) and (Point[0] <= Box[1, 0]) and
+    (Box[0, 1] <= Point[1]) and (Point[1] <= Box[1, 1]) and
+    (Point[2] >= Box[1, 2]);
+
+  if IsAboveTheBox then
+    SqrHeightAboveTheBox := Sqr(Point[2] - Box[1, 2]);
+end;
+
 procedure TLevel.PlayerGetCameraHeight(Navigator: TMatrixWalker;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+var
+  IsAboveTheBox: boolean;
+  SqrHeightAboveTheBox: Single;
+  I: Integer;
 begin
   GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
     SqrHeightAboveTheGround);
+
+  { Check is player standing over one of the creatures. }
+  for I := 0 to Creatures.High do
+  begin
+    GetPointHeightAboveBox3d(Navigator.CameraPos, Creatures[I].BoundingBox,
+      IsAboveTheBox, SqrHeightAboveTheBox);
+
+    if IsAboveTheBox then
+    begin
+      if not IsAboveTheGround then
+      begin
+        IsAboveTheGround := true;
+        SqrHeightAboveTheGround := SqrHeightAboveTheBox;
+      end else
+      if SqrHeightAboveTheBox < SqrHeightAboveTheGround then
+      begin
+        SqrHeightAboveTheGround := SqrHeightAboveTheBox;
+      end;
+    end;
+  end;
 end;
 
 procedure TLevel.Render(const Frustum: TFrustum);
