@@ -50,6 +50,7 @@ type
     ViewAngleSlider: TViewAngleSlider;
     RotationHorizontalSpeedSlider: TGLMenuFloatSlider;
     RotationVerticalSpeedSlider: TGLMenuFloatSlider;
+    PlayerSpeedSlider: TGLMenuFloatSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -116,10 +117,12 @@ begin
   inherited Create;
 
   ViewAngleSlider := TViewAngleSlider.Create;
+
   { Note that Player is not created at this point.
-    We will init Value of these 2 sliders later. }
+    We will init Value of these sliders later. }
   RotationHorizontalSpeedSlider := TGLMenuFloatSlider.Create(0.5, 10, 1);
   RotationVerticalSpeedSlider := TGLMenuFloatSlider.Create(0.5, 10, 1);
+  PlayerSpeedSlider := TGLMenuFloatSlider.Create(0.1, 5, 1);
 
   Items.Add('Player.Life := Player.MaxLife');
   Items.Add('Show creatures on level info');
@@ -129,6 +132,7 @@ begin
   Items.AddObject('Set view angle', ViewAngleSlider);
   Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
   Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
+  Items.AddObject('Set player speed', PlayerSpeedSlider);
   Items.Add('Back to main menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -251,7 +255,8 @@ begin
     5: ;
     6: ;
     7: ;
-    8: CurrentMenu := GameMenu;
+    8: ;
+    9: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -265,6 +270,8 @@ begin
        end;
     6: Player.Navigator.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
     7: Player.Navigator.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
+    8: Player.Navigator.CameraDir := VectorAdjustToLength(
+         Player.Navigator.CameraDir, PlayerSpeedSlider.Value);
   end;
 end;
 
@@ -325,10 +332,13 @@ var
   SavedMode: TGLMode;
 begin
   ViewAngleChanged := false;
+
   DebugMenu.RotationHorizontalSpeedSlider.Value :=
     Player.Navigator.RotationHorizontalSpeed;
   DebugMenu.RotationVerticalSpeedSlider.Value :=
     Player.Navigator.RotationVerticalSpeed;
+  DebugMenu.PlayerSpeedSlider.Value :=
+    VectorLen(Player.Navigator.CameraDir);
 
   GLList_ScreenImage := Glw.SaveScreenToDispList;
   try
