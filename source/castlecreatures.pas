@@ -430,7 +430,9 @@ type
     function HeadPositionSector: TSceneSector;
 
     { Direction the creature is facing.
-      It always must be normalized. }
+      It always must be normalized.
+
+      In constructor, when setting this from ADirection, we normalize it. }
     property Direction: TVector3Single read FDirection write FDirection;
 
     { When this function returns true, the creature will be removed
@@ -821,7 +823,7 @@ begin
 
   FKind := AKind;
   FLegsPosition := ALegsPosition;
-  FDirection := ADirection;
+  FDirection := Normalized(ADirection);
   FMaxLife := AMaxLife;
 
   FLife := MaxLife;

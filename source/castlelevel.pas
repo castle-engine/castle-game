@@ -536,7 +536,6 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
     CreatureDirection := VectorSubtract(HomeCameraPos, CreaturePosition);
     if not CreatureKind.Flying then
       MakeVectorsOrthoOnTheirPlane(CreatureDirection, HomeCameraUp);
-    NormalizeTo1st(CreatureDirection);
 
     { calculate Creature }
     Creature := CreatureKind.CreateDefaultCreature(CreaturePosition,

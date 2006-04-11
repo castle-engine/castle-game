@@ -150,6 +150,10 @@ type
         these are exactly player's camera settings.
       - Navigator.CameraPreferredHeight. In fact, it's OK to just call
         Navigator.Init.
+      - Navigator.RotationHorizontal/VerticalSpeed 
+        (you can read and write this --- although it should be
+        only for testing/debug purposes, in real game rotation speeds
+        should stay constant)
       - Navigator.ProjectionMatrix, to update it in game's OnResize or such.
       - You can call Navigator.KeyDown and Idle.
         It's OK to just assign Navigator to Glw.Navigator.

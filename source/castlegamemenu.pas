@@ -48,6 +48,8 @@ type
 
   TDebugMenu = class(TCastleMenu)
     ViewAngleSlider: TViewAngleSlider;
+    RotationHorizontalSpeedSlider: TGLMenuFloatSlider;
+    RotationVerticalSpeedSlider: TGLMenuFloatSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -98,7 +100,7 @@ end;
 
 constructor TViewAngleSlider.Create;
 begin
-  inherited Create(30, 90, ViewAngleDegX);
+  inherited Create(10, 170, ViewAngleDegX);
 end;
 
 function TViewAngleSlider.ValueToStr(const AValue: Single): string;
@@ -114,6 +116,10 @@ begin
   inherited Create;
 
   ViewAngleSlider := TViewAngleSlider.Create;
+  { Note that Player is not created at this point.
+    We will init Value of these 2 sliders later. }
+  RotationHorizontalSpeedSlider := TGLMenuFloatSlider.Create(0.5, 10, 1);
+  RotationVerticalSpeedSlider := TGLMenuFloatSlider.Create(0.5, 10, 1);
 
   Items.Add('Player.Life := Player.MaxLife');
   Items.Add('Show creatures on level info');
@@ -121,6 +127,8 @@ begin
   Items.Add('Change creature kind MoveSpeed');
   Items.Add('Give me 20 instances of every possible item');
   Items.AddObject('Set view angle', ViewAngleSlider);
+  Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
+  Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
   Items.Add('Back to main menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -241,7 +249,9 @@ begin
     3: ChangeCreatureKindMoveSpeed;
     4: GiveItems;
     5: ;
-    6: CurrentMenu := GameMenu;
+    6: ;
+    7: ;
+    8: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -253,6 +263,8 @@ begin
          ViewAngleDegX := ViewAngleSlider.Value;
          ViewAngleChanged := true;
        end;
+    6: Player.Navigator.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
+    7: Player.Navigator.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
   end;
 end;
 
@@ -313,6 +325,10 @@ var
   SavedMode: TGLMode;
 begin
   ViewAngleChanged := false;
+  DebugMenu.RotationHorizontalSpeedSlider.Value :=
+    Player.Navigator.RotationHorizontalSpeed;
+  DebugMenu.RotationVerticalSpeedSlider.Value :=
+    Player.Navigator.RotationVerticalSpeed;
 
   GLList_ScreenImage := Glw.SaveScreenToDispList;
   try
