@@ -50,6 +50,7 @@ clean:
 			   -iname '*.blend1' ')' -print \
 	     | xargs rm -f
 	rm -f castle-?.?.?.tar.gz
+	$(MAKE) -C source/ clean
 
 # Remove private files that Michalis keeps inside his castle/trunk/,
 # but he doesn't want to upload them for PGD compo.

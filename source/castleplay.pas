@@ -30,11 +30,13 @@ procedure PlayLevel(ALevel: TLevel; APlayer: TPlayer);
 
 var
   { Currently used player by PlayLevel. nil if PlayLevel doesn't work
-    right now. }
+    right now.
+    @noAutoLinkHere }
   Player: TPlayer;
 
   { Currently used level by PlayLevel. nil if PlayLevel doesn't work
-    right now. }
+    right now.
+    @noAutoLinkHere }
   Level: TLevel;
 
   { These are all messages passed to GameMessage.

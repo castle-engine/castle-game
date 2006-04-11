@@ -37,6 +37,7 @@ type
     edit initial player before game starts etc. are possible.
 
     ------------------------------------------------------------
+
     Notes about dying:
 
     Dead player actually behaves (from the point
@@ -129,7 +130,9 @@ type
       we also destroy all Items.Items[].
 
       Do not directly delete from this list --- always use
-      DropItem or DeleteItem. }
+      DropItem or DeleteItem.
+
+      @noAutoLinkHere }
     property Items: TItemsList read FItems;
 
     { Each player object always has related Navigator object.
@@ -141,26 +144,31 @@ type
       with it's Navigator object, that's why it was most comfortable
       to just put Navigator inside TPlayer.
 
-      In general you *must not* operate directly on this Navigator properties
-      or call it's methods (TPlayer instance should do this for you),
+      In general you @italic(must not) operate directly on this Navigator
+      properties or call it's methods (TPlayer instance should do this for you),
       with some exceptions.
 
       You are allowed to read and write:
-      - Navigator.CameraPos, CameraPosDir, CameraPosUp and HomeCameraXxx ---
-        these are exactly player's camera settings.
-      - Navigator.CameraPreferredHeight. In fact, it's OK to just call
-        Navigator.Init.
-      - Navigator.RotationHorizontal/VerticalSpeed 
-        (you can read and write this --- although it should be
-        only for testing/debug purposes, in real game rotation speeds
-        should stay constant)
-      - Navigator.ProjectionMatrix, to update it in game's OnResize or such.
-      - You can call Navigator.KeyDown and Idle.
-        It's OK to just assign Navigator to Glw.Navigator.
-      - You can assign things to Navigator.OnMatrixChanged,
+      @unorderedList(
+        @item(Navigator.CameraPos, CameraDir, CameraUp and HomeCameraXxx ---
+          these are exactly player's camera settings.)
+        @item(Navigator.CameraPreferredHeight. In fact, it's OK to just call
+          Navigator.Init.)
+        @item(Navigator.RotationHorizontal/VerticalSpeed
+          (you can read and write this --- although it should be
+          only for testing/debug purposes, in real game rotation speeds
+          should stay constant).)
+        @item(Navigator.ProjectionMatrix, to update it in game's
+          OnResize or such.)
+        @item(You can call Navigator.KeyDown and Idle.
+          It's OK to just assign Navigator to Glw.Navigator.)
+        @item(You can assign things to Navigator.OnMatrixChanged.)
+      )
 
       You are allowed to read:
-      - Navigator.RotationOnlyMatrix, Matrixm, Frustum.
+      @unorderedList(
+        @item Navigator.RotationOnlyMatrix, Matrixm, Frustum.
+      )
     }
     property Navigator: TMatrixWalker read FNavigator;
 
@@ -184,9 +192,11 @@ type
     { Deletes given item from the list. Note that this is different
       than DropItem: it's more low-level, which means that
 
-      1. it doesn't ask or care about item's quantity --- it will always
-         delete it as a whole, no matter what quantity is has
-      2. it doesn't do any nice GameMessage that you dropped an item.
+      @orderedList(
+        @item(it doesn't ask or care about item's quantity --- it will always
+         delete it as a whole, no matter what quantity is has)
+        @item(it doesn't do any nice GameMessage that you dropped an item.)
+      )
 
       However, it does check whether the deleted item was EquippedWeapon
       and if it was, it will set EquippedWeapon to nil and give to player
@@ -220,7 +230,8 @@ type
     procedure RenderWeapon2D;
 
     { Adjust some things based on passing time.
-      For now, this is for things like FlyingModeTimeout to "wear out". }
+      For now, this is for things like FlyingModeTimeout to "wear out".
+      @noAutoLinkHere }
     procedure Idle(const CompSpeed: Single);
 
     { Make blackout with given Color (so it's not really a "black"out,
@@ -233,9 +244,11 @@ type
       @noAutoLinkHere }
     procedure RedOut;
 
-    { Just a shortcut for Life <= 0. }
+    { Just a shortcut for Life <= 0.
+      @noAutoLinkHere }
     function Dead: boolean;
 
+    { @noAutoLinkHere }
     procedure Attack;
 
     { This will render player's weapon attacking.
