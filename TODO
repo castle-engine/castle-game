@@ -1,9 +1,5 @@
 - why with wide angle the corner geometry is sometimes clipped ?
 
-- Eric stage 4 comment:
-  - you can also get "stuck" when colliding against a wall, instead of sliding.
-
---------------------
 - creature<->creature collision is also needed
 
 - when player stops moving, head bobbing should go down automatically
@@ -20,14 +16,14 @@
 
   Same thing for player/items collision checking ?
 
+- right now pressing Ctrl blocks rotations and moves (because of
+  ModsDown = [] in MatrixNavigation). Fix.
+
 --------------------
 Must-have before next stage:
 
 Stage 5 (3 weeks): Mar 26th - Apr 15th
 Goal #1 (10 Points) - Engine must allow you to play more than one level per play. Design a minimum of 2 levels to be played by optional selection or in sequence.
-
---------------------
-Would-be-nice before next stage:
 
 --------------------
 Stage 6:
@@ -39,6 +35,9 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
+
+- Eric stage 4 comment:
+  - you can also get "stuck" when colliding against a wall, instead of sliding.
 
 - Enemies:
   - More enemies attacks.
@@ -69,9 +68,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   I think that I know why: I check where the creature will be after
   2 secs, but what if there is a pit between 2 secs and current pos ?
   Fix by checking everything *along the 2 secs way*.
-
-- right now pressing Ctrl blocks rotations and moves (because of
-  ModsDown = [] in MatrixNavigation). Fix.
 
 - ball_missile looks rather funny, too colorful.
   It must look like something fiery, or lighting, or just anything
