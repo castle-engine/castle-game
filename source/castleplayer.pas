@@ -281,7 +281,7 @@ begin
   FNavigator := TMatrixWalker.Create(nil);
   Navigator.Key_MoveSpeedInc := K_None; { turn key off }
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
-  Navigator.AllowSlowerRotations := false;
+  Navigator.CheckModsDown := false;
   Navigator.OnFalledDown := FalledDown;
 
   HintEscapeKeyShown := false;
