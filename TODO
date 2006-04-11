@@ -1,24 +1,7 @@
 - why with wide angle the corner geometry is sometimes clipped ?
 
-- Eric stage 4 comments answer:
-
-    Level loading seems to be quite long given the relatively low complexity of meshes and textures, could be something to watch before levels become more complex.
-
-    - That's because loading creatures takes long (animations must be generated, along with display lists). I improved it after stage 4 deadline --- it's about 4x faster now. On the other hand, new creatures will be added for stage 5, so the whole process will probably get slower again...
-
-      In any case, loading creatures happens only when loading the very first level, when loading further levels (or ending game and executing "New game" once again) creatures will not be loaded again, so this will not slow down the game between the levels.
-
-  Movement is blocked by dead aliens (which aren't visible when you're blocked on them, too low and flat on the floor), you can also get "stuck" when colliding against a wall, instead of sliding.
-
-    - Two known problems. To be fixed.
-
-  Default movement controls key setup is also quite uncommon (need to read the help to figure them out).
-
-    - Much like normal Quake/Duke/Doom things ? Unlike newer games (HalfLife 2), but then the mouse is not used as usual. (known thing, maybe will be fixed).
-
-  Finally, readme and text files are UNIX-style, which means notepad and common Windows text viewers won't display them correctly (okay for me, but be aware many end-users will be unable to view them correctly).
-
-    - Good point, I can change line endings to DOS-style for README and TODO files. The rest of the text files is not intended to be read by end-users, so I guess it's not a problem.
+- Eric stage 4 comment:
+  - you can also get "stuck" when colliding against a wall, instead of sliding.
 
 --------------------
 - creature<->creature collision is also needed
