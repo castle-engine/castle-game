@@ -62,7 +62,7 @@ procedure SaveScreen;
   You can freely change ViewAngleDegX at runtime, just make sure
   that our OnResize will be called after. }
 var
-  ViewAngleDegX: Single = 45.0;
+  ViewAngleDegX: Single = 70.0;
 function ViewAngleDegY: Single;
 
 var

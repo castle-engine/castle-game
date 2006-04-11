@@ -133,7 +133,7 @@ begin
   Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
   Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
   Items.AddObject('Set player speed', PlayerSpeedSlider);
-  Items.Add('Back to main menu');
+  Items.Add('Back to game menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
