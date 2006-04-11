@@ -2,18 +2,6 @@
 
 - creature<->creature collision is also needed
 
-- Sometimes I can walk "through" some creature, e.g. werewolf.
-
-  That's because collisions between creatures/player check only
-  point collisions, not segment between points. When moving fast
-  (or low FPS count, so FpsCompSpeed large), this check can fail to work.
-
-  This can also be caused by hack TLevel.PlayerMoveAllowed
-  --- this hack allows the player to move "into" the creature !
-  Very bad !
-
-  Same thing for player/items collision checking ?
-
 --------------------
 Must-have before next stage:
 
@@ -43,6 +31,7 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
     Model of "alien" creature will probably be just removed and replaced
     by something else.
   - Just add more creatures.
+    creature hydra (very tall, very long when killed; will be a nice demo of my good collision checking routines)
 
 - "The Gate" level:
   - volumetric fog (like from malfunction) needed there. I also want to demonstrate fog in my engine...
@@ -54,6 +43,15 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
     for AI for creatures with Flying.
 
 - sectors and waypoints finish, see README for TO-DOs.
+
+- Improve collisions player<->creatures and player<->items to
+  check not only final collisions, but also segment collisions when moving ?
+  Otherwise when moving fast (or low FPS count, so FpsCompSpeed large),
+  this collision check can fail to work.
+
+  This doesn't seem to be a problem in practice, in practice moving speed is
+  not so large (unless running on some ancient GPU with 1 frame per second,
+  but there the game is not playable anyway...).
 
 - do weather (I have snow and rain from my szklane_lasy, but they look poor...)
 

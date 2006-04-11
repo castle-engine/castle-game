@@ -619,28 +619,41 @@ begin
 
   if Result then
   begin
-    { Check collision Player <-> Creatures here.
-
-      Note that there is weakness in collision checking with creatures,
-      because when AnimationTime changes then effectively creature's
-      CurrentScene.BoundingBox changes, and there is no way how I can
-      check for collision there (what could I do ? Stop the animation ?
-      Throw the creature back ? None of this seems sensible...)
-      This means that we cannot prevent the situation where player
-      and creature bounding boxes collide.
-
-      That's the reasoning behind PlayerOldBoundingBox and checking for
-      "not Boxes3dCollision(PlayerOldBoundingBox, Creatures[I].BoundingBox)".
-      Player must not "get stuck" with this creature (because any potential
-      move collides with this creature). }
+    { Check collision Player <-> Creatures here. }
     PlayerOldBoundingBox := Player.BoundingBox(false);
     PlayerNewBoundingBox := Player.BoundingBoxAssuming(NewPos, false);
     for I := 0 to Creatures.High do
     begin
       if (not (Creatures[I] is TMissileCreature) { TODO: not clean } ) and
-        Boxes3dCollision(PlayerNewBoundingBox, Creatures[I].BoundingBox) and
-        (not Boxes3dCollision(PlayerOldBoundingBox, Creatures[I].BoundingBox)) then
-        Exit(false);
+        Boxes3dCollision(PlayerNewBoundingBox, Creatures[I].BoundingBox) then
+      begin
+        { Strictly thinking, now I know that I have a collision with creature
+          and I should exit with false. But it's not that simple.
+
+          Note that there is weakness in collision checking with creatures,
+          because when AnimationTime changes then effectively creature's
+          CurrentScene.BoundingBox changes, and there is no way how I can
+          check for collision there (what could I do ? Stop the animation ?
+          Throw the creature back ? None of this seems sensible...)
+          This means that we cannot prevent the situation where player
+          and creature bounding boxes collide.
+
+          So we must take precautions to not make player "stuck"
+          with this creature (because any potential move collides
+          with this creature).
+
+          That's the reasoning behind PlayerOldBoundingBox and checks below.
+          I disallow the collision only if there was no collision before
+          (so the pathologic situation doesn't occur) or if the player
+          tries to get closer to the creature (so if the pathologic situation
+          occurs, player can't make it worse, and can't "abuse" this
+          by entering into creature's bounding box). }
+        if (not Boxes3dCollision(PlayerOldBoundingBox,
+             Creatures[I].BoundingBox)) or
+           ( PointsDistanceSqr(NewPos, Creatures[I].HeadPosition) <
+             PointsDistanceSqr(Navigator.CameraPos, Creatures[I].HeadPosition) ) then
+          Exit(false);
+      end;
     end;
   end;
 end;
