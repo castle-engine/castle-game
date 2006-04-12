@@ -110,9 +110,20 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 
 - shadow under the creatures would be nice (sgk_shadows should allow
   me to this super-nicely).
+  Done, but need to be optimized to enabled by default!
 
   For "Video options" menu add:
     Creature shadows: on/off [on]
+
+  Add option --no-shadows to forbid even creation of shadows,
+  this inits RenderShadowsAllowed.
+
+  Add creature option CastsShadow (def true) to turn shadows off
+  for some creatures.
+
+  LightCastingShadowsPosition should be cofigurable.
+  Can be inited from LightSet.Lights[0].TransfLocation
+  (but this doesn't give so much results usually...)
 
 - "shrink" spell (that was *coool* in DUKE 3D !)
   "freeze" (it's from DUKE 3D also)

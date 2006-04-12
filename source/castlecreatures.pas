@@ -418,6 +418,10 @@ type
 
     procedure Render(const Frustum: TFrustum); virtual;
 
+    procedure RenderShadowQuads(
+      const LightPosition, CameraPosition: TVector3Single;
+      Front: boolean); virtual;
+
     procedure Idle(const CompSpeed: Single); virtual;
 
     function CurrentScene: TVRMLFlatSceneGL; virtual; abstract;
@@ -738,7 +742,7 @@ procedure TWalkAttackCreatureKind.PrepareRender;
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
-    Anim.PrepareRender(false, true);
+    Anim.PrepareRender(false, true, RenderShadows, false);
     Progress.Step;
   end;
 
@@ -820,7 +824,7 @@ procedure TMissileCreatureKind.PrepareRender;
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
-    Anim.PrepareRender(false, true);
+    Anim.PrepareRender(false, true, RenderShadows, false);
     Progress.Step;
   end;
 
@@ -948,6 +952,14 @@ begin
       glPopAttrib;
     end;
   end;
+end;
+
+procedure TCreature.RenderShadowQuads(
+  const LightPosition, CameraPosition: TVector3Single;
+  Front: boolean);
+begin
+  CurrentScene.RenderShadowQuads(LightPosition, CameraPosition,
+    SceneTransform, Front);
 end;
 
 function TCreature.HeadCollisionWithPlayer(

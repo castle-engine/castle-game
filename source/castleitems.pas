@@ -436,7 +436,7 @@ end;
 
 procedure TItemKind.PrepareRender;
 begin
-  Scene.PrepareRender(false, true);
+  Scene.PrepareRender(false, true, false, false);
   Progress.Step;
 end;
 
@@ -561,7 +561,7 @@ procedure TItemWeaponKind.PrepareRender;
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
     if Anim <> nil then
-      Anim.PrepareRender(false, true);
+      Anim.PrepareRender(false, true, false, false);
     Progress.Step;
   end;
 

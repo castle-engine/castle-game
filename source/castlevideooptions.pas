@@ -74,6 +74,12 @@ var
   { You can set this to true for testing purposes. }
   RenderBoundingBoxes: boolean = false;
 
+var
+  RenderShadows: boolean = true;
+
+  { You can set this to true for debug purposes. }
+  RenderShadowQuads: boolean = false;
+
 implementation
 
 uses CastleConfig;

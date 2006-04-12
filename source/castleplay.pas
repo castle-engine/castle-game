@@ -86,7 +86,8 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
-  KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound;
+  KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound,
+  CastleVideoOptions;
 
 var
   GameMessagesManager: TTimeMessagesManager;
@@ -280,36 +281,137 @@ begin
 end;
 
 procedure Draw(Glwin: TGLWindow);
+
+  procedure RenderLevelCreaturesItems;
+  begin
+    { Rendering order of Creatures, Items and Level:
+      You know the problem. We must first render all non-transparent objects,
+      then all transparent objects. Otherwise transparent objects
+      (that must be rendered without updating depth buffer) could get brutally
+      covered by non-transparent objects (that are in fact further away from
+      the camera).
+
+      For simplicity, I decided that for now creatures and items are not allowed
+      to be partially transparent and partially opaque.
+      So we first render all non-transparent creatures and items,
+      then the level, then all transparent creatures and items. }
+
+    Level.Creatures.Render(Player.Navigator.Frustum, false);
+    Level.Items.Render(Player.Navigator.Frustum, false);
+    Level.Render(Player.Navigator.Frustum);
+    Level.Creatures.Render(Player.Navigator.Frustum, true);
+    Level.Items.Render(Player.Navigator.Frustum, true);
+  end;
+
+  procedure RenderShadowQuads(Front: boolean);
+  var
+    I: Integer;
+  begin
+    for I := 0 to Level.Creatures.High do
+    begin
+      Level.Creatures.Items[I].RenderShadowQuads(
+        Level.LightCastingShadowsPosition,
+        Player.Navigator.CameraPos, Front);
+    end;
+  end;
+
+const
+  { Which stencil bits should be tested when determining which things
+    are in the scene ?
+
+    Not only *while rendering* shadow quads but also *after this rendering*
+    value in stencil buffer may be > 1 (so you need more than 1 bit
+    to hold it in stencil buffer).
+
+    Why ? It's obvious that *while rendering* (e.g. right after rendering
+    all front quads) this value may be > 1. But when the point
+    is in the shadow because it's inside more than one shadow
+    (cast by 2 different shadow quads) then even *after rendering*
+    this point will have value > 1.
+
+    So it's important that this constant spans a couple of bits.
+    More precisely, it should be the maximum number of possibly overlapping
+    front shadow quads from any possible camera view. }
+  StencilShadowBits = $FF;
+var
+  ClearBuffers: TGLbitfield;
 begin
+  ClearBuffers := GL_DEPTH_BUFFER_BIT;
+
+  if RenderShadows then
+    ClearBuffers := ClearBuffers or GL_STENCIL_BUFFER_BIT;
+
   if Level.Scene.Background <> nil then
   begin
     glLoadMatrix(Glw.Navigator.RotationOnlyMatrix);
     Level.Scene.Background.Render;
-    glClear(GL_DEPTH_BUFFER_BIT);
   end else
-    glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
+    ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
+
+  { Now clear buffers indicated in ClearBuffers. }
+  glClear(ClearBuffers);
 
   glLoadMatrix(Glw.Navigator.Matrix);
 
   Level.LightSet.RenderLights;
 
-  { Rendering order of Creatures, Items and Level:
-    You know the problem. We must first render all non-transparent objects,
-    then all transparent objects. Otherwise transparent objects
-    (that must be rendered without updating depth buffer) could get brutally
-    covered by non-transparent objects (that are in fact further away from
-    the camera).
+  if RenderShadows then
+  begin
+    glPushAttrib(GL_LIGHTING_BIT);
+      { Headlight will stay on here, but lights in Level.LightSet are off.
+        More precise would be to turn off only the light that
+        is casting shadows (Level.LightCastingShadowsPosition),
+        but, well, this is only an approximation :) }
+      Level.LightSet.TurnLightsOff;
+      RenderLevelCreaturesItems;
+    glPopAttrib;
 
-    For simplicity, I decided that for now creatures and items are not allowed
-    to be partially transparent and partially opaque.
-    So we first render all non-transparent creatures and items,
-    then the level, then all transparent creatures and items. }
+    glEnable(GL_STENCIL_TEST);
+      { Note that stencil buffer is set to all 0 now. }
 
-  Level.Creatures.Render(Player.Navigator.Frustum, false);
-  Level.Items.Render(Player.Navigator.Frustum, false);
-  Level.Render(Player.Navigator.Frustum);
-  Level.Creatures.Render(Player.Navigator.Frustum, true);
-  Level.Items.Render(Player.Navigator.Frustum, true);
+      glPushAttrib(GL_ENABLE_BIT);
+        glEnable(GL_DEPTH_TEST);
+        { Calculate shadows to the stencil buffer.
+          Don't write anything to depth or color buffers. }
+        glSetDepthAndColorWriteable(GL_FALSE);
+          { For each fragment that passes depth-test, *increase* it's stencil
+            value by 1. Render front facing shadow quads. }
+          glStencilFunc(GL_ALWAYS, 0, 0);
+          glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+          RenderShadowQuads(true);
+          { For each fragment that passes depth-test, *decrease* it's stencil
+            value by 1. Render back facing shadow quads. }
+          glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
+          RenderShadowQuads(false);
+        glSetDepthAndColorWriteable(GL_TRUE);
+      glPopAttrib;
+
+      { Now render everything once again, with lights turned on.
+        But render only things not in shadow. }
+      glClear(GL_DEPTH_BUFFER_BIT);
+
+      { setup stencil : don't modify stencil, stencil test passes only for =0 }
+      glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+      glStencilFunc(GL_EQUAL, 0, StencilShadowBits);
+      RenderLevelCreaturesItems;
+    glDisable(GL_STENCIL_TEST);
+
+    if CastleVideoOptions.RenderShadowQuads then
+    begin
+      glPushAttrib(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT or GL_ENABLE_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_LIGHTING);
+        glColor4f(1, 1, 0, 0.3);
+        glDepthMask(GL_FALSE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+        RenderShadowQuads(true);
+      glPopAttrib;
+    end;
+  end else
+  begin
+    RenderLevelCreaturesItems;
+  end;
 
   Player.RenderAttack;
 

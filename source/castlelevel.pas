@@ -72,6 +72,7 @@ type
 
     FSectors: TSceneSectorsList;
     FWaypoints: TSceneWaypointsList;
+    FLightCastingShadowsPosition: TVector3Single;
   protected
     { This will be called from our constructor before initializing
       our octrees. You can override this to do here some operations
@@ -124,6 +125,9 @@ type
     property Creatures: TCreaturesList read FCreatures;
 
     property Headlight: boolean read FHeadlight;
+
+    property LightCastingShadowsPosition: TVector3Single
+      read FLightCastingShadowsPosition;
 
     { LineOfSight, MoveAllowed and GetCameraHeight perform
       collision detection with the level.
@@ -412,7 +416,7 @@ begin
 
   Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
     (ProjectionNear, ProjectionFar);
-  Scene.PrepareRender(true, true);
+  Scene.PrepareRender(true, true, false, false);
 
   FLightSet := TVRMLLightSetGL.Create(LoadVRMLNode(ALightSetFileName),
     true, 1, -1);
@@ -420,12 +424,16 @@ begin
   WorldInfoNode := Scene.RootNode.TryFindNode(TNodeWorldInfo, true)
     as TNodeWorldInfo;
 
-  { calculate FTitle }
+  { Calculate FTitle }
   FTitle := '';
   if WorldInfoNode <> nil then
     FTitle := WorldInfoNode.FdTitle.Value;
   if FTitle = '' then
     FTitle := ExtractFileName(DeleteFileExt(ASceneFileName));
+
+  { Calculate LightCastingShadowsPosition }
+  FLightCastingShadowsPosition := Box3dMiddle(Scene.BoundingBox);
+  FLightCastingShadowsPosition[2] := Scene.BoundingBox[1, 2];
 end;
 
 destructor TLevel.Destroy;
