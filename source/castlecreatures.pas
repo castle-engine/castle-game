@@ -635,9 +635,6 @@ var
   Werewolf: TWerewolfKind;
   BallMissile: TMissileCreatureKind;
 
-  { You can set this to true for testing purposes. }
-  RenderBoundingBoxes: boolean = false;
-
 {$undef read_interface}
 
 implementation

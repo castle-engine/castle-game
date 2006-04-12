@@ -31,7 +31,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
-  CastleItems, GLMenu, RaysWindow;
+  CastleItems, GLMenu, RaysWindow, CastleVideoOptions;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -138,8 +138,7 @@ begin
   Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
   Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
   Items.AddObject('Set player speed', PlayerSpeedSlider);
-  Items.AddObject('Render creature bounding boxes',
-    RenderBoundingBoxesArgument);
+  Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
   Items.Add('Back to game menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);

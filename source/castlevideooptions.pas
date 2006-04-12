@@ -70,6 +70,10 @@ const
 var
   CreatureAnimationScenesPerTime: Cardinal;
 
+var
+  { You can set this to true for testing purposes. }
+  RenderBoundingBoxes: boolean = false;
+
 implementation
 
 uses CastleConfig;

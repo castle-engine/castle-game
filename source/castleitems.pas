@@ -349,7 +349,7 @@ implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
   KambiGLUtils, CastlePlay, KambiFilesUtils, ProgressUnit,
-  CastleCreatures;
+  CastleCreatures, CastleVideoOptions;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -697,6 +697,16 @@ begin
       glRotatev(FRotation, UnitVector3Single[2]);
       Item.Kind.Scene.Render(nil);
     glPopMatrix;
+
+    if RenderBoundingBoxes then
+    begin
+      glPushAttrib(GL_ENABLE_BIT);
+        glDisable(GL_LIGHTING);
+        glEnable(GL_DEPTH_TEST);
+        glColorv(Gray3Single);
+        DrawGLBoxWire(BoundingBox, 0, 0, 0, true);
+      glPopAttrib;
+    end;
   end;
 end;
 

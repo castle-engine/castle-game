@@ -390,10 +390,66 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
   end;
 
   procedure DropItem;
+
+    function GetItemDropPosition(
+      DroppedItemKind: TItemKind;
+      var DropPosition: TVector3Single): boolean;
+    var
+      ItemBox: TBox3d;
+      ItemBoxRadius: Single;
+      ItemBoxMiddle: TVector3Single;
+      PushVector: TVector3Single;
+      PushVectorLength: Single;
+    begin
+      ItemBox := DroppedItemKind.BoundingBoxRotated;
+      ItemBoxMiddle := Box3dMiddle(ItemBox);
+      { Box3dRadius calculates radius around (0, 0, 0) and we want
+        radius around ItemBoxMiddle }
+      ItemBoxRadius := Box3dRadius(
+        Box3dTranslate(ItemBox, VectorNegate(ItemBoxMiddle)));
+
+      { Calculate DropPosition.
+
+        We must move the item a little before us to
+        1. show visually player that the item was dropped
+        2. to avoid automatically picking it again
+
+        Note that I take PushVector from CameraDirInHomePlane,
+        not from CameraDir, otherwise when player is looking
+        down he could be able to put item "inside the ground".
+        Collision detection with the level below would actually
+        prevent putting item "inside the ground", but the item
+        would be too close to the player --- he could pick it up
+        immediately. }
+      PushVector := Player.Navigator.CameraDirInHomePlane;
+      PushVectorLength := Max(
+        Player.Navigator.RealCameraPreferredHeight,
+        Box3dSizeX(ItemBox) * 2,
+        Box3dSizeY(ItemBox) * 2);
+      VectorAdjustToLengthTo1st(PushVector, PushVectorLength);
+      DropPosition := VectorAdd(Player.Navigator.CameraPos,
+        PushVector);
+
+      { Now check is DropPosition actually possible
+        (i.e. check collisions item<->level).
+        The assumption is that item starts from
+        Player.Navigator.CameraPos and is moved to DropPosition.
+
+        But actually we must shift both these positions,
+        so that we check positions that are ideally in the middle
+        of item's BoundingBoxRotated. Otherwise the item
+        could get *partially* stuck within the wall, which wouldn't
+        look good. }
+
+      Result := Level.MoveAllowedSimple(
+        VectorAdd(Player.Navigator.CameraPos, ItemBoxMiddle),
+        VectorAdd(DropPosition, ItemBoxMiddle),
+        false, ItemBoxRadius)
+    end;
+
   var
     DropppedItem: TItem;
-    DropPosition, PushVector: TVector3Single;
-    PushVectorLength: Single;
+    DropPosition: TVector3Single;
   begin
     if Player.Dead then
     begin
@@ -403,33 +459,17 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
     if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
-      DropppedItem := Player.DropItem(InventoryCurrentItem);
-      if DropppedItem <> nil then
+      if GetItemDropPosition(Player.Items[InventoryCurrentItem].Kind,
+        DropPosition) then
       begin
-        UpdateInventoryCurrentItemAfterDelete;
-
-        { Calculate DropPosition. }
-        DropPosition := Player.Navigator.CameraPos;
-
-        { We must move the item a little before us to
-          1. show visually player that the item was dropped
-          2. to avoid automatically picking it again
-
-          Note that I take PushVector from CameraDirInHomePlane,
-          not from CameraDir, otherwise when player is looking
-          down he could be able to put item "inside the ground".
-          TODO: actually, I should just check collision of item with level,
-          to avoid "pushing item into the wall". }
-        PushVector := Player.Navigator.CameraDirInHomePlane;
-        PushVectorLength := Max(
-          Player.Navigator.RealCameraPreferredHeight,
-          Box3dSizeX(DropppedItem.Kind.BoundingBoxRotated) * 2,
-          Box3dSizeY(DropppedItem.Kind.BoundingBoxRotated) * 2);
-        VectorAdjustToLengthTo1st(PushVector, PushVectorLength);
-        VectorAddTo1st(DropPosition, PushVector);
-
-        Level.Items.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
-      end;
+        DropppedItem := Player.DropItem(InventoryCurrentItem);
+        if DropppedItem <> nil then
+        begin
+          UpdateInventoryCurrentItemAfterDelete;
+          Level.Items.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
+        end;
+      end else
+        GameMessage('Not enough room here to drop this item');
     end else
       GameMessage('Nothing to drop - select some item first');
   end;
