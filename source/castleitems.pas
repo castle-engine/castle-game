@@ -701,8 +701,49 @@ begin
 end;
 
 procedure TItemOnLevel.Idle(const CompSpeed: Single);
+const
+  PositionRadius = 1.0;
+  FallingDownSpeed = 0.2;
+var
+  IsAboveTheGround: boolean;
+  SqrHeightAboveTheGround, HeightAboveTheGround: Single;
+  ShiftedPosition: TVector3Single;
+  ProposedNewShiftedPosition, NewShiftedPosition: TVector3Single;
 begin
   FRotation += 3 * CompSpeed;
+
+  ShiftedPosition := Position;
+  ShiftedPosition[2] += PositionRadius;
+
+  { Note that I'm using ShiftedPosition, not Position,
+    and later I'm comparing "SqrHeightAboveTheGround > Sqr(PositionRadius)",
+    instead of "SqrHeightAboveTheGround > 0".
+    Otherwise, I risk that when item will be placed perfectly on the ground,
+    it may "slip through" this ground down.
+
+    For the same reason, I use sphere around ShiftedPosition
+    when doing Level.MoveAllowed below. }
+
+  Level.GetCameraHeight(ShiftedPosition, IsAboveTheGround,
+    SqrHeightAboveTheGround);
+  if (not IsAboveTheGround) or
+     (SqrHeightAboveTheGround > Sqr(PositionRadius)) then
+  begin
+    { Item falls down because of gravity. }
+
+    HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
+    ProposedNewShiftedPosition := ShiftedPosition;
+    ProposedNewShiftedPosition[2] -= Min(
+      HeightAboveTheGround - PositionRadius,
+      CompSpeed * FallingDownSpeed);
+
+    if Level.MoveAllowed(ShiftedPosition, ProposedNewShiftedPosition,
+      NewShiftedPosition, true, PositionRadius) then
+    begin
+      FPosition := ProposedNewShiftedPosition;
+      FPosition[2] -= PositionRadius;
+    end;
+  end;
 end;
 
 function TItemOnLevel.BoundingBox: TBox3d;

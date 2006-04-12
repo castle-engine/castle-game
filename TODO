@@ -22,6 +22,7 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 - Creatures<->level collision checking should be done using
   creature's bounding box, not CameraRadius.
   Creature's CameraRadius is a hack, and should be preferably removed.
+  Same thing for items<->level.
 
 - "Restore defaults" in Video and Sound options.
 

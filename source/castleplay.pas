@@ -393,8 +393,6 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
   var
     DropppedItem: TItem;
     DropPosition, PushVector: TVector3Single;
-    IsAboveTheGround: boolean;
-    SqrHeightAboveTheGround: Single;
     PushVectorLength: Single;
   begin
     if Player.Dead then
@@ -410,18 +408,8 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       begin
         UpdateInventoryCurrentItemAfterDelete;
 
-        { Calculate DropPosition.
-          TODO: this should be done better,
-          DropPosition should be always initialized to Player.Navigator.CameraPos
-          and then we should just let items to fall down on the ground. }
-        Player.Navigator.DoGetCameraHeight(IsAboveTheGround,
-          SqrHeightAboveTheGround);
-
-        if not IsAboveTheGround then
-          DropPosition := Player.Navigator.CameraPos else
-          DropPosition := VectorSubtract(Player.Navigator.CameraPos,
-            VectorAdjustToLength(Player.Navigator.HomeCameraUp,
-              Sqrt(SqrHeightAboveTheGround)));
+        { Calculate DropPosition. }
+        DropPosition := Player.Navigator.CameraPos;
 
         { We must move the item a little before us to
           1. show visually player that the item was dropped
