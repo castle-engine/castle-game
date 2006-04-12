@@ -462,9 +462,35 @@ type
   TCreaturesList = class(TObjectsList_1)
     procedure Render(const Frustum: TFrustum);
     procedure Idle(const CompSpeed: Single);
+
     { Remove from this list all creatures that return
       RemoveMeFromLevel = @true. }
     procedure RemoveFromLevel;
+
+    { This checks whether someone (player or creature) moving from
+      OldBoundingBox to NewBoundingBox(and OldPosition to NewPosition
+      --- appropriate positions should be within their bounding boxes)
+      collides with any creature on the the list.
+
+      You can pass IgnoreCreature <> nil if you want to ignore
+      collisions with given creature (this will obviously be useful
+      when checking for collisions for this creature). }
+    function MoveAllowedSimple(
+      const OldBoundingBox, NewBoundingBox: TBox3d;
+      const OldPosition, NewPosition: TVector3Single;
+      IgnoreCreature: TCreature): boolean;
+
+    { Height of Position over creatures' bounding boxes.
+
+      Assumes IsAboveTheGround is already initialized
+      (and if true, then SqrHeightAboveTheGround is already initialized too).
+      It will update them.
+
+      You can pass IgnoreCreature <> nil if you want to ignore
+      collisions with given creature (this will obviously be useful
+      when checking for collisions for this creature). }
+    procedure GetCameraHeight(const Position: TVector3Single;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
   end;
 
   TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying, wasHurt);
@@ -1079,6 +1105,95 @@ begin
     if Items[I].RemoveMeFromLevel then
       FreeAndNil(I);
   DeleteAll(nil);
+end;
+
+function TCreaturesList.MoveAllowedSimple(
+  const OldBoundingBox, NewBoundingBox: TBox3d;
+  const OldPosition, NewPosition: TVector3Single;
+  IgnoreCreature: TCreature): boolean;
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+    if Items[I] <> IgnoreCreature then
+    begin
+      if (not (Items[I] is TMissileCreature) { TODO: not clean } ) and
+        Boxes3dCollision(NewBoundingBox, Items[I].BoundingBox) then
+      begin
+        { Strictly thinking, now I know that I have a collision with creature
+          and I should exit with false. But it's not that simple.
+
+          Note that there is weakness in collision checking with creatures,
+          because when AnimationTime changes then effectively creature's
+          CurrentScene.BoundingBox changes, and there is no way how I can
+          check for collision there (what could I do ? Stop the animation ?
+          Throw the creature back ? None of this seems sensible...)
+          This means that we cannot prevent the situation when someone's
+          (player's or creature's) and other creature's bounding boxes collide.
+
+          So we must take precautions to not make someone "stuck"
+          with this creature (because any potential move collides
+          with this creature).
+
+          That's the reasoning behind using OldBoundingBox and checks below.
+          I disallow the collision only if there was no collision before
+          (so the pathologic situation doesn't occur) or if someone
+          tries to get closer to the creature (so if the pathologic situation
+          occurs, someone can't make it worse, and can't "abuse" this
+          by entering into creature's bounding box). }
+        if (not Boxes3dCollision(OldBoundingBox, Items[I].BoundingBox)) or
+           ( PointsDistanceSqr(NewPosition, Items[I].HeadPosition) <
+             PointsDistanceSqr(OldPosition, Items[I].HeadPosition) ) then
+          Exit(false);
+      end;
+    end;
+
+  Result := true;
+end;
+
+procedure TCreaturesList.GetCameraHeight(
+  const Position: TVector3Single;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+
+  { If the Point is inside the Box then it answers IsAboveTheBox := false. }
+  procedure GetPointHeightAboveBox3d(const Point: TVector3Single;
+    const Box: TBox3d;
+    var IsAboveTheBox: boolean; var SqrHeightAboveTheBox: Single);
+  begin
+    { We use here the assumption that HomeCameraUp is (0, 0, 1). }
+
+    IsAboveTheBox := (not IsEmptyBox3d(Box)) and
+      (Box[0, 0] <= Point[0]) and (Point[0] <= Box[1, 0]) and
+      (Box[0, 1] <= Point[1]) and (Point[1] <= Box[1, 1]) and
+      (Point[2] >= Box[1, 2]);
+
+    if IsAboveTheBox then
+      SqrHeightAboveTheBox := Sqr(Point[2] - Box[1, 2]);
+  end;
+
+var
+  I: Integer;
+  IsAboveTheBox: boolean;
+  SqrHeightAboveTheBox: Single;
+begin
+  for I := 0 to High do
+  begin
+    GetPointHeightAboveBox3d(Position, Items[I].BoundingBox,
+      IsAboveTheBox, SqrHeightAboveTheBox);
+
+    if IsAboveTheBox then
+    begin
+      if not IsAboveTheGround then
+      begin
+        IsAboveTheGround := true;
+        SqrHeightAboveTheGround := SqrHeightAboveTheBox;
+      end else
+      if SqrHeightAboveTheBox < SqrHeightAboveTheGround then
+      begin
+        SqrHeightAboveTheGround := SqrHeightAboveTheBox;
+      end;
+    end;
+  end;
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }

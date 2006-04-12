@@ -610,99 +610,29 @@ end;
 function TLevel.PlayerMoveAllowed(Navigator: TMatrixWalker;
   const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
-var
-  I: Integer;
-  PlayerOldBoundingBox, PlayerNewBoundingBox: TBox3d;
 begin
-  Result := MoveAllowed(Navigator.CameraPos, ProposedNewPos, NewPos,
-    BecauseOfGravity, CameraRadius);
+  Result :=
+    { Check collision Player <-> level. }
+    MoveAllowed(Navigator.CameraPos, ProposedNewPos, NewPos,
+      BecauseOfGravity, CameraRadius) and
 
-  if Result then
-  begin
     { Check collision Player <-> Creatures here. }
-    PlayerOldBoundingBox := Player.BoundingBox(false);
-    PlayerNewBoundingBox := Player.BoundingBoxAssuming(NewPos, false);
-    for I := 0 to Creatures.High do
-    begin
-      if (not (Creatures[I] is TMissileCreature) { TODO: not clean } ) and
-        Boxes3dCollision(PlayerNewBoundingBox, Creatures[I].BoundingBox) then
-      begin
-        { Strictly thinking, now I know that I have a collision with creature
-          and I should exit with false. But it's not that simple.
-
-          Note that there is weakness in collision checking with creatures,
-          because when AnimationTime changes then effectively creature's
-          CurrentScene.BoundingBox changes, and there is no way how I can
-          check for collision there (what could I do ? Stop the animation ?
-          Throw the creature back ? None of this seems sensible...)
-          This means that we cannot prevent the situation where player
-          and creature bounding boxes collide.
-
-          So we must take precautions to not make player "stuck"
-          with this creature (because any potential move collides
-          with this creature).
-
-          That's the reasoning behind PlayerOldBoundingBox and checks below.
-          I disallow the collision only if there was no collision before
-          (so the pathologic situation doesn't occur) or if the player
-          tries to get closer to the creature (so if the pathologic situation
-          occurs, player can't make it worse, and can't "abuse" this
-          by entering into creature's bounding box). }
-        if (not Boxes3dCollision(PlayerOldBoundingBox,
-             Creatures[I].BoundingBox)) or
-           ( PointsDistanceSqr(NewPos, Creatures[I].HeadPosition) <
-             PointsDistanceSqr(Navigator.CameraPos, Creatures[I].HeadPosition) ) then
-          Exit(false);
-      end;
-    end;
-  end;
-end;
-
-{ If the Point is inside the Box then it answers IsAboveTheBox := false. }
-procedure GetPointHeightAboveBox3d(const Point: TVector3Single;
-  const Box: TBox3d;
-  var IsAboveTheBox: boolean; var SqrHeightAboveTheBox: Single);
-begin
-  { We use here the assumption that HomeCameraUp is (0, 0, 1). }
-
-  IsAboveTheBox := (not IsEmptyBox3d(Box)) and
-    (Box[0, 0] <= Point[0]) and (Point[0] <= Box[1, 0]) and
-    (Box[0, 1] <= Point[1]) and (Point[1] <= Box[1, 1]) and
-    (Point[2] >= Box[1, 2]);
-
-  if IsAboveTheBox then
-    SqrHeightAboveTheBox := Sqr(Point[2] - Box[1, 2]);
+    Creatures.MoveAllowedSimple(
+      Player.BoundingBox(false),
+      Player.BoundingBoxAssuming(NewPos, false),
+      Navigator.CameraPos, NewPos, nil);
 end;
 
 procedure TLevel.PlayerGetCameraHeight(Navigator: TMatrixWalker;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
-var
-  IsAboveTheBox: boolean;
-  SqrHeightAboveTheBox: Single;
-  I: Integer;
 begin
+  { Check is player standing over level. }
   GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
     SqrHeightAboveTheGround);
 
   { Check is player standing over one of the creatures. }
-  for I := 0 to Creatures.High do
-  begin
-    GetPointHeightAboveBox3d(Navigator.CameraPos, Creatures[I].BoundingBox,
-      IsAboveTheBox, SqrHeightAboveTheBox);
-
-    if IsAboveTheBox then
-    begin
-      if not IsAboveTheGround then
-      begin
-        IsAboveTheGround := true;
-        SqrHeightAboveTheGround := SqrHeightAboveTheBox;
-      end else
-      if SqrHeightAboveTheBox < SqrHeightAboveTheGround then
-      begin
-        SqrHeightAboveTheGround := SqrHeightAboveTheBox;
-      end;
-    end;
-  end;
+  Creatures.GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
+    SqrHeightAboveTheGround);
 end;
 
 procedure TLevel.Render(const Frustum: TFrustum);
