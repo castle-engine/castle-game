@@ -148,7 +148,7 @@ type
     function MoveAllowedSimple(const CameraPos: TVector3Single;
       const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean;
+      const MovingObjectCameraRadius: Single): boolean; virtual;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
@@ -231,6 +231,15 @@ type
       and Button as TVRMLGLAnimation. }
     Symbol_TL, Symbol_BL, Symbol_TR, Symbol_BR: TVRMLFlatSceneGL;
     Button: TVRMLFlatSceneGL;
+
+    { Check collision only with Symbol, Button --- but not with real
+      level geometry (i.e. not with things handled by inherited
+      MoveAllowed, MoveAllowedSimple). }
+    function MoveAllowedAdditionalSimple(
+      const CameraPos: TVector3Single;
+      const NewPos: TVector3Single;
+      const BecauseOfGravity: boolean;
+      const MovingObjectCameraRadius: Single): boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -240,6 +249,11 @@ type
 
     function MoveAllowed(const CameraPos: TVector3Single;
       const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const BecauseOfGravity: boolean;
+      const MovingObjectCameraRadius: Single): boolean; override;
+
+    function MoveAllowedSimple(const CameraPos: TVector3Single;
+      const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean; override;
 
@@ -587,16 +601,11 @@ function TLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
   const NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
-var
-  ResultingNewPos: TVector3Single;
 begin
-  { TODO: simple implementation. I should rather call
-    Scene.DefaultTriangleOctree.MoveAllowedSimple here,
-    to not waste time. This means that MoveAllowedSimple will
-    also have to be overriden. }
-  Result := MoveAllowed(CameraPos, NewPos, ResultingNewPos,
-    BecauseOfGravity, MovingObjectCameraRadius) and
-    VectorsPerfectlyEqual(NewPos, ResultingNewPos);
+  Result :=
+    Box3dPointInside(NewPos, LevelBox) and
+    Scene.DefaultTriangleOctree.MoveAllowedSimple(
+      CameraPos, NewPos, MovingObjectCameraRadius);
 end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
@@ -731,8 +740,9 @@ begin
   end;
 end;
 
-function TCastleHallLevel.MoveAllowed(const CameraPos: TVector3Single;
-  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+function TCastleHallLevel.MoveAllowedAdditionalSimple(
+  const CameraPos: TVector3Single;
+  const NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
 
@@ -743,9 +753,7 @@ function TCastleHallLevel.MoveAllowed(const CameraPos: TVector3Single;
   end;
 
 begin
-  Result := inherited;
-
-  Result := Result and
+  Result :=
     Button.DefaultTriangleOctree.MoveAllowedSimple(
       CameraPos, NewPos, MovingObjectCameraRadius);
 
@@ -757,6 +765,28 @@ begin
       MakeSymbol(Symbol_TR) and
       MakeSymbol(Symbol_BR);
   end;
+end;
+
+function TCastleHallLevel.MoveAllowed(const CameraPos: TVector3Single;
+  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const BecauseOfGravity: boolean;
+  const MovingObjectCameraRadius: Single): boolean;
+begin
+  Result := inherited;
+
+  Result := Result and MoveAllowedAdditionalSimple(
+    CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
+end;
+
+function TCastleHallLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
+  const NewPos: TVector3Single;
+  const BecauseOfGravity: boolean;
+  const MovingObjectCameraRadius: Single): boolean;
+begin
+  Result := inherited;
+
+  Result := Result and MoveAllowedAdditionalSimple(
+    CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
 end;
 
 procedure TCastleHallLevel.GetCameraHeight(const CameraPos: TVector3Single;
