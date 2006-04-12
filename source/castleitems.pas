@@ -605,7 +605,6 @@ begin
     { Tests: Writeln('Creature bbox is ', Box3dToNiceStr(C.BoundingBox)); }
     if Boxes3dCollision(C.BoundingBox, WeaponBoundingBox) then
     begin
-      { TODO: some "throw back" for creature here ? }
       C.Life := C.Life - 20 - Random(20);
       C.LastAttackDirection := Player.Navigator.CameraDir;
     end;

@@ -226,9 +226,7 @@ type
     SymbolOpened: boolean;
     AnimationOpenSymbolRotation: Single;
     AnimationButtonPress: Single;
-    { TODO: now that TVRMLGLAnimation class is great,
-      I should convert this to use Symbol (only 1 object and model needed)
-      and Button as TVRMLGLAnimation. }
+
     Symbol_TL, Symbol_BL, Symbol_TR, Symbol_BR: TVRMLFlatSceneGL;
     Button: TVRMLFlatSceneGL;
 

@@ -127,8 +127,13 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   list for each frame. Instead, it two scenes share the same RootNode
   and differ e.g. only in CurrentMatrix states, then I can use
   one display list and do glPushMatrix,MultMatrix,render,PopMatrix.
+
   This could save some loading time for e.g. ball_missile anim
   (but not for alien animations, as they change geometry).
+
+  This is also required to convert Symbol and Button on "Castle Hall"
+  to use TVRMLGLAnimation class (additional simplification will be that
+  only one Symbol model will be needed, not 4 (like now)).
 
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim ? Look how much it adds to AirBlast !)
