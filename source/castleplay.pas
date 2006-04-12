@@ -298,16 +298,18 @@ begin
     then all transparent objects. Otherwise transparent objects
     (that must be rendered without updating depth buffer) could get brutally
     covered by non-transparent objects (that are in fact further away from
-    the camera). So we first render all non-transparent creatures and items,
-    then the level, then all transparent creatures and items.
+    the camera).
 
-    TODO: actually, right now I workaround this by first rendering
-    creatures (there is no transparent creature), then level,
-    then items (there is a transparent item --- life potion). }
+    For simplicity, I decided that for now creatures and items are not allowed
+    to be partially transparent and partially opaque.
+    So we first render all non-transparent creatures and items,
+    then the level, then all transparent creatures and items. }
 
-  Level.Creatures.Render(Player.Navigator.Frustum);
+  Level.Creatures.Render(Player.Navigator.Frustum, false);
+  Level.Items.Render(Player.Navigator.Frustum, false);
   Level.Render(Player.Navigator.Frustum);
-  Level.Items.Render(Player.Navigator.Frustum);
+  Level.Creatures.Render(Player.Navigator.Frustum, true);
+  Level.Items.Render(Player.Navigator.Frustum, true);
 
   Player.RenderAttack;
 

@@ -81,9 +81,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   and make it automatic.
   Problem: long load times ("Loading creatures...") and memory consumption.
 
-- Take TItemKind and TCreatureKind PrepareRender, PrepareRenderSteps, CloseGL
-  into one base class, like TGLLoading or something like that.
-
 - creatures can climb high (almost-vertical) walls.
   Actually, player can climb almost-vertical walls too !
 

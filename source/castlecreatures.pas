@@ -24,7 +24,8 @@ unit CastleCreatures;
 interface
 
 uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
-  VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints;
+  VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints,
+  CastleObjectKinds;
 
 {$define read_interface}
 
@@ -44,7 +45,7 @@ const
 type
   TCreature = class;
 
-  TCreatureKind = class
+  TCreatureKind = class(TObjectKind)
   private
     FFlying: boolean;
     FVRMLNodeName: string;
@@ -53,17 +54,6 @@ type
     FDefaultMaxLife: Single;
   public
     constructor Create(const AVRMLNodeName: string);
-
-    { Prepare anything needed when starting new game.
-      It can call Progress.Step PrepareRenderSteps times.
-      In this class, PrepareRender initializes CameraRadius from CurrentScene
-      (so you may need to call "inherited" at the *end* in subclasses). }
-    procedure PrepareRender; virtual;
-
-    function PrepareRenderSteps: Cardinal; virtual;
-
-    { Free any association with current OpenGL context. }
-    procedure CloseGL; virtual;
 
     { If @true, then the creature flies. Otherwise it always tries to move only
       horizontally (which means that Direction is always orthogonal
@@ -165,7 +155,8 @@ type
     destructor Destroy; override;
 
     { Make all TVRMLGLAnimation properties non-nil. I.e. load them from their
-      XxxInfo counterparts. }
+      XxxInfo counterparts.
+      Also initialize CameraRadius from StandAnimation.Scenes[0]. }
     procedure PrepareRender; override;
 
     function PrepareRenderSteps: Cardinal; override;
@@ -493,7 +484,7 @@ type
   TObjectsListItem_1 = TCreature;
   {$I objectslist_1.inc}
   TCreaturesList = class(TObjectsList_1)
-    procedure Render(const Frustum: TFrustum);
+    procedure Render(const Frustum: TFrustum; const Transparent: boolean);
     procedure Idle(const CompSpeed: Single);
 
     { Remove from this list all creatures that return
@@ -656,21 +647,6 @@ begin
   FFlying := false;
   FDefaultMaxLife := DefaultDefaultMaxLife;
   CreaturesKinds.Add(Self);
-end;
-
-procedure TCreatureKind.PrepareRender;
-begin
-  { Nothing to do in this class. }
-end;
-
-function TCreatureKind.PrepareRenderSteps: Cardinal;
-begin
-  Result := 0;
-end;
-
-procedure TCreatureKind.CloseGL;
-begin
-  { Nothing to do in this class. }
 end;
 
 { TCreaturesKindsList -------------------------------------------------------- }
@@ -1170,12 +1146,14 @@ end;
 
 { TCreatures ----------------------------------------------------------------- }
 
-procedure TCreaturesList.Render(const Frustum: TFrustum);
+procedure TCreaturesList.Render(const Frustum: TFrustum;
+  const Transparent: boolean);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    Items[I].Render(Frustum);
+    if Items[I].Kind.Transparent = Transparent then
+      Items[I].Render(Frustum);
 end;
 
 procedure TCreaturesList.Idle(const CompSpeed: Single);

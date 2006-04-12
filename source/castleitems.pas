@@ -25,7 +25,7 @@ interface
 
 uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
   KambiClassUtils, Images, OpenGLh, CastleSound,
-  VRMLGLAnimation, VRMLGLAnimationInfo;
+  VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds;
 
 {$define read_interface}
 
@@ -48,7 +48,7 @@ type
     (and also creates most (all, for now) instances of TItemKind).
     You're free to create new descendants and instances of TItemKind
     outside this unit, but then leave freeing them to this unit. }
-  TItemKind = class
+  TItemKind = class(TObjectKind)
   private
     FModelFileName: string;
     FScene: TVRMLFlatSceneGL;
@@ -116,14 +116,9 @@ type
       to account the fact that Scene may be rotated around +Z vector. }
     function BoundingBoxRotated: TBox3d;
 
-    { Prepare anything needed when starting new game.
-      It can call Progress.Step PrepareRenderSteps times. }
-    procedure PrepareRender; virtual;
-
-    function PrepareRenderSteps: Cardinal; virtual;
-
-    { Free any association with current OpenGL context. }
-    procedure CloseGL; virtual;
+    procedure PrepareRender; override;
+    function PrepareRenderSteps: Cardinal; override;
+    procedure CloseGL; override;
   end;
 
   TObjectsListItem_3 = TItemKind;
@@ -196,9 +191,7 @@ type
     procedure Use(Item: TItem); override;
 
     procedure PrepareRender; override;
-
     function PrepareRenderSteps: Cardinal; override;
-
     procedure CloseGL; override;
 
     { This is the time point within AttackAnimation
@@ -325,7 +318,7 @@ type
   {$I objectslist_1.inc}
   TItemsOnLevelList = class(TObjectsList_1)
     { Call Render for all items. }
-    procedure Render(const Frustum: TFrustum);
+    procedure Render(const Frustum: TFrustum; const Transparent: boolean);
     { Call Idle for all items. }
     procedure Idle(const CompSpeed: Single);
     { Check collision with all items, returns index of first collider
@@ -778,12 +771,14 @@ end;
 
 { TItemsOnLevelList -------------------------------------------------- }
 
-procedure TItemsOnLevelList.Render(const Frustum: TFrustum);
+procedure TItemsOnLevelList.Render(const Frustum: TFrustum;
+  const Transparent: boolean);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    Items[I].Render(Frustum);
+    if Items[I].Item.Kind.Transparent = Transparent then
+      Items[I].Render(Frustum);
 end;
 
 procedure TItemsOnLevelList.Idle(const CompSpeed: Single);
@@ -869,6 +864,7 @@ begin
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
     'LifePotion', 'Potion of Life', 'life_potion.png');
+  LifePotion.Transparent := true;
 
   ScrollOfFlying := TItemScrollOfFlyingKind.Create('scroll_final.wrl',
     'ScrFlying', 'Scroll Of Flying', 'scroll.png');
