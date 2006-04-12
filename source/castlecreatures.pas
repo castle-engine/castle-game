@@ -361,8 +361,11 @@ type
 
     { Returns BoundingBox, assuming that LegsPosition and Direction are
       as specified here. }
-    function BoundingBoxAssuming(
+    function BoundingBoxAssumingLegs(
       const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
+
+    function BoundingBoxAssumingHead(
+      const AssumeHeadPosition, AssumeDirection: TVector3Single): TBox3d;
 
     { This checks collision with Player.BoundingBox, assuming that HeadPosition
       (and implied LegsPosition) is as given. }
@@ -373,6 +376,36 @@ type
       const AssumeLegsPosition: TVector3Single): boolean;
 
     procedure SetLife(const Value: Single); virtual;
+
+    { Tries to move from OldHeadPosition to ProposedNewHeadPosition.
+      Returns true and sets NewHeadPosition if some move is allowed.
+
+      Note that OldHeadPosition *must be equal to HeadPosition*.
+      It's passed here only for speed.
+
+      Check collisions with the level, with player, and with other
+      creatures. }
+    function MoveAllowed(
+      const OldHeadPosition, ProposedNewHeadPosition: TVector3Single;
+      var NewHeadPosition: TVector3Single;
+      BecauseOfGravity: boolean): boolean;
+
+    { Like MoveAllowed, but this is only a "yes/no" collision check. }
+    function MoveAllowedSimple(
+      const OldHeadPosition, NewHeadPosition: TVector3Single;
+      const BecauseOfGravity: boolean): boolean;
+
+    { Checks AssumeHeadPosition height above the level and other creatures.
+
+      I don't check height above the player, this is not needed
+      (GetCameraHeight is needed only for "growing up" and "falling down";
+      in case of "growing up", creature doesn't have to "grow up"
+      when standing on player's head. In case of "falling down" ---
+      we don't have to take this into account. Things will work correctly
+      anyway.) }
+    procedure GetCameraHeight(
+      const AssumeHeadPosition: TVector3Single;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
   public
     { Constructor. Note for AnimationTime: usually I will take
       AnimationTime from global Level.AnimationTime, but in the case of
@@ -472,13 +505,16 @@ type
       --- appropriate positions should be within their bounding boxes)
       collides with any creature on the the list.
 
+      Returns nil if no collision or reference of (one of) colliding
+      creatures.
+
       You can pass IgnoreCreature <> nil if you want to ignore
       collisions with given creature (this will obviously be useful
       when checking for collisions for this creature). }
     function MoveAllowedSimple(
       const OldBoundingBox, NewBoundingBox: TBox3d;
       const OldPosition, NewPosition: TVector3Single;
-      IgnoreCreature: TCreature): boolean;
+      IgnoreCreature: TCreature): TCreature;
 
     { Height of Position over creatures' bounding boxes.
 
@@ -490,7 +526,8 @@ type
       collisions with given creature (this will obviously be useful
       when checking for collisions for this creature). }
     procedure GetCameraHeight(const Position: TVector3Single;
-      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single;
+      IgnoreCreature: TCreature);
   end;
 
   TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying, wasHurt);
@@ -896,16 +933,27 @@ begin
   Result := SceneTransformAssuming(LegsPosition, Direction);
 end;
 
-function TCreature.BoundingBoxAssuming(
+function TCreature.BoundingBoxAssumingLegs(
   const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
 begin
   Result := BoundingBoxTransform(CurrentScene.BoundingBox,
     SceneTransformAssuming(AssumeLegsPosition, AssumeDirection));
 end;
 
+function TCreature.BoundingBoxAssumingHead(
+  const AssumeHeadPosition, AssumeDirection: TVector3Single): TBox3d;
+var
+  AssumeLegsPosition: TVector3Single;
+begin
+  AssumeLegsPosition := AssumeHeadPosition;
+  AssumeLegsPosition[2] -= Height;
+
+  Result := BoundingBoxAssumingLegs(AssumeLegsPosition, AssumeDirection);
+end;
+
 function TCreature.BoundingBox: TBox3d;
 begin
-  Result := BoundingBoxAssuming(LegsPosition, Direction);
+  Result := BoundingBoxAssumingLegs(LegsPosition, Direction);
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum);
@@ -931,20 +979,65 @@ end;
 
 function TCreature.HeadCollisionWithPlayer(
   const AssumeHeadPosition: TVector3Single): boolean;
-var
-  AssumeLegsPosition: TVector3Single;
 begin
-  AssumeLegsPosition := AssumeHeadPosition;
-  AssumeLegsPosition[2] -= Height;
   Result := Boxes3dCollision(
-    BoundingBoxAssuming(AssumeLegsPosition, Direction), Player.BoundingBox);
+    BoundingBoxAssumingHead(AssumeHeadPosition, Direction), Player.BoundingBox);
 end;
 
 function TCreature.LegsCollisionWithPlayer(
   const AssumeLegsPosition: TVector3Single): boolean;
 begin
   Result := Boxes3dCollision(
-    BoundingBoxAssuming(AssumeLegsPosition, Direction), Player.BoundingBox);
+    BoundingBoxAssumingLegs(AssumeLegsPosition, Direction), Player.BoundingBox);
+end;
+
+function TCreature.MoveAllowed(
+  const OldHeadPosition, ProposedNewHeadPosition: TVector3Single;
+  var NewHeadPosition: TVector3Single;
+  const BecauseOfGravity: boolean): boolean;
+begin
+  Result :=
+    { Check creature<->level collision. }
+    Level.MoveAllowed(
+      OldHeadPosition, ProposedNewHeadPosition, NewHeadPosition,
+      BecauseOfGravity, Kind.CameraRadius) and
+    { Check creature<->player collision. }
+    (not HeadCollisionWithPlayer(NewHeadPosition)) and
+    { Check creature<->other creatures collision. }
+    (Level.Creatures.MoveAllowedSimple(
+      BoundingBox,
+      BoundingBoxAssumingHead(NewHeadPosition, Direction),
+      OldHeadPosition, NewHeadPosition, Self) = nil);
+end;
+
+function TCreature.MoveAllowedSimple(
+  const OldHeadPosition, NewHeadPosition: TVector3Single;
+  const BecauseOfGravity: boolean): boolean;
+begin
+  Result :=
+    { Check creature<->level collision. }
+    Level.MoveAllowedSimple(OldHeadPosition, NewHeadPosition,
+      BecauseOfGravity, Kind.CameraRadius) and
+    { Check creature<->player collision. }
+    (not HeadCollisionWithPlayer(NewHeadPosition)) and
+    { Check creature<->other creatures collision. }
+    (Level.Creatures.MoveAllowedSimple(
+      BoundingBox,
+      BoundingBoxAssumingHead(NewHeadPosition, Direction),
+      OldHeadPosition, NewHeadPosition, Self) = nil);
+end;
+
+procedure TCreature.GetCameraHeight(
+  const AssumeHeadPosition: TVector3Single;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+begin
+  { Check creature<->level collision. }
+  Level.GetCameraHeight(AssumeHeadPosition,
+    IsAboveTheGround, SqrHeightAboveTheGround);
+
+  { Check creature<->other creatures collision. }
+  Level.Creatures.GetCameraHeight(AssumeHeadPosition,
+    IsAboveTheGround, SqrHeightAboveTheGround, Self);
 end;
 
 procedure TCreature.Idle(const CompSpeed: Single);
@@ -976,9 +1069,8 @@ procedure TCreature.Idle(const CompSpeed: Single);
       ProposedNewHeadPosition := OldHeadPosition;
       ProposedNewHeadPosition[2] += Distance;
 
-      Result := Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
-        NewHeadPosition, true, Kind.CameraRadius) and
-        (not HeadCollisionWithPlayer(NewHeadPosition));
+      Result := MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
+        NewHeadPosition, true);
 
       if Result then
       begin
@@ -1012,7 +1104,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     OldIsFallingDown := FIsFallingDown;
     OldHeadPosition := HeadPosition;
 
-    Level.GetCameraHeight(OldHeadPosition, IsAboveTheGround,
+    GetCameraHeight(OldHeadPosition, IsAboveTheGround,
       SqrHeightAboveTheGround);
     { We will need it anyway. OK, I'll pay this Sqrt. }
     HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
@@ -1110,15 +1202,17 @@ end;
 function TCreaturesList.MoveAllowedSimple(
   const OldBoundingBox, NewBoundingBox: TBox3d;
   const OldPosition, NewPosition: TVector3Single;
-  IgnoreCreature: TCreature): boolean;
+  IgnoreCreature: TCreature): TCreature;
 var
   I: Integer;
 begin
   for I := 0 to High do
-    if Items[I] <> IgnoreCreature then
+  begin
+    Result := Items[I];
+    if Result <> IgnoreCreature then
     begin
-      if (not (Items[I] is TMissileCreature) { TODO: not clean } ) and
-        Boxes3dCollision(NewBoundingBox, Items[I].BoundingBox) then
+      if (not (Result is TMissileCreature) { TODO: not clean } ) and
+        Boxes3dCollision(NewBoundingBox, Result.BoundingBox) then
       begin
         { Strictly thinking, now I know that I have a collision with creature
           and I should exit with false. But it's not that simple.
@@ -1141,19 +1235,21 @@ begin
           tries to get closer to the creature (so if the pathologic situation
           occurs, someone can't make it worse, and can't "abuse" this
           by entering into creature's bounding box). }
-        if (not Boxes3dCollision(OldBoundingBox, Items[I].BoundingBox)) or
-           ( PointsDistanceSqr(NewPosition, Items[I].HeadPosition) <
-             PointsDistanceSqr(OldPosition, Items[I].HeadPosition) ) then
-          Exit(false);
+        if (not Boxes3dCollision(OldBoundingBox, Result.BoundingBox)) or
+           ( PointsDistanceSqr(NewPosition, Result.HeadPosition) <
+             PointsDistanceSqr(OldPosition, Result.HeadPosition) ) then
+          Exit;
       end;
     end;
+  end;
 
-  Result := true;
+  Result := nil;
 end;
 
 procedure TCreaturesList.GetCameraHeight(
   const Position: TVector3Single;
-  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single;
+  IgnoreCreature: TCreature);
 
   { If the Point is inside the Box then it answers IsAboveTheBox := false. }
   procedure GetPointHeightAboveBox3d(const Point: TVector3Single;
@@ -1177,23 +1273,24 @@ var
   SqrHeightAboveTheBox: Single;
 begin
   for I := 0 to High do
-  begin
-    GetPointHeightAboveBox3d(Position, Items[I].BoundingBox,
-      IsAboveTheBox, SqrHeightAboveTheBox);
-
-    if IsAboveTheBox then
+    if Items[I] <> IgnoreCreature then
     begin
-      if not IsAboveTheGround then
+      GetPointHeightAboveBox3d(Position, Items[I].BoundingBox,
+        IsAboveTheBox, SqrHeightAboveTheBox);
+
+      if IsAboveTheBox then
       begin
-        IsAboveTheGround := true;
-        SqrHeightAboveTheGround := SqrHeightAboveTheBox;
-      end else
-      if SqrHeightAboveTheBox < SqrHeightAboveTheGround then
-      begin
-        SqrHeightAboveTheGround := SqrHeightAboveTheBox;
+        if not IsAboveTheGround then
+        begin
+          IsAboveTheGround := true;
+          SqrHeightAboveTheGround := SqrHeightAboveTheBox;
+        end else
+        if SqrHeightAboveTheBox < SqrHeightAboveTheGround then
+        begin
+          SqrHeightAboveTheGround := SqrHeightAboveTheBox;
+        end;
       end;
     end;
-  end;
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -1479,7 +1576,7 @@ var
         Result := false;
         if not Kind.Flying then
         begin
-          Level.GetCameraHeight(NewHeadPosition, IsAboveTheGround,
+          GetCameraHeight(NewHeadPosition, IsAboveTheGround,
             SqrHeightAboveTheGround);
           if (not IsAboveTheGround) or
             (SqrHeightAboveTheGround > Sqr(MaxHeightAcceptableToFall + Height)) then
@@ -1516,10 +1613,7 @@ var
           Our trick with "AlternativeTarget" should handle
           eventual problems with the track of creature, so MoveAllowed
           should not be needed. }
-        Level.MoveAllowedSimple(OldHeadPosition, NewHeadPosition,
-          false, Kind.CameraRadius) and
-
-        (not HeadCollisionWithPlayer(NewHeadPosition));
+        MoveAllowedSimple(OldHeadPosition, NewHeadPosition, false);
 
       if Result then
       begin
@@ -1796,9 +1890,8 @@ var
       ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
         VectorScale(LastAttackDirection, CurrentKnockBackDistance));
 
-      if Level.MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
-        NewHeadPosition, false, Kind.CameraRadius) and
-        (not HeadCollisionWithPlayer(NewHeadPosition)) then
+      if MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
+        NewHeadPosition, false) then
       begin
         FLegsPosition := NewHeadPosition;
         FLegsPosition[2] -= Height;

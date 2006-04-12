@@ -617,10 +617,10 @@ begin
       BecauseOfGravity, CameraRadius) and
 
     { Check collision Player <-> Creatures here. }
-    Creatures.MoveAllowedSimple(
+    (Creatures.MoveAllowedSimple(
       Player.BoundingBox(false),
       Player.BoundingBoxAssuming(NewPos, false),
-      Navigator.CameraPos, NewPos, nil);
+      Navigator.CameraPos, NewPos, nil) = nil);
 end;
 
 procedure TLevel.PlayerGetCameraHeight(Navigator: TMatrixWalker;
@@ -632,7 +632,7 @@ begin
 
   { Check is player standing over one of the creatures. }
   Creatures.GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
-    SqrHeightAboveTheGround);
+    SqrHeightAboveTheGround, nil);
 end;
 
 procedure TLevel.Render(const Frustum: TFrustum);
