@@ -99,6 +99,7 @@ dist:
 	cp /win/mojewww/camelot/src/pascal/units-src.tar.gz $(TMP_DIST_PATH)castle/source/
 	cd $(TMP_DIST_PATH)castle/source/; tar xzf units-src.tar.gz
 	rm -f $(TMP_DIST_PATH)castle/source/units-src.tar.gz
+	mv $(TMP_DIST_PATH)castle/source/COPYING $(TMP_DIST_PATH)castle/COPYING
 # Pack things
 	cd $(TMP_DIST_PATH); tar czf castle-$(VERSION).tar.gz castle/
 	mv $(TMP_DIST_PATH)castle-$(VERSION).tar.gz .
