@@ -52,6 +52,7 @@ type
     FCameraRadius: Single;
     FSoundSuddenPain: TSoundType;
     FDefaultMaxLife: Single;
+    FCollisionsWithCreaturesAndPlayer: boolean;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -98,6 +99,21 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single): TCreature; virtual; abstract;
+
+    { If @false, then TCreaturesList.MoveAllowedSimple and
+      TCreaturesList.GetCameraHeight will always ignore this
+      creature, which means that collisions between this creature
+      and player/other creatures will not be checked.
+      You should set this to @false only in exceptional situations,
+      when you're doing collision checking elsewhere
+      (e.g. for TMissileCreatureKind, collision is done when
+      the missile moves).
+
+      For all "normal" creatures this should be left as @true. }
+    property CollisionsWithCreaturesAndPlayer: boolean
+      read FCollisionsWithCreaturesAndPlayer
+      write FCollisionsWithCreaturesAndPlayer
+      default true;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -318,6 +334,10 @@ type
       cares to keep Direction horizontal). }
     property Flying default true;
 
+    { Missiles always should have this left as @false.
+      We will check for collisions when missile moves. }
+    property CollisionsWithCreaturesAndPlayer default false;
+
     property SoundExplosion: TSoundType
       read FSoundExplosion write FSoundExplosion default stNone;
 
@@ -340,6 +360,11 @@ type
     { For gravity work. }
     FallingDownStartHeight: Single;
     FIsFallingDown: boolean;
+
+    { We use our own SavedShadowQuads, to not waste so much memory
+      (otherwise each CurrentScene would use it's own
+      DefaultSavedShadowQuads instance) }
+    SavedShadowQuads: TDynQuad3SingleArray;
   protected
     { Return matrix that takes into account current LegsPosition and Direction.
       Multiply CurrentScene geometry by this matrix to get current geometry. }
@@ -407,6 +432,8 @@ type
       const AMaxLife: Single;
       const AnimationTime: Single);
 
+    destructor Destroy; override;
+
     { Current Life. Initially set from MaxLife. }
     property Life: Single read FLife write SetLife;
 
@@ -418,9 +445,10 @@ type
 
     procedure Render(const Frustum: TFrustum); virtual;
 
-    procedure RenderShadowQuads(
-      const LightPosition, CameraPosition: TVector3Single;
-      Front: boolean); virtual;
+    procedure RenderFrontShadowQuads(
+      const LightPosition, CameraPosition: TVector3Single); virtual;
+
+    procedure RenderBackShadowQuads; virtual;
 
     procedure Idle(const CompSpeed: Single); virtual;
 
@@ -650,6 +678,7 @@ begin
   FVRMLNodeName := AVRMLNodeName;
   FFlying := false;
   FDefaultMaxLife := DefaultDefaultMaxLife;
+  FCollisionsWithCreaturesAndPlayer := true;
   CreaturesKinds.Add(Self);
 end;
 
@@ -742,7 +771,7 @@ procedure TWalkAttackCreatureKind.PrepareRender;
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
-    Anim.PrepareRender(false, true, RenderShadows, false);
+    Anim.PrepareRender(false, true, RenderShadowsPossible, false);
     Progress.Step;
   end;
 
@@ -806,6 +835,7 @@ begin
   inherited Create(AVRMLNodeName);
   FAnimationInfo := AAnimationInfo;
   Flying := true;
+  CollisionsWithCreaturesAndPlayer := false;
   FMoveSpeed := DefaultMissileMoveSpeed;
 end;
 
@@ -824,7 +854,7 @@ procedure TMissileCreatureKind.PrepareRender;
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
-    Anim.PrepareRender(false, true, RenderShadows, false);
+    Anim.PrepareRender(false, true, RenderShadowsPossible, false);
     Progress.Step;
   end;
 
@@ -870,6 +900,14 @@ begin
   FMaxLife := AMaxLife;
 
   FLife := MaxLife;
+
+  SavedShadowQuads := TDynQuad3SingleArray.Create;
+end;
+
+destructor TCreature.Destroy;
+begin
+  FreeAndNil(SavedShadowQuads);
+  inherited;
 end;
 
 function TCreature.Height: Single;
@@ -954,12 +992,16 @@ begin
   end;
 end;
 
-procedure TCreature.RenderShadowQuads(
-  const LightPosition, CameraPosition: TVector3Single;
-  Front: boolean);
+procedure TCreature.RenderFrontShadowQuads(
+  const LightPosition, CameraPosition: TVector3Single);
 begin
-  CurrentScene.RenderShadowQuads(LightPosition, CameraPosition,
-    SceneTransform, Front);
+  CurrentScene.RenderFrontShadowQuads(LightPosition, CameraPosition,
+    SceneTransform, SavedShadowQuads);
+end;
+
+procedure TCreature.RenderBackShadowQuads;
+begin
+  CurrentScene.RenderBackShadowQuads(SavedShadowQuads);
 end;
 
 function TCreature.HeadCollisionWithPlayer(
@@ -1198,7 +1240,7 @@ begin
     Result := Items[I];
     if Result <> IgnoreCreature then
     begin
-      if (not (Result is TMissileCreature) { TODO: not clean } ) and
+      if Result.Kind.CollisionsWithCreaturesAndPlayer and
         Boxes3dCollision(NewBoundingBox, Result.BoundingBox) then
       begin
         { Strictly thinking, now I know that I have a collision with creature
@@ -1260,7 +1302,8 @@ var
   SqrHeightAboveTheBox: Single;
 begin
   for I := 0 to High do
-    if Items[I] <> IgnoreCreature then
+    if (Items[I] <> IgnoreCreature) and
+       (Items[I].Kind.CollisionsWithCreaturesAndPlayer) then
     begin
       GetPointHeightAboveBox3d(Position, Items[I].BoundingBox,
         IsAboveTheBox, SqrHeightAboveTheBox);

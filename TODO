@@ -111,15 +111,31 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 - shadow under the creatures would be nice (sgk_shadows should allow
   me to this super-nicely).
   Done, but need to be optimized to enabled by default!
-
-  For "Video options" menu add:
-    Creature shadows: on/off [on]
+  Walk with gprof.
 
   Add option --no-shadows to forbid even creation of shadows,
-  this inits RenderShadowsAllowed.
+  this inits RenderShadowsPossible.
+
+  README desc:
+
+  --no-shadows
+
+    This forbids generation of shadows in the program.
+    Not only this speeds up rendering, this also requires less
+    resources (we don't require stencil buffer from the OpenGL context)
+    and loading creatures is slightly faster.
+
+    It's adviced to use this option only if you use really old
+    graphic card (where stencil buffer requires too much resources).
+    For any sensible graphic card, you can simply turn shadows off
+    from the menu item "Video options -> Shadows", this will speed
+    up rendering.
+
+  When not RenderShadowsPossible, RenderShadows should not be
+  configurable from menu.
 
   Add creature option CastsShadow (def true) to turn shadows off
-  for some creatures.
+  for some creatures. For ball missile turn them off.
 
   LightCastingShadowsPosition should be cofigurable.
   Can be inited from LightSet.Lights[0].TransfLocation

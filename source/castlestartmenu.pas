@@ -34,7 +34,8 @@ uses SysUtils, KambiUtils, GLWindow, GLWinModes,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
-  CastleControlsMenu, CastleKeys, CastleVideoOptions;
+  CastleControlsMenu, CastleKeys, CastleVideoOptions,
+  KambiStringUtils;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -52,6 +53,7 @@ type
   TVideoMenu = class(TSubMenu)
     TextureMinificationQualitySlider: TGLMenuIntegerSlider;
     AllowScreenResizeArgument: TGLMenuItemArgument;
+    RenderShadowsArgument: TGLMenuItemArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -167,9 +169,14 @@ begin
     TGLMenuItemArgument.TextWidth('WWW'));
   AllowScreenResizeArgument.Value := AllowScreenResizeToStr[AllowScreenResize];
 
+  RenderShadowsArgument := TGLMenuItemArgument.Create(
+    TGLMenuItemArgument.TextWidth('WWW'));
+  RenderShadowsArgument.Value := BoolToStrYesNo[RenderShadows];
+
   Items.Add('View video information');
   Items.AddObject('Texture quality', TextureMinificationQualitySlider);
   Items.AddObject('Allow screen resize on startup', AllowScreenResizeArgument);
+  Items.AddObject('Shadows', RenderShadowsArgument);
   Items.Add('Back to main menu');
 
   { Resigned ideas for menu options:
@@ -235,7 +242,11 @@ begin
          AllowScreenResizeArgument.Value :=
            AllowScreenResizeToStr[AllowScreenResize];
        end;
-    3: CurrentMenu := MainMenu;
+    3: begin
+         RenderShadows := not RenderShadows;
+         RenderShadowsArgument.Value := BoolToStrYesNo[RenderShadows];
+       end;
+    4: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

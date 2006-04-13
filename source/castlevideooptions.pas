@@ -74,10 +74,25 @@ var
   { You can set this to true for testing purposes. }
   RenderBoundingBoxes: boolean = false;
 
-var
-  RenderShadows: boolean = true;
+const
+  DefaultRenderShadows = true;
 
-  { You can set this to true for debug purposes. }
+var
+  { If false then you should do *nothing* related to the shadows,
+    i.e. you even shouldn't request stencil buffer for our window
+    or do in PrepareRender appropriate preparations for shadows.
+
+    In other words, RenderShadowsPossible = @false means that
+    for the whole lifetime of this program RenderShadows will
+    be treated like @false. }
+  RenderShadowsPossible: boolean = true;
+
+  { Should we actually render shadows ?
+    This is meaningfull only if RenderShadowsPossible. }
+  RenderShadows: boolean;
+
+  { You can set this to true for debug purposes.
+    This is meaningull only if RenderShadowsPossible and RenderShadows. }
   RenderShadowQuads: boolean = false;
 
 implementation
@@ -94,6 +109,8 @@ initialization
   CreatureAnimationScenesPerTime := ConfigFile.GetValue(
     'video_options/creature_animation_smoothness',
     DefaultCreatureAnimationScenesPerTime);
+  RenderShadows := ConfigFile.GetValue(
+    'video_options/shadows', DefaultRenderShadows);
 finalization
   ConfigFile.SetDeleteValue(
     'video_options/texture_minification_quality',
@@ -104,4 +121,7 @@ finalization
   ConfigFile.SetDeleteValue(
     'video_options/creature_animation_smoothness',
     CreatureAnimationScenesPerTime, DefaultCreatureAnimationScenesPerTime);
+  ConfigFile.SetDeleteValue(
+    'video_options/shadows',
+    RenderShadows, DefaultRenderShadows);
 end.

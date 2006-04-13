@@ -303,16 +303,24 @@ procedure Draw(Glwin: TGLWindow);
     Level.Items.Render(Player.Navigator.Frustum, true);
   end;
 
-  procedure RenderShadowQuads(Front: boolean);
+  procedure RenderFrontShadowQuads;
   var
     I: Integer;
   begin
     for I := 0 to Level.Creatures.High do
     begin
-      Level.Creatures.Items[I].RenderShadowQuads(
+      Level.Creatures.Items[I].RenderFrontShadowQuads(
         Level.LightCastingShadowsPosition,
-        Player.Navigator.CameraPos, Front);
+        Player.Navigator.CameraPos);
     end;
+  end;
+
+  procedure RenderBackShadowQuads;
+  var
+    I: Integer;
+  begin
+    for I := 0 to Level.Creatures.High do
+      Level.Creatures.Items[I].RenderBackShadowQuads;
   end;
 
 const
@@ -338,7 +346,7 @@ var
 begin
   ClearBuffers := GL_DEPTH_BUFFER_BIT;
 
-  if RenderShadows then
+  if RenderShadowsPossible and RenderShadows then
     ClearBuffers := ClearBuffers or GL_STENCIL_BUFFER_BIT;
 
   if Level.Scene.Background <> nil then
@@ -355,7 +363,7 @@ begin
 
   Level.LightSet.RenderLights;
 
-  if RenderShadows then
+  if RenderShadowsPossible and RenderShadows then
   begin
     glPushAttrib(GL_LIGHTING_BIT);
       { Headlight will stay on here, but lights in Level.LightSet are off.
@@ -378,11 +386,11 @@ begin
             value by 1. Render front facing shadow quads. }
           glStencilFunc(GL_ALWAYS, 0, 0);
           glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
-          RenderShadowQuads(true);
+          RenderFrontShadowQuads;
           { For each fragment that passes depth-test, *decrease* it's stencil
             value by 1. Render back facing shadow quads. }
           glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
-          RenderShadowQuads(false);
+          RenderBackShadowQuads;
         glSetDepthAndColorWriteable(GL_TRUE);
       glPopAttrib;
 
@@ -405,7 +413,7 @@ begin
         glDepthMask(GL_FALSE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
-        RenderShadowQuads(true);
+        RenderFrontShadowQuads;
       glPopAttrib;
     end;
   end else

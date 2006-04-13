@@ -123,7 +123,7 @@ begin
     { init glwindow }
     Glw.Caption := 'The Castle';
     Glw.ResizeAllowed := raOnlyAtInit;
-    if RenderShadows then
+    if RenderShadowsPossible then
       Glw.StencilBufferBits := 8;
     Glw.Init;
 
