@@ -245,6 +245,20 @@ begin
     3: begin
          RenderShadows := not RenderShadows;
          RenderShadowsArgument.Value := BoolToStrYesNo[RenderShadows];
+         if not RenderShadowsPossible then
+         begin
+           if RenderShadows then
+             MessageOK(Glw, 'Note that shadows are disabled by --no-shadows ' +
+               'command-line option. You must restart the game to see the ' +
+               'shadows.', taLeft);
+         end else
+         begin
+           if RenderShadows then
+             MessageOK(Glw, 'Shadows are basically implemented and work, ' +
+               'but they slow down rendering very much. That''s the reason ' +
+               'why for PGD stage 5 shadows are disabled by default. ' +
+               'You have been warned!', taLeft);
+         end;
        end;
     4: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');

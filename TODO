@@ -108,31 +108,17 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 
 - put some vertical crates around GlassPrison on basic_castle
 
-- shadow under the creatures would be nice (sgk_shadows should allow
-  me to this super-nicely).
-  Done, but need to be optimized to enabled by default!
-  Walk with gprof.
+- shadows under the creatures:
+  - need to be optimized to enabled by default.
+    Then set DefaultRenderShadows to true, and remove the warning in
+    CastleStartMenu when changing RenderShadows.
 
-  Add option --no-shadows to forbid even creation of shadows,
-  this inits RenderShadowsPossible.
+  GDC2003_ShadowVolumes.pdf has many interesting ideas.
+  Idea to eliminate occluders based on Frustum+LightPos seems suitable for me
+  and relatively easy, implement ?
 
-  README desc:
-
-  --no-shadows
-
-    This forbids generation of shadows in the program.
-    Not only this speeds up rendering, this also requires less
-    resources (we don't require stencil buffer from the OpenGL context)
-    and loading creatures is slightly faster.
-
-    It's adviced to use this option only if you use really old
-    graphic card (where stencil buffer requires too much resources).
-    For any sensible graphic card, you can simply turn shadows off
-    from the menu item "Video options -> Shadows", this will speed
-    up rendering.
-
-  When not RenderShadowsPossible, RenderShadows should not be
-  configurable from menu.
+  Implement and use (when you have to) ZFail,
+  test like descr in GDC2003_ShadowVolumes.pdf.
 
   Add creature option CastsShadow (def true) to turn shadows off
   for some creatures. For ball missile turn them off.

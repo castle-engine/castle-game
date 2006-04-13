@@ -35,11 +35,12 @@ var
   WasParam_NoScreenResize: boolean = false;
 
 const
-  Options: array[0..3]of TOption =
+  Options: array[0..4]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short: #0; Long: 'no-sound'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
-    (Short:'n'; Long: 'no-screen-resize'; Argument: oaNone)
+    (Short:'n'; Long: 'no-screen-resize'; Argument: oaNone),
+    (Short: #0; Long: 'no-shadows'; Argument: oaNone)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -60,6 +61,7 @@ begin
            '                        If your screen size is not ' +
              RequiredScreenSize +nl+
            '                        then will run in windowed mode.' +nl+
+           '  --no-shadows          Disable initializing and using shadows.' +nl+
            nl+
            SProgramHelpSuffix);
          ProgramBreak;
@@ -70,6 +72,7 @@ begin
          ProgramBreak;
        end;
     3: WasParam_NoScreenResize := true;
+    4: RenderShadowsPossible := false;
     else raise EInternalError.Create('OptionProc');
   end;
 end;

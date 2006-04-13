@@ -75,7 +75,7 @@ var
   RenderBoundingBoxes: boolean = false;
 
 const
-  DefaultRenderShadows = true;
+  DefaultRenderShadows = false;
 
 var
   { If false then you should do *nothing* related to the shadows,

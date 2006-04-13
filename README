@@ -123,6 +123,26 @@ You can also set this from the main menu:
 "Video options -> Allow screen resize on startup".
 
 --------------------
+Miscellaneous command-line options:
+
+--no-shadows
+
+  This disallows rendering of shadows in the game.
+  Just like turning off "Video options -> Shadows" option, this will
+  speed up rendering, since shadows will not be rendered.
+  Moreover this command-line option will cause whole
+  game to require less resources (we don't require stencil buffer
+  from the OpenGL context) and loading creatures will be (very slightly)
+  faster.
+
+  It's adviced to use this option only if stencil buffer
+  of your graphic card requires too much resources.
+  Then setting "Video options -> Shadows" option will not help,
+  but this command-line option will help.
+  In other cases, just turning off menu option "Video options -> Shadows"
+  is a good way to speed up rendering.
+
+--------------------
 Sound:
 
 The game doesn't play any sounds for now, although all the sound units
