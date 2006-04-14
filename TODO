@@ -8,8 +8,11 @@ Goal #1 (10 Points) - Engine must allow you to play more than one level per play
 Would be nice before next stage:
 - why with wide angle the corner geometry is sometimes clipped ?
 
-- Gate: 
+- Gate:
   - staircase: excessive polygons clear
+  - texture for water
+  - fix trees over the water
+  - make larger bumps in the ground after making river. Don't forget to fix height of the trees.
 
 --------------------
 Stage 6:
