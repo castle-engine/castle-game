@@ -552,6 +552,11 @@ Code:
   See [http://www.freepascal.org/]
 
 Graphics:
+- tree.blend based on tree02.3DS from Micha³ Wojtkiewicz. Thanks!
+
+- werewolf and alien creatures' models based on free models from
+  [http://www.3dcafe.com/]
+
 - Some of my other programs are used:
 
   - view3dscene was often used to see how VRMLs look
