@@ -13,7 +13,7 @@ Switch {
 		shininess 0.500000 
 		transparency 0.000000 
 	}
-	DEF Mesh
+	DEF MeshTree
 	Separator {
 		Texture2 {
 			filename //../textures/tree_texture.jpg
@@ -894,7 +894,7 @@ Separator {
 			0.000000 0.000000 0.005000 0.000000
 			0.246816 -0.291082 4.944858 1.000000
 		}
-		USE Mesh
+		USE MeshTree
 	}
 }
 }
