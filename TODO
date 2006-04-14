@@ -8,6 +8,9 @@ Goal #1 (10 Points) - Engine must allow you to play more than one level per play
 Would be nice before next stage:
 - why with wide angle the corner geometry is sometimes clipped ?
 
+- Gate: 
+  - staircase: excessive polygons clear
+
 --------------------
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.
