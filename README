@@ -332,9 +332,14 @@ Levels:
   Why ? Because I place items and enemies on the level.
   So size of all these various models must match.
 
-  In other words: just make sure you use "avatarSize [ 1, 2 ]"
+  In other words: just make sure you use
+    NavigationInfo {
+      avatarSize [ 0.5, 2 ]
+      speed 1.5
+      ...
+    }
   in your level. And force yourself to design a level that "fits"
-  such avatarSize.
+  such avatarSize and speed.
 
 - For more customized levels, you may want to derive new class
   from TLevel and override there things you want.
