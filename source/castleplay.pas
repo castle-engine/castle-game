@@ -26,7 +26,19 @@ interface
 
 uses Classes, CastleLevel, CastlePlayer, OpenGLFonts;
 
-procedure PlayLevel(ALevel: TLevel; APlayer: TPlayer);
+{ Play the game.
+
+  This initializes Level and Player global variables to
+  ALevel and APlayer. Upon exit, it will set Player and Level
+  back to nil.
+
+  Note that Level may change during the PlayLevel, because
+  of LevelFinished. In such case old Level value will be freeed,
+  and Level will be set to new value. Last Level value should
+  be freed be the called of PlayLevel. ALevel upon exit is set to this
+  last Level value (global Level value is then set to nil, so it
+  becomes useless). }
+procedure PlayLevel(var ALevel: TLevel; APlayer: TPlayer);
 
 var
   { Currently used player by PlayLevel. nil if PlayLevel doesn't work
@@ -53,6 +65,13 @@ var
   display it on the game screen. }
 procedure GameMessage(const S: string);
 
+{ If NextLevel = nil, then end the game.
+  Else free current Level and set Level to NextLevel.
+
+  Note that this doesn't work immediately, but will perform
+  at nearest possibility. While LevelFinished is scheduled but not
+  performed yet, you of course can't call LevelFinished once again
+  with different NextLevel. }
 procedure LevelFinished(NextLevel: TLevel);
 
 { Saves a screen, causing also appropriate GameMessage. }
@@ -118,6 +137,11 @@ var
   DisplayFpsUpdateTick: TMilisecTime;
   DisplayFpsFrameTime: Single;
   DisplayFpsRealTime: Single;
+
+  LevelFinishedSchedule: boolean = false;
+  { If LevelFinishedSchedule, then this is non-nil, and should be the next
+    value of Level. }
+  LevelFinishedNextLevel: TLevel;
 
 const
   SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
@@ -430,6 +454,43 @@ begin
   glPopAttrib;
 end;
 
+{ Call this when Level value changed (because of LevelFinished
+  or because we just started new game). }
+procedure InitNewLevel;
+const
+  HeadlightPower = 0.5;
+begin
+  { Resize uses Level.BoundingBox to set good projection min/max depths.
+    So we must call EventResize on each Level change. }
+  Glw.EventResize;
+
+  { Init Player.Navigator properties }
+  Player.Navigator.OnMoveAllowed := Level.PlayerMoveAllowed;
+  Player.Navigator.OnGetCameraHeight := Level.PlayerGetCameraHeight;
+
+  { Init initial camera pos }
+  Player.Navigator.Init(Level.HomeCameraPos, Level.HomeCameraDir,
+    Level.HomeCameraUp, Level.CameraPreferredHeight,
+    0.0 { Level.CameraPreferredHeight is already corrected if necessary,
+          so I pass here 0.0 instead of CameraRadius } );
+
+  Player.Navigator.CancelFallingDown;
+
+  { Init headlight }
+  if Level.Headlight then
+  begin
+    glEnable(GL_LIGHT0);
+    glLightv(GL_LIGHT0, GL_DIFFUSE,
+      Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
+    glLightv(GL_LIGHT0, GL_SPECULAR,
+      Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
+  end else
+    glDisable(GL_LIGHT0);
+
+  { First GameMessage for this level. }
+  GameMessage('Loaded level "' + Level.Title + '"');
+end;
+
 procedure Idle(Glwin: TGLWindow);
 var
   PickItemIndex, PlayerItemIndex: Integer;
@@ -463,6 +524,14 @@ begin
   end;
 
   Player.Idle(Glw.FpsCompSpeed);
+
+  if LevelFinishedSchedule then
+  begin
+    LevelFinishedSchedule := false;
+    FreeAndNil(Level);
+    Level := LevelFinishedNextLevel;
+    InitNewLevel;
+  end;
 end;
 
 procedure Timer(Glwin: TGLWindow);
@@ -794,9 +863,7 @@ begin
   alUpdateListener;
 end;
 
-procedure PlayLevel(ALevel: TLevel; APlayer: TPlayer);
-const
-  HeadlightPower = 0.5;
+procedure PlayLevel(var ALevel: TLevel; APlayer: TPlayer);
 var
   SavedMode: TGLMode;
 begin
@@ -804,6 +871,7 @@ begin
   Player := APlayer;
   InventoryVisible := false;
   InventoryCurrentItem := -1;
+  LevelFinishedSchedule := false;
   try
 
     SavedMode := TGLMode.Create(glw,
@@ -817,14 +885,6 @@ begin
       try
         { Init Player.Navigator properties }
         Player.Navigator.OnMatrixChanged := TDummy.MatrixChanged;
-        Player.Navigator.OnMoveAllowed := Level.PlayerMoveAllowed;
-        Player.Navigator.OnGetCameraHeight := Level.PlayerGetCameraHeight;
-
-        { Init initial camera pos }
-        Player.Navigator.Init(Level.HomeCameraPos, Level.HomeCameraDir,
-          Level.HomeCameraUp, Level.CameraPreferredHeight,
-          0.0 { Level.CameraPreferredHeight is already corrected if necessary,
-                so I pass here 0.0 instead of CameraRadius } );
 
         { tests:
           InfoWrite(Format('%f %f %f %f',
@@ -843,29 +903,18 @@ begin
         Glw.OnKeyDown := KeyDown;
         Glw.OnMouseDown := MouseDown;
 
-        Glw.EventResize;
-
-        GameEnded := false;
-
-        glEnable(GL_LIGHTING);
-        if Level.Headlight then
-        begin
-          glEnable(GL_LIGHT0);
-          glLightv(GL_LIGHT0, GL_DIFFUSE,
-            Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
-          glLightv(GL_LIGHT0, GL_SPECULAR,
-            Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
-        end;
-
-        GLWinMessagesTheme.RectColor[3] := 0.4;
-
         GameMessagesManager := TTimeMessagesManager.Create(
           Glw, hpMiddle, vpDown, Glw.Width);
         try
           GameMessagesManager.MaxMessagesCount := 4;
 
-          { First GameMessage for this level. }
-          GameMessage('Loaded level "' + Level.Title + '"');
+          InitNewLevel;
+
+          GameEnded := false;
+
+          glEnable(GL_LIGHTING);
+
+          GLWinMessagesTheme.RectColor[3] := 0.4;
 
           repeat
             Glwm.ProcessMessage(true);
@@ -882,6 +931,7 @@ begin
 
   finally
     { clear global vars, for safety }
+    ALevel := Level;
     Level := nil;
     Player := nil;
   end;
@@ -902,8 +952,12 @@ begin
     GameEnded := true;
   end else
   begin
-    MessageOK(Glw, 'Next level: TODO');
-    GameEnded := true;
+    if LevelFinishedSchedule and (LevelFinishedNextLevel <> NextLevel) then
+      raise EInternalError.Create(
+        'You cannot call LevelFinished while previous LevelFinished is not done yet');
+
+    LevelFinishedSchedule := true;
+    LevelFinishedNextLevel := NextLevel;
   end;
 end;
 

@@ -74,10 +74,15 @@ type
     FWaypoints: TSceneWaypointsList;
     FLightCastingShadowsPosition: TVector3Single;
   protected
+    { See README for description of LevelBox and HintButtonBox trick.
+      Remember that this may change Scene.BoundingBox (in case we will
+      find and remove the node from Scene). }
+    function RemoveBoxNode(var Box: TBox3d; const NodeName: string): boolean;
+
     { This will be called from our constructor before initializing
       our octrees. You can override this to do here some operations
       that change the Scene.RootNode (e.g. you can do here tricks like
-      extracting some specific objects like HintButtonBox).
+      extracting some specific objects using RemoveBoxNode).
       Be very cautious what you do here --- remember that this is called
       while TLevel.Create constructor did not finish it's work yet ! }
     procedure ChangeLevelScene; virtual;
@@ -273,6 +278,16 @@ type
       SpecialObjectIndex: Integer); override;
   end;
 
+  TGateLevel = class(TLevel)
+  private
+    FGateExitBox: TBox3d;
+  protected
+    procedure ChangeLevelScene; override;
+  public
+    constructor Create;
+    procedure Idle(const CompSpeed: Single); override;
+  end;
+
 implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
@@ -290,27 +305,6 @@ constructor TLevel.Create(const ASceneFileName, ALightSetFileName: string);
     for I := 0 to ItemsToRemove.Count - 1 do
       ItemsToRemove.Items[I].FreeRemovingFromAllParents;
     Scene.ChangedAll;
-  end;
-
-  { See README for description of LevelBox and HintButtonBox trick.
-    Remember that this may change Scene.BoundingBox (in case we will
-    find and remove the node from Scene). }
-  function RemoveBoxNode(var Box: TBox3d; const NodeName: string): boolean;
-  var
-    BoxNodeIndex: Integer;
-  begin
-    BoxNodeIndex := Scene.ShapeStates.IndexOfShapeWithParentNamed(NodeName);
-    Result := BoxNodeIndex <> -1;
-    if Result then
-    begin
-      { When node with name NodeName is found, then we calculate our
-        Box from this node (and we delete this node from the scene,
-        as it should not be visible).
-        This way we can comfortably set such boxes from Blender. }
-      Box := Scene.ShapeStates[BoxNodeIndex].BoundingBox;
-      Scene.ShapeStates[BoxNodeIndex].ShapeNode.FreeRemovingFromAllParents;
-      Scene.ChangedAll;
-    end;
   end;
 
 const
@@ -445,6 +439,24 @@ begin
   FreeWithContentsAndNil(FItems);
   FreeWithContentsAndNil(FCreatures);
   inherited;
+end;
+
+function TLevel.RemoveBoxNode(var Box: TBox3d; const NodeName: string): boolean;
+var
+  BoxNodeIndex: Integer;
+begin
+  BoxNodeIndex := Scene.ShapeStates.IndexOfShapeWithParentNamed(NodeName);
+  Result := BoxNodeIndex <> -1;
+  if Result then
+  begin
+    { When node with name NodeName is found, then we calculate our
+      Box from this node (and we delete this node from the scene,
+      as it should not be visible).
+      This way we can comfortably set such boxes from Blender. }
+    Box := Scene.ShapeStates[BoxNodeIndex].BoundingBox;
+    Scene.ShapeStates[BoxNodeIndex].ShapeNode.FreeRemovingFromAllParents;
+    Scene.ChangedAll;
+  end;
 end;
 
 procedure TLevel.ChangeLevelScene;
@@ -968,6 +980,28 @@ begin
         end else
           GameMessage('You see a button. You cannot reach it from here');
       end;
+  end;
+end;
+
+{ TGateLevel ----------------------------------------------------------------- }
+
+constructor TGateLevel.Create;
+begin
+  inherited Create('gate_final.wrl', 'gate_lights.wrl');
+end;
+
+procedure TGateLevel.ChangeLevelScene;
+begin
+  inherited;
+  if not RemoveBoxNode(FGateExitBox, 'GateExitBox') then
+    raise EInternalError.Create('Gate level doesn''t contain "GateExitBox"');
+end;
+
+procedure TGateLevel.Idle(const CompSpeed: Single);
+begin
+  if Box3dPointInside(Player.Navigator.CameraPos, FGateExitBox) then
+  begin
+    LevelFinished(TCastleHallLevel.Create);
   end;
 end;
 

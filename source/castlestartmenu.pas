@@ -109,25 +109,24 @@ end;
 
 procedure TMainMenu.CurrentItemSelected;
 
-  procedure NewGame(Level: TLevel);
+  procedure NewGame(LocalLevel: TLevel);
   var
-    Player: TPlayer;
+    LocalPlayer: TPlayer;
   begin
     try
       CreaturesKinds.PrepareRender;
       ItemsKinds.PrepareRender;
       GameMessages.Clear;
-      Player := TPlayer.Create;
+      LocalPlayer := TPlayer.Create;
       try
-        PlayLevel(Level, Player);
-      finally Player.Free end;
-    finally Level.Free end;
+        PlayLevel(LocalLevel, LocalPlayer);
+      finally FreeAndNil(LocalPlayer) end;
+    finally FreeAndNil(LocalLevel) end;
   end;
 
 begin
   case CurrentItem of
-    0: NewGame(
-         TLevel.Create('gate_final.wrl', 'gate_lights.wrl'));
+    0: NewGame(TGateLevel.Create);
     1: NewGame(
          TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
     2: NewGame(TCastleHallLevel.Create);
