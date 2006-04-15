@@ -81,7 +81,7 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
 	Separator {
 		"))
 
-(defun kam-remove-vertex-col-material-one-mesh ()
+(defun kam-remove-vertex-col-material-one-mesh (mesh-name-regexp)
   "When UV mapping was used for the mesh, blender will export this model
 with Materal properties taken from vertex painting.
 It will do this even if you did not actually use vertex painting.
@@ -94,7 +94,7 @@ but you still want the mesh to use \"normal\" material defined
 in blender, not the vertex painting."
   (interactive)
   (kam-simple-re-replace-buffer (concat
-    (kam-blender-mesh-node-start-regexp mesh-name)
+    (kam-blender-mesh-node-start-regexp mesh-name-regexp)
     (kam-blender-texture2-node-regexp ".+") "
 		Material {
 			diffuseColor \\[\\([.0-9 ,\t\n]+\\)\\]
@@ -190,5 +190,11 @@ on MESH-NAME to be correctly interpreted."
 (defun kam-process-gate ()
   (interactive)
   (kam-fix-vertex-col-material "MeshRocks")
+  (kam-remove-vertex-col-material-one-mesh "MeshWater")
+  (kam-add-material-for-mesh "MeshWater" "MatWater")
+  (kam-simple-replace-buffer "DEF MatWater
+	Material {" "DEF MatWater
+	Material {
+          fogImmune TRUE")
   (write-file "gate_processed.wrl")
 )

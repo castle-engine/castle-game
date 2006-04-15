@@ -1,18 +1,16 @@
 --------------------
 Must-have before next stage:
+- Gate:
+  - fix trees over the water
+  - make larger bumps in the ground after making river. Don't forget to fix height of the trees.
 
 Stage 5 (3 weeks): Mar 26th - Apr 15th
 Goal #1 (10 Points) - Engine must allow you to play more than one level per play. Design a minimum of 2 levels to be played by optional selection or in sequence.
 
 --------------------
 Would be nice before next stage:
-- why with wide angle the corner geometry is sometimes clipped ?
-
 - Gate:
   - staircase: excessive polygons clear
-  - texture for water
-  - fix trees over the water
-  - make larger bumps in the ground after making river. Don't forget to fix height of the trees.
 
   - player behavior with the water:
 
@@ -36,6 +34,8 @@ Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
 
+- why with wide angle the corner geometry is sometimes clipped ?
+
 - Creatures<->level collision checking should be done using
   creature's bounding box, not CameraRadius.
   Creature's CameraRadius is a hack, and should be preferably removed.
@@ -56,7 +56,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
     creature hydra (very tall, very long when killed; will be a nice demo of my good collision checking routines)
 
 - "The Gate" level:
-  - volumetric fog (like from malfunction) needed there. I also want to demonstrate fog in my engine...
   - intro under menu: camera floating around level with this fog ?
   - walking down the stairs and down the hill causes player to lose life
 

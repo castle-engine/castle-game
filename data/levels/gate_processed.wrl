@@ -8,7 +8,8 @@ Separator {
 Switch {
 	DEF MatWater
 	Material {
-		diffuseColor 0.000000 0.571664 0.965806
+          fogImmune TRUE
+		diffuseColor 0.000000 0.000000 1.000000
 		specularColor 0.000000 0.000000 0.000000
 		shininess 0.500000 
 		transparency 0.284406 
@@ -21188,7 +21189,12 @@ Switch {
 		}
 	}
 	DEF MeshWater
-	Separator {
+	Separator { USE MatWater
+		Texture2 {
+			filename //../textures/water2.jpg
+			wrapS REPEAT 
+			wrapT REPEAT 
+		}
 		Coordinate3 {
 			point [
 				 186.480011 186.479980 0.000000,
@@ -21197,11 +21203,20 @@ Switch {
 				 -186.479965 186.480057 0.000000,
 			]
 		}
-		USE MatWater
-
+		TextureCoordinate2 {
+			point [
+				 -4.511200 5.511200,
+				 -4.511200 -4.511200,
+				 5.511200 -4.511200,
+				 5.511200 5.511200,
+			]
+		}
 		IndexedFaceSet {
 			coordIndex [
 				 0, 3, 2, 1, -1,
+			]
+			textureCoordIndex [
+				 0, 1, 2, 3, -1,
 			]
 		}
 	}
