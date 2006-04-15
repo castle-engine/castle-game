@@ -2,8 +2,12 @@
 
 --------------------
 PGD competition stage 5 short notes:
+
 - Menus: done. Start menu and in-game menu (on Escape key).
-- New level: in progress...
+
+- New level: done. It's the "Gate" level (this is the initial level
+  when you enter "New Game"). See section "Levels included" below
+  for more info.
 
 --------------------
 Installing and running:
@@ -39,9 +43,32 @@ Also you should have at least 256 MB available memory.
 Preferably more (like 512 MB) to be on the "really safe side".
 
 --------------------
-Sample levels included:
+Levels included:
 
-"Tower" : initially it was named "Sample castle level" and was a simple
+Currently there are 3 levels in the game (but 1 of them is only for testing,
+not for the final game).
+
+"Gate":
+  This is the level made for PGD stage 5.
+  When you start "New Game", you enter this level.
+
+  Walkthrough: to finish the level go up the stairs and
+  step inside the black corridor.
+
+"Castle hall" :
+  This is the level made for PGD stage 3.
+  After finishing "Gate" level, you're transferred to this level.
+
+  Walkthrough: find and click the red button. Kill the boss.
+  Level exit will be revealed.
+
+"Tower" :
+  This is only a testing level (i.e. it's not something supposed
+  to be played by real player; it's just a playground for me,
+  to test various things).
+  You have to use "Debug menu -> Change to level" option to get to this level.
+
+  Initially it was named "Sample castle level" and was a simple
   level submitted for PGD stage 2.
   This was actually combined from my old demo castle model,
   and I added night sky with moon that was used in
@@ -51,9 +78,9 @@ Sample levels included:
   Before stage 4 deadline, I changed it a lot, but it's still
   just a testing level.
 
-"Castle hall" : this is the level made for PGD stage 3.
-  Walkthrough: find and click the red button. Kill the boss.
-  Level exit will be revealed.
+  There is no way to exit from this level. You just have to end the game,
+  kill yourself, or use "Debug menu" to switch to another level.
+  Like I said, this is only a testing level.
 
 If you want to see other models demonstrating my engine, see
 [http://www.camelot.homedns.org/~michalis/miscella/kambi_vrml_examples.zip]

@@ -31,7 +31,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
-  CastleItems, GLMenu, RaysWindow, CastleVideoOptions;
+  CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -145,6 +145,7 @@ begin
   Items.AddObject('Set player speed', PlayerSpeedSlider);
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
   Items.AddObject('Render shadow quads', RenderShadowQuadsArgument);
+  Items.Add('Change to level');
   Items.Add('Back to game menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -257,6 +258,30 @@ procedure TDebugMenu.CurrentItemSelected;
     UserQuit := true;
   end;
 
+  procedure ChangeToLevel;
+  var
+    S: TStringList;
+    Index: Integer;
+  begin
+    S := TStringList.Create;
+    try
+      S.Append('Level "Gate"');
+      S.Append('Level "Castle Hall"');
+      S.Append('Level "Tower"');
+      S.Append('Cancel');
+      Index := ChooseByMenu(GLList_ScreenImage, S);
+      case Index of
+        0: LevelFinished(TGateLevel.Create);
+        1: LevelFinished(TCastleHallLevel.Create);
+        2: LevelFinished(
+             TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
+        3: Exit { don't set UserQuit to true } ;
+        else raise EInternalError.Create('ChangeToLevel: Index = ?');
+      end;
+      UserQuit := true;
+    finally S.Free end;
+  end;
+
 begin
   case CurrentItem of
     0: PlayerMaxLife;
@@ -277,7 +302,8 @@ begin
          RenderShadowQuads := not RenderShadowQuads;
          RenderShadowQuadsArgument.Value := BoolToStrYesNo[RenderShadowQuads];
        end;
-    11: CurrentMenu := GameMenu;
+    11: ChangeToLevel;
+    12: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

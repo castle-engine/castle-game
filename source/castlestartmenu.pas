@@ -89,9 +89,7 @@ constructor TMainMenu.Create;
 begin
   inherited Create;
 
-  Items.Add('New game (The Gate - new level for PGD stage 4)');
-  Items.Add('New game (Tower - just a test level)');
-  Items.Add('New game (Castle Hall - new level for PGD stage 3)');
+  Items.Add('New game');
   Items.Add('Configure controls');
   Items.Add('Video options');
   Items.Add('Sound options');
@@ -127,14 +125,11 @@ procedure TMainMenu.CurrentItemSelected;
 begin
   case CurrentItem of
     0: NewGame(TGateLevel.Create);
-    1: NewGame(
-         TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
-    2: NewGame(TCastleHallLevel.Create);
-    3: ShowControlsMenu(GLList_ScreenImage, false, false);
-    4: CurrentMenu := VideoMenu;
-    5: CurrentMenu := SoundMenu;
-    6: ShowCreditsMessage;
-    7: UserQuit := true;
+    1: ShowControlsMenu(GLList_ScreenImage, false, false);
+    2: CurrentMenu := VideoMenu;
+    3: CurrentMenu := SoundMenu;
+    4: ShowCreditsMessage;
+    5: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
