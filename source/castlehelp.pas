@@ -24,7 +24,7 @@ unit CastleHelp;
 interface
 
 const
-  Version = '0.4.0';
+  Version = '0.5.0';
 
 procedure ShowCreditsMessage;
 
@@ -38,7 +38,7 @@ uses SysUtils, Classes, GLWinMessages, CastleWindow, KambiUtils, CastlePlay;
 
 procedure ShowCreditsMessage;
 begin
-  { TODO: put here credist from README etc. }
+  { TODO: put here credits from README etc. }
   MessageOK(Glw, SProgramHelpSuffix, taLeft);
 end;
 
