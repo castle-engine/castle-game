@@ -14,6 +14,18 @@ Would be nice before next stage:
   - fix trees over the water
   - make larger bumps in the ground after making river. Don't forget to fix height of the trees.
 
+  - player behavior with the water:
+
+    He must be able to get under the water.
+    Visibility under the water: blueish (blue fog ?)
+    He must be able to drown!
+    Up/down should work there like when flying (but slower ?)
+    Gravity should be slower under the water.
+
+  - try ideas to make rock look even more like a rock:
+    more randomization still ?
+    color some vertexes darker ?
+
 --------------------
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.
