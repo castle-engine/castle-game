@@ -1,8 +1,10 @@
 --------------------
 Must-have before next stage:
 - Gate:
-  - fix trees over the water
   - make larger bumps in the ground after making river. Don't forget to fix height of the trees.
+  - texture gate mesh
+  - make gate entrance to castle_hall level
+  - place creatures on gate level (new creature: ghost!)
 
 Stage 5 (3 weeks): Mar 26th - Apr 15th
 Goal #1 (10 Points) - Engine must allow you to play more than one level per play. Design a minimum of 2 levels to be played by optional selection or in sequence.
