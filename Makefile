@@ -104,4 +104,12 @@ dist:
 	cd $(TMP_DIST_PATH); tar czf castle-$(VERSION).tar.gz castle/
 	mv $(TMP_DIST_PATH)castle-$(VERSION).tar.gz .
 
+# ----------------------------------------
+# Set SVN tag.
+
+svntag:
+	svn copy file:///home/michal/svn/kambi-svn-repos/castle/trunk/ \
+	         file:///home/michal/svn/kambi-svn-repos/castle/tags/$(VERSION) \
+	  -m "Tagging the $(VERSION) version of 'The Castle'."
+
 # eof ------------------------------------------------------------

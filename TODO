@@ -289,5 +289,7 @@ Each time before uploading PGD release:
       rm -f ~/.castle.data
       ln -s /win/mojepasy/openGL/castle/trunk/ ~/.castle.data
   - test building from extracted created dist (using `make build-xxx')
+- upload to PGD
+- make svntag
 
 ----------------------------------------
