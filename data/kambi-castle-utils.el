@@ -53,24 +53,61 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
     "filename ../textures/")
 )
 
-(defun kam-blender-texture2-node-regexp (texture-filename)
+(defun kam-blender-texture2-node-regexp (texture-filename-regexp)
   "Texture2 VRML 1.0 node as written by Blender exporter."
   (concat
   "Texture2 {
-			filename \\(" texture-filename "\\)
+			filename \\(" texture-filename-regexp "\\)
 			wrapS \\(.+\\)
 			wrapT \\(.+\\)
-		}")
+		}"))
+
+(defun kam-blender-texture2-node-regexp-replacement (replacement-num)
+  (concat
+    "Texture2 {
+			filename \\" (number-to-string replacement-num) "
+			wrapS \\" (number-to-string (+ 1 replacement-num)) "
+			wrapT \\" (number-to-string (+ 2 replacement-num)) "
+		}"))
+
+(defun kam-blender-mesh-node-start-regexp (mesh-name-regexp)
+  (concat "DEF \\(" mesh-name-regexp "\\)
+	Separator {
+		"))
+
+(defun kam-blender-mesh-node-start-regexp-replacement (replacement-num)
+  (concat
+    "DEF \\" (number-to-string replacement-num) "
+	Separator {
+		"))
+
+(defun kam-remove-vertex-col-material-one-mesh ()
+  "When UV mapping was used for the mesh, blender will export this model
+with Materal properties taken from vertex painting.
+It will do this even if you did not actually use vertex painting.
+This means that blender's material values that you set for this
+object will be ignored. This function fixes the situation by removing
+VRML Material node that corresponds to vertex painting.
+
+In other words: use this when you used UV mapping for your mesh,
+but you still want the mesh to use \"normal\" material defined
+in blender, not the vertex painting."
+  (interactive)
+  (kam-simple-re-replace-buffer (concat
+    (kam-blender-mesh-node-start-regexp mesh-name)
+    (kam-blender-texture2-node-regexp ".+") "
+		Material {
+			diffuseColor \\[\\([.0-9 ,\t\n]+\\)\\]
+		}
+		MaterialBinding { value PER_VERTEX_INDEXED }")
+    (concat
+      (kam-blender-mesh-node-start-regexp-replacement 1)
+      (kam-blender-texture2-node-regexp-replacement 2)))
 )
 
-(defconst kam-blender-texture2-node-regexp-replacement
-  "Texture2 {
-			filename \\1
-			wrapS \\2
-			wrapT \\3
-		}")
-
 (defun kam-remove-vertex-col-material ()
+  "Like `kam-remove-vertex-col-material-one-mesh' but for all
+meshes in the model."
   (interactive)
   (kam-simple-re-replace-buffer (concat
     (kam-blender-texture2-node-regexp ".+") "
@@ -78,7 +115,33 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
 			diffuseColor \\[\\([.0-9 ,\t\n]+\\)\\]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }")
-    kam-blender-texture2-node-regexp-replacement)
+    (kam-blender-texture2-node-regexp-replacement 1))
+)
+
+(defun kam-fix-vertex-col-material (mesh-name)
+  "When UV mapping was used for the mesh, blender will export this model
+with Materal properties taken from vertex painting.
+However, Material property will be wrong (PER_VERTEX_INDEXED instead of
+PER_VERTEX). This fixes the error.
+
+In other words: use this if you want your vertex painting
+on MESH-NAME to be correctly interpreted."
+  (interactive)
+  (kam-simple-re-replace-buffer (concat
+    (kam-blender-mesh-node-start-regexp mesh-name)
+    (kam-blender-texture2-node-regexp ".+") "
+		Material {
+			diffuseColor \\(\\[\\([.0-9 ,\t\n]+\\)\\]\\)
+		}
+		MaterialBinding { value PER_VERTEX_INDEXED }")
+    (concat
+      (kam-blender-mesh-node-start-regexp-replacement 1)
+      (kam-blender-texture2-node-regexp-replacement 2) "
+		Material {
+			diffuseColor \\5
+		}
+		MaterialBinding { value PER_VERTEX }")
+  )
 )
 
 (defun kam-add-material-for-mesh (mesh-name material-name)
@@ -122,4 +185,10 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
                 "USE MatInside")
   (kam-fix-blender-filename)
   (write-file "life_potion_processed.wrl")
+)
+
+(defun kam-process-gate ()
+  (interactive)
+  (kam-fix-vertex-col-material "MeshRocks")
+  (write-file "gate_processed.wrl")
 )

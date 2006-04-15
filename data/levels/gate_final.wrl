@@ -41,5 +41,5 @@ Group {
     visibilityRange 50
   }
 
-  WWWInline { name "gate.wrl" }
+  WWWInline { name "gate_processed.wrl" }
 }
