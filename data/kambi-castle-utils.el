@@ -196,5 +196,6 @@ on MESH-NAME to be correctly interpreted."
 	Material {" "DEF MatWater
 	Material {
           fogImmune TRUE")
+  (kam-fix-vertex-col-material "MeshGate")
   (write-file "gate_processed.wrl")
 )

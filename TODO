@@ -2,7 +2,6 @@
 Must-have before next stage:
 - Gate:
   - make larger bumps in the ground after making river. Don't forget to fix height of the trees.
-  - texture gate mesh
   - make gate entrance to castle_hall level
   - place creatures on gate level (new creature: ghost!)
 
@@ -241,6 +240,8 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   horror/abom
   anatomy_people/creature
   anatomy_people/vampire
+
+  /win/3dmodels/www.katorlegaz.com/animals/horse
 
 - Load / save game ability.
 
