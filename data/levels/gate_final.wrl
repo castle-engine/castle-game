@@ -2,7 +2,7 @@
 
 Group {
   # Just for testing lights from view3dscene
-  WWWInline { name "gate_lights.wrl" separate FALSE }
+  # WWWInline { name "gate_lights.wrl" separate FALSE }
 
   PerspectiveCamera {
     position 205.94734191894531 -320.15972900390625 1.816442251205444
