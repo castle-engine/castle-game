@@ -1,5 +1,4 @@
 --------------------
-Must-have before next stage:
 - Gate:
   - place ghosts on gate level
 
@@ -102,8 +101,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   But that's still just a workaround.
 
 - some effects: blood explode when player hits monster.
-
-- creature that attacks from short-range (swordsman, golem etc.)
 
 - I really don't like the "alien" model. It's generally nice,
   but it doesn't fit this game, and I just can't texture it appropriately.
@@ -251,11 +248,7 @@ dist-making to-dos:
   it doesn't need many things, including all sources and *
   .blend and *.xcf (and some other internals in menu_bg)
 
-- Makefile to pack distro of my game:
-  add at some point svn log (with files, i.e. C-u svn log) of trunk,
-  add svn log of units changes,
-  say somewhere that this was developed as part of svn repository.
-
+- Makefile to pack distro of my game: add at some point svn log:
   svn log -v file:///home/michal/svn/kambi-svn-repos/ \
     castle/trunk kambi_pascal_units/trunk > ChangeLog
 
