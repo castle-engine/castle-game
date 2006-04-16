@@ -69,6 +69,8 @@ type
     stWerewolfHowling,
     stBallMissileFired,
     stBallMissileExplode,
+    stGhostSuddenPain,
+    stGhostAttackStart,
     { @groupEnd }
 
     { Others.

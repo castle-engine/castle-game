@@ -999,6 +999,7 @@ end;
 
 procedure TGateLevel.Idle(const CompSpeed: Single);
 begin
+  inherited;
   if Box3dPointInside(Player.Navigator.CameraPos, FGateExitBox) then
   begin
     LevelFinished(TCastleHallLevel.Create);

@@ -1,15 +1,10 @@
 --------------------
 Must-have before next stage:
 - Gate:
-  - make larger bumps in the ground after making river. Don't forget to fix height of the trees.
-  - place creatures on gate level (new creature: ghost!)
+  - place ghosts on gate level
 
-Stage 5 (3 weeks): Mar 26th - Apr 15th
-Goal #1 (10 Points) - Engine must allow you to play more than one level per play. Design a minimum of 2 levels to be played by optional selection or in sequence.
+  - give him weapon and life potion!
 
---------------------
-Would be nice before next stage:
-- Gate:
   - staircase: excessive polygons clear
 
   - player behavior with the water:
@@ -22,6 +17,8 @@ Would be nice before next stage:
 
   - try ideas to make rock look even more like a rock:
     more randomization still ?
+
+  - make larger bumps in the ground after making river. Don't forget to fix height of the trees.
 
 --------------------
 Stage 6:
@@ -59,9 +56,8 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   - intro under menu: camera floating around level with this fog ?
   - walking down the stairs and down the hill causes player to lose life
 
-- Do Flying creature (Like a ghost ? Only blended things ? Would be nice...)
-  - There must be a way to say that some sectors are not important
-    for AI for creatures with Flying.
+- There must be a way to say that some sectors are not important
+  for AI for creatures with Flying. (like ghost)
 
 - sectors and waypoints finish, see README for TO-DOs.
 

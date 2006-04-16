@@ -52,7 +52,6 @@ type
     FCameraRadius: Single;
     FSoundSuddenPain: TSoundType;
     FDefaultMaxLife: Single;
-    FCollisionsWithCreaturesAndPlayer: boolean;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -99,21 +98,6 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single): TCreature; virtual; abstract;
-
-    { If @false, then TCreaturesList.MoveAllowedSimple and
-      TCreaturesList.GetCameraHeight will always ignore this
-      creature, which means that collisions between this creature
-      and player/other creatures will not be checked.
-      You should set this to @false only in exceptional situations,
-      when you're doing collision checking elsewhere
-      (e.g. for TMissileCreatureKind, collision is done when
-      the missile moves).
-
-      For all "normal" creatures this should be left as @true. }
-    property CollisionsWithCreaturesAndPlayer: boolean
-      read FCollisionsWithCreaturesAndPlayer
-      write FCollisionsWithCreaturesAndPlayer
-      default true;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -300,6 +284,13 @@ type
       const AnimationTime: Single): TCreature; override;
   end;
 
+  TGhostKind = class(TWalkAttackCreatureKind)
+    function CreateDefaultCreature(
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AnimationTime: Single): TCreature; override;
+  end;
+
   { This is a missile. As you can see, this is also treated as a creature
     --- it's just a very dumb creature, that just moves into the given
     direction and explodes on any collision. }
@@ -333,10 +324,6 @@ type
       for this class (because TMissileCreature may depend on it and never
       cares to keep Direction horizontal). }
     property Flying default true;
-
-    { Missiles always should have this left as @false.
-      We will check for collisions when missile moves. }
-    property CollisionsWithCreaturesAndPlayer default false;
 
     property SoundExplosion: TSoundType
       read FSoundExplosion write FSoundExplosion default stNone;
@@ -511,6 +498,19 @@ type
       On set, this vector will be normalized. }
     property LastAttackDirection: TVector3Single
       read FLastAttackDirection write SetLastAttackDirection;
+
+    { If @false, then TCreaturesList.MoveAllowedSimple and
+      TCreaturesList.GetCameraHeight will ignore this
+      creature, which means that collisions between this creature
+      and player/other creatures will not be checked.
+      You should set this to @false only in exceptional situations,
+      when you're doing collision checking elsewhere
+      (e.g. for TMissileCreatureKind, collision is done when
+      the missile moves).
+
+      For all "normal" creatures this should be left as default implementation
+      that always returns @true. }
+    function CollisionsWithCreaturesAndPlayer: boolean; virtual;
   end;
 
   TObjectsListItem_1 = TCreature;
@@ -561,8 +561,7 @@ type
     FState: TWalkAttackCreatureState;
     procedure SetState(Value: TWalkAttackCreatureState);
 
-    { last FState change time, taken from Level.AnimationTime. }
-    StateChangeTime: Single;
+    FStateChangeTime: Single;
 
     { time of last FState change to wasAttack, taken from Level.AnimationTime. }
     LastAttackTime: Single;
@@ -600,6 +599,9 @@ type
     property State: TWalkAttackCreatureState read FState
       default wasStand;
 
+    { Last State change time, taken from Level.AnimationTime. }
+    property StateChangeTime: Single read FStateChangeTime;
+
     procedure Idle(const CompSpeed: Single); override;
 
     function CurrentScene: TVRMLFlatSceneGL; override;
@@ -634,6 +636,19 @@ type
     procedure ActualAttack; override;
   end;
 
+  TGhostCreature = class(TWalkAttackCreature)
+  public
+    procedure ActualAttack; override;
+
+    { Ghosts dead animation is quite unique, so we will not check
+      collisions with ghost when it's in dying state.
+      Ghost is blended anyway, so checking for collisions with him
+      is not really necessary anyway. }
+    function CollisionsWithCreaturesAndPlayer: boolean; override;
+
+    function RemoveMeFromLevel: boolean; override;
+  end;
+
   { This is TCreature that has a kind always of TMissileCreatureKind. }
   TMissileCreature = class(TCreature)
   private
@@ -648,6 +663,10 @@ type
 
     function CurrentScene: TVRMLFlatSceneGL; override;
 
+    { Missiles return @false here.
+      We will check for collisions when missile moves. }
+    function CollisionsWithCreaturesAndPlayer: boolean; override;
+
     function RemoveMeFromLevel: boolean; override;
   end;
 
@@ -657,6 +676,7 @@ var
   Alien: TBallThrowerCreatureKind;
   Werewolf: TWerewolfKind;
   BallMissile: TMissileCreatureKind;
+  Ghost: TGhostKind;
 
 {$undef read_interface}
 
@@ -678,7 +698,6 @@ begin
   FVRMLNodeName := AVRMLNodeName;
   FFlying := false;
   FDefaultMaxLife := DefaultDefaultMaxLife;
-  FCollisionsWithCreaturesAndPlayer := true;
   CreaturesKinds.Add(Self);
 end;
 
@@ -826,6 +845,17 @@ begin
     DefaultMaxLife, AnimationTime);
 end;
 
+{ TGhostKind ------------------------------------------------------------- }
+
+function TGhostKind.CreateDefaultCreature(
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AnimationTime: Single): TCreature;
+begin
+  Result := TGhostCreature.Create(Self, ALegsPosition, ADirection,
+    DefaultMaxLife, AnimationTime);
+end;
+
 { TMissileCreatureKind ---------------------------------------------------- }
 
 constructor TMissileCreatureKind.Create(
@@ -835,7 +865,6 @@ begin
   inherited Create(AVRMLNodeName);
   FAnimationInfo := AAnimationInfo;
   Flying := true;
-  CollisionsWithCreaturesAndPlayer := false;
   FMoveSpeed := DefaultMissileMoveSpeed;
 end;
 
@@ -1198,6 +1227,11 @@ begin
   Result := Level.Sectors.SectorWithPoint(HeadPosition);
 end;
 
+function TCreature.CollisionsWithCreaturesAndPlayer: boolean;
+begin
+  Result := true;
+end;
+
 { TCreatures ----------------------------------------------------------------- }
 
 procedure TCreaturesList.Render(const Frustum: TFrustum;
@@ -1240,7 +1274,7 @@ begin
     Result := Items[I];
     if Result <> IgnoreCreature then
     begin
-      if Result.Kind.CollisionsWithCreaturesAndPlayer and
+      if Result.CollisionsWithCreaturesAndPlayer and
         Boxes3dCollision(NewBoundingBox, Result.BoundingBox) then
       begin
         { Strictly thinking, now I know that I have a collision with creature
@@ -1303,7 +1337,7 @@ var
 begin
   for I := 0 to High do
     if (Items[I] <> IgnoreCreature) and
-       (Items[I].Kind.CollisionsWithCreaturesAndPlayer) then
+       (Items[I].CollisionsWithCreaturesAndPlayer) then
     begin
       GetPointHeightAboveBox3d(Position, Items[I].BoundingBox,
         IsAboveTheBox, SqrHeightAboveTheBox);
@@ -1333,7 +1367,7 @@ constructor TWalkAttackCreature.Create(AKind: TCreatureKind;
 begin
   inherited Create(AKind, ALegsPosition, ADirection, AMaxLife, AnimationTime);
   FState := wasStand;
-  StateChangeTime := AnimationTime;
+  FStateChangeTime := AnimationTime;
   WaypointsSaved := TSceneWaypointsList.Create;
 end;
 
@@ -1353,7 +1387,7 @@ begin
   if FState <> Value then
   begin
     FState := Value;
-    StateChangeTime := Level.AnimationTime;
+    FStateChangeTime := Level.AnimationTime;
     { Some states require special initialization here. }
     case FState of
       wasAttack:
@@ -2041,6 +2075,28 @@ begin
   end;
 end;
 
+{ TGhostCreature ---------------------------------------------------------- }
+
+procedure TGhostCreature.ActualAttack;
+begin
+  if Boxes3dCollision(Box3dTranslate(BoundingBox,
+    VectorScale(Direction, WAKind.MaxAttackDistance)), Player.BoundingBox) then
+  begin
+    Player.Life := Player.Life - 10 - Random(10);
+  end;
+end;
+
+function TGhostCreature.CollisionsWithCreaturesAndPlayer: boolean;
+begin
+  Result := State <> wasDying;
+end;
+
+function TGhostCreature.RemoveMeFromLevel: boolean;
+begin
+  Result := (State = wasDying) and
+    (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd);
+end;
+
 { TMissileCreature ----------------------------------------------------------- }
 
 function TMissileCreature.MissileKind: TMissileCreatureKind;
@@ -2105,6 +2161,11 @@ end;
 procedure TMissileCreature.ExplodeWithLevel;
 begin
   ExplodeCore;
+end;
+
+function TMissileCreature.CollisionsWithCreaturesAndPlayer: boolean;
+begin
+  Result := false;
 end;
 
 { initialization / finalization ---------------------------------------------- }
@@ -2245,6 +2306,53 @@ begin
     );
   BallMissile.SoundExplosion := stBallMissileExplode;
   BallMissile.DefaultMaxLife := 1.0;
+
+  Ghost := TGhostKind.Create(
+    'Ghost',
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
+        CreatureFileName('ghost' + PathDelim + 'ghost_stand_2_final.wrl') ],
+      [ 0, 1 ],
+      AnimScenesPerTime, AnimOptimization, true, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
+        CreatureFileName('ghost' + PathDelim + 'ghost_walk_2_final.wrl') ],
+      [ 0, 0.5 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
+        CreatureFileName('ghost' + PathDelim + 'ghost_walk_2_final.wrl') ],
+      [ 0, 0.5 ],
+      AnimScenesPerTime, AnimOptimization, true, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
+        CreatureFileName('ghost' + PathDelim + 'ghost_attack_2_final.wrl') ],
+      [ 0, 0.2 ],
+      AnimScenesPerTime, AnimOptimization, false, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
+        CreatureFileName('ghost' + PathDelim + 'ghost_dying_2_final.wrl'),
+        CreatureFileName('ghost' + PathDelim + 'ghost_dying_3_final.wrl') ],
+      [ 0.0, 0.3, 1.0 ],
+      AnimScenesPerTime, AnimOptimization, false, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
+        CreatureFileName('ghost' + PathDelim + 'ghost_walk_2_final.wrl') ],
+      [ 0.0, 0.3 ],
+      AnimScenesPerTime, AnimOptimization, false, true)
+    );
+  Ghost.Flying := true;
+  //Ghost.ActualAttackTime := 0.4;
+  Ghost.SoundSuddenPain := stGhostSuddenPain;
+  //Ghost.MoveSpeed := 0.1;
+  Ghost.MaxAttackDistance := 2.0;
+  Ghost.PreferredAttackDistance := Ghost.MaxAttackDistance;
+  Ghost.MinDelayBetweenAttacks := 2.0;
+  Ghost.SoundSuddenPain := stGhostSuddenPain;
+  Ghost.SoundAttackStart := stGhostAttackStart;
+  Ghost.LifeToRunAway := 0.01;
+  Ghost.DefaultMaxLife := 30.0;
+  Ghost.Transparent := true;
 end;
 
 procedure DoFinalization;
