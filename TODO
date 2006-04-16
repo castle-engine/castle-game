@@ -1,7 +1,5 @@
 --------------------
 - Gate:
-  - place ghosts on gate level
-
   - staircase: excessive polygons clear
 
   - player behavior with the water:
@@ -15,7 +13,7 @@
   - try ideas to make rock look even more like a rock:
     more randomization still ?
 
-  - make larger bumps in the ground after making river. Don't forget to fix height of the trees.
+  - make larger bumps in the ground -- hills, valleys. Not so flat. Don't forget to fix height of the trees above the ground.
 
 --------------------
 Stage 6:
