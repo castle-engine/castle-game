@@ -285,6 +285,8 @@ type
   end;
 
   TGhostKind = class(TWalkAttackCreatureKind)
+    procedure PrepareRender; override;
+
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
@@ -578,6 +580,14 @@ type
 
     HasAlternativeTarget: boolean;
     AlternativeTarget: TVector3Single;
+    { Time of last setting HasAlternativeTarget to true and AlternativeTarget
+      value, taken from Level.AnimationTime. Used to not fall into loop
+      when the creature tries to walk to AlternativeTarget, and is not
+      permanently blocked (so MoveAllowed returns true all the time)
+      but at the same time the creature can't get close enough to the
+      AlternativeTarget. In such case we use this variable to resign from
+      AlternativeTarget after some time. }
+    AlternativeTargetTime: Single;
 
     WaypointsSaved_Begin: TSceneSector;
     WaypointsSaved_End: TSceneSector;
@@ -846,6 +856,20 @@ begin
 end;
 
 { TGhostKind ------------------------------------------------------------- }
+
+procedure TGhostKind.PrepareRender;
+var
+  ReferenceScene: TVRMLFlatSceneGL;
+begin
+  inherited;
+
+  { For Flying creatures, larger CameraRadius (that *really* surrounds whole
+    model from HeadPosition) is better. }
+  ReferenceScene := StandAnimation.Scenes[0];
+
+  CameraRadius := Max(Box3dXYRadius(ReferenceScene.BoundingBox),
+    ReferenceScene.BoundingBox[1, 2]);
+end;
 
 function TGhostKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
@@ -1686,15 +1710,19 @@ var
       end;
     end;
 
-    function CalculateAlternativeTarget: TVector3Single;
+    procedure InitAlternativeTarget;
     const
-      RandomWalkDistance = 20;
+      RandomWalkDistance = 10;
     begin
-      Result := HeadPosition;
-      Result[0] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
-      Result[1] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
+      AlternativeTarget := HeadPosition;
+      AlternativeTarget[0] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
+      AlternativeTarget[1] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
       if WAKind.Flying then
-        Result[2] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
+        AlternativeTarget[2] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
+
+      HasAlternativeTarget := true;
+
+      AlternativeTargetTime := Level.AnimationTime;
     end;
 
     { Go the way to LastSeenPlayer, *not* by using waypoints.
@@ -1713,8 +1741,7 @@ var
         begin
           { Not able to get to player this way ? Maybe there exists
             some alternative way, not straight. Lets try. }
-          HasAlternativeTarget := true;
-          AlternativeTarget := CalculateAlternativeTarget;
+          InitAlternativeTarget;
           Exit;
         end;
       end else
@@ -1742,8 +1769,7 @@ var
         begin
           { Not able to get to waypoint this way ? Maybe there exists
             some alternative way, not straight. Lets try. }
-          HasAlternativeTarget := true;
-          AlternativeTarget := CalculateAlternativeTarget;
+          InitAlternativeTarget;
           Exit;
         end;
       end else
@@ -1760,6 +1786,7 @@ var
   const
     ProbabilityToTryAnotherAlternativeTarget = 0.5;
     AngleRadBetweenDirectionToTargetToResign = Pi / 180 { 1 degree };
+    MaxTimeForAlternativeTarget = 5.0;
   var
     DirectionToTarget: TVector3Single;
     AngleRadBetweenDirectionToTarget: Single;
@@ -1768,7 +1795,8 @@ var
   begin
     if HasAlternativeTarget then
     begin
-      if CloseEnoughToTarget(AlternativeTarget) then
+      if CloseEnoughToTarget(AlternativeTarget) or
+         (Level.AnimationTime - AlternativeTargetTime > MaxTimeForAlternativeTarget) then
       begin
         HasAlternativeTarget := false;
         Exit;
@@ -1799,7 +1827,7 @@ var
           if Random <= ProbabilityToTryAnotherAlternativeTarget then
           begin
             { Try yet another alternative way. }
-            AlternativeTarget := CalculateAlternativeTarget;
+            InitAlternativeTarget;
             Exit;
           end else
           begin
@@ -1833,8 +1861,7 @@ var
              AngleRadBetweenDirectionToTargetToResign) then
         begin
           { Maybe there exists some alternative way, not straight. Lets try. }
-          HasAlternativeTarget := true;
-          AlternativeTarget := CalculateAlternativeTarget;
+          InitAlternativeTarget;
           Exit;
         end;
       end;

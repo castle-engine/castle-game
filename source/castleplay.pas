@@ -306,27 +306,6 @@ end;
 
 procedure Draw(Glwin: TGLWindow);
 
-  procedure RenderLevelCreaturesItems;
-  begin
-    { Rendering order of Creatures, Items and Level:
-      You know the problem. We must first render all non-transparent objects,
-      then all transparent objects. Otherwise transparent objects
-      (that must be rendered without updating depth buffer) could get brutally
-      covered by non-transparent objects (that are in fact further away from
-      the camera).
-
-      For simplicity, I decided that for now creatures and items are not allowed
-      to be partially transparent and partially opaque.
-      So we first render all non-transparent creatures and items,
-      then the level, then all transparent creatures and items. }
-
-    Level.Creatures.Render(Player.Navigator.Frustum, false);
-    Level.Items.Render(Player.Navigator.Frustum, false);
-    Level.Render(Player.Navigator.Frustum);
-    Level.Creatures.Render(Player.Navigator.Frustum, true);
-    Level.Items.Render(Player.Navigator.Frustum, true);
-  end;
-
   procedure RenderFrontShadowQuads;
   var
     I: Integer;
@@ -395,7 +374,7 @@ begin
         is casting shadows (Level.LightCastingShadowsPosition),
         but, well, this is only an approximation :) }
       Level.LightSet.TurnLightsOff;
-      RenderLevelCreaturesItems;
+      Level.Render(Player.Navigator.Frustum);
     glPopAttrib;
 
     glEnable(GL_STENCIL_TEST);
@@ -417,15 +396,24 @@ begin
           RenderBackShadowQuads;
         glSetDepthAndColorWriteable(GL_TRUE);
       glPopAttrib;
+    glDisable(GL_STENCIL_TEST);
 
-      { Now render everything once again, with lights turned on.
-        But render only things not in shadow. }
-      glClear(GL_DEPTH_BUFFER_BIT);
+    { Now render everything once again, with lights turned on.
+      But render only things not in shadow. }
+    glClear(GL_DEPTH_BUFFER_BIT);
 
-      { setup stencil : don't modify stencil, stencil test passes only for =0 }
-      glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-      glStencilFunc(GL_EQUAL, 0, StencilShadowBits);
-      RenderLevelCreaturesItems;
+    { Creatures and items are never in shadow (this looks bad).
+      So I just render them here, when the lights are turned on
+      and ignoring stencil buffer. I have to do this *after*
+      glClear(GL_DEPTH_BUFFER_BIT) above. }
+    Level.Creatures.Render(Player.Navigator.Frustum, false);
+    Level.Items.Render(Player.Navigator.Frustum, false);
+
+    { setup stencil : don't modify stencil, stencil test passes only for =0 }
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glStencilFunc(GL_EQUAL, 0, StencilShadowBits);
+    glEnable(GL_STENCIL_TEST);
+      Level.Render(Player.Navigator.Frustum);
     glDisable(GL_STENCIL_TEST);
 
     if CastleVideoOptions.RenderShadowQuads then
@@ -442,8 +430,24 @@ begin
     end;
   end else
   begin
-    RenderLevelCreaturesItems;
+    Level.Creatures.Render(Player.Navigator.Frustum, false);
+    Level.Items.Render(Player.Navigator.Frustum, false);
+    Level.Render(Player.Navigator.Frustum);
   end;
+
+  { Rendering order of Creatures, Items and Level:
+    You know the problem. We must first render all non-transparent objects,
+    then all transparent objects. Otherwise transparent objects
+    (that must be rendered without updating depth buffer) could get brutally
+    covered by non-transparent objects (that are in fact further away from
+    the camera).
+
+    For simplicity, I decided that for now creatures and items are not allowed
+    to be partially transparent and partially opaque.
+    So we first render all non-transparent creatures and items,
+    then the level, then all transparent creatures and items. }
+  Level.Creatures.Render(Player.Navigator.Frustum, true);
+  Level.Items.Render(Player.Navigator.Frustum, true);
 
   Player.RenderAttack;
 
