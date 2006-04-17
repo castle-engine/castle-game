@@ -307,23 +307,13 @@ This section describes issues specific to the game "The Castle":
 
 Levels:
 
-- When you create new level and you want to play it:
+- To actually play a level you have to add code to run this
+  level --- e.g. extend ChangeToLevel in castlegamemenu.pas.
 
-  Basically all you have to do is to add the call to NewGame
-  in castlemenu.pas to use your VRML file. Specify there the filename
-  of VRML file without the lights and the filename of VRML file
-  with only lights.
-
-  (If it's too tiresome for you to recompile castle,
-  you can also change the NewGame call
-  to include some generic VRML file that always looks like
-    WWWInline { name "xxx.wrl" }
-  Then you will not have to recompile castle, instead you
-  will just need to update the "xxx" in this generic file.
-
-  Of course you can also just override my current files,
-  castle_hall_final.wrl and castle_hall_lights.wrl,
-  but that's a brutal solution :) ).
+  If you don't want to recompile the program, then another
+  possibility is to just override some existing level file
+  (e.g. override gate_final.wrl and gate_lights.wrl to make
+  this level load on "New Game").
 
 - WorldInfo.title field specifies level name, so you want to set
   this to something nice for user.
@@ -501,10 +491,19 @@ Items:
   (Once I tried just automatically rendering models inside inventory slots
   but this doesn't look good enough). You can do it however you like.
 
-  My preferred way is to use my raytracer, called rayhunter
+  One way to do it is to use my raytracer, called rayhunter
   ([http://www.camelot.homedns.org/~michalis/rayhunter.php]):
   set up appropriate light and camera settings and then just render
-  item's model to the image. See data/items/images/.
+  item's model to the image. data/items/images/sword.png is done like this.
+
+  Another is to open a model with view3dscene
+  ([http://www.camelot.homedns.org/~michalis/view3dscene.php]),
+  set your camera however you like and make a screenshot.
+  Then you can edit it in whatever program you like
+  (like GIMP) to suit your needs.
+
+  Note that all items' images must be of equal size.
+  See data/items/images/Makefile for IMAGE_WIDTH and IMAGE_HEIGHT constant.
 
 - If this is a weapon, then additionally you want to prepare what I call
   a ScreenImage of this weapon --- this will be displayed on player's
@@ -512,6 +511,9 @@ Items:
 
   Once again, you can do this image however you like.
   I used rayhunter to render screen for sword.
+
+  You must also prepare an animation of "swinging" the weapon.
+  See data/items/attack_animations/.
 
 - Finally, to really add the item to the game add 1 line to
   CastleItems units in DoInitialization call creating your
@@ -523,8 +525,8 @@ Items:
 
 - For technical reasons, whole item should use either *only transparent
   materials* or *only non-transparent materials*. Otherwise rendering
-  in some special cases could get wrong.
-  TODO: in the future you will have to mark it at creation of TItemKind.
+  in some special cases could get wrong. In the code you should set
+  Transparent property to true if this item is transparent.
 
 Creatures (enemies etc.):
 - Several notes about items apply also to creatures:
@@ -586,8 +588,11 @@ Code:
 Graphics:
 - tree.blend based on tree02.3DS from Micha³ Wojtkiewicz. Thanks!
 
-- werewolf and alien creatures' models based on free models from
+- Werewolf and Alien creatures' models based on free models from
   [http://www.3dcafe.com/]
+
+- Ghost's teeth are based on vampire teeth from [http://www.katorlegaz.com/]
+  from characters/vamp.zip model
 
 - Some of my other programs are used:
 

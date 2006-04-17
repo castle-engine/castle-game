@@ -1,5 +1,9 @@
 --------------------
 - Gate:
+  - better coll detection for ghost --- maybe larger camera radius ?
+    Sometimes it's too deep into the ground...
+    Maybe smaller AlternativePoint distance.
+
   - staircase: excessive polygons clear
 
   - player behavior with the water:
