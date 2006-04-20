@@ -1,3 +1,7 @@
+blender:
+
+- use ant_landscade with preset cliff to make *much* better looking rock mesh
+
 --------------------
 - Gate:
   - staircase: excessive polygons clear
@@ -12,8 +16,6 @@
 
   - try ideas to make rock look even more like a rock:
     more randomization still ?
-
-  - make larger bumps in the ground -- hills, valleys. Not so flat. Don't forget to fix height of the trees above the ground.
 
 --------------------
 Stage 6:
