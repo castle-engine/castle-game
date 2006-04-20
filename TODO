@@ -1,7 +1,3 @@
-blender:
-
-- use ant_landscade with preset cliff to make *much* better looking rock mesh
-
 --------------------
 - Gate:
   - staircase: excessive polygons clear
