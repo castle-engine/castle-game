@@ -103,6 +103,12 @@ type
 
     procedure KeyChanged(KeyConfiguration: TKeyConfiguration);
 
+    { If Swimming, then this is the time (from Level.AnimationTime)
+      of setting Swimming to true. SwimLastDrownTime is the time of last
+      drowning (or 0.0 if there was no drowning yet in this swimming session). }
+    SwimBeginTime: Single;
+    SwimLastDrownTime: Single;
+
     FSwimming: boolean;
     procedure SetSwimming(const Value: boolean);
   public
@@ -277,7 +283,7 @@ type
     { You should set this property as appropriate.
       This object will just use this property (changing it's Navigator
       properties etc.). }
-    property Swimming: boolean read FSwimming write FSwimming;
+    property Swimming: boolean read FSwimming write SetSwimming;
   end;
 
 implementation
@@ -556,7 +562,7 @@ begin
       I checked how this looks in quake2, and they simply ignored the
       problem (i.e. it is there...). And it's not so noticeable...
       So I can ignore this problem too :)
-      
+
       Note: once I had an idea (an I actually did it in 1st szklane_lasy
       version) to mark water by the blueish fog. This looks cool,
       but in this case I can't use OpenGL fog, as it may be used
@@ -660,6 +666,11 @@ begin
 end;
 
 procedure TPlayer.Idle(const CompSpeed: Single);
+const
+  { How many seconds you can swin before you start to drown ? }
+  SwimBreathSeconds = 30.0;
+  { How many seconds between each drown ? }
+  SwimDrownPauseSeconds = 5.0;
 begin
   if FlyingMode then
   begin
@@ -671,6 +682,22 @@ begin
   end;
 
   UpdateNavigator;
+
+  if Swimming and (not Dead) then
+  begin
+    if Level.AnimationTime - SwimBeginTime > SwimBreathSeconds then
+    begin
+      if (SwimLastDrownTime = 0.0) or
+         (Level.AnimationTime - SwimLastDrownTime > SwimDrownPauseSeconds) then
+      begin
+        if SwimLastDrownTime = 0.0 then
+          GameMessage('You''re drowning');
+        SwimLastDrownTime := Level.AnimationTime;
+        Life := Life - (5 + Random(10));
+        Sound(stPlayerDrowning);
+      end;
+    end;
+  end;
 
   if BlackOutIntensity > 0 then
     BlackOutIntensity -= 0.04 * Glw.FpsCompSpeed;
@@ -717,7 +744,7 @@ begin
     Sound(stPlayerDies);
     Navigator.FallOnTheGround;
   end else
-  if (Life - Value) > 10 then
+  if (Life - Value) > 1 then
   begin
     RedOut;
     Sound(stPlayerSuddenPain);
@@ -792,7 +819,11 @@ begin
   begin
     FSwimming := Value;
     if Swimming then
-      Sound(stPlayerSwimmingBegin) else
+    begin
+      Sound(stPlayerSwimmingBegin);
+      SwimBeginTime := Level.AnimationTime;
+      SwimLastDrownTime := 0.0;
+    end else
       Sound(stPlayerSwimmingEnd);
 
     { UpdateNavigator will be called in Idle. }

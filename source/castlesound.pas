@@ -49,6 +49,7 @@ type
     stPlayerDies,
     stPlayerSwimmingBegin,
     stPlayerSwimmingEnd,
+    stPlayerDrowning,
     { @groupEnd }
 
     { Items sounds.

@@ -1,8 +1,6 @@
 --------------------
 - Gate:
   - staircase: excessive polygons clear
-  - player must be able to drown --- some sound of choking and life loss
-    when he's under the water for too long.
 --------------------
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.
@@ -34,6 +32,7 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
     by something else.
   - Just add more creatures.
     creature hydra (very tall, very long when killed; will be a nice demo of my good collision checking routines)
+    creature that attacks by snapping it hand (tentacle ?) far out
 
 - "The Gate" level:
   - intro under menu: camera floating around level with this fog ?
