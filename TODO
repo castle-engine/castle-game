@@ -1,30 +1,8 @@
 --------------------
 - Gate:
   - staircase: excessive polygons clear
-
-  - player behavior with the water:
-
-    Visibility under the water: blueish (blue fog ?).
-    The problem: player eyes may be equal to water level,
-    and then camera near plane cuts some water, and then player
-    simultaneously sees things under the water (but not looking
-    through the water surface, so he doesn't see blended water surface)
-    and above the water.
-    So effect like "show fog when player pos under the water" will look
-    bad when player is exactly at the water surface: then he will
-    be able to see some part water clearly (without the water fog,
-    and without the blended water surface).
-
-    I check how this looks in quake2, and they simply ignored the
-    problem (i.e. it is there...). And it's not so noticeable.
-    They just placed water fog (or maybe it's blended blue screen)
-    at low level, so there is no sudden visual difference above/under
-    the water. So I'll ignore this problem too.
-
-    He must be able to drown!
-    Up/down should work there like when flying (but slower ?)
-    Gravity should work (but be slower) under the water.
-
+  - player must be able to drown --- some sound of choking and life loss
+    when he's under the water for too long.
 --------------------
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.

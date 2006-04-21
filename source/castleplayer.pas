@@ -79,7 +79,8 @@ type
     BlackOutColor: TVector3f;
 
     { This updates Navigator properties.
-      Call this always when FlyingMode or Dead or some key values change. }
+      Call this always when FlyingMode or Dead or some key values
+      or Swimming change. }
     procedure UpdateNavigator;
 
     procedure FalledDown(Navigator: TMatrixWalker; const FallenHeight: Single);
@@ -101,6 +102,9 @@ type
     function EquippedWeaponKind: TItemWeaponKind;
 
     procedure KeyChanged(KeyConfiguration: TKeyConfiguration);
+
+    FSwimming: boolean;
+    procedure SetSwimming(const Value: boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -269,6 +273,11 @@ type
       This is a 3D rendering. Note that this may clear depth buffer
       and set matrix to identity. }
     procedure RenderAttack;
+
+    { You should set this property as appropriate.
+      This object will just use this property (changing it's Navigator
+      properties etc.). }
+    property Swimming: boolean read FSwimming write FSwimming;
   end;
 
 implementation
@@ -282,6 +291,7 @@ var
   GLList_BlankIndicatorImage: TGLuint;
   GLList_RedIndicatorImage: TGLuint;
   GLList_BlueIndicatorImage: TGLuint;
+  GLList_DrawWaterRect: TGLuint;
 
 { TPlayer -------------------------------------------------------------------- }
 
@@ -530,13 +540,44 @@ begin
   if Dead then
     DrawGLBlackOutRect(Red3Single, 1.0, 0, 0,
       RequiredScreenWidth, RequiredScreenHeight) else
+  begin
+    { The problem with drawing such water screen:
+      Player eyes may be equal to water level,
+      and then camera near plane cuts some water, and then player
+      simultaneously sees things under the water (but not looking
+      through the water surface, so he doesn't see blended water surface)
+      and above the water.
+
+      So effect like "show fog when player pos under the water" will look
+      bad when player is exactly at the water surface: then he will
+      be able to see some part water clearly (without the water fog,
+      and without the blended water surface).
+
+      I checked how this looks in quake2, and they simply ignored the
+      problem (i.e. it is there...). And it's not so noticeable...
+      So I can ignore this problem too :)
+      
+      Note: once I had an idea (an I actually did it in 1st szklane_lasy
+      version) to mark water by the blueish fog. This looks cool,
+      but in this case I can't use OpenGL fog, as it may be used
+      by the level itself (as it is, actually, for the 'Gate" level). }
+
+    if Swimming then
+      glCallList(GLList_DrawWaterRect);
+
+    { Apply black out effect on the possibly watery effect.
+      Yes, they both must mix. }
     DrawGLBlackOutRect(BlackOutColor, BlackOutIntensity, 0, 0,
       RequiredScreenWidth, RequiredScreenHeight);
+  end;
 end;
 
 procedure TPlayer.UpdateNavigator;
 begin
   Navigator.Gravity := not FlyingMode;
+  { Note that when not Navigator.Gravity then FallingDownEffect will not
+    work anyway. }
+  Navigator.FallingDownEffect := not Swimming;
 
   if Dead then
   begin
@@ -554,6 +595,13 @@ begin
     Navigator.Key_UpRotate := K_None;
     Navigator.Key_DownRotate := K_None;
     Navigator.Key_HomeUp := K_None;
+
+    Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
+    Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
+    Navigator.HeadBobbing := 0.0;
+    if Level <> nil then
+      Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01 else
+      Navigator.CameraPreferredHeight := 0;
   end else
   begin
     if FlyingMode then
@@ -562,12 +610,41 @@ begin
       Navigator.Key_Crouch := K_None;
       Navigator.Key_UpMove := CastleKey_UpMove.Value;
       Navigator.Key_DownMove := CastleKey_DownMove.Value;
+
+      { Navigator.HeadBobbing and
+        Navigator.CameraPreferredHeight and
+        Navigator.FallingDownStartSpeed and
+        Navigator.FallingDownSpeedIncrease
+        ... don't matter here, because Gravity is false. }
     end else
     begin
-      Navigator.Key_Jump := CastleKey_UpMove.Value;
-      Navigator.Key_Crouch := CastleKey_DownMove.Value;
-      Navigator.Key_UpMove := K_None;
-      Navigator.Key_DownMove := K_None;
+      if Swimming then
+      begin
+        Navigator.Key_Jump := K_None;
+        Navigator.Key_Crouch := K_None;
+        Navigator.Key_UpMove := CastleKey_UpMove.Value;
+        Navigator.Key_DownMove := CastleKey_DownMove.Value;
+
+        Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 10;
+        Navigator.FallingDownSpeedIncrease := 1.0;
+        Navigator.HeadBobbing := 0.0;
+        if Level <> nil then
+          Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01 else
+          Navigator.CameraPreferredHeight := 0;
+      end else
+      begin
+        Navigator.Key_Jump := CastleKey_UpMove.Value;
+        Navigator.Key_Crouch := CastleKey_DownMove.Value;
+        Navigator.Key_UpMove := K_None;
+        Navigator.Key_DownMove := K_None;
+
+        Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
+        Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
+        Navigator.HeadBobbing := DefaultHeadBobbing;
+        if Level <> nil then
+          Navigator.CameraPreferredHeight := Level.CameraPreferredHeight else
+          Navigator.CameraPreferredHeight := 0;
+      end;
     end;
 
     Navigator.Key_Forward := CastleKey_Forward.Value;
@@ -626,7 +703,7 @@ end;
 procedure TPlayer.FalledDown(Navigator: TMatrixWalker;
   const FallenHeight: Single);
 begin
-  if FallenHeight > 4 then
+  if (not Swimming) and (FallenHeight > 4) then
     Life := Life - Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
 
   { Tests: GameMessage(Format('Falled down from %f', [FallenHeight])); }
@@ -638,8 +715,6 @@ begin
   begin
     GameMessage('You die');
     Sound(stPlayerDies);
-    Navigator.HeadBobbing := 0.0;
-    Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01;
     Navigator.FallOnTheGround;
   end else
   if (Life - Value) > 10 then
@@ -711,6 +786,19 @@ begin
   UpdateNavigator;
 end;
 
+procedure TPlayer.SetSwimming(const Value: boolean);
+begin
+  if Value <> FSwimming then
+  begin
+    FSwimming := Value;
+    if Swimming then
+      Sound(stPlayerSwimmingBegin) else
+      Sound(stPlayerSwimmingEnd);
+
+    { UpdateNavigator will be called in Idle. }
+  end;
+end;
+
 { GLWindow init / close ------------------------------------------------------ }
 
 procedure GLWindowInit(Glwin: TGLWindow);
@@ -731,6 +819,18 @@ begin
   GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
   GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
   GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
+
+  GLList_DrawWaterRect := glGenLists(1);
+  glNewList(GLList_DrawWaterRect, GL_COMPILE);
+  try
+    glPushAttrib(GL_COLOR_BUFFER_BIT or GL_CURRENT_BIT);
+      glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_SRC_ALPHA);
+        glColorv(Vector4Single(0, 0, 0.1, 0.5));
+        glRectf(0, 0, Glwin.Width, Glwin.Height);
+      glDisable(GL_BLEND);
+    glPopAttrib;
+  finally glEndList; end;
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);

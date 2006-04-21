@@ -47,6 +47,8 @@ type
     stPlayerPickItem,
     stPlayerDropItem,
     stPlayerDies,
+    stPlayerSwimmingBegin,
+    stPlayerSwimmingEnd,
     { @groupEnd }
 
     { Items sounds.

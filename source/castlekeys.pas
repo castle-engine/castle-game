@@ -228,8 +228,8 @@ begin
   CastleKey_UpRotate := TKeyConfiguration.Create('Loop up', 'look_up', kgBasic, WalkerDefaultKey_UpRotate);
   CastleKey_DownRotate := TKeyConfiguration.Create('Look down', 'look_down', kgBasic, WalkerDefaultKey_DownRotate);
   CastleKey_HomeUp := TKeyConfiguration.Create('Look straight', 'look_straight', kgBasic, WalkerDefaultKey_HomeUp);
-  CastleKey_UpMove := TKeyConfiguration.Create('Jump (or fly up)', 'move_up', kgBasic, WalkerDefaultKey_Jump);
-  CastleKey_DownMove := TKeyConfiguration.Create('Crouch (or fly down)', 'move_down', kgBasic, WalkerDefaultKey_Crouch);
+  CastleKey_UpMove := TKeyConfiguration.Create('Jump (or fly/swim up)', 'move_up', kgBasic, WalkerDefaultKey_Jump);
+  CastleKey_DownMove := TKeyConfiguration.Create('Crouch (or fly/swim down)', 'move_down', kgBasic, WalkerDefaultKey_Crouch);
 
   { Items keys. }
   CastleKey_InventoryShow := TKeyConfiguration.Create('Inventory show / hide', 'inventory_toggle', kgItems, K_I);
