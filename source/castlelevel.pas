@@ -73,6 +73,8 @@ type
     FSectors: TSceneSectorsList;
     FWaypoints: TSceneWaypointsList;
     FLightCastingShadowsPosition: TVector3Single;
+
+    FWaterBox: TBox3d;
   protected
     { See README for description of LevelBox and HintButtonBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
@@ -116,6 +118,8 @@ type
     property HintButtonShown: boolean
       read FHintButtonShown write FHintButtonShown;
 
+    property WaterBox: TBox3d read FWaterBox;
+
     { Title of the level, taken from WorldInfo node
       or just basename of ASceneFileName. }
     property Title: string read FTitle;
@@ -134,16 +138,22 @@ type
     property LightCastingShadowsPosition: TVector3Single
       read FLightCastingShadowsPosition;
 
+    function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
+      OctreeItemIndex: Integer): boolean; virtual;
+
     { LineOfSight, MoveAllowed and GetCameraHeight perform
       collision detection with the level.
 
       Note that MoveAllowed and GetCameraHeight treat transparent
-      objects as others --- i.e., they collide.
+      objects as others --- i.e., they collide. You have to override
+      CollisionIgnoreItem to eventually change this for some items
+      (transparent or opaque) to make them not colliding.
 
       But LineOfSight checks just collision between segment (Pos1, Pos2)
       and it *does ignore transparent materials*. This means that
       e.g. creatures can see through glass --- even though they
-      can't walk through it.
+      can't walk through it. CollisionIgnoreItem doesn't matter
+      for LineOfSight.
 
       @groupBegin }
     function LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
@@ -284,6 +294,8 @@ type
   protected
     procedure ChangeLevelScene; override;
   public
+    function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
+      OctreeItemIndex: Integer): boolean; override;
     constructor Create;
     procedure Idle(const CompSpeed: Single); override;
   end;
@@ -355,6 +367,9 @@ begin
 
   if not RemoveBoxNode(FHintButtonBox, 'HintButtonBox') then
     FHintButtonBox := EmptyBox3d;
+
+  if not RemoveBoxNode(FWaterBox, 'WaterBox') then
+    FWaterBox := EmptyBox3d;
 
   { calculate Sectors and Waypoints }
   FSectors := TSceneSectorsList.Create;
@@ -612,7 +627,8 @@ begin
   Result :=
     Box3dPointInside(ProposedNewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveAllowed(
-      CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius);
+      CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius,
+      NoItemIndex, CollisionIgnoreItem);
 end;
 
 function TLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
@@ -623,7 +639,8 @@ begin
   Result :=
     Box3dPointInside(NewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveAllowedSimple(
-      CameraPos, NewPos, MovingObjectCameraRadius);
+      CameraPos, NewPos, MovingObjectCameraRadius,
+      NoItemIndex, CollisionIgnoreItem);
 end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
@@ -631,7 +648,8 @@ procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
 begin
   Scene.DefaultTriangleOctree.GetCameraHeight(
     CameraPos, HomeCameraUp,
-    IsAboveTheGround, SqrHeightAboveTheGround);
+    IsAboveTheGround, SqrHeightAboveTheGround,
+    NoItemIndex, CollisionIgnoreItem);
 end;
 
 function TLevel.PlayerMoveAllowed(Navigator: TMatrixWalker;
@@ -687,6 +705,13 @@ procedure TLevel.SpecialObjectPicked(const Distance: Single;
   SpecialObjectIndex: Integer);
 begin
   { Nothing to do in this class. }
+end;
+
+function TLevel.CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
+  OctreeItemIndex: Integer): boolean;
+begin
+  { Don't ignore anything in this class. }
+  Result := false;
 end;
 
 { TCastleHallLevel ----------------------------------------------------------- }
@@ -767,13 +792,13 @@ function TCastleHallLevel.MoveAllowedAdditionalSimple(
   function MakeSymbol(SymbolScene: TVRMLFlatSceneGL): boolean;
   begin
     Result := SymbolScene.DefaultTriangleOctree.MoveAllowedSimple(
-      CameraPos, NewPos, MovingObjectCameraRadius);
+      CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
   end;
 
 begin
   Result :=
     Button.DefaultTriangleOctree.MoveAllowedSimple(
-      CameraPos, NewPos, MovingObjectCameraRadius);
+      CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
 
   if Result and (not SymbolOpened) then
   begin
@@ -817,7 +842,8 @@ procedure TCastleHallLevel.GetCameraHeight(const CameraPos: TVector3Single;
   begin
     BonusScene.DefaultTriangleOctree.GetCameraHeight(
       CameraPos, HomeCameraUp,
-      IsAboveTheBonusScene, SqrHeightAboveTheBonusScene);
+      IsAboveTheBonusScene, SqrHeightAboveTheBonusScene,
+      NoItemIndex, nil);
 
     if IsAboveTheBonusScene then
     begin
@@ -954,7 +980,7 @@ begin
 
   if Button.DefaultTriangleOctree.RayCollision(
     IntersectionDistance, Ray0, RayVector, true, NoItemIndex,
-    false) <> NoItemIndex then
+    false, nil) <> NoItemIndex then
   begin
     Result := 0;
   end;
@@ -1004,6 +1030,18 @@ begin
   begin
     LevelFinished(TCastleHallLevel.Create);
   end;
+end;
+
+function TGateLevel.CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
+  OctreeItemIndex: Integer): boolean;
+var
+  ItemPtr: POctreeItem;
+begin
+  Result := inherited;
+
+  ItemPtr := @(Octree.OctreeItems.Items[OctreeItemIndex]);
+  Result := Result or
+    (ItemPtr^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
 end.

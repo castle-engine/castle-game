@@ -801,7 +801,7 @@ begin
 
     { Collision with Level.Scene }
     LevelCollisionIndex := Level.Scene.DefaultTriangleOctree.RayCollision(
-      ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex, false);
+      ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex, false, nil);
     if (LevelCollisionIndex <> NoItemIndex) and
        ( (PickedObjectType = poNone) or
          (ThisIntersectionDistance < IntersectionDistance) ) then

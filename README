@@ -337,6 +337,12 @@ Levels:
   'HintButtonBox'. This is the box that will trigger message
   "Hint: you can press the button by clicking on it".
 
+- Similar to 'LevelBox', I do identical trick to calculate
+  water boxes. Just place a mesh with name 'WaterBox'.
+  At some point this will be extended (when I'll need it) to
+  include every 'WaterBox_<ignored>', so that you will be able to
+  define water by a sum of boxes.
+
 - Levels must be oriented such that +Z is "up".
   While all things in my general units are flexible
   and allow any up vector to be used, I made in "The Castle" a couple
