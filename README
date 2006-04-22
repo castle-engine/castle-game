@@ -633,6 +633,10 @@ Graphics:
 - stars.jpg from
   [http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm]
 
+Sounds:
+- menu_current_item_changed.wav based on
+  /usr/share/sounds/KDE_TypeWriter_Key_2.ogg
+
 --------------------
 Have fun! All comments are welcome.
 

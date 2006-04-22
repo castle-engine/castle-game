@@ -80,69 +80,62 @@ end;
 { main -------------------------------------------------------------------- }
 
 begin
-  try
-    { parse parameters }
-    OpenALOptionsParse;
-    ParseParameters(Options, OptionProc, nil);
+  { parse parameters }
+  OpenALOptionsParse;
+  ParseParameters(Options, OptionProc, nil);
 
-    Glw.Width := RequiredScreenWidth;
-    Glw.Height := RequiredScreenHeight;
-    if WasParam_NoScreenResize or (not AllowScreenResize) then
+  Glw.Width := RequiredScreenWidth;
+  Glw.Height := RequiredScreenHeight;
+  if WasParam_NoScreenResize or (not AllowScreenResize) then
+  begin
+    Glw.FullScreen :=
+      (Glwm.ScreenWidth = RequiredScreenWidth) and
+      (Glwm.ScreenHeight = RequiredScreenHeight);
+  end else
+  begin
+    Glw.FullScreen := true;
+    if (Glwm.ScreenWidth <> RequiredScreenWidth) or
+       (Glwm.ScreenHeight <> RequiredScreenHeight) then
     begin
-      Glw.FullScreen :=
-        (Glwm.ScreenWidth = RequiredScreenWidth) and
-        (Glwm.ScreenHeight = RequiredScreenHeight);
-    end else
-    begin
-      Glw.FullScreen := true;
-      if (Glwm.ScreenWidth <> RequiredScreenWidth) or
-         (Glwm.ScreenHeight <> RequiredScreenHeight) then
-      begin
-        Glwm.VideoResize := true;
-        Glwm.VideoResizeWidth := RequiredScreenWidth;
-        Glwm.VideoResizeHeight := RequiredScreenHeight;
+      Glwm.VideoResize := true;
+      Glwm.VideoResizeWidth := RequiredScreenWidth;
+      Glwm.VideoResizeHeight := RequiredScreenHeight;
 
-        if Glwm.VideoResize then
-          if not Glwm.TryVideoChange then
-          begin
-            WarningWrite('Can''t change display settings to ' +
-              RequiredScreenSize + '. Will continue in windowed mode.');
-            Glw.FullScreen := false;
-          end;
-      end;
+      if Glwm.VideoResize then
+        if not Glwm.TryVideoChange then
+        begin
+          WarningWrite('Can''t change display settings to ' +
+            RequiredScreenSize + '. Will continue in windowed mode.');
+          Glw.FullScreen := false;
+        end;
     end;
+  end;
 
-    { init OpenAL }
-    if WasParam_NoSound then
-      SoundInitializationReport :=
-        'Sound disabled by --no-sound command-line option' else
-    if not TryBeginAL(false) then
-      SoundInitializationReport :=
-        'OpenAL initialization failed : ' +ALActivationErrorMessage +nl+
-        'SOUND IS DISABLED' else
-      SoundInitializationReport :=
-        'OpenAL initialized, sound enabled';
+  { init glwindow }
+  Glw.Caption := 'The Castle';
+  Glw.ResizeAllowed := raOnlyAtInit;
+  if RenderShadowsPossible then
+    Glw.StencilBufferBits := 8;
+  Glw.Init;
 
-    { init glwindow }
-    Glw.Caption := 'The Castle';
-    Glw.ResizeAllowed := raOnlyAtInit;
-    if RenderShadowsPossible then
-      Glw.StencilBufferBits := 8;
-    Glw.Init;
+  { init progress }
+  ProgressGLInterface.Window := Glw;
+  Progress.UserInterface := ProgressGLInterface;
+  { I'm turning UseDescribePosition to false, because it's usually
+    confusing for the user.
+    E.g. each creature is conted as PrepareRenderSteps steps,
+    each item is conted as PrepareRenderSteps steps,
+    when loading levels user would have to know what an "octree" is. }
+  Progress.UseDescribePosition := false;
 
-    { init progress }
-    ProgressGLInterface.Window := Glw;
-    Progress.UserInterface := ProgressGLInterface;
-    { I'm turning UseDescribePosition to false, because it's usually
-      confusing for the user.
-      E.g. each creature is conted as PrepareRenderSteps steps,
-      each item is conted as PrepareRenderSteps steps,
-      when loading levels user would have to know what an "octree" is. }
-    Progress.UseDescribePosition := false;
-
+  { init OpenAL (after initing Glw and Progress, because ALContextInit
+    wants to display progress of "Loading sounds") }
+  DrawInitializationBackground;
+  ALContextInit(WasParam_NoSound);
+  try
     ShowStartMenu;
   finally
-    EndAL;
+    ALContextClose;
   end;
 end.
 

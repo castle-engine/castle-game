@@ -23,6 +23,8 @@ unit CastleStartMenu;
 
 interface
 
+procedure DrawInitializationBackground;
+
 { Show menu, ask user what to do, do what the user wants
   (e.g. load level and call PlayLevel), when user wants to quit -- return. }
 procedure ShowStartMenu;
@@ -385,6 +387,22 @@ procedure CloseQuery(Glwin: TGLWindow);
 begin
   if MessageYesNo(glwin, 'Are you sure you want to quit ?') then
     UserQuit := true;
+end;
+
+procedure DoDrawInitializationBackground(Glwin: TGLWindow);
+begin
+  glLoadIdentity;
+  glRasterPos2i(0, 0);
+  glCallList(GLList_ScreenImage);
+end;
+
+procedure DrawInitializationBackground;
+begin
+  Glw.OnResize := Resize;
+  Glw.OnDraw := DoDrawInitializationBackground;
+  Glw.EventResize;
+  Glw.PostRedisplay;
+  Glw.FlushRedisplay;
 end;
 
 procedure ShowStartMenu;
