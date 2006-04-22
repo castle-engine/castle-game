@@ -12,6 +12,11 @@ PGD competition stage 5 short notes:
 --------------------
 Installing and running:
 
+Note that to hear sounds you should first install OpenAL
+(see [http://www.camelot.homedns.org/~michalis/openal_notes.php#section_install]).
+
+Installing the actual game:
+
 - For Linux:
 
   Extract the archive, move the whole `castle' directory to

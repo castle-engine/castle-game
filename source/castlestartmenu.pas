@@ -309,16 +309,7 @@ procedure TSoundMenu.CurrentItemSelected;
     MessageOK(Glw,
       'Sound library (OpenAL) status:' +nl+
       nl+
-      SoundInitializationReport +nl+
-      nl+
-      'TODO: for now, "The Castle" initializes OpenAL '+
-      'but it''s not used. It will be used in the future. '+
-      'Until then, "Sound effects volume" and "Music volume" '+
-      'controls here do nothing.' +nl+
-      nl+
-      'Programmers: see my older demo, ' +
-      '[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php] '+
-      'if you want to see how I''m dealing with OpenAL.',
+      SoundInitializationReport,
       taLeft);
   end;
 

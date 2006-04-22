@@ -1,5 +1,6 @@
 - choosing OpenAL device from menu.
 - choosing Min/MaxALAllocatedSounds from menu.
+- ask on PGD: can I assume that judges will download OpenAL on their own ?
 
 --------------------
 Stage 6:
@@ -171,12 +172,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 
   I can do this in my TGLWindow.VideoChange.
 
-- sound configuration do -- allow turning sounds on/off from menu, allow volume control
-
-  Add to "installing and running" in README:
-  Note that to hear sounds you should first install OpenAL
-  (see [http://www.camelot.homedns.org/~michalis/openal_notes.php#section_install]).
-
 - change the name --- there already exists game named "castle"!
   And there is "Castle Adventure" !
 
@@ -266,6 +261,9 @@ Each time before uploading PGD release:
       ln -s /win/mojepasy/openGL/castle/trunk/ ~/.castle.data
   - test building from extracted created dist (using `make build-xxx')
 - upload to PGD
+- upload to camelot:
+  copy tar.gz to /win/mojewww/camelot/,
+  update /win/mojewww/camelot/castle.php CASTLE_VERSION constant
 - make svntag
 
 ----------------------------------------

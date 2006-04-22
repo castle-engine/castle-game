@@ -155,6 +155,7 @@ type
 
 const
   SoundInfos: array[TSoundType] of TSoundInfo =
+  { TODO: fill all sounds below. }
   ( ( FileName: ''; Gain: 0; DefaultImportance: 0; ),
     ( FileName: '' { player_sudden_pain.wav }; Gain: 1; DefaultImportance: 0; ),
     ( FileName: '' { player_potion_drink.wav }; Gain: 1; DefaultImportance: 0; ),
