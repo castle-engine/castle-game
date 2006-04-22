@@ -27,7 +27,7 @@ unit CastleSound;
 
 interface
 
-uses VectorMath;
+uses VectorMath, ALSourceAllocator;
 
 var
   SoundInitializationReport: string;
@@ -90,19 +90,36 @@ type
   and ALActive. }
 procedure ALContextInit(WasParam_NoSound: boolean);
 
+{ This will call RefreshUsed on internal ALSourceAllocator,
+  see TALSourceAllocator.RefreshUsed for info.
+  It's silently ignored when not ALActive. }
+procedure ALRefreshUsedSources;
+
 { Call this always to release OpenAL things.
   This is ignored if not ALActive. }
 procedure ALContextClose;
 
 { Play given sound. This should be used to play sounds
   that are not spatial actually, i.e. have no place in 3D space.
+
+  Returns used TALAllocatedSource (or nil if none was available).
+  You don't have to do anything with this returned TALAllocatedSource.
+
   @noAutoLinkHere }
-procedure Sound(SoundType: TSoundType);
+function Sound(SoundType: TSoundType;
+  const Looping: boolean = false): TALAllocatedSource;
 
 { Play given sound at appropriate position in 3D space.
-  @noAutoLinkHere }
-procedure Sound3d(SoundType: TSoundType; const Position: TVector3Single);
 
+  Returns used TALAllocatedSource (or nil if none was available).
+  You don't have to do anything with this returned TALAllocatedSource.
+
+  @noAutoLinkHere }
+function Sound3d(SoundType: TSoundType;
+  const Position: TVector3Single;
+  const Looping: boolean = false): TALAllocatedSource; overload;
+
+{ }
 function GetEffectsVolume: Single;
 procedure SetEffectsVolume(const Value: Single);
 
@@ -144,8 +161,13 @@ type
     { '' means that this sound is not implemented and will have
       no OpenAL buffer associated with it. }
     FileName: string;
-    { XxxGain are mapped directly on respective OpenAL source properties. }
+
+    { XxxGain are mapped directly on respective OpenAL source properties.
+      Note that Gain and MaxGain > 1 are allowed (because OpenAL allows them),
+      although OpenAL may clip them for the resulting sound (after all
+      calculations taking into account 3d position will be done). }
     Gain, MinGain, MaxGain: Single;
+
     DefaultImportance: Cardinal;
   end;
 
@@ -198,7 +220,7 @@ var
     ( FileName: '' { werewolf_actual_attack_hit.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: 'werewolf_howling.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0.8; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { ball_missile_fired.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { ball_missile_explode.wav };
@@ -216,7 +238,7 @@ var
 implementation
 
 uses SysUtils, CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
-  KambiFilesUtils, ALSourceAllocator;
+  KambiFilesUtils;
 
 var
   { Values on this array are useful only when ALContextInited
@@ -291,46 +313,68 @@ begin
   end;
 end;
 
+procedure ALRefreshUsedSources;
+begin
+  if SourceAllocator <> nil then
+    SourceAllocator.RefreshUsed;
+end;
+
 { Set common properties for spatialized and non-spatialized
   sound effects. }
-procedure alCommonSourceSetup(ALSource: TALuint; SoundType: TSoundType);
+procedure alCommonSourceSetup(ALSource: TALuint; SoundType: TSoundType;
+  const Looping: boolean);
 begin
   alSourcei(ALSource, AL_BUFFER, SoundBuffers[SoundType]);
+  alSourcei(ALSource, AL_LOOPING, BoolToAL[Looping]);
   alSourcef(ALSource, AL_GAIN, SoundInfos[SoundType].Gain);
   alSourcef(ALSource, AL_MIN_GAIN, SoundInfos[SoundType].MinGain);
   alSourcef(ALSource, AL_MAX_GAIN, SoundInfos[SoundType].MaxGain);
 end;
 
-procedure Sound(SoundType: TSoundType);
-var
-  NewSource: TALAllocatedSource;
+function Sound(SoundType: TSoundType;
+  const Looping: boolean): TALAllocatedSource;
 begin
+  Result := nil;
+
   if ALActive and (SoundInfos[SoundType].FileName <> '') then
   begin
-    NewSource := SourceAllocator.AllocateSource(
+    Result := SourceAllocator.AllocateSource(
       SoundInfos[SoundType].DefaultImportance);
-    if NewSource <> nil then
+    if Result <> nil then
     begin
-      alCommonSourceSetup(NewSource.ALSource, SoundType);
+      alCommonSourceSetup(Result.ALSource, SoundType, Looping);
 
-      alSourcei(NewSource.ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
+      alSourcei(Result.ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
       { Windows OpenAL doesn't work correctly when below is exactly
         (0, 0, 0) --- see /win/docs/audio/OpenAL/bug_relative_0/
-
         TODO: check does this bug still exist ?
         Correct lets_take_a_walk, test_al_sound_allocator }
-      alSourceVector3f(NewSource.ALSource, AL_POSITION, Vector3Single(0, 0, 0.1));
+      alSourceVector3f(Result.ALSource, AL_POSITION, Vector3Single(0, 0, 0.1));
 
-      alSourcePlay(NewSource.ALSource);
+      alSourcePlay(Result.ALSource);
     end;
   end;
 end;
 
-procedure Sound3d(SoundType: TSoundType; const Position: TVector3Single);
+function Sound3d(SoundType: TSoundType;
+  const Position: TVector3Single;
+  const Looping: boolean): TALAllocatedSource;
 begin
-  if SoundType <> stNone then
+  Result := nil;
+
+  if ALActive and (SoundInfos[SoundType].FileName <> '') then
   begin
-    { TODO }
+    Result := SourceAllocator.AllocateSource(
+      SoundInfos[SoundType].DefaultImportance);
+    if Result <> nil then
+    begin
+      alCommonSourceSetup(Result.ALSource, SoundType, Looping);
+
+      alSourcei(Result.ALSource, AL_SOURCE_RELATIVE, AL_FALSE);
+      alSourceVector3f(Result.ALSource, AL_POSITION, Position);
+
+      alSourcePlay(Result.ALSource);
+    end;
   end;
 end;
 

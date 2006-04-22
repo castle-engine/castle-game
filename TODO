@@ -1,10 +1,9 @@
 - choosing OpenAL device from menu.
 - choosing Min/MaxALAllocatedSounds from menu.
 - ask on PGD: can I assume that judges will download OpenAL on their own ?
-- sound when creature sees player for the 1st time
 
-- sound props changeable from debug menu
-- make 3d sounds, test werewolf_howling
+- sound when creature sees player for the 1st time
+- sound on menu item select
 
 --------------------
 Stage 6:

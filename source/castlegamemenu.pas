@@ -31,7 +31,8 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
-  CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel;
+  CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel,
+  CastleSound;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -146,6 +147,7 @@ begin
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
   Items.AddObject('Render shadow quads', RenderShadowQuadsArgument);
   Items.Add('Change to level');
+  Items.Add('Change sound properties');
   Items.Add('Back to game menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -282,6 +284,56 @@ procedure TDebugMenu.CurrentItemSelected;
     finally S.Free end;
   end;
 
+  procedure ChangeSoundProperties;
+
+    function SoundName(ST: TSoundType): string;
+    begin
+      Result := SoundInfos[ST].FileName;
+      if Result = '' then
+        Result := '(unused)';
+    end;
+
+  var
+    S: TStringList;
+    STInteger: Cardinal;
+    ST: TSoundType;
+    SingleValue: Single;
+  begin
+    S := TStringList.Create;
+    try
+      for ST := Succ(stNone) to High(ST) do
+        S.Append(Format('%d: sound "' + SoundName(ST) + '"', [Ord(ST)]));
+
+      { I don't use here ChooseByMenu(GLList_ScreenImage, S),
+        there are too many sound names to fit on one screen. }
+
+      STInteger := 1;
+      if MessageInputQueryCardinal(Glw, S.Text, STInteger, taLeft) and
+         Between(STInteger, Ord(Succ(stNone)), Ord(High(ST))) then
+      begin
+        ST := TSoundType(STInteger);
+
+        SingleValue := SoundInfos[ST].Gain;
+        if MessageInputQuerySingle(Glw,
+          'Change GAIN of sound "' + SoundName(ST) + '"',
+          SingleValue, taLeft) then
+          SoundInfos[ST].Gain := SingleValue;
+
+        SingleValue := SoundInfos[ST].MinGain;
+        if MessageInputQuerySingle(Glw,
+          'Change MIN_GAIN of sound "' + SoundName(ST) + '"',
+          SingleValue, taLeft) then
+          SoundInfos[ST].MinGain := SingleValue;
+
+        SingleValue := SoundInfos[ST].MaxGain;
+        if MessageInputQuerySingle(Glw,
+          'Change MAX_GAIN of sound "' + SoundName(ST) + '"',
+          SingleValue, taLeft) then
+          SoundInfos[ST].MaxGain := SingleValue;
+      end;
+    finally S.Free end;
+  end;
+
 begin
   case CurrentItem of
     0: PlayerMaxLife;
@@ -303,7 +355,8 @@ begin
          RenderShadowQuadsArgument.Value := BoolToStrYesNo[RenderShadowQuads];
        end;
     11: ChangeToLevel;
-    12: CurrentMenu := GameMenu;
+    12: ChangeSoundProperties;
+    13: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

@@ -153,7 +153,7 @@ begin
 end;
 
 { If ALActive then update listener POSITION and ORIENTATION
-  and GAIN based on Player.Navigator.Camera* }
+  based on Player.Navigator.Camera* }
 procedure alUpdateListener;
 begin
   if ALActive then
@@ -540,7 +540,11 @@ end;
 
 procedure Timer(Glwin: TGLWindow);
 begin
-  if ALActive then CheckAL('game loop (check in OnTimer)');
+  if ALActive then
+  begin
+    CheckAL('game loop (check in OnTimer)');
+    ALRefreshUsedSources;
+  end;
 end;
 
 procedure GameCancel(RequireConfirmation: boolean);
