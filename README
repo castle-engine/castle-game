@@ -1,15 +1,6 @@
 "The Castle"
 
 --------------------
-PGD competition stage 5 short notes:
-
-- Menus: done. Start menu and in-game menu (on Escape key).
-
-- New level: done. It's the "Gate" level (this is the initial level
-  when you enter "New Game"). See section "Levels included" below
-  for more info.
-
---------------------
 Installing and running:
 
 Note that to hear sounds you should first install OpenAL
@@ -177,14 +168,13 @@ Miscellaneous command-line options:
 --------------------
 Sound:
 
-The game doesn't play any sounds for now, although all the sound units
-using OpenAL are compiled in and OpenAL is initialized.
-Instructions about installing OpenAL
+OpenAL is used to play sounds. Instructions about installing OpenAL
 and command-line options related to OpenAL are described here:
 [http://www.camelot.homedns.org/~michalis/openal_notes.php].
 
-As a demo that my OpenAL engine can work, see e.g. my old demo program
-[http://www.camelot.homedns.org/~michalis/lets_take_a_walk.php].
+If the game performance suffers when the sound is on,
+or sound quality suffers, or there is sound latency, then you should
+probably stop any other programs that play some music.
 
 --------------------
 Versioning:
@@ -641,6 +631,7 @@ Graphics:
 Sounds:
 - menu_current_item_changed.wav based on
   /usr/share/sounds/KDE_TypeWriter_Key_2.ogg
+- werewolf_howling.wav from http://www.a1.freesoundeffects.com
 
 --------------------
 Have fun! All comments are welcome.

@@ -86,7 +86,7 @@ type
     { @groupEnd });
 
 { Call this always to initialize OpenAL and OpenAL context,
-  and load sounds. This sets SoundInitializationReport
+  and load sound files. This sets SoundInitializationReport
   and ALActive. }
 procedure ALContextInit(WasParam_NoSound: boolean);
 
@@ -117,81 +117,117 @@ procedure SetMusicVolume(const Value: Single);
   0.0 means that there is no music (this case should be optimized).}
 property MusicVolume: Single read GetMusicVolume write SetMusicVolume;
 
-{ When changing Min/MaxAllocatedSounds, remember to always keep
-  MinAllocatedSounds <= MaxAllocatedSounds. }
+{ When changing Min/MaxAllocatedSources, remember to always keep
+  MinAllocatedSources <= MaxAllocatedSources. }
 
 { }
-function GetALMinAllocatedSounds: Cardinal;
-procedure SetALMinAllocatedSounds(const Value: Cardinal);
+function GetALMinAllocatedSources: Cardinal;
+procedure SetALMinAllocatedSources(const Value: Cardinal);
 
 const
-  DefaultALMinAllocatedSounds = 16;
+  DefaultALMinAllocatedSources = 16;
 
-property ALMinAllocatedSounds: Cardinal
-  read GetALMinAllocatedSounds write SetALMinAllocatedSounds;
+property ALMinAllocatedSources: Cardinal
+  read GetALMinAllocatedSources write SetALMinAllocatedSources;
 
-function GetALMaxAllocatedSounds: Cardinal;
-procedure SetALMaxAllocatedSounds(const Value: Cardinal);
+function GetALMaxAllocatedSources: Cardinal;
+procedure SetALMaxAllocatedSources(const Value: Cardinal);
 
 const
-  DefaultALMaxAllocatedSounds = 32;
+  DefaultALMaxAllocatedSources = 32;
 
-property ALMaxAllocatedSounds: Cardinal
-  read GetALMaxAllocatedSounds write SetALMaxAllocatedSounds;
-
-implementation
-
-uses SysUtils, CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
-  KambiFilesUtils, ALSoundAllocator;
+property ALMaxAllocatedSources: Cardinal
+  read GetALMaxAllocatedSources write SetALMaxAllocatedSources;
 
 type
   TSoundInfo = record
     { '' means that this sound is not implemented and will have
       no OpenAL buffer associated with it. }
     FileName: string;
-    Gain: Single;
+    { XxxGain are mapped directly on respective OpenAL source properties. }
+    Gain, MinGain, MaxGain: Single;
     DefaultImportance: Cardinal;
   end;
 
-const
+var
+  { Properties of sounds.
+
+    For the actual game, as used by end-user, SoundInfos is a constant,
+    moreover it's internal to this unit (so you shouldn't even read
+    this).
+
+    However, for the sake of debugging/testing the game,
+    you can read and change some things in SoundInfos:
+    right now, you can reliably change everything except FileName.
+    Note that the changes will only be reflected in new sounds,
+    not in currently played sounds. }
   SoundInfos: array[TSoundType] of TSoundInfo =
   { TODO: fill all sounds below. }
-  ( ( FileName: ''; Gain: 0; DefaultImportance: 0; ),
-    ( FileName: '' { player_sudden_pain.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_potion_drink.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_cast_flying_spell.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_pick_item.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_drop_item.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_dies.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_swimming_begin.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_swimming_end.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_drowning.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { sword_equipping.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { sword_attack_start.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { castle_hall_symbol_moving.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { alien_sudden_pain.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { werewolf_sudden_pain.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { werewolf_attack_start.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { werewolf_actual_attack_hit.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { werewolf_howling.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { ball_missile_fired.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { ball_missile_explode.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { ghost_sudden_pain.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { ghost_attack_start.wav }; Gain: 1; DefaultImportance: 0; ),
-    ( FileName: 'menu_current_item_changed.wav'; Gain: 1; DefaultImportance: MaxSoundImportance; ),
-    ( FileName: '' { save_screen.wav }; Gain: 1; DefaultImportance: 0; )
+  ( ( FileName: '';
+      Gain: 0; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { player_sudden_pain.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { player_potion_drink.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { player_cast_flying_spell.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { player_pick_item.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { player_drop_item.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { player_dies.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { player_swimming_begin.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { player_swimming_end.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { player_drowning.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { sword_equipping.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { sword_attack_start.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { castle_hall_symbol_moving.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { alien_sudden_pain.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { werewolf_sudden_pain.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { werewolf_attack_start.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { werewolf_actual_attack_hit.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: 'werewolf_howling.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { ball_missile_fired.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { ball_missile_explode.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { ghost_sudden_pain.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: '' { ghost_attack_start.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: 'menu_current_item_changed.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
+    ( FileName: '' { save_screen.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; )
   );
+
+implementation
+
+uses SysUtils, CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
+  KambiFilesUtils, ALSourceAllocator;
 
 var
   { Values on this array are useful only when ALContextInited
     and only for sounds with SoundInfos[].FileName <> ''. }
   SoundBuffers: array[TSoundType] of TALuint;
 
-  { When SoundAllocator <> nil, these correspond to it's properties. }
-  FALMinAllocatedSounds: Cardinal;
-  FALMaxAllocatedSounds: Cardinal;
+  { When SourceAllocator <> nil, these correspond to it's properties. }
+  FALMinAllocatedSources: Cardinal;
+  FALMaxAllocatedSources: Cardinal;
 
-  SoundAllocator: TALSoundAllocator;
+  SourceAllocator: TALSourceAllocator;
 
 procedure ALContextInit(WasParam_NoSound: boolean);
 var
@@ -211,8 +247,10 @@ begin
       'OpenAL initialized, sound enabled';
 
     try
-      SoundAllocator := TALSoundAllocator.Create(
-        FALMinAllocatedSounds, FALMaxAllocatedSounds);
+      SourceAllocator := TALSourceAllocator.Create(
+        FALMinAllocatedSources, FALMaxAllocatedSources);
+
+      alListenerf(AL_GAIN, EffectsVolume);
 
       Progress.Init(Ord(High(TSoundType)) + 1, 'Loading sounds');
       try
@@ -230,7 +268,7 @@ begin
     except
       { If loading sounds above will fail, we have to finish already initialized
         things here before reraising exception. }
-      FreeAndNil(SoundAllocator);
+      FreeAndNil(SourceAllocator);
       EndAL;
       raise;
     end;
@@ -243,7 +281,7 @@ var
 begin
   if ALActive then
   begin
-    FreeAndNil(SoundAllocator);
+    FreeAndNil(SourceAllocator);
 
     for ST := Low(TSoundType) to High(TSoundType) do
       if SoundInfos[ST].FileName <> '' then
@@ -253,30 +291,37 @@ begin
   end;
 end;
 
+{ Set common properties for spatialized and non-spatialized
+  sound effects. }
+procedure alCommonSourceSetup(ALSource: TALuint; SoundType: TSoundType);
+begin
+  alSourcei(ALSource, AL_BUFFER, SoundBuffers[SoundType]);
+  alSourcef(ALSource, AL_GAIN, SoundInfos[SoundType].Gain);
+  alSourcef(ALSource, AL_MIN_GAIN, SoundInfos[SoundType].MinGain);
+  alSourcef(ALSource, AL_MAX_GAIN, SoundInfos[SoundType].MaxGain);
+end;
+
 procedure Sound(SoundType: TSoundType);
 var
-  NewSound: TALAllocatedSound;
+  NewSource: TALAllocatedSource;
 begin
   if ALActive and (SoundInfos[SoundType].FileName <> '') then
   begin
-    NewSound := SoundAllocator.AllocateSound(
+    NewSource := SourceAllocator.AllocateSource(
       SoundInfos[SoundType].DefaultImportance);
-    if NewSound <> nil then
+    if NewSource <> nil then
     begin
-      alSourcei(NewSound.ALSound, AL_BUFFER, SoundBuffers[SoundType]);
-      alSourcef(NewSound.ALSound, AL_GAIN, SoundInfos[SoundType].Gain);
+      alCommonSourceSetup(NewSource.ALSource, SoundType);
 
-      { AL_MIN_GAIN and AL_MAX_GAIN should also be set }
-
-      alSourcei(NewSound.ALSound, AL_SOURCE_RELATIVE, AL_TRUE);
+      alSourcei(NewSource.ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
       { Windows OpenAL doesn't work correctly when below is exactly
         (0, 0, 0) --- see /win/docs/audio/OpenAL/bug_relative_0/
 
         TODO: check does this bug still exist ?
         Correct lets_take_a_walk, test_al_sound_allocator }
-      alSourceVector3f(NewSound.ALSound, AL_POSITION, Vector3Single(0, 0, 0.1));
+      alSourceVector3f(NewSource.ALSource, AL_POSITION, Vector3Single(0, 0, 0.1));
 
-      alSourcePlay(NewSound.ALSound);
+      alSourcePlay(NewSource.ALSource);
     end;
   end;
 end;
@@ -305,7 +350,8 @@ begin
   if Value <> FEffectsVolume then
   begin
     FEffectsVolume := Value;
-    { TODO }
+    if ALActive then
+      alListenerf(AL_GAIN, EffectsVolume);
   end;
 end;
 
@@ -329,48 +375,48 @@ begin
   end;
 end;
 
-function GetALMinAllocatedSounds: Cardinal;
+function GetALMinAllocatedSources: Cardinal;
 begin
-  Result := FALMinAllocatedSounds;
+  Result := FALMinAllocatedSources;
 end;
 
-procedure SetALMinAllocatedSounds(const Value: Cardinal);
+procedure SetALMinAllocatedSources(const Value: Cardinal);
 begin
-  if Value <> FALMinAllocatedSounds then
+  if Value <> FALMinAllocatedSources then
   begin
-    FALMinAllocatedSounds := Value;
-    if SoundAllocator <> nil then
-      SoundAllocator.MinAllocatedSounds := FALMinAllocatedSounds;
+    FALMinAllocatedSources := Value;
+    if SourceAllocator <> nil then
+      SourceAllocator.MinAllocatedSources := FALMinAllocatedSources;
   end;
 end;
 
-function GetALMaxAllocatedSounds: Cardinal;
+function GetALMaxAllocatedSources: Cardinal;
 begin
-  Result := FALMaxAllocatedSounds;
+  Result := FALMaxAllocatedSources;
 end;
 
-procedure SetALMaxAllocatedSounds(const Value: Cardinal);
+procedure SetALMaxAllocatedSources(const Value: Cardinal);
 begin
-  if Value <> FALMaxAllocatedSounds then
+  if Value <> FALMaxAllocatedSources then
   begin
-    FALMaxAllocatedSounds := Value;
-    if SoundAllocator <> nil then
-      SoundAllocator.MaxAllocatedSounds := FALMaxAllocatedSounds;
+    FALMaxAllocatedSources := Value;
+    if SourceAllocator <> nil then
+      SourceAllocator.MaxAllocatedSources := FALMaxAllocatedSources;
   end;
 end;
 
 initialization
   FEffectsVolume := ConfigFile.GetValue('sound/effects/volume', DefaultEffectsVolume);
   FMusicVolume   := ConfigFile.GetValue('sound/music/volume', DefaultMusicVolume);
-  FALMinAllocatedSounds := ConfigFile.GetValue(
-    'sound/allocated_sounds/min', DefaultALMinAllocatedSounds);
-  FALMaxAllocatedSounds := ConfigFile.GetValue(
-    'sound/allocated_sounds/max', DefaultALMaxAllocatedSounds);
+  FALMinAllocatedSources := ConfigFile.GetValue(
+    'sound/allocated_sources/min', DefaultALMinAllocatedSources);
+  FALMaxAllocatedSources := ConfigFile.GetValue(
+    'sound/allocated_sources/max', DefaultALMaxAllocatedSources);
 finalization
   ConfigFile.SetDeleteValue('sound/effects/volume', EffectsVolume, DefaultEffectsVolume);
   ConfigFile.SetDeleteValue('sound/music/volume', MusicVolume, DefaultMusicVolume);
-  ConfigFile.SetDeleteValue('sound/allocated_sounds/min',
-    FALMinAllocatedSounds, DefaultALMinAllocatedSounds);
-  ConfigFile.SetDeleteValue('sound/allocated_sounds/max',
-    FALMaxAllocatedSounds, DefaultALMaxAllocatedSounds);
+  ConfigFile.SetDeleteValue('sound/allocated_sources/min',
+    FALMinAllocatedSources, DefaultALMinAllocatedSources);
+  ConfigFile.SetDeleteValue('sound/allocated_sources/max',
+    FALMaxAllocatedSources, DefaultALMaxAllocatedSources);
 end.
