@@ -1,9 +1,10 @@
-- choosing OpenAL device from menu.
 - choosing Min/MaxALAllocatedSounds from menu.
 - ask on PGD: can I assume that judges will download OpenAL on their own ?
 
 - sound when creature sees player for the 1st time
-- sound on menu item select
+
+- update sources positions when creature move.
+  Add TCreature.Sound method.
 
 --------------------
 Stage 6:

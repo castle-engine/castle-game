@@ -87,6 +87,8 @@ end;
 
 procedure TGameMenu.CurrentItemSelected;
 begin
+  inherited;
+
   case CurrentItem of
     0: UserQuit := true;
     1: ViewGameMessages;
@@ -335,6 +337,8 @@ procedure TDebugMenu.CurrentItemSelected;
   end;
 
 begin
+  inherited;
+
   case CurrentItem of
     0: PlayerMaxLife;
     1: ShowLevelCreaturesInfo;

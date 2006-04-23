@@ -31,6 +31,7 @@ type
   TCastleMenu = class(TGLMenu)
     procedure CurrentItemChanged; override;
     procedure SomethingChanged; override;
+    procedure CurrentItemSelected; override;
   end;
 
 implementation
@@ -43,6 +44,12 @@ procedure TCastleMenu.CurrentItemChanged;
 begin
   inherited;
   Sound(stMenuCurrentItemChanged);
+end;
+
+procedure TCastleMenu.CurrentItemSelected;
+begin
+  inherited;
+  Sound(stMenuCurrentItemSelected);
 end;
 
 procedure TCastleMenu.SomethingChanged;

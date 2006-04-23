@@ -82,12 +82,16 @@ type
     { Others.
       @groupBegin }
     stMenuCurrentItemChanged,
+    stMenuCurrentItemSelected,
     stSaveScreen
     { @groupEnd });
 
 { Call this always to initialize OpenAL and OpenAL context,
   and load sound files. This sets SoundInitializationReport
-  and ALActive. }
+  and ALActive.
+
+  You can set ALCDevice before calling this.
+  Note that this unit saves/restores ALCDevice value to/from config file. }
 procedure ALContextInit(WasParam_NoSound: boolean);
 
 { This will call RefreshUsed on internal ALSourceAllocator,
@@ -220,7 +224,7 @@ var
     ( FileName: '' { werewolf_actual_attack_hit.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: 'werewolf_howling.wav';
-      Gain: 1; MinGain: 0.8; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0.8; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: '' { ball_missile_fired.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { ball_missile_explode.wav };
@@ -231,6 +235,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: 'menu_current_item_changed.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
+    ( FileName: '' { 'menu_current_item_selected.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { save_screen.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; )
   );
@@ -456,6 +462,7 @@ initialization
     'sound/allocated_sources/min', DefaultALMinAllocatedSources);
   FALMaxAllocatedSources := ConfigFile.GetValue(
     'sound/allocated_sources/max', DefaultALMaxAllocatedSources);
+  ALCDevice := ConfigFile.GetValue('sound/device', BestALCDevice);
 finalization
   ConfigFile.SetDeleteValue('sound/effects/volume', EffectsVolume, DefaultEffectsVolume);
   ConfigFile.SetDeleteValue('sound/music/volume', MusicVolume, DefaultMusicVolume);
@@ -463,4 +470,5 @@ finalization
     FALMinAllocatedSources, DefaultALMinAllocatedSources);
   ConfigFile.SetDeleteValue('sound/allocated_sources/max',
     FALMaxAllocatedSources, DefaultALMaxAllocatedSources);
+  ConfigFile.SetDeleteValue('sound/device', ALCDevice, BestALCDevice);
 end.

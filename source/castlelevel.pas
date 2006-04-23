@@ -1001,7 +1001,6 @@ begin
           begin
             ButtonPressed := true;
             GameMessage('You press the button');
-            GameMessage('Suddenly you hear a wolf howling somewhere near...');
           end;
         end else
           GameMessage('You see a button. You cannot reach it from here');

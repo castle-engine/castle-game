@@ -31,13 +31,13 @@ procedure ShowStartMenu;
 
 implementation
 
-uses SysUtils, KambiUtils, GLWindow, GLWinModes,
+uses SysUtils, Classes, KambiUtils, GLWindow, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleKeys, CastleVideoOptions,
-  KambiStringUtils;
+  KambiStringUtils, ALUtils, OpenAL, KambiClassUtils;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -69,9 +69,17 @@ type
   TSoundMenu = class(TSubMenu)
     EffectsVolumeSlider: TSoundVolumeSlider;
     MusicVolumeSlider: TSoundVolumeSlider;
+    OpenALDeviceArgument: TGLMenuItemArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
+  end;
+
+  TChangeOpenALDeviceMenu = class(TSubMenu)
+    OpenALDevices: TStringList;
+    constructor Create;
+    destructor Destroy; override;
+    procedure CurrentItemSelected; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -83,6 +91,7 @@ var
   MainMenu: TMainMenu;
   VideoMenu: TVideoMenu;
   SoundMenu: TSoundMenu;
+  ChangeOpenALDeviceMenu: TChangeOpenALDeviceMenu;
   GLList_ScreenImage: TGLuint;
 
 { TMainMenu ------------------------------------------------------------ }
@@ -125,6 +134,8 @@ procedure TMainMenu.CurrentItemSelected;
   end;
 
 begin
+  inherited;
+
   case CurrentItem of
     0: NewGame(TGateLevel.Create);
     1: ShowControlsMenu(GLList_ScreenImage, false, false);
@@ -230,6 +241,8 @@ procedure TVideoMenu.CurrentItemSelected;
   end;
 
 begin
+  inherited;
+
   case CurrentItem of
     0: ViewVideoInfo;
     1: ;
@@ -292,9 +305,13 @@ begin
   EffectsVolumeSlider := TSoundVolumeSlider.Create(EffectsVolume);
   MusicVolumeSlider := TSoundVolumeSlider.Create(MusicVolume);
 
+  OpenALDeviceArgument := TGLMenuItemArgument.Create(400);
+  OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
+
   Items.Add('View sound information');
   Items.AddObject('Sound effects volume', EffectsVolumeSlider);
   Items.AddObject('Music volume', MusicVolumeSlider);
+  Items.AddObject('Sound output device', OpenALDeviceArgument);
   Items.Add('Back to main menu');
 
   SubMenuTitle := 'Sound options';
@@ -305,20 +322,36 @@ end;
 procedure TSoundMenu.CurrentItemSelected;
 
   procedure ViewSoundInfo;
+  var
+    S: TStringList;
   begin
-    MessageOK(Glw,
-      'Sound library (OpenAL) status:' +nl+
-      nl+
-      SoundInitializationReport,
-      taLeft);
+    S := TStringList.Create;
+    try
+      S.Append('Sound library (OpenAL) status:');
+      S.Append('');
+      Strings_AddSplittedString(S, SoundInitializationReport, nl);
+      if ALActive then
+      begin
+        S.Append('');
+        S.Append('Version : ' + alGetString(AL_VERSION));
+        S.Append('Renderer : ' + alGetString(AL_RENDERER));
+        S.Append('Vendor : ' + alGetString(AL_VENDOR));
+        S.Append('Extensions : ' + alGetString(AL_EXTENSIONS));
+      end;
+
+      MessageOK(Glw, S, taLeft);
+    finally S.Free end;
   end;
 
 begin
+  inherited;
+
   case CurrentItem of
     0: ViewSoundInfo;
     1: ;
     2: ;
-    3: CurrentMenu := MainMenu;
+    3: CurrentMenu := ChangeOpenALDeviceMenu;
+    4: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -329,6 +362,50 @@ begin
     1: EffectsVolume := EffectsVolumeSlider.Value;
     2: MusicVolume := MusicVolumeSlider.Value;
   end;
+end;
+
+{ TChangeOpenALDeviceMenu ---------------------------------------------------- }
+
+constructor TChangeOpenALDeviceMenu.Create;
+var
+  I: Integer;
+begin
+  inherited;
+
+  OpenALDevices := TStringList.Create;
+  OpenALDevices.Append(''); { Default OpenAL device }
+  GetOpenALDevices(OpenALDevices);
+
+  for I := 0 to OpenALDevices.Count - 1 do
+    Items.Add(ALCDeviceToNiceStr(OpenALDevices[I]));
+  Items.Add('Cancel');
+
+  SubMenuTitle := 'Change sound output device';
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+destructor TChangeOpenALDeviceMenu.Destroy;
+begin
+  FreeAndNil(OpenALDevices);
+  inherited;
+end;
+
+procedure TChangeOpenALDeviceMenu.CurrentItemSelected;
+begin
+  inherited;
+
+  if CurrentItem < OpenALDevices.Count then
+  begin
+    ALContextClose;
+    ALCDevice := OpenALDevices[CurrentItem];
+    SoundMenu.OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
+    ALContextInit(false);
+    if not ALActive then
+      MessageOK(Glw, SoundInitializationReport, taLeft);
+  end;
+
+  CurrentMenu := SoundMenu;
 end;
 
 { global things -------------------------------------------------------------- }
@@ -436,6 +513,7 @@ begin
   MainMenu := TMainMenu.Create;
   VideoMenu := TVideoMenu.Create;
   SoundMenu := TSoundMenu.Create;
+  ChangeOpenALDeviceMenu := TChangeOpenALDeviceMenu.Create;
   CurrentMenu := MainMenu;
 end;
 
@@ -445,6 +523,7 @@ begin
   FreeAndNil(MainMenu);
   FreeAndNil(VideoMenu);
   FreeAndNil(SoundMenu);
+  FreeAndNil(ChangeOpenALDeviceMenu);
 end;
 
 initialization
