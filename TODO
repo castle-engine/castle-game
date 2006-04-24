@@ -6,6 +6,9 @@
 - update sources positions when creature move.
   Add TCreature.Sound method.
 
+- menu_item_selected sounds stipid, too electronical.
+- apply sounds from /win/music/flashkit_soundfx_freeware
+
 --------------------
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.

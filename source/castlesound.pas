@@ -235,8 +235,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: 'menu_current_item_changed.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
-    ( FileName: '' { 'menu_current_item_selected.wav' };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: 'menu_current_item_selected.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: '' { save_screen.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; )
   );

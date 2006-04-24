@@ -631,7 +631,10 @@ Graphics:
 Sounds:
 - menu_current_item_changed.wav based on
   /usr/share/sounds/KDE_TypeWriter_Key_2.ogg
-- werewolf_howling.wav from http://www.a1.freesoundeffects.com
+- werewolf_howling.wav from
+  http://www.acs.ucalgary.ca/~mmusiani/
+- menu_current_item_selected based on
+  /usr/share/sounds/generic.wav (gnome-audio)
 
 --------------------
 Have fun! All comments are welcome.
