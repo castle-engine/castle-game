@@ -305,7 +305,7 @@ begin
   EffectsVolumeSlider := TSoundVolumeSlider.Create(EffectsVolume);
   MusicVolumeSlider := TSoundVolumeSlider.Create(MusicVolume);
 
-  OpenALDeviceArgument := TGLMenuItemArgument.Create(400);
+  OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
   OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
 
   Items.Add('View sound information');
@@ -398,6 +398,9 @@ begin
   if CurrentItem < OpenALDevices.Count then
   begin
     ALContextClose;
+
+    OpenALRestart;
+
     ALCDevice := OpenALDevices[CurrentItem];
     SoundMenu.OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
     ALContextInit(false);
