@@ -361,12 +361,8 @@ begin
     begin
       alCommonSourceSetup(Result.ALSource, SoundType, Looping);
 
-      alSourcei(Result.ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
-      { Windows OpenAL doesn't work correctly when below is exactly
-        (0, 0, 0) --- see /win/docs/audio/OpenAL/bug_relative_0/
-        TODO: check does this bug still exist ?
-        Correct lets_take_a_walk, test_al_sound_allocator }
-      alSourceVector3f(Result.ALSource, AL_POSITION, Vector3Single(0, 0, 0.1));
+      { No attenuation by distance. }
+      alSourcef(Result.ALSource, AL_ROLLOFF_FACTOR, 0);
 
       alSourcePlay(Result.ALSource);
     end;
@@ -387,7 +383,10 @@ begin
     begin
       alCommonSourceSetup(Result.ALSource, SoundType, Looping);
 
-      alSourcei(Result.ALSource, AL_SOURCE_RELATIVE, AL_FALSE);
+      { Set attenuation by distance. }
+      alSourcef(Result.ALSource, AL_ROLLOFF_FACTOR, 0.1);
+      alSourcef(Result.ALSource, AL_REFERENCE_DISTANCE, 2.0);
+
       alSourceVector3f(Result.ALSource, AL_POSITION, Position);
 
       alSourcePlay(Result.ALSource);
