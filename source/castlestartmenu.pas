@@ -67,7 +67,7 @@ type
   end;
 
   TSoundMenu = class(TSubMenu)
-    EffectsVolumeSlider: TSoundVolumeSlider;
+    SoundVolumeSlider: TSoundVolumeSlider;
     MusicVolumeSlider: TSoundVolumeSlider;
     OpenALDeviceArgument: TGLMenuItemArgument;
     constructor Create;
@@ -304,14 +304,14 @@ constructor TSoundMenu.Create;
 begin
   inherited Create;
 
-  EffectsVolumeSlider := TSoundVolumeSlider.Create(EffectsVolume);
+  SoundVolumeSlider := TSoundVolumeSlider.Create(SoundVolume);
   MusicVolumeSlider := TSoundVolumeSlider.Create(MusicVolume);
 
   OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
   OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
 
   Items.Add('View sound information');
-  Items.AddObject('Sound effects volume', EffectsVolumeSlider);
+  Items.AddObject('Volume', SoundVolumeSlider);
   Items.AddObject('Music volume', MusicVolumeSlider);
   Items.AddObject('Sound output device', OpenALDeviceArgument);
   Items.Add('Back to main menu');
@@ -361,7 +361,7 @@ end;
 procedure TSoundMenu.CurrentItemAccessoryValueChanged;
 begin
   case CurrentItem of
-    1: EffectsVolume := EffectsVolumeSlider.Value;
+    1: SoundVolume := SoundVolumeSlider.Value;
     2: MusicVolume := MusicVolumeSlider.Value;
   end;
 end;

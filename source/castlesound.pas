@@ -132,12 +132,13 @@ function Sound3d(SoundType: TSoundType;
   const Looping: boolean = false): TALAllocatedSource; overload;
 
 { }
-function GetEffectsVolume: Single;
-procedure SetEffectsVolume(const Value: Single);
+function GetSoundVolume: Single;
+procedure SetSoundVolume(const Value: Single);
 
-{ Sound effects volume. This must always be within 0..1 range.
+{ Sound volume, affects all sounds (effects and music).
+  This must always be within 0..1 range.
   0.0 means that there are no effects (this case should be optimized). }
-property EffectsVolume: Single read GetEffectsVolume write SetEffectsVolume;
+property SoundVolume: Single read GetSoundVolume write SetSoundVolume;
 
 function GetMusicVolume: Single;
 procedure SetMusicVolume(const Value: Single);
@@ -209,9 +210,16 @@ type
     { XxxGain are mapped directly on respective OpenAL source properties.
       Note that Gain and MaxGain > 1 are allowed (because OpenAL allows them),
       although OpenAL may clip them for the resulting sound (after all
-      calculations taking into account 3d position will be done). }
+      calculations taking into account 3d position will be done).
+
+      When sound is used for MusicPlayer.PlayedSound:
+      1. MinGain, MaxGain are ignored
+      2. Gain is always multiplied by MusicVolume when setting AL_GAIN
+         of the music source. }
     Gain, MinGain, MaxGain: Single;
 
+    { Importance, as passed to TALSourceAllocator.
+      This is ignored when sound is used for MusicPlayer.PlayedSound. }
     DefaultImportance: Cardinal;
   end;
 
@@ -330,7 +338,7 @@ begin
       SourceAllocator := TALSourceAllocator.Create(
         FALMinAllocatedSources, FALMaxAllocatedSources);
 
-      alListenerf(AL_GAIN, EffectsVolume);
+      alListenerf(AL_GAIN, SoundVolume);
 
       Progress.Init(Ord(High(TSoundType)) + 1, 'Loading sounds');
       try
@@ -469,23 +477,23 @@ begin
 end;
 
 const
-  DefaultEffectsVolume = 0.5;
+  DefaultSoundVolume = 0.5;
 
 var
-  FEffectsVolume: Single;
+  FSoundVolume: Single;
 
-function GetEffectsVolume: Single;
+function GetSoundVolume: Single;
 begin
-  Result := FEffectsVolume;
+  Result := FSoundVolume;
 end;
 
-procedure SetEffectsVolume(const Value: Single);
+procedure SetSoundVolume(const Value: Single);
 begin
-  if Value <> FEffectsVolume then
+  if Value <> FSoundVolume then
   begin
-    FEffectsVolume := Value;
+    FSoundVolume := Value;
     if ALActive then
-      alListenerf(AL_GAIN, EffectsVolume);
+      alListenerf(AL_GAIN, SoundVolume);
   end;
 end;
 
@@ -499,7 +507,8 @@ begin
     if FAllocatedSource <> nil then
     begin
       alCommonSourceSetup(FAllocatedSource.ALSource, true, false,
-        SoundBuffers[PlayedSound], MusicVolume, 0, 1);
+        SoundBuffers[PlayedSound],
+        MusicVolume * SoundInfos[PlayedSound].Gain, 0, 1);
 
       alSourcePlay(FAllocatedSource.ALSource);
 
@@ -534,7 +543,7 @@ end;
 { Other non-class things ----------------------------------------------------- }
 
 const
-  DefaultMusicVolume = 0.5;
+  DefaultMusicVolume = 1.0;
 
 var
   FMusicVolume: Single;
@@ -549,7 +558,9 @@ begin
   if Value <> FMusicVolume then
   begin
     FMusicVolume := Value;
-    { TODO }
+    if MusicPlayer.FAllocatedSource <> nil then
+      alSourcef(MusicPlayer.FAllocatedSource.ALSource,
+        AL_GAIN, MusicVolume * SoundInfos[MusicPlayer.PlayedSound].Gain);
   end;
 end;
 
@@ -586,7 +597,7 @@ end;
 initialization
   MusicPlayer := TMusicPlayer.Create;
 
-  FEffectsVolume := ConfigFile.GetValue('sound/effects/volume', DefaultEffectsVolume);
+  FSoundVolume := ConfigFile.GetValue('sound/volume', DefaultSoundVolume);
   FMusicVolume   := ConfigFile.GetValue('sound/music/volume', DefaultMusicVolume);
   FALMinAllocatedSources := ConfigFile.GetValue(
     'sound/allocated_sources/min', DefaultALMinAllocatedSources);
@@ -594,7 +605,7 @@ initialization
     'sound/allocated_sources/max', DefaultALMaxAllocatedSources);
   ALCDevice := ConfigFile.GetValue('sound/device', BestALCDevice);
 finalization
-  ConfigFile.SetDeleteValue('sound/effects/volume', EffectsVolume, DefaultEffectsVolume);
+  ConfigFile.SetDeleteValue('sound/volume', SoundVolume, DefaultSoundVolume);
   ConfigFile.SetDeleteValue('sound/music/volume', MusicVolume, DefaultMusicVolume);
   ConfigFile.SetDeleteValue('sound/allocated_sources/min',
     FALMinAllocatedSources, DefaultALMinAllocatedSources);
