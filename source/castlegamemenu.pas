@@ -32,7 +32,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
   CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel,
-  CastleSound;
+  CastleSound, CastleSoundMenu;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -59,6 +59,14 @@ type
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
+  TGameSoundMenu = class(TCastleMenu)
+    SoundVolumeSlider: TSoundVolumeSlider;
+    MusicVolumeSlider: TSoundVolumeSlider;
+    constructor Create;
+    procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
+  end;
+
 { ----------------------------------------------------------------------------
   global vars (used by TCastleMenu descendants implementation) }
 
@@ -68,6 +76,7 @@ var
   CurrentMenu: TCastleMenu;
   GameMenu: TGameMenu;
   DebugMenu: TDebugMenu;
+  GameSoundMenu: TGameSoundMenu;
   ViewAngleChanged: boolean;
 
 { TGameMenu ------------------------------------------------------------ }
@@ -79,6 +88,7 @@ begin
   Items.Add('Back to game');
   Items.Add('View last game messages');
   Items.Add('Configure controls');
+  Items.Add('Sound options');
   Items.Add('End game');
   Items.Add('Debug (cheating) options');
 
@@ -93,12 +103,51 @@ begin
     0: UserQuit := true;
     1: ViewGameMessages;
     2: ShowControlsMenu(GLList_ScreenImage, true, true);
-    3: { At first I did here GameCancel(false), but tests (with Mama)
+    3: CurrentMenu := GameSoundMenu;
+    4: { At first I did here GameCancel(false), but tests (with Mama)
          show that it's too easy to select this and accidentaly
          end the game. }
        GameCancel(true);
-    4: CurrentMenu := DebugMenu;
+    5: CurrentMenu := DebugMenu;
     else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+{ TGameSoundMenu ------------------------------------------------------------- }
+
+constructor TGameSoundMenu.Create;
+begin
+  inherited Create;
+
+  SoundVolumeSlider := TSoundVolumeSlider.Create(SoundVolume);
+  MusicVolumeSlider := TSoundVolumeSlider.Create(MusicVolume);
+
+  Items.Add('View sound information');
+  Items.AddObject('Volume', SoundVolumeSlider);
+  Items.AddObject('Music volume', MusicVolumeSlider);
+  Items.Add('Back to game menu');
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TGameSoundMenu.CurrentItemSelected;
+begin
+  inherited;
+
+  case CurrentItem of
+    0: ViewSoundInfo;
+    1: ;
+    2: ;
+    3: CurrentMenu := GameMenu;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+procedure TGameSoundMenu.CurrentItemAccessoryValueChanged;
+begin
+  case CurrentItem of
+    1: SoundVolume := SoundVolumeSlider.Value;
+    2: MusicVolume := MusicVolumeSlider.Value;
   end;
 end;
 
@@ -443,6 +492,8 @@ begin
     Player.Navigator.RotationVerticalSpeed;
   DebugMenu.PlayerSpeedSlider.Value :=
     VectorLen(Player.Navigator.CameraDir);
+  GameSoundMenu.SoundVolumeSlider.Value := SoundVolume;
+  GameSoundMenu.MusicVolumeSlider.Value := MusicVolume;
 
   GLList_ScreenImage := Glw.SaveScreenToDispList;
   try
@@ -487,6 +538,7 @@ procedure InitGLW(Glwin: TGLWindow);
 begin
   GameMenu := TGameMenu.Create;
   DebugMenu := TDebugMenu.Create;
+  GameSoundMenu := TGameSoundMenu.Create;
   CurrentMenu := GameMenu;
 end;
 
@@ -495,6 +547,7 @@ begin
   CurrentMenu := nil;
   FreeAndNil(GameMenu);
   FreeAndNil(DebugMenu);
+  FreeAndNil(GameSoundMenu);
 end;
 
 initialization

@@ -37,7 +37,7 @@ uses SysUtils, Classes, KambiUtils, GLWindow, GLWinModes,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleKeys, CastleVideoOptions,
-  KambiStringUtils, ALUtils, OpenAL, KambiClassUtils;
+  KambiStringUtils, ALUtils, OpenAL, KambiClassUtils, CastleSoundMenu;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -59,11 +59,6 @@ type
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
-  end;
-
-  TSoundVolumeSlider = class(TGLMenuFloatSlider)
-    constructor Create(const Value: Single);
-    function ValueToStr(const AValue: Single): string; override;
   end;
 
   TSoundMenu = class(TSubMenu)
@@ -133,6 +128,8 @@ procedure TMainMenu.CurrentItemSelected;
     finally FreeAndNil(LocalLevel) end;
 
     MusicPlayer.PlayedSound := stIntroMusic;
+    SoundMenu.SoundVolumeSlider.Value := SoundVolume;
+    SoundMenu.MusicVolumeSlider.Value := MusicVolume;
   end;
 
 begin
@@ -284,20 +281,6 @@ begin
   end;
 end;
 
-{ TSoundVolumeSlider ---------------------------------------------------- }
-
-constructor TSoundVolumeSlider.Create(const Value: Single);
-begin
-  inherited Create(0, 1, Value);
-end;
-
-function TSoundVolumeSlider.ValueToStr(const AValue: Single): string;
-begin
-  if AValue = 0.0 then
-    Result := 'Off' else
-    Result := inherited ValueToStr(AValue);
-end;
-
 { TSoundMenu ------------------------------------------------------------- }
 
 constructor TSoundMenu.Create;
@@ -322,29 +305,6 @@ begin
 end;
 
 procedure TSoundMenu.CurrentItemSelected;
-
-  procedure ViewSoundInfo;
-  var
-    S: TStringList;
-  begin
-    S := TStringList.Create;
-    try
-      S.Append('Sound library (OpenAL) status:');
-      S.Append('');
-      Strings_AddSplittedString(S, SoundInitializationReport, nl);
-      if ALActive then
-      begin
-        S.Append('');
-        S.Append('Version : ' + alGetString(AL_VERSION));
-        S.Append('Renderer : ' + alGetString(AL_RENDERER));
-        S.Append('Vendor : ' + alGetString(AL_VENDOR));
-        S.Append('Extensions : ' + alGetString(AL_EXTENSIONS));
-      end;
-
-      MessageOK(Glw, S, taLeft);
-    finally S.Free end;
-  end;
-
 begin
   inherited;
 
