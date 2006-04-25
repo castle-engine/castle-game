@@ -26,7 +26,7 @@ interface
 
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
-  VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints;
+  VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound;
 
 type
   TLevel = class
@@ -75,6 +75,8 @@ type
     FLightCastingShadowsPosition: TVector3Single;
 
     FWaterBox: TBox3d;
+
+    FPlayedMusicSound: TSoundType;
   protected
     { See README for description of LevelBox and HintButtonBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
@@ -237,6 +239,9 @@ type
 
     property Sectors: TSceneSectorsList read FSectors;
     property Waypoints: TSceneWaypointsList read FWaypoints;
+
+    property PlayedMusicSound: TSoundType
+      read FPlayedMusicSound write FPlayedMusicSound default stNone;
   end;
 
   TCastleHallLevel = class(TLevel)
@@ -304,7 +309,7 @@ implementation
 
 uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
-  CastleSound, CastleVideoOptions;
+  CastleVideoOptions;
 
 { TLevel --------------------------------------------------------------------- }
 
@@ -443,6 +448,8 @@ begin
   { Calculate LightCastingShadowsPosition }
   FLightCastingShadowsPosition := Box3dMiddle(Scene.BoundingBox);
   FLightCastingShadowsPosition[2] := Scene.BoundingBox[1, 2];
+
+  PlayedMusicSound := stNone;
 end;
 
 destructor TLevel.Destroy;
@@ -732,6 +739,8 @@ constructor TCastleHallLevel.Create;
 
 begin
   inherited Create('castle_hall_final.wrl', 'castle_hall_lights.wrl');
+
+  PlayedMusicSound := stCastleHallMusic;
 
   Symbol_TL := LoadSymbol('tl');
   Symbol_BL := LoadSymbol('bl');

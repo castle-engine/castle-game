@@ -491,6 +491,8 @@ begin
   end else
     glDisable(GL_LIGHT0);
 
+  MusicPlayer.PlayedSound := Level.PlayedMusicSound;
+
   { First GameMessage for this level. }
   GameMessage('Loaded level "' + Level.Title + '"');
 end;

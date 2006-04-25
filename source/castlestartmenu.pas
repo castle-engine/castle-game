@@ -131,6 +131,8 @@ procedure TMainMenu.CurrentItemSelected;
         PlayLevel(LocalLevel, LocalPlayer);
       finally FreeAndNil(LocalPlayer) end;
     finally FreeAndNil(LocalLevel) end;
+
+    MusicPlayer.PlayedSound := stIntroMusic;
   end;
 
 begin
@@ -480,29 +482,32 @@ procedure ShowStartMenu;
 var
   SavedMode: TGLMode;
 begin
-  SavedMode := TGLMode.Create(glw, 0, false);
+  MusicPlayer.PlayedSound := stIntroMusic;
   try
-    SavedMode.FakeMouseDown := false;
+    SavedMode := TGLMode.Create(glw, 0, false);
+    try
+      SavedMode.FakeMouseDown := false;
 
-    SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
-      nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
-      false, K_None, #0, false, false);
+      SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
+        nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
+        false, K_None, #0, false, false);
 
-    Glw.OnKeyDown := KeyDown;
-    Glw.OnMouseDown := MouseDown;
-    Glw.OnMouseUp := MouseUp;
-    Glw.OnMouseMove := MouseMove;
-    Glw.OnIdle := Idle;
+      Glw.OnKeyDown := KeyDown;
+      Glw.OnMouseDown := MouseDown;
+      Glw.OnMouseUp := MouseUp;
+      Glw.OnMouseMove := MouseMove;
+      Glw.OnIdle := Idle;
 
-    Glw.EventResize;
+      Glw.EventResize;
 
-    UserQuit := false;
+      UserQuit := false;
 
-    repeat
-      Glwm.ProcessMessage(true);
-    until UserQuit;
+      repeat
+        Glwm.ProcessMessage(true);
+      until UserQuit;
 
-  finally FreeAndNil(SavedMode); end;
+    finally FreeAndNil(SavedMode); end;
+  finally MusicPlayer.PlayedSound := stNone; end;
 end;
 
 { initialization / finalization ---------------------------------------------- }

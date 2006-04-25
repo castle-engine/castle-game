@@ -63,9 +63,10 @@ type
     stSwordAttackStart,
     { @groupEnd }
 
-    { Level objects sounds.
+    { Levels sounds.
       @groupBegin }
     stCastleHallSymbolMoving,
+    stCastleHallMusic,
     { @groupEnd }
 
     { Creatures sounds.
@@ -86,6 +87,7 @@ type
 
     { Others.
       @groupBegin }
+    stIntroMusic,
     stMenuCurrentItemChanged,
     stMenuCurrentItemSelected,
     stSaveScreen
@@ -142,6 +144,38 @@ procedure SetMusicVolume(const Value: Single);
 { Music volume. This must always be within 0..1 range.
   0.0 means that there is no music (this case should be optimized).}
 property MusicVolume: Single read GetMusicVolume write SetMusicVolume;
+
+type
+  TMusicPlayer = class
+  private
+    FPlayedSound: TSoundType;
+    procedure SetPlayedSound(const Value: TSoundType);
+
+    { This is nil if we don't play music right now
+      (because OpenAL is not initialized, or PlayedSound = stNone,
+      or PlayerSound.FileName = '' (not implemented)). }
+    FAllocatedSource: TALAllocatedSource;
+
+    procedure AllocatedSourceUsingEnd(Sender: TALAllocatedSource);
+
+    { Called by ALInitContext. You should check here if
+      PlayedSound <> stNone and eventually initialize FAllocatedSource. }
+    procedure AllocateSource;
+  public
+    { Currently played music.
+      Set to stNone to stop playing music.
+      Set to anything else to play that music.
+
+      Changing value of this property (when both the old and new values
+      are <> stNone and are different) restarts playing the music. }
+    property PlayedSound: TSoundType read FPlayedSound write SetPlayedSound
+      default stNone;
+  end;
+
+var
+  { This is the only allowed instance of TMusicPlayer class,
+    created and destroyed in this unit's init/fini. }
+  MusicPlayer: TMusicPlayer;
 
 { When changing Min/MaxAllocatedSources, remember to always keep
   MinAllocatedSources <= MaxAllocatedSources. }
@@ -202,11 +236,11 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { player_cast_flying_spell.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_pick_item.wav };
+    ( FileName: 'player_pick_item.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { player_drop_item.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { player_dies.wav };
+    ( FileName: 'player_dies.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { player_swimming_begin.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
@@ -220,6 +254,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { castle_hall_symbol_moving.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: 'castle_hall_music.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: 'alien_sudden_pain.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'alien_dying.wav';
@@ -234,9 +270,9 @@ var
       Gain: 1; MinGain: 0.8; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: 'werewolf_dying.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { ball_missile_fired.wav };
+    ( FileName: 'ball_missile_fired.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { ball_missile_explode.wav };
+    ( FileName: 'ball_missile_explode.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'ghost_sudden_pain.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
@@ -244,6 +280,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: '' { 'ghost_dying.wav' };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: 'intro_music.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: 'menu_current_item_changed.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialImportance; ),
     ( FileName: 'menu_current_item_selected.wav';
@@ -304,6 +342,8 @@ begin
           Progress.Step;
         end;
       finally Progress.Fini; end;
+
+      MusicPlayer.AllocateSource;
     except
       { If loading sounds above will fail, we have to finish already initialized
         things here before reraising exception. }
@@ -320,6 +360,8 @@ var
 begin
   if ALActive then
   begin
+    MusicPlayer.FAllocatedSource := nil;
+
     FreeAndNil(SourceAllocator);
 
     for ST := Low(TSoundType) to High(TSoundType) do
@@ -337,15 +379,54 @@ begin
 end;
 
 { Set common properties for spatialized and non-spatialized
-  sound effects. }
-procedure alCommonSourceSetup(ALSource: TALuint; SoundType: TSoundType;
-  const Looping: boolean);
+  sound effects. If Spatial = true, you have to always set this sound's
+  AL_POSITION after calling this. }
+procedure alCommonSourceSetup(ALSource: TALuint;
+  const Looping: boolean;
+  const Spatial: boolean;
+  const ALBuffer: TALuint; const Gain, MinGain, MaxGain: Single); overload;
 begin
-  alSourcei(ALSource, AL_BUFFER, SoundBuffers[SoundType]);
+  alSourcei(ALSource, AL_BUFFER, ALBuffer);
   alSourcei(ALSource, AL_LOOPING, BoolToAL[Looping]);
-  alSourcef(ALSource, AL_GAIN, SoundInfos[SoundType].Gain);
-  alSourcef(ALSource, AL_MIN_GAIN, SoundInfos[SoundType].MinGain);
-  alSourcef(ALSource, AL_MAX_GAIN, SoundInfos[SoundType].MaxGain);
+  alSourcef(ALSource, AL_GAIN, Gain);
+  alSourcef(ALSource, AL_MIN_GAIN, MinGain);
+  alSourcef(ALSource, AL_MAX_GAIN, MaxGain);
+
+  if Spatial then
+  begin
+    { Set attenuation by distance. }
+    alSourcef(ALSource, AL_ROLLOFF_FACTOR, 0.1);
+    alSourcef(ALSource, AL_REFERENCE_DISTANCE, 2.0);
+
+    alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_FALSE);
+  end else
+  begin
+    { No attenuation by distance. }
+    alSourcef(ALSource, AL_ROLLOFF_FACTOR, 0);
+
+    { Although AL_ROLLOFF_FACTOR := 0 turns off
+      attenuation by distance, we still have to turn off
+      any changes from player's orientation (so that the sound
+      is not played on left or right side, but normally).
+      That's why setting source position exactly on the player
+      is needed here. }
+    alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
+    { Windows OpenAL doesn't work correctly when below is exactly
+      (0, 0, 0) --- see /win/docs/audio/OpenAL/bug_relative_0/
+      TODO: check does this bug still exist ?
+      Correct lets_take_a_walk, test_al_sound_allocator }
+    alSourceVector3f(ALSource, AL_POSITION, Vector3Single(0, 0, 0.1));
+  end;
+end;
+
+procedure alCommonSourceSetup(ALSource: TALuint; SoundType: TSoundType;
+  const Looping: boolean;
+  const Spatial: boolean); overload;
+begin
+  alCommonSourceSetup(ALSource, Looping, Spatial, SoundBuffers[SoundType],
+    SoundInfos[SoundType].Gain,
+    SoundInfos[SoundType].MinGain,
+    SoundInfos[SoundType].MaxGain);
 end;
 
 function Sound(SoundType: TSoundType;
@@ -359,11 +440,7 @@ begin
       SoundInfos[SoundType].DefaultImportance);
     if Result <> nil then
     begin
-      alCommonSourceSetup(Result.ALSource, SoundType, Looping);
-
-      { No attenuation by distance. }
-      alSourcef(Result.ALSource, AL_ROLLOFF_FACTOR, 0);
-
+      alCommonSourceSetup(Result.ALSource, SoundType, Looping, false);
       alSourcePlay(Result.ALSource);
     end;
   end;
@@ -381,14 +458,8 @@ begin
       SoundInfos[SoundType].DefaultImportance);
     if Result <> nil then
     begin
-      alCommonSourceSetup(Result.ALSource, SoundType, Looping);
-
-      { Set attenuation by distance. }
-      alSourcef(Result.ALSource, AL_ROLLOFF_FACTOR, 0.1);
-      alSourcef(Result.ALSource, AL_REFERENCE_DISTANCE, 2.0);
-
+      alCommonSourceSetup(Result.ALSource, SoundType, Looping, true);
       alSourceVector3f(Result.ALSource, AL_POSITION, Position);
-
       alSourcePlay(Result.ALSource);
     end;
   end;
@@ -414,6 +485,50 @@ begin
       alListenerf(AL_GAIN, EffectsVolume);
   end;
 end;
+
+{ TMusicPlayer --------------------------------------------------------------- }
+
+procedure TMusicPlayer.AllocateSource;
+begin
+  if ALActive and (SoundInfos[PlayedSound].FileName <> '') then
+  begin
+    FAllocatedSource := SourceAllocator.AllocateSource(MaxSoundImportance);
+    if FAllocatedSource <> nil then
+    begin
+      alCommonSourceSetup(FAllocatedSource.ALSource, true, false,
+        SoundBuffers[PlayedSound], MusicVolume, 0, 1);
+
+      alSourcePlay(FAllocatedSource.ALSource);
+
+      FAllocatedSource.OnUsingEnd :=
+        {$ifdef FPC_OBJFPC} @ {$endif} AllocatedSourceUsingEnd;
+    end;
+  end;
+end;
+
+procedure TMusicPlayer.SetPlayedSound(const Value: TSoundType);
+begin
+  if Value <> FPlayedSound then
+  begin
+    if FAllocatedSource <> nil then
+    begin
+      FAllocatedSource.DoUsingEnd;
+      { AllocatedSourceUsingEnd should set FAllocatedSource to nil. }
+      Assert(FAllocatedSource = nil);
+    end;
+
+    FPlayedSound := Value;
+
+    AllocateSource;
+  end;
+end;
+
+procedure TMusicPlayer.AllocatedSourceUsingEnd(Sender: TALAllocatedSource);
+begin
+  FAllocatedSource := nil;
+end;
+
+{ Other non-class things ----------------------------------------------------- }
 
 const
   DefaultMusicVolume = 0.5;
@@ -466,6 +581,8 @@ begin
 end;
 
 initialization
+  MusicPlayer := TMusicPlayer.Create;
+
   FEffectsVolume := ConfigFile.GetValue('sound/effects/volume', DefaultEffectsVolume);
   FMusicVolume   := ConfigFile.GetValue('sound/music/volume', DefaultMusicVolume);
   FALMinAllocatedSources := ConfigFile.GetValue(
@@ -481,4 +598,6 @@ finalization
   ConfigFile.SetDeleteValue('sound/allocated_sources/max',
     FALMaxAllocatedSources, DefaultALMaxAllocatedSources);
   ConfigFile.SetDeleteValue('sound/device', ALCDevice, BestALCDevice);
+
+  FreeAndNil(MusicPlayer);
 end.
