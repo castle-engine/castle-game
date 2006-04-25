@@ -67,6 +67,17 @@ clean_private:
 
 TMP_DIST_PATH := /tmp/castle_dist_tmp/
 
+# Uncomment to get bzip2 packed dist
+#BZIP2 := t
+
+ifdef BZIP2
+DIST_EXTENSION := bz2
+DIST_TAR_FILTER := --bzip2
+else
+DIST_EXTENSION := gz
+DIST_TAR_FILTER := --gzip
+endif
+
 # Make distribution tar.gz to upload for PGD competition.
 # For now, this target is not supposed to be run by anyone
 # else than me (Michalis), because it depends on some private
@@ -101,8 +112,9 @@ dist:
 	rm -f $(TMP_DIST_PATH)castle/source/units-src.tar.gz
 	mv $(TMP_DIST_PATH)castle/source/COPYING $(TMP_DIST_PATH)castle/COPYING
 # Pack things
-	cd $(TMP_DIST_PATH); tar czf castle-$(VERSION).tar.gz castle/
-	mv $(TMP_DIST_PATH)castle-$(VERSION).tar.gz .
+	cd $(TMP_DIST_PATH); tar -c $(DIST_TAR_FILTER) -f \
+	  castle-$(VERSION).tar.$(DIST_EXTENSION) castle/
+	mv $(TMP_DIST_PATH)castle-$(VERSION).tar.$(DIST_EXTENSION) .
 
 # ----------------------------------------
 # Set SVN tag.
