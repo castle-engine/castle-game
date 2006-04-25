@@ -25,7 +25,7 @@ interface
 
 uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints,
-  CastleObjectKinds;
+  CastleObjectKinds, ALSourceAllocator;
 
 {$define read_interface}
 
@@ -51,6 +51,7 @@ type
     FVRMLNodeName: string;
     FCameraRadius: Single;
     FSoundSuddenPain: TSoundType;
+    FSoundDying: TSoundType;
     FDefaultMaxLife: Single;
   public
     constructor Create(const AVRMLNodeName: string);
@@ -69,6 +70,9 @@ type
 
     property SoundSuddenPain: TSoundType
       read FSoundSuddenPain write FSoundSuddenPain default stNone;
+
+    property SoundDying: TSoundType
+      read FSoundDying write FSoundDying default stNone;
 
     { This will be used to refer to item kind from VRML models
       (and from some other places too). }
@@ -354,6 +358,10 @@ type
       (otherwise each CurrentScene would use it's own
       DefaultSavedShadowQuads instance) }
     SavedShadowQuads: TDynQuad3SingleArray;
+
+    UsedSounds: TALAllocatedSourcesList;
+
+    procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
   protected
     { Return matrix that takes into account current LegsPosition and Direction.
       Multiply CurrentScene geometry by this matrix to get current geometry. }
@@ -513,6 +521,14 @@ type
       For all "normal" creatures this should be left as default implementation
       that always returns @true. }
     function CollisionsWithCreaturesAndPlayer: boolean; virtual;
+
+    { Play SountType where the creature's position is.
+      Exactly, the position is between LegsPosition and HeadPosition
+      --- AHeight = 0 means LegsPosition, AHeight = 1 means HeadPosition,
+      AHeight between means ... well, between LegsPosition and HeadPosition.
+
+      The sounds position will be updated as the creature will move. }
+    procedure Sound3d(const SoundType: TSoundType; const AHeight: Single);
   end;
 
   TObjectsListItem_1 = TCreature;
@@ -694,7 +710,7 @@ implementation
 
 uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
-  CastleLevel, CastleVideoOptions;
+  CastleLevel, CastleVideoOptions, OpenAL, ALUtils;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -937,6 +953,14 @@ begin
     DefaultMaxLife, AnimationTime);
 end;
 
+{ TCreatureSoundSourceData --------------------------------------------------- }
+
+type
+  TCreatureSoundSourceData = class
+  public
+    AHeight: Single;
+  end;
+
 { TCreature ------------------------------------------------------------------ }
 
 constructor TCreature.Create(AKind: TCreatureKind;
@@ -955,12 +979,56 @@ begin
   FLife := MaxLife;
 
   SavedShadowQuads := TDynQuad3SingleArray.Create;
+
+  UsedSounds := TALAllocatedSourcesList.Create;
 end;
 
 destructor TCreature.Destroy;
+var
+  I: Integer;
 begin
+  if UsedSounds <> nil then
+  begin
+    for I := 0 to UsedSounds.High do
+    begin
+      UsedSounds[I].UserData.Free;
+      UsedSounds[I].UserData := nil;
+
+      { Otherwise OnUsingEnd would call TCreature.SoundSourceUsingEnd,
+        and this would remove it from UsedSounds list, breaking our
+        indexing over this list here. }
+      UsedSounds[I].OnUsingEnd := nil;
+      UsedSounds[I].DoUsingEnd;
+    end;
+    FreeAndNil(UsedSounds);
+  end;
+
   FreeAndNil(SavedShadowQuads);
   inherited;
+end;
+
+procedure TCreature.SoundSourceUsingEnd(Sender: TALAllocatedSource);
+begin
+  Sender.UserData.Free;
+  Sender.UserData := nil;
+  Sender.OnUsingEnd := nil;
+  UsedSounds.Delete(Sender);
+end;
+
+procedure TCreature.Sound3d(const SoundType: TSoundType; const AHeight: Single);
+var
+  NewSource: TALAllocatedSource;
+  SoundPosition: TVector3Single;
+begin
+  SoundPosition := LegsPosition;
+  SoundPosition[2] += Height * AHeight;
+  NewSource := CastleSound.Sound3d(SoundType, SoundPosition);
+  if NewSource <> nil then
+  begin
+    UsedSounds.Add(NewSource);
+    NewSource.OnUsingEnd := SoundSourceUsingEnd;
+    NewSource.UserData := TCreatureSoundSourceData.Create;
+  end;
 end;
 
 function TCreature.Height: Single;
@@ -1122,6 +1190,20 @@ end;
 
 procedure TCreature.Idle(const CompSpeed: Single);
 
+  procedure UpdateUsedSounds;
+  var
+    I: Integer;
+    SoundPosition: TVector3Single;
+  begin
+    for I := 0 to UsedSounds.High do
+    begin
+      SoundPosition := LegsPosition;
+      SoundPosition[2] += Height *
+        TCreatureSoundSourceData(UsedSounds[I].UserData).AHeight;
+      alSourceVector3f(UsedSounds[I].ALSource, AL_POSITION, SoundPosition);
+    end;
+  end;
+
   procedure DoGravity;
 
     procedure FalledDown;
@@ -1218,6 +1300,8 @@ procedure TCreature.Idle(const CompSpeed: Single);
   end;
 
 begin
+  UpdateUsedSounds;
+
   if not Kind.Flying then
     DoGravity;
 end;
@@ -1229,10 +1313,16 @@ end;
 
 procedure TCreature.SetLife(const Value: Single);
 begin
+  if (Life > 0) and (Value <= 0) then
+  begin
+    { When dies, we don't play SoundSuddenPain sound. We will play SoundDying. }
+    Sound3d(Kind.SoundDying, 1.0);
+  end else
   if (Life - Value) > MaxLife / 10 then
   begin
-    Sound3d(Kind.SoundSuddenPain, HeadPosition);
+    Sound3d(Kind.SoundSuddenPain, 1.0);
   end;
+
   FLife := Value;
 end;
 
@@ -1416,7 +1506,7 @@ begin
     case FState of
       wasAttack:
         begin
-          Sound3d(WAKind.SoundAttackStart, HeadPosition);
+          Sound3d(WAKind.SoundAttackStart, 1.0);
           LastAttackTime := StateChangeTime;
           ActualAttackDone := false;
         end;
@@ -2072,7 +2162,7 @@ begin
 
     Level.Creatures.Add(Missile);
 
-    Sound3d(stBallMissileFired, Missile.LegsPosition);
+    Sound3d(stBallMissileFired, 0.0);
   end;
 end;
 
@@ -2083,7 +2173,7 @@ begin
   if Boxes3dCollision(Box3dTranslate(BoundingBox,
     VectorScale(Direction, WAKind.MaxAttackDistance)), Player.BoundingBox) then
   begin
-    Sound3d(stWerewolfActualAttackHit, HeadPosition);
+    Sound3d(stWerewolfActualAttackHit, 1.0);
     Player.Life := Player.Life - 10 - Random(10);
   end;
 end;
@@ -2169,7 +2259,7 @@ begin
   { TODO: for some missiles, their explosion may hurt everyone around.
     So do here additional checks for collision and hurt player and creatures. }
 
-  Sound3d(MissileKind.SoundExplosion, LegsPosition);
+  Sound3d(MissileKind.SoundExplosion, 0.0);
 
   Life := 0.0;
 
@@ -2278,6 +2368,7 @@ begin
   Alien.ActualAttackTime := 0.4;
   Alien.SoundSuddenPain := stAlienSuddenPain;
   Alien.MoveSpeed := 0.1;
+  Alien.SoundDying := stAlienDying;
 
   Werewolf := TWerewolfKind.Create(
     'Werewolf',
@@ -2322,6 +2413,7 @@ begin
   Werewolf.LifeToRunAway := 0.1;
   Werewolf.DefaultMaxLife := 500.0;
   Werewolf.MoveSpeed := 0.1;
+  Werewolf.SoundDying := stWerewolfDying;
 
   BallMissile := TMissileCreatureKind.Create(
     'BallMissile',
@@ -2380,6 +2472,7 @@ begin
   Ghost.LifeToRunAway := 0.01;
   Ghost.DefaultMaxLife := 30.0;
   Ghost.Transparent := true;
+  Ghost.SoundDying := stGhostDying;
 end;
 
 procedure DoFinalization;

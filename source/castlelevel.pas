@@ -938,6 +938,8 @@ const
   MaxAnimationOpenSymbolRotation = 80;
   MinAnimationButtonPress = 0.5;
   WerewolfStartPosition: TVector3Single = (0, 0, 0);
+var
+  WerewolfCreature: TWerewolfCreature;
 begin
   inherited;
 
@@ -951,16 +953,14 @@ begin
     if not SymbolOpened then
     begin
       SymbolOpened := true;
-      Creatures.Add(TWerewolfCreature.Create(Werewolf,
-        WerewolfStartPosition,
-        Vector3Single(0, 1, 0), 500, AnimationTime));
 
-      { Right now stCastleHallSymbolMoving and stWerewolfHowling
-        are actually played together and at the same position,
-        so I could merge them into one sound. But in the future
-        this may change, so I will not merge them. }
+      WerewolfCreature := TWerewolfCreature.Create(Werewolf,
+        WerewolfStartPosition,
+        Vector3Single(0, 1, 0), 500, AnimationTime);
+      Creatures.Add(WerewolfCreature);
+      WerewolfCreature.Sound3d(stWerewolfHowling, 1.0);
+
       Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
-      Sound3d(stWerewolfHowling, WerewolfStartPosition);
     end;
   end;
 

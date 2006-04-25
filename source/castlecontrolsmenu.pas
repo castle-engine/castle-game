@@ -143,6 +143,8 @@ end;
 
 procedure TControlsMenu.CurrentItemSelected;
 begin
+  inherited;
+
   case CurrentItem of
     0: CurrentMenu := BasicControlsMenu;
     1: CurrentMenu := ItemsControlsMenu;
@@ -199,6 +201,8 @@ var
   KeyConfiguration, ConflictingKey: TKeyConfiguration;
   NewKey: TKey;
 begin
+  inherited;
+
   if Between(CurrentItem, 0, CastleGroupKeys[Group].High) then
   begin
     KeyConfiguration := CastleGroupKeys[Group].Items[CurrentItem];

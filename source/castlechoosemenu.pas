@@ -46,6 +46,8 @@ type
 
 procedure TChooseMenu.CurrentItemSelected;
 begin
+  inherited;
+  
   Selected := true;
   SelectedIndex := CurrentItem;
 end;

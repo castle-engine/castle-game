@@ -34,6 +34,8 @@ var
 
 const
   MaxSoundImportance = MaxInt;
+  DefaultCreatureSoundImportance = 1000;
+  MinorNonSpatialImportance = 100;
 
 type
   TSoundType = (
@@ -69,14 +71,17 @@ type
     { Creatures sounds.
       @groupBegin }
     stAlienSuddenPain,
+    stAlienDying,
     stWerewolfSuddenPain,
     stWerewolfAttackStart,
     stWerewolfActualAttackHit,
     stWerewolfHowling,
+    stWerewolfDying,
     stBallMissileFired,
     stBallMissileExplode,
     stGhostSuddenPain,
     stGhostAttackStart,
+    stGhostDying,
     { @groupEnd }
 
     { Others.
@@ -215,30 +220,36 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { castle_hall_symbol_moving.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { alien_sudden_pain.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { werewolf_sudden_pain.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { werewolf_attack_start.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: 'alien_sudden_pain.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: 'alien_dying.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: 'werewolf_sudden_pain.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: 'werewolf_attack_start.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: '' { werewolf_actual_attack_hit.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'werewolf_howling.wav';
       Gain: 1; MinGain: 0.8; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
+    ( FileName: 'werewolf_dying.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: '' { ball_missile_fired.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: '' { ball_missile_explode.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { ghost_sudden_pain.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { ghost_attack_start.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: 'ghost_sudden_pain.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: 'ghost_attack_start.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: '' { 'ghost_dying.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'menu_current_item_changed.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialImportance; ),
     ( FileName: 'menu_current_item_selected.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialImportance; ),
     ( FileName: '' { save_screen.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; )
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialImportance; )
   );
 
 implementation
