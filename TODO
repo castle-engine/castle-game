@@ -1,5 +1,10 @@
 - more environ sounds: water, wind blowing, player's (and creature's ?) footsteps.
 
+- test on Windows is bug
+  /win/docs/audio/OpenAL/bug_relative_0/
+  still existent ?
+  This causes me trouble (when player dies my trick causes music and dying_sound to be spatialized...)
+
 - ask on PGD: can I assume that judges will download OpenAL on their own ?
 
 - when walking on flat/almost flat surface, FallingDownEffect should not
