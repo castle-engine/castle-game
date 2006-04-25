@@ -1022,6 +1022,8 @@ end;
 constructor TGateLevel.Create;
 begin
   inherited Create('gate_final.wrl', 'gate_lights.wrl');
+
+  PlayedMusicSound := stGateMusic;
 end;
 
 procedure TGateLevel.ChangeLevelScene;

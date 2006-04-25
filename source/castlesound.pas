@@ -65,6 +65,7 @@ type
 
     { Levels sounds.
       @groupBegin }
+    stGateMusic,
     stCastleHallSymbolMoving,
     stCastleHallMusic,
     { @groupEnd }
@@ -252,6 +253,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: '' { sword_attack_start.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+    ( FileName: 'gate_music.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: '' { castle_hall_symbol_moving.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
     ( FileName: 'castle_hall_music.wav';
