@@ -549,7 +549,6 @@ end;
 procedure TItemWeaponKind.Use(Item: TItem);
 begin
   Player.EquippedWeapon := Item;
-  Sound(EquippingSound);
 end;
 
 procedure TItemWeaponKind.PrepareRender;

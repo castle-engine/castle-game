@@ -33,9 +33,11 @@ var
   SoundInitializationReport: string;
 
 const
-  MaxSoundImportance = MaxInt;
+  MaxSoundImportance             = MaxInt;
+  LevelEventSoundImportance      = 100000;
+  PlayerSoundImportance          = 10000;
   DefaultCreatureSoundImportance = 1000;
-  MinorNonSpatialImportance = 100;
+  MinorNonSpatialSoundImportance = 100;
 
 type
   TSoundType = (
@@ -238,33 +240,33 @@ var
   SoundInfos: array[TSoundType] of TSoundInfo =
   { TODO: fill all sounds below. }
   ( ( FileName: '';
-      Gain: 0; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 0; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_sudden_pain.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_potion_drink.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_cast_flying_spell.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'player_pick_item.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_drop_item.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'player_dies.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_swimming_begin.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_swimming_end.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_drowning.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
-    ( FileName: '' { sword_equipping.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: 'sword_equipping.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { sword_attack_start.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'gate_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: '' { castle_hall_symbol_moving.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: 0; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'castle_hall_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: 'alien_sudden_pain.wav';
@@ -278,7 +280,7 @@ var
     ( FileName: '' { werewolf_actual_attack_hit.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'werewolf_howling.wav';
-      Gain: 1; MinGain: 0.8; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
+      Gain: 1; MinGain: 0.8; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'werewolf_dying.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'ball_missile_fired.wav';
@@ -294,11 +296,11 @@ var
     ( FileName: 'intro_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: 'menu_current_item_changed.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialImportance; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; ),
     ( FileName: 'menu_current_item_selected.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialImportance; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; ),
     ( FileName: '' { save_screen.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialImportance; )
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; )
   );
 
 implementation

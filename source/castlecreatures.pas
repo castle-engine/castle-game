@@ -2162,7 +2162,7 @@ begin
 
     Level.Creatures.Add(Missile);
 
-    Sound3d(stBallMissileFired, 0.0);
+    Missile.Sound3d(stBallMissileFired, 0.0);
   end;
 end;
 
@@ -2259,7 +2259,11 @@ begin
   { TODO: for some missiles, their explosion may hurt everyone around.
     So do here additional checks for collision and hurt player and creatures. }
 
-  Sound3d(MissileKind.SoundExplosion, 0.0);
+  { This sound is done using CastleSound.Sound3d, not our Sound3d
+    --- because when the creature will be destroyed (and missile will
+    be destroyed in nearest RemoveFromLevel pass), we want this sound
+    to go on. }
+  CastleSound.Sound3d(MissileKind.SoundExplosion, LegsPosition);
 
   Life := 0.0;
 

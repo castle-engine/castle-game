@@ -477,6 +477,7 @@ begin
       GameMessage(Format('You''re using weapon "%s" now',
         [EquippedWeapon.Kind.Name]));
       Assert(EquippedWeapon.Kind is TItemWeaponKind);
+      Sound(EquippedWeaponKind.EquippingSound);
     end;
 
     { Any attack done with previous weapon must be stopped now. }
