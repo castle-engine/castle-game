@@ -9,6 +9,7 @@ Eric stage 5 notes:
 - In the keyboard configuration dialog, it would be preferable if the previous key assignment was just erased (after a yes/no), as it is, you have to hunt to find where the key you want to redefine is used, erase this use to avoid the conflict, and then go back to assign it.
 - Mouse look would be a great help to climbing the stairs for those that aren't accustomed to keyboard-based upward/downward/look.
 - Sometimes, the player camera "banks" (inclines on the side), apparently when walking on inclines (like near the pond on the outside), though not always.
+  (that's dupl of "FallingDownEffect should not activate" above)
 
 Dean stage 5 notes:
 - I think the addition of mouse look would be a welcome addition to the controls, as it will give the game a more natural feel.
