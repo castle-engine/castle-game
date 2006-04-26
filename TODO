@@ -1,9 +1,7 @@
-- more environ sounds: water, wind blowing, player's (and creature's ?) footsteps.
+- more environ sounds: water, wind blowing.
 
 - Important sounds to fill:
-  swimming, drowning,
-
-  while_swimming, while_walking
+  swimming, drowning, while_swimming,
 
 - test on Windows is bug
   /win/docs/audio/OpenAL/bug_relative_0/
@@ -35,6 +33,8 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
+
+- creature's footsteps sound ?
 
 - sound when creature sees player for the 1st time
 

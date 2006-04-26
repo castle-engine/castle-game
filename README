@@ -571,6 +571,19 @@ Creatures (enemies etc.):
   parameters) you can use my demo_animation program
   (see units/3dmodels.gl/examples/demo_animation.dpr).
 
+Sounds:
+
+- Special notes for creating footsteps:
+  - Don't make the footsteps sound too long.
+    Preferably you should put there only 2 footsteps. Reason ?
+    When progress is displayed (e.g. because player changes levels),
+    or when player enters the game menu, footsteps sond is not
+    immediately stopped --- it's just player until the end.
+    Yes, this is desired, as it makes better effect than suddenly
+    stopping all the sounds.
+  - These 2 footsteps should take about 1 second. This is the amount
+    of time that "feels good" with player speed and head bobbing.
+
 --------------------
 Used things:
 

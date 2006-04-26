@@ -58,6 +58,8 @@ type
     stPlayerSwimmingEnd,
     stPlayerDrowning,
     stPlayerFalledDown,
+    stPlayerFootstepsConcrete,
+    stPlayerFootstepsGrass,
     { @groupEnd }
 
     { Items sounds.
@@ -264,6 +266,10 @@ var
     ( FileName: '' { player_drowning.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'player_falled_down.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: 'player_footsteps_concrete.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: 'player_footsteps_grass.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'sword_equipping.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
@@ -551,6 +557,8 @@ end;
 
 procedure TMusicPlayer.AllocatedSourceUsingEnd(Sender: TALAllocatedSource);
 begin
+  Assert(Sender = FAllocatedSource);
+  FAllocatedSource.OnUsingEnd := nil;
   FAllocatedSource := nil;
 end;
 

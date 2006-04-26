@@ -24,7 +24,7 @@ unit CastlePlayer;
 interface
 
 uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh,
-  VRMLSceneWaypoints, CastleKeys;
+  VRMLSceneWaypoints, CastleKeys, ALSourceAllocator, CastleSound;
 
 const
   DefaultMaxLife = 100;
@@ -111,6 +111,15 @@ type
 
     FSwimming: boolean;
     procedure SetSwimming(const Value: boolean);
+
+    { There always must be satisfied:
+        AllocatedFootstepsSource <> nil
+      if and only if
+        FootstepsSoundPlaying <> stNone. }
+    AllocatedFootstepsSource: TALAllocatedSource;
+    FootstepsSoundPlaying: TSoundType;
+    ReallyWalkingOnTheGroundTime: Single;
+    procedure AllocatedFootstepsSourceUsingEnd(Sender: TALAllocatedSource);
   public
     constructor Create;
     destructor Destroy; override;
@@ -291,7 +300,7 @@ implementation
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
-  CastleSound, VRMLGLAnimation;
+  VRMLGLAnimation, ALUtils, OpenAL;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -331,6 +340,10 @@ begin
 
   FreeAndNil(FNavigator);
   FreeWithContentsAndNil(FItems);
+
+  if AllocatedFootstepsSource <> nil then
+    AllocatedFootstepsSource.DoUsingEnd;
+
   inherited;
 end;
 
@@ -666,12 +679,105 @@ begin
   end;
 end;
 
+procedure TPlayer.AllocatedFootstepsSourceUsingEnd(Sender: TALAllocatedSource);
+begin
+  Assert(Sender = AllocatedFootstepsSource);
+  AllocatedFootstepsSource.OnUsingEnd := nil;
+  AllocatedFootstepsSource := nil;
+  FootstepsSoundPlaying := stNone;
+end;
+
 procedure TPlayer.Idle(const CompSpeed: Single);
 const
   { How many seconds you can swin before you start to drown ? }
   SwimBreathSeconds = 30.0;
   { How many seconds between each drown ? }
   SwimDrownPauseSeconds = 5.0;
+
+  procedure UpdateFootstepsSoundPlaying;
+  const
+    TimeToChangeFootstepsSoundPlaying = 0.5;
+  var
+    NewFootstepsSoundPlaying: TSoundType;
+  begin
+    { The meaning of ReallyWalkingOnTheGroundTime and
+      TimeToChangeFootstepsSoundPlaying:
+      Navigator.IsWalkingOnTheGround can change quite rapidly
+      (when player quickly presses and releases up/down keys,
+      or when he're walking up the stairs, or when he's walking
+      on un-flat terrain --- then Navigator.IsWalkingOnTheGround
+      switches between @true and @false quite often).
+      But it is undesirable to change FootstepsSoundPlaying
+      so often, as this causes footsteps to suddenly stop, then play,
+      then stop again etc. --- this doesn't sound good.
+
+      So I use ReallyWalkingOnTheGroundTime to mark myself
+      the time when Navigator.IsWalkingOnTheGround was true.
+      In normal situation I would set NewFootstepsSoundPlaying to stNone
+      when Navigator.IsWalkingOnTheGround = @false.
+      But now I set NewFootstepsSoundPlaying to stNone only if
+      Navigator.IsWalkingOnTheGround = @false
+      for at least TimeToChangeFootstepsSoundPlaying seconds. }
+
+    if Level = nil then
+    begin
+      NewFootstepsSoundPlaying := stNone;
+    end else
+    if Navigator.IsWalkingOnTheGround then
+    begin
+      ReallyWalkingOnTheGroundTime := Level.AnimationTime;
+      NewFootstepsSoundPlaying := Level.FootstepsSound;
+    end else
+    if Level.AnimationTime - ReallyWalkingOnTheGroundTime >
+      TimeToChangeFootstepsSoundPlaying then
+      NewFootstepsSoundPlaying := stNone else
+      NewFootstepsSoundPlaying := FootstepsSoundPlaying;
+
+    { Once I had an idea here to use AL_LOOPING sound for footsteps.
+      But this is not good, because then I would have to manually
+      stop this sound whenever player stops walking. This is not so easy.
+      This occurs when FootstepsSoundPlaying changes from non-stNone to stNone,
+      but this occurs also when CastlePlay starts loading new level, enters
+      game menu etc. --- in all these cases player footsteps must stop.
+      So it's better (simpler) to simply use non-looping sound for footsteps.
+      Whenever old sound for footsteps will end, this procedure will just
+      allocate and start new footsteps sound. }
+
+    if FootstepsSoundPlaying <> NewFootstepsSoundPlaying then
+    begin
+      if FootstepsSoundPlaying <> stNone then
+      begin
+        { Stop footsteps sound. }
+        AllocatedFootstepsSource.DoUsingEnd;
+        { AllocatedFootstepsSourceUsingEnd should set this to nil. }
+        Assert(AllocatedFootstepsSource = nil);
+      end;
+
+      if NewFootstepsSoundPlaying <> stNone then
+      begin
+        { Start footsteps sound. }
+        AllocatedFootstepsSource := Sound(NewFootstepsSoundPlaying, false);
+        if AllocatedFootstepsSource <> nil then
+        begin
+          { Lower the position, to be on our feet. }
+          alSourceVector3f(AllocatedFootstepsSource.ALSource,
+            AL_POSITION, Vector3Single(0, 0, -1.0));
+          AllocatedFootstepsSource.OnUsingEnd :=
+            AllocatedFootstepsSourceUsingEnd;
+        end else
+          { Failed to allocate source, so force new
+            NewFootstepsSoundPlaying to stNone. }
+          NewFootstepsSoundPlaying := stNone;
+      end;
+
+      FootstepsSoundPlaying := NewFootstepsSoundPlaying;
+    end;
+
+    Assert(
+      (AllocatedFootstepsSource <> nil) =
+      (FootstepsSoundPlaying <> stNone));
+  end;
+
 begin
   if FlyingMode then
   begin
@@ -715,6 +821,8 @@ begin
     HintEscapeKeyShown := true;
     GameMessage('Hint: press "Escape" for game menu');
   end;
+
+  UpdateFootstepsSoundPlaying;
 end;
 
 procedure TPlayer.BlackOut(const Color: TVector3f);

@@ -28,6 +28,9 @@ uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound;
 
+const
+  DefaultFootstepsSound = stPlayerFootstepsConcrete;
+
 type
   TLevel = class
   private
@@ -77,6 +80,7 @@ type
     FWaterBox: TBox3d;
 
     FPlayedMusicSound: TSoundType;
+    FFootstepsSound: TSoundType;
   protected
     { See README for description of LevelBox and HintButtonBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
@@ -242,6 +246,9 @@ type
 
     property PlayedMusicSound: TSoundType
       read FPlayedMusicSound write FPlayedMusicSound default stNone;
+
+    property FootstepsSound: TSoundType
+      read FFootstepsSound write FFootstepsSound default DefaultFootstepsSound;
   end;
 
   TCastleHallLevel = class(TLevel)
@@ -449,7 +456,8 @@ begin
   FLightCastingShadowsPosition := Box3dMiddle(Scene.BoundingBox);
   FLightCastingShadowsPosition[2] := Scene.BoundingBox[1, 2];
 
-  PlayedMusicSound := stNone;
+  FPlayedMusicSound := stNone;
+  FFootstepsSound := DefaultFootstepsSound;
 end;
 
 destructor TLevel.Destroy;
@@ -1024,6 +1032,8 @@ begin
   inherited Create('gate_final.wrl', 'gate_lights.wrl');
 
   PlayedMusicSound := stGateMusic;
+
+  FFootstepsSound := stPlayerFootstepsGrass;
 end;
 
 procedure TGateLevel.ChangeLevelScene;
