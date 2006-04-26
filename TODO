@@ -1,5 +1,3 @@
-- ask on PGD: can I assume that judges will download OpenAL on their own ?
-
 - when walking on flat/almost flat surface, FallingDownEffect should not
   activate.
 
@@ -265,7 +263,7 @@ dist-making to-dos:
     castle/trunk kambi_pascal_units/trunk > ChangeLog
 
 ----------------------------------------
-Each time before uploading PGD release:
+Each time before uploading release (to PGD and/or camelot):
 
 - make sure Version (in castlehelp.pas) is good
 - under Linux and Windows:
