@@ -584,6 +584,15 @@ Sounds:
   - These 2 footsteps should take about 1 second. This is the amount
     of time that "feels good" with player speed and head bobbing.
 
+- Remember that if sounds are supposed to be spatialized (i.e. played
+  by Sound3d procedures), then you must make them mono (never stereo!).
+  That's because Windows OpenAL will never spatialize stereo sounds.
+
+  You can use any editor you like to convert your sounds to mono.
+  I like this sox command-line:
+    sox input.wav -c output.wav
+  See also data/sounds/scripts/example_make_mono.sh
+
 --------------------
 Used things:
 
@@ -644,6 +653,9 @@ Graphics:
 Sounds:
 - The sound editing program that I use is sweep:
   [http://www.metadecks.org/software/sweep/]
+
+- Sox [http://sox.sourceforge.net/] is also a great program,
+  suitable for batch processing of sounds.
 
 - menu_current_item_changed.wav based on
   /usr/share/sounds/KDE_TypeWriter_Key_2.ogg

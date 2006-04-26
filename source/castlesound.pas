@@ -27,7 +27,7 @@ unit CastleSound;
 
 interface
 
-uses VectorMath, ALSourceAllocator;
+uses Classes, VectorMath, ALSourceAllocator;
 
 var
   SoundInitializationReport: string;
@@ -133,6 +133,9 @@ procedure ALRefreshUsedSources;
   This is ignored if not ALActive. }
 procedure ALContextClose;
 
+{ If ALActive, then will append some info about current OpenAL used. }
+procedure AppendALInformation(S: TStrings);
+
 { Play given sound. This should be used to play sounds
   that are not spatial actually, i.e. have no place in 3D space.
 
@@ -186,6 +189,8 @@ type
       PlayedSound <> stNone and eventually initialize FAllocatedSource. }
     procedure AllocateSource;
   public
+    destructor Destroy; override;
+
     { Currently played music.
       Set to stNone to stop playing music.
       Set to anything else to play that music.
@@ -209,7 +214,7 @@ function GetALMinAllocatedSources: Cardinal;
 procedure SetALMinAllocatedSources(const Value: Cardinal);
 
 const
-  DefaultALMinAllocatedSources = 16;
+  DefaultALMinAllocatedSources = 4;
 
 property ALMinAllocatedSources: Cardinal
   read GetALMinAllocatedSources write SetALMinAllocatedSources;
@@ -218,7 +223,7 @@ function GetALMaxAllocatedSources: Cardinal;
 procedure SetALMaxAllocatedSources(const Value: Cardinal);
 
 const
-  DefaultALMaxAllocatedSources = 32;
+  DefaultALMaxAllocatedSources = 16;
 
 property ALMaxAllocatedSources: Cardinal
   read GetALMaxAllocatedSources write SetALMaxAllocatedSources;
@@ -389,6 +394,8 @@ begin
       finally Progress.Fini; end;
 
       MusicPlayer.AllocateSource;
+
+      CheckAL('initializing sounds (ALContextInit)');
     except
       { If loading sounds above will fail, we have to finish already initialized
         things here before reraising exception. }
@@ -405,8 +412,6 @@ var
 begin
   if ALActive then
   begin
-    MusicPlayer.FAllocatedSource := nil;
-
     FreeAndNil(SourceAllocator);
 
     for ST := Low(TSoundType) to High(TSoundType) do
@@ -456,11 +461,7 @@ begin
       That's why setting source position exactly on the player
       is needed here. }
     alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
-    { Windows OpenAL doesn't work correctly when below is exactly
-      (0, 0, 0) --- see /win/docs/audio/OpenAL/bug_relative_0/
-      TODO: check does this bug still exist ?
-      Correct lets_take_a_walk, test_al_sound_allocator }
-    alSourceVector3f(ALSource, AL_POSITION, Vector3Single(0, 0, 0.1));
+    alSourceVector3f(ALSource, AL_POSITION, Vector3Single(0, 0, 0));
   end;
 end;
 
@@ -531,7 +532,31 @@ begin
   end;
 end;
 
+procedure AppendALInformation(S: TStrings);
+begin
+  if ALActive then
+  begin
+    S.Append('');
+    S.Append('Version : ' + alGetString(AL_VERSION));
+    S.Append('Renderer : ' + alGetString(AL_RENDERER));
+    S.Append('Vendor : ' + alGetString(AL_VENDOR));
+    S.Append('Extensions : ' + alGetString(AL_EXTENSIONS));
+    S.Append('');
+    S.Append(Format('Allocated OpenAL sources: %d (min %d, max %d)',
+      [ SourceAllocator.AllocatedSources.Count,
+        SourceAllocator.MinAllocatedSources,
+        SourceAllocator.MaxAllocatedSources ]));
+  end;
+end;
+
 { TMusicPlayer --------------------------------------------------------------- }
+
+destructor TMusicPlayer.Destroy;
+begin
+  if FAllocatedSource <> nil then
+    FAllocatedSource.DoUsingEnd;
+  inherited;
+end;
 
 procedure TMusicPlayer.AllocateSource;
 begin

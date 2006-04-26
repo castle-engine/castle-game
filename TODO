@@ -1,13 +1,3 @@
-- make sure that alsourceallocator works good even if OpenAL impl simply denies
-  new sounds, i.e. if alGenSound fails --- just fall back to other methods.
-  So the actual limit may be always  < MaxAllocatedSounds or even <
-  MinAllocatedSounds.
-
-- test on Windows is bug
-  /win/docs/audio/OpenAL/bug_relative_0/
-  still existent ?
-  This causes me trouble (when player dies my trick causes music and dying_sound to be spatialized...)
-
 - ask on PGD: can I assume that judges will download OpenAL on their own ?
 
 - when walking on flat/almost flat surface, FallingDownEffect should not

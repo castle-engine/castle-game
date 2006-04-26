@@ -47,14 +47,7 @@ begin
     S.Append('Sound library (OpenAL) status:');
     S.Append('');
     Strings_AddSplittedString(S, SoundInitializationReport, nl);
-    if ALActive then
-    begin
-      S.Append('');
-      S.Append('Version : ' + alGetString(AL_VERSION));
-      S.Append('Renderer : ' + alGetString(AL_RENDERER));
-      S.Append('Vendor : ' + alGetString(AL_VENDOR));
-      S.Append('Extensions : ' + alGetString(AL_EXTENSIONS));
-    end;
+    AppendALInformation(S);
 
     MessageOK(Glw, S, taLeft);
   finally S.Free end;
