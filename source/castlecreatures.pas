@@ -52,6 +52,7 @@ type
     FCameraRadius: Single;
     FSoundSuddenPain: TSoundType;
     FSoundDying: TSoundType;
+    FSoundDyingTiedToCreature: boolean;
     FDefaultMaxLife: Single;
   public
     constructor Create(const AVRMLNodeName: string);
@@ -73,6 +74,13 @@ type
 
     property SoundDying: TSoundType
       read FSoundDying write FSoundDying default stNone;
+
+    { See TCreature.Sound3d TiedToCreature parameter docs.
+      You can set this to false if you want SoundDying to last even
+      after the creature object was destroyed. }
+    property SoundDyingTiedToCreature: boolean
+      read FSoundDyingTiedToCreature write FSoundDyingTiedToCreature
+      default true;
 
     { This will be used to refer to item kind from VRML models
       (and from some other places too). }
@@ -527,8 +535,13 @@ type
       --- AHeight = 0 means LegsPosition, AHeight = 1 means HeadPosition,
       AHeight between means ... well, between LegsPosition and HeadPosition.
 
-      The sounds position will be updated as the creature will move. }
-    procedure Sound3d(const SoundType: TSoundType; const AHeight: Single);
+      If TiedToCreature then the sounds position will be updated
+      as the creature will move, and when the creature object will
+      be destroyed, sound will stop. If not TiedToCreature, then
+      the sound will simply be done at creature's position, but then
+      it will continue to be played independent of this creature. }
+    procedure Sound3d(const SoundType: TSoundType; const AHeight: Single;
+      TiedToCreature: boolean = true);
   end;
 
   TObjectsListItem_1 = TCreature;
@@ -724,6 +737,7 @@ begin
   FVRMLNodeName := AVRMLNodeName;
   FFlying := false;
   FDefaultMaxLife := DefaultDefaultMaxLife;
+  FSoundDyingTiedToCreature := true;
   CreaturesKinds.Add(Self);
 end;
 
@@ -1015,7 +1029,8 @@ begin
   UsedSounds.Delete(Sender);
 end;
 
-procedure TCreature.Sound3d(const SoundType: TSoundType; const AHeight: Single);
+procedure TCreature.Sound3d(const SoundType: TSoundType; const AHeight: Single;
+  TiedToCreature: boolean);
 var
   NewSource: TALAllocatedSource;
   SoundPosition: TVector3Single;
@@ -1023,7 +1038,7 @@ begin
   SoundPosition := LegsPosition;
   SoundPosition[2] += Height * AHeight;
   NewSource := CastleSound.Sound3d(SoundType, SoundPosition);
-  if NewSource <> nil then
+  if TiedToCreature and (NewSource <> nil) then
   begin
     UsedSounds.Add(NewSource);
     NewSource.OnUsingEnd := SoundSourceUsingEnd;
@@ -1316,7 +1331,7 @@ begin
   if (Life > 0) and (Value <= 0) then
   begin
     { When dies, we don't play SoundSuddenPain sound. We will play SoundDying. }
-    Sound3d(Kind.SoundDying, 1.0);
+    Sound3d(Kind.SoundDying, 1.0, Kind.SoundDyingTiedToCreature);
   end else
   if (Life - Value) > MaxLife / 10 then
   begin
@@ -2477,6 +2492,7 @@ begin
   Ghost.DefaultMaxLife := 30.0;
   Ghost.Transparent := true;
   Ghost.SoundDying := stGhostDying;
+  Ghost.SoundDyingTiedToCreature := false;
 end;
 
 procedure DoFinalization;

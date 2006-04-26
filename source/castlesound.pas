@@ -243,7 +243,7 @@ var
       Gain: 0; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_sudden_pain.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { player_potion_drink.wav };
+    ( FileName: 'player_potion_drink.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_cast_flying_spell.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
@@ -291,7 +291,7 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'ghost_attack_start.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'ghost_dying.wav' };
+    ( FileName: 'ghost_dying.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'intro_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
