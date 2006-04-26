@@ -1,5 +1,12 @@
 - more environ sounds: water, wind blowing, player's (and creature's ?) footsteps.
 
+- Important sounds to fill:
+  swimming, drowning,
+
+  while_swimming, while_walking
+
+  castle_hall_symbol_moving
+
 - test on Windows is bug
   /win/docs/audio/OpenAL/bug_relative_0/
   still existent ?
