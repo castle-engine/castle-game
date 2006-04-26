@@ -732,7 +732,10 @@ procedure TPlayer.FalledDown(Navigator: TMatrixWalker;
   const FallenHeight: Single);
 begin
   if (not Swimming) and (FallenHeight > 4) then
+  begin
     Life := Life - Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
+    Sound(stPlayerFalledDown);
+  end;
 
   { Tests: GameMessage(Format('Falled down from %f', [FallenHeight])); }
 end;

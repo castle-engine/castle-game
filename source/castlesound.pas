@@ -57,12 +57,15 @@ type
     stPlayerSwimmingBegin,
     stPlayerSwimmingEnd,
     stPlayerDrowning,
+    stPlayerFalledDown,
     { @groupEnd }
 
     { Items sounds.
       @groupBegin }
     stSwordEquipping,
     stSwordAttackStart,
+    stArrowHit { TODO: not used for now. },
+    stKeyUse { TODO: not used for now. },
     { @groupEnd }
 
     { Levels sounds.
@@ -74,6 +77,7 @@ type
 
     { Creatures sounds.
       @groupBegin }
+    stCreatureFalledDown,
     stAlienSuddenPain,
     stAlienDying,
     stWerewolfSuddenPain,
@@ -241,7 +245,7 @@ var
   { TODO: fill all sounds below. }
   ( ( FileName: '';
       Gain: 0; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { player_sudden_pain.wav };
+    ( FileName: '' { 'player_sudden_pain.wav' };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'player_potion_drink.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
@@ -249,7 +253,7 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'player_pick_item.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { player_drop_item.wav };
+    ( FileName: 'player_drop_item.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'player_dies.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
@@ -259,9 +263,15 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { player_drowning.wav };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: 'player_falled_down.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'sword_equipping.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: '' { sword_attack_start.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: 'arrow_hit.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: 'key_use.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'gate_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
@@ -269,6 +279,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'castle_hall_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
+    ( FileName: 'creature_falled_down.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'alien_sudden_pain.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'alien_dying.wav';

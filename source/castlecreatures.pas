@@ -1228,6 +1228,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
       FallenHeight := FallingDownStartHeight - LegsPosition[2];
       if FallenHeight > 1.0 then
       begin
+        Sound3d(stCreatureFalledDown, 0.1, false);
         LifeLoss := Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
         Life := Life - LifeLoss;
         LastAttackDirection := ZeroVector3Single;
