@@ -275,7 +275,7 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'gate_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
-    ( FileName: '' { castle_hall_symbol_moving.wav };
+    ( FileName: 'castle_hall_symbol_moving.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'castle_hall_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
