@@ -48,14 +48,28 @@ type
 
     { Player sounds.
       @groupBegin }
+    { Note for stPlayerSuddenPain:
+      After trying many sounds (things that sound like someone saying "ouh",
+      things that sound like some "thud" etc.), nothing seems to sound OK.
+
+      There are various ways how you can get hurt, and many of
+      them already have appropriate sounds --- e.g. on drowning you get
+      stPlayerDrowning, on falling down you get stFalledDown. When being
+      hit by the creature it's at least supposed that we'll create some
+      sounds for particular creatures and their particular attacks
+      (e.g. when hit by ball_missile, player gets ball_missile_explode sound
+      already).
+
+      So maybe it's not a good idea to create a general sound
+      that will be played always when player is wound ? }
     stPlayerSuddenPain,
     stPlayerPotionDrink,
     stPlayerCastFlyingSpell,
     stPlayerPickItem,
     stPlayerDropItem,
     stPlayerDies,
-    stPlayerSwimmingBegin,
-    stPlayerSwimmingEnd,
+    stPlayerSwimmingChange,
+    stPlayerSwimming,
     stPlayerDrowning,
     stPlayerFalledDown,
     stPlayerFootstepsConcrete,
@@ -259,11 +273,11 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'player_dies.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { player_swimming_begin.wav };
+    ( FileName: 'player_swimming_change.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { player_swimming_end.wav };
+    ( FileName: 'player_swimming.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { player_drowning.wav };
+    ( FileName: 'player_drowning.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'player_falled_down.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),

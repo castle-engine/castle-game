@@ -104,10 +104,21 @@ type
     procedure KeyChanged(KeyConfiguration: TKeyConfiguration);
 
     { If Swimming, then this is the time (from Level.AnimationTime)
-      of setting Swimming to true. SwimLastDrownTime is the time of last
-      drowning (or 0.0 if there was no drowning yet in this swimming session). }
+      of setting Swimming to true. }
     SwimBeginTime: Single;
+    { If Swimming, this is the time of last
+      drowning (or 0.0 if there was no drowning yet in this swimming session). }
     SwimLastDrownTime: Single;
+    { If Swimming, this is the time of last stPlayerSwimming sound
+      (or 0.0 if there was no stPlayerSwimming played yet in this
+      swimming session). }
+    SwimLastSoundTime: Single;
+
+    AllocatedSwimmingChangeSource: TALAllocatedSource;
+    procedure AllocatedSwimmingChangeSourceUsingEnd(Sender: TALAllocatedSource);
+
+    AllocatedSwimmingSource: TALAllocatedSource;
+    procedure AllocatedSwimmingSourceUsingEnd(Sender: TALAllocatedSource);
 
     FSwimming: boolean;
     procedure SetSwimming(const Value: boolean);
@@ -343,6 +354,12 @@ begin
 
   if AllocatedFootstepsSource <> nil then
     AllocatedFootstepsSource.DoUsingEnd;
+
+  if AllocatedSwimmingChangeSource <> nil then
+    AllocatedSwimmingChangeSource.DoUsingEnd;
+
+  if AllocatedSwimmingSource <> nil then
+    AllocatedSwimmingSource.DoUsingEnd;
 
   inherited;
 end;
@@ -622,6 +639,9 @@ begin
     if Level <> nil then
       Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01 else
       Navigator.CameraPreferredHeight := 0;
+
+    Navigator.MoveSpeed := 1.0;
+    Navigator.MoveVertSpeed := 1.0;
   end else
   begin
     if FlyingMode then
@@ -636,6 +656,9 @@ begin
         Navigator.FallingDownStartSpeed and
         Navigator.FallingDownSpeedIncrease
         ... don't matter here, because Gravity is false. }
+
+      Navigator.MoveSpeed := 1.0;
+      Navigator.MoveVertSpeed := 1.0;
     end else
     begin
       if Swimming then
@@ -651,6 +674,9 @@ begin
         if Level <> nil then
           Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01 else
           Navigator.CameraPreferredHeight := 0;
+
+        Navigator.MoveSpeed := 0.3;
+        Navigator.MoveVertSpeed := 0.3;
       end else
       begin
         Navigator.Key_Jump := CastleKey_UpMove.Value;
@@ -664,6 +690,9 @@ begin
         if Level <> nil then
           Navigator.CameraPreferredHeight := Level.CameraPreferredHeight else
           Navigator.CameraPreferredHeight := 0;
+
+        Navigator.MoveSpeed := 1.0;
+        Navigator.MoveVertSpeed := 1.0;
       end;
     end;
 
@@ -687,13 +716,71 @@ begin
   FootstepsSoundPlaying := stNone;
 end;
 
-procedure TPlayer.Idle(const CompSpeed: Single);
-const
-  { How many seconds you can swin before you start to drown ? }
-  SwimBreathSeconds = 30.0;
-  { How many seconds between each drown ? }
-  SwimDrownPauseSeconds = 5.0;
+procedure TPlayer.AllocatedSwimmingChangeSourceUsingEnd(Sender: TALAllocatedSource);
+begin
+  Assert(Sender = AllocatedSwimmingChangeSource);
+  AllocatedSwimmingChangeSource.OnUsingEnd := nil;
+  AllocatedSwimmingChangeSource := nil;
+end;
 
+procedure TPlayer.AllocatedSwimmingSourceUsingEnd(Sender: TALAllocatedSource);
+begin
+  Assert(Sender = AllocatedSwimmingSource);
+  AllocatedSwimmingSource.OnUsingEnd := nil;
+  AllocatedSwimmingSource := nil;
+end;
+
+procedure TPlayer.Idle(const CompSpeed: Single);
+
+  { Perform various things related to player swimming. }
+  procedure UpdateSwimming;
+  const
+    { How many seconds you can swin before you start to drown ? }
+    SwimBreathSeconds = 30.0;
+    { How many seconds between each drown ? }
+    SwimDrownPauseSeconds = 5.0;
+    { Pause between playing stPlayerSwimming sound.
+      Remember to set this so that it will *not* easily synchronize
+      with stPlayerDrowning. }
+    SwimSoundPauseSeconds = 3.11111111;
+  begin
+    if Swimming then
+    begin
+      { Take care of drowning. }
+      if not Dead then
+      begin
+        if Level.AnimationTime - SwimBeginTime > SwimBreathSeconds then
+        begin
+          if (SwimLastDrownTime = 0.0) or
+             (Level.AnimationTime - SwimLastDrownTime > SwimDrownPauseSeconds) then
+          begin
+            if SwimLastDrownTime = 0.0 then
+              GameMessage('You''re drowning');
+            SwimLastDrownTime := Level.AnimationTime;
+            Life := Life - (5 + Random(10));
+            Sound(stPlayerDrowning);
+          end;
+        end;
+      end;
+
+      { Take care of playing stPlayerSwimming }
+      { See comments at creation of AllocatedSwimmingChangeSource
+        for reasons why I should safeguard here and play this sound
+        only when AllocatedSwimmingSource = nil. }
+      if (AllocatedSwimmingSource = nil) and
+         ( (SwimLastSoundTime = 0.0) or
+           (Level.AnimationTime - SwimLastSoundTime > SwimSoundPauseSeconds) ) then
+      begin
+        SwimLastSoundTime := Level.AnimationTime;
+        AllocatedSwimmingSource := Sound(stPlayerSwimming);
+        if AllocatedSwimmingSource <> nil then
+          AllocatedSwimmingSource.OnUsingEnd :=
+            AllocatedSwimmingSourceUsingEnd;
+      end;
+    end;
+  end;
+
+  { Update FootstepsSoundPlaying and related variables. }
   procedure UpdateFootstepsSoundPlaying;
   const
     TimeToChangeFootstepsSoundPlaying = 0.5;
@@ -790,21 +877,7 @@ begin
 
   UpdateNavigator;
 
-  if Swimming and (not Dead) then
-  begin
-    if Level.AnimationTime - SwimBeginTime > SwimBreathSeconds then
-    begin
-      if (SwimLastDrownTime = 0.0) or
-         (Level.AnimationTime - SwimLastDrownTime > SwimDrownPauseSeconds) then
-      begin
-        if SwimLastDrownTime = 0.0 then
-          GameMessage('You''re drowning');
-        SwimLastDrownTime := Level.AnimationTime;
-        Life := Life - (5 + Random(10));
-        Sound(stPlayerDrowning);
-      end;
-    end;
-  end;
+  UpdateSwimming;
 
   if BlackOutIntensity > 0 then
     BlackOutIntensity -= 0.04 * Glw.FpsCompSpeed;
@@ -930,13 +1003,27 @@ begin
   if Value <> FSwimming then
   begin
     FSwimming := Value;
+
+    { If AllocatedSwimmingChangeSource <> nil, then the
+      stPlayerSwimmingChange sound is already played (this may be caused
+      when player tries to stay above the water --- he will then repeatedly
+      go under and above the water). So do not start it again, to avoid
+      bad sound atrifacts (the same sound playing a couple times on top
+      of each other). }
+    if AllocatedSwimmingChangeSource = nil then
+    begin
+      AllocatedSwimmingChangeSource := Sound(stPlayerSwimmingChange);
+      if AllocatedSwimmingChangeSource <> nil then
+        AllocatedSwimmingChangeSource.OnUsingEnd :=
+          AllocatedSwimmingChangeSourceUsingEnd;
+    end;
+
     if Swimming then
     begin
-      Sound(stPlayerSwimmingBegin);
       SwimBeginTime := Level.AnimationTime;
       SwimLastDrownTime := 0.0;
-    end else
-      Sound(stPlayerSwimmingEnd);
+      SwimLastSoundTime := 0.0;
+    end;
 
     { UpdateNavigator will be called in Idle. }
   end;
