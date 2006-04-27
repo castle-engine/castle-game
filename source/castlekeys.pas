@@ -104,6 +104,7 @@ var
   CastleKey_SaveScreen: TKeyConfiguration;
   CastleKey_CancelFlying: TKeyConfiguration;
   CastleKey_FPSShow: TKeyConfiguration;
+  CastleKey_InteractWithLevel: TKeyConfiguration;
 
   { List of all configurable keys.
     Will be created in initialization and freed in finalization of this unit.
@@ -243,6 +244,7 @@ begin
   CastleKey_SaveScreen := TKeyConfiguration.Create('Save screen', 'save_screen', kgOther, K_F5);
   CastleKey_CancelFlying := TKeyConfiguration.Create('Cancel flying spell', 'cancel_flying', kgOther, K_C);
   CastleKey_FPSShow := TKeyConfiguration.Create('FPS show / hide', 'fps_toggle', kgOther, K_BackQuote);
+  CastleKey_InteractWithLevel := TKeyConfiguration.Create('Press button / move lever / open door etc.', 'interact', kgOther, K_Space);
 
   CastleAllKeys.LoadFromConfigFile;
 end;

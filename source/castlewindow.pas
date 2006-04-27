@@ -37,6 +37,9 @@ const
   RequiredScreenWidth = 800;
   RequiredScreenHeight = 600;
 
+  MiddleScreenWidth = RequiredScreenWidth div 2;
+  MiddleScreenHeight = RequiredScreenHeight div 2;
+
 function RequiredScreenSize: string;
 
 implementation

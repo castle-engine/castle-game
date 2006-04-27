@@ -557,6 +557,13 @@ begin
     GameEnded := true;
 end;
 
+procedure DoAttack;
+begin
+  if not Player.Dead then
+    Player.Attack else
+    GameMessage(SDeadMessage);
+end;
+
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
   procedure ChangeInventoryCurrentItem(Change: Integer);
@@ -709,13 +716,6 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       GameMessage(SDeadMessage);
   end;
 
-  procedure DoAttack;
-  begin
-    if not Player.Dead then
-      Player.Attack else
-      GameMessage(SDeadMessage);
-  end;
-
   procedure DoGameMenu;
   var
     ViewAngleChanged: boolean;
@@ -733,13 +733,15 @@ begin
      (Key = CastleKey_DownMove.Value) or
      (Key = CastleKey_Forward.Value) or
      (Key = CastleKey_Backward.Value) or
+     (Key = CastleKey_LeftStrafe.Value) or
+     (Key = CastleKey_RightStrafe.Value) { or
+       Rotation keys work even when player is dead.
+       See comments in TPlayer.UpdateNavigator.
      (Key = CastleKey_LeftRot.Value) or
      (Key = CastleKey_RightRot.Value) or
-     (Key = CastleKey_LeftStrafe.Value) or
-     (Key = CastleKey_RightStrafe.Value) or
      (Key = CastleKey_UpRotate.Value) or
      (Key = CastleKey_DownRotate.Value) or
-     (Key = CastleKey_HomeUp.Value) then
+     (Key = CastleKey_HomeUp.Value) } then
     MaybeDeadMessage else
 
   { Items keys. }
@@ -775,6 +777,22 @@ begin
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Btn: TMouseButton);
+begin
+  if Btn = mbLeft then
+    DoAttack;
+end;
+
+(* This is unused for now --- collides with MouseLook and attacking
+   by left mouse click features. MouseLook requires mouse to be hidden
+   and makes mouse position irrelevant, while mouse picking requires
+   cursor shown and mouse position relevant.
+
+   Picking mode may be restored later,
+   as a special "mouse pick mode" (activated by some key etc.
+   --- then pickable things should also be highlighted;
+   or at least mouse cursor should change when mouse moves over them).
+
+procedure PickingMouseDown(Glwin: TGLWindow; Btn: TMouseButton);
 type
   { TODO: This will be expanded with at least poEnemy in the future. }
   TPickedObjectType = (poNone, poLevel, poItem, poSpecialObject);
@@ -861,6 +879,51 @@ begin
     end;
   end;
 end;
+*)
+
+procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
+begin
+  { Note that Glwin.SetMousePosition may (but doesn't have to)
+    generate OnMouseMove to destination position.
+    This can cause some problems:
+
+    1. Consider this:
+
+       - player moves mouse to MiddleX-10
+       - MouseMove is generated, I rotate camera by "-10" horizontally
+       - Glwin.SetMousePosition sets mouse to the Middle,
+         but this time no MouseMove is generated
+       - player moved mouse to MiddleX+10. Although mouse was
+         positioned on Middle, TGLWindow thinks that the mouse
+         is still positioned on Middle-10, and I will get "+20" move
+         for player (while I should get only "+10")
+
+       Fine solution for this would be to always subtract
+       MiddleScreenWidth and MiddleScreenHeight below
+       (instead of previous values, Glwin.MouseX and Glwin.MouseY).
+       But this causes another problem:
+
+    2. What if player switches to another window, moves the mouse,
+       than goes alt+tab back to our window ? Next mouse move will
+       be stupid, because it's really *not* from the middle of the screen.
+
+    The solution for both problems: you have to check that previous
+    position, Glwin.MouseX and Glwin.MouseY, are indeed equal to
+    MiddleScreenWidth and MiddleScreenHeight. This way we know that
+    this is good move, that qualifies to perform mouse move. }
+  if (Glwin.MouseX = MiddleScreenWidth) and
+     (Glwin.MouseY = MiddleScreenHeight) then
+    Player.Navigator.MouseMove(
+      NewX - MiddleScreenWidth, NewY - MiddleScreenHeight);
+
+  { I check the condition below to avoid calling Glwin.SetMousePosition,
+    OnMouseMove, Glwin.SetMousePosition, OnMouseMove... in a loop.
+    Not really likely (as messages will be queued, and some
+    SetMousePosition will finally just not generate OnMouseMove),
+    but I want to safeguard anyway. }
+  if (NewX <> MiddleScreenWidth) or (NewY <> MiddleScreenHeight) then
+    Glwin.SetMousePosition(MiddleScreenWidth, MiddleScreenHeight);
+end;
 
 type
   TDummy = class
@@ -921,6 +984,11 @@ begin
         Glw.OnIdle := Idle;
         Glw.OnKeyDown := KeyDown;
         Glw.OnMouseDown := MouseDown;
+        Glw.OnMouseMove := MouseMove;
+
+        { Needed for mouse look }
+        Glw.MouseVisible := false;
+        Glw.SetMousePosition(MiddleScreenWidth, MiddleScreenHeight);
 
         GameMessagesManager := TTimeMessagesManager.Create(
           Glw, hpMiddle, vpDown, Glw.Width);

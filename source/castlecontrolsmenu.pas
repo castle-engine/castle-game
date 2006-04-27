@@ -23,7 +23,7 @@ unit CastleControlsMenu;
 
 interface
 
-uses OpenGLh, CastleGeneralMenu;
+uses OpenGLh, CastleGeneralMenu, MatrixNavigation;
 
 type
   TSubMenu = class(TCastleMenu)
@@ -36,18 +36,28 @@ type
 procedure ShowControlsMenu(AGLList_ScreenImage: TGLuint;
   ADrawFadeRect, ADrawCentered: boolean);
 
+var
+  { Global mouse look sensitivity. Are controlled by ShowControlsMenu,
+    and are saved/loaded to/from config file in this unit. }
+  MouseLookHorizontalSensitivity: Single;
+  MouseLookVerticalSensitivity: Single;
+
 implementation
 
 uses SysUtils, GLWindow, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
   GLMenu, OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit,
-  OpenGLFonts, CastleKeys, Keys, VectorMath, KambiUtils, CastlePlay;
+  OpenGLFonts, CastleKeys, Keys, VectorMath, KambiUtils, CastlePlay,
+  CastleConfig;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
 type
   TControlsMenu = class(TSubMenu)
+    MouseLookHorizontalSensitivitySlider: TGLMenuFloatSlider;
+    MouseLookVerticalSensitivitySlider: TGLMenuFloatSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
   end;
 
   TControlsSubMenu = class(TSubMenu)
@@ -130,10 +140,19 @@ constructor TControlsMenu.Create;
 begin
   inherited Create;
 
+  MouseLookHorizontalSensitivitySlider := TGLMenuFloatSlider.Create(
+    0.01, 0.3, MouseLookHorizontalSensitivity);
+  MouseLookVerticalSensitivitySlider := TGLMenuFloatSlider.Create(
+    0.01, 0.3, MouseLookVerticalSensitivity);
+
   Items.Add('Configure basic controls');
   Items.Add('Configure items controls');
   Items.Add('Configure other controls');
-  Items.Add('Restore all keys to defaults');
+  Items.AddObject('Mouse horizontal sensitivity',
+    MouseLookHorizontalSensitivitySlider);
+  Items.AddObject('Mouse vertical sensitivity',
+    MouseLookVerticalSensitivitySlider);
+  Items.Add('Restore to defaults');
   Items.Add('Back to main menu');
 
   SubMenuTitle := 'Configure controls';
@@ -149,12 +168,30 @@ begin
     0: CurrentMenu := BasicControlsMenu;
     1: CurrentMenu := ItemsControlsMenu;
     2: CurrentMenu := OtherControlsMenu;
-    3: begin
+    3: ;
+    4: ;
+    5: begin
          CastleAllKeys.RestoreDefaults;
-         MessageOK(Glw, 'All keys restored to defaults.');
+         MouseLookHorizontalSensitivity := DefaultMouseLookHorizontalSensitivity;
+         MouseLookVerticalSensitivity   := DefaultMouseLookVerticalSensitivity  ;
+         MouseLookHorizontalSensitivitySlider.Value := MouseLookHorizontalSensitivity;
+         MouseLookVerticalSensitivitySlider  .Value := MouseLookVerticalSensitivity  ;
+         MessageOK(Glw, 'All keys and mouse settings restored to defaults.');
        end;
-    4: UserQuit := true;
+    6: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+procedure TControlsMenu.CurrentItemAccessoryValueChanged;
+begin
+  inherited;
+
+  case CurrentItem of
+    3: MouseLookHorizontalSensitivity :=
+         MouseLookHorizontalSensitivitySlider.Value;
+    4: MouseLookVerticalSensitivity :=
+         MouseLookVerticalSensitivitySlider.Value;
   end;
 end;
 
@@ -279,10 +316,9 @@ begin
     '  In many other cases it can be used to "exit".' +nl+
     '  This key is not configurable.' +nl+
     nl+
-    'Mouse:' +nl+
-    '  left mouse click on anything =' +nl+
-    '    show information about pointed item on the level,' +nl+
-    '    or use pointed device (press button, move switch etc.)';
+    'Controlling game with mouse:' +nl+
+    '  Left mouse click performs Attack.' +nl+
+    '  Moving mouse rotates the view.';
 
     { Too much info, not needed, I think that player can figure this out:
     nl+
@@ -435,5 +471,14 @@ end;
 initialization
   Glw.OnInitList.AppendItem(@InitGLW);
   Glw.OnCloseList.AppendItem(@CloseGLW);
+
+  MouseLookHorizontalSensitivity := ConfigFile.GetValue(
+    'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);
+  MouseLookVerticalSensitivity := ConfigFile.GetValue(
+    'mouse/vertical_sensitivity', DefaultMouseLookVerticalSensitivity);
 finalization
+  ConfigFile.SetDeleteValue('mouse/horizontal_sensitivity',
+    MouseLookHorizontalSensitivity, DefaultMouseLookHorizontalSensitivity);
+  ConfigFile.SetDeleteValue('mouse/vertical_sensitivity',
+    MouseLookVerticalSensitivity, DefaultMouseLookVerticalSensitivity);
 end.

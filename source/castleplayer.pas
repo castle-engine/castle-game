@@ -311,7 +311,7 @@ implementation
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
-  VRMLGLAnimation, ALUtils, OpenAL;
+  VRMLGLAnimation, ALUtils, OpenAL, CastleControlsMenu;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -333,6 +333,9 @@ begin
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
   Navigator.CheckModsDown := false;
   Navigator.OnFalledDown := FalledDown;
+  { MouseLook is turned on always, even when player is dead.
+    Just like rotation keys. }
+  Navigator.MouseLook := true;
 
   HintEscapeKeyShown := false;
 
@@ -616,6 +619,20 @@ begin
     work anyway. }
   Navigator.FallingDownEffect := not Swimming;
 
+  Navigator.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
+  Navigator.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
+
+  { Rotation keys work always, even when player is dead.
+    Initially I disabled them, but after some thought:
+    let them work. They work a little strangely (because CameraUp
+    is orthogonal to HomeCameraUp), but they still work and player
+    can figure it out. }
+  Navigator.Key_LeftRot := CastleKey_LeftRot.Value;
+  Navigator.Key_RightRot := CastleKey_RightRot.Value;
+  Navigator.Key_UpRotate := CastleKey_UpRotate.Value;
+  Navigator.Key_DownRotate := CastleKey_DownRotate.Value;
+  Navigator.Key_HomeUp := CastleKey_HomeUp.Value;
+
   if Dead then
   begin
     Navigator.Key_Jump := K_None;
@@ -625,13 +642,8 @@ begin
 
     Navigator.Key_Forward := K_None;
     Navigator.Key_Backward := K_None;
-    Navigator.Key_LeftRot := K_None;
-    Navigator.Key_RightRot := K_None;
     Navigator.Key_LeftStrafe := K_None;
     Navigator.Key_RightStrafe := K_None;
-    Navigator.Key_UpRotate := K_None;
-    Navigator.Key_DownRotate := K_None;
-    Navigator.Key_HomeUp := K_None;
 
     Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
@@ -698,13 +710,8 @@ begin
 
     Navigator.Key_Forward := CastleKey_Forward.Value;
     Navigator.Key_Backward := CastleKey_Backward.Value;
-    Navigator.Key_LeftRot := CastleKey_LeftRot.Value;
-    Navigator.Key_RightRot := CastleKey_RightRot.Value;
     Navigator.Key_LeftStrafe := CastleKey_LeftStrafe.Value;
     Navigator.Key_RightStrafe := CastleKey_RightStrafe.Value;
-    Navigator.Key_UpRotate := CastleKey_UpRotate.Value;
-    Navigator.Key_DownRotate := CastleKey_DownRotate.Value;
-    Navigator.Key_HomeUp := CastleKey_HomeUp.Value;
   end;
 end;
 

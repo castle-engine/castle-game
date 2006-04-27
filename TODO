@@ -1,5 +1,18 @@
+- compare our mouselook sensitivity with halflife2 on win sensitivity
+
+- actually implement CastleKey_InteractWithLevel
+
+----------------------------------------
 - when walking on flat/almost flat surface, FallingDownEffect should not
   activate.
+
+- allow player to get more above the water, to not make such confusing
+  effect flipping when he tries to get out of the water and floats on
+  water surf.
+
+- when using menu slider, it's too easy to switch to other menu and affect
+  other slider. You should be able to affect only the slider that you
+  did mouseDown on !
 
 ----------------------------------------
 Eric stage 5 notes:
@@ -22,6 +35,15 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
+
+- mouse smoothing for mouse look ?
+  Seems not needed, at least with my mouse ?
+  Players with poor mouses can always just use keys ?
+
+- fix GTK backend to resize screen (surprisingly, it seems that I should
+  just use XFV86VidMode from Xlib ? GTK does not wrap this ?)
+  and then compile release versions of "The Castle" with GTK backend,
+  avoiding override_redirect.
 
 - Mama reports:
   Po uruchomieniu castle.exe mam taki komunikat:
@@ -212,9 +234,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   "High castle"
   "Castle above the mist" ?
 
-- Do navigating with mouse, like in Quake.
-  Hmm. Collides with mouse picking ?
-
 - idea from quake: water surface slowly moving (change/move the texture?
   some deformation of the texture ? I'm not sure how to do this trick,
   but it looks very nice!)
@@ -224,13 +243,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   ("i" - inventory on/off, "m" - messages).
 
 - debug menu is only for testing -- hide somehow at some point.
-
-- remove base_castle (or make it hidden ?),
-  together with it's sky (this was copied from lets_take_a_walk),
-  --- this was just a testing level.
-
-- key names: bold, key meaning = not bold
-  This is a nice Mama idea, but it will require changing GLWinMessages implementation, so probably will not be done for PGD compo.
 
 - mail to author of
   http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
@@ -257,6 +269,9 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   In the game menu, when asking before "End Game", do question
   like "Do you want to save the game before ending ?"
   with answers "Save and end the game", "Don't save and end the game", "Cancel".
+
+- OpenAL under Linux can close awfully long, make there some
+  dialog "Closing sound device, please wait"
 
 ----------------------------------------
 dist-making to-dos:
