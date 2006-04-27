@@ -1,8 +1,7 @@
-- compare our mouselook sensitivity with halflife2 on win sensitivity
-
-- actually implement CastleKey_InteractWithLevel
-
 ----------------------------------------
+- when player reached some level once, it should be possible to then reenter
+  the game from this game
+
 - when walking on flat/almost flat surface, FallingDownEffect should not
   activate.
 
@@ -19,11 +18,13 @@ Eric stage 5 notes:
 - In the menu, you can select with the mouse, but you can't use the mouse to validate the question dialogs.
 - In the keyboard configuration dialog, it would be preferable if the previous key assignment was just erased (after a yes/no), as it is, you have to hunt to find where the key you want to redefine is used, erase this use to avoid the conflict, and then go back to assign it.
 - Mouse look would be a great help to climbing the stairs for those that aren't accustomed to keyboard-based upward/downward/look.
+  (now fixed)
 - Sometimes, the player camera "banks" (inclines on the side), apparently when walking on inclines (like near the pond on the outside), though not always.
   (that's dupl of "FallingDownEffect should not activate" above)
 
 Dean stage 5 notes:
 - I think the addition of mouse look would be a welcome addition to the controls, as it will give the game a more natural feel.
+  (now fixed)
 - A few more enemies in the final levels would also be nice.
 
 --------------------
@@ -35,6 +36,8 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
+
+- when player walks, his weapon should slowly move
 
 - mouse smoothing for mouse look ?
   Seems not needed, at least with my mouse ?

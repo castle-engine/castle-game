@@ -74,6 +74,7 @@ type
     stPlayerFalledDown,
     stPlayerFootstepsConcrete,
     stPlayerFootstepsGrass,
+    stPlayerInteractFailed,
     { @groupEnd }
 
     { Items sounds.
@@ -289,6 +290,8 @@ var
     ( FileName: 'player_footsteps_concrete.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'player_footsteps_grass.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: 'player_interact_failed.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'sword_equipping.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),

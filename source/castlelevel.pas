@@ -208,9 +208,12 @@ type
     property AnimationTime: Single read FAnimationTime;
 
     { Call this when player picked some triangle on the level.
-      Distance is the exact distance to picked point. }
-    procedure TrianglePicked(const Distance: Single;
-      const Item: TOctreeItem); virtual;
+      Distance is the exact distance to picked point.
+
+      Returns whether something was done with response to this pick
+      (some message displayed, something happened ?) }
+    function TrianglePicked(const Distance: Single;
+      const Item: TOctreeItem): boolean; virtual;
 
     { Override this to allow player to pick some additional objects,
       not contained in @link(Scene). Ray0 and RayVector describe picking
@@ -705,9 +708,11 @@ begin
   FAnimationTime += CompSpeed / 50;
 end;
 
-procedure TLevel.TrianglePicked(const Distance: Single; const Item: TOctreeItem);
+function TLevel.TrianglePicked(const Distance: Single;
+  const Item: TOctreeItem): boolean;
 begin
   { Nothing to do in this class. }
+  Result := false;
 end;
 
 function TLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;

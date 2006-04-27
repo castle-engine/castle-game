@@ -315,9 +315,9 @@ begin
     '  This can be used in game to exit to game menu.' +nl+
     '  In many other cases it can be used to "exit".' +nl+
     '  This key is not configurable.' +nl+
-    nl+
     'Controlling game with mouse:' +nl+
-    '  Left mouse click performs Attack.' +nl+
+    '  Left mouse click performs attack.' +nl+
+    '  Right mouse click uses buttons/levers/opens doors etc.' +nl+
     '  Moving mouse rotates the view.';
 
     { Too much info, not needed, I think that player can figure this out:

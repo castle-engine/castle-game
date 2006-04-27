@@ -24,7 +24,7 @@ unit CastleHelp;
 interface
 
 const
-  Version = '0.5.3';
+  Version = '0.5.4';
 
 procedure ShowCreditsMessage;
 
@@ -46,14 +46,9 @@ function SProgramHelpSuffix: string;
 begin
   Result :=
     ApplicationName + ' version ' + Version + '.' +nl+
+    'WWW: http://www.camelot.homedns.org/~michalis/castle.php' +nl+
     nl+
     'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
-    'http://www.camelot.homedns.org/~michalis/' +nl+
-    { TODO: later I will just use here SCamelotProgramHelpSuffix,
-      for now this program is not avail on camelot. }
-    {'See http://www.camelot.homedns.org/~michalis/ for latest versions' +
-    Iff(WrapLines, nl + ' ', '') +
-    ' of this program, sources, documentation etc.' +nl+}
     nl+
     'Compiled with ' + SCompilerDescription +'.';
 end;
