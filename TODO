@@ -23,6 +23,13 @@ Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
 
+- Mama reports:
+  Po uruchomieniu castle.exe mam taki komunikat:
+    Error
+    castle: Exception EAccessViolation:
+    Access violation
+  pod windows'98
+
 - more environ sounds: wind blowing.
 
 - do rain and thunder (like in lets_take_a_walk)
