@@ -291,5 +291,7 @@ Each time before uploading release (to PGD and/or camelot):
   copy tar.gz to /win/mojewww/camelot/,
   update /win/mojewww/camelot/castle.php CASTLE_VERSION constant
 - make svntag
+  check by
+    svn list file:///home/michal/svn/kambi-svn-repos/castle/tags/
 
 ----------------------------------------
