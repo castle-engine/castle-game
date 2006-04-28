@@ -22,20 +22,30 @@ info:
 # ------------------------------------------------------------
 # Building targets.
 #
-# If you're using also some other means to compile some parts
-# of my sources, you may wish to call target `clean' before
+# You may wish to call target `clean' before
 # calling build targets. This will make sure that everything is
-# compiled with appropriate options (suitable for release, not debugging,
+# compiled with appropriate options (suitable for release or debugging,
 # and that GLWindow unit uses proper backend).
+#
+# Call make with DEBUG=t to get debug build, otherwise release build
+# will be done.
+
+ifdef DEBUG
+FPC_UNIX_OPTIONS := -dDEBUG
+FPC_WIN32_OPTIONS := -dDEBUG
+else
+FPC_UNIX_OPTIONS := -dRELEASE -dGLWINDOW_XLIB
+FPC_WIN32_OPTIONS := -dRELEASE
+endif
 
 build-unix:
 	cd source; \
-	  fpc -dRELEASE @kambi.cfg -dGLWINDOW_XLIB castle.dpr; \
+	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg castle.dpr; \
 	  mv castle ../
 
 build-win32:
 	cd source; \
-	  fpc -dRELEASE @kambi.cfg castle.dpr; \
+	  fpc $(FPC_WIN32_OPTIONS) @kambi.cfg castle.dpr; \
 	  mv castle.exe ../
 
 # ------------------------------------------------------------
