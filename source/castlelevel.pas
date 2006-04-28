@@ -27,7 +27,7 @@ interface
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
-  KambiUtils, KambiClassUtils;
+  KambiUtils, KambiClassUtils, CastlePlayer;
 
 {$define read_interface}
 
@@ -267,6 +267,18 @@ type
       However, they are displayed in menu in linear order, and that's
       why this is needed. }
     class function Number: Integer; virtual; abstract;
+
+    { This will be called when new player starts game on this level.
+      This is supposed to equip the player with some basic weapon/items.
+
+      Usually level design assumes that player came to level from some
+      other level in the game, so he already owns some weapon / items etc.
+      But when player uses "New Game" command to get to some already
+      AvailableForNewGame non-first level, this method will be called and it should
+      give player some basic weapon / items suitable for starting this level.
+
+      In TLevel class implementation of this does nothing.  }
+    procedure PrepareNewPlayer(NewPlayer: TPlayer); virtual;
   end;
 
   TLevelClass = class of TLevel;
@@ -324,6 +336,8 @@ type
 
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer); override;
+
+    procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
 
   TGateLevel = class(TLevel)
@@ -357,19 +371,27 @@ type
   TLevelAvailable = class
   public
     LevelClass: TLevelClass;
-    Visited: boolean;
+    AvailableForNewGame: boolean;
   end;
 
   TObjectsListItem_1 = TLevelAvailable;
   {$I objectslist_1.inc}
   TLevelsAvailableList = class(TObjectsList_1)
+  private
+    function IsSmallerByNumber(const A, B: TLevelAvailable): boolean;
   public
-    procedure AddLevelClass(LevelClass: TLevelClass);
+    procedure AddLevelClass(LevelClass: TLevelClass;
+      AvailableForNewGame: boolean = false);
+
+    { raises EInternalError if LevelClass not on the list. }
+    function FindLevelClass(LevelClass: TLevelClass): TLevelAvailable;
+
+    procedure SortByNumber;
   end;
 
 var
   { This lists all available TLevel classes, along with information
-    whether player visited them already.
+    whether they are allowed to be placed in "New Game" levels.
 
     Created in initialization of this unit, destroyed in finalization.
     Owns it's Items. }
@@ -515,6 +537,9 @@ begin
 
   FPlayedMusicSound := stNone;
   FFootstepsSound := DefaultFootstepsSound;
+
+  LevelsAvailable.FindLevelClass(TLevelClass(Self.ClassType)).
+    AvailableForNewGame := true;
 end;
 
 destructor TLevel.Destroy;
@@ -786,6 +811,11 @@ function TLevel.CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
 begin
   { Don't ignore anything in this class. }
   Result := false;
+end;
+
+procedure TLevel.PrepareNewPlayer(NewPlayer: TPlayer);
+begin
+  { Nothing to do in this class. }
 end;
 
 { TCastleHallLevel ----------------------------------------------------------- }
@@ -1104,6 +1134,16 @@ begin
   end;
 end;
 
+procedure TCastleHallLevel.PrepareNewPlayer(NewPlayer: TPlayer);
+begin
+  inherited;
+
+  { Give player 1 sword. Otherwise player would start the level
+    without any weapon, and there's no weapon to be found on
+    the level... }
+  NewPlayer.PickItem(TItem.Create(Sword, 1));
+end;
+
 { TGateLevel ----------------------------------------------------------------- }
 
 constructor TGateLevel.Create;
@@ -1187,19 +1227,45 @@ end;
 
 { TLevelsAvailableList ------------------------------------------------------- }
 
-procedure TLevelsAvailableList.AddLevelClass(LevelClass: TLevelClass);
+procedure TLevelsAvailableList.AddLevelClass(LevelClass: TLevelClass;
+  AvailableForNewGame: boolean);
 var
   LevelAvailable: TLevelAvailable;
 begin
   LevelAvailable := TLevelAvailable.Create;
   Add(LevelAvailable);
-  LevelAvailable.Visited := false;
   LevelAvailable.LevelClass := LevelClass;
+  LevelAvailable.AvailableForNewGame := AvailableForNewGame;
+end;
+
+function TLevelsAvailableList.FindLevelClass(
+  LevelClass: TLevelClass): TLevelAvailable;
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+    if Items[I].LevelClass = LevelClass then
+      Exit(Items[I]);
+
+  raise EInternalError.CreateFmt(
+    'Level %d "%s" not found on LevelsAvailable list',
+    [LevelClass.Number, LevelClass.Title]);
+end;
+
+function TLevelsAvailableList.IsSmallerByNumber(
+  const A, B: TLevelAvailable): boolean;
+begin
+  Result := A.LevelClass.Number < B.LevelClass.Number;
+end;
+
+procedure TLevelsAvailableList.SortByNumber;
+begin
+  Sort(IsSmallerByNumber);
 end;
 
 initialization
   LevelsAvailable := TLevelsAvailableList.Create;
-  LevelsAvailable.AddLevelClass(TGateLevel);
+  LevelsAvailable.AddLevelClass(TGateLevel, true);
   LevelsAvailable.AddLevelClass(TCastleHallLevel);
   LevelsAvailable.AddLevelClass(TTowerLevel);
 finalization

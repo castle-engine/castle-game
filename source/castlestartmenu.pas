@@ -26,7 +26,7 @@ interface
 procedure DrawInitializationBackground;
 
 { Show menu, ask user what to do, do what the user wants
-  (e.g. load level and call PlayLevel), when user wants to quit -- return. }
+  (e.g. load level and call PlayGame), when user wants to quit -- return. }
 procedure ShowStartMenu;
 
 implementation
@@ -77,6 +77,13 @@ type
     procedure CurrentItemSelected; override;
   end;
 
+  TChooseNewLevelMenu = class(TSubMenu)
+    LevelsAvailableForNewGame: TLevelsAvailableList;
+    constructor Create;
+    destructor Destroy; override;
+    procedure CurrentItemSelected; override;
+  end;
+
 { ----------------------------------------------------------------------------
   global vars (used by TCastleMenu descendants implementation) }
 
@@ -86,8 +93,39 @@ var
   MainMenu: TMainMenu;
   VideoMenu: TVideoMenu;
   SoundMenu: TSoundMenu;
+  ChooseNewLevelMenu: TChooseNewLevelMenu;
   ChangeOpenALDeviceMenu: TChangeOpenALDeviceMenu;
   GLList_ScreenImage: TGLuint;
+
+{ NewGame ------------------------------------------------------------- }
+
+{ This is just a wrapper that calls PlayGame.
+
+  Before calling PlayGame it prepares some things (creating player)
+  and after calling PlayGame is restores some things
+  (menu item's values that could change during the game and music).
+
+  The idea is that in the future there will be LoadGame procedure,
+  that will also call PlayGame, but creating / initializing
+  TPlayer and TLevel instances differently. }
+procedure NewGame(NewGameLevelClass: TLevelClass);
+var
+  LocalPlayer: TPlayer;
+  LocalLevel: TLevel;
+begin
+  LocalLevel := NewGameLevelClass.Create;
+  try
+    LocalPlayer := TPlayer.Create;
+    try
+      LocalLevel.PrepareNewPlayer(LocalPlayer);
+      PlayGame(LocalLevel, LocalPlayer);
+    finally FreeAndNil(LocalPlayer) end;
+  finally FreeAndNil(LocalLevel) end;
+
+  MusicPlayer.PlayedSound := stIntroMusic;
+  SoundMenu.SoundVolumeSlider.Value := SoundVolume;
+  SoundMenu.MusicVolumeSlider.Value := MusicVolume;
+end;
 
 { TMainMenu ------------------------------------------------------------ }
 
@@ -113,30 +151,46 @@ end;
 
 procedure TMainMenu.CurrentItemSelected;
 
-  procedure NewGame(LocalLevel: TLevel);
-  var
-    LocalPlayer: TPlayer;
-  begin
-    try
-      CreaturesKinds.PrepareRender;
-      ItemsKinds.PrepareRender;
-      GameMessages.Clear;
-      LocalPlayer := TPlayer.Create;
-      try
-        PlayLevel(LocalLevel, LocalPlayer);
-      finally FreeAndNil(LocalPlayer) end;
-    finally FreeAndNil(LocalLevel) end;
+  procedure ChooseNewGame;
 
-    MusicPlayer.PlayedSound := stIntroMusic;
-    SoundMenu.SoundVolumeSlider.Value := SoundVolume;
-    SoundMenu.MusicVolumeSlider.Value := MusicVolume;
+    procedure SetChooseNewLevelMenu;
+    begin
+      { Recreate ChooseNewLevelMenu now, to refresh list of levels AvailableForNewGame. }
+      FreeAndNil(ChooseNewLevelMenu);
+      ChooseNewLevelMenu := TChooseNewLevelMenu.Create;
+
+      CurrentMenu := ChooseNewLevelMenu;
+    end;
+
+  var
+    I: Integer;
+    AvailableForNewGameLevelClass: TLevelClass;
+  begin
+    AvailableForNewGameLevelClass := nil;
+    for I := 0 to LevelsAvailable.High do
+      if LevelsAvailable[I].AvailableForNewGame then
+      begin
+        if AvailableForNewGameLevelClass <> nil then
+        begin
+          { So we have > 1 level AvailableForNewGame.
+            So we have to use ChooseNewLevelMenu }
+          SetChooseNewLevelMenu;
+          Exit;
+        end else
+          AvailableForNewGameLevelClass := LevelsAvailable[I].LevelClass;
+      end;
+
+    if AvailableForNewGameLevelClass = nil then
+      raise EInternalError.Create('No level available for play');
+
+    NewGame(AvailableForNewGameLevelClass);
   end;
 
 begin
   inherited;
 
   case CurrentItem of
-    0: NewGame(TGateLevel.Create);
+    0: ChooseNewGame;
     1: ShowControlsMenu(GLList_ScreenImage, false, false);
     2: CurrentMenu := VideoMenu;
     3: CurrentMenu := SoundMenu;
@@ -373,6 +427,48 @@ begin
   CurrentMenu := SoundMenu;
 end;
 
+{ TChooseNewLevelMenu ------------------------------------------------------- }
+
+constructor TChooseNewLevelMenu.Create;
+var
+  I: Integer;
+begin
+  inherited;
+
+  LevelsAvailableForNewGame := TLevelsAvailableList.Create;
+
+  LevelsAvailable.SortByNumber;
+  for I := 0 to LevelsAvailable.Count - 1 do
+    if LevelsAvailable[I].AvailableForNewGame then
+    begin
+      LevelsAvailableForNewGame.Add(LevelsAvailable[I]);
+      Items.Add(Format('%d: %s',
+        [ LevelsAvailable[I].LevelClass.Number,
+          LevelsAvailable[I].LevelClass.Title ]));
+    end;
+  Items.Add('Cancel');
+
+  SubMenuTitle := 'Choose start level';
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+destructor TChooseNewLevelMenu.Destroy;
+begin
+  FreeAndNil(LevelsAvailableForNewGame);
+  inherited;
+end;
+
+procedure TChooseNewLevelMenu.CurrentItemSelected;
+begin
+  inherited;
+
+  if CurrentItem <> LevelsAvailableForNewGame.Count then
+    NewGame(LevelsAvailableForNewGame[CurrentItem].LevelClass);
+
+  CurrentMenu := MainMenu;
+end;
+
 { global things -------------------------------------------------------------- }
 
 procedure Resize(Glwin: TGLWindow);
@@ -492,6 +588,7 @@ begin
   FreeAndNil(VideoMenu);
   FreeAndNil(SoundMenu);
   FreeAndNil(ChangeOpenALDeviceMenu);
+  FreeAndNil(ChooseNewLevelMenu);
 end;
 
 initialization

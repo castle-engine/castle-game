@@ -32,21 +32,21 @@ uses Classes, CastleLevel, CastlePlayer, OpenGLFonts;
   ALevel and APlayer. Upon exit, it will set Player and Level
   back to nil.
 
-  Note that Level may change during the PlayLevel, because
+  Note that Level may change during the PlayGame, because
   of LevelFinished. In such case old Level value will be freeed,
   and Level will be set to new value. Last Level value should
-  be freed be the called of PlayLevel. ALevel upon exit is set to this
+  be freed by the caller of PlayGame. ALevel upon exit is set to this
   last Level value (global Level value is then set to nil, so it
   becomes useless). }
-procedure PlayLevel(var ALevel: TLevel; APlayer: TPlayer);
+procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer);
 
 var
-  { Currently used player by PlayLevel. nil if PlayLevel doesn't work
+  { Currently used player by PlayGame. nil if PlayGame doesn't work
     right now.
     @noAutoLinkHere }
   Player: TPlayer;
 
-  { Currently used level by PlayLevel. nil if PlayLevel doesn't work
+  { Currently used level by PlayGame. nil if PlayGame doesn't work
     right now.
     @noAutoLinkHere }
   Level: TLevel;
@@ -57,11 +57,11 @@ var
 
     You should clear this when new game starts or load this from file
     when loading saved game.
-    When PlayLevel runs, you cannot modify it directly, you can change it
+    When PlayGame runs, you cannot modify it directly, you can change it
     only by calling GameMessage. }
   GameMessages: TStringList;
 
-{ Add message to GameMessages and (only if PlayLevel is running)
+{ Add message to GameMessages and (only if PlayGame is running)
   display it on the game screen. }
 procedure GameMessage(const S: string);
 
@@ -111,7 +111,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
-  BFNT_BitstreamVeraSans_Unit,
+  BFNT_BitstreamVeraSans_Unit, CastleCreatures,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig;
@@ -970,10 +970,14 @@ begin
     Level.WaterBox);
 end;
 
-procedure PlayLevel(var ALevel: TLevel; APlayer: TPlayer);
+procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer);
 var
   SavedMode: TGLMode;
 begin
+  CreaturesKinds.PrepareRender;
+  ItemsKinds.PrepareRender;
+  GameMessages.Clear;
+
   Level := ALevel;
   Player := APlayer;
   InventoryVisible := false;

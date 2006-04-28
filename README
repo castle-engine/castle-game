@@ -444,9 +444,12 @@ Levels:
 
   To additionally make your level part of the actual game
   (i.e. reachable by normal player, not using any debug/cheat commands):
-  you have to add somewhere the call to LevelFinished(TYourLevel.Create),
-  so that player is in some situation transferred from other level
-  to your level.
+  - You can replace the call above with
+      LevelsAvailable.AddLevelClass(TYourLevel, true);
+    This will add your level to levels available in "New Game" menu by default.
+  - You can add somewhere the call to LevelFinished(TYourLevel.Create),
+    so that player is in some situation transferred from other level
+    to your level.
 
   Note that when starting "New Game" player can choose to start
   from any level that he (she ? :) previously visited ("visited"

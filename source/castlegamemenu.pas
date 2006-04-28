@@ -318,6 +318,8 @@ procedure TDebugMenu.CurrentItemSelected;
   begin
     S := TStringList.Create;
     try
+      LevelsAvailable.SortByNumber;
+
       for I := 0 to LevelsAvailable.High do
       begin
         S.Append(Format('Level %d "%s"',

@@ -37,6 +37,8 @@ Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
 
+- chooseNewLevel menu: display thumbnails of levels
+
 - when player walks, his weapon should slowly move
 
 - mouse smoothing for mouse look ?
