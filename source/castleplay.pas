@@ -97,6 +97,14 @@ var
 { Note that when Player.Dead, confirmation will never be required anyway. }
 procedure GameCancel(RequireConfirmation: boolean);
 
+const
+  DefaultAutoOpenInventory = true;
+
+var
+  { Automatically open inventory on pickup ?
+    Saved/loaded to config file in this unit. }
+  AutoOpenInventory: boolean;
+
 implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
@@ -106,7 +114,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   BFNT_BitstreamVeraSans_Unit,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound,
-  CastleVideoOptions, Keys;
+  CastleVideoOptions, Keys, CastleConfig;
 
 var
   GameMessagesManager: TTimeMessagesManager;
@@ -519,6 +527,9 @@ begin
       { update InventoryCurrentItem. }
       if not Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
         InventoryCurrentItem := PlayerItemIndex;
+
+      if AutoOpenInventory then
+        InventoryVisible := true;
     end;
   end;
 
@@ -1145,6 +1156,12 @@ initialization
   ShowDebugInfo := false;
   Glw.OnInitList.AppendItem(@GLWindowInit);
   Glw.OnCloseList.AppendItem(@GLWindowClose);
+
+  AutoOpenInventory := ConfigFile.GetValue(
+    'auto_open_inventory', DefaultAutoOpenInventory);
 finalization
+  ConfigFile.SetDeleteValue('auto_open_inventory',
+    AutoOpenInventory, DefaultAutoOpenInventory);
+
   FreeAndNil(GameMessages);
 end.

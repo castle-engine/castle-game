@@ -47,7 +47,7 @@ implementation
 uses SysUtils, GLWindow, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
   GLMenu, OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit,
   OpenGLFonts, CastleKeys, Keys, VectorMath, KambiUtils, CastlePlay,
-  CastleConfig;
+  CastleConfig, KambiStringUtils;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -55,6 +55,7 @@ type
   TControlsMenu = class(TSubMenu)
     MouseLookHorizontalSensitivitySlider: TGLMenuFloatSlider;
     MouseLookVerticalSensitivitySlider: TGLMenuFloatSlider;
+    AutoOpenInventoryArgument: TGLMenuItemArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -144,6 +145,9 @@ begin
     0.01, 0.3, MouseLookHorizontalSensitivity);
   MouseLookVerticalSensitivitySlider := TGLMenuFloatSlider.Create(
     0.01, 0.3, MouseLookVerticalSensitivity);
+  AutoOpenInventoryArgument := TGLMenuItemArgument.Create(
+    TGLMenuItemArgument.TextWidth('WWW'));
+  AutoOpenInventoryArgument.Value := BoolToStrYesNo[AutoOpenInventory];
 
   Items.Add('Configure basic controls');
   Items.Add('Configure items controls');
@@ -152,6 +156,8 @@ begin
     MouseLookHorizontalSensitivitySlider);
   Items.AddObject('Mouse vertical sensitivity',
     MouseLookVerticalSensitivitySlider);
+  Items.AddObject('Auto show inventory on pickup',
+    AutoOpenInventoryArgument);
   Items.Add('Restore to defaults');
   Items.Add('Back to main menu');
 
@@ -171,14 +177,23 @@ begin
     3: ;
     4: ;
     5: begin
+         AutoOpenInventory := not AutoOpenInventory;
+         AutoOpenInventoryArgument.Value := BoolToStrYesNo[AutoOpenInventory];
+       end;
+    6: begin
          CastleAllKeys.RestoreDefaults;
+
          MouseLookHorizontalSensitivity := DefaultMouseLookHorizontalSensitivity;
          MouseLookVerticalSensitivity   := DefaultMouseLookVerticalSensitivity  ;
          MouseLookHorizontalSensitivitySlider.Value := MouseLookHorizontalSensitivity;
          MouseLookVerticalSensitivitySlider  .Value := MouseLookVerticalSensitivity  ;
-         MessageOK(Glw, 'All keys and mouse settings restored to defaults.');
+
+         AutoOpenInventory := DefaultAutoOpenInventory;
+         AutoOpenInventoryArgument.Value := BoolToStrYesNo[AutoOpenInventory];
+
+         MessageOK(Glw, 'All keys and settings restored to defaults.');
        end;
-    6: UserQuit := true;
+    7: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
