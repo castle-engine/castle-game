@@ -10,9 +10,14 @@
   other slider. You should be able to affect only the slider that you
   did mouseDown on !
 
+- ask Szymon: should left/right be now by default assigned to strafes ?
+
 ----------------------------------------
 Eric stage 5 notes:
 - In the menu, you can select with the mouse, but you can't use the mouse to validate the question dialogs.
+
+  Simplest "OK" dialogs now can be dismissed by mouse click anywhere within the dialog box. "Yes"/"No" and other dialogs will have to be still answered by keys --- no time before the 7th May to close this issue correctly (by drawing real clickable buttons for dialogs).
+
 - In the keyboard configuration dialog, it would be preferable if the previous key assignment was just erased (after a yes/no), as it is, you have to hunt to find where the key you want to redefine is used, erase this use to avoid the conflict, and then go back to assign it.
 - Mouse look would be a great help to climbing the stairs for those that aren't accustomed to keyboard-based upward/downward/look.
   (now fixed)
