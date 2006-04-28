@@ -19,10 +19,6 @@ Group{
     headlight TRUE
   }
 
-  WorldInfo {
-    title "Sample castle level"
-  }
-
   PerspectiveCamera {
     position -1.3881112099 -94.8213851929 -0.8746259093
     orientation 0.999027609825134 0.031415648758411 0.030929347500205 1.571789145469666

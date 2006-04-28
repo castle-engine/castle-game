@@ -46,9 +46,5 @@ Group {
     }
   }
 
-  WorldInfo {
-    title "Castle Hall"
-  }
-
   WWWInline { name "castle_hall_processed.wrl" }
 }

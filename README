@@ -243,7 +243,7 @@ materials and textures of the level.
 
 Typical things that I write "by hand" are
 
-- Background, NavigationInfo, WorldInfo nodes
+- Background, NavigationInfo nodes
 
   These nodes were introduced in VRML 2 (although I implemented them
   for VRML 1 also). So Blender exporter to VRML 1 does not write
@@ -302,16 +302,12 @@ This section describes issues specific to the game "The Castle":
 
 Levels:
 
-- To actually play a level you have to add code to run this
-  level --- e.g. extend ChangeToLevel in castlegamemenu.pas.
-
-  If you don't want to recompile the program, then another
-  possibility is to just override some existing level file
-  (e.g. override gate_final.wrl and gate_lights.wrl to make
-  this level load on "New Game").
-
-- WorldInfo.title field specifies level name, so you want to set
-  this to something nice for user.
+- The very concept of this game (much like any other modern game)
+  is that you can design new levels without writing a single line
+  of "real" (in this case: ObjectPascal) code.
+  For simple start, if you want to play around, you can start
+  by modifying some existing level, like the "Tower" level
+  (see files data/level/basic_castle_*).
 
 - When loading level, we search for node named 'LevelBox'.
   Such node should be a parent of some shape (e.g. IndexedFaceSet)
@@ -358,9 +354,6 @@ Levels:
     }
   in your level. And force yourself to design a level that "fits"
   such avatarSize and speed.
-
-- For more customized levels, you may want to derive new class
-  from TLevel and override there things you want.
 
 - Sectors and waypoints (aka portals) for the level:
   - Shapes placed under the name Sector<index>_<ignored>
@@ -437,6 +430,35 @@ Levels:
     the simplest search on the graph to find a satisfiable path
     (no A* algorithm or anything; it's simply not needed for the kind of
     sectors layouts that I will typically use).
+
+- If you made a completely new level, you want to add it to the game.
+  You have to add a little code for this:
+
+  To add your level to the list of levels available from
+  debug command "Change to level": implement new TLevel descendant
+  (overriding it's abstract methods). For simplest example see
+  how TTowerLevel is defined in CastleLevel, it's really trivial.
+  Also add
+    LevelsAvailable.AddLevelClass(TYourLevel);
+  call to initialization.
+
+  To additionally make your level part of the actual game
+  (i.e. reachable by normal player, not using any debug/cheat commands):
+  you have to add somewhere the call to LevelFinished(TYourLevel.Create),
+  so that player is in some situation transferred from other level
+  to your level.
+
+  Note that when starting "New Game" player can choose to start
+  from any level that he (she ? :) previously visited ("visited"
+  either as part of normal game story of through debug command
+  "Change to level"). This feature may be removed in the future when
+  real "Save game" / "Load game" feature will be implemented.
+
+  If you don't mind a little programming, you may want to add
+  more interesting code to your TYourLevel implementation.
+  See existing level implementations for examples what can be achieved.
+  You may want to move your new level class
+  to a completely separate unit file if you want.
 
 Items:
 

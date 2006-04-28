@@ -26,7 +26,10 @@ interface
 
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
-  VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound;
+  VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
+  KambiUtils, KambiClassUtils;
+
+{$define read_interface}
 
 const
   DefaultFootstepsSound = stPlayerFootstepsConcrete;
@@ -41,7 +44,6 @@ type
     FProjectionNear: Single;
     FProjectionFar: Single;
     FNavigationSpeed: Single;
-    FTitle: string;
     FLevelBox: TBox3d;
     FItems: TItemsOnLevelList;
     FHeadlight: boolean;
@@ -98,10 +100,17 @@ type
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
       be sure to initialize Progress.UserInterface before calling this. }
-    constructor Create(const ASceneFileName, ALightSetFileName: string);
+    constructor Create; virtual;
 
     destructor Destroy; override;
 
+    { These will be used in constructor to load level.
+      @groupBegin }
+    class function SceneFileName: string; virtual; abstract;
+    class function LightSetFileName: string; virtual; abstract;
+    { @groupEnd }
+
+    { }
     property Scene: TVRMLFlatSceneGL read FScene;
     property LightSet: TVRMLLightSetGL read FLightSet;
 
@@ -125,10 +134,6 @@ type
       read FHintButtonShown write FHintButtonShown;
 
     property WaterBox: TBox3d read FWaterBox;
-
-    { Title of the level, taken from WorldInfo node
-      or just basename of ASceneFileName. }
-    property Title: string read FTitle;
 
     { Items lying on the level.
       These Items are owned by level object, so everything remaining
@@ -252,7 +257,19 @@ type
 
     property FootstepsSound: TSoundType
       read FFootstepsSound write FFootstepsSound default DefaultFootstepsSound;
+
+    { This is the nice name of the level. }
+    class function Title: string; virtual; abstract;
+
+    { This is level number, shown for the player in the menu.
+      This *does not* determine the order in which levels are played,
+      as levels do not have to be played in linear order.
+      However, they are displayed in menu in linear order, and that's
+      why this is needed. }
+    class function Number: Integer; virtual; abstract;
   end;
+
+  TLevelClass = class of TLevel;
 
   TCastleHallLevel = class(TLevel)
   private
@@ -273,8 +290,14 @@ type
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean;
   public
-    constructor Create;
+    constructor Create; override;
     destructor Destroy; override;
+
+    class function SceneFileName: string; override;
+    class function LightSetFileName: string; override;
+
+    class function Title: string; override;
+    class function Number: Integer; override;
 
     function LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
       override;
@@ -309,21 +332,63 @@ type
   protected
     procedure ChangeLevelScene; override;
   public
+    constructor Create; override;
+
+    class function SceneFileName: string; override;
+    class function LightSetFileName: string; override;
+
+    class function Title: string; override;
+    class function Number: Integer; override;
+
     function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
       OctreeItemIndex: Integer): boolean; override;
-    constructor Create;
     procedure Idle(const CompSpeed: Single); override;
   end;
 
+  TTowerLevel = class(TLevel)
+  public
+    class function SceneFileName: string; override;
+    class function LightSetFileName: string; override;
+
+    class function Title: string; override;
+    class function Number: Integer; override;
+  end;
+
+  TLevelAvailable = class
+  public
+    LevelClass: TLevelClass;
+    Visited: boolean;
+  end;
+
+  TObjectsListItem_1 = TLevelAvailable;
+  {$I objectslist_1.inc}
+  TLevelsAvailableList = class(TObjectsList_1)
+  public
+    procedure AddLevelClass(LevelClass: TLevelClass);
+  end;
+
+var
+  { This lists all available TLevel classes, along with information
+    whether player visited them already.
+
+    Created in initialization of this unit, destroyed in finalization.
+    Owns it's Items. }
+  LevelsAvailable: TLevelsAvailableList;
+
+{$undef read_interface}
+
 implementation
 
-uses SysUtils, OpenGLh, KambiUtils, BackgroundGL, KambiClassUtils,
+uses SysUtils, OpenGLh, BackgroundGL,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions;
 
+{$define read_implementation}
+{$I objectslist_1.inc}
+
 { TLevel --------------------------------------------------------------------- }
 
-constructor TLevel.Create(const ASceneFileName, ALightSetFileName: string);
+constructor TLevel.Create;
 
   procedure RemoveItemsToRemove;
   var
@@ -338,12 +403,11 @@ const
   SectorsMargin = 0.5;
 var
   NavigationNode: TNodeNavigationInfo;
-  WorldInfoNode: TNodeWorldInfo;
 begin
   inherited Create;
 
   FScene := TVRMLFlatSceneGL.Create(
-    LoadVRMLNode(ASceneFileName), true, roSeparateShapeStates);
+    LoadVRMLNode(SceneFileName), true, roSeparateShapeStates);
 
   { initialize FAnimationTime. Must be initialized before creating creatures. }
   FAnimationTime := 0.0;
@@ -442,18 +506,8 @@ begin
     (ProjectionNear, ProjectionFar);
   Scene.PrepareRender(true, true, false, false);
 
-  FLightSet := TVRMLLightSetGL.Create(LoadVRMLNode(ALightSetFileName),
+  FLightSet := TVRMLLightSetGL.Create(LoadVRMLNode(LightSetFileName),
     true, 1, -1);
-
-  WorldInfoNode := Scene.RootNode.TryFindNode(TNodeWorldInfo, true)
-    as TNodeWorldInfo;
-
-  { Calculate FTitle }
-  FTitle := '';
-  if WorldInfoNode <> nil then
-    FTitle := WorldInfoNode.FdTitle.Value;
-  if FTitle = '' then
-    FTitle := ExtractFileName(DeleteFileExt(ASceneFileName));
 
   { Calculate LightCastingShadowsPosition }
   FLightCastingShadowsPosition := Box3dMiddle(Scene.BoundingBox);
@@ -751,7 +805,7 @@ constructor TCastleHallLevel.Create;
   end;
 
 begin
-  inherited Create('castle_hall_final.wrl', 'castle_hall_lights.wrl');
+  inherited;
 
   PlayedMusicSound := stCastleHallMusic;
 
@@ -775,6 +829,26 @@ begin
   FreeAndNil(Symbol_TR);
   FreeAndNil(Symbol_BR);
   inherited;
+end;
+
+class function TCastleHallLevel.SceneFileName: string;
+begin
+  Result := 'castle_hall_final.wrl';
+end;
+
+class function TCastleHallLevel.LightSetFileName: string;
+begin
+  Result := 'castle_hall_lights.wrl';
+end;
+
+class function TCastleHallLevel.Title: string;
+begin
+  Result := 'Castle Hall';
+end;
+
+class function TCastleHallLevel.Number: Integer;
+begin
+  Result := 2;
 end;
 
 function TCastleHallLevel.LineOfSight(
@@ -1034,7 +1108,7 @@ end;
 
 constructor TGateLevel.Create;
 begin
-  inherited Create('gate_final.wrl', 'gate_lights.wrl');
+  inherited;
 
   PlayedMusicSound := stGateMusic;
 
@@ -1046,6 +1120,26 @@ begin
   inherited;
   if not RemoveBoxNode(FGateExitBox, 'GateExitBox') then
     raise EInternalError.Create('Gate level doesn''t contain "GateExitBox"');
+end;
+
+class function TGateLevel.SceneFileName: string;
+begin
+  Result := 'gate_final.wrl';
+end;
+
+class function TGateLevel.LightSetFileName: string;
+begin
+  Result := 'gate_lights.wrl';
+end;
+
+class function TGateLevel.Title: string;
+begin
+  Result := 'The Gate';
+end;
+
+class function TGateLevel.Number: Integer;
+begin
+  Result := 1;
 end;
 
 procedure TGateLevel.Idle(const CompSpeed: Single);
@@ -1069,4 +1163,45 @@ begin
     (ItemPtr^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
+{ TTowerLevel ---------------------------------------------------------------- }
+
+class function TTowerLevel.SceneFileName: string;
+begin
+  Result := 'basic_castle_final.wrl';
+end;
+
+class function TTowerLevel.LightSetFileName: string;
+begin
+  Result := 'basic_castle_lights.wrl';
+end;
+
+class function TTowerLevel.Title: string;
+begin
+  Result := 'Tower';
+end;
+
+class function TTowerLevel.Number: Integer;
+begin
+  Result := 99;
+end;
+
+{ TLevelsAvailableList ------------------------------------------------------- }
+
+procedure TLevelsAvailableList.AddLevelClass(LevelClass: TLevelClass);
+var
+  LevelAvailable: TLevelAvailable;
+begin
+  LevelAvailable := TLevelAvailable.Create;
+  Add(LevelAvailable);
+  LevelAvailable.Visited := false;
+  LevelAvailable.LevelClass := LevelClass;
+end;
+
+initialization
+  LevelsAvailable := TLevelsAvailableList.Create;
+  LevelsAvailable.AddLevelClass(TGateLevel);
+  LevelsAvailable.AddLevelClass(TCastleHallLevel);
+  LevelsAvailable.AddLevelClass(TTowerLevel);
+finalization
+  FreeWithContentsAndNil(LevelsAvailable);
 end.

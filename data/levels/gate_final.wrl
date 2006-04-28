@@ -28,10 +28,6 @@ Group {
     }
   }
 
-  WorldInfo {
-    title "The Gate"
-  }
-
   Fog {
     color 0.6 0.6 0.6
     fogType "LINEAR"

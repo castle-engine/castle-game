@@ -314,24 +314,25 @@ procedure TDebugMenu.CurrentItemSelected;
   procedure ChangeToLevel;
   var
     S: TStringList;
-    Index: Integer;
+    I, Index: Integer;
   begin
     S := TStringList.Create;
     try
-      S.Append('Level "Gate"');
-      S.Append('Level "Castle Hall"');
-      S.Append('Level "Tower"');
-      S.Append('Cancel');
-      Index := ChooseByMenu(GLList_ScreenImage, S);
-      case Index of
-        0: LevelFinished(TGateLevel.Create);
-        1: LevelFinished(TCastleHallLevel.Create);
-        2: LevelFinished(
-             TLevel.Create('basic_castle_final.wrl', 'basic_castle_lights.wrl'));
-        3: Exit { don't set UserQuit to true } ;
-        else raise EInternalError.Create('ChangeToLevel: Index = ?');
+      for I := 0 to LevelsAvailable.High do
+      begin
+        S.Append(Format('Level %d "%s"',
+          [ LevelsAvailable[I].LevelClass.Number,
+            LevelsAvailable[I].LevelClass.Title ]));
       end;
-      UserQuit := true;
+      S.Append('Cancel');
+
+      Index := ChooseByMenu(GLList_ScreenImage, S);
+
+      if Index <> LevelsAvailable.Count then
+      begin
+        LevelFinished(LevelsAvailable[Index].LevelClass.Create);
+        UserQuit := true;
+      end;
     finally S.Free end;
   end;
 
