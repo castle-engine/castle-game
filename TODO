@@ -1,7 +1,4 @@
 ----------------------------------------
-- when player reached some level once, it should be possible to then reenter
-  the game from this game
-
 - when walking on flat/almost flat surface, FallingDownEffect should not
   activate.
 

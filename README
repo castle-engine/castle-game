@@ -460,8 +460,10 @@ Levels:
   If you don't mind a little programming, you may want to add
   more interesting code to your TYourLevel implementation.
   See existing level implementations for examples what can be achieved.
-  You may want to move your new level class
-  to a completely separate unit file if you want.
+  You may even want to move your new level class
+  to a completely separate unit file if you want
+  (but keep LevelsAvailable.AddLevelClass call inside CastleLevel
+  initializaition).
 
 Items:
 

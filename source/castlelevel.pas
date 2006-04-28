@@ -372,6 +372,7 @@ type
   public
     LevelClass: TLevelClass;
     AvailableForNewGame: boolean;
+    DefaultAvailableForNewGame: boolean;
   end;
 
   TObjectsListItem_1 = TLevelAvailable;
@@ -381,12 +382,15 @@ type
     function IsSmallerByNumber(const A, B: TLevelAvailable): boolean;
   public
     procedure AddLevelClass(LevelClass: TLevelClass;
-      AvailableForNewGame: boolean = false);
+      DefaultAvailableForNewGame: boolean = false);
 
     { raises EInternalError if LevelClass not on the list. }
     function FindLevelClass(LevelClass: TLevelClass): TLevelAvailable;
 
     procedure SortByNumber;
+
+    procedure LoadFromConfig;
+    procedure SaveToConfig;
   end;
 
 var
@@ -403,7 +407,7 @@ implementation
 
 uses SysUtils, OpenGLh, BackgroundGL,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
-  CastleVideoOptions;
+  CastleVideoOptions, CastleConfig;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -1228,14 +1232,14 @@ end;
 { TLevelsAvailableList ------------------------------------------------------- }
 
 procedure TLevelsAvailableList.AddLevelClass(LevelClass: TLevelClass;
-  AvailableForNewGame: boolean);
+  DefaultAvailableForNewGame: boolean);
 var
   LevelAvailable: TLevelAvailable;
 begin
   LevelAvailable := TLevelAvailable.Create;
   Add(LevelAvailable);
   LevelAvailable.LevelClass := LevelClass;
-  LevelAvailable.AvailableForNewGame := AvailableForNewGame;
+  LevelAvailable.DefaultAvailableForNewGame := DefaultAvailableForNewGame;
 end;
 
 function TLevelsAvailableList.FindLevelClass(
@@ -1263,11 +1267,34 @@ begin
   Sort(IsSmallerByNumber);
 end;
 
+procedure TLevelsAvailableList.LoadFromConfig;
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+    Items[I].AvailableForNewGame := ConfigFile.GetValue(
+      'levels_available/' + LowerCase(Items[I].LevelClass.ClassName),
+      Items[I].DefaultAvailableForNewGame);
+end;
+
+procedure TLevelsAvailableList.SaveToConfig;
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+    ConfigFile.SetDeleteValue(
+      'levels_available/' + LowerCase(Items[I].LevelClass.ClassName),
+      Items[I].AvailableForNewGame,
+      Items[I].DefaultAvailableForNewGame);
+end;
+
 initialization
   LevelsAvailable := TLevelsAvailableList.Create;
   LevelsAvailable.AddLevelClass(TGateLevel, true);
   LevelsAvailable.AddLevelClass(TCastleHallLevel);
   LevelsAvailable.AddLevelClass(TTowerLevel);
+  LevelsAvailable.LoadFromConfig;
 finalization
+  LevelsAvailable.SaveToConfig;
   FreeWithContentsAndNil(LevelsAvailable);
 end.
