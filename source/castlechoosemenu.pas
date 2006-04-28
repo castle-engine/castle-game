@@ -75,7 +75,7 @@ end;
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   ChooseMenu.KeyDown(Key, C);
-  if Key = CastleKey_SaveScreen.Value then
+  if CastleKey_SaveScreen.IsValue(Key) then
     SaveScreen;
 end;
 

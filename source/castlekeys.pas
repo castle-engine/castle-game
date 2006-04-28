@@ -51,8 +51,15 @@ type
 
     { Current key value. Initially equal to DefaultValue.
       On every change of Value (not inside TKeyConfiguration
-      constructor), OnKeyChanged callbacks will be called. }
+      constructor), OnKeyChanged callbacks will be called.
+
+      Note that this can be K_None, to mean "unassigned". }
     property Value: TKey read FValue write SetValue;
+
+    { @true if Value = AKey and AKey <> K_None.
+      This way it always returns @false when AKey is K_None
+      or Value is K_None. }
+    function IsValue(AKey: TKey): boolean;
   end;
 
   TObjectsListItem_3 = TKeyConfiguration;
@@ -201,6 +208,11 @@ begin
     FValue := NewValue;
     OnKeyChanged.ExecuteAll(Self);
   end;
+end;
+
+function TKeyConfiguration.IsValue(AKey: TKey): boolean;
+begin
+  Result := (AKey <> K_None) and (AKey = Value);
 end;
 
 { initialization / finalization ---------------------------------------------- }

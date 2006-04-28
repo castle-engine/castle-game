@@ -854,45 +854,45 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
 begin
   { Basic keys. }
-  if Key = CastleKey_Attack.Value then
+  if CastleKey_Attack.IsValue(Key) then
     DoAttack else
-  if (Key = CastleKey_UpMove.Value) or
-     (Key = CastleKey_DownMove.Value) or
-     (Key = CastleKey_Forward.Value) or
-     (Key = CastleKey_Backward.Value) or
-     (Key = CastleKey_LeftStrafe.Value) or
-     (Key = CastleKey_RightStrafe.Value) { or
+  if CastleKey_UpMove.IsValue(Key) or
+     CastleKey_DownMove.IsValue(Key) or
+     CastleKey_Forward.IsValue(Key) or
+     CastleKey_Backward.IsValue(Key) or
+     CastleKey_LeftStrafe.IsValue(Key) or
+     CastleKey_RightStrafe.IsValue(Key) { or
        Rotation keys work even when player is dead.
        See comments in TPlayer.UpdateNavigator.
-     (Key = CastleKey_LeftRot.Value) or
-     (Key = CastleKey_RightRot.Value) or
-     (Key = CastleKey_UpRotate.Value) or
-     (Key = CastleKey_DownRotate.Value) or
-     (Key = CastleKey_HomeUp.Value) } then
+     CastleKey_LeftRot.IsValue(Key) or
+     CastleKey_RightRot.IsValue(Key) or
+     CastleKey_UpRotate.IsValue(Key) or
+     CastleKey_DownRotate.IsValue(Key) or
+     CastleKey_HomeUp.IsValue(Key) } then
     MaybeDeadMessage else
 
   { Items keys. }
-  if Key = CastleKey_InventoryShow.Value then
+  if CastleKey_InventoryShow.IsValue(Key) then
     InventoryVisible := not InventoryVisible else
-  if Key = CastleKey_InventoryPrevious.Value then
+  if CastleKey_InventoryPrevious.IsValue(Key) then
     ChangeInventoryCurrentItem(-1) else
-  if Key = CastleKey_InventoryNext.Value then
+  if CastleKey_InventoryNext.IsValue(Key) then
     ChangeInventoryCurrentItem(+1) else
-  if Key = CastleKey_DropItem.Value then
+  if CastleKey_DropItem.IsValue(Key) then
     DropItem else
-  if Key = CastleKey_UseItem.Value then
+  if CastleKey_UseItem.IsValue(Key) then
     UseItem else
 
   { Other keys. }
-  if Key = CastleKey_SaveScreen.Value then
+  if CastleKey_SaveScreen.IsValue(Key) then
     SaveScreen else
-  if Key = CastleKey_ViewMessages.Value then
+  if CastleKey_ViewMessages.IsValue(Key) then
     ViewGameMessages else
-  if Key = CastleKey_CancelFlying.Value then
+  if CastleKey_CancelFlying.IsValue(Key) then
     CancelFlying else
-  if Key = CastleKey_FPSShow.Value then
+  if CastleKey_FPSShow.IsValue(Key) then
     ShowDebugInfo := not ShowDebugInfo else
-  if Key = CastleKey_Interact.Value then
+  if CastleKey_Interact.IsValue(Key) then
     DoInteract else
 
   { Fixed keys. }

@@ -270,9 +270,21 @@ begin
     begin
       ConflictingKey := CastleAllKeys.SeekKeyByValue(NewKey);
       if ConflictingKey <> nil then
-        MessageOK(Glw,
-          Format('Conflict: Key "%s" is already assigned to action "%s"',
-          [KeyToStr(NewKey), ConflictingKey.Name]), taLeft) else
+      begin
+        if MessageYesNo(Glw,
+          Format('Conflict: Key "%s" is already assigned to action "%s".' + nl+
+            nl+
+            'Are you sure you want to assign this key to action "%s" (if yes, ' +
+            'the assignment for action "%s" will be cleared) ?',
+          [ KeyToStr(NewKey),
+            ConflictingKey.Name,
+            KeyConfiguration.Name,
+            ConflictingKey.Name]), taLeft) then
+        begin
+          ConflictingKey.Value := K_None;
+          KeyConfiguration.Value := NewKey;
+        end;
+      end else
         KeyConfiguration.Value := NewKey;
     end;
   end else
@@ -375,7 +387,7 @@ end;
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   CurrentMenu.KeyDown(Key, C);
-  if Key = CastleKey_SaveScreen.Value then
+  if CastleKey_SaveScreen.IsValue(Key) then
     SaveScreen;
 end;
 
