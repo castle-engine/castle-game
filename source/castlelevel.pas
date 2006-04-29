@@ -80,6 +80,7 @@ type
     FLightCastingShadowsPosition: TVector3Single;
 
     FWaterBox: TBox3d;
+    FAboveWaterBox: TBox3d;
 
     FPlayedMusicSound: TSoundType;
     FFootstepsSound: TSoundType;
@@ -134,6 +135,21 @@ type
       read FHintButtonShown write FHintButtonShown;
 
     property WaterBox: TBox3d read FWaterBox;
+
+    { This is always calculated as a box with X, Y borders just like
+      the WaterBox and the Z borders placed such that AboveWaterBox
+      is exactly above WaterBox (top of WaterBox is equal to bottom of
+      AboveWaterBox) and the height of AboveWaterBox is "rather small".
+
+      The intention of "rather small" is such that when player CameraPos
+      is within AboveWaterBox then the player is floating slightly
+      above the water --- not immediately falling down, but also
+      not drowning.
+
+      In other words, this means that player head is above the water surface
+      but his feet are in the water. In some sense he/she is swimming,
+      in some not. }
+    property AboveWaterBox: TBox3d read FAboveWaterBox;
 
     { Items lying on the level.
       These Items are owned by level object, so everything remaining
@@ -473,8 +489,16 @@ begin
   if not RemoveBoxNode(FHintButtonBox, 'HintButtonBox') then
     FHintButtonBox := EmptyBox3d;
 
-  if not RemoveBoxNode(FWaterBox, 'WaterBox') then
+  if RemoveBoxNode(FWaterBox, 'WaterBox') then
+  begin
+    FAboveWaterBox := FWaterBox;
+    FAboveWaterBox[0, 2] := FWaterBox[1, 2];
+    FAboveWaterBox[1, 2] := FAboveWaterBox[0, 2] + 0.8;
+  end else
+  begin
     FWaterBox := EmptyBox3d;
+    FAboveWaterBox := EmptyBox3d;
+  end;
 
   { calculate Sectors and Waypoints }
   FSectors := TSceneSectorsList.Create;

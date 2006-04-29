@@ -966,8 +966,12 @@ class procedure TDummy.MatrixChanged(Navigator: TMatrixNavigator);
 begin
   Glw.PostRedisplay;
   alUpdateListener;
-  Player.Swimming := Box3dPointInside(Player.Navigator.CameraPos,
-    Level.WaterBox);
+
+  if Box3dPointInside(Player.Navigator.CameraPos, Level.AboveWaterBox) then
+    Player.Swimming := psAboveWater else
+  if Box3dPointInside(Player.Navigator.CameraPos, Level.WaterBox) then
+    Player.Swimming := psUnderWater else
+    Player.Swimming := psNo;
 end;
 
 procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer);

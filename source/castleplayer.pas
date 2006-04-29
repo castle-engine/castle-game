@@ -30,6 +30,8 @@ const
   DefaultMaxLife = 100;
 
 type
+  TPlayerSwimming = (psNo, psAboveWater, psUnderWater);
+
   { Player class.
 
     Note that this is designed in such way that it doesn't require current
@@ -103,13 +105,13 @@ type
 
     procedure KeyChanged(KeyConfiguration: TKeyConfiguration);
 
-    { If Swimming, then this is the time (from Level.AnimationTime)
-      of setting Swimming to true. }
+    { If Swimming = psUnderWater, then this is the time (from Level.AnimationTime)
+      of setting Swimming to psUnderWater. }
     SwimBeginTime: Single;
-    { If Swimming, this is the time of last
+    { If Swimming = psUnderWater, this is the time of last
       drowning (or 0.0 if there was no drowning yet in this swimming session). }
     SwimLastDrownTime: Single;
-    { If Swimming, this is the time of last stPlayerSwimming sound
+    { If Swimming = psUnderWater, this is the time of last stPlayerSwimming sound
       (or 0.0 if there was no stPlayerSwimming played yet in this
       swimming session). }
     SwimLastSoundTime: Single;
@@ -120,8 +122,8 @@ type
     AllocatedSwimmingSource: TALAllocatedSource;
     procedure AllocatedSwimmingSourceUsingEnd(Sender: TALAllocatedSource);
 
-    FSwimming: boolean;
-    procedure SetSwimming(const Value: boolean);
+    FSwimming: TPlayerSwimming;
+    procedure SetSwimming(const Value: TPlayerSwimming);
 
     { There always must be satisfied:
         AllocatedFootstepsSource <> nil
@@ -303,7 +305,7 @@ type
     { You should set this property as appropriate.
       This object will just use this property (changing it's Navigator
       properties etc.). }
-    property Swimming: boolean read FSwimming write SetSwimming;
+    property Swimming: TPlayerSwimming read FSwimming write SetSwimming;
   end;
 
 implementation
@@ -602,7 +604,7 @@ begin
       but in this case I can't use OpenGL fog, as it may be used
       by the level itself (as it is, actually, for the 'Gate" level). }
 
-    if Swimming then
+    if Swimming = psUnderWater then
       glCallList(GLList_DrawWaterRect);
 
     { Apply black out effect on the possibly watery effect.
@@ -617,7 +619,7 @@ begin
   Navigator.Gravity := not FlyingMode;
   { Note that when not Navigator.Gravity then FallingDownEffect will not
     work anyway. }
-  Navigator.FallingDownEffect := not Swimming;
+  Navigator.FallingDownEffect := Swimming = psNo;
 
   Navigator.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
   Navigator.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
@@ -673,7 +675,7 @@ begin
       Navigator.MoveVertSpeed := 1.0;
     end else
     begin
-      if Swimming then
+      if Swimming <> psNo then
       begin
         Navigator.Key_Jump := K_None;
         Navigator.Key_Crouch := K_None;
@@ -751,7 +753,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       with stPlayerDrowning. }
     SwimSoundPauseSeconds = 3.11111111;
   begin
-    if Swimming then
+    if Swimming = psUnderWater then
     begin
       { Take care of drowning. }
       if not Dead then
@@ -919,7 +921,7 @@ end;
 procedure TPlayer.FalledDown(Navigator: TMatrixWalker;
   const FallenHeight: Single);
 begin
-  if (not Swimming) and (FallenHeight > 4) then
+  if (Swimming = psNo) and (FallenHeight > 4) then
   begin
     Life := Life - Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
     Sound(stPlayerFalledDown);
@@ -1005,34 +1007,63 @@ begin
   UpdateNavigator;
 end;
 
-procedure TPlayer.SetSwimming(const Value: boolean);
+procedure TPlayer.SetSwimming(const Value: TPlayerSwimming);
 begin
   if Value <> FSwimming then
   begin
-    FSwimming := Value;
-
-    { If AllocatedSwimmingChangeSource <> nil, then the
-      stPlayerSwimmingChange sound is already played (this may be caused
-      when player tries to stay above the water --- he will then repeatedly
-      go under and above the water). So do not start it again, to avoid
-      bad sound atrifacts (the same sound playing a couple times on top
-      of each other). }
-    if AllocatedSwimmingChangeSource = nil then
+    { If "Swimming = psUnderWater" state changed then play a sound. }
+    if (FSwimming = psUnderWater) <>
+       (Value = psUnderWater) then
     begin
-      AllocatedSwimmingChangeSource := Sound(stPlayerSwimmingChange);
-      if AllocatedSwimmingChangeSource <> nil then
-        AllocatedSwimmingChangeSource.OnUsingEnd :=
-          AllocatedSwimmingChangeSourceUsingEnd;
+      { If AllocatedSwimmingChangeSource <> nil, then the
+        stPlayerSwimmingChange sound is already played (this may be caused
+        when player tries to stay above the water --- he will then repeatedly
+        go under and above the water). So do not start it again, to avoid
+        bad sound atrifacts (the same sound playing a couple times on top
+        of each other). }
+      if AllocatedSwimmingChangeSource = nil then
+      begin
+        AllocatedSwimmingChangeSource := Sound(stPlayerSwimmingChange);
+        if AllocatedSwimmingChangeSource <> nil then
+          AllocatedSwimmingChangeSource.OnUsingEnd :=
+            AllocatedSwimmingChangeSourceUsingEnd;
+      end;
     end;
 
-    if Swimming then
+    if (FSwimming = psNo) and (Value <> psNo) then
+    begin
+      { Cancel falling down, otherwise he will fall down into the water
+        with the high speed (because in the air FallingDownStartSpeed
+        is high and it's increased, but in the water it's much lower
+        and not increased at all right now). }
+      Navigator.CancelFallingDown;
+    end;
+
+    FSwimming := Value;
+
+    if Swimming = psUnderWater then
     begin
       SwimBeginTime := Level.AnimationTime;
       SwimLastDrownTime := 0.0;
       SwimLastSoundTime := 0.0;
     end;
 
-    { UpdateNavigator will be called in Idle. }
+    { Although UpdateNavigator will be called in nearest Player.Idle anyway,
+      I want to call it *now*. That's because I want to set
+      Navigator.FallingDownStartSpeed to low speed (suitable for moving
+      under the water) before next falling down will happen.
+      Why ? See comments about Navigator.CancelFallingDown above.
+
+      And next falling down will happen... actually SetSwimming
+      is called from OnMatrixChanged that may be called
+      from TryFallingDown ! So next falling down definitely *can*
+      happen before next Player.Idle. Actually we may be in the middle
+      of falling down right now. Fortunately Navigator.Idle
+      and Navigator.CancelFallingDown are implemented (or rather fixed :)
+      to honour calling CancelFallingDown and setting FallingDownStartSpeed now.
+
+      So the safeguard below is needed. }
+    UpdateNavigator;
   end;
 end;
 
