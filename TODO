@@ -1,16 +1,12 @@
 ----------------------------------------
-- when walking on flat/almost flat surface, FallingDownEffect should not
-  activate.
-  Hmm. Partially fixed. When walking on flat surface --- doesn't occur.
-
-  But still it activates too fast when walking on "almost flat" surface,
-  like river banks or hills on the "Gate" level ?
-
 - when using menu slider, it's too easy to switch to other menu and affect
   other slider. You should be able to affect only the slider that you
   did mouseDown on !
 
-- ask Szymon: should left/right be now by default assigned to strafes ?
+- ask Szymon/PGD: should left/right be now by default assigned to strafes ?
+  I think so.
+  quake2 doesn't do this.
+  Test quake3 on win.
 
 ----------------------------------------
 Eric stage 5 notes:
@@ -114,7 +110,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 
 - "The Gate" level:
   - intro under menu: camera floating around level with this fog ?
-  - walking down the stairs and down the hill causes player to lose life
 
 - There must be a way to say that some sectors are not important
   for AI for creatures with Flying. (like ghost)
