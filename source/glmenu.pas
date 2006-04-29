@@ -83,6 +83,15 @@ type
       passed here, so you can e.g. calculate mouse position
       relative to this accessory as (MouseX - Area.X0, MouseY - Area.Y0).
 
+      Note that while the user holds the mouse clicked (MousePressed <> []),
+      the mouse is "grabbed" by this accessory, and even when the user
+      will move the mouse over other items, they will not receive their
+      MouseDown/MouseMove messages until user will let the mouse go.
+      This prevents the bad situation when user does MouseDown e.g.
+      on "Sound Volume" slider, slides it to the right and then accidentaly
+      moves the mouse also a little down, and suddenly he's over "Music Volume"
+      slider and he changed the position of "Music Volume" slider.
+
       You can use ParentMenu to call
       ParentMenu.CurrentItemAccessoryValueChanged. }
     procedure MouseDown(const MouseX, MouseY: Single; Button: TMouseButton;
@@ -261,6 +270,9 @@ type
     MaxItemWidth: Single;
     FSpaceBetweenItems: Cardinal;
     FDrawBackgroundRectangle: boolean;
+    { Item accessory that currently has "grabbed" the mouse.
+      -1 if none. }
+    ItemAccessoryGrabbed: Integer;
     function GetCurrentItem: Integer;
     procedure SetCurrentItem(const Value: Integer);
   public
@@ -360,8 +372,10 @@ type
     procedure MouseMove(const NewX, NewY: Single;
       const MousePressed: TMouseButtons);
 
-    procedure MouseDown(const MouseX, MouseY: Single; Button: TMouseButton);
-    procedure MouseUp(const MouseX, MouseY: Single; Button: TMouseButton);
+    procedure MouseDown(const MouseX, MouseY: Single; Button: TMouseButton;
+      const MousePressed: TMouseButtons);
+    procedure MouseUp(const MouseX, MouseY: Single; Button: TMouseButton;
+      const MousePressed: TMouseButtons);
 
     procedure Idle(const CompSpeed: Single);
 
@@ -741,7 +755,7 @@ function TGLMenuIntegerSlider.XCoordToValue(
   const XCoord: Single; const Area: TArea): Integer;
 begin
   { We do additional Clamped over Round result to avoid any
-    change of floating-point errors due to lack of precision. }
+    chance of floating-point errors due to lack of precision. }
   Result := Clamped(Round(
     MapRange(XCoordToSliderPosition(XCoord, Area), 0, 1,
       BeginRange, EndRange)), BeginRange, EndRange);
@@ -882,6 +896,8 @@ var
   PositionXMove, PositionYMove: Single;
 begin
   MenuFontInit;
+
+  ItemAccessoryGrabbed := -1;
 
   FAccessoryAreas.Count := Items.Count;
 
@@ -1060,21 +1076,25 @@ begin
       then user just moves mouse within current item.
       So maybe we should call TGLMenuItemAccessory.MouseMove. }
     if (Items.Objects[CurrentItem] <> nil) and
-       (PointInArea(NewX, NewY, FAccessoryAreas.Items[CurrentItem])) then
+       (PointInArea(NewX, NewY, FAccessoryAreas.Items[CurrentItem])) and
+       (ItemAccessoryGrabbed = CurrentItem) then
       TGLMenuItemAccessory(Items.Objects[CurrentItem]).MouseMove(
         NewX, NewY, MousePressed,
         FAccessoryAreas.Items[CurrentItem], Self);
   end;
 end;
 
-procedure TGLMenu.MouseDown(const MouseX, MouseY: Single; Button: TMouseButton);
+procedure TGLMenu.MouseDown(const MouseX, MouseY: Single; Button: TMouseButton;
+  const MousePressed: TMouseButtons);
 var
   NewItemIndex: Integer;
 begin
   if (CurrentItem <> -1) and
      (Items.Objects[CurrentItem] <> nil) and
-     (PointInArea(MouseX, MouseY, FAccessoryAreas.Items[CurrentItem])) then
+     (PointInArea(MouseX, MouseY, FAccessoryAreas.Items[CurrentItem])) and
+     (MousePressed - [Button] = []) then
   begin
+    ItemAccessoryGrabbed := CurrentItem;
     TGLMenuItemAccessory(Items.Objects[CurrentItem]).MouseDown(
       MouseX, MouseY, Button, FAccessoryAreas.Items[CurrentItem], Self);
   end;
@@ -1090,8 +1110,16 @@ begin
   end;
 end;
 
-procedure TGLMenu.MouseUp(const MouseX, MouseY: Single; Button: TMouseButton);
+procedure TGLMenu.MouseUp(const MouseX, MouseY: Single; Button: TMouseButton;
+  const MousePressed: TMouseButtons);
 begin
+  { This is actually not needed, smart check for
+    (MousePressed - [Button] = []) inside MouseDown handles everything,
+    so we don't have to depend on MouseUp for ungrabbing.
+    But I do it here, just "to keep my state as current as possible". }
+  if MousePressed = [] then
+    ItemAccessoryGrabbed := -1;
+
   { Nothing to do here for now. }
 end;
 

@@ -499,12 +499,14 @@ end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  CurrentMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
+  CurrentMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
+    Glwin.MousePressed);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  CurrentMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
+  CurrentMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
+    Glwin.MousePressed);
 end;
 
 procedure Idle(Glwin: TGLWindow);

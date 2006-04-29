@@ -47,7 +47,7 @@ type
 procedure TChooseMenu.CurrentItemSelected;
 begin
   inherited;
-  
+
   Selected := true;
   SelectedIndex := CurrentItem;
 end;
@@ -87,12 +87,14 @@ end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  ChooseMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
+  ChooseMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
+    Glwin.MousePressed);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  ChooseMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button);
+  ChooseMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
+    Glwin.MousePressed);
 end;
 
 procedure Idle(Glwin: TGLWindow);

@@ -400,13 +400,13 @@ end;
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
   CurrentMenu.MouseDown(Glwin.MouseX - MoveX,
-    Glwin.Height - Glwin.MouseY - MoveY, Button);
+    Glwin.Height - Glwin.MouseY - MoveY, Button, Glwin.MousePressed);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
 begin
   CurrentMenu.MouseUp(Glwin.MouseX - MoveX,
-    Glwin.Height - Glwin.MouseY - MoveY, Button);
+    Glwin.Height - Glwin.MouseY - MoveY, Button, Glwin.MousePressed);
 end;
 
 procedure Idle(Glwin: TGLWindow);

@@ -1,8 +1,4 @@
 ----------------------------------------
-- when using menu slider, it's too easy to switch to other menu and affect
-  other slider. You should be able to affect only the slider that you
-  did mouseDown on !
-
 - ask Szymon/PGD: should left/right be now by default assigned to strafes ?
   I think so.
   quake2 doesn't do this.
@@ -25,7 +21,8 @@ Eric stage 5 notes:
   Also flying and swimming feels less awkward, as you fly upwards/downloads just by pressing forward/backward key while looking up/down. Which means that you only need to hold hands over forward/backward keys to fly in full 3D space.
 
 - Sometimes, the player camera "banks" (inclines on the side), apparently when walking on inclines (like near the pond on the outside), though not always.
-  (that's dupl of "FallingDownEffect should not activate" above)
+
+  Yes, this was a little effect (that is activated when you fall down from high) that got a little "out of control" :) Fixed now.
 
 Dean stage 5 notes:
 - I think the addition of mouse look would be a welcome addition to the controls, as it will give the game a more natural feel.
