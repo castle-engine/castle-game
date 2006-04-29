@@ -234,10 +234,14 @@ begin
   CastleKey_Attack := TKeyConfiguration.Create('Attack', 'attack', kgBasic, K_Ctrl);
   CastleKey_Forward := TKeyConfiguration.Create('Move forward', 'move_forward', kgBasic, WalkerDefaultKey_Forward);
   CastleKey_Backward := TKeyConfiguration.Create('Move backward', 'move_backward', kgBasic, WalkerDefaultKey_Backward);
-  CastleKey_LeftRot := TKeyConfiguration.Create('Turn left', 'turn_left', kgBasic, WalkerDefaultKey_LeftRot);
-  CastleKey_RightRot := TKeyConfiguration.Create('Turn right', 'turn_right', kgBasic, WalkerDefaultKey_RightRot);
-  CastleKey_LeftStrafe := TKeyConfiguration.Create('Move left', 'move_left', kgBasic, WalkerDefaultKey_LeftStrafe);
-  CastleKey_RightStrafe := TKeyConfiguration.Create('Move right', 'move_right', kgBasic, WalkerDefaultKey_RightStrafe);
+  { Left/RightRot and Left/RightStrafe are switched between castle defaults
+    and WalkerDefaultKey_Xxx defaults, because WalkerDefaultKey_Xxx defaults
+    were prepared without thinking about mouse look. With mouse look,
+    strafe keys are far more useful than turn keys. }
+  CastleKey_LeftStrafe := TKeyConfiguration.Create('Move left', 'move_left', kgBasic, WalkerDefaultKey_LeftRot);
+  CastleKey_RightStrafe := TKeyConfiguration.Create('Move right', 'move_right', kgBasic, WalkerDefaultKey_RightRot);
+  CastleKey_LeftRot := TKeyConfiguration.Create('Turn left', 'turn_left', kgBasic, WalkerDefaultKey_LeftStrafe);
+  CastleKey_RightRot := TKeyConfiguration.Create('Turn right', 'turn_right', kgBasic, WalkerDefaultKey_RightStrafe);
   CastleKey_UpRotate := TKeyConfiguration.Create('Loop up', 'look_up', kgBasic, WalkerDefaultKey_UpRotate);
   CastleKey_DownRotate := TKeyConfiguration.Create('Look down', 'look_down', kgBasic, WalkerDefaultKey_DownRotate);
   CastleKey_HomeUp := TKeyConfiguration.Create('Look straight', 'look_straight', kgBasic, WalkerDefaultKey_HomeUp);
