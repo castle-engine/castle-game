@@ -639,6 +639,9 @@ begin
 
   if Dead then
   begin
+    { Let him rotate freely when he's dead. }
+    Navigator.PreferHomeUpForMoving := false;
+
     Navigator.Key_Jump := K_None;
     Navigator.Key_Crouch := K_None;
     Navigator.Key_UpMove := K_None;
@@ -662,6 +665,8 @@ begin
   begin
     if FlyingMode then
     begin
+      Navigator.PreferHomeUpForMoving := false;
+
       Navigator.Key_Jump := K_None;
       Navigator.Key_Crouch := K_None;
       Navigator.Key_UpMove := CastleKey_UpMove.Value;
@@ -679,6 +684,8 @@ begin
     begin
       if Swimming <> psNo then
       begin
+        Navigator.PreferHomeUpForMoving := false;
+
         Navigator.Key_Jump := K_None;
         Navigator.Key_Crouch := K_None;
         Navigator.Key_UpMove := CastleKey_UpMove.Value;
@@ -695,6 +702,8 @@ begin
         Navigator.MoveVertSpeed := 0.5;
       end else
       begin
+        Navigator.PreferHomeUpForMoving := true;
+
         Navigator.Key_Jump := CastleKey_UpMove.Value;
         Navigator.Key_Crouch := CastleKey_DownMove.Value;
         Navigator.Key_UpMove := K_None;

@@ -6,8 +6,6 @@
   But still it activates too fast when walking on "almost flat" surface,
   like river banks or hills on the "Gate" level ?
 
-- when Flying, turn PreferHomeUp off ?
-
 - when using menu slider, it's too easy to switch to other menu and affect
   other slider. You should be able to affect only the slider that you
   did mouseDown on !
@@ -27,6 +25,8 @@ Eric stage 5 notes:
 - Mouse look would be a great help to climbing the stairs for those that aren't accustomed to keyboard-based upward/downward/look.
 
   Mouse look was requested by both you and Dean and it was actually planned... So it's done now. BTW do you think that by default left/right keys should now be assigned to strafe left/right (instead of turn left/right) ? Assigning them to strafes is more sensible if someone uses mouse look.
+
+  Also flying and swimming feels less awkward, as you fly upwards/downloads just by pressing forward/backward key while looking up/down. Which means that you only need to hold hands over forward/backward keys to fly in full 3D space.
 
 - Sometimes, the player camera "banks" (inclines on the side), apparently when walking on inclines (like near the pond on the outside), though not always.
   (that's dupl of "FallingDownEffect should not activate" above)
