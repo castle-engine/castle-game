@@ -1,28 +1,3 @@
-----------------------------------------
-Eric stage 5 notes:
-- In the menu, you can select with the mouse, but you can't use the mouse to validate the question dialogs.
-
-  Simplest "OK" dialogs now can be dismissed by mouse click anywhere within the dialog box. "Yes"/"No" and other dialogs will have to be still answered by keys --- no time before the 7th May to close this issue correctly (by drawing real clickable buttons for dialogs).
-
-- In the keyboard configuration dialog, it would be preferable if the previous key assignment was just erased (after a yes/no), as it is, you have to hunt to find where the key you want to redefine is used, erase this use to avoid the conflict, and then go back to assign it.
-
-  Good idea, done.
-
-- Mouse look would be a great help to climbing the stairs for those that aren't accustomed to keyboard-based upward/downward/look.
-
-  Mouse look was requested by both you and Dean and it was actually planned... So it's done now. By default left/right keys are now assigned to strafe left/right (instead of turn left/right, as they used to), since assigning them to strafes is more useful if someone uses mouse look.
-
-  Also flying and swimming feels less awkward, as you fly upwards/downloads just by pressing forward/backward key while looking up/down. Which means that you only need to hold hands over forward/backward keys to fly in full 3D space.
-
-- Sometimes, the player camera "banks" (inclines on the side), apparently when walking on inclines (like near the pond on the outside), though not always.
-
-  Yes, this was a little effect (that is activated when you fall down from high) that got a little "out of control" :) Fixed now.
-
-Dean stage 5 notes:
-- I think the addition of mouse look would be a welcome addition to the controls, as it will give the game a more natural feel.
-  (now fixed)
-- A few more enemies in the final levels would also be nice.
-
 --------------------
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.

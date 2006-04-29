@@ -37,8 +37,12 @@ uses Classes, CastleLevel, CastlePlayer, OpenGLFonts;
   and Level will be set to new value. Last Level value should
   be freed by the caller of PlayGame. ALevel upon exit is set to this
   last Level value (global Level value is then set to nil, so it
-  becomes useless). }
-procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer);
+  becomes useless).
+
+  If PrepareNewPlayer then it will call Level.PrepareNewPlayer
+  right before starting the actual game. }
+procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer;
+  PrepareNewPlayer: boolean);
 
 var
   { Currently used player by PlayGame. nil if PlayGame doesn't work
@@ -674,6 +678,18 @@ procedure DoInteract;
     Result := TryInteract(RayVector);
   end;
 
+  function TryInteractAroundSquare(const Change: Integer): boolean;
+  begin
+    Result := TryInteractAround(-Change, -Change) or
+              TryInteractAround(-Change, +Change) or
+              TryInteractAround(+Change, +Change) or
+              TryInteractAround(+Change, -Change) or
+              TryInteractAround(      0, -Change) or
+              TryInteractAround(      0, +Change) or
+              TryInteractAround(-Change,       0) or
+              TryInteractAround(+Change,       0);
+  end;
+
 begin
   if Player.Dead then
   begin
@@ -684,10 +700,10 @@ begin
   { Try to interact with the object in the middle --- if nothing interesting
     there, try to interact with things around the middle. }
   if not TryInteract(Player.Navigator.CameraDir) then
-    if not TryInteractAround(-50, -50) then
-      if not TryInteractAround(-50, +50) then
-        if not TryInteractAround(+50, +50) then
-          if not TryInteractAround(+50, -50) then
+    if not TryInteractAroundSquare(25) then
+      if not TryInteractAroundSquare(50) then
+        if not TryInteractAroundSquare(100) then
+          if not TryInteractAroundSquare(200) then
             Sound(stPlayerInteractFailed);
 end;
 
@@ -974,7 +990,8 @@ begin
     Player.Swimming := psNo;
 end;
 
-procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer);
+procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer;
+  PrepareNewPlayer: boolean);
 var
   SavedMode: TGLMode;
 begin
@@ -1042,6 +1059,9 @@ begin
           glEnable(GL_LIGHTING);
 
           GLWinMessagesTheme.RectColor[3] := 0.4;
+
+          if PrepareNewPlayer then
+            Level.PrepareNewPlayer(Player);
 
           repeat
             Glwm.ProcessMessage(true);

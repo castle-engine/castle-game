@@ -117,8 +117,7 @@ begin
   try
     LocalPlayer := TPlayer.Create;
     try
-      LocalLevel.PrepareNewPlayer(LocalPlayer);
-      PlayGame(LocalLevel, LocalPlayer);
+      PlayGame(LocalLevel, LocalPlayer, true);
     finally FreeAndNil(LocalPlayer) end;
   finally FreeAndNil(LocalLevel) end;
 
@@ -448,7 +447,7 @@ begin
     end;
   Items.Add('Cancel');
 
-  SubMenuTitle := 'Choose start level';
+  SubMenuTitle := 'Choose initial level';
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
