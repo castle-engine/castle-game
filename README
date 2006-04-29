@@ -1,6 +1,15 @@
 "The Castle"
 
 --------------------
+PGD stage 6 short notes:
+
+For maximum safety please remove old configuration file (castle.conf)
+created by stage 5 entry before running this new version. (Everything should
+work smoothly with old config file, but just to be sure...)
+See [http://www.camelot.homedns.org/~michalis/castle.php#subsection_uninstall]
+for location of castle.conf file on your system.
+
+--------------------
 Installing and running:
 
 Note that to hear sounds you should first install OpenAL
