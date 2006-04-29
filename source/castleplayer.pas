@@ -338,6 +338,8 @@ begin
   { MouseLook is turned on always, even when player is dead.
     Just like rotation keys. }
   Navigator.MouseLook := true;
+  { This matches nicely with our footsteps sound. }
+  Navigator.HeadBobbingDistance := 25.0;
 
   HintEscapeKeyShown := false;
 
@@ -682,15 +684,15 @@ begin
         Navigator.Key_UpMove := CastleKey_UpMove.Value;
         Navigator.Key_DownMove := CastleKey_DownMove.Value;
 
-        Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 10;
+        Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
         Navigator.FallingDownSpeedIncrease := 1.0;
         Navigator.HeadBobbing := 0.0;
         if Level <> nil then
           Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01 else
           Navigator.CameraPreferredHeight := 0;
 
-        Navigator.MoveSpeed := 0.3;
-        Navigator.MoveVertSpeed := 0.3;
+        Navigator.MoveSpeed := 0.5;
+        Navigator.MoveVertSpeed := 0.5;
       end else
       begin
         Navigator.Key_Jump := CastleKey_UpMove.Value;

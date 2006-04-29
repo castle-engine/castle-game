@@ -493,7 +493,7 @@ begin
   begin
     FAboveWaterBox := FWaterBox;
     FAboveWaterBox[0, 2] := FWaterBox[1, 2];
-    FAboveWaterBox[1, 2] := FAboveWaterBox[0, 2] + 0.8;
+    FAboveWaterBox[1, 2] := FAboveWaterBox[0, 2] + 0.4;
   end else
   begin
     FWaterBox := EmptyBox3d;

@@ -1,6 +1,12 @@
 ----------------------------------------
 - when walking on flat/almost flat surface, FallingDownEffect should not
   activate.
+  Hmm. Partially fixed. When walking on flat surface --- doesn't occur.
+
+  But still it activates too fast when walking on "almost flat" surface,
+  like river banks or hills on the "Gate" level ?
+
+- when Flying, turn PreferHomeUp off ?
 
 - when using menu slider, it's too easy to switch to other menu and affect
   other slider. You should be able to affect only the slider that you

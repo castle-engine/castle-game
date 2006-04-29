@@ -349,7 +349,7 @@ Levels:
   In other words: just make sure you use
     NavigationInfo {
       avatarSize [ 0.5, 2 ]
-      speed 1.5
+      speed 1.0
       ...
     }
   in your level. And force yourself to design a level that "fits"
