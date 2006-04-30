@@ -64,8 +64,8 @@ var
 
 const
   DefaultCreatureAnimationScenesPerTime = 30;
-  MinCreatureAnimationScenesPerTime = 10;
-  MaxCreatureAnimationScenesPerTime = 50;
+  MinCreatureAnimationScenesPerTime = 5;
+  MaxCreatureAnimationScenesPerTime = 40;
 
 var
   CreatureAnimationScenesPerTime: Cardinal;

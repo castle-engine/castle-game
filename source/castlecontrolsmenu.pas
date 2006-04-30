@@ -28,6 +28,9 @@ uses OpenGLh, CastleGeneralMenu, MatrixNavigation;
 type
   TSubMenu = class(TCastleMenu)
     SubMenuTitle: string;
+    { Note that you can freely change this at runtime. No need to call
+      things like FixItemsAreas or something like that when you change
+      the value of this property. }
     SubMenuAdditionalInfo: string;
     constructor Create;
     procedure Draw; override;
@@ -467,7 +470,7 @@ end;
 procedure InitGLW(Glwin: TGLWindow);
 begin
   if GLList_DrawFadeRect = 0 then
-    GLList_DrawFadeRect := glGenLists(1);
+    GLList_DrawFadeRect := glGenListsCheck(1, 'CastleControlsMenu.InitGLW');
   glNewList(GLList_DrawFadeRect, GL_COMPILE);
   try
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

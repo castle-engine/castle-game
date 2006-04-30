@@ -56,6 +56,7 @@ type
     TextureMinificationQualitySlider: TGLMenuIntegerSlider;
     AllowScreenResizeArgument: TGLMenuItemArgument;
     RenderShadowsArgument: TGLMenuItemArgument;
+    CreatureAnimationSlider: TGLMenuIntegerSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -218,6 +219,10 @@ end;
 
 { TVideoMenu ------------------------------------------------------------- }
 
+const
+  SRestartTheGame = 'You have to restart the game for the ' +
+    'new "Creature animation smoothness" settings to take effect.';
+
 constructor TVideoMenu.Create;
 begin
   inherited Create;
@@ -232,10 +237,17 @@ begin
     TGLMenuItemArgument.TextWidth('WWW'));
   RenderShadowsArgument.Value := BoolToStrYesNo[RenderShadows];
 
+  CreatureAnimationSlider := TGLMenuIntegerSlider.Create(
+    MinCreatureAnimationScenesPerTime,
+    MaxCreatureAnimationScenesPerTime,
+    CreatureAnimationScenesPerTime);
+
   Items.Add('View video information');
   Items.AddObject('Texture quality', TextureMinificationQualitySlider);
   Items.AddObject('Allow screen resize on startup', AllowScreenResizeArgument);
   Items.AddObject('Shadows', RenderShadowsArgument);
+  Items.AddObject('Creature animation smoothness', CreatureAnimationSlider);
+  Items.Add('Restore to defaults');
   Items.Add('Back to main menu');
 
   { Resigned ideas for menu options:
@@ -249,19 +261,9 @@ begin
       will really look too bad to be sensible.
 
     - Creature animation smoothness
-      Resigned. I actually implemented it:
+      I actually implemented it.
 
-        CreatureAnimationSlider: TGLMenuIntegerSlider;
-        CreatureAnimationSlider := TGLMenuIntegerSlider.Create(
-          MinCreatureAnimationScenesPerTime,
-          MaxCreatureAnimationScenesPerTime,
-          CreatureAnimationScenesPerTime);
-        Items.AddObject('Creature animation smoothness', CreatureAnimationSlider);
-        2: CreatureAnimationScenesPerTime := CreatureAnimationSlider.Value;
-
-      But I removed this implementation (ConfigFile setting stays,
-      so it's kind of a "hidden setting" that user can change
-      by manually editing .castle.conf file). Why ?
+      But I don't like this implementation. Why ?
 
       1. CastleCreatures implementation requires that the
          program must be restarted for new CreatureAnimationScenesPerTime
@@ -274,6 +276,8 @@ begin
   }
 
   SubMenuTitle := 'Video options';
+
+  SubMenuAdditionalInfo := '';
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
@@ -321,7 +325,46 @@ begin
                'You have been warned!', taLeft);
          end;
        end;
-    4: CurrentMenu := MainMenu;
+    4: ;
+    5: begin
+         AllowScreenResize := DefaultAllowScreenResize;
+         AllowScreenResizeArgument.Value := AllowScreenResizeToStr[AllowScreenResize];
+
+         RenderShadows := DefaultRenderShadows;
+         RenderShadowsArgument.Value := BoolToStrYesNo[RenderShadows];
+
+         TextureMinificationQuality := DefaultTextureMinificationQuality;
+         TextureMinificationQualitySlider.Value := Ord(TextureMinificationQuality);
+
+         if CreatureAnimationScenesPerTime <> DefaultCreatureAnimationScenesPerTime then
+         begin
+           CreatureAnimationScenesPerTime := DefaultCreatureAnimationScenesPerTime;
+
+           { TODO: FPC bug below ?
+             When I change below DefaultCreatureAnimationScenesPerTime
+             to CreatureAnimationScenesPerTime, the assignment below doesn't
+             work anymore. Doing
+               Writeln('Should be ', CreatureAnimationScenesPerTime);
+             suddenly makes the assigment working.
+
+             Steps to reproduce : run the game, change the slider value
+             using mouse, press "Reset to defaults" and see if the slider
+             is drawn back with default value.
+
+             Happens only with FPC 2.0.2 (or 2.0.3 from 2006/03/26)
+             with -dRELEASE on Linux.
+             With -dDEBUG doesn't happen.
+             On Win32 with -dRELEASE doesn't happen. }
+
+           CreatureAnimationSlider.Value := DefaultCreatureAnimationScenesPerTime;
+           SubMenuAdditionalInfo := SRestartTheGame;
+         end;
+
+         SomethingChanged;
+
+         MessageOK(Glw, 'All video settings restored to defaults.', taLeft);
+       end;
+    6: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -331,6 +374,14 @@ begin
   case CurrentItem of
     1: TextureMinificationQuality :=
       TTextureMinificationQuality(TextureMinificationQualitySlider.Value);
+    4: begin
+         if CreatureAnimationScenesPerTime <> CreatureAnimationSlider.Value then
+         begin
+           CreatureAnimationScenesPerTime := CreatureAnimationSlider.Value;
+           SubMenuAdditionalInfo := 'You have to restart the game for the ' +
+             'new "Creature animation smoothness" settings to take effect.';
+         end;
+       end;
   end;
 end;
 

@@ -59,7 +59,7 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   Creature's CameraRadius is a hack, and should be preferably removed.
   Same thing for items<->level.
 
-- "Restore defaults" in Video and Sound options.
+- "Restore defaults" in Sound options.
 
 - Eric stage 4 comment:
   - you can also get "stuck" when colliding against a wall, instead of sliding.

@@ -1145,7 +1145,7 @@ var
   I: Integer;
 begin
   { Calculate GLList_Draw2dBegin }
-  GLList_Draw2dBegin := glGenLists(1);
+  GLList_Draw2dBegin := glGenListsCheck(1, 'CastlePlay.GLWindowInit');
   glNewList(GLList_Draw2dBegin, GL_COMPILE);
   try
     glLoadIdentity;

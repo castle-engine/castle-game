@@ -523,7 +523,7 @@ var
 begin
   if FGLList_DrawScreenImage = 0 then
   begin
-    FGLList_DrawScreenImage := glGenLists(1);
+    FGLList_DrawScreenImage := glGenListsCheck(1, 'TItemWeaponKind.GLList_DrawScreenImage');
     glNewList(FGLList_DrawScreenImage, GL_COMPILE);
     try
       if ScreenImageAlignLeft then

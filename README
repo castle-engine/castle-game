@@ -411,7 +411,7 @@ Levels:
     that is a little special. It's geometry is considered
     infinte (every 3D point belongs to it, if it doesn't belong to any
     of the explicitly defined scetors). VisibleSectors
-    is treated like filled with values "true"(so all other sectors
+    is treated like filled with values "true" (so all other sectors
     are assumed to be visible).
 
     For programmers: SectorWithPoint returns nil when no sector found,
@@ -422,14 +422,14 @@ Levels:
   - Sectors and waypoints are used for 2 things:
 
     1. To speed up rendering: When player's CameraPos is within
-       a given sector (not -1), we have to render only the sectors
+       a given sector (not nil), we have to render only the sectors
        for which VisibleSectors is true.
        TODO: right now it's not used for to speed up rendering,
        and VisibleSectors is ignored.
 
     2. To make creature moving AI more intelligent:
        If a creature wants to move from SectionBegin to SectorEnd,
-       and SectionBegin <> SectorEnd (and none of them is -1),
+       and SectionBegin <> SectorEnd (and none of them is nil),
        creature knows that it must pass through appropriate waypoints.
 
     It's assumed that there will not be too many sectors on the level

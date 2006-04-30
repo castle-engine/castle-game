@@ -980,7 +980,7 @@ begin
   { Calculate GLList_DrawFadeRect }
 
   if GLList_DrawFadeRect = 0 then
-    GLList_DrawFadeRect := glGenLists(1);
+    GLList_DrawFadeRect := glGenListsCheck(1, 'TGLMenu.FixItemsAreas');
   glNewList(GLList_DrawFadeRect, GL_COMPILE);
   try
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

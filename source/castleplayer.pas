@@ -1104,7 +1104,7 @@ begin
   GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
   GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
 
-  GLList_DrawWaterRect := glGenLists(1);
+  GLList_DrawWaterRect := glGenListsCheck(1, 'CastlePlayer.GLWindowInit');
   glNewList(GLList_DrawWaterRect, GL_COMPILE);
   try
     glPushAttrib(GL_COLOR_BUFFER_BIT or GL_CURRENT_BIT);
