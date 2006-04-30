@@ -106,6 +106,7 @@ begin
           WarningWrite('Can''t change display settings to ' +
             RequiredScreenSize + '. Will continue in windowed mode.');
           Glw.FullScreen := false;
+          AllowScreenResize := false;
         end;
     end;
   end;
