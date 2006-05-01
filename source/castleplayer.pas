@@ -340,8 +340,9 @@ begin
   Navigator.MouseLook := true;
   { This matches nicely with our footsteps sound. }
   Navigator.HeadBobbingDistance := 25.0;
-  Navigator.MaxJumpHeight := 4.0;
-  Navigator.JumpSpeedMultiply := 4.0;
+  Navigator.MaxJumpHeight := 2.0;
+  Navigator.JumpSpeedMultiply := 2.0;
+  Navigator.JumpPower := 0.9;
 
   HintEscapeKeyShown := false;
 

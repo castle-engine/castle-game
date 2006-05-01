@@ -418,6 +418,11 @@ procedure TDebugMenu.CurrentItemSelected;
     if MessageInputQuerySingle(Glw,
       'Change Player.Navigator.JumpSpeedMultiply', SingleValue, taLeft) then
       Player.Navigator.JumpSpeedMultiply := SingleValue;
+
+    SingleValue := Player.Navigator.JumpPower;
+    if MessageInputQuerySingle(Glw,
+      'Change Player.Navigator.JumpPower', SingleValue, taLeft) then
+      Player.Navigator.JumpPower := SingleValue;
   end;
 
 begin
