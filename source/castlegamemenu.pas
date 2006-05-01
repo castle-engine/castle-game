@@ -70,7 +70,7 @@ type
   end;
 
   TEditLevelLightsMenu = class(TCastleMenu)
-    procedure RefreshItems;
+    constructor Create;
     procedure CurrentItemSelected; override;
   end;
 
@@ -429,7 +429,8 @@ begin
     11: ChangeToLevel;
     12: ChangeSoundProperties;
     13: begin
-          EditLevelLightsMenu.RefreshItems;
+          FreeAndNil(EditLevelLightsMenu);
+          EditLevelLightsMenu := TEditLevelLightsMenu.Create;
           CurrentMenu := EditLevelLightsMenu;
         end;
     14: CurrentMenu := GameMenu;
@@ -454,12 +455,13 @@ end;
 
 { TEditLevelLightsMenu ------------------------------------------------------- }
 
-procedure TEditLevelLightsMenu.RefreshItems;
+constructor TEditLevelLightsMenu.Create;
 var
   I: Integer;
   LightNode: TNodeGeneralLight;
 begin
-  Items.Clear;
+  inherited Create;
+
   for I := 0 to Level.LightSet.Lights.High do
   begin
     LightNode := Level.LightSet.Lights[I].LightNode;
@@ -500,6 +502,8 @@ end;
 constructor TEditOneLightMenu.Create(ALight: TNodeGeneralLight);
 begin
   inherited Create;
+
+  DrawBackgroundRectangle := false;
 
   Light := ALight;
 
@@ -740,7 +744,6 @@ begin
   GameMenu := TGameMenu.Create;
   DebugMenu := TDebugMenu.Create;
   GameSoundMenu := TGameSoundMenu.Create;
-  EditLevelLightsMenu := TEditLevelLightsMenu.Create;
   CurrentMenu := GameMenu;
 end;
 

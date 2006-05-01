@@ -1,4 +1,5 @@
-- check mouse smoothness problems with -dRELEASE on win32
+- life indicator of the boss --- this should be a good workaround for lack
+  of blood effects etc. for now.
 
 --------------------
 Stage 6:
