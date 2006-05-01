@@ -25,7 +25,7 @@ program castle;
 uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   ParseParametersUnit, GLWinMessages, KambiGLUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
-  KambiClassUtils, CastleVideoOptions;
+  KambiClassUtils, CastleVideoOptions, CastleInitialBackground;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -130,10 +130,10 @@ begin
 
   { init OpenAL (after initing Glw and Progress, because ALContextInit
     wants to display progress of "Loading sounds") }
-  DrawInitializationBackground;
+  DrawInitialBackground;
   ALContextInit(WasParam_NoSound);
   try
-    ShowStartMenu;
+    ShowStartMenu(Glw.OnDraw);
   finally
     ALContextClose;
   end;

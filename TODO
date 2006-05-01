@@ -1,3 +1,5 @@
+- bug (after new menu): enter game menu, choose "view messages" (on "show all creatures" --- anything with MessageOK), close with mouse... and things got broken. after "esc" and returning to game, looks like part of the rendering went only to back buffer ?!?!
+
 --------------------
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.

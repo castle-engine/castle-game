@@ -23,17 +23,17 @@ unit CastleChooseMenu;
 
 interface
 
-uses Classes, OpenGLh;
+uses Classes, GLWindow, OpenGLh;
 
 { Allows user to choose one item from MenuItems.
-  Displays menu using TCastleMenu with AGLList_ScreenImage background. }
-function ChooseByMenu(AGLList_ScreenImage: TGLuint;
+  Displays menu using TCastleMenu with ADrawUnderMenu background. }
+function ChooseByMenu(ADrawUnderMenu: TDrawFunc;
   MenuItems: TStringList): Integer;
 
 implementation
 
-uses SysUtils, GLWindow, GLWinModes, KambiGLUtils, CastleKeys, GLWinMessages,
-  CastleWindow, CastleGeneralMenu, CastlePlay;
+uses SysUtils, GLWinModes, KambiGLUtils, CastleKeys, GLWinMessages,
+  CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath;
 
 var
   Selected: boolean;
@@ -55,21 +55,25 @@ end;
 { global things -------------------------------------------------------------- }
 
 var
-  GLList_ScreenImage: TGLuint;
+  DrawUnderMenu: TDrawFunc;
   ChooseMenu: TChooseMenu;
 
-procedure Resize(Glwin: TGLWindow);
+procedure Draw2d(Draw2DData: Integer);
 begin
-  ProjectionGLOrtho(0, Glwin.Width, 0, Glwin.Height);
+  glLoadIdentity;
+  glRasterPos2i(0, 0);
+  ChooseMenu.Draw;
 end;
 
 procedure Draw(Glwin: TGLWindow);
 begin
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
-  glCallList(GLList_ScreenImage);
+  DrawUnderMenu(Glwin);
 
-  ChooseMenu.Draw;
+  glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    ProjectionGLPushPop(Draw2d, 0, Ortho2dProjMatrix(
+      0, RequiredScreenWidth, 0, RequiredScreenHeight));
+  glPopAttrib;
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
@@ -107,21 +111,23 @@ begin
   MessageOK(Glwin, 'You can''t exit now.');
 end;
 
-function ChooseByMenu(AGLList_ScreenImage: TGLuint;
+function ChooseByMenu(ADrawUnderMenu: TDrawFunc;
   MenuItems: TStringList): Integer;
 var
   SavedMode: TGLMode;
 begin
-  GLList_ScreenImage := AGLList_ScreenImage;
+  DrawUnderMenu := ADrawUnderMenu;
 
   ChooseMenu.Items.Assign(MenuItems);
   ChooseMenu.FixItemsAreas(Glw.Width, Glw.Height);
 
-  SavedMode := TGLMode.Create(Glw, GL_ENABLE_BIT, true);
+  SavedMode := TGLMode.Create(Glw, 0, true);
   try
     SavedMode.FakeMouseDown := false;
+    { This shouldn't change projection matrix anyway. }
+    SavedMode.RestoreProjectionMatrix := false;
 
-    SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
+    SetStandardGLWindowState(Glw, Draw, CloseQuery, Glw.OnResize,
       nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
       false, K_None, #0, false, false);
 
@@ -131,15 +137,11 @@ begin
     Glw.OnMouseMove := MouseMove;
     Glw.OnIdle := Idle;
 
-    Glw.EventResize;
-
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
     GLWinMessagesTheme.RectColor[3] := 1.0;
 
     Selected := false;
-
-    glDisable(GL_LIGHTING);
 
     repeat
       Glwm.ProcessMessage(true);

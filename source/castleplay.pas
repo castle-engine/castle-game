@@ -860,12 +860,8 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
   end;
 
   procedure DoGameMenu;
-  var
-    ViewAngleChanged: boolean;
   begin
-    ShowGameMenu(ViewAngleChanged);
-    if ViewAngleChanged then
-      Glwin.EventResize;
+    ShowGameMenu(Draw);
   end;
 
 begin

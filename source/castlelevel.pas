@@ -384,6 +384,15 @@ type
     class function Number: Integer; override;
   end;
 
+  TCagesLevel = class(TLevel)
+  public
+    class function SceneFileName: string; override;
+    class function LightSetFileName: string; override;
+
+    class function Title: string; override;
+    class function Number: Integer; override;
+  end;
+
   TLevelAvailable = class
   public
     LevelClass: TLevelClass;
@@ -1253,6 +1262,28 @@ begin
   Result := 99;
 end;
 
+{ TCagesLevel ---------------------------------------------------------------- }
+
+class function TCagesLevel.SceneFileName: string;
+begin
+  Result := 'cages/cages_final.wrl';
+end;
+
+class function TCagesLevel.LightSetFileName: string;
+begin
+  Result := 'cages/cages_lights.wrl';
+end;
+
+class function TCagesLevel.Title: string;
+begin
+  Result := 'Cages';
+end;
+
+class function TCagesLevel.Number: Integer;
+begin
+  Result := 3;
+end;
+
 { TLevelsAvailableList ------------------------------------------------------- }
 
 procedure TLevelsAvailableList.AddLevelClass(LevelClass: TLevelClass;
@@ -1317,6 +1348,7 @@ initialization
   LevelsAvailable.AddLevelClass(TGateLevel, true);
   LevelsAvailable.AddLevelClass(TCastleHallLevel);
   LevelsAvailable.AddLevelClass(TTowerLevel);
+  LevelsAvailable.AddLevelClass(TCagesLevel);
   LevelsAvailable.LoadFromConfig;
 finalization
   LevelsAvailable.SaveToConfig;

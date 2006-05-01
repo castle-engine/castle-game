@@ -23,7 +23,7 @@ unit CastleControlsMenu;
 
 interface
 
-uses OpenGLh, CastleGeneralMenu, MatrixNavigation;
+uses GLWindow, OpenGLh, CastleGeneralMenu, MatrixNavigation;
 
 type
   TSubMenu = class(TCastleMenu)
@@ -36,7 +36,7 @@ type
     procedure Draw; override;
   end;
 
-procedure ShowControlsMenu(AGLList_ScreenImage: TGLuint;
+procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
   ADrawFadeRect, ADrawCentered: boolean);
 
 var
@@ -47,7 +47,7 @@ var
 
 implementation
 
-uses SysUtils, GLWindow, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
+uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
   GLMenu, OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit,
   OpenGLFonts, CastleKeys, Keys, VectorMath, KambiUtils, CastlePlay,
   CastleConfig, KambiStringUtils;
@@ -365,26 +365,31 @@ const
   WholeAreaY1 = 450;
 
 var
-  GLList_ScreenImage: TGLuint;
+  DrawUnderMenu: TDrawFunc;
   DrawFadeRect: boolean;
   GLList_DrawFadeRect: TGLuint;
   MoveX, MoveY: Single;
 
-procedure Resize(Glwin: TGLWindow);
-begin
-  ProjectionGLOrtho(0, Glwin.Width, 0, Glwin.Height);
-end;
-
-procedure Draw(Glwin: TGLWindow);
+procedure Draw2d(Draw2DData: Integer);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
-  glCallList(GLList_ScreenImage);
 
   glTranslatef(MoveX, MoveY, 0);
   if DrawFadeRect then
     glCallList(GLList_DrawFadeRect);
   CurrentMenu.Draw;
+end;
+
+procedure Draw(Glwin: TGLWindow);
+begin
+  DrawUnderMenu(Glwin);
+
+  glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    ProjectionGLPushPop(Draw2d, 0, Ortho2dProjMatrix(
+      0, RequiredScreenWidth, 0, RequiredScreenHeight));
+  glPopAttrib;
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
@@ -422,12 +427,12 @@ begin
   MessageOK(Glwin, 'You can''t exit now.');
 end;
 
-procedure ShowControlsMenu(AGLList_ScreenImage: TGLuint;
+procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
   ADrawFadeRect, ADrawCentered: boolean);
 var
   SavedMode: TGLMode;
 begin
-  GLList_ScreenImage := AGLList_ScreenImage;
+  DrawUnderMenu := ADrawUnderMenu;
   DrawFadeRect := ADrawFadeRect;
 
   if ADrawCentered then
@@ -443,8 +448,10 @@ begin
   SavedMode := TGLMode.Create(glw, 0, false);
   try
     SavedMode.FakeMouseDown := false;
+    { This shouldn't change projection matrix anyway. }
+    SavedMode.RestoreProjectionMatrix := false;
 
-    SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
+    SetStandardGLWindowState(Glw, Draw, CloseQuery, Glw.OnResize,
       nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
       false, K_None, #0, false, false);
 
@@ -453,8 +460,6 @@ begin
     Glw.OnMouseUp := MouseUp;
     Glw.OnMouseMove := MouseMove;
     Glw.OnIdle := Idle;
-
-    Glw.EventResize;
 
     UserQuit := false;
 

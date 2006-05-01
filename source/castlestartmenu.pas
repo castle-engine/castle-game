@@ -23,15 +23,15 @@ unit CastleStartMenu;
 
 interface
 
-procedure DrawInitializationBackground;
+uses GLWindow;
 
 { Show menu, ask user what to do, do what the user wants
   (e.g. load level and call PlayGame), when user wants to quit -- return. }
-procedure ShowStartMenu;
+procedure ShowStartMenu(ADrawUnderMenu: TDrawFunc);
 
 implementation
 
-uses SysUtils, Classes, KambiUtils, GLWindow, GLWinModes,
+uses SysUtils, Classes, KambiUtils, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
@@ -96,7 +96,7 @@ var
   SoundMenu: TSoundMenu;
   ChooseNewLevelMenu: TChooseNewLevelMenu;
   ChangeOpenALDeviceMenu: TChangeOpenALDeviceMenu;
-  GLList_ScreenImage: TGLuint;
+  DrawUnderMenu: TDrawFunc;
 
 { NewGame ------------------------------------------------------------- }
 
@@ -191,7 +191,7 @@ begin
 
   case CurrentItem of
     0: ChooseNewGame;
-    1: ShowControlsMenu(GLList_ScreenImage, false, false);
+    1: ShowControlsMenu(DrawUnderMenu, false, false);
     2: CurrentMenu := VideoMenu;
     3: CurrentMenu := SoundMenu;
     4: ShowCreditsMessage;
@@ -521,17 +521,22 @@ end;
 
 { global things -------------------------------------------------------------- }
 
-procedure Resize(Glwin: TGLWindow);
+procedure Draw2d(Draw2DData: Integer);
 begin
-  ProjectionGLOrtho(0, Glwin.Width, 0, Glwin.Height);
+  glLoadIdentity;
+  glRasterPos2i(0, 0);
+  CurrentMenu.Draw;
 end;
 
 procedure Draw(Glwin: TGLWindow);
 begin
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
-  glCallList(GLList_ScreenImage);
-  CurrentMenu.Draw;
+  DrawUnderMenu(Glwin);
+
+  glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    ProjectionGLPushPop(Draw2d, 0, Ortho2dProjMatrix(
+      0, RequiredScreenWidth, 0, RequiredScreenHeight));
+  glPopAttrib;
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
@@ -570,33 +575,21 @@ begin
     UserQuit := true;
 end;
 
-procedure DoDrawInitializationBackground(Glwin: TGLWindow);
-begin
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
-  glCallList(GLList_ScreenImage);
-end;
-
-procedure DrawInitializationBackground;
-begin
-  Glw.OnResize := Resize;
-  Glw.OnDraw := DoDrawInitializationBackground;
-  Glw.EventResize;
-  Glw.PostRedisplay;
-  Glw.FlushRedisplay;
-end;
-
-procedure ShowStartMenu;
+procedure ShowStartMenu(ADrawUnderMenu: TDrawFunc);
 var
   SavedMode: TGLMode;
 begin
+  DrawUnderMenu := ADrawUnderMenu;
+
   MusicPlayer.PlayedSound := stIntroMusic;
   try
     SavedMode := TGLMode.Create(glw, 0, false);
     try
       SavedMode.FakeMouseDown := false;
+      { This shouldn't change projection matrix anyway. }
+      SavedMode.RestoreProjectionMatrix := false;
 
-      SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
+      SetStandardGLWindowState(Glw, Draw, CloseQuery, Glw.OnResize,
         nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
         false, K_None, #0, false, false);
 
@@ -605,8 +598,6 @@ begin
       Glw.OnMouseUp := MouseUp;
       Glw.OnMouseMove := MouseMove;
       Glw.OnIdle := Idle;
-
-      Glw.EventResize;
 
       UserQuit := false;
 
@@ -622,10 +613,6 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  GLList_ScreenImage := LoadImageToDispList(ProgramDataPath + 'data' +
-    PathDelim + 'menu_bg' + PathDelim + 'menu_bg.png',
-    [TRGBImage], [], Glw.Width, Glw.Height);
-
   MainMenu := TMainMenu.Create;
   VideoMenu := TVideoMenu.Create;
   SoundMenu := TSoundMenu.Create;

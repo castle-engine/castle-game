@@ -23,11 +23,13 @@ unit CastleGameMenu;
 
 interface
 
-procedure ShowGameMenu(out AViewAngleChanged: boolean);
+uses GLWindow;
+
+procedure ShowGameMenu(ADrawUnderMenu: TDrawFunc);
 
 implementation
 
-uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWindow, GLWinModes,
+uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
@@ -72,12 +74,11 @@ type
 
 var
   UserQuit: boolean;
-  GLList_ScreenImage: TGLuint;
+  DrawUnderMenu: TDrawFunc;
   CurrentMenu: TCastleMenu;
   GameMenu: TGameMenu;
   DebugMenu: TDebugMenu;
   GameSoundMenu: TGameSoundMenu;
-  ViewAngleChanged: boolean;
 
 { TGameMenu ------------------------------------------------------------ }
 
@@ -102,7 +103,7 @@ begin
   case CurrentItem of
     0: UserQuit := true;
     1: ViewGameMessages;
-    2: ShowControlsMenu(GLList_ScreenImage, true, true);
+    2: ShowControlsMenu(DrawUnderMenu, true, true);
     3: CurrentMenu := GameSoundMenu;
     4: { At first I did here GameCancel(false), but tests (with Mama)
          show that it's too easy to select this and accidentaly
@@ -248,7 +249,7 @@ procedure TDebugMenu.CurrentItemSelected;
       for I := 0 to CreaturesKinds.High do
         S.Append('Creature ' + CreaturesKinds[I].VRMLNodeName);
       S.Append('Cancel');
-      ResultIndex := ChooseByMenu(GLList_ScreenImage, S);
+      ResultIndex := ChooseByMenu(DrawUnderMenu, S);
       Result := ResultIndex <> CreaturesKinds.High + 1;
       if Result then
         ChooseCreature := CreaturesKinds[ResultIndex];
@@ -328,7 +329,7 @@ procedure TDebugMenu.CurrentItemSelected;
       end;
       S.Append('Cancel');
 
-      Index := ChooseByMenu(GLList_ScreenImage, S);
+      Index := ChooseByMenu(DrawUnderMenu, S);
 
       if Index <> LevelsAvailable.Count then
       begin
@@ -422,7 +423,8 @@ begin
   case CurrentItem of
     5: begin
          ViewAngleDegX := ViewAngleSlider.Value;
-         ViewAngleChanged := true;
+         { After changing ViewAngleDegX, game's OnResize must be called. }
+         Glw.EventResize;
        end;
     6: Player.Navigator.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
     7: Player.Navigator.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
@@ -433,18 +435,22 @@ end;
 
 { global things -------------------------------------------------------------- }
 
-procedure Resize(Glwin: TGLWindow);
+procedure Draw2d(Draw2DData: Integer);
 begin
-  ProjectionGLOrtho(0, Glwin.Width, 0, Glwin.Height);
+  glLoadIdentity;
+  glRasterPos2i(0, 0);
+  CurrentMenu.Draw;
 end;
 
 procedure Draw(Glwin: TGLWindow);
 begin
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
-  glCallList(GLList_ScreenImage);
+  DrawUnderMenu(Glwin);
 
-  CurrentMenu.Draw;
+  glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    ProjectionGLPushPop(Draw2d, 0, Ortho2dProjMatrix(
+      0, RequiredScreenWidth, 0, RequiredScreenHeight));
+  glPopAttrib;
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
@@ -485,11 +491,11 @@ begin
   GameCancel(true);
 end;
 
-procedure ShowGameMenu(out AViewAngleChanged: boolean);
+procedure ShowGameMenu(ADrawUnderMenu: TDrawFunc);
 var
   SavedMode: TGLMode;
 begin
-  ViewAngleChanged := false;
+  DrawUnderMenu := ADrawUnderMenu;
 
   DebugMenu.RotationHorizontalSpeedSlider.Value :=
     Player.Navigator.RotationHorizontalSpeed;
@@ -500,41 +506,36 @@ begin
   GameSoundMenu.SoundVolumeSlider.Value := SoundVolume;
   GameSoundMenu.MusicVolumeSlider.Value := MusicVolume;
 
-  GLList_ScreenImage := Glw.SaveScreenToDispList;
+  SavedMode := TGLMode.Create(Glw, 0, true);
   try
-    SavedMode := TGLMode.Create(Glw, GL_ENABLE_BIT, true);
-    try
-      SavedMode.FakeMouseDown := false;
+    SavedMode.FakeMouseDown := false;
+    { This is needed, because when changing ViewAngleDegX we will call
+      Glw.OnResize to set new projection matrix, and this
+      new projection matrix should stay for the game. }
+    SavedMode.RestoreProjectionMatrix := false;
 
-      SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
-        nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
-        false, K_None, #0, false, false);
+    SetStandardGLWindowState(Glw, Draw, CloseQuery, Glw.OnResize,
+      nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
+      false, K_None, #0, false, false);
 
-      { Otherwise messages don't look good, because the text is mixed
-        with the menu text. }
-      GLWinMessagesTheme.RectColor[3] := 1.0;
+    { Otherwise messages don't look good, because the text is mixed
+      with the menu text. }
+    GLWinMessagesTheme.RectColor[3] := 1.0;
 
-      Glw.OnKeyDown := KeyDown;
-      Glw.OnMouseDown := MouseDown;
-      Glw.OnMouseUp := MouseUp;
-      Glw.OnMouseMove := MouseMove;
-      Glw.OnIdle := Idle;
+    Glw.OnKeyDown := KeyDown;
+    Glw.OnMouseDown := MouseDown;
+    Glw.OnMouseUp := MouseUp;
+    Glw.OnMouseMove := MouseMove;
+    Glw.OnIdle := Idle;
 
-      Glw.EventResize;
+    CurrentMenu := GameMenu;
+    UserQuit := false;
 
-      CurrentMenu := GameMenu;
-      UserQuit := false;
+    repeat
+      Glwm.ProcessMessage(true);
+    until GameEnded or UserQuit;
 
-      glDisable(GL_LIGHTING);
-
-      repeat
-        Glwm.ProcessMessage(true);
-      until GameEnded or UserQuit;
-
-    finally FreeAndNil(SavedMode); end;
-  finally glFreeDisplayList(GLList_ScreenImage); end;
-
-  AViewAngleChanged := ViewAngleChanged;
+  finally FreeAndNil(SavedMode); end;
 end;
 
 { initialization / finalization ---------------------------------------------- }
