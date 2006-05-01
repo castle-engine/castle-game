@@ -1,0 +1,33 @@
+#VRML V1.0 ascii
+
+Group{
+  Separator {
+    Rotation { rotation 1 0 0 1.57 }
+    Background {
+      backUrl "../skies/sky_back.png"
+      bottomUrl "../skies/sky_bottom.png"
+      frontUrl "../skies/sky_front.png"
+      leftUrl "../skies/sky_left.png"
+      rightUrl "../skies/sky_right.png"
+      topUrl "../skies/sky_top.png"
+    }
+  }
+
+  NavigationInfo {
+    avatarSize [ 0.5, 2 ]
+    speed 1.0
+    headlight TRUE
+  }
+
+  PerspectiveCamera {
+    position -1.3881112099 -94.8213851929 -0.8746259093
+    orientation 0.999027609825134 0.031415648758411 0.030929347500205 1.571789145469666
+  }
+
+#   Fog {
+#     color 0.6 0.6 0.6
+#     visibilityRange 200
+#   }
+
+  WWWInline { name "basic_castle.wrl" }
+}

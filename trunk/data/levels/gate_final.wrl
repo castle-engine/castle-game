@@ -1,0 +1,41 @@
+#VRML V1.0 ascii
+
+Group {
+  # Just for testing lights from view3dscene
+  # WWWInline { name "gate_lights.wrl" separate FALSE }
+
+  PerspectiveCamera {
+    position 205.94734191894531 -320.15972900390625 1.816442251205444
+    orientation 0.83828604221344 0.38553649187088 0.385536462068558 1.746284484863281
+  }
+
+  NavigationInfo {
+    avatarSize [ 0.5, 2 ]
+    speed 1.0
+    headlight FALSE
+  }
+
+  Separator {
+    Rotation { rotation 1 0 0 1.57 }
+
+    Background {
+      backUrl "../skies/sky_back.png"
+      bottomUrl "../skies/sky_bottom.png"
+      frontUrl "../skies/sky_front.png"
+      leftUrl "../skies/sky_left.png"
+      rightUrl "../skies/sky_right.png"
+      topUrl "../skies/sky_top.png"
+    }
+  }
+
+  Fog {
+    color 0.6 0.6 0.6
+    fogType "LINEAR"
+    volumetric TRUE
+    volumetricDirection 0 0 -1
+    volumetricVisibilityStart -30
+    visibilityRange 50
+  }
+
+  WWWInline { name "gate_processed.wrl" }
+}

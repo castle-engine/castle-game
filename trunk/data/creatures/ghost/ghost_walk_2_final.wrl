@@ -1,0 +1,6 @@
+#VRML V1.0 ascii
+
+Group {
+  WWWInline { name "ghost_header.wrl" separate FALSE }
+  WWWInline { name "ghost_walk_2.wrl" }
+}
