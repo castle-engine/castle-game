@@ -215,6 +215,7 @@ begin
   Items.Add('Change to level');
   Items.Add('Change sound properties');
   Items.Add('Edit level lights');
+  Items.Add('Change jump properties');
   Items.Add('Back to game menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -404,6 +405,21 @@ procedure TDebugMenu.CurrentItemSelected;
     finally S.Free end;
   end;
 
+  procedure ChangeJumpProperties;
+  var
+    SingleValue: Single;
+  begin
+    SingleValue := Player.Navigator.MaxJumpHeight;
+    if MessageInputQuerySingle(Glw,
+      'Change Player.Navigator.MaxJumpHeight', SingleValue, taLeft) then
+      Player.Navigator.MaxJumpHeight := SingleValue;
+
+    SingleValue := Player.Navigator.JumpSpeedMultiply;
+    if MessageInputQuerySingle(Glw,
+      'Change Player.Navigator.JumpSpeedMultiply', SingleValue, taLeft) then
+      Player.Navigator.JumpSpeedMultiply := SingleValue;
+  end;
+
 begin
   inherited;
 
@@ -433,7 +449,8 @@ begin
           EditLevelLightsMenu := TEditLevelLightsMenu.Create;
           CurrentMenu := EditLevelLightsMenu;
         end;
-    14: CurrentMenu := GameMenu;
+    14: ChangeJumpProperties;
+    15: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
