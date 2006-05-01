@@ -58,7 +58,7 @@ type
   TControlsMenu = class(TSubMenu)
     MouseLookHorizontalSensitivitySlider: TGLMenuFloatSlider;
     MouseLookVerticalSensitivitySlider: TGLMenuFloatSlider;
-    AutoOpenInventoryArgument: TGLMenuItemArgument;
+    AutoOpenInventoryArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -148,9 +148,7 @@ begin
     0.01, 0.3, MouseLookHorizontalSensitivity);
   MouseLookVerticalSensitivitySlider := TGLMenuFloatSlider.Create(
     0.01, 0.3, MouseLookVerticalSensitivity);
-  AutoOpenInventoryArgument := TGLMenuItemArgument.Create(
-    TGLMenuItemArgument.TextWidth('WWW'));
-  AutoOpenInventoryArgument.Value := BoolToStrYesNo[AutoOpenInventory];
+  AutoOpenInventoryArgument := TGLMenuBooleanArgument.Create(AutoOpenInventory);
 
   Items.Add('Configure basic controls');
   Items.Add('Configure items controls');
@@ -181,7 +179,7 @@ begin
     4: ;
     5: begin
          AutoOpenInventory := not AutoOpenInventory;
-         AutoOpenInventoryArgument.Value := BoolToStrYesNo[AutoOpenInventory];
+         AutoOpenInventoryArgument.Value := AutoOpenInventory;
        end;
     6: begin
          CastleAllKeys.RestoreDefaults;
@@ -192,7 +190,7 @@ begin
          MouseLookVerticalSensitivitySlider  .Value := MouseLookVerticalSensitivity  ;
 
          AutoOpenInventory := DefaultAutoOpenInventory;
-         AutoOpenInventoryArgument.Value := BoolToStrYesNo[AutoOpenInventory];
+         AutoOpenInventoryArgument.Value := AutoOpenInventory;
 
          MessageOK(Glw, 'All keys and settings restored to defaults.');
        end;

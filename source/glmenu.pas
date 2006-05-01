@@ -134,6 +134,20 @@ type
     procedure Draw(const Area: TArea); override;
   end;
 
+  { This is like TGLMenuItemArgument that displays boolean value
+    (as "Yes" or "No").
+
+    Don't access MaximumValueWidth or inherited Value (as string)
+    when using this class --- this class should handle this yourself. }
+  TGLMenuBooleanArgument = class(TGLMenuItemArgument)
+  private
+    FValue: boolean;
+    procedure SetValue(const AValue: boolean);
+  public
+    constructor Create(const AValue: boolean);
+    property Value: boolean read FValue write SetValue;
+  end;
+
   TGLMenuSlider = class(TGLMenuItemAccessory)
   private
     FDisplayValue: boolean;
@@ -449,7 +463,7 @@ procedure GLMenuCloseGL;
 implementation
 
 uses SysUtils, KambiUtils, KambiGLUtils, Images, KambiFilesUtils,
-  BFNT_BitstreamVeraSans_m10_Unit;
+  BFNT_BitstreamVeraSans_m10_Unit, KambiStringUtils;
 
 procedure SliderFontInit;
 begin
@@ -549,6 +563,26 @@ begin
     glRasterPos2i(0, 0);
     MenuFont.Print(Value);
   glPopMatrix;
+end;
+
+{ TGLMenuBooleanArgument ----------------------------------------------------- }
+
+constructor TGLMenuBooleanArgument.Create(const AValue: boolean);
+begin
+  inherited Create(
+    Max(TGLMenuItemArgument.TextWidth(BoolToStrYesNo[true]),
+        TGLMenuItemArgument.TextWidth(BoolToStrYesNo[false])));
+  FValue := AValue;
+  inherited Value := BoolToStrYesNo[Value];
+end;
+
+procedure TGLMenuBooleanArgument.SetValue(const AValue: boolean);
+begin
+  if FValue <> AValue then
+  begin
+    FValue := AValue;
+    inherited Value := BoolToStrYesNo[Value];
+  end;
 end;
 
 { TGLMenuSlider -------------------------------------------------------------- }

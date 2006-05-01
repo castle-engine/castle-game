@@ -34,7 +34,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
   CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel,
-  CastleSound, CastleSoundMenu;
+  CastleSound, CastleSoundMenu, VRMLNodes, KambiClassUtils;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -54,8 +54,8 @@ type
     RotationHorizontalSpeedSlider: TGLMenuFloatSlider;
     RotationVerticalSpeedSlider: TGLMenuFloatSlider;
     PlayerSpeedSlider: TGLMenuFloatSlider;
-    RenderBoundingBoxesArgument: TGLMenuItemArgument;
-    RenderShadowQuadsArgument: TGLMenuItemArgument;
+    RenderBoundingBoxesArgument: TGLMenuBooleanArgument;
+    RenderShadowQuadsArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -65,6 +65,23 @@ type
     SoundVolumeSlider: TSoundVolumeSlider;
     MusicVolumeSlider: TSoundVolumeSlider;
     constructor Create;
+    procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
+  end;
+
+  TEditLevelLightsMenu = class(TCastleMenu)
+    procedure RefreshItems;
+    procedure CurrentItemSelected; override;
+  end;
+
+  TEditOneLightMenu = class(TCastleMenu)
+    Light: TNodeGeneralLight;
+    RedColorSlider: TGLMenuFloatSlider;
+    GreenColorSlider: TGLMenuFloatSlider;
+    BlueColorSlider: TGLMenuFloatSlider;
+    IntensitySlider: TGLMenuFloatSlider;
+    OnArgument: TGLMenuBooleanArgument;
+    constructor Create(ALight: TNodeGeneralLight);
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
@@ -79,6 +96,8 @@ var
   GameMenu: TGameMenu;
   DebugMenu: TDebugMenu;
   GameSoundMenu: TGameSoundMenu;
+  EditLevelLightsMenu: TEditLevelLightsMenu;
+  EditOneLightMenu: TEditOneLightMenu;
 
 { TGameMenu ------------------------------------------------------------ }
 
@@ -179,13 +198,8 @@ begin
   RotationVerticalSpeedSlider := TGLMenuFloatSlider.Create(0.5, 10, 1);
   PlayerSpeedSlider := TGLMenuFloatSlider.Create(0.1, 5, 1);
 
-  RenderBoundingBoxesArgument := TGLMenuItemArgument.Create(
-    TGLMenuItemArgument.TextWidth('WWW'));
-  RenderBoundingBoxesArgument.Value := BoolToStrYesNo[RenderBoundingBoxes];
-
-  RenderShadowQuadsArgument := TGLMenuItemArgument.Create(
-    TGLMenuItemArgument.TextWidth('WWW'));
-  RenderShadowQuadsArgument.Value := BoolToStrYesNo[RenderShadowQuads];
+  RenderBoundingBoxesArgument := TGLMenuBooleanArgument.Create(RenderBoundingBoxes);
+  RenderShadowQuadsArgument := TGLMenuBooleanArgument.Create(RenderShadowQuads);
 
   Items.Add('Player.Life := Player.MaxLife');
   Items.Add('Show creatures on level info');
@@ -200,6 +214,7 @@ begin
   Items.AddObject('Render shadow quads', RenderShadowQuadsArgument);
   Items.Add('Change to level');
   Items.Add('Change sound properties');
+  Items.Add('Edit level lights');
   Items.Add('Back to game menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -239,7 +254,7 @@ procedure TDebugMenu.CurrentItemSelected;
     finally S.Free end;
   end;
 
-  function ChooseCreatureKind(var ChooseCreature: TCreatureKind): boolean;
+  function ChooseCreatureKind(out ChooseCreature: TCreatureKind): boolean;
   var
     S: TStringList;
     I, ResultIndex: Integer;
@@ -404,16 +419,20 @@ begin
     8: ;
     9: begin
          RenderBoundingBoxes := not RenderBoundingBoxes;
-         RenderBoundingBoxesArgument.Value := BoolToStrYesNo[RenderBoundingBoxes];
+         RenderBoundingBoxesArgument.Value := RenderBoundingBoxes;
        end;
     10:
        begin
          RenderShadowQuads := not RenderShadowQuads;
-         RenderShadowQuadsArgument.Value := BoolToStrYesNo[RenderShadowQuads];
+         RenderShadowQuadsArgument.Value := RenderShadowQuads;
        end;
     11: ChangeToLevel;
     12: ChangeSoundProperties;
-    13: CurrentMenu := GameMenu;
+    13: begin
+          EditLevelLightsMenu.RefreshItems;
+          CurrentMenu := EditLevelLightsMenu;
+        end;
+    14: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -431,6 +450,182 @@ begin
     8: Player.Navigator.CameraDir := VectorAdjustToLength(
          Player.Navigator.CameraDir, PlayerSpeedSlider.Value);
   end;
+end;
+
+{ TEditLevelLightsMenu ------------------------------------------------------- }
+
+procedure TEditLevelLightsMenu.RefreshItems;
+var
+  I: Integer;
+  LightNode: TNodeGeneralLight;
+begin
+  Items.Clear;
+  for I := 0 to Level.LightSet.Lights.High do
+  begin
+    LightNode := Level.LightSet.Lights[I].LightNode;
+    Items.Add(Format('Edit light %d: %s named "%s"',
+      [I, LightNode.NodeTypeName, LightNode.NodeName]));
+  end;
+  Items.Add('Output VRML lights on console');
+  Items.Add('Back to debug menu');
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TEditLevelLightsMenu.CurrentItemSelected;
+begin
+  if CurrentItem = Level.LightSet.Lights.Count then
+  begin
+    if StdOutStream <> nil then
+      SaveToVRMLFile(Level.LightSet.RootNode, StdOutStream,
+        Format('Generated by "castle" lights editor for level "%s"',
+        [Level.Title])) else
+      MessageOK(Glw, 'No stdout available. On Windows you must run the game ' +
+        'from the command-line to get stdout.', taLeft);
+  end else
+  if CurrentItem = Level.LightSet.Lights.Count + 1 then
+  begin
+    CurrentMenu := DebugMenu;
+  end else
+  begin
+    FreeAndNil(EditOneLightMenu);
+    EditOneLightMenu := TEditOneLightMenu.Create(
+      Level.LightSet.Lights[CurrentItem].LightNode);
+    CurrentMenu := EditOneLightMenu;
+  end;
+end;
+
+{ TEditOneLightMenu ---------------------------------------------------------- }
+
+constructor TEditOneLightMenu.Create(ALight: TNodeGeneralLight);
+begin
+  inherited Create;
+
+  Light := ALight;
+
+  RedColorSlider := TGLMenuFloatSlider.Create(0, 1, Light.FdColor.Value[0]);
+  GreenColorSlider := TGLMenuFloatSlider.Create(0, 1, Light.FdColor.Value[1]);
+  BlueColorSlider := TGLMenuFloatSlider.Create(0, 1, Light.FdColor.Value[2]);
+  IntensitySlider := TGLMenuFloatSlider.Create(0, 1, Light.FdIntensity.Value);
+  OnArgument := TGLMenuBooleanArgument.Create(Light.FdOn.Value);
+
+  Items.AddObject('Red color', RedColorSlider);
+  Items.AddObject('Green color', GreenColorSlider);
+  Items.AddObject('Blue color', BlueColorSlider);
+  Items.AddObject('Intensity', IntensitySlider);
+  Items.AddObject('On', OnArgument);
+  Items.Add('Point/SpotLight: Change location');
+  Items.Add('Point/SpotLight: Change location to current');
+  Items.Add('Point/SpotLight: Change attenuation');
+  Items.Add('DirectionalLight: Change direction');
+  Items.Add('SpotLight: Change direction');
+  Items.Add('SpotLight: Change dropOffRate');
+  Items.Add('SpotLight: Change cutOffAngle');
+  Items.Add('Back');
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TEditOneLightMenu.CurrentItemSelected;
+var
+  Vector: TVector3Single;
+  Value: Single;
+begin
+  case CurrentItem of
+    0, 1, 2, 3: ;
+    4: begin
+         OnArgument.Value := not OnArgument.Value;
+         Light.FdOn.Value := OnArgument.Value;
+         Level.LightSet.CalculateLights;
+       end;
+    5: begin
+         if Light is TNodeGeneralPositionalLight then
+         begin
+           Vector := TNodeGeneralPositionalLight(Light).FdLocation.Value;
+           if MessageInputQueryVector3Single(Glw, 'Change location', Vector, taLeft) then
+           begin
+             TNodeGeneralPositionalLight(Light).FdLocation.Value := Vector;
+             Level.LightSet.CalculateLights;
+           end;
+         end;
+       end;
+    6: if Light is TNodeGeneralPositionalLight then
+       begin
+         TNodeGeneralPositionalLight(Light).FdLocation.Value :=
+           Player.Navigator.CameraPos;
+         Level.LightSet.CalculateLights;
+       end;
+    7: begin
+         if Light is TNodeGeneralPositionalLight then
+         begin
+           Vector := TNodeGeneralPositionalLight(Light).FdAttenuation.Value;
+           if MessageInputQueryVector3Single(Glw, 'Change attenuation', Vector, taLeft) then
+           begin
+             TNodeGeneralPositionalLight(Light).FdAttenuation.Value := Vector;
+             Level.LightSet.CalculateLights;
+           end;
+         end;
+       end;
+    8: begin
+         if Light is TNodeDirectionalLight then
+         begin
+           Vector := TNodeDirectionalLight(Light).FdDirection.Value;
+           if MessageInputQueryVector3Single(Glw, 'Change direction', Vector, taLeft) then
+           begin
+             TNodeDirectionalLight(Light).FdDirection.Value := Vector;
+             Level.LightSet.CalculateLights;
+           end;
+         end;
+       end;
+    9: begin
+         if Light is TNodeSpotLight then
+         begin
+           Vector := TNodeSpotLight(Light).FdDirection.Value;
+           if MessageInputQueryVector3Single(Glw, 'Change direction', Vector, taLeft) then
+           begin
+             TNodeSpotLight(Light).FdDirection.Value := Vector;
+             Level.LightSet.CalculateLights;
+           end;
+         end;
+       end;
+    10:begin
+         if Light is TNodeSpotLight then
+         begin
+           Value := TNodeSpotLight(Light).FdDropOffRate.Value;
+           if MessageInputQuerySingle(Glw, 'Change dropOffRate', Value, taLeft) then
+           begin
+             TNodeSpotLight(Light).FdDropOffRate.Value := Value;
+             Level.LightSet.CalculateLights;
+           end;
+         end;
+       end;
+    11:begin
+         if Light is TNodeSpotLight then
+         begin
+           Value := TNodeSpotLight(Light).FdCutOffAngle.Value;
+           if MessageInputQuerySingle(Glw, 'Change cutOffAngle', Value, taLeft) then
+           begin
+             TNodeSpotLight(Light).FdCutOffAngle.Value := Value;
+             Level.LightSet.CalculateLights;
+           end;
+         end;
+       end;
+    12:CurrentMenu := EditLevelLightsMenu;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+procedure TEditOneLightMenu.CurrentItemAccessoryValueChanged;
+begin
+  case CurrentItem of
+    0: Light.FdColor.Value[0] := RedColorSlider.Value;
+    1: Light.FdColor.Value[1] := GreenColorSlider.Value;
+    2: Light.FdColor.Value[2] := BlueColorSlider.Value;
+    3: Light.FdIntensity.Value := IntensitySlider.Value;
+    else Exit;
+  end;
+
+  Level.LightSet.CalculateLights;
 end;
 
 { global things -------------------------------------------------------------- }
@@ -545,6 +740,7 @@ begin
   GameMenu := TGameMenu.Create;
   DebugMenu := TDebugMenu.Create;
   GameSoundMenu := TGameSoundMenu.Create;
+  EditLevelLightsMenu := TEditLevelLightsMenu.Create;
   CurrentMenu := GameMenu;
 end;
 
@@ -554,6 +750,8 @@ begin
   FreeAndNil(GameMenu);
   FreeAndNil(DebugMenu);
   FreeAndNil(GameSoundMenu);
+  FreeAndNil(EditLevelLightsMenu);
+  FreeAndNil(EditOneLightMenu);
 end;
 
 initialization

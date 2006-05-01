@@ -57,7 +57,6 @@ var
 
 const
   DefaultAllowScreenResize = true;
-  AllowScreenResizeToStr: array[boolean] of string = ('No', 'Yes');
 
 var
   AllowScreenResize: boolean;

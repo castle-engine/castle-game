@@ -54,8 +54,8 @@ type
 
   TVideoMenu = class(TSubMenu)
     TextureMinificationQualitySlider: TGLMenuIntegerSlider;
-    AllowScreenResizeArgument: TGLMenuItemArgument;
-    RenderShadowsArgument: TGLMenuItemArgument;
+    AllowScreenResizeArgument: TGLMenuBooleanArgument;
+    RenderShadowsArgument: TGLMenuBooleanArgument;
     CreatureAnimationSlider: TGLMenuIntegerSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
@@ -228,15 +228,8 @@ begin
   inherited Create;
 
   TextureMinificationQualitySlider := TTextureMinificationQualitySlider.Create;
-
-  AllowScreenResizeArgument := TGLMenuItemArgument.Create(
-    TGLMenuItemArgument.TextWidth('WWW'));
-  AllowScreenResizeArgument.Value := AllowScreenResizeToStr[AllowScreenResize];
-
-  RenderShadowsArgument := TGLMenuItemArgument.Create(
-    TGLMenuItemArgument.TextWidth('WWW'));
-  RenderShadowsArgument.Value := BoolToStrYesNo[RenderShadows];
-
+  AllowScreenResizeArgument := TGLMenuBooleanArgument.Create(AllowScreenResize);
+  RenderShadowsArgument := TGLMenuBooleanArgument.Create(RenderShadows);
   CreatureAnimationSlider := TGLMenuIntegerSlider.Create(
     MinCreatureAnimationScenesPerTime,
     MaxCreatureAnimationScenesPerTime,
@@ -304,12 +297,11 @@ begin
     1: ;
     2: begin
          AllowScreenResize := not AllowScreenResize;
-         AllowScreenResizeArgument.Value :=
-           AllowScreenResizeToStr[AllowScreenResize];
+         AllowScreenResizeArgument.Value := AllowScreenResize;
        end;
     3: begin
          RenderShadows := not RenderShadows;
-         RenderShadowsArgument.Value := BoolToStrYesNo[RenderShadows];
+         RenderShadowsArgument.Value := RenderShadows;
          if not RenderShadowsPossible then
          begin
            if RenderShadows then
@@ -328,10 +320,10 @@ begin
     4: ;
     5: begin
          AllowScreenResize := DefaultAllowScreenResize;
-         AllowScreenResizeArgument.Value := AllowScreenResizeToStr[AllowScreenResize];
+         AllowScreenResizeArgument.Value := AllowScreenResize;
 
          RenderShadows := DefaultRenderShadows;
-         RenderShadowsArgument.Value := BoolToStrYesNo[RenderShadows];
+         RenderShadowsArgument.Value := RenderShadows;
 
          TextureMinificationQuality := DefaultTextureMinificationQuality;
          TextureMinificationQualitySlider.Value := Ord(TextureMinificationQuality);
