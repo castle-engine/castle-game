@@ -342,7 +342,7 @@ begin
   Navigator.HeadBobbingDistance := 25.0;
   Navigator.MaxJumpHeight := 2.0;
   Navigator.JumpSpeedMultiply := 2.0;
-  Navigator.JumpPower := 0.9;
+  Navigator.JumpPower := 0.09;
 
   HintEscapeKeyShown := false;
 
@@ -943,7 +943,7 @@ begin
   if (Swimming = psNo) and (FallenHeight > 4.0) then
   begin
     Sound(stPlayerFalledDown);
-    if FallenHeight > Navigator.MaxJumpDistance then
+    if FallenHeight > Navigator.MaxJumpDistance * 1.2 then
       Life := Life - Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
   end;
 end;
