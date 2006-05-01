@@ -939,13 +939,12 @@ end;
 procedure TPlayer.FalledDown(Navigator: TMatrixWalker;
   const FallenHeight: Single);
 begin
-  if (Swimming = psNo) and (FallenHeight > 4) then
+  if (Swimming = psNo) and (FallenHeight > 4.0) then
   begin
-    Life := Life - Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
     Sound(stPlayerFalledDown);
+    if FallenHeight > Navigator.MaxJumpDistance then
+      Life := Life - Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
   end;
-
-  { Tests: GameMessage(Format('Falled down from %f', [FallenHeight])); }
 end;
 
 procedure TPlayer.SetLife(const Value: Single);

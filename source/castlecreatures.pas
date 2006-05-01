@@ -1229,11 +1229,12 @@ procedure TCreature.Idle(const CompSpeed: Single);
       if FallenHeight > 1.0 then
       begin
         Sound3d(stCreatureFalledDown, 0.1, false);
-        LifeLoss := Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
-        Life := Life - LifeLoss;
-        LastAttackDirection := ZeroVector3Single;
-        { Tests: GameMessage(Format('Creature fallen down from %f, lost %f life',
-          [FallenHeight, LifeLoss])); }
+        if FallenHeight > 4.0 then
+        begin
+          LifeLoss := Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
+          Life := Life - LifeLoss;
+          LastAttackDirection := ZeroVector3Single;
+        end;
       end;
     end;
 
