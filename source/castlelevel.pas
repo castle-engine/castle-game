@@ -437,6 +437,11 @@ uses SysUtils, OpenGLh, BackgroundGL,
 {$define read_implementation}
 {$I objectslist_1.inc}
 
+function CastleLevelsPath: string;
+begin
+  Result := ProgramDataPath + 'data' + PathDelim + 'levels' + PathDelim;
+end;
+
 { TLevel --------------------------------------------------------------------- }
 
 constructor TLevel.Create;
@@ -615,8 +620,7 @@ end;
 
 function TLevel.LoadVRMLNode(const FileName: string): TVRMLNode;
 begin
-  Result := ParseVRMLFile(ProgramDataPath + 'data' + PathDelim +
-    'levels' + PathDelim + FileName, false);
+  Result := ParseVRMLFile(FileName, false);
 end;
 
 procedure TLevel.TraverseForItems(Node: TVRMLNode;
@@ -862,7 +866,7 @@ constructor TCastleHallLevel.Create;
   function LoadSymbol(const Suffix: string): TVRMLFlatSceneGL;
   begin
     Result := TVRMLFlatSceneGL.Create(LoadVRMLNode(
-      'castle_hall_symbol_' + Suffix + '.wrl'),
+      CastleLevelsPath + 'castle_hall_symbol_' + Suffix + '.wrl'),
       true, roSeparateShapeStates);
 
     Result.Attrib_TextureMinFilter :=
@@ -881,7 +885,8 @@ begin
   Symbol_TR := LoadSymbol('tr');
   Symbol_BR := LoadSymbol('br');
 
-  Button := TVRMLFlatSceneGL.Create(LoadVRMLNode('castle_hall_button.wrl'),
+  Button := TVRMLFlatSceneGL.Create(LoadVRMLNode(
+    CastleLevelsPath + 'castle_hall_button.wrl'),
     true, roSeparateShapeStates);
   Button.DefaultTriangleOctree := Button.CreateTriangleOctree('');
 
@@ -900,12 +905,12 @@ end;
 
 class function TCastleHallLevel.SceneFileName: string;
 begin
-  Result := 'castle_hall_final.wrl';
+  Result := CastleLevelsPath + 'castle_hall_final.wrl';
 end;
 
 class function TCastleHallLevel.LightSetFileName: string;
 begin
-  Result := 'castle_hall_lights.wrl';
+  Result := CastleLevelsPath + 'castle_hall_lights.wrl';
 end;
 
 class function TCastleHallLevel.Title: string;
@@ -1201,12 +1206,12 @@ end;
 
 class function TGateLevel.SceneFileName: string;
 begin
-  Result := 'gate_final.wrl';
+  Result := CastleLevelsPath + 'gate_final.wrl';
 end;
 
 class function TGateLevel.LightSetFileName: string;
 begin
-  Result := 'gate_lights.wrl';
+  Result := CastleLevelsPath + 'gate_lights.wrl';
 end;
 
 class function TGateLevel.Title: string;
@@ -1244,12 +1249,12 @@ end;
 
 class function TTowerLevel.SceneFileName: string;
 begin
-  Result := 'basic_castle_final.wrl';
+  Result := CastleLevelsPath + 'basic_castle_final.wrl';
 end;
 
 class function TTowerLevel.LightSetFileName: string;
 begin
-  Result := 'basic_castle_lights.wrl';
+  Result := CastleLevelsPath + 'basic_castle_lights.wrl';
 end;
 
 class function TTowerLevel.Title: string;
@@ -1266,12 +1271,12 @@ end;
 
 class function TCagesLevel.SceneFileName: string;
 begin
-  Result := 'cages/cages_final.wrl';
+  Result := CastleLevelsPath + 'cages/cages_final.wrl';
 end;
 
 class function TCagesLevel.LightSetFileName: string;
 begin
-  Result := 'cages/cages_lights.wrl';
+  Result := CastleLevelsPath + 'cages/cages_lights.wrl';
 end;
 
 class function TCagesLevel.Title: string;
