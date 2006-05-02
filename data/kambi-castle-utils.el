@@ -199,3 +199,11 @@ on MESH-NAME to be correctly interpreted."
   (kam-fix-vertex-col-material "MeshGate")
   (write-file "gate_processed.wrl")
 )
+
+(defun kam-process-cages ()
+  (interactive)
+  (kam-fix-vertex-col-material "MeshCage")
+  (write-file "cages_processed.wrl")
+  (kam-remove-vertex-col-material-one-mesh "MeshGround")
+  (kam-add-material-for-mesh "MeshGround" "MatGround")
+)

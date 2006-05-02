@@ -18,4 +18,8 @@ Group {
 		dropOffRate 0.090000003576279
 		cutOffAngle 0.5
 	}
+	PointLight {
+		intensity 0.538461565971375
+		location 12.344467163085938 -118.05523681640625 1.813037157058716
+	}
 }

@@ -1,6 +1,7 @@
 ALL_OUTPUT := castle_hall_processed.wrl gate_processed.wrl
 
 all: $(ALL_OUTPUT)
+	$(MAKE) -C cages/ all
 
 castle_hall_processed.wrl: castle_hall.wrl
 	emacs --batch -l ../kambi-castle-utils.el $< \
@@ -12,3 +13,4 @@ gate_processed.wrl: gate.wrl
 
 clean:
 	rm -f $(ALL_OUTPUT)
+	$(MAKE) -C cages/ clean

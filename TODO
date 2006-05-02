@@ -258,9 +258,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   like "Do you want to save the game before ending ?"
   with answers "Save and end the game", "Don't save and end the game", "Cancel".
 
-- OpenAL under Linux can close awfully long, make there some
-  dialog "Closing sound device, please wait"
-
 ----------------------------------------
 dist-making to-dos:
 

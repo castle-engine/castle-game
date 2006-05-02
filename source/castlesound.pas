@@ -421,7 +421,13 @@ begin
       if SoundInfos[ST].FileName <> '' then
         alDeleteBuffers(1, @SoundBuffers[ST]);
 
-    EndAL;
+    { EndAL may take a while on Unix OpenAL, so provide feedback
+      for user here (otherwise he (she?) may think that program hanged. }
+    Progress.Init(1, 'Closing sound device, please wait');
+    try
+      EndAL;
+      Progress.Step;
+    finally Progress.Fini; end;
   end;
 end;
 

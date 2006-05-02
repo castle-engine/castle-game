@@ -9,7 +9,7 @@ Group {
   NavigationInfo {
     avatarSize [ 0.5, 2 ]
     speed 1.0
-    headlight FALSE
+    headlight TRUE
   }
 
   Separator {
@@ -28,5 +28,5 @@ Group {
     }
   }
 
-  WWWInline { name "cages.wrl" }
+  WWWInline { name "cages_processed.wrl" }
 }

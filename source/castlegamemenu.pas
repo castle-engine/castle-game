@@ -88,6 +88,17 @@ type
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
+  TEditHeadlightMenu = class(TCastleMenu)
+    AmbientColorSlider: array[0..2] of TGLMenuFloatSlider;
+    DiffuseColorSlider: array[0..2] of TGLMenuFloatSlider;
+    SpecularColorSlider: array[0..2] of TGLMenuFloatSlider;
+    SpotArgument: TGLMenuBooleanArgument;
+    { Create this only when Level.Headlight <> nil. }
+    constructor Create;
+    procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
+  end;
+
 { ----------------------------------------------------------------------------
   global vars (used by TCastleMenu descendants implementation) }
 
@@ -100,6 +111,7 @@ var
   GameSoundMenu: TGameSoundMenu;
   EditLevelLightsMenu: TEditLevelLightsMenu;
   EditOneLightMenu: TEditOneLightMenu;
+  EditHeadlightMenu: TEditHeadlightMenu;
 
 { TGameMenu ------------------------------------------------------------ }
 
@@ -216,7 +228,7 @@ begin
   Items.AddObject('Render shadow quads', RenderShadowQuadsArgument);
   Items.Add('Change to level');
   Items.Add('Change sound properties');
-  Items.Add('Edit level lights');
+  Items.Add('Edit lights');
   Items.Add('Change jump properties');
   Items.Add('Back to game menu');
 
@@ -485,6 +497,122 @@ begin
   end;
 end;
 
+{ TEditHeadlightMenu --------------------------------------------------------- }
+
+constructor TEditHeadlightMenu.Create;
+begin
+  inherited Create;
+
+  { To better visualize light changes. }
+  DrawBackgroundRectangle := false;
+
+  AmbientColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.AmbientColor[0]);
+  AmbientColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.AmbientColor[1]);
+  AmbientColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.AmbientColor[2]);
+
+  DiffuseColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.DiffuseColor[0]);
+  DiffuseColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.DiffuseColor[1]);
+  DiffuseColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.DiffuseColor[2]);
+
+  SpecularColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.SpecularColor[0]);
+  SpecularColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.SpecularColor[1]);
+  SpecularColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.SpecularColor[2]);
+
+  SpotArgument := TGLMenuBooleanArgument.Create(Level.Headlight.Spot);
+
+  Items.AddObject('Ambient color red'  , AmbientColorSlider[0]);
+  Items.AddObject('Ambient color green', AmbientColorSlider[1]);
+  Items.AddObject('Ambient color blue' , AmbientColorSlider[2]);
+
+  Items.AddObject('Diffuse color red'  , DiffuseColorSlider[0]);
+  Items.AddObject('Diffuse color green', DiffuseColorSlider[1]);
+  Items.AddObject('Diffuse color blue' , DiffuseColorSlider[2]);
+
+  Items.AddObject('Specular color red'  , SpecularColorSlider[0]);
+  Items.AddObject('Specular color green', SpecularColorSlider[1]);
+  Items.AddObject('Specular color blue' , SpecularColorSlider[2]);
+
+  Items.Add('Change attenuation');
+
+  Items.AddObject('Spot', SpotArgument);
+
+  Items.Add('Change spot properties');
+
+  Items.Add('Back');
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TEditHeadlightMenu.CurrentItemSelected;
+
+  procedure ChangeAttenuation;
+  var
+    Vector3: TVector3Single;
+  begin
+    Vector3 := Level.Headlight.Attenuation;
+    if MessageInputQueryVector3Single(Glw, 'Change headlight Attenuation',
+      Vector3, taLeft) then
+      Level.Headlight.Attenuation := Vector3;
+  end;
+
+  procedure ChangeSpotProperties;
+  var
+    Value: Single;
+  begin
+    Value := Level.Headlight.SpotCutoff;
+    if MessageInputQuerySingle(Glw, 'Change headlight SpotCutoff',
+      Value, taLeft) then
+      Level.Headlight.SpotCutoff := Value;
+
+    Value := Level.Headlight.SpotExponent;
+    if MessageInputQuerySingle(Glw, 'Change headlight SpotExponent',
+      Value, taLeft) then
+      Level.Headlight.SpotExponent := Value;
+  end;
+
+begin
+  case CurrentItem of
+    0..8: Exit;
+    9: begin
+         ChangeAttenuation;
+         Level.Headlight.Render(0, false { it should be already enabled });
+       end;
+    10:begin
+         SpotArgument.Value := not SpotArgument.Value;
+         Level.Headlight.Spot := SpotArgument.Value;
+         Level.Headlight.Render(0, false { it should be already enabled });
+       end;
+    11:begin
+         ChangeSpotProperties;
+         Level.Headlight.Render(0, false { it should be already enabled });
+       end;
+    12:CurrentMenu := EditLevelLightsMenu;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+procedure TEditHeadlightMenu.CurrentItemAccessoryValueChanged;
+begin
+  case CurrentItem of
+    0..2:
+      begin
+        Level.Headlight.AmbientColor[CurrentItem  ] := AmbientColorSlider[CurrentItem  ].Value;
+        Level.Headlight.Render(0, false { it should be already enabled });
+      end;
+    3..5:
+      begin
+        Level.Headlight.DiffuseColor[CurrentItem-3] := DiffuseColorSlider[CurrentItem-3].Value;
+        Level.Headlight.Render(0, false { it should be already enabled });
+      end;
+    6..8:
+      begin
+        Level.Headlight.SpecularColor[CurrentItem-6] := SpecularColorSlider[CurrentItem-6].Value;
+        Level.Headlight.Render(0, false { it should be already enabled });
+      end;
+    else Exit;
+  end;
+end;
+
 { TEditLevelLightsMenu ------------------------------------------------------- }
 
 constructor TEditLevelLightsMenu.Create;
@@ -512,6 +640,7 @@ begin
   Items.AddObject('Global ambient light red'  , AmbientColorSlider[0]);
   Items.AddObject('Global ambient light green', AmbientColorSlider[1]);
   Items.AddObject('Global ambient light blue' , AmbientColorSlider[2]);
+  Items.Add('Edit headlight');
   Items.Add('Back to debug menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -541,7 +670,17 @@ begin
              LightSetVRMLComment);
        end;
     2, 3, 4: ;
-    5: CurrentMenu := DebugMenu;
+    5: begin
+         if Level.Headlight <> nil then
+         begin
+           FreeAndNil(EditHeadlightMenu);
+           EditHeadlightMenu := TEditHeadlightMenu.Create;
+           CurrentMenu := EditHeadlightMenu;
+         end else
+           MessageOK(Glw, 'No headlight in level ' +
+             ' (set NavigationInfo.headlight to TRUE to get headlight)', taLeft);
+       end;
+    6: CurrentMenu := DebugMenu;
     else
        begin
          FreeAndNil(EditOneLightMenu);
@@ -570,6 +709,7 @@ constructor TEditOneLightMenu.Create(ALight: TNodeGeneralLight);
 begin
   inherited Create;
 
+  { To better visualize light changes. }
   DrawBackgroundRectangle := false;
 
   Light := ALight;
@@ -847,6 +987,7 @@ begin
   FreeAndNil(GameSoundMenu);
   FreeAndNil(EditLevelLightsMenu);
   FreeAndNil(EditOneLightMenu);
+  FreeAndNil(EditHeadlightMenu);
 end;
 
 initialization
