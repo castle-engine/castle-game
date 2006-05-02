@@ -12,5 +12,21 @@ Group {
     headlight FALSE
   }
 
+  Separator {
+    Rotation { rotation 1 0 0 1.57 }
+
+    Background {
+#       skyColor [ 0.12 0 0.17 ] # , 1 1 0 ]
+#       skyAngle [             ] # 1.7 ]
+
+      backUrl "../../skies/cages/back.png"
+      bottomUrl "../../skies/cages/bottom.png"
+      frontUrl "../../skies/cages/front.png"
+      leftUrl "../../skies/cages/left.png"
+      rightUrl "../../skies/cages/right.png"
+      topUrl "../../skies/cages/top.png"
+    }
+  }
+
   WWWInline { name "cages.wrl" }
 }
