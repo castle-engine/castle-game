@@ -563,7 +563,6 @@ begin
   Items.AddObject('Intensity', IntensitySlider);
   Items.AddObject('On', OnArgument);
   Items.Add('Point/SpotLight: Change location');
-  Items.Add('Point/SpotLight: Change location to current');
   Items.Add('Point/SpotLight: Change attenuation');
   Items.Add('DirectionalLight: Change direction');
   Items.Add('SpotLight: Change direction');
@@ -575,6 +574,31 @@ begin
 end;
 
 procedure TEditOneLightMenu.CurrentItemSelected;
+
+  function MessageInputQueryVector3SingleP(
+    glwin: TGLWindow; const Title: string;
+    var Value: TVector3Single; TextAlign: TTextAlign;
+    const OnP: TVector3Single): boolean;
+  var s: string;
+  begin
+   Result := false;
+   s := Format('%g %g %g', [Value[0], Value[1], Value[2]]);
+   if MessageInputQuery(glwin, Title, s, TextAlign) then
+   begin
+    try
+     if LowerCase(Trim(S)) = 'p' then
+       Value := OnP else
+       Value := Vector3SingleFromStr(s);
+     Result := true;
+    except
+     on E: EConvertError do
+     begin
+      MessageOK(glwin, 'Invalid vector 3 value : ' + E.Message, taLeft);
+     end;
+    end;
+   end;
+  end;
+
 var
   Vector: TVector3Single;
   Value: Single;
@@ -590,53 +614,54 @@ begin
          if Light is TNodeGeneralPositionalLight then
          begin
            Vector := TNodeGeneralPositionalLight(Light).FdLocation.Value;
-           if MessageInputQueryVector3Single(Glw, 'Change location', Vector, taLeft) then
+           if MessageInputQueryVector3SingleP(Glw, 'Change location' +nl+
+             '(Input "P" to use current player''s location)',
+             Vector, taLeft, Player.Navigator.CameraPos) then
            begin
              TNodeGeneralPositionalLight(Light).FdLocation.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;
        end;
-    6: if Light is TNodeGeneralPositionalLight then
-       begin
-         TNodeGeneralPositionalLight(Light).FdLocation.Value :=
-           Player.Navigator.CameraPos;
-         Level.LightSet.CalculateLights;
-       end;
-    7: begin
+    6: begin
          if Light is TNodeGeneralPositionalLight then
          begin
            Vector := TNodeGeneralPositionalLight(Light).FdAttenuation.Value;
-           if MessageInputQueryVector3Single(Glw, 'Change attenuation', Vector, taLeft) then
+           if MessageInputQueryVector3Single(Glw, 'Change attenuation',
+             Vector, taLeft) then
            begin
              TNodeGeneralPositionalLight(Light).FdAttenuation.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;
        end;
-    8: begin
+    7: begin
          if Light is TNodeDirectionalLight then
          begin
            Vector := TNodeDirectionalLight(Light).FdDirection.Value;
-           if MessageInputQueryVector3Single(Glw, 'Change direction', Vector, taLeft) then
+           if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
+             '(Input "P" to use current player''s direction)',
+             Vector, taLeft, Player.Navigator.CameraDir) then
            begin
              TNodeDirectionalLight(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;
        end;
-    9: begin
+    8: begin
          if Light is TNodeSpotLight then
          begin
            Vector := TNodeSpotLight(Light).FdDirection.Value;
-           if MessageInputQueryVector3Single(Glw, 'Change direction', Vector, taLeft) then
+           if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
+             '(Input "P" to use current player''s direction)',
+             Vector, taLeft, Player.Navigator.CameraDir) then
            begin
              TNodeSpotLight(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;
        end;
-    10:begin
+    9: begin
          if Light is TNodeSpotLight then
          begin
            Value := TNodeSpotLight(Light).FdDropOffRate.Value;
@@ -647,7 +672,7 @@ begin
            end;
          end;
        end;
-    11:begin
+    10:begin
          if Light is TNodeSpotLight then
          begin
            Value := TNodeSpotLight(Light).FdCutOffAngle.Value;
@@ -658,7 +683,7 @@ begin
            end;
          end;
        end;
-    12:CurrentMenu := EditLevelLightsMenu;
+    11:CurrentMenu := EditLevelLightsMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
