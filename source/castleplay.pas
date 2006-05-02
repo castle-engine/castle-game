@@ -118,7 +118,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   BFNT_BitstreamVeraSans_Unit, CastleCreatures,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound,
-  CastleVideoOptions, Keys, CastleConfig;
+  CastleVideoOptions, Keys, CastleConfig, GLHeadlight;
 
 var
   GameMessagesManager: TTimeMessagesManager;
@@ -473,8 +473,6 @@ end;
 { Call this when Level value changed (because of LevelFinished
   or because we just started new game). }
 procedure InitNewLevel;
-const
-  HeadlightPower = 0.5;
 begin
   { Resize uses Level.BoundingBox to set good projection min/max depths.
     So we must call EventResize on each Level change. }
@@ -492,16 +490,8 @@ begin
 
   Player.Navigator.CancelFallingDown;
 
-  { Init headlight }
-  if Level.Headlight then
-  begin
-    glEnable(GL_LIGHT0);
-    glLightv(GL_LIGHT0, GL_DIFFUSE,
-      Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
-    glLightv(GL_LIGHT0, GL_SPECULAR,
-      Vector4Single(HeadlightPower, HeadlightPower, HeadlightPower, 1));
-  end else
-    glDisable(GL_LIGHT0);
+  { Init Level.Headlight }
+  TGLHeadlight.RenderOrDisable(Level.Headlight, 0);
 
   glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
 

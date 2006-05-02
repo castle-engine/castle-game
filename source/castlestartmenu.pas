@@ -367,7 +367,8 @@ begin
     1: TextureMinificationQuality :=
       TTextureMinificationQuality(TextureMinificationQualitySlider.Value);
     4: begin
-         if CreatureAnimationScenesPerTime <> CreatureAnimationSlider.Value then
+         if CreatureAnimationScenesPerTime <>
+           Cardinal(CreatureAnimationSlider.Value) then
          begin
            CreatureAnimationScenesPerTime := CreatureAnimationSlider.Value;
            SubMenuAdditionalInfo := 'You have to restart the game for the ' +

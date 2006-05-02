@@ -27,7 +27,7 @@ interface
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
-  KambiUtils, KambiClassUtils, CastlePlayer;
+  KambiUtils, KambiClassUtils, CastlePlayer, GLHeadlight;
 
 {$define read_interface}
 
@@ -47,7 +47,7 @@ type
     FNavigationSpeed: Single;
     FLevelBox: TBox3d;
     FItems: TItemsOnLevelList;
-    FHeadlight: boolean;
+    FHeadlight: TGLHeadlight;
 
     { Used only within constructor.
       We will process the scene graph, and sometimes it's not comfortable
@@ -161,8 +161,6 @@ type
     { Creatures on the level. Note that objects on this list are owned
       by level object. }
     property Creatures: TCreaturesList read FCreatures;
-
-    property Headlight: boolean read FHeadlight;
 
     property LightCastingShadowsPosition: TVector3Single
       read FLightCastingShadowsPosition;
@@ -306,6 +304,18 @@ type
       default GL_LIGHT_MODEL_AMBIENT setting. }
     property GlobalAmbientLight: TVector4Single
       read FGlobalAmbientLight write FGlobalAmbientLight;
+
+    { Properties of default level's headlight.
+      @Nil if no headlight should be used by default for this level.
+
+      Note for descendants: TLevel sets this to nil if NavigationInfo.headlight
+      field of level's VRML is FALSE. Otherwise TLevel initializes it by
+      TGLHeadlight.Create, i.e. creates an instance of TGLHeadlight
+      with default params. Descendants can change the properties of this instance
+      in their constructor.
+
+      TLevel destructor frees this object. }
+    property Headlight: TGLHeadlight read FHeadlight;
   end;
 
   TLevelClass = class of TLevel;
@@ -397,6 +407,8 @@ type
 
   TCagesLevel = class(TLevel)
   public
+    constructor Create; override;
+
     class function SceneFileName: string; override;
     class function LightSetFileName: string; override;
 
@@ -550,9 +562,9 @@ begin
     FNavigationSpeed := NavigationNode.FdSpeed.Value else
     FNavigationSpeed := 1.0;
 
-  if NavigationNode <> nil then
-    FHeadlight := NavigationNode.FdHeadlight.Value else
-    FHeadlight := false;
+  if (NavigationNode <> nil) and NavigationNode.FdHeadlight.Value then
+    FHeadlight := TGLHeadlight.Create else
+    FHeadlight := nil;
 
   FProjectionNear := CameraRadius * 0.75;
   FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
@@ -599,6 +611,7 @@ end;
 
 destructor TLevel.Destroy;
 begin
+  FreeAndNil(FHeadlight);
   FreeWithContentsAndNil(FSectors);
   FreeWithContentsAndNil(FWaypoints);
   FreeAndNil(FLightSet);
@@ -904,6 +917,12 @@ begin
   Button.DefaultTriangleOctree := Button.CreateTriangleOctree('');
 
   AnimationButtonPress := 1.0;
+
+  if Headlight <> nil then
+  begin
+    Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
+    Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
+  end;
 end;
 
 destructor TCastleHallLevel.Destroy;
@@ -1281,6 +1300,21 @@ begin
 end;
 
 { TCagesLevel ---------------------------------------------------------------- }
+
+constructor TCagesLevel.Create;
+begin
+  inherited;
+
+  if Headlight <> nil then
+  begin
+    Headlight.DiffuseColor := Vector4Single(1, 1, 0.29, 1.0);
+    Headlight.SpecularColor := Vector4Single(1, 1, 0.29, 1.0);
+    Headlight.Spot := true;
+//    Headlight.Attenuation := Vector3Single(1, 0.1, 0);
+    Headlight.SpotCutoff := 40;
+    Headlight.SpotExponent := 0.1;
+  end;
+end;
 
 class function TCagesLevel.SceneFileName: string;
 begin
