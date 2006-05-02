@@ -33,6 +33,7 @@ uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
 
 const
   DefaultFootstepsSound = stPlayerFootstepsConcrete;
+  DefaultGlobalAmbientLight: TVector4Single = (0.2, 0.2, 0.2, 1.0);
 
 type
   TLevel = class
@@ -84,6 +85,7 @@ type
 
     FPlayedMusicSound: TSoundType;
     FFootstepsSound: TSoundType;
+    FGlobalAmbientLight: TVector4Single;
   protected
     { See README for description of LevelBox and HintButtonBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
@@ -295,6 +297,15 @@ type
 
       In TLevel class implementation of this does nothing.  }
     procedure PrepareNewPlayer(NewPlayer: TPlayer); virtual;
+
+    { This controls OpenGL GL_LIGHT_MODEL_AMBIENT setting.
+      You can change it while the level is loaded (just remember to refresh
+      OpenGL setting if needed).
+
+      By default it's DefaultGlobalAmbientLight, which is equal to OpenGL's
+      default GL_LIGHT_MODEL_AMBIENT setting. }
+    property GlobalAmbientLight: TVector4Single
+      read FGlobalAmbientLight write FGlobalAmbientLight;
   end;
 
   TLevelClass = class of TLevel;
@@ -582,6 +593,8 @@ begin
 
   LevelsAvailable.FindLevelClass(TLevelClass(Self.ClassType)).
     AvailableForNewGame := true;
+
+  FGlobalAmbientLight := DefaultGlobalAmbientLight;
 end;
 
 destructor TLevel.Destroy;

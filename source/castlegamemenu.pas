@@ -70,8 +70,10 @@ type
   end;
 
   TEditLevelLightsMenu = class(TCastleMenu)
+    AmbientColorSlider: array[0..2] of TGLMenuFloatSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
   end;
 
   TEditOneLightMenu = class(TCastleMenu)
@@ -492,14 +494,24 @@ var
 begin
   inherited Create;
 
+  { To better visualize changes to Level.GlobalAmbientLight }
+  DrawBackgroundRectangle := false;
+
+  AmbientColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[0]);
+  AmbientColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[1]);
+  AmbientColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[2]);
+
   for I := 0 to Level.LightSet.Lights.High do
   begin
     LightNode := Level.LightSet.Lights[I].LightNode;
-    Items.Add(Format('Edit light %d: %s named "%s"',
+    Items.Add(Format('Edit level light %d: %s named "%s"',
       [I, LightNode.NodeTypeName, LightNode.NodeName]));
   end;
-  Items.Add('Output VRML lights on console');
-  Items.Add('Output VRML lights to level xxx_lights.wrl file');
+  Items.Add('Output level lights on console');
+  Items.Add('Save level lights to level xxx_lights.wrl file');
+  Items.AddObject('Global ambient light red'  , AmbientColorSlider[0]);
+  Items.AddObject('Global ambient light green', AmbientColorSlider[1]);
+  Items.AddObject('Global ambient light blue' , AmbientColorSlider[2]);
   Items.Add('Back to debug menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -514,31 +526,42 @@ procedure TEditLevelLightsMenu.CurrentItemSelected;
   end;
 
 begin
-  if CurrentItem = Level.LightSet.Lights.Count then
-  begin
-    if StdOutStream <> nil then
-      SaveToVRMLFile(Level.LightSet.RootNode, StdOutStream, LightSetVRMLComment) else
-      MessageOK(Glw, 'No stdout available. On Windows you must run the game ' +
-        'from the command-line to get stdout.', taLeft);
-  end else
-  if CurrentItem = Level.LightSet.Lights.Count + 1 then
-  begin
-    if MessageYesNo(Glw, Format('This will permanently overwrite file "%s". ' +
-      'Are you sure you want to save the lights ?',
-      [Level.LightSetFileName]), taLeft) then
-      SaveToVRMLFile(Level.LightSet.RootNode, Level.LightSetFileName,
-        LightSetVRMLComment);
-  end else
-  if CurrentItem = Level.LightSet.Lights.Count + 2 then
-  begin
-    CurrentMenu := DebugMenu;
-  end else
-  begin
-    FreeAndNil(EditOneLightMenu);
-    EditOneLightMenu := TEditOneLightMenu.Create(
-      Level.LightSet.Lights[CurrentItem].LightNode);
-    CurrentMenu := EditOneLightMenu;
+  case CurrentItem - Level.LightSet.Lights.Count of
+    0: begin
+         if StdOutStream <> nil then
+           SaveToVRMLFile(Level.LightSet.RootNode, StdOutStream, LightSetVRMLComment) else
+           MessageOK(Glw, 'No stdout available. On Windows you must run the game ' +
+             'from the command-line to get stdout.', taLeft);
+       end;
+    1: begin
+         if MessageYesNo(Glw, Format('This will permanently overwrite file "%s". ' +
+           'Are you sure you want to save the lights ?',
+           [Level.LightSetFileName]), taLeft) then
+           SaveToVRMLFile(Level.LightSet.RootNode, Level.LightSetFileName,
+             LightSetVRMLComment);
+       end;
+    2, 3, 4: ;
+    5: CurrentMenu := DebugMenu;
+    else
+       begin
+         FreeAndNil(EditOneLightMenu);
+         EditOneLightMenu := TEditOneLightMenu.Create(
+           Level.LightSet.Lights[CurrentItem].LightNode);
+         CurrentMenu := EditOneLightMenu;
+       end;
   end;
+end;
+
+procedure TEditLevelLightsMenu.CurrentItemAccessoryValueChanged;
+begin
+  case CurrentItem - Level.LightSet.Lights.Count of
+    2: Level.GlobalAmbientLight[0] := AmbientColorSlider[0].Value;
+    3: Level.GlobalAmbientLight[1] := AmbientColorSlider[1].Value;
+    4: Level.GlobalAmbientLight[2] := AmbientColorSlider[2].Value;
+    else Exit;
+  end;
+
+  glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
 end;
 
 { TEditOneLightMenu ---------------------------------------------------------- }

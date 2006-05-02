@@ -503,6 +503,8 @@ begin
   end else
     glDisable(GL_LIGHT0);
 
+  glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
+
   MusicPlayer.PlayedSound := Level.PlayedMusicSound;
 
   { First GameMessage for this level. }
