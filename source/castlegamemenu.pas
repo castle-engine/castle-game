@@ -202,7 +202,7 @@ begin
   RenderShadowQuadsArgument := TGLMenuBooleanArgument.Create(RenderShadowQuads);
 
   Items.Add('Player.Life := Player.MaxLife');
-  Items.Add('Show creatures on level info');
+  Items.Add('Creatures on level: show info, kill');
   Items.Add('Add creature to level');
   Items.Add('Change creature kind MoveSpeed');
   Items.Add('Give me 20 instances of every possible item');
@@ -251,7 +251,15 @@ procedure TDebugMenu.CurrentItemSelected;
             FloatToNiceStr(Level.Creatures[I].Life),
             FloatToNiceStr(Level.Creatures[I].MaxLife) ]));
 
-      MessageOK(Glw, S, taLeft);
+      S.Append('Kill all creatures ?');
+
+      if MessageYesNo(Glw, S, taLeft) then
+        for I := 0 to Level.Creatures.High do
+          if Level.Creatures[I].Life > 0 then
+          begin
+            Level.Creatures[I].Life := 0;
+            Level.Creatures[I].LastAttackDirection := ZeroVector3Single;
+          end;
     finally S.Free end;
   end;
 

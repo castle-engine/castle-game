@@ -510,8 +510,8 @@ type
 
     { Each time you decrease life of this creature, set this property.
       This is the direction from where the attack came.
-      You can set this to (0, 0, 0) if there was no specific direction
-      of attack.
+      You can set this to (0, 0, 0) (ZeroVector3Single)
+      if there was no specific direction of attack.
 
       On set, this vector will be normalized. }
     property LastAttackDirection: TVector3Single

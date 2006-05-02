@@ -2,15 +2,14 @@
 
 Group {
   PerspectiveCamera {
-    position 6.296680927276611 -134.73121643066406 3.268791437149048
-    direction -0.186874628067017 1.281014561653137 -0.000000000592678
-    up 0 -0.000000043711388 1
+    position -12.851985931396484 -63.229564666748047 1.807070970535278
+    orientation 0.997727334499359 0.047644775360823 0.047645185142756 1.573071718215942
   }
 
   NavigationInfo {
     avatarSize [ 0.5, 2 ]
     speed 1.0
-    headlight TRUE
+    headlight FALSE
   }
 
   WWWInline { name "cages.wrl" }
