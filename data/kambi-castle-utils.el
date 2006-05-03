@@ -213,13 +213,26 @@ on MESH-NAME to be correctly interpreted."
 (defun kam-process-cages ()
   (interactive)
   (kam-fix-vertex-col-material "MeshCage")
+  (kam-fix-vertex-col-material "MeshCageKnife")
+  (kam-fix-vertex-col-material "MeshCageOnlyDown")
+
   (kam-fix-vertex-col-material "MeshWalls")
+
   (kam-remove-vertex-col-material-one-mesh "MeshGround")
   (kam-add-material-for-mesh "MeshGround" "MatNormal")
+
   (kam-remove-vertex-col-material-one-mesh "MeshCageBar")
   (kam-add-material-for-mesh "MeshCageBar" "MatNormal")
+  (kam-remove-vertex-col-material-one-mesh "MeshCageBarsKnife")
+  (kam-add-material-for-mesh "MeshCageBarsKnife" "MatNormal")
+  (kam-remove-vertex-col-material-one-mesh "MeshCageBarsKnife")
+  (kam-add-material-for-mesh "MeshCageBarsKnife" "MatNormal")
+  (kam-remove-vertex-col-material-one-mesh "MeshCageBarsDown")
+  (kam-add-material-for-mesh "MeshCageBarsDown" "MatNormal")
+
   (kam-remove-vertex-col-material-one-mesh "MeshRandomBlock")
   (kam-add-material-for-mesh "MeshRandomBlock" "MatNormal")
   (kam-add-for-mesh "MeshNaturalRockSide" "ShapeHints { creaseAngle 4 }")
+
   (write-file "cages_processed.wrl")
 )
