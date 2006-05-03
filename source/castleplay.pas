@@ -376,6 +376,8 @@ begin
 
   glLoadMatrix(Glw.Navigator.Matrix);
 
+  if Level.ThunderEffect <> nil then
+    Level.ThunderEffect.Render(Level.AnimationTime);
   Level.LightSet.RenderLights;
 
   if RenderShadowsPossible and RenderShadows then
@@ -492,6 +494,9 @@ begin
 
   { Init Level.Headlight }
   TGLHeadlight.RenderOrDisable(Level.Headlight, 0);
+
+  if Level.ThunderEffect <> nil then
+    Level.ThunderEffect.InitGLLight;
 
   glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
 

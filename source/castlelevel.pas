@@ -27,7 +27,7 @@ interface
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
-  KambiUtils, KambiClassUtils, CastlePlayer, GLHeadlight;
+  KambiUtils, KambiClassUtils, CastlePlayer, GLHeadlight, CastleThunder;
 
 {$define read_interface}
 
@@ -86,6 +86,7 @@ type
     FPlayedMusicSound: TSoundType;
     FFootstepsSound: TSoundType;
     FGlobalAmbientLight: TVector4Single;
+    FThunderEffect: TThunderEffect;
   protected
     { See README for description of LevelBox and HintButtonBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
@@ -316,6 +317,14 @@ type
 
       TLevel destructor frees this object. }
     property Headlight: TGLHeadlight read FHeadlight;
+
+    { For thunder effect. nil if no thunder effect should be done for this level.
+
+      Descendants can set this in their constructor.
+      We will call it's Idle, CastlePlay will call it's InitGLLight and Render,
+      our destructor will free it. }
+    property ThunderEffect: TThunderEffect
+      read FThunderEffect write FThunderEffect;
   end;
 
   TLevelClass = class of TLevel;
@@ -594,7 +603,11 @@ begin
   Scene.PrepareRender(true, true, false, false);
 
   FLightSet := TVRMLLightSetGL.Create(LoadVRMLNode(LightSetFileName),
-    true, 1, -1);
+    true,
+    { GL_LIGHT0 is reserved for headlight. }
+    { GL_LIGHT1 is reserved for thunder effect in cages level.
+      So first light is GL_LIGHT2. }
+    2, -1);
 
   { Calculate LightCastingShadowsPosition }
   FLightCastingShadowsPosition := Box3dMiddle(Scene.BoundingBox);
@@ -611,6 +624,7 @@ end;
 
 destructor TLevel.Destroy;
 begin
+  FreeAndNil(FThunderEffect);
   FreeAndNil(FHeadlight);
   FreeWithContentsAndNil(FSectors);
   FreeWithContentsAndNil(FWaypoints);
@@ -852,6 +866,9 @@ end;
 procedure TLevel.Idle(const CompSpeed: Single);
 begin
   FAnimationTime += CompSpeed / 50;
+
+  if ThunderEffect <> nil then
+    ThunderEffect.Idle(AnimationTime);
 end;
 
 function TLevel.TrianglePicked(const Distance: Single;
@@ -1306,6 +1323,9 @@ begin
   inherited;
 
   PlayedMusicSound := stCagesMusic;
+
+  ThunderEffect := TThunderEffect.Create;
+  ThunderEffect.GLLightNumber := 1;
 
   if Headlight <> nil then
   begin

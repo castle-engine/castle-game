@@ -10,5 +10,4 @@ doit()
   mv "$1"_2.wav "$1".wav
 }
 
-doit input1
-doit input2
+doit thunder

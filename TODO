@@ -1,8 +1,6 @@
 - life indicator of the boss --- this should be a good workaround for lack
   of blood effects etc. for now.
 
-- headlight on cages level ? By torch item ?
-
 --------------------
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.
@@ -12,6 +10,13 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
+
+- thunder: 3d sound ?
+
+- headlight on cages level ? By torch item ?
+  No ? Spot headlight looks poor (must over-triangulate meshes),
+  and it doesn't resemble a torch anyway. Positional light with attenuation
+  also doesn't look too special.
 
 - Things that I would like to show in new levels:
   - swimming feels great --- show it off more ?

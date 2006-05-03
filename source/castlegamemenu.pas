@@ -230,6 +230,7 @@ begin
   Items.Add('Change sound properties');
   Items.Add('Edit lights');
   Items.Add('Change jump properties');
+  Items.Add('Force thunder now');
   Items.Add('Back to game menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -447,6 +448,16 @@ procedure TDebugMenu.CurrentItemSelected;
       Player.Navigator.JumpPower := SingleValue;
   end;
 
+  procedure ForceThunder;
+  begin
+    if Level.ThunderEffect <> nil then
+    begin
+      Level.ThunderEffect.ForceNow;
+      UserQuit := true;
+    end else
+      MessageOK(Glw, 'Thunder effect not defined for this level.', taLeft);
+  end;
+
 begin
   inherited;
 
@@ -477,7 +488,8 @@ begin
           CurrentMenu := EditLevelLightsMenu;
         end;
     14: ChangeJumpProperties;
-    15: CurrentMenu := GameMenu;
+    15: ForceThunder;
+    16: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
