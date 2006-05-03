@@ -90,6 +90,7 @@ type
     stGateMusic,
     stCastleHallSymbolMoving,
     stCastleHallMusic,
+    stCagesMusic,
     { @groupEnd }
 
     { Creatures sounds.
@@ -306,6 +307,8 @@ var
     ( FileName: 'castle_hall_symbol_moving.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'castle_hall_music.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
+    ( FileName: 'cages_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: 'creature_falled_down.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),

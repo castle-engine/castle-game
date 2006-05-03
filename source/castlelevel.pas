@@ -1305,6 +1305,8 @@ constructor TCagesLevel.Create;
 begin
   inherited;
 
+  PlayedMusicSound := stCagesMusic;
+
   if Headlight <> nil then
   begin
     Headlight.DiffuseColor := Vector4Single(1, 1, 0.29, 1.0);
