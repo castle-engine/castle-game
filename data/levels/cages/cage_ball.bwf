@@ -1,6 +1,6 @@
 <BlenderWorld version="0.1.0">
 <Mapping>3</Mapping>
-<Dimensions USize="16" VSize="128" Radius="10.0"
+<Dimensions USize="4" VSize="128" Radius="1.0"
             ThMin="-10.0" ThMax="10.0" PhMin="-20.0" PhMax="20.0">
 </Dimensions>
 <Noise Type="4" XOffset="0.0" YOffset="0.0" ZOffset="0.0"

@@ -283,6 +283,12 @@ Typical things that I write "by hand" are
   (Also, while Blender exporter can export Blender lights to VRML,
   it doesn't allow me to use all features of VRML lights.)
 
+  Since version 0.5.7 you can also edit the lights from the game
+  --- see "Debug options" menu for "Edit lights" command.
+  So you have to add appropriate nodes to xxx_lights.wrl
+  file by hand, and then you can just run the game and configure lights
+  properties from the game.
+
 Moreover, I sometimes want to post-process VRML files generated from
 Blender. I use EmacsLisp macros for this (since this is a great language
 for text operations, and it's built in my favourite editor :) ).
