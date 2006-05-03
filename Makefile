@@ -59,7 +59,7 @@ clean:
 	                   -iname '*.~???' -or \
 			   -iname '*.blend1' ')' -print \
 	     | xargs rm -f
-	rm -f castle-?.?.?.tar.gz
+	rm -f castle-*.tar.gz
 	$(MAKE) -C source/ clean
 
 # Remove private files that Michalis keeps inside his castle/trunk/,
@@ -94,6 +94,12 @@ DIST_EXTENSION := gz
 DIST_TAR_FILTER := --gzip
 endif
 
+ifdef DIST_WITH_SRC
+DIST_ARCHIVE_FILENAME := castle-with-sources-$(VERSION).tar.$(DIST_EXTENSION)
+else
+DIST_ARCHIVE_FILENAME := castle-$(VERSION).tar.$(DIST_EXTENSION)
+endif
+
 # Make distribution tar.gz to upload for PGD competition.
 # For now, this target is not supposed to be run by anyone
 # else than me (Michalis), because it depends on some private
@@ -102,9 +108,15 @@ endif
 # packed into tar.gz using my private script).
 #
 # Before doing this target, remember to
-# - make sure Version in castleplay.pas is correct
+# - make sure Version in castlehelp.pas is correct
 # - recompile castle for Linux and Windows
 dist:
+	$(MAKE) DIST_WITH_SRC=t dist-core
+	$(MAKE) dist-core
+
+# This is internal that actually does all the work of dist.
+# Only tha dist target should call this.
+dist-core:
 # Start with empty $(TMP_DIST_PATH)
 	rm -Rf $(TMP_DIST_PATH)
 	mkdir -p $(TMP_DIST_PATH)
@@ -122,15 +134,30 @@ dist:
 	find $(TMP_DIST_PATH) -type f -and -iname '*.sh' -and -exec chmod 755 '{}' ';'
 	chmod 755 $(TMP_DIST_PATH)castle/castle
 # Copy and clean general units sources
+ifdef DIST_WITH_SRC
 	cd /win/mojewww/camelot/private/update_archives/; ./update_pascal_src.sh units
 	cp /win/mojewww/camelot/src/pascal/units-src.tar.gz $(TMP_DIST_PATH)castle/source/
 	cd $(TMP_DIST_PATH)castle/source/; tar xzf units-src.tar.gz
 	rm -f $(TMP_DIST_PATH)castle/source/units-src.tar.gz
 	mv $(TMP_DIST_PATH)castle/source/COPYING $(TMP_DIST_PATH)castle/COPYING
+else
+	cp /usr/share/common-licenses/GPL-2 $(TMP_DIST_PATH)castle/COPYING
+endif
+# If not with sources, clean some things that should be only in sources
+ifndef DIST_WITH_SRC
+	rm -Rf $(TMP_DIST_PATH)castle/source/
+	find $(TMP_DIST_PATH)castle/data/ \
+	  '(' '(' -type f -iname '*.blend' ')' -or \
+	      '(' -type f -iname 'Makefile' ')' -or \
+	      '(' -type f -iname '*.xcf' ')' -or \
+	      '(' -type f -iname '*.sh' ')' -or \
+	      '(' -type f -iname '*.el' ')' \
+	  ')' -exec rm -f '{}' ';'
+endif
 # Pack things
 	cd $(TMP_DIST_PATH); tar -c $(DIST_TAR_FILTER) -f \
-	  castle-$(VERSION).tar.$(DIST_EXTENSION) castle/
-	mv $(TMP_DIST_PATH)castle-$(VERSION).tar.$(DIST_EXTENSION) .
+	  $(DIST_ARCHIVE_FILENAME) castle/
+	mv $(TMP_DIST_PATH)$(DIST_ARCHIVE_FILENAME) .
 
 # ----------------------------------------
 # Set SVN tag.

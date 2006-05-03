@@ -7,6 +7,8 @@ Cages level:
 - life indicator of the boss --- this should be a good workaround for lack
   of blood effects etc. for now.
 
+- Update WWW to point to both -with-sources and without versions.
+
 --------------------
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.
@@ -271,10 +273,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 
 ----------------------------------------
 dist-making to-dos:
-
-- prepare some binary only distro ?
-  it doesn't need many things, including all sources and *
-  .blend and *.xcf (and some other internals in menu_bg)
 
 - Makefile to pack distro of my game: add at some point svn log:
   svn log -v file:///home/michal/svn/kambi-svn-repos/ \
