@@ -152,6 +152,16 @@ on MESH-NAME to be correctly interpreted."
 	Separator { USE " material-name))
 )
 
+(defun kam-add-for-mesh (mesh-name-regexp vrml-code)
+  "Add any VRML code before meshes matching MESH-NAME-REGEXP."
+  (interactive)
+  (kam-simple-re-replace-buffer
+    (kam-blender-mesh-node-start-regexp mesh-name-regexp)
+    (concat
+      (kam-blender-mesh-node-start-regexp-replacement 1)
+      vrml-code))
+)
+
 ;; Processing specific VRML files ----------------------------------------------
 
 (defun kam-process-castle-hall ()
@@ -210,5 +220,6 @@ on MESH-NAME to be correctly interpreted."
   (kam-add-material-for-mesh "MeshCageBar" "MatNormal")
   (kam-remove-vertex-col-material-one-mesh "MeshRandomBlock")
   (kam-add-material-for-mesh "MeshRandomBlock" "MatNormal")
+  (kam-add-for-mesh "MeshNaturalRockSide" "ShapeHints { creaseAngle 4 }")
   (write-file "cages_processed.wrl")
 )

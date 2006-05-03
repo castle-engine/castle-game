@@ -1,6 +1,5 @@
 Cages level:
 - make some cages broken
-- put some dark natural rock things
 - finish: room and queen liar
 - creatures: spider, spider queen
 
@@ -19,7 +18,12 @@ Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
 
-- thunder: 3d sound ?
+- thunder:
+  - 3d sound ?
+  - if the light would only shine through the window's shapes it would be even better.
+
+Cages level:
+- this natural rock thing better ?
 
 - headlight on cages level ? By torch item ?
   No ? Spot headlight looks poor (must over-triangulate meshes),
@@ -30,10 +34,6 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
   - swimming feels great --- show it off more ?
   - lights: Spot light. Moving light.
   - Some moving objects on the level: this is easy to do in my levels. Use it more !
-  - indoor dungeon, with window high in the wall (to high to look straight through):
-    Rain sound, from time to time make "thunder",
-    and the light shines through the window. Basics of this trick
-    are tested in lets_take_a_walk.
   - more environ sounds: wind blowing.
 
 - "Set keys to "Half life 2" scheme" menu command ?
