@@ -25,7 +25,8 @@ program castle;
 uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   ParseParametersUnit, GLWinMessages, KambiGLUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
-  KambiClassUtils, CastleVideoOptions, CastleInitialBackground;
+  KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
+  CastleCreatures;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -34,12 +35,13 @@ var
   WasParam_NoScreenResize: boolean = false;
 
 const
-  Options: array[0..4]of TOption =
+  Options: array[0..5]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short: #0; Long: 'no-sound'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
     (Short:'n'; Long: 'no-screen-resize'; Argument: oaNone),
-    (Short: #0; Long: 'no-shadows'; Argument: oaNone)
+    (Short: #0; Long: 'no-shadows'; Argument: oaNone),
+    (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -62,6 +64,9 @@ begin
            '                        then will run in windowed mode.' +nl+
            '  --no-shadows          Disable initializing and using shadows.' +nl+
            nl+
+           'Debug options (don''t use unless you know what you''re doing):' +nl+
+           '  --debug-no-creatures  Disable loading creatures animations' +nl+
+           nl+
            SProgramHelpSuffix);
          ProgramBreak;
        end;
@@ -72,6 +77,7 @@ begin
        end;
     3: WasParam_NoScreenResize := true;
     4: RenderShadowsPossible := false;
+    5: WasParam_DebugNoCreatures := true;
     else raise EInternalError.Create('OptionProc');
   end;
 end;

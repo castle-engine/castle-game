@@ -717,6 +717,8 @@ var
   BallMissile: TMissileCreatureKind;
   Ghost: TGhostKind;
 
+  WasParam_DebugNoCreatures: boolean = false;
+
 {$undef read_interface}
 
 implementation
@@ -748,15 +750,18 @@ var
   I: Integer;
   PrepareRenderSteps: Cardinal;
 begin
-  PrepareRenderSteps := 0;
-  for I := 0 to High do
-    PrepareRenderSteps +=  Items[I].PrepareRenderSteps;
-
-  Progress.Init(PrepareRenderSteps, 'Loading creatures');
-  try
+  if not WasParam_DebugNoCreatures then
+  begin
+    PrepareRenderSteps := 0;
     for I := 0 to High do
-      Items[I].PrepareRender;
-  finally Progress.Fini; end;
+      PrepareRenderSteps +=  Items[I].PrepareRenderSteps;
+
+    Progress.Init(PrepareRenderSteps, 'Loading creatures');
+    try
+      for I := 0 to High do
+        Items[I].PrepareRender;
+    finally Progress.Fini; end;
+  end;
 end;
 
 function TCreaturesKindsList.FindByVRMLNodeName(

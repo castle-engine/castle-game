@@ -407,6 +407,8 @@ type
 
   TTowerLevel = class(TLevel)
   public
+    constructor Create; override;
+
     class function SceneFileName: string; override;
     class function LightSetFileName: string; override;
 
@@ -780,7 +782,8 @@ begin
     Parent := Node.Parents[ParentIndex];
     if IsPrefix(CreaturePrefix, Parent.NodeName) then
     begin
-      CreateNewCreature(SEnding(Parent.NodeName, Length(CreaturePrefix) + 1));
+      if not WasParam_DebugNoCreatures then
+        CreateNewCreature(SEnding(Parent.NodeName, Length(CreaturePrefix) + 1));
       { Don't remove Parent now --- will be removed later.
         This avoids problems with removing nodes while traversing. }
       ItemsToRemove.Add(Parent);
@@ -1295,6 +1298,17 @@ begin
 end;
 
 { TTowerLevel ---------------------------------------------------------------- }
+
+constructor TTowerLevel.Create;
+begin
+  inherited;
+
+  if Headlight <> nil then
+  begin
+    Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
+    Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
+  end;
+end;
 
 class function TTowerLevel.SceneFileName: string;
 begin
