@@ -312,7 +312,7 @@ var
     ( FileName: 'cages_music_with_rain.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: 'thunder.wav';
-      Gain: 2; MinGain: 0; MaxGain: 2; DefaultImportance: LevelEventSoundImportance; ),
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'creature_falled_down.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'alien_sudden_pain.wav';

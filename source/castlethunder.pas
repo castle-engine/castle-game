@@ -81,7 +81,7 @@ begin
   if NextBeginTime <= Level.AnimationTime then
   begin
     LastBeginTime := Level.AnimationTime;
-    NextBeginTime := Level.AnimationTime + 10 + Random(30);
+    NextBeginTime := Level.AnimationTime + 10 + Random(20);
 
     {ThunderAllocatedSound := }Sound(stThunder);
   end;

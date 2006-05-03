@@ -215,6 +215,7 @@ on MESH-NAME to be correctly interpreted."
   (kam-fix-vertex-col-material "MeshCage")
   (kam-fix-vertex-col-material "MeshCageKnife")
   (kam-fix-vertex-col-material "MeshCageOnlyDown")
+  (kam-fix-vertex-col-material "MeshCageUpSlide")
 
   (kam-fix-vertex-col-material "MeshWalls")
 
@@ -229,6 +230,8 @@ on MESH-NAME to be correctly interpreted."
   (kam-add-material-for-mesh "MeshCageBarsKnife" "MatNormal")
   (kam-remove-vertex-col-material-one-mesh "MeshCageBarsDown")
   (kam-add-material-for-mesh "MeshCageBarsDown" "MatNormal")
+  (kam-remove-vertex-col-material-one-mesh "MeshCageBarsUpSlide")
+  (kam-add-material-for-mesh "MeshCageBarsUpSlide" "MatNormal")
 
   (kam-remove-vertex-col-material-one-mesh "MeshRandomBlock")
   (kam-add-material-for-mesh "MeshRandomBlock" "MatNormal")
