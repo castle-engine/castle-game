@@ -873,7 +873,7 @@ begin
   FAnimationTime += CompSpeed / 50;
 
   if ThunderEffect <> nil then
-    ThunderEffect.Idle(AnimationTime);
+    ThunderEffect.Idle;
 end;
 
 function TLevel.TrianglePicked(const Distance: Single;
@@ -1341,7 +1341,6 @@ begin
   PlayedMusicSound := stCagesMusic;
 
   ThunderEffect := TThunderEffect.Create;
-  ThunderEffect.GLLightNumber := 1;
 
   if Headlight <> nil then
   begin
@@ -1381,7 +1380,7 @@ begin
   LightSet.Lights[0].LightNode.FdIntensity.Value := Clamped(
       LightSet.Lights[0].LightNode.FdIntensity.Value +
         MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed,
-      0, 1);
+      0.5, 1);
   LightSet.CalculateLights;
 end;
 

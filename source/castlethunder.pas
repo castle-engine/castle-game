@@ -33,10 +33,17 @@ type
   private
     LastBeginTime, NextBeginTime: Single;
   public
-    GLLightNumber: Cardinal;
-    procedure InitGLLight;
-    procedure Render(AnimationTime: Single);
-    procedure Idle(AnimationTime: Single);
+    procedure InitGLLight(LightNumber: Cardinal);
+    procedure Render(LightNumber: Cardinal);
+
+    { If ThunderEffect <> nil, this just calls ThunderEffect.Render(LightNumber).
+      If no, this disables OpenGL light number LightNumber.
+      In effect, this *always* enables or disables
+      OpenGL light number LightNumber. }
+    class procedure RenderOrDisable(
+      ThunderEffect: TThunderEffect; LightNumber: Cardinal);
+
+    procedure Idle;
     { Force thunder happening in next Idle call. }
     procedure ForceNow;
   end;
@@ -45,11 +52,11 @@ implementation
 
 uses ALSourceAllocator, OpenGLh, KambiGLUtils, CastleSound, CastlePlay;
 
-procedure TThunderEffect.InitGLLight;
+procedure TThunderEffect.InitGLLight(LightNumber: Cardinal);
 var
   GLLight: TGLenum;
 begin
-  GLLight := GL_LIGHT0 + GLLightNumber;
+  GLLight := GL_LIGHT0 + LightNumber;
   { Prepare "thunder light" }
   glLightv(GLLight, GL_POSITION, Vector4f(0, 1, -1, 0));
   glLightv(GLLight, GL_AMBIENT, Vector4f(0.5, 0.5, 1, 1));
@@ -59,18 +66,36 @@ begin
   glLighti(GLLight, GL_SPOT_CUTOFF, 180);
 end;
 
-procedure TThunderEffect.Render;
+procedure TThunderEffect.Render(LightNumber: Cardinal);
 var
+  GLLight: TGLenum;
   ThunderTime: Single;
+  ThunderVisible: boolean;
 begin
+  { calculate GLLight }
+  GLLight := GL_LIGHT0 + LightNumber;
+
+  { calculate ThunderVisible }
+  ThunderVisible := false;
   if LastBeginTime <> 0 then
   begin
     ThunderTime := Level.AnimationTime - LastBeginTime;
     if (ThunderTime < 1.0) or
        ((1.5 < ThunderTime) and (ThunderTime < 2.5)) then
-      glEnable(GL_LIGHT0 + GLLightNumber) else
-      glDisable(GL_LIGHT0 + GLLightNumber);
+      ThunderVisible := true;
   end;
+
+  if ThunderVisible then
+    glEnable(GLLight) else
+    glDisable(GLLight);
+end;
+
+class procedure TThunderEffect.RenderOrDisable(
+  ThunderEffect: TThunderEffect; LightNumber: Cardinal);
+begin
+  if ThunderEffect <> nil then
+    ThunderEffect.Render(LightNumber) else
+    glDisable(GL_LIGHT0 + LightNumber);
 end;
 
 procedure TThunderEffect.Idle;

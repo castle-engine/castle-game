@@ -118,7 +118,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   BFNT_BitstreamVeraSans_Unit, CastleCreatures,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound,
-  CastleVideoOptions, Keys, CastleConfig, GLHeadlight;
+  CastleVideoOptions, Keys, CastleConfig, GLHeadlight, CastleThunder;
 
 var
   GameMessagesManager: TTimeMessagesManager;
@@ -376,8 +376,7 @@ begin
 
   glLoadMatrix(Glw.Navigator.Matrix);
 
-  if Level.ThunderEffect <> nil then
-    Level.ThunderEffect.Render(Level.AnimationTime);
+  TThunderEffect.RenderOrDisable(Level.ThunderEffect, 1);
   Level.LightSet.RenderLights;
 
   if RenderShadowsPossible and RenderShadows then
@@ -496,7 +495,7 @@ begin
   TGLHeadlight.RenderOrDisable(Level.Headlight, 0);
 
   if Level.ThunderEffect <> nil then
-    Level.ThunderEffect.InitGLLight;
+    Level.ThunderEffect.InitGLLight(1);
 
   glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
 
