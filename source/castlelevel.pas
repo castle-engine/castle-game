@@ -425,6 +425,8 @@ type
 
     class function Title: string; override;
     class function Number: Integer; override;
+
+    procedure Idle(const CompSpeed: Single); override;
   end;
 
   TLevelAvailable = class
@@ -1370,6 +1372,17 @@ end;
 class function TCagesLevel.Number: Integer;
 begin
   Result := 3;
+end;
+
+procedure TCagesLevel.Idle(const CompSpeed: Single);
+begin
+  inherited;
+
+  LightSet.Lights[0].LightNode.FdIntensity.Value := Clamped(
+      LightSet.Lights[0].LightNode.FdIntensity.Value +
+        MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed,
+      0, 1);
+  LightSet.CalculateLights;
 end;
 
 { TLevelsAvailableList ------------------------------------------------------- }
