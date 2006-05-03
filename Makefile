@@ -68,9 +68,15 @@ clean:
 # These things are *not* automatically generated (automatically generated
 # stuff is removed always by `clean'). So this target is supposed to be
 # used only by `make dist', it does it inside temporary copy of castle/trunk/.
+#
+# Notes: I remove here data/sounds/intermediate/, because it's large
+# and almost noone should need this. These files are downloadable from
+# internet anyway, as they are just original things used to make
+# cages_music_with_rain.wav.
 clean_private:
 	find . -type d '(' -iname '.svn' ')' -print \
 	     | xargs rm -Rf
+	rm -Rf data/sounds/intermediate/
 
 # ------------------------------------------------------------
 # Dist making.
