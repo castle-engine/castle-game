@@ -7,6 +7,13 @@ Cages level:
 
 - Update WWW to point to both -with-sources and without versions.
 
+- alien: 
+  lower MinDelayBetweenAttacks?
+  samonaprowadzajace sie kulki ?
+
+  02:11:50) Szymon: przede wszystkim duchy powinny byc 0.5
+  (02:12:12) Szymon: a alien gdzies tak 0.35. wyglada naturalnie a jest trudniejszy
+
 - ask szymon about cages level:
   too dark ?
 
@@ -26,6 +33,7 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 
 Cages level:
 - this natural rock thing better ?
+- torch model base : use nice mesh from the base on lantern3.3ds from 3dcafe.com ?
 
 - headlight on cages level ? By torch item ?
   No ? Spot headlight looks poor (must over-triangulate meshes),
