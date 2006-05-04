@@ -305,6 +305,14 @@ type
       const AnimationTime: Single): TCreature; override;
   end;
 
+  TSpiderKind = class(TWalkAttackCreatureKind)
+  public
+    function CreateDefaultCreature(
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AnimationTime: Single): TCreature; override;
+  end;
+
   TGhostKind = class(TWalkAttackCreatureKind)
     procedure PrepareRender; override;
 
@@ -685,6 +693,11 @@ type
     procedure ActualAttack; override;
   end;
 
+  TSpiderCreature = class(TWalkAttackCreature)
+  public
+    procedure ActualAttack; override;
+  end;
+
   TGhostCreature = class(TWalkAttackCreature)
   public
     procedure ActualAttack; override;
@@ -726,7 +739,7 @@ var
   Werewolf: TWerewolfKind;
   BallMissile: TMissileCreatureKind;
   Ghost: TGhostKind;
-//  Spider: TSpiderKind;
+  Spider: TSpiderKind;
 
   WasParam_DebugNoCreatures: boolean = false;
 
@@ -952,6 +965,17 @@ function TWerewolfKind.CreateDefaultCreature(
   const AnimationTime: Single): TCreature;
 begin
   Result := TWerewolfCreature.Create(Self, ALegsPosition, ADirection,
+    DefaultMaxLife, AnimationTime);
+end;
+
+{ TSpiderKind -------------------------------------------------------------- }
+
+function TSpiderKind.CreateDefaultCreature(
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AnimationTime: Single): TCreature;
+begin
+  Result := TSpiderCreature.Create(Self, ALegsPosition, ADirection,
     DefaultMaxLife, AnimationTime);
 end;
 
@@ -2287,6 +2311,18 @@ begin
   end;
 end;
 
+{ TSpiderCreature ---------------------------------------------------------- }
+
+procedure TSpiderCreature.ActualAttack;
+begin
+  if Boxes3dCollision(Box3dTranslate(BoundingBox,
+    VectorScale(Direction, WAKind.MaxAttackDistance)), Player.BoundingBox) then
+  begin
+    Sound3d(stSpiderActualAttackHit, 1.0);
+    Player.Life := Player.Life - 20 - Random(10);
+  end;
+end;
+
 { TGhostCreature ---------------------------------------------------------- }
 
 procedure TGhostCreature.ActualAttack;
@@ -2553,7 +2589,6 @@ begin
   Ghost.SoundAttackStart := stGhostAttackStart;
   Ghost.SoundDying := stGhostDying;
 
-(*
   Spider := TSpiderKind.Create(
     'Spider',
     TVRMLGLAnimationInfo.Create(
@@ -2583,7 +2618,7 @@ begin
     );
   Spider.SoundSuddenPain := stSpiderSuddenPain;
   Spider.SoundAttackStart := stSpiderAttackStart;
-  Spider.SoundDying := stSpiderDying; *)
+  Spider.SoundDying := stSpiderDying;
 
   CreaturesKinds.LoadFromFile;
 end;

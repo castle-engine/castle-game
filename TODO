@@ -1,6 +1,16 @@
 Cages level:
+- spider:
+  finish the model (head larger ?),
+  material,
+  textures,
+  animate,
+  sounds,
+  adjust kinds.xml
+  new attack: throw some slime/webs ?
 - finish: room and queen liar
 - creatures: spider, spider queen
+
+- kangury debian: hangs on Quit.
 
 - life indicator of the boss --- this should be a good workaround for lack
   of blood effects etc. for now.

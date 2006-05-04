@@ -46,4 +46,14 @@
     max_knocked_back_distance="4.2"
     sound_dying_tied_to_creature="False"
   />
+
+  <Spider
+    actual_attack_time="0.5"
+    move_speed="0.1"
+    max_attack_distance="2.0"
+    preferred_attack_distance="2.0"
+    min_delay_between_attacks="2.0"
+    default_max_life="50.0"
+    max_knocked_back_distance="2.0"
+  />
 </CONFIG>

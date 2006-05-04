@@ -609,6 +609,10 @@ Creatures (enemies etc.):
 
   - Whole creature should use either *only transparent
     materials* or *only non-transparent materials*.
+    See TObjectKind.Transparent documentation for reasoning.
+
+- For simple customizations you can set various creature
+  parameters by editing data/creatures/kinds.xml file.
 
 - For testing various animations of creatures (and adjusting their time
   parameters) you can use my demo_animation program
