@@ -24,22 +24,7 @@ unit CastleConfig;
 
 interface
 
-uses KambiUtils, XMLCfg;
-
-type
-  { This is descendant of TXMLConfig that adds
-    GetValue, SetValue, SetDeleteValue for the Float type. }
-  TKamXMLConfig = class(TXMLConfig)
-  public
-    function GetValue(const APath: string;
-      const ADefaultValue: Float): Float; overload;
-
-    procedure SetValue(const APath: string;
-      const AValue: Float); overload;
-
-    procedure SetDeleteValue(const APath: string;
-      const AValue, ADefaultValue: Float); overload;
-  end;
+uses KambiUtils, KambiXMLCfg;
 
 var
   { User config file for this game.
@@ -50,29 +35,6 @@ var
 implementation
 
 uses SysUtils, KambiFilesUtils;
-
-{ TKamXMLConfig -------------------------------------------------------------- }
-
-function TKamXMLConfig.GetValue(const APath: string;
-  const ADefaultValue: Float): Float;
-var
-  ResultString: string;
-begin
-  ResultString := GetValue(APath, FloatToStr(ADefaultValue));
-  Result := StrToFloatDef(ResultString, ADefaultValue);
-end;
-
-procedure TKamXMLConfig.SetValue(const APath: string;
-  const AValue: Float);
-begin
-  SetValue(APath, FloatToStr(AValue));
-end;
-
-procedure TKamXMLConfig.SetDeleteValue(const APath: string;
-  const AValue, ADefaultValue: Float);
-begin
-  SetDeleteValue(APath, FloatToStr(AValue), FloatToStr(ADefaultValue));
-end;
 
 { initialization / finalization --------------------------------------------- }
 

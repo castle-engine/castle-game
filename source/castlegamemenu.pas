@@ -219,7 +219,7 @@ begin
   Items.Add('Player.Life := Player.MaxLife');
   Items.Add('Creatures on level: show info, kill');
   Items.Add('Add creature to level');
-  Items.Add('Change creature kind MoveSpeed');
+  Items.Add('Reload creatures/kinds.xml file');
   Items.Add('Give me 20 instances of every possible item');
   Items.AddObject('Set view angle', ViewAngleSlider);
   Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
@@ -312,34 +312,6 @@ procedure TDebugMenu.CurrentItemSelected;
         Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime));
 
       UserQuit := true;
-    end;
-  end;
-
-  procedure ChangeCreatureKindMoveSpeed;
-  var
-    Kind: TCreatureKind;
-    MoveSpeed: Single;
-  begin
-    if ChooseCreatureKind(Kind) then
-    begin
-      if Kind is TWalkAttackCreatureKind then
-        MoveSpeed := (Kind as TWalkAttackCreatureKind).MoveSpeed else
-      if Kind is TMissileCreatureKind then
-        MoveSpeed := (Kind as TMissileCreatureKind).MoveSpeed else
-      begin
-        MessageOK(Glw, 'This creature kind has no MoveSpeed property', taLeft);
-        Exit;
-      end;
-
-      if MessageInputQuerySingle(Glw, 'Input new MoveSpeed for the creature:',
-        MoveSpeed, taLeft) then
-      begin
-        if Kind is TWalkAttackCreatureKind then
-          (Kind as TWalkAttackCreatureKind).MoveSpeed := MoveSpeed else
-        if Kind is TMissileCreatureKind then
-          (Kind as TMissileCreatureKind).MoveSpeed := MoveSpeed else
-          raise EInternalError.Create('Kind = ? 2006-04-09');
-      end;
     end;
   end;
 
@@ -466,7 +438,7 @@ begin
     0: PlayerMaxLife;
     1: ShowLevelCreaturesInfo;
     2: AddLevelCreature;
-    3: ChangeCreatureKindMoveSpeed;
+    3: CreaturesKinds.LoadFromFile;
     4: GiveItems;
     5: ;
     6: ;

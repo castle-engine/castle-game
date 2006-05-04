@@ -52,7 +52,6 @@ type
   private
     FModelFileName: string;
     FScene: TVRMLFlatSceneGL;
-    FVRMLNodeName: string;
     FName: string;
     FImageFileName: string;
     FImage: TImage;
@@ -65,15 +64,6 @@ type
     destructor Destroy; override;
 
     property ModelFileName: string read FModelFileName;
-
-    { This will be used to refer to item kind from VRML models.
-
-      This should be a valid VRML node name.
-      Also, this mustn't contain '_' or '0' ... '9' chars (we may use them
-      internally to encode other info in the same VRML node name)
-      --- so actually this should only contain letters, 'a'..'z' and 'A'..'Z'.
-      Make this in 'CamelCase' to be consistent. }
-    property VRMLNodeName: string read FVRMLNodeName;
 
     { Nice name for user. }
     property Name: string read FName;
@@ -354,9 +344,8 @@ uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
 constructor TItemKind.Create(const AModelFileName, AVRMLNodeName, AName,
   AImageFileName: string);
 begin
-  inherited Create;
+  inherited Create(AVRMLNodeName);
   FModelFileName := AModelFileName;
-  FVRMLNodeName := AVRMLNodeName;
   FName := AName;
   FImageFileName := AImageFileName;
   ItemsKinds.Add(Self);

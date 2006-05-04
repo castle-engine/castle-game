@@ -7,12 +7,18 @@ Cages level:
 
 - Update WWW to point to both -with-sources and without versions.
 
-- alien: 
+- alien:
   lower MinDelayBetweenAttacks?
   samonaprowadzajace sie kulki ?
 
   02:11:50) Szymon: przede wszystkim duchy powinny byc 0.5
   (02:12:12) Szymon: a alien gdzies tak 0.35. wyglada naturalnie a jest trudniejszy
+  (MoveSpeed)
+
+- mouse problems:
+  function StrToFloatDef(const s: string; DefValue: Extended): Extended;
+  Was there a bug about this in FPC ? I don't remember, but I have this
+  in my KambiStringUtils.
 
 - ask szymon about cages level:
   too dark ?

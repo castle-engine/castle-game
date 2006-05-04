@@ -23,13 +23,19 @@ unit CastleObjectKinds;
 
 interface
 
+uses KambiXMLCfg;
+
+const
+  DefaultTransparent = false;
+
 type
   { This is a common class for item kind and creature kind. }
   TObjectKind = class
   private
     FTransparent: boolean;
+    FVRMLNodeName: string;
   public
-    constructor Create;
+    constructor Create(const AVRMLNodeName: string);
 
     { Prepare anything needed when starting new game.
       It can call Progress.Step PrepareRenderSteps times. }
@@ -39,6 +45,16 @@ type
 
     { Free any association with current OpenGL context. }
     procedure CloseGL; virtual;
+
+    { This will be used to refer to this kind from VRML models
+      (or some other places too).
+
+      This should be a valid VRML node name.
+      Also, this mustn't contain '_' or '0' ... '9' chars (we may use them
+      internally to encode other info in the same VRML node name)
+      --- so actually this should only contain letters, 'a'..'z' and 'A'..'Z'.
+      Make this in 'CamelCase' to be consistent. }
+    property VRMLNodeName: string read FVRMLNodeName;
 
     { Should the creature be rendered as transparent or opaque ?
       Each item/creature should either use only partially-transparent
@@ -62,15 +78,18 @@ type
 
       For more reasoning, see CastlePlay.Draw routine. }
     property Transparent: boolean
-      read FTransparent write FTransparent default false;
+      read FTransparent write FTransparent default DefaultTransparent;
+
+    procedure LoadFromFile(KindsConfig: TKamXMLConfig); virtual;
   end;
 
 implementation
 
-constructor TObjectKind.Create;
+constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
-  inherited;
-  FTransparent := false;
+  inherited Create;
+  FVRMLNodeName := AVRMLNodeName;
+  FTransparent := DefaultTransparent;
 end;
 
 procedure TObjectKind.PrepareRender;
@@ -86,6 +105,12 @@ end;
 procedure TObjectKind.CloseGL;
 begin
   { Nothing to do in this class. }
+end;
+
+procedure TObjectKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+begin
+  Transparent := KindsConfig.GetValue(VRMLNodeName + '/transparent',
+    DefaultTransparent);
 end;
 
 end.

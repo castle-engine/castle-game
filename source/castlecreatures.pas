@@ -25,7 +25,7 @@ interface
 
 uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints,
-  CastleObjectKinds, ALSourceAllocator;
+  CastleObjectKinds, ALSourceAllocator, KambiXMLCfg;
 
 {$define read_interface}
 
@@ -34,6 +34,8 @@ const
     Yes, it's not a typo, this identifier starts with "DefaultDefault". }
   DefaultDefaultMaxLife = 100.0;
 
+  DefaultFlying = false;
+
   DefaultMoveSpeed = 0.2;
   DefaultMinDelayBetweenAttacks = 5.0;
   DefaultMaxAttackDistance = 50.0 * 0.7;
@@ -41,6 +43,9 @@ const
   DefaultMissileMoveSpeed = 1.0 * 0.7;
   DefaultMaxKnockedBackDistance = 6.0 * 0.7;
   DefaultLifeToRunAway = 0.3;
+  DefaultActualAttackTime = 0.0;
+
+  DefaultSoundDyingTiedToCreature = true;
 
 type
   TCreature = class;
@@ -48,7 +53,6 @@ type
   TCreatureKind = class(TObjectKind)
   private
     FFlying: boolean;
-    FVRMLNodeName: string;
     FCameraRadius: Single;
     FSoundSuddenPain: TSoundType;
     FSoundDying: TSoundType;
@@ -61,7 +65,7 @@ type
       horizontally (which means that Direction is always orthogonal
       to Level.HomeCameraUp), and it falls down when Position is above
       the ground. }
-    property Flying: boolean read FFlying write FFlying default false;
+    property Flying: boolean read FFlying write FFlying default DefaultFlying;
 
     { Camera radius when moving. By default it's 0.
       You should initialize it to something larger, for collision detection.
@@ -80,11 +84,7 @@ type
       after the creature object was destroyed. }
     property SoundDyingTiedToCreature: boolean
       read FSoundDyingTiedToCreature write FSoundDyingTiedToCreature
-      default true;
-
-    { This will be used to refer to item kind from VRML models
-      (and from some other places too). }
-    property VRMLNodeName: string read FVRMLNodeName;
+      default DefaultSoundDyingTiedToCreature;
 
     { This will be used by CreateDefaultCreature to initialize
       MaxLife of the creature. Which means that not all instances
@@ -110,6 +110,8 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single): TCreature; virtual; abstract;
+
+    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -123,6 +125,10 @@ type
     { Find item with given VRMLNodeName.
       @raises Exception if not found. }
     function FindByVRMLNodeName(const AVRMLNodeName: string): TCreatureKind;
+
+    { This opens creatures/kinds.xml file and calls LoadFromFile for
+      all existing TCreatureKind instances. }
+    procedure LoadFromFile;
   end;
 
   { This is a TCreatureKind that has simple states:
@@ -256,7 +262,8 @@ type
       Note that actually ActualAttack may be called a *very little* later
       (hopefully it shouldn't be noticeable to the player). }
     property ActualAttackTime: Single
-      read FActualAttackTime write FActualAttackTime default 0.0;
+      read FActualAttackTime write FActualAttackTime
+      default DefaultActualAttackTime;
 
     { When this creature is knocked back by something (i.e. goes to wasHurt
       state), then it's forced to move in general LastAttackDirection
@@ -278,6 +285,8 @@ type
       the creature runs away. }
     property LifeToRunAway: Single
       read FLifeToRunAway write FLifeToRunAway default DefaultLifeToRunAway;
+
+    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
   end;
 
   TBallThrowerCreatureKind = class(TWalkAttackCreatureKind)
@@ -307,7 +316,12 @@ type
 
   { This is a missile. As you can see, this is also treated as a creature
     --- it's just a very dumb creature, that just moves into the given
-    direction and explodes on any collision. }
+    direction and explodes on any collision.
+
+    Missile must be generally considered as Flying, otherwise
+    it doesn't have much sense... Don't set Flying to false
+    for this class (because TMissileCreature may depend on it and never
+    cares to keep Direction horizontal). }
   TMissileCreatureKind = class(TCreatureKind)
   private
     FAnimation: TVRMLGLAnimation;
@@ -333,12 +347,6 @@ type
     property MoveSpeed: Single read FMoveSpeed write FMoveSpeed
       default DefaultMissileMoveSpeed;
 
-    { Missile must be generally considered as Flying, otherwise
-      it doesn't have much sense... Don't set Flying to false
-      for this class (because TMissileCreature may depend on it and never
-      cares to keep Direction horizontal). }
-    property Flying default true;
-
     property SoundExplosion: TSoundType
       read FSoundExplosion write FSoundExplosion default stNone;
 
@@ -346,6 +354,8 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single): TCreature; override;
+
+    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
   end;
 
   TCreature = class
@@ -716,6 +726,7 @@ var
   Werewolf: TWerewolfKind;
   BallMissile: TMissileCreatureKind;
   Ghost: TGhostKind;
+//  Spider: TSpiderKind;
 
   WasParam_DebugNoCreatures: boolean = false;
 
@@ -735,12 +746,24 @@ uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow,
 
 constructor TCreatureKind.Create(const AVRMLNodeName: string);
 begin
-  inherited Create;
-  FVRMLNodeName := AVRMLNodeName;
-  FFlying := false;
+  inherited Create(AVRMLNodeName);
+  FFlying := DefaultFlying;
   FDefaultMaxLife := DefaultDefaultMaxLife;
-  FSoundDyingTiedToCreature := true;
+  FSoundDyingTiedToCreature := DefaultSoundDyingTiedToCreature;
   CreaturesKinds.Add(Self);
+end;
+
+procedure TCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+begin
+  inherited;
+
+  Flying := KindsConfig.GetValue(VRMLNodeName + '/flying',
+    DefaultFlying);
+  SoundDyingTiedToCreature :=
+    KindsConfig.GetValue(VRMLNodeName + '/sound_dying_tied_to_creature',
+    DefaultSoundDyingTiedToCreature);
+  DefaultMaxLife := KindsConfig.GetValue(VRMLNodeName + '/default_max_life',
+    DefaultDefaultMaxLife);
 end;
 
 { TCreaturesKindsList -------------------------------------------------------- }
@@ -780,6 +803,23 @@ begin
     [AVRMLNodeName]);
 end;
 
+procedure TCreaturesKindsList.LoadFromFile;
+var
+  I: Integer;
+  KindsConfig: TKamXMLConfig;
+begin
+  KindsConfig := TKamXMLConfig.Create(nil);
+  try
+    KindsConfig.FileName := ProgramDataPath + 'data' + PathDelim +
+      'creatures' + PathDelim + 'kinds.xml';
+
+    for I := 0 to High do
+    begin
+      Items[I].LoadFromFile(KindsConfig);
+    end;
+  finally SysUtils.FreeAndNil(KindsConfig); end;
+end;
+
 { TWalkAttackCreatureKind ---------------------------------------------------- }
 
 constructor TWalkAttackCreatureKind.Create(
@@ -806,6 +846,7 @@ begin
   FPreferredAttackDistance := DefaultPreferredAttackDistance;
   FMaxKnockedBackDistance := DefaultMaxKnockedBackDistance;
   FLifeToRunAway := DefaultLifeToRunAway;
+  FActualAttackTime := DefaultActualAttackTime;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -866,6 +907,30 @@ begin
   if AttackAnimation <> nil then AttackAnimation.CloseGL;
   if DyingAnimation <> nil then DyingAnimation.CloseGL;
   if HurtAnimation <> nil then HurtAnimation.CloseGL;
+end;
+
+procedure TWalkAttackCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+begin
+  inherited;
+
+  ActualAttackTime := KindsConfig.GetValue(VRMLNodeName + '/actual_attack_time',
+    DefaultActualAttackTime);
+  MoveSpeed := KindsConfig.GetValue(VRMLNodeName + '/move_speed',
+    DefaultMoveSpeed);
+  MaxAttackDistance := KindsConfig.GetValue(VRMLNodeName + '/max_attack_distance',
+    DefaultMaxAttackDistance);
+  PreferredAttackDistance :=
+    KindsConfig.GetValue(VRMLNodeName + '/preferred_attack_distance',
+    DefaultPreferredAttackDistance);
+  MinDelayBetweenAttacks :=
+    KindsConfig.GetValue(VRMLNodeName + '/min_delay_between_attacks',
+    DefaultMinDelayBetweenAttacks);
+  LifeToRunAway :=
+    KindsConfig.GetValue(VRMLNodeName + '/life_to_run_away',
+    DefaultLifeToRunAway);
+  MaxKnockedBackDistance :=
+    KindsConfig.GetValue(VRMLNodeName + '/max_knocked_back_distance',
+    DefaultMaxKnockedBackDistance)
 end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
@@ -970,6 +1035,14 @@ function TMissileCreatureKind.CreateDefaultCreature(
 begin
   Result := TMissileCreature.Create(Self, ALegsPosition, ADirection,
     DefaultMaxLife, AnimationTime);
+end;
+
+procedure TMissileCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+begin
+  inherited;
+
+  MoveSpeed := KindsConfig.GetValue(VRMLNodeName + '/move_speed',
+    DefaultMissileMoveSpeed);
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }
@@ -2391,9 +2464,7 @@ begin
       [ 0.0, 0.1 ],
       AnimScenesPerTime, AnimOptimization, false, true)
     );
-  Alien.ActualAttackTime := 0.4;
   Alien.SoundSuddenPain := stAlienSuddenPain;
-  Alien.MoveSpeed := 0.1;
   Alien.SoundDying := stAlienDying;
 
   Werewolf := TWerewolfKind.Create(
@@ -2430,15 +2501,8 @@ begin
       [ 0.0, 0.3 ],
       AnimScenesPerTime, AnimOptimization, false, true)
     );
-  Werewolf.ActualAttackTime := 0.5;
-  Werewolf.MaxAttackDistance := 6.0 * 0.7;
-  Werewolf.PreferredAttackDistance := Werewolf.MaxAttackDistance;
-  Werewolf.MinDelayBetweenAttacks := 2.0;
   Werewolf.SoundSuddenPain := stWerewolfSuddenPain;
   Werewolf.SoundAttackStart := stWerewolfAttackStart;
-  Werewolf.LifeToRunAway := 0.1;
-  Werewolf.DefaultMaxLife := 500.0;
-  Werewolf.MoveSpeed := 0.1;
   Werewolf.SoundDying := stWerewolfDying;
 
   BallMissile := TMissileCreatureKind.Create(
@@ -2450,7 +2514,6 @@ begin
       AnimScenesPerTime, AnimOptimization, true, false)
     );
   BallMissile.SoundExplosion := stBallMissileExplode;
-  BallMissile.DefaultMaxLife := 1.0;
 
   Ghost := TGhostKind.Create(
     'Ghost',
@@ -2486,20 +2549,43 @@ begin
       [ 0.0, 0.3 ],
       AnimScenesPerTime, AnimOptimization, false, true)
     );
-  Ghost.Flying := true;
-  //Ghost.ActualAttackTime := 0.4;
-  Ghost.SoundSuddenPain := stGhostSuddenPain;
-  //Ghost.MoveSpeed := 0.1;
-  Ghost.MaxAttackDistance := 2.0;
-  Ghost.PreferredAttackDistance := Ghost.MaxAttackDistance;
-  Ghost.MinDelayBetweenAttacks := 2.0;
   Ghost.SoundSuddenPain := stGhostSuddenPain;
   Ghost.SoundAttackStart := stGhostAttackStart;
-  Ghost.LifeToRunAway := 0.01;
-  Ghost.DefaultMaxLife := 30.0;
-  Ghost.Transparent := true;
   Ghost.SoundDying := stGhostDying;
-  Ghost.SoundDyingTiedToCreature := false;
+
+(*
+  Spider := TSpiderKind.Create(
+    'Spider',
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, true, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, true, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, true)
+    );
+  Spider.SoundSuddenPain := stSpiderSuddenPain;
+  Spider.SoundAttackStart := stSpiderAttackStart;
+  Spider.SoundDying := stSpiderDying; *)
+
+  CreaturesKinds.LoadFromFile;
 end;
 
 procedure DoFinalization;
