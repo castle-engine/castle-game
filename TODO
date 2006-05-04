@@ -9,16 +9,18 @@ Cages level:
 
 - alien:
   lower MinDelayBetweenAttacks?
-  samonaprowadzajace sie kulki ?
+  Szymon: samonaprowadzajace sie kulki ?
 
-  02:11:50) Szymon: przede wszystkim duchy powinny byc 0.5
-  (02:12:12) Szymon: a alien gdzies tak 0.35. wyglada naturalnie a jest trudniejszy
   (MoveSpeed)
+  (02:11:50) Szymon: przede wszystkim duchy powinny byc 0.5
+  (02:12:12) Szymon: a alien gdzies tak 0.35. wyglada naturalnie a jest trudniejszy
 
-- mouse problems:
+- mouse sensitivity problems:
   function StrToFloatDef(const s: string; DefValue: Extended): Extended;
+
   Was there a bug about this in FPC ? I don't remember, but I have this
   in my KambiStringUtils.
+  No, the bug that I remembered was for Hex2Dec.
 
 - ask szymon about cages level:
   too dark ?
@@ -32,6 +34,14 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
+
+- "Color depth" and "Display Frequency" are ignored on non-Win32 targets.
+  (Seems that judges and most people test on Windows, so no time (it's already 4th May)
+  to do this for Unix (xvf86mode) now. "Display Frequency" should be definitely
+  possible using xvf86mode, "Color depth" --- I'm not sure. Possibly
+  color depth is not switchable without restarting XWindows ?
+  Look at xvidtune.
+  Look at gnome program to change screen resolutions.)
 
 - thunder:
   - 3d sound ?
@@ -227,22 +237,6 @@ Cages level:
 
 - inventory should be able to scroll, when more than MaxInventorySlots items
   are available.
-
-- test on high resolution screen (19'' etc.) --- do I have this problem
-  with screen refresh rate that Eric talkes about ?
-
-  I can implement refresh changes on Windows, like in GLScene:
-    /win/mojepasy/delphi/units/not_kambi/GLScene/newest/Source/GLScreen.pas
-  see SetFullscreenMode:
-
-      if displayFrequency>0 then begin
-         dmFields:=dmFields or DM_DISPLAYFREQUENCY;
-         if displayFrequency>vVideoModes[ModeIndex].MaxFrequency then
-            displayFrequency:=vVideoModes[ModeIndex].MaxFrequency;
-         dmDisplayFrequency:=displayFrequency;
-      end;
-
-  I can do this in my TGLWindow.VideoChange.
 
 - change the name --- there already exists game named "castle"!
   And there is "Castle Adventure" !

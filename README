@@ -148,12 +148,12 @@ be restored to previous size). If this resizing will fail
 (for whatever reason, e.g. you have poor graphics driver),
 it will run in window sized 800x600.
 
-You can pass command-line option --no-screen-resize (short form: -n)
+You can pass command-line option --no-screen-change (short form: -n)
 to disable the automatic screen resizing. Then the game will
 run in fullscreen mode only if your current screen size is 800x600,
 otherwise it will run in window sized 800x600.
 You can also set this from the main menu:
-"Video options -> Allow screen resize on startup".
+"Video options -> Allow screen settings change on startup".
 
 --------------------
 Miscellaneous command-line options:

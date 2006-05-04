@@ -54,9 +54,11 @@ type
 
   TVideoMenu = class(TSubMenu)
     TextureMinificationQualitySlider: TGLMenuIntegerSlider;
-    AllowScreenResizeArgument: TGLMenuBooleanArgument;
+    AllowScreenChangeArgument: TGLMenuBooleanArgument;
     RenderShadowsArgument: TGLMenuBooleanArgument;
     CreatureAnimationSlider: TGLMenuIntegerSlider;
+    ColorDepthArgument: TGLMenuItemArgument;
+    VideoFrequencyArgument: TGLMenuItemArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -221,25 +223,51 @@ end;
 
 const
   SRestartTheGame = 'You have to restart the game for the ' +
-    'new "Creature animation smoothness" settings to take effect.';
+    'new settings to take effect.';
+
+  SSystemDefault = 'System default';
+
+function ColorDepthBitsToStr(const Value: Cardinal): string;
+begin
+  if Value = 0 then
+    Result := SSystemDefault else
+    Result := IntToStr(Value);
+end;
+
+function VideoFrequencyToStr(const Value: Cardinal): string;
+begin
+  if Value = 0 then
+    Result := SSystemDefault else
+    Result := IntToStr(Value);
+end;
 
 constructor TVideoMenu.Create;
 begin
   inherited Create;
 
   TextureMinificationQualitySlider := TTextureMinificationQualitySlider.Create;
-  AllowScreenResizeArgument := TGLMenuBooleanArgument.Create(AllowScreenResize);
+  AllowScreenChangeArgument := TGLMenuBooleanArgument.Create(AllowScreenChange);
   RenderShadowsArgument := TGLMenuBooleanArgument.Create(RenderShadows);
   CreatureAnimationSlider := TGLMenuIntegerSlider.Create(
     MinCreatureAnimationScenesPerTime,
     MaxCreatureAnimationScenesPerTime,
     CreatureAnimationScenesPerTime);
 
+  ColorDepthArgument := TGLMenuItemArgument.Create(
+    TGLMenuItemArgument.TextWidth(SSystemDefault));
+  ColorDepthArgument.Value := ColorDepthBitsToStr(ColorDepthBits);
+
+  VideoFrequencyArgument := TGLMenuItemArgument.Create(
+    TGLMenuItemArgument.TextWidth(SSystemDefault));
+  VideoFrequencyArgument.Value := VideoFrequencyToStr(VideoFrequency);
+
   Items.Add('View video information');
   Items.AddObject('Texture quality', TextureMinificationQualitySlider);
-  Items.AddObject('Allow screen resize on startup', AllowScreenResizeArgument);
+  Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
   Items.AddObject('Shadows', RenderShadowsArgument);
   Items.AddObject('Creature animation smoothness', CreatureAnimationSlider);
+  Items.AddObject('Color depth', ColorDepthArgument);
+  Items.AddObject('Display frequency', VideoFrequencyArgument);
   Items.Add('Restore to defaults');
   Items.Add('Back to main menu');
 
@@ -289,6 +317,33 @@ procedure TVideoMenu.CurrentItemSelected;
       taLeft);
   end;
 
+  procedure ChangeColorDepthBits;
+  begin
+    if ColorDepthBits = 0 then
+      ColorDepthBits := 16 else
+    if ColorDepthBits = 16 then
+      ColorDepthBits := 32 else
+      ColorDepthBits := 0;
+    ColorDepthArgument.Value := ColorDepthBitsToStr(ColorDepthBits);
+    SubMenuAdditionalInfo := SRestartTheGame;
+  end;
+
+  procedure ChangeVideoFrequency;
+  var
+    Value: Cardinal;
+  begin
+    Value := VideoFrequency;
+    if MessageInputQueryCardinal(Glw,
+      'What display frequency to use ?' +nl+ '("0" means "system default")',
+      Value, taLeft) and
+      (Value <> VideoFrequency) then
+    begin
+      VideoFrequency := Value;
+      VideoFrequencyArgument.Value := VideoFrequencyToStr(VideoFrequency);
+      SubMenuAdditionalInfo := SRestartTheGame;
+    end;
+  end;
+
 begin
   inherited;
 
@@ -296,8 +351,8 @@ begin
     0: ViewVideoInfo;
     1: ;
     2: begin
-         AllowScreenResize := not AllowScreenResize;
-         AllowScreenResizeArgument.Value := AllowScreenResize;
+         AllowScreenChange := not AllowScreenChange;
+         AllowScreenChangeArgument.Value := AllowScreenChange;
        end;
     3: begin
          RenderShadows := not RenderShadows;
@@ -305,9 +360,12 @@ begin
          if not RenderShadowsPossible then
          begin
            if RenderShadows then
+           begin
              MessageOK(Glw, 'Note that shadows are disabled by --no-shadows ' +
-               'command-line option. You must restart the game to see the ' +
+               'command-line option. So you must restart the game to see the ' +
                'shadows.', taLeft);
+             SubMenuAdditionalInfo := SRestartTheGame;
+           end;
          end else
          begin
            if RenderShadows then
@@ -318,9 +376,11 @@ begin
          end;
        end;
     4: ;
-    5: begin
-         AllowScreenResize := DefaultAllowScreenResize;
-         AllowScreenResizeArgument.Value := AllowScreenResize;
+    5: ChangeColorDepthBits;
+    6: ChangeVideoFrequency;
+    7: begin
+         AllowScreenChange := DefaultAllowScreenChange;
+         AllowScreenChangeArgument.Value := AllowScreenChange;
 
          RenderShadows := DefaultRenderShadows;
          RenderShadowsArgument.Value := RenderShadows;
@@ -352,11 +412,25 @@ begin
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
+         if ColorDepthBits <> DefaultColorDepthBits then
+         begin
+           ColorDepthBits := DefaultColorDepthBits;
+           ColorDepthArgument.Value := ColorDepthBitsToStr(DefaultColorDepthBits);
+           SubMenuAdditionalInfo := SRestartTheGame;
+         end;
+
+         if VideoFrequency <> DefaultVideoFrequency then
+         begin
+           VideoFrequency := DefaultVideoFrequency;
+           VideoFrequencyArgument.Value := VideoFrequencyToStr(DefaultVideoFrequency);
+           SubMenuAdditionalInfo := SRestartTheGame;
+         end;
+
          SomethingChanged;
 
          MessageOK(Glw, 'All video settings restored to defaults.', taLeft);
        end;
-    6: CurrentMenu := MainMenu;
+    8: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -371,8 +445,7 @@ begin
            Cardinal(CreatureAnimationSlider.Value) then
          begin
            CreatureAnimationScenesPerTime := CreatureAnimationSlider.Value;
-           SubMenuAdditionalInfo := 'You have to restart the game for the ' +
-             'new "Creature animation smoothness" settings to take effect.';
+           SubMenuAdditionalInfo := SRestartTheGame;
          end;
        end;
   end;

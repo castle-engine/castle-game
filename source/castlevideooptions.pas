@@ -56,10 +56,10 @@ var
   TextureMinificationQuality: TTextureMinificationQuality;
 
 const
-  DefaultAllowScreenResize = true;
+  DefaultAllowScreenChange = true;
 
 var
-  AllowScreenResize: boolean;
+  AllowScreenChange: boolean;
 
 const
   DefaultCreatureAnimationScenesPerTime = 30;
@@ -94,6 +94,18 @@ var
     This is meaningull only if RenderShadowsPossible and RenderShadows. }
   RenderShadowQuads: boolean = false;
 
+const
+  DefaultColorDepthBits = 0;
+var
+  { 0 means "use system default" }
+  ColorDepthBits: Cardinal;
+
+const
+  DefaultVideoFrequency = 0 ;
+var
+  { 0 means "use system default" }
+  VideoFrequency: Cardinal;
+
 implementation
 
 uses CastleConfig;
@@ -103,24 +115,34 @@ initialization
     ConfigFile.GetValue(
     'video_options/texture_minification_quality',
     Ord(DefaultTextureMinificationQuality)));
-  AllowScreenResize := ConfigFile.GetValue(
-    'video_options/allow_screen_resize', DefaultAllowScreenResize);
+  AllowScreenChange := ConfigFile.GetValue(
+    'video_options/allow_screen_change', DefaultAllowScreenChange);
   CreatureAnimationScenesPerTime := ConfigFile.GetValue(
     'video_options/creature_animation_smoothness',
     DefaultCreatureAnimationScenesPerTime);
   RenderShadows := ConfigFile.GetValue(
     'video_options/shadows', DefaultRenderShadows);
+  ColorDepthBits := ConfigFile.GetValue(
+    'video_options/color_depth_bits', DefaultColorDepthBits);
+  VideoFrequency := ConfigFile.GetValue(
+    'video_options/frequency', DefaultVideoFrequency);
 finalization
   ConfigFile.SetDeleteValue(
     'video_options/texture_minification_quality',
     Ord(TextureMinificationQuality), Ord(DefaultTextureMinificationQuality));
   ConfigFile.SetDeleteValue(
-    'video_options/allow_screen_resize',
-    AllowScreenResize, DefaultAllowScreenResize);
+    'video_options/allow_screen_change',
+    AllowScreenChange, DefaultAllowScreenChange);
   ConfigFile.SetDeleteValue(
     'video_options/creature_animation_smoothness',
     CreatureAnimationScenesPerTime, DefaultCreatureAnimationScenesPerTime);
   ConfigFile.SetDeleteValue(
     'video_options/shadows',
     RenderShadows, DefaultRenderShadows);
+  ConfigFile.SetDeleteValue(
+    'video_options/color_depth_bits',
+    ColorDepthBits, DefaultColorDepthBits);
+  ConfigFile.SetDeleteValue(
+    'video_options/frequency',
+    VideoFrequency, DefaultVideoFrequency);
 end.

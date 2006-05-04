@@ -32,14 +32,14 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
 
 var
   WasParam_NoSound: boolean = false;
-  WasParam_NoScreenResize: boolean = false;
+  WasParam_NoScreenChange: boolean = false;
 
 const
   Options: array[0..5]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short: #0; Long: 'no-sound'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
-    (Short:'n'; Long: 'no-screen-resize'; Argument: oaNone),
+    (Short:'n'; Long: 'no-screen-change'; Argument: oaNone),
     (Short: #0; Long: 'no-shadows'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone)
   );
@@ -75,7 +75,7 @@ begin
          WritelnStr(Version);
          ProgramBreak;
        end;
-    3: WasParam_NoScreenResize := true;
+    3: WasParam_NoScreenChange := true;
     4: RenderShadowsPossible := false;
     5: WasParam_DebugNoCreatures := true;
     else raise EInternalError.Create('OptionProc');
@@ -91,7 +91,8 @@ begin
 
   Glw.Width := RequiredScreenWidth;
   Glw.Height := RequiredScreenHeight;
-  if WasParam_NoScreenResize or (not AllowScreenResize) then
+  Glw.ColorBits := ColorDepthBits;
+  if WasParam_NoScreenChange or (not AllowScreenChange) then
   begin
     Glw.FullScreen :=
       (Glwm.ScreenWidth = RequiredScreenWidth) and
@@ -100,20 +101,31 @@ begin
   begin
     Glw.FullScreen := true;
     if (Glwm.ScreenWidth <> RequiredScreenWidth) or
-       (Glwm.ScreenHeight <> RequiredScreenHeight) then
+       (Glwm.ScreenHeight <> RequiredScreenHeight) or
+       (VideoFrequency <> 0) or
+       (ColorDepthBits <> 0) then
     begin
+      Glwm.VideoColorBits := ColorDepthBits;
+      Glwm.VideoFrequency := VideoFrequency;
       Glwm.VideoResize := true;
       Glwm.VideoResizeWidth := RequiredScreenWidth;
       Glwm.VideoResizeHeight := RequiredScreenHeight;
 
-      if Glwm.VideoResize then
-        if not Glwm.TryVideoChange then
-        begin
-          WarningWrite('Can''t change display settings to ' +
-            RequiredScreenSize + '. Will continue in windowed mode.');
-          Glw.FullScreen := false;
-          AllowScreenResize := false;
-        end;
+      if not Glwm.TryVideoChange then
+      begin
+        WarningWrite('Can''t change display settings to: ' +nl+
+          Glwm.VideoSettingsDescribe +
+          nl+
+          'I will set "Allow screen settings change on startup" option to "No". ' +
+          'You may want to review settings in "Video options" menu and then ' +
+          'set "Allow screen settings change on startup" back to "Yes".' +nl+
+          nl+
+          'Now I will just continue with default system settings. ');
+        Glw.FullScreen :=
+          (Glwm.ScreenWidth = RequiredScreenWidth) and
+          (Glwm.ScreenHeight = RequiredScreenHeight);
+        AllowScreenChange := false;
+      end;
     end;
   end;
 
