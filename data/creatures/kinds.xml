@@ -20,7 +20,7 @@
   />
 
   <Werewolf
-    actual_attack_time="0.5"
+    actual_attack_time="0.3"
     move_speed="0.1"
     max_attack_distance="4.2"
     preferred_attack_distance="4.2"
@@ -52,7 +52,7 @@
   />
 
   <Spider
-    actual_attack_time="0.5"
+    actual_attack_time="0.25"
     move_speed="0.1"
     max_attack_distance="2.0"
     preferred_attack_distance="2.0"

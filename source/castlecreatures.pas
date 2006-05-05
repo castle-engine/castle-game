@@ -2726,7 +2726,7 @@ begin
         CreatureFileName('werewolf' + PathDelim + 'werewolf_attack_1_final.wrl'),
         CreatureFileName('werewolf' + PathDelim + 'werewolf_attack_2_final.wrl'),
         CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
-      [ 0, 0.3, 0.6, 1.0 ],
+      [ 0, 0.3 / 2, 0.6 / 2, 1.0 / 2 ],
       AnimScenesPerTime, AnimOptimization, false, false),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
@@ -2823,17 +2823,21 @@ begin
       [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
         CreatureFileName('spider' + PathDelim + 'spider_attack_2.wrl'),
         CreatureFileName('spider' + PathDelim + 'spider_attack_3.wrl') ],
-      [ 0, 0.25, 0.5 ],
+      [ 0, 0.125, 0.25 ],
       AnimScenesPerTime, AnimOptimization, false, true),
     { DyingAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, false, true),
+      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_hurt_2.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_dying_3.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_dying_4.wrl') ],
+      [ 0, 0.3, 0.6, 1.0 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
     { HurtAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
-      [ 0 ],
+      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_hurt_2.wrl') ],
+      [ 0, 0.3 ],
       AnimScenesPerTime, AnimOptimization, false, true)
     );
   Spider.SoundSuddenPain := stSpiderSuddenPain;
