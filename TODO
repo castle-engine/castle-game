@@ -3,7 +3,7 @@ Things which must be done for PGD deadline:
 
 Cages level:
 - windows: don't look like windows
-- queen liar
+- connect MeshLair with MeshTunnel
 - spider queen: new attack:
   throw some slime/webs ?
   produce normal spiders.
@@ -64,6 +64,8 @@ Things for which I will hopefully find time before PGD deadline:
 - some effects: blood explode when player hits monster.
 
 - debug menu is only for testing -- hide somehow at some point.
+
+- different footsteps sound on different ground
 
 ----------------------------------------
 Things for which probably will be no time before PGD deadline:

@@ -236,6 +236,7 @@ on MESH-NAME to be correctly interpreted."
   (kam-remove-vertex-col-material-one-mesh "MeshRandomBlock")
   (kam-add-material-for-mesh "MeshRandomBlock" "MatNormal")
   (kam-add-for-mesh "MeshNaturalRockSide" "ShapeHints { creaseAngle 4 }")
+  (kam-add-for-mesh "MeshLair" "ShapeHints { creaseAngle 4 }")
 
   (write-file "cages_processed.wrl")
 )

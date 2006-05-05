@@ -1,13 +1,13 @@
 <BlenderWorld version="0.1.0">
 <Mapping>3</Mapping>
-<Dimensions USize="4" VSize="128" Radius="1.0"
+<Dimensions USize="8" VSize="128" Radius="10.0"
             ThMin="-10.0" ThMax="10.0" PhMin="-20.0" PhMax="20.0">
 </Dimensions>
-<Noise Type="4" XOffset="0.0" YOffset="0.0" ZOffset="0.0"
-       NoiseInputScale="1.0" AltitudeScale="1.0"
-       Function="5" Metric="0" H="1.0"
-       Lacunarity="2.0" Octaves="9.89227294922" Offset="1.0"
-       Gain="1.0" Hard="0" Amplitude="1.46987116337" Frequency="0.0010000000475" Exp="2.5">
+<Noise Type="0" XOffset="0.0" YOffset="0.0" ZOffset="0.0"
+       NoiseInputScale="1.0" AltitudeScale="0.600053787231"
+       Function="0" Metric="0" H="1.0"
+       Lacunarity="2.0" Octaves="2.0" Offset="1.0"
+       Gain="1.0" Hard="0" Amplitude="0.5" Frequency="2.0" Exp="2.5">
 </Noise>
 <Invert>
 0
