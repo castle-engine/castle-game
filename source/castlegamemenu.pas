@@ -628,7 +628,7 @@ begin
   for I := 0 to Level.LightSet.Lights.High do
   begin
     LightNode := Level.LightSet.Lights[I].LightNode;
-    Items.Add(Format('Edit level light %d: %s named "%s"',
+    Items.Add(Format('Edit %d: %s "%s"',
       [I, LightNode.NodeTypeName, LightNode.NodeName]));
   end;
   Items.Add('Output level lights on console');
