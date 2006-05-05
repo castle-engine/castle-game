@@ -34,6 +34,11 @@ type
   private
     FTransparent: boolean;
     FVRMLNodeName: string;
+    FPrepareRenderDone: boolean;
+  protected
+    { This will be used by TCreature.ReloadAnimations.
+      In this class this just sets PrepareRenderDone to @false. }
+    procedure FreePrepareRender; virtual;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -42,6 +47,9 @@ type
     procedure PrepareRender; virtual;
 
     function PrepareRenderSteps: Cardinal; virtual;
+
+    { Are we between PrepareRender and FreePrepareRender. }
+    property PrepareRenderDone: boolean read FPrepareRenderDone;
 
     { Free any association with current OpenGL context. }
     procedure CloseGL; virtual;
@@ -81,9 +89,17 @@ type
       read FTransparent write FTransparent default DefaultTransparent;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); virtual;
+
+    { This is a debug command, will cause FreePrepareRender
+      and then (wrapped within Progress.Init...Fini) will
+      call PrepareRender. This should reload / regenerate all
+      things prepared in PrepareRender. }
+    procedure RedoPrepareRender;
   end;
 
 implementation
+
+uses ProgressUnit;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
@@ -94,12 +110,17 @@ end;
 
 procedure TObjectKind.PrepareRender;
 begin
-  { Nothing to do in this class. }
+  FPrepareRenderDone := true;
 end;
 
 function TObjectKind.PrepareRenderSteps: Cardinal;
 begin
   Result := 0;
+end;
+
+procedure TObjectKind.FreePrepareRender;
+begin
+  FPrepareRenderDone := false;
 end;
 
 procedure TObjectKind.CloseGL;
@@ -111,6 +132,24 @@ procedure TObjectKind.LoadFromFile(KindsConfig: TKamXMLConfig);
 begin
   Transparent := KindsConfig.GetValue(VRMLNodeName + '/transparent',
     DefaultTransparent);
+end;
+
+procedure TObjectKind.RedoPrepareRender;
+begin
+  Progress.Init(PrepareRenderSteps, 'Loading object ' + VRMLNodeName);
+  try
+    { It's important to do FreePrepareRender after Progress.Init.
+      Why ? Because Progress.Init does TGLWindow.SaveScreeToDispList,
+      and this may call Glw.OnDraw, and this may want to redraw
+      the object (e.g. if creature of given kind already exists
+      on the screen) and this requires PrepareRender to be already done.
+
+      So we should call Progress.Init before we invalidate PrepareRender
+      work. }
+    FreePrepareRender;
+
+    PrepareRender;
+  finally Progress.Fini; end;
 end;
 
 end.

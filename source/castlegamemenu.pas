@@ -322,9 +322,7 @@ procedure TDebugMenu.CurrentItemSelected;
     Kind: TCreatureKind;
   begin
     if ChooseCreatureKind(Kind) then
-    begin
-      Kind.ReloadAnimations;
-    end;
+      Kind.RedoPrepareRender;
   end;
 
   procedure GiveItems;

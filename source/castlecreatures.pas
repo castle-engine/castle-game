@@ -62,10 +62,6 @@ type
   protected
     { In descendants only PrepareRender can (and should!) set this. }
     CameraRadiusFromPrepareRender: Single;
-
-    { This will be used by ReloadAnimations.
-      In this class this does nothing. }
-    procedure FreePrepareRender; virtual;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -137,12 +133,6 @@ type
       const AnimationTime: Single): TCreature; virtual; abstract;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
-
-    { This is a debug command, will cause FreePrepareRender
-      and then (wrapped within Progress.Init...Fini) will
-      call PrepareRender. This reloads and regenerates all
-      animations. }
-    procedure ReloadAnimations; virtual;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -865,24 +855,6 @@ begin
     Result := CameraRadiusFromPrepareRender;
 end;
 
-procedure TCreatureKind.FreePrepareRender;
-begin
-  { Nothing to do in this class. }
-end;
-
-procedure TCreatureKind.ReloadAnimations;
-begin
-  { Ignore WasParam_DebugNoCreatures here.
-    This is a debug command, so user requested it explicitly. }
-
-  FreePrepareRender;
-
-  Progress.Init(PrepareRenderSteps, 'Re-Loading creature ' + VRMLNodeName);
-  try
-    PrepareRender;
-  finally Progress.Fini; end;
-end;
-
 { TCreaturesKindsList -------------------------------------------------------- }
 
 procedure TCreaturesKindsList.PrepareRender;
@@ -1216,6 +1188,9 @@ constructor TCreature.Create(AKind: TCreatureKind;
   const AnimationTime: Single);
 begin
   inherited Create;
+
+  if not AKind.PrepareRenderDone then
+    AKind.RedoPrepareRender;
 
   FKind := AKind;
   FLegsPosition := ALegsPosition;
