@@ -8,6 +8,8 @@ Cages level:
 - finish: room and queen liar
 - creatures: spider, spider queen
 
+- player can fly through windows --- not good.
+
 - kangury debian: hangs on Quit.
 
 - life indicator of the boss --- this should be a good workaround for lack

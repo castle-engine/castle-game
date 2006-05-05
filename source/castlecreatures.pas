@@ -1491,6 +1491,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     IsAboveTheGround: boolean;
     SqrHeightAboveTheGround, HeightAboveTheGround: Single;
     OldIsFallingDown: boolean;
+    FallingDownDistance: Single;
   begin
     { Gravity does it's work here.
       This is extremely simplified version of Gravity work in MatrixNavigation.
@@ -1515,8 +1516,13 @@ procedure TCreature.Idle(const CompSpeed: Single);
         FallingDownStartHeight := LegsPosition[2];
 
       FIsFallingDown := true;
-      if not MoveVertical(-Min(FallingDownSpeed * CompSpeed,
-        HeightAboveTheGround - HeightBetweenLegsAndMiddle)) then
+
+      FallingDownDistance := FallingDownSpeed * CompSpeed;
+      if IsAboveTheGround then
+        MinTo1st(FallingDownDistance,
+          HeightAboveTheGround - HeightBetweenLegsAndMiddle);
+
+      if not MoveVertical(-FallingDownDistance) then
         FIsFallingDown := false;
     end else
     begin
@@ -2720,27 +2726,42 @@ begin
   Spider := TSpiderKind.Create(
     'Spider',
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
       [ 0 ],
       AnimScenesPerTime, AnimOptimization, true, true),
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
       [ 0 ],
       AnimScenesPerTime, AnimOptimization, false, false),
+    { WalkAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, true, true),
+      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_walk_2.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_walk_3.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_walk_4.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_walk_5.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
+      [   0 / 5,
+        0.2 / 5,
+        0.4 / 5,
+        0.6 / 5,
+        0.8 / 5,
+        1 / 5 ],
+      { This animation really needs more frames to look smoothly. }
+      AnimScenesPerTime * 10, AnimOptimization, true, false),
+    { AttackAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
       [ 0 ],
       AnimScenesPerTime, AnimOptimization, false, true),
+    { DyingAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
       [ 0 ],
       AnimScenesPerTime, AnimOptimization, false, true),
+    { HurtAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider.wrl') ],
+      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
       [ 0 ],
       AnimScenesPerTime, AnimOptimization, false, true)
     );
