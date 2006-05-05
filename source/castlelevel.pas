@@ -339,8 +339,12 @@ type
     Symbol_TL, Symbol_BL, Symbol_TR, Symbol_BR: TVRMLFlatSceneGL;
     Button: TVRMLFlatSceneGL;
 
-    { Check collision only with Symbol, Button --- but not with real
-      level geometry (i.e. not with things handled by inherited
+    StairsBlocker: TVRMLFlatSceneGL;
+    StairsBlockerExists: boolean;
+
+    { Check collision only with Symbol, Button, StairsBlocker
+      --- but not with real level geometry
+      (i.e. not with things handled by inherited
       MoveAllowed, MoveAllowedSimple). }
     function MoveAllowedAdditionalSimple(
       const CameraPos: TVector3Single;
@@ -388,6 +392,8 @@ type
       SpecialObjectIndex: Integer); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
+
+    procedure DestroyStairsBlocker;
   end;
 
   TGateLevel = class(TLevel)
@@ -944,6 +950,13 @@ begin
     true, roSeparateShapeStates);
   Button.DefaultTriangleOctree := Button.CreateTriangleOctree('');
 
+  StairsBlocker := TVRMLFlatSceneGL.Create(LoadVRMLNode(
+    CastleLevelsPath + 'castle_hall_stairs_blocker.wrl'),
+    true, roSeparateShapeStates);
+  StairsBlocker.DefaultTriangleOctree := StairsBlocker.CreateTriangleOctree('');
+
+  StairsBlockerExists := true;
+
   AnimationButtonPress := 1.0;
 
   if Headlight <> nil then
@@ -956,6 +969,7 @@ end;
 destructor TCastleHallLevel.Destroy;
 begin
   FreeAndNil(Button);
+  FreeAndNil(StairsBlocker);
   FreeAndNil(Symbol_TL);
   FreeAndNil(Symbol_BL);
   FreeAndNil(Symbol_TR);
@@ -1008,6 +1022,14 @@ begin
       Pos1, Pos2, false, NoItemIndex, false,
       TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex);
 
+  if Result and StairsBlockerExists then
+  begin
+    Result :=
+      (StairsBlocker.DefaultTriangleOctree.SegmentCollision(
+        Pos1, Pos2, false, NoItemIndex, false,
+        TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex);
+  end;
+
   if Result and (not SymbolOpened) then
   begin
     Result :=
@@ -1034,6 +1056,13 @@ begin
   Result :=
     Button.DefaultTriangleOctree.MoveAllowedSimple(
       CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
+
+  if Result and StairsBlockerExists then
+  begin
+    Result :=
+      StairsBlocker.DefaultTriangleOctree.MoveAllowedSimple(
+        CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
+  end;
 
   if Result and (not SymbolOpened) then
   begin
@@ -1103,6 +1132,9 @@ begin
     MakeBonusScene(Symbol_BR);
   end;
 
+  if StairsBlockerExists then
+    MakeBonusScene(StairsBlocker);
+
   MakeBonusScene(Button);
 end;
 
@@ -1163,6 +1195,9 @@ begin
     RenderButtonScaled else
     Button.RenderFrustum(Frustum);
 
+  if StairsBlockerExists then
+    StairsBlocker.RenderFrustum(Frustum);
+
   { Note that we render Symbol before inherited, i.e. before rendering
     real level --- to allow alpha objects on level to be rendered as last. }
   inherited;
@@ -1214,16 +1249,30 @@ end;
 
 function TCastleHallLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single): Integer;
+
+  procedure MakeBonusScene(Scene: TVRMLFlatSceneGL; SpecialObjectIndex: Integer);
+  var
+    ThisIntersectionDistance: Single;
+  begin
+    if (Scene.DefaultTriangleOctree.RayCollision(
+      ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex,
+      false, nil) <> NoItemIndex) and
+      ( (Result = -1) or
+        (ThisIntersectionDistance < IntersectionDistance) ) then
+    begin
+      IntersectionDistance := ThisIntersectionDistance;
+      Result := SpecialObjectIndex;
+    end;
+  end;
+
 begin
   Result := inherited SpecialObjectsTryPick(
     IntersectionDistance, Ray0, RayVector);
 
-  if Button.DefaultTriangleOctree.RayCollision(
-    IntersectionDistance, Ray0, RayVector, true, NoItemIndex,
-    false, nil) <> NoItemIndex then
-  begin
-    Result := 0;
-  end;
+  MakeBonusScene(Button, 0);
+
+  if StairsBlockerExists then
+    MakeBonusScene(StairsBlocker, 1);
 end;
 
 procedure TCastleHallLevel.SpecialObjectPicked(const Distance: Single;
@@ -1245,6 +1294,10 @@ begin
         end else
           GameMessage('You see a button. You cannot reach it from here');
       end;
+    1:begin
+        GameMessage('You are not able to open it');
+        Sound(stPlayerInteractFailed);
+      end;
   end;
 end;
 
@@ -1256,6 +1309,15 @@ begin
     without any weapon, and there's no weapon to be found on
     the level... }
   NewPlayer.PickItem(TItem.Create(Sword, 1));
+end;
+
+procedure TCastleHallLevel.DestroyStairsBlocker;
+begin
+  if StairsBlockerExists then
+  begin
+    StairsBlockerExists := false;
+    Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.BoundingBox));
+  end;
 end;
 
 { TGateLevel ----------------------------------------------------------------- }

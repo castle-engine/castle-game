@@ -92,6 +92,7 @@ type
     stCastleHallMusic,
     stCagesMusic,
     stThunder,
+    stStairsBlockerDestroyed,
     { @groupEnd }
 
     { Creatures sounds.
@@ -301,7 +302,7 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'sword_equipping.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { sword_attack_start.wav };
+    ( FileName: 'sword_attack_start.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'arrow_hit.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
@@ -316,6 +317,8 @@ var
     ( FileName: 'cages_music_with_rain.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: 'thunder.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
+    ( FileName: 'stairs_blocker_destroyed.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'creature_falled_down.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),

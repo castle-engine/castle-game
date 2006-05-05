@@ -2502,13 +2502,8 @@ begin
   inherited;
 
   if (FState = wasDying) and
-    (Level.AnimationTime - StateChangeTime >
-      WAKind.DyingAnimation.TimeEnd + 5
-      { + 5 seconds, to allow player look at the dead werewolf }) and
-    (Level is TCastleHallLevel) then
-  begin
-    LevelFinished(nil);
-  end;
+     (Level is TCastleHallLevel) then
+    TCastleHallLevel(Level).DestroyStairsBlocker;
 end;
 
 { TSpiderCreature ---------------------------------------------------------- }
