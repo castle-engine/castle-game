@@ -148,7 +148,7 @@ Switch {
 				 0.878431 0.886275 0.729412,
 			]
 		}
-		MaterialBinding { value PER_VERTEX_INDEXED }
+		MaterialBinding { value PER_VERTEX }
 		Coordinate3 {
 			point [
 				 -0.109198 0.170838 -0.504665,
@@ -1100,7 +1100,7 @@ Switch {
 	DEF MeshLegs
 	Separator {
 		Texture2 {
-			filename //../../../../../../../images/textures/lemog3d/flesh/flesh016.jpg
+			filename //../../textures/flesh016.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -1252,7 +1252,7 @@ Switch {
 				 1.000000 1.000000 1.000000,
 			]
 		}
-		MaterialBinding { value PER_VERTEX_INDEXED }
+		MaterialBinding { value PER_VERTEX }
 		Coordinate3 {
 			point [
 				 -0.504329 -0.340000 -0.797491,
