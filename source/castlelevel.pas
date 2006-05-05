@@ -427,8 +427,12 @@ type
   end;
 
   TCagesLevel = class(TLevel)
+  private
+    FSpidersAppearing: TDynVector3SingleArray;
+    NextSpidersAppearingTime: Single;
   public
     constructor Create; override;
+    destructor Destroy; override;
 
     class function SceneFileName: string; override;
     class function LightSetFileName: string; override;
@@ -439,6 +443,8 @@ type
     procedure Idle(const CompSpeed: Single); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
+
+    procedure Render(const Frustum: TFrustum); override;
   end;
 
   TLevelAvailable = class
@@ -1431,6 +1437,15 @@ begin
     Headlight.SpotCutoff := 40;
     Headlight.SpotExponent := 0.1;
   end;
+
+  FSpidersAppearing := TDynVector3SingleArray.Create;
+  NextSpidersAppearingTime := 0;
+end;
+
+destructor TCagesLevel.Destroy;
+begin
+  FreeAndNil(FSpidersAppearing);
+  inherited;
 end;
 
 class function TCagesLevel.SceneFileName: string;
@@ -1453,15 +1468,111 @@ begin
   Result := 3;
 end;
 
+const
+  { Remember to make it -1 lower than actual ceiling geometry,
+    otherwise the spiders will be created on the ceiling of the model... }
+  SpiderZ = 69.0;
+
 procedure TCagesLevel.Idle(const CompSpeed: Single);
+const
+  { Some SpiderRadius is used to not put spider inside the wall. }
+  SpiderRadius = 2;
+  MinSpiderX = -11.0  + SpiderRadius;
+  MaxSpiderX = 69.0   - SpiderRadius;
+  MinSpiderY = -123.0 + SpiderRadius;
+  MaxSpiderY = 162.0  - SpiderRadius;
+
+  procedure AppearSpider(const Position: TVector3Single);
+  begin
+    FSpidersAppearing.AppendItem(Position);
+  end;
+
+  function RandomSpiderXY: TVector3Single;
+  begin
+    Result[0] := MapRange(Random, 0.0, 1.0, MinSpiderX, MaxSpiderX);
+    Result[1] := MapRange(Random, 0.0, 1.0, MinSpiderY, MaxSpiderY);
+    Result[2] := SpiderZ;
+  end;
+
+  function RandomSpiderXYAroundPlayer: TVector3Single;
+  const
+    RandomDist = 10.0;
+  begin
+    Result[0] := Player.Navigator.CameraPos[0] +
+      MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
+    Result[0] := Clamped(Result[0], MinSpiderX, MaxSpiderX);
+    Result[1] := Player.Navigator.CameraPos[1] +
+      MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
+    Result[1] := Clamped(Result[1], MinSpiderY, MaxSpiderY);
+    Result[2] := SpiderZ;
+  end;
+
+const
+  SpidersFallingSpeed = 0.5;
+var
+  IsAboveTheGround: boolean;
+  SqrHeightAboveTheGround: Single;
+  I: Integer;
+  SpiderCreature: TCreature;
+  SpiderPosition, SpiderDirection: TVector3Single;
 begin
   inherited;
 
+  { Torch light modify, to make an illusion of unstable light }
   LightSet.Lights[0].LightNode.FdIntensity.Value := Clamped(
       LightSet.Lights[0].LightNode.FdIntensity.Value +
         MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed,
       0.5, 1);
   LightSet.CalculateLights;
+
+  { Maybe appear new spiders }
+  if Level.Creatures.Count < 10 then
+  begin
+    if NextSpidersAppearingTime = 0 then
+    begin
+      if AnimationTime > 1 then
+      begin
+        NextSpidersAppearingTime := AnimationTime + 5 + Random(20);
+        for I := 1 to 5 + Random(3) do
+          AppearSpider(RandomSpiderXY);
+      end;
+    end else
+    if AnimationTime >= NextSpidersAppearingTime then
+    begin
+      NextSpidersAppearingTime := AnimationTime + 2 + Random(10);
+      for I := 1 to 1 + Random(3) do
+        AppearSpider(RandomSpiderXYAroundPlayer);
+    end;
+  end;
+
+  { Move spiders down }
+  I := 0;
+  { 2 lines below only to get rid of compiler warnings }
+  IsAboveTheGround := false;
+  SqrHeightAboveTheGround := 0;
+  while I < FSpidersAppearing.Count do
+  begin
+    GetCameraHeight(FSpidersAppearing.Items[I], IsAboveTheGround,
+      SqrHeightAboveTheGround);
+    if IsAboveTheGround and
+      (SqrHeightAboveTheGround < Sqr(Spider.CameraRadius * 2)) then
+    begin
+      SpiderPosition := FSpidersAppearing.Items[I];
+      SpiderDirection :=
+        VectorSubtract(Player.Navigator.CameraPos, SpiderPosition);
+      MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.HomeCameraUp);
+      SpiderCreature := Spider.CreateDefaultCreature(
+        SpiderPosition, SpiderDirection, AnimationTime);
+      Creatures.Add(SpiderCreature);
+      SpiderCreature.Sound3d(stSpiderAppears, 1.0);
+      FSpidersAppearing.Delete(I, 1);
+    end else
+    begin
+      FSpidersAppearing[I][2] -= Min(SpidersFallingSpeed * CompSpeed,
+        Sqrt(SqrHeightAboveTheGround) - Spider.CameraRadius);
+      Inc(I);
+    end;
+  end;
 end;
 
 procedure TCagesLevel.PrepareNewPlayer(NewPlayer: TPlayer);
@@ -1472,6 +1583,36 @@ begin
     without any weapon, and there's no weapon to be found on
     the level... }
   NewPlayer.PickItem(TItem.Create(Sword, 1));
+end;
+
+procedure TCagesLevel.Render(const Frustum: TFrustum);
+var
+  I: Integer;
+begin
+  { Render spiders before rendering inherited,
+    because spiders are not transparent. }
+  glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+    glColorv(Black3Single);
+    glBegin(GL_LINES);
+      for I := 0 to FSpidersAppearing.High do
+      begin
+        glVertex3f(FSpidersAppearing[I][0], FSpidersAppearing[I][1], SpiderZ);
+        glVertexv(FSpidersAppearing.Items[I]);
+      end;
+    glEnd;
+  glPopAttrib;
+
+  for I := 0 to FSpidersAppearing.High do
+  begin
+    glPushMatrix;
+      glTranslatev(FSpidersAppearing.Items[I]);
+      Spider.StandAnimation.Scenes[0].Render(nil);
+    glPopMatrix;
+  end;
+
+  inherited;
 end;
 
 { TLevelsAvailableList ------------------------------------------------------- }

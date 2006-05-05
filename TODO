@@ -2,10 +2,14 @@
 Things which must be done for PGD deadline:
 
 Cages level:
-- spiders place on level
 - spider queen: new attack:
   throw some slime/webs ?
   produce normal spiders.
+  when queen dies, drops a key
+  key opens door -> game over
+- too many spiders on level slow down rendering. See why. Also fix CompSpeed,
+  to not use FpsCompSpeed ?
+- spider_appears.wav sound do
 
 - kangury debian: hangs on Quit.
 
@@ -67,6 +71,7 @@ Things for which I will hopefully find time before PGD deadline:
 cages level:
 - windows: don't look like windows
 - player can fly through windows --- not good.
+- stairs beginning cages and ending castle_hall: endings should be more black, current vertex colouring is not black enough
 
 ----------------------------------------
 Things for which probably will be no time before PGD deadline:

@@ -114,6 +114,7 @@ type
     stSpiderSuddenPain,
     stSpiderAttackStart,
     stSpiderDying,
+    stSpiderAppears,
     { @groupEnd }
 
     { Others.
@@ -353,6 +354,8 @@ var
     ( FileName: 'spider_attack_start.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'spider_dying.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: '' { 'spider_appears.wav' };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'intro_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),

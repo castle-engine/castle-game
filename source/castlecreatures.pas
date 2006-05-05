@@ -779,6 +779,8 @@ type
   TSpiderCreature = class(TWalkAttackCreature)
   public
     procedure ActualAttack; override;
+
+    function RemoveMeFromLevel: boolean; override;
   end;
 
   TGhostCreature = class(TWalkAttackCreature)
@@ -2517,6 +2519,15 @@ begin
   end;
 end;
 
+function TSpiderCreature.RemoveMeFromLevel: boolean;
+begin
+  { Spiders must be removed from level, otherwise too many of them
+    stay on Cages level and slow down the rendering.
+    dying animation is adjusted to scale the model down. }
+  Result := (State = wasDying) and
+    (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd);
+end;
+
 { TGhostCreature ---------------------------------------------------------- }
 
 procedure TGhostCreature.ActualAttack;
@@ -2825,8 +2836,9 @@ begin
       [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
         CreatureFileName('spider' + PathDelim + 'spider_hurt_2.wrl'),
         CreatureFileName('spider' + PathDelim + 'spider_dying_3.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_dying_4.wrl') ],
-      [ 0, 0.3, 0.6, 1.0 ],
+        CreatureFileName('spider' + PathDelim + 'spider_dying_4.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_dying_5.wrl') ],
+      [ 0, 0.3, 0.6, 1.0, 2.0 ],
       AnimScenesPerTime, AnimOptimization, false, false),
     { HurtAnimation }
     TVRMLGLAnimationInfo.Create(
