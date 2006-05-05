@@ -217,6 +217,7 @@ on MESH-NAME to be correctly interpreted."
   (kam-fix-vertex-col-material "MeshCageKnife")
   (kam-fix-vertex-col-material "MeshCageOnlyDown")
   (kam-fix-vertex-col-material "MeshCageUpSlide")
+  (kam-fix-vertex-col-material "MeshStairsEntrance")
 
   (kam-fix-vertex-col-material "MeshWalls")
 
