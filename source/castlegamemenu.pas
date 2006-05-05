@@ -220,6 +220,7 @@ begin
   Items.Add('Creatures on level: show info, kill');
   Items.Add('Add creature to level');
   Items.Add('Reload creatures/kinds.xml file');
+  Items.Add('Reload animations of specific creature');
   Items.Add('Give me 20 instances of every possible item');
   Items.AddObject('Set view angle', ViewAngleSlider);
   Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
@@ -313,6 +314,16 @@ procedure TDebugMenu.CurrentItemSelected;
         Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime));
 
       UserQuit := true;
+    end;
+  end;
+
+  procedure ReloadCreatureAnimation;
+  var
+    Kind: TCreatureKind;
+  begin
+    if ChooseCreatureKind(Kind) then
+    begin
+      Kind.ReloadAnimations;
     end;
   end;
 
@@ -440,30 +451,31 @@ begin
     1: ShowLevelCreaturesInfo;
     2: AddLevelCreature;
     3: CreaturesKinds.LoadFromFile;
-    4: GiveItems;
-    5: ;
+    4: ReloadCreatureAnimation;
+    5: GiveItems;
     6: ;
     7: ;
     8: ;
-    9: begin
+    9: ;
+    10:begin
          RenderBoundingBoxes := not RenderBoundingBoxes;
          RenderBoundingBoxesArgument.Value := RenderBoundingBoxes;
        end;
-    10:
+    11:
        begin
          RenderShadowQuads := not RenderShadowQuads;
          RenderShadowQuadsArgument.Value := RenderShadowQuads;
        end;
-    11: ChangeToLevel;
-    12: ChangeSoundProperties;
-    13: begin
+    12: ChangeToLevel;
+    13: ChangeSoundProperties;
+    14: begin
           FreeAndNil(EditLevelLightsMenu);
           EditLevelLightsMenu := TEditLevelLightsMenu.Create;
           CurrentMenu := EditLevelLightsMenu;
         end;
-    14: ChangeJumpProperties;
-    15: ForceThunder;
-    16: CurrentMenu := GameMenu;
+    15: ChangeJumpProperties;
+    16: ForceThunder;
+    17: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

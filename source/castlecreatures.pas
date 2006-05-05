@@ -62,6 +62,10 @@ type
   protected
     { In descendants only PrepareRender can (and should!) set this. }
     CameraRadiusFromPrepareRender: Single;
+
+    { This will be used by ReloadAnimations.
+      In this class this does nothing. }
+    procedure FreePrepareRender; virtual;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -133,6 +137,12 @@ type
       const AnimationTime: Single): TCreature; virtual; abstract;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
+
+    { This is a debug command, will cause FreePrepareRender
+      and then (wrapped within Progress.Init...Fini) will
+      call PrepareRender. This reloads and regenerates all
+      animations. }
+    procedure ReloadAnimations; virtual;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -181,6 +191,8 @@ type
 
     FSoundAttackStart: TSoundType;
     FLifeToRunAway: Single;
+  protected
+    procedure FreePrepareRender; override;
   public
     constructor Create(
       const AVRMLNodeName: string;
@@ -359,6 +371,8 @@ type
     FAnimationInfo: TVRMLGLAnimationInfo;
     FMoveSpeed: Single;
     FSoundExplosion: TSoundType;
+  protected
+    procedure FreePrepareRender; override;
   public
     constructor Create(
       const AVRMLNodeName: string;
@@ -851,6 +865,24 @@ begin
     Result := CameraRadiusFromPrepareRender;
 end;
 
+procedure TCreatureKind.FreePrepareRender;
+begin
+  { Nothing to do in this class. }
+end;
+
+procedure TCreatureKind.ReloadAnimations;
+begin
+  { Ignore WasParam_DebugNoCreatures here.
+    This is a debug command, so user requested it explicitly. }
+
+  FreePrepareRender;
+
+  Progress.Init(PrepareRenderSteps, 'Re-Loading creature ' + VRMLNodeName);
+  try
+    PrepareRender;
+  finally Progress.Fini; end;
+end;
+
 { TCreaturesKindsList -------------------------------------------------------- }
 
 procedure TCreaturesKindsList.PrepareRender;
@@ -984,6 +1016,18 @@ begin
   Result := (inherited PrepareRenderSteps) + 12;
 end;
 
+procedure TWalkAttackCreatureKind.FreePrepareRender;
+begin
+  FreeAndNil(FStandAnimation);
+  FreeAndNil(FStandToWalkAnimation);
+  FreeAndNil(FWalkAnimation);
+  FreeAndNil(FAttackAnimation);
+  FreeAndNil(FDyingAnimation);
+  FreeAndNil(FHurtAnimation);
+
+  inherited;
+end;
+
 procedure TWalkAttackCreatureKind.CloseGL;
 begin
   inherited;
@@ -1097,6 +1141,12 @@ destructor TMissileCreatureKind.Destroy;
 begin
   FreeAndNil(FAnimation);
   FreeAndNil(FAnimationInfo);
+  inherited;
+end;
+
+procedure TMissileCreatureKind.FreePrepareRender;
+begin
+  FreeAndNil(FAnimation);
   inherited;
 end;
 
@@ -2377,9 +2427,18 @@ end;
 { TWerewolfCreature ---------------------------------------------------------- }
 
 procedure TWerewolfCreature.ActualAttack;
+var
+  B, PB: TBox3d;
 begin
-  if Boxes3dCollision(Box3dTranslate(BoundingBox,
-    VectorScale(Direction, WAKind.MaxAttackDistance)), Player.BoundingBox) then
+  B := BoundingBox;
+  PB := Player.BoundingBox;
+  if Boxes3dCollision(Box3dTranslate(B,
+       VectorScale(Direction, WAKind.MaxAttackDistance)), PB) or
+     { Werewolf has so large WAKind.MaxAttackDistance that
+       player could avoid collision above by just standing close
+       to Werewolf... So we do additional check below: }
+     Boxes3dCollision(Box3dTranslate(B,
+       VectorScale(Direction, WAKind.MaxAttackDistance / 2)), PB) then
   begin
     Sound3d(stWerewolfActualAttackHit, 1.0);
     Player.Life := Player.Life - 10 - Random(10);
