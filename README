@@ -637,7 +637,7 @@ Sounds:
 
   You can use any editor you like to convert your sounds to mono.
   I like this sox command-line:
-    sox input.wav -c output.wav
+    sox input.wav -c 1 output.wav
   See also data/sounds/scripts/example_make_mono.sh
 
 --------------------

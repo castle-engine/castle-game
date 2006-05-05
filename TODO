@@ -2,12 +2,11 @@
 Things which must be done for PGD deadline:
 
 Cages level:
-- spider:
-  sounds,
-  new attack: throw some slime/webs ?
 - windows: don't look like windows
 - finish: room and queen liar
-- creatures: spider, spider queen
+- spider queen: new attack:
+  throw some slime/webs ?
+  produce normal spiders.
 
 - player can fly through windows --- not good.
 

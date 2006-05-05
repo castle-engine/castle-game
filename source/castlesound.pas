@@ -343,13 +343,13 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'ghost_dying.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'spider_actual_attack_hit' };
+    ( FileName: 'spider_actual_attack_hit.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'spider_sudden_pain' };
+    ( FileName: 'spider_sudden_pain.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'spider_attack_start' };
+    ( FileName: 'spider_attack_start.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'spider_dying' };
+    ( FileName: 'spider_dying.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'intro_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),

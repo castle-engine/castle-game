@@ -1606,7 +1606,7 @@ begin
     { When dies, we don't play SoundSuddenPain sound. We will play SoundDying. }
     Sound3d(Kind.SoundDying, 1.0, Kind.SoundDyingTiedToCreature);
   end else
-  if (Life - Value) > MaxLife / 10 then
+  if (Life > 0) and (Life - Value > 5) then
   begin
     Sound3d(Kind.SoundSuddenPain, 1.0);
   end;
