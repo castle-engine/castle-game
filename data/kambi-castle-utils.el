@@ -238,5 +238,14 @@ on MESH-NAME to be correctly interpreted."
   (kam-add-for-mesh "MeshNaturalRockSide" "ShapeHints { creaseAngle 4 }")
   (kam-add-for-mesh "MeshLair" "ShapeHints { creaseAngle 4 }")
 
+  ;; I don't know why blender refuses to write these as relative paths...
+  ;; Yes, I checked "relative paths" button when loading.
+  (kam-simple-replace-buffer
+    "/win/mojepasy/openGL/castle/trunk/data/textures/006bois.jpg"
+    "../../textures/006bois.jpg")
+  (kam-simple-replace-buffer
+    "/win/mojepasy/openGL/castle/trunk/data/textures/023roche.jpg"
+    "../../textures/023roche.jpg")
+
   (write-file "cages_processed.wrl")
 )

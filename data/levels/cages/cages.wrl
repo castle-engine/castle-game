@@ -32508,7 +32508,7 @@ Switch {
 	DEF MeshTunnel
 	Separator {
 		Texture2 {
-			filename //../../../../../../../images/textures/lemog3d/stone_rock/023roche.jpg
+			filename /win/mojepasy/openGL/castle/trunk/data/textures/023roche.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}

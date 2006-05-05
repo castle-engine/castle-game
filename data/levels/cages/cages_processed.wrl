@@ -31482,7 +31482,7 @@ Switch {
 	DEF MeshTableLeg
 	Separator {
 		Texture2 {
-			filename /win/mojepasy/openGL/castle/trunk/data/textures/006bois.jpg
+			filename ../../textures/006bois.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -31561,7 +31561,7 @@ Switch {
 	DEF MeshTableTop
 	Separator {
 		Texture2 {
-			filename /win/mojepasy/openGL/castle/trunk/data/textures/006bois.jpg
+			filename ../../textures/006bois.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -31640,7 +31640,7 @@ Switch {
 	DEF MeshTunnel
 	Separator {
 		Texture2 {
-			filename //../../../../../../../images/textures/lemog3d/stone_rock/023roche.jpg
+			filename ../../textures/023roche.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
