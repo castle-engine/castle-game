@@ -347,6 +347,10 @@ type
       const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean;
+
+    FLevelExitBox: TBox3d;
+  protected
+    procedure ChangeLevelScene; override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -427,6 +431,8 @@ type
     class function Number: Integer; override;
 
     procedure Idle(const CompSpeed: Single); override;
+
+    procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
 
   TLevelAvailable = class
@@ -957,6 +963,13 @@ begin
   inherited;
 end;
 
+procedure TCastleHallLevel.ChangeLevelScene;
+begin
+  inherited;
+  if not RemoveBoxNode(FLevelExitBox, 'LevelExitBox') then
+    raise EInternalError.Create('castle_hall level doesn''t contain "LevelExitBox"');
+end;
+
 class function TCastleHallLevel.SceneFileName: string;
 begin
   Result := CastleLevelsPath + 'castle_hall_final.wrl';
@@ -1164,6 +1177,11 @@ var
   WerewolfCreature: TWerewolfCreature;
 begin
   inherited;
+
+  if Box3dPointInside(Player.Navigator.CameraPos, FLevelExitBox) then
+  begin
+    LevelFinished(TCagesLevel.Create);
+  end;
 
   if ButtonPressed then
   begin
@@ -1382,6 +1400,16 @@ begin
         MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed,
       0.5, 1);
   LightSet.CalculateLights;
+end;
+
+procedure TCagesLevel.PrepareNewPlayer(NewPlayer: TPlayer);
+begin
+  inherited;
+
+  { Give player 1 sword. Otherwise player would start the level
+    without any weapon, and there's no weapon to be found on
+    the level... }
+  NewPlayer.PickItem(TItem.Create(Sword, 1));
 end;
 
 { TLevelsAvailableList ------------------------------------------------------- }

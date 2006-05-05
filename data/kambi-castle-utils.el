@@ -167,6 +167,7 @@ on MESH-NAME to be correctly interpreted."
 (defun kam-process-castle-hall ()
   (interactive)
   (kam-fix-blender-filename)
+  (kam-fix-vertex-col-material "MeshStairsExit")
   (kam-remove-vertex-col-material)
   (kam-add-material-for-mesh "MeshDome" "MatUnderTexture")
   (kam-add-material-for-mesh "MeshGround" "MatGround")

@@ -1,14 +1,18 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
+castle_hall:
+- plane blocking LevelExit until he defeats Werewolf
+- why werewolf is hurt when opening castle_hall ?
+  make him -4 lower ?
+- remove "level finished" when werewolf defeated
+
 Cages level:
-- windows: don't look like windows
+- make similar stairs at level start
 - spiders place on level
 - spider queen: new attack:
   throw some slime/webs ?
   produce normal spiders.
-- player can fly through windows --- not good.
-- connection between castle_hall and cages levels.
 
 - kangury debian: hangs on Quit.
 
@@ -66,6 +70,10 @@ Things for which I will hopefully find time before PGD deadline:
 - debug menu is only for testing -- hide somehow at some point.
 
 - different footsteps sound on different ground
+
+cages level:
+- windows: don't look like windows
+- player can fly through windows --- not good.
 
 ----------------------------------------
 Things for which probably will be no time before PGD deadline:
