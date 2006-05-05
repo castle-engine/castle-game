@@ -68,6 +68,11 @@ Things for which I will hopefully find time before PGD deadline:
 ----------------------------------------
 Things for which probably will be no time before PGD deadline:
 
+- cages level:
+  - on the other side of the wall, also a door, but blocked by rocks
+  - from queen lair, passage to this 2nd hidden room --- some treasures there
+  - make real doors that you must click to open them
+
 - "Color depth" and "Display Frequency" are ignored on non-Win32 targets.
   (Seems that judges and most people test on Windows, so no time (it's already 4th May)
   to do this for Unix (xvf86mode) now. "Display Frequency" should be definitely
