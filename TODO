@@ -1,8 +1,9 @@
+----------------------------------------
+Things which must be done for PGD deadline:
+
 Cages level:
 - spider:
-  animate,
   sounds,
-  adjust kinds.xml
   new attack: throw some slime/webs ?
 - windows: don't look like windows
 - finish: room and queen liar
@@ -32,7 +33,11 @@ Cages level:
   in my KambiStringUtils.
   No, the bug that I remembered was for Hex2Dec.
 
---------------------
+- player should also get "knockback" when creature hits him.
+
+- intro moving when the game starts (either movie from the game --- or just some
+  nice anim, moving camera around the level.)
+
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.
 Goal #3 (2.5 Points) - Have a game splash screen showing your game's title.
@@ -41,6 +46,28 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 Goal #6 (2.5 Points) - Have a minimum of at least 1 kind of enemy per level.
 Goal #7 (2.5 Points) - Add an ending sequence of some kind.
 Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
+
+----------------------------------------
+Things for which I will hopefully find time before PGD deadline:
+
+- second weapon, crossbow/bow, that requires another item in your inventory
+  (bolts/arrows)
+
+  When you hold attack key, arrow/bolt appears on your bow/crossbow
+  and you're holding the bow. There is also a crosshair (circle target area)
+  that "trembles", because your hands are trembling.
+
+  You shoot when you release Ctrl key. The longer you held Ctrl,
+  the more power has the arrow (more velocity), but also the trembling
+  of your crosshair (and it's circle) is larger, so your accuracy
+  is lower.
+
+- some effects: blood explode when player hits monster.
+
+- debug menu is only for testing -- hide somehow at some point.
+
+----------------------------------------
+Things for which probably will be no time before PGD deadline:
 
 - "Color depth" and "Display Frequency" are ignored on non-Win32 targets.
   (Seems that judges and most people test on Windows, so no time (it's already 4th May)
@@ -94,8 +121,6 @@ Cages level:
 - creature's footsteps sound ?
 
 - sound when creature sees player for the 1st time
-
-- player should also get "knockback" when creature hits him.
 
 - music volume is affected by sound volume now. That's because listener gain affects everything...
 
@@ -175,8 +200,6 @@ Cages level:
   so player and creatures are never able to climb up from the moat...
   But that's still just a workaround.
 
-- some effects: blood explode when player hits monster.
-
 - I really don't like the "alien" model. It's generally nice,
   but it doesn't fit this game, and I just can't texture it appropriately.
   The basic model was just taken from www.3dcafe.com when I realized that
@@ -227,21 +250,6 @@ Cages level:
   to use TVRMLGLAnimation class (additional simplification will be that
   only one Symbol model will be needed, not 4 (like now)).
 
-- intro moving when the game starts (either movie from the game --- or just some
-  nice anim ? Look how much it adds to AirBlast !)
-
-- second weapon, crossbow/bow, that requires another item in your inventory
-  (bolts/arrows)
-
-  When you hold attack key, arrow/bolt appears on your bow/crossbow
-  and you're holding the bow. There is also a crosshair (circle target area)
-  that "trembles", because your hands are trembling.
-
-  You shoot when you release Ctrl key. The longer you held Ctrl,
-  the more power has the arrow (more velocity), but also the trembling
-  of your crosshair (and it's circle) is larger, so your accuracy
-  is lower.
-
 - inventory should be able to scroll, when more than MaxInventorySlots items
   are available.
 
@@ -259,8 +267,6 @@ Cages level:
 - Some buttons visible at lower part of the screen to access some
   things with mouse and to show (as hints) their key shortcuts ?
   ("i" - inventory on/off, "m" - messages).
-
-- debug menu is only for testing -- hide somehow at some point.
 
 - mail to author of
   http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
