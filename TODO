@@ -304,6 +304,11 @@ dist-making to-dos:
 Each time before uploading release (to PGD and/or camelot):
 
 - make sure Version (in castlehelp.pas) is good
+- test data/ things easy to forget:
+  - All textures in VRML files must have relative filenames
+      find data/ -type f -iname '*.wrl' | xargs grep filename
+  - All sounds that are intended to be spatialized must be mono:
+      wavidentify data/sounds/*.wav | grep stereo
 - under Linux and Windows:
   - build debug exe from this dir, test
       make -C /win/mojepasy/units/ clean
