@@ -7,6 +7,7 @@ Cages level:
   sounds,
   adjust kinds.xml
   new attack: throw some slime/webs ?
+- windows: don't look like windows
 - finish: room and queen liar
 - creatures: spider, spider queen
 
@@ -31,9 +32,6 @@ Cages level:
   Was there a bug about this in FPC ? I don't remember, but I have this
   in my KambiStringUtils.
   No, the bug that I remembered was for Hex2Dec.
-
-- ask szymon about cages level:
-  too dark ?
 
 --------------------
 Stage 6:

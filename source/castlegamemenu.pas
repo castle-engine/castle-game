@@ -257,15 +257,16 @@ procedure TDebugMenu.CurrentItemSelected;
     S := TStringList.Create;
     try
       S.Append(Format('%d creatures on level:', [Level.Creatures.Count]));
-      S.Append('Index: Kind, Position, Life / MaxLife');
+      S.Append('Index: Kind, Position, Life / MaxLife, CameraRadius');
       S.Append('');
 
       for I := 0 to Level.Creatures.High do
-        S.Append(Format('%d: %s, %s, %s / %s',
+        S.Append(Format('%d: %s, %s, %s / %s, %s',
           [ I, Level.Creatures[I].Kind.VRMLNodeName,
             VectorToNiceStr(Level.Creatures[I].LegsPosition),
             FloatToNiceStr(Level.Creatures[I].Life),
-            FloatToNiceStr(Level.Creatures[I].MaxLife) ]));
+            FloatToNiceStr(Level.Creatures[I].MaxLife),
+            FloatToNiceStr(Level.Creatures[I].Kind.CameraRadius) ]));
 
       S.Append('Kill all creatures ?');
 

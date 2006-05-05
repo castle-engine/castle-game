@@ -53,11 +53,15 @@ type
   TCreatureKind = class(TObjectKind)
   private
     FFlying: boolean;
-    FCameraRadius: Single;
     FSoundSuddenPain: TSoundType;
     FSoundDying: TSoundType;
     FSoundDyingTiedToCreature: boolean;
     FDefaultMaxLife: Single;
+
+    CameraRadiusFromFile: Single;
+  protected
+    { In descendants only PrepareRender can (and should!) set this. }
+    CameraRadiusFromPrepareRender: Single;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -67,11 +71,28 @@ type
       the ground. }
     property Flying: boolean read FFlying write FFlying default DefaultFlying;
 
-    { Camera radius when moving. By default it's 0.
-      You should initialize it to something larger, for collision detection.
-      You can do it in PrepareRender. }
-    property CameraRadius: Single read FCameraRadius write FCameraRadius
-      default 0;
+    { Camera radius when moving.
+      You should make sure that it's something <> 0 for collision detection.
+
+      This is always calculated like:
+      Of CameraRadiusFromFile <> 0, then take it.
+      Otherwise take CameraRadiusFromPrepareRender.
+      So there are 2 ways to initialize this:
+      1. Set this in creatures/kinds.xml file.
+      2. Set CameraRadiusFromPrepareRender properly.
+
+      Setting this in creatures/kinds.xml file to non-zero will effectively
+      ignore any CameraRadiusFromPrepareRender value.
+
+      And PrepareRender should always set CameraRadiusFromPrepareRender
+      to something non-zero. So note that before PrepareRender was called,
+      CameraRadius may remain zero. But you can depend on the fact that
+      it's non-zero after PrepareRender.
+
+      Note that this is always measured from MiddlePosition of given
+      creature. So take this into account when calcuating
+      CameraRadiusFromPrepareRender or writing it in kinds.xml file. }
+    function CameraRadius: Single;
 
     property SoundSuddenPain: TSoundType
       read FSoundSuddenPain write FSoundSuddenPain default stNone;
@@ -174,7 +195,9 @@ type
 
     { Make all TVRMLGLAnimation properties non-nil. I.e. load them from their
       XxxInfo counterparts.
-      Also initialize CameraRadius from StandAnimation.Scenes[0]. }
+
+      Also calculates CameraRadiusFromPrepareRender
+      from StandAnimation.Scenes[0]. }
     procedure PrepareRender; override;
 
     function PrepareRenderSteps: Cardinal; override;
@@ -243,7 +266,7 @@ type
 
     { Maximum distance between player and creature to allow creature
       to start attack. More precisely, this is measured between
-      Player.Navigator.CameraPos and creature's HeadPosition. }
+      Player.Navigator.CameraPos and creature's MiddlePosition. }
     property MaxAttackDistance: Single
       read FMaxAttackDistance write FMaxAttackDistance
       default DefaultMaxAttackDistance;
@@ -274,7 +297,7 @@ type
       read FMaxKnockedBackDistance write FMaxKnockedBackDistance
       default DefaultMaxKnockedBackDistance;
 
-    { This will be played at HeadPosition when entering wasAttack state.
+    { This will be played at MiddlePosition when entering wasAttack state.
       Sometimes you may prefer to rather play a sound at ActualAttack
       --- then just do it in overriden ActualAttack. }
     property SoundAttackStart: TSoundType
@@ -398,43 +421,68 @@ type
     function SceneTransformAssuming(
       const AssumeLegsPosition, AssumeDirection: TVector3Single): TMatrix4Single;
 
+    { These define exactly what "MiddlePosition" means for this creature.
+
+      LegsPositionFromMiddle must always specify reverse function.
+
+      VLerpLegsMiddlePosition must always be equal to
+      VLerp(A, LegsPosition, MiddlePosition)
+      (but usually can be calculated more efficiently than calling VLerp).
+
+      In this class they calculate MiddlePosition as LegsPosition
+      moved higher than HeightBetweenLegsAndMiddle.
+      So if you want to change the meaning of these functions
+      you can simply override only HeightBetweenLegsAndMiddle
+      (and all things below will still work OK).
+      *Or* you can change all 4 functions (3 functions below and
+      HeightBetweenLegsAndMiddle), to keep them "synchronized".
+
+      @groupBegin }
+    function MiddlePositionFromLegs(
+      const AssumeLegsPosition: TVector3Single): TVector3Single; virtual;
+    function LegsPositionFromMiddle(
+      const AssumeMiddlePosition: TVector3Single): TVector3Single; virtual;
+    function VLerpLegsMiddlePosition(
+      const A: Single): TVector3Single; virtual;
+    { @groupEnd }
+
     { Returns BoundingBox, assuming that LegsPosition and Direction are
       as specified here. }
     function BoundingBoxAssumingLegs(
       const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
 
-    function BoundingBoxAssumingHead(
-      const AssumeHeadPosition, AssumeDirection: TVector3Single): TBox3d;
+    function BoundingBoxAssumingMiddle(
+      const AssumeMiddlePosition, AssumeDirection: TVector3Single): TBox3d;
 
-    { This checks collision with Player.BoundingBox, assuming that HeadPosition
+    { This checks collision with Player.BoundingBox, assuming that MiddlePosition
       (and implied LegsPosition) is as given. }
-    function HeadCollisionWithPlayer(
-      const AssumeHeadPosition: TVector3Single): boolean;
+    function MiddleCollisionWithPlayer(
+      const AssumeMiddlePosition: TVector3Single): boolean;
 
     function LegsCollisionWithPlayer(
       const AssumeLegsPosition: TVector3Single): boolean;
 
     procedure SetLife(const Value: Single); virtual;
 
-    { Tries to move from OldHeadPosition to ProposedNewHeadPosition.
-      Returns true and sets NewHeadPosition if some move is allowed.
+    { Tries to move from OldMiddlePosition to ProposedNewMiddlePosition.
+      Returns true and sets NewMiddlePosition if some move is allowed.
 
-      Note that OldHeadPosition *must be equal to HeadPosition*.
+      Note that OldMiddlePosition *must be equal to MiddlePosition*.
       It's passed here only for speed.
 
       Check collisions with the level, with player, and with other
       creatures. }
     function MoveAllowed(
-      const OldHeadPosition, ProposedNewHeadPosition: TVector3Single;
-      var NewHeadPosition: TVector3Single;
+      const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
+      var NewMiddlePosition: TVector3Single;
       BecauseOfGravity: boolean): boolean;
 
     { Like MoveAllowed, but this is only a "yes/no" collision check. }
     function MoveAllowedSimple(
-      const OldHeadPosition, NewHeadPosition: TVector3Single;
+      const OldMiddlePosition, NewMiddlePosition: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
 
-    { Checks AssumeHeadPosition height above the level and other creatures.
+    { Checks AssumeMiddlePosition height above the level and other creatures.
 
       I don't check height above the player, this is not needed
       (GetCameraHeight is needed only for "growing up" and "falling down";
@@ -443,7 +491,7 @@ type
       we don't have to take this into account. Things will work correctly
       anyway.) }
     procedure GetCameraHeight(
-      const AssumeHeadPosition: TVector3Single;
+      const AssumeMiddlePosition: TVector3Single;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
   public
     { Constructor. Note for AnimationTime: usually I will take
@@ -481,17 +529,18 @@ type
       (or rather, currently used model! Creatures are animated after all). }
     property LegsPosition: TVector3Single read FLegsPosition write FLegsPosition;
 
-    { Just a shortcut for CurrentScene.BoundingBox[1, 2].
+    { This is the height of MiddlePosition above LegsPosition.
+      In this class, just a shortcut for CurrentScene.BoundingBox[1, 2].
       Note that while CurrentScene may change, this also may change. }
-    function Height: Single;
+    function HeightBetweenLegsAndMiddle: Single; virtual;
 
-    { This is the position of the head. Actually, it's the place where
-      (0, 0, Height) point of creatures bounding box currently is
-      (i.e., translated by LegsPosition).
+    { This is the "middle" position of the creature.
+      For some creatures it can be considered the position of their "heads".
+      How precisely this is calculated for given creature depends
+      on MiddlePositionFromLegs implementation in this class.
 
-      Note that all collision detection (MoveAllowed, GetCameraHeight)
-      when not Flying
-      should be done using HeadPosition, and then appropriately translated
+      All collision detection (MoveAllowed, GetCameraHeight)
+      should be done using MiddlePosition, and then appropriately translated
       back to LegsPosition. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
       are not Flying and have already fallen down on the ground) on the
@@ -499,14 +548,21 @@ type
       is always vulnerable to accidentaly finding collision between LegsPosition
       and the ground.
 
-      For Flying creatures this is not a problem, they can use LegsPosition
-      surrounded by CameraRadius for collision detection. }
-    function HeadPosition: TVector3Single;
+      So for creatures not Flying, MiddlePosition should
+      be always higher (at least by CameraRadius) than LegsPosition.
 
-    { Return the one of Level.Sectors that contains HeadPosition.
+      For Flying creatures this is not a problem, they could use LegsPosition
+      surrounded by CameraRadius for collision detection. But this would
+      be inefficient --- since LegsPosition surrounded by CameraRadius
+      would unnecessarily block creature's moves. So for Flying creatures
+      it's best to actually set MiddlePosition right in the middle of
+      creature's model, and so you can make CameraRadius slightly smaller. }
+    function MiddlePosition: TVector3Single;
+
+    { Return the one of Level.Sectors that contains MiddlePosition.
       Nil if none. Yes, this is just a shortcut for
-      Level.Sectors.SectorWithPoint(HeadPosition). }
-    function HeadPositionSector: TSceneSector;
+      Level.Sectors.SectorWithPoint(MiddlePosition). }
+    function MiddlePositionSector: TSceneSector;
 
     { Direction the creature is facing.
       It always must be normalized.
@@ -548,17 +604,20 @@ type
       that always returns @true. }
     function CollisionsWithCreaturesAndPlayer: boolean; virtual;
 
-    { Play SountType where the creature's position is.
-      Exactly, the position is between LegsPosition and HeadPosition
-      --- AHeight = 0 means LegsPosition, AHeight = 1 means HeadPosition,
-      AHeight between means ... well, between LegsPosition and HeadPosition.
+    { Play SoundType where the creature's position is.
+
+      Exactly, the position is between LegsPosition and MiddlePosition
+      --- SoundHeight = 0 means LegsPosition, SoundHeight = 1 means MiddlePosition,
+      SoundHeight between means ... well, between LegsPosition and MiddlePosition.
+      This can also be higher than 1 or lower than 0, should be treated like
+      vlerp between LegsPosition and MiddlePosition.
 
       If TiedToCreature then the sounds position will be updated
       as the creature will move, and when the creature object will
       be destroyed, sound will stop. If not TiedToCreature, then
       the sound will simply be done at creature's position, but then
       it will continue to be played independent of this creature. }
-    procedure Sound3d(const SoundType: TSoundType; const AHeight: Single;
+    procedure Sound3d(const SoundType: TSoundType; const SoundHeight: Single;
       TiedToCreature: boolean = true);
   end;
 
@@ -668,7 +727,7 @@ type
 
       This happens in the middle of AttackAnimation,
       see also ActualAttackTime. Of course you should use
-      current creature LegsPosition, HeadPosition, Direction
+      current creature LegsPosition, MiddlePosition, Direction
       etc. to determine things like missile starting position
       and direction.
 
@@ -709,6 +768,8 @@ type
     function CollisionsWithCreaturesAndPlayer: boolean; override;
 
     function RemoveMeFromLevel: boolean; override;
+
+    function HeightBetweenLegsAndMiddle: Single; override;
   end;
 
   { This is TCreature that has a kind always of TMissileCreatureKind. }
@@ -777,6 +838,15 @@ begin
     DefaultSoundDyingTiedToCreature);
   DefaultMaxLife := KindsConfig.GetValue(VRMLNodeName + '/default_max_life',
     DefaultDefaultMaxLife);
+  CameraRadiusFromFile := KindsConfig.GetValue(VRMLNodeName + '/camera_radius',
+    0);
+end;
+
+function TCreatureKind.CameraRadius: Single;
+begin
+  if CameraRadiusFromFile <> 0 then
+    Result := CameraRadiusFromFile else
+    Result := CameraRadiusFromPrepareRender;
 end;
 
 { TCreaturesKindsList -------------------------------------------------------- }
@@ -903,7 +973,8 @@ begin
   CreateIfNeeded(FDyingAnimation      , FDyingAnimationInfo      );
   CreateIfNeeded(FHurtAnimation       , FHurtAnimationInfo       );
 
-  CameraRadius := Box3dXYRadius(StandAnimation.Scenes[0].BoundingBox);
+  CameraRadiusFromPrepareRender :=
+    Box3dXYRadius(StandAnimation.Scenes[0].BoundingBox);
 end;
 
 function TWalkAttackCreatureKind.PrepareRenderSteps: Cardinal;
@@ -988,11 +1059,15 @@ begin
   inherited;
 
   { For Flying creatures, larger CameraRadius (that *really* surrounds whole
-    model from HeadPosition) is better. }
+    model from MiddlePosition) is better. }
   ReferenceScene := StandAnimation.Scenes[0];
 
-  CameraRadius := Max(Box3dXYRadius(ReferenceScene.BoundingBox),
-    ReferenceScene.BoundingBox[1, 2]);
+  CameraRadiusFromPrepareRender :=
+    Max(Box3dXYRadius(ReferenceScene.BoundingBox),
+    { I can do here "/ 2" thanks to implementation of
+      TGhostCreature.HeightBetweenLegsAndMiddle, that sets uses
+      CurrentScene.BoundingBox[1, 2] / 2. }
+    ReferenceScene.BoundingBox[1, 2] / 2);
 end;
 
 function TGhostKind.CreateDefaultCreature(
@@ -1038,7 +1113,9 @@ procedure TMissileCreatureKind.PrepareRender;
 begin
   inherited;
   CreateIfNeeded(FAnimation, FAnimationInfo);
-  CameraRadius := Box3dXYRadius(Animation.Scenes[0].BoundingBox);
+
+  CameraRadiusFromPrepareRender :=
+    Box3dXYRadius(Animation.Scenes[0].BoundingBox);
 end;
 
 function TMissileCreatureKind.PrepareRenderSteps: Cardinal;
@@ -1074,7 +1151,8 @@ end;
 type
   TCreatureSoundSourceData = class
   public
-    AHeight: Single;
+    { TODO: unused ? }
+    SoundHeight: Single;
   end;
 
 { TCreature ------------------------------------------------------------------ }
@@ -1131,14 +1209,13 @@ begin
   UsedSounds.Delete(Sender);
 end;
 
-procedure TCreature.Sound3d(const SoundType: TSoundType; const AHeight: Single;
+procedure TCreature.Sound3d(const SoundType: TSoundType; const SoundHeight: Single;
   TiedToCreature: boolean);
 var
   NewSource: TALAllocatedSource;
   SoundPosition: TVector3Single;
 begin
-  SoundPosition := LegsPosition;
-  SoundPosition[2] += Height * AHeight;
+  SoundPosition := VLerpLegsMiddlePosition(SoundHeight);
   NewSource := CastleSound.Sound3d(SoundType, SoundPosition);
   if TiedToCreature and (NewSource <> nil) then
   begin
@@ -1148,15 +1225,34 @@ begin
   end;
 end;
 
-function TCreature.Height: Single;
+function TCreature.HeightBetweenLegsAndMiddle: Single;
 begin
   Result := CurrentScene.BoundingBox[1, 2];
 end;
 
-function TCreature.HeadPosition: TVector3Single;
+function TCreature.MiddlePositionFromLegs(
+  const AssumeLegsPosition: TVector3Single): TVector3Single;
+begin
+  Result := AssumeLegsPosition;
+  Result[2] += HeightBetweenLegsAndMiddle;
+end;
+
+function TCreature.LegsPositionFromMiddle(
+  const AssumeMiddlePosition: TVector3Single): TVector3Single;
+begin
+  Result := AssumeMiddlePosition;
+  Result[2] -= HeightBetweenLegsAndMiddle;
+end;
+
+function TCreature.VLerpLegsMiddlePosition(const A: Single): TVector3Single;
 begin
   Result := LegsPosition;
-  Result[2] += Height;
+  Result[2] += HeightBetweenLegsAndMiddle * A;
+end;
+
+function TCreature.MiddlePosition: TVector3Single;
+begin
+  Result := MiddlePositionFromLegs(LegsPosition);
 end;
 
 function TCreature.SceneTransformAssuming(
@@ -1193,14 +1289,12 @@ begin
     SceneTransformAssuming(AssumeLegsPosition, AssumeDirection));
 end;
 
-function TCreature.BoundingBoxAssumingHead(
-  const AssumeHeadPosition, AssumeDirection: TVector3Single): TBox3d;
+function TCreature.BoundingBoxAssumingMiddle(
+  const AssumeMiddlePosition, AssumeDirection: TVector3Single): TBox3d;
 var
   AssumeLegsPosition: TVector3Single;
 begin
-  AssumeLegsPosition := AssumeHeadPosition;
-  AssumeLegsPosition[2] -= Height;
-
+  AssumeLegsPosition := LegsPositionFromMiddle(AssumeMiddlePosition);
   Result := BoundingBoxAssumingLegs(AssumeLegsPosition, AssumeDirection);
 end;
 
@@ -1242,11 +1336,11 @@ begin
   CurrentScene.RenderBackShadowQuads(SavedShadowQuads);
 end;
 
-function TCreature.HeadCollisionWithPlayer(
-  const AssumeHeadPosition: TVector3Single): boolean;
+function TCreature.MiddleCollisionWithPlayer(
+  const AssumeMiddlePosition: TVector3Single): boolean;
 begin
   Result := Boxes3dCollision(
-    BoundingBoxAssumingHead(AssumeHeadPosition, Direction), Player.BoundingBox);
+    BoundingBoxAssumingMiddle(AssumeMiddlePosition, Direction), Player.BoundingBox);
 end;
 
 function TCreature.LegsCollisionWithPlayer(
@@ -1257,51 +1351,51 @@ begin
 end;
 
 function TCreature.MoveAllowed(
-  const OldHeadPosition, ProposedNewHeadPosition: TVector3Single;
-  var NewHeadPosition: TVector3Single;
+  const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
+  var NewMiddlePosition: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result :=
     { Check creature<->level collision. }
     Level.MoveAllowed(
-      OldHeadPosition, ProposedNewHeadPosition, NewHeadPosition,
+      OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
       BecauseOfGravity, Kind.CameraRadius) and
     { Check creature<->player collision. }
-    (not HeadCollisionWithPlayer(NewHeadPosition)) and
+    (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
     { Check creature<->other creatures collision. }
     (Level.Creatures.MoveAllowedSimple(
       BoundingBox,
-      BoundingBoxAssumingHead(NewHeadPosition, Direction),
-      OldHeadPosition, NewHeadPosition, Self) = nil);
+      BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
+      OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
 function TCreature.MoveAllowedSimple(
-  const OldHeadPosition, NewHeadPosition: TVector3Single;
+  const OldMiddlePosition, NewMiddlePosition: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result :=
     { Check creature<->level collision. }
-    Level.MoveAllowedSimple(OldHeadPosition, NewHeadPosition,
+    Level.MoveAllowedSimple(OldMiddlePosition, NewMiddlePosition,
       BecauseOfGravity, Kind.CameraRadius) and
     { Check creature<->player collision. }
-    (not HeadCollisionWithPlayer(NewHeadPosition)) and
+    (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
     { Check creature<->other creatures collision. }
     (Level.Creatures.MoveAllowedSimple(
       BoundingBox,
-      BoundingBoxAssumingHead(NewHeadPosition, Direction),
-      OldHeadPosition, NewHeadPosition, Self) = nil);
+      BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
+      OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
 procedure TCreature.GetCameraHeight(
-  const AssumeHeadPosition: TVector3Single;
+  const AssumeMiddlePosition: TVector3Single;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 begin
   { Check creature<->level collision. }
-  Level.GetCameraHeight(AssumeHeadPosition,
+  Level.GetCameraHeight(AssumeMiddlePosition,
     IsAboveTheGround, SqrHeightAboveTheGround);
 
   { Check creature<->other creatures collision. }
-  Level.Creatures.GetCameraHeight(AssumeHeadPosition,
+  Level.Creatures.GetCameraHeight(AssumeMiddlePosition,
     IsAboveTheGround, SqrHeightAboveTheGround, Self);
 end;
 
@@ -1314,9 +1408,8 @@ procedure TCreature.Idle(const CompSpeed: Single);
   begin
     for I := 0 to UsedSounds.High do
     begin
-      SoundPosition := LegsPosition;
-      SoundPosition[2] += Height *
-        TCreatureSoundSourceData(UsedSounds[I].UserData).AHeight;
+      SoundPosition := VLerpLegsMiddlePosition(
+        TCreatureSoundSourceData(UsedSounds[I].UserData).SoundHeight);
       alSourceVector3f(UsedSounds[I].ALSource, AL_POSITION, SoundPosition);
     end;
   end;
@@ -1341,23 +1434,20 @@ procedure TCreature.Idle(const CompSpeed: Single);
     end;
 
   var
-    OldHeadPosition: TVector3Single;
+    OldMiddlePosition: TVector3Single;
 
     function MoveVertical(const Distance: Single): boolean;
     var
-      NewHeadPosition, ProposedNewHeadPosition: TVector3Single;
+      NewMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
     begin
-      ProposedNewHeadPosition := OldHeadPosition;
-      ProposedNewHeadPosition[2] += Distance;
+      ProposedNewMiddlePosition := OldMiddlePosition;
+      ProposedNewMiddlePosition[2] += Distance;
 
-      Result := MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
-        NewHeadPosition, true);
+      Result := MoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
+        NewMiddlePosition, true);
 
       if Result then
-      begin
-        FLegsPosition := NewHeadPosition;
-        FLegsPosition[2] -= Height;
-      end;
+        FLegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
 
   const
@@ -1379,19 +1469,19 @@ procedure TCreature.Idle(const CompSpeed: Single);
       This is extremely simplified version of Gravity work in MatrixNavigation.
       (simplified, because creature doesn't need all these effects). }
 
-    { Note that also here we do collision detection using HeadPosition,
-      not LegsPosition. See HeadPosition docs for reasoning. }
+    { Note that also here we do collision detection using MiddlePosition,
+      not LegsPosition. See MiddlePosition docs for reasoning. }
 
     OldIsFallingDown := FIsFallingDown;
-    OldHeadPosition := HeadPosition;
+    OldMiddlePosition := MiddlePosition;
 
-    GetCameraHeight(OldHeadPosition, IsAboveTheGround,
+    GetCameraHeight(OldMiddlePosition, IsAboveTheGround,
       SqrHeightAboveTheGround);
     { We will need it anyway. OK, I'll pay this Sqrt. }
     HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
 
     if (not IsAboveTheGround) or
-      (HeightAboveTheGround > Height * HeightMargin) then
+      (HeightAboveTheGround > HeightBetweenLegsAndMiddle * HeightMargin) then
     begin
       { Fall down }
       if not FIsFallingDown then
@@ -1399,18 +1489,18 @@ procedure TCreature.Idle(const CompSpeed: Single);
 
       FIsFallingDown := true;
       if not MoveVertical(-Min(FallingDownSpeed * CompSpeed,
-        HeightAboveTheGround - Height)) then
+        HeightAboveTheGround - HeightBetweenLegsAndMiddle)) then
         FIsFallingDown := false;
     end else
     begin
       FIsFallingDown := false;
 
       if IsAboveTheGround and
-        (HeightAboveTheGround < Height / HeightMargin) then
+        (HeightAboveTheGround < HeightBetweenLegsAndMiddle / HeightMargin) then
       begin
         { Growing up }
         MoveVertical(Min(GrowingUpSpeed * CompSpeed,
-          Height - HeightAboveTheGround));
+          HeightBetweenLegsAndMiddle - HeightAboveTheGround));
       end;
     end;
 
@@ -1455,9 +1545,9 @@ begin
   FLastAttackDirection := Normalized(Value);
 end;
 
-function TCreature.HeadPositionSector: TSceneSector;
+function TCreature.MiddlePositionSector: TSceneSector;
 begin
-  Result := Level.Sectors.SectorWithPoint(HeadPosition);
+  Result := Level.Sectors.SectorWithPoint(MiddlePosition);
 end;
 
 function TCreature.CollisionsWithCreaturesAndPlayer: boolean;
@@ -1532,8 +1622,8 @@ begin
           occurs, someone can't make it worse, and can't "abuse" this
           by entering into creature's bounding box). }
         if (not Boxes3dCollision(OldBoundingBox, Result.BoundingBox)) or
-           ( PointsDistanceSqr(NewPosition, Result.HeadPosition) <
-             PointsDistanceSqr(OldPosition, Result.HeadPosition) ) then
+           ( PointsDistanceSqr(NewPosition, Result.MiddlePosition) <
+             PointsDistanceSqr(OldPosition, Result.MiddlePosition) ) then
           Exit;
       end;
     end;
@@ -1655,7 +1745,7 @@ var
     begin
       { Calculate and check AngleRadBetweenTheDirectionToPlayer. }
       AngleRadBetweenTheDirectionToPlayer := AngleRadBetweenVectors(
-        VectorSubtract(LastSeenPlayer, HeadPosition),
+        VectorSubtract(LastSeenPlayer, MiddlePosition),
         Direction);
       Result := AngleRadBetweenTheDirectionToPlayer <= MaxAngleToAttack;
     end;
@@ -1667,7 +1757,7 @@ var
     var AngleRadBetweenDirectionToTarget: Single);
   begin
     { calculate DirectionToTarget }
-    DirectionToTarget := VectorSubtract(Target, HeadPosition);
+    DirectionToTarget := VectorSubtract(Target, MiddlePosition);
     if not Kind.Flying then
       MakeVectorsOrthoOnTheirPlane(DirectionToTarget, Level.HomeCameraUp);
 
@@ -1736,8 +1826,8 @@ var
     SqrDistanceToTarget: Single;
   begin
     if WAKind.Flying then
-      SqrDistanceToTarget := PointsDistanceSqr(HeadPosition, Target) else
-      SqrDistanceToTarget := PointsDistanceXYSqr(HeadPosition, Target);
+      SqrDistanceToTarget := PointsDistanceSqr(MiddlePosition, Target) else
+      SqrDistanceToTarget := PointsDistanceXYSqr(MiddlePosition, Target);
     Result :=
       { If creature is ideally at the target
         (for not Flying creatures, this means "ideally under/above the target"),
@@ -1745,7 +1835,7 @@ var
 
         We check this with some "epsilon" (MinDistanceToTarget), as usual, to
 
-        1. Avoid the unnecessary moving when HeadPosition is in fact
+        1. Avoid the unnecessary moving when MiddlePosition is in fact
            close enough to the target, but lack of floating precision
            can't move it really ideally to Target.
 
@@ -1850,7 +1940,7 @@ var
   procedure DoWalk;
 
     { This performs the real move, which means that it changes LegsPosition
-      and HeadPosition along the Direction vector.
+      and MiddlePosition along the Direction vector.
 
       This doesn't check whether this is a sensible move, so use this
       only if you know that the creature really wants to go in this Direction.
@@ -1862,7 +1952,7 @@ var
     function MoveAlongTheDirection: boolean;
 
       { Don't be stupid, and don't walk where you see you will fall down. }
-      function TooHighAboveTheGround(const NewHeadPosition: TVector3Single):
+      function TooHighAboveTheGround(const NewMiddlePosition: TVector3Single):
         boolean;
       const
         MaxHeightAcceptableToFall = 2.0 * 0.7;
@@ -1873,34 +1963,35 @@ var
         Result := false;
         if not Kind.Flying then
         begin
-          GetCameraHeight(NewHeadPosition, IsAboveTheGround,
+          GetCameraHeight(NewMiddlePosition, IsAboveTheGround,
             SqrHeightAboveTheGround);
           if (not IsAboveTheGround) or
-            (SqrHeightAboveTheGround > Sqr(MaxHeightAcceptableToFall + Height)) then
+            (SqrHeightAboveTheGround > Sqr(MaxHeightAcceptableToFall +
+              HeightBetweenLegsAndMiddle)) then
             Result := true;
         end;
       end;
 
     var
-      OldHeadPosition, NewHeadPosition: TVector3Single;
+      OldMiddlePosition, NewMiddlePosition: TVector3Single;
     begin
-      OldHeadPosition := HeadPosition;
-      NewHeadPosition := VectorAdd(OldHeadPosition,
+      OldMiddlePosition := MiddlePosition;
+      NewMiddlePosition := VectorAdd(OldMiddlePosition,
         VectorScale(Direction, WAKind.MoveSpeed * CompSpeed));
 
       Result :=
         { First check to not step into some deep fall.
-          Note that I'm not using here NewHeadPosition
+          Note that I'm not using here NewMiddlePosition
           (that will be calculated later by Level.MoveAllowed)
-          or ProposedNewHeadPosition, because they are too close
-          to OldHeadPosition to be good to test against.
+          or ProposedNewMiddlePosition, because they are too close
+          to OldMiddlePosition to be good to test against.
           I'm calculating here where I would get after 0.2 second
           (WAKind.MoveSpeed * 0.2 * 50). }
-        (not TooHighAboveTheGround(VectorAdd(OldHeadPosition,
+        (not TooHighAboveTheGround(VectorAdd(OldMiddlePosition,
           VectorScale(Direction, WAKind.MoveSpeed * 0.2 * 50)))) and
 
         { MoveAllowed is free to just return true and set
-          NewHeadPosition to OldHeadPosition (or something very close)
+          NewMiddlePosition to OldMiddlePosition (or something very close)
           instead of returning false. But this is not good for
           MoveAlongTheDirection, as things using MoveAlongTheDirection
           depend on the fact that MoveAlongTheDirection will return false
@@ -1910,20 +2001,17 @@ var
           Our trick with "AlternativeTarget" should handle
           eventual problems with the track of creature, so MoveAllowed
           should not be needed. }
-        MoveAllowedSimple(OldHeadPosition, NewHeadPosition, false);
+        MoveAllowedSimple(OldMiddlePosition, NewMiddlePosition, false);
 
       if Result then
-      begin
-        FLegsPosition := NewHeadPosition;
-        FLegsPosition[2] -= Height;
-      end;
+        FLegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
 
     procedure InitAlternativeTarget;
     const
       RandomWalkDistance = 10;
     begin
-      AlternativeTarget := HeadPosition;
+      AlternativeTarget := MiddlePosition;
       AlternativeTarget[0] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
       AlternativeTarget[1] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
       if WAKind.Flying then
@@ -1999,7 +2087,7 @@ var
   var
     DirectionToTarget: TVector3Single;
     AngleRadBetweenDirectionToTarget: Single;
-    HeadPositionSectorNow: TSceneSector;
+    MiddlePositionSectorNow: TSceneSector;
     UseWalkNormal: boolean;
   begin
     if HasAlternativeTarget then
@@ -2088,20 +2176,20 @@ var
 
       UseWalkNormal := true;
 
-      HeadPositionSectorNow := HeadPositionSector;
-      if (HeadPositionSectorNow <> LastSeenPlayerSector) and
-         (HeadPositionSectorNow <> nil) and
+      MiddlePositionSectorNow := MiddlePositionSector;
+      if (MiddlePositionSectorNow <> LastSeenPlayerSector) and
+         (MiddlePositionSectorNow <> nil) and
          (LastSeenPlayerSector <> nil) then
       begin
         { The way to LastSeenPlayer is using waypoints. }
 
         { Recalculate WaypointsSaved.
-          Note that I recalculate only when HeadPositionSectorNow or
+          Note that I recalculate only when MiddlePositionSectorNow or
           LastSeenPlayerSector changed. }
-        if (HeadPositionSectorNow <> WaypointsSaved_Begin) or
+        if (MiddlePositionSectorNow <> WaypointsSaved_Begin) or
            (LastSeenPlayerSector <> WaypointsSaved_End) then
         begin
-          WaypointsSaved_Begin := HeadPositionSectorNow;
+          WaypointsSaved_Begin := MiddlePositionSectorNow;
           WaypointsSaved_End := LastSeenPlayerSector;
           TSceneSectorsList.FindWay(WaypointsSaved_Begin, WaypointsSaved_End,
             WaypointsSaved);
@@ -2163,7 +2251,7 @@ var
     KnockedBackSpeed = 1.0 * 0.7;
   var
     StateTime: Single;
-    OldHeadPosition, ProposedNewHeadPosition, NewHeadPosition: TVector3Single;
+    OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition: TVector3Single;
     CurrentKnockBackDistance: Single;
   begin
     StateTime := Level.AnimationTime - StateChangeTime;
@@ -2172,7 +2260,7 @@ var
       SetState(wasStand) else
     if KnockedBackDistance <= WAKind.MaxKnockedBackDistance then
     begin
-      OldHeadPosition := HeadPosition;
+      OldMiddlePosition := MiddlePosition;
 
       { Calculate CurrentKnockBackDistance, update KnockedBackDistance }
       CurrentKnockBackDistance := KnockedBackSpeed * CompSpeed;
@@ -2187,15 +2275,12 @@ var
         KnockedBackDistance += CurrentKnockBackDistance;
       end;
 
-      ProposedNewHeadPosition := VectorAdd(OldHeadPosition,
+      ProposedNewMiddlePosition := VectorAdd(OldMiddlePosition,
         VectorScale(LastAttackDirection, CurrentKnockBackDistance));
 
-      if MoveAllowed(OldHeadPosition, ProposedNewHeadPosition,
-        NewHeadPosition, false) then
-      begin
-        FLegsPosition := NewHeadPosition;
-        FLegsPosition[2] -= Height;
-      end;
+      if MoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
+        NewMiddlePosition, false) then
+        FLegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
   end;
 
@@ -2208,7 +2293,7 @@ begin
     Exit;
   end;
 
-  SeesPlayer := Level.LineOfSight(HeadPosition, Player.Navigator.CameraPos);
+  SeesPlayer := Level.LineOfSight(MiddlePosition, Player.Navigator.CameraPos);
   if SeesPlayer then
   begin
     HasLastSeenPlayer := true;
@@ -2219,7 +2304,7 @@ begin
   if HasLastSeenPlayer then
   begin
     SqrDistanceToLastSeenPlayer :=
-      PointsDistanceSqr(LastSeenPlayer, HeadPosition);
+      PointsDistanceSqr(LastSeenPlayer, MiddlePosition);
   end;
 
   case FState of
@@ -2271,12 +2356,14 @@ const
   FiringMissileHeight = 0.6;
 var
   Missile: TCreature;
+  MissilePosition, MissileDirection: TVector3Single;
 begin
   if HasLastSeenPlayer then
   begin
+    MissilePosition := VLerpLegsMiddlePosition(FiringMissileHeight);
+    MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
     Missile := BallMissile.CreateDefaultCreature(
-      VLerp(FiringMissileHeight, LegsPosition, HeadPosition),
-      Normalized(VectorSubtract(LastSeenPlayer, HeadPosition)),
+      MissilePosition, MissileDirection,
       Level.AnimationTime);
 
     Level.Creatures.Add(Missile);
@@ -2343,6 +2430,11 @@ function TGhostCreature.RemoveMeFromLevel: boolean;
 begin
   Result := (State = wasDying) and
     (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd);
+end;
+
+function TGhostCreature.HeightBetweenLegsAndMiddle: Single;
+begin
+  Result := CurrentScene.BoundingBox[1, 2] / 2;
 end;
 
 { TMissileCreature ----------------------------------------------------------- }
