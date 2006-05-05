@@ -44,6 +44,7 @@ const
   DefaultMaxKnockedBackDistance = 6.0 * 0.7;
   DefaultLifeToRunAway = 0.3;
   DefaultActualAttackTime = 0.0;
+  DefaultMaxAngleToAttack = Pi / 6 { 30 degrees };
 
   DefaultSoundDyingTiedToCreature = true;
 
@@ -181,6 +182,7 @@ type
 
     FSoundAttackStart: TSoundType;
     FLifeToRunAway: Single;
+    FMaxAngleToAttack: Single;
   protected
     procedure FreePrepareRender; override;
   public
@@ -312,6 +314,21 @@ type
       read FLifeToRunAway write FLifeToRunAway default DefaultLifeToRunAway;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
+
+    { Because most of the creatures will have their weapon
+      on their front (teeth, shooting hands, claws, whatever),
+      so they can attack player only when their Direction is somewhat
+      close to the direction to player.
+
+      More precisely, the attack is allowed to start only when
+      the angle between current Direction and the vector
+      from creature's MiddlePosition to the player's CameraPos
+      is <= MaxAngleToAttack.
+
+      This is in radians. }
+    property MaxAngleToAttack: Single
+      read FMaxAngleToAttack write FMaxAngleToAttack
+      default DefaultMaxAngleToAttack;
   end;
 
   TBallThrowerCreatureKind = class(TWalkAttackCreatureKind)
@@ -702,6 +719,9 @@ type
     WaypointsSaved_Begin: TSceneSector;
     WaypointsSaved_End: TSceneSector;
     WaypointsSaved: TSceneWaypointsList;
+
+    { Use this is ActualAttack for short range creatures. }
+    function ShortRangeActualAttackHits: boolean;
   protected
     procedure SetLife(const Value: Single); override;
   public
@@ -936,6 +956,7 @@ begin
   FMaxKnockedBackDistance := DefaultMaxKnockedBackDistance;
   FLifeToRunAway := DefaultLifeToRunAway;
   FActualAttackTime := DefaultActualAttackTime;
+  FMaxAngleToAttack := DefaultMaxAngleToAttack;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -980,7 +1001,8 @@ begin
   CreateIfNeeded(FHurtAnimation       , FHurtAnimationInfo       );
 
   CameraRadiusFromPrepareRender :=
-    Box3dXYRadius(StandAnimation.Scenes[0].BoundingBox);
+    Min(Box3dXYRadius(StandAnimation.Scenes[0].BoundingBox),
+        StandAnimation.Scenes[0].BoundingBox[1, 2] * 0.75);
 end;
 
 function TWalkAttackCreatureKind.PrepareRenderSteps: Cardinal;
@@ -1032,7 +1054,10 @@ begin
     DefaultLifeToRunAway);
   MaxKnockedBackDistance :=
     KindsConfig.GetValue(VRMLNodeName + '/max_knocked_back_distance',
-    DefaultMaxKnockedBackDistance)
+    DefaultMaxKnockedBackDistance);
+  MaxAngleToAttack :=
+    KindsConfig.GetValue(VRMLNodeName + '/max_angle_to_attack',
+    DefaultMaxAngleToAttack);
 end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
@@ -1189,8 +1214,14 @@ constructor TCreature.Create(AKind: TCreatureKind;
 begin
   inherited Create;
 
-  if not AKind.PrepareRenderDone then
-    AKind.RedoPrepareRender;
+  { If --debug-no-creatures, then we actually load the creature now.
+    If not, then we depend on CreaturesKinds.PrepareRender call
+    to call our PrepareRender (this *may* happen after TCreature creation
+    --- when loading new creatures designed on a level, TLevel constructor
+    creates creatures and then PlayGame calls CreaturesKinds.PrepareRender). }
+  if WasParam_DebugNoCreatures then
+    if not AKind.PrepareRenderDone then
+      AKind.RedoPrepareRender;
 
   FKind := AKind;
   FLegsPosition := ALegsPosition;
@@ -1331,6 +1362,28 @@ begin
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum);
+
+  procedure RenderBoundingGeometry;
+  var
+    Q: PGLUQuadric;
+  begin
+    glPushAttrib(GL_ENABLE_BIT);
+      glDisable(GL_LIGHTING);
+      glEnable(GL_DEPTH_TEST);
+      glColorv(Gray3Single);
+
+      DrawGLBoxWire(BoundingBox, 0, 0, 0, true);
+
+      glPushMatrix;
+        glTranslatev(MiddlePosition);
+        Q := NewGLUQuadric(GL_FALSE, GLU_NONE, GLU_OUTSIDE, GLU_LINE);
+        try
+          gluSphere(Q, Kind.CameraRadius, 10, 10);
+        finally gluDeleteQuadric(Q); end;
+      glPopMatrix;
+    glPopAttrib;
+  end;
+
 begin
   if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
   begin
@@ -1340,14 +1393,7 @@ begin
     glPopMatrix;
 
     if RenderBoundingBoxes then
-    begin
-      glPushAttrib(GL_ENABLE_BIT);
-        glDisable(GL_LIGHTING);
-        glEnable(GL_DEPTH_TEST);
-        glColorv(Gray3Single);
-        DrawGLBoxWire(BoundingBox, 0, 0, 0, true);
-      glPopAttrib;
-    end;
+      RenderBoundingGeometry;
   end;
 end;
 
@@ -1765,8 +1811,6 @@ var
 
   { Is attack allowed ? }
   function AttackAllowed: boolean;
-  const
-    MaxAngleToAttack = Pi / 6 { 30 degrees };
   var
     AngleRadBetweenTheDirectionToPlayer: Single;
   begin
@@ -1780,7 +1824,7 @@ var
       AngleRadBetweenTheDirectionToPlayer := AngleRadBetweenVectors(
         VectorSubtract(LastSeenPlayer, MiddlePosition),
         Direction);
-      Result := AngleRadBetweenTheDirectionToPlayer <= MaxAngleToAttack;
+      Result := AngleRadBetweenTheDirectionToPlayer <= WAKind.MaxAngleToAttack;
     end;
   end;
 
@@ -2382,6 +2426,43 @@ begin
   inherited;
 end;
 
+function TWalkAttackCreature.ShortRangeActualAttackHits: boolean;
+var
+  B, PB: TBox3d;
+  DistanceLength, DistanceIncrease: Single;
+begin
+  B := BoundingBox;
+  PB := Player.BoundingBox;
+
+  { We would like to check collision between PB and our B translated
+    by our Direction now, i.e.
+      Boxes3dCollision(Box3dTranslate(B, VectorScale(Direction, ???)), PB)
+    But how much should be scale Direction, i.e. what to put for "???" ?
+    It must be large enough to compensate even large WAKind.MaxAttackDistance,
+    it must be small enough so that player should not be able to avoid
+    our attacks just by standing very close to the creature.
+
+    So we have to check a couple of bounding boxes.
+    If we move our boxes by Box3dMinSize(B), we're sure that
+    each box will stick to the previous and next. But maybe
+    there will be some areas around the sticking points ?
+    So Box3dMinSize(B) / 2 seems safe. }
+  DistanceIncrease := Box3dMinSize(B) / 2;
+
+  DistanceLength := DistanceIncrease;
+  while DistanceLength < WAKind.MaxAttackDistance do
+  begin
+    if Boxes3dCollision(Box3dTranslate(B,
+       VectorScale(Direction, DistanceLength)), PB) then
+      Exit(true);
+    DistanceLength += DistanceIncrease;
+  end;
+
+  { Check one last time for WAKind.MaxAttackDistance }
+  Result := Boxes3dCollision(Box3dTranslate(B,
+    VectorScale(Direction, WAKind.MaxAttackDistance)), PB);
+end;
+
 { TBallThrowerCreature ------------------------------------------------------- }
 
 procedure TBallThrowerCreature.ActualAttack;
@@ -2408,18 +2489,8 @@ end;
 { TWerewolfCreature ---------------------------------------------------------- }
 
 procedure TWerewolfCreature.ActualAttack;
-var
-  B, PB: TBox3d;
 begin
-  B := BoundingBox;
-  PB := Player.BoundingBox;
-  if Boxes3dCollision(Box3dTranslate(B,
-       VectorScale(Direction, WAKind.MaxAttackDistance)), PB) or
-     { Werewolf has so large WAKind.MaxAttackDistance that
-       player could avoid collision above by just standing close
-       to Werewolf... So we do additional check below: }
-     Boxes3dCollision(Box3dTranslate(B,
-       VectorScale(Direction, WAKind.MaxAttackDistance / 2)), PB) then
+  if ShortRangeActualAttackHits then
   begin
     Sound3d(stWerewolfActualAttackHit, 1.0);
     Player.Life := Player.Life - 10 - Random(10);
@@ -2444,8 +2515,7 @@ end;
 
 procedure TSpiderCreature.ActualAttack;
 begin
-  if Boxes3dCollision(Box3dTranslate(BoundingBox,
-    VectorScale(Direction, WAKind.MaxAttackDistance)), Player.BoundingBox) then
+  if ShortRangeActualAttackHits then
   begin
     Sound3d(stSpiderActualAttackHit, 1.0);
     Player.Life := Player.Life - 20 - Random(10);
@@ -2456,8 +2526,7 @@ end;
 
 procedure TGhostCreature.ActualAttack;
 begin
-  if Boxes3dCollision(Box3dTranslate(BoundingBox,
-    VectorScale(Direction, WAKind.MaxAttackDistance)), Player.BoundingBox) then
+  if ShortRangeActualAttackHits then
   begin
     Player.Life := Player.Life - 10 - Random(10);
   end;
@@ -2751,8 +2820,10 @@ begin
       AnimScenesPerTime * 10, AnimOptimization, true, false),
     { AttackAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
-      [ 0 ],
+      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_attack_2.wrl'),
+        CreatureFileName('spider' + PathDelim + 'spider_attack_3.wrl') ],
+      [ 0, 0.25, 0.5 ],
       AnimScenesPerTime, AnimOptimization, false, true),
     { DyingAnimation }
     TVRMLGLAnimationInfo.Create(
