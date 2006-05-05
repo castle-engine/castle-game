@@ -3,8 +3,6 @@ Things which must be done for PGD deadline:
 
 castle_hall:
 - plane blocking LevelExit until he defeats Werewolf
-- why werewolf is hurt when opening castle_hall ?
-  make him -4 lower ?
 - remove "level finished" when werewolf defeated
 
 Cages level:

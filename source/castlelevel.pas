@@ -1172,7 +1172,7 @@ procedure TCastleHallLevel.Idle(const CompSpeed: Single);
 const
   MaxAnimationOpenSymbolRotation = 80;
   MinAnimationButtonPress = 0.5;
-  WerewolfStartPosition: TVector3Single = (0, 0, 0);
+  WerewolfStartPosition: TVector3Single = (0, 0, -4);
 var
   WerewolfCreature: TWerewolfCreature;
 begin
