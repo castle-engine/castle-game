@@ -1,14 +1,16 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
+- light from 2nd torch, high attenuation
+
 Cages level:
 - windows: don't look like windows
-- finish: room and queen liar
+- queen liar
 - spider queen: new attack:
   throw some slime/webs ?
   produce normal spiders.
-
 - player can fly through windows --- not good.
+- connection between castle_hall and cages levels.
 
 - kangury debian: hangs on Quit.
 
