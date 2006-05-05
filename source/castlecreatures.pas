@@ -839,7 +839,9 @@ begin
   DefaultMaxLife := KindsConfig.GetValue(VRMLNodeName + '/default_max_life',
     DefaultDefaultMaxLife);
   CameraRadiusFromFile := KindsConfig.GetValue(VRMLNodeName + '/camera_radius',
-    0);
+    { It's important to use here Float 0.0, not Integer 0, to choose
+      proper overloaded version of GetValue }
+    0.0);
 end;
 
 function TCreatureKind.CameraRadius: Single;
