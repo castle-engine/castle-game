@@ -1,8 +1,5 @@
 Cages level:
 - spider:
-  finish the model (head larger ?),
-  material,
-  textures,
   animate,
   sounds,
   adjust kinds.xml
