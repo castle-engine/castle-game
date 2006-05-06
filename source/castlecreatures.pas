@@ -3080,8 +3080,18 @@ begin
       AnimScenesPerTime, AnimOptimization, false, false),
     { WalkAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      [ 0 ],
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_walk_2.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_walk_3.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_walk_4.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_walk_5.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      [   0 / 5,
+        0.2 / 5,
+        0.4 / 5,
+        0.6 / 5,
+        0.8 / 5,
+        1 / 5 ],
       { This animation really needs more frames to look smoothly. }
       AnimScenesPerTime * 10, AnimOptimization, true, false),
     { AttackAnimation }

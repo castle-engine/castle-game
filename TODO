@@ -1,6 +1,8 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
+- Testing camera pos on cages revert
+
 - ftp://stoma.name/michalis/castle_patch-0.1.tar.gz
 
 - PerfTimerInit remove
@@ -44,7 +46,17 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 ----------------------------------------
 Things for which I will hopefully find time before PGD deadline:
 
+- better spider_queen model. Inspiration ?
+  http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen02.jpg
+  http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen01.jpg
+  http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen03.jpg
+
 - spider_appears.wav sound do
+
+- spider: try to climb by doing additional MoveAlowed with higher destination
+  position. They can't climb on logs now (but maybe it's a good thing ?)
+
+  same for spider_queen --- it can't climb back to MeshTunnel.
 
 - alien:
   lower MinDelayBetweenAttacks?
