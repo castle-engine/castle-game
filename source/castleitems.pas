@@ -332,7 +332,7 @@ implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
   KambiGLUtils, CastlePlay, KambiFilesUtils, ProgressUnit,
-  CastleCreatures, CastleVideoOptions;
+  CastleCreatures, CastleVideoOptions, CastleTimeMessages;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -388,7 +388,7 @@ end;
 
 procedure TItemKind.Use(Item: TItem);
 begin
-  GameMessage('This item cannot be used');
+  TimeMessage('This item cannot be used');
 end;
 
 function TItemKind.BoundingBoxRotated: TBox3d;
@@ -465,11 +465,11 @@ begin
   if Player.Life < Player.MaxLife then
   begin
     Player.Life := Min(Player.Life + 50, Player.MaxLife);
-    GameMessage(Format('You drink "%s"', [Item.Kind.Name]));
+    TimeMessage(Format('You drink "%s"', [Item.Kind.Name]));
     Item.Quantity := Item.Quantity - 1;
     Sound(stPlayerPotionDrink);
   end else
-    GameMessage('You feel quite alright, no need to waste this potion');
+    TimeMessage('You feel quite alright, no need to waste this potion');
 end;
 
 { TItemWeaponKind ------------------------------------------------------------ }
@@ -596,7 +596,7 @@ end;
 
 procedure TItemScrollOfFlyingKind.Use(Item: TItem);
 begin
-  GameMessage(Format('You cast spell from "%s"', [Item.Kind.Name]));
+  TimeMessage(Format('You cast spell from "%s"', [Item.Kind.Name]));
   Player.FlyingModeTimeoutBegin(30.0);
   Item.Quantity := Item.Quantity - 1;
   Sound(stPlayerCastFlyingSpell);
@@ -752,9 +752,9 @@ begin
     S := Format('You see an item "%s"', [Item.Kind.Name]);
     if Item.Quantity <> 1 then
       S += Format(' (quantity %d)', [Item.Quantity]);
-    GameMessage(S);
+    TimeMessage(S);
   end else
-    GameMessage('You see some item, but it''s too far to tell exactly what it is');
+    TimeMessage('You see some item, but it''s too far to tell exactly what it is');
 end;
 
 { TItemsOnLevelList -------------------------------------------------- }

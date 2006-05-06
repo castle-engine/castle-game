@@ -27,7 +27,8 @@ interface
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
-  KambiUtils, KambiClassUtils, CastlePlayer, GLHeadlight, CastleThunder;
+  KambiUtils, KambiClassUtils, CastlePlayer, GLHeadlight, CastleThunder,
+  ProgressUnit;
 
 {$define read_interface}
 
@@ -486,7 +487,7 @@ implementation
 
 uses SysUtils, OpenGLh, BackgroundGL,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
-  CastleVideoOptions, CastleConfig;
+  CastleVideoOptions, CastleConfig, CastleTimeMessages;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -516,132 +517,142 @@ var
 begin
   inherited Create;
 
-  FScene := TVRMLFlatSceneGL.Create(
-    LoadVRMLNode(SceneFileName), true, roSeparateShapeStates);
-
-  { initialize FAnimationTime. Must be initialized before creating creatures. }
-  FAnimationTime := 0.0;
-
-  Scene.Attrib_TextureMinFilter :=
-    TextureMinificationQualityToGL[TextureMinificationQuality];
-
-  { Calculate HomeCameraPos, HomeCameraDir, HomeCameraUp.
-    Must be done before initializing creatures, as they right now
-    use HomeCameraPos. FHomeCameraDir, FHomeCameraUp will be
-    actually changed later in this procedure. }
-  Scene.GetPerspectiveCamera(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
-
-  ItemsToRemove := TVRMLNodesList.Create;
+  Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    { Initialize Items }
-    FItems := TItemsOnLevelList.Create;
-    Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, TraverseForItems);
+    FScene := TVRMLFlatSceneGL.Create(
+      LoadVRMLNode(SceneFileName), true, roSeparateShapeStates);
 
-    { Initialize Creatures }
-    FCreatures := TCreaturesList.Create;
-    Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, TraverseForCreatures);
+    { initialize FAnimationTime. Must be initialized before creating creatures. }
+    FAnimationTime := 0.0;
 
-    RemoveItemsToRemove;
-  finally ItemsToRemove.Free end;
+    Scene.Attrib_TextureMinFilter :=
+      TextureMinificationQualityToGL[TextureMinificationQuality];
 
-  ChangeLevelScene;
+    { Calculate HomeCameraPos, HomeCameraDir, HomeCameraUp.
+      Must be done before initializing creatures, as they right now
+      use HomeCameraPos. FHomeCameraDir, FHomeCameraUp will be
+      actually changed later in this procedure. }
+    Scene.GetPerspectiveCamera(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
 
-  { Calculate LevelBox. }
-  if not RemoveBoxNode(FLevelBox, 'LevelBox') then
-  begin
-    { Set LevelBox to Scene.BoundingBox, and make maximum Z larger. }
-    FLevelBox := Scene.BoundingBox;
-    FLevelBox[1, 2] += 4 * (LevelBox[1, 2] - LevelBox[0, 2]);
+    ItemsToRemove := TVRMLNodesList.Create;
+    try
+      { Initialize Items }
+      FItems := TItemsOnLevelList.Create;
+      Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, TraverseForItems);
+
+      { Initialize Creatures }
+      FCreatures := TCreaturesList.Create;
+      Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, TraverseForCreatures);
+
+      RemoveItemsToRemove;
+    finally ItemsToRemove.Free end;
+
+    ChangeLevelScene;
+
+    { Calculate LevelBox. }
+    if not RemoveBoxNode(FLevelBox, 'LevelBox') then
+    begin
+      { Set LevelBox to Scene.BoundingBox, and make maximum Z larger. }
+      FLevelBox := Scene.BoundingBox;
+      FLevelBox[1, 2] += 4 * (LevelBox[1, 2] - LevelBox[0, 2]);
+    end;
+
+    if not RemoveBoxNode(FHintButtonBox, 'HintButtonBox') then
+      FHintButtonBox := EmptyBox3d;
+
+    if RemoveBoxNode(FWaterBox, 'WaterBox') then
+    begin
+      FAboveWaterBox := FWaterBox;
+      FAboveWaterBox[0, 2] := FWaterBox[1, 2];
+      FAboveWaterBox[1, 2] := FAboveWaterBox[0, 2] + 0.4;
+    end else
+    begin
+      FWaterBox := EmptyBox3d;
+      FAboveWaterBox := EmptyBox3d;
+    end;
+
+    { calculate Sectors and Waypoints }
+    FSectors := TSceneSectorsList.Create;
+    FWaypoints := TSceneWaypointsList.Create;
+    Waypoints.ExtractPositions(Scene.RootNode);
+    Sectors.ExtractBoundingBoxes(Scene.RootNode);
+    Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
+    Scene.ChangedAll;
+
+    NavigationNode := Scene.RootNode.TryFindNode(TNodeNavigationInfo, true)
+      as TNodeNavigationInfo;
+
+    if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
+      FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
+      FCameraRadius := Box3dAvgSize(Scene.BoundingBox) * 0.007;
+
+    if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
+      FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
+      FCameraPreferredHeight := FCameraRadius * 5;
+    CorrectCameraPreferredHeight(FCameraPreferredHeight, CameraRadius,
+      DefaultCrouchHeight, DefaultHeadBobbing);
+
+    if NavigationNode <> nil then
+      FNavigationSpeed := NavigationNode.FdSpeed.Value else
+      FNavigationSpeed := 1.0;
+
+    if (NavigationNode <> nil) and NavigationNode.FdHeadlight.Value then
+      FHeadlight := TGLHeadlight.Create else
+      FHeadlight := nil;
+
+    FProjectionNear := CameraRadius * 0.75;
+    FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
+
+    { Fix HomeCameraDir length. Uses CameraRadius and NavigationSpeed. }
+    VectorAdjustToLengthTo1st(FHomeCameraDir, CameraRadius *
+      0.8 * { I multiply just to get the same thing
+      that view3dscene does at this time. }
+      NavigationSpeed);
+
+    { Check and fix HomeCameraUp. }
+    if not VectorsEqual(Normalized(HomeCameraUp),
+      Vector3Single(0, 0, 1), 0.001) then
+      raise EInternalError.CreateFmt(
+        'Initial camera up vector must be +Z, but is %s',
+        [ VectorToRawStr(Normalized(HomeCameraUp)) ]) else
+      { Make HomeCameraUp = (0, 0, 1) more "precisely" }
+      FHomeCameraUp := Vector3Single(0, 0, 1);
+
+    Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
+      (ProjectionNear, ProjectionFar);
+    Scene.PrepareRender(true, true, false, false);
+
+    FLightSet := TVRMLLightSetGL.Create(LoadVRMLNode(LightSetFileName),
+      true,
+      { GL_LIGHT0 is reserved for headlight. }
+      { GL_LIGHT1 is reserved for thunder effect in cages level.
+        So first light is GL_LIGHT2. }
+      2, -1);
+
+    { Calculate LightCastingShadowsPosition }
+    FLightCastingShadowsPosition := Box3dMiddle(Scene.BoundingBox);
+    FLightCastingShadowsPosition[2] := Scene.BoundingBox[1, 2];
+
+    FPlayedMusicSound := stNone;
+    FFootstepsSound := DefaultFootstepsSound;
+
+    LevelsAvailable.FindLevelClass(TLevelClass(Self.ClassType)).
+      AvailableForNewGame := true;
+
+    FGlobalAmbientLight := DefaultGlobalAmbientLight;
+
+    Progress.Step;
+  finally
+    Progress.Fini;
   end;
 
-  if not RemoveBoxNode(FHintButtonBox, 'HintButtonBox') then
-    FHintButtonBox := EmptyBox3d;
-
-  if RemoveBoxNode(FWaterBox, 'WaterBox') then
-  begin
-    FAboveWaterBox := FWaterBox;
-    FAboveWaterBox[0, 2] := FWaterBox[1, 2];
-    FAboveWaterBox[1, 2] := FAboveWaterBox[0, 2] + 0.4;
-  end else
-  begin
-    FWaterBox := EmptyBox3d;
-    FAboveWaterBox := EmptyBox3d;
-  end;
-
-  { calculate Sectors and Waypoints }
-  FSectors := TSceneSectorsList.Create;
-  FWaypoints := TSceneWaypointsList.Create;
-  Waypoints.ExtractPositions(Scene.RootNode);
-  Sectors.ExtractBoundingBoxes(Scene.RootNode);
-  Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
-  Scene.ChangedAll;
-
-  NavigationNode := Scene.RootNode.TryFindNode(TNodeNavigationInfo, true)
-    as TNodeNavigationInfo;
-
-  if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
-    FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
-    FCameraRadius := Box3dAvgSize(Scene.BoundingBox) * 0.007;
-
-  if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
-    FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
-    FCameraPreferredHeight := FCameraRadius * 5;
-  CorrectCameraPreferredHeight(FCameraPreferredHeight, CameraRadius,
-    DefaultCrouchHeight, DefaultHeadBobbing);
-
-  if NavigationNode <> nil then
-    FNavigationSpeed := NavigationNode.FdSpeed.Value else
-    FNavigationSpeed := 1.0;
-
-  if (NavigationNode <> nil) and NavigationNode.FdHeadlight.Value then
-    FHeadlight := TGLHeadlight.Create else
-    FHeadlight := nil;
-
-  FProjectionNear := CameraRadius * 0.75;
-  FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
-
-  { Fix HomeCameraDir length. Uses CameraRadius and NavigationSpeed. }
-  VectorAdjustToLengthTo1st(FHomeCameraDir, CameraRadius *
-    0.8 * { I multiply just to get the same thing
-    that view3dscene does at this time. }
-    NavigationSpeed);
-
-  { Check and fix HomeCameraUp. }
-  if not VectorsEqual(Normalized(HomeCameraUp),
-    Vector3Single(0, 0, 1), 0.001) then
-    raise EInternalError.CreateFmt(
-      'Initial camera up vector must be +Z, but is %s',
-      [ VectorToRawStr(Normalized(HomeCameraUp)) ]) else
-    { Make HomeCameraUp = (0, 0, 1) more "precisely" }
-    FHomeCameraUp := Vector3Single(0, 0, 1);
+  { Loading octree have their own Progress, so we load them outside our
+    progress. }
 
   Scene.DefaultTriangleOctree :=
     Scene.CreateTriangleOctree('Loading level (triangle octree)');
   Scene.DefaultShapeStateOctree :=
     Scene.CreateShapeStateOctree('Loading level (ShapeState octree)');
-
-  Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
-    (ProjectionNear, ProjectionFar);
-  Scene.PrepareRender(true, true, false, false);
-
-  FLightSet := TVRMLLightSetGL.Create(LoadVRMLNode(LightSetFileName),
-    true,
-    { GL_LIGHT0 is reserved for headlight. }
-    { GL_LIGHT1 is reserved for thunder effect in cages level.
-      So first light is GL_LIGHT2. }
-    2, -1);
-
-  { Calculate LightCastingShadowsPosition }
-  FLightCastingShadowsPosition := Box3dMiddle(Scene.BoundingBox);
-  FLightCastingShadowsPosition[2] := Scene.BoundingBox[1, 2];
-
-  FPlayedMusicSound := stNone;
-  FFootstepsSound := DefaultFootstepsSound;
-
-  LevelsAvailable.FindLevelClass(TLevelClass(Self.ClassType)).
-    AvailableForNewGame := true;
-
-  FGlobalAmbientLight := DefaultGlobalAmbientLight;
 end;
 
 destructor TLevel.Destroy;
@@ -1292,16 +1303,16 @@ begin
         if Distance < 10.0 then
         begin
           if ButtonPressed then
-            GameMessage('Button is already pressed') else
+            TimeMessage('Button is already pressed') else
           begin
             ButtonPressed := true;
-            GameMessage('You press the button');
+            TimeMessage('You press the button');
           end;
         end else
-          GameMessage('You see a button. You cannot reach it from here');
+          TimeMessage('You see a button. You cannot reach it from here');
       end;
     1:begin
-        GameMessage('You are not able to open it');
+        TimeMessage('You are not able to open it');
         Sound(stPlayerInteractFailed);
       end;
   end;

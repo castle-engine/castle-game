@@ -34,7 +34,8 @@ procedure ViewGameMessages;
 
 implementation
 
-uses SysUtils, Classes, GLWinMessages, CastleWindow, KambiUtils, CastlePlay;
+uses SysUtils, Classes, GLWinMessages, CastleWindow, KambiUtils, CastlePlay,
+  CastleTimeMessages;
 
 procedure ShowCreditsMessage;
 begin
@@ -59,8 +60,8 @@ var
 begin
   SList := TStringList.Create;
   try
-    SList.Assign(GameMessages);
-    SList.Insert(0, Format('%d messages :', [GameMessages.Count]));
+    SList.Assign(TimeMessagesList);
+    SList.Insert(0, Format('%d messages :', [TimeMessagesList.Count]));
     SList.Insert(1, '');
     MessageOK(Glw, SList, taLeft);
   finally SList.Free end;

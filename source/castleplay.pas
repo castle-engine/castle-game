@@ -55,20 +55,6 @@ var
     @noAutoLinkHere }
   Level: TLevel;
 
-  { These are all messages passed to GameMessage.
-    Created / destroyed in this unit's initialization / finalization.
-    They are not broken (to fit into some particular line width).
-
-    You should clear this when new game starts or load this from file
-    when loading saved game.
-    When PlayGame runs, you cannot modify it directly, you can change it
-    only by calling GameMessage. }
-  GameMessages: TStringList;
-
-{ Add message to GameMessages and (only if PlayGame is running)
-  display it on the game screen. }
-procedure GameMessage(const S: string);
-
 { If NextLevel = nil, then end the game.
   Else free current Level and set Level to NextLevel.
 
@@ -78,7 +64,7 @@ procedure GameMessage(const S: string);
   with different NextLevel. }
 procedure LevelFinished(NextLevel: TLevel);
 
-{ Saves a screen, causing also appropriate GameMessage. }
+{ Saves a screen, causing also appropriate TimeMessage. }
 procedure SaveScreen;
 
 { ViewAngleDegX and ViewAngleDegY specify field of view in the game.
@@ -113,15 +99,15 @@ implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
-  MatrixNavigation, VectorMath, Boxes3d, TimeMessages, Images,
+  MatrixNavigation, VectorMath, Boxes3d, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, CastleCreatures,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound,
-  CastleVideoOptions, Keys, CastleConfig, GLHeadlight, CastleThunder;
+  CastleVideoOptions, Keys, CastleConfig, GLHeadlight, CastleThunder,
+  CastleTimeMessages;
 
 var
-  GameMessagesManager: TTimeMessagesManager;
   GLList_Draw2dBegin: TGLuint;
 
   GLList_InventorySlot: TGLuint;
@@ -301,8 +287,7 @@ begin
 
   glCallList(GLList_Draw2dBegin);
 
-  GameMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
-    Glw.Width, Glw.Height);
+  TimeMessagesDraw;
 
   if InventoryVisible then
     DoDrawInventory;
@@ -501,8 +486,8 @@ begin
 
   MusicPlayer.PlayedSound := Level.PlayedMusicSound;
 
-  { First GameMessage for this level. }
-  GameMessage('Loaded level "' + Level.Title + '"');
+  { First TimeMessage for this level. }
+  TimeMessage('Loaded level "' + Level.Title + '"');
 end;
 
 procedure Idle(Glwin: TGLWindow);
@@ -512,7 +497,8 @@ var
 begin
   CompSpeed := Glw.IdleCompSpeed;
 
-  GameMessagesManager.Idle;
+  TimeMessagesIdle;
+
   Level.Idle(CompSpeed);
   Level.Items.Idle(CompSpeed);
   Level.Creatures.Idle(CompSpeed);
@@ -539,7 +525,7 @@ begin
   if (not Level.HintButtonShown) and
      Box3dPointInside(Player.Navigator.CameraPos, Level.HintButtonBox) then
   begin
-    GameMessage('Hint: press this red button by clicking on it with ' +
+    TimeMessage('Hint: press this red button by clicking on it with ' +
       'right mouse button');
     Level.HintButtonShown := true;
   end;
@@ -576,7 +562,7 @@ procedure DoAttack;
 begin
   if not Player.Dead then
     Player.Attack else
-    GameMessage(SDeadMessage);
+    TimeMessage(SDeadMessage);
 end;
 
 procedure DoInteract;
@@ -692,7 +678,7 @@ procedure DoInteract;
 begin
   if Player.Dead then
   begin
-    GameMessage(SDeadMessage);
+    TimeMessage(SDeadMessage);
     Exit;
   end;
 
@@ -793,7 +779,7 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
   begin
     if Player.Dead then
     begin
-      GameMessage(SDeadMessage);
+      TimeMessage(SDeadMessage);
       Exit;
     end;
 
@@ -809,9 +795,9 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
           Level.Items.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
         end;
       end else
-        GameMessage('Not enough room here to drop this item');
+        TimeMessage('Not enough room here to drop this item');
     end else
-      GameMessage('Nothing to drop - select some item first');
+      TimeMessage('Nothing to drop - select some item first');
   end;
 
   procedure UseItem;
@@ -821,7 +807,7 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
   begin
     if Player.Dead then
     begin
-      GameMessage(SDeadMessage);
+      TimeMessage(SDeadMessage);
       Exit;
     end;
 
@@ -842,20 +828,20 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
       UpdateInventoryCurrentItemAfterDelete;
     end else
-      GameMessage('Nothing to use - select some item first');
+      TimeMessage('Nothing to use - select some item first');
   end;
 
   procedure CancelFlying;
   begin
     if not Player.Dead then
       Player.CancelFlying else
-      GameMessage(SDeadMessage);
+      TimeMessage(SDeadMessage);
   end;
 
   procedure MaybeDeadMessage;
   begin
     if Player.Dead then
-      GameMessage(SDeadMessage);
+      TimeMessage(SDeadMessage);
   end;
 
   procedure DoGameMenu;
@@ -992,7 +978,7 @@ var
 begin
   CreaturesKinds.PrepareRender;
   ItemsKinds.PrepareRender;
-  GameMessages.Clear;
+  TimeMessagesClear;
 
   Level := ALevel;
   Player := APlayer;
@@ -1042,26 +1028,20 @@ begin
         Glw.MouseVisible := false;
         Glw.SetMousePosition(MiddleScreenWidth, MiddleScreenHeight);
 
-        GameMessagesManager := TTimeMessagesManager.Create(
-          Glw, hpMiddle, vpDown, Glw.Width);
-        try
-          GameMessagesManager.MaxMessagesCount := 4;
+        InitNewLevel;
 
-          InitNewLevel;
+        GameEnded := false;
 
-          GameEnded := false;
+        glEnable(GL_LIGHTING);
 
-          glEnable(GL_LIGHTING);
+        GLWinMessagesTheme.RectColor[3] := 0.4;
 
-          GLWinMessagesTheme.RectColor[3] := 0.4;
+        if PrepareNewPlayer then
+          Level.PrepareNewPlayer(Player);
 
-          if PrepareNewPlayer then
-            Level.PrepareNewPlayer(Player);
-
-          repeat
-            Glwm.ProcessMessage(true);
-          until GameEnded;
-        finally FreeAndNil(GameMessagesManager) end;
+        repeat
+          Glwm.ProcessMessage(true);
+        until GameEnded;
       finally
         Glw.Navigator := nil;
         { Clear some Player.Navigator callbacks. }
@@ -1077,13 +1057,6 @@ begin
     Level := nil;
     Player := nil;
   end;
-end;
-
-procedure GameMessage(const S: string);
-begin
-  if GameMessagesManager <> nil then
-    GameMessagesManager.Show(S);
-  GameMessages.Insert(0, S);
 end;
 
 procedure LevelFinished(NextLevel: TLevel);
@@ -1109,7 +1082,7 @@ var
 begin
   FileName := FnameAutoInc(ApplicationName + '_screen_%d.png');
   Glw.SaveScreen(FileName);
-  GameMessage('Screen saved to ' + FileName);
+  TimeMessage('Screen saved to ' + FileName);
   Sound(stSaveScreen);
 end;
 
@@ -1131,7 +1104,7 @@ procedure GLWindowInit(Glwin: TGLWindow);
 
 const
   { Note: this constant must be synchronized with
-    GameMessagesManager.MaxMessagesCount }
+    TimeMessagesManager.MaxMessagesCount }
   DarkAreaHeight = 80;
 
   DarkAreaFadeHeight = 20;
@@ -1175,7 +1148,6 @@ begin
 end;
 
 initialization
-  GameMessages := TStringList.Create;
   ShowDebugInfo := false;
   Glw.OnInitList.AppendItem(@GLWindowInit);
   Glw.OnCloseList.AppendItem(@GLWindowClose);
@@ -1185,6 +1157,4 @@ initialization
 finalization
   ConfigFile.SetDeleteValue('auto_open_inventory',
     AutoOpenInventory, DefaultAutoOpenInventory);
-
-  FreeAndNil(GameMessages);
 end.

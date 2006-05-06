@@ -33,7 +33,7 @@ function ChooseByMenu(ADrawUnderMenu: TDrawFunc;
 implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, CastleKeys, GLWinMessages,
-  CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath;
+  CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleTimeMessages;
 
 var
   Selected: boolean;
@@ -104,6 +104,7 @@ end;
 procedure Idle(Glwin: TGLWindow);
 begin
   ChooseMenu.Idle(Glwin.IdleCompSpeed);
+  TimeMessagesIdle;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);

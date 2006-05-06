@@ -1,7 +1,12 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
+- fix initial Progress.Init when loading level -- it is not seen ?
+
 - PerfTimerInit remove
+
+- more aliens on castle_hall ?
+  texture the alien finally ?
 
 Cages level:
 - spider queen: new attack:
@@ -307,6 +312,8 @@ Cages level:
   In the game menu, when asking before "End Game", do question
   like "Do you want to save the game before ending ?"
   with answers "Save and end the game", "Don't save and end the game", "Cancel".
+
+  When loading game, load saved TimeMessages for this game.
 
 ----------------------------------------
 dist-making to-dos:

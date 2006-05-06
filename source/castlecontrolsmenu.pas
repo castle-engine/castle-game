@@ -50,7 +50,7 @@ implementation
 uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
   GLMenu, OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit,
   OpenGLFonts, CastleKeys, Keys, VectorMath, KambiUtils, CastlePlay,
-  CastleConfig, KambiStringUtils;
+  CastleConfig, KambiStringUtils, CastleTimeMessages;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -418,6 +418,7 @@ end;
 procedure Idle(Glwin: TGLWindow);
 begin
   CurrentMenu.Idle(Glwin.IdleCompSpeed);
+  TimeMessagesIdle;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);

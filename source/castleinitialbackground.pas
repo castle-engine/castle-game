@@ -23,13 +23,17 @@ unit CastleInitialBackground;
 
 interface
 
-{ Sets initial OnResize and OnDraw and draws intro. }
+{ Sets initial OnResize and OnDraw and draws intro.
+
+  OnDraw already does TimeMessagesDraw.
+  You should remember to call TimeMessagesIdle if you will inherit
+  our OnDraw (and e.g. draw start menu over it). }
 procedure DrawInitialBackground;
 
 implementation
 
 uses SysUtils, OpenGLh, GLWindow, KambiGLUtils, CastleWindow, KambiFilesUtils,
-  Images;
+  Images, CastleTimeMessages;
 
 var
   GLList_ScreenImage: TGLuint;
@@ -44,6 +48,7 @@ begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
   glCallList(GLList_ScreenImage);
+  TimeMessagesDraw;
 end;
 
 procedure DrawInitialBackground;

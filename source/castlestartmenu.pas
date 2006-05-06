@@ -37,7 +37,8 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleKeys, CastleVideoOptions,
-  KambiStringUtils, ALUtils, OpenAL, KambiClassUtils, CastleSoundMenu;
+  KambiStringUtils, ALUtils, OpenAL, KambiClassUtils, CastleSoundMenu,
+  CastleTimeMessages;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -633,6 +634,7 @@ end;
 procedure Idle(Glwin: TGLWindow);
 begin
   CurrentMenu.Idle(Glwin.IdleCompSpeed);
+  TimeMessagesIdle;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);
