@@ -122,6 +122,7 @@ type
     stSpiderQueenDying,
     stThrownWebFired,
     stThrownWebHit,
+    stThrownWebIdle,
     { @groupEnd }
 
     { Others.
@@ -377,6 +378,8 @@ var
     ( FileName: '' { 'thrown_web_fired.wav' };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: '' { 'thrown_web_hit.wav'};
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: '' { 'thrown_web_idle.wav'};
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'intro_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),

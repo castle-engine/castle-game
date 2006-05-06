@@ -63,6 +63,8 @@ const
 
   DefaultCreatureRandomWalkDistance = 10.0;
 
+  DefaultPauseBetweenSoundIdle = 2.5;
+
 type
   TCreature = class;
 
@@ -521,6 +523,8 @@ type
     FSoundExplosion: TSoundType;
     FCloseDirectionToPlayer: boolean;
     FCloseDirectionToTargetSpeed: Single;
+    FPauseBetweenSoundIdle: Single;
+    FSoundIdle: TSoundType;
   protected
     procedure FreePrepareRender; override;
   public
@@ -563,6 +567,15 @@ type
       read FCloseDirectionToTargetSpeed
       write FCloseDirectionToTargetSpeed
       default DefaultCloseDirectionToTargetSpeed;
+
+    { Sound just played when the missile is going. }
+    property SoundIdle: TSoundType
+      read FSoundIdle write FSoundIdle default stNone;
+
+    { This should be synchonized with length of SoundIdle sound. }
+    property PauseBetweenSoundIdle: Single
+      read FPauseBetweenSoundIdle write FPauseBetweenSoundIdle
+      default DefaultPauseBetweenSoundIdle;
   end;
 
   TCreature = class
@@ -982,7 +995,7 @@ type
     procedure ExplodeCore;
     procedure ExplodeWithPlayer;
     procedure ExplodeWithLevel;
-    LastIdleSoundTime: Single;
+    LastSoundIdleTime: Single;
   public
     { Shortcut for TMissileCreatureKind(Kind). }
     function MissileKind: TMissileCreatureKind;
@@ -1488,6 +1501,7 @@ begin
   FMoveSpeed := DefaultMissileMoveSpeed;
   FCloseDirectionToPlayer := DefaultCloseDirectionToPlayer;
   FCloseDirectionToTargetSpeed := DefaultCloseDirectionToTargetSpeed;
+  FPauseBetweenSoundIdle := DefaultPauseBetweenSoundIdle;
 end;
 
 destructor TMissileCreatureKind.Destroy;
@@ -1556,6 +1570,9 @@ begin
   CloseDirectionToTargetSpeed :=
     KindsConfig.GetFloat(VRMLNodeName + '/close_direction_to_target_speed',
     DefaultCloseDirectionToTargetSpeed);
+  PauseBetweenSoundIdle :=
+    KindsConfig.GetFloat(VRMLNodeName + '/pause_between_sound_idle',
+    DefaultPauseBetweenSoundIdle);
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }
@@ -3068,9 +3085,6 @@ begin
 end;
 
 procedure TMissileCreature.Idle(const CompSpeed: Single);
-const
-  { This should be synchonized with length of stBallMissleIdle sound. }
-  PauseBetweenIdleSound = 2.5;
 var
   NewLegsPosition: TVector3Single;
   AngleBetween, AngleChange: Single;
@@ -3110,11 +3124,12 @@ begin
     end;
   end;
 
-  if (LastIdleSoundTime = 0) or
-     (Level.AnimationTime - LastIdleSoundTime > PauseBetweenIdleSound) then
+  if (LastSoundIdleTime = 0) or
+     (Level.AnimationTime - LastSoundIdleTime >
+       MissileKind.PauseBetweenSoundIdle) then
   begin
-    LastIdleSoundTime := Level.AnimationTime;
-    Sound3d(stBallMissileIdle, 0.0);
+    LastSoundIdleTime := Level.AnimationTime;
+    Sound3d(MissileKind.SoundIdle, 0.0);
   end;
 end;
 
@@ -3294,6 +3309,7 @@ begin
       AnimScenesPerTime, AnimOptimization, true, false)
     );
   BallMissile.SoundExplosion := stBallMissileExplode;
+  BallMissile.SoundIdle := stBallMissileIdle;
 
   Ghost := TGhostKind.Create(
     'Ghost',
@@ -3455,6 +3471,7 @@ begin
       AnimScenesPerTime, AnimOptimization, false, false)
     );
   ThrownWeb.SoundExplosion := stThrownWebHit;
+  ThrownWeb.SoundIdle := stThrownWebIdle;
 
   CreaturesKinds.LoadFromFile;
 end;

@@ -11,11 +11,12 @@ Things which must be done for PGD deadline:
 
 - PerfTimerInit remove
 
+- Sounds: at least sounds related to SpiderQueen and ThrownWeb fill
+
+- place more spiders --- test speed
+
 Cages level:
-- spider queen:
-  sounds fill,
-  place on level
-  when queen dies, drops a key
+- when queen dies, drops a key
   key opens door -> game over
 
 - kangury debian: hangs on Quit.
