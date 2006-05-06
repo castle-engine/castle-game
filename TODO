@@ -24,8 +24,6 @@ Cages level:
   in my KambiStringUtils.
   No, the bug that I remembered was for Hex2Dec.
 
-- player should also get "knockback" when creature hits him.
-
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim, moving camera around the level.)
 
