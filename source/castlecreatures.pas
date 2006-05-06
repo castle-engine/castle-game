@@ -845,6 +845,7 @@ type
     procedure ExplodeCore;
     procedure ExplodeWithPlayer;
     procedure ExplodeWithLevel;
+    LastIdleSoundTime: Single;
   public
     { Shortcut for TMissileCreatureKind(Kind). }
     function MissileKind: TMissileCreatureKind;
@@ -2626,6 +2627,9 @@ begin
 end;
 
 procedure TMissileCreature.Idle(const CompSpeed: Single);
+const
+  { This should be synchonized with length of stBallMissleIdle sound. }
+  PauseBetweenIdleSound = 2.5;
 var
   NewLegsPosition: TVector3Single;
   AngleBetween, AngleChange: Single;
@@ -2663,6 +2667,13 @@ begin
         AngleBetween - AngleChange);
       Direction := Normalized(NewDirection);
     end;
+  end;
+
+  if (LastIdleSoundTime = 0) or
+     (Level.AnimationTime - LastIdleSoundTime > PauseBetweenIdleSound) then
+  begin
+    LastIdleSoundTime := Level.AnimationTime;
+    Sound3d(stBallMissileIdle, 0.0);
   end;
 end;
 

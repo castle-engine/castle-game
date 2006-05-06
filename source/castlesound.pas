@@ -107,6 +107,7 @@ type
     stWerewolfDying,
     stBallMissileFired,
     stBallMissileExplode,
+    stBallMissileIdle,
     stGhostSuddenPain,
     stGhostAttackStart,
     stGhostDying,
@@ -340,6 +341,8 @@ var
     ( FileName: 'ball_missile_fired.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'ball_missile_explode.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: 'ball_missile_idle.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'ghost_sudden_pain.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
