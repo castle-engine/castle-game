@@ -54,6 +54,10 @@ const
   DefaultCloseDirectionToPlayer = false;
   DefaultCloseDirectionToTargetSpeed = 0.1;
 
+  DefaultShortRangeAttackDamageConst = 10.0;
+  DefaultShortRangeAttackDamageRandom = 10.0;
+  DefaultShortRangeAttackKnockbackDistance = 0.1;
+
 type
   TCreature = class;
 
@@ -66,6 +70,10 @@ type
     FDefaultMaxLife: Single;
 
     CameraRadiusFromFile: Single;
+
+    FShortRangeAttackDamageConst: Single;
+    FShortRangeAttackDamageRandom: Single;
+    FShortRangeAttackKnockbackDistance: Single;
   protected
     { In descendants only PrepareRender can (and should!) set this. }
     CameraRadiusFromPrepareRender: Single;
@@ -140,6 +148,33 @@ type
       const AnimationTime: Single): TCreature; virtual; abstract;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
+
+    { These will be used only by creatures doing ShortRangeAttackHurt
+      in their ActualAttack implementation.
+
+      ShortRangeAttackDamageConst and ShortRangeAttackDamageRandom
+      and ShortRangeAttackKnockbackDistance must be >= 0.
+
+      ShortRangeAttackKnockbackDistance = 0 means no knockback.
+
+      For now exploding missiles also use these properties.
+
+      @groupBegin }
+    property ShortRangeAttackDamageConst: Single
+      read FShortRangeAttackDamageConst
+      write FShortRangeAttackDamageConst
+      default DefaultShortRangeAttackDamageConst;
+
+    property ShortRangeAttackDamageRandom: Single
+      read FShortRangeAttackDamageRandom
+      write FShortRangeAttackDamageRandom
+      default DefaultShortRangeAttackDamageRandom;
+
+    property ShortRangeAttackKnockbackDistance: Single
+      read FShortRangeAttackKnockbackDistance
+      write FShortRangeAttackKnockbackDistance
+      default DefaultShortRangeAttackKnockbackDistance;
+    { @groupEnd }
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -555,6 +590,8 @@ type
     procedure GetCameraHeight(
       const AssumeMiddlePosition: TVector3Single;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+
+    procedure ShortRangeAttackHurt;
   public
     { Constructor. Note for AnimationTime: usually I will take
       AnimationTime from global Level.AnimationTime, but in the case of
@@ -892,6 +929,9 @@ begin
   FFlying := DefaultFlying;
   FDefaultMaxLife := DefaultDefaultMaxLife;
   FSoundDyingTiedToCreature := DefaultSoundDyingTiedToCreature;
+  FShortRangeAttackDamageConst := DefaultShortRangeAttackDamageConst;
+  FShortRangeAttackDamageRandom := DefaultShortRangeAttackDamageRandom;
+  FShortRangeAttackKnockbackDistance := DefaultShortRangeAttackKnockbackDistance;
   CreaturesKinds.Add(Self);
 end;
 
@@ -910,6 +950,15 @@ begin
     { It's important to use here Float 0.0, not Integer 0, to choose
       proper overloaded version of GetValue }
     0.0);
+  ShortRangeAttackDamageConst :=
+    KindsConfig.GetValue(VRMLNodeName + '/short_range_attack/damage/const',
+    DefaultShortRangeAttackDamageConst);
+  ShortRangeAttackDamageRandom :=
+    KindsConfig.GetValue(VRMLNodeName + '/short_range_attack/damage/random',
+    DefaultShortRangeAttackDamageRandom);
+  ShortRangeAttackKnockbackDistance :=
+    KindsConfig.GetValue(VRMLNodeName + '/short_range_attack/knockback_distance',
+    DefaultShortRangeAttackKnockbackDistance);
 end;
 
 function TCreatureKind.CameraRadius: Single;
@@ -1696,6 +1745,19 @@ end;
 function TCreature.CollisionsWithCreaturesAndPlayer: boolean;
 begin
   Result := true;
+end;
+
+procedure TCreature.ShortRangeAttackHurt;
+var
+  Damage: Single;
+begin
+  Damage := Kind.ShortRangeAttackDamageConst +
+    Random * Kind.ShortRangeAttackDamageRandom;
+
+  if Kind.ShortRangeAttackKnockbackDistance <> 0 then
+    Player.Knockback(Damage, Kind.ShortRangeAttackKnockbackDistance,
+      Direction) else
+    Player.Life := Player.Life - Damage;
 end;
 
 { TCreatures ----------------------------------------------------------------- }
@@ -2560,7 +2622,7 @@ begin
   if ShortRangeActualAttackHits then
   begin
     Sound3d(stWerewolfActualAttackHit, 1.0);
-    Player.Life := Player.Life - 10 - Random(10);
+    ShortRangeAttackHurt;
   end;
 end;
 
@@ -2580,7 +2642,7 @@ begin
   if ShortRangeActualAttackHits then
   begin
     Sound3d(stSpiderActualAttackHit, 1.0);
-    Player.Life := Player.Life - 20 - Random(10);
+    ShortRangeAttackHurt;
   end;
 end;
 
@@ -2599,7 +2661,7 @@ procedure TGhostCreature.ActualAttack;
 begin
   if ShortRangeActualAttackHits then
   begin
-    Player.Life := Player.Life - 10 - Random(10);
+    ShortRangeAttackHurt;
   end;
 end;
 
@@ -2710,7 +2772,7 @@ end;
 procedure TMissileCreature.ExplodeWithPlayer;
 begin
   ExplodeCore;
-  Player.Life := Player.Life - 10 - Random(10);
+  ShortRangeAttackHurt;
 end;
 
 procedure TMissileCreature.ExplodeWithLevel;

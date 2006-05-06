@@ -128,6 +128,7 @@ begin
   MusicPlayer.PlayedSound := stIntroMusic;
   SoundMenu.SoundVolumeSlider.Value := SoundVolume;
   SoundMenu.MusicVolumeSlider.Value := MusicVolume;
+  TimeMessagesClear;
 end;
 
 { TMainMenu ------------------------------------------------------------ }

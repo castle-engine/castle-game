@@ -133,6 +133,12 @@ type
     FootstepsSoundPlaying: TSoundType;
     ReallyWalkingOnTheGroundTime: Single;
     procedure AllocatedFootstepsSourceUsingEnd(Sender: TALAllocatedSource);
+
+    { FKnockbackDistance <= 0 means "no knockback currently" }
+    FKnockbackDistance: Single;
+    { This must be valid and non-zero when FKnockbackDistance > 0 }
+    FKnockbackDirection: TVector3Single;
+    KnockBackSpeed: Single;
   public
     constructor Create;
     destructor Destroy; override;
@@ -306,6 +312,23 @@ type
       This object will just use this property (changing it's Navigator
       properties etc.). }
     property Swimming: TPlayerSwimming read FSwimming write SetSwimming;
+
+    { Do knockback. KnockbackDistance must be > 0.
+      KnockbackDirection must be normalized (so, obviously, also non-zero)
+      vector.
+
+      This also lowers player's life (exactly like
+      Player.Life := Player.Life - LifeLoss), because usually knockback
+      is caused by life loss, so usually you want to lower life
+      along with doing knockback. }
+    procedure Knockback(const LifeLoss: Single;
+      const AKnockbackDistance: Single;
+      const AKnockbackDirection: TVector3Single);
+
+    { This loads player's properties from player.xml file.
+      This is called from constructor, you can also call this
+      later (for debug purposes, if you changed something). }
+    procedure LoadFromFile;
   end;
 
 implementation
@@ -314,7 +337,7 @@ uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, OpenAL, CastleControlsMenu,
-  CastleTimeMessages;
+  CastleTimeMessages, KambiXMLCfg;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -339,15 +362,12 @@ begin
   { MouseLook is turned on always, even when player is dead.
     Just like rotation keys. }
   Navigator.MouseLook := true;
-  { This matches nicely with our footsteps sound. }
-  Navigator.HeadBobbingDistance := 25.0;
-  Navigator.MaxJumpHeight := 2.0;
-  Navigator.JumpSpeedMultiply := 2.0;
-  Navigator.JumpPower := 0.09;
 
   HintEscapeKeyShown := false;
 
   OnKeyChanged.AppendItem(KeyChanged);
+
+  LoadFromFile;
 
   { Although it will be called in every OnIdle anyway,
     we also call it here to be sure that right after TPlayer constructor
@@ -894,6 +914,27 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       (FootstepsSoundPlaying <> stNone));
   end;
 
+  procedure DoKnockback;
+  var
+    ProposedNewPosition, NewPosition: TVector3Single;
+    CurrentKnockBackDistance: Single;
+  begin
+    if FKnockbackDistance > 0 then
+    begin
+      { Calculate CurrentKnockBackDistance, update KnockedBackDistance }
+      CurrentKnockBackDistance := KnockBackSpeed * CompSpeed;
+      MinTo1st(CurrentKnockBackDistance, FKnockbackDistance);
+      FKnockbackDistance -= CurrentKnockBackDistance;
+
+      ProposedNewPosition := VectorAdd(Navigator.CameraPos,
+        VectorScale(FKnockbackDirection, CurrentKnockBackDistance));
+
+      if Level.PlayerMoveAllowed(Navigator, ProposedNewPosition,
+        NewPosition, false) then
+        Navigator.CameraPos := NewPosition;
+    end;
+  end;
+
 begin
   if FlyingMode then
   begin
@@ -925,6 +966,8 @@ begin
   end;
 
   UpdateFootstepsSoundPlaying;
+
+  DoKnockback;
 end;
 
 procedure TPlayer.BlackOut(const Color: TVector3f);
@@ -1084,6 +1127,40 @@ begin
       So the safeguard below is needed. }
     UpdateNavigator;
   end;
+end;
+
+procedure TPlayer.Knockback(const LifeLoss: Single;
+  const AKnockbackDistance: Single;
+  const AKnockbackDirection: TVector3Single);
+begin
+  Life := Life - LifeLoss;
+  FKnockbackDistance := AKnockbackDistance;
+  FKnockbackDirection := AKnockbackDirection;
+end;
+
+procedure TPlayer.LoadFromFile;
+var
+  PlayerConfig: TKamXMLConfig;
+begin
+  PlayerConfig := TKamXMLConfig.Create(nil);
+  try
+    PlayerConfig.FileName := ProgramDataPath + 'data' + PathDelim +
+      'player.xml';
+
+    KnockBackSpeed := PlayerConfig.GetValue('player/knock_back_speed', 0.3);
+    Navigator.MaxJumpHeight :=
+      PlayerConfig.GetValue('player/jump/max_height',
+      DefaultMaxJumpHeight);
+    Navigator.JumpSpeedMultiply :=
+      PlayerConfig.GetValue('player/jump/speed_multiply',
+      DefaultJumpSpeedMultiply);
+    Navigator.JumpPower :=
+      PlayerConfig.GetValue('player/jump/power',
+      DefaultJumpPower);
+    Navigator.HeadBobbingDistance :=
+      PlayerConfig.GetValue('player/head_bobbing_distance',
+      DefaultHeadBobbingDistance);
+  finally SysUtils.FreeAndNil(PlayerConfig); end;
 end;
 
 { GLWindow init / close ------------------------------------------------------ }

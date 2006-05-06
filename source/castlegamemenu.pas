@@ -231,7 +231,7 @@ begin
   Items.Add('Change to level');
   Items.Add('Change sound properties');
   Items.Add('Edit lights');
-  Items.Add('Change jump properties');
+  Items.Add('Reload player.xml file');
   Items.Add('Force thunder now');
   Items.Add('Back to game menu');
 
@@ -411,26 +411,6 @@ procedure TDebugMenu.CurrentItemSelected;
     finally S.Free end;
   end;
 
-  procedure ChangeJumpProperties;
-  var
-    SingleValue: Single;
-  begin
-    SingleValue := Player.Navigator.MaxJumpHeight;
-    if MessageInputQuerySingle(Glw,
-      'Change Player.Navigator.MaxJumpHeight', SingleValue, taLeft) then
-      Player.Navigator.MaxJumpHeight := SingleValue;
-
-    SingleValue := Player.Navigator.JumpSpeedMultiply;
-    if MessageInputQuerySingle(Glw,
-      'Change Player.Navigator.JumpSpeedMultiply', SingleValue, taLeft) then
-      Player.Navigator.JumpSpeedMultiply := SingleValue;
-
-    SingleValue := Player.Navigator.JumpPower;
-    if MessageInputQuerySingle(Glw,
-      'Change Player.Navigator.JumpPower', SingleValue, taLeft) then
-      Player.Navigator.JumpPower := SingleValue;
-  end;
-
   procedure ForceThunder;
   begin
     if Level.ThunderEffect <> nil then
@@ -471,7 +451,7 @@ begin
           EditLevelLightsMenu := TEditLevelLightsMenu.Create;
           CurrentMenu := EditLevelLightsMenu;
         end;
-    15: ChangeJumpProperties;
+    15: Player.LoadFromFile;
     16: ForceThunder;
     17: CurrentMenu := GameMenu;
     else raise EInternalError.Create('Menu item unknown');
