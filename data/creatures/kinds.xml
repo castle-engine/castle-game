@@ -29,6 +29,8 @@
     default_max_life="500.0"
     max_knocked_back_distance="4.2"
     max_angle_to_attack="1.04"
+    min_life_loss_to_hurt="0.05"
+    chance_to_hurt="0.3"
   />
   <!-- Werewolf is quite big and has MiddlePosition high and doesn't fly,
        so without this special large max_angle_to_attack value,

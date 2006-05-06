@@ -48,6 +48,9 @@ const
 
   DefaultSoundDyingTiedToCreature = true;
 
+  DefaultMinLifeLossToHurt = 0.0;
+  DefaultChanceToHurt = 1.0;
+
 type
   TCreature = class;
 
@@ -183,6 +186,8 @@ type
     FSoundAttackStart: TSoundType;
     FLifeToRunAway: Single;
     FMaxAngleToAttack: Single;
+    FMinLifeLossToHurt: Single;
+    FChanceToHurt: Single;
   protected
     procedure FreePrepareRender; override;
   public
@@ -329,6 +334,25 @@ type
     property MaxAngleToAttack: Single
       read FMaxAngleToAttack write FMaxAngleToAttack
       default DefaultMaxAngleToAttack;
+
+    { When creature is wounded for more than MaxLife * MinLifeLossToHurt
+      points and moreover Random < ChanceToHurt then creature will
+      change to wasHurt state and be knocked back.
+      Changing to wasHurt state means that any other state will be
+      interrupted (e.g. player can interrupt
+      creature's attack this way if ActualAttackTime > 0).
+
+      It's expected that "tougher" creatures will have MinLifeLossToHurt
+      somewhat higher than DefaultMinLifeLossToHurt and ChanceToHurt
+      significantly lower than DefaultChanceToHurt. }
+    property MinLifeLossToHurt: Single
+      read FMinLifeLossToHurt write FMinLifeLossToHurt
+      default DefaultMinLifeLossToHurt;
+
+    { See MinLifeLossToHurt. }
+    property ChanceToHurt: Single
+      read FChanceToHurt write FChanceToHurt
+      default DefaultChanceToHurt;
   end;
 
   TBallThrowerCreatureKind = class(TWalkAttackCreatureKind)
@@ -959,6 +983,8 @@ begin
   FLifeToRunAway := DefaultLifeToRunAway;
   FActualAttackTime := DefaultActualAttackTime;
   FMaxAngleToAttack := DefaultMaxAngleToAttack;
+  FMinLifeLossToHurt := DefaultMinLifeLossToHurt;
+  FChanceToHurt := DefaultChanceToHurt;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -1039,11 +1065,14 @@ procedure TWalkAttackCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
 begin
   inherited;
 
-  ActualAttackTime := KindsConfig.GetValue(VRMLNodeName + '/actual_attack_time',
+  ActualAttackTime :=
+    KindsConfig.GetValue(VRMLNodeName + '/actual_attack_time',
     DefaultActualAttackTime);
-  MoveSpeed := KindsConfig.GetValue(VRMLNodeName + '/move_speed',
+  MoveSpeed :=
+    KindsConfig.GetValue(VRMLNodeName + '/move_speed',
     DefaultMoveSpeed);
-  MaxAttackDistance := KindsConfig.GetValue(VRMLNodeName + '/max_attack_distance',
+  MaxAttackDistance :=
+    KindsConfig.GetValue(VRMLNodeName + '/max_attack_distance',
     DefaultMaxAttackDistance);
   PreferredAttackDistance :=
     KindsConfig.GetValue(VRMLNodeName + '/preferred_attack_distance',
@@ -1060,6 +1089,12 @@ begin
   MaxAngleToAttack :=
     KindsConfig.GetValue(VRMLNodeName + '/max_angle_to_attack',
     DefaultMaxAngleToAttack);
+  MinLifeLossToHurt :=
+    KindsConfig.GetValue(VRMLNodeName + '/min_life_loss_to_hurt',
+    DefaultMinLifeLossToHurt);
+  ChanceToHurt :=
+    KindsConfig.GetValue(VRMLNodeName + '/chance_to_hurt',
+    DefaultChanceToHurt);
 end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
@@ -2423,7 +2458,10 @@ end;
 
 procedure TWalkAttackCreature.SetLife(const Value: Single);
 begin
-  if (not Dead) and (Value < Life) then
+  if (not Dead) and
+    (Life - Value > WAKind.MinLifeLossToHurt * MaxLife) and
+    ( (WAKind.ChanceToHurt = 1.0) or
+      (Random < WAKind.ChanceToHurt) ) then
     SetState(wasHurt);
   inherited;
 end;
