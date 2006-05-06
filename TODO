@@ -3,16 +3,12 @@ Things which must be done for PGD deadline:
 
 - PerfTimerInit remove
 
-- more aliens on castle_hall ?
-  texture the alien finally ?
-
 Cages level:
 - spider queen: new attack:
   throw some slime/webs ?
   produce normal spiders.
   when queen dies, drops a key
   key opens door -> game over
-- spider_appears.wav sound do
 
 - kangury debian: hangs on Quit.
 
@@ -20,13 +16,6 @@ Cages level:
   of blood effects etc. for now.
 
 - Update WWW to point to both -with-sources and without versions.
-
-- alien:
-  lower MinDelayBetweenAttacks?
-
-  (MoveSpeed)
-  (02:11:50) Szymon: przede wszystkim duchy powinny byc 0.5
-  (02:12:12) Szymon: a alien gdzies tak 0.35. wyglada naturalnie a jest trudniejszy
 
 - mouse sensitivity problems:
   function StrToFloatDef(const s: string; DefValue: Extended): Extended;
@@ -40,8 +29,6 @@ Cages level:
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim, moving camera around the level.)
 
-- game messages in the middle of the screen ?
-
 Stage 6:
 Goal #1 (2.5 Points) - Create a min. of 3 playable levels.
 Goal #3 (2.5 Points) - Have a game splash screen showing your game's title.
@@ -53,6 +40,19 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 
 ----------------------------------------
 Things for which I will hopefully find time before PGD deadline:
+
+- spider_appears.wav sound do
+
+- alien:
+  lower MinDelayBetweenAttacks?
+  more aliens on castle_hall ?
+  texture the alien finally ?
+
+  (MoveSpeed)
+  (02:11:50) Szymon: przede wszystkim duchy powinny byc 0.5
+  (02:12:12) Szymon: a alien gdzies tak 0.35. wyglada naturalnie a jest trudniejszy
+
+- test game messages in the middle of the screen ?
 
 - second weapon, crossbow/bow, that requires another item in your inventory
   (bolts/arrows)
