@@ -1,9 +1,7 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
-- try to turn off lighting for creatures ?
-  for ThrownWeb, also for SpiderQueen, this is a good idea.
-
+- place more spiders --- test speed
 - Testing camera pos on cages revert
 
 - ftp://stoma.name/michalis/castle_patch-0.1.tar.gz
@@ -12,8 +10,6 @@ Things which must be done for PGD deadline:
 - PerfTimerInit remove
 
 - Sounds: at least sounds related to SpiderQueen and ThrownWeb fill
-
-- place more spiders --- test speed
 
 Cages level:
 - when queen dies, drops a key
