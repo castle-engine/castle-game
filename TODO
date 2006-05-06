@@ -1,8 +1,6 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
-- fix initial Progress.Init when loading level -- it is not seen ?
-
 - PerfTimerInit remove
 
 - more aliens on castle_hall ?
