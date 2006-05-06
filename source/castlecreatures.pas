@@ -3115,17 +3115,21 @@ begin
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_3.wrl'),
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
       [ 0, 0.2, 0.4, 0.6 ],
-      AnimScenesPerTime, AnimOptimization, false, true),
+      AnimScenesPerTime, AnimOptimization, false, false),
     { DyingAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      [ 0 ],
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_dying_2.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_dying_3.wrl') ],
+      [ 0, 0.5, 1.5 ],
       AnimScenesPerTime, AnimOptimization, false, false),
     { HurtAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, false, true)
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      { Non-zero anim to have a little knockback. }
+      [ 0, 0.1 ],
+      AnimScenesPerTime, AnimOptimization, false, false)
     );
   SpiderQueen.SoundSuddenPain := stSpiderQueenSuddenPain;
   SpiderQueen.SoundAttackStart := stSpiderQueenAttackStart;

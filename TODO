@@ -10,8 +10,6 @@ Things which must be done for PGD deadline:
 Cages level:
 - spider queen:
   sounds fill,
-  animations do,
-  kinds.xml adjust.
   new attack: throw some slime/webs ?
   produce normal spiders.
   when queen dies, drops a key
