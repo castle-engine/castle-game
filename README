@@ -10,6 +10,15 @@ work smoothly with old config file, but just to be sure...)
 See [http://www.camelot.homedns.org/~michalis/castle.php#subsection_uninstall]
 for location of castle.conf file on your system.
 
+Goals notes:
+- Sound, music: done, yeah! Remember to install OpenAL. For best effect,
+  be sure to try all available devices in "Sound options" ---
+  the default device doesn't always sound the best.
+  This is true for both Linux and Windows.
+  E.g. a standard sound card (without real 3d surround support) on Windows
+  may sound better with "Generic Software" device.
+- 3 playable levels, 1 new kind of regular enemy per level: yes.
+
 --------------------
 Installing and running:
 
