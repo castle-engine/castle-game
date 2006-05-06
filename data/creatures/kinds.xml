@@ -39,6 +39,8 @@
   <BallMissile
     flying="True"
     default_max_life="1.0"
+    close_direction_to_player="True"
+    close_direction_to_target_speed="0.1"
   />
 
   <Ghost

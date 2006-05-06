@@ -6,6 +6,8 @@ Things which must be done for PGD deadline:
 - more aliens on castle_hall ?
   texture the alien finally ?
 
+- sound where ball missile is, to better make auto-target ?
+
 Cages level:
 - spider queen: new attack:
   throw some slime/webs ?
@@ -23,7 +25,6 @@ Cages level:
 
 - alien:
   lower MinDelayBetweenAttacks?
-  Szymon: samonaprowadzajace sie kulki ?
 
   (MoveSpeed)
   (02:11:50) Szymon: przede wszystkim duchy powinny byc 0.5

@@ -51,6 +51,9 @@ const
   DefaultMinLifeLossToHurt = 0.0;
   DefaultChanceToHurt = 1.0;
 
+  DefaultCloseDirectionToPlayer = false;
+  DefaultCloseDirectionToTargetSpeed = 0.1;
+
 type
   TCreature = class;
 
@@ -402,6 +405,8 @@ type
     FAnimationInfo: TVRMLGLAnimationInfo;
     FMoveSpeed: Single;
     FSoundExplosion: TSoundType;
+    FCloseDirectionToPlayer: boolean;
+    FCloseDirectionToTargetSpeed: Single;
   protected
     procedure FreePrepareRender; override;
   public
@@ -432,6 +437,18 @@ type
       const AnimationTime: Single): TCreature; override;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
+
+    property CloseDirectionToPlayer: boolean
+      read FCloseDirectionToPlayer
+      write FCloseDirectionToPlayer
+      default DefaultCloseDirectionToPlayer;
+
+    { How fast direction to the target is corrected.
+      Used only if CloseDirectionToPlayer. }
+    property CloseDirectionToTargetSpeed: Single
+      read FCloseDirectionToTargetSpeed
+      write FCloseDirectionToTargetSpeed
+      default DefaultCloseDirectionToTargetSpeed;
   end;
 
   TCreature = class
@@ -1169,6 +1186,8 @@ begin
   FAnimationInfo := AAnimationInfo;
   Flying := true;
   FMoveSpeed := DefaultMissileMoveSpeed;
+  FCloseDirectionToPlayer := DefaultCloseDirectionToPlayer;
+  FCloseDirectionToTargetSpeed := DefaultCloseDirectionToTargetSpeed;
 end;
 
 destructor TMissileCreatureKind.Destroy;
@@ -1228,8 +1247,15 @@ procedure TMissileCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
 begin
   inherited;
 
-  MoveSpeed := KindsConfig.GetValue(VRMLNodeName + '/move_speed',
+  MoveSpeed :=
+    KindsConfig.GetValue(VRMLNodeName + '/move_speed',
     DefaultMissileMoveSpeed);
+  CloseDirectionToPlayer :=
+    KindsConfig.GetValue(VRMLNodeName + '/close_direction_to_player',
+    DefaultCloseDirectionToPlayer);
+  CloseDirectionToTargetSpeed :=
+    KindsConfig.GetValue(VRMLNodeName + '/close_direction_to_target_speed',
+    DefaultCloseDirectionToTargetSpeed);
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }
@@ -2602,6 +2628,8 @@ end;
 procedure TMissileCreature.Idle(const CompSpeed: Single);
 var
   NewLegsPosition: TVector3Single;
+  AngleBetween, AngleChange: Single;
+  NewDirection, TargetDirection: TVector3Single;
 begin
   inherited;
 
@@ -2619,6 +2647,23 @@ begin
     ExplodeWithPlayer;
 
   { TODO: if collides with other creature, explode also there. }
+
+  if MissileKind.CloseDirectionToPlayer and
+     (MissileKind.CloseDirectionToTargetSpeed <> 0) then
+  begin
+    TargetDirection := VectorSubtract(Player.Navigator.CameraPos,
+      LegsPosition);
+    AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
+    AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed;
+    if AngleBetween <= AngleChange then
+      Direction := Normalized(TargetDirection) else
+    begin
+      NewDirection := Direction;
+      MakeVectorsAngleRadOnTheirPlane(NewDirection, TargetDirection,
+        AngleBetween - AngleChange);
+      Direction := Normalized(NewDirection);
+    end;
+  end;
 end;
 
 function TMissileCreature.CurrentScene: TVRMLFlatSceneGL;
