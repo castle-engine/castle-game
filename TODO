@@ -9,8 +9,6 @@ Cages level:
   produce normal spiders.
   when queen dies, drops a key
   key opens door -> game over
-- too many spiders on level slow down rendering. See why. Also fix CompSpeed,
-  to not use FpsCompSpeed ?
 - spider_appears.wav sound do
 
 - kangury debian: hangs on Quit.
