@@ -148,7 +148,7 @@ Switch {
 				 0.878431 0.886275 0.729412,
 			]
 		}
-		MaterialBinding { value PER_VERTEX }
+		MaterialBinding { value PER_VERTEX_INDEXED }
 		Coordinate3 {
 			point [
 				 0.202502 -0.291704 1.076992,
@@ -1252,7 +1252,7 @@ Switch {
 				 1.000000 1.000000 1.000000,
 			]
 		}
-		MaterialBinding { value PER_VERTEX }
+		MaterialBinding { value PER_VERTEX_INDEXED }
 		Coordinate3 {
 			point [
 				 -0.624408 -0.181979 1.312889,

@@ -1076,7 +1076,50 @@ end;
 
 { TCreaturesKindsList -------------------------------------------------------- }
 
+{ $define WRITELN_ANIMATION_INFO}
+
 procedure TCreaturesKindsList.PrepareRender;
+
+  {$ifdef WRITELN_ANIMATION_INFO}
+  procedure WritelnAnimationsInfo;
+  var
+    TrianglesCount: Cardinal;
+
+    procedure WritelnAnimInfo(Animation: TVRMLGLAnimation; Name: string);
+    begin
+      Writeln('    ', Name: 20, ': ',
+        Animation.ScenesCount: 3, ' scenes * ',
+        Animation.Scenes[0].TrianglesCount(true): 8, ' triangles');
+      TrianglesCount += Animation.ScenesCount *
+        Animation.Scenes[0].TrianglesCount(true);
+    end;
+
+  var
+    I: Integer;
+  begin
+    Writeln('Animations in memory:');
+    for I := 0 to High do
+    begin
+      TrianglesCount := 0;
+      Writeln('  ', Items[I].VRMLNodeName);
+      if Items[I] is TWalkAttackCreatureKind then
+      begin
+        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).StandAnimation, 'Stand');
+        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).StandToWalkAnimation, 'StandToWalk');
+        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).WalkAnimation, 'Walk');
+        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).AttackAnimation, 'Attack');
+        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).DyingAnimation, 'Dying');
+        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).HurtAnimation, 'Hurt');
+        if Items[I] is TSpiderQueenKind then
+          WritelnAnimInfo(TSpiderQueenKind(Items[I]).ThrowWebAttackAnimation, 'ThrowWebAttack');
+      end;
+      if Items[I] is TMissileCreatureKind then
+        WritelnAnimInfo(TMissileCreatureKind(Items[I]).Animation, '(Standard)');
+      Writeln('  Total ', TrianglesCount);
+    end;
+  end;
+  {$endif WRITELN_ANIMATION_INFO}
+
 var
   I: Integer;
   PrepareRenderSteps: Cardinal;
@@ -1092,6 +1135,11 @@ begin
       for I := 0 to High do
         Items[I].PrepareRender;
     finally Progress.Fini; end;
+
+    { Tests : }
+    {$ifdef WRITELN_ANIMATION_INFO}
+    WritelnAnimationsInfo;
+    {$endif}
   end;
 end;
 

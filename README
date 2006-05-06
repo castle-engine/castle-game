@@ -618,6 +618,19 @@ Creatures (enemies etc.):
   parameters) you can use my demo_animation program
   (see units/3dmodels.gl/examples/demo_animation.dpr).
 
+- Notes for animations: beware. Animations are done with a method
+  that essentially makes their rendering very fast (rendering each
+  animation frame should be as fast as if it was a still scene).
+  However it costs much in terms of memory consumption (and in
+  "Loading creatures" time). Some features that should be avoided:
+
+  - Different material for each vertex. This is taken from vertex painting
+    in blender. I.e. you can leave vertex painting as generated (incorrectly)
+    by blender, as PER_VERTEX_INDEXED. If you fix it to PER_VERTEX your
+    models will take a lot of more memory space. E.g. for SpiderQueen
+    this is 270 MB with vertex painting vs 80 MB without vertex painting
+    (triangle count is 2715).
+
 Sounds:
 
 - Special notes for creating footsteps:
