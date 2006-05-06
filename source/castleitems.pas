@@ -549,7 +549,7 @@ procedure TItemWeaponKind.PrepareRender;
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
     if Anim <> nil then
-      Anim.PrepareRender(false, true, false, false);
+      Anim.PrepareRender(false, true, false, false, false);
     Progress.Step;
   end;
 

@@ -1117,7 +1117,7 @@ procedure TWalkAttackCreatureKind.PrepareRender;
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
-    Anim.PrepareRender(false, true, RenderShadowsPossible, false);
+    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false);
     Progress.Step;
   end;
 
@@ -1311,7 +1311,7 @@ procedure TMissileCreatureKind.PrepareRender;
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
-    Anim.PrepareRender(false, true, RenderShadowsPossible, false);
+    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false);
     Progress.Step;
   end;
 
@@ -3096,8 +3096,11 @@ begin
       AnimScenesPerTime * 10, AnimOptimization, true, false),
     { AttackAnimation }
     TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      [ 0 ],
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_2.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_3.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      [ 0, 0.2, 0.4, 0.6 ],
       AnimScenesPerTime, AnimOptimization, false, true),
     { DyingAnimation }
     TVRMLGLAnimationInfo.Create(

@@ -100,8 +100,8 @@
   <SpiderQueen
     actual_attack_time="0.25"
     move_speed="0.4"
-    max_attack_distance="2.0"
-    preferred_attack_distance="2.0"
+    max_attack_distance="8.0"
+    preferred_attack_distance="8.0"
     min_delay_between_attacks="2.0"
     default_max_life="50.0"
     max_knocked_back_distance="2.0"
