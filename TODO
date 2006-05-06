@@ -8,13 +8,13 @@ Things which must be done for PGD deadline:
 - Testing camera pos on cages revert
 
 - ftp://stoma.name/michalis/castle_patch-0.1.tar.gz
+  ftp://stoma.name/michalis/castle_patch-0.2.tar.gz
 
 - PerfTimerInit remove
 
 Cages level:
 - spider queen:
   sounds fill,
-  new attack: throw some slime/webs ?
   place on level
   when queen dies, drops a key
   key opens door -> game over

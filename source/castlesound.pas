@@ -120,6 +120,8 @@ type
     stSpiderQueenSuddenPain,
     stSpiderQueenAttackStart,
     stSpiderQueenDying,
+    stThrownWebFired,
+    stThrownWebHit,
     { @groupEnd }
 
     { Others.
@@ -371,6 +373,10 @@ var
     ( FileName: '' { 'spider_queen_attack_start.wav' };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: '' { 'spider_queen_dying.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: '' { 'thrown_web_fired.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: '' { 'thrown_web_hit.wav'};
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'intro_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),

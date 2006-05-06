@@ -125,4 +125,15 @@
       actual_attack_time="0.6"
     />
   </SpiderQueen>
+
+  <ThrownWeb
+    flying="True"
+    default_max_life="1.0"
+    close_direction_to_player="False"
+  >
+
+    <short_range_attack knockback_distance="5">
+      <damage const="10" random="10"/>
+    </short_range_attack>
+  </ThrownWeb>
 </CONFIG>

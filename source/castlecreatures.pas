@@ -1007,6 +1007,7 @@ var
   Ghost: TGhostKind;
   Spider: TSpiderKind;
   SpiderQueen: TSpiderQueenKind;
+  ThrownWeb: TMissileCreatureKind;
 
   WasParam_DebugNoCreatures: boolean = false;
 
@@ -2876,7 +2877,6 @@ procedure TSpiderQueenCreature.SetState(Value: TWalkAttackCreatureState);
 begin
   if (State <> Value) and (Value = wasSpecial1) then
   begin
-    { TODO: Sound3d(stSpiderQueenThrowWebAttackStart, 1.0); }
     LastThrowWebAttackTime := Level.AnimationTime;
     ActualThrowWebAttackDone := false;
   end;
@@ -2955,8 +2955,24 @@ begin
 end;
 
 procedure TSpiderQueenCreature.ActualThrowWebAttack;
+const
+  FiringMissileHeight = 0.6;
+var
+  Missile: TCreature;
+  MissilePosition, MissileDirection: TVector3Single;
 begin
-  TimeMessage('TSpiderQueenCreature.ActualThrowWebAttack'); { TODO }
+  if HasLastSeenPlayer then
+  begin
+    MissilePosition := VLerpLegsMiddlePosition(FiringMissileHeight);
+    MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
+    Missile := ThrownWeb.CreateDefaultCreature(
+      MissilePosition, MissileDirection,
+      Level.AnimationTime);
+
+    Level.Creatures.Add(Missile);
+
+    Missile.Sound3d(stThrownWebFired, 0.0);
+  end;
 end;
 
 { TGhostCreature ---------------------------------------------------------- }
@@ -3371,6 +3387,15 @@ begin
   SpiderQueen.SoundSuddenPain := stSpiderQueenSuddenPain;
   SpiderQueen.SoundAttackStart := stSpiderQueenAttackStart;
   SpiderQueen.SoundDying := stSpiderQueenDying;
+
+  ThrownWeb := TMissileCreatureKind.Create(
+    'ThrownWeb',
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('web' + PathDelim + 'web.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, false)
+    );
+  ThrownWeb.SoundExplosion := stThrownWebHit;
 
   CreaturesKinds.LoadFromFile;
 end;
