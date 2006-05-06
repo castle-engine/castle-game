@@ -103,7 +103,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  ChooseMenu.Idle(Glwin.FpsCompSpeed);
+  ChooseMenu.Idle(Glwin.IdleCompSpeed);
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);
@@ -128,7 +128,7 @@ begin
     SavedMode.RestoreProjectionMatrix := false;
 
     SetStandardGLWindowState(Glw, Draw, CloseQuery, Glw.OnResize,
-      nil, false, true { FPSActive is needed for FpsCompSpeed in Idle. },
+      nil, false, true { FPSActive should not be needed anymore, but I leave it. },
       false, K_None, #0, false, false);
 
     Glw.OnKeyDown := KeyDown;

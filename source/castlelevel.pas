@@ -1526,7 +1526,7 @@ begin
   LightSet.CalculateLights;
 
   { Maybe appear new spiders }
-  if Level.Creatures.Count < 10 then
+  if Level.Creatures.Count < 15 then
   begin
     if NextSpidersAppearingTime = 0 then
     begin

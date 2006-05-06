@@ -508,11 +508,14 @@ end;
 procedure Idle(Glwin: TGLWindow);
 var
   PickItemIndex, PlayerItemIndex: Integer;
+  CompSpeed: Single;
 begin
+  CompSpeed := Glw.IdleCompSpeed;
+
   GameMessagesManager.Idle;
-  Level.Idle(Glw.FpsCompSpeed);
-  Level.Items.Idle(Glw.FpsCompSpeed);
-  Level.Creatures.Idle(Glw.FpsCompSpeed);
+  Level.Idle(CompSpeed);
+  Level.Items.Idle(CompSpeed);
+  Level.Creatures.Idle(CompSpeed);
   Level.Creatures.RemoveFromLevel;
 
   if not Player.Dead then
@@ -541,7 +544,7 @@ begin
     Level.HintButtonShown := true;
   end;
 
-  Player.Idle(Glw.FpsCompSpeed);
+  Player.Idle(CompSpeed);
 
   if LevelFinishedSchedule then
   begin
