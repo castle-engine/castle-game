@@ -1,11 +1,16 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
+- ftp://stoma.name/michalis/castle_patch-0.1.tar.gz
+
 - PerfTimerInit remove
 
 Cages level:
-- spider queen: new attack:
-  throw some slime/webs ?
+- spider queen:
+  sounds fill,
+  animations do,
+  kinds.xml adjust.
+  new attack: throw some slime/webs ?
   produce normal spiders.
   when queen dies, drops a key
   key opens door -> game over

@@ -17,6 +17,7 @@
     actual_attack_time="0.4"
     move_speed="0.1"
     max_knocked_back_distance="4.2"
+    max_height_acceptable_to_fall="1.4"
   />
 
   <Werewolf
@@ -30,7 +31,10 @@
     max_knocked_back_distance="4.2"
     max_angle_to_attack="1.04"
     min_life_loss_to_hurt="0.05"
-    chance_to_hurt="0.3">
+    chance_to_hurt="0.3"
+    max_height_acceptable_to_fall="1.4"
+  >
+
     <!-- Werewolf is quite big and has MiddlePosition high and doesn't fly,
          so without this special large max_angle_to_attack value,
          player could avoid attacks just by crouching. -->
@@ -44,7 +48,8 @@
     flying="True"
     default_max_life="1.0"
     close_direction_to_player="True"
-    close_direction_to_target_speed="0.02">
+    close_direction_to_target_speed="0.02"
+  >
 
     <short_range_attack knockback_distance="5">
       <damage const="10" random="10"/>
@@ -60,7 +65,9 @@
     default_max_life="30.0"
     transparent="True"
     max_knocked_back_distance="4.2"
-    sound_dying_tied_to_creature="False">
+    sound_dying_tied_to_creature="False"
+    max_height_acceptable_to_fall="1.4"
+  >
 
     <short_range_attack knockback_distance="0.0">
       <damage const="10" random="10"/>
@@ -75,7 +82,10 @@
     min_delay_between_attacks="2.0"
     default_max_life="50.0"
     max_knocked_back_distance="2.0"
-    max_angle_to_attack="1.04">
+    max_angle_to_attack="1.04"
+    max_height_acceptable_to_fall="1.4"
+  >
+
     <!-- Spider is quite flat and has MiddlePosition low and doesn't fly.
          This is analogous to Werewolf situation, but this time it's low.
          Without this special large max_angle_to_attack value,
@@ -86,4 +96,25 @@
       <damage const="10" random="10"/>
     </short_range_attack>
   </Spider>
+
+  <SpiderQueen
+    actual_attack_time="0.25"
+    move_speed="0.1"
+    max_attack_distance="2.0"
+    preferred_attack_distance="2.0"
+    min_delay_between_attacks="2.0"
+    default_max_life="50.0"
+    max_knocked_back_distance="2.0"
+    max_angle_to_attack="1.04"
+    max_height_acceptable_to_fall="5"
+    fall_down_life_loss_scale="0.5"
+  >
+
+    <!-- SpiderQueen is large, so again the same reasoning applies
+         for max_angle_to_attack as for Werewolf. -->
+
+    <short_range_attack knockback_distance="5">
+      <damage const="10" random="10"/>
+    </short_range_attack>
+  </SpiderQueen>
 </CONFIG>

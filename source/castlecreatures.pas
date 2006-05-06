@@ -58,6 +58,9 @@ const
   DefaultShortRangeAttackDamageRandom = 10.0;
   DefaultShortRangeAttackKnockbackDistance = 0.1;
 
+  DefaultMaxHeightAcceptableToFall = 2.0 * 0.7;
+  DefaultFallDownLifeLossScale = 1.0;
+
 type
   TCreature = class;
 
@@ -74,6 +77,8 @@ type
     FShortRangeAttackDamageConst: Single;
     FShortRangeAttackDamageRandom: Single;
     FShortRangeAttackKnockbackDistance: Single;
+
+    FFallDownLifeLossScale: Single;
   protected
     { In descendants only PrepareRender can (and should!) set this. }
     CameraRadiusFromPrepareRender: Single;
@@ -175,6 +180,11 @@ type
       write FShortRangeAttackKnockbackDistance
       default DefaultShortRangeAttackKnockbackDistance;
     { @groupEnd }
+
+    property FallDownLifeLossScale: Single
+      read FFallDownLifeLossScale
+      write FFallDownLifeLossScale
+      default DefaultFallDownLifeLossScale;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -226,6 +236,7 @@ type
     FMaxAngleToAttack: Single;
     FMinLifeLossToHurt: Single;
     FChanceToHurt: Single;
+    FMaxHeightAcceptableToFall: Single;
   protected
     procedure FreePrepareRender; override;
   public
@@ -391,6 +402,11 @@ type
     property ChanceToHurt: Single
       read FChanceToHurt write FChanceToHurt
       default DefaultChanceToHurt;
+
+    property MaxHeightAcceptableToFall: Single
+      read FMaxHeightAcceptableToFall
+      write FMaxHeightAcceptableToFall
+      default DefaultMaxHeightAcceptableToFall;
   end;
 
   TBallThrowerCreatureKind = class(TWalkAttackCreatureKind)
@@ -410,6 +426,14 @@ type
   end;
 
   TSpiderKind = class(TWalkAttackCreatureKind)
+  public
+    function CreateDefaultCreature(
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AnimationTime: Single): TCreature; override;
+  end;
+
+  TSpiderQueenKind = class(TWalkAttackCreatureKind)
   public
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
@@ -861,6 +885,11 @@ type
     function RemoveMeFromLevel: boolean; override;
   end;
 
+  TSpiderQueenCreature = class(TWalkAttackCreature)
+  public
+    procedure ActualAttack; override;
+  end;
+
   TGhostCreature = class(TWalkAttackCreature)
   public
     procedure ActualAttack; override;
@@ -906,6 +935,7 @@ var
   BallMissile: TMissileCreatureKind;
   Ghost: TGhostKind;
   Spider: TSpiderKind;
+  SpiderQueen: TSpiderQueenKind;
 
   WasParam_DebugNoCreatures: boolean = false;
 
@@ -932,6 +962,7 @@ begin
   FShortRangeAttackDamageConst := DefaultShortRangeAttackDamageConst;
   FShortRangeAttackDamageRandom := DefaultShortRangeAttackDamageRandom;
   FShortRangeAttackKnockbackDistance := DefaultShortRangeAttackKnockbackDistance;
+  FFallDownLifeLossScale := DefaultFallDownLifeLossScale;
   CreaturesKinds.Add(Self);
 end;
 
@@ -959,6 +990,10 @@ begin
   ShortRangeAttackKnockbackDistance :=
     KindsConfig.GetValue(VRMLNodeName + '/short_range_attack/knockback_distance',
     DefaultShortRangeAttackKnockbackDistance);
+
+  FallDownLifeLossScale :=
+    KindsConfig.GetValue(VRMLNodeName + '/fall_down_life_loss_scale',
+    DefaultFallDownLifeLossScale)
 end;
 
 function TCreatureKind.CameraRadius: Single;
@@ -1052,6 +1087,7 @@ begin
   FMaxAngleToAttack := DefaultMaxAngleToAttack;
   FMinLifeLossToHurt := DefaultMinLifeLossToHurt;
   FChanceToHurt := DefaultChanceToHurt;
+  FMaxHeightAcceptableToFall := DefaultMaxHeightAcceptableToFall;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -1162,6 +1198,9 @@ begin
   ChanceToHurt :=
     KindsConfig.GetValue(VRMLNodeName + '/chance_to_hurt',
     DefaultChanceToHurt);
+  MaxHeightAcceptableToFall :=
+    KindsConfig.GetValue(VRMLNodeName + '/max_height_acceptable_to_fall',
+    DefaultMaxHeightAcceptableToFall);
 end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
@@ -1194,6 +1233,17 @@ function TSpiderKind.CreateDefaultCreature(
   const AnimationTime: Single): TCreature;
 begin
   Result := TSpiderCreature.Create(Self, ALegsPosition, ADirection,
+    DefaultMaxLife, AnimationTime);
+end;
+
+{ TSpiderQueenKind -------------------------------------------------------- }
+
+function TSpiderQueenKind.CreateDefaultCreature(
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AnimationTime: Single): TCreature;
+begin
+  Result := TSpiderQueenCreature.Create(Self, ALegsPosition, ADirection,
     DefaultMaxLife, AnimationTime);
 end;
 
@@ -1612,7 +1662,9 @@ procedure TCreature.Idle(const CompSpeed: Single);
         Sound3d(stCreatureFalledDown, 0.1, false);
         if FallenHeight > 4.0 then
         begin
-          LifeLoss := Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
+          LifeLoss := Max(0,
+            Kind.FallDownLifeLossScale *
+            FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
           Life := Life - LifeLoss;
           LastAttackDirection := ZeroVector3Single;
         end;
@@ -2157,8 +2209,6 @@ var
       { Don't be stupid, and don't walk where you see you will fall down. }
       function TooHighAboveTheGround(const NewMiddlePosition: TVector3Single):
         boolean;
-      const
-        MaxHeightAcceptableToFall = 2.0 * 0.7;
       var
         IsAboveTheGround: boolean;
         SqrHeightAboveTheGround: Single;
@@ -2169,7 +2219,7 @@ var
           GetCameraHeight(NewMiddlePosition, IsAboveTheGround,
             SqrHeightAboveTheGround);
           if (not IsAboveTheGround) or
-            (SqrHeightAboveTheGround > Sqr(MaxHeightAcceptableToFall +
+            (SqrHeightAboveTheGround > Sqr(WAKind.MaxHeightAcceptableToFall +
               HeightBetweenLegsAndMiddle)) then
             Result := true;
         end;
@@ -2655,6 +2705,17 @@ begin
     (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd);
 end;
 
+{ TSpiderQueenCreature ---------------------------------------------------- }
+
+procedure TSpiderQueenCreature.ActualAttack;
+begin
+  if ShortRangeActualAttackHits then
+  begin
+    Sound3d(stSpiderQueenActualAttackHit, 1.0);
+    ShortRangeAttackHurt;
+  end;
+end;
+
 { TGhostCreature ---------------------------------------------------------- }
 
 procedure TGhostCreature.ActualAttack;
@@ -3006,6 +3067,42 @@ begin
   Spider.SoundSuddenPain := stSpiderSuddenPain;
   Spider.SoundAttackStart := stSpiderAttackStart;
   Spider.SoundDying := stSpiderDying;
+
+  SpiderQueen := TSpiderQueenKind.Create(
+    'SpiderQueen',
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, true, true),
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
+    { WalkAnimation }
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      [ 0 ],
+      { This animation really needs more frames to look smoothly. }
+      AnimScenesPerTime * 10, AnimOptimization, true, false),
+    { AttackAnimation }
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, true),
+    { DyingAnimation }
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
+    { HurtAnimation }
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, true)
+    );
+  SpiderQueen.SoundSuddenPain := stSpiderQueenSuddenPain;
+  SpiderQueen.SoundAttackStart := stSpiderQueenAttackStart;
+  SpiderQueen.SoundDying := stSpiderQueenDying;
 
   CreaturesKinds.LoadFromFile;
 end;

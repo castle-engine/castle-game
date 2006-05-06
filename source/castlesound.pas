@@ -116,6 +116,10 @@ type
     stSpiderAttackStart,
     stSpiderDying,
     stSpiderAppears,
+    stSpiderQueenActualAttackHit,
+    stSpiderQueenSuddenPain,
+    stSpiderQueenAttackStart,
+    stSpiderQueenDying,
     { @groupEnd }
 
     { Others.
@@ -359,6 +363,14 @@ var
     ( FileName: 'spider_dying.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: '' { 'spider_appears.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: '' { 'spider_queen_actual_attack_hit.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: '' { 'spider_queen_sudden_pain.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: '' { 'spider_queen_attack_start.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
+    ( FileName: '' { 'spider_queen_dying.wav' };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'intro_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
