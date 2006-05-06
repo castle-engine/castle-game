@@ -61,6 +61,8 @@ const
   DefaultMaxHeightAcceptableToFall = 2.0 * 0.7;
   DefaultFallDownLifeLossScale = 1.0;
 
+  DefaultCreatureRandomWalkDistance = 10.0;
+
 type
   TCreature = class;
 
@@ -237,6 +239,7 @@ type
     FMinLifeLossToHurt: Single;
     FChanceToHurt: Single;
     FMaxHeightAcceptableToFall: Single;
+    FRandomWalkDistance: Single;
   protected
     procedure FreePrepareRender; override;
   public
@@ -407,6 +410,11 @@ type
       read FMaxHeightAcceptableToFall
       write FMaxHeightAcceptableToFall
       default DefaultMaxHeightAcceptableToFall;
+
+    property RandomWalkDistance: Single
+      read FRandomWalkDistance
+      write FRandomWalkDistance
+      default DefaultCreatureRandomWalkDistance;
   end;
 
   TBallThrowerCreatureKind = class(TWalkAttackCreatureKind)
@@ -1088,6 +1096,7 @@ begin
   FMinLifeLossToHurt := DefaultMinLifeLossToHurt;
   FChanceToHurt := DefaultChanceToHurt;
   FMaxHeightAcceptableToFall := DefaultMaxHeightAcceptableToFall;
+  FRandomWalkDistance := DefaultCreatureRandomWalkDistance;
 end;
 
 destructor TWalkAttackCreatureKind.Destroy;
@@ -1201,6 +1210,9 @@ begin
   MaxHeightAcceptableToFall :=
     KindsConfig.GetValue(VRMLNodeName + '/max_height_acceptable_to_fall',
     DefaultMaxHeightAcceptableToFall);
+  RandomWalkDistance :=
+    KindsConfig.GetValue(VRMLNodeName + '/random_walk_distance',
+    DefaultCreatureRandomWalkDistance);
 end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
@@ -2261,14 +2273,16 @@ var
     end;
 
     procedure InitAlternativeTarget;
-    const
-      RandomWalkDistance = 10;
+    var
+      Distance: Single;
     begin
+      Distance := WAKind.RandomWalkDistance;
+
       AlternativeTarget := MiddlePosition;
-      AlternativeTarget[0] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
-      AlternativeTarget[1] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
+      AlternativeTarget[0] += Random * Distance * 2 - Distance;
+      AlternativeTarget[1] += Random * Distance * 2 - Distance;
       if WAKind.Flying then
-        AlternativeTarget[2] += Random * RandomWalkDistance * 2 - RandomWalkDistance;
+        AlternativeTarget[2] += Random * Distance * 2 - Distance;
 
       HasAlternativeTarget := true;
 

@@ -99,7 +99,7 @@
 
   <SpiderQueen
     actual_attack_time="0.25"
-    move_speed="0.4"
+    move_speed="0.35"
     max_attack_distance="8.0"
     preferred_attack_distance="8.0"
     min_delay_between_attacks="2.0"
@@ -108,6 +108,7 @@
     max_angle_to_attack="1.04"
     max_height_acceptable_to_fall="5"
     fall_down_life_loss_scale="0.5"
+    random_walk_distance="30"
   >
 
     <!-- SpiderQueen is large, so again the same reasoning applies
