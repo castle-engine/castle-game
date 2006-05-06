@@ -2004,10 +2004,10 @@ begin
   for I := 0 to High do
   begin
     Result := Items[I];
-    if Result <> IgnoreCreature then
+    if (Result <> IgnoreCreature) and
+      Result.CollisionsWithCreaturesAndPlayer then
     begin
-      if Result.CollisionsWithCreaturesAndPlayer and
-        Boxes3dCollision(NewBoundingBox, Result.BoundingBox) then
+      if Boxes3dCollision(NewBoundingBox, Result.BoundingBox) then
       begin
         { Strictly thinking, now I know that I have a collision with creature
           and I should exit with false. But it's not that simple.
@@ -2034,7 +2034,18 @@ begin
            ( PointsDistanceSqr(NewPosition, Result.MiddlePosition) <
              PointsDistanceSqr(OldPosition, Result.MiddlePosition) ) then
           Exit;
-      end;
+      end else
+      { If NewBoundingBox doesn't collide with Result.BoundingBox,
+        and OldBoundingBox also doesn't collide (so pathological
+        situation above occurs) we know that segment between
+        OldPosition and NewPosition cannot collide with Result.BoundingBox.
+
+        Without this check, player could get on the other side
+        of the creature if the creature is slim (e.g. Alien) and player
+        tries very hard, and he has large speed. }
+      if (not Boxes3dCollision(OldBoundingBox, Result.BoundingBox)) and
+         IsBox3dSegmentCollision(Result.BoundingBox, OldPosition, NewPosition) then
+        Exit;
     end;
   end;
 
