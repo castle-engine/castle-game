@@ -1147,18 +1147,19 @@ begin
     PlayerConfig.FileName := ProgramDataPath + 'data' + PathDelim +
       'player.xml';
 
-    KnockBackSpeed := PlayerConfig.GetValue('player/knock_back_speed', 0.3);
+    KnockBackSpeed :=
+      PlayerConfig.GetFloat('player/knock_back_speed', 0.3);
     Navigator.MaxJumpHeight :=
-      PlayerConfig.GetValue('player/jump/max_height',
+      PlayerConfig.GetFloat('player/jump/max_height',
       DefaultMaxJumpHeight);
     Navigator.JumpSpeedMultiply :=
-      PlayerConfig.GetValue('player/jump/speed_multiply',
+      PlayerConfig.GetFloat('player/jump/speed_multiply',
       DefaultJumpSpeedMultiply);
     Navigator.JumpPower :=
-      PlayerConfig.GetValue('player/jump/power',
+      PlayerConfig.GetFloat('player/jump/power',
       DefaultJumpPower);
     Navigator.HeadBobbingDistance :=
-      PlayerConfig.GetValue('player/head_bobbing_distance',
+      PlayerConfig.GetFloat('player/head_bobbing_distance',
       DefaultHeadBobbingDistance);
   finally SysUtils.FreeAndNil(PlayerConfig); end;
 end;

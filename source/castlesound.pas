@@ -706,16 +706,16 @@ end;
 initialization
   MusicPlayer := TMusicPlayer.Create;
 
-  FSoundVolume := ConfigFile.GetValue('sound/volume', DefaultSoundVolume);
-  FMusicVolume   := ConfigFile.GetValue('sound/music/volume', DefaultMusicVolume);
+  FSoundVolume := ConfigFile.GetFloat('sound/volume', DefaultSoundVolume);
+  FMusicVolume   := ConfigFile.GetFloat('sound/music/volume', DefaultMusicVolume);
   FALMinAllocatedSources := ConfigFile.GetValue(
     'sound/allocated_sources/min', DefaultALMinAllocatedSources);
   FALMaxAllocatedSources := ConfigFile.GetValue(
     'sound/allocated_sources/max', DefaultALMaxAllocatedSources);
   ALCDevice := ConfigFile.GetValue('sound/device', BestALCDevice);
 finalization
-  ConfigFile.SetDeleteValue('sound/volume', SoundVolume, DefaultSoundVolume);
-  ConfigFile.SetDeleteValue('sound/music/volume', MusicVolume, DefaultMusicVolume);
+  ConfigFile.SetDeleteFloat('sound/volume', SoundVolume, DefaultSoundVolume);
+  ConfigFile.SetDeleteFloat('sound/music/volume', MusicVolume, DefaultMusicVolume);
   ConfigFile.SetDeleteValue('sound/allocated_sources/min',
     FALMinAllocatedSources, DefaultALMinAllocatedSources);
   ConfigFile.SetDeleteValue('sound/allocated_sources/max',

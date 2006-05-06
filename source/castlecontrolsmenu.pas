@@ -506,13 +506,13 @@ initialization
   Glw.OnInitList.AppendItem(@InitGLW);
   Glw.OnCloseList.AppendItem(@CloseGLW);
 
-  MouseLookHorizontalSensitivity := ConfigFile.GetValue(
+  MouseLookHorizontalSensitivity := ConfigFile.GetFloat(
     'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);
-  MouseLookVerticalSensitivity := ConfigFile.GetValue(
+  MouseLookVerticalSensitivity := ConfigFile.GetFloat(
     'mouse/vertical_sensitivity', DefaultMouseLookVerticalSensitivity);
 finalization
-  ConfigFile.SetDeleteValue('mouse/horizontal_sensitivity',
+  ConfigFile.SetDeleteFloat('mouse/horizontal_sensitivity',
     MouseLookHorizontalSensitivity, DefaultMouseLookHorizontalSensitivity);
-  ConfigFile.SetDeleteValue('mouse/vertical_sensitivity',
+  ConfigFile.SetDeleteFloat('mouse/vertical_sensitivity',
     MouseLookVerticalSensitivity, DefaultMouseLookVerticalSensitivity);
 end.

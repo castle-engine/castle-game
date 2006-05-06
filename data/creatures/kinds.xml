@@ -117,5 +117,12 @@
     <short_range_attack knockback_distance="5">
       <damage const="10" random="10"/>
     </short_range_attack>
+
+    <throw_web
+      min_delay_between_attacks="5.0"
+      max_attack_distance="30.0"
+      max_angle_to_attack="0.6"
+      actual_attack_time="0.6"
+    />
   </SpiderQueen>
 </CONFIG>

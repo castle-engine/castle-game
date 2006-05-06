@@ -1,6 +1,10 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
+- is AnimScenesPerTime * 5 for spiders walk OK ?
+
+- Requires too much mem !
+
 - Testing camera pos on cages revert
 
 - ftp://stoma.name/michalis/castle_patch-0.1.tar.gz
@@ -11,7 +15,7 @@ Cages level:
 - spider queen:
   sounds fill,
   new attack: throw some slime/webs ?
-  produce normal spiders.
+  place on level
   when queen dies, drops a key
   key opens door -> game over
 
@@ -28,6 +32,12 @@ Cages level:
   Was there a bug about this in FPC ? I don't remember, but I have this
   in my KambiStringUtils.
   No, the bug that I remembered was for Hex2Dec.
+
+  maybe it was the problem with wrong overloads choosing ?
+  Compile in objfpc mode for test.
+
+  Possibly fixed by rename GetValue -> GetFloat (that was needed anyway
+  for code cleanliness)
 
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim, moving camera around the level.)
@@ -55,6 +65,9 @@ Things for which I will hopefully find time before PGD deadline:
   position. They can't climb on logs now (but maybe it's a good thing ?)
 
   same for spider_queen --- it can't climb back to MeshTunnel.
+
+- spider queen:
+  lay eggs, produce normal spiders.
 
 - alien:
   lower MinDelayBetweenAttacks?

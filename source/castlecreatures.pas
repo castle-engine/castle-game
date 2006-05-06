@@ -442,11 +442,58 @@ type
   end;
 
   TSpiderQueenKind = class(TWalkAttackCreatureKind)
+  private
+    FThrowWebAttackAnimation: TVRMLGLAnimation;
+    FThrowWebAttackAnimationInfo: TVRMLGLAnimationInfo;
+
+    FMinDelayBetweenThrowWebAttacks: Single;
+    FMaxThrowWebAttackDistance: Single;
+    FMaxAngleToThrowWebAttack: Single;
+    FActualThrowWebAttackTime: Single;
   public
+    constructor Create(
+      const AVRMLNodeName: string;
+      AStandAnimationInfo: TVRMLGLAnimationInfo;
+      AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
+      AWalkAnimationInfo: TVRMLGLAnimationInfo;
+      AAttackAnimationInfo: TVRMLGLAnimationInfo;
+      ADyingAnimationInfo: TVRMLGLAnimationInfo;
+      AHurtAnimationInfo: TVRMLGLAnimationInfo;
+      AThrowWebAttackAnimationInfo: TVRMLGLAnimationInfo);
+
+    destructor Destroy; override;
+
+    procedure CloseGL; override;
+
+    procedure PrepareRender; override;
+    function PrepareRenderSteps: Cardinal; override;
+    procedure FreePrepareRender; override;
+
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single): TCreature; override;
+
+    property MinDelayBetweenThrowWebAttacks: Single
+      read FMinDelayBetweenThrowWebAttacks
+      write FMinDelayBetweenThrowWebAttacks default 0;
+
+    property MaxThrowWebAttackDistance: Single
+      read FMaxThrowWebAttackDistance
+      write FMaxThrowWebAttackDistance default 0;
+
+    property MaxAngleToThrowWebAttack: Single
+      read FMaxAngleToThrowWebAttack
+      write FMaxAngleToThrowWebAttack default 0;
+
+    property ActualThrowWebAttackTime: Single
+      read FActualThrowWebAttackTime
+      write FActualThrowWebAttackTime default 0;
+
+    property ThrowWebAttackAnimation: TVRMLGLAnimation
+      read FThrowWebAttackAnimation;
+
+    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
   end;
 
   TGhostKind = class(TWalkAttackCreatureKind)
@@ -792,13 +839,13 @@ type
       IgnoreCreature: TCreature);
   end;
 
-  TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying, wasHurt);
+  TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying, wasHurt,
+    wasSpecial1);
 
   { This is TCreature that has a kind always of TWalkAttackCreatureKind. }
   TWalkAttackCreature = class(TCreature)
   private
     FState: TWalkAttackCreatureState;
-    procedure SetState(Value: TWalkAttackCreatureState);
 
     FStateChangeTime: Single;
 
@@ -829,10 +876,17 @@ type
     WaypointsSaved_Begin: TSceneSector;
     WaypointsSaved_End: TSceneSector;
     WaypointsSaved: TSceneWaypointsList;
-
-    { Use this is ActualAttack for short range creatures. }
-    function ShortRangeActualAttackHits: boolean;
   protected
+    procedure SetState(Value: TWalkAttackCreatureState); virtual;
+
+    { Use this in ActualAttack for short range creatures. }
+    function ShortRangeActualAttackHits: boolean;
+
+    { Set by Idle in this class, may be used by descendants
+      in their Idle calls (to not calculate the same thing twice). }
+    IdleSeesPlayer: boolean;
+    IdleSqrDistanceToLastSeenPlayer: Single;
+
     procedure SetLife(const Value: Single); override;
   public
     constructor Create(AKind: TCreatureKind;
@@ -894,8 +948,17 @@ type
   end;
 
   TSpiderQueenCreature = class(TWalkAttackCreature)
+  private
+    LastThrowWebAttackTime: Single;
+    ActualThrowWebAttackDone: boolean;
+    function SQKind: TSpiderQueenKind;
+    procedure ActualThrowWebAttack;
+  protected
+    procedure SetState(Value: TWalkAttackCreatureState); override;
   public
     procedure ActualAttack; override;
+    procedure Idle(const CompSpeed: Single); override;
+    function CurrentScene: TVRMLFlatSceneGL; override;
   end;
 
   TGhostCreature = class(TWalkAttackCreature)
@@ -953,7 +1016,8 @@ implementation
 
 uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
-  CastleLevel, CastleVideoOptions, OpenAL, ALUtils;
+  CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
+  CastleTimeMessages;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -983,24 +1047,22 @@ begin
   SoundDyingTiedToCreature :=
     KindsConfig.GetValue(VRMLNodeName + '/sound_dying_tied_to_creature',
     DefaultSoundDyingTiedToCreature);
-  DefaultMaxLife := KindsConfig.GetValue(VRMLNodeName + '/default_max_life',
+  DefaultMaxLife := KindsConfig.GetFloat(VRMLNodeName + '/default_max_life',
     DefaultDefaultMaxLife);
-  CameraRadiusFromFile := KindsConfig.GetValue(VRMLNodeName + '/camera_radius',
-    { It's important to use here Float 0.0, not Integer 0, to choose
-      proper overloaded version of GetValue }
+  CameraRadiusFromFile := KindsConfig.GetFloat(VRMLNodeName + '/camera_radius',
     0.0);
   ShortRangeAttackDamageConst :=
-    KindsConfig.GetValue(VRMLNodeName + '/short_range_attack/damage/const',
+    KindsConfig.GetFloat(VRMLNodeName + '/short_range_attack/damage/const',
     DefaultShortRangeAttackDamageConst);
   ShortRangeAttackDamageRandom :=
-    KindsConfig.GetValue(VRMLNodeName + '/short_range_attack/damage/random',
+    KindsConfig.GetFloat(VRMLNodeName + '/short_range_attack/damage/random',
     DefaultShortRangeAttackDamageRandom);
   ShortRangeAttackKnockbackDistance :=
-    KindsConfig.GetValue(VRMLNodeName + '/short_range_attack/knockback_distance',
+    KindsConfig.GetFloat(VRMLNodeName + '/short_range_attack/knockback_distance',
     DefaultShortRangeAttackKnockbackDistance);
 
   FallDownLifeLossScale :=
-    KindsConfig.GetValue(VRMLNodeName + '/fall_down_life_loss_scale',
+    KindsConfig.GetFloat(VRMLNodeName + '/fall_down_life_loss_scale',
     DefaultFallDownLifeLossScale)
 end;
 
@@ -1178,40 +1240,40 @@ begin
   inherited;
 
   ActualAttackTime :=
-    KindsConfig.GetValue(VRMLNodeName + '/actual_attack_time',
+    KindsConfig.GetFloat(VRMLNodeName + '/actual_attack_time',
     DefaultActualAttackTime);
   MoveSpeed :=
-    KindsConfig.GetValue(VRMLNodeName + '/move_speed',
+    KindsConfig.GetFloat(VRMLNodeName + '/move_speed',
     DefaultMoveSpeed);
   MaxAttackDistance :=
-    KindsConfig.GetValue(VRMLNodeName + '/max_attack_distance',
+    KindsConfig.GetFloat(VRMLNodeName + '/max_attack_distance',
     DefaultMaxAttackDistance);
   PreferredAttackDistance :=
-    KindsConfig.GetValue(VRMLNodeName + '/preferred_attack_distance',
+    KindsConfig.GetFloat(VRMLNodeName + '/preferred_attack_distance',
     DefaultPreferredAttackDistance);
   MinDelayBetweenAttacks :=
-    KindsConfig.GetValue(VRMLNodeName + '/min_delay_between_attacks',
+    KindsConfig.GetFloat(VRMLNodeName + '/min_delay_between_attacks',
     DefaultMinDelayBetweenAttacks);
   LifeToRunAway :=
-    KindsConfig.GetValue(VRMLNodeName + '/life_to_run_away',
+    KindsConfig.GetFloat(VRMLNodeName + '/life_to_run_away',
     DefaultLifeToRunAway);
   MaxKnockedBackDistance :=
-    KindsConfig.GetValue(VRMLNodeName + '/max_knocked_back_distance',
+    KindsConfig.GetFloat(VRMLNodeName + '/max_knocked_back_distance',
     DefaultMaxKnockedBackDistance);
   MaxAngleToAttack :=
-    KindsConfig.GetValue(VRMLNodeName + '/max_angle_to_attack',
+    KindsConfig.GetFloat(VRMLNodeName + '/max_angle_to_attack',
     DefaultMaxAngleToAttack);
   MinLifeLossToHurt :=
-    KindsConfig.GetValue(VRMLNodeName + '/min_life_loss_to_hurt',
+    KindsConfig.GetFloat(VRMLNodeName + '/min_life_loss_to_hurt',
     DefaultMinLifeLossToHurt);
   ChanceToHurt :=
-    KindsConfig.GetValue(VRMLNodeName + '/chance_to_hurt',
+    KindsConfig.GetFloat(VRMLNodeName + '/chance_to_hurt',
     DefaultChanceToHurt);
   MaxHeightAcceptableToFall :=
-    KindsConfig.GetValue(VRMLNodeName + '/max_height_acceptable_to_fall',
+    KindsConfig.GetFloat(VRMLNodeName + '/max_height_acceptable_to_fall',
     DefaultMaxHeightAcceptableToFall);
   RandomWalkDistance :=
-    KindsConfig.GetValue(VRMLNodeName + '/random_walk_distance',
+    KindsConfig.GetFloat(VRMLNodeName + '/random_walk_distance',
     DefaultCreatureRandomWalkDistance);
 end;
 
@@ -1250,6 +1312,69 @@ end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
 
+constructor TSpiderQueenKind.Create(
+  const AVRMLNodeName: string;
+  AStandAnimationInfo: TVRMLGLAnimationInfo;
+  AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
+  AWalkAnimationInfo: TVRMLGLAnimationInfo;
+  AAttackAnimationInfo: TVRMLGLAnimationInfo;
+  ADyingAnimationInfo: TVRMLGLAnimationInfo;
+  AHurtAnimationInfo: TVRMLGLAnimationInfo;
+  AThrowWebAttackAnimationInfo: TVRMLGLAnimationInfo);
+begin
+  inherited Create(
+    AVRMLNodeName,
+    AStandAnimationInfo,
+    AStandToWalkAnimationInfo,
+    AWalkAnimationInfo,
+    AAttackAnimationInfo,
+    ADyingAnimationInfo,
+    AHurtAnimationInfo);
+
+  FThrowWebAttackAnimationInfo := AThrowWebAttackAnimationInfo;
+end;
+
+destructor TSpiderQueenKind.Destroy;
+begin
+  FreeAndNil(FThrowWebAttackAnimation);
+  FreeAndNil(FThrowWebAttackAnimationInfo);
+  inherited;
+end;
+
+procedure TSpiderQueenKind.CloseGL;
+begin
+  inherited;
+  if ThrowWebAttackAnimation <> nil then ThrowWebAttackAnimation.CloseGL;
+end;
+
+procedure TSpiderQueenKind.PrepareRender;
+
+  procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
+    AnimInfo: TVRMLGLAnimationInfo);
+  begin
+    if Anim = nil then
+      Anim := AnimInfo.CreateAnimation;
+    Progress.Step;
+    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false);
+    Progress.Step;
+  end;
+
+begin
+  inherited;
+  CreateIfNeeded(FThrowWebAttackAnimation, FThrowWebAttackAnimationInfo);
+end;
+
+function TSpiderQueenKind.PrepareRenderSteps: Cardinal;
+begin
+  Result := (inherited PrepareRenderSteps) + 2;
+end;
+
+procedure TSpiderQueenKind.FreePrepareRender;
+begin
+  FreeAndNil(ThrowWebAttackAnimation);
+  inherited;
+end;
+
 function TSpiderQueenKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
@@ -1257,6 +1382,20 @@ function TSpiderQueenKind.CreateDefaultCreature(
 begin
   Result := TSpiderQueenCreature.Create(Self, ALegsPosition, ADirection,
     DefaultMaxLife, AnimationTime);
+end;
+
+procedure TSpiderQueenKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+begin
+  inherited;
+
+  MinDelayBetweenThrowWebAttacks :=
+    KindsConfig.GetFloat(VRMLNodeName + '/throw_web/min_delay_between_attacks', 0.0);
+  MaxThrowWebAttackDistance :=
+    KindsConfig.GetFloat(VRMLNodeName + '/throw_web/max_attack_distance', 0.0);
+  MaxAngleToThrowWebAttack :=
+    KindsConfig.GetFloat(VRMLNodeName + '/throw_web/max_angle_to_attack', 0.0);
+  ActualThrowWebAttackTime :=
+    KindsConfig.GetFloat(VRMLNodeName + '/throw_web/actual_attack_time', 0.0);
 end;
 
 { TGhostKind ------------------------------------------------------------- }
@@ -1360,13 +1499,13 @@ begin
   inherited;
 
   MoveSpeed :=
-    KindsConfig.GetValue(VRMLNodeName + '/move_speed',
+    KindsConfig.GetFloat(VRMLNodeName + '/move_speed',
     DefaultMissileMoveSpeed);
   CloseDirectionToPlayer :=
     KindsConfig.GetValue(VRMLNodeName + '/close_direction_to_player',
     DefaultCloseDirectionToPlayer);
   CloseDirectionToTargetSpeed :=
-    KindsConfig.GetValue(VRMLNodeName + '/close_direction_to_target_speed',
+    KindsConfig.GetFloat(VRMLNodeName + '/close_direction_to_target_speed',
     DefaultCloseDirectionToTargetSpeed);
 end;
 
@@ -1995,18 +2134,15 @@ begin
 end;
 
 procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
-var
-  SeesPlayer: boolean;
-  SqrDistanceToLastSeenPlayer: Single;
 
   { Is attack allowed ? }
   function AttackAllowed: boolean;
   var
     AngleRadBetweenTheDirectionToPlayer: Single;
   begin
-    Result := SeesPlayer and
+    Result := IdleSeesPlayer and
       (Level.AnimationTime - LastAttackTime > WAKind.MinDelayBetweenAttacks) and
-      (SqrDistanceToLastSeenPlayer <= Sqr(WAKind.MaxAttackDistance));
+      (IdleSqrDistanceToLastSeenPlayer <= Sqr(WAKind.MaxAttackDistance));
 
     if Result then
     begin
@@ -2154,13 +2290,13 @@ var
         Yes --- only if it will help make AttackAllowed from false to true.
         See AttackAllowed implementation.
 
-        If SeesPlayer and SqrDistanceToLastSeenPlayer is small enough,
+        If IdleSeesPlayer and IdleSqrDistanceToLastSeenPlayer is small enough,
         there's no point in getting closer to the player. In fact, it would
         be bad to get closer to player in this case, as this would allow
         player to easier attack (shorter distance --- easier to reach with
         short-range weapon, or easier to aim with long-range weapon). }
-      ( (not SeesPlayer) or
-        (SqrDistanceToLastSeenPlayer > Sqr(WAKind.PreferredAttackDistance))
+      ( (not IdleSeesPlayer) or
+        (IdleSqrDistanceToLastSeenPlayer > Sqr(WAKind.PreferredAttackDistance))
       );
   end;
 
@@ -2177,9 +2313,9 @@ var
 
   function WantToRunAway: boolean;
   begin
-    Result := SeesPlayer and
+    Result := IdleSeesPlayer and
       (Life <= MaxLife * WAKind.LifeToRunAway) and
-      (SqrDistanceToLastSeenPlayer < Sqr(WAKind.MaxAttackDistance / 4));
+      (IdleSqrDistanceToLastSeenPlayer < Sqr(WAKind.MaxAttackDistance / 4));
   end;
 
   procedure DoStand;
@@ -2560,8 +2696,8 @@ begin
     Exit;
   end;
 
-  SeesPlayer := Level.LineOfSight(MiddlePosition, Player.Navigator.CameraPos);
-  if SeesPlayer then
+  IdleSeesPlayer := Level.LineOfSight(MiddlePosition, Player.Navigator.CameraPos);
+  if IdleSeesPlayer then
   begin
     HasLastSeenPlayer := true;
     LastSeenPlayer := Player.Navigator.CameraPos;
@@ -2570,7 +2706,7 @@ begin
 
   if HasLastSeenPlayer then
   begin
-    SqrDistanceToLastSeenPlayer :=
+    IdleSqrDistanceToLastSeenPlayer :=
       PointsDistanceSqr(LastSeenPlayer, MiddlePosition);
   end;
 
@@ -2580,6 +2716,7 @@ begin
     wasAttack: DoAttack;
     wasDying: ;
     wasHurt: DoHurt;
+    wasSpecial1: { Should be handled in descendants. };
     else raise EInternalError.Create('FState ?');
   end;
 end;
@@ -2721,6 +2858,11 @@ end;
 
 { TSpiderQueenCreature ---------------------------------------------------- }
 
+function TSpiderQueenCreature.SQKind: TSpiderQueenKind;
+begin
+  Result := TSpiderQueenKind(Kind);
+end;
+
 procedure TSpiderQueenCreature.ActualAttack;
 begin
   if ShortRangeActualAttackHits then
@@ -2728,6 +2870,93 @@ begin
     Sound3d(stSpiderQueenActualAttackHit, 1.0);
     ShortRangeAttackHurt;
   end;
+end;
+
+procedure TSpiderQueenCreature.SetState(Value: TWalkAttackCreatureState);
+begin
+  if (State <> Value) and (Value = wasSpecial1) then
+  begin
+    { TODO: Sound3d(stSpiderQueenThrowWebAttackStart, 1.0); }
+    LastThrowWebAttackTime := Level.AnimationTime;
+    ActualThrowWebAttackDone := false;
+  end;
+
+  inherited;
+end;
+
+procedure TSpiderQueenCreature.Idle(const CompSpeed: Single);
+
+  procedure DoMaybeSwitchToThrowWebAttack;
+  var
+    ThrowWebAttackAllowed: boolean;
+    AngleRadBetweenTheDirectionToPlayer: Single;
+  begin
+    ThrowWebAttackAllowed :=
+      IdleSeesPlayer and
+      (Level.AnimationTime - LastThrowWebAttackTime >
+        SQKind.MinDelayBetweenThrowWebAttacks) and
+      (IdleSqrDistanceToLastSeenPlayer <=
+        Sqr(SQKind.MaxThrowWebAttackDistance));
+
+    if ThrowWebAttackAllowed then
+    begin
+      { Calculate and check AngleRadBetweenTheDirectionToPlayer. }
+      AngleRadBetweenTheDirectionToPlayer := AngleRadBetweenVectors(
+        VectorSubtract(LastSeenPlayer, MiddlePosition),
+        Direction);
+      ThrowWebAttackAllowed := AngleRadBetweenTheDirectionToPlayer <=
+        SQKind.MaxAngleToThrowWebAttack;
+
+      if ThrowWebAttackAllowed then
+        SetState(wasSpecial1);
+    end;
+  end;
+
+  procedure DoThrowWebAttack;
+  var
+    StateTime: Single;
+  begin
+    StateTime := Level.AnimationTime - StateChangeTime;
+
+    if (not ActualThrowWebAttackDone) and
+       (StateTime >= SQKind.ActualThrowWebAttackTime) then
+    begin
+      ActualThrowWebAttackDone := true;
+      ActualThrowWebAttack;
+    end;
+
+    if StateTime > SQKind.ThrowWebAttackAnimation.TimeEnd then
+      { wasStand will quickly change to wasWalk if it will want to walk. }
+      SetState(wasStand);
+  end;
+
+begin
+  inherited;
+
+  if not Dead then
+    case State of
+      wasStand, wasWalk: DoMaybeSwitchToThrowWebAttack;
+      wasSpecial1: DoThrowWebAttack;
+    end;
+end;
+
+function TSpiderQueenCreature.CurrentScene: TVRMLFlatSceneGL;
+var
+  StateTime: Single;
+begin
+  if State = wasSpecial1 then
+  begin
+    { Time from the change to this state. }
+    StateTime := Level.AnimationTime - StateChangeTime;
+
+    Result := SQKind.ThrowWebAttackAnimation.SceneFromTime(StateTime);
+  end else
+    Result := inherited;
+end;
+
+procedure TSpiderQueenCreature.ActualThrowWebAttack;
+begin
+  TimeMessage('TSpiderQueenCreature.ActualThrowWebAttack'); { TODO }
 end;
 
 { TGhostCreature ---------------------------------------------------------- }
@@ -3054,7 +3283,7 @@ begin
         0.8 / 5,
         1 / 5 ],
       { This animation really needs more frames to look smoothly. }
-      AnimScenesPerTime * 10, AnimOptimization, true, false),
+      AnimScenesPerTime * 5, AnimOptimization, true, false),
     { AttackAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
@@ -3107,7 +3336,7 @@ begin
         0.8 / 5,
         1 / 5 ],
       { This animation really needs more frames to look smoothly. }
-      AnimScenesPerTime * 10, AnimOptimization, true, false),
+      AnimScenesPerTime * 5, AnimOptimization, true, false),
     { AttackAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
@@ -3129,6 +3358,14 @@ begin
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
       { Non-zero anim to have a little knockback. }
       [ 0, 0.1 ],
+      AnimScenesPerTime, AnimOptimization, false, false),
+    { ThrowWebAttackAnimation }
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_2.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_alt.wrl'),
+        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
+      [ 0, 0.3, 0.6, 1.0 ],
       AnimScenesPerTime, AnimOptimization, false, false)
     );
   SpiderQueen.SoundSuddenPain := stSpiderQueenSuddenPain;

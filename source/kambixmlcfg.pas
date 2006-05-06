@@ -27,17 +27,31 @@ uses KambiUtils, XMLCfg;
 
 type
   { This is descendant of TXMLConfig that adds
-    GetValue, SetValue, SetDeleteValue for the Float type. }
+    GetFloat, SetFloat, SetDeleteFloat for the Float type.
+
+    Note: at the beginning I named them GetValue, SetValue etc.
+    and made them overloaded. But this is *very* bad idea.
+    Why ? Because integers are casted to floats without any problems,
+    and this may cause choosing wrong overloaded version.
+    Consider that default value for some float parameter is integer
+    (e.g. because it was declared as an integer, I forgot to
+    write "0.0" instead of "0" etc.). Then
+      MyValue := GetValue(Name, IntegerValue);
+    will choose GetValue that interprets given value as an integer.
+    Although MyValue is variable of type float, you can assign integer
+    to a float without any problem, so again no compile-time error.
+    But this is obviously wrong --- if float value was recorded
+    in the file, it will be read incorrectly. }
   TKamXMLConfig = class(TXMLConfig)
   public
-    function GetValue(const APath: string;
-      const ADefaultValue: Float): Float; overload;
+    function GetFloat(const APath: string;
+      const ADefaultValue: Float): Float;
 
-    procedure SetValue(const APath: string;
-      const AValue: Float); overload;
+    procedure SetFloat(const APath: string;
+      const AValue: Float);
 
-    procedure SetDeleteValue(const APath: string;
-      const AValue, ADefaultValue: Float); overload;
+    procedure SetDeleteFloat(const APath: string;
+      const AValue, ADefaultValue: Float);
   end;
 
 implementation
@@ -46,7 +60,7 @@ uses SysUtils;
 
 { TKamXMLConfig -------------------------------------------------------------- }
 
-function TKamXMLConfig.GetValue(const APath: string;
+function TKamXMLConfig.GetFloat(const APath: string;
   const ADefaultValue: Float): Float;
 var
   ResultString: string;
@@ -55,13 +69,13 @@ begin
   Result := StrToFloatDef(ResultString, ADefaultValue);
 end;
 
-procedure TKamXMLConfig.SetValue(const APath: string;
+procedure TKamXMLConfig.SetFloat(const APath: string;
   const AValue: Float);
 begin
   SetValue(APath, FloatToStr(AValue));
 end;
 
-procedure TKamXMLConfig.SetDeleteValue(const APath: string;
+procedure TKamXMLConfig.SetDeleteFloat(const APath: string;
   const AValue, ADefaultValue: Float);
 begin
   SetDeleteValue(APath, FloatToStr(AValue), FloatToStr(ADefaultValue));
