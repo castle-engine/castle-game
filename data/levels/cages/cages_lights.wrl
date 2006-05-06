@@ -29,6 +29,4 @@ Group {
 		location 86.841522216796875 130.67515563964844 3.222983360290527
 		attenuation 1 0 0.009999999776483
 	}
-	DEF FromTheRight DirectionalLight {
-	}
 }
