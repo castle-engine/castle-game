@@ -19,21 +19,11 @@ TODO:
 ----------------------------------------
 Things which must be done for PGD deadline:
 
-- use Szymon's red light with maxed intensity to shine on the top of the sword.
 - gate:
-  - one tree is inside murek, move it
-  - top of columns and "wieza" have wrong UV coords, fix
   - what's the purpose of "dziura" ? Texture / materials needed, or remove
   - grave lacks textures; is this a good idea ?
 
 - add Szymon+Ka¶ka to Credits!
-
-- use data/creatures/ball_missile/ball_missile_s
-  instead of ball_missile --- Transparency: all or none must be fixed.
-
-- maybe load/free creatures animations for specific levels ?
-  This would make memory requirements lower, but loading
-  time would suffer --- for each level "Loading creatures".
 
 - ftp://stoma.name/michalis/castle_patch-0.1.tar.gz
   ftp://stoma.name/michalis/castle_patch-0.2.tar.gz
@@ -41,30 +31,13 @@ Things which must be done for PGD deadline:
 - PerfTimerInit remove
 
 - Sounds: at least sounds related to SpiderQueen and ThrownWeb fill
+  At least copy sounds from Spider to SpiderQueen.
 
 Cages level:
 - when queen dies, drops a key
-  key opens door -> game over
+  key opens door -> game win sequence
 
 - kangury debian: hangs on Quit.
-
-- life indicator of the boss --- this should be a good workaround for lack
-  of blood effects etc. for now.
-
-- Update WWW to point to both -with-sources and without versions.
-
-- mouse sensitivity problems:
-  function StrToFloatDef(const s: string; DefValue: Extended): Extended;
-
-  Was there a bug about this in FPC ? I don't remember, but I have this
-  in my KambiStringUtils.
-  No, the bug that I remembered was for Hex2Dec.
-
-  maybe it was the problem with wrong overloads choosing ?
-  Compile in objfpc mode for test.
-
-  Possibly fixed by rename GetValue -> GetFloat (that was needed anyway
-  for code cleanliness)
 
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim, moving camera around the level.)
@@ -78,6 +51,23 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 
 ----------------------------------------
 Things for which I will hopefully find time before PGD deadline:
+
+- Test Radeon problems reported on PGD.
+
+- life indicator of the boss --- this should be a good workaround for lack
+  of blood effects etc. for now.
+
+- use data/creatures/ball_missile/ball_missile_s
+  instead of ball_missile --- Transparency: all or none must be fixed.
+
+- maybe load/free creatures animations for specific levels ?
+  This would make memory requirements lower, but loading
+  time would suffer --- for each level "Loading creatures".
+
+- gate:
+  - use S&K red light with maxed intensity to shine on the top of the sword.
+  - one tree is inside murek, move it
+  - top of columns and "wieza" have wrong UV coords, fix
 
 - better spider_queen model. Inspiration ?
   http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen02.jpg
@@ -129,6 +119,25 @@ cages level:
 - windows: don't look like windows
 - player can fly through windows --- not good.
 - stairs beginning cages and ending castle_hall: endings should be more black, current vertex colouring is not black enough
+
+- mouse sensitivity problems:
+  function StrToFloatDef(const s: string; DefValue: Extended): Extended;
+
+  Was there a bug about this in FPC ? I don't remember, but I have this
+  in my KambiStringUtils.
+  No, the bug that I remembered was for Hex2Dec.
+
+  maybe it was the problem with wrong overloads choosing ?
+  Compile in objfpc mode for test.
+
+  Possibly fixed by rename GetValue -> GetFloat (that was needed anyway
+  for code cleanliness)
+
+  Maybe add a sanity check for mouseSensit values to MatrixWalker
+  --- if outside range, use default ? Just in case it's some real bug
+  in FPC etc.
+
+- Update WWW to point to both -with-sources and without versions.
 
 ----------------------------------------
 Things for which probably will be no time before PGD deadline:
