@@ -24,7 +24,7 @@ unit CastleHelp;
 interface
 
 const
-  Version = '0.5.10';
+  Version = '0.5.11';
 
 procedure ShowCreditsMessage;
 
