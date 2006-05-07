@@ -84,6 +84,10 @@ var
   { Read-only from outside of this unit. }
   GameEnded: boolean;
 
+  { Read-only from outside of this unit. Initially false when starting
+    PlayGame. }
+  GameWin: boolean;
+
 { Note that when Player.Dead, confirmation will never be required anyway. }
 procedure GameCancel(RequireConfirmation: boolean);
 
@@ -105,7 +109,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, GLHeadlight, CastleThunder,
-  CastleTimeMessages;
+  CastleTimeMessages, BackgroundGL;
 
 var
   GLList_Draw2dBegin: TGLuint;
@@ -343,16 +347,21 @@ const
   StencilShadowBits = $FF;
 var
   ClearBuffers: TGLbitfield;
+  UsedBackground: TBackgroundGL;
 begin
   ClearBuffers := GL_DEPTH_BUFFER_BIT;
 
   if RenderShadowsPossible and RenderShadows then
     ClearBuffers := ClearBuffers or GL_STENCIL_BUFFER_BIT;
 
-  if Level.Scene.Background <> nil then
+  if (Level is TCagesLevel) and TCagesLevel(Level).DoEndSequence then
+    UsedBackground := TCagesLevel(Level).EndSequence.Background else
+    UsedBackground := Level.Scene.Background;
+
+  if UsedBackground <> nil then
   begin
     glLoadMatrix(Glw.Navigator.RotationOnlyMatrix);
-    Level.Scene.Background.Render;
+    UsedBackground.Render;
   end else
     ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
 
@@ -980,6 +989,8 @@ begin
   ItemsKinds.PrepareRender;
   TimeMessagesClear;
 
+  GameWin := false;
+
   Level := ALevel;
   Player := APlayer;
   InventoryVisible := false;
@@ -1063,8 +1074,10 @@ procedure LevelFinished(NextLevel: TLevel);
 begin
   if NextLevel = nil then
   begin
-    MessageOK(Glw, 'Congratulations, game finished', taLeft);
-    GameEnded := true;
+    TimeMessage('Congratulations, game finished');
+    GameWin := true;
+    if Level is TCagesLevel then
+      TCagesLevel(Level).DoEndSequence := true;
   end else
   begin
     if LevelFinishedSchedule and (LevelFinishedNextLevel <> NextLevel) then

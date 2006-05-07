@@ -258,3 +258,15 @@ on MESH-NAME to be correctly interpreted."
 
   (write-file "cages_processed.wrl")
 )
+
+(defun kam-process-end-sequence ()
+  (interactive)
+  (kam-remove-vertex-col-material-one-mesh "Water")
+  (kam-add-material-for-mesh "Water" "MatWater")
+
+  (kam-simple-replace-buffer
+    "/win/mojepasy/openGL/castle/trunk/data/textures/"
+    "../textures/")
+
+  (write-file "end_sequence_processed.wrl")
+)

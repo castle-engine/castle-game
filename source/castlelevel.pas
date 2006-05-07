@@ -454,6 +454,12 @@ type
 
     FHintOpenDoorBox: TBox3d;
     HintOpenDoorBoxShown: boolean;
+
+    FGateExit: TVRMLFlatSceneGL;
+
+    FDoEndSequence: boolean;
+
+    FEndSequence: TVRMLFlatSceneGL;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -472,8 +478,34 @@ type
 
     procedure Render(const Frustum: TFrustum); override;
 
-    function TrianglePicked(const Distance: Single;
-      const Item: TOctreeItem): boolean; override;
+    property EndSequence: TVRMLFlatSceneGL read FEndSequence;
+
+    { True means that GateExit will not be rendered (or collided)
+      and EndSequence will be rendered. }
+    property DoEndSequence: boolean
+      read FDoEndSequence write FDoEndSequence default false;
+
+    function LineOfSight(
+      const Pos1, Pos2: TVector3Single): boolean; override;
+
+    function MoveAllowed(const CameraPos: TVector3Single;
+      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const BecauseOfGravity: boolean;
+      const MovingObjectCameraRadius: Single): boolean; override;
+
+    function MoveAllowedSimple(const CameraPos: TVector3Single;
+      const NewPos: TVector3Single;
+      const BecauseOfGravity: boolean;
+      const MovingObjectCameraRadius: Single): boolean; override;
+
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
+
+    function SpecialObjectsTryPick(var IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single): Integer; override;
+
+    procedure SpecialObjectPicked(const Distance: Single;
+      SpecialObjectIndex: Integer); override;
   end;
 
   TLevelAvailable = class
@@ -1662,11 +1694,23 @@ begin
   NextSpidersAppearingTime := 0;
 
   HintOpenDoorBoxShown := false;
+
+  FEndSequence := TVRMLFlatSceneGL.Create(LoadVRMLNode(
+    CastleLevelsPath + 'end_sequence_final.wrl'),
+    true, roSeparateShapeStates);
+  FEndSequence.PrepareRender(true, true, false, false);
+
+  FGateExit := TVRMLFlatSceneGL.Create(LoadVRMLNode(
+    CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl'),
+    true, roSeparateShapeStates);
+  FGateExit.DefaultTriangleOctree := FGateExit.CreateTriangleOctree('');
 end;
 
 destructor TCagesLevel.Destroy;
 begin
   FreeAndNil(FSpidersAppearing);
+  FreeAndNil(FEndSequence);
+  FreeAndNil(FGateExit);
   inherited;
 end;
 
@@ -1851,23 +1895,128 @@ begin
     glPopMatrix;
   end;
 
+  if not DoEndSequence then
+    FGateExit.RenderFrustum(Frustum);
+
   inherited;
+
+  if DoEndSequence then
+    EndSequence.RenderFrustum(Frustum);
 end;
 
-function TCagesLevel.TrianglePicked(const Distance: Single;
-  const Item: TOctreeItem): boolean;
+function TCagesLevel.LineOfSight(
+  const Pos1, Pos2: TVector3Single): boolean;
 begin
   Result := inherited;
 
-  if not Result then
+  if not DoEndSequence then
   begin
-    if Item.ShapeNode.TryFindParentNodeByName('MeshExitGate') <> nil then
+    Result := Result and
+      (FGateExit.DefaultTriangleOctree.SegmentCollision(
+        Pos1, Pos2, false, NoItemIndex, false,
+        TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex);
+  end;
+end;
+
+function TCagesLevel.MoveAllowed(const CameraPos: TVector3Single;
+  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const BecauseOfGravity: boolean;
+  const MovingObjectCameraRadius: Single): boolean;
+begin
+  Result := inherited;
+
+  if not DoEndSequence then
+  begin
+    Result := Result and
+      FGateExit.DefaultTriangleOctree.MoveAllowedSimple(
+        CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
+  end;
+end;
+
+function TCagesLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
+  const NewPos: TVector3Single;
+  const BecauseOfGravity: boolean;
+  const MovingObjectCameraRadius: Single): boolean;
+begin
+  Result := inherited;
+
+  if not DoEndSequence then
+  begin
+    Result := Result and
+      FGateExit.DefaultTriangleOctree.MoveAllowedSimple(
+        CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
+  end;
+end;
+
+procedure TCagesLevel.GetCameraHeight(const CameraPos: TVector3Single;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+
+  procedure MakeBonusScene(BonusScene: TVRMLFlatSceneGL);
+  var
+    IsAboveTheBonusScene: boolean;
+    SqrHeightAboveTheBonusScene: Single;
+  begin
+    BonusScene.DefaultTriangleOctree.GetCameraHeight(
+      CameraPos, HomeCameraUp,
+      IsAboveTheBonusScene, SqrHeightAboveTheBonusScene,
+      NoItemIndex, nil);
+
+    if IsAboveTheBonusScene then
     begin
-      Result := true;
-      if Player.Items.FindKind(RedKeyItemKind) <> -1 then
-        LevelFinished(nil) else
-        TimeMessage('You need an appropriate key to open this door');
+      if not IsAboveTheGround then
+      begin
+        IsAboveTheGround := IsAboveTheBonusScene;
+        SqrHeightAboveTheGround := SqrHeightAboveTheBonusScene;
+      end else
+        SqrHeightAboveTheGround :=
+          Min(SqrHeightAboveTheGround, SqrHeightAboveTheBonusScene);
     end;
+  end;
+
+begin
+  inherited GetCameraHeight(CameraPos, IsAboveTheGround, SqrHeightAboveTheGround);
+
+  if not DoEndSequence then
+    MakeBonusScene(FGateExit);
+end;
+
+function TCagesLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single): Integer;
+
+  procedure MakeBonusScene(Scene: TVRMLFlatSceneGL; SpecialObjectIndex: Integer);
+  var
+    ThisIntersectionDistance: Single;
+  begin
+    if (Scene.DefaultTriangleOctree.RayCollision(
+      ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex,
+      false, nil) <> NoItemIndex) and
+      ( (Result = -1) or
+        (ThisIntersectionDistance < IntersectionDistance) ) then
+    begin
+      IntersectionDistance := ThisIntersectionDistance;
+      Result := SpecialObjectIndex;
+    end;
+  end;
+
+begin
+  Result := inherited SpecialObjectsTryPick(
+    IntersectionDistance, Ray0, RayVector);
+
+  if not DoEndSequence then
+    MakeBonusScene(FGateExit, 0);
+end;
+
+procedure TCagesLevel.SpecialObjectPicked(const Distance: Single;
+  SpecialObjectIndex: Integer);
+begin
+  inherited;
+
+  case SpecialObjectIndex of
+    0:begin
+        if Player.Items.FindKind(RedKeyItemKind) <> -1 then
+          LevelFinished(nil) else
+          TimeMessage('You need an appropriate key to open this door');
+      end;
   end;
 end;
 
