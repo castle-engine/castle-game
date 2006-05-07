@@ -5,7 +5,6 @@
     then change DoEndSequence to @true
     and ride the camera to DoEndSequence
   Music for DoEndSequence --- calm, ocean, birds.
-  texture min/mag for gateExit and EndSequence set correctly.
 
 --------------------
 (22:05:19) Szymon: 1/ (nie koniecznie) RightMouseButton -> Jump.

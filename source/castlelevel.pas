@@ -1698,12 +1698,17 @@ begin
   FEndSequence := TVRMLFlatSceneGL.Create(LoadVRMLNode(
     CastleLevelsPath + 'end_sequence_final.wrl'),
     true, roSeparateShapeStates);
+  FEndSequence.Attrib_TextureMinFilter :=
+    TextureMinificationQualityToGL[TextureMinificationQuality];
   FEndSequence.PrepareRender(true, true, false, false);
 
   FGateExit := TVRMLFlatSceneGL.Create(LoadVRMLNode(
     CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl'),
     true, roSeparateShapeStates);
   FGateExit.DefaultTriangleOctree := FGateExit.CreateTriangleOctree('');
+  FGateExit.Attrib_TextureMinFilter :=
+    TextureMinificationQualityToGL[TextureMinificationQuality];
+  FGateExit.PrepareRender(true, true, false, false);
 end;
 
 destructor TCagesLevel.Destroy;
