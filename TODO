@@ -1,9 +1,7 @@
 ----------------------------------------
 Remaining from S&K:
 
-* teleporty: Teleport_1 powinien dzialac jak teleport, byc moze powinien byc traktowany jak
-  przedmiot i zwyczajnie sie krecic i prowadzic do Teleport_2; w druga strone tez moze dzialac..
-  * klucz: Key_0 powinien byc przedmiotem. Do otworzenia drzwi prowadzacych do nastepnego levelu
+  * Do otworzenia drzwi prowadzacych do nastepnego levelu
          powinny byc wymagane dwie rzeczy: klucz i miecz: jezeli ich niemasz:
                  "You need a key to open this door.."
                  "Better find a wepon You can use to protect Yourself in the castle.."

@@ -400,10 +400,20 @@ type
   TGateLevel = class(TLevel)
   private
     FGateExitBox: TBox3d;
+
+    TeleportOpaque, TeleportTransp: TVRMLFlatSceneGL;
+    FTeleport1Box, FTeleport2Box: TBox3d;
+
+    Teleport1Rotate: Single;
+    Teleport2Rotate: Single;
+
+    Teleport1Destination: TVector3Single;
+    Teleport2Destination: TVector3Single;
   protected
     procedure ChangeLevelScene; override;
   public
     constructor Create; override;
+    destructor Destroy; override;
 
     class function SceneFileName: string; override;
     class function LightSetFileName: string; override;
@@ -414,6 +424,8 @@ type
     function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
       OctreeItemIndex: Integer): boolean; override;
     procedure Idle(const CompSpeed: Single); override;
+
+    procedure Render(const Frustum: TFrustum); override;
   end;
 
   TTowerLevel = class(TLevel)
@@ -1346,6 +1358,21 @@ begin
   PlayedMusicSound := stGateMusic;
 
   FFootstepsSound := stPlayerFootstepsGrass;
+
+  TeleportOpaque := TVRMLFlatSceneGL.Create(LoadVRMLNode(
+    CastleLevelsPath + 'teleport_opaque.wrl'),
+    true, roSeparateShapeStates);
+
+  TeleportTransp := TVRMLFlatSceneGL.Create(LoadVRMLNode(
+    CastleLevelsPath + 'teleport_transp.wrl'),
+    true, roSeparateShapeStates);
+end;
+
+destructor TGateLevel.Destroy;
+begin
+  FreeAndNil(TeleportOpaque);
+  FreeAndNil(TeleportTransp);
+  inherited;
 end;
 
 procedure TGateLevel.ChangeLevelScene;
@@ -1353,6 +1380,18 @@ begin
   inherited;
   if not RemoveBoxNode(FGateExitBox, 'GateExitBox') then
     raise EInternalError.Create('Gate level doesn''t contain "GateExitBox"');
+  if not RemoveBoxNode(FTeleport1Box, 'Teleport1Box') then
+    raise EInternalError.Create('Gate level doesn''t contain "Teleport1Box"');
+  if not RemoveBoxNode(FTeleport2Box, 'Teleport2Box') then
+    raise EInternalError.Create('Gate level doesn''t contain "Teleport2Box"');
+
+  Teleport1Destination := Box3dMiddle(FTeleport2Box);
+  Teleport1Destination[0] += 2;
+  Teleport1Destination[1] += 2;
+
+  Teleport2Destination := Box3dMiddle(FTeleport1Box);
+  Teleport2Destination[0] -= 2;
+  Teleport2Destination[1] -= 2;
 end;
 
 class function TGateLevel.SceneFileName: string;
@@ -1376,11 +1415,31 @@ begin
 end;
 
 procedure TGateLevel.Idle(const CompSpeed: Single);
+
+  procedure TeleportWork(const TeleportBox: TBox3d;
+    const Destination: TVector3Single);
+  begin
+    if Box3dPointInside(Player.Navigator.CameraPos, TeleportBox) then
+    begin
+      Player.Navigator.CameraPos := Destination;
+      Player.Navigator.CancelFallingDown;
+
+      Sound(stTeleport);
+    end;
+  end;
+
 begin
   inherited;
+
   if Box3dPointInside(Player.Navigator.CameraPos, FGateExitBox) then
   begin
     LevelFinished(TCastleHallLevel.Create);
+  end else
+  begin
+    Teleport1Rotate += 0.2 * CompSpeed;
+    Teleport2Rotate += 0.2 * CompSpeed;
+    TeleportWork(FTeleport1Box, Teleport1Destination);
+    TeleportWork(FTeleport2Box, Teleport2Destination);
   end;
 end;
 
@@ -1394,6 +1453,31 @@ begin
   ItemPtr := @(Octree.OctreeItems.Items[OctreeItemIndex]);
   Result := Result or
     (ItemPtr^.State.LastNodes.Material.NodeName = 'MatWater');
+end;
+
+procedure TGateLevel.Render(const Frustum: TFrustum);
+
+  procedure RenderTeleport(
+    const TeleportRotation: Single;
+    const TeleportBox: TBox3d;
+    TeleportScene: TVRMLFlatSceneGL);
+  begin
+    if FrustumBox3dCollisionPossibleSimple(Frustum, TeleportBox) then
+    begin
+      glPushMatrix;
+        glTranslatev(Box3dMiddle(TeleportBox));
+        glRotatef(TeleportRotation, 1, 1, 0);
+        TeleportScene.Render(nil);
+      glPopMatrix;
+    end;
+  end;
+
+begin
+  RenderTeleport(Teleport1Rotate, FTeleport1Box, TeleportOpaque);
+  RenderTeleport(Teleport2Rotate, FTeleport2Box, TeleportOpaque);
+  inherited;
+  RenderTeleport(Teleport1Rotate, FTeleport1Box, TeleportTransp);
+  RenderTeleport(Teleport2Rotate, FTeleport2Box, TeleportTransp);
 end;
 
 { TTowerLevel ---------------------------------------------------------------- }

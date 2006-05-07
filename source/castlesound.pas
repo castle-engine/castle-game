@@ -93,6 +93,7 @@ type
     stCagesMusic,
     stThunder,
     stStairsBlockerDestroyed,
+    stTeleport,
     { @groupEnd }
 
     { Creatures sounds.
@@ -329,6 +330,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'stairs_blocker_destroyed.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
+    ( FileName: 'teleport.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'creature_falled_down.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'alien_sudden_pain.wav';
