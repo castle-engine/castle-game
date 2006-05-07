@@ -1520,7 +1520,7 @@ const
 
 const
   SpidersFallingSpeed = 0.5;
-  CreaturesCountToAddSpiders = 10;
+  CreaturesCountToAddSpiders = 20;
 var
   IsAboveTheGround: boolean;
   SqrHeightAboveTheGround: Single;

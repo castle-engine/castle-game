@@ -1,8 +1,9 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
-- place more spiders --- test speed
-- Testing camera pos on cages revert
+- maybe load/free creatures animations for specific levels ?
+  This would make memory requirements lower, but loading
+  time would suffer --- for each level "Loading creatures".
 
 - ftp://stoma.name/michalis/castle_patch-0.1.tar.gz
   ftp://stoma.name/michalis/castle_patch-0.2.tar.gz
