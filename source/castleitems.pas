@@ -322,6 +322,7 @@ var
   Sword: TItemSwordKind;
   LifePotion: TItemKind;
   ScrollOfFlying: TItemKind;
+  KeyItemKind: TItemKind;
 
 { Returns nil if not found. }
 function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
@@ -856,6 +857,9 @@ begin
 
   ScrollOfFlying := TItemScrollOfFlyingKind.Create('scroll_final.wrl',
     'ScrFlying', 'Scroll Of Flying', 'scroll.png');
+
+  KeyItemKind := TItemKind.Create('key.wrl',
+    'Key', 'Key', 'key.png');
 end;
 
 procedure DoFinalization;

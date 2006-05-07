@@ -1,0 +1,18 @@
+#VRML V1.0 ascii
+
+# I generated life_potion.png image using
+#   view3dscene --geometry 400x400 key.wrl
+# doing screenshot, then I modified the image (scaled down and added
+# alpha channel) using GIMP. This is *not* automated in the Makefile
+# in this directory.
+
+Group {
+  PerspectiveCamera {
+    position -0.361246794462204 2.586284160614014 0.59759110212326
+    orientation -0.25050762295723 0.648251295089722 0.719038307666779 2.800452470779419
+  }
+  PointLight {
+    location 3 3 3
+  }
+  WWWInline { name "../models/key.wrl" }
+}
