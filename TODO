@@ -1,20 +1,18 @@
 ----------------------------------------
 Remaining from S&K:
 
-* potworki -- jak wyzej. moim zdaniem takie parametry pozwalaja sie pobawic.
+* teleporty: Teleport_1 powinien dzialac jak teleport, byc moze powinien byc traktowany jak
+  przedmiot i zwyczajnie sie krecic i prowadzic do Teleport_2; w druga strone tez moze dzialac..
+  * klucz: Key_0 powinien byc przedmiotem. Do otworzenia drzwi prowadzacych do nastepnego levelu
+         powinny byc wymagane dwie rzeczy: klucz i miecz: jezeli ich niemasz:
+                 "You need a key to open this door.."
+                 "Better find a wepon You can use to protect Yourself in the castle.."
+  * duchy: w okolicy klucza powinny pojawiac sie tylko gdy wskoczy sie na grob(moze byc rowniez puszczony dzwiek
+         potepienczego wycia - jak smierc ducha). w innym przypadku szczesliwy gracz
+    moze je sobie darowac. jesli dobrze pamietam jest ich 6.
+  * w okolicy miecza pojawiaja sie gdy gracz wskoczy do grobu (3 sztuki).
 
-TODO:
-
-     * teleporty: Teleport_1 powinien dzialac jak teleport, byc moze powinien byc traktowany jak
-	 przedmiot i zwyczajnie sie krecic i prowadzic do Teleport_2; w druga strone tez moze dzialac..
-	 * klucz: Key_0 powinien byc przedmiotem. Do otworzenia drzwi prowadzacych do nastepnego levelu
-		powinny byc wymagane dwie rzeczy: klucz i miecz: jezeli ich niemasz:
-			"You need a key to open this door.."
-			"Better find a wepon You can use to protect Yourself in the castle.."
-	 * duchy: w okolicy klucza powinny pojawiac sie tylko gdy wskoczy sie na grob(moze byc rowniez puszczony dzwiek
-		potepienczego wycia - jak smierc ducha). w innym przypadku szczesliwy gracz
-	   moze je sobie darowac. jesli dobrze pamietam jest ich 6.
-	 * w okolicy miecza pojawiaja sie gdy gracz wskoczy do grobu (3 sztuki).
+After: check Ghost.move_speed="0.5"
 
 ----------------------------------------
 Things which must be done for PGD deadline:
@@ -82,13 +80,8 @@ Things for which I will hopefully find time before PGD deadline:
   lay eggs, produce normal spiders.
 
 - alien:
-  lower MinDelayBetweenAttacks?
   more aliens on castle_hall ?
   texture the alien finally ?
-
-  (MoveSpeed)
-  (02:11:50) Szymon: przede wszystkim duchy powinny byc 0.5
-  (02:12:12) Szymon: a alien gdzies tak 0.35. wyglada naturalnie a jest trudniejszy
 
 - test game messages in the middle of the screen ?
 

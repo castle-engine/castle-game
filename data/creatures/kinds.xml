@@ -15,8 +15,11 @@
 <CONFIG>
   <Alien
     actual_attack_time="0.4"
+    min_delay_between_attacks="2.0"
     move_speed="0.1"
     max_knocked_back_distance="4.2"
+    life_to_run_away="1.0"
+    default_max_life="90.0"
     max_height_acceptable_to_fall="1.4"
   />
 
