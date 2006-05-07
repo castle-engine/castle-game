@@ -1,10 +1,6 @@
 ----------------------------------------
 Remaining from S&K:
 
-  * Do otworzenia drzwi prowadzacych do nastepnego levelu
-         powinny byc wymagane dwie rzeczy: klucz i miecz: jezeli ich niemasz:
-                 "You need a key to open this door.."
-                 "Better find a wepon You can use to protect Yourself in the castle.."
   * duchy: w okolicy klucza powinny pojawiac sie tylko gdy wskoczy sie na grob(moze byc rowniez puszczony dzwiek
          potepienczego wycia - jak smierc ducha). w innym przypadku szczesliwy gracz
     moze je sobie darowac. jesli dobrze pamietam jest ich 6.
@@ -14,6 +10,8 @@ After: check Ghost.move_speed="0.5"
 
 ----------------------------------------
 Things which must be done for PGD deadline:
+
+- need an actual door inside GateExitBox to make the message valid.
 
 - gate:
   - what's the purpose of "dziura" ? Texture / materials needed, or remove

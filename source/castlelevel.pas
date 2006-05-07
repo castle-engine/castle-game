@@ -1416,6 +1416,19 @@ end;
 
 procedure TGateLevel.Idle(const CompSpeed: Single);
 
+  procedure RejectGateExitBox;
+  var
+    NewPosition: TVector3Single;
+  begin
+    NewPosition := Player.Navigator.CameraPos;
+    { Although I do him knockback, I also change the position
+      to make sure that he is thrown outside of FGateExitBox. }
+    NewPosition[1] := FGateExitBox[0, 1] - 0.1;
+    Player.Navigator.CameraPos := NewPosition;
+
+    Player.Knockback(0, 2, Vector3Single(0, -1, 0));
+  end;
+
   procedure TeleportWork(const TeleportBox: TBox3d;
     const Destination: TVector3Single);
   begin
@@ -1433,7 +1446,17 @@ begin
 
   if Box3dPointInside(Player.Navigator.CameraPos, FGateExitBox) then
   begin
-    LevelFinished(TCastleHallLevel.Create);
+    if Player.Items.FindKind(KeyItemKind) = -1 then
+    begin
+      TimeMessage('You need a key to open this door');
+      RejectGateExitBox;
+    end else
+    if Player.Items.FindKind(Sword) = -1 then
+    begin
+      TimeMessage('Better find a wepon first to protect yourself in the castle');
+      RejectGateExitBox;
+    end else
+      LevelFinished(TCastleHallLevel.Create);
   end else
   begin
     Teleport1Rotate += 0.2 * CompSpeed;

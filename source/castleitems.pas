@@ -242,10 +242,15 @@ type
   TObjectsListItem_2 = TItem;
   {$I objectslist_2.inc}
   TItemsList = class(TObjectsList_2)
+  public
     { This checks is Item "stackable" with any item on the list.
       Returns index of item on the list that is stackable with given Item,
       or -1 if none. }
     function Stackable(Item: TItem): Integer;
+
+    { Searches for item of given Kind. Returns index of first found,
+      or -1 if not found. }
+    function FindKind(Kind: TItemKind): Integer;
   end;
 
   TItemOnLevel = class
@@ -634,6 +639,14 @@ function TItemsList.Stackable(Item: TItem): Integer;
 begin
   for Result := 0 to Count - 1 do
     if Items[Result].Stackable(Item) then
+      Exit;
+  Result := -1;
+end;
+
+function TItemsList.FindKind(Kind: TItemKind): Integer;
+begin
+  for Result := 0 to Count - 1 do
+    if Items[Result].Kind = Kind then
       Exit;
   Result := -1;
 end;
