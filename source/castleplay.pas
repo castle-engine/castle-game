@@ -518,23 +518,32 @@ var
 
   procedure ModifyPlayerEndSequence(
     const TargetPosition: TVector3Single;
-    const TargetDirection: TVector3Single);
+    const TargetDirection: TVector3Single;
+    const TargetUp: TVector3Single);
   const
     PositionChangeSpeed = 0.05;
     DirectionChangeSpeed = 0.01;
+    UpChangeSpeed = 0.01;
   var
     ToPosition: TVector3Single;
     ToDirection: TVector3Single;
+    ToUp: TVector3Single;
+
     ToPositionLength: Single;
     ToDirectionLength: Single;
+    ToUpLength: Single;
   begin
-    ToPosition := VectorSubtract(TargetPosition, Player.Navigator.CameraPos);
+    ToPosition  := VectorSubtract(TargetPosition , Player.Navigator.CameraPos);
     ToDirection := VectorSubtract(TargetDirection, Player.Navigator.CameraDir);
+    ToUp        := VectorSubtract(TargetUp       , Player.Navigator.CameraUp);
 
-    ToPositionLength := VectorLen(ToPosition);
+    ToPositionLength  := VectorLen(ToPosition);
     ToDirectionLength := VectorLen(ToDirection);
+    ToUpLength        := VectorLen(ToUp);
 
-    if IsZero(ToPositionLength) and IsZero(ToDirectionLength) then
+    if IsZero(ToPositionLength) and
+       IsZero(ToDirectionLength) and
+       IsZero(ToUpLength) then
       TCagesLevel(Level).DoEndSequence := true else
     begin
       if ToPositionLength < CompSpeed * PositionChangeSpeed then
@@ -548,6 +557,12 @@ var
         Player.Navigator.CameraDir := VectorAdd(
           Player.Navigator.CameraDir,
           VectorAdjustToLength(ToDirection, CompSpeed * DirectionChangeSpeed));
+
+      if ToUpLength < CompSpeed * UpChangeSpeed then
+        Player.Navigator.CameraUp := TargetUp else
+        Player.Navigator.CameraUp := VectorAdd(
+          Player.Navigator.CameraUp,
+          VectorAdjustToLength(ToUp, CompSpeed * UpChangeSpeed));
     end;
   end;
 
@@ -555,6 +570,7 @@ const
   GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
   GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
   GameWinDirection: TVector3Single = (0, 1, 0);
+  GameWinUp: TVector3Single = (0, 0, 1);
 var
   PickItemIndex, PlayerItemIndex: Integer;
 begin
@@ -608,8 +624,8 @@ begin
   if GameWin and (Level is TCagesLevel) then
   begin
     if TCagesLevel(Level).DoEndSequence then
-      ModifyPlayerEndSequence(GameWinPosition2, GameWinDirection) else
-      ModifyPlayerEndSequence(GameWinPosition1, GameWinDirection);
+      ModifyPlayerEndSequence(GameWinPosition2, GameWinDirection, GameWinUp) else
+      ModifyPlayerEndSequence(GameWinPosition1, GameWinDirection, GameWinUp);
   end;
 end;
 

@@ -1,3 +1,7 @@
+Game ending finish:
+(fix ending level --- water, and ground surface; adjust GameWinPosition2 then)
+(should creatures be rendered at all when GameWin ?)
+
 --------------------
 (22:05:19) Szymon: 1/ (nie koniecznie) RightMouseButton -> Jump.
 (22:05:48) Szymon: 2/ cos sie za dlugo ladujepierwszy poziom. staje na 25% procentach loading creatures.
