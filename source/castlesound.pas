@@ -94,6 +94,7 @@ type
     stThunder,
     stStairsBlockerDestroyed,
     stTeleport,
+    stSacrilegeAmbush,
     { @groupEnd }
 
     { Creatures sounds.
@@ -331,6 +332,8 @@ var
     ( FileName: 'stairs_blocker_destroyed.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'teleport.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: 'sacrilege_ambush.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'creature_falled_down.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),

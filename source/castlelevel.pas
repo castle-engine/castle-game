@@ -409,6 +409,14 @@ type
 
     Teleport1Destination: TVector3Single;
     Teleport2Destination: TVector3Single;
+
+    SacrilegeAmbushStartingPosition: array[0..5]of TVector3Single;
+    SwordAmbushStartingPosition: array[0..2]of TVector3Single;
+
+    SacrilegeAmbushDone: boolean;
+    SwordAmbushDone: boolean;
+
+    FSacrilegeBox: TBox3d;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -1366,6 +1374,9 @@ begin
   TeleportTransp := TVRMLFlatSceneGL.Create(LoadVRMLNode(
     CastleLevelsPath + 'teleport_transp.wrl'),
     true, roSeparateShapeStates);
+
+  SacrilegeAmbushDone := false;
+  SwordAmbushDone := false;
 end;
 
 destructor TGateLevel.Destroy;
@@ -1376,14 +1387,30 @@ begin
 end;
 
 procedure TGateLevel.ChangeLevelScene;
+
+  function AmbushStartingPos(const Box: TBox3d): TVector3Single;
+  begin
+    Result[0] := (Box[0, 0] + Box[1, 0]) / 2;
+    Result[1] := (Box[0, 1] + Box[1, 1]) / 2;
+    Result[2] := Box[0, 2];
+  end;
+
+var
+  TempBox: TBox3d;
+  I: Integer;
 begin
   inherited;
+
   if not RemoveBoxNode(FGateExitBox, 'GateExitBox') then
     raise EInternalError.Create('Gate level doesn''t contain "GateExitBox"');
+
   if not RemoveBoxNode(FTeleport1Box, 'Teleport1Box') then
     raise EInternalError.Create('Gate level doesn''t contain "Teleport1Box"');
   if not RemoveBoxNode(FTeleport2Box, 'Teleport2Box') then
     raise EInternalError.Create('Gate level doesn''t contain "Teleport2Box"');
+
+  if not RemoveBoxNode(FSacrilegeBox, 'SacrilegeBox') then
+    raise EInternalError.Create('Gate level doesn''t contain "SacrilegeBox"');
 
   Teleport1Destination := Box3dMiddle(FTeleport2Box);
   Teleport1Destination[0] += 2;
@@ -1392,6 +1419,24 @@ begin
   Teleport2Destination := Box3dMiddle(FTeleport1Box);
   Teleport2Destination[0] -= 2;
   Teleport2Destination[1] -= 2;
+
+  for I := 0 to High(SacrilegeAmbushStartingPosition) do
+  begin
+    if not RemoveBoxNode(TempBox, 'SacrilegeGhost_' + IntToStr(I)) then
+      raise EInternalError.Create(
+        'Gate level doesn''t contain "SacrilegeGhost_' + IntToStr(I) + '"');
+
+    SacrilegeAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
+  end;
+
+  for I := 0 to High(SwordAmbushStartingPosition) do
+  begin
+    if not RemoveBoxNode(TempBox, 'SwordGhost_' + IntToStr(I)) then
+      raise EInternalError.Create(
+        'Gate level doesn''t contain "SwordGhost_' + IntToStr(I) + '"');
+
+    SwordAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
+  end;
 end;
 
 class function TGateLevel.SceneFileName: string;
@@ -1441,6 +1486,41 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
     end;
   end;
 
+  procedure SacrilegeAmbush;
+  var
+    I: Integer;
+    CreaturePosition, CreatureDirection: TVector3Single;
+    Creature: TCreature;
+  begin
+    Sound(stSacrilegeAmbush);
+    for I := 0 to High(SacrilegeAmbushStartingPosition) do
+    begin
+      CreaturePosition := SacrilegeAmbushStartingPosition[I];
+      CreatureDirection := VectorSubtract(Player.Navigator.CameraPos,
+        CreaturePosition);
+      Creature := Ghost.CreateDefaultCreature(CreaturePosition,
+        CreatureDirection, AnimationTime);
+      FCreatures.Add(Creature);
+    end;
+  end;
+
+  procedure SwordAmbush;
+  var
+    I: Integer;
+    CreaturePosition, CreatureDirection: TVector3Single;
+    Creature: TCreature;
+  begin
+    for I := 0 to High(SwordAmbushStartingPosition) do
+    begin
+      CreaturePosition := SwordAmbushStartingPosition[I];
+      CreatureDirection := VectorSubtract(Player.Navigator.CameraPos,
+        CreaturePosition);
+      Creature := Ghost.CreateDefaultCreature(CreaturePosition,
+        CreatureDirection, AnimationTime);
+      FCreatures.Add(Creature);
+    end;
+  end;
+
 begin
   inherited;
 
@@ -1463,6 +1543,20 @@ begin
     Teleport2Rotate += 0.2 * CompSpeed;
     TeleportWork(FTeleport1Box, Teleport1Destination);
     TeleportWork(FTeleport2Box, Teleport2Destination);
+
+    if (not SacrilegeAmbushDone) and
+      Box3dPointInside(Player.Navigator.CameraPos, FSacrilegeBox) then
+    begin
+      SacrilegeAmbushDone := true;
+      SacrilegeAmbush;
+    end;
+
+    if (not SwordAmbushDone) and
+      (Player.Items.FindKind(Sword) <> -1) then
+    begin
+      SwordAmbushDone := true;
+      SwordAmbush;
+    end;
   end;
 end;
 
