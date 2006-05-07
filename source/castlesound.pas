@@ -132,7 +132,8 @@ type
     stIntroMusic,
     stMenuCurrentItemChanged,
     stMenuCurrentItemSelected,
-    stSaveScreen
+    stSaveScreen,
+    stGameWinMusic
     { @groupEnd });
 
 { Call this always to initialize OpenAL and OpenAL context,
@@ -394,6 +395,8 @@ var
     ( FileName: 'menu_current_item_selected.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; ),
     ( FileName: '' { save_screen.wav };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; ),
+    ( FileName: 'game_win_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; )
   );
 

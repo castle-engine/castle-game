@@ -64,6 +64,10 @@ type
     In general, my strategy is that "if some method doesn't explicitly
     state that Player must be alive to call it --- then I'm allowed
     to call this method even when Player is Dead".
+
+    The same thing applied to GameWin = @true state.
+    Generally all things are allowed except things that are explicitly
+    forbidden.
   }
   TPlayer = class
   private
@@ -82,7 +86,7 @@ type
 
     { This updates Navigator properties.
       Call this always when FlyingMode or Dead or some key values
-      or Swimming change. }
+      or Swimming or GameWin change. }
     procedure UpdateNavigator;
 
     procedure FalledDown(Navigator: TMatrixWalker; const FallenHeight: Single);
@@ -157,8 +161,9 @@ type
       automatically wear off, but you don't want to wait and you
       want to cancel flying *now*. Ignored if not in FlyingMode.
 
-      Note that while you can call this when Dead, this will
-      be always ignored (because when Dead, FlyingMode is always false). }
+      Note that while you can call this when Dead or GameWin, this will
+      be always ignored (because when Dead or GameWin,
+      FlyingMode is always false). }
     procedure CancelFlying;
 
     { Inventory, items owned by the player.
@@ -359,9 +364,6 @@ begin
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
   Navigator.CheckModsDown := false;
   Navigator.OnFalledDown := FalledDown;
-  { MouseLook is turned on always, even when player is dead.
-    Just like rotation keys. }
-  Navigator.MouseLook := true;
 
   HintEscapeKeyShown := false;
 
@@ -397,7 +399,7 @@ end;
 
 function TPlayer.GetFlyingMode: boolean;
 begin
-  Result := (FFlyingModeTimeOut > 0) and (not Dead);
+  Result := (FFlyingModeTimeOut > 0) and (not Dead) and (not GameWin);
 end;
 
 procedure TPlayer.FlyingModeTimeoutBegin(const TimeOut: Single);
@@ -642,7 +644,7 @@ end;
 
 procedure TPlayer.UpdateNavigator;
 begin
-  Navigator.Gravity := not FlyingMode;
+  Navigator.Gravity := (not FlyingMode) and (not GameWin);
   { Note that when not Navigator.Gravity then FallingDownEffect will not
     work anyway. }
   Navigator.FallingDownEffect := Swimming = psNo;
@@ -650,17 +652,59 @@ begin
   Navigator.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
   Navigator.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
 
-  { Rotation keys work always, even when player is dead.
-    Initially I disabled them, but after some thought:
-    let them work. They work a little strangely (because CameraUp
-    is orthogonal to HomeCameraUp), but they still work and player
-    can figure it out. }
-  Navigator.Key_LeftRot := CastleKey_LeftRot.Value;
-  Navigator.Key_RightRot := CastleKey_RightRot.Value;
-  Navigator.Key_UpRotate := CastleKey_UpRotate.Value;
-  Navigator.Key_DownRotate := CastleKey_DownRotate.Value;
-  Navigator.Key_HomeUp := CastleKey_HomeUp.Value;
+  if GameWin then
+  begin
+    Navigator.MouseLook := false;
+    Navigator.Key_LeftRot := K_None;
+    Navigator.Key_RightRot := K_None;
+    Navigator.Key_UpRotate := K_None;
+    Navigator.Key_DownRotate := K_None;
+    Navigator.Key_HomeUp := K_None;
+  end else
+  begin
+    { MouseLook is turned on always, even when player is dead.
+      Just like rotation keys. }
+    Navigator.MouseLook := true;
 
+    { Rotation keys work always, even when player is dead.
+      Initially I disabled them, but after some thought:
+      let them work. They work a little strangely (because CameraUp
+      is orthogonal to HomeCameraUp), but they still work and player
+      can figure it out. }
+    Navigator.Key_LeftRot := CastleKey_LeftRot.Value;
+    Navigator.Key_RightRot := CastleKey_RightRot.Value;
+    Navigator.Key_UpRotate := CastleKey_UpRotate.Value;
+    Navigator.Key_DownRotate := CastleKey_DownRotate.Value;
+    Navigator.Key_HomeUp := CastleKey_HomeUp.Value;
+  end;
+
+  if GameWin then
+  begin
+    { PreferHomeUpXxx should be ignored actually, because rotations
+      don't work now. }
+    Navigator.PreferHomeUpForMoving := true;
+    Navigator.PreferHomeUpForRotations := false;
+
+    Navigator.Key_Jump := K_None;
+    Navigator.Key_Crouch := K_None;
+    Navigator.Key_UpMove := K_None;
+    Navigator.Key_DownMove := K_None;
+
+    Navigator.Key_Forward := K_None;
+    Navigator.Key_Backward := K_None;
+    Navigator.Key_LeftStrafe := K_None;
+    Navigator.Key_RightStrafe := K_None;
+
+    Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
+    Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
+    Navigator.HeadBobbing := 0.0;
+    if Level <> nil then
+      Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01 else
+      Navigator.CameraPreferredHeight := 0;
+
+    Navigator.MoveSpeed := 1.0;
+    Navigator.MoveVertSpeed := 1.0;
+  end else
   if Dead then
   begin
     Navigator.PreferHomeUpForMoving := true;

@@ -1798,68 +1798,71 @@ var
 begin
   inherited;
 
-  { Torch light modify, to make an illusion of unstable light }
-  LightSet.Lights[0].LightNode.FdIntensity.Value := Clamped(
-      LightSet.Lights[0].LightNode.FdIntensity.Value +
-        MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed,
-      0.5, 1);
-  LightSet.CalculateLights;
-
-  { Maybe appear new spiders }
-  if (Level.Creatures.Count < CreaturesCountToAddSpiders) and
-     (not WasParam_DebugNoCreatures) then
+  if not GameWin then
   begin
-    if NextSpidersAppearingTime = 0 then
+    { Torch light modify, to make an illusion of unstable light }
+    LightSet.Lights[0].LightNode.FdIntensity.Value := Clamped(
+        LightSet.Lights[0].LightNode.FdIntensity.Value +
+          MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed,
+        0.5, 1);
+    LightSet.CalculateLights;
+
+    { Maybe appear new spiders }
+    if (Level.Creatures.Count < CreaturesCountToAddSpiders) and
+       (not WasParam_DebugNoCreatures) then
     begin
-      if AnimationTime > 1 then
+      if NextSpidersAppearingTime = 0 then
       begin
-        NextSpidersAppearingTime := AnimationTime + 5 + Random(20);
-        for I := 1 to 5 + Random(3) do
-          AppearSpider(RandomSpiderXY);
+        if AnimationTime > 1 then
+        begin
+          NextSpidersAppearingTime := AnimationTime + 5 + Random(20);
+          for I := 1 to 5 + Random(3) do
+            AppearSpider(RandomSpiderXY);
+        end;
+      end else
+      if AnimationTime >= NextSpidersAppearingTime then
+      begin
+        NextSpidersAppearingTime := AnimationTime + 2 + Random(10);
+        for I := 1 to 1 + Random(3) do
+          AppearSpider(RandomSpiderXYAroundPlayer);
       end;
-    end else
-    if AnimationTime >= NextSpidersAppearingTime then
-    begin
-      NextSpidersAppearingTime := AnimationTime + 2 + Random(10);
-      for I := 1 to 1 + Random(3) do
-        AppearSpider(RandomSpiderXYAroundPlayer);
     end;
-  end;
 
-  { Move spiders down }
-  I := 0;
-  { 2 lines below only to get rid of compiler warnings }
-  IsAboveTheGround := false;
-  SqrHeightAboveTheGround := 0;
-  while I < FSpidersAppearing.Count do
-  begin
-    GetCameraHeight(FSpidersAppearing.Items[I], IsAboveTheGround,
-      SqrHeightAboveTheGround);
-    if IsAboveTheGround and
-      (SqrHeightAboveTheGround < Sqr(Spider.CameraRadius * 2)) then
+    { Move spiders down }
+    I := 0;
+    { 2 lines below only to get rid of compiler warnings }
+    IsAboveTheGround := false;
+    SqrHeightAboveTheGround := 0;
+    while I < FSpidersAppearing.Count do
     begin
-      SpiderPosition := FSpidersAppearing.Items[I];
-      SpiderDirection :=
-        VectorSubtract(Player.Navigator.CameraPos, SpiderPosition);
-      MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.HomeCameraUp);
-      SpiderCreature := Spider.CreateDefaultCreature(
-        SpiderPosition, SpiderDirection, AnimationTime);
-      Creatures.Add(SpiderCreature);
-      SpiderCreature.Sound3d(stSpiderAppears, 1.0);
-      FSpidersAppearing.Delete(I, 1);
-    end else
-    begin
-      FSpidersAppearing[I][2] -= Min(SpidersFallingSpeed * CompSpeed,
-        Sqrt(SqrHeightAboveTheGround) - Spider.CameraRadius);
-      Inc(I);
+      GetCameraHeight(FSpidersAppearing.Items[I], IsAboveTheGround,
+        SqrHeightAboveTheGround);
+      if IsAboveTheGround and
+        (SqrHeightAboveTheGround < Sqr(Spider.CameraRadius * 2)) then
+      begin
+        SpiderPosition := FSpidersAppearing.Items[I];
+        SpiderDirection :=
+          VectorSubtract(Player.Navigator.CameraPos, SpiderPosition);
+        MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.HomeCameraUp);
+        SpiderCreature := Spider.CreateDefaultCreature(
+          SpiderPosition, SpiderDirection, AnimationTime);
+        Creatures.Add(SpiderCreature);
+        SpiderCreature.Sound3d(stSpiderAppears, 1.0);
+        FSpidersAppearing.Delete(I, 1);
+      end else
+      begin
+        FSpidersAppearing[I][2] -= Min(SpidersFallingSpeed * CompSpeed,
+          Sqrt(SqrHeightAboveTheGround) - Spider.CameraRadius);
+        Inc(I);
+      end;
     end;
-  end;
 
-  if (not HintOpenDoorBoxShown) and
-    Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then
-  begin
-    HintOpenDoorBoxShown := true;
-    TimeMessage('Hint: open this door by clicking on it with right mouse button');
+    if (not HintOpenDoorBoxShown) and
+      Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then
+    begin
+      HintOpenDoorBoxShown := true;
+      TimeMessage('Hint: open this door by clicking on it with right mouse button');
+    end;
   end;
 end;
 
@@ -2018,9 +2021,13 @@ begin
 
   case SpecialObjectIndex of
     0:begin
-        if Player.Items.FindKind(RedKeyItemKind) <> -1 then
-          LevelFinished(nil) else
-          TimeMessage('You need an appropriate key to open this door');
+        if Distance > 10 then
+          TimeMessage('You see a door. You''re too far to open it from here') else
+        begin
+          if Player.Items.FindKind(RedKeyItemKind) <> -1 then
+            LevelFinished(nil) else
+            TimeMessage('You need an appropriate key to open this door');
+        end;
       end;
   end;
 end;

@@ -88,7 +88,8 @@ var
     PlayGame. }
   GameWin: boolean;
 
-{ Note that when Player.Dead, confirmation will never be required anyway. }
+{ Note that when Player.Dead or GameWin,
+  confirmation will never be required anyway. }
 procedure GameCancel(RequireConfirmation: boolean);
 
 const
@@ -147,6 +148,7 @@ var
 
 const
   SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
+  SGameWinMessage = 'Game finished. Press [Escape] to exit to menu';
 
 function ViewAngleDegY: Single;
 begin
@@ -286,6 +288,14 @@ procedure Draw2D(Draw2DData: Integer);
     Font_BFNT_BitstreamVeraSans.Print(SDeadMessage);
   end;
 
+  procedure DoShowGameWinInfo;
+  begin
+    glColorv(Vector3Single(0.8, 0.8, 0.8));
+    glRasterPos2i(0, RequiredScreenHeight -
+      Font_BFNT_BitstreamVeraSans.RowHeight * 3 - 15 { margin });
+    Font_BFNT_BitstreamVeraSans.Print(SGameWinMessage);
+  end;
+
 begin
   Player.RenderWeapon2D;
 
@@ -301,6 +311,9 @@ begin
 
   if Player.Dead then
     DoShowDeadInfo;
+
+  if GameWin then
+    DoShowGameWinInfo;
 
   Player.Render2D;
 end;
@@ -501,8 +514,49 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 var
-  PickItemIndex, PlayerItemIndex: Integer;
   CompSpeed: Single;
+
+  procedure ModifyPlayerEndSequence(
+    const TargetPosition: TVector3Single;
+    const TargetDirection: TVector3Single);
+  const
+    PositionChangeSpeed = 0.05;
+    DirectionChangeSpeed = 0.01;
+  var
+    ToPosition: TVector3Single;
+    ToDirection: TVector3Single;
+    ToPositionLength: Single;
+    ToDirectionLength: Single;
+  begin
+    ToPosition := VectorSubtract(TargetPosition, Player.Navigator.CameraPos);
+    ToDirection := VectorSubtract(TargetDirection, Player.Navigator.CameraDir);
+
+    ToPositionLength := VectorLen(ToPosition);
+    ToDirectionLength := VectorLen(ToDirection);
+
+    if IsZero(ToPositionLength) and IsZero(ToDirectionLength) then
+      TCagesLevel(Level).DoEndSequence := true else
+    begin
+      if ToPositionLength < CompSpeed * PositionChangeSpeed then
+        Player.Navigator.CameraPos := TargetPosition else
+        Player.Navigator.CameraPos := VectorAdd(
+          Player.Navigator.CameraPos,
+          VectorAdjustToLength(ToPosition, CompSpeed * PositionChangeSpeed));
+
+      if ToDirectionLength < CompSpeed * DirectionChangeSpeed then
+        Player.Navigator.CameraDir := TargetDirection else
+        Player.Navigator.CameraDir := VectorAdd(
+          Player.Navigator.CameraDir,
+          VectorAdjustToLength(ToDirection, CompSpeed * DirectionChangeSpeed));
+    end;
+  end;
+
+const
+  GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
+  GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
+  GameWinDirection: TVector3Single = (0, 1, 0);
+var
+  PickItemIndex, PlayerItemIndex: Integer;
 begin
   CompSpeed := Glw.IdleCompSpeed;
 
@@ -510,10 +564,12 @@ begin
 
   Level.Idle(CompSpeed);
   Level.Items.Idle(CompSpeed);
-  Level.Creatures.Idle(CompSpeed);
+
+  if not GameWin then
+    Level.Creatures.Idle(CompSpeed);
   Level.Creatures.RemoveFromLevel;
 
-  if not Player.Dead then
+  if (not Player.Dead) and (not GameWin) then
   begin
     PickItemIndex := Level.Items.PlayerCollision;
     if PickItemIndex <> -1 then
@@ -548,6 +604,13 @@ begin
     Level := LevelFinishedNextLevel;
     InitNewLevel;
   end;
+
+  if GameWin and (Level is TCagesLevel) then
+  begin
+    if TCagesLevel(Level).DoEndSequence then
+      ModifyPlayerEndSequence(GameWinPosition2, GameWinDirection) else
+      ModifyPlayerEndSequence(GameWinPosition1, GameWinDirection);
+  end;
 end;
 
 procedure Timer(Glwin: TGLWindow);
@@ -561,14 +624,15 @@ end;
 
 procedure GameCancel(RequireConfirmation: boolean);
 begin
-  if Player.Dead or
-    (not RequireConfirmation) or
+  if Player.Dead or GameWin or (not RequireConfirmation) or
     MessageYesNo(Glw, 'Are you sure you want to end the game ?', taLeft) then
     GameEnded := true;
 end;
 
 procedure DoAttack;
 begin
+  if GameWin then
+    TimeMessage(SGameWinMessage) else
   if not Player.Dead then
     Player.Attack else
     TimeMessage(SDeadMessage);
@@ -685,6 +749,12 @@ procedure DoInteract;
   end;
 
 begin
+  if GameWin then
+  begin
+    TimeMessage(SGameWinMessage);
+    Exit;
+  end;
+
   if Player.Dead then
   begin
     TimeMessage(SDeadMessage);
@@ -786,6 +856,12 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
     DropppedItem: TItem;
     DropPosition: TVector3Single;
   begin
+    if GameWin then
+    begin
+      TimeMessage(SGameWinMessage);
+      Exit;
+    end;
+
     if Player.Dead then
     begin
       TimeMessage(SDeadMessage);
@@ -814,6 +890,12 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
     UsedItem: TItem;
     UsedItemIndex: Integer;
   begin
+    if GameWin then
+    begin
+      TimeMessage(SGameWinMessage);
+      Exit;
+    end;
+
     if Player.Dead then
     begin
       TimeMessage(SDeadMessage);
@@ -842,15 +924,25 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
   procedure CancelFlying;
   begin
+    if GameWin then
+      TimeMessage(SGameWinMessage) else
     if not Player.Dead then
       Player.CancelFlying else
       TimeMessage(SDeadMessage);
   end;
 
-  procedure MaybeDeadMessage;
+  procedure MaybeDeadWinMessage;
   begin
+    if GameWin then
+      TimeMessage(SGameWinMessage) else
     if Player.Dead then
       TimeMessage(SDeadMessage);
+  end;
+
+  procedure MaybeWinMessage;
+  begin
+    if GameWin then
+      TimeMessage(SGameWinMessage);
   end;
 
   procedure DoGameMenu;
@@ -867,15 +959,16 @@ begin
      CastleKey_Forward.IsValue(Key) or
      CastleKey_Backward.IsValue(Key) or
      CastleKey_LeftStrafe.IsValue(Key) or
-     CastleKey_RightStrafe.IsValue(Key) { or
-       Rotation keys work even when player is dead.
-       See comments in TPlayer.UpdateNavigator.
+     CastleKey_RightStrafe.IsValue(Key) then
+    MaybeDeadWinMessage else
+  if { Note that rotation keys work even when player is dead.
+       See comments in TPlayer.UpdateNavigator. }
      CastleKey_LeftRot.IsValue(Key) or
      CastleKey_RightRot.IsValue(Key) or
      CastleKey_UpRotate.IsValue(Key) or
      CastleKey_DownRotate.IsValue(Key) or
-     CastleKey_HomeUp.IsValue(Key) } then
-    MaybeDeadMessage else
+     CastleKey_HomeUp.IsValue(Key) then
+    MaybeWinMessage else
 
   { Items keys. }
   if CastleKey_InventoryShow.IsValue(Key) then
@@ -1076,8 +1169,7 @@ begin
   begin
     TimeMessage('Congratulations, game finished');
     GameWin := true;
-    if Level is TCagesLevel then
-      TCagesLevel(Level).DoEndSequence := true;
+    MusicPlayer.PlayedSound := stGameWinMusic;
   end else
   begin
     if LevelFinishedSchedule and (LevelFinishedNextLevel <> NextLevel) then
