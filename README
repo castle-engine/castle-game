@@ -686,6 +686,16 @@ Code:
   See [http://www.freepascal.org/]
 
 Graphics:
+- All models in data/levels/gate_parts/ and items "bow", "quiver" and "arrow",
+  and missile "ball_missile_s" are made by
+    Szymon Stoma & Ka¶ka Zaremba.
+  Consider them GPL, or contact Szymon & Ka¶ka ([http://stoma.bestweb.pl/])
+  for other licensing. Thanks!
+
+- ... with the exception of the data/levels/gate_parts/cart
+  that was found among the first 10 google results for "free 3d models".
+  Terms are some open license (like artistic or gpl).
+
 - tree.blend based on tree02.3DS from Micha³ Wojtkiewicz. Thanks!
 
 - Werewolf and Alien creatures' models based on free models from

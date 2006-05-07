@@ -1,5 +1,35 @@
 ----------------------------------------
+Remaining from S&K:
+
+* potworki -- jak wyzej. moim zdaniem takie parametry pozwalaja sie pobawic.
+
+TODO:
+
+     * teleporty: Teleport_1 powinien dzialac jak teleport, byc moze powinien byc traktowany jak
+	 przedmiot i zwyczajnie sie krecic i prowadzic do Teleport_2; w druga strone tez moze dzialac..
+	 * klucz: Key_0 powinien byc przedmiotem. Do otworzenia drzwi prowadzacych do nastepnego levelu
+		powinny byc wymagane dwie rzeczy: klucz i miecz: jezeli ich niemasz:
+			"You need a key to open this door.."
+			"Better find a wepon You can use to protect Yourself in the castle.."
+	 * duchy: w okolicy klucza powinny pojawiac sie tylko gdy wskoczy sie na grob(moze byc rowniez puszczony dzwiek
+		potepienczego wycia - jak smierc ducha). w innym przypadku szczesliwy gracz
+	   moze je sobie darowac. jesli dobrze pamietam jest ich 6.
+	 * w okolicy miecza pojawiaja sie gdy gracz wskoczy do grobu (3 sztuki).
+
+----------------------------------------
 Things which must be done for PGD deadline:
+
+- use Szymon's red light with maxed intensity to shine on the top of the sword.
+- gate:
+  - one tree is inside murek, move it
+  - top of columns and "wieza" have wrong UV coords, fix
+  - what's the purpose of "dziura" ? Texture / materials needed, or remove
+  - grave lacks textures; is this a good idea ?
+
+- add Szymon+Ka¶ka to Credits!
+
+- use data/creatures/ball_missile/ball_missile_s
+  instead of ball_missile --- Transparency: all or none must be fixed.
 
 - maybe load/free creatures animations for specific levels ?
   This would make memory requirements lower, but loading
@@ -86,6 +116,8 @@ Things for which I will hopefully find time before PGD deadline:
   the more power has the arrow (more velocity), but also the trembling
   of your crosshair (and it's circle) is larger, so your accuracy
   is lower.
+
+  Use arrow, bow, quiver from S&K.
 
 - some effects: blood explode when player hits monster.
 

@@ -208,6 +208,13 @@ on MESH-NAME to be correctly interpreted."
 	Material {
           fogImmune TRUE")
   (kam-fix-vertex-col-material "MeshGate")
+
+  ;; I don't know why blender refuses to write here relative paths...
+  ;; Yes, I checked "relative paths" button when loading.
+  (kam-simple-replace-buffer
+    "/win/mojepasy/openGL/castle/trunk/data/textures/"
+    "../textures/")
+
   (write-file "gate_processed.wrl")
 )
 
