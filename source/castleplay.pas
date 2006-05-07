@@ -1063,7 +1063,7 @@ procedure LevelFinished(NextLevel: TLevel);
 begin
   if NextLevel = nil then
   begin
-    MessageOK(Glw, 'Level finished', taLeft);
+    MessageOK(Glw, 'Congratulations, game finished', taLeft);
     GameEnded := true;
   end else
   begin

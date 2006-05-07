@@ -451,6 +451,11 @@ type
   private
     FSpidersAppearing: TDynVector3SingleArray;
     NextSpidersAppearingTime: Single;
+
+    FHintOpenDoorBox: TBox3d;
+    HintOpenDoorBoxShown: boolean;
+  protected
+    procedure ChangeLevelScene; override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -466,6 +471,9 @@ type
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
     procedure Render(const Frustum: TFrustum); override;
+
+    function TrianglePicked(const Distance: Single;
+      const Item: TOctreeItem): boolean; override;
   end;
 
   TLevelAvailable = class
@@ -1652,12 +1660,22 @@ begin
 
   FSpidersAppearing := TDynVector3SingleArray.Create;
   NextSpidersAppearingTime := 0;
+
+  HintOpenDoorBoxShown := false;
 end;
 
 destructor TCagesLevel.Destroy;
 begin
   FreeAndNil(FSpidersAppearing);
   inherited;
+end;
+
+procedure TCagesLevel.ChangeLevelScene;
+begin
+  inherited;
+
+  if not RemoveBoxNode(FHintOpenDoorBox, 'HintOpenDoorBox') then
+    raise EInternalError.Create('Level doesn''t contain "HintOpenDoorBox"');
 end;
 
 class function TCagesLevel.SceneFileName: string;
@@ -1787,6 +1805,13 @@ begin
       Inc(I);
     end;
   end;
+
+  if (not HintOpenDoorBoxShown) and
+    Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then
+  begin
+    HintOpenDoorBoxShown := true;
+    TimeMessage('Hint: open this door by clicking on it with right mouse button');
+  end;
 end;
 
 procedure TCagesLevel.PrepareNewPlayer(NewPlayer: TPlayer);
@@ -1827,6 +1852,23 @@ begin
   end;
 
   inherited;
+end;
+
+function TCagesLevel.TrianglePicked(const Distance: Single;
+  const Item: TOctreeItem): boolean;
+begin
+  Result := inherited;
+
+  if not Result then
+  begin
+    if Item.ShapeNode.TryFindParentNodeByName('MeshExitGate') <> nil then
+    begin
+      Result := true;
+      if Player.Items.FindKind(RedKeyItemKind) <> -1 then
+        LevelFinished(nil) else
+        TimeMessage('You need an appropriate key to open this door');
+    end;
+  end;
 end;
 
 { TLevelsAvailableList ------------------------------------------------------- }

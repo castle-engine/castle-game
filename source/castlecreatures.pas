@@ -968,6 +968,7 @@ type
     procedure ActualThrowWebAttack;
   protected
     procedure SetState(Value: TWalkAttackCreatureState); override;
+    procedure SetLife(const Value: Single); override;
   public
     procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single); override;
@@ -1031,7 +1032,7 @@ implementation
 uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
-  CastleTimeMessages;
+  CastleTimeMessages, CastleItems;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -3049,6 +3050,20 @@ begin
 
     Missile.Sound3d(stThrownWebFired, 0.0);
   end;
+end;
+
+procedure TSpiderQueenCreature.SetLife(const Value: Single);
+var
+  ItemPosition: TVector3Single;
+begin
+  if (Life > 0) and (Value <= 0) and (Level is TCagesLevel) then
+  begin
+    ItemPosition := Player.Navigator.CameraPos;
+    Level.Items.Add(TItemOnLevel.Create(TItem.Create(RedKeyItemKind, 1),
+      ItemPosition));
+  end;
+
+  inherited;
 end;
 
 { TGhostCreature ---------------------------------------------------------- }

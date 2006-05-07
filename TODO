@@ -4,8 +4,9 @@ Things which must be done for PGD deadline:
 - gate:
   - need an actual door inside GateExitBox to make the message valid.
   - what's the purpose of "dziura" ? Texture / materials needed, or remove
-  - grave lacks textures
-  - is this a good idea to just force player to restart if he jumped into the grave ?
+  - dodaæ spidera do levelu gate ?
+
+- improve "game finished" message
 
 - add Szymon+Ka¶ka to Credits!
 
@@ -13,10 +14,6 @@ Things which must be done for PGD deadline:
 
 - Sounds: at least sounds related to SpiderQueen and ThrownWeb fill
   At least copy sounds from Spider to SpiderQueen.
-
-Cages level:
-- when queen dies, drops a key
-  key opens door -> game win sequence
 
 - kangury debian: hangs on Quit.
 
@@ -32,6 +29,8 @@ Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that 
 
 ----------------------------------------
 Things for which I will hopefully find time before PGD deadline:
+
+- better re key position, to allow player actually pick it up
 
 - Test Radeon problems reported on PGD.
 
@@ -117,6 +116,10 @@ cages level:
 
 ----------------------------------------
 Things for which probably will be no time before PGD deadline:
+
+- gate:
+  - grave lacks textures
+  - is this a good idea to just force player to restart if he jumped into the grave ? I think yes, but later maybe some alt way should be possible ?
 
 - RemoveBoxNodeCheck
 
