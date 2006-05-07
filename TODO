@@ -1,11 +1,8 @@
 ----------------------------------------
 Things which must be done for PGD deadline:
 
-- check Ghost.move_speed="0.5"
-
-- need an actual door inside GateExitBox to make the message valid.
-
 - gate:
+  - need an actual door inside GateExitBox to make the message valid.
   - what's the purpose of "dziura" ? Texture / materials needed, or remove
   - grave lacks textures
   - is this a good idea to just force player to restart if he jumped into the grave ?

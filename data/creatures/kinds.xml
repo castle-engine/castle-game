@@ -61,6 +61,7 @@
   </BallMissile>
 
   <Ghost
+    move_speed="0.5"
     flying="True"
     max_attack_distance="2.0"
     preferred_attack_distance="2.0"
