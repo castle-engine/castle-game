@@ -1,0 +1,148 @@
+{
+  Copyright 2006 Michalis Kamburelis.
+
+  This file is part of "castle".
+
+  "castle" is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  "castle" is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with "castle"; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+}
+
+{ Variables and utilities for things in "Video options" menu. }
+unit CastleVideoOptions;
+
+interface
+
+uses OpenGLh;
+
+type
+  { Approximately from worst to best. }
+  TTextureMinificationQuality =
+  ( tqNearest, tqLinear,
+    tqNearestMipmapNearest, tqNearestMipmapLinear,
+    tqLinearMipmapNearest, tqLinearMipmapLinear );
+
+const
+  TextureMinificationQualityToStr:
+    array[TTextureMinificationQuality] of string =
+  ( 'NEAREST', 'LINEAR',
+    'NEAREST_MIPMAP_NEAREST', 'NEAREST_MIPMAP_LINEAR',
+    'LINEAR_MIPMAP_NEAREST', 'LINEAR_MIPMAP_LINEAR' );
+
+  TextureMinificationQualityToGL:
+    array[TTextureMinificationQuality] of TGLint =
+  ( GL_NEAREST, GL_LINEAR,
+    GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR,
+    GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR );
+
+  { Default value for TextureMinificationQuality.
+
+    This is the slowest one, but it looks perfect.
+    In fact, it's not so very slow on my system, so I think that
+    this can be the default. }
+  DefaultTextureMinificationQuality = tqLinearMipmapLinear;
+
+var
+  TextureMinificationQuality: TTextureMinificationQuality;
+
+const
+  DefaultAllowScreenChange = true;
+
+var
+  AllowScreenChange: boolean;
+
+const
+  DefaultCreatureAnimationScenesPerTime = 30;
+  MinCreatureAnimationScenesPerTime = 5;
+  MaxCreatureAnimationScenesPerTime = 40;
+
+var
+  CreatureAnimationScenesPerTime: Cardinal;
+
+var
+  { You can set this to true for testing purposes. }
+  RenderBoundingBoxes: boolean = false;
+
+const
+  DefaultRenderShadows = false;
+
+var
+  { If false then you should do *nothing* related to the shadows,
+    i.e. you even shouldn't request stencil buffer for our window
+    or do in PrepareRender appropriate preparations for shadows.
+
+    In other words, RenderShadowsPossible = @false means that
+    for the whole lifetime of this program RenderShadows will
+    be treated like @false. }
+  RenderShadowsPossible: boolean = true;
+
+  { Should we actually render shadows ?
+    This is meaningfull only if RenderShadowsPossible. }
+  RenderShadows: boolean;
+
+  { You can set this to true for debug purposes.
+    This is meaningull only if RenderShadowsPossible and RenderShadows. }
+  RenderShadowQuads: boolean = false;
+
+const
+  DefaultColorDepthBits = 0;
+var
+  { 0 means "use system default" }
+  ColorDepthBits: Cardinal;
+
+const
+  DefaultVideoFrequency = 0 ;
+var
+  { 0 means "use system default" }
+  VideoFrequency: Cardinal;
+
+implementation
+
+uses CastleConfig;
+
+initialization
+  TextureMinificationQuality := TTextureMinificationQuality(
+    ConfigFile.GetValue(
+    'video_options/texture_minification_quality',
+    Ord(DefaultTextureMinificationQuality)));
+  AllowScreenChange := ConfigFile.GetValue(
+    'video_options/allow_screen_change', DefaultAllowScreenChange);
+  CreatureAnimationScenesPerTime := ConfigFile.GetValue(
+    'video_options/creature_animation_smoothness',
+    DefaultCreatureAnimationScenesPerTime);
+  RenderShadows := ConfigFile.GetValue(
+    'video_options/shadows', DefaultRenderShadows);
+  ColorDepthBits := ConfigFile.GetValue(
+    'video_options/color_depth_bits', DefaultColorDepthBits);
+  VideoFrequency := ConfigFile.GetValue(
+    'video_options/frequency', DefaultVideoFrequency);
+finalization
+  ConfigFile.SetDeleteValue(
+    'video_options/texture_minification_quality',
+    Ord(TextureMinificationQuality), Ord(DefaultTextureMinificationQuality));
+  ConfigFile.SetDeleteValue(
+    'video_options/allow_screen_change',
+    AllowScreenChange, DefaultAllowScreenChange);
+  ConfigFile.SetDeleteValue(
+    'video_options/creature_animation_smoothness',
+    CreatureAnimationScenesPerTime, DefaultCreatureAnimationScenesPerTime);
+  ConfigFile.SetDeleteValue(
+    'video_options/shadows',
+    RenderShadows, DefaultRenderShadows);
+  ConfigFile.SetDeleteValue(
+    'video_options/color_depth_bits',
+    ColorDepthBits, DefaultColorDepthBits);
+  ConfigFile.SetDeleteValue(
+    'video_options/frequency',
+    VideoFrequency, DefaultVideoFrequency);
+end.

@@ -1,0 +1,112 @@
+<BlenderWorld version="0.1.0">
+<Mapping>3</Mapping>
+<Dimensions USize="8" VSize="128" Radius="10.0"
+            ThMin="-10.0" ThMax="10.0" PhMin="-20.0" PhMax="20.0">
+</Dimensions>
+<Noise Type="0" XOffset="0.0" YOffset="0.0" ZOffset="0.0"
+       NoiseInputScale="1.0" AltitudeScale="0.600053787231"
+       Function="0" Metric="0" H="1.0"
+       Lacunarity="2.0" Octaves="2.0" Offset="1.0"
+       Gain="1.0" Hard="0" Amplitude="0.5" Frequency="2.0" Exp="2.5">
+</Noise>
+<Invert>
+0
+</Invert>
+<Exp a="1.0" b="1.0" c="1.0">
+0
+</Exp>
+<Poly a="1.0" b="1.0"
+      c="0.0" d="0.0">
+0
+</Poly>
+<HStep Px0="0.0" Py0="0.0"
+       Pw="1.0" Ps="0.0"
+       Pmm1="1.0" Pmp1="1.0">
+0
+</HStep>
+<VStep Px0="0.0" Py0="0.0"
+       Pw="1.0" Ps="0.0"
+       Pmm1="1.0" Pmp1="1.0">
+0
+</VStep>
+<Craters Seed="0"
+         Radius="1.0" RadiusV="1.0"
+         Height="1.0" HeightV="1.0"
+         Depth="1.0" DepthV="1.0"
+         Steep="1.0" SteepV="1.0">
+0
+</Craters>
+<Peaks Seed="0"
+       Radius="1.0" RadiusV="1.0"
+       Height="1.0" HeightV="1.0"
+       TopSteep="0.0" TopSteepV="0.0"
+       FootSteep="0.0" FootSteepV="0.0">
+0
+</Peaks>
+<SubLayer
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0">
+0
+</SubLayer>
+<SubLayer
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0">
+1
+</SubLayer>
+<SubLayer
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0">
+2
+</SubLayer>
+<SubLayer
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0">
+3
+</SubLayer>
+<SubLayer
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0">
+4
+</SubLayer>
+<SubLayer
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0">
+5
+</SubLayer>
+<VertexCloud
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0"
+       Density="4.0">
+0
+</VertexCloud>
+<VertexCloud
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0"
+       Density="4.0">
+1
+</VertexCloud>
+<VertexCloud
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0"
+       Density="4.0">
+2
+</VertexCloud>
+<VertexCloud
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0"
+       Density="4.0">
+3
+</VertexCloud>
+<VertexCloud
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0"
+       Density="4.0">
+4
+</VertexCloud>
+<VertexCloud
+       Zmin="-1.0" Zmax="1.0"
+       Smin="0.0" Smax="100.0"
+       Density="4.0">
+5
+</VertexCloud>
+</BlenderWorld>

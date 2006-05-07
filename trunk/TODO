@@ -1,0 +1,411 @@
+----------------------------------------
+Remaining from S&K:
+
+* teleporty: Teleport_1 powinien dzialac jak teleport, byc moze powinien byc traktowany jak
+  przedmiot i zwyczajnie sie krecic i prowadzic do Teleport_2; w druga strone tez moze dzialac..
+  * klucz: Key_0 powinien byc przedmiotem. Do otworzenia drzwi prowadzacych do nastepnego levelu
+         powinny byc wymagane dwie rzeczy: klucz i miecz: jezeli ich niemasz:
+                 "You need a key to open this door.."
+                 "Better find a wepon You can use to protect Yourself in the castle.."
+  * duchy: w okolicy klucza powinny pojawiac sie tylko gdy wskoczy sie na grob(moze byc rowniez puszczony dzwiek
+         potepienczego wycia - jak smierc ducha). w innym przypadku szczesliwy gracz
+    moze je sobie darowac. jesli dobrze pamietam jest ich 6.
+  * w okolicy miecza pojawiaja sie gdy gracz wskoczy do grobu (3 sztuki).
+
+After: check Ghost.move_speed="0.5"
+
+----------------------------------------
+Things which must be done for PGD deadline:
+
+- gate:
+  - what's the purpose of "dziura" ? Texture / materials needed, or remove
+  - grave lacks textures; is this a good idea ?
+
+- add Szymon+Ka¶ka to Credits!
+
+- PerfTimerInit remove
+
+- Sounds: at least sounds related to SpiderQueen and ThrownWeb fill
+  At least copy sounds from Spider to SpiderQueen.
+
+Cages level:
+- when queen dies, drops a key
+  key opens door -> game win sequence
+
+- kangury debian: hangs on Quit.
+
+- intro moving when the game starts (either movie from the game --- or just some
+  nice anim, moving camera around the level.)
+
+Stage 6:
+Goal #3 (2.5 Points) - Have a game splash screen showing your game's title.
+Goal #4 (2.5 Points) - Add an in-game list of credits listing all involved of it's development.
+Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the game.
+Goal #7 (2.5 Points) - Add an ending sequence of some kind.
+Goal #8 (2.5 Points) - Add and design The Big Boss at the end of your game that is tougher than the mini-bosses.
+
+----------------------------------------
+Things for which I will hopefully find time before PGD deadline:
+
+- Test Radeon problems reported on PGD.
+
+- life indicator of the boss --- this should be a good workaround for lack
+  of blood effects etc. for now.
+
+- use data/creatures/ball_missile/ball_missile_s
+  instead of ball_missile --- Transparency: all or none must be fixed.
+
+- maybe load/free creatures animations for specific levels ?
+  This would make memory requirements lower, but loading
+  time would suffer --- for each level "Loading creatures".
+
+- gate:
+  - use S&K red light with maxed intensity to shine on the top of the sword.
+  - one tree is inside murek, move it
+  - top of columns and "wieza" have wrong UV coords, fix
+
+- better spider_queen model. Inspiration ?
+  http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen02.jpg
+  http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen01.jpg
+  http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen03.jpg
+
+- spider_appears.wav sound do
+
+- spider: try to climb by doing additional MoveAlowed with higher destination
+  position. They can't climb on logs now (but maybe it's a good thing ?)
+
+  same for spider_queen --- it can't climb back to MeshTunnel.
+
+- spider queen:
+  lay eggs, produce normal spiders.
+
+- alien:
+  more aliens on castle_hall ?
+  texture the alien finally ?
+
+- test game messages in the middle of the screen ?
+
+- second weapon, crossbow/bow, that requires another item in your inventory
+  (bolts/arrows)
+
+  When you hold attack key, arrow/bolt appears on your bow/crossbow
+  and you're holding the bow. There is also a crosshair (circle target area)
+  that "trembles", because your hands are trembling.
+
+  You shoot when you release Ctrl key. The longer you held Ctrl,
+  the more power has the arrow (more velocity), but also the trembling
+  of your crosshair (and it's circle) is larger, so your accuracy
+  is lower.
+
+  Use arrow, bow, quiver from S&K.
+
+- some effects: blood explode when player hits monster.
+
+- debug menu is only for testing -- hide somehow at some point.
+
+- different footsteps sound on different ground
+
+cages level:
+- windows: don't look like windows
+- player can fly through windows --- not good.
+- stairs beginning cages and ending castle_hall: endings should be more black, current vertex colouring is not black enough
+
+- mouse sensitivity problems:
+  function StrToFloatDef(const s: string; DefValue: Extended): Extended;
+
+  Was there a bug about this in FPC ? I don't remember, but I have this
+  in my KambiStringUtils.
+  No, the bug that I remembered was for Hex2Dec.
+
+  maybe it was the problem with wrong overloads choosing ?
+  Compile in objfpc mode for test.
+
+  Possibly fixed by rename GetValue -> GetFloat (that was needed anyway
+  for code cleanliness)
+
+  Maybe add a sanity check for mouseSensit values to MatrixWalker
+  --- if outside range, use default ? Just in case it's some real bug
+  in FPC etc.
+
+- Update WWW to point to both -with-sources and without versions.
+
+----------------------------------------
+Things for which probably will be no time before PGD deadline:
+
+- cages level:
+  - on the other side of the wall, also a door, but blocked by rocks
+  - from queen lair, passage to this 2nd hidden room --- some treasures there
+  - make real doors that you must click to open them
+
+- "Color depth" and "Display Frequency" are ignored on non-Win32 targets.
+  (Seems that judges and most people test on Windows, so no time (it's already 4th May)
+  to do this for Unix (xvf86mode) now. "Display Frequency" should be definitely
+  possible using xvf86mode, "Color depth" --- I'm not sure. Possibly
+  color depth is not switchable without restarting XWindows ?
+  Look at xvidtune.
+  Look at gnome program to change screen resolutions.)
+
+- thunder:
+  - 3d sound ?
+  - if the light would only shine through the window's shapes it would be even better.
+
+Cages level:
+- this natural rock thing better ?
+- torch model base : use nice mesh from the base on lantern3.3ds from 3dcafe.com ?
+
+- headlight on cages level ? By torch item ?
+  No ? Spot headlight looks poor (must over-triangulate meshes),
+  and it doesn't resemble a torch anyway. Positional light with attenuation
+  also doesn't look too special.
+
+- Things that I would like to show in new levels:
+  - swimming feels great --- show it off more ?
+  - lights: Spot light. Moving light.
+  - Some moving objects on the level: this is easy to do in my levels. Use it more !
+  - more environ sounds: wind blowing.
+
+- "Set keys to "Half life 2" scheme" menu command ?
+
+- chooseNewLevel menu: display thumbnails of levels
+
+- when player walks, his weapon should slowly move
+
+- mouse smoothing for mouse look ?
+  Seems not needed, at least with my mouse ?
+  Players with poor mouses can always just use keys ?
+
+- fix GTK backend to resize screen (surprisingly, it seems that I should
+  just use XFV86VidMode from Xlib ? GTK does not wrap this ?)
+  and then compile release versions of "The Castle" with GTK backend,
+  avoiding override_redirect.
+
+- Mama reports:
+  Po uruchomieniu castle.exe mam taki komunikat:
+    Error
+    castle: Exception EAccessViolation:
+    Access violation
+  pod windows'98
+
+- creature's footsteps sound ?
+
+- sound when creature sees player for the 1st time
+
+- music volume is affected by sound volume now. That's because listener gain affects everything...
+
+- Add names of guys that did the loops, maybe send them mails ? Some of the loops are plainly great!
+
+- choosing Min/MaxALAllocatedSounds from menu.
+
+- why with wide angle the corner geometry is sometimes clipped ?
+
+- Creatures<->level collision checking should be done using
+  creature's bounding box, not CameraRadius.
+  Creature's CameraRadius is a hack, and should be preferably removed.
+  Same thing for items<->level.
+
+- "Restore defaults" in Sound options.
+
+- Eric stage 4 comment:
+  - you can also get "stuck" when colliding against a wall, instead of sliding.
+
+- Enemies:
+  - More enemies attacks.
+  - Nice 3d effects (lighting-like things, explosions etc.).
+  - Models of the two current creatures need to be improved.
+    Model of "alien" creature will probably be just removed and replaced
+    by something else.
+  - Just add more creatures.
+    creature hydra (very tall, very long when killed; will be a nice demo of my good collision checking routines)
+    creature that attacks by snapping it hand (tentacle ?) far out
+
+- "The Gate" level:
+  - intro under menu: camera floating around level with this fog ?
+
+- There must be a way to say that some sectors are not important
+  for AI for creatures with Flying. (like ghost)
+
+- sectors and waypoints finish, see README for TO-DOs.
+
+- Improve collisions player<->creatures and player<->items to
+  check not only final collisions, but also segment collisions when moving ?
+  Otherwise when moving fast (or low FPS count, so FpsCompSpeed large),
+  this collision check can fail to work.
+
+  This doesn't seem to be a problem in practice, in practice moving speed is
+  not so large (unless running on some ancient GPU with 1 frame per second,
+  but there the game is not playable anyway...).
+
+- do weather (I have snow and rain from my szklane_lasy, but they look poor...)
+
+- weapon-less attack (does knockback + small damage)
+
+- non-moving creature (just shooting etc.)
+
+- avoiding falling down sometimes doesn't work like it should.
+  I think that I know why: I check where the creature will be after
+  2 secs, but what if there is a pit between 2 secs and current pos ?
+  Fix by checking everything *along the 2 secs way*.
+
+- ball_missile looks rather funny, too colorful.
+  It must look like something fiery, or lighting, or just anything
+  that seems at least a little dangerous :)
+
+- various kinds of swinging the sword, with various animations.
+  Also they can yield various damage and various hit chances.
+
+- Smooth between various creature states.
+  I.e. expand the idea of StandToWalkAnimation, for every combination
+  and make it automatic.
+  Problem: long load times ("Loading creatures...") and memory consumption.
+
+- creatures can climb high (almost-vertical) walls.
+  Actually, player can climb almost-vertical walls too !
+
+  This is not so very noticeable now, because there are no high walls
+  now, and creatures' AI doesn't let them fall into deep pits now.
+
+  As a workaround, basic_castle's moat has now edges that are wider down,
+  so player and creatures are never able to climb up from the moat...
+  But that's still just a workaround.
+
+- I really don't like the "alien" model. It's generally nice,
+  but it doesn't fit this game, and I just can't texture it appropriately.
+  The basic model was just taken from www.3dcafe.com when I realized that
+  I don't have time to make some really nice creature model before
+  stage 4 deadline.
+
+  So this creature model is scheduled to be removed and replaced by something
+  better after stage 4 deadline.
+
+- in game, in config controls, escape should go back to game.
+
+- put some vertical crates around GlassPrison on basic_castle
+
+- shadows under the creatures:
+  - need to be optimized to enabled by default.
+    Then set DefaultRenderShadows to true, and remove the warning in
+    CastleStartMenu when changing RenderShadows.
+
+  GDC2003_ShadowVolumes.pdf has many interesting ideas.
+  Idea to eliminate occluders based on Frustum+LightPos seems suitable for me
+  and relatively easy, implement ?
+
+  Implement and use (when you have to) ZFail,
+  test like descr in GDC2003_ShadowVolumes.pdf.
+
+  Add creature option CastsShadow (def true) to turn shadows off
+  for some creatures. For ball missile turn them off.
+
+  LightCastingShadowsPosition should be cofigurable.
+  Can be inited from LightSet.Lights[0].TransfLocation
+  (but this doesn't give so much results usually...)
+
+- "shrink" spell (that was *coool* in DUKE 3D !)
+  "freeze" (it's from DUKE 3D also)
+  "fry"
+  "throw back" (throws all enemies slightly backward --- this is also useful
+     for player to actually see that monsters get hurt when falling from high)
+
+- Maybe it's sometimes a good idea to not create separate display
+  list for each animation frame. Instead, it two scenes share the same RootNode
+  and differ e.g. only in CurrentMatrix states, then I can use
+  one display list and do glPushMatrix,MultMatrix,render,PopMatrix.
+
+  This could save some loading time for e.g. ball_missile anim
+  (but not for alien animations, as they change geometry).
+
+  This is also required to convert Symbol and Button on "Castle Hall"
+  to use TVRMLGLAnimation class (additional simplification will be that
+  only one Symbol model will be needed, not 4 (like now)).
+
+- inventory should be able to scroll, when more than MaxInventorySlots items
+  are available.
+
+- change the name --- there already exists game named "castle"!
+  And there is "Castle Adventure" !
+
+  "Castle in the rock"
+  "High castle"
+  "Castle above the mist" ?
+
+- idea from quake: water surface slowly moving (change/move the texture?
+  some deformation of the texture ? I'm not sure how to do this trick,
+  but it looks very nice!)
+
+- Some buttons visible at lower part of the screen to access some
+  things with mouse and to show (as hints) their key shortcuts ?
+  ("i" - inventory on/off, "m" - messages).
+
+- mail to author of
+  http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
+  : permission to use stars.jpg in my game ?
+
+- apply nice "strips" texture to handle of the sword,
+  see http://mediawiki.blender.org/index.php/Manual/PartII/Basic_Mesh_Modelling
+
+- some alpha rect around the item's model ?
+  test, although it seems that rotating is enough.
+
+- Not bad creature models from www.3dcafe.com:
+
+  horror/abom
+  anatomy_people/creature
+  anatomy_people/vampire
+
+  /win/3dmodels/www.katorlegaz.com/animals/horse
+
+- Load / save game ability.
+
+  Place load in the start menu.
+  Place save in the game menu.
+  In the game menu, when asking before "End Game", do question
+  like "Do you want to save the game before ending ?"
+  with answers "Save and end the game", "Don't save and end the game", "Cancel".
+
+  When loading game, load saved TimeMessages for this game.
+
+----------------------------------------
+dist-making to-dos:
+
+- Makefile to pack distro of my game: add at some point svn log:
+  svn log -v file:///home/michal/svn/kambi-svn-repos/ \
+    castle/trunk kambi_pascal_units/trunk > ChangeLog
+
+----------------------------------------
+Each time before uploading release (to PGD and/or camelot):
+
+- make sure Version (in castlehelp.pas) is good
+- test data/ things easy to forget:
+  - All textures in VRML files must have relative filenames
+      find data/ -type f -iname '*.wrl' | xargs grep filename
+  - All sounds that are intended to be spatialized must be mono:
+      wavidentify data/sounds/*.wav | grep stereo
+- under Linux and Windows:
+  - build debug exe from this dir, test
+      make -C /win/mojepasy/units/ clean
+      open source/castle.dpr,
+      C-F9
+      ./castle
+  - build release exe from this dir, test
+      make -C /win/mojepasy/units/ clean
+      open source/castle.dpr,
+      C-F10
+      ./castle
+  - make dist
+  - extract created dist
+  - test running from extracted created dist
+      rm -f ~/.castle.data
+      ln -s /tmp/ggg/castle/ ~/.castle.data
+      ./castle
+      rm -f ~/.castle.data
+      ln -s /win/mojepasy/openGL/castle/trunk/ ~/.castle.data
+  - test building from extracted created dist (using `make build-xxx')
+- upload to PGD
+- upload to camelot:
+  copy tar.gz to /win/mojewww/camelot/,
+  update /win/mojewww/camelot/castle.php CASTLE_VERSION constant
+- make svntag
+  check by
+    svn list file:///home/michal/svn/kambi-svn-repos/castle/tags/
+
+----------------------------------------

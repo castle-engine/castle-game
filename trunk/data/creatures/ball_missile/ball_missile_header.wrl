@@ -1,0 +1,10 @@
+#VRML V1.0 ascii
+
+Group {
+  ShapeHints {
+    creaseAngle 4 # > Pi
+  }
+  Scale {
+    scaleFactor 0.07 0.07 0.07
+  }
+}

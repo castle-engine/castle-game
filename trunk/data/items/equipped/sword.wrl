@@ -1,0 +1,13 @@
+#VRML V1.0 ascii
+
+Group {
+  PerspectiveCamera {
+    position -0.570138692855835 -0.783580601215363 3.139318227767944
+    orientation 0.948633849620819 0.254963964223862 -0.187315329909325 2.037299156188965
+  }
+  PointLight {
+    location -0.570138692855835 -0.783580601215363 3.139318227767944
+  }
+  WWWInline { name "../models/sword.wrl" }
+}
+

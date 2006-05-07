@@ -1,0 +1,10 @@
+#VRML V1.0 ascii
+
+Background {
+  backUrl "back.png"
+  bottomUrl "bottom.png"
+  frontUrl "front.png"
+  leftUrl "left.png"
+  rightUrl "right.png"
+  topUrl "top.png"
+}

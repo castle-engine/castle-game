@@ -1,0 +1,770 @@
+"The Castle"
+http://www.camelot.homedns.org/~michalis/castle.php
+
+--------------------
+PGD stage 6 short notes:
+
+For maximum safety please remove old configuration file (castle.conf)
+created by stage 5 entry before running this new version. (Everything should
+work smoothly with old config file, but just to be sure...)
+See [http://www.camelot.homedns.org/~michalis/castle.php#subsection_uninstall]
+for location of castle.conf file on your system.
+
+Goals notes:
+- Sound, music: done, yeah! Remember to install OpenAL. For best effect,
+  be sure to try all available devices in "Sound options" ---
+  the default device doesn't always sound the best.
+  This is true for both Linux and Windows.
+  E.g. a standard sound card (without real 3d surround support) on Windows
+  may sound better with "Generic Software" device.
+- 3 playable levels, 1 new kind of regular enemy per level: yes.
+
+--------------------
+Installing and running:
+
+Note that to hear sounds you should first install OpenAL
+(see [http://www.camelot.homedns.org/~michalis/openal_notes.php#section_install]).
+
+Installing the actual game:
+
+- For Linux:
+
+  Extract the archive, move the whole `castle' directory to
+  - /usr/local/share/castle/ (for system-wide install) or
+  - $HOME/.castle.data/ (for installation only for you)
+  To make it clear: you should get directories like
+  /usr/local/share/castle/data/ or ~/.castle.data/data/ then.
+
+  Run the executable "castle".
+
+- For Windows:
+
+  Extract the archive anywhere you want.
+
+  Run the executable "castle.exe".
+
+Some general notes about command-line options understood by all my
+programs are here:
+[http://www.camelot.homedns.org/~michalis/common_options.php].
+
+--------------------
+Requirements:
+
+In short: good graphics card, with good OpenGL drivers installed.
+In case of doubt, be sure to install newest drivers from your
+graphics card manufacturer.
+
+Also you should have at least 512 MB available memory.
+Right now (it's 6th May 2006) the running game can take up to 450 MB
+on GeForce. But this may depend on various factors, including your
+OpenGL implementation. If the game seems to drain your system
+of all the memory (which will most likely be observed as sudden slowdown
+in the middle of "Loading creatures" sequence, as this is the main
+memory-eater) you can
+- Try closing all other programs before running the game
+  (although a decent OS should send them to swap anyway...)
+- Lower the setting "Creature animation smoothness" in "Video options".
+
+--------------------
+Levels included:
+
+Currently there are 3 levels in the game (but 1 of them is only for testing,
+not for the final game).
+
+"Gate":
+  This is the level made for PGD stage 5.
+  When you start "New Game", you enter this level.
+
+  Walkthrough: to finish the level go up the stairs and
+  step inside the black corridor.
+
+"Castle hall" :
+  This is the level made for PGD stage 3.
+  After finishing "Gate" level, you're transferred to this level.
+
+  Walkthrough: find and click the red button. Kill the boss.
+  Level exit will be revealed.
+
+"Tower" :
+  This is only a testing level (i.e. it's not something supposed
+  to be played by real player; it's just a playground for me,
+  to test various things).
+  You have to use "Debug menu -> Change to level" option to get to this level.
+
+  Initially it was named "Sample castle level" and was a simple
+  level submitted for PGD stage 2.
+  This was actually combined from my old demo castle model,
+  and I added night sky with moon that was used in
+  my other toy-game (named "lets_take_a_walk").
+  Looked good as a demo, but it was not really intended to be used in this game,
+  I just added this for stage 2.
+  Before stage 4 deadline, I changed it a lot, but it's still
+  just a testing level.
+
+  There is no way to exit from this level. You just have to end the game,
+  kill yourself, or use "Debug menu" to switch to another level.
+  Like I said, this is only a testing level.
+
+If you want to see other models demonstrating my engine, see
+[http://www.camelot.homedns.org/~michalis/miscella/kambi_vrml_examples.zip]
+--- there are many testcases and demos of what can be expressed in VRML 1.0
+and what my engine can understand and render. See also
+[http://www.camelot.homedns.org/~michalis/view3dscene.php] ---
+view3dscene is my VRML 1.0 (and 3DS) viewer based on the same engine as
+this game.
+
+--------------------
+Sources:
+
+Compile with simple
+  make build-unix
+under Unixes (Linux, FreeBSD) or
+  make build-win32
+under Windows. Note that you must use GNU make. Note that the only
+FPC version that I really support is 2.0.2 (although 2.0.0 is probably
+also still OK). There is no Delphi support --- I live in open source world.
+
+I include in this archive all the sources needed to compile the game.
+I include also compiled binaries for Linux and Windows, for your comfort.
+Also everything needed to tweak with various parts of the game
+(e.g. GIMP *.xcf files, that are the "source" version of "png" images,
+and Blender's *.blend files that are the "source" version of some "*.wrl" files).
+
+Everything is open source, GNU GPL.
+
+Sources inside units/ subdirectory are not specific to this project.
+They are my general units, and together I like to call them
+"my 3d game engine" (although there are also many various units that
+don't do anything directly related to "3d game engine").
+These units are publicly available from my WWW page
+[http://www.camelot.homedns.org/~michalis/] ---
+see [http://www.camelot.homedns.org/~michalis/sources.php].
+Their documentation generated by pasdoc is also available, see
+[http://www.camelot.homedns.org/~michalis/sources_docs.php].
+
+Sources specific for this project, "The Castle", are not yet
+publicly available from my WWW pages. But they will be published
+there at some point (probably right before PGD competition final deadline).
+
+--------------------
+Window size:
+
+The game runs only in resolution 800x600.
+
+Reasoning: My practice shows that it's simply too difficult to really make
+a game that looks perfect on any resolution, because any 2D graphics
+is highly tied to resolution it was prepared for. Scaling 2D graphics,
+even using really good algorithms, never results in optimal look.
+My game is 3D, but still there are elements displayed in 2D,
+so this still matters.
+
+If your current screen resolution is 800x600, the game will
+happily run in fullscreen. Otherwise the game will try to resize
+your screen to 800x600 first (on exit, the screen size will
+be restored to previous size). If this resizing will fail
+(for whatever reason, e.g. you have poor graphics driver),
+it will run in window sized 800x600.
+
+You can pass command-line option --no-screen-change (short form: -n)
+to disable the automatic screen resizing. Then the game will
+run in fullscreen mode only if your current screen size is 800x600,
+otherwise it will run in window sized 800x600.
+You can also set this from the main menu:
+"Video options -> Allow screen settings change on startup".
+
+--------------------
+Miscellaneous command-line options:
+
+--no-shadows
+
+  This disallows rendering of shadows in the game.
+  Just like turning off "Video options -> Shadows" option, this will
+  speed up rendering, since shadows will not be rendered.
+  Moreover this command-line option will cause whole
+  game to require less resources (we don't require stencil buffer
+  from the OpenGL context) and loading creatures will be (very slightly)
+  faster.
+
+  It's adviced to use this option only if stencil buffer
+  of your graphic card requires too much resources.
+  Then setting "Video options -> Shadows" option will not help,
+  but this command-line option will help.
+  In other cases, just turning off menu option "Video options -> Shadows"
+  is a good way to speed up rendering.
+
+--------------------
+Sound:
+
+OpenAL is used to play sounds. Instructions about installing OpenAL
+and command-line options related to OpenAL are described here:
+[http://www.camelot.homedns.org/~michalis/openal_notes.php].
+
+If the game performance suffers when the sound is on,
+or sound quality suffers, or there is sound latency, then you should
+probably stop any other programs that play some music.
+
+--------------------
+Versioning:
+
+Version numbers are 0.y.z, where "y" is a stage of PGD competition.
+So "version 0.2.0" is what I submit at the end of stage 2 of competition.
+"z" is a release number (will be used in later stages when I will want
+to give this game to friends to actually test it before submitting to PGD).
+
+Later, when PGD competition will end and I will continue developing
+this game on my WWW page [http://www.camelot.homedns.org/~michalis/],
+I will switch to my normal versioning scheme
+[http://www.camelot.homedns.org/~michalis/versioning.php].
+
+--------------------
+Items in the game:
+
+You can pick items (just walk on them), browse your items (keys: i, [, ]),
+drop (key: d), equip and use (key: enter). When you have no weapon equipped,
+then new picked weapon will be automatically equipped.
+Unequipping happens automatically on drop.
+
+Items are "stackable", i.e. when you own two or more items
+of the same kind, they are displayed like one item with quantity N.
+Picking and dropping handle this appropriately (when dropping you
+can drop only part of owned items).
+
+You can point with your mouse at item lying on the level,
+this tells you the name and quantity of visible object.
+(of course, if object is too far, you will not be able to tell it exactly).
+
+As I'm writing this (2006-03-07), there are 3 items: the sword,
+the potion of life and the scroll of flying. More items will
+be added if only time will allow..
+
+See below in this file for description how you can design new
+items for this game.
+
+--------------------
+Creating levels, 3d objects for my games:
+
+The short 1-sentence instruction is:
+Use any 3d modelling program able to create VRML 1.0 files.
+
+VRML 1.0 format has an official specification and my engine is capable
+of handling any VRML 1.0 valid files (actually, even more than that ---
+see [http://www.camelot.homedns.org/~michalis/kambi_vrml_extensions.php]).
+So my engine is not tied to any particular modelling program.
+
+My favourite 3d modeller is Blender, [http://www.blender3d.org/].
+It's open source, it's available for Linux (yeah, Windows too
+if you insist :), and it has an enormous set of features.
+Including good export for VRML 1.0, of course. There are no special
+rules for designing in Blender models for my engine --- basically
+just do whatever you like (and whatever can be exported to VRML 1.0).
+Below I offer some hints.
+
+I often "wrap" (using WWWInline VRML construction) models produced by
+Blender inside some small VRML files written by hand.
+For example, data/levels/castle_hall_final.wrl is a small VRML file that is
+maintained by hand. It sets up some things that were uncomfortable
+(or impossible, due to lacks of VRML 1.0 exporter) to set up from Blender,
+and includes (using WWWInline node) other VRML file
+(data/levels/castle_hall_processed.wrl in this case) that defines geometry,
+materials and textures of the level.
+
+Typical things that I write "by hand" are
+
+- Background, NavigationInfo nodes
+
+  These nodes were introduced in VRML 2 (although I implemented them
+  for VRML 1 also). So Blender exporter to VRML 1 does not write
+  these nodes. So I just write them by hand.
+
+- PerspectiveCamera node
+
+  Blender exports camera settings, but in an uncomfortable
+  format (as a transformation, instead of as VRML camera node).
+  This is OK for simple viewing of VRML models, but it's not OK
+  if you want to "tweak" VRML models. In particular, it's bad
+  when you want to add Background node (see above) and light nodes
+  (see hints below) by hand. Then you have to either insert it
+  into the middle of Blender's generated VRML file, or use awkward
+  coordinates (because of additional transformation).
+  So I usually generate camera node by opening model in my view3dscene
+  (see [http://www.camelot.homedns.org/~michalis/view3dscene.php])
+  and using "Print current camera node (Ctrl+C)" feature.
+
+- Light nodes
+
+  I usually write light nodes in a separate VRML file
+  (that contains only light nodes; see e.g. data/levels/castle_hall_lights.wrl).
+  This is comfortable, because I usually want to use level lights
+  also on other objects (like enemies) that are not part of the level
+  object.
+
+  (Also, while Blender exporter can export Blender lights to VRML,
+  it doesn't allow me to use all features of VRML lights.)
+
+  Since version 0.5.7 you can also edit the lights from the game
+  --- see "Debug options" menu for "Edit lights" command.
+  So you have to add appropriate nodes to xxx_lights.wrl
+  file by hand, and then you can just run the game and configure lights
+  properties from the game.
+
+Moreover, I sometimes want to post-process VRML files generated from
+Blender. I use EmacsLisp macros for this (since this is a great language
+for text operations, and it's built in my favourite editor :) ).
+For example data/levels/castle_hall.wrl in VRML file
+exported from Blender (from data/levels/castle_hall.blend),
+and it's processed to data/levels/castle_hall_processed.wrl.
+
+3DS notes: Actually, you can also use models in 3DS format instead
+of VRML 1.0. So if your favourite 3d modelling program is not able to export
+to VRML 1.0 but it's able to export to 3DS --- you can use it too.
+But, since 3DS is a closed format, it will never be supported
+completely by my engine (just like by any other program, since everyone
+has to decode 3DS). In particular, *everything* that can be expressed
+in 3DS format and that is understood by me engine can also be expressed
+in VRML 1.0. But not vice-versa, i.e. there are some features that
+are available with my engine when using VRML 1.0 but are not available
+when using 3DS. So the bottom line is: well, you can use 3DS format
+with my engine, it works OK, but VRML 1.0 format is just better :)
+
+--------------------
+Creating levels, 3d objects for *this* game:
+
+Section above had general comments about how anyone can create
+levels and 3d objects that are useful for my VRML units.
+This section describes issues specific to the game "The Castle":
+
+Levels:
+
+- The very concept of this game (much like any other modern game)
+  is that you can design new levels without writing a single line
+  of "real" (in this case: ObjectPascal) code.
+  For simple start, if you want to play around, you can start
+  by modifying some existing level, like the "Tower" level
+  (see files data/level/basic_castle_*).
+
+- When loading level, we search for node named 'LevelBox'.
+  Such node should be a parent of some shape (e.g. IndexedFaceSet)
+  node. (In other words: in Blender just add a mesh (usually a cube)
+  and name it 'LevelBox').
+
+  When such node is found, we calculate it's BoundingBox and remove
+  it from the scene. Calculated BoundingBox becomes Level.LevelBox
+  value. And Level.LevelBox is used to limit allowed player positions.
+  This can be used to disallow player to move to the very edge of
+  the level.
+
+  Usually you will add 'LevelBox' node using Blender, you can also
+  use my view3dscene --- see command
+  'Console -> Print scene bounding box as VRML node'.
+
+- Similar to 'LevelBox', I do identical trick to calculate
+  'HintButtonBox'. This is the box that will trigger message
+  "Hint: you can press the button by clicking on it".
+
+- Similar to 'LevelBox', I do identical trick to calculate
+  water boxes. Just place a mesh with name 'WaterBox'.
+  At some point this will be extended (when I'll need it) to
+  include every 'WaterBox_<ignored>', so that you will be able to
+  define water by a sum of boxes.
+
+- Levels must be oriented such that +Z is "up".
+  While all things in my general units are flexible
+  and allow any up vector to be used, I made in "The Castle" a couple
+  of assumptions that really need +Z to be up.
+  (like TItemOnLevel.PlayerCollision).
+
+- All levels should keep the same general sizes. In other words,
+  it's *not good* to just make your new level of arbitrary
+  size and then set player's avatarSize such that things "look sensible".
+  Why ? Because I place items and enemies on the level.
+  So size of all these various models must match.
+
+  In other words: just make sure you use
+    NavigationInfo {
+      avatarSize [ 0.5, 2 ]
+      speed 1.0
+      ...
+    }
+  in your level. And force yourself to design a level that "fits"
+  such avatarSize and speed.
+
+- Sectors and waypoints (aka portals) for the level:
+  - Shapes placed under the name Sector<index>_<ignored>
+    are removed from the real level in TLevel constructor.
+    The geometry of given sector is understood to be the sum
+    of all Sector<index> boxes.
+
+    Also VisibleSectors for each sector are coded in CastleLevel.pas unit.
+
+    For programmers: in cases when the sum of bounding boxes
+    is not flexible enough to define a geometry,
+    you can define any kind of geometry in Pascal code,
+    by overriding TSceneSector.IsPointInside.
+    In the future, treatment of the shape inside Sector<index>_<ignored>
+    may change, so that any kind of closed shape will be allowed there
+    and it will be stored and used precisely (not only as it's bounding box).
+
+    Remember that sectors are numbered starting from 0.
+
+  - Shapes placed under the name Waypoint<index>_<ignored>
+    are also removed from the real level in TLevel constructor.
+    Middle point of bounding box of such shape determines
+    waypoint's Posiiton.
+    Remember that waypoints are numbered starting from 0.
+
+  - Sectors of waypoints (and reverse property, Waypoints
+    of sectors) are automatically calculated, by looking for waypoints
+    that have a Position that falls inside Sector's BoundingBoxes
+    enlarged by margin 0.5.
+
+    Note that sectors' BoundingBoxes need *not* be strictly separated.
+    When object (like player or creature) is within two sectors,
+    it's arbitrarily assigned to any allowed sector.
+    And for the rendering optimization, such sectors would work fine.
+    However, for monster AI, sectors should not have any common
+    large non-zero volume.
+
+    So in practice, each sector should usually place
+    waypoint's Position at it's border. Sectors may overlap but only
+    for a minimal distance (otherwise awkward movement may happen
+    when creature is in the common part).
+
+  - You don't have to cover whole level with sectors.
+    If some object (like player or creature) is not within any defined
+    sector, it's considered to be inside the "implicit whole sector",
+    that is a little special. It's geometry is considered
+    infinte (every 3D point belongs to it, if it doesn't belong to any
+    of the explicitly defined scetors). VisibleSectors
+    is treated like filled with values "true" (so all other sectors
+    are assumed to be visible).
+
+    For programmers: SectorWithPoint returns nil when no sector found,
+    and this indicates such "implicit whole sector".
+    FindWay accepts SectorBegin and SectorEnd as nil
+    (and always returns then false).
+
+  - Sectors and waypoints are used for 2 things:
+
+    1. To speed up rendering: When player's CameraPos is within
+       a given sector (not nil), we have to render only the sectors
+       for which VisibleSectors is true.
+       TODO: right now it's not used for to speed up rendering,
+       and VisibleSectors is ignored.
+
+    2. To make creature moving AI more intelligent:
+       If a creature wants to move from SectionBegin to SectorEnd,
+       and SectionBegin <> SectorEnd (and none of them is nil),
+       creature knows that it must pass through appropriate waypoints.
+
+    It's assumed that there will not be too many sectors on the level
+    (100 sectors is *really* around maximum. 10-20 is reasonable.)
+    So sectors are *not* (at least right now) stored in any "intelligent"
+    structure (like an octree) and creature moving AI uses
+    the simplest search on the graph to find a satisfiable path
+    (no A* algorithm or anything; it's simply not needed for the kind of
+    sectors layouts that I will typically use).
+
+- If you made a completely new level, you want to add it to the game.
+  You have to add a little code for this:
+
+  To add your level to the list of levels available from
+  debug command "Change to level": implement new TLevel descendant
+  (overriding it's abstract methods). For simplest example see
+  how TTowerLevel is defined in CastleLevel, it's really trivial.
+  Also add
+    LevelsAvailable.AddLevelClass(TYourLevel);
+  call to initialization.
+
+  To additionally make your level part of the actual game
+  (i.e. reachable by normal player, not using any debug/cheat commands):
+  - You can replace the call above with
+      LevelsAvailable.AddLevelClass(TYourLevel, true);
+    This will add your level to levels available in "New Game" menu by default.
+  - You can add somewhere the call to LevelFinished(TYourLevel.Create),
+    so that player is in some situation transferred from other level
+    to your level.
+
+  Note that when starting "New Game" player can choose to start
+  from any level that he (she ? :) previously visited ("visited"
+  either as part of normal game story of through debug command
+  "Change to level"). This feature may be removed in the future when
+  real "Save game" / "Load game" feature will be implemented.
+
+  If you don't mind a little programming, you may want to add
+  more interesting code to your TYourLevel implementation.
+  See existing level implementations for examples what can be achieved.
+  You may even want to move your new level class
+  to a completely separate unit file if you want
+  (but keep LevelsAvailable.AddLevelClass call inside CastleLevel
+  initializaition).
+
+Items:
+
+- Item up vector must be +Z.
+
+- Item should be oriented such that:
+
+  Z = 0 plane is the base plane of the item. It will be aligned with the base
+  (i.e. lowest Z) of "stub" object placed on the level.
+
+  X = 0 and Y = 0 is the line around which object will rotate
+  when shown on the level. It will be aligned with the X, Y middle
+  of "stub" object placed on the level.
+
+  I had an idea to just automatically take item's bounding box,
+  it's middle X, Y and lowest Z and automatically adjust to this.
+  But this would disable some possible visual tricks.
+
+- Size of item model is exactly the size that will be used to display
+  it on level, so set this to look good. Sensible default
+  is size around 1.0.
+
+- About the "stub" objects on the level:
+
+  You can place items on the level by placing a "stub" object
+  on the level with appropriate name.
+
+  When loading, I search for shape nodes that have a parent node
+  named like "Item<item-kind-name><quantity>_<ignored>".
+  Where "<item-kind-name>" is "LifePotion" or "Sword" or any
+  other TItemKind.VRMLNodeName value (see CastleItems unit),
+  "<quantity>" is, well, the integer quantity
+  ("1" is assumed if "<quantity>" is omitted), and "<ignored>"
+  is just anything that will be ignored (you can use this
+  to make object names in your model unique,
+  which is obviously desirable).
+
+  Some reasoning about convention above: Blender's names
+  have quite limited length, that's why CamelCase is used
+  for "<item-kind-name>" and components are generally "glued"
+  without any "_" or "-" or " " between.
+
+  Such "stub" object is removed from the actual level and
+  instead I insert into level an item. Item position is determined
+  by stub lowest Z and middle X,Y line (see above).
+
+  You can easily insert such "stub" with Blender --- just insert
+  any shape (I usually insert Cube, and set it's rendering to
+  "wireframe" in Blender), and then edit Blender's mesh name
+  as appropriate.
+
+- Prepare appropriate 2d image of item (to be shown in inventory slots etc.).
+  (Once I tried just automatically rendering models inside inventory slots
+  but this doesn't look good enough). You can do it however you like.
+
+  One way to do it is to use my raytracer, called rayhunter
+  ([http://www.camelot.homedns.org/~michalis/rayhunter.php]):
+  set up appropriate light and camera settings and then just render
+  item's model to the image. data/items/images/sword.png is done like this.
+
+  Another is to open a model with view3dscene
+  ([http://www.camelot.homedns.org/~michalis/view3dscene.php]),
+  set your camera however you like and make a screenshot.
+  Then you can edit it in whatever program you like
+  (like GIMP) to suit your needs.
+
+  Note that all items' images must be of equal size.
+  See data/items/images/Makefile for IMAGE_WIDTH and IMAGE_HEIGHT constant.
+
+- If this is a weapon, then additionally you want to prepare what I call
+  a ScreenImage of this weapon --- this will be displayed on player's
+  screen when it's equipped. See data/items/equipped/.
+
+  Once again, you can do this image however you like.
+  I used rayhunter to render screen for sword.
+
+  You must also prepare an animation of "swinging" the weapon.
+  See data/items/attack_animations/.
+
+- Finally, to really add the item to the game add 1 line to
+  CastleItems units in DoInitialization call creating your
+  TItemKind instance.
+
+- For some items you may be able to just reuse some existing TItemKind
+  class, for others you will want to derive new class from TItemKind
+  and override there things you want.
+
+- For technical reasons, whole item should use either *only transparent
+  materials* or *only non-transparent materials*. Otherwise rendering
+  in some special cases could get wrong. In the code you should set
+  Transparent property to true if this item is transparent.
+
+Creatures (enemies etc.):
+- Several notes about items apply also to creatures:
+
+  - Up vector must be +Z.
+    Moreover, for creatures: the looking direction
+    (i.e. whatever should be considered the "front" of the creature)
+    should be +X.
+
+  - Z = 0 is the base plane (ground) of the creature
+  - X = 0 and Y = 0 is the middle of the creature on XY plane
+
+  - Size of creature's model as rendered in the game is exactly
+    the size of it's model. A good reference is player's camera
+    height: 2. So creatures have generally height around 2.
+
+  - Like with items, initial creatures positions can be set
+    by placing a "stubs" on the level. Name of stub object is like
+    "Crea<creature-kind-name>_<ignored>".
+    Creature position is determined by stub lowest Z and
+    middle X,Y line.
+
+    Moreover, for creatures: initial creature direction
+    is determined by ... TODO: right now starting creature direction
+    just points into player starting position.
+    This is more-or-less sensible, usually.
+    But it's meant to be comfortably configurable in scene file in the future.
+
+  - To really add the creature to the game add 1 line to
+    CastleCreatures unit in DoInitialization call creating your
+    TCreatureKind instance.
+
+  - For some creatures you may be able to just reuse some existing TCreatureKind
+    and TCreature descendants, for others you will want to derive
+    your own descendants.
+
+  - Whole creature should use either *only transparent
+    materials* or *only non-transparent materials*.
+    See TObjectKind.Transparent documentation for reasoning.
+
+- For simple customizations you can set various creature
+  parameters by editing data/creatures/kinds.xml file.
+
+- For testing various animations of creatures (and adjusting their time
+  parameters) you can use my demo_animation program
+  (see units/3dmodels.gl/examples/demo_animation.dpr).
+
+- Notes for animations: beware. Animations are done with a method
+  that essentially makes their rendering very fast (rendering each
+  animation frame should be as fast as if it was a still scene).
+  However it costs much in terms of memory consumption (and in
+  "Loading creatures" time). Some features that should be avoided:
+
+  - Different material for each vertex. This is taken from vertex painting
+    in blender. I.e. you can leave vertex painting as generated (incorrectly)
+    by blender, as PER_VERTEX_INDEXED. If you fix it to PER_VERTEX your
+    models will take a lot of more memory space. E.g. for SpiderQueen
+    this is 270 MB with vertex painting vs 80 MB without vertex painting
+    (triangle count is 2715).
+
+Sounds:
+
+- Special notes for creating footsteps:
+  - Don't make the footsteps sound too long.
+    Preferably you should put there only 2 footsteps. Reason ?
+    When progress is displayed (e.g. because player changes levels),
+    or when player enters the game menu, footsteps sond is not
+    immediately stopped --- it's just player until the end.
+    Yes, this is desired, as it makes better effect than suddenly
+    stopping all the sounds.
+  - These 2 footsteps should take about 1 second. This is the amount
+    of time that "feels good" with player speed and head bobbing.
+
+- Remember that if sounds are supposed to be spatialized (i.e. played
+  by Sound3d procedures), then you must make them mono (never stereo!).
+  That's because Windows OpenAL will never spatialize stereo sounds.
+
+  You can use any editor you like to convert your sounds to mono.
+  I like this sox command-line:
+    sox input.wav -c 1 output.wav
+  See also data/sounds/scripts/example_make_mono.sh
+
+--------------------
+Used things:
+
+Code:
+- My 3d game engine in units/. You can treat this engine as
+  part of this game (I'm actually extending it while developing
+  this game...), but it's generally useful.
+  See [http://www.camelot.homedns.org/~michalis/sources.php]
+
+- My font2pascal was used to generate font,
+  see bfnt_bitstreamverasans_m10_unit.pas and mk_fonts.sh
+
+- FPC, of course.
+  See [http://www.freepascal.org/]
+
+Graphics:
+- All models in data/levels/gate_parts/ and items "bow", "quiver" and "arrow",
+  and missile "ball_missile_s" are made by
+    Szymon Stoma & Ka¶ka Zaremba.
+  Consider them GPL, or contact Szymon & Ka¶ka ([http://stoma.bestweb.pl/])
+  for other licensing. Thanks!
+
+- ... with the exception of the data/levels/gate_parts/cart
+  that was found among the first 10 google results for "free 3d models".
+  Terms are some open license (like artistic or gpl).
+
+- tree.blend based on tree02.3DS from Micha³ Wojtkiewicz. Thanks!
+
+- Werewolf and Alien creatures' models based on free models from
+  [http://www.3dcafe.com/]
+  Spider's queen face also based on model from this site.
+
+- Ghost's teeth are based on vampire teeth from [http://www.katorlegaz.com/]
+  from characters/vamp.zip model
+
+- Some of my other programs are used:
+
+  - view3dscene was often used to see how VRMLs look
+    (independent of how they look when used in "The Castle"),
+    and to generate some VRML pieces, and some other things...
+    See [http://www.camelot.homedns.org/~michalis/view3dscene.php]
+
+  - rayhunter was used to render items images, see data/items/images/.
+    See [http://www.camelot.homedns.org/~michalis/rayhunter.php]
+
+- Blender
+  See [http://www.blender3d.org/]
+
+- GIMP
+  See [http://www.gimp.org/]
+
+- ImageMagick
+  See [http://www.imagemagick.org/script/index.php]
+
+- Terragen was used to create sky (see data/skies/).
+  This is the only non-open-source component I used... pity :(.
+  But I don't know of any (open-source or not) alternative to Terragen.
+  See [http://www.planetside.co.uk/terragen/]
+
+- Many textures from public domain Golgotha textures.
+  See [http://www.vb3d.com/Textures.html]
+
+- Many textures from [http://lemog.free.fr/]
+
+- Some post-processing of VRML models is done using EmacsLisp,
+  see data/kambi-castle-utils.el and data/items/models/Makefile
+
+- stars.jpg from
+  [http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm]
+
+Sounds:
+- The sound editing program that I use is sweep:
+  [http://www.metadecks.org/software/sweep/]
+
+- Sox [http://sox.sourceforge.net/] is also a great program,
+  suitable for batch processing of sounds.
+
+- menu_current_item_changed.wav based on
+  /usr/share/sounds/KDE_TypeWriter_Key_2.ogg
+- werewolf_howling.wav from [http://www.acs.ucalgary.ca/~mmusiani/]
+- Many freeware sounds and loops from [http://www.flashkit.com/soundfx/]
+- tomb.wav from [http://rasmus.uib.no/~st01369/filarkiv/lyder.html]
+
+- Sound loops (i.e. game music):
+  Found by [http://www.flashkit.com/loops/]. These loops are really great
+  so I'll try to give here a link to all author's websites --- if I'll forget
+  some loop please remind me.
+  - gate level: [http://calpomatt.lavista.org/]
+  - intro: [http://www.edgen.com/]
+  - cages level: [http://reaction.roxr.com/]
+    (downloaded from [http://www.flashkit.com/loops/Ambient/Soundscapes/Cath-Mark-9479/index.php])
+
+--------------------
+Have fun! All comments are welcome.
+
+Michalis Kamburelis
+http://www.camelot.homedns.org/~michalis/
+<kambi@users.sourceforge.net> (or <michalis@camelot.homedns.org>)
