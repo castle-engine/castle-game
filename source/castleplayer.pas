@@ -342,13 +342,14 @@ uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, OpenAL, CastleControlsMenu,
-  CastleTimeMessages, KambiXMLCfg;
+  CastleTimeMessages, KambiXMLCfg, CastleCreatures;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
   GLList_RedIndicatorImage: TGLuint;
   GLList_BlueIndicatorImage: TGLuint;
   GLList_DrawWaterRect: TGLuint;
+  GLList_BossIndicatorImage: TGLuint;
 
 { TPlayer -------------------------------------------------------------------- }
 
@@ -548,36 +549,35 @@ begin
   end;
 end;
 
-procedure TPlayer.Render2D;
-
-  procedure RenderLifeIndicator;
+  procedure RenderLifeIndicator(const ALife, AMaxLife: Single;
+    const GLList_FullIndicatorImage: TGLuint;
+    const XMove: Integer; const PrintText: boolean);
   const
     IndicatorHeight = 120;
     IndicatorWidth = 40;
     IndicatorMargin = 5;
   var
-    PlayerLifeMapped: Integer;
+    LifeMapped: Integer;
     LifeTextPosition: Integer;
     LifeText: string;
   begin
-    glRasterPos2i(IndicatorMargin, IndicatorMargin);
+    glRasterPos2i(XMove + IndicatorMargin, IndicatorMargin);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-      PlayerLifeMapped :=
-        Round(MapRange(Player.Life, 0, Player.MaxLife, 0, IndicatorHeight));
+      LifeMapped := Round(MapRange(ALife, 0, AMaxLife, 0, IndicatorHeight));
 
-      { Note that Player.Life may be > Player.MaxLife, and
-        Player.Life may be < 0. }
-      if PlayerLifeMapped >= IndicatorHeight then
-        glCallList(GLList_RedIndicatorImage) else
-      if PlayerLifeMapped < 0 then
+      { Note that Life may be > MaxLife, and
+        Life may be < 0. }
+      if LifeMapped >= IndicatorHeight then
+        glCallList(GLList_FullIndicatorImage) else
+      if LifeMapped < 0 then
         glCallList(GLList_BlankIndicatorImage) else
       begin
         glEnable(GL_SCISSOR_TEST);
-          glScissor(IndicatorMargin, IndicatorMargin, RequiredScreenWidth, PlayerLifeMapped);
-          glCallList(GLList_RedIndicatorImage);
-          glScissor(IndicatorMargin, IndicatorMargin + PlayerLifeMapped,
+          glScissor(IndicatorMargin, IndicatorMargin, RequiredScreenWidth, LifeMapped);
+          glCallList(GLList_FullIndicatorImage);
+          glScissor(IndicatorMargin, IndicatorMargin + LifeMapped,
             RequiredScreenWidth, RequiredScreenHeight);
           glCallList(GLList_BlankIndicatorImage);
         glDisable(GL_SCISSOR_TEST);
@@ -585,17 +585,34 @@ procedure TPlayer.Render2D;
 
     glDisable(GL_BLEND);
 
-    glColorv(Vector3Single(0.8, 0.8, 0.8));
-    LifeText := Format('%d', [Round(Life)]);
-    LifeTextPosition := IndicatorMargin +
-      (IndicatorWidth - Font_BFNT_BitstreamVeraSans.TextWidth(LifeText)) div 2;
-    MaxTo1st(LifeTextPosition, IndicatorMargin);
-    glRasterPos2i(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2);
-    Font_BFNT_BitstreamVeraSans.Print(LifeText);
+    if PrintText then
+    begin
+      glColorv(Vector3Single(0.8, 0.8, 0.8));
+      LifeText := Format('%d', [Round(ALife)]);
+      LifeTextPosition := XMove + IndicatorMargin +
+        (IndicatorWidth - Font_BFNT_BitstreamVeraSans.TextWidth(LifeText)) div 2;
+      MaxTo1st(LifeTextPosition, IndicatorMargin);
+      glRasterPos2i(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2);
+      Font_BFNT_BitstreamVeraSans.Print(LifeText);
+    end;
   end;
 
+procedure TPlayer.Render2D;
+var
+  BossIndex: Integer;
 begin
-  RenderLifeIndicator;
+  RenderLifeIndicator(Life, MaxLife, GLList_RedIndicatorImage, 0, true);
+
+  BossIndex := Level.Creatures.FindKind(SpiderQueen);
+  if BossIndex = -1 then
+    BossIndex := Level.Creatures.FindKind(Werewolf);
+  if (BossIndex <> -1) and (not Level.Creatures[BossIndex].Dead) then
+  begin
+    RenderLifeIndicator(
+      Level.Creatures[BossIndex].Life,
+      Level.Creatures[BossIndex].MaxLife,
+      GLList_BossIndicatorImage, RequiredScreenWidth - 150, false);
+  end;
 
   if FlyingMode then
   begin
@@ -1228,6 +1245,7 @@ begin
   GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
   GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
   GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
+  GLList_BossIndicatorImage := LoadPlayerControlToDisplayList('boss.png');
 
   GLList_DrawWaterRect := glGenListsCheck(1, 'CastlePlayer.GLWindowInit');
   glNewList(GLList_DrawWaterRect, GL_COMPILE);
@@ -1247,6 +1265,7 @@ begin
   glFreeDisplayList(GLList_BlankIndicatorImage);
   glFreeDisplayList(GLList_RedIndicatorImage);
   glFreeDisplayList(GLList_BlueIndicatorImage);
+  glFreeDisplayList(GLList_BossIndicatorImage);
 end;
 
 initialization

@@ -22,9 +22,6 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 
 - Test Radeon problems reported on PGD.
 
-- life indicator of the boss --- this should be a good workaround for lack
-  of blood effects etc. for now.
-
 - use data/creatures/ball_missile/ball_missile_s
   instead of ball_missile --- Transparency: all or none must be fixed.
 
