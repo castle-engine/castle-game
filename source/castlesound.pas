@@ -95,6 +95,7 @@ type
     stStairsBlockerDestroyed,
     stTeleport,
     stSacrilegeAmbush,
+    stEvilLaugh,
     { @groupEnd }
 
     { Creatures sounds.
@@ -336,6 +337,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'sacrilege_ambush.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: 'evil_laugh.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
     ( FileName: 'creature_falled_down.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'alien_sudden_pain.wav';

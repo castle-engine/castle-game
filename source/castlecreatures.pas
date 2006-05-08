@@ -850,6 +850,10 @@ type
     procedure GetCameraHeight(const Position: TVector3Single;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single;
       IgnoreCreature: TCreature);
+
+    { Searches for item of given Kind. Returns index of first found,
+      or -1 if not found. }
+    function FindKind(Kind: TCreatureKind): Integer;
   end;
 
   TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying, wasHurt,
@@ -2166,6 +2170,14 @@ begin
     end;
 end;
 
+function TCreaturesList.FindKind(Kind: TCreatureKind): Integer;
+begin
+  for Result := 0 to Count - 1 do
+    if Items[Result].Kind = Kind then
+      Exit;
+  Result := -1;
+end;
+
 { TWalkAttackCreature -------------------------------------------------------- }
 
 constructor TWalkAttackCreature.Create(AKind: TCreatureKind;
@@ -3053,16 +3065,7 @@ begin
 end;
 
 procedure TSpiderQueenCreature.SetLife(const Value: Single);
-var
-  ItemPosition: TVector3Single;
 begin
-  if (Life > 0) and (Value <= 0) and (Level is TCagesLevel) then
-  begin
-    ItemPosition := Player.Navigator.CameraPos;
-    Level.Items.Add(TItemOnLevel.Create(TItem.Create(RedKeyItemKind, 1),
-      ItemPosition));
-  end;
-
   inherited;
 end;
 

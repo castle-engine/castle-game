@@ -2016,6 +2016,8 @@ end;
 
 procedure TCagesLevel.SpecialObjectPicked(const Distance: Single;
   SpecialObjectIndex: Integer);
+var
+  SpiderQueenIndex: Integer;
 begin
   inherited;
 
@@ -2025,7 +2027,17 @@ begin
           TimeMessage('You see a door. You''re too far to open it from here') else
         begin
           if Player.Items.FindKind(RedKeyItemKind) <> -1 then
-            LevelFinished(nil) else
+          begin
+            SpiderQueenIndex := Creatures.FindKind(SpiderQueen);
+            if (SpiderQueenIndex <> -1) and
+              (not Creatures[SpiderQueenIndex].Dead) then
+            begin
+              Player.Knockback(2 + Random(5), 2, Vector3Single(0, -1, 0));
+              Sound(stEvilLaugh);
+              TimeMessage('No exit for the one who does not fight');
+            end else
+              LevelFinished(nil);
+          end else
             TimeMessage('You need an appropriate key to open this door');
         end;
       end;
