@@ -24,7 +24,7 @@ unit CastleHelp;
 interface
 
 const
-  Version = '0.5.13';
+  Version = '0.6.0';
 
 procedure ShowCreditsMessage;
 
@@ -50,6 +50,11 @@ begin
     'WWW: http://www.camelot.homedns.org/~michalis/castle.php' +nl+
     nl+
     'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
+    nl+
+    'Szymon Stoma and Kaska Zaremba designed and modelled the scenario ' +
+    'on "The Gate" level, provided models for keys items (and unused ' +
+    'for now bow + arrows), some sounds and a large amount of feedback. ' +
+    'Thanks!' +nl+
     nl+
     'Compiled with ' + SCompilerDescription +'.';
 end;

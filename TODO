@@ -1,13 +1,4 @@
-Things which must be done for PGD deadline:
-
-- add Szymon+Ka¶ka to Credits!
-
-- PerfTimerInit remove
-
-- kangury debian: hangs on Quit.
-
 ----------------------------------------
-Things for which I will hopefully find time before PGD deadline:
 
 - (22:05:19) Szymon: 1/ (nie koniecznie) RightMouseButton -> Jump.
 
@@ -98,6 +89,8 @@ cages level:
   in FPC etc.
 
 - Update WWW to point to both -with-sources and without versions.
+
+- kangury debian: hangs on Quit. Probably OpenAL problems.
 
 ----------------------------------------
 Things for which probably will be no time before PGD deadline:

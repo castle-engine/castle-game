@@ -85,6 +85,10 @@ end;
 { main -------------------------------------------------------------------- }
 
 begin
+  { TODO: This should be done in GLWindow when using IdleCompSpeed,
+    no time to write it cleaner now. }
+  Check( PerfTimerInit, 'performance timer not supported on this hardware');
+
   { parse parameters }
   OpenALOptionsParse;
   ParseParameters(Options, OptionProc, nil);
