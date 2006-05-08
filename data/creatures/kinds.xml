@@ -30,12 +30,13 @@
     preferred_attack_distance="4.2"
     min_delay_between_attacks="2.0"
     life_to_run_away="0.1"
-    default_max_life="600.0"
+    default_max_life="1000.0"
     max_knocked_back_distance="4.2"
     max_angle_to_attack="1.04"
     min_life_loss_to_hurt="0.05"
     chance_to_hurt="0.3"
     max_height_acceptable_to_fall="1.4"
+    life_to_run_away="0.2"
   >
 
     <!-- Werewolf is quite big and has MiddlePosition high and doesn't fly,
@@ -109,7 +110,7 @@
     max_attack_distance="8.0"
     preferred_attack_distance="8.0"
     min_delay_between_attacks="2.0"
-    default_max_life="600.0"
+    default_max_life="2000.0"
     max_knocked_back_distance="2.0"
     max_angle_to_attack="1.04"
     max_height_acceptable_to_fall="5"
@@ -117,6 +118,7 @@
     random_walk_distance="30"
     min_life_loss_to_hurt="0.05"
     chance_to_hurt="0.3"
+    life_to_run_away="0.2"
   >
 
     <!-- SpiderQueen is large, so again the same reasoning applies
