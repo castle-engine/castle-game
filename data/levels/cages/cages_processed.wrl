@@ -11593,7 +11593,7 @@ Switch {
 	DEF MeshExitGate_001
 	Separator {
 		Texture2 {
-			filename /win/mojepasy/openGL/castle/trunk/data/textures/egyptstreetfull.jpg
+			filename ../../textures/egyptstreetfull.jpg
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
