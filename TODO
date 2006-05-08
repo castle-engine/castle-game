@@ -1,6 +1,4 @@
 --------------------
-(22:05:19) Szymon: 1/ (nie koniecznie) RightMouseButton -> Jump.
---------------------
 (22:13:54) Szymon: aaaa.. mamy dzwieki na siec pajeczycy.
 (22:14:02) Szymon: wrzuce je na ftp, ok??
 --------------------
@@ -9,10 +7,6 @@
 (23:00:57) Szymon: zostawie je na ftp: plik vrml i blender
 ----------------------------------------
 Things which must be done for PGD deadline:
-
-- gate:
-  - what's the purpose of "dziura" ? Texture / materials needed, or remove
-  - dodaæ spidera do levelu gate ?
 
 - add Szymon+Ka¶ka to Credits!
 
@@ -25,6 +19,8 @@ Things which must be done for PGD deadline:
 
 ----------------------------------------
 Things for which I will hopefully find time before PGD deadline:
+
+- (22:05:19) Szymon: 1/ (nie koniecznie) RightMouseButton -> Jump.
 
 - gate
   - need an actual door inside GateExitBox to make the message valid.

@@ -245,7 +245,7 @@ begin
   CastleKey_UpRotate := TKeyConfiguration.Create('Loop up', 'look_up', kgBasic, WalkerDefaultKey_UpRotate);
   CastleKey_DownRotate := TKeyConfiguration.Create('Look down', 'look_down', kgBasic, WalkerDefaultKey_DownRotate);
   CastleKey_HomeUp := TKeyConfiguration.Create('Look straight', 'look_straight', kgBasic, WalkerDefaultKey_HomeUp);
-  CastleKey_UpMove := TKeyConfiguration.Create('Jump (or fly/swim up)', 'move_up', kgBasic, WalkerDefaultKey_Jump);
+  CastleKey_UpMove := TKeyConfiguration.Create('Jump (or fly/swim up)', 'move_up', kgBasic, K_Space);
   CastleKey_DownMove := TKeyConfiguration.Create('Crouch (or fly/swim down)', 'move_down', kgBasic, WalkerDefaultKey_Crouch);
 
   { Items keys. }
@@ -260,7 +260,7 @@ begin
   CastleKey_SaveScreen := TKeyConfiguration.Create('Save screen', 'save_screen', kgOther, K_F5);
   CastleKey_CancelFlying := TKeyConfiguration.Create('Cancel flying spell', 'cancel_flying', kgOther, K_C);
   CastleKey_FPSShow := TKeyConfiguration.Create('FPS show / hide', 'fps_toggle', kgOther, K_BackQuote);
-  CastleKey_Interact := TKeyConfiguration.Create('Press button / move lever / open door etc.', 'interact', kgOther, K_Space);
+  CastleKey_Interact := TKeyConfiguration.Create('Press button / move lever / open door etc.', 'interact', kgOther, K_P);
 
   CastleAllKeys.LoadFromConfigFile;
 end;
