@@ -121,6 +121,8 @@ var
 
   OnKeyChanged: TDynKeyChangedEventArray;
 
+function InteractKeyDescription: string;
+
 {$undef read_interface}
 
 implementation
@@ -130,6 +132,13 @@ uses SysUtils, CastleConfig;
 {$define read_implementation}
 {$I dynarray_1.inc}
 {$I objectslist_3.inc}
+
+function InteractKeyDescription: string;
+begin
+  if CastleKey_Interact.Value <> K_None then
+    Result := Format('"%s" key', [KeyToStr(CastleKey_Interact.Value)]) else
+    Result := '"Interact" key';
+end;
 
 { TKeyConfigurationsList ----------------------------------------------------- }
 
@@ -260,7 +269,7 @@ begin
   CastleKey_SaveScreen := TKeyConfiguration.Create('Save screen', 'save_screen', kgOther, K_F5);
   CastleKey_CancelFlying := TKeyConfiguration.Create('Cancel flying spell', 'cancel_flying', kgOther, K_C);
   CastleKey_FPSShow := TKeyConfiguration.Create('FPS show / hide', 'fps_toggle', kgOther, K_BackQuote);
-  CastleKey_Interact := TKeyConfiguration.Create('Press button / move lever / open door etc.', 'interact', kgOther, K_P);
+  CastleKey_Interact := TKeyConfiguration.Create('Interact (press button / open door etc.)', 'interact', kgOther, K_P);
 
   CastleAllKeys.LoadFromConfigFile;
 end;

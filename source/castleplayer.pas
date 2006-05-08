@@ -712,6 +712,8 @@ begin
     Navigator.Key_LeftStrafe := K_None;
     Navigator.Key_RightStrafe := K_None;
 
+    Navigator.JumpMouseButtonActive := false;
+
     Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
     Navigator.HeadBobbing := 0.0;
@@ -738,6 +740,8 @@ begin
     Navigator.Key_Backward := K_None;
     Navigator.Key_LeftStrafe := K_None;
     Navigator.Key_RightStrafe := K_None;
+
+    Navigator.JumpMouseButtonActive := false;
 
     Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
@@ -810,6 +814,8 @@ begin
         Navigator.MoveVertSpeed := 1.0;
       end;
     end;
+
+    Navigator.JumpMouseButtonActive := true;
 
     Navigator.Key_Forward := CastleKey_Forward.Value;
     Navigator.Key_Backward := CastleKey_Backward.Value;

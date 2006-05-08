@@ -612,8 +612,8 @@ begin
   if (not Level.HintButtonShown) and
      Box3dPointInside(Player.Navigator.CameraPos, Level.HintButtonBox) then
   begin
-    TimeMessage('Hint: press this red button by clicking on it with ' +
-      'right mouse button');
+    TimeMessage('Hint: press this red button with the ' +
+      InteractKeyDescription);
     Level.HintButtonShown := true;
   end;
 
@@ -793,6 +793,14 @@ begin
             Sound(stPlayerInteractFailed);
 end;
 
+procedure MaybeDeadWinMessage;
+begin
+  if GameWin then
+    TimeMessage(SGameWinMessage) else
+  if Player.Dead then
+    TimeMessage(SDeadMessage);
+end;
+
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
   procedure ChangeInventoryCurrentItem(Change: Integer);
@@ -953,14 +961,6 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       TimeMessage(SDeadMessage);
   end;
 
-  procedure MaybeDeadWinMessage;
-  begin
-    if GameWin then
-      TimeMessage(SGameWinMessage) else
-    if Player.Dead then
-      TimeMessage(SDeadMessage);
-  end;
-
   procedure MaybeWinMessage;
   begin
     if GameWin then
@@ -1030,7 +1030,7 @@ procedure MouseDown(Glwin: TGLWindow; Btn: TMouseButton);
 begin
   case Btn of
     mbLeft: DoAttack;
-    mbRight: DoInteract;
+    mbRight: MaybeDeadWinMessage;
   end;
 end;
 

@@ -345,7 +345,7 @@ begin
     '  This key is not configurable.' +nl+
     'Controlling game with mouse:' +nl+
     '  Left mouse click performs attack.' +nl+
-    '  Right mouse click uses buttons/levers/opens doors etc.' +nl+
+    '  Right mouse click jumps.' +nl+
     '  Moving mouse rotates the view.';
 
     { Too much info, not needed, I think that player can figure this out:

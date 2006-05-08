@@ -547,7 +547,8 @@ implementation
 
 uses SysUtils, OpenGLh, BackgroundGL,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
-  CastleVideoOptions, CastleConfig, CastleTimeMessages;
+  CastleVideoOptions, CastleConfig, CastleTimeMessages,
+  CastleKeys;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -1861,7 +1862,8 @@ begin
       Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then
     begin
       HintOpenDoorBoxShown := true;
-      TimeMessage('Hint: open this door by clicking on it with right mouse button');
+      TimeMessage('Hint: open this door using the ' +
+        InteractKeyDescription);
     end;
   end;
 end;
