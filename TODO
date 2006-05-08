@@ -1,17 +1,5 @@
 --------------------
 (22:05:19) Szymon: 1/ (nie koniecznie) RightMouseButton -> Jump.
-(22:05:48) Szymon: 2/ cos sie za dlugo ladujepierwszy poziom. staje na 25% procentach loading creatures.
-(22:06:10) Szymon: 3/ (wazne) trzeba zmniejszyc uszkodzenia przy spadaniu.
-(22:06:37) Szymon: ad3. czasami jak sie podskoczy na gorce troszeczke w dol dostaje sie obrazenia.
-(22:07:39) Szymon: 4/ alieny maja zly model kuli. (inny byl w patchu) -- po tym strasznie kolorowym zrobilismy jeszcze jeden z teksturowanymi zielonymi kulami.
-(22:07:54) Szymon: ad4. wyglada lepiej niz to co jest w tej chwili.\
-(22:08:37) Szymon: ad alieny: wreszcie sie fajnie zachowuja. zabijanie drani stalo sie przyjemnoscia (nowe hobby)...
-(22:09:02) Szymon: 5/ pasek energi przy bosie.. (moze nie w tym wydaniu..)
-(22:10:36) Ja: 2 zauwa¿y³em ju¿, nie wiem czemu. Zobaczê pó¼niej.
-3 o jakiej górce mówisz ? Anyway, my¶lê ¿e mo¿e zostaæ jak jest, to nie jest wielki problem.
-1 pewnie zaraz zrobiê.
-4 nie na³o¿y³em waszych kulek bo trzeba u¿yæ albo tylko materia³ów transparent albo tylko nie transparent. To trzeba poprawiæ, inaczej renderowanie bêdzie ¼le. Patrz nasza wcze¶niejsza rozmowa o Transparency.
-5 jak zd±¿ê.
 --------------------
 (22:13:54) Szymon: aaaa.. mamy dzwieki na siec pajeczycy.
 (22:14:02) Szymon: wrzuce je na ftp, ok??
@@ -23,7 +11,6 @@
 Things which must be done for PGD deadline:
 
 - gate:
-  - need an actual door inside GateExitBox to make the message valid.
   - what's the purpose of "dziura" ? Texture / materials needed, or remove
   - dodaæ spidera do levelu gate ?
 
@@ -38,6 +25,9 @@ Things which must be done for PGD deadline:
 
 ----------------------------------------
 Things for which I will hopefully find time before PGD deadline:
+
+- gate
+  - need an actual door inside GateExitBox to make the message valid.
 
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim, moving camera around the level.)
