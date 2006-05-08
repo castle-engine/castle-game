@@ -10,15 +10,6 @@ work smoothly with old config file, but just to be sure...)
 See [http://www.camelot.homedns.org/~michalis/castle.php#subsection_uninstall]
 for location of castle.conf file on your system.
 
-Goals notes:
-- Sound, music: done, yeah! Remember to install OpenAL. For best effect,
-  be sure to try all available devices in "Sound options" ---
-  the default device doesn't always sound the best.
-  This is true for both Linux and Windows.
-  E.g. a standard sound card (without real 3d surround support) on Windows
-  may sound better with "Generic Software" device.
-- 3 playable levels, 1 new kind of regular enemy per level: yes.
-
 --------------------
 Installing and running:
 
@@ -68,42 +59,14 @@ memory-eater) you can
 --------------------
 Levels included:
 
-Currently there are 3 levels in the game (but 1 of them is only for testing,
-not for the final game).
+The actual game consists of 3 levels. There's also 1 hidden debugging level.
 
-"Gate":
-  This is the level made for PGD stage 5.
-  When you start "New Game", you enter this level.
+I used to have here a description and walkthorugh of the levels,
+but it's probably more fun to just go and play them.
+So that's all I'm going to say about levels.
 
-  Walkthrough: to finish the level go up the stairs and
-  step inside the black corridor.
-
-"Castle hall" :
-  This is the level made for PGD stage 3.
-  After finishing "Gate" level, you're transferred to this level.
-
-  Walkthrough: find and click the red button. Kill the boss.
-  Level exit will be revealed.
-
-"Tower" :
-  This is only a testing level (i.e. it's not something supposed
-  to be played by real player; it's just a playground for me,
-  to test various things).
-  You have to use "Debug menu -> Change to level" option to get to this level.
-
-  Initially it was named "Sample castle level" and was a simple
-  level submitted for PGD stage 2.
-  This was actually combined from my old demo castle model,
-  and I added night sky with moon that was used in
-  my other toy-game (named "lets_take_a_walk").
-  Looked good as a demo, but it was not really intended to be used in this game,
-  I just added this for stage 2.
-  Before stage 4 deadline, I changed it a lot, but it's still
-  just a testing level.
-
-  There is no way to exit from this level. You just have to end the game,
-  kill yourself, or use "Debug menu" to switch to another level.
-  Like I said, this is only a testing level.
+If you're interested in designing levels (making new levels or
+modifying existing levels), more information is lower in this file.
 
 If you want to see other models demonstrating my engine, see
 [http://www.camelot.homedns.org/~michalis/miscella/kambi_vrml_examples.zip]
@@ -198,6 +161,12 @@ Sound:
 OpenAL is used to play sounds. Instructions about installing OpenAL
 and command-line options related to OpenAL are described here:
 [http://www.camelot.homedns.org/~michalis/openal_notes.php].
+
+For best effect, be sure to try all available devices in "Sound options" ---
+the default device doesn't always sound the best.
+This is true for both Unixes and Windows.
+E.g. a standard sound card (without real 3d surround support) on Windows
+may sound better with "Generic Software" device.
 
 If the game performance suffers when the sound is on,
 or sound quality suffers, or there is sound latency, then you should
