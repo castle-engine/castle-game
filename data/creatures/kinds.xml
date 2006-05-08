@@ -53,6 +53,7 @@
     close_direction_to_player="True"
     close_direction_to_target_speed="0.02"
     pause_between_sound_idle="2.5"
+    transparent="True"
   >
 
     <short_range_attack knockback_distance="5">

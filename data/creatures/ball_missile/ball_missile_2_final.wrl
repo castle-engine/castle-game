@@ -3,5 +3,5 @@
 Group {
   WWWInline { name "ball_missile_header.wrl" separate FALSE }
   Rotation { rotation 0 1 1 6.2831853072 }
-  WWWInline { name "ball_missile.wrl" }
+  WWWInline { name "ball_missile_s.wrl" }
 }

@@ -10,4 +10,4 @@ doit()
   mv "$1"_2.wav "$1".wav
 }
 
-doit thunder
+doit spider_queen_dying

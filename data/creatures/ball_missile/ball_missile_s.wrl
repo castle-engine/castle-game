@@ -18,7 +18,7 @@ Switch {
 		diffuseColor 0.833333 0.000000 1.000000
 		specularColor 0.420000 0.420000 0.420000
 		shininess 0.500000 
-		transparency 0.000000 
+		transparency 0.095290 
 	}
 	DEF Sphere
 	Separator {
@@ -314,6 +314,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -735,6 +736,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -886,6 +888,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -1037,6 +1040,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -1188,6 +1192,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -1339,6 +1344,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -1490,6 +1496,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -1641,6 +1648,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -1792,6 +1800,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -1943,6 +1952,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -2094,6 +2104,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,
@@ -2245,6 +2256,7 @@ Switch {
 			]
 		}
 		MaterialBinding { value PER_VERTEX_INDEXED }
+                USE Material_002
 		Coordinate3 {
 			point [
 				 0.000000 0.000000 -1.414214,

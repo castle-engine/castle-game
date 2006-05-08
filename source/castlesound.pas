@@ -376,17 +376,17 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: '' { 'spider_queen_actual_attack_hit.wav' };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'spider_queen_sudden_pain.wav' };
+    ( FileName: 'spider_queen_sudden_pain.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'spider_queen_attack_start.wav' };
+    ( FileName: 'spider_queen_attack_start.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'spider_queen_dying.wav' };
+    ( FileName: 'spider_queen_dying.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'thrown_web_fired.wav' };
+    ( FileName: 'thrown_web_fired.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'thrown_web_hit.wav'};
+    ( FileName: 'thrown_web_hit.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'thrown_web_idle.wav'};
+    ( FileName: 'thrown_web_idle.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'intro_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),

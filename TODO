@@ -1,19 +1,8 @@
---------------------
-(22:13:54) Szymon: aaaa.. mamy dzwieki na siec pajeczycy.
-(22:14:02) Szymon: wrzuce je na ftp, ok??
---------------------
-(22:58:31) Szymon: a mooooze
-(22:59:59) Szymon: to kulki sa i dzialaja
-(23:00:57) Szymon: zostawie je na ftp: plik vrml i blender
-----------------------------------------
 Things which must be done for PGD deadline:
 
 - add Szymon+Ka¶ka to Credits!
 
 - PerfTimerInit remove
-
-- Sounds: at least sounds related to SpiderQueen and ThrownWeb fill
-  At least copy sounds from Spider to SpiderQueen.
 
 - kangury debian: hangs on Quit.
 
