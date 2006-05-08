@@ -117,7 +117,7 @@
     random_walk_distance="30"
     min_life_loss_to_hurt="0.05"
     chance_to_hurt="0.3"
-    life_to_run_away="0.2"
+    life_to_run_away="0.25"
   >
 
     <!-- SpiderQueen is large, so again the same reasoning applies
@@ -130,9 +130,11 @@
     <throw_web
       min_delay_between_attacks="5.0"
       max_attack_distance="30.0"
-      max_angle_to_attack="0.6"
+      max_angle_to_attack="4"
       actual_attack_time="0.6"
     />
+    <!-- max_angle_to_attack > Pi means "no limits".
+         This makes the trick with jumping/flying on SpiderQueen much harder. -->
   </SpiderQueen>
 
   <ThrownWeb
