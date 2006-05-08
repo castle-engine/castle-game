@@ -340,6 +340,15 @@ procedure Draw(Glwin: TGLWindow);
       Level.Creatures.Items[I].RenderBackShadowQuads;
   end;
 
+  procedure RenderCreaturesItems(const Transparent: boolean);
+  begin
+    { When GameWin, don't render creatures (as we don't check
+      collisions when MovingPlayerEndSequence). }
+    if not GameWin then
+      Level.Creatures.Render(Player.Navigator.Frustum, Transparent);
+    Level.Items.Render(Player.Navigator.Frustum, Transparent);
+  end;
+
 const
   { Which stencil bits should be tested when determining which things
     are in the scene ?
@@ -426,8 +435,7 @@ begin
       So I just render them here, when the lights are turned on
       and ignoring stencil buffer. I have to do this *after*
       glClear(GL_DEPTH_BUFFER_BIT) above. }
-    Level.Creatures.Render(Player.Navigator.Frustum, false);
-    Level.Items.Render(Player.Navigator.Frustum, false);
+    RenderCreaturesItems(false);
 
     { setup stencil : don't modify stencil, stencil test passes only for =0 }
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -450,8 +458,7 @@ begin
     end;
   end else
   begin
-    Level.Creatures.Render(Player.Navigator.Frustum, false);
-    Level.Items.Render(Player.Navigator.Frustum, false);
+    RenderCreaturesItems(false);
     Level.Render(Player.Navigator.Frustum);
   end;
 
@@ -466,8 +473,7 @@ begin
     to be partially transparent and partially opaque.
     So we first render all non-transparent creatures and items,
     then the level, then all transparent creatures and items. }
-  Level.Creatures.Render(Player.Navigator.Frustum, true);
-  Level.Items.Render(Player.Navigator.Frustum, true);
+  RenderCreaturesItems(true);
 
   Player.RenderAttack;
 
