@@ -53,7 +53,9 @@ begin
     nl+
     'Szymon Stoma and Kaska Zaremba designed and modelled the scenario ' +
     'on "The Gate" level, provided models for keys items (and unused ' +
-    'for now bow + arrows), some sounds and a large amount of feedback. ' +
+    'for now bow + arrows), ball_missile, ' +
+    'some sounds and a large amount of feedback. And probably some ' +
+    'more stuff that I don''t remember right now :) ' +
     'Thanks!' +nl+
     nl+
     'Compiled with ' + SCompilerDescription +'.';
