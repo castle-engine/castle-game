@@ -68,8 +68,7 @@ type
     { Nice name for user. }
     property Name: string read FName;
 
-    { Note that the first call to Scene will try to load model from
-      ModelFileName if it wasn't already loaded. }
+    { Note that the Scene is nil if not PrepareRenderDone. }
     function Scene: TVRMLFlatSceneGL;
 
     { This is a 2d image, to be used for inventory slots etc.
@@ -374,13 +373,6 @@ end;
 
 function TItemKind.Scene: TVRMLFlatSceneGL;
 begin
-  if FScene = nil then
-  begin
-    FScene := TVRMLFlatSceneGL.Create(LoadAsVRML(
-      ProgramDataPath + 'data' + PathDelim +
-      'items' + PathDelim + 'models' + PathDelim + ModelFileName, false),
-      true, roSceneAsAWhole);
-  end;
   Result := FScene;
 end;
 
@@ -439,7 +431,23 @@ end;
 
 procedure TItemKind.PrepareRender;
 begin
-  Scene.PrepareRender(false, true, false, false);
+  if FScene = nil then
+  begin
+    FScene := TVRMLFlatSceneGL.Create(LoadAsVRML(
+      ProgramDataPath + 'data' + PathDelim +
+      'items' + PathDelim + 'models' + PathDelim + ModelFileName, false),
+      true, roSceneAsAWhole);
+
+    Scene.PrepareRender(false, true, false, false);
+
+    { TODO: So after changing TextureMinificationQuality,
+      FreePrepareRender should be called (and actually implemented
+      for TItemKind descendants) to make sure that textures are reloaded
+      with proper filtering. }
+    Scene.Attrib_TextureMinFilter :=
+      TextureMinificationQualityToGL[TextureMinificationQuality];
+  end;
+
   Progress.Step;
 end;
 
