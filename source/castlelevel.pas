@@ -1307,10 +1307,9 @@ begin
     begin
       SymbolOpened := true;
 
-      WerewolfCreature := TWerewolfCreature.Create(Werewolf,
+      WerewolfCreature := Werewolf.CreateDefaultCreature(
         WerewolfStartPosition,
-        Vector3Single(0, 1, 0), 800, AnimationTime);
-      Creatures.Add(WerewolfCreature);
+        Vector3Single(0, 1, 0), AnimationTime);
       WerewolfCreature.Sound3d(stWerewolfHowling, 1.0);
 
       Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));

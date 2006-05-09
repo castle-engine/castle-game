@@ -1,18 +1,23 @@
 --------------------
-wiec tak:
-* oteksturowany duzy grob,
-* zmieniona tekstura duzego miecza,
-* dodane swiatlo dajace czerwona poswiate ;] (zobacz sobie, czy ci sie podoba, ale dzieki temu fajniej swieca potiony i tekstura sciany jest fajnie podkresona),
+- S&K patches:
+  wiec tak:
+  * oteksturowany duzy grob,
+  * zmieniona tekstura duzego miecza,
+  * dodane swiatlo dajace czerwona poswiate ;] (zobacz sobie, czy ci sie podoba, ale dzieki temu fajniej swieca potiony i tekstura sciany jest fajnie podkresona),
 
-wszystko w katalogu stoma.name/michalis/patch-06-05-09-0100
---------------------
-- wilczek: wiêksze life, ¿eby brute force nie dzia³a³o
+  wszystko w katalogu stoma.name/michalis/patch-06-05-09-0100
 
-- uzyj default_max_life a nie hardcoded
+- bow more interesting:
+  - When you hold attack key, arrow/bolt appears on your bow/crossbow
+    and you're holding the bow. There is also a crosshair (circle target area)
+    that "trembles", because your hands are trembling.
 
-----------------------------------------
-- crosshair for bow
-- showing arrow in shooting anim for bow
+    You shoot when you release Ctrl key. The longer you held Ctrl,
+    the more power has the arrow (more velocity), but also the trembling
+    of your crosshair (and it's circle) is larger, so your accuracy
+    is lower.
+  - crosshair for bow
+  - showing arrow in shooting anim for bow
 
 - gate
   - need an actual door inside GateExitBox to make the message valid.
@@ -58,20 +63,6 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 
 - test game messages in the middle of the screen ?
 
-- second weapon, crossbow/bow, that requires another item in your inventory
-  (bolts/arrows)
-
-  When you hold attack key, arrow/bolt appears on your bow/crossbow
-  and you're holding the bow. There is also a crosshair (circle target area)
-  that "trembles", because your hands are trembling.
-
-  You shoot when you release Ctrl key. The longer you held Ctrl,
-  the more power has the arrow (more velocity), but also the trembling
-  of your crosshair (and it's circle) is larger, so your accuracy
-  is lower.
-
-  Use arrow, bow, quiver from S&K.
-
 - some effects: blood explode when player hits monster.
 
 - debug menu is only for testing -- hide somehow at some point.
@@ -99,10 +90,6 @@ cages level:
   Maybe add a sanity check for mouseSensit values to MatrixWalker
   --- if outside range, use default ? Just in case it's some real bug
   in FPC etc.
-
-- Update WWW to point to both -with-sources and without versions.
-
-- kangury debian: hangs on Quit. Probably OpenAL problems.
 
 ----------------------------------------
 Things for which probably will be no time before PGD deadline:
