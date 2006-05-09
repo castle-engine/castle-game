@@ -1,3 +1,4 @@
+--------------------
 wiec tak:
 * oteksturowany duzy grob,
 * zmieniona tekstura duzego miecza,
@@ -6,6 +7,8 @@ wiec tak:
 wszystko w katalogu stoma.name/michalis/patch-06-05-09-0100
 --------------------
 - wilczek: wiêksze life, ¿eby brute force nie dzia³a³o
+
+- uzyj default_max_life a nie hardcoded
 
 ----------------------------------------
 - crosshair for bow

@@ -1309,7 +1309,7 @@ begin
 
       WerewolfCreature := TWerewolfCreature.Create(Werewolf,
         WerewolfStartPosition,
-        Vector3Single(0, 1, 0), 500, AnimationTime);
+        Vector3Single(0, 1, 0), 800, AnimationTime);
       Creatures.Add(WerewolfCreature);
       WerewolfCreature.Sound3d(stWerewolfHowling, 1.0);
 
