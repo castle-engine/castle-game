@@ -198,13 +198,9 @@ of the same kind, they are displayed like one item with quantity N.
 Picking and dropping handle this appropriately (when dropping you
 can drop only part of owned items).
 
-You can point with your mouse at item lying on the level,
-this tells you the name and quantity of visible object.
+You can use the "p" key ("Interact") when looking at item lying on the level,
+this tells you the name and quantity of visible object without picking it up.
 (of course, if object is too far, you will not be able to tell it exactly).
-
-As I'm writing this (2006-03-07), there are 3 items: the sword,
-the potion of life and the scroll of flying. More items will
-be added if only time will allow..
 
 See below in this file for description how you can design new
 items for this game.
