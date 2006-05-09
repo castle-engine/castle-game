@@ -101,6 +101,15 @@ type
       Be very cautious what you do here --- remember that this is called
       while TLevel.Create constructor did not finish it's work yet ! }
     procedure ChangeLevelScene; virtual;
+
+    { Just load TVRMLFlatSceneGL from file, doing some common tasks:
+      @unorderedList(
+        @item set texture params as the main level scene
+        @item optionally create triangle octree
+        @teim call PrepareRender, optionally with PrepareBackground = @true
+      ) }
+    function LoadLevelScene(const FileName: string;
+      CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -997,20 +1006,30 @@ begin
   { Nothing to do in this class. }
 end;
 
+function TLevel.LoadLevelScene(const FileName: string;
+  CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;
+begin
+  Result := TVRMLFlatSceneGL.Create(LoadVRMLNode(FileName),
+    true, roSeparateShapeStates);
+  Result.Attrib_TextureMinFilter :=
+    TextureMinificationQualityToGL[TextureMinificationQuality];
+
+  Result.PrepareRender(PrepareBackground,
+    true { true, because this is almost always needed anyway }, false, false);
+
+  if CreateDefaultTriangleOctree then
+    Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
+end;
+
 { TCastleHallLevel ----------------------------------------------------------- }
 
 constructor TCastleHallLevel.Create;
 
   function LoadSymbol(const Suffix: string): TVRMLFlatSceneGL;
   begin
-    Result := TVRMLFlatSceneGL.Create(LoadVRMLNode(
-      CastleLevelsPath + 'castle_hall_symbol_' + Suffix + '.wrl'),
-      true, roSeparateShapeStates);
-
-    Result.Attrib_TextureMinFilter :=
-      TextureMinificationQualityToGL[TextureMinificationQuality];
-
-    Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
+    Result := LoadLevelScene(
+      CastleLevelsPath + 'castle_hall_symbol_' + Suffix + '.wrl',
+      true, false);
   end;
 
 begin
@@ -1023,15 +1042,11 @@ begin
   Symbol_TR := LoadSymbol('tr');
   Symbol_BR := LoadSymbol('br');
 
-  Button := TVRMLFlatSceneGL.Create(LoadVRMLNode(
-    CastleLevelsPath + 'castle_hall_button.wrl'),
-    true, roSeparateShapeStates);
-  Button.DefaultTriangleOctree := Button.CreateTriangleOctree('');
+  Button := LoadLevelScene(CastleLevelsPath + 'castle_hall_button.wrl',
+    true, false);
 
-  StairsBlocker := TVRMLFlatSceneGL.Create(LoadVRMLNode(
-    CastleLevelsPath + 'castle_hall_stairs_blocker.wrl'),
-    true, roSeparateShapeStates);
-  StairsBlocker.DefaultTriangleOctree := StairsBlocker.CreateTriangleOctree('');
+  StairsBlocker := LoadLevelScene(
+    CastleLevelsPath + 'castle_hall_stairs_blocker.wrl', true, false);
 
   StairsBlockerExists := true;
 
@@ -1408,13 +1423,11 @@ begin
 
   FFootstepsSound := stPlayerFootstepsGrass;
 
-  TeleportOpaque := TVRMLFlatSceneGL.Create(LoadVRMLNode(
-    CastleLevelsPath + 'teleport_opaque.wrl'),
-    true, roSeparateShapeStates);
+  TeleportOpaque := LoadLevelScene(CastleLevelsPath + 'teleport_opaque.wrl',
+    false, false);
 
-  TeleportTransp := TVRMLFlatSceneGL.Create(LoadVRMLNode(
-    CastleLevelsPath + 'teleport_transp.wrl'),
-    true, roSeparateShapeStates);
+  TeleportTransp := LoadLevelScene(CastleLevelsPath + 'teleport_transp.wrl',
+    false, false);
 
   SacrilegeAmbushDone := false;
   SwordAmbushDone := false;
@@ -1696,20 +1709,12 @@ begin
 
   HintOpenDoorBoxShown := false;
 
-  FEndSequence := TVRMLFlatSceneGL.Create(LoadVRMLNode(
-    CastleLevelsPath + 'end_sequence_final.wrl'),
-    true, roSeparateShapeStates);
-  FEndSequence.Attrib_TextureMinFilter :=
-    TextureMinificationQualityToGL[TextureMinificationQuality];
-  FEndSequence.PrepareRender(true, true, false, false);
+  FEndSequence := LoadLevelScene(CastleLevelsPath + 'end_sequence_final.wrl',
+    false, true);
 
-  FGateExit := TVRMLFlatSceneGL.Create(LoadVRMLNode(
-    CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl'),
-    true, roSeparateShapeStates);
-  FGateExit.DefaultTriangleOctree := FGateExit.CreateTriangleOctree('');
-  FGateExit.Attrib_TextureMinFilter :=
-    TextureMinificationQualityToGL[TextureMinificationQuality];
-  FGateExit.PrepareRender(true, true, false, false);
+  FGateExit := LoadLevelScene(
+    CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
+    true, false);
 end;
 
 destructor TCagesLevel.Destroy;
