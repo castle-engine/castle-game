@@ -81,7 +81,8 @@ type
       @groupBegin }
     stSwordEquipping,
     stSwordAttackStart,
-    stArrowHit { TODO: not used for now. },
+    stArrowFired,
+    stArrowHit,
     stKeyUse { TODO: not used for now. },
     stBowAttackStart,
     stBowEquipping,
@@ -319,6 +320,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'sword_attack_start.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: '' { 'arrow_fired.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'arrow_hit.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'key_use.wav';

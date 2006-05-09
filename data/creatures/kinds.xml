@@ -147,4 +147,20 @@
       <damage const="10" random="10"/>
     </short_range_attack>
   </ThrownWeb>
+
+  <Arrow
+    camera_radius="1.0"
+    flying="True"
+    default_max_life="1.0"
+    close_direction_to_player="False"
+    transparent="False"
+    hits_player="False"
+    hits_creatures="True"
+    move_speed="2.0"
+  >
+
+    <short_range_attack knockback_distance="5">
+      <damage const="20" random="20"/>
+    </short_range_attack>
+  </Arrow>
 </CONFIG>

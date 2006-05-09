@@ -65,6 +65,9 @@ const
 
   DefaultPauseBetweenSoundIdle = 2.5;
 
+  DefaultHitsPlayer = true;
+  DefaultHitsCreatures = false;
+
 type
   TCreature = class;
 
@@ -525,6 +528,8 @@ type
     FCloseDirectionToTargetSpeed: Single;
     FPauseBetweenSoundIdle: Single;
     FSoundIdle: TSoundType;
+    FHitsPlayer: boolean;
+    FHitsCreatures: boolean;
   protected
     procedure FreePrepareRender; override;
   public
@@ -576,6 +581,11 @@ type
     property PauseBetweenSoundIdle: Single
       read FPauseBetweenSoundIdle write FPauseBetweenSoundIdle
       default DefaultPauseBetweenSoundIdle;
+
+    property HitsPlayer: boolean
+      read FHitsPlayer write FHitsPlayer default DefaultHitsPlayer;
+    property HitsCreatures: boolean
+      read FHitsCreatures write FHitsCreatures default DefaultHitsCreatures;
   end;
 
   TCreature = class
@@ -1000,6 +1010,7 @@ type
     procedure ExplodeCore;
     procedure ExplodeWithPlayer;
     procedure ExplodeWithLevel;
+    procedure ExplodeWithCreature(Creature: TCreature);
     LastSoundIdleTime: Single;
   public
     { Shortcut for TMissileCreatureKind(Kind). }
@@ -1026,6 +1037,7 @@ var
   Spider: TSpiderKind;
   SpiderQueen: TSpiderQueenKind;
   ThrownWeb: TMissileCreatureKind;
+  Arrow: TMissileCreatureKind;
 
   WasParam_DebugNoCreatures: boolean = false;
 
@@ -1507,6 +1519,8 @@ begin
   FCloseDirectionToPlayer := DefaultCloseDirectionToPlayer;
   FCloseDirectionToTargetSpeed := DefaultCloseDirectionToTargetSpeed;
   FPauseBetweenSoundIdle := DefaultPauseBetweenSoundIdle;
+  FHitsPlayer := DefaultHitsPlayer;
+  FHitsCreatures := DefaultHitsCreatures;
 end;
 
 destructor TMissileCreatureKind.Destroy;
@@ -1578,6 +1592,12 @@ begin
   PauseBetweenSoundIdle :=
     KindsConfig.GetFloat(VRMLNodeName + '/pause_between_sound_idle',
     DefaultPauseBetweenSoundIdle);
+  HitsPlayer :=
+    KindsConfig.GetValue(VRMLNodeName + '/hits_player',
+    DefaultHitsPlayer);
+  HitsCreatures :=
+    KindsConfig.GetValue(VRMLNodeName + '/hits_creatures',
+    DefaultHitsCreatures);
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }
@@ -3107,6 +3127,8 @@ var
   NewLegsPosition: TVector3Single;
   AngleBetween, AngleChange: Single;
   NewDirection, TargetDirection: TVector3Single;
+  Box: TBox3d;
+  I: Integer;
 begin
   inherited;
 
@@ -3120,10 +3142,22 @@ begin
   end else
     ExplodeWithLevel;
 
-  if LegsCollisionWithPlayer(LegsPosition) then
+  if MissileKind.HitsPlayer and LegsCollisionWithPlayer(LegsPosition) then
     ExplodeWithPlayer;
 
-  { TODO: if collides with other creature, explode also there. }
+  if MissileKind.HitsCreatures then
+  begin
+    Box := BoundingBox;
+    for I := 0 to Level.Creatures.Count - 1 do
+      if (Level.Creatures[I] <> Self) and
+         (Level.Creatures[I].CollisionsWithCreaturesAndPlayer) and
+         (Boxes3dCollision(Box, Level.Creatures[I].BoundingBox)) then
+      begin
+        ExplodeWithCreature(Level.Creatures[I]);
+        { TODO: projectiles shouldn't do here "break". }
+        break;
+      end;
+  end;
 
   if MissileKind.CloseDirectionToPlayer and
      (MissileKind.CloseDirectionToTargetSpeed <> 0) then
@@ -3190,6 +3224,15 @@ end;
 procedure TMissileCreature.ExplodeWithLevel;
 begin
   ExplodeCore;
+end;
+
+procedure TMissileCreature.ExplodeWithCreature(Creature: TCreature);
+begin
+  ExplodeCore;
+  { TODO: knockback for creatures should be done here. }
+  Creature.Life := Creature.Life -
+    (Kind.ShortRangeAttackDamageConst +
+      Random * Kind.ShortRangeAttackDamageRandom);
 end;
 
 function TMissileCreature.CollisionsWithCreaturesAndPlayer: boolean;
@@ -3490,6 +3533,15 @@ begin
     );
   ThrownWeb.SoundExplosion := stThrownWebHit;
   ThrownWeb.SoundIdle := stThrownWebIdle;
+
+  Arrow := TMissileCreatureKind.Create(
+    'Arrow',
+    TVRMLGLAnimationInfo.Create(
+      [ CreatureFileName('arrow' + PathDelim + 'arrow.wrl') ],
+      [ 0 ],
+      AnimScenesPerTime, AnimOptimization, false, false)
+    );
+  Arrow.SoundExplosion := stArrowHit;
 
   CreaturesKinds.LoadFromFile;
 end;

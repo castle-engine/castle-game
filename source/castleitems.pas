@@ -609,8 +609,32 @@ end;
 { TItemBowKind ------------------------------------------------------------- }
 
 procedure TItemBowKind.ActualAttack(Item: TItem);
+var
+  QuiverIndex: Integer;
+  Missile: TCreature;
+  MissilePosition, MissileDirection: TVector3Single;
 begin
-  { TODO }
+  QuiverIndex := Player.Items.FindKind(Quiver);
+  if QuiverIndex = -1 then
+  begin
+    TimeMessage('You have no arrows');
+    Sound(stPlayerInteractFailed);
+  end else
+  begin
+    { delete arrow from player }
+    Player.Items[QuiverIndex].Quantity :=
+      Player.Items[QuiverIndex].Quantity - 1;
+    if Player.Items[QuiverIndex].Quantity = 0 then
+      Player.DeleteItem(QuiverIndex).Free;
+
+    { shoot the arrow }
+    MissilePosition := Player.Navigator.CameraPos;
+    MissileDirection := Player.Navigator.CameraDir;
+    Missile := Arrow.CreateDefaultCreature(MissilePosition, MissileDirection,
+      Level.AnimationTime);
+    Level.Creatures.Add(Missile);
+    Sound(stArrowFired);
+  end;
 end;
 
 { TItemScrollOfFlyingKind ---------------------------------------------------- }
@@ -903,7 +927,7 @@ begin
     'RedKey', 'Red Key', 'red_key.png');
 
   Quiver := TItemKind.Create('quiver.wrl',
-    'Quiver', 'Quiver', 'quiver.png');
+    'Arrow', 'Arrow', 'quiver.png');
 end;
 
 procedure DoFinalization;

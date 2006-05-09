@@ -1,9 +1,15 @@
+wiec tak:
+* oteksturowany duzy grob,
+* zmieniona tekstura duzego miecza,
+* dodane swiatlo dajace czerwona poswiate ;] (zobacz sobie, czy ci sie podoba, ale dzieki temu fajniej swieca potiony i tekstura sciany jest fajnie podkresona),
+
+wszystko w katalogu stoma.name/michalis/patch-06-05-09-0100
+--------------------
 - wilczek: wiêksze life, ¿eby brute force nie dzia³a³o
 
+----------------------------------------
 - crosshair for bow
 - showing arrow in shooting anim for bow
-
-----------------------------------------
 
 - gate
   - need an actual door inside GateExitBox to make the message valid.
