@@ -193,24 +193,34 @@ procedure Draw2D(Draw2DData: Integer);
     InventorySlotWidth = 100;
     InventorySlotHeight = 100;
     InventorySlotMargin = 2;
-    MaxInventorySlotsVisible = RequiredScreenHeight div InventorySlotHeight;
+    InventorySlotsVisibleInColumn = RequiredScreenHeight div InventorySlotHeight;
 
-    ItemSlotX = RequiredScreenWidth - InventorySlotWidth;
+    function ItemSlotX(I: Integer): Integer;
+    begin
+      Result := RequiredScreenWidth - InventorySlotWidth *
+        ((I div InventorySlotsVisibleInColumn) + 1);
+    end;
 
     function ItemSlotY(I: Integer): Integer;
     begin
-      Result := InventorySlotHeight * (MaxInventorySlotsVisible - 1 - I);
+      Result := InventorySlotHeight * (InventorySlotsVisibleInColumn
+        - 1 - (I mod InventorySlotsVisibleInColumn));
     end;
 
   var
-    I, X, Y, MaxItemShown: Integer;
+    I, X, Y: Integer;
     S: string;
   begin
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-      for I := 0 to MaxInventorySlotsVisible - 1 do
+      { Draw at least InventorySlotsVisibleInColumn slots,
+        possibly drawing empty slots. This is needed, because
+        otherwise when no items are owned player doesn't see any
+        effect of changing InventoryVisible. }
+      for I := 0 to Max(Player.Items.Count - 1,
+        InventorySlotsVisibleInColumn - 1) do
       begin
-        X := ItemSlotX;
+        X := ItemSlotX(I);
         Y := ItemSlotY(I);
 
         glRasterPos2i(X, Y);
@@ -218,13 +228,11 @@ procedure Draw2D(Draw2DData: Integer);
       end;
     glDisable(GL_BLEND);
 
-    MaxItemShown := Min(MaxInventorySlotsVisible - 1, Player.Items.Count - 1);
-
     glAlphaFunc(GL_GREATER, 0.5);
     glEnable(GL_ALPHA_TEST);
-      for I := 0 to MaxItemShown do
+      for I := 0 to Player.Items.Count - 1 do
       begin
-        X := ItemSlotX;
+        X := ItemSlotX(I);
         Y := ItemSlotY(I);
 
         glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
@@ -232,22 +240,22 @@ procedure Draw2D(Draw2DData: Integer);
       end;
     glDisable(GL_ALPHA_TEST);
 
-    if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) and
-       (InventoryCurrentItem <= MaxItemShown) then
+    if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
       glColor4f(0.8, 0.8, 0.8, 1);
       DrawGLRectBorder(
-        ItemSlotX + InventorySlotMargin,
+        ItemSlotX(InventoryCurrentItem) + InventorySlotMargin,
         ItemSlotY(InventoryCurrentItem) + InventorySlotMargin,
-        ItemSlotX + InventorySlotWidth - InventorySlotMargin,
+        ItemSlotX(InventoryCurrentItem)
+          + InventorySlotWidth - InventorySlotMargin,
         ItemSlotY(InventoryCurrentItem)
           + InventorySlotHeight - InventorySlotMargin);
     end;
 
     glColor4f(1, 1, 0.5, 1);
-    for I := 0 to MaxItemShown do
+    for I := 0 to Player.Items.Count - 1 do
     begin
-      X := ItemSlotX;
+      X := ItemSlotX(I);
       Y := ItemSlotY(I);
 
       glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
@@ -1163,7 +1171,12 @@ begin
         GLWinMessagesTheme.RectColor[3] := 0.4;
 
         if PrepareNewPlayer then
+        begin
           Level.PrepareNewPlayer(Player);
+          { Adjust InventoryCurrentItem, as player possibly got some items here. }
+          if Player.Items.Count > 0 then
+            InventoryCurrentItem := 0;
+        end;
 
         repeat
           Glwm.ProcessMessage(true);

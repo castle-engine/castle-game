@@ -287,9 +287,6 @@ Cages level:
   to use TVRMLGLAnimation class (additional simplification will be that
   only one Symbol model will be needed, not 4 (like now)).
 
-- inventory should be able to scroll, when more than MaxInventorySlots items
-  are available.
-
 - change the name --- there already exists game named "castle"!
   And there is "Castle Adventure" !
 

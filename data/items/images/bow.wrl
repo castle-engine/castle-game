@@ -1,0 +1,18 @@
+#VRML V1.0 ascii
+
+# I generated life_potion.png image using
+#   view3dscene --geometry 400x400 bow.wrl
+# doing screenshot, then I modified the image (scaled down and added
+# alpha channel) using GIMP. This is *not* automated in the Makefile
+# in this directory.
+
+Group {
+  PerspectiveCamera {
+    position -0.369846522808075 1.794093370437622 1.853734135627747
+    orientation -0.331410497426987 0.530446887016296 0.780251979827881 2.843760251998901
+  }
+  PointLight {
+    location 3 3 3
+  }
+  WWWInline { name "../models/bow.wrl" }
+}

@@ -205,6 +205,11 @@ type
     procedure ActualAttack(Item: TItem); override;
   end;
 
+  TItemBowKind = class(TItemKind)
+  public
+//    procedure ActualAttack(Item: TItem); override;
+  end;
+
   TItemScrollOfFlyingKind = class(TItemKind)
     procedure Use(Item: TItem); override;
   end;
@@ -325,10 +330,12 @@ var
   ItemsKinds: TItemKindsList;
 
   Sword: TItemSwordKind;
+  Bow: TItemBowKind;
   LifePotion: TItemKind;
   ScrollOfFlying: TItemKind;
   KeyItemKind: TItemKind;
   RedKeyItemKind: TItemKind;
+  Quiver: TItemKind;
 
 { Returns nil if not found. }
 function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
@@ -599,6 +606,13 @@ begin
   end;
 end;
 
+{ TItemBowKind ------------------------------------------------------------- }
+
+(*procedure TItemBowKind.ActualAttack(Item: TItem);
+begin
+  { TODO }
+end;*)
+
 { TItemScrollOfFlyingKind ---------------------------------------------------- }
 
 procedure TItemScrollOfFlyingKind.Use(Item: TItem);
@@ -844,7 +858,7 @@ end;
 
 procedure DoInitialization;
 
-  function SwordAnimFileName(const ModelFileName: string): string;
+  function WeaponAnimFileName(const ModelFileName: string): string;
   begin
     Result := ProgramDataPath + 'data' + PathDelim +
       'items' + PathDelim + 'attack_animations' + PathDelim + ModelFileName;
@@ -858,12 +872,22 @@ begin
   Sword := TItemSwordKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
     'sword.png', false, true, stSwordEquipping,
     TVRMLGLAnimationInfo.Create(
-      [ SwordAnimFileName('sword_1.wrl'),
-        SwordAnimFileName('sword_2.wrl') ],
+      [ WeaponAnimFileName('sword_1.wrl'),
+        WeaponAnimFileName('sword_2.wrl') ],
       [ 0, 0.5 ],
       30, roSceneAsAWhole, false, false));
   Sword.ActualAttackTime := MapRange(0.0, -1.0, +0.7, 0.0, 0.5);
   Sword.SoundAttackStart := stSwordAttackStart;
+
+  Bow := TItemBowKind.Create('bow.wrl', 'Bow', 'Bow', 'bow.png'
+    {,
+    'bow.png', false, true, stBowEquipping,
+    TVRMLGLAnimationInfo.Create(
+      [ WeaponAnimFileName('bow_equipped.wrl')
+      [ 0 ],
+      1, roSceneAsAWhole, false, false)});
+{  Bow.ActualAttackTime := 0;
+  Bow.SoundAttackStart := stBowAttackStart;}
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
     'LifePotion', 'Potion of Life', 'life_potion.png');
@@ -877,6 +901,9 @@ begin
 
   RedKeyItemKind := TItemKind.Create('red_key.wrl',
     'RedKey', 'Red Key', 'red_key.png');
+
+  Quiver := TItemKind.Create('quiver.wrl',
+    'Quiver', 'Quiver', 'quiver.png');
 end;
 
 procedure DoFinalization;
