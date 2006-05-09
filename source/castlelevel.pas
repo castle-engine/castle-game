@@ -1287,7 +1287,7 @@ const
   MinAnimationButtonPress = 0.5;
   WerewolfStartPosition: TVector3Single = (0, 0, -4);
 var
-  WerewolfCreature: TWerewolfCreature;
+  WerewolfCreature: TCreature;
 begin
   inherited;
 
@@ -1310,6 +1310,7 @@ begin
       WerewolfCreature := Werewolf.CreateDefaultCreature(
         WerewolfStartPosition,
         Vector3Single(0, 1, 0), AnimationTime);
+      Creatures.Add(WerewolfCreature);
       WerewolfCreature.Sound3d(stWerewolfHowling, 1.0);
 
       Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
