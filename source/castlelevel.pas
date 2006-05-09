@@ -1872,10 +1872,9 @@ procedure TCagesLevel.PrepareNewPlayer(NewPlayer: TPlayer);
 begin
   inherited;
 
-  { Give player 1 sword. Otherwise player would start the level
-    without any weapon, and there's no weapon to be found on
-    the level... }
+  { Give player 1 sword and 1 bow, to have weapons. }
   NewPlayer.PickItem(TItem.Create(Sword, 1));
+  NewPlayer.PickItem(TItem.Create(Bow, 1));
 end;
 
 procedure TCagesLevel.Render(const Frustum: TFrustum);
