@@ -373,7 +373,8 @@ begin
            if RenderShadows then
              MessageOK(Glw, 'Shadows are basically implemented and work, ' +
                'but they slow down rendering very much and there are some unresolved issues. ' +
-               'That''s the reason why for PGD stage 5 shadows are disabled by default. ' +
+               'That''s the reason why for PGD competition entry ' +
+               'shadows are disabled by default. ' +
                'You have been warned!', taLeft);
          end;
        end;

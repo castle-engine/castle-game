@@ -83,6 +83,8 @@ type
     stSwordAttackStart,
     stArrowHit { TODO: not used for now. },
     stKeyUse { TODO: not used for now. },
+    stBowAttackStart,
+    stBowEquipping,
     { @groupEnd }
 
     { Levels sounds.
@@ -320,6 +322,10 @@ var
     ( FileName: 'arrow_hit.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'key_use.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: '' { 'bow_equipping.wav' };
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
+    ( FileName: '' { 'bow_attack_start.wav' };
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'gate_music.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),

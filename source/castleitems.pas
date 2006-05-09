@@ -205,9 +205,9 @@ type
     procedure ActualAttack(Item: TItem); override;
   end;
 
-  TItemBowKind = class(TItemKind)
+  TItemBowKind = class(TItemWeaponKind)
   public
-//    procedure ActualAttack(Item: TItem); override;
+    procedure ActualAttack(Item: TItem); override;
   end;
 
   TItemScrollOfFlyingKind = class(TItemKind)
@@ -608,10 +608,10 @@ end;
 
 { TItemBowKind ------------------------------------------------------------- }
 
-(*procedure TItemBowKind.ActualAttack(Item: TItem);
+procedure TItemBowKind.ActualAttack(Item: TItem);
 begin
   { TODO }
-end;*)
+end;
 
 { TItemScrollOfFlyingKind ---------------------------------------------------- }
 
@@ -879,15 +879,15 @@ begin
   Sword.ActualAttackTime := MapRange(0.0, -1.0, +0.7, 0.0, 0.5);
   Sword.SoundAttackStart := stSwordAttackStart;
 
-  Bow := TItemBowKind.Create('bow.wrl', 'Bow', 'Bow', 'bow.png'
-    {,
+  Bow := TItemBowKind.Create('bow.wrl', 'Bow', 'Bow', 'bow.png',
     'bow.png', false, true, stBowEquipping,
     TVRMLGLAnimationInfo.Create(
-      [ WeaponAnimFileName('bow_equipped.wrl')
-      [ 0 ],
-      1, roSceneAsAWhole, false, false)});
-{  Bow.ActualAttackTime := 0;
-  Bow.SoundAttackStart := stBowAttackStart;}
+      [ WeaponAnimFileName('bow_2.wrl'),
+        WeaponAnimFileName('bow.wrl') ],
+      [ 0, 0.5 ],
+      30, roSceneAsAWhole, false, false));
+  Bow.ActualAttackTime := 0;
+  Bow.SoundAttackStart := stBowAttackStart;
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
     'LifePotion', 'Potion of Life', 'life_potion.png');
