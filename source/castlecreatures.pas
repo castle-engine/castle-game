@@ -455,6 +455,8 @@ type
     FMaxThrowWebAttackDistance: Single;
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
+  protected
+    procedure FreePrepareRender; override;
   public
     constructor Create(
       const AVRMLNodeName: string;
@@ -472,7 +474,6 @@ type
 
     procedure PrepareRender; override;
     function PrepareRenderSteps: Cardinal; override;
-    procedure FreePrepareRender; override;
 
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;

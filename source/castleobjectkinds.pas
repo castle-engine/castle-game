@@ -36,7 +36,12 @@ type
     FVRMLNodeName: string;
     FPrepareRenderDone: boolean;
   protected
-    { This will be used by TCreature.ReloadAnimations.
+    { This should release everything done by PrepareRender.
+
+      When such thing should be called ? E.g. because PrepareRender
+      must be done once again, because some attributes (e.g. things
+      set by AnimationAttributesSet) changed.
+
       In this class this just sets PrepareRenderDone to @false. }
     procedure FreePrepareRender; virtual;
   public

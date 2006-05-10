@@ -357,7 +357,7 @@ constructor TPlayer.Create;
 begin
   inherited Create;
   FLife := DefaultMaxLife;
-  FMaxLife := DefaultMaxLife;;
+  FMaxLife := DefaultMaxLife;
   FItems := TItemsList.Create;
 
   FNavigator := TMatrixWalker.Create(nil);

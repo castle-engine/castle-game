@@ -58,6 +58,8 @@ type
     FGLList_DrawImage: TGLuint;
     FBoundingBoxRotated: TBox3d;
     FBoundingBoxRotatedCalculated: boolean;
+  protected
+    procedure FreePrepareRender; override;
   public
     constructor Create(const AModelFileName, AVRMLNodeName, AName,
       AImageFileName: string);
@@ -134,6 +136,8 @@ type
     FAttackAnimationInfo: TVRMLGLAnimationInfo;
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
+  protected
+    procedure FreePrepareRender; override;
   public
     { Constryctor. You can pass
       AAttackAnimationInfo = nil to get
@@ -452,7 +456,13 @@ end;
 
 function TItemKind.PrepareRenderSteps: Cardinal;
 begin
-  Result := 1;
+  Result := (inherited PrepareRenderSteps) + 1;
+end;
+
+procedure TItemKind.FreePrepareRender;
+begin
+  FreeAndNil(FScene);
+  inherited;
 end;
 
 procedure TItemKind.CloseGL;
@@ -582,6 +592,12 @@ end;
 function TItemWeaponKind.PrepareRenderSteps: Cardinal;
 begin
   Result := (inherited PrepareRenderSteps) + 2;
+end;
+
+procedure TItemWeaponKind.FreePrepareRender;
+begin
+  FreeAndNil(FAttackAnimation);
+  inherited;
 end;
 
 procedure TItemWeaponKind.CloseGL;

@@ -94,6 +94,10 @@ cages level:
 ----------------------------------------
 Things for which probably will be no time before PGD deadline:
 
+- when debug menu "give me 20 items" is used, InventoryCurrentItem
+  may remain -1. Fix by placing InventoryCurrentItem as inside
+  read-only TPlayer property.
+
 - gate:
   - grave lacks textures
   - is this a good idea to just force player to restart if he jumped into the grave ? I think yes, but later maybe some alt way should be possible ?
