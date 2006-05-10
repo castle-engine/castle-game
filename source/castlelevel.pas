@@ -595,8 +595,7 @@ begin
     { initialize FAnimationTime. Must be initialized before creating creatures. }
     FAnimationTime := 0.0;
 
-    Scene.Attrib_TextureMinFilter :=
-      TextureMinificationQualityToGL[TextureMinificationQuality];
+    AttributesSet(Scene.Attributes);
 
     { Calculate HomeCameraPos, HomeCameraDir, HomeCameraUp.
       Must be done before initializing creatures, as they right now
@@ -1011,8 +1010,7 @@ function TLevel.LoadLevelScene(const FileName: string;
 begin
   Result := TVRMLFlatSceneGL.Create(LoadVRMLNode(FileName),
     true, roSeparateShapeStates);
-  Result.Attrib_TextureMinFilter :=
-    TextureMinificationQualityToGL[TextureMinificationQuality];
+  AttributesSet(Result.Attributes);
 
   Result.PrepareRender(PrepareBackground,
     true { true, because this is almost always needed anyway }, false, false);

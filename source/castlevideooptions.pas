@@ -23,7 +23,7 @@ unit CastleVideoOptions;
 
 interface
 
-uses OpenGLh;
+uses OpenGLh, VRMLFlatSceneGL;
 
 type
   { Approximately from worst to best. }
@@ -39,12 +39,6 @@ const
     'NEAREST_MIPMAP_NEAREST', 'NEAREST_MIPMAP_LINEAR',
     'LINEAR_MIPMAP_NEAREST', 'LINEAR_MIPMAP_LINEAR' );
 
-  TextureMinificationQualityToGL:
-    array[TTextureMinificationQuality] of TGLint =
-  ( GL_NEAREST, GL_LINEAR,
-    GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR,
-    GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR );
-
   { Default value for TextureMinificationQuality.
 
     This is the slowest one, but it looks perfect.
@@ -54,6 +48,16 @@ const
 
 var
   TextureMinificationQuality: TTextureMinificationQuality;
+
+{ Set Attributes as needed. Right now this means setting
+  current TextureMinificationQuality. }
+procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes);
+
+{ Set Attributes of animation as needed. In theory you should
+  call AttributesSet here, but in practice animation's attributes
+  must be a little different, otherwise animations can
+  take too much memory to load. }
+procedure AnimationAttributesSet(Attributes: TVRMLSceneRenderingAttributes);
 
 const
   DefaultAllowScreenChange = true;
@@ -109,6 +113,25 @@ var
 implementation
 
 uses CastleConfig;
+
+procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes);
+const
+  TextureMinificationQualityToGL:
+    array[TTextureMinificationQuality] of TGLint =
+  ( GL_NEAREST, GL_LINEAR,
+    GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR,
+    GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR );
+begin
+  Attributes.TextureMinFilter :=
+    TextureMinificationQualityToGL[TextureMinificationQuality];
+end;
+
+procedure AnimationAttributesSet(Attributes: TVRMLSceneRenderingAttributes);
+begin
+  { Despite the comments in the interface, this is the same thing
+    as AttributesSet for now. }
+  AttributesSet(Attributes);
+end;
 
 initialization
   TextureMinificationQuality := TTextureMinificationQuality(

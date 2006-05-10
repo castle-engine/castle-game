@@ -19,10 +19,6 @@
   - crosshair for bow
   - showing arrow in shooting anim for bow
 
-- when creating items and creatures animations, texture filtering should also
-  be set to make them look better. To find all occurences:
-    grep_pas_src . AnimInfo.CreateAnimation
-
 - gate
   - need an actual door inside GateExitBox to make the message valid.
 

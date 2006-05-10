@@ -444,8 +444,7 @@ begin
       FreePrepareRender should be called (and actually implemented
       for TItemKind descendants) to make sure that textures are reloaded
       with proper filtering. }
-    Scene.Attrib_TextureMinFilter :=
-      TextureMinificationQualityToGL[TextureMinificationQuality];
+    AttributesSet(Scene.Attributes);
   end;
 
   Progress.Step;
@@ -570,8 +569,8 @@ procedure TItemWeaponKind.PrepareRender;
     if (AnimInfo <> nil) and (Anim = nil) then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
-    if Anim <> nil then
-      Anim.PrepareRender(false, true, false, false, false);
+    AnimationAttributesSet(Anim.Attributes);
+    Anim.PrepareRender(false, true, false, false, false);
     Progress.Step;
   end;
 

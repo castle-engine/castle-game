@@ -1267,6 +1267,7 @@ procedure TWalkAttackCreatureKind.PrepareRender;
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
+    AnimationAttributesSet(Anim.Attributes);
     Anim.PrepareRender(false, true, RenderShadowsPossible, false, false);
     Progress.Step;
   end;
@@ -1434,6 +1435,7 @@ procedure TSpiderQueenKind.PrepareRender;
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
+    AnimationAttributesSet(Anim.Attributes);
     Anim.PrepareRender(false, true, RenderShadowsPossible, false, false);
     Progress.Step;
   end;
@@ -1544,6 +1546,7 @@ procedure TMissileCreatureKind.PrepareRender;
     if Anim = nil then
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
+    AnimationAttributesSet(Anim.Attributes);
     Anim.PrepareRender(false, true, RenderShadowsPossible, false, false);
     Progress.Step;
   end;
