@@ -115,9 +115,13 @@ type
   TObjectsListItem_3 = TItemKind;
   {$I objectslist_3.inc}
   TItemKindsList = class(TObjectsList_3)
+  public
     { Calls PrepareRender for all items.
       This does Progress.Init, Step, Fini. }
     procedure PrepareRender;
+
+    { Call FreePrepareRender for all items. }
+    procedure FreePrepareRender;
   end;
 
   TItemPotionOfLifeKind = class(TItemKind)
@@ -444,10 +448,6 @@ begin
 
     Scene.PrepareRender(false, true, false, false);
 
-    { TODO: So after changing TextureMinificationQuality,
-      FreePrepareRender should be called (and actually implemented
-      for TItemKind descendants) to make sure that textures are reloaded
-      with proper filtering. }
     AttributesSet(Scene.Attributes);
   end;
 
@@ -487,6 +487,14 @@ begin
     for I := 0 to High do
       Items[I].PrepareRender;
   finally Progress.Fini; end;
+end;
+
+procedure TItemKindsList.FreePrepareRender;
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+    Items[I].FreePrepareRender;
 end;
 
 { TItemPotionOfLifeKind ---------------------------------------------------- }

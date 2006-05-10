@@ -202,6 +202,9 @@ type
       This does Progress.Init, Step, Fini. }
     procedure PrepareRender;
 
+    { Call FreePrepareRender for all items. }
+    procedure FreePrepareRender;
+
     { Find item with given VRMLNodeName.
       @raises Exception if not found. }
     function FindByVRMLNodeName(const AVRMLNodeName: string): TCreatureKind;
@@ -1172,6 +1175,14 @@ begin
     WritelnAnimationsInfo;
     {$endif}
   end;
+end;
+
+procedure TCreaturesKindsList.FreePrepareRender;
+var
+  I: Integer;
+begin
+  for I := 0 to High do
+    Items[I].FreePrepareRender;
 end;
 
 function TCreaturesKindsList.FindByVRMLNodeName(

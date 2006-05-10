@@ -388,8 +388,15 @@ begin
          RenderShadows := DefaultRenderShadows;
          RenderShadowsArgument.Value := RenderShadows;
 
-         TextureMinificationQuality := DefaultTextureMinificationQuality;
-         TextureMinificationQualitySlider.Value := Ord(TextureMinificationQuality);
+         if TextureMinificationQuality <> DefaultTextureMinificationQuality then
+         begin
+           TextureMinificationQuality := DefaultTextureMinificationQuality;
+           TextureMinificationQualitySlider.Value := Ord(TextureMinificationQuality);
+           { All items and creatures must be reloaded after
+             texture minification filter changed. }
+           ItemsKinds.FreePrepareRender;
+           CreaturesKinds.FreePrepareRender;
+         end;
 
          if CreatureAnimationScenesPerTime <> DefaultCreatureAnimationScenesPerTime then
          begin
@@ -439,10 +446,20 @@ begin
 end;
 
 procedure TVideoMenu.CurrentItemAccessoryValueChanged;
+var
+  NewTextureMinificationQuality: TTextureMinificationQuality;
 begin
   case CurrentItem of
-    1: TextureMinificationQuality :=
-      TTextureMinificationQuality(TextureMinificationQualitySlider.Value);
+    1: begin
+         NewTextureMinificationQuality :=
+           TTextureMinificationQuality(TextureMinificationQualitySlider.Value);
+         if TextureMinificationQuality <> NewTextureMinificationQuality then
+         begin
+           TextureMinificationQuality := NewTextureMinificationQuality;
+           ItemsKinds.FreePrepareRender;
+           CreaturesKinds.FreePrepareRender;
+         end;
+       end;
     4: begin
          if CreatureAnimationScenesPerTime <>
            Cardinal(CreatureAnimationSlider.Value) then
