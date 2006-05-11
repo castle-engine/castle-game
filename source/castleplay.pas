@@ -816,7 +816,7 @@ begin
   { Glwin.UpdateMouseLook will read Navigator.MouseLook, so we better set
     it here (even though it's set in Player.Idle). }
   Player.Navigator.MouseLook := UseMouseLook;
-  Glwin.UpdateMouseLook;
+  Glw.UpdateMouseLook;
 end;
 
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
@@ -1124,7 +1124,6 @@ begin
         Glw.OnIdle := Idle;
         Glw.OnKeyDown := KeyDown;
         Glw.OnMouseDown := MouseDown;
-        Glw.OnMouseMove := MouseMove;
 
         UpdateMouseLook;
 

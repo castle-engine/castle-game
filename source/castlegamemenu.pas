@@ -92,7 +92,7 @@ begin
   case CurrentItem of
     0: UserQuit := true;
     1: ViewGameMessages;
-    2: ShowControlsMenu(DrawUnderMenu, true, true);
+    2: ShowControlsMenuEscape(DrawUnderMenu, true, true, UserQuit);
     3: CurrentMenu := GameSoundMenu;
     4: { At first I did here GameCancel(false), but tests (with Mama)
          show that it's too easy to select this and accidentaly

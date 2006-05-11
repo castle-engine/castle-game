@@ -39,6 +39,13 @@ type
 procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
   ADrawFadeRect, ADrawCentered: boolean);
 
+{ This is like ShowControlsMenu, but user can quit with
+  escape key. AExitWithEscape will be set to @true or @false,
+  depending on whether user used escape to exit. }
+procedure ShowControlsMenuEscape(ADrawUnderMenu: TDrawFunc;
+  ADrawFadeRect, ADrawCentered: boolean;
+  out AExitWithEscape: boolean);
+
 const
   DefaultUseMouseLook = true;
 
@@ -382,6 +389,8 @@ var
   DrawFadeRect: boolean;
   GLList_DrawFadeRect: TGLuint;
   MoveX, MoveY: Single;
+  ExitWithEscapeAllowed: boolean;
+  ExitWithEscape: boolean;
 
 procedure Draw2d(Draw2DData: Integer);
 begin
@@ -409,7 +418,15 @@ procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   CurrentMenu.KeyDown(Key, C);
   if CastleKey_SaveScreen.IsValue(Key) then
-    SaveScreen;
+    SaveScreen else
+  if ExitWithEscapeAllowed then
+  case C of
+    CharEscape:
+      begin
+        UserQuit := true;
+        ExitWithEscape := true;
+      end;
+  end;
 end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
@@ -441,13 +458,16 @@ begin
   MessageOK(Glwin, 'You can''t exit now.');
 end;
 
-procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
-  ADrawFadeRect, ADrawCentered: boolean);
+procedure ShowControlsMenuCore(ADrawUnderMenu: TDrawFunc;
+  ADrawFadeRect, ADrawCentered, AExitWithEscapeAllowed: boolean;
+  out AExitWithEscape: boolean);
 var
   SavedMode: TGLMode;
 begin
   DrawUnderMenu := ADrawUnderMenu;
   DrawFadeRect := ADrawFadeRect;
+  ExitWithEscapeAllowed := AExitWithEscapeAllowed;
+  ExitWithEscape := false;
 
   if ADrawCentered then
   begin
@@ -482,6 +502,25 @@ begin
     until UserQuit;
 
   finally FreeAndNil(SavedMode); end;
+
+  AExitWithEscape := ExitWithEscape;
+end;
+
+procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
+  ADrawFadeRect, ADrawCentered: boolean);
+var
+  Dummy: boolean;
+begin
+  ShowControlsMenuCore(ADrawUnderMenu, ADrawFadeRect, ADrawCentered,
+    false, Dummy);
+end;
+
+procedure ShowControlsMenuEscape(ADrawUnderMenu: TDrawFunc;
+  ADrawFadeRect, ADrawCentered: boolean;
+  out AExitWithEscape: boolean);
+begin
+  ShowControlsMenuCore(ADrawUnderMenu, ADrawFadeRect, ADrawCentered,
+    true, AExitWithEscape);
 end;
 
 { initialization / finalization ---------------------------------------------- }
