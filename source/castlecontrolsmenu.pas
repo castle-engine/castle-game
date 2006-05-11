@@ -39,7 +39,12 @@ type
 procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
   ADrawFadeRect, ADrawCentered: boolean);
 
+const
+  DefaultUseMouseLook = true;
+
 var
+  UseMouseLook: boolean;
+
   { Global mouse look sensitivity. Are controlled by ShowControlsMenu,
     and are saved/loaded to/from config file in this unit. }
   MouseLookHorizontalSensitivity: Single;
@@ -59,6 +64,7 @@ type
     MouseLookHorizontalSensitivitySlider: TGLMenuFloatSlider;
     MouseLookVerticalSensitivitySlider: TGLMenuFloatSlider;
     AutoOpenInventoryArgument: TGLMenuBooleanArgument;
+    UseMouseLookArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -149,13 +155,15 @@ begin
   MouseLookVerticalSensitivitySlider := TGLMenuFloatSlider.Create(
     0.01, 0.3, MouseLookVerticalSensitivity);
   AutoOpenInventoryArgument := TGLMenuBooleanArgument.Create(AutoOpenInventory);
+  UseMouseLookArgument := TGLMenuBooleanArgument.Create(UseMouseLook);
 
   Items.Add('Configure basic controls');
   Items.Add('Configure items controls');
   Items.Add('Configure other controls');
-  Items.AddObject('Mouse horizontal sensitivity',
+  Items.AddObject('Use mouse look', UseMouseLookArgument);
+  Items.AddObject('Mouse look horizontal sensitivity',
     MouseLookHorizontalSensitivitySlider);
-  Items.AddObject('Mouse vertical sensitivity',
+  Items.AddObject('Mouse look vertical sensitivity',
     MouseLookVerticalSensitivitySlider);
   Items.AddObject('Auto show inventory on pickup',
     AutoOpenInventoryArgument);
@@ -175,14 +183,21 @@ begin
     0: CurrentMenu := BasicControlsMenu;
     1: CurrentMenu := ItemsControlsMenu;
     2: CurrentMenu := OtherControlsMenu;
-    3: ;
+    3: begin
+         UseMouseLook := not UseMouseLook;
+         UseMouseLookArgument.Value := UseMouseLook;
+       end;
     4: ;
-    5: begin
+    5: ;
+    6: begin
          AutoOpenInventory := not AutoOpenInventory;
          AutoOpenInventoryArgument.Value := AutoOpenInventory;
        end;
-    6: begin
+    7: begin
          CastleAllKeys.RestoreDefaults;
+
+         UseMouseLook := DefaultUseMouseLook;
+         UseMouseLookArgument.Value := UseMouseLook;
 
          MouseLookHorizontalSensitivity := DefaultMouseLookHorizontalSensitivity;
          MouseLookVerticalSensitivity   := DefaultMouseLookVerticalSensitivity  ;
@@ -194,7 +209,7 @@ begin
 
          MessageOK(Glw, 'All keys and settings restored to defaults.');
        end;
-    7: UserQuit := true;
+    8: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -204,9 +219,9 @@ begin
   inherited;
 
   case CurrentItem of
-    3: MouseLookHorizontalSensitivity :=
+    4: MouseLookHorizontalSensitivity :=
          MouseLookHorizontalSensitivitySlider.Value;
-    4: MouseLookVerticalSensitivity :=
+    5: MouseLookVerticalSensitivity :=
          MouseLookVerticalSensitivitySlider.Value;
   end;
 end;
@@ -510,9 +525,13 @@ initialization
     'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);
   MouseLookVerticalSensitivity := ConfigFile.GetFloat(
     'mouse/vertical_sensitivity', DefaultMouseLookVerticalSensitivity);
+  UseMouseLook := ConfigFile.GetValue(
+    'mouse/use_mouse_look', DefaultUseMouseLook);
 finalization
   ConfigFile.SetDeleteFloat('mouse/horizontal_sensitivity',
     MouseLookHorizontalSensitivity, DefaultMouseLookHorizontalSensitivity);
   ConfigFile.SetDeleteFloat('mouse/vertical_sensitivity',
     MouseLookVerticalSensitivity, DefaultMouseLookVerticalSensitivity);
+  ConfigFile.SetDeleteValue('mouse/use_mouse_look',
+    UseMouseLook, DefaultUseMouseLook);
 end.

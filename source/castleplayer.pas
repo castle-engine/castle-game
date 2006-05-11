@@ -681,7 +681,7 @@ begin
   begin
     { MouseLook is turned on always, even when player is dead.
       Just like rotation keys. }
-    Navigator.MouseLook := true;
+    Navigator.MouseLook := UseMouseLook;
 
     { Rotation keys work always, even when player is dead.
       Initially I disabled them, but after some thought:

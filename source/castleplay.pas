@@ -110,7 +110,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, GLHeadlight, CastleThunder,
-  CastleTimeMessages, BackgroundGL;
+  CastleTimeMessages, BackgroundGL, CastleControlsMenu;
 
 var
   GLList_Draw2dBegin: TGLuint;
@@ -809,6 +809,15 @@ begin
     TimeMessage(SDeadMessage);
 end;
 
+{ Call this always when entering the game mode, or when UseMouseLook changes
+  while we're in game mode. This sets mouse visibility and position. }
+procedure UpdateUseMouseLook;
+begin
+  Glw.MouseVisible := not UseMouseLook;
+  if UseMouseLook then
+    Glw.SetMousePosition(MiddleScreenWidth, MiddleScreenHeight);
+end;
+
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
   procedure ChangeInventoryCurrentItem(Change: Integer);
@@ -978,6 +987,8 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
   procedure DoGameMenu;
   begin
     ShowGameMenu(Draw);
+    { UseMouseLook possibly changed now. }
+    UpdateUseMouseLook;
   end;
 
 begin
@@ -1044,46 +1055,49 @@ end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
 begin
-  { Note that Glwin.SetMousePosition may (but doesn't have to)
-    generate OnMouseMove to destination position.
-    This can cause some problems:
+  if UseMouseLook then
+  begin
+    { Note that Glwin.SetMousePosition may (but doesn't have to)
+      generate OnMouseMove to destination position.
+      This can cause some problems:
 
-    1. Consider this:
+      1. Consider this:
 
-       - player moves mouse to MiddleX-10
-       - MouseMove is generated, I rotate camera by "-10" horizontally
-       - Glwin.SetMousePosition sets mouse to the Middle,
-         but this time no MouseMove is generated
-       - player moved mouse to MiddleX+10. Although mouse was
-         positioned on Middle, TGLWindow thinks that the mouse
-         is still positioned on Middle-10, and I will get "+20" move
-         for player (while I should get only "+10")
+         - player moves mouse to MiddleX-10
+         - MouseMove is generated, I rotate camera by "-10" horizontally
+         - Glwin.SetMousePosition sets mouse to the Middle,
+           but this time no MouseMove is generated
+         - player moved mouse to MiddleX+10. Although mouse was
+           positioned on Middle, TGLWindow thinks that the mouse
+           is still positioned on Middle-10, and I will get "+20" move
+           for player (while I should get only "+10")
 
-       Fine solution for this would be to always subtract
-       MiddleScreenWidth and MiddleScreenHeight below
-       (instead of previous values, Glwin.MouseX and Glwin.MouseY).
-       But this causes another problem:
+         Fine solution for this would be to always subtract
+         MiddleScreenWidth and MiddleScreenHeight below
+         (instead of previous values, Glwin.MouseX and Glwin.MouseY).
+         But this causes another problem:
 
-    2. What if player switches to another window, moves the mouse,
-       than goes alt+tab back to our window ? Next mouse move will
-       be stupid, because it's really *not* from the middle of the screen.
+      2. What if player switches to another window, moves the mouse,
+         than goes alt+tab back to our window ? Next mouse move will
+         be stupid, because it's really *not* from the middle of the screen.
 
-    The solution for both problems: you have to check that previous
-    position, Glwin.MouseX and Glwin.MouseY, are indeed equal to
-    MiddleScreenWidth and MiddleScreenHeight. This way we know that
-    this is good move, that qualifies to perform mouse move. }
-  if (Glwin.MouseX = MiddleScreenWidth) and
-     (Glwin.MouseY = MiddleScreenHeight) then
-    Player.Navigator.MouseMove(
-      NewX - MiddleScreenWidth, NewY - MiddleScreenHeight);
+      The solution for both problems: you have to check that previous
+      position, Glwin.MouseX and Glwin.MouseY, are indeed equal to
+      MiddleScreenWidth and MiddleScreenHeight. This way we know that
+      this is good move, that qualifies to perform mouse move. }
+    if (Glwin.MouseX = MiddleScreenWidth) and
+       (Glwin.MouseY = MiddleScreenHeight) then
+      Player.Navigator.MouseMove(
+        NewX - MiddleScreenWidth, NewY - MiddleScreenHeight);
 
-  { I check the condition below to avoid calling Glwin.SetMousePosition,
-    OnMouseMove, Glwin.SetMousePosition, OnMouseMove... in a loop.
-    Not really likely (as messages will be queued, and some
-    SetMousePosition will finally just not generate OnMouseMove),
-    but I want to safeguard anyway. }
-  if (NewX <> MiddleScreenWidth) or (NewY <> MiddleScreenHeight) then
-    Glwin.SetMousePosition(MiddleScreenWidth, MiddleScreenHeight);
+    { I check the condition below to avoid calling Glwin.SetMousePosition,
+      OnMouseMove, Glwin.SetMousePosition, OnMouseMove... in a loop.
+      Not really likely (as messages will be queued, and some
+      SetMousePosition will finally just not generate OnMouseMove),
+      but I want to safeguard anyway. }
+    if (NewX <> MiddleScreenWidth) or (NewY <> MiddleScreenHeight) then
+      Glwin.SetMousePosition(MiddleScreenWidth, MiddleScreenHeight);
+  end;
 end;
 
 type
@@ -1158,9 +1172,7 @@ begin
         Glw.OnMouseDown := MouseDown;
         Glw.OnMouseMove := MouseMove;
 
-        { Needed for mouse look }
-        Glw.MouseVisible := false;
-        Glw.SetMousePosition(MiddleScreenWidth, MiddleScreenHeight);
+        UpdateUseMouseLook;
 
         InitNewLevel;
 
