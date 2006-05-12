@@ -1280,7 +1280,7 @@ procedure TWalkAttackCreatureKind.PrepareRender;
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
     AnimationAttributesSet(Anim.Attributes);
-    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false);
+    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false, true);
     Progress.Step;
   end;
 
@@ -1448,7 +1448,7 @@ procedure TSpiderQueenKind.PrepareRender;
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
     AnimationAttributesSet(Anim.Attributes);
-    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false);
+    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false, true);
     Progress.Step;
   end;
 
@@ -1559,7 +1559,7 @@ procedure TMissileCreatureKind.PrepareRender;
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
     AnimationAttributesSet(Anim.Attributes);
-    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false);
+    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false, true);
     Progress.Step;
   end;
 

@@ -98,25 +98,6 @@ Things for which probably will be no time before PGD deadline:
   may remain -1. Fix by placing InventoryCurrentItem as inside
   read-only TPlayer property.
 
-- Free RootNode after preparing animations --- how much does it free memory ?
-  Any reasons against it ?
-
-  No reasons against it, it can be done by
-    FScenes[I].RootNode.Free;
-    FScenes[I].RootNode := nil;
-  in TVRMLGLAnimation.PrepareRender (TVRMLFlatScene.RootNode docs
-  should be updated to make this trick somewhat official).
-
-  But actually it doesn't conserve that much memory ?
-  Tests on Linux, with -dRELEASE version,
-  running ./castle + entring "The Gate" leve:
-  - 499 MB without freeing
-  - 455 MB with freeing
-  - 436 MB with freeing and using CMem memory manager
-
-  Conserving 65 MB is a good thing, but it's no revolution.
-  Resign ?
-
 - gate:
   - grave lacks textures
   - is this a good idea to just force player to restart if he jumped into the grave ? I think yes, but later maybe some alt way should be possible ?

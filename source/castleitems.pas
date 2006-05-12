@@ -588,7 +588,7 @@ procedure TItemWeaponKind.PrepareRender;
       Anim := AnimInfo.CreateAnimation;
     Progress.Step;
     AnimationAttributesSet(Anim.Attributes);
-    Anim.PrepareRender(false, true, false, false, false);
+    Anim.PrepareRender(false, true, false, false, false, true);
     Progress.Step;
   end;
 
