@@ -444,7 +444,7 @@ begin
     FScene := TVRMLFlatSceneGL.Create(LoadAsVRML(
       ProgramDataPath + 'data' + PathDelim +
       'items' + PathDelim + 'models' + PathDelim + ModelFileName, false),
-      true, roSceneAsAWhole);
+      true, roSceneAsAWhole, GLContextCache);
 
     Scene.PrepareRender(false, true, false, false);
 
@@ -930,7 +930,7 @@ begin
       [ WeaponAnimFileName('sword_1.wrl'),
         WeaponAnimFileName('sword_2.wrl') ],
       [ 0, 0.5 ],
-      30, roSceneAsAWhole, false, false));
+      30, roSceneAsAWhole, false, false, GLContextCache));
   Sword.ActualAttackTime := MapRange(0.0, -1.0, +0.7, 0.0, 0.5);
   Sword.SoundAttackStart := stSwordAttackStart;
 
@@ -940,7 +940,7 @@ begin
       [ WeaponAnimFileName('bow_2.wrl'),
         WeaponAnimFileName('bow.wrl') ],
       [ 0, 0.5 ],
-      30, roSceneAsAWhole, false, false));
+      30, roSceneAsAWhole, false, false, GLContextCache));
   Bow.ActualAttackTime := 0;
   Bow.SoundAttackStart := stBowAttackStart;
 

@@ -557,7 +557,7 @@ implementation
 uses SysUtils, OpenGLh, BackgroundGL,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
-  CastleKeys;
+  CastleKeys, CastleWindow;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -590,7 +590,7 @@ begin
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
     FScene := TVRMLFlatSceneGL.Create(
-      LoadVRMLNode(SceneFileName), true, roSeparateShapeStates);
+      LoadVRMLNode(SceneFileName), true, roSeparateShapeStates, GLContextCache);
 
     { initialize FAnimationTime. Must be initialized before creating creatures. }
     FAnimationTime := 0.0;
@@ -1009,7 +1009,7 @@ function TLevel.LoadLevelScene(const FileName: string;
   CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;
 begin
   Result := TVRMLFlatSceneGL.Create(LoadVRMLNode(FileName),
-    true, roSeparateShapeStates);
+    true, roSeparateShapeStates, GLContextCache);
   AttributesSet(Result.Attributes);
 
   Result.PrepareRender(PrepareBackground,

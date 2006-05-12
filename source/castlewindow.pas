@@ -27,7 +27,7 @@ unit CastleWindow;
 
 interface
 
-uses GLWindow;
+uses GLWindow, VRMLOpenGLRenderer;
 
 var
   { @noAutoLinkHere }
@@ -42,6 +42,9 @@ const
 
 function RequiredScreenSize: string;
 
+var
+  GLContextCache: TVRMLOpenGLRendererContextCache;
+
 implementation
 
 uses SysUtils;
@@ -51,9 +54,16 @@ begin
   Result := Format('%d x %d', [RequiredScreenWidth, RequiredScreenHeight]);
 end;
 
+{ initialization / finalization ---------------------------------------------- }
+
 initialization
   Glw := TGLWindowNavigated.Create;
   Glw.OwnsNavigator := false;
+
+  GLContextCache := TVRMLOpenGLRendererContextCache.Create;
+  GLContextCache.UseTextureFileNames := true;
 finalization
+  FreeAndNil(GLContextCache);
+
   FreeAndNil(Glw);
 end.

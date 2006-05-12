@@ -3305,35 +3305,35 @@ begin
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_still_final.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization, true, true),
+      AnimScenesPerTime, AnimOptimization, true, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_still_final.wrl'),
         AlienFileName('alien_walk_1_final.wrl') ],
       [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_walk_1_final.wrl'),
         AlienFileName('alien_walk_2_final.wrl') ],
       [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, true, true),
+      AnimScenesPerTime, AnimOptimization, true, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_still_final.wrl'),
         AlienFileName('alien_attack_2_final.wrl'),
         AlienFileName('alien_attack_1_final.wrl'),
         AlienFileName('alien_still_final.wrl') ],
       [ 0, 0.3, 0.6, 1.0 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_still_final.wrl'),
         AlienFileName('alien_dying_1_final.wrl'),
         AlienFileName('alien_dying_2_final.wrl') ],
       [ 0.0, 0.1, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ AlienFileName('alien_still_final.wrl'),
         AlienFileName('alien_dying_1_final.wrl') ],
       [ 0.0, 0.1 ],
-      AnimScenesPerTime, AnimOptimization, false, true)
+      AnimScenesPerTime, AnimOptimization, false, true, GLContextCache)
     );
   Alien.SoundSuddenPain := stAlienSuddenPain;
   Alien.SoundDying := stAlienDying;
@@ -3343,34 +3343,34 @@ begin
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization, true, true),
+      AnimScenesPerTime, AnimOptimization, true, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
         CreatureFileName('werewolf' + PathDelim + 'werewolf_walk_2_final.wrl') ],
       [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, true, true),
+      AnimScenesPerTime, AnimOptimization, true, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
         CreatureFileName('werewolf' + PathDelim + 'werewolf_attack_1_final.wrl'),
         CreatureFileName('werewolf' + PathDelim + 'werewolf_attack_2_final.wrl'),
         CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
       [ 0, 0.3 / 2, 0.6 / 2, 1.0 / 2 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
         CreatureFileName('werewolf' + PathDelim + 'werewolf_hurt_final.wrl'),
         CreatureFileName('werewolf' + PathDelim + 'werewolf_dead_final.wrl') ],
       [ 0.0, 0.3, 0.8 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
         CreatureFileName('werewolf' + PathDelim + 'werewolf_hurt_final.wrl') ],
       [ 0.0, 0.3 ],
-      AnimScenesPerTime, AnimOptimization, false, true)
+      AnimScenesPerTime, AnimOptimization, false, true, GLContextCache)
     );
   Werewolf.SoundSuddenPain := stWerewolfSuddenPain;
   Werewolf.SoundAttackStart := stWerewolfAttackStart;
@@ -3382,7 +3382,7 @@ begin
       [ CreatureFileName('ball_missile' + PathDelim + 'ball_missile_1_final.wrl'),
         CreatureFileName('ball_missile' + PathDelim + 'ball_missile_2_final.wrl') ],
       [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, true, false)
+      AnimScenesPerTime, AnimOptimization, true, false, GLContextCache)
     );
   BallMissile.SoundExplosion := stBallMissileExplode;
   BallMissile.SoundIdle := stBallMissileIdle;
@@ -3393,33 +3393,33 @@ begin
       [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
         CreatureFileName('ghost' + PathDelim + 'ghost_stand_2_final.wrl') ],
       [ 0, 1 ],
-      AnimScenesPerTime, AnimOptimization, true, true),
+      AnimScenesPerTime, AnimOptimization, true, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
         CreatureFileName('ghost' + PathDelim + 'ghost_walk_2_final.wrl') ],
       [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
         CreatureFileName('ghost' + PathDelim + 'ghost_walk_2_final.wrl') ],
       [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, true, true),
+      AnimScenesPerTime, AnimOptimization, true, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
         CreatureFileName('ghost' + PathDelim + 'ghost_attack_2_final.wrl') ],
       [ 0, 0.2 ],
-      AnimScenesPerTime, AnimOptimization, false, true),
+      AnimScenesPerTime, AnimOptimization, false, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
         CreatureFileName('ghost' + PathDelim + 'ghost_dying_2_final.wrl'),
         CreatureFileName('ghost' + PathDelim + 'ghost_dying_3_final.wrl') ],
       [ 0.0, 0.3, 1.0 ],
-      AnimScenesPerTime, AnimOptimization, false, true),
+      AnimScenesPerTime, AnimOptimization, false, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
         CreatureFileName('ghost' + PathDelim + 'ghost_walk_2_final.wrl') ],
       [ 0.0, 0.3 ],
-      AnimScenesPerTime, AnimOptimization, false, true)
+      AnimScenesPerTime, AnimOptimization, false, true, GLContextCache)
     );
   Ghost.SoundSuddenPain := stGhostSuddenPain;
   Ghost.SoundAttackStart := stGhostAttackStart;
@@ -3430,11 +3430,11 @@ begin
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization, true, true),
+      AnimScenesPerTime, AnimOptimization, true, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     { WalkAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
@@ -3450,14 +3450,14 @@ begin
         0.8 / 5,
         1 / 5 ],
       { This animation really needs more frames to look smoothly. }
-      AnimScenesPerTime * 5, AnimOptimization, true, false),
+      AnimScenesPerTime * 5, AnimOptimization, true, false, GLContextCache),
     { AttackAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
         CreatureFileName('spider' + PathDelim + 'spider_attack_2.wrl'),
         CreatureFileName('spider' + PathDelim + 'spider_attack_3.wrl') ],
       [ 0, 0.125, 0.25 ],
-      AnimScenesPerTime, AnimOptimization, false, true),
+      AnimScenesPerTime, AnimOptimization, false, true, GLContextCache),
     { DyingAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
@@ -3466,13 +3466,13 @@ begin
         CreatureFileName('spider' + PathDelim + 'spider_dying_4.wrl'),
         CreatureFileName('spider' + PathDelim + 'spider_dying_5.wrl') ],
       [ 0, 0.3, 0.6, 1.0, 2.0 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     { HurtAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
         CreatureFileName('spider' + PathDelim + 'spider_hurt_2.wrl') ],
       [ 0, 0.3 ],
-      AnimScenesPerTime, AnimOptimization, false, true)
+      AnimScenesPerTime, AnimOptimization, false, true, GLContextCache)
     );
   Spider.SoundSuddenPain := stSpiderSuddenPain;
   Spider.SoundAttackStart := stSpiderAttackStart;
@@ -3483,11 +3483,11 @@ begin
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization, true, true),
+      AnimScenesPerTime, AnimOptimization, true, true, GLContextCache),
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     { WalkAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
@@ -3503,7 +3503,7 @@ begin
         0.8 / 5,
         1 / 5 ],
       { This animation really needs more frames to look smoothly. }
-      AnimScenesPerTime * 5, AnimOptimization, true, false),
+      AnimScenesPerTime * 5, AnimOptimization, true, false, GLContextCache),
     { AttackAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
@@ -3511,21 +3511,21 @@ begin
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_3.wrl'),
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
       [ 0, 0.2, 0.4, 0.6 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     { DyingAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_dying_2.wrl'),
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_dying_3.wrl') ],
       [ 0, 0.5, 1.5 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     { HurtAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
       { Non-zero anim to have a little knockback. }
       [ 0, 0.1 ],
-      AnimScenesPerTime, AnimOptimization, false, false),
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache),
     { ThrowWebAttackAnimation }
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
@@ -3533,7 +3533,7 @@ begin
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_alt.wrl'),
         CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
       [ 0, 0.3, 0.6, 1.0 ],
-      AnimScenesPerTime, AnimOptimization, false, false)
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache)
     );
   SpiderQueen.SoundSuddenPain := stSpiderQueenSuddenPain;
   SpiderQueen.SoundAttackStart := stSpiderQueenAttackStart;
@@ -3544,7 +3544,7 @@ begin
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('web' + PathDelim + 'web.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization, false, false)
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache)
     );
   ThrownWeb.SoundExplosion := stThrownWebHit;
   ThrownWeb.SoundIdle := stThrownWebIdle;
@@ -3554,7 +3554,7 @@ begin
     TVRMLGLAnimationInfo.Create(
       [ CreatureFileName('arrow' + PathDelim + 'arrow.wrl') ],
       [ 0 ],
-      AnimScenesPerTime, AnimOptimization, false, false)
+      AnimScenesPerTime, AnimOptimization, false, false, GLContextCache)
     );
   Arrow.SoundExplosion := stArrowHit;
 

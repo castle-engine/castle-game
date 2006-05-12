@@ -23,7 +23,7 @@ unit VRMLGLAnimationInfo;
 
 interface
 
-uses VRMLFlatSceneGL, VRMLGLAnimation;
+uses VRMLFlatSceneGL, VRMLGLAnimation, VRMLOpenGLRenderer;
 
 type
   { Simple class to postpone loading vrml files that will be used
@@ -36,13 +36,15 @@ type
     FScenesPerTime: Cardinal;
     FOptimization: TGLRendererOptimization;
     FTimeLoop, FTimeBackwards: boolean;
+    FCache: TVRMLOpenGLRendererContextCache;
   public
     constructor Create(
       const AModelFileNames: array of string;
       const ATimes: array of Single;
       AScenesPerTime: Cardinal;
       AOptimization: TGLRendererOptimization;
-      ATimeLoop, ATimeBackwards: boolean);
+      ATimeLoop, ATimeBackwards: boolean;
+      ACache: TVRMLOpenGLRendererContextCache = nil);
 
     { Remember that you're responsible for returned TVRMLGLAnimation
       instance after calling this function. }
@@ -58,7 +60,8 @@ constructor TVRMLGLAnimationInfo.Create(
   const ATimes: array of Single;
   AScenesPerTime: Cardinal;
   AOptimization: TGLRendererOptimization;
-  ATimeLoop, ATimeBackwards: boolean);
+  ATimeLoop, ATimeBackwards: boolean;
+  ACache: TVRMLOpenGLRendererContextCache);
 var
   I: Integer;
 begin
@@ -78,6 +81,7 @@ begin
   FOptimization := AOptimization;
   FTimeLoop := ATimeLoop;
   FTimeBackwards := ATimeBackwards;
+  FCache := ACache;
 end;
 
 function TVRMLGLAnimationInfo.CreateAnimation: TVRMLGLAnimation;
@@ -90,7 +94,7 @@ begin
     RootNodes[I] := LoadAsVRML(FModelFileNames[I], false);
 
   Result := TVRMLGLAnimation.Create(RootNodes, FTimes,
-    FScenesPerTime, FOptimization, FTimeLoop, FTimeBackwards);
+    FScenesPerTime, FOptimization, FTimeLoop, FTimeBackwards, FCache);
 end;
 
 end.
