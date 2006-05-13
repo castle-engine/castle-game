@@ -446,9 +446,8 @@ begin
       'items' + PathDelim + 'models' + PathDelim + ModelFileName, false),
       true, roSeparateShapeStates, GLContextCache);
 
-    Scene.PrepareRender(false, true, false, false);
-
     AttributesSet(Scene.Attributes);
+    Scene.PrepareRender(false, true, false, false);
   end;
 
   Progress.Step;

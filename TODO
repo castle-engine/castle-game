@@ -1,5 +1,3 @@
-- RenderBegin/End also put on shared disp list
-
 - werewolf: almost half of the vertices are not moving -> separate them.
 
 --------------------
