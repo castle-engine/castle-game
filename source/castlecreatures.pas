@@ -3278,7 +3278,7 @@ end;
 
 procedure DoInitialization;
 const
-  AnimOptimization = roSceneAsAWhole;
+  AnimOptimization = roSeparateShapeStates;
 
   function CreatureFileName(const FileName: string): string;
   begin

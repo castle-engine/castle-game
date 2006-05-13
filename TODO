@@ -1,3 +1,7 @@
+- RenderBegin/End also put on shared disp list
+
+- werewolf: almost half of the vertices are not moving -> separate them.
+
 --------------------
 - Things from README should be moved to WWW page, and then WWW pages
   about castle should be included in the releases (in DOC/ subdir ?)
