@@ -2,5 +2,5 @@
 
 Group {
   WWWInline { name "werewolf_header.wrl" separate FALSE }
-  WWWInline { name "werewolf_walk_2.wrl" }
+  WWWInline { name "werewolf_walk_2_processed.wrl" }
 }
