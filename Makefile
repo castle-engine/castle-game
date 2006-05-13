@@ -13,6 +13,7 @@ default: info
 	$(MAKE) -C data/items/images/
 	$(MAKE) -C data/items/equipped/
 	$(MAKE) -C data/levels/
+	$(MAKE) -C data/creatures/werewolf/
 
 VERSION := $(shell ./castle --version)
 
