@@ -584,7 +584,7 @@ procedure TItemWeaponKind.PrepareRender;
     AnimInfo: TVRMLGLAnimationInfo);
   begin
     if (AnimInfo <> nil) and (Anim = nil) then
-      Anim := AnimInfo.CreateAnimation;
+      Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
     Progress.Step;
     AnimationAttributesSet(Anim.Attributes);
     Anim.PrepareRender(false, true, false, false, false, true);

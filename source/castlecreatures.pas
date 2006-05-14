@@ -23,7 +23,7 @@ unit CastleCreatures;
 
 interface
 
-uses VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
+uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSourceAllocator, KambiXMLCfg;
 
@@ -1049,10 +1049,10 @@ var
 
 implementation
 
-uses SysUtils, Classes, OpenGLh, CastleWindow, GLWindow,
+uses SysUtils, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
-  CastleTimeMessages, CastleItems;
+  CastleTimeMessages, CastleItems, Object3dAsVRML;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -1273,11 +1273,20 @@ end;
 
 procedure TWalkAttackCreatureKind.PrepareRender;
 
+  procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
+  var
+    FileName: string;
+  begin
+    FileName := AnimInfo.ModelFileNames[0];
+    if FirstRootNodesPool.IndexOf(FileName) = -1 then
+      FirstRootNodesPool.AddObject(FileName, LoadAsVRML(FileName, false));
+  end;
+
   procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
     AnimInfo: TVRMLGLAnimationInfo);
   begin
     if Anim = nil then
-      Anim := AnimInfo.CreateAnimation;
+      Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
     Progress.Step;
     AnimationAttributesSet(Anim.Attributes);
     Anim.PrepareRender(false, true, RenderShadowsPossible, false, false, true);
@@ -1286,6 +1295,13 @@ procedure TWalkAttackCreatureKind.PrepareRender;
 
 begin
   inherited;
+
+  AddFirstRootNodesPool(FStandAnimationInfo      );
+  AddFirstRootNodesPool(FStandToWalkAnimationInfo);
+  AddFirstRootNodesPool(FWalkAnimationInfo       );
+  AddFirstRootNodesPool(FAttackAnimationInfo     );
+  AddFirstRootNodesPool(FDyingAnimationInfo      );
+  AddFirstRootNodesPool(FHurtAnimationInfo       );
 
   CreateIfNeeded(FStandAnimation      , FStandAnimationInfo      );
   CreateIfNeeded(FStandToWalkAnimation, FStandToWalkAnimationInfo);
@@ -1445,7 +1461,7 @@ procedure TSpiderQueenKind.PrepareRender;
     AnimInfo: TVRMLGLAnimationInfo);
   begin
     if Anim = nil then
-      Anim := AnimInfo.CreateAnimation;
+      Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
     Progress.Step;
     AnimationAttributesSet(Anim.Attributes);
     Anim.PrepareRender(false, true, RenderShadowsPossible, false, false, true);
@@ -1556,7 +1572,7 @@ procedure TMissileCreatureKind.PrepareRender;
     AnimInfo: TVRMLGLAnimationInfo);
   begin
     if Anim = nil then
-      Anim := AnimInfo.CreateAnimation;
+      Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
     Progress.Step;
     AnimationAttributesSet(Anim.Attributes);
     Anim.PrepareRender(false, true, RenderShadowsPossible, false, false, true);

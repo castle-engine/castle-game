@@ -23,7 +23,7 @@ unit CastleObjectKinds;
 
 interface
 
-uses KambiXMLCfg;
+uses Classes, KambiXMLCfg;
 
 const
   DefaultTransparent = false;
@@ -42,10 +42,17 @@ type
       must be done once again, because some attributes (e.g. things
       set by AnimationAttributesSet) changed.
 
-      In this class this just sets PrepareRenderDone to @false. }
+      In this class this just sets PrepareRenderDone to @false,
+      and takes care of clearing FirstRootNodesPool. }
     procedure FreePrepareRender; virtual;
+
+    { Use this in PrepareRender to share RootNodes[0]
+      of your animations in subclasses. In our destructor and FreePrepareRender
+      we will free and clear objects on this list. }
+    FirstRootNodesPool: TStringList;
   public
     constructor Create(const AVRMLNodeName: string);
+    destructor Destroy; override;
 
     { Prepare anything needed when starting new game.
       It can call Progress.Step PrepareRenderSteps times. }
@@ -104,13 +111,28 @@ type
 
 implementation
 
-uses ProgressUnit;
+uses SysUtils, ProgressUnit;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
   inherited Create;
   FVRMLNodeName := AVRMLNodeName;
   FTransparent := DefaultTransparent;
+  FirstRootNodesPool := TStringList.Create;
+end;
+
+destructor TObjectKind.Destroy;
+var
+  I: Integer;
+begin
+  for I := 0 to FirstRootNodesPool.Count - 1 do
+  begin
+    FirstRootNodesPool.Objects[I].Free;
+    FirstRootNodesPool.Objects[I] := nil;
+  end;
+  FreeAndNil(FirstRootNodesPool);
+
+  inherited;
 end;
 
 procedure TObjectKind.PrepareRender;
@@ -124,7 +146,16 @@ begin
 end;
 
 procedure TObjectKind.FreePrepareRender;
+var
+  I: Integer;
 begin
+  for I := 0 to FirstRootNodesPool.Count - 1 do
+  begin
+    FirstRootNodesPool.Objects[I].Free;
+    FirstRootNodesPool.Objects[I] := nil;
+  end;
+  FirstRootNodesPool.Clear;
+
   FPrepareRenderDone := false;
 end;
 
