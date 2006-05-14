@@ -10,6 +10,9 @@
 
   wszystko w katalogu stoma.name/michalis/patch-06-05-09-0100
 
+- (2006-05-08 11:42:27) Szymon: hej tu kasia co do poprawek takich prostych i na szybko to mam pytanie o klucz
+  (2006-05-08 11:43:15) Szymon: bo szczerze mowiac to go ledwo widac... fajnie by bylo gdyby byl jakos oswietlony...
+
 - Now Symbol and Button on "Castle Hall" may be converted to
   use TVRMLGLAnimation class (additional simplification will be that
   only one Symbol model will be needed, not 4 (like now)).
