@@ -10,6 +10,10 @@
 
   wszystko w katalogu stoma.name/michalis/patch-06-05-09-0100
 
+- Now Symbol and Button on "Castle Hall" may be converted to
+  use TVRMLGLAnimation class (additional simplification will be that
+  only one Symbol model will be needed, not 4 (like now)).
+
 - bow more interesting:
   - When you hold attack key, arrow/bolt appears on your bow/crossbow
     and you're holding the bow. There is also a crosshair (circle target area)
@@ -275,22 +279,6 @@ Cages level:
   "fry"
   "throw back" (throws all enemies slightly backward --- this is also useful
      for player to actually see that monsters get hurt when falling from high)
-
-- Maybe it's sometimes a good idea to not create separate display
-  list for each animation frame. Instead, it two scenes share the same RootNode
-  and differ e.g. only in CurrentMatrix states, then I can use
-  one display list and do glPushMatrix,MultMatrix,render,PopMatrix.
-
-  This could save some loading time for e.g. ball_missile anim
-  (but not for alien animations, as they change geometry).
-
-  This is also required to convert Symbol and Button on "Castle Hall"
-  to use TVRMLGLAnimation class (additional simplification will be that
-  only one Symbol model will be needed, not 4 (like now)).
-
-  This should also allow me to share more ShapeStates.
-  E.g. right now for werewolf MeshCorpseLegs is not shared --- although
-  the mesh is the same, but it moves (State.CurrMatrix changes).
 
 - change the name --- there already exists game named "castle"!
   And there is "Castle Adventure" !

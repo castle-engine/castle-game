@@ -918,6 +918,9 @@ procedure DoInitialization;
       'items' + PathDelim + 'attack_animations' + PathDelim + ModelFileName;
   end;
 
+const
+  AnimOptimization = roSeparateShapeStatesNoTransform;
+  AnimEpsilonEquality = 0.0;
 begin
   Glw.OnCloseList.AppendItem(@GLWindowClose);
 
@@ -929,7 +932,7 @@ begin
       [ WeaponAnimFileName('sword_1.wrl'),
         WeaponAnimFileName('sword_2.wrl') ],
       [ 0, 0.5 ],
-      30, roSeparateShapeStates, false, false, GLContextCache));
+      30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
   Sword.ActualAttackTime := MapRange(0.0, -1.0, +0.7, 0.0, 0.5);
   Sword.SoundAttackStart := stSwordAttackStart;
 
@@ -939,7 +942,7 @@ begin
       [ WeaponAnimFileName('bow_2.wrl'),
         WeaponAnimFileName('bow.wrl') ],
       [ 0, 0.5 ],
-      30, roSeparateShapeStates, false, false, GLContextCache));
+      30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
   Bow.ActualAttackTime := 0;
   Bow.SoundAttackStart := stBowAttackStart;
 
