@@ -2,14 +2,6 @@
 - Things from README should be moved to WWW page, and then WWW pages
   about castle should be included in the releases (in DOC/ subdir ?)
 
-- S&K patches:
-  wiec tak:
-  * oteksturowany duzy grob,
-  * zmieniona tekstura duzego miecza,
-  * dodane swiatlo dajace czerwona poswiate ;] (zobacz sobie, czy ci sie podoba, ale dzieki temu fajniej swieca potiony i tekstura sciany jest fajnie podkresona),
-
-  wszystko w katalogu stoma.name/michalis/patch-06-05-09-0100
-
 - (2006-05-08 11:42:27) Szymon: hej tu kasia co do poprawek takich prostych i na szybko to mam pytanie o klucz
   (2006-05-08 11:43:15) Szymon: bo szczerze mowiac to go ledwo widac... fajnie by bylo gdyby byl jakos oswietlony...
 
@@ -106,7 +98,6 @@ Things for which probably will be no time before PGD deadline:
   read-only TPlayer property.
 
 - gate:
-  - grave lacks textures
   - is this a good idea to just force player to restart if he jumped into the grave ? I think yes, but later maybe some alt way should be possible ?
 
 - RemoveBoxNodeCheck
