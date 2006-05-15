@@ -64,6 +64,8 @@ begin
            '                        then will run in windowed mode.' +nl+
            '  --no-shadows          Disable initializing and using shadows.' +nl+
            nl+
+           Glw.ParseParametersHelp([poDisplay], true) +nl+
+           nl+
            'Debug options (don''t use unless you know what you''re doing):' +nl+
            '  --debug-no-creatures  Disable loading creatures animations' +nl+
            nl+
@@ -91,6 +93,7 @@ begin
 
   { parse parameters }
   OpenALOptionsParse;
+  Glw.ParseParameters([poDisplay]);
   ParseParameters(Options, OptionProc, nil);
 
   Glw.Width := RequiredScreenWidth;
@@ -157,6 +160,13 @@ begin
   try
     ShowStartMenu(Glw.OnDraw);
   finally
+    { Usually Glw.Closed = false here.
+      But this is finally...end clause so we try hard to avoid raising
+      another exception here --- so we safeguard and eventually change
+      Progress.UserInterface here. }
+    if Glw.Closed then
+      Progress.UserInterface := ProgressNullInterface;
+
     ALContextClose;
   end;
 end.

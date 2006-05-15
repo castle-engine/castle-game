@@ -94,6 +94,9 @@ type
       find and remove the node from Scene). }
     function RemoveBoxNode(var Box: TBox3d; const NodeName: string): boolean;
 
+    { Like RemoveBoxNode, but raise EInternalError if not found. }
+    procedure RemoveBoxNodeCheck(var Box: TBox3d; const NodeName: string);
+
     { This will be called from our constructor before initializing
       our octrees. You can override this to do here some operations
       that change the Scene.RootNode (e.g. you can do here tricks like
@@ -755,6 +758,13 @@ begin
   end;
 end;
 
+procedure TLevel.RemoveBoxNodeCheck(var Box: TBox3d; const NodeName: string);
+begin
+  if not RemoveBoxNode(Box, NodeName) then
+    raise EInternalError.CreateFmt('Error in level "%s": no box named "%s" found',
+      [Title, NodeName]);
+end;
+
 procedure TLevel.ChangeLevelScene;
 begin
   { Nothing to do in this class. }
@@ -1071,8 +1081,7 @@ end;
 procedure TCastleHallLevel.ChangeLevelScene;
 begin
   inherited;
-  if not RemoveBoxNode(FLevelExitBox, 'LevelExitBox') then
-    raise EInternalError.Create('castle_hall level doesn''t contain "LevelExitBox"');
+  RemoveBoxNodeCheck(FLevelExitBox, 'LevelExitBox');
 end;
 
 class function TCastleHallLevel.SceneFileName: string;
@@ -1453,16 +1462,12 @@ var
 begin
   inherited;
 
-  if not RemoveBoxNode(FGateExitBox, 'GateExitBox') then
-    raise EInternalError.Create('Gate level doesn''t contain "GateExitBox"');
+  RemoveBoxNodeCheck(FGateExitBox, 'GateExitBox');
 
-  if not RemoveBoxNode(FTeleport1Box, 'Teleport1Box') then
-    raise EInternalError.Create('Gate level doesn''t contain "Teleport1Box"');
-  if not RemoveBoxNode(FTeleport2Box, 'Teleport2Box') then
-    raise EInternalError.Create('Gate level doesn''t contain "Teleport2Box"');
+  RemoveBoxNodeCheck(FTeleport1Box, 'Teleport1Box');
+  RemoveBoxNodeCheck(FTeleport2Box, 'Teleport2Box');
 
-  if not RemoveBoxNode(FSacrilegeBox, 'SacrilegeBox') then
-    raise EInternalError.Create('Gate level doesn''t contain "SacrilegeBox"');
+  RemoveBoxNodeCheck(FSacrilegeBox, 'SacrilegeBox');
 
   Teleport1Destination := Box3dMiddle(FTeleport2Box);
   Teleport1Destination[0] += 2;
@@ -1474,19 +1479,13 @@ begin
 
   for I := 0 to High(SacrilegeAmbushStartingPosition) do
   begin
-    if not RemoveBoxNode(TempBox, 'SacrilegeGhost_' + IntToStr(I)) then
-      raise EInternalError.Create(
-        'Gate level doesn''t contain "SacrilegeGhost_' + IntToStr(I) + '"');
-
+    RemoveBoxNodeCheck(TempBox, 'SacrilegeGhost_' + IntToStr(I));
     SacrilegeAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
   end;
 
   for I := 0 to High(SwordAmbushStartingPosition) do
   begin
-    if not RemoveBoxNode(TempBox, 'SwordGhost_' + IntToStr(I)) then
-      raise EInternalError.Create(
-        'Gate level doesn''t contain "SwordGhost_' + IntToStr(I) + '"');
-
+    RemoveBoxNodeCheck(TempBox, 'SwordGhost_' + IntToStr(I));
     SwordAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
   end;
 end;
@@ -1727,8 +1726,7 @@ procedure TCagesLevel.ChangeLevelScene;
 begin
   inherited;
 
-  if not RemoveBoxNode(FHintOpenDoorBox, 'HintOpenDoorBox') then
-    raise EInternalError.Create('Level doesn''t contain "HintOpenDoorBox"');
+  RemoveBoxNodeCheck(FHintOpenDoorBox, 'HintOpenDoorBox');
 end;
 
 class function TCagesLevel.SceneFileName: string;

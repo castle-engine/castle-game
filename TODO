@@ -100,8 +100,6 @@ Things for which probably will be no time before PGD deadline:
 - gate:
   - is this a good idea to just force player to restart if he jumped into the grave ? I think yes, but later maybe some alt way should be possible ?
 
-- RemoveBoxNodeCheck
-
 - cages level:
   - on the other side of the wall, also a door, but blocked by rocks
   - from queen lair, passage to this 2nd hidden room --- some treasures there
@@ -109,11 +107,13 @@ Things for which probably will be no time before PGD deadline:
 
 - "Color depth" and "Display Frequency" are ignored on non-Win32 targets.
   (Seems that judges and most people test on Windows, so no time (it's already 4th May)
-  to do this for Unix (xvf86mode) now. "Display Frequency" should be definitely
-  possible using xvf86mode, "Color depth" --- I'm not sure. Possibly
-  color depth is not switchable without restarting XWindows ?
-  Look at xvidtune.
-  Look at gnome program to change screen resolutions.)
+  to do this for Unix (xvf86mode) now.
+
+  "Display Frequency" should be definitely possible using xvf86mode,
+
+  "Color depth" --- I'm not sure.
+  Looking at xvidtune and gnome-display-properties : no such possibility.
+  Possibly color depth is not switchable without restarting XWindows ?
 
 - thunder:
   - 3d sound ?
