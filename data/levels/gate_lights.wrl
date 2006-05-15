@@ -8,6 +8,7 @@ Group {
 		location 10 10 100
 	}
 	PointLight {
+		on FALSE
 		intensity 0.300000011920929
 		color 1 0 0
 		ambientIntensity 0.020000416785479
