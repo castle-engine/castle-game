@@ -1,3 +1,26 @@
+- Test Radeon problems reported on PGD.
+- debug menu is only for testing -- hide somehow at some point.
+
+- mouse sensitivity problems:
+  function StrToFloatDef(const s: string; DefValue: Extended): Extended;
+
+  Was there a bug about this in FPC ? I don't remember, but I have this
+  in my KambiStringUtils.
+  No, the bug that I remembered was for Hex2Dec.
+
+  maybe it was the problem with wrong overloads choosing ?
+  Compile in objfpc mode for test.
+
+  Possibly fixed by rename GetValue -> GetFloat (that was needed anyway
+  for code cleanliness)
+
+  Maybe add a sanity check for mouseSensit values to MatrixWalker
+  --- if outside range, use default ? Just in case it's some real bug
+  in FPC etc.
+
+  I should close this issue after doing more tests on other computers
+  (Windows in uni ?).
+
 --------------------
 - Things from README should be moved to WWW page, and then WWW pages
   about castle should be included in the releases (in DOC/ subdir ?)
@@ -29,8 +52,6 @@
 
 Stage 6:
 Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the game.
-
-- Test Radeon problems reported on PGD.
 
 - maybe load/free creatures animations for specific levels ?
   This would make memory requirements lower, but loading
@@ -64,34 +85,12 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
 
 - some effects: blood explode when player hits monster.
 
-- debug menu is only for testing -- hide somehow at some point.
-
 - different footsteps sound on different ground
 
 cages level:
 - windows: don't look like windows
 - player can fly through windows --- not good.
 - stairs beginning cages and ending castle_hall: endings should be more black, current vertex colouring is not black enough
-
-- mouse sensitivity problems:
-  function StrToFloatDef(const s: string; DefValue: Extended): Extended;
-
-  Was there a bug about this in FPC ? I don't remember, but I have this
-  in my KambiStringUtils.
-  No, the bug that I remembered was for Hex2Dec.
-
-  maybe it was the problem with wrong overloads choosing ?
-  Compile in objfpc mode for test.
-
-  Possibly fixed by rename GetValue -> GetFloat (that was needed anyway
-  for code cleanliness)
-
-  Maybe add a sanity check for mouseSensit values to MatrixWalker
-  --- if outside range, use default ? Just in case it's some real bug
-  in FPC etc.
-
-----------------------------------------
-Things for which probably will be no time before PGD deadline:
 
 - when debug menu "give me 20 items" is used, InventoryCurrentItem
   may remain -1. Fix by placing InventoryCurrentItem as inside
