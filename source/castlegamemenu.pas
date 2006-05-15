@@ -44,11 +44,6 @@ type
     procedure CurrentItemSelected; override;
   end;
 
-  TViewAngleSlider = class(TGLMenuFloatSlider)
-    constructor Create;
-    function ValueToStr(const AValue: Single): string; override;
-  end;
-
   TGameSoundMenu = class(TCastleMenu)
     SoundVolumeSlider: TSoundVolumeSlider;
     MusicVolumeSlider: TSoundVolumeSlider;
@@ -67,8 +62,6 @@ var
   GameMenu: TGameMenu;
   GameSoundMenu: TGameSoundMenu;
 
-{$I castledebugmenu.inc}
-
 { TGameMenu ------------------------------------------------------------ }
 
 constructor TGameMenu.Create;
@@ -80,7 +73,6 @@ begin
   Items.Add('Configure controls');
   Items.Add('Sound options');
   Items.Add('End game');
-  Items.Add('Debug (cheating) options');
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
@@ -98,7 +90,6 @@ begin
          show that it's too easy to select this and accidentaly
          end the game. }
        GameCancel(true);
-    5: CurrentMenu := DebugMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -141,19 +132,6 @@ begin
   end;
 end;
 
-{ TViewAngleSlider ----------------------------------------------------------- }
-
-constructor TViewAngleSlider.Create;
-begin
-  inherited Create(10, 170, ViewAngleDegX);
-end;
-
-function TViewAngleSlider.ValueToStr(const AValue: Single): string;
-begin
-  Result := Format('horiz %f, vert %f', [AValue,
-    AdjustViewAngleDegToAspectRatio(AValue, Glw.Height / Glw.Width)]);
-end;
-
 { global things -------------------------------------------------------------- }
 
 procedure Draw2d(Draw2DData: Integer);
@@ -174,57 +152,13 @@ begin
   glPopAttrib;
 end;
 
-procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
-begin
-  CurrentMenu.KeyDown(Key, C);
-  if CastleKey_SaveScreen.IsValue(Key) then
-    SaveScreen else
-  case C of
-    CharEscape: UserQuit := true;
-  end;
-end;
-
-procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
-begin
-  CurrentMenu.MouseMove(NewX, Glwin.Height - NewY,
-    Glwin.MousePressed);
-end;
-
-procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
-begin
-  CurrentMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
-    Glwin.MousePressed);
-end;
-
-procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
-begin
-  CurrentMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
-    Glwin.MousePressed);
-end;
-
-procedure Idle(Glwin: TGLWindow);
-begin
-  CurrentMenu.Idle(Glwin.IdleCompSpeed);
-  TimeMessagesIdle;
-end;
-
-procedure CloseQuery(Glwin: TGLWindow);
-begin
-  GameCancel(true);
-end;
+{$I castlemenucallbacks.inc}
 
 procedure ShowGameMenu(ADrawUnderMenu: TDrawFunc);
 var
   SavedMode: TGLMode;
 begin
   DrawUnderMenu := ADrawUnderMenu;
-
-  DebugPlayerMenu.RotationHorizontalSpeedSlider.Value :=
-    Player.Navigator.RotationHorizontalSpeed;
-  DebugPlayerMenu.RotationVerticalSpeedSlider.Value :=
-    Player.Navigator.RotationVerticalSpeed;
-  DebugPlayerMenu.PlayerSpeedSlider.Value :=
-    VectorLen(Player.Navigator.CameraDir);
 
   GameSoundMenu.SoundVolumeSlider.Value := SoundVolume;
   GameSoundMenu.MusicVolumeSlider.Value := MusicVolume;
@@ -266,11 +200,7 @@ end;
 procedure InitGLW(Glwin: TGLWindow);
 begin
   GameMenu := TGameMenu.Create;
-  DebugMenu := TDebugMenu.Create;
   GameSoundMenu := TGameSoundMenu.Create;
-  DebugPlayerMenu := TDebugPlayerMenu.Create;
-  DebugCreaturesMenu := TDebugCreaturesMenu.Create;
-  DebugItemsMenu := TDebugItemsMenu.Create;
   CurrentMenu := GameMenu;
 end;
 
@@ -278,14 +208,7 @@ procedure CloseGLW(Glwin: TGLWindow);
 begin
   CurrentMenu := nil;
   FreeAndNil(GameMenu);
-  FreeAndNil(DebugMenu);
   FreeAndNil(GameSoundMenu);
-  FreeAndNil(EditLevelLightsMenu);
-  FreeAndNil(EditOneLightMenu);
-  FreeAndNil(EditHeadlightMenu);
-  FreeAndNil(DebugItemsMenu);
-  FreeAndNil(DebugCreaturesMenu);
-  FreeAndNil(DebugPlayerMenu);
 end;
 
 initialization

@@ -1,5 +1,4 @@
 - Test Radeon problems reported on PGD.
-- debug menu is only for testing -- hide somehow at some point.
 
 - mouse sensitivity problems:
   function StrToFloatDef(const s: string; DefValue: Extended): Extended;

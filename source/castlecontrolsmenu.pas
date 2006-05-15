@@ -380,7 +380,7 @@ end;
 
 const
   WholeAreaX0 = 10;
-  WholeAreaY0 = 80;
+  WholeAreaY0 = 50;
   WholeAreaX1 = 750;
   WholeAreaY1 = 450;
 

@@ -108,7 +108,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, CastleCreatures,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
-  KambiFilesUtils, CastleKeys, CastleGameMenu, CastleSound,
+  KambiFilesUtils, CastleKeys, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, GLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu;
 
@@ -992,6 +992,11 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
     UpdateMouseLook;
   end;
 
+  procedure DoDebugMenu;
+  begin
+    ShowDebugMenu(Draw);
+  end;
+
 begin
   { Basic keys. }
   if CastleKey_Attack.IsValue(Key) then
@@ -1035,6 +1040,8 @@ begin
     ShowDebugInfo := not ShowDebugInfo else
   if CastleKey_Interact.IsValue(Key) then
     DoInteract else
+  if CastleKey_DebugMenu.IsValue(Key) then
+    DoDebugMenu else
 
   { Fixed keys. }
   if C = CharEscape then

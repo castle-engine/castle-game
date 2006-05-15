@@ -18,9 +18,32 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
+{ }
+unit CastleDebugMenu;
+
+interface
+
+uses GLWindow;
+
+procedure ShowDebugMenu(ADrawUnderMenu: TDrawFunc);
+
+implementation
+
+uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
+  OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
+  VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
+  CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
+  CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel,
+  CastleSound, CastleSoundMenu, VRMLNodes, KambiClassUtils, CastleTimeMessages;
+
 { TCastleMenu descendants interface ------------------------------------------ }
 
 type
+  TViewAngleSlider = class(TGLMenuFloatSlider)
+    constructor Create;
+    function ValueToStr(const AValue: Single): string; override;
+  end;
+
   TDebugMenu = class(TCastleMenu)
     RenderBoundingBoxesArgument: TGLMenuBooleanArgument;
     constructor Create;
@@ -79,10 +102,27 @@ type
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
+{ TViewAngleSlider ----------------------------------------------------------- }
+
+constructor TViewAngleSlider.Create;
+begin
+  inherited Create(10, 170, ViewAngleDegX);
+end;
+
+function TViewAngleSlider.ValueToStr(const AValue: Single): string;
+begin
+  Result := Format('horiz %f, vert %f', [AValue,
+    AdjustViewAngleDegToAspectRatio(AValue, Glw.Height / Glw.Width)]);
+end;
+
 { ----------------------------------------------------------------------------
   global vars (used by TCastleMenu descendants implementation) }
 
 var
+  UserQuit: boolean;
+  DrawUnderMenu: TDrawFunc;
+  CurrentMenu: TCastleMenu;
+
   DebugMenu: TDebugMenu;
   DebugPlayerMenu: TDebugPlayerMenu;
   DebugCreaturesMenu: TDebugCreaturesMenu;
@@ -107,7 +147,7 @@ begin
   Items.Add('Change sound properties');
   Items.Add('Edit lights');
   Items.Add('Force thunder now');
-  Items.Add('Back to game menu');
+  Items.Add('Back to game');
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
@@ -220,7 +260,7 @@ begin
          CurrentMenu := EditLevelLightsMenu;
        end;
     7: ForceThunder;
-    8: CurrentMenu := GameMenu;
+    8: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -844,3 +884,98 @@ begin
   Level.LightSet.CalculateLights;
 end;
 
+{ global things -------------------------------------------------------------- }
+
+{$I castlemenucallbacks.inc}
+
+procedure Draw2d(Draw2DData: Integer);
+begin
+  glLoadIdentity;
+  glRasterPos2i(0, 0);
+  CurrentMenu.Draw;
+end;
+
+procedure Draw(Glwin: TGLWindow);
+begin
+  DrawUnderMenu(Glwin);
+
+  glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    ProjectionGLPushPop(Draw2d, 0, Ortho2dProjMatrix(
+      0, RequiredScreenWidth, 0, RequiredScreenHeight));
+  glPopAttrib;
+end;
+
+procedure ShowDebugMenu(ADrawUnderMenu: TDrawFunc);
+var
+  SavedMode: TGLMode;
+begin
+  DrawUnderMenu := ADrawUnderMenu;
+
+  DebugPlayerMenu.RotationHorizontalSpeedSlider.Value :=
+    Player.Navigator.RotationHorizontalSpeed;
+  DebugPlayerMenu.RotationVerticalSpeedSlider.Value :=
+    Player.Navigator.RotationVerticalSpeed;
+  DebugPlayerMenu.PlayerSpeedSlider.Value :=
+    VectorLen(Player.Navigator.CameraDir);
+
+  SavedMode := TGLMode.Create(Glw, 0, true);
+  try
+    SavedMode.FakeMouseDown := false;
+    { This is needed, because when changing ViewAngleDegX we will call
+      Glw.OnResize to set new projection matrix, and this
+      new projection matrix should stay for the game. }
+    SavedMode.RestoreProjectionMatrix := false;
+
+    SetStandardGLWindowState(Glw, Draw, CloseQuery, Glw.OnResize,
+      nil, false, true { FPSActive should not be needed anymore, but I leave it. },
+      false, K_None, #0, false, false);
+
+    { Otherwise messages don't look good, because the text is mixed
+      with the menu text. }
+    GLWinMessagesTheme.RectColor[3] := 1.0;
+
+    Glw.OnKeyDown := KeyDown;
+    Glw.OnMouseDown := MouseDown;
+    Glw.OnMouseUp := MouseUp;
+    Glw.OnMouseMove := MouseMove;
+    Glw.OnIdle := Idle;
+
+    CurrentMenu := DebugMenu;
+    UserQuit := false;
+
+    repeat
+      Glwm.ProcessMessage(true);
+    until GameEnded or UserQuit;
+
+  finally FreeAndNil(SavedMode); end;
+end;
+
+{ initialization / finalization ---------------------------------------------- }
+
+procedure InitGLW(Glwin: TGLWindow);
+begin
+  DebugMenu := TDebugMenu.Create;
+  DebugPlayerMenu := TDebugPlayerMenu.Create;
+  DebugCreaturesMenu := TDebugCreaturesMenu.Create;
+  DebugItemsMenu := TDebugItemsMenu.Create;
+  CurrentMenu := DebugMenu;
+end;
+
+procedure CloseGLW(Glwin: TGLWindow);
+begin
+  CurrentMenu := nil;
+  FreeAndNil(DebugMenu);
+  FreeAndNil(EditLevelLightsMenu);
+  FreeAndNil(EditOneLightMenu);
+  FreeAndNil(EditHeadlightMenu);
+  FreeAndNil(DebugItemsMenu);
+  FreeAndNil(DebugCreaturesMenu);
+  FreeAndNil(DebugPlayerMenu);
+end;
+
+initialization
+  Glw.OnInitList.AppendItem(@InitGLW);
+  Glw.OnCloseList.AppendItem(@CloseGLW);
+finalization
+end.
