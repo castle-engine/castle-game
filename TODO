@@ -1,6 +1,41 @@
-- Test Radeon problems reported on PGD.
+- Radeon problems
+
+  Reported on PGD:
+  1.Loading time (creating display lists for animations) is ridicuously long.
+    Confirmed on Majka.
+
+  2.Volumetric fog somehow gets applied to upper rock parts.
+    Confirmed on Majka.
+
+  3.2d controls problems --- sword should be with alpha-test, item slots' borders should be with blending. But on Radeon screenshots they all look as if they were drawn "just like that", covering things underneath.
+    No problems on Majka Windows.
+
+  4.Switching task (Alt+Tab) craps graphics when switching back to game (although this is known to happen on older Windowses (98 and like) with crappy graphic drivers, it definitely should not happen on XP with latest ATI drivers).
+    No such problems on Majka Windows.
+
+  On Majka Windows:
+  5.Switching task (Alt+Tab) while "Loading creatures" craps things --- or maybe I was impatient ?
+
+  6.FPS is awfully low.
+
+  7.Switching task (Alt+Tab) and going back to game causes "can't change display settings" warning.
+
+  8.Using ctrl+alt+del to bring taskmgr -> taskmgr.exe fails. Well, this is definitely Radeon's problem. But maybe I'm just overloading the system too much ?
+
+   9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game.
+
+   10.view3dscene: with status text, FPS is much lower.
+
+   12.view3dscene: displayed bbox sometimes has, sometimes has no line indicating triangle inside.
+
+  - Check changing ColorsBits and VideoFrequency on Radeon, maybe will help for some problems ?
+
+  Traveler's screenshot from geforce 6800gt also shows artifact when rendering life indicator --- it should be rendered with blending (like on Huehnerschaender screenshot), while on Traveler's screenshots it shows white background underneath.
 
 - mouse sensitivity problems:
+
+  There's also the problem with wrong mouse sensitivity, it seems that the mouse sensitivity values get assigned completely wrong. Sometimes it gets 9.0, sometimes it gets some ridiculous large value (though it's not MaxSingle). I understand now that this was also meant by Traveler in "Something else I noticed is that changed controls are not loaded properly again when restarting the game. I think you are converting values incorrectly.". This is very strange, because these values are actually changed only when reading them from config file, or setting them to default, or moving the slider in the menu. And converting is done using the plain StrToFloat / FloatToStr routines. And, needless to say, I don't experience these problems --- neither on Linux nor on Windows (XP and 2000 Prof). So they may indicate some memory corruption.
+
   function StrToFloatDef(const s: string; DefValue: Extended): Extended;
 
   Was there a bug about this in FPC ? I don't remember, but I have this
@@ -19,6 +54,7 @@
 
   I should close this issue after doing more tests on other computers
   (Windows in uni ?).
+  No problems on Majka Windows.
 
 --------------------
 - Things from README should be moved to WWW page, and then WWW pages
