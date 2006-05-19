@@ -119,6 +119,14 @@ var
 begin
   SetLength(RootNodes, Length(FModelFileNames));
 
+  { $define DEBUG_ANIMATION_LOADING}
+
+  {$ifdef DEBUG_ANIMATION_LOADING}
+  Writeln('Loading animation:');
+  for I := 0 to High(RootNodes) do
+    Writeln('  RootNodes[I] from "', FModelFileNames[I], '"');
+  {$endif}
+
   FirstRootNodeIndex := FirstRootNodesPool.IndexOf(FModelFileNames[0]);
   OwnsFirstRootNode := FirstRootNodeIndex = -1;
   if not OwnsFirstRootNode then
