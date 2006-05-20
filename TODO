@@ -392,10 +392,12 @@ Each time before uploading release (to PGD and/or camelot):
       rm -f ~/.castle.data
       ln -s /win/mojepasy/openGL/castle/trunk/ ~/.castle.data
   - test building from extracted created dist (using `make build-xxx')
-- upload to PGD
-- upload to camelot:
+- upload to WWW:
   copy tar.gz to /win/mojewww/camelot/,
-  update /win/mojewww/camelot/castle.php CASTLE_VERSION constant
+  update /win/mojewww/camelot/castle.php CASTLE_VERSION constant,
+  upload to http://stoma.name/michalis
+  upload to http://camelot.homedns.org/~michalis/ as usual
+    (make md5, upload, html_apply_ontheway),
 - make svntag
   check by
     svn list file:///home/michal/svn/kambi-svn-repos/castle/tags/
