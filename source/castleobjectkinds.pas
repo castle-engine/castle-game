@@ -23,7 +23,7 @@ unit CastleObjectKinds;
 
 interface
 
-uses Classes, KambiXMLCfg;
+uses Classes, KambiXMLCfg, VRMLGLAnimation, VRMLGLAnimationInfo;
 
 const
   DefaultTransparent = false;
@@ -50,6 +50,24 @@ type
       of your animations in subclasses. In our destructor and FreePrepareRender
       we will free and clear objects on this list. }
     FirstRootNodesPool: TStringList;
+
+    { This creates Anim from given AnimInfo, only if Anim = nil.
+      Then it sets attributes for the animation and then prepares
+      the animation by calling animation's @noAutoLink(PrepareRender).
+
+      So this may be helpful to use in PrepareRender implementations.
+
+      It uses FirstRootNodesPool. It calls Progress.Step 2 times. }
+    procedure CreateAnimationIfNeeded(
+      const AnimationName: string;
+      var Anim: TVRMLGLAnimation;
+      AnimInfo: TVRMLGLAnimationInfo;
+      DoPrepareBackground, DoPrepareBoundingBox,
+      DoPrepareTrianglesListNotOverTriangulate,
+      DoPrepareTrianglesListOverTriangulate: boolean);
+
+    { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool }
+    procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
@@ -109,9 +127,12 @@ type
     procedure RedoPrepareRender;
   end;
 
+var
+  WasParam_DebugWriteAnimationsInfo: boolean;
+
 implementation
 
-uses SysUtils, ProgressUnit;
+uses SysUtils, ProgressUnit, Object3dAsVRML, CastleVideoOptions;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
@@ -186,6 +207,44 @@ begin
 
     PrepareRender;
   finally Progress.Fini; end;
+end;
+
+procedure TObjectKind.AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
+var
+  FileName: string;
+begin
+  FileName := AnimInfo.ModelFileNames[0];
+  if FirstRootNodesPool.IndexOf(FileName) = -1 then
+    FirstRootNodesPool.AddObject(FileName, LoadAsVRML(FileName, false));
+end;
+
+procedure TObjectKind.CreateAnimationIfNeeded(
+  const AnimationName: string;
+  var Anim: TVRMLGLAnimation;
+  AnimInfo: TVRMLGLAnimationInfo;
+  DoPrepareBackground, DoPrepareBoundingBox,
+  DoPrepareTrianglesListNotOverTriangulate,
+  DoPrepareTrianglesListOverTriangulate: boolean);
+begin
+  if (AnimInfo <> nil) and (Anim = nil) then
+    Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
+  Progress.Step;
+
+  if Anim <> nil then
+  begin
+    { Write info before PrepareRender, otherwise it could not
+      be available after freeing scene RootNodes in Anim.PrepareRender. }
+    if WasParam_DebugWriteAnimationsInfo then
+      Writeln((VRMLNodeName + '.' + AnimationName + ' animation: '): 40,
+        Anim.ScenesCount: 3, ' scenes * ',
+        Anim.Scenes[0].TrianglesCount(true): 8, ' triangles');
+
+    AnimationAttributesSet(Anim.Attributes);
+    Anim.PrepareRender(DoPrepareBackground, DoPrepareBoundingBox,
+      DoPrepareTrianglesListNotOverTriangulate,
+      DoPrepareTrianglesListOverTriangulate, false, true);
+  end;
+  Progress.Step;
 end;
 
 end.

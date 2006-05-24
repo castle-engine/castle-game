@@ -60,6 +60,13 @@ type
     FBoundingBoxRotatedCalculated: boolean;
   protected
     procedure FreePrepareRender; override;
+
+    { This is like @inherited, but it passes proper values for boolean parameters
+      specifying what to prepare. }
+    procedure CreateAnimationIfNeeded(
+      const AnimationName: string;
+      var Anim: TVRMLGLAnimation;
+      AnimInfo: TVRMLGLAnimationInfo);
   public
     constructor Create(const AModelFileName, AVRMLNodeName, AName,
       AImageFileName: string);
@@ -470,6 +477,15 @@ begin
     FScene.CloseGL;
 end;
 
+procedure TItemKind.CreateAnimationIfNeeded(
+  const AnimationName: string;
+  var Anim: TVRMLGLAnimation;
+  AnimInfo: TVRMLGLAnimationInfo);
+begin
+  inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
+    false, true, false, false);
+end;
+
 { TItemKindsList ------------------------------------------------------------- }
 
 procedure TItemKindsList.PrepareRender;
@@ -579,21 +595,9 @@ begin
 end;
 
 procedure TItemWeaponKind.PrepareRender;
-
-  procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
-    AnimInfo: TVRMLGLAnimationInfo);
-  begin
-    if (AnimInfo <> nil) and (Anim = nil) then
-      Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
-    Progress.Step;
-    AnimationAttributesSet(Anim.Attributes);
-    Anim.PrepareRender(false, true, false, false, false, true);
-    Progress.Step;
-  end;
-
 begin
   inherited;
-  CreateIfNeeded(FAttackAnimation, FAttackAnimationInfo);
+  CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationInfo);
 end;
 
 function TItemWeaponKind.PrepareRenderSteps: Cardinal;

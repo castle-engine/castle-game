@@ -89,6 +89,13 @@ type
   protected
     { In descendants only PrepareRender can (and should!) set this. }
     CameraRadiusFromPrepareRender: Single;
+
+    { This is like @inherited, but it passes proper values for boolean parameters
+      specifying what to prepare. }
+    procedure CreateAnimationIfNeeded(
+      const AnimationName: string;
+      var Anim: TVRMLGLAnimation;
+      AnimInfo: TVRMLGLAnimationInfo);
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -1108,52 +1115,18 @@ begin
     Result := CameraRadiusFromPrepareRender;
 end;
 
+procedure TCreatureKind.CreateAnimationIfNeeded(
+  const AnimationName: string;
+  var Anim: TVRMLGLAnimation;
+  AnimInfo: TVRMLGLAnimationInfo);
+begin
+  inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
+    false, true, RenderShadowsPossible, false);
+end;
+
 { TCreaturesKindsList -------------------------------------------------------- }
 
-{ $define WRITELN_ANIMATION_INFO}
-
 procedure TCreaturesKindsList.PrepareRender;
-
-  {$ifdef WRITELN_ANIMATION_INFO}
-  procedure WritelnAnimationsInfo;
-  var
-    TrianglesCount: Cardinal;
-
-    procedure WritelnAnimInfo(Animation: TVRMLGLAnimation; Name: string);
-    begin
-      Writeln('    ', Name: 20, ': ',
-        Animation.ScenesCount: 3, ' scenes * ',
-        Animation.Scenes[0].TrianglesCount(true): 8, ' triangles');
-      TrianglesCount += Animation.ScenesCount *
-        Animation.Scenes[0].TrianglesCount(true);
-    end;
-
-  var
-    I: Integer;
-  begin
-    Writeln('Animations in memory:');
-    for I := 0 to High do
-    begin
-      TrianglesCount := 0;
-      Writeln('  ', Items[I].VRMLNodeName);
-      if Items[I] is TWalkAttackCreatureKind then
-      begin
-        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).StandAnimation, 'Stand');
-        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).StandToWalkAnimation, 'StandToWalk');
-        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).WalkAnimation, 'Walk');
-        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).AttackAnimation, 'Attack');
-        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).DyingAnimation, 'Dying');
-        WritelnAnimInfo(TWalkAttackCreatureKind(Items[I]).HurtAnimation, 'Hurt');
-        if Items[I] is TSpiderQueenKind then
-          WritelnAnimInfo(TSpiderQueenKind(Items[I]).ThrowWebAttackAnimation, 'ThrowWebAttack');
-      end;
-      if Items[I] is TMissileCreatureKind then
-        WritelnAnimInfo(TMissileCreatureKind(Items[I]).Animation, '(Standard)');
-      Writeln('  Total ', TrianglesCount);
-    end;
-  end;
-  {$endif WRITELN_ANIMATION_INFO}
-
 var
   I: Integer;
   PrepareRenderSteps: Cardinal;
@@ -1169,11 +1142,6 @@ begin
       for I := 0 to High do
         Items[I].PrepareRender;
     finally Progress.Fini; end;
-
-    { Tests : }
-    {$ifdef WRITELN_ANIMATION_INFO}
-    WritelnAnimationsInfo;
-    {$endif}
   end;
 end;
 
@@ -1272,27 +1240,6 @@ begin
 end;
 
 procedure TWalkAttackCreatureKind.PrepareRender;
-
-  procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
-  var
-    FileName: string;
-  begin
-    FileName := AnimInfo.ModelFileNames[0];
-    if FirstRootNodesPool.IndexOf(FileName) = -1 then
-      FirstRootNodesPool.AddObject(FileName, LoadAsVRML(FileName, false));
-  end;
-
-  procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
-    AnimInfo: TVRMLGLAnimationInfo);
-  begin
-    if Anim = nil then
-      Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
-    Progress.Step;
-    AnimationAttributesSet(Anim.Attributes);
-    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false, true);
-    Progress.Step;
-  end;
-
 begin
   inherited;
 
@@ -1303,12 +1250,12 @@ begin
   AddFirstRootNodesPool(FDyingAnimationInfo      );
   AddFirstRootNodesPool(FHurtAnimationInfo       );
 
-  CreateIfNeeded(FStandAnimation      , FStandAnimationInfo      );
-  CreateIfNeeded(FStandToWalkAnimation, FStandToWalkAnimationInfo);
-  CreateIfNeeded(FWalkAnimation       , FWalkAnimationInfo       );
-  CreateIfNeeded(FAttackAnimation     , FAttackAnimationInfo     );
-  CreateIfNeeded(FDyingAnimation      , FDyingAnimationInfo      );
-  CreateIfNeeded(FHurtAnimation       , FHurtAnimationInfo       );
+  CreateAnimationIfNeeded('Stand'      , FStandAnimation      , FStandAnimationInfo      );
+  CreateAnimationIfNeeded('StandToWalk', FStandToWalkAnimation, FStandToWalkAnimationInfo);
+  CreateAnimationIfNeeded('Walk'       , FWalkAnimation       , FWalkAnimationInfo       );
+  CreateAnimationIfNeeded('Attack'     , FAttackAnimation     , FAttackAnimationInfo     );
+  CreateAnimationIfNeeded('Dying'      , FDyingAnimation      , FDyingAnimationInfo      );
+  CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationInfo       );
 
   CameraRadiusFromPrepareRender :=
     Min(Box3dXYRadius(StandAnimation.Scenes[0].BoundingBox),
@@ -1456,21 +1403,10 @@ begin
 end;
 
 procedure TSpiderQueenKind.PrepareRender;
-
-  procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
-    AnimInfo: TVRMLGLAnimationInfo);
-  begin
-    if Anim = nil then
-      Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
-    Progress.Step;
-    AnimationAttributesSet(Anim.Attributes);
-    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false, true);
-    Progress.Step;
-  end;
-
 begin
   inherited;
-  CreateIfNeeded(FThrowWebAttackAnimation, FThrowWebAttackAnimationInfo);
+  CreateAnimationIfNeeded('ThrowWebAttack',
+    FThrowWebAttackAnimation, FThrowWebAttackAnimationInfo);
 end;
 
 function TSpiderQueenKind.PrepareRenderSteps: Cardinal;
@@ -1567,21 +1503,9 @@ begin
 end;
 
 procedure TMissileCreatureKind.PrepareRender;
-
-  procedure CreateIfNeeded(var Anim: TVRMLGLAnimation;
-    AnimInfo: TVRMLGLAnimationInfo);
-  begin
-    if Anim = nil then
-      Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
-    Progress.Step;
-    AnimationAttributesSet(Anim.Attributes);
-    Anim.PrepareRender(false, true, RenderShadowsPossible, false, false, true);
-    Progress.Step;
-  end;
-
 begin
   inherited;
-  CreateIfNeeded(FAnimation, FAnimationInfo);
+  CreateAnimationIfNeeded('Move', FAnimation, FAnimationInfo);
 
   CameraRadiusFromPrepareRender :=
     Box3dXYRadius(Animation.Scenes[0].BoundingBox);
