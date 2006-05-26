@@ -1,3 +1,7 @@
+- falling down lifeloss lower, sometimes even jumping causes small damage.
+  make the "acceptable height to fall without life loss" higher
+  and lower the life loss factor
+
 - Radeon problems
 
   Reported on PGD:
@@ -22,13 +26,18 @@
 
   8.Using ctrl+alt+del to bring taskmgr -> taskmgr.exe fails. Well, this is definitely Radeon's problem. But maybe I'm just overloading the system too much ?
 
-   9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game.
+  9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game.
 
-   10.view3dscene: with status text, FPS is much lower.
+  10.view3dscene: with status text, FPS is much lower.
 
-   12.view3dscene: displayed bbox sometimes has, sometimes has no line indicating triangle inside.
+  12.view3dscene: displayed bbox sometimes has, sometimes has no line indicating triangle inside.
 
   - Check changing ColorsBits and VideoFrequency on Radeon, maybe will help for some problems ?
+
+  Daniël Mantione:
+  - when starting the game a few bars appear that it is
+    loading things, after that the game aborts with a EDivByZero.
+    Linux, Radeon Mobility M7, it is using the open source OpenGL driver.
 
   Traveler's screenshot from geforce 6800gt also shows artifact when rendering life indicator --- it should be rendered with blending (like on Huehnerschaender screenshot), while on Traveler's screenshots it shows white background underneath.
 
