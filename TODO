@@ -34,11 +34,6 @@
 
   - Check changing ColorsBits and VideoFrequency on Radeon, maybe will help for some problems ?
 
-  Daniël Mantione:
-  - when starting the game a few bars appear that it is
-    loading things, after that the game aborts with a EDivByZero.
-    Linux, Radeon Mobility M7, it is using the open source OpenGL driver.
-
   Traveler's screenshot from geforce 6800gt also shows artifact when rendering life indicator --- it should be rendered with blending (like on Huehnerschaender screenshot), while on Traveler's screenshots it shows white background underneath.
 
 - mouse sensitivity problems:
