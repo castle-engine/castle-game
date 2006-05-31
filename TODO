@@ -1,6 +1,14 @@
+- Eric stage 6 comment:
+  - Display frequency can be changed, but is 60Hz by default, has to be changed by hand and is not hardware's optimal value
+  - I just saw one problem: when you switch (alt+tab) to other window, but the game window remains visible on the desktop, then the mouse is hidden when you mouse over the game window (even though the other window has focus).
+
+- log file, it will be done at some point, and then probably will include everything printed by "View video information" and "View sound information" and by yellow messages printed on game screen, and probably some more... You know, it's probably easier to implement it instead of talking Smile OK, it will be done for 0.6.4 version (hopefully around next weekend).
+
 - falling down lifeloss lower, sometimes even jumping causes small damage.
   make the "acceptable height to fall without life loss" higher
   and lower the life loss factor
+
+- remove one scroll of flying, to make the trick harder ?
 
 - Radeon problems
 
@@ -138,7 +146,17 @@ cages level:
   read-only TPlayer property.
 
 - gate:
-  - is this a good idea to just force player to restart if he jumped into the grave ? I think yes, but later maybe some alt way should be possible ?
+  - Wall of fence around the level, to get rid of invisible walls.
+    Chebmaster:
+    a) impassabe cliffs/abysses at the edges of the landscape
+       (too high/wide to pass even by flying)
+    b) endless sea (level=island)
+
+    Hmm, both are good ideas. I don't want to surround the whole level with sea (I want the level to "feel" like in the middle of the forest). Actually, maybe I'll use all three ideas ---- on the left side of the level I could do a cliff, on the right and bottom I could use wall of fance, and add a little "opening on the sea" on the right side where the river ends.
+
+  - is this a good idea to just force player to restart if he
+    jumped into the grave ? I think yes, but later maybe some
+    alt way should be possible ?
 
 - cages level:
   - on the other side of the wall, also a door, but blocked by rocks
@@ -363,6 +381,12 @@ dist-making to-dos:
 - Makefile to pack distro of my game: add at some point svn log:
   svn log -v file:///home/michal/svn/kambi-svn-repos/ \
     castle/trunk kambi_pascal_units/trunk > ChangeLog
+
+- real exe installer for Windows,
+  include OpenAL installer
+  (run after the question "install Creative's OpenAL implementation ?").
+
+- real packages for Linux, depend (as recommend:) on OpenAL packages
 
 ----------------------------------------
 Each time before uploading release (to PGD and/or camelot):
