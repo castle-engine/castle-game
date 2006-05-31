@@ -45,9 +45,9 @@ In short: good graphics card, with good OpenGL drivers installed.
 In case of doubt, be sure to install newest drivers from your
 graphics card manufacturer.
 
-Also you should have at least 512 MB available memory.
-Right now (it's 6th May 2006) the running game can take up to 450 MB
-on GeForce. But this may depend on various factors, including your
+Also you should have enough free memory available when running the game.
+As of version 0.6.3, game can take up to 280 MB on GeForce with Linux drivers
+from nvidia.com. But this may depend on various factors, including your
 OpenGL implementation. If the game seems to drain your system
 of all the memory (which will most likely be observed as sudden slowdown
 in the middle of "Loading creatures" sequence, as this is the main
