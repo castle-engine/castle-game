@@ -21,6 +21,7 @@
 
   3.2d controls problems --- sword should be with alpha-test, item slots' borders should be with blending. But on Radeon screenshots they all look as if they were drawn "just like that", covering things underneath.
     No problems on Majka Windows.
+    Maybe glProjectionPushPop will silently fix this ?
 
   4.Switching task (Alt+Tab) craps graphics when switching back to game (although this is known to happen on older Windowses (98 and like) with crappy graphic drivers, it definitely should not happen on XP with latest ATI drivers).
     No such problems on Majka Windows.
