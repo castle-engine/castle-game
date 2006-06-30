@@ -1,3 +1,10 @@
+- Starting level: I think that after "New Game" there should always
+  be a choice of level, even when there's only 1 level.
+  Otherwise people are confused at first, they don't realize that
+  later "New Game" allows them to restart from further levels.
+
+- Paul: going up the steps could do with a smoother animation
+
 - Eric stage 6 comment:
   - Display frequency can be changed, but is 60Hz by default, has to be changed by hand and is not hardware's optimal value
   - I just saw one problem: when you switch (alt+tab) to other window, but the game window remains visible on the desktop, then the mouse is hidden when you mouse over the game window (even though the other window has focus).
@@ -423,10 +430,9 @@ Each time before uploading release (to PGD and/or camelot):
   - test building from extracted created dist (using `make build-xxx')
 - upload to WWW:
   copy tar.gz to /win/mojewww/camelot/,
-  update /win/mojewww/camelot/castle.php CASTLE_VERSION constant,
   upload to http://stoma.name/michalis
   upload to http://camelot.homedns.org/~michalis/ as usual
-    (make md5, upload, html_apply_ontheway),
+    (generate_versions, make md5, upload, html_apply_ontheway),
 - make svntag
   check by
     svn list file:///home/michal/svn/kambi-svn-repos/castle/tags/
