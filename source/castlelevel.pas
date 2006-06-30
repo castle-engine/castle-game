@@ -201,7 +201,7 @@ type
       virtual;
 
     function MoveAllowed(const CameraPos: TVector3Single;
-      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean; virtual;
 
@@ -211,7 +211,7 @@ type
       const MovingObjectCameraRadius: Single): boolean; virtual;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
-      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
       virtual;
     { @groupEnd }
 
@@ -225,11 +225,11 @@ type
 
       @groupBegin }
     function PlayerMoveAllowed(Navigator: TMatrixWalker;
-      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
 
     procedure PlayerGetCameraHeight(Navigator: TMatrixWalker;
-      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
     { Call this to render level things. Frustum is current player's frustum. }
     procedure Render(const Frustum: TFrustum); virtual;
@@ -382,7 +382,7 @@ type
       override;
 
     function MoveAllowed(const CameraPos: TVector3Single;
-      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean; override;
 
@@ -392,7 +392,7 @@ type
       const MovingObjectCameraRadius: Single): boolean; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
-      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
       override;
 
     procedure Render(const Frustum: TFrustum); override;
@@ -501,7 +501,7 @@ type
       const Pos1, Pos2: TVector3Single): boolean; override;
 
     function MoveAllowed(const CameraPos: TVector3Single;
-      const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean; override;
 
@@ -511,7 +511,7 @@ type
       const MovingObjectCameraRadius: Single): boolean; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
-      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
+      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single); override;
 
     function SpecialObjectsTryPick(var IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single): Integer; override;
@@ -911,15 +911,15 @@ begin
 end;
 
 function TLevel.MoveAllowed(const CameraPos: TVector3Single;
-  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
 begin
   Result :=
-    Box3dPointInside(ProposedNewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveAllowed(
       CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius,
-      NoItemIndex, CollisionIgnoreItem);
+      NoItemIndex, CollisionIgnoreItem) and
+    Box3dPointInside(NewPos, LevelBox);
 end;
 
 function TLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
@@ -935,7 +935,7 @@ begin
 end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
-  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 begin
   Scene.DefaultTriangleOctree.GetCameraHeight(
     CameraPos, HomeCameraUp,
@@ -944,7 +944,7 @@ begin
 end;
 
 function TLevel.PlayerMoveAllowed(Navigator: TMatrixWalker;
-  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result :=
@@ -960,7 +960,7 @@ begin
 end;
 
 procedure TLevel.PlayerGetCameraHeight(Navigator: TMatrixWalker;
-  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 begin
   { Check is player standing over level. }
   GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
@@ -1175,7 +1175,7 @@ begin
 end;
 
 function TCastleHallLevel.MoveAllowed(const CameraPos: TVector3Single;
-  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
 begin
@@ -1197,7 +1197,7 @@ begin
 end;
 
 procedure TCastleHallLevel.GetCameraHeight(const CameraPos: TVector3Single;
-  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
   procedure MakeBonusScene(BonusScene: TVRMLFlatSceneGL);
   var
@@ -1853,6 +1853,7 @@ begin
         FSpidersAppearing.Delete(I, 1);
       end else
       begin
+        { TODO: fix for case when not IsAboveTheGround }
         FSpidersAppearing[I][2] -= Min(SpidersFallingSpeed * CompSpeed,
           Sqrt(SqrHeightAboveTheGround) - Spider.CameraRadius);
         Inc(I);
@@ -1929,7 +1930,7 @@ begin
 end;
 
 function TCagesLevel.MoveAllowed(const CameraPos: TVector3Single;
-  const ProposedNewPos: TVector3Single; var NewPos: TVector3Single;
+  const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
 begin
@@ -1959,7 +1960,7 @@ begin
 end;
 
 procedure TCagesLevel.GetCameraHeight(const CameraPos: TVector3Single;
-  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
   procedure MakeBonusScene(BonusScene: TVRMLFlatSceneGL);
   var

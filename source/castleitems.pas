@@ -786,6 +786,7 @@ var
   SqrHeightAboveTheGround, HeightAboveTheGround: Single;
   ShiftedPosition: TVector3Single;
   ProposedNewShiftedPosition, NewShiftedPosition: TVector3Single;
+  FallingDownLength: Single;
 begin
   FRotation += 3 * CompSpeed;
 
@@ -808,18 +809,34 @@ begin
   begin
     { Item falls down because of gravity. }
 
-    HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
-    ProposedNewShiftedPosition := ShiftedPosition;
-    ProposedNewShiftedPosition[2] -= Min(
-      HeightAboveTheGround - PositionRadius,
-      CompSpeed * FallingDownSpeed);
+    FallingDownLength := CompSpeed * FallingDownSpeed;
 
-    if Level.MoveAllowed(ShiftedPosition, ProposedNewShiftedPosition,
-      NewShiftedPosition, true, PositionRadius) then
+    if IsAboveTheGround then
+    begin
+      HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
+      MinTo1st(FallingDownLength, HeightAboveTheGround - PositionRadius);
+    end;
+
+    ProposedNewShiftedPosition := ShiftedPosition;
+    ProposedNewShiftedPosition[2] -= FallingDownLength;
+
+    if Level.MoveAllowedSimple(ShiftedPosition, ProposedNewShiftedPosition,
+      true, PositionRadius) then
     begin
       FPosition := ProposedNewShiftedPosition;
       FPosition[2] -= PositionRadius;
     end;
+
+    { TODO: I should use Level.MoveAllowed here, not
+      Level.MoveAllowedSimple. But then left life potion on gate
+      level must be corrected (possibly by correcting the large sword mesh)
+      to not "slip down" from the sword. }
+    {if Level.MoveAllowed(ShiftedPosition, ProposedNewShiftedPosition,
+      NewShiftedPosition, true, PositionRadius) then
+    begin
+      FPosition := NewShiftedPosition;
+      FPosition[2] -= PositionRadius;
+    end;}
   end;
 end;
 

@@ -684,7 +684,7 @@ type
       creatures. }
     function MoveAllowed(
       const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
-      var NewMiddlePosition: TVector3Single;
+      out NewMiddlePosition: TVector3Single;
       BecauseOfGravity: boolean): boolean;
 
     { Like MoveAllowed, but this is only a "yes/no" collision check. }
@@ -702,7 +702,7 @@ type
       anyway.) }
     procedure GetCameraHeight(
       const AssumeMiddlePosition: TVector3Single;
-      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
     procedure ShortRangeAttackHurt;
   public
@@ -1785,7 +1785,7 @@ end;
 
 function TCreature.MoveAllowed(
   const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
-  var NewMiddlePosition: TVector3Single;
+  out NewMiddlePosition: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result :=
@@ -1821,7 +1821,7 @@ end;
 
 procedure TCreature.GetCameraHeight(
   const AssumeMiddlePosition: TVector3Single;
-  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 begin
   { Check creature<->level collision. }
   Level.GetCameraHeight(AssumeMiddlePosition,
@@ -1913,8 +1913,9 @@ procedure TCreature.Idle(const CompSpeed: Single);
 
     GetCameraHeight(OldMiddlePosition, IsAboveTheGround,
       SqrHeightAboveTheGround);
-    { We will need it anyway. OK, I'll pay this Sqrt. }
-    HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
+    if IsAboveTheGround then
+      { We will need it anyway. OK, I'll pay this Sqrt. }
+      HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
 
     if (not IsAboveTheGround) or
       (HeightAboveTheGround > HeightBetweenLegsAndMiddle * HeightMargin) then
