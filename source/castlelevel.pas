@@ -92,10 +92,10 @@ type
     { See README for description of LevelBox and HintButtonBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
       find and remove the node from Scene). }
-    function RemoveBoxNode(var Box: TBox3d; const NodeName: string): boolean;
+    function RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
 
     { Like RemoveBoxNode, but raise EInternalError if not found. }
-    procedure RemoveBoxNodeCheck(var Box: TBox3d; const NodeName: string);
+    procedure RemoveBoxNodeCheck(out Box: TBox3d; const NodeName: string);
 
     { This will be called from our constructor before initializing
       our octrees. You can override this to do here some operations

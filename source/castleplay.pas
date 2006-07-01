@@ -846,7 +846,7 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
     function GetItemDropPosition(
       DroppedItemKind: TItemKind;
-      var DropPosition: TVector3Single): boolean;
+      out DropPosition: TVector3Single): boolean;
     var
       ItemBox: TBox3d;
       ItemBoxRadius: Single;

@@ -2106,7 +2106,7 @@ procedure TCreaturesList.GetCameraHeight(
   { If the Point is inside the Box then it answers IsAboveTheBox := false. }
   procedure GetPointHeightAboveBox3d(const Point: TVector3Single;
     const Box: TBox3d;
-    var IsAboveTheBox: boolean; var SqrHeightAboveTheBox: Single);
+    out IsAboveTheBox: boolean; out SqrHeightAboveTheBox: Single);
   begin
     { We use here the assumption that HomeCameraUp is (0, 0, 1). }
 
@@ -2222,8 +2222,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
   procedure CalculateDirectionToTarget(
     const Target: TVector3Single;
-    var DirectionToTarget: TVector3Single;
-    var AngleRadBetweenDirectionToTarget: Single);
+    out DirectionToTarget: TVector3Single;
+    out AngleRadBetweenDirectionToTarget: Single);
   begin
     { calculate DirectionToTarget }
     DirectionToTarget := VectorSubtract(Target, MiddlePosition);
@@ -2236,8 +2236,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
   end;
 
   { Call this only when HasLastSeenPlayer }
-  procedure CalculateDirectionToPlayer(var DirectionToPlayer: TVector3Single;
-    var AngleRadBetweenDirectionToPlayer: Single);
+  procedure CalculateDirectionToPlayer(out DirectionToPlayer: TVector3Single;
+    out AngleRadBetweenDirectionToPlayer: Single);
   begin
     CalculateDirectionToTarget(LastSeenPlayer,
       DirectionToPlayer, AngleRadBetweenDirectionToPlayer);
