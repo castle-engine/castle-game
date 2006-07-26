@@ -1,3 +1,9 @@
+- Things from README should be moved to WWW page, and then WWW pages
+  about castle should be included in the releases (in DOC/ subdir ?)
+
+  Rephrase: Move README to castle-development, include HTMLs in DOC folder.
+  grep for 'readme' web pages.
+
 - Starting level: I think that after "New Game" there should always
   be a choice of level, even when there's only 1 level.
   Otherwise people are confused at first, they don't realize that
@@ -78,9 +84,6 @@
 
 --------------------
 - werewolf's mouth is too dark
-
-- Things from README should be moved to WWW page, and then WWW pages
-  about castle should be included in the releases (in DOC/ subdir ?)
 
 - (2006-05-08 11:42:27) Szymon: hej tu kasia co do poprawek takich prostych i na szybko to mam pytanie o klucz
   (2006-05-08 11:43:15) Szymon: bo szczerze mowiac to go ledwo widac... fajnie by bylo gdyby byl jakos oswietlony...
