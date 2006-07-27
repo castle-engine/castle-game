@@ -22,39 +22,6 @@ view3dscene is my VRML 1.0 (and 3DS) viewer based on the same engine as
 this game.
 
 --------------------
-Versioning:
-
-Version numbers are 0.y.z, where "y" is a stage of PGD competition.
-So "version 0.2.0" is what I submit at the end of stage 2 of competition.
-"z" is a release number (will be used in later stages when I will want
-to give this game to friends to actually test it before submitting to PGD).
-
-Later, when PGD competition will end and I will continue developing
-this game on my WWW page [http://www.camelot.homedns.org/~michalis/],
-I will switch to my normal versioning scheme
-[http://www.camelot.homedns.org/~michalis/versioning.php].
-
---------------------
-Items in the game:
-
-You can pick items (just walk on them), browse your items (keys: i, [, ]),
-drop (key: d), equip and use (key: enter). When you have no weapon equipped,
-then new picked weapon will be automatically equipped.
-Unequipping happens automatically on drop.
-
-Items are "stackable", i.e. when you own two or more items
-of the same kind, they are displayed like one item with quantity N.
-Picking and dropping handle this appropriately (when dropping you
-can drop only part of owned items).
-
-You can use the "p" key ("Interact") when looking at item lying on the level,
-this tells you the name and quantity of visible object without picking it up.
-(of course, if object is too far, you will not be able to tell it exactly).
-
-See below in this file for description how you can design new
-items for this game.
-
---------------------
 Creating levels, 3d objects for my games:
 
 The short 1-sentence instruction is:
@@ -64,6 +31,8 @@ VRML 1.0 format has an official specification and my engine is capable
 of handling any VRML 1.0 valid files (actually, even more than that ---
 see [http://www.camelot.homedns.org/~michalis/kambi_vrml_extensions.php]).
 So my engine is not tied to any particular modelling program.
+Use [http://www.camelot.homedns.org/~michalis/view3dscene.php]
+to view the various models outside of the game.
 
 My favourite 3d modeller is Blender, [http://www.blender3d.org/].
 It's open source, it's available for Linux (yeah, Windows too
@@ -485,128 +454,6 @@ Sounds:
   See also data/sounds/scripts/example_make_mono.sh
 
 --------------------
-Used things:
-
-Code:
-- My 3d game engine in units/. You can treat this engine as
-  part of this game (I'm actually extending it while developing
-  this game...), but it's generally useful.
-  See [http://www.camelot.homedns.org/~michalis/sources.php]
-
-- My font2pascal was used to generate font,
-  see bfnt_bitstreamverasans_m10_unit.pas and mk_fonts.sh
-
-- FPC, of course.
-  See [http://www.freepascal.org/]
-
-Graphics:
-- All models in data/levels/gate_parts/ and items "bow", "quiver" and "arrow",
-  and missile "ball_missile_s" are made by
-    Szymon Stoma & Ka¶ka Zaremba.
-  Consider them GPL, or contact Szymon & Ka¶ka ([http://stoma.bestweb.pl/])
-  for other licensing. Thanks!
-
-- ... with the exception of the data/levels/gate_parts/cart
-  that was found among the first 10 google results for "free 3d models".
-  Terms are some open license (like artistic or gpl).
-
-- tree.blend based on tree02.3DS from Micha³ Wojtkiewicz. Thanks!
-
-- Werewolf and Alien creatures' models based on free models from
-  [http://www.3dcafe.com/]
-  Spider's queen face also based on model from this site.
-
-- Ghost's teeth are based on vampire teeth from [http://www.katorlegaz.com/]
-  from characters/vamp.zip model
-
-- Some of my other programs are used:
-
-  - view3dscene was often used to see how VRMLs look
-    (independent of how they look when used in "The Castle"),
-    and to generate some VRML pieces, and some other things...
-    See [http://www.camelot.homedns.org/~michalis/view3dscene.php]
-
-  - rayhunter was used to render items images, see data/items/images/.
-    See [http://www.camelot.homedns.org/~michalis/rayhunter.php]
-
-- Blender
-  See [http://www.blender3d.org/]
-
-- GIMP
-  See [http://www.gimp.org/]
-
-- ImageMagick
-  See [http://www.imagemagick.org/script/index.php]
-
-- Terragen was used to create sky (see data/skies/).
-  This is the only non-open-source component I used... pity :(.
-  But I don't know of any (open-source or not) alternative to Terragen.
-  See [http://www.planetside.co.uk/terragen/]
-
-- Many textures from public domain Golgotha textures.
-  See [http://www.vb3d.com/Textures.html]
-
-- Many textures from [http://lemog.free.fr/]
-
-- Some post-processing of VRML models is done using EmacsLisp,
-  see data/kambi-castle-utils.el and data/items/models/Makefile
-
-- stars.jpg from
-  [http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm]
-
-Sounds:
-- The sound editing program that I use is sweep:
-  [http://www.metadecks.org/software/sweep/]
-
-- Sox [http://sox.sourceforge.net/] is also a great program,
-  suitable for batch processing of sounds.
-
-- menu_current_item_changed.wav based on
-  /usr/share/sounds/KDE_TypeWriter_Key_2.ogg
-- werewolf_howling.wav from [http://www.acs.ucalgary.ca/~mmusiani/]
-- Many freeware sounds and loops from [http://www.flashkit.com/soundfx/]
-- tomb.wav from [http://rasmus.uib.no/~st01369/filarkiv/lyder.html]
-
-- Sound loops (i.e. game music):
-
-  Found by [http://www.flashkit.com/loops/]. These loops are really great
-  so I give here a link to all author's websites --- if I'll forget
-  some loop please remind me.
-
-  - Intro (initial menu):
-
-    Original title: (don't remember)
-    URL on flashkit: (don't remember)
-    Author: edgen
-    Author WWW: [http://www.edgen.com/]
-
-  - "The Gate" level:
-
-    Original title: (don't remember)
-    URL on flashkit: (don't remember)
-    Author: calpomatt
-    Author WWW: [http://calpomatt.lavista.org/]
-
-  - "Castle Hall" level:
-
-    Original title: Temple
-    URL on flashkit: [http://www.flashkit.com/soundfx/Ambience/TEMPLE-Adam_Goh-7394/index.php]
-    Author: Adam Goh
-    Author WWW: [http://www.sades.com/]
-
-  - "Cages" level:
-
-    Original title: Cathedral
-    URL on flashkit: [http://www.flashkit.com/loops/Ambient/Soundscapes/Cath-Mark-9479/index.php])
-    Author: Mark
-    Author WWW: [http://reaction.roxr.com/]
-
-  - Game finish sequence:
-
-    Original title: Quiet
-    URL on flashkit: [http://www.flashkit.com/loops/Ambient/Ambient/Quiet-calpomat-5053/index.php]
-    Author: calpomatt
-    Author WWW: [http://calpomatt.lavista.org/]
 
 --------------------
 Have fun! All comments are welcome.
