@@ -1,9 +1,3 @@
-- Things from README should be moved to WWW page, and then WWW pages
-  about castle should be included in the releases (in DOC/ subdir ?)
-
-  Rephrase: Move README to castle-development, include HTMLs in DOC folder.
-  grep for 'readme' web pages.
-
 - Starting level: I think that after "New Game" there should always
   be a choice of level, even when there's only 1 level.
   Otherwise people are confused at first, they don't realize that
@@ -422,6 +416,12 @@ Each time before uploading release (to PGD and/or camelot):
       open source/castle.dpr,
       C-F10
       ./castle
+  - On either Linux or Windows:
+    run generate_versions (this must be done before making dists,
+    because dists contain HTML files generated from our PHP files,
+    and there is recorded version of "The Castle"; so generate_versions
+    *must* be run *after new version is compiled* and
+    *before make dist is called*)
   - make dist
   - extract created dist
   - test running from extracted created dist

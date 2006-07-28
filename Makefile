@@ -101,6 +101,10 @@ else
 DIST_ARCHIVE_FILENAME := castle-$(VERSION).tar.$(DIST_EXTENSION)
 endif
 
+DOCUMENTATION_HTML_FILES := openal_notes.html \
+  opengl_options.html common_options.html \
+  castle.html castle-advanced.html castle-development.html castle-credits.html
+
 # Make distribution tar.gz to upload for PGD competition.
 # For now, this target is not supposed to be run by anyone
 # else than me (Michalis), because it depends on some private
@@ -128,6 +132,14 @@ dist-core:
 	areFilenamesLower -i Makefile $(TMP_DIST_PATH)castle/data/
 # Add libpng and zlib for Windows
 	cp -f /win/mojewww/camelot/private/win32_libpng_and_zlib/* $(TMP_DIST_PATH)castle/
+# Add documentation/ subdirectory
+	mkdir $(TMP_DIST_PATH)castle/documentation/
+#         Trzeba najpierw zrobiæ make clean bo dotychczasowe le¿±ce tam HTMLe
+#         mog³y byæ wygenerowane z innymi LOCALLY_AVAIL
+	cd $(CAMELOT_LOCAL_PATH)private/local_html_versions/; \
+	  $(MAKE) clean ; \
+	  $(MAKE) $(DOCUMENTATION_HTML_FILES) LOCALLY_AVAIL="$(DOCUMENTATION_HTML_FILES)" ; \
+	  cp $(DOCUMENTATION_HTML_FILES) $(TMP_DIST_PATH)castle/documentation/
 # Setup right permissions of things (in castle/trunk/ and libpng/zlib)
 # (because they are kept on FAT filesystem)
 	find $(TMP_DIST_PATH) -type f -and -exec chmod 644 '{}' ';'
