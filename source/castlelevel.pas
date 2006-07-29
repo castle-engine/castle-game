@@ -1036,8 +1036,8 @@ constructor TCastleHallLevel.Create;
   function LoadSymbol(const Suffix: string): TVRMLFlatSceneGL;
   begin
     Result := LoadLevelScene(
-      CastleLevelsPath + 'castle_hall_symbol_' + Suffix + '.wrl',
-      true, false);
+      CastleLevelsPath + 'castle_hall' + PathDelim +
+      'castle_hall_symbol_' + Suffix + '.wrl', true, false);
   end;
 
 begin
@@ -1050,11 +1050,13 @@ begin
   Symbol_TR := LoadSymbol('tr');
   Symbol_BR := LoadSymbol('br');
 
-  Button := LoadLevelScene(CastleLevelsPath + 'castle_hall_button.wrl',
-    true, false);
+  Button := LoadLevelScene(
+    CastleLevelsPath + 'castle_hall' + PathDelim +
+    'castle_hall_button.wrl', true, false);
 
   StairsBlocker := LoadLevelScene(
-    CastleLevelsPath + 'castle_hall_stairs_blocker.wrl', true, false);
+    CastleLevelsPath + 'castle_hall' + PathDelim +
+    'castle_hall_stairs_blocker.wrl', true, false);
 
   StairsBlockerExists := true;
 
@@ -1086,12 +1088,12 @@ end;
 
 class function TCastleHallLevel.SceneFileName: string;
 begin
-  Result := CastleLevelsPath + 'castle_hall_final.wrl';
+  Result := CastleLevelsPath + 'castle_hall' + PathDelim + 'castle_hall_final.wrl';
 end;
 
 class function TCastleHallLevel.LightSetFileName: string;
 begin
-  Result := CastleLevelsPath + 'castle_hall_lights.wrl';
+  Result := CastleLevelsPath + 'castle_hall' + PathDelim + 'castle_hall_lights.wrl';
 end;
 
 class function TCastleHallLevel.Title: string;
@@ -1430,10 +1432,12 @@ begin
 
   FFootstepsSound := stPlayerFootstepsGrass;
 
-  TeleportOpaque := LoadLevelScene(CastleLevelsPath + 'teleport_opaque.wrl',
+  TeleportOpaque := LoadLevelScene(
+    CastleLevelsPath + 'gate' + PathDelim + 'teleport_opaque.wrl',
     false, false);
 
-  TeleportTransp := LoadLevelScene(CastleLevelsPath + 'teleport_transp.wrl',
+  TeleportTransp := LoadLevelScene(
+    CastleLevelsPath + 'gate' + PathDelim + 'teleport_transp.wrl',
     false, false);
 
   SacrilegeAmbushDone := false;
@@ -1492,12 +1496,12 @@ end;
 
 class function TGateLevel.SceneFileName: string;
 begin
-  Result := CastleLevelsPath + 'gate_final.wrl';
+  Result := CastleLevelsPath + 'gate' + PathDelim + 'gate_final.wrl';
 end;
 
 class function TGateLevel.LightSetFileName: string;
 begin
-  Result := CastleLevelsPath + 'gate_lights.wrl';
+  Result := CastleLevelsPath + 'gate' + PathDelim + 'gate_lights.wrl';
 end;
 
 class function TGateLevel.Title: string;
@@ -1663,12 +1667,12 @@ end;
 
 class function TTowerLevel.SceneFileName: string;
 begin
-  Result := CastleLevelsPath + 'basic_castle_final.wrl';
+  Result := CastleLevelsPath + 'tower' + PathDelim + 'basic_castle_final.wrl';
 end;
 
 class function TTowerLevel.LightSetFileName: string;
 begin
-  Result := CastleLevelsPath + 'basic_castle_lights.wrl';
+  Result := CastleLevelsPath + 'tower' + PathDelim + 'basic_castle_lights.wrl';
 end;
 
 class function TTowerLevel.Title: string;
@@ -1706,7 +1710,8 @@ begin
 
   HintOpenDoorBoxShown := false;
 
-  FEndSequence := LoadLevelScene(CastleLevelsPath + 'end_sequence_final.wrl',
+  FEndSequence := LoadLevelScene(CastleLevelsPath +
+    'end_sequence' + PathDelim + 'end_sequence_final.wrl',
     false, true);
 
   FGateExit := LoadLevelScene(
@@ -1731,12 +1736,12 @@ end;
 
 class function TCagesLevel.SceneFileName: string;
 begin
-  Result := CastleLevelsPath + 'cages/cages_final.wrl';
+  Result := CastleLevelsPath + 'cages' + PathDelim + 'cages_final.wrl';
 end;
 
 class function TCagesLevel.LightSetFileName: string;
 begin
-  Result := CastleLevelsPath + 'cages/cages_lights.wrl';
+  Result := CastleLevelsPath + 'cages' + PathDelim + 'cages_lights.wrl';
 end;
 
 class function TCagesLevel.Title: string;
