@@ -166,28 +166,34 @@ procedure TMainMenu.CurrentItemSelected;
       CurrentMenu := ChooseNewLevelMenu;
     end;
 
-  var
-    I: Integer;
-    AvailableForNewGameLevelClass: TLevelClass;
   begin
-    AvailableForNewGameLevelClass := nil;
-    for I := 0 to LevelsAvailable.High do
-      if LevelsAvailable[I].AvailableForNewGame then
-      begin
-        if AvailableForNewGameLevelClass <> nil then
-        begin
-          { So we have > 1 level AvailableForNewGame.
-            So we have to use ChooseNewLevelMenu }
-          SetChooseNewLevelMenu;
-          Exit;
-        end else
-          AvailableForNewGameLevelClass := LevelsAvailable[I].LevelClass;
-      end;
+    { Initially I had here code to show SetChooseNewLevelMenu only
+      if I had more than 1 level with AvailableForNewGame.
 
-    if AvailableForNewGameLevelClass = nil then
-      raise EInternalError.Create('No level available for play');
+      But it turns out that this was confusing for users:
+      they thought that each "New Level" will always restart from the 1st
+      level. So they complained that "there is no restart from level
+      functionality", before even trying to do "New Game" next time...
 
-    NewGame(AvailableForNewGameLevelClass);
+      This may be related to the fact that my game is small and some
+      of the "quick testers" only run the game once, and they didn't
+      even manage to get to 2nd level, or they assumed (wrong) that
+      "Loading creatures" will be done again so they didn't even
+      "risk" calling "New Game" again... In any case, I think that
+      this falls under one of the UI usability rules:
+
+      "Avoid hiding some functionality at runtime, based on some
+      gllobal state, because this will confuse users (they don't know
+      that there are some rules at runtime that will "unlock" some
+      funtionality). It's better to make some items disabled
+      (but still visible). It's even acceptable to show them
+      a menu or a dialog or a combobox etc. where only 1 choice
+      is possible --- this way users will know that *the choice
+      is here always, just currently there is only 1 possibility*."
+
+      So it was a bad idea to hide "Choose new level" menu. }
+
+    SetChooseNewLevelMenu;
   end;
 
 begin
