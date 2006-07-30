@@ -33,6 +33,10 @@ type
   private
     LastBeginTime, NextBeginTime: Single;
   public
+    { This will init GL_LIGHT_LightNumber properties.
+
+      Note that this requires that current matrix is modelview.
+      Matrix @italic(may) be reset to identity by this procedure. }
     procedure InitGLLight(LightNumber: Cardinal);
     procedure Render(LightNumber: Cardinal);
 
@@ -57,6 +61,12 @@ var
   GLLight: TGLenum;
 begin
   GLLight := GL_LIGHT0 + LightNumber;
+
+  { GL_POSITION of the light is affected by current matrix
+    (i.e. current at the time of glLightv(GLLight, GL_POSITION, ...) call).
+    So it's safest to set here matrix. }
+  glLoadIdentity;
+
   { Prepare "thunder light" }
   glLightv(GLLight, GL_POSITION, Vector4f(0, 1, -1, 0));
   glLightv(GLLight, GL_AMBIENT, Vector4f(0.5, 0.5, 1, 1));

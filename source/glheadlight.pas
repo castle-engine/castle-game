@@ -65,9 +65,8 @@ type
 
     { This sets properties of GL_LIGHT_GLLightNumber to render given light.
 
-      It does a little trick and checks first if Self <> nil (this is
-      a trick like standard Free procedure). If it's nil, then it will
-      call glDisable on given light.
+      Note that this requires that current matrix is modelview.
+      Matrix @italic(may) be reset to identity by this procedure.
 
       If CallEnabled then it will also call glEnable(GL_LIGHT_GLLightNumber). }
     procedure Render(GLLightNumber: Cardinal; CallEnabled: boolean);
@@ -109,12 +108,18 @@ var
 begin
   GLLight := GL_LIGHT0 + GLLightNumber;
 
+  { GL_POSITION of the light is affected by current matrix
+    (i.e. current at the time of glLightv(GLLight, GL_POSITION, ...) call).
+    This is headlight, so this always wants to be relative to identity
+    matrix. }
+  glLoadIdentity;
+
   if Spot then
     glLightv(GLLight, GL_POSITION, Vector4Single(0, 0, 0, 1)) else
     { The light is directional }
     glLightv(GLLight, GL_POSITION, Vector4Single(0, 0, 1, 0));
 
-  glLightv(GLLight, GL_AMBIENT, DiffuseColor);
+  glLightv(GLLight, GL_AMBIENT, DiffuseColor{}{}{}{}{!!!});
   glLightv(GLLight, GL_DIFFUSE, DiffuseColor);
   glLightv(GLLight, GL_SPECULAR, SpecularColor);
   glLightf(GLLight, GL_CONSTANT_ATTENUATION, Attenuation[0]);

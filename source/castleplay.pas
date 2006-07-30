@@ -100,6 +100,9 @@ var
     Saved/loaded to config file in this unit. }
   AutoOpenInventory: boolean;
 
+var
+  WasParam_DebugRenderForLevelScreenshot: boolean = false;
+
 implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
@@ -354,7 +357,8 @@ procedure Draw(Glwin: TGLWindow);
       collisions when MovingPlayerEndSequence). }
     if not GameWin then
       Level.Creatures.Render(Player.Navigator.Frustum, Transparent);
-    Level.Items.Render(Player.Navigator.Frustum, Transparent);
+    if not WasParam_DebugRenderForLevelScreenshot then
+      Level.Items.Render(Player.Navigator.Frustum, Transparent);
   end;
 
 const
@@ -485,11 +489,14 @@ begin
 
   Player.RenderAttack;
 
-  glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glProjectionPushPopOrtho2D(Draw2d, 0,
-      0, RequiredScreenWidth, 0, RequiredScreenHeight);
-  glPopAttrib;
+  if not WasParam_DebugRenderForLevelScreenshot then
+  begin
+    glPushAttrib(GL_ENABLE_BIT);
+      glDisable(GL_LIGHTING);
+      glProjectionPushPopOrtho2D(Draw2d, 0,
+        0, RequiredScreenWidth, 0, RequiredScreenHeight);
+    glPopAttrib;
+  end;
 end;
 
 { Call this when Level value changed (because of LevelFinished

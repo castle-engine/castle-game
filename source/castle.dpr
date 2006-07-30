@@ -26,7 +26,7 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   ParseParametersUnit, GLWinMessages, KambiGLUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
-  CastleCreatures, CastleObjectKinds;
+  CastleCreatures, CastleObjectKinds, CastlePlay;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -35,14 +35,15 @@ var
   WasParam_NoScreenChange: boolean = false;
 
 const
-  Options: array[0..6]of TOption =
+  Options: array[0..7]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short: #0; Long: 'no-sound'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
     (Short:'n'; Long: 'no-screen-change'; Argument: oaNone),
     (Short: #0; Long: 'no-shadows'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
-    (Short: #0; Long: 'debug-write-animations-info'; Argument: oaNone)
+    (Short: #0; Long: 'debug-write-animations-info'; Argument: oaNone),
+    (Short: #0; Long: 'debug-render-for-level-screenshot'; Argument: oaNone)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -71,6 +72,7 @@ begin
            '  --debug-no-creatures  Disable loading creatures animations' +nl+
            '  --debug-write-animations-info' +nl+
            '                        Output info on stdout when loading animations' +nl+
+           '  --debug-render-for-level-screenshot' +nl+
            nl+
            SProgramHelpSuffix);
          ProgramBreak;
@@ -84,6 +86,7 @@ begin
     4: RenderShadowsPossible := false;
     5: WasParam_DebugNoCreatures := true;
     6: WasParam_DebugWriteAnimationsInfo := true;
+    7: WasParam_DebugRenderForLevelScreenshot := true;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
