@@ -1,13 +1,3 @@
-- Paul: going up the steps could do with a smoother animation
-
-- Eric stage 6 comment:
-  - Display frequency can be changed, but is 60Hz by default, has to be changed by hand and is not hardware's optimal value
-  - I just saw one problem: when you switch (alt+tab) to other window, but the game window remains visible on the desktop, then the mouse is hidden when you mouse over the game window (even though the other window has focus).
-
-- falling down lifeloss lower, sometimes even jumping causes small damage.
-  make the "acceptable height to fall without life loss" higher
-  and lower the life loss factor
-
 - Radeon problems
 
   Reported on PGD:
@@ -67,7 +57,12 @@
   (Windows in uni ?).
   No problems on Majka Windows.
 
---------------------
+- Paul: going up the steps could do with a smoother animation
+
+- Eric stage 6 comment:
+  - Display frequency can be changed, but is 60Hz by default, has to be changed by hand and is not hardware's optimal value
+  - I just saw one problem: when you switch (alt+tab) to other window, but the game window remains visible on the desktop, then the mouse is hidden when you mouse over the game window (even though the other window has focus).
+
 - werewolf's mouth is too dark
 
 - (2006-05-08 11:42:27) Szymon: hej tu kasia co do poprawek takich prostych i na szybko to mam pytanie o klucz
