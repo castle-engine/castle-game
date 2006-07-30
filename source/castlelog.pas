@@ -20,7 +20,8 @@ procedure WritelnLog(const LogType: TLogType; const LogMessage: string);
 
 implementation
 
-uses Classes, KambiUtils, KambiClassUtils, GLWinMessages;
+uses Classes, KambiUtils, KambiClassUtils, GLWinMessages, CastleHelp,
+  SysUtils;
 
 procedure GLWinMessageLog(Text: TStringList);
 begin
@@ -37,6 +38,7 @@ begin
       'redirect program''s stdout to make it available, e.g. ' +
       'run "castle > castle.log".');
   OnGLWinMessage := GLWinMessageLog;
+  WritelnStr('Log started on ' + DateTimeToAtStr(Now) + '. Version ' + Version);
 end;
 
 procedure WritelnLog(const LogType: TLogType; const LogMessage: string);
