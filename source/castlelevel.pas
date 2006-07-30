@@ -1064,6 +1064,7 @@ begin
 
   if Headlight <> nil then
   begin
+    Headlight.AmbientColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
     Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
     Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
   end;
@@ -1660,6 +1661,7 @@ begin
 
   if Headlight <> nil then
   begin
+    Headlight.AmbientColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
     Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
     Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
   end;

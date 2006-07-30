@@ -119,7 +119,7 @@ begin
     { The light is directional }
     glLightv(GLLight, GL_POSITION, Vector4Single(0, 0, 1, 0));
 
-  glLightv(GLLight, GL_AMBIENT, DiffuseColor{}{}{}{}{!!!});
+  glLightv(GLLight, GL_AMBIENT, AmbientColor);
   glLightv(GLLight, GL_DIFFUSE, DiffuseColor);
   glLightv(GLLight, GL_SPECULAR, SpecularColor);
   glLightf(GLLight, GL_CONSTANT_ATTENUATION, Attenuation[0]);
