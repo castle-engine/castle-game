@@ -127,12 +127,9 @@ type
     procedure RedoPrepareRender;
   end;
 
-var
-  WasParam_DebugWriteAnimationsInfo: boolean;
-
 implementation
 
-uses SysUtils, ProgressUnit, Object3dAsVRML, CastleVideoOptions;
+uses SysUtils, ProgressUnit, Object3dAsVRML, CastleVideoOptions, CastleLog;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
@@ -234,10 +231,12 @@ begin
   begin
     { Write info before PrepareRender, otherwise it could not
       be available after freeing scene RootNodes in Anim.PrepareRender. }
-    if WasParam_DebugWriteAnimationsInfo then
-      Writeln((VRMLNodeName + '.' + AnimationName + ' animation: '): 40,
-        Anim.ScenesCount: 3, ' scenes * ',
-        Anim.Scenes[0].TrianglesCount(true): 8, ' triangles');
+    if WasParam_DebugLog then
+      WritelnLog(ltAnimationInfo,
+        Format('%40s %3d scenes * %8d triangles',
+        [ VRMLNodeName + '.' + AnimationName + ' animation: ',
+          Anim.ScenesCount,
+          Anim.Scenes[0].TrianglesCount(true) ]));
 
     AnimationAttributesSet(Anim.Attributes);
     Anim.PrepareRender(DoPrepareBackground, DoPrepareBoundingBox,

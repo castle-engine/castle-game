@@ -23,10 +23,10 @@
 program castle;
 
 uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
-  ParseParametersUnit, GLWinMessages, KambiGLUtils,
+  Classes, ParseParametersUnit, GLWinMessages, KambiGLUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
-  CastleCreatures, CastleObjectKinds, CastlePlay;
+  CastleCreatures, CastleObjectKinds, CastlePlay, CastleLog;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -42,8 +42,8 @@ const
     (Short:'n'; Long: 'no-screen-change'; Argument: oaNone),
     (Short: #0; Long: 'no-shadows'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
-    (Short: #0; Long: 'debug-write-animations-info'; Argument: oaNone),
-    (Short: #0; Long: 'debug-render-for-level-screenshot'; Argument: oaNone)
+    (Short: #0; Long: 'debug-render-for-level-screenshot'; Argument: oaNone),
+    (Short: #0; Long: 'debug-log'; Argument: oaNone)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -69,9 +69,8 @@ begin
            Glw.ParseParametersHelp([poDisplay], true) +nl+
            nl+
            'Debug options (don''t use unless you know what you''re doing):' +nl+
+           '  --debug-log           Write various log info on stdout' +nl+
            '  --debug-no-creatures  Disable loading creatures animations' +nl+
-           '  --debug-write-animations-info' +nl+
-           '                        Output info on stdout when loading animations' +nl+
            '  --debug-render-for-level-screenshot' +nl+
            nl+
            SProgramHelpSuffix);
@@ -85,8 +84,8 @@ begin
     3: WasParam_NoScreenChange := true;
     4: RenderShadowsPossible := false;
     5: WasParam_DebugNoCreatures := true;
-    6: WasParam_DebugWriteAnimationsInfo := true;
-    7: WasParam_DebugRenderForLevelScreenshot := true;
+    6: WasParam_DebugRenderForLevelScreenshot := true;
+    7: InitializeLog;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
@@ -149,6 +148,8 @@ begin
   if RenderShadowsPossible then
     Glw.StencilBufferBits := 8;
   Glw.Init;
+  if WasParam_DebugLog then
+    WritelnLog(ltOpenGLInitialization, GLCapsString);
 
   { init progress }
   ProgressGLInterface.Window := Glw;

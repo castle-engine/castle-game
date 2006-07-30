@@ -415,7 +415,7 @@ var
 implementation
 
 uses SysUtils, CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
-  KambiFilesUtils;
+  KambiFilesUtils, CastleLog;
 
 var
   { Values on this array are useful only when ALContextInited
@@ -476,6 +476,9 @@ begin
       raise;
     end;
   end;
+
+  if WasParam_DebugLog then
+    WritelnLog(ltSoundInitialization, SoundInitializationReport);
 end;
 
 procedure ALContextClose;

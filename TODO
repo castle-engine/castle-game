@@ -4,8 +4,6 @@
   - Display frequency can be changed, but is 60Hz by default, has to be changed by hand and is not hardware's optimal value
   - I just saw one problem: when you switch (alt+tab) to other window, but the game window remains visible on the desktop, then the mouse is hidden when you mouse over the game window (even though the other window has focus).
 
-- log file, it will be done at some point, and then probably will include everything printed by "View video information" and "View sound information" and by yellow messages printed on game screen, and probably some more... You know, it's probably easier to implement it instead of talking Smile OK, it will be done for 0.6.4 version (hopefully around next weekend).
-
 - falling down lifeloss lower, sometimes even jumping causes small damage.
   make the "acceptable height to fall without life loss" higher
   and lower the life loss factor
