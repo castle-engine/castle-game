@@ -366,6 +366,18 @@ Cages level:
 
   When loading game, load saved TimeMessages for this game.
 
+- FPC 2.0.3 and Windows problems with stdout
+  (reported as [http://www.freepascal.org/mantis/view.php?id=7213]) :
+
+  When no stdout avail: --help goes nowhere (no dialog ?),
+  same for --debug-log (no error dialog, just nothing).
+  When stdout avail: --help goes to console, while it should go to dialog
+  (help on Windows should always go by dialog). IsConsole is true, should be
+  false! (this explains at least --help when stdout avail behavior;
+  possibly in case when no stdout avail, it tries to write there,
+  then it fails, and then tries to write the error to the stdout,
+  and just fails... check!).
+
 ----------------------------------------
 dist-making to-dos:
 

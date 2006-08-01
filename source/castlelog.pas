@@ -29,16 +29,35 @@ begin
 end;
 
 procedure InitializeLog;
-begin
-  WasParam_DebugLog := true;
-  if StdOutStream = nil then
+
+  procedure RaiseStdOutNotAvail;
+  begin
     raise EWithHiddenClassName.Create(
-      'You used --debug-log option but stdout (standard output) ' +
+      'You used --debug-log option but it seems that stdout (standard output) ' +
       'is not available. Under Windows you should explicitly ' +
       'redirect program''s stdout to make it available, e.g. ' +
       'run "castle > castle.log".');
+  end;
+
+begin
+  WasParam_DebugLog := true;
+
+  { Ideally, check for "StdOutStream = nil" should be all that is needed,
+    and wrapping WritelnStr inside try...except should not be needed.
+    But... see StdOutStream comments: you cannot
+    depend on the fact that "StdOutStream <> nil means that stdout
+    is actually available (because user redirected stdout etc.). }
+
+  if StdOutStream = nil then
+    RaiseStdOutNotAvail;
+
+  try
+    WritelnStr('Log started on ' + DateTimeToAtStr(Now) + '. Version ' + Version);
+  except
+    on E: EWriteError do RaiseStdOutNotAvail;
+  end;
+
   OnGLWinMessage := GLWinMessageLog;
-  WritelnStr('Log started on ' + DateTimeToAtStr(Now) + '. Version ' + Version);
 end;
 
 procedure WritelnLog(const LogType: TLogType; const LogMessage: string);
