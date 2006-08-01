@@ -159,7 +159,7 @@ endif
 # If not with sources, clean some things that should be only in sources
 ifndef DIST_WITH_SRC
 	rm -Rf $(TMP_DIST_PATH)castle/source/
-	find $(TMP_DIST_PATH)castle/data/ \
+	find $(TMP_DIST_PATH)castle/ \
 	  '(' '(' -type f -iname '*.blend' ')' -or \
 	      '(' -type f -iname 'Makefile' ')' -or \
 	      '(' -type f -iname '*.xcf' ')' -or \
