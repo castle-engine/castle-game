@@ -182,6 +182,7 @@ Cages level:
   - lights: Spot light. Moving light.
   - Some moving objects on the level: this is easy to do in my levels. Use it more !
   - more environ sounds: wind blowing.
+  - homing missiles make great effect on a vast empty space, like in "Tower" level. Demonstrate this in some "real" level too!
 
 - "Set keys to "Half life 2" scheme" menu command ?
 
@@ -428,12 +429,15 @@ Each time before uploading release (to PGD and/or camelot):
       ./castle
       rm -f ~/.castle.data
       ln -s /win/mojepasy/openGL/castle/trunk/ ~/.castle.data
+  - Remember to test whether FPC version used was correct
+    (to avoid accidentaly compiling with some SVN intermediate version etc.)
   - test building from extracted created dist (using `make build-xxx')
 - upload to WWW:
   copy tar.gz to /win/mojewww/camelot/,
   upload to http://stoma.name/michalis
   upload to http://camelot.homedns.org/~michalis/ as usual
-    (generate_versions, make md5, upload, html_apply_ontheway),
+    (generate_versions should be already done,
+    make md5, upload, html_apply_ontheway),
 - make svntag
   check by
     svn list file:///home/michal/svn/kambi-svn-repos/castle/tags/
