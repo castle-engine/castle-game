@@ -818,49 +818,49 @@ begin
          end;
        end;
     8: begin
-         if Light is TNodeDirectionalLight then
+         if Light is TNodeDirectionalLight_1 then
          begin
-           Vector := TNodeDirectionalLight(Light).FdDirection.Value;
+           Vector := TNodeDirectionalLight_1(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Navigator.CameraDir) then
            begin
-             TNodeDirectionalLight(Light).FdDirection.Value := Vector;
+             TNodeDirectionalLight_1(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;
        end;
     9: begin
-         if Light is TNodeSpotLight then
+         if Light is TNodeSpotLight_1 then
          begin
-           Vector := TNodeSpotLight(Light).FdDirection.Value;
+           Vector := TNodeSpotLight_1(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Navigator.CameraDir) then
            begin
-             TNodeSpotLight(Light).FdDirection.Value := Vector;
+             TNodeSpotLight_1(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;
        end;
     10:begin
-         if Light is TNodeSpotLight then
+         if Light is TNodeSpotLight_1 then
          begin
-           Value := TNodeSpotLight(Light).FdDropOffRate.Value;
+           Value := TNodeSpotLight_1(Light).FdDropOffRate.Value;
            if MessageInputQuerySingle(Glw, 'Change dropOffRate', Value, taLeft) then
            begin
-             TNodeSpotLight(Light).FdDropOffRate.Value := Value;
+             TNodeSpotLight_1(Light).FdDropOffRate.Value := Value;
              Level.LightSet.CalculateLights;
            end;
          end;
        end;
     11:begin
-         if Light is TNodeSpotLight then
+         if Light is TNodeSpotLight_1 then
          begin
-           Value := TNodeSpotLight(Light).FdCutOffAngle.Value;
+           Value := TNodeSpotLight_1(Light).FdCutOffAngle.Value;
            if MessageInputQuerySingle(Glw, 'Change cutOffAngle', Value, taLeft) then
            begin
-             TNodeSpotLight(Light).FdCutOffAngle.Value := Value;
+             TNodeSpotLight_1(Light).FdCutOffAngle.Value := Value;
              Level.LightSet.CalculateLights;
            end;
          end;

@@ -579,7 +579,7 @@ constructor TLevel.Create;
     I: Integer;
   begin
     for I := 0 to ItemsToRemove.Count - 1 do
-      ItemsToRemove.Items[I].FreeRemovingFromAllParents;
+      ItemsToRemove.Items[I].FreeRemovingFromAllParentNodes;
     Scene.ChangedAll;
   end;
 
@@ -753,7 +753,7 @@ begin
       as it should not be visible).
       This way we can comfortably set such boxes from Blender. }
     Box := Scene.ShapeStates[BoxNodeIndex].BoundingBox;
-    Scene.ShapeStates[BoxNodeIndex].ShapeNode.FreeRemovingFromAllParents;
+    Scene.ShapeStates[BoxNodeIndex].ShapeNode.FreeRemovingFromAllParentNodes;
     Scene.ChangedAll;
   end;
 end;
@@ -825,9 +825,9 @@ var
   ParentIndex: Integer;
   Parent: TVRMLNode;
 begin
-  for ParentIndex := 0 to Node.ParentsCount - 1 do
+  for ParentIndex := 0 to Node.ParentNodesCount - 1 do
   begin
-    Parent := Node.Parents[ParentIndex];
+    Parent := Node.ParentNodes[ParentIndex];
     if IsPrefix(ItemPrefix, Parent.NodeName) then
     begin
       CreateNewItem(SEnding(Parent.NodeName, Length(ItemPrefix) + 1));
@@ -887,9 +887,9 @@ var
   ParentIndex: Integer;
   Parent: TVRMLNode;
 begin
-  for ParentIndex := 0 to Node.ParentsCount - 1 do
+  for ParentIndex := 0 to Node.ParentNodesCount - 1 do
   begin
-    Parent := Node.Parents[ParentIndex];
+    Parent := Node.ParentNodes[ParentIndex];
     if IsPrefix(CreaturePrefix, Parent.NodeName) then
     begin
       if not WasParam_DebugNoCreatures then
