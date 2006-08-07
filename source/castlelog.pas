@@ -36,7 +36,7 @@ procedure InitializeLog;
       'You used --debug-log option but it seems that stdout (standard output) ' +
       'is not available. Under Windows you should explicitly ' +
       'redirect program''s stdout to make it available, e.g. ' +
-      'run "castle > castle.log".');
+      'run "castle --debug-log > castle.log".');
   end;
 
 begin
