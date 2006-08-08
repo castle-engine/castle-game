@@ -1,3 +1,20 @@
+- Traveler's screenshot from geforce 6800gt also shows artifact when rendering life indicator --- it should be rendered with blending (like on Huehnerschaender screenshot), while on Traveler's screenshots it shows white background underneath.
+  Hooray! It's reproduceable now on kangury!
+
+- kangury: dying anim of Alien is not what it should be.
+  Observed with ../castle --debug-no-creatures,
+  enter "Gate", add Alien, kill it (by debug menu or as usual).
+  Observed with FPC 2.0.3, with 2.0.2 it's OK.
+
+- kangury: resource drown:
+  Observed with ../castle --debug-no-creatures,
+  enter "Gate", add Alien, kill,
+  get sword (adds Ghosts), kill,
+  add Alien, kill,
+  add Werewolf, kill,
+  add Spider Queen, kill.
+  Investigate how much mem was used, and can I do something about it.
+
 - Radeon problems
 
   Reported on PGD:
@@ -30,8 +47,6 @@
   12.view3dscene: displayed bbox sometimes has, sometimes has no line indicating triangle inside.
 
   - Check changing ColorsBits and VideoFrequency on Radeon, maybe will help for some problems ?
-
-  Traveler's screenshot from geforce 6800gt also shows artifact when rendering life indicator --- it should be rendered with blending (like on Huehnerschaender screenshot), while on Traveler's screenshots it shows white background underneath.
 
 - mouse sensitivity problems:
 
@@ -367,17 +382,11 @@ Cages level:
 
   When loading game, load saved TimeMessages for this game.
 
-- FPC 2.0.3 and Windows problems with stdout
-  (reported as [http://www.freepascal.org/mantis/view.php?id=7213]) :
-
-  When no stdout avail: --help goes nowhere (no dialog ?),
-  same for --debug-log (no error dialog, just nothing).
-  When stdout avail: --help goes to console, while it should go to dialog
-  (help on Windows should always go by dialog). IsConsole is true, should be
-  false! (this explains at least --help when stdout avail behavior;
-  possibly in case when no stdout avail, it tries to write there,
-  then it fails, and then tries to write the error to the stdout,
-  and just fails... check!).
+- It would be nice to get Mesa3D working with my game. Right now I get
+    castle: indirect_vertex_array.c:1359: __indirect_glTexCoordPointer: Assertion `a != ((void *)0)' failed.
+  when loading level, which seems to be a
+  <a href="http://forum.linspire.com/viewtopic.php?t=423672&">common
+  problem with Mesa</a>
 
 ----------------------------------------
 dist-making to-dos:
