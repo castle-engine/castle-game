@@ -4,16 +4,12 @@
 - kangury: dying anim of Alien is not what it should be.
   Observed with ../castle --debug-no-creatures,
   enter "Gate", add Alien, kill it (by debug menu or as usual).
-  Observed with FPC 2.0.3, with 2.0.2 it's OK.
 
-- kangury: resource drown:
-  Observed with ../castle --debug-no-creatures,
-  enter "Gate", add Alien, kill,
-  get sword (adds Ghosts), kill,
-  add Alien, kill,
-  add Werewolf, kill,
-  add Spider Queen, kill.
-  Investigate how much mem was used, and can I do something about it.
+  Shiit! It happens always when compiled with -dRELEASE. Fuck!
+  It doesn't happen in debug builds!
+  
+  Fuck! Now I can reproduce this even with full -dDEBUG version.
+  What the hell is going on ?
 
 - Radeon problems
 
