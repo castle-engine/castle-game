@@ -19,12 +19,12 @@ Group {
     Rotation { rotation 1 0 0 1.57 }
 
     Background {
-      backUrl "../skies/sky_back.png"
-      bottomUrl "../skies/sky_bottom.png"
-      frontUrl "../skies/sky_front.png"
-      leftUrl "../skies/sky_left.png"
-      rightUrl "../skies/sky_right.png"
-      topUrl "../skies/sky_top.png"
+      backUrl "../../skies/sky_back.png"
+      bottomUrl "../../skies/sky_bottom.png"
+      frontUrl "../../skies/sky_front.png"
+      leftUrl "../../skies/sky_left.png"
+      rightUrl "../../skies/sky_right.png"
+      topUrl "../../skies/sky_top.png"
     }
   }
 
