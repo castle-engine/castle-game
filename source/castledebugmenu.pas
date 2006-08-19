@@ -818,14 +818,14 @@ begin
          end;
        end;
     8: begin
-         if Light is TNodeDirectionalLight_1 then
+         if Light is TNodeGeneralDirectionalLight then
          begin
-           Vector := TNodeDirectionalLight_1(Light).FdDirection.Value;
+           Vector := TNodeGeneralDirectionalLight(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Navigator.CameraDir) then
            begin
-             TNodeDirectionalLight_1(Light).FdDirection.Value := Vector;
+             TNodeGeneralDirectionalLight(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;

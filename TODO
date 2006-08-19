@@ -43,6 +43,7 @@
   12.view3dscene: displayed bbox sometimes has, sometimes has no line indicating triangle inside.
 
   - Check changing ColorsBits and VideoFrequency on Radeon, maybe will help for some problems ?
+    Check disabling lockArrays in renderer.
 
 - mouse sensitivity problems:
 

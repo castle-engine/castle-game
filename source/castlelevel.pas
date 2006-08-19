@@ -604,7 +604,7 @@ begin
       Must be done before initializing creatures, as they right now
       use HomeCameraPos. FHomeCameraDir, FHomeCameraUp will be
       actually changed later in this procedure. }
-    Scene.GetPerspectiveCamera(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
+    Scene.GetPerspectiveViewpoint(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
 
     ItemsToRemove := TVRMLNodesList.Create;
     try
