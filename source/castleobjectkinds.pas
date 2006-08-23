@@ -241,7 +241,10 @@ begin
     AnimationAttributesSet(Anim.Attributes);
     Anim.PrepareRender(DoPrepareBackground, DoPrepareBoundingBox,
       DoPrepareTrianglesListNotOverTriangulate,
-      DoPrepareTrianglesListOverTriangulate, false, true);
+      DoPrepareTrianglesListOverTriangulate, false, 
+      { It's temporary false --- see ../TODO file about
+        "Wrong Alien dying anim" problem. }
+      false);
   end;
   Progress.Step;
 end;
