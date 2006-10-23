@@ -685,7 +685,7 @@ type
     function MoveAllowed(
       const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
       out NewMiddlePosition: TVector3Single;
-      BecauseOfGravity: boolean): boolean;
+      const BecauseOfGravity: boolean): boolean;
 
     { Like MoveAllowed, but this is only a "yes/no" collision check. }
     function MoveAllowedSimple(
@@ -1638,7 +1638,7 @@ begin
   if TiedToCreature and (NewSource <> nil) then
   begin
     UsedSounds.Add(NewSource);
-    NewSource.OnUsingEnd := SoundSourceUsingEnd;
+    NewSource.OnUsingEnd := @SoundSourceUsingEnd;
     NewSource.UserData := TCreatureSoundSourceData.Create;
   end;
 end;

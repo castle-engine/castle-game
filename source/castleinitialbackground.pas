@@ -53,8 +53,8 @@ end;
 
 procedure DrawInitialBackground;
 begin
-  Glw.OnResize := Resize;
-  Glw.OnDraw := Draw;
+  Glw.OnResize := @Resize;
+  Glw.OnDraw := @Draw;
   Glw.EventResize;
   Glw.PostRedisplay;
   Glw.FlushRedisplay;

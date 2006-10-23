@@ -27,7 +27,7 @@ uses GLMenu;
 
 type
   TSoundVolumeSlider = class(TGLMenuFloatSlider)
-    constructor Create(const Value: Single);
+    constructor Create(const AValue: Single);
     function ValueToStr(const AValue: Single): string; override;
   end;
 
@@ -55,9 +55,9 @@ end;
 
 { TSoundVolumeSlider ---------------------------------------------------- }
 
-constructor TSoundVolumeSlider.Create(const Value: Single);
+constructor TSoundVolumeSlider.Create(const AValue: Single);
 begin
-  inherited Create(0, 1, Value);
+  inherited Create(0, 1, AValue);
 end;
 
 function TSoundVolumeSlider.ValueToStr(const AValue: Single): string;

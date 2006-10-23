@@ -261,13 +261,13 @@ begin
 
   FixItemsAreas(Glw.Width, Glw.Height);
 
-  OnKeyChanged.AppendItem(KeyChanged);
+  OnKeyChanged.AppendItem(@KeyChanged);
 end;
 
 destructor TControlsSubMenu.Destroy;
 begin
   if OnKeyChanged <> nil then
-    OnKeyChanged.DeleteFirstEqual(KeyChanged);
+    OnKeyChanged.DeleteFirstEqual(@KeyChanged);
   inherited;
 end;
 
@@ -409,7 +409,7 @@ begin
 
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
-    glProjectionPushPopOrtho2D(Draw2d, 0,
+    glProjectionPushPopOrtho2D(@Draw2d, 0,
       0, RequiredScreenWidth, 0, RequiredScreenHeight);
   glPopAttrib;
 end;
@@ -485,15 +485,15 @@ begin
     { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;
 
-    SetStandardGLWindowState(Glw, Draw, CloseQuery, Glw.OnResize,
+    SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
       nil, false, true { FPSActive should not be needed anymore, but I leave it. },
       false, K_None, #0, false, false);
 
-    Glw.OnKeyDown := KeyDown;
-    Glw.OnMouseDown := MouseDown;
-    Glw.OnMouseUp := MouseUp;
-    Glw.OnMouseMove := MouseMove;
-    Glw.OnIdle := Idle;
+    Glw.OnKeyDown := @KeyDown;
+    Glw.OnMouseDown := @MouseDown;
+    Glw.OnMouseUp := @MouseUp;
+    Glw.OnMouseMove := @MouseMove;
+    Glw.OnIdle := @Idle;
 
     UserQuit := false;
 

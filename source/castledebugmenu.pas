@@ -647,7 +647,7 @@ begin
 
   for I := 0 to Level.LightSet.Lights.High do
   begin
-    LightNode := Level.LightSet.Lights[I].LightNode;
+    LightNode := Level.LightSet.Lights.Items[I].LightNode;
     Items.Add(Format('Edit %d: %s "%s"',
       [I, LightNode.NodeTypeName, LightNode.NodeName]));
   end;
@@ -701,7 +701,7 @@ begin
        begin
          FreeAndNil(EditOneLightMenu);
          EditOneLightMenu := TEditOneLightMenu.Create(
-           Level.LightSet.Lights[CurrentItem].LightNode);
+           Level.LightSet.Lights.Items[CurrentItem].LightNode);
          CurrentMenu := EditOneLightMenu;
        end;
   end;
@@ -901,7 +901,7 @@ begin
 
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
-    glProjectionPushPopOrtho2D(Draw2d, 0,
+    glProjectionPushPopOrtho2D(@Draw2d, 0,
       0, RequiredScreenWidth, 0, RequiredScreenHeight);
   glPopAttrib;
 end;
@@ -927,7 +927,7 @@ begin
       new projection matrix should stay for the game. }
     SavedMode.RestoreProjectionMatrix := false;
 
-    SetStandardGLWindowState(Glw, Draw, CloseQuery, Glw.OnResize,
+    SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
       nil, false, true { FPSActive should not be needed anymore, but I leave it. },
       false, K_None, #0, false, false);
 
@@ -935,11 +935,11 @@ begin
       with the menu text. }
     GLWinMessagesTheme.RectColor[3] := 1.0;
 
-    Glw.OnKeyDown := KeyDown;
-    Glw.OnMouseDown := MouseDown;
-    Glw.OnMouseUp := MouseUp;
-    Glw.OnMouseMove := MouseMove;
-    Glw.OnIdle := Idle;
+    Glw.OnKeyDown := @KeyDown;
+    Glw.OnMouseDown := @MouseDown;
+    Glw.OnMouseUp := @MouseUp;
+    Glw.OnMouseMove := @MouseMove;
+    Glw.OnIdle := @Idle;
 
     CurrentMenu := DebugMenu;
     UserQuit := false;

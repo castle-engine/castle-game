@@ -105,7 +105,7 @@ var
 
 implementation
 
-uses Math, SysUtils, KambiUtils, GLWindow, VRMLRayTracer, OpenAL, ALUtils,
+uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   GLWinModes, OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
@@ -493,7 +493,7 @@ begin
   begin
     glPushAttrib(GL_ENABLE_BIT);
       glDisable(GL_LIGHTING);
-      glProjectionPushPopOrtho2D(Draw2d, 0,
+      glProjectionPushPopOrtho2D(@Draw2d, 0,
         0, RequiredScreenWidth, 0, RequiredScreenHeight);
     glPopAttrib;
   end;
@@ -508,8 +508,8 @@ begin
   Glw.EventResize;
 
   { Init Player.Navigator properties }
-  Player.Navigator.OnMoveAllowed := Level.PlayerMoveAllowed;
-  Player.Navigator.OnGetCameraHeight := Level.PlayerGetCameraHeight;
+  Player.Navigator.OnMoveAllowed := @Level.PlayerMoveAllowed;
+  Player.Navigator.OnGetCameraHeight := @Level.PlayerGetCameraHeight;
 
   { Init initial camera pos }
   Player.Navigator.Init(Level.HomeCameraPos, Level.HomeCameraDir,
@@ -994,14 +994,14 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
   procedure DoGameMenu;
   begin
-    ShowGameMenu(Draw);
+    ShowGameMenu(@Draw);
     { UseMouseLook possibly changed now. }
     UpdateMouseLook;
   end;
 
   procedure DoDebugMenu;
   begin
-    ShowDebugMenu(Draw);
+    ShowDebugMenu(@Draw);
   end;
 
 begin
@@ -1069,11 +1069,11 @@ begin
 end;
 
 type
-  TDummy = class
+  TPlayGameHelper = class
     class procedure MatrixChanged(Navigator: TMatrixNavigator);
   end;
 
-class procedure TDummy.MatrixChanged(Navigator: TMatrixNavigator);
+class procedure TPlayGameHelper.MatrixChanged(Navigator: TMatrixNavigator);
 begin
   Glw.PostRedisplay;
   alUpdateListener;
@@ -1089,6 +1089,7 @@ procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer;
   PrepareNewPlayer: boolean);
 var
   SavedMode: TGLMode;
+  PlayGameHelper: TPlayGameHelper;
 begin
   CreaturesKinds.PrepareRender;
   ItemsKinds.PrepareRender;
@@ -1113,7 +1114,12 @@ begin
       Glw.Navigator := Player.Navigator;
       try
         { Init Player.Navigator properties }
-        Player.Navigator.OnMatrixChanged := TDummy.MatrixChanged;
+        PlayGameHelper := nil;
+        { No need to actually create PlayGameHelper class,
+          but I must pass here an instance, not a TPlayGameHelper
+          only --- at least in objfpc mode, see
+          [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
+        Player.Navigator.OnMatrixChanged := @PlayGameHelper.MatrixChanged;
 
         { tests:
           InfoWrite(Format('%f %f %f %f',
@@ -1123,7 +1129,7 @@ begin
             Player.Navigator.MoveSpeed])); }
 
         { Note that this sets AutoRedisplay to true. }
-        SetStandardGLWindowState(Glw, Draw, CloseQuery, Resize,
+        SetStandardGLWindowState(Glw, @Draw, @CloseQuery, @Resize,
           nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
           K_None, #0, { FpsShowOnCaption } false, { UseNavigator } true);
 
@@ -1133,11 +1139,11 @@ begin
           sound stopped. And our Timer calls RefreshUsed that will
           call OnUsingEnd. }
         Glwm.TimerMilisec := 100;
-        Glw.OnTimer := Timer;
+        Glw.OnTimer := @Timer;
 
-        Glw.OnIdle := Idle;
-        Glw.OnKeyDown := KeyDown;
-        Glw.OnMouseDown := MouseDown;
+        Glw.OnIdle := @Idle;
+        Glw.OnKeyDown := @KeyDown;
+        Glw.OnMouseDown := @MouseDown;
 
         UpdateMouseLook;
 

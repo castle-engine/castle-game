@@ -610,11 +610,11 @@ begin
     try
       { Initialize Items }
       FItems := TItemsOnLevelList.Create;
-      Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, TraverseForItems);
+      Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, @TraverseForItems);
 
       { Initialize Creatures }
       FCreatures := TCreaturesList.Create;
-      Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, TraverseForCreatures);
+      Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, @TraverseForCreatures);
 
       RemoveItemsToRemove;
     finally ItemsToRemove.Free end;
@@ -740,7 +740,7 @@ begin
   inherited;
 end;
 
-function TLevel.RemoveBoxNode(var Box: TBox3d; const NodeName: string): boolean;
+function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
 var
   BoxNodeIndex: Integer;
 begin
@@ -758,7 +758,7 @@ begin
   end;
 end;
 
-procedure TLevel.RemoveBoxNodeCheck(var Box: TBox3d; const NodeName: string);
+procedure TLevel.RemoveBoxNodeCheck(out Box: TBox3d; const NodeName: string);
 begin
   if not RemoveBoxNode(Box, NodeName) then
     raise EInternalError.CreateFmt('Error in level "%s": no box named "%s" found',
@@ -907,7 +907,7 @@ function TLevel.LineOfSight(
 begin
   Result := Scene.DefaultTriangleOctree.SegmentCollision(
     Pos1, Pos2, false, NoItemIndex, false,
-    TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex;
+    @Scene.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex;
 end;
 
 function TLevel.MoveAllowed(const CameraPos: TVector3Single;
@@ -918,7 +918,7 @@ begin
   Result :=
     Scene.DefaultTriangleOctree.MoveAllowed(
       CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius,
-      NoItemIndex, CollisionIgnoreItem) and
+      NoItemIndex, @CollisionIgnoreItem) and
     Box3dPointInside(NewPos, LevelBox);
 end;
 
@@ -931,7 +931,7 @@ begin
     Box3dPointInside(NewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveAllowedSimple(
       CameraPos, NewPos, MovingObjectCameraRadius,
-      NoItemIndex, CollisionIgnoreItem);
+      NoItemIndex, @CollisionIgnoreItem);
 end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
@@ -940,7 +940,7 @@ begin
   Scene.DefaultTriangleOctree.GetCameraHeight(
     CameraPos, HomeCameraUp,
     IsAboveTheGround, SqrHeightAboveTheGround,
-    NoItemIndex, CollisionIgnoreItem);
+    NoItemIndex, @CollisionIgnoreItem);
 end;
 
 function TLevel.PlayerMoveAllowed(Navigator: TMatrixWalker;
@@ -1114,7 +1114,7 @@ function TCastleHallLevel.LineOfSight(
   begin
     Result := SymbolScene.DefaultTriangleOctree.SegmentCollision(
       Pos1, Pos2, false, NoItemIndex, false,
-      TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex;
+      @SymbolScene.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex;
   end;
 
 begin
@@ -1123,14 +1123,14 @@ begin
   Result := Result and
     (Button.DefaultTriangleOctree.SegmentCollision(
       Pos1, Pos2, false, NoItemIndex, false,
-      TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex);
+      @Button.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
 
   if Result and StairsBlockerExists then
   begin
     Result :=
       (StairsBlocker.DefaultTriangleOctree.SegmentCollision(
         Pos1, Pos2, false, NoItemIndex, false,
-        TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex);
+        @StairsBlocker.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
   end;
 
   if Result and (not SymbolOpened) then
@@ -1810,8 +1810,8 @@ begin
   if not GameWin then
   begin
     { Torch light modify, to make an illusion of unstable light }
-    LightSet.Lights[0].LightNode.FdIntensity.Value := Clamped(
-        LightSet.Lights[0].LightNode.FdIntensity.Value +
+    LightSet.Lights.Items[0].LightNode.FdIntensity.Value := Clamped(
+        LightSet.Lights.Items[0].LightNode.FdIntensity.Value +
           MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed,
         0.5, 1);
     LightSet.CalculateLights;
@@ -1861,7 +1861,7 @@ begin
       end else
       begin
         { TODO: fix for case when not IsAboveTheGround }
-        FSpidersAppearing[I][2] -= Min(SpidersFallingSpeed * CompSpeed,
+        FSpidersAppearing.Items[I][2] -= Min(SpidersFallingSpeed * CompSpeed,
           Sqrt(SqrHeightAboveTheGround) - Spider.CameraRadius);
         Inc(I);
       end;
@@ -1899,7 +1899,8 @@ begin
     glBegin(GL_LINES);
       for I := 0 to FSpidersAppearing.High do
       begin
-        glVertex3f(FSpidersAppearing[I][0], FSpidersAppearing[I][1], SpiderZ);
+        glVertex3f(FSpidersAppearing.Items[I][0], 
+                   FSpidersAppearing.Items[I][1], SpiderZ);
         glVertexv(FSpidersAppearing.Items[I]);
       end;
     glEnd;
@@ -1932,7 +1933,7 @@ begin
     Result := Result and
       (FGateExit.DefaultTriangleOctree.SegmentCollision(
         Pos1, Pos2, false, NoItemIndex, false,
-        TOctreeIgnore_Transparent.IgnoreItem) = NoItemIndex);
+        @FGateExit.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
   end;
 end;
 
@@ -2089,7 +2090,7 @@ end;
 
 procedure TLevelsAvailableList.SortByNumber;
 begin
-  Sort(IsSmallerByNumber);
+  Sort(@IsSmallerByNumber);
 end;
 
 procedure TLevelsAvailableList.LoadFromConfig;

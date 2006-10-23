@@ -49,7 +49,7 @@ initialization
       ParamStr(0) is ugly uppercased.
     - ParamStr(0) is unsure for Unixes.
     - ParamStr(0) is useless for upx executables. }
-  OnGetApplicationName := MyGetApplicationName;
+  OnGetApplicationName := {$ifdef FPC_OBJFPC} @ {$endif} MyGetApplicationName;
 
   ConfigFile := TKamXMLConfig.Create(nil);
   ConfigFile.FileName := UserConfigFile('.conf');

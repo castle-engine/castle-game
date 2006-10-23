@@ -141,11 +141,11 @@ type
     when using this class --- this class should handle this yourself. }
   TGLMenuBooleanArgument = class(TGLMenuItemArgument)
   private
-    FValue: boolean;
+    FBooleanValue: boolean;
     procedure SetValue(const AValue: boolean);
   public
     constructor Create(const AValue: boolean);
-    property Value: boolean read FValue write SetValue;
+    property Value: boolean read FBooleanValue write SetValue;
   end;
 
   TGLMenuSlider = class(TGLMenuItemAccessory)
@@ -548,7 +548,7 @@ begin
   Result := MenuFont.TextWidth(Text);
 end;
 
-function TGLMenuItemArgument.GetWidth(MenuFont: TGLBitmapFont);
+function TGLMenuItemArgument.GetWidth(MenuFont: TGLBitmapFont): Single;
 begin
   Result := MaximumValueWidth;
 end;
@@ -572,15 +572,15 @@ begin
   inherited Create(
     Max(TGLMenuItemArgument.TextWidth(BoolToStrYesNo[true]),
         TGLMenuItemArgument.TextWidth(BoolToStrYesNo[false])));
-  FValue := AValue;
+  FBooleanValue := AValue;
   inherited Value := BoolToStrYesNo[Value];
 end;
 
 procedure TGLMenuBooleanArgument.SetValue(const AValue: boolean);
 begin
-  if FValue <> AValue then
+  if FBooleanValue <> AValue then
   begin
-    FValue := AValue;
+    FBooleanValue := AValue;
     inherited Value := BoolToStrYesNo[Value];
   end;
 end;
@@ -944,11 +944,11 @@ begin
     MaxTo1st(MaxItemWidth, MenuFont.TextWidth(Items[I]));
 
     if Items.Objects[I] <> nil then
-      FAccessoryAreas[I].Width :=
+      FAccessoryAreas.Items[I].Width :=
         TGLMenuItemAccessory(Items.Objects[I]).GetWidth(MenuFont) else
-      FAccessoryAreas[I].Width := 0.0;
+      FAccessoryAreas.Items[I].Width := 0.0;
 
-    MaxTo1st(MaxAccessoryWidth, FAccessoryAreas[I].Width);
+    MaxTo1st(MaxAccessoryWidth, FAccessoryAreas.Items[I].Width);
   end;
 
   { calculate FAllItemsArea Width and Height }
@@ -996,8 +996,8 @@ begin
 
   for I := 0 to Areas.High do
   begin
-    Areas[I].X0 := PositionXMove + AllItemsAreaMargin;
-    Areas[I].Y0 := PositionYMove + AllItemsAreaMargin
+    Areas.Items[I].X0 := PositionXMove + AllItemsAreaMargin;
+    Areas.Items[I].Y0 := PositionYMove + AllItemsAreaMargin
       + (Areas.High - I) * (MenuFont.RowHeight + SpaceBetweenItems);
   end;
   FAllItemsArea.X0 := PositionXMove;
@@ -1006,9 +1006,10 @@ begin
   { Calculate FAccessoryAreas[].X0, Y0, Height }
   for I := 0 to Areas.High do
   begin
-    FAccessoryAreas[I].X0 := Areas[I].X0 + MaxItemWidth + MarginBeforeAccessory;
-    FAccessoryAreas[I].Y0 := Areas[I].Y0;
-    FAccessoryAreas[I].Height := Areas[I].Height;
+    FAccessoryAreas.Items[I].X0 := Areas.Items[I].X0 +
+      MaxItemWidth + MarginBeforeAccessory;
+    FAccessoryAreas.Items[I].Y0 := Areas.Items[I].Y0;
+    FAccessoryAreas.Items[I].Height := Areas.Items[I].Height;
   end;
 
   { Calculate GLList_DrawFadeRect }
@@ -1052,17 +1053,17 @@ begin
 
       glColorv(CurrentItemBorderColor);
       DrawGLRectBorder(
-        Areas[I].X0 - CurrentItemBorderMargin,
-        Areas[I].Y0,
-        Areas[I].X0 + Areas[I].Width + CurrentItemBorderMargin,
-        Areas[I].Y0 + Areas[I].Height);
+        Areas.Items[I].X0 - CurrentItemBorderMargin,
+        Areas.Items[I].Y0,
+        Areas.Items[I].X0 + Areas.Items[I].Width + CurrentItemBorderMargin,
+        Areas.Items[I].Y0 + Areas.Items[I].Height);
 
       glColorv(CurrentItemColor);
     end else
       glColorv(NonCurrentItemColor);
 
     glPushMatrix;
-      glTranslatef(Areas[I].X0, Areas[I].Y0 + MenuFont.Descend, 0);
+      glTranslatef(Areas.Items[I].X0, Areas.Items[I].Y0 + MenuFont.Descend, 0);
       glRasterPos2i(0, 0);
       MenuFont.Print(Items[I]);
     glPopMatrix;

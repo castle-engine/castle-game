@@ -100,7 +100,7 @@ begin
   { parse parameters }
   OpenALOptionsParse;
   Glw.ParseParameters([poDisplay]);
-  ParseParameters(Options, OptionProc, nil);
+  ParseParameters(Options, @OptionProc, nil);
 
   Glw.Width := RequiredScreenWidth;
   Glw.Height := RequiredScreenHeight;

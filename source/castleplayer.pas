@@ -364,11 +364,11 @@ begin
   Navigator.Key_MoveSpeedInc := K_None; { turn key off }
   Navigator.Key_MoveSpeedDec := K_None; { turn key off }
   Navigator.CheckModsDown := false;
-  Navigator.OnFalledDown := FalledDown;
+  Navigator.OnFalledDown := @FalledDown;
 
   HintEscapeKeyShown := false;
 
-  OnKeyChanged.AppendItem(KeyChanged);
+  OnKeyChanged.AppendItem(@KeyChanged);
 
   LoadFromFile;
 
@@ -381,7 +381,7 @@ end;
 destructor TPlayer.Destroy;
 begin
   if OnKeyChanged <> nil then
-    OnKeyChanged.DeleteFirstEqual(KeyChanged);
+    OnKeyChanged.DeleteFirstEqual(@KeyChanged);
 
   FreeAndNil(FNavigator);
   FreeWithContentsAndNil(FItems);
@@ -896,7 +896,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
         AllocatedSwimmingSource := Sound(stPlayerSwimming);
         if AllocatedSwimmingSource <> nil then
           AllocatedSwimmingSource.OnUsingEnd :=
-            AllocatedSwimmingSourceUsingEnd;
+            @AllocatedSwimmingSourceUsingEnd;
       end;
     end;
   end;
@@ -971,7 +971,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
           alSourceVector3f(AllocatedFootstepsSource.ALSource,
             AL_POSITION, Vector3Single(0, 0, -1.0));
           AllocatedFootstepsSource.OnUsingEnd :=
-            AllocatedFootstepsSourceUsingEnd;
+            @AllocatedFootstepsSourceUsingEnd;
         end else
           { Failed to allocate source, so force new
             NewFootstepsSoundPlaying to stNone. }
@@ -1160,7 +1160,7 @@ begin
         AllocatedSwimmingChangeSource := Sound(stPlayerSwimmingChange);
         if AllocatedSwimmingChangeSource <> nil then
           AllocatedSwimmingChangeSource.OnUsingEnd :=
-            AllocatedSwimmingChangeSourceUsingEnd;
+            @AllocatedSwimmingChangeSourceUsingEnd;
       end;
     end;
 

@@ -57,7 +57,7 @@ begin
     on E: EWriteError do RaiseStdOutNotAvail;
   end;
 
-  OnGLWinMessage := GLWinMessageLog;
+  OnGLWinMessage := @GLWinMessageLog;
 end;
 
 procedure WritelnLog(const LogType: TLogType; const LogMessage: string);
