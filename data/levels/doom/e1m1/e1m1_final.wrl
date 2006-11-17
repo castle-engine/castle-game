@@ -1,0 +1,37 @@
+#VRML V1.0 ascii
+
+Group {
+  NavigationInfo {
+    avatarSize [ 0.5, 2 ]
+    speed 1.0
+    headlight FALSE
+  }
+
+  Separator {
+    Rotation { rotation 1 0 0 1.57 }
+
+    Background {
+      backUrl "../../../skies/doom/sky1/back.png"
+      bottomUrl "../../../skies/doom/sky1/bottom.png"
+      frontUrl "../../../skies/doom/sky1/front.png"
+      leftUrl "../../../skies/doom/sky1/left.png"
+      rightUrl "../../../skies/doom/sky1/right.png"
+      topUrl "../../../skies/doom/sky1/top.png"
+    }
+  }
+
+  PerspectiveCamera {
+    position -52.858566284179688 180.4088134765625 1.656345009803772
+    direction 0.00284720514901 -0.199979782104492 -0.000000017483666
+    up 0 0 1
+  }
+
+  # rotate to make up vector as +Z
+  Rotation { rotation 1 0 0 1.57 }
+
+  # proper scaling - original model is scaled down to fit
+  # sizes of my items and creatures
+  Scale { scaleFactor 0.05 0.05 0.05 }
+
+  WWWInline { name "e1m1.wrl" }
+}

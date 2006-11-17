@@ -1,0 +1,6 @@
+#VRML V1.0 ascii
+
+Group {
+    DirectionalLight { intensity 1 direction -1 -1 -1 }
+    DirectionalLight { intensity 1 direction  1  1  1 }
+}

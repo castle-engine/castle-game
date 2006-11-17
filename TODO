@@ -436,6 +436,9 @@ Cages level:
   <a href="http://forum.linspire.com/viewtopic.php?t=423672&">common
   problem with Mesa</a>
 
+  Update: on kocury, GL_VERSION 1.2 (1.5 Mesa 6.4.1) works OK now.
+  Test on ii.uni in 137 room.
+
 ----------------------------------------
 dist-making to-dos:
 

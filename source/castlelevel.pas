@@ -520,6 +520,17 @@ type
       SpecialObjectIndex: Integer); override;
   end;
 
+  TDoomE1M1Level = class(TLevel)
+  public
+    constructor Create; override;
+
+    class function SceneFileName: string; override;
+    class function LightSetFileName: string; override;
+
+    class function Title: string; override;
+    class function Number: Integer; override;
+  end;
+
   TLevelAvailable = class
   public
     LevelClass: TLevelClass;
@@ -2055,6 +2066,40 @@ begin
   end;
 end;
 
+{ TDoomE1M1Level ---------------------------------------------------------------- }
+
+constructor TDoomE1M1Level.Create;
+begin
+  inherited;
+
+  if Headlight <> nil then
+  begin
+    Headlight.AmbientColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
+    Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
+    Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
+  end;
+end;
+
+class function TDoomE1M1Level.SceneFileName: string;
+begin
+  Result := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' + PathDelim + 'e1m1_final.wrl';
+end;
+
+class function TDoomE1M1Level.LightSetFileName: string;
+begin
+  Result := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' + PathDelim + 'e1m1_lights.wrl';
+end;
+
+class function TDoomE1M1Level.Title: string;
+begin
+  Result := 'Doom E1M1';
+end;
+
+class function TDoomE1M1Level.Number: Integer;
+begin
+  Result := 90;
+end;
+
 { TLevelsAvailableList ------------------------------------------------------- }
 
 procedure TLevelsAvailableList.AddLevelClass(LevelClass: TLevelClass;
@@ -2120,6 +2165,7 @@ initialization
   LevelsAvailable.AddLevelClass(TCastleHallLevel);
   LevelsAvailable.AddLevelClass(TTowerLevel);
   LevelsAvailable.AddLevelClass(TCagesLevel);
+  LevelsAvailable.AddLevelClass(TDoomE1M1Level);
   LevelsAvailable.LoadFromConfig;
 finalization
   LevelsAvailable.SaveToConfig;
