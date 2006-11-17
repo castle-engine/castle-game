@@ -1732,7 +1732,7 @@ procedure TCreature.Render(const Frustum: TFrustum);
       glEnable(GL_DEPTH_TEST);
       glColorv(Gray3Single);
 
-      DrawGLBoxWire(BoundingBox, 0, 0, 0, true);
+      glDrawBox3dWire(BoundingBox);
 
       glPushMatrix;
         glTranslatev(MiddlePosition);
