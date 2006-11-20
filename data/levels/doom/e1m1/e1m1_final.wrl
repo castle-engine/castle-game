@@ -7,16 +7,29 @@ Group {
     headlight FALSE
   }
 
-  Separator {
-    Rotation { rotation 1 0 0 1.57 }
+#   Separator {
+#     Rotation { rotation 1 0 0 1.57 }
 
+#     Background {
+#       backUrl "../../../skies/doom/sky1/back.png"
+#       bottomUrl "../../../skies/doom/sky1/bottom.png"
+#       frontUrl "../../../skies/doom/sky1/front.png"
+#       leftUrl "../../../skies/doom/sky1/left.png"
+#       rightUrl "../../../skies/doom/sky1/right.png"
+#       topUrl "../../../skies/doom/sky1/top.png"
+#     }
+#   }
+
+  Separator {
+    Rotation { rotation 0 0 1 1.5 }
+    Rotation { rotation 1 0 0 1.57 }
     Background {
-      backUrl "../../../skies/doom/sky1/back.png"
-      bottomUrl "../../../skies/doom/sky1/bottom.png"
-      frontUrl "../../../skies/doom/sky1/front.png"
-      leftUrl "../../../skies/doom/sky1/left.png"
-      rightUrl "../../../skies/doom/sky1/right.png"
-      topUrl "../../../skies/doom/sky1/top.png"
+      backUrl "../../../skies/foggy_sky_back.png"
+      bottomUrl "../../../skies/foggy_sky_bottom.png"
+      frontUrl "../../../skies/foggy_sky_front.png"
+      leftUrl "../../../skies/foggy_sky_left.png"
+      rightUrl "../../../skies/foggy_sky_right.png"
+      topUrl "../../../skies/foggy_sky_top.png"
     }
   }
 
@@ -25,6 +38,9 @@ Group {
     direction 0.00284720514901 -0.199979782104492 -0.000000017483666
     up 0 0 1
   }
+
+  # creatures, items (locations set by picking a point in view3dscene
+  # and using "Selected object info" feature)
 
   # rotate to make up vector as +Z
   Rotation { rotation 1 0 0 1.57 }
