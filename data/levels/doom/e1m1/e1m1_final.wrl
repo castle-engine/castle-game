@@ -50,4 +50,5 @@ Group {
   Scale { scaleFactor 0.05 0.05 0.05 }
 
   WWWInline { name "e1m1.wrl" }
+  WWWInline { name "e1m1_blender.wrl" }
 }

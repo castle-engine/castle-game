@@ -1,0 +1,38 @@
+This is a DOOM e1m1 level remade in VRML for "The Castle".
+A lot of things were changed from the actual DOOM, but the
+level geometry and textures are original.
+See [http://www.camelot.homedns.org/~michalis/castle-doom.php]
+for user description.
+This file contains some internal notes: how this is organized.
+
+First of all, this is *not* the best example how "The Castle"
+levels should be done. If you want to educate yourself how to
+create new levels, go see any other level (like ../../cages/).
+
+This level needed some tricks to get things working.
+
+- I already got this level in VRML 1.0 format from
+  [http://www.ocnus.com/models/]
+
+- The most important blocker was that Blender wasn't able to fully import
+  this VRML 1.0 model: namely, only the object geometry is imported,
+  the texture coordinates and filename is lost. This is unacceptable
+  loss, since textures are the basis of DOOM levels --- everything
+  is textured, and textures create the main look of most things.
+
+- However, the level needed some corrections. Many unnecessary faces
+  needed deletion and some faces (around the basin in the starting
+  room) were missing. I was able to implement deletion in my view3dscene
+  (see "Remove face" feature). But for adding new faces in proper places
+  I needed some real 3D authoring tool.
+
+- So I imported DOOM model into blender --- but not to export this model !
+  I imported it and placed it on layer 0, and by default this layer
+  will *not* be exported to VRML model. This geometry is used only to
+  create new faces in blender and connect them to actual level geometry.
+
+- Summary: e1m1 level geometry is the sum of two files:
+  e1m1.wrl - this is the main file, heavily modified version of what I got
+    from [http://www.ocnus.com/models/]
+  e1m1_blender.wrl - this is the additional geometry for the model that
+    was created in blender (blender source file is e1m1_blender.blend).
