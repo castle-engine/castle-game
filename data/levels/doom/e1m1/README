@@ -36,3 +36,6 @@ This level needed some tricks to get things working.
     from [http://www.ocnus.com/models/]
   e1m1_blender.wrl - this is the additional geometry for the model that
     was created in blender (blender source file is e1m1_blender.blend).
+
+- Also the items and creatures positions are marked in blender,
+  so it's on e1m1_blender.wrl.
