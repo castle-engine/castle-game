@@ -98,7 +98,9 @@ type
     procedure RemoveBoxNodeCheck(out Box: TBox3d; const NodeName: string);
 
     { This will be called from our constructor before initializing
-      our octrees. You can override this to do here some operations
+      our octrees. Even before initializing creatures and items.
+
+      You can override this to do here some operations
       that change the Scene.RootNode (e.g. you can do here tricks like
       extracting some specific objects using RemoveBoxNode).
       Be very cautious what you do here --- remember that this is called
@@ -555,6 +557,10 @@ type
       const MovingObjectCameraRadius: Single): boolean;
 
     function SomethingBlocksClosingDoor(const Door: TDoomLevelDoor): boolean;
+
+    procedure RenameCreatures(Node: TVRMLNode);
+  protected
+    procedure ChangeLevelScene; override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -587,6 +593,8 @@ type
 
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer); override;
+
+    procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
 
   TLevelAvailable = class
@@ -675,6 +683,8 @@ begin
       actually changed later in this procedure. }
     Scene.GetPerspectiveViewpoint(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
 
+    ChangeLevelScene;
+
     ItemsToRemove := TVRMLNodesList.Create;
     try
       { Initialize Items }
@@ -687,8 +697,6 @@ begin
 
       RemoveItemsToRemove;
     finally ItemsToRemove.Free end;
-
-    ChangeLevelScene;
 
     { Calculate LevelBox. }
     if not RemoveBoxNode(FLevelBox, 'LevelBox') then
@@ -2134,6 +2142,8 @@ var
 begin
   inherited;
 
+  PlayedMusicSound := stDoomE1M1Music;
+
   if Headlight <> nil then
   begin
     Headlight.AmbientColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
@@ -2478,6 +2488,35 @@ begin
     Door^.OpenStateChangeTime := AnimationTime;
     { TODO: play sound }
   end;
+end;
+
+procedure TDoomE1M1Level.RenameCreatures(Node: TVRMLNode);
+const
+  SCreaDoomZomb = 'CreaDoomZomb_';
+  SCreaDoomSerg = 'CreaDoomSerg_';
+begin
+  { This is just a trick to rename all creatures 'DoomZomb' and 'DoomSerg'
+    on level just to our 'Alien' creature. In the future maybe we will
+    have real (and different) DoomZomb/Serg creatures, then the trick
+    below will be removed. }
+  if IsPrefix(SCreaDoomZomb, Node.NodeName) then
+    Node.NodeName := 'CreaAlien_' + SEnding(Node.NodeName, Length(SCreaDoomZomb) + 1) else
+  if IsPrefix(SCreaDoomSerg, Node.NodeName) then
+    Node.NodeName := 'CreaAlien_' + SEnding(Node.NodeName, Length(SCreaDoomSerg) + 1);
+end;
+
+procedure TDoomE1M1Level.ChangeLevelScene;
+begin
+  inherited;
+  Scene.RootNode.EnumerateNodes(@RenameCreatures, true);
+end;
+
+procedure TDoomE1M1Level.PrepareNewPlayer(NewPlayer: TPlayer);
+begin
+  inherited;
+
+  NewPlayer.PickItem(TItem.Create(Bow, 1));
+  NewPlayer.PickItem(TItem.Create(Quiver, 10));
 end;
 
 { TLevelsAvailableList ------------------------------------------------------- }

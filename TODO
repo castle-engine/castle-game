@@ -1,3 +1,14 @@
+- life potion looks bad, too light on doom level.
+  Change it's blending settings to the darker ones ?
+
+- footsteps sound used on castle hall and doom level has some awful
+  noise at the end. You don't hear it when the music plays, but when
+  music stops it can be clearly heard.
+
+- doom music file is too large!
+
+----------------------------------------
+
 - Traveler's screenshot from geforce 6800gt also shows artifact when rendering life indicator --- it should be rendered with blending (like on Huehnerschaender screenshot), while on Traveler's screenshots it shows white background underneath.
   Hooray! It's reproduceable now on kangury!
   Started investigation in ../non_alpha_life_indicator_problem.patch

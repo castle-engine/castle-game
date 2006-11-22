@@ -27,7 +27,7 @@ unit CastleSound;
 
 interface
 
-uses Classes, VectorMath, ALSourceAllocator;
+uses Classes, VectorMath, ALSourceAllocator, SysUtils;
 
 var
   SoundInitializationReport: string;
@@ -99,6 +99,7 @@ type
     stTeleport,
     stSacrilegeAmbush,
     stEvilLaugh,
+    stDoomE1M1Music,
     { @groupEnd }
 
     { Creatures sounds.
@@ -348,6 +349,8 @@ var
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
     ( FileName: 'evil_laugh.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
+    ( FileName: 'doom' + PathDelim + 'e1m1.wav';
+      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
     ( FileName: 'creature_falled_down.wav';
       Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
     ( FileName: 'alien_sudden_pain.wav';
@@ -414,7 +417,7 @@ var
 
 implementation
 
-uses SysUtils, CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
+uses CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
   KambiFilesUtils, CastleLog;
 
 var
