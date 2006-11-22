@@ -553,6 +553,8 @@ type
       const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean;
+
+    function SomethingBlocksClosingDoor(const Door: TDoomLevelDoor): boolean;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -2354,13 +2356,24 @@ begin
   end;
 end;
 
+function TDoomE1M1Level.SomethingBlocksClosingDoor(const Door: TDoomLevelDoor):
+  boolean;
+begin
+  Result := Boxes3dCollision(Door.OpenAnimation.FirstScene.BoundingBox,
+    Player.BoundingBox);
+
+  { TODO: we should do the same for creatures.
+    TODO: the above code uses explicitly global Player variable,
+    this is unclean. }
+end;
+
 procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
 var
   I: Integer;
   Door: PDoomLevelDoor;
 begin
   { First (before calling inherited) check for all the doors
-    that are during closing: if the player possibly collides
+    that are during closing: if the player or creatures possibly collide
     with them, then we must stop and open again (to avoid
     entering into collision with player because of player moves)
 
@@ -2371,24 +2384,22 @@ begin
     we always with door's fully closed octree, so the collision
     will be detected practically immediately and we can simply set
     Door^.OpenStateChangeTime to something to avoid any animation
-    at all. }
+    at all.
+
+    In fact, right now this check is useless. The useful analogy
+    of this check is done later, right *before we even start closing*. }
   for I := Low(Doors) to High(Doors) do
   begin
     Door := @Doors[I];
 
     if (not Door^.Open) and
       (AnimationTime - Door^.OpenStateChangeTime < Door^.OpenCloseTime) and
-      (Boxes3dCollision(Door^.OpenAnimation.FirstScene.BoundingBox,
-        Player.BoundingBox)) then
+      SomethingBlocksClosingDoor(Door^) then
     begin
       Door^.Open := true;
       Door^.OpenStateChangeTime := AnimationTime - 10 * Door^.OpenCloseTime;
     end;
   end;
-
-  { TODO: we should do the same for creatures.
-    TODO: the above code uses explicitly global Player variable,
-    this is unclean. }
 
   inherited;
 
@@ -2398,7 +2409,12 @@ begin
 
     if Door^.Open and
       (AnimationTime - Door^.OpenStateChangeTime >
-        Door^.OpenCloseTime + Door^.StayOpenTime) then
+        Door^.OpenCloseTime + Door^.StayOpenTime) and
+      { We must do the check for SomethingBlocksClosingDoor also here,
+        not only before "inherited" --- otherwise player/creature standing
+        right under the open door wouldn't be able to move, because the door
+        would constantly swap between "completely open" and "during closing". }
+      (not SomethingBlocksClosingDoor(Door^)) then
     begin
       Door := @Doors[I];
       Door^.Open := false;
