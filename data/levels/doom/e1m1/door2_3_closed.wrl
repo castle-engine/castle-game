@@ -1,0 +1,13 @@
+#VRML V1.0 ascii
+
+Group {
+  # rotate to make up vector as +Z
+  Rotation { rotation 1 0 0 1.57 }
+
+  # proper scaling - original model is scaled down to fit
+  # sizes of my items and creatures
+  Scale { scaleFactor 0.05 0.05 0.05 }
+
+  Translation { translation 0 0 0 }
+  WWWInline { name "door2_3.wrl" }
+}
