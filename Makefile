@@ -40,14 +40,14 @@ FPC_WIN32_OPTIONS := -dRELEASE
 endif
 
 build-unix:
-	cd source; \
-	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg castle.dpr; \
-	  mv castle ../
+	cd source/kambi_vrml_game_engine/; \
+	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg ../castle.dpr
+	mv source/castle ./
 
 build-win32:
-	cd source; \
-	  fpc $(FPC_WIN32_OPTIONS) @kambi.cfg castle.dpr; \
-	  mv castle.exe ../
+	cd source/kambi_vrml_game_engine/; \
+	  fpc $(FPC_WIN32_OPTIONS) @kambi.cfg ../castle.dpr
+	mv source/castle ./
 
 # ------------------------------------------------------------
 # Cleaning targets.
@@ -73,7 +73,7 @@ clean:
 # Notes: I remove here data/sounds/intermediate/, because it's large
 # and almost noone should need this. These files are downloadable from
 # internet anyway, as they are just original things used to make
-# cages_music_with_rain.wav.
+# some sounds.
 clean_private:
 	find . -type d '(' -iname '.svn' ')' -print \
 	     | xargs rm -Rf
@@ -129,7 +129,7 @@ dist-core:
 	cp -R ../trunk/ $(TMP_DIST_PATH)
 	mv $(TMP_DIST_PATH)trunk/ $(TMP_DIST_PATH)castle
 	make -C $(TMP_DIST_PATH)castle/ clean clean_private
-	areFilenamesLower -i Makefile $(TMP_DIST_PATH)castle/data/
+	areFilenamesLower -i Makefile -i README $(TMP_DIST_PATH)castle/data/
 # Add libpng and zlib for Windows
 	cp -f /win/mojewww/camelot/private/win32_libpng_and_zlib/* $(TMP_DIST_PATH)castle/
 # Add documentation/ subdirectory
@@ -146,12 +146,12 @@ dist-core:
 	find $(TMP_DIST_PATH) -type d -and -exec chmod 755 '{}' ';'
 	find $(TMP_DIST_PATH) -type f -and -iname '*.sh' -and -exec chmod 755 '{}' ';'
 	chmod 755 $(TMP_DIST_PATH)castle/castle
-# Copy and clean general units sources
+# Copy and clean kambi_vrml_game_engine sources
 ifdef DIST_WITH_SRC
-	cd /win/mojewww/camelot/private/update_archives/; ./update_pascal_src.sh units
-	cp /win/mojewww/camelot/src/pascal/units-src.tar.gz $(TMP_DIST_PATH)castle/source/
-	cd $(TMP_DIST_PATH)castle/source/; tar xzf units-src.tar.gz
-	rm -f $(TMP_DIST_PATH)castle/source/units-src.tar.gz
+	cd /win/mojewww/camelot/private/update_archives/; ./update_pascal_src.sh kambi_vrml_game_engine
+	cp /win/mojewww/camelot/src/pascal/kambi_vrml_game_engine-src.tar.gz $(TMP_DIST_PATH)castle/source/
+	cd $(TMP_DIST_PATH)castle/source/; tar xzf kambi_vrml_game_engine-src.tar.gz
+	rm -f $(TMP_DIST_PATH)castle/source/kambi_vrml_game_engine-src.tar.gz
 	mv $(TMP_DIST_PATH)castle/source/COPYING $(TMP_DIST_PATH)castle/COPYING
 else
 	cp /usr/share/common-licenses/GPL-2 $(TMP_DIST_PATH)castle/COPYING
