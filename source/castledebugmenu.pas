@@ -149,7 +149,7 @@ begin
   Items.AddObject('Render for level screenshot',
     DebugRenderForLevelScreenshotArgument);
   Items.Add('Change to level');
-  Items.Add('Change sound properties');
+  Items.Add('Reload sounds.xml');
   Items.Add('Edit lights');
   Items.Add('Force thunder now');
   Items.Add('Back to game');
@@ -186,56 +186,6 @@ procedure TDebugMenu.CurrentItemSelected;
     finally S.Free end;
   end;
 
-  procedure ChangeSoundProperties;
-
-    function SoundName(ST: TSoundType): string;
-    begin
-      Result := SoundInfos[ST].FileName;
-      if Result = '' then
-        Result := '(unused)';
-    end;
-
-  var
-    S: TStringList;
-    STInteger: Cardinal;
-    ST: TSoundType;
-    SingleValue: Single;
-  begin
-    S := TStringList.Create;
-    try
-      for ST := Succ(stNone) to High(ST) do
-        S.Append(Format('%d: sound "' + SoundName(ST) + '"', [Ord(ST)]));
-
-      { I don't use here ChooseByMenu(GLList_ScreenImage, S),
-        there are too many sound names to fit on one screen. }
-
-      STInteger := 1;
-      if MessageInputQueryCardinal(Glw, S.Text, STInteger, taLeft) and
-         Between(STInteger, Ord(Succ(stNone)), Ord(High(ST))) then
-      begin
-        ST := TSoundType(STInteger);
-
-        SingleValue := SoundInfos[ST].Gain;
-        if MessageInputQuerySingle(Glw,
-          'Change GAIN of sound "' + SoundName(ST) + '"',
-          SingleValue, taLeft) then
-          SoundInfos[ST].Gain := SingleValue;
-
-        SingleValue := SoundInfos[ST].MinGain;
-        if MessageInputQuerySingle(Glw,
-          'Change MIN_GAIN of sound "' + SoundName(ST) + '"',
-          SingleValue, taLeft) then
-          SoundInfos[ST].MinGain := SingleValue;
-
-        SingleValue := SoundInfos[ST].MaxGain;
-        if MessageInputQuerySingle(Glw,
-          'Change MAX_GAIN of sound "' + SoundName(ST) + '"',
-          SingleValue, taLeft) then
-          SoundInfos[ST].MaxGain := SingleValue;
-      end;
-    finally S.Free end;
-  end;
-
   procedure ForceThunder;
   begin
     if Level.ThunderEffect <> nil then
@@ -263,7 +213,7 @@ begin
            DebugRenderForLevelScreenshot;
        end;
     5: ChangeToLevel;
-    6: ChangeSoundProperties;
+    6: ReadSoundInfos;
     7: begin
          FreeAndNil(EditLevelLightsMenu);
          EditLevelLightsMenu := TEditLevelLightsMenu.Create;

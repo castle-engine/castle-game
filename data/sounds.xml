@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+
+<!-- Configuration of game sounds.
+   Element name is the unique sound name, as defined in CastleSound unit.
+
+   file_name attribute defaults to element_name + '.wav', so in the most
+   common situation, when sound named xxx have the filename xxx.wav,
+   you don't have to specify filename. You have to specify file_name
+   only if the sound needs different file_name (for whatever reason),
+   or when the sound currently has no file_name (which means that it will
+   not be ever played). In the last case, you should set file_name to
+   empty string, i.e. file_name="".
+
+   gain, min_gain, max_gain set loudness.
+
+   default_importance is the sound importance, for AL sound manager.
+   You can place here a simple unsigned int value, but it's strongly adviced
+   to use one of predefined special values, like "player" or "default_creature"
+   or "level_event".
+
+   For more details see declaration of TSoundInfo record in CastleSound unit.
+
+   Note that you can change this file while the game is running,
+   and reload it by "Reload sounds.xml" command from the debug menu.
+   This allows you to easily test various sound settings without
+   restarting the actual game program.
+   Note that when using "Reload sounds.xml" command:
+   - Changes to "file_name" attributes will not be reflected (i.e. you must exit
+     and run the game again to use new sound file_name).
+   - Changes will only be reflected in newly started sounds,
+     not in currently played sounds.
+-->
+
+<CONFIG>
+  <!-- Player sounds. -->
+  <!--
+    Note for player_sudden_pain:
+    After trying many sounds (things that sound like someone saying "ouh",
+    things that sound like some "thud" etc.), nothing seems to sound OK.
+
+    There are various ways how you can get hurt, and many of
+    them already have appropriate sounds - - - e.g. on drowning you get
+    player_drowning, on falling down you get player_falled_down. When being
+    hit by the creature it's at least supposed that we'll create some
+    sounds for particular creatures and their particular attacks
+    (e.g. when hit by ball_missile, player gets ball_missile_explode sound
+    already).
+
+    So maybe it's not a good idea to create a general sound
+    that will be played always when player is wound ? -->
+  <player_sudden_pain file_name=""
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_potion_drink
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_cast_flying_spell
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_pick_item
+    gain="0.5" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_drop_item
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_dies
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_swimming_change
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_swimming
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_drowning
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_falled_down
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_footsteps_concrete
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_footsteps_grass
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <player_interact_failed
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+
+  <!-- Items sounds. -->
+  <sword_equipping
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <sword_attack_start
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <arrow_fired file_name=""
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <arrow_hit
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <!-- TODO: key_use sound is not used for now. -->
+  <key_use
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <bow_equipping file_name=""
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <bow_attack_start file_name=""
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+
+  <!-- Levels sounds. -->
+  <gate_music
+    gain="1" min_gain="0" max_gain="1" default_importance="max"/>
+  <castle_hall_symbol_moving
+    gain="1" min_gain="0" max_gain="1" default_importance="level_event"/>
+  <castle_hall_music
+    gain="1" min_gain="0" max_gain="1" default_importance="max"/>
+  <cages_music_with_rain
+    gain="1" min_gain="0" max_gain="1" default_importance="max"/>
+  <thunder
+    gain="1" min_gain="0" max_gain="1" default_importance="level_event"/>
+  <stairs_blocker_destroyed
+    gain="1" min_gain="0" max_gain="1" default_importance="level_event"/>
+  <teleport
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <sacrilege_ambush
+    gain="1" min_gain="0" max_gain="1" default_importance="player"/>
+  <evil_laugh
+    gain="1" min_gain="0" max_gain="1" default_importance="level_event"/>
+  <doom_e1m1 file_name="doom/e1m1.wav"
+    gain="1" min_gain="0" max_gain="1" default_importance="max"/>
+
+  <!-- Creatures sounds. -->
+  <creature_falled_down
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+
+  <alien_sudden_pain
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <alien_dying
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+
+  <werewolf_sudden_pain
+    gain="0.4" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <werewolf_attack_start
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <werewolf_actual_attack_hit file_name=""
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <werewolf_howling
+    gain="1" min_gain="0.8" max_gain="1" default_importance="level_event"/>
+  <werewolf_dying
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+
+  <ball_missile_fired
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <ball_missile_explode
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <ball_missile_idle
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+
+  <ghost_sudden_pain
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <ghost_attack_start
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <ghost_dying
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+
+  <spider_actual_attack_hit
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <spider_sudden_pain
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <spider_attack_start
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <spider_dying
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <spider_appears file_name=""
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+
+  <spider_queen_actual_attack_hit file_name=""
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <spider_queen_sudden_pain
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <spider_queen_attack_start
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <spider_queen_dying
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+
+  <thrown_web_fired
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <thrown_web_hit
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+  <thrown_web_idle
+    gain="1" min_gain="0" max_gain="1" default_importance="default_creature"/>
+
+  <!-- Other sounds. -->
+  <intro_music
+    gain="1" min_gain="0" max_gain="1" default_importance="max"/>
+  <menu_current_item_changed
+    gain="1" min_gain="0" max_gain="1" default_importance="minor_non_spatial"/>
+  <menu_current_item_selected
+    gain="1" min_gain="0" max_gain="1" default_importance="minor_non_spatial"/>
+  <save_screen file_name=""
+    gain="1" min_gain="0" max_gain="1" default_importance="minor_non_spatial"/>
+  <game_win_music
+    gain="1" min_gain="0" max_gain="1" default_importance="minor_non_spatial"/>
+</CONFIG>

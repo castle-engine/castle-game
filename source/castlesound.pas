@@ -48,20 +48,6 @@ type
 
     { Player sounds.
       @groupBegin }
-    { Note for stPlayerSuddenPain:
-      After trying many sounds (things that sound like someone saying "ouh",
-      things that sound like some "thud" etc.), nothing seems to sound OK.
-
-      There are various ways how you can get hurt, and many of
-      them already have appropriate sounds --- e.g. on drowning you get
-      stPlayerDrowning, on falling down you get stFalledDown. When being
-      hit by the creature it's at least supposed that we'll create some
-      sounds for particular creatures and their particular attacks
-      (e.g. when hit by ball_missile, player gets ball_missile_explode sound
-      already).
-
-      So maybe it's not a good idea to create a general sound
-      that will be played always when player is wound ? }
     stPlayerSuddenPain,
     stPlayerPotionDrink,
     stPlayerCastFlyingSpell,
@@ -83,7 +69,7 @@ type
     stSwordAttackStart,
     stArrowFired,
     stArrowHit,
-    stKeyUse { TODO: not used for now. },
+    stKeyUse,
     stBowAttackStart,
     stBowEquipping,
     { @groupEnd }
@@ -253,6 +239,81 @@ const
 property ALMaxAllocatedSources: Cardinal
   read GetALMaxAllocatedSources write SetALMaxAllocatedSources;
 
+procedure ReadSoundInfos;
+
+implementation
+
+uses CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
+  KambiFilesUtils, CastleLog, KambiXMLCfg;
+
+const
+  { Each sound has a unique name, used to identify sound in sounds.xml file.
+    For stNone sound name is always ''. }
+  SoundNames: array [TSoundType] of string =
+  ( '',
+    'player_sudden_pain',
+    'player_potion_drink',
+    'player_cast_flying_spell',
+    'player_pick_item',
+    'player_drop_item',
+    'player_dies',
+    'player_swimming_change',
+    'player_swimming',
+    'player_drowning',
+    'player_falled_down',
+    'player_footsteps_concrete',
+    'player_footsteps_grass',
+    'player_interact_failed',
+    'sword_equipping',
+    'sword_attack_start',
+    'arrow_fired',
+    'arrow_hit',
+    'key_use',
+    'bow_equipping',
+    'bow_attack_start',
+    'gate_music',
+    'castle_hall_symbol_moving',
+    'castle_hall_music',
+    'cages_music_with_rain',
+    'thunder',
+    'stairs_blocker_destroyed',
+    'teleport',
+    'sacrilege_ambush',
+    'evil_laugh',
+    'doom_e1m1',
+    'creature_falled_down',
+    'alien_sudden_pain',
+    'alien_dying',
+    'werewolf_sudden_pain',
+    'werewolf_attack_start',
+    'werewolf_actual_attack_hit',
+    'werewolf_howling',
+    'werewolf_dying',
+    'ball_missile_fired',
+    'ball_missile_explode',
+    'ball_missile_idle',
+    'ghost_sudden_pain',
+    'ghost_attack_start',
+    'ghost_dying',
+    'spider_actual_attack_hit',
+    'spider_sudden_pain',
+    'spider_attack_start',
+    'spider_dying',
+    'spider_appears',
+    'spider_queen_actual_attack_hit',
+    'spider_queen_sudden_pain',
+    'spider_queen_attack_start',
+    'spider_queen_dying',
+    'thrown_web_fired',
+    'thrown_web_hit',
+    'thrown_web_idle',
+    'intro_music',
+    'menu_current_item_changed',
+    'menu_current_item_selected',
+    'save_screen',
+    'game_win_music'
+  );
+
 type
   TSoundInfo = record
     { '' means that this sound is not implemented and will have
@@ -278,149 +339,14 @@ type
 var
   { Properties of sounds.
 
-    For the actual game, as used by end-user, SoundInfos is a constant,
-    moreover it's internal to this unit (so you shouldn't even read
-    this).
+    For the actual game, as used by end-user, SoundInfos is a constant.
 
     However, for the sake of debugging/testing the game,
-    you can read and change some things in SoundInfos:
-    right now, you can reliably change everything except FileName.
-    Note that the changes will only be reflected in new sounds,
-    not in currently played sounds. }
-  SoundInfos: array[TSoundType] of TSoundInfo =
-  { TODO: fill all sounds below. }
-  ( ( FileName: '';
-      Gain: 0; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { 'player_sudden_pain.wav' };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_potion_drink.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_cast_flying_spell.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_pick_item.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_drop_item.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_dies.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_swimming_change.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_swimming.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_drowning.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_falled_down.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_footsteps_concrete.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_footsteps_grass.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'player_interact_failed.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'sword_equipping.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'sword_attack_start.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { 'arrow_fired.wav' };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'arrow_hit.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'key_use.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { 'bow_equipping.wav' };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: '' { 'bow_attack_start.wav' };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'gate_music.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
-    ( FileName: 'castle_hall_symbol_moving.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
-    ( FileName: 'castle_hall_music.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
-    ( FileName: 'cages_music_with_rain.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
-    ( FileName: 'thunder.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
-    ( FileName: 'stairs_blocker_destroyed.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
-    ( FileName: 'teleport.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'sacrilege_ambush.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: PlayerSoundImportance; ),
-    ( FileName: 'evil_laugh.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
-    ( FileName: 'doom' + PathDelim + 'e1m1.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
-    ( FileName: 'creature_falled_down.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'alien_sudden_pain.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'alien_dying.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'werewolf_sudden_pain.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'werewolf_attack_start.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { werewolf_actual_attack_hit.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'werewolf_howling.wav';
-      Gain: 1; MinGain: 0.8; MaxGain: 1; DefaultImportance: LevelEventSoundImportance; ),
-    ( FileName: 'werewolf_dying.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'ball_missile_fired.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'ball_missile_explode.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'ball_missile_idle.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'ghost_sudden_pain.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'ghost_attack_start.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'ghost_dying.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'spider_actual_attack_hit.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'spider_sudden_pain.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'spider_attack_start.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'spider_dying.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'spider_appears.wav' };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: '' { 'spider_queen_actual_attack_hit.wav' };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'spider_queen_sudden_pain.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'spider_queen_attack_start.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'spider_queen_dying.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'thrown_web_fired.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'thrown_web_hit.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'thrown_web_idle.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: DefaultCreatureSoundImportance; ),
-    ( FileName: 'intro_music.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MaxSoundImportance; ),
-    ( FileName: 'menu_current_item_changed.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; ),
-    ( FileName: 'menu_current_item_selected.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; ),
-    ( FileName: '' { save_screen.wav };
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; ),
-    ( FileName: 'game_win_music.wav';
-      Gain: 1; MinGain: 0; MaxGain: 1; DefaultImportance: MinorNonSpatialSoundImportance; )
-  );
+    and for content designers, the actual values of SoundInfos are loaded
+    at initialization from sounds.xml file, and later can be changed by
+    "Reload sounds.xml" command. }
+  SoundInfos: array[TSoundType] of TSoundInfo;
 
-implementation
-
-uses CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
-  KambiFilesUtils, CastleLog;
-
-var
   { Values on this array are useful only when ALContextInited
     and only for sounds with SoundInfos[].FileName <> ''. }
   SoundBuffers: array[TSoundType] of TALuint;
@@ -447,6 +373,8 @@ begin
   begin
     SoundInitializationReport :=
       'OpenAL initialized, sound enabled';
+
+    ReadSoundInfos;
 
     try
       SourceAllocator := TALSourceAllocator.Create(
@@ -736,6 +664,43 @@ begin
     FALMaxAllocatedSources := Value;
     if SourceAllocator <> nil then
       SourceAllocator.MaxAllocatedSources := FALMaxAllocatedSources;
+  end;
+end;
+
+procedure ReadSoundInfos;
+var
+  ST: TSoundType;
+  SoundConfig: TKamXMLConfig;
+  S: string;
+begin
+  SoundConfig := TKamXMLConfig.Create(nil);
+  try
+    SoundConfig.FileName := ProgramDataPath + 'data' + PathDelim + 'sounds.xml';
+    for ST := Succ(stNone) to High(ST) do
+    begin
+      SoundInfos[ST].FileName := SoundConfig.GetValue(
+        SoundNames[ST] + '/file_name', SoundNames[ST] + '.wav');
+      SoundInfos[ST].Gain := SoundConfig.GetFloat(SoundNames[ST] + '/gain', 1);
+      SoundInfos[ST].MinGain := SoundConfig.GetFloat(SoundNames[ST] + '/min_gain', 0);
+      SoundInfos[ST].MaxGain := SoundConfig.GetFloat(SoundNames[ST] + '/max_gain', 1);
+      S := SoundConfig.GetValue(SoundNames[ST] + '/default_importance', 'max');
+      case ArrayPosStr(S,
+        [ 'max',
+          'level_event',
+          'player',
+          'default_creature',
+          'minor_non_spatial' ]) of
+        -1: SoundInfos[ST].DefaultImportance := StrToInt(S);
+        0: SoundInfos[ST].DefaultImportance := MaxSoundImportance;
+        1: SoundInfos[ST].DefaultImportance := LevelEventSoundImportance;
+        2: SoundInfos[ST].DefaultImportance := PlayerSoundImportance;
+        3: SoundInfos[ST].DefaultImportance := DefaultCreatureSoundImportance;
+        4: SoundInfos[ST].DefaultImportance := MinorNonSpatialSoundImportance;
+        else raise EInternalError.Create('20061125-case ArrayPosStr');
+      end;
+    end;
+  finally
+    FreeAndNil(SoundConfig);
   end;
 end;
 

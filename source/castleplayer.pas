@@ -598,8 +598,6 @@ end;
   end;
 
 procedure TPlayer.Render2D;
-var
-  BossIndex: Integer;
 begin
   RenderLifeIndicator(Life, MaxLife, GLList_RedIndicatorImage, 0, true);
 
