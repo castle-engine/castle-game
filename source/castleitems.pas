@@ -665,7 +665,7 @@ begin
     MissilePosition := Player.Navigator.CameraPos;
     MissileDirection := Player.Navigator.CameraDir;
     Missile := Arrow.CreateDefaultCreature(MissilePosition, MissileDirection,
-      Level.AnimationTime);
+      Level.AnimationTime, Arrow.DefaultMaxLife);
     Level.Creatures.Add(Missile);
     Sound(stArrowFired);
   end;

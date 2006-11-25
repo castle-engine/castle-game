@@ -141,18 +141,17 @@ type
       read FSoundDyingTiedToCreature write FSoundDyingTiedToCreature
       default DefaultSoundDyingTiedToCreature;
 
-    { This will be used by CreateDefaultCreature to initialize
-      MaxLife of the creature. Which means that not all instances
-      of TCreature with this Kind *must* have this MaxLife,
-      because you don't have to use CreateDefaultCreature to create
-      new creatures... It's just some default, "suggested" MaxLife
-      for this Kind. }
+    { This is a default MaxLife for this Kind.
+
+      You cannot depend that every creature has this MaxLife ---
+      caller can pass any MaxLife value when creating creature by
+      CreateDefaultCreature or by any other means.
+      This is only a "suggested" default for MaxLife of this creature. }
     property DefaultMaxLife: Single
       read FDefaultMaxLife write FDefaultMaxLife default DefaultDefaultMaxLife;
 
     { This creates the "default creature instance" with Kind = Self.
-      This uses DefaultMaxLife. It uses the TCreature descendant
-      most suitable for this TCreatureKind.
+      It uses the TCreature descendant most suitable for this TCreatureKind.
 
       Note that you don't have to use this function to create
       creature instances with this Kind. You can freely create
@@ -164,7 +163,8 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single): TCreature; virtual; abstract;
+      const AnimationTime: Single;
+      const MaxLife: Single): TCreature; virtual; abstract;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
 
@@ -437,7 +437,8 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single): TCreature; override;
+      const AnimationTime: Single;
+      const MaxLife: Single): TCreature; override;
   end;
 
   TWerewolfKind = class(TWalkAttackCreatureKind)
@@ -445,7 +446,8 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single): TCreature; override;
+      const AnimationTime: Single;
+      const MaxLife: Single): TCreature; override;
   end;
 
   TSpiderKind = class(TWalkAttackCreatureKind)
@@ -453,7 +455,8 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single): TCreature; override;
+      const AnimationTime: Single;
+      const MaxLife: Single): TCreature; override;
   end;
 
   TSpiderQueenKind = class(TWalkAttackCreatureKind)
@@ -488,7 +491,8 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single): TCreature; override;
+      const AnimationTime: Single;
+      const MaxLife: Single): TCreature; override;
 
     property MinDelayBetweenThrowWebAttacks: Single
       read FMinDelayBetweenThrowWebAttacks
@@ -518,7 +522,8 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single): TCreature; override;
+      const AnimationTime: Single;
+      const MaxLife: Single): TCreature; override;
   end;
 
   { This is a missile. As you can see, this is also treated as a creature
@@ -568,7 +573,8 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single): TCreature; override;
+      const AnimationTime: Single;
+      const MaxLife: Single): TCreature; override;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
 
@@ -1337,10 +1343,11 @@ end;
 function TBallThrowerCreatureKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single): TCreature;
+  const AnimationTime: Single;
+  const MaxLife: Single): TCreature;
 begin
   Result := TBallThrowerCreature.Create(Self, ALegsPosition, ADirection,
-    DefaultMaxLife, AnimationTime);
+    MaxLife, AnimationTime);
 end;
 
 { TWerewolfKind -------------------------------------------------------------- }
@@ -1348,10 +1355,11 @@ end;
 function TWerewolfKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single): TCreature;
+  const AnimationTime: Single;
+  const MaxLife: Single): TCreature;
 begin
   Result := TWerewolfCreature.Create(Self, ALegsPosition, ADirection,
-    DefaultMaxLife, AnimationTime);
+    MaxLife, AnimationTime);
 end;
 
 { TSpiderKind -------------------------------------------------------------- }
@@ -1359,10 +1367,11 @@ end;
 function TSpiderKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single): TCreature;
+  const AnimationTime: Single;
+  const MaxLife: Single): TCreature;
 begin
   Result := TSpiderCreature.Create(Self, ALegsPosition, ADirection,
-    DefaultMaxLife, AnimationTime);
+    MaxLife, AnimationTime);
 end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
@@ -1423,10 +1432,11 @@ end;
 function TSpiderQueenKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single): TCreature;
+  const AnimationTime: Single;
+  const MaxLife: Single): TCreature;
 begin
   Result := TSpiderQueenCreature.Create(Self, ALegsPosition, ADirection,
-    DefaultMaxLife, AnimationTime);
+    MaxLife, AnimationTime);
 end;
 
 procedure TSpiderQueenKind.LoadFromFile(KindsConfig: TKamXMLConfig);
@@ -1466,10 +1476,11 @@ end;
 function TGhostKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single): TCreature;
+  const AnimationTime: Single;
+  const MaxLife: Single): TCreature;
 begin
   Result := TGhostCreature.Create(Self, ALegsPosition, ADirection,
-    DefaultMaxLife, AnimationTime);
+    MaxLife, AnimationTime);
 end;
 
 { TMissileCreatureKind ---------------------------------------------------- }
@@ -1525,10 +1536,11 @@ end;
 function TMissileCreatureKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single): TCreature;
+  const AnimationTime: Single;
+  const MaxLife: Single): TCreature;
 begin
   Result := TMissileCreature.Create(Self, ALegsPosition, ADirection,
-    DefaultMaxLife, AnimationTime);
+    MaxLife, AnimationTime);
 end;
 
 procedure TMissileCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
@@ -2163,8 +2175,23 @@ constructor TWalkAttackCreature.Create(AKind: TCreatureKind;
   const AnimationTime: Single);
 begin
   inherited Create(AKind, ALegsPosition, ADirection, AMaxLife, AnimationTime);
-  FState := wasStand;
-  FStateChangeTime := AnimationTime;
+
+  if AMaxLife > 0 then
+  begin
+    FState := wasStand;
+    FStateChangeTime := AnimationTime;
+  end else
+  begin
+    { This means that the creature is created already in dead state...
+      So we start with wasDying state and set FStateChangeTime to fake
+      the fact that creature was killed long time ago.
+
+      This way the creature is created as a dead corpse, without making
+      any kind of dying (or wounded) sound or animation. }
+    FState := wasDying;
+    FStateChangeTime := AnimationTime - 1000;
+  end;
+
   WaypointsSaved := TSceneWaypointsList.Create;
 end;
 
@@ -2874,7 +2901,7 @@ begin
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
     Missile := BallMissile.CreateDefaultCreature(
       MissilePosition, MissileDirection,
-      Level.AnimationTime);
+      Level.AnimationTime, BallMissile.DefaultMaxLife);
 
     Level.Creatures.Add(Missile);
 
@@ -3032,7 +3059,7 @@ begin
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
     Missile := ThrownWeb.CreateDefaultCreature(
       MissilePosition, MissileDirection,
-      Level.AnimationTime);
+      Level.AnimationTime, ThrownWeb.DefaultMaxLife);
 
     Level.Creatures.Add(Missile);
 

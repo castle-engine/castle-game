@@ -933,12 +933,24 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
     CreatureKindName: string;
     Creature: TCreature;
     IgnoredBegin: Integer;
+    MaxLifeBegin: Integer;
+    IsMaxLife: boolean;
+    MaxLife: Single;
   begin
     { calculate CreatureKindName }
     IgnoredBegin := Pos('_', CreatureNodeName);
     if IgnoredBegin = 0 then
       CreatureKindName := CreatureNodeName else
       CreatureKindName := Copy(CreatureNodeName, 1, IgnoredBegin - 1);
+
+    { possibly calculate MaxLife by truncating last part of CreatureKindName }
+    MaxLifeBegin := CharsPos(['0'..'9'], CreatureKindName);
+    IsMaxLife := MaxLifeBegin <> 0;
+    if IsMaxLife then
+    begin
+      MaxLife := StrToFloat(SEnding(CreatureKindName, MaxLifeBegin));
+      CreatureKindName := Copy(CreatureKindName, 1, MaxLifeBegin - 1);
+    end;
 
     { calculate CreaturePosition }
     StubBoundingBox := (Node as TNodeGeneralShape).BoundingBox(State);
@@ -957,9 +969,16 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
     if not CreatureKind.Flying then
       MakeVectorsOrthoOnTheirPlane(CreatureDirection, HomeCameraUp);
 
+    { make sure that MaxLife is initialized now }
+    if not IsMaxLife then
+    begin
+      IsMaxLife := true;
+      MaxLife := CreatureKind.DefaultMaxLife;
+    end;
+
     { calculate Creature }
     Creature := CreatureKind.CreateDefaultCreature(CreaturePosition,
-      CreatureDirection, AnimationTime);
+      CreatureDirection, AnimationTime, MaxLife);
 
     FCreatures.Add(Creature);
   end;
@@ -1417,7 +1436,7 @@ begin
 
       WerewolfCreature := Werewolf.CreateDefaultCreature(
         WerewolfStartPosition,
-        Vector3Single(0, 1, 0), AnimationTime);
+        Vector3Single(0, 1, 0), AnimationTime, Werewolf.DefaultMaxLife);
       Creatures.Add(WerewolfCreature);
       WerewolfCreature.Sound3d(stWerewolfHowling, 1.0);
 
@@ -1640,7 +1659,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
       CreatureDirection := VectorSubtract(Player.Navigator.CameraPos,
         CreaturePosition);
       Creature := Ghost.CreateDefaultCreature(CreaturePosition,
-        CreatureDirection, AnimationTime);
+        CreatureDirection, AnimationTime, Ghost.DefaultMaxLife);
       FCreatures.Add(Creature);
     end;
   end;
@@ -1657,7 +1676,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
       CreatureDirection := VectorSubtract(Player.Navigator.CameraPos,
         CreaturePosition);
       Creature := Ghost.CreateDefaultCreature(CreaturePosition,
-        CreatureDirection, AnimationTime);
+        CreatureDirection, AnimationTime, Ghost.DefaultMaxLife);
       FCreatures.Add(Creature);
     end;
   end;
@@ -1945,7 +1964,7 @@ begin
           VectorSubtract(Player.Navigator.CameraPos, SpiderPosition);
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.HomeCameraUp);
         SpiderCreature := Spider.CreateDefaultCreature(
-          SpiderPosition, SpiderDirection, AnimationTime);
+          SpiderPosition, SpiderDirection, AnimationTime, Spider.DefaultMaxLife);
         Creatures.Add(SpiderCreature);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
         FSpidersAppearing.Delete(I, 1);

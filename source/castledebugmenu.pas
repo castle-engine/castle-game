@@ -384,7 +384,8 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
       Direction := Player.Navigator.CameraDir;
 
       Level.Creatures.Add(
-        Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime));
+        Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime,
+          Kind.DefaultMaxLife));
 
       UserQuit := true;
     end;
