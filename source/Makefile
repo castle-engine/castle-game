@@ -23,7 +23,11 @@ apidoc:
 	  --auto-abstract \
 	  --auto-link \
 	  --include $(UNITS_BASE_PATH)base/templates/ \
+	  --graphviz-classes --graphviz-uses \
+	  --link-gv-classes jpg --link-gv-uses jpg \
 	  *.pas
+	dot -Grankdir=LR -Tjpg -oapidoc/GVClasses.jpg apidoc/GVClasses.dot
+	dot -Grankdir=LR -Tjpg -oapidoc/GVUses.jpg apidoc/GVUses.dot
 
 clean:
 	rm -Rf apidoc
