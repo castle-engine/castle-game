@@ -111,7 +111,7 @@ type
       @unorderedList(
         @item set texture params as the main level scene
         @item optionally create triangle octree
-        @teim call PrepareRender, optionally with PrepareBackground = @true
+        @item call PrepareRender, optionally with PrepareBackground = @true
       ) }
     function LoadLevelScene(const FileName: string;
       CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;

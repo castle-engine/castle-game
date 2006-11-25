@@ -3,7 +3,7 @@
 default:
 	@echo 'Nothing to do by default in this Makefile right now'
 
-UNITS_BASE_PATH := /win/mojepasy/units/
+UNITS_BASE_PATH := /win/mojepasy/units/kambi_vrml_game_engine/
 
 # Generate docs.
 # This is just for fun (I'm a pasdoc developer after all...),
@@ -17,7 +17,7 @@ apidoc:
 	  --define FPC \
 	  --define VER2 \
 	  --define VER2_0 \
-	  --define VER2_0_2 \
+	  --define VER2_0_4 \
 	  --write-uses-list \
 	  --title 'The Castle units' \
 	  --auto-abstract \
