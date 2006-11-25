@@ -43,7 +43,6 @@ const
     (Short: #0; Long: 'no-shadows'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
     (Short: #0; Long: 'debug-log'; Argument: oaNone)
-  
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
