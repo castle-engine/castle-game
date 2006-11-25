@@ -2260,8 +2260,6 @@ var
 begin
   Result := inherited;
 
-  { TODO: test it when creatures on doom level will be placed. }
-
   if not Result then
     Exit;
 
@@ -2293,8 +2291,6 @@ var
   I: Integer;
   Door: PDoomLevelDoor;
 begin
-  { TODO: test it when creatures on doom level will be placed. }
-
   for I := Low(Doors) to High(Doors) do
   begin
     Door := @Doors[I];
@@ -2405,9 +2401,7 @@ begin
   Result := Boxes3dCollision(Door.OpenAnimation.FirstScene.BoundingBox,
     Player.BoundingBox);
 
-  { TODO: we should do the same for creatures.
-    TODO: the above code uses explicitly global Player variable,
-    this is unclean. }
+  { TODO: we should do the same for creatures. }
 end;
 
 procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
@@ -2468,6 +2462,7 @@ begin
 end;
 
 { TODO: hint box for player (Use key "p" to open doors) }
+{ TODO: don't allow to pick from large dist }
 
 function TDoomE1M1Level.SpecialObjectsTryPick(var IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single): Integer;
