@@ -35,15 +35,15 @@ var
   WasParam_NoScreenChange: boolean = false;
 
 const
-  Options: array[0..7]of TOption =
+  Options: array[0..6]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short: #0; Long: 'no-sound'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
     (Short:'n'; Long: 'no-screen-change'; Argument: oaNone),
     (Short: #0; Long: 'no-shadows'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
-    (Short: #0; Long: 'debug-render-for-level-screenshot'; Argument: oaNone),
     (Short: #0; Long: 'debug-log'; Argument: oaNone)
+  
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -71,7 +71,6 @@ begin
            'Debug options (don''t use unless you know what you''re doing):' +nl+
            '  --debug-log           Write various log info on stdout' +nl+
            '  --debug-no-creatures  Disable loading creatures animations' +nl+
-           '  --debug-render-for-level-screenshot' +nl+
            nl+
            SProgramHelpSuffix);
          ProgramBreak;
@@ -84,8 +83,7 @@ begin
     3: WasParam_NoScreenChange := true;
     4: RenderShadowsPossible := false;
     5: WasParam_DebugNoCreatures := true;
-    6: WasParam_DebugRenderForLevelScreenshot := true;
-    7: InitializeLog;
+    6: InitializeLog;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
@@ -156,8 +154,8 @@ begin
   Progress.UserInterface := ProgressGLInterface;
   { I'm turning UseDescribePosition to false, because it's usually
     confusing for the user.
-    E.g. each creature is conted as PrepareRenderSteps steps,
-    each item is conted as PrepareRenderSteps steps,
+    E.g. each creature is counted as PrepareRenderSteps steps,
+    each item is counted as PrepareRenderSteps steps,
     when loading levels user would have to know what an "octree" is. }
   Progress.UseDescribePosition := false;
 

@@ -101,7 +101,7 @@ var
   AutoOpenInventory: boolean;
 
 var
-  WasParam_DebugRenderForLevelScreenshot: boolean = false;
+  DebugRenderForLevelScreenshot: boolean = false;
 
 implementation
 
@@ -357,7 +357,7 @@ procedure Draw(Glwin: TGLWindow);
       collisions when MovingPlayerEndSequence). }
     if not GameWin then
       Level.Creatures.Render(Player.Navigator.Frustum, Transparent);
-    if not WasParam_DebugRenderForLevelScreenshot then
+    if not DebugRenderForLevelScreenshot then
       Level.Items.Render(Player.Navigator.Frustum, Transparent);
   end;
 
@@ -489,7 +489,7 @@ begin
 
   Player.RenderAttack;
 
-  if not WasParam_DebugRenderForLevelScreenshot then
+  if not DebugRenderForLevelScreenshot then
   begin
     glPushAttrib(GL_ENABLE_BIT);
       glDisable(GL_LIGHTING);

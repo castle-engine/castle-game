@@ -46,6 +46,7 @@ type
 
   TDebugMenu = class(TCastleMenu)
     RenderBoundingBoxesArgument: TGLMenuBooleanArgument;
+    DebugRenderForLevelScreenshotArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
   end;
@@ -138,11 +139,15 @@ begin
   inherited Create;
 
   RenderBoundingBoxesArgument := TGLMenuBooleanArgument.Create(RenderBoundingBoxes);
+  DebugRenderForLevelScreenshotArgument := TGLMenuBooleanArgument.Create(
+    DebugRenderForLevelScreenshot);
 
   Items.Add('Player debug menu');
   Items.Add('Creatures debug menu');
   Items.Add('Items debug menu');
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
+  Items.AddObject('Render for level screenshot',
+    DebugRenderForLevelScreenshotArgument);
   Items.Add('Change to level');
   Items.Add('Change sound properties');
   Items.Add('Edit lights');
@@ -252,15 +257,20 @@ begin
          RenderBoundingBoxes := not RenderBoundingBoxes;
          RenderBoundingBoxesArgument.Value := RenderBoundingBoxes;
        end;
-    4: ChangeToLevel;
-    5: ChangeSoundProperties;
-    6: begin
+    4: begin
+         DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
+         DebugRenderForLevelScreenshotArgument.Value :=
+           DebugRenderForLevelScreenshot;
+       end;
+    5: ChangeToLevel;
+    6: ChangeSoundProperties;
+    7: begin
          FreeAndNil(EditLevelLightsMenu);
          EditLevelLightsMenu := TEditLevelLightsMenu.Create;
          CurrentMenu := EditLevelLightsMenu;
        end;
-    7: ForceThunder;
-    8: UserQuit := true;
+    8: ForceThunder;
+    9: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
