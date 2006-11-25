@@ -89,6 +89,8 @@ type
     FGlobalAmbientLight: TVector4Single;
     FThunderEffect: TThunderEffect;
   protected
+    FBossCreature: TCreature;
+
     { See README for description of LevelBox and HintButtonBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
       find and remove the node from Scene). }
@@ -340,6 +342,10 @@ type
       our destructor will free it. }
     property ThunderEffect: TThunderEffect
       read FThunderEffect write FThunderEffect;
+
+    { Instance of boss creature, if any, on the level. @nil is no boss creature
+      exists on this level. }
+    property BossCreature: TCreature read FBossCreature;
   end;
 
   TLevelClass = class of TLevel;
@@ -1415,6 +1421,8 @@ begin
       Creatures.Add(WerewolfCreature);
       WerewolfCreature.Sound3d(stWerewolfHowling, 1.0);
 
+      FBossCreature := WerewolfCreature;
+
       Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
     end;
   end;
@@ -1767,6 +1775,8 @@ end;
 { TCagesLevel ---------------------------------------------------------------- }
 
 constructor TCagesLevel.Create;
+var
+  BossIndex: Integer;
 begin
   inherited;
 
@@ -1796,6 +1806,10 @@ begin
   FGateExit := LoadLevelScene(
     CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
     true, false);
+
+  BossIndex := Creatures.FindKind(SpiderQueen);
+  if BossIndex <> -1 then
+    FBossCreature := Creatures[BossIndex];
 end;
 
 destructor TCagesLevel.Destroy;

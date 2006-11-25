@@ -342,7 +342,7 @@ uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, OpenAL, CastleControlsMenu,
-  CastleTimeMessages, KambiXMLCfg, CastleCreatures;
+  CastleTimeMessages, KambiXMLCfg;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -603,14 +603,11 @@ var
 begin
   RenderLifeIndicator(Life, MaxLife, GLList_RedIndicatorImage, 0, true);
 
-  BossIndex := Level.Creatures.FindKind(SpiderQueen);
-  if BossIndex = -1 then
-    BossIndex := Level.Creatures.FindKind(Werewolf);
-  if (BossIndex <> -1) and (not Level.Creatures[BossIndex].Dead) then
+  if (Level.BossCreature <> nil) and (not Level.BossCreature.Dead) then
   begin
     RenderLifeIndicator(
-      Level.Creatures[BossIndex].Life,
-      Level.Creatures[BossIndex].MaxLife,
+      Level.BossCreature.Life,
+      Level.BossCreature.MaxLife,
       GLList_BossIndicatorImage, RequiredScreenWidth - 150, false);
   end;
 
