@@ -51,7 +51,7 @@ begin
   case OptionNum of
     0: begin
          InfoWrite(
-           'castle.' +nl+
+           SCastleVersionWWW +nl+
            nl+
            'Options:' +nl+
            HelpOptionHelp +nl+
@@ -69,9 +69,7 @@ begin
            nl+
            'Debug options (don''t use unless you know what you''re doing):' +nl+
            '  --debug-log           Write various log info on stdout' +nl+
-           '  --debug-no-creatures  Disable loading creatures animations' +nl+
-           nl+
-           SProgramHelpSuffix);
+           '  --debug-no-creatures  Disable loading creatures animations');
          ProgramBreak;
        end;
     1: WasParam_NoSound := true;

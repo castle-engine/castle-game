@@ -26,9 +26,9 @@ interface
 const
   Version = '0.6.6';
 
-procedure ShowCreditsMessage;
+function SCastleVersionWWW: string;
 
-function SProgramHelpSuffix: string;
+procedure ShowCreditsMessage;
 
 procedure ViewGameMessages;
 
@@ -37,17 +37,17 @@ implementation
 uses SysUtils, Classes, GLWinMessages, CastleWindow, KambiUtils, CastlePlay,
   CastleTimeMessages;
 
-procedure ShowCreditsMessage;
-begin
-  { TODO: put here credits from README etc. }
-  MessageOK(Glw, SProgramHelpSuffix, taLeft);
-end;
-
-function SProgramHelpSuffix: string;
+function SCastleVersionWWW: string;
 begin
   Result :=
     ApplicationName + ' version ' + Version + '.' +nl+
-    'WWW: http://www.camelot.homedns.org/~michalis/castle.php' +nl+
+    'WWW: http://www.camelot.homedns.org/~michalis/castle.php';
+end;
+
+procedure ShowCreditsMessage;
+begin
+  MessageOK(Glw,
+    SCastleVersionWWW + nl +
     nl+
     'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
     nl+
@@ -58,7 +58,7 @@ begin
     'And probably some more stuff that I don''t remember right now :) ' +
     'Thanks!' +nl+
     nl+
-    'Compiled with ' + SCompilerDescription +'.';
+    'Compiled with ' + SCompilerDescription +'.', taLeft);
 end;
 
 procedure ViewGameMessages;
