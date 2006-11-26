@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<!--
+  This file configures many aspects of items' kinds.
+  For the documentation and default values of properties that you can
+  set here see TObjectKind, TItemKind and descendants
+  classes documentation (in units CastleObjectKinds and CastleItems).
+
+  This file is read each time when the program starts.
+  When you manually change this file, you can also force reloading this file
+  into the game by command "Reload items/kinds.xml file"
+  in "Debug options" menu. This way you can test various settings
+  without restarting the game.
+-->
+
+<CONFIG>
+  <LifePotion
+    transparent="True"
+  />
+</CONFIG>

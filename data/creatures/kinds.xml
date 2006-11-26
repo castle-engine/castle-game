@@ -6,7 +6,7 @@
   set here see TObjectKind, TCreatureKind and descendants
   classes documentation (in units CastleObjectKinds and CastleCreatures).
 
-  This file is read when "Loading creatures" in the game.
+  This file is read each time when the program starts.
   When you manually change this file, you can also force reloading this file
   into the game by command "Reload creatures/kinds.xml file"
   in "Debug options" menu.

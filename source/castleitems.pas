@@ -129,6 +129,10 @@ type
 
     { Call FreePrepareRender for all items. }
     procedure FreePrepareRender;
+
+    { This opens items/kinds.xml file and calls LoadFromFile for
+      all existing TItemKind instances. }
+    procedure LoadFromFile;
   end;
 
   TItemPotionOfLifeKind = class(TItemKind)
@@ -360,7 +364,8 @@ implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
   KambiGLUtils, CastlePlay, KambiFilesUtils, ProgressUnit,
-  CastleCreatures, CastleVideoOptions, CastleTimeMessages;
+  CastleCreatures, CastleVideoOptions, CastleTimeMessages,
+  KambiXMLCfg;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -453,7 +458,7 @@ begin
       'items' + PathDelim + 'models' + PathDelim + ModelFileName, false),
       true, roSeparateShapeStates, GLContextCache);
 
-    AttributesSet(Scene.Attributes);
+    AttributesSet(Scene.Attributes, BlendingType);
     Scene.PrepareRender(false, true, false, false);
   end;
 
@@ -510,6 +515,23 @@ var
 begin
   for I := 0 to High do
     Items[I].FreePrepareRender;
+end;
+
+procedure TItemKindsList.LoadFromFile;
+var
+  I: Integer;
+  KindsConfig: TKamXMLConfig;
+begin
+  KindsConfig := TKamXMLConfig.Create(nil);
+  try
+    KindsConfig.FileName := ProgramDataPath + 'data' + PathDelim +
+      'items' + PathDelim + 'kinds.xml';
+
+    for I := 0 to High do
+    begin
+      Items[I].LoadFromFile(KindsConfig);
+    end;
+  finally SysUtils.FreeAndNil(KindsConfig); end;
 end;
 
 { TItemPotionOfLifeKind ---------------------------------------------------- }
@@ -969,7 +991,6 @@ begin
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
     'LifePotion', 'Potion of Life', 'life_potion.png');
-  LifePotion.Transparent := true;
 
   ScrollOfFlying := TItemScrollOfFlyingKind.Create('scroll_final.wrl',
     'ScrFlying', 'Scroll Of Flying', 'scroll.png');
@@ -982,6 +1003,8 @@ begin
 
   Quiver := TItemKind.Create('quiver.wrl',
     'Arrow', 'Arrow', 'quiver.png');
+
+  ItemsKinds.LoadFromFile;
 end;
 
 procedure DoFinalization;

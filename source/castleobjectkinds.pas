@@ -23,7 +23,8 @@ unit CastleObjectKinds;
 
 interface
 
-uses Classes, KambiXMLCfg, VRMLGLAnimation, VRMLGLAnimationInfo;
+uses Classes, KambiXMLCfg, VRMLGLAnimation, VRMLGLAnimationInfo,
+  CastleVideoOptions;
 
 const
   DefaultTransparent = false;
@@ -35,6 +36,7 @@ type
     FTransparent: boolean;
     FVRMLNodeName: string;
     FPrepareRenderDone: boolean;
+    FBlendingType: TBlendingType;
   protected
     { This should release everything done by PrepareRender.
 
@@ -118,6 +120,9 @@ type
     property Transparent: boolean
       read FTransparent write FTransparent default DefaultTransparent;
 
+    property BlendingType: TBlendingType
+      read FBlendingType write FBlendingType default DefaultBlendingType;
+
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); virtual;
 
     { This is a debug command, will cause FreePrepareRender
@@ -129,13 +134,14 @@ type
 
 implementation
 
-uses SysUtils, ProgressUnit, Object3dAsVRML, CastleVideoOptions, CastleLog;
+uses SysUtils, ProgressUnit, Object3dAsVRML, CastleLog;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
   inherited Create;
   FVRMLNodeName := AVRMLNodeName;
   FTransparent := DefaultTransparent;
+  FBlendingType := DefaultBlendingType;
   FirstRootNodesPool := TStringList.Create;
 end;
 
@@ -183,9 +189,22 @@ begin
 end;
 
 procedure TObjectKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+const
+  SBlendingTypeIncrease = 'increase';
+  SBlendingTypeScale = 'scale';
+var
+  SBlendingType: string;
 begin
   Transparent := KindsConfig.GetValue(VRMLNodeName + '/transparent',
     DefaultTransparent);
+
+  SBlendingType := KindsConfig.GetValue(VRMLNodeName + '/blending_type',
+    SBlendingTypeIncrease);
+  if SBlendingType = SBlendingTypeIncrease then
+    BlendingType := btIncrease else
+  if SBlendingType = SBlendingTypeScale then
+    BlendingType := btScale else
+    raise Exception.CreateFmt('Wrong blending_type value "%s"', [SBlendingType]);
 end;
 
 procedure TObjectKind.RedoPrepareRender;
@@ -238,10 +257,10 @@ begin
           Anim.ScenesCount,
           Anim.Scenes[0].TrianglesCount(true) ]));
 
-    AnimationAttributesSet(Anim.Attributes);
+    AnimationAttributesSet(Anim.Attributes, BlendingType);
     Anim.PrepareRender(DoPrepareBackground, DoPrepareBoundingBox,
       DoPrepareTrianglesListNotOverTriangulate,
-      DoPrepareTrianglesListOverTriangulate, false, 
+      DoPrepareTrianglesListOverTriangulate, false,
       { It's temporary false --- see ../TODO file about
         "Wrong Alien dying anim" problem. }
       false);

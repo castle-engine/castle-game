@@ -711,7 +711,7 @@ begin
     { initialize FAnimationTime. Must be initialized before creating creatures. }
     FAnimationTime := 0.0;
 
-    AttributesSet(Scene.Attributes);
+    AttributesSet(Scene.Attributes, btIncrease);
 
     { Calculate HomeCameraPos, HomeCameraDir, HomeCameraUp.
       Must be done before initializing creatures, as they right now
@@ -1152,7 +1152,7 @@ function TLevel.LoadLevelScene(const FileName: string;
 begin
   Result := TVRMLFlatSceneGL.Create(LoadVRMLNode(FileName),
     true, roSeparateShapeStates, GLContextCache);
-  AttributesSet(Result.Attributes);
+  AttributesSet(Result.Attributes, btIncrease);
 
   Result.PrepareRender(PrepareBackground,
     true { true, because this is almost always needed anyway }, false, false);

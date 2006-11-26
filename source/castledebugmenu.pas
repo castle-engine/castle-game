@@ -422,6 +422,7 @@ begin
   inherited Create;
 
   Items.Add('Give me 20 instances of every possible item');
+  Items.Add('Reload items/kinds.xml file');
   Items.Add('Reload animations/models of specific item');
   Items.Add('Back');
 
@@ -469,8 +470,9 @@ begin
 
   case CurrentItem of
     0: GiveItems;
-    1: ReloadItemAnimation;
-    2: CurrentMenu := DebugMenu;
+    1: ItemsKinds.LoadFromFile;
+    2: ReloadItemAnimation;
+    3: CurrentMenu := DebugMenu;
   end;
 end;
 
