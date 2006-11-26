@@ -28,7 +28,7 @@ uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, GLHeadlight, CastleThunder,
-  ProgressUnit, VRMLGLAnimation;
+  ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix;
 
 {$define read_interface}
 
@@ -528,24 +528,53 @@ type
       SpecialObjectIndex: Integer); override;
   end;
 
-  TDoomLevelDoor = record
-    { Constant fields, i.e. once set in level constructor.
+  TDoomLevelDoor = class
+  private
+    UsedSound: TALAllocatedSource;
+    procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    { Constant fields, i.e. once set in TDoomE1M1Level constructor.
+      Scene should have door placed in closed position.
       @groupBegin }
-    ClosedSceneFileName, OpenSceneFileName: string;
+    SceneFileName: string;
     OpenCloseTime: Single;
+    OpenMove: TVector3_Single;
     StayOpenTime: Single;
     { @groupEnd }
 
-    { Variable fields, they change during level lifetime.
-      They are calculated automatically in level constructor
+    { Constants fields set in level constructor
+      (uniformly for all doors). }
+    ParentLevel: TLevel;
+    Scene: TVRMLFlatSceneGL;
+
+    { Variable fields. They may change during level lifetime.
+      They are initialized automatically in level constructor
       from constant fields above.
       @groupBegin }
-    OpenAnimation: TVRMLGLAnimation;
     Open: boolean;
     OpenStateChangeTime: Single;
     { @groupEnd }
+
+    procedure DoOpen;
+    procedure DoClose;
+    procedure RevertDoOpen;
+
+    function SceneTranslation(const AnimationTime: Single): TVector3_Single;
+
+    function CompletelyOpen: boolean;
+    function CompletelyClosed: boolean;
+
+    function MoveAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const CameraRadius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+
+    function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
   end;
-  PDoomLevelDoor = ^TDoomLevelDoor;
 
   TDoomE1M1Level = class(TLevel)
   private
@@ -561,8 +590,6 @@ type
       const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean;
-
-    function SomethingBlocksClosingDoor(const Door: TDoomLevelDoor): boolean;
 
     procedure RenameCreatures(Node: TVRMLNode);
   protected
@@ -2165,13 +2192,153 @@ begin
   end;
 end;
 
-{ TDoomE1M1Level ---------------------------------------------------------------- }
+{ TDoomLevelDoor ------------------------------------------------------------- }
+
+constructor TDoomLevelDoor.Create;
+begin
+  inherited;
+end;
+
+destructor TDoomLevelDoor.Destroy;
+begin
+  if UsedSound <> nil then
+  begin
+    { We detach ourselved from UsedSound, but we let UsedSound to eventually
+      continue playing. }
+    UsedSound.OnUsingEnd := nil;
+    UsedSound := nil;
+  end;
+
+  inherited;
+end;
+
+procedure TDoomLevelDoor.SoundSourceUsingEnd(Sender: TALAllocatedSource);
+begin
+  Assert(Sender = UsedSound);
+  UsedSound.OnUsingEnd := nil;
+  UsedSound := nil;
+end;
+
+procedure TDoomLevelDoor.DoOpen;
+begin
+  Open := true;
+  OpenStateChangeTime := ParentLevel.AnimationTime;
+
+  { Door can play only one sound at a time. }
+  if UsedSound <> nil then
+    UsedSound.DoUsingEnd;
+  UsedSound := Sound(stDoorOpen);
+  if UsedSound <> nil then
+    UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
+end;
+
+procedure TDoomLevelDoor.DoClose;
+begin
+  Open := false;
+  OpenStateChangeTime := ParentLevel.AnimationTime;
+
+  { Door can play only one sound at a time. }
+  if UsedSound <> nil then
+    UsedSound.DoUsingEnd;
+  UsedSound := Sound(stDoorClose);
+  if UsedSound <> nil then
+    UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
+end;
+
+procedure TDoomLevelDoor.RevertDoOpen;
+begin
+  Open := true;
+  OpenStateChangeTime := { ParentLevel.AnimationTime -
+    (OpenCloseTime - (ParentLevel.AnimationTime - OpenStateChangeTime)) }
+    { simplified : }
+    2 * ParentLevel.AnimationTime - OpenCloseTime - OpenStateChangeTime;
+
+  { Door can play only one sound at a time. }
+  if UsedSound <> nil then
+    UsedSound.DoUsingEnd;
+  UsedSound := Sound(stDoorOpen);
+  if UsedSound <> nil then
+    UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
+end;
+
+function TDoomLevelDoor.SceneTranslation(const AnimationTime: Single):
+  TVector3_Single;
+begin
+  if not Open then
+  begin
+    if AnimationTime - OpenStateChangeTime > OpenCloseTime then
+      { Completely closed. }
+      Result.Init_Zero else
+      { During closing. }
+      Result := OpenMove *
+        (1 - (AnimationTime - OpenStateChangeTime) / OpenCloseTime);
+  end else
+  begin
+    if AnimationTime - OpenStateChangeTime > OpenCloseTime then
+      { Completely open. }
+      Result := OpenMove else
+      { During opening. }
+      Result := OpenMove *
+        ((AnimationTime - OpenStateChangeTime) / OpenCloseTime);
+  end;
+end;
+
+function TDoomLevelDoor.CompletelyOpen: boolean;
+begin
+  Result := Open and
+    (ParentLevel.AnimationTime - OpenStateChangeTime > OpenCloseTime);
+end;
+
+function TDoomLevelDoor.CompletelyClosed: boolean;
+begin
+  Result := (not Open) and
+    (ParentLevel.AnimationTime - OpenStateChangeTime > OpenCloseTime);
+end;
+
+function TDoomLevelDoor.MoveAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const CameraRadius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  T: TVector3_Single;
+begin
+  { I have to check collision between
+      Scene + SceneTranslation and (OldPos, ProposedNewPos).
+    So it's equivalent to checking for collision between
+      Scene and (OldPos, ProposedNewPos) - SceneTranslation
+    And this way I can use Scene.DefaultTriangleOctree.MoveAllowedSimple. }
+
+  T := SceneTranslation(ParentLevel.AnimationTime);
+  Result := Scene.DefaultTriangleOctree.MoveAllowedSimple(
+    VectorSubtract(OldPos, T.Data),
+    VectorSubtract(ProposedNewPos, T.Data),
+    CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
+end;
+
+function TDoomLevelDoor.SegmentCollision(const Pos1, Pos2: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  T: TVector3_Single;
+begin
+  { We use the same trick as in TDoomLevelDoor.MoveAllowedSimple to
+    use Scene.DefaultTriangleOctree.SegmentCollsion with
+    SceneTranslation. }
+
+  T := SceneTranslation(ParentLevel.AnimationTime);
+  Result := Scene.DefaultTriangleOctree.SegmentCollision(
+    VectorSubtract(Pos1, T.Data),
+    VectorSubtract(Pos2, T.Data),
+    false, NoItemIndex, false, ItemsToIgnoreFunc)
+    <> NoItemIndex;
+end;
+
+{ TDoomE1M1Level ------------------------------------------------------------- }
 
 constructor TDoomE1M1Level.Create;
 var
   DoomDoorsPathPrefix: string;
   I: Integer;
-  Door: PDoomLevelDoor;
+  Door: TDoomLevelDoor;
 begin
   inherited;
 
@@ -2184,9 +2351,10 @@ begin
     Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
   end;
 
-  Doors[0].ClosedSceneFileName := 'door2_3_closed.wrl';
-  Doors[0].OpenSceneFileName := 'door2_3_open.wrl';
+  Doors[0] := TDoomLevelDoor.Create;
+  Doors[0].SceneFileName := 'door2_3_closed.wrl';
   Doors[0].OpenCloseTime := 1.0;
+  Doors[0].OpenMove.Init(0, 0, 7/2);
   Doors[0].StayOpenTime := 5.0;
 
   DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +
@@ -2194,29 +2362,21 @@ begin
 
   for I := Low(Doors) to High(Doors) do
   begin
-    Door := @Doors[I];
+    Door := Doors[I];
 
-    { prepare Door^.OpenAnimation }
-    Door^.OpenAnimation := TVRMLGLAnimation.Create(
-      [ LoadVRMLNode(DoomDoorsPathPrefix + Door^.ClosedSceneFileName),
-        LoadVRMLNode(DoomDoorsPathPrefix + Door^.OpenSceneFileName) ],
-      true,
-      [ 0, Door^.OpenCloseTime ],
-      100 { door animation should be perfectly memory-optimized,
-            so we can give here a really large value for ScenesPerTime },
-      roSeparateShapeStatesNoTransform, 0.1, GLContextCache);
-    AnimationAttributesSet(Door^.OpenAnimation.Attributes);
-    Door^.OpenAnimation.PrepareRender(false, true, false, false, false, false);
-    Door^.OpenAnimation.FirstScene.DefaultTriangleOctree :=
-      Door^.OpenAnimation.FirstScene.CreateTriangleOctree('');
-    Door^.OpenAnimation.LastScene.DefaultTriangleOctree :=
-      Door^.OpenAnimation.LastScene.CreateTriangleOctree('');
+    Door.ParentLevel := Self;
+
+    { prepare Door.Scene }
+    Door.Scene := LoadLevelScene(DoomDoorsPathPrefix + Door.SceneFileName,
+      true, false);
 
     { All doors are initially closed.
-      We set Door^.OpenStateChangeTime to a past time, to be sure
+      We set Door.OpenStateChangeTime to a past time, to be sure
       that we don't treat the door as "closing right now". }
-    Door^.Open := false;
-    Door^.OpenStateChangeTime := - 10 * Door^.OpenCloseTime;
+    Door.Open := false;
+    Door.OpenStateChangeTime := - 10 * Door.OpenCloseTime;
+
+    Door.UsedSound := nil;
   end;
 end;
 
@@ -2226,7 +2386,8 @@ var
 begin
   for I := Low(Doors) to High(Doors) do
   begin
-    FreeAndNil(Doors[I].OpenAnimation);
+    FreeAndNil(Doors[I].Scene);
+    FreeAndNil(Doors[I]);
   end;
 
   inherited;
@@ -2256,7 +2417,7 @@ function TDoomE1M1Level.LineOfSight(
   const Pos1, Pos2: TVector3Single): boolean;
 var
   I: Integer;
-  Door: PDoomLevelDoor;
+  Door: TDoomLevelDoor;
 begin
   Result := inherited;
 
@@ -2265,16 +2426,10 @@ begin
 
   for I := Low(Doors) to High(Doors) do
   begin
-    Door := @Doors[I];
+    Door := Doors[I];
 
-    { Only if the door is completely closed
-      (and not during closing right now) it is blocking creature view. }
-    if (not Door^.Open) and
-      (AnimationTime - Door^.OpenStateChangeTime > Door^.OpenCloseTime) and
-      (Door^.OpenAnimation.Scenes[0].DefaultTriangleOctree.SegmentCollision(
-        Pos1, Pos2, false, NoItemIndex, false,
-        @Door^.OpenAnimation.Scenes[0].DefaultTriangleOctree.IgnoreTransparentItem)
-        <> NoItemIndex) then
+    if Door.SegmentCollision(Pos1, Pos2,
+      @Scene.DefaultTriangleOctree.IgnoreTransparentItem) then
     begin
       Result := false;
       Exit;
@@ -2289,36 +2444,17 @@ function TDoomE1M1Level.MoveAllowedAdditionalSimple(
   const MovingObjectCameraRadius: Single): boolean;
 var
   I: Integer;
-  Door: PDoomLevelDoor;
 begin
   for I := Low(Doors) to High(Doors) do
   begin
-    Door := @Doors[I];
-
-    { The door that is completely closed or is during opening or closing
-      blocks every move (with it's "closed box", i.e. the largest box).
-      This is stronger condition than for LineOfSight,
-      since nor player neither creatures may be ever allowed to
-      break collision detection. }
-    if ( (not Door^.Open) or
-         (AnimationTime - Door^.OpenStateChangeTime <= Door^.OpenCloseTime)) and
-       (not Door^.OpenAnimation.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
-         CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil)) then
+    if not Doors[I].MoveAllowedSimple(CameraPos, NewPos,
+      MovingObjectCameraRadius, nil) then
     begin
       Result := false;
       Exit;
-    end else
-    { We cannot just ignore other cases (when the door is completely open).
-      We have to check for collision here. Otherwise user could get
-      strange things if he will stand right under open door and jump high
-      --- he could jump through the door ! }
-    if (not Door^.OpenAnimation.LastScene.DefaultTriangleOctree.MoveAllowedSimple(
-      CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil)) then
-    begin
-      Result := false;
-      Exit;
-    end
+    end;
   end;
+
   Result := true;
 end;
 
@@ -2348,116 +2484,87 @@ end;
 procedure TDoomE1M1Level.GetCameraHeight(const CameraPos: TVector3Single;
   out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
-No need to override, since all doors open up ?
+No need to override, since all doors open upward ?
 }
 
 procedure TDoomE1M1Level.Render(const Frustum: TFrustum);
 var
   I: Integer;
-  Door: PDoomLevelDoor;
+  Door: TDoomLevelDoor;
 begin
   inherited;
 
   for I := Low(Doors) to High(Doors) do
   begin
-    Door := @Doors[I];
+    Door := Doors[I];
 
-    if not Door^.Open then
-    begin
-      if AnimationTime - Door^.OpenStateChangeTime > Door^.OpenCloseTime then
+    { The completely closed door is the most common case
+      (since all doors close automatically, and initially all are closed...).
+      Fortunately, it's also the case when we have constructed an octree,
+      so we can efficiently render it by RenderFrustum call. }
+    if Door.CompletelyClosed then
+      Door.Scene.RenderFrustum(Frustum) else
       begin
-        { The completely closed door is the most common case
-          (since all doors close automatically, and initially all are closed...).
-          Fortunately, it's also the case when we have constructed an octree,
-          so we can efficiently render it by RenderFrustum call. }
-        Door^.OpenAnimation.FirstScene.RenderFrustum(Frustum);
-      end else
-      begin
-        { Then it is during closing (since "complete close" case was handled
-          earlier). We perform OpenAnimation, but backwards
-          (that's why initial "Door^.OpenCloseTime -", to reverse the time). }
-        Door^.OpenAnimation.SceneFromTime(Door^.OpenCloseTime -
-          (AnimationTime - Door^.OpenStateChangeTime)).Render(nil);
+        glPushMatrix;
+          glTranslatev(Door.SceneTranslation(AnimationTime));
+          Door.Scene.Render(nil);
+        glPopMatrix;
       end;
-    end else
-    begin
-      if AnimationTime - Door^.OpenStateChangeTime > Door^.OpenCloseTime then
-      begin
-        { The door is completely open. }
-        Door^.OpenAnimation.LastScene.RenderFrustum(Frustum);
-      end else
-      begin
-        { The door is during opening. }
-        Door^.OpenAnimation.SceneFromTime(AnimationTime -
-          Door^.OpenStateChangeTime).Render(nil);
-      end;
-    end;
   end;
-end;
-
-function TDoomE1M1Level.SomethingBlocksClosingDoor(const Door: TDoomLevelDoor):
-  boolean;
-begin
-  Result := Boxes3dCollision(Door.OpenAnimation.FirstScene.BoundingBox,
-    Player.BoundingBox);
-
-  { TODO: we should do the same for creatures. }
 end;
 
 procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
+
+  function SomethingWillBlockClosingDoor(const Door: TDoomLevelDoor;
+    const NewAnimationTime: Single): boolean;
+  var
+    DoorBox: TBox3d;
+  begin
+    DoorBox := Box3dTranslate(Door.Scene.BoundingBox,
+      Door.SceneTranslation(NewAnimationTime));
+    Result := Boxes3dCollision(DoorBox, Player.BoundingBox);
+
+    { TODO: we should do the same for creatures. }
+  end;
+
 var
   I: Integer;
-  Door: PDoomLevelDoor;
+  Door: TDoomLevelDoor;
+  NewAnimationTime: Single;
 begin
   { First (before calling inherited) check for all the doors
-    that are during closing: if the player or creatures possibly collide
-    with them, then we must stop and open again (to avoid
-    entering into collision with player because of player moves)
-
-    In theory we should switch here Door^.Open to @true
-    and do something intelligent to Door^.OpenStateChangeTime,
-    so that the opening is exactly at the same point as closing.
-    In practice this doesn't matter (at least for now), since
-    we always with door's fully closed octree, so the collision
-    will be detected practically immediately and we can simply set
-    Door^.OpenStateChangeTime to something to avoid any animation
-    at all.
-
-    In fact, right now this check is useless. The useful analogy
-    of this check is done later, right *before we even start closing*. }
+    that are during closing: if the player or creatures will collide
+    with them after inherited will change AnimationTime,
+    then we must stop and open again (to avoid
+    entering into collision with player/creature because of
+    door move). }
+  NewAnimationTime := AnimationTime + CompSpeed / 50;
   for I := Low(Doors) to High(Doors) do
   begin
-    Door := @Doors[I];
+    Door := Doors[I];
 
-    if (not Door^.Open) and
-      (AnimationTime - Door^.OpenStateChangeTime < Door^.OpenCloseTime) and
-      SomethingBlocksClosingDoor(Door^) then
-    begin
-      Door^.Open := true;
-      Door^.OpenStateChangeTime := AnimationTime - 10 * Door^.OpenCloseTime;
-    end;
+    if (not Door.Open) and
+      (AnimationTime - Door.OpenStateChangeTime < Door.OpenCloseTime) and
+      SomethingWillBlockClosingDoor(Door, NewAnimationTime) then
+      Door.RevertDoOpen;
   end;
 
   inherited;
 
   for I := Low(Doors) to High(Doors) do
   begin
-    Door := @Doors[I];
+    Door := Doors[I];
 
-    if Door^.Open and
-      (AnimationTime - Door^.OpenStateChangeTime >
-        Door^.OpenCloseTime + Door^.StayOpenTime) and
-      { We must do the check for SomethingBlocksClosingDoor also here,
-        not only before "inherited" --- otherwise player/creature standing
-        right under the open door wouldn't be able to move, because the door
-        would constantly swap between "completely open" and "during closing". }
-      (not SomethingBlocksClosingDoor(Door^)) then
-    begin
-      Door := @Doors[I];
-      Door^.Open := false;
-      Door^.OpenStateChangeTime := AnimationTime;
-      { TODO: play sound }
-    end;
+    if Door.Open and
+      (AnimationTime - Door.OpenStateChangeTime >
+        Door.OpenCloseTime + Door.StayOpenTime) then
+      Door.DoClose;
+
+    { If the door open/close sound is longer than the Door.OpenCloseTime,
+      stop this sound after the door is completely opened/closed. }
+    if (AnimationTime - Door.OpenStateChangeTime > Door.OpenCloseTime) and
+      (Door.UsedSound <> nil) then
+      Door.UsedSound.DoUsingEnd;
   end
 end;
 
@@ -2484,38 +2591,30 @@ function TDoomE1M1Level.SpecialObjectsTryPick(var IntersectionDistance: Single;
 
 var
   I: Integer;
-  Door: PDoomLevelDoor;
+  Door: TDoomLevelDoor;
 begin
   Result := inherited SpecialObjectsTryPick(
     IntersectionDistance, Ray0, RayVector);
 
   for I := Low(Doors) to High(Doors) do
   begin
-    Door := @Doors[I];
+    Door := Doors[I];
 
     { Only if the door is completely closed
       (and not during closing right now) we allow player to "pick" it
       (i.e. which will cause open). }
-    if (not Door^.Open) and
-      (AnimationTime - Door^.OpenStateChangeTime > Door^.OpenCloseTime) then
-      MakeBonusScene(Door^.OpenAnimation.FirstScene, I);
+    if Door.CompletelyClosed then
+      MakeBonusScene(Door.Scene, I);
   end;
 end;
 
 procedure TDoomE1M1Level.SpecialObjectPicked(const Distance: Single;
   SpecialObjectIndex: Integer);
-var
-  Door: PDoomLevelDoor;
 begin
   inherited;
 
   if Between(SpecialObjectIndex, Low(Doors), High(Doors)) then
-  begin
-    Door := @Doors[SpecialObjectIndex];
-    Door^.Open := true;
-    Door^.OpenStateChangeTime := AnimationTime;
-    { TODO: play sound }
-  end;
+    Doors[SpecialObjectIndex].DoOpen;
 end;
 
 procedure TDoomE1M1Level.RenameCreatures(Node: TVRMLNode);

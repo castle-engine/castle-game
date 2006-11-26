@@ -86,6 +86,8 @@ type
     stSacrilegeAmbush,
     stEvilLaugh,
     stDoomE1M1Music,
+    stDoorOpen,
+    stDoorClose,
     { @groupEnd }
 
     { Creatures sounds.
@@ -281,6 +283,8 @@ const
     'sacrilege_ambush',
     'evil_laugh',
     'doom_e1m1',
+    'door_open',
+    'door_close',
     'creature_falled_down',
     'alien_sudden_pain',
     'alien_dying',
