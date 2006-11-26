@@ -9,6 +9,8 @@
 
 - bow must work better to really appreciate the doom level !
 - fire over barrels - pixel pracht finally ?
+- werewolf cannot crawl inside DOOM E1M1 corridor between room 1st and 3rd
+  too large bounding sphere
 
 ----------------------------------------
 

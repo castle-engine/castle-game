@@ -2519,12 +2519,21 @@ procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
     const NewAnimationTime: Single): boolean;
   var
     DoorBox: TBox3d;
+    I: Integer;
   begin
     DoorBox := Box3dTranslate(Door.Scene.BoundingBox,
       Door.SceneTranslation(NewAnimationTime));
-    Result := Boxes3dCollision(DoorBox, Player.BoundingBox);
 
-    { TODO: we should do the same for creatures. }
+    Result := Boxes3dCollision(DoorBox, Player.BoundingBox);
+    if Result then
+      Exit;
+
+    for I := 0 to Creatures.High do
+    begin
+      Result := Boxes3dCollision(DoorBox, Creatures[I].BoundingBox);
+      if Result then
+        Exit;
+    end;
   end;
 
 var
