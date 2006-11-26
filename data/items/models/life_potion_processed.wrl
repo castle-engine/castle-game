@@ -11,14 +11,14 @@ Switch {
 		diffuseColor 0.628384 0.628321 0.628321
 		specularColor 0.318703 0.318671 0.318671
 		shininess 0.500000 
-		transparency 0.532703 
+		transparency 0.691298 
 	}
 	DEF MatInside
 	Material {
 		diffuseColor 0.693784 0.094331 0.094331
 		specularColor 0.293929 0.293899 0.293899
 		shininess 0.500000 
-		transparency 0.111496 
+		transparency 0.538481 
 	}
 	DEF Cube
 	Separator {
