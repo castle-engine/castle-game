@@ -592,6 +592,9 @@ type
       const MovingObjectCameraRadius: Single): boolean;
 
     procedure RenameCreatures(Node: TVRMLNode);
+
+    FHintOpenDoorBox: TBox3d;
+    HintOpenDoorShown: boolean;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -1941,6 +1944,7 @@ var
   I: Integer;
   SpiderCreature: TCreature;
   SpiderPosition, SpiderDirection: TVector3Single;
+  SpiderMoveDistance: Single;
 begin
   inherited;
 
@@ -1997,9 +2001,17 @@ begin
         FSpidersAppearing.Delete(I, 1);
       end else
       begin
-        { TODO: fix for case when not IsAboveTheGround }
-        FSpidersAppearing.Items[I][2] -= Min(SpidersFallingSpeed * CompSpeed,
-          Sqrt(SqrHeightAboveTheGround) - Spider.CameraRadius);
+        { calculate SpiderMoveDistance }
+        SpiderMoveDistance := SpidersFallingSpeed * CompSpeed;
+        { Actually IsAboveTheGround should be always @true, the way the
+          "Cages" level is designed. However, I want to be safe here,
+          in case someone will edit cages level, so I check IsAboveTheGround
+          here. }
+        if IsAboveTheGround then
+          MinTo1st(SpiderMoveDistance,
+            Sqrt(SqrHeightAboveTheGround) - Spider.CameraRadius);
+
+        FSpidersAppearing.Items[I][2] -= SpiderMoveDistance;
         Inc(I);
       end;
     end;
@@ -2378,6 +2390,8 @@ begin
 
     Door.UsedSound := nil;
   end;
+
+  HintOpenDoorShown := false;
 end;
 
 destructor TDoomE1M1Level.Destroy;
@@ -2574,11 +2588,15 @@ begin
     if (AnimationTime - Door.OpenStateChangeTime > Door.OpenCloseTime) and
       (Door.UsedSound <> nil) then
       Door.UsedSound.DoUsingEnd;
-  end
-end;
+  end;
 
-{ TODO: hint box for player (Use key "p" to open doors) }
-{ TODO: don't allow to pick from large dist }
+  if (not HintOpenDoorShown) and
+    Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then
+  begin
+    HintOpenDoorShown := true;
+    TimeMessage('Hint: open doors using the ' + InteractKeyDescription);
+  end;
+end;
 
 function TDoomE1M1Level.SpecialObjectsTryPick(var IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single): Integer;
@@ -2623,7 +2641,11 @@ begin
   inherited;
 
   if Between(SpecialObjectIndex, Low(Doors), High(Doors)) then
-    Doors[SpecialObjectIndex].DoOpen;
+  begin
+    if Distance > 7 then
+      TimeMessage('You see a door. You''re too far to open it from here') else
+      Doors[SpecialObjectIndex].DoOpen;
+  end;
 end;
 
 procedure TDoomE1M1Level.RenameCreatures(Node: TVRMLNode);
@@ -2644,6 +2666,7 @@ end;
 procedure TDoomE1M1Level.ChangeLevelScene;
 begin
   inherited;
+  RemoveBoxNodeCheck(FHintOpenDoorBox, 'HintOpenDoorBox');
   Scene.RootNode.EnumerateNodes(@RenameCreatures, true);
 end;
 
