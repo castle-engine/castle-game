@@ -25,7 +25,12 @@ interface
 
 uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
   KambiClassUtils, Images, OpenGLh, CastleSound,
-  VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds;
+  VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds,
+  KambiXMLCfg;
+
+const
+  DefaultItemDamageConst = 5.0;
+  DefaultItemDamageRandom = 5.0;
 
 {$define read_interface}
 
@@ -218,7 +223,26 @@ type
       read FSoundAttackStart write FSoundAttackStart default stNone;
   end;
 
-  TItemSwordKind = class(TItemWeaponKind)
+  TItemShortRangeWeaponKind = class(TItemWeaponKind)
+  private
+    FDamageConst: Single;
+    FDamageRandom: Single;
+  public
+    constructor Create(const AModelFileName, AVRMLNodeName, AName,
+      AImageFileName, AScreenImageFileName: string;
+      AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
+      AEquippingSound: TSoundType;
+      AAttackAnimationInfo: TVRMLGLAnimationInfo);
+
+    property DamageConst: Single read FDamageConst write FDamageConst
+      default DefaultItemDamageConst;
+    property DamageRandom: Single read FDamageRandom write FDamageRandom
+      default DefaultItemDamageRandom;
+
+    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
+  end;
+
+  TItemSwordKind = class(TItemShortRangeWeaponKind)
   public
     procedure ActualAttack(Item: TItem); override;
   end;
@@ -364,8 +388,7 @@ implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
   KambiGLUtils, CastlePlay, KambiFilesUtils, ProgressUnit,
-  CastleCreatures, CastleVideoOptions, CastleTimeMessages,
-  KambiXMLCfg;
+  CastleCreatures, CastleVideoOptions, CastleTimeMessages;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -639,6 +662,30 @@ begin
   if AttackAnimation <> nil then AttackAnimation.CloseGL;
 end;
 
+{ TItemShortRangeWeaponKind -------------------------------------------------- }
+
+constructor TItemShortRangeWeaponKind.Create(
+  const AModelFileName, AVRMLNodeName, AName,
+  AImageFileName, AScreenImageFileName: string;
+  AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
+  AEquippingSound: TSoundType;
+  AAttackAnimationInfo: TVRMLGLAnimationInfo);
+begin
+  inherited;
+  FDamageConst := DefaultItemDamageConst;
+  FDamageRandom := DefaultItemDamageRandom;
+end;
+
+procedure TItemShortRangeWeaponKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+begin
+  inherited;
+
+  DamageConst := KindsConfig.GetFloat(VRMLNodeName + '/damage/const',
+    DefaultItemDamageConst);
+  DamageRandom :=KindsConfig.GetFloat(VRMLNodeName + '/damage/random',
+    DefaultItemDamageRandom);
+end;
+
 { TItemSwordKind ------------------------------------------------------------- }
 
 procedure TItemSwordKind.ActualAttack(Item: TItem);
@@ -656,7 +703,7 @@ begin
     { Tests: Writeln('Creature bbox is ', Box3dToNiceStr(C.BoundingBox)); }
     if Boxes3dCollision(C.BoundingBox, WeaponBoundingBox) then
     begin
-      C.Life := C.Life - 20 - Random(20);
+      C.Life := C.Life - DamageConst - Random * DamageRandom;
       C.LastAttackDirection := Player.Navigator.CameraDir;
     end;
   end;

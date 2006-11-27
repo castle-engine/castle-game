@@ -17,4 +17,8 @@
   <LifePotion
     transparent="True"
   />
+
+  <Sword>
+    <damage const="20.0" random="20.0" />
+  </Sword>
 </CONFIG>
