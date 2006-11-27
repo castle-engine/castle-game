@@ -31,6 +31,7 @@ uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
 const
   DefaultItemDamageConst = 5.0;
   DefaultItemDamageRandom = 5.0;
+  DefaultItemActualAttackTime = 0.0;
 
 {$define read_interface}
 
@@ -212,7 +213,8 @@ type
       Note that actually ActualAttack may be called a *very little* later
       (hopefully it shouldn't be noticeable to the player). }
     property ActualAttackTime: Single
-      read FActualAttackTime write FActualAttackTime default 0.0;
+      read FActualAttackTime write FActualAttackTime
+      default DefaultItemActualAttackTime;
 
     { Perform real attack here.
       This may mean hurting some creature within the range,
@@ -221,6 +223,8 @@ type
 
     property SoundAttackStart: TSoundType
       read FSoundAttackStart write FSoundAttackStart default stNone;
+
+    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
   end;
 
   TItemShortRangeWeaponKind = class(TItemWeaponKind)
@@ -662,6 +666,14 @@ begin
   if AttackAnimation <> nil then AttackAnimation.CloseGL;
 end;
 
+procedure TItemWeaponKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+begin
+  inherited;
+
+  ActualAttackTime := KindsConfig.GetFloat(VRMLNodeName + '/actual_attack_time',
+    DefaultItemActualAttackTime);
+end;
+
 { TItemShortRangeWeaponKind -------------------------------------------------- }
 
 constructor TItemShortRangeWeaponKind.Create(
@@ -1023,7 +1035,6 @@ begin
         WeaponAnimFileName('sword_2.wrl') ],
       [ 0, 0.5 ],
       30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
-  Sword.ActualAttackTime := MapRange(0.0, -1.0, +0.7, 0.0, 0.5);
   Sword.SoundAttackStart := stSwordAttackStart;
 
   Bow := TItemBowKind.Create('bow.wrl', 'Bow', 'Bow', 'bow.png',
@@ -1033,7 +1044,6 @@ begin
         WeaponAnimFileName('bow.wrl') ],
       [ 0, 0.5 ],
       30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
-  Bow.ActualAttackTime := 0;
   Bow.SoundAttackStart := stBowAttackStart;
 
   LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',

@@ -18,7 +18,12 @@
     transparent="True"
   />
 
-  <Sword>
+  <Sword
+    actual_attack_time="0.294">
     <damage const="20.0" random="20.0" />
   </Sword>
+
+  <Bow
+    actual_attack_time="0.0"
+  />
 </CONFIG>
