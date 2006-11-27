@@ -246,7 +246,7 @@ procedure ReadSoundInfos;
 implementation
 
 uses CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
-  KambiFilesUtils, CastleLog, KambiXMLCfg;
+  KambiFilesUtils, CastleLog, DOM, XMLRead;
 
 const
   { Each sound has a unique name, used to identify sound in sounds.xml file.
@@ -672,37 +672,115 @@ begin
 end;
 
 procedure ReadSoundInfos;
+
+  { Seaches for sound with given Name. Case-sensitive.
+    Returns given TSoundType.
+    @raises Exception When given Name is not found }
+  function SoundByName(const Name: string): TSoundType;
+  begin
+    for Result := Low(Result) to High(Result) do
+      if SoundNames[Result] = Name then
+        Exit;
+    raise Exception.CreateFmt('Sound name "%s" not found', [Name]);
+  end;
+
+  { Retrieves from Element attribute Value and returns @true,
+    or (of there is no such attribute) returns @false
+    and does not modify Value. Value is a "var", not "out" param,
+    because in the latter case it's guaranteed that the old Value
+    will not be cleared. }
+  function DOMGetAttribute(const Element: TDOMElement;
+    const AttrName: string; var Value: string): boolean;
+  var
+    AttrNode: TDOMNode;
+  begin
+    AttrNode := Element.Attributes.GetNamedItem(AttrName);
+    Result := AttrNode <> nil;
+    if Result then
+    begin
+      Check(AttrNode.NodeType = ATTRIBUTE_NODE,
+        'All element attributes must have ATTRIBUTE_NODE');
+      Value := (AttrNode as TDOMAttr).Value;
+    end;
+  end;
+
+  function DOMGetSingleAttribute(const Element: TDOMElement;
+    const AttrName: string; var Value: Single): boolean;
+  var
+    ValueStr: string;
+  begin
+    Result := DOMGetAttribute(Element, AttrName, ValueStr);
+    if Result then
+      Value := StrToFloat(ValueStr);
+  end;
+
 var
   ST: TSoundType;
-  SoundConfig: TKamXMLConfig;
+  SoundConfig: TXMLDocument;
+  SoundNode: TDOMNode;
+  SoundElement: TDOMElement;
+  SoundElements: TDOMNodeList;
   S: string;
+  I: Integer;
 begin
-  SoundConfig := TKamXMLConfig.Create(nil);
+  ReadXMLFile(SoundConfig, ProgramDataPath + 'data' + PathDelim + 'sounds.xml');
   try
-    SoundConfig.FileName := ProgramDataPath + 'data' + PathDelim + 'sounds.xml';
+    Check(SoundConfig.DocumentElement.TagName = 'sounds',
+      'Root node of sounds.xml must be <sounds>');
+
+    { Init all SoundInfos to default values }
     for ST := Succ(stNone) to High(ST) do
     begin
-      SoundInfos[ST].FileName := SoundConfig.GetValue(
-        SoundNames[ST] + '/file_name', SoundNames[ST] + '.wav');
-      SoundInfos[ST].Gain := SoundConfig.GetFloat(SoundNames[ST] + '/gain', 1);
-      SoundInfos[ST].MinGain := SoundConfig.GetFloat(SoundNames[ST] + '/min_gain', 0);
-      SoundInfos[ST].MaxGain := SoundConfig.GetFloat(SoundNames[ST] + '/max_gain', 1);
-      S := SoundConfig.GetValue(SoundNames[ST] + '/default_importance', 'max');
-      case ArrayPosStr(S,
-        [ 'max',
-          'level_event',
-          'player',
-          'default_creature',
-          'minor_non_spatial' ]) of
-        -1: SoundInfos[ST].DefaultImportance := StrToInt(S);
-        0: SoundInfos[ST].DefaultImportance := MaxSoundImportance;
-        1: SoundInfos[ST].DefaultImportance := LevelEventSoundImportance;
-        2: SoundInfos[ST].DefaultImportance := PlayerSoundImportance;
-        3: SoundInfos[ST].DefaultImportance := DefaultCreatureSoundImportance;
-        4: SoundInfos[ST].DefaultImportance := MinorNonSpatialSoundImportance;
-        else raise EInternalError.Create('20061125-case ArrayPosStr');
-      end;
+      SoundInfos[ST].FileName := SoundNames[ST] + '.wav';
+      SoundInfos[ST].Gain := 1;
+      SoundInfos[ST].MinGain := 0;
+      SoundInfos[ST].MaxGain := 1;
+      SoundInfos[ST].DefaultImportance := MaxSoundImportance;
     end;
+
+    SoundElements := SoundConfig.DocumentElement.ChildNodes;
+    try
+      for I := 0 to SoundElements.Count - 1 do
+      begin
+        SoundNode := SoundElements.Item[I];
+        if SoundNode.NodeType = ELEMENT_NODE then
+        begin
+          SoundElement := SoundNode as TDOMElement;
+          Check(SoundElement.TagName = 'sound',
+            'Each child of sounds.xml root node must be the <sound> element');
+
+          ST := SoundByName(SoundElement.GetAttribute('name'));
+
+          { I retrieve FileNameNode using DOMGetAttribute
+            (that internally uses SoundElement.Attributes.GetNamedItem),
+            because I have to distinguish between the case when file_name
+            attribute is not present (in this case FileName is left as it was)
+            and when it's present as set to empty string.
+            Standard SoundElement.GetAttribute wouldn't allow me this. }
+          DOMGetAttribute(SoundElement, 'file_name', SoundInfos[ST].FileName);
+
+          DOMGetSingleAttribute(SoundElement, 'gain', SoundInfos[ST].Gain);
+          DOMGetSingleAttribute(SoundElement, 'min_gain', SoundInfos[ST].MinGain);
+          DOMGetSingleAttribute(SoundElement, 'max_gain', SoundInfos[ST].MaxGain);
+
+          if DOMGetAttribute(SoundElement, 'default_importance', S) then
+            case ArrayPosStr(S,
+              [ 'max',
+                'level_event',
+                'player',
+                'default_creature',
+                'minor_non_spatial' ]) of
+              -1: SoundInfos[ST].DefaultImportance := StrToInt(S);
+              0: SoundInfos[ST].DefaultImportance := MaxSoundImportance;
+              1: SoundInfos[ST].DefaultImportance := LevelEventSoundImportance;
+              2: SoundInfos[ST].DefaultImportance := PlayerSoundImportance;
+              3: SoundInfos[ST].DefaultImportance := DefaultCreatureSoundImportance;
+              4: SoundInfos[ST].DefaultImportance := MinorNonSpatialSoundImportance;
+              else raise EInternalError.Create('20061125-case ArrayPosStr');
+            end;
+        end;
+      end;
+    finally SoundElements.Release; end;
   finally
     FreeAndNil(SoundConfig);
   end;
