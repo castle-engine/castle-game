@@ -60,9 +60,6 @@ type
       early. }
     ItemsToRemove: TVRMLNodesList;
 
-    FHintButtonBox: TBox3d;
-    FHintButtonShown: boolean;
-
     procedure TraverseForItems(Node: TVRMLNode; State: TVRMLGraphTraverseState);
 
     function LoadVRMLNode(const FileName: string): TVRMLNode;
@@ -91,7 +88,8 @@ type
   protected
     FBossCreature: TCreature;
 
-    { See README for description of LevelBox and HintButtonBox trick.
+    { See [http://www.camelot.homedns.org/~michalis/castle-development.php]
+      for description of LevelBox and WaterBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
       find and remove the node from Scene). }
     function RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
@@ -111,12 +109,28 @@ type
 
     { Just load TVRMLFlatSceneGL from file, doing some common tasks:
       @unorderedList(
-        @item set texture params as the main level scene
+        @item sets Attributes according to AttributesSet
         @item optionally create triangle octree
         @item call PrepareRender, optionally with PrepareBackground = @true
       ) }
     function LoadLevelScene(const FileName: string;
       CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;
+
+    { Load TVRMLGLAnimation from file, doing common tasks.
+      @unorderedList(
+        @item sets Attributes according to AnimationAttributesSet
+        @item optionally creates triangle octree for the FirstScene
+        @item call PrepareRender
+      ) }
+    function LoadLevelAnimation(
+      const RootNodes: array of TVRMLNode;
+      AOwnsFirstRootNode: boolean;
+      const ATimes: array of Single;
+      ScenesPerTime: Cardinal;
+      AOptimization: TGLRendererOptimization;
+      const EqualityEpsilon: Single;
+      ATimeLoop, ATimeBackwards: boolean;
+      CreateDefaultTriangleOctree: boolean): TVRMLGLAnimation;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -143,16 +157,6 @@ type
 
     { Player position should always be within this box. }
     property LevelBox: TBox3d read FLevelBox;
-
-    { HintButtonBox, see README for meaning of this.
-      This will be empty if level does not contain HintButtonBox. }
-    property HintButtonBox: TBox3d read FHintButtonBox;
-
-    { HintButtonShown is considered to be part of the level.
-      This means that player will get second "hint: you can press the button..."
-      message on second level --- I think that it's good. }
-    property HintButtonShown: boolean
-      read FHintButtonShown write FHintButtonShown;
 
     property WaterBox: TBox3d read FWaterBox;
 
@@ -352,13 +356,17 @@ type
 
   TCastleHallLevel = class(TLevel)
   private
-    ButtonPressed: boolean;
-    SymbolOpened: boolean;
-    AnimationOpenSymbolRotation: Single;
-    AnimationButtonPress: Single;
+    SymbolOpen: boolean;
+    SymbolOpenTime: Single;
+    Symbol: TVRMLGLAnimation;
 
-    Symbol_TL, Symbol_BL, Symbol_TR, Symbol_BR: TVRMLFlatSceneGL;
-    Button: TVRMLFlatSceneGL;
+    ButtonPressed: boolean;
+    ButtonPressedTime: Single;
+    Button: TVRMLGLAnimation;
+
+    { HintButtonBox, indicating when to display hint about pressing a button. }
+    FHintButtonBox: TBox3d;
+    FHintButtonShown: boolean;
 
     StairsBlocker: TVRMLFlatSceneGL;
     StairsBlockerExists: boolean;
@@ -741,9 +749,6 @@ begin
       FLevelBox := Scene.BoundingBox;
       FLevelBox[1, 2] += 4 * (LevelBox[1, 2] - LevelBox[0, 2]);
     end;
-
-    if not RemoveBoxNode(FHintButtonBox, 'HintButtonBox') then
-      FHintButtonBox := EmptyBox3d;
 
     if RemoveBoxNode(FWaterBox, 'WaterBox') then
     begin
@@ -1161,38 +1166,59 @@ begin
     Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
 end;
 
+function TLevel.LoadLevelAnimation(
+  const RootNodes: array of TVRMLNode;
+  AOwnsFirstRootNode: boolean;
+  const ATimes: array of Single;
+  ScenesPerTime: Cardinal;
+  AOptimization: TGLRendererOptimization;
+  const EqualityEpsilon: Single;
+  ATimeLoop, ATimeBackwards: boolean;
+  CreateDefaultTriangleOctree: boolean): TVRMLGLAnimation;
+begin
+  Result := TVRMLGLAnimation.Create(RootNodes, AOwnsFirstRootNode,
+    ATimes, ScenesPerTime, AOptimization, EqualityEpsilon,
+    ATimeLoop, ATimeBackwards, GLContextCache);
+
+  AnimationAttributesSet(Result.Attributes, btIncrease);
+
+  Result.PrepareRender(false,
+    { DoPrepareBoundingBox is true, because this is almost always needed anyway }
+    true,
+    false, false, false, false);
+
+  if CreateDefaultTriangleOctree then
+    Result.FirstScene.DefaultTriangleOctree :=
+      Result.FirstScene.CreateTriangleOctree('');
+end;
+
 { TCastleHallLevel ----------------------------------------------------------- }
 
 constructor TCastleHallLevel.Create;
-
-  function LoadSymbol(const Suffix: string): TVRMLFlatSceneGL;
-  begin
-    Result := LoadLevelScene(
-      CastleLevelsPath + 'castle_hall' + PathDelim +
-      'castle_hall_symbol_' + Suffix + '.wrl', true, false);
-  end;
-
+var
+  CastleHallLevelPath: string;
 begin
   inherited;
 
   PlayedMusicSound := stCastleHallMusic;
 
-  Symbol_TL := LoadSymbol('tl');
-  Symbol_BL := LoadSymbol('bl');
-  Symbol_TR := LoadSymbol('tr');
-  Symbol_BR := LoadSymbol('br');
+  CastleHallLevelPath := CastleLevelsPath + 'castle_hall' + PathDelim;
 
-  Button := LoadLevelScene(
-    CastleLevelsPath + 'castle_hall' + PathDelim +
-    'castle_hall_button.wrl', true, false);
+  Symbol := LoadLevelAnimation(
+    [ LoadVRMLNode(CastleHallLevelPath + 'castle_hall_symbol_closed.wrl'),
+      LoadVRMLNode(CastleHallLevelPath + 'castle_hall_symbol_open.wrl') ],
+    true, [ 0, 1.5 ], 30, roSeparateShapeStatesNoTransform, 0.1, false, false,
+    true);
+
+  Button := LoadLevelAnimation(
+    [ LoadVRMLNode(CastleHallLevelPath + 'castle_hall_button_not_pressed.wrl'),
+      LoadVRMLNode(CastleHallLevelPath + 'castle_hall_button_pressed.wrl') ],
+    true, [ 0, 0.5 ], 30, roSeparateShapeStatesNoTransform, 0.01, false, false,
+    true);
 
   StairsBlocker := LoadLevelScene(
-    CastleLevelsPath + 'castle_hall' + PathDelim +
-    'castle_hall_stairs_blocker.wrl', true, false);
-
+    CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl', true, false);
   StairsBlockerExists := true;
-
-  AnimationButtonPress := 1.0;
 
   if Headlight <> nil then
   begin
@@ -1206,10 +1232,7 @@ destructor TCastleHallLevel.Destroy;
 begin
   FreeAndNil(Button);
   FreeAndNil(StairsBlocker);
-  FreeAndNil(Symbol_TL);
-  FreeAndNil(Symbol_BL);
-  FreeAndNil(Symbol_TR);
-  FreeAndNil(Symbol_BR);
+  FreeAndNil(Symbol);
   inherited;
 end;
 
@@ -1217,6 +1240,7 @@ procedure TCastleHallLevel.ChangeLevelScene;
 begin
   inherited;
   RemoveBoxNodeCheck(FLevelExitBox, 'LevelExitBox');
+  RemoveBoxNodeCheck(FHintButtonBox, 'HintButtonBox');
 end;
 
 class function TCastleHallLevel.SceneFileName: string;
@@ -1241,21 +1265,13 @@ end;
 
 function TCastleHallLevel.LineOfSight(
   const Pos1, Pos2: TVector3Single): boolean;
-
-  function MakeSymbol(SymbolScene: TVRMLFlatSceneGL): boolean;
-  begin
-    Result := SymbolScene.DefaultTriangleOctree.SegmentCollision(
-      Pos1, Pos2, false, NoItemIndex, false,
-      @SymbolScene.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex;
-  end;
-
 begin
   Result := inherited;
 
   Result := Result and
-    (Button.DefaultTriangleOctree.SegmentCollision(
+    (Button.FirstScene.DefaultTriangleOctree.SegmentCollision(
       Pos1, Pos2, false, NoItemIndex, false,
-      @Button.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
+      @Button.FirstScene.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
 
   if Result and StairsBlockerExists then
   begin
@@ -1265,13 +1281,12 @@ begin
         @StairsBlocker.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
   end;
 
-  if Result and (not SymbolOpened) then
+  if Result and (not SymbolOpen) then
   begin
     Result :=
-      MakeSymbol(Symbol_TL) and
-      MakeSymbol(Symbol_BL) and
-      MakeSymbol(Symbol_TR) and
-      MakeSymbol(Symbol_BR);
+      Symbol.FirstScene.DefaultTriangleOctree.SegmentCollision(
+        Pos1, Pos2, false, NoItemIndex, false,
+        @Symbol.FirstScene.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex;
   end;
 end;
 
@@ -1280,16 +1295,9 @@ function TCastleHallLevel.MoveAllowedAdditionalSimple(
   const NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
-
-  function MakeSymbol(SymbolScene: TVRMLFlatSceneGL): boolean;
-  begin
-    Result := SymbolScene.DefaultTriangleOctree.MoveAllowedSimple(
-      CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
-  end;
-
 begin
   Result :=
-    Button.DefaultTriangleOctree.MoveAllowedSimple(
+    Button.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
       CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
 
   if Result and StairsBlockerExists then
@@ -1299,13 +1307,11 @@ begin
         CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
   end;
 
-  if Result and (not SymbolOpened) then
+  if Result and (not SymbolOpen) then
   begin
     Result :=
-      MakeSymbol(Symbol_TL) and
-      MakeSymbol(Symbol_BL) and
-      MakeSymbol(Symbol_TR) and
-      MakeSymbol(Symbol_BR);
+      Symbol.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
+        CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
   end;
 end;
 
@@ -1359,76 +1365,24 @@ procedure TCastleHallLevel.GetCameraHeight(const CameraPos: TVector3Single;
 begin
   inherited GetCameraHeight(CameraPos, IsAboveTheGround, SqrHeightAboveTheGround);
 
-  if not SymbolOpened then
-  begin
-    MakeBonusScene(Symbol_TL);
-    MakeBonusScene(Symbol_BL);
-    MakeBonusScene(Symbol_TR);
-    MakeBonusScene(Symbol_BR);
-  end;
+  if not SymbolOpen then
+    MakeBonusScene(Symbol.FirstScene);
 
   if StairsBlockerExists then
     MakeBonusScene(StairsBlocker);
 
-  MakeBonusScene(Button);
+  MakeBonusScene(Button.FirstScene);
 end;
 
 procedure TCastleHallLevel.Render(const Frustum: TFrustum);
-
-  procedure RenderRotated(SymbolScene: TVRMLFlatSceneGL;
-    const RotationX, RotationY, TranslationX, TranslationY: Integer);
-  const
-    SymbolSize = 30;
-  begin
-    glPushMatrix;
-      glTranslatef(+TranslationX * SymbolSize, +TranslationY * SymbolSize, 0);
-      glRotatef(AnimationOpenSymbolRotation, RotationX, RotationY, 0);
-      glTranslatef(-TranslationX * SymbolSize, -TranslationY * SymbolSize, 0);
-      { SymbolScene BoundingBox doesn't account for transformations abovem
-        so we can't do here RenderFrustum, because this could make false
-        results (objects could be visible, but RenderFrustum would not
-        render it). So below we do normal Render. }
-      SymbolScene.Render(nil);
-    glPopMatrix;
-  end;
-
-  procedure RenderButtonScaled;
-  var
-    Translation: TVector3Single;
-  begin
-    Translation[0] := 0;
-    Translation[1] := 0;
-    Translation[2] := Button.BoundingBox[0, 2];
-
-    glPushMatrix;
-      glTranslatev(Translation);
-      glScalef(1, 1, AnimationButtonPress);
-      glTranslatev(VectorNegate(Translation));
-      { Scaling of Button will always make it smaller,
-        so it's BoundingBox is OK, even though we do glScale above.
-        So we can call RenderFrustum below. }
-      Button.RenderFrustum(Frustum);
-    glPopMatrix;
-  end;
-
 begin
-  if SymbolOpened then
-  begin
-    RenderRotated(Symbol_TL, +1, +1, -1, +1);
-    RenderRotated(Symbol_BL, -1, +1, -1, -1);
-    RenderRotated(Symbol_BR, -1, -1, +1, -1);
-    RenderRotated(Symbol_TR, +1, -1, +1, +1);
-  end else
-  begin
-    Symbol_TL.RenderFrustum(Frustum);
-    Symbol_BL.RenderFrustum(Frustum);
-    Symbol_TR.RenderFrustum(Frustum);
-    Symbol_BR.RenderFrustum(Frustum);
-  end;
+  if SymbolOpen then
+    Symbol.SceneFromTime(AnimationTime - SymbolOpenTime).Render(nil) else
+    Symbol.SceneFromTime(0).RenderFrustum(Frustum);
 
   if ButtonPressed then
-    RenderButtonScaled else
-    Button.RenderFrustum(Frustum);
+    Button.SceneFromTime(AnimationTime - ButtonPressedTime).Render(nil) else
+    Button.SceneFromTime(0).RenderFrustum(Frustum);
 
   if StairsBlockerExists then
     StairsBlocker.RenderFrustum(Frustum);
@@ -1440,8 +1394,6 @@ end;
 
 procedure TCastleHallLevel.Idle(const CompSpeed: Single);
 const
-  MaxAnimationOpenSymbolRotation = 80;
-  MinAnimationButtonPress = 0.5;
   WerewolfStartPosition: TVector3Single = (0, 0, -4);
 var
   WerewolfCreature: TCreature;
@@ -1453,16 +1405,13 @@ begin
     LevelFinished(TCagesLevel.Create);
   end;
 
-  if ButtonPressed then
+  if ButtonPressed and
+    (AnimationTime - ButtonPressedTime > Button.TimeDuration) then
   begin
-    if AnimationButtonPress > MinAnimationButtonPress then
+    if not SymbolOpen then
     begin
-      AnimationButtonPress := Max(MinAnimationButtonPress,
-        AnimationButtonPress - 0.02 * CompSpeed);
-    end else
-    if not SymbolOpened then
-    begin
-      SymbolOpened := true;
+      SymbolOpen := true;
+      SymbolOpenTime := AnimationTime;
 
       WerewolfCreature := Werewolf.CreateDefaultCreature(
         WerewolfStartPosition,
@@ -1476,11 +1425,12 @@ begin
     end;
   end;
 
-  if SymbolOpened then
+  if (not FHintButtonShown) and
+     Box3dPointInside(Player.Navigator.CameraPos, FHintButtonBox) then
   begin
-    if AnimationOpenSymbolRotation < MaxAnimationOpenSymbolRotation then
-      AnimationOpenSymbolRotation := Min(MaxAnimationOpenSymbolRotation,
-        AnimationOpenSymbolRotation + 0.1 * CompSpeed);
+    TimeMessage('Hint: press this red button with the ' +
+      InteractKeyDescription);
+    FHintButtonShown := true;
   end;
 end;
 
@@ -1506,7 +1456,7 @@ begin
   Result := inherited SpecialObjectsTryPick(
     IntersectionDistance, Ray0, RayVector);
 
-  MakeBonusScene(Button, 0);
+  MakeBonusScene(Button.FirstScene, 0);
 
   if StairsBlockerExists then
     MakeBonusScene(StairsBlocker, 1);
@@ -1526,6 +1476,7 @@ begin
             TimeMessage('Button is already pressed') else
           begin
             ButtonPressed := true;
+            ButtonPressedTime := AnimationTime;
             TimeMessage('You press the button');
           end;
         end else

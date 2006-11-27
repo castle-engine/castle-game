@@ -1,0 +1,15 @@
+#VRML V1.0 ascii
+
+Group {
+  # Viewpoint is only for viewing from demo_animation, it will be ignored
+  # when loaded into game
+  Viewpoint  {
+    position -0.634338736534119 0.362587004899979 12.031494140625
+    orientation 0.577350258827209 -0.577350199222565 -0.577350199222565 2.094395160675049
+  }
+
+  Translation { translation 0 0 11.86 }
+  Scale { }
+  Translation { translation 0 0 -11.86 }
+  WWWInline { name "castle_hall_button.wrl" }
+}

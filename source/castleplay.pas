@@ -624,14 +624,6 @@ begin
     end;
   end;
 
-  if (not Level.HintButtonShown) and
-     Box3dPointInside(Player.Navigator.CameraPos, Level.HintButtonBox) then
-  begin
-    TimeMessage('Hint: press this red button with the ' +
-      InteractKeyDescription);
-    Level.HintButtonShown := true;
-  end;
-
   Player.Idle(CompSpeed);
 
   if LevelFinishedSchedule then
