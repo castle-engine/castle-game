@@ -540,6 +540,7 @@ type
   private
     UsedSound: TALAllocatedSource;
     procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
+    procedure PlaySound(SoundType: TSoundType);
   public
     constructor Create;
     destructor Destroy; override;
@@ -2182,30 +2183,28 @@ begin
   UsedSound := nil;
 end;
 
+procedure TDoomLevelDoor.PlaySound(SoundType: TSoundType);
+begin
+  { Door can play only one sound at a time. }
+  if UsedSound <> nil then
+    UsedSound.DoUsingEnd;
+  UsedSound := Sound3d(SoundType, Box3dMiddle(Scene.BoundingBox));
+  if UsedSound <> nil then
+    UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
+end;
+
 procedure TDoomLevelDoor.DoOpen;
 begin
   Open := true;
   OpenStateChangeTime := ParentLevel.AnimationTime;
-
-  { Door can play only one sound at a time. }
-  if UsedSound <> nil then
-    UsedSound.DoUsingEnd;
-  UsedSound := Sound(stDoorOpen);
-  if UsedSound <> nil then
-    UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
+  PlaySound(stDoorOpen);
 end;
 
 procedure TDoomLevelDoor.DoClose;
 begin
   Open := false;
   OpenStateChangeTime := ParentLevel.AnimationTime;
-
-  { Door can play only one sound at a time. }
-  if UsedSound <> nil then
-    UsedSound.DoUsingEnd;
-  UsedSound := Sound(stDoorClose);
-  if UsedSound <> nil then
-    UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
+  PlaySound(stDoorClose);
 end;
 
 procedure TDoomLevelDoor.RevertDoOpen;
@@ -2215,13 +2214,7 @@ begin
     (OpenCloseTime - (ParentLevel.AnimationTime - OpenStateChangeTime)) }
     { simplified : }
     2 * ParentLevel.AnimationTime - OpenCloseTime - OpenStateChangeTime;
-
-  { Door can play only one sound at a time. }
-  if UsedSound <> nil then
-    UsedSound.DoUsingEnd;
-  UsedSound := Sound(stDoorOpen);
-  if UsedSound <> nil then
-    UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
+  PlaySound(stDoorOpen);
 end;
 
 function TDoomLevelDoor.SceneTranslation(const AnimationTime: Single):
