@@ -76,7 +76,7 @@
   >
 
     <short_range_attack knockback_distance="0.0">
-      <damage const="10" random="10"/>
+      <damage const="7" random="8"/>
     </short_range_attack>
   </Ghost>
 
