@@ -12,6 +12,19 @@
 - on castle_hall level, stand very close the box that has the button on it.
   Press "crouch". You start slowly getting falling down effect.
 
+- doom: in each room, check
+
+  barriers ?
+  interactive doors/elevators ?
+  lava ?
+  interactive barrels ?
+  items to pick up ?
+  creatures ?
+
+  finish things on castle-doom page.
+
+  use data/levels/doom/logo/doom_title.png, since I did it..
+
 ----------------------------------------
 
 - knockback for player sword (or for some other short-range weapon ?)
