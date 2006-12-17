@@ -12,18 +12,38 @@
 - on castle_hall level, stand very close the box that has the button on it.
   Press "crouch". You start slowly getting falling down effect.
 
-- doom: in each room, check
+- doom: in each room, check:
 
-  barriers ?
-  interactive doors/elevators ?
-  lava ?
-  interactive barrels ?
-  items to pick up ?
-  creatures ?
+  barriers (left: 4-9)
+  interactive doors/elevators (left: 4-9)
+  lava (left: rooms 4, 8, ?9)
+  interactive barrels (left: rooms 4, 5, 8, 9)
+  items to pick up (left: rooms 4, 5, 8, 9)
+  creatures (left: room 9)
 
   finish things on castle-doom page.
 
   use data/levels/doom/logo/doom_title.png, since I did it..
+
+  - room 6: creatures should see through texture with alpha channel
+  - creatures should see through fake "barrier" texture (in some
+    special cases if creatures will be able to do something)
+  - implement all doom e1m1 secrets. The secret that allow the speedwalk:
+    what was it? Check WWW for list of known E1M1 secrets.
+
+- test kolizji ze strzalami jest chyba za latwy: kiedy potwor stoi obok
+  sciany, jest latwo strzelic w sciane zamiast potwora.
+  Solution: traktuj strzale jako odcinek ?
+  Ew. eksplozje na strzaly tez moga pomoc ?
+
+- ball missile should hit other creatures too (helpful on crowdy places
+  on Doom level)
+
+- the fact that alien dying falls on it's back means that usually
+  after alien falls dead (killed with a sword) it makes strange
+  collision detection problems. It would be most natural to make
+  2 alien death animations, depending on the direction of attack
+  (I have direction of attack for knockback anyway) ?
 
 ----------------------------------------
 
