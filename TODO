@@ -14,7 +14,7 @@
 
 - doom: in each room, check:
 
-  interactive doors/elevators (left: from 4 to 9, in 9, from 5 to 6)
+  interactive doors/elevators (left: from 4 to 9, in 9)
   lava (left: rooms 4, 8)
   interactive barrels (left: rooms 4, 5, 8, 9)
   items to pick up (left: rooms 4, 5, 8, 9)
