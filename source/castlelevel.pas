@@ -589,7 +589,7 @@ type
   private
     { If you want to add a new door, just increase high index of this array
       and then init your door in TDoomE1M1Level constructor. }
-    Doors: array[0..1] of TDoomLevelDoor;
+    Doors: array[0..2] of TDoomLevelDoor;
 
     { Check collision only with doors --- but not with real level geometry
       (i.e. not with things handled by inherited
@@ -2318,6 +2318,12 @@ begin
   Doors[1].OpenCloseTime := 1.0;
   Doors[1].OpenMove.Init(0, 0, 3.5);
   Doors[1].StayOpenTime := 5.0;
+
+  Doors[2] := TDoomLevelDoor.Create;
+  Doors[2].SceneFileName := 'door4_7_closed.wrl';
+  Doors[2].OpenCloseTime := 1.0;
+  Doors[2].OpenMove.Init(0, 0, 3.5);
+  Doors[2].StayOpenTime := 5.0;
 
   DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +
     PathDelim;
