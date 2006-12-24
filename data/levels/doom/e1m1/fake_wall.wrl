@@ -1,0 +1,58 @@
+#VRML V1.0 ascii
+
+# This was cut&pasted from Blender generated VRML file.
+# I wanted to add by hand ShapeHints (to force this to be visible
+# only from one side), and this is loaded and rendered separately
+# (as it doesn't participate in collision detection).
+
+ShapeHints {
+  shapeType SOLID
+  vertexOrdering CLOCKWISE
+}
+
+Switch {
+	DEF FakeWall
+	Separator {
+		Texture2 {
+			filename //../../../textures/doom/browngrn.png
+			wrapS REPEAT
+			wrapT REPEAT
+		}
+		Coordinate3 {
+			point [
+				 -1880.000000 112.000000 304.000000,
+				 -1784.000000 112.000000 416.000000,
+				 -1880.000000 40.000000 304.000000,
+				 -1784.000000 40.000000 416.000000,
+			]
+		}
+		TextureCoordinate2 {
+			point [
+				 2.125000 -0.000000,
+				 2.125000 0.437500,
+				 0.000000 0.437500,
+				 -0.000000 0.000000,
+			]
+		}
+		IndexedFaceSet {
+			coordIndex [
+				 0, 2, 3, 1, -1,
+			]
+			textureCoordIndex [
+				 0, 1, 2, 3, -1,
+			]
+		}
+	}
+
+}
+
+	Separator {
+		MatrixTransform {
+		matrix
+			1.000000 0.000000 0.000000 0.000000
+			0.000000 1.000000 0.000000 0.000000
+			0.000000 0.000000 1.000000 0.000000
+			-1520.000000 64.000000 -3456.000000 1.000000
+		}
+		USE FakeWall
+	}

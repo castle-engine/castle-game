@@ -604,6 +604,8 @@ type
 
     FHintOpenDoorBox: TBox3d;
     HintOpenDoorShown: boolean;
+
+    FakeWall: TVRMLFlatSceneGL;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -2353,6 +2355,9 @@ begin
     Door.UsedSound := nil;
   end;
 
+  FakeWall := LoadLevelScene(DoomDoorsPathPrefix + 'fake_wall_final.wrl',
+    false, false);
+
   HintOpenDoorShown := false;
 end;
 
@@ -2365,6 +2370,8 @@ begin
     FreeAndNil(Doors[I].Scene);
     FreeAndNil(Doors[I]);
   end;
+
+  FreeAndNil(FakeWall);
 
   inherited;
 end;
@@ -2469,6 +2476,10 @@ var
   Door: TDoomLevelDoor;
 begin
   inherited;
+
+  { FakeWall is always rendered. That's it.
+    It never participates in collision detection, line of sight collision, etc. }
+  FakeWall.RenderFrustum(Frustum);
 
   for I := Low(Doors) to High(Doors) do
   begin
