@@ -2366,10 +2366,11 @@ var
   I: Integer;
 begin
   for I := Low(Doors) to High(Doors) do
-  begin
-    FreeAndNil(Doors[I].Scene);
-    FreeAndNil(Doors[I]);
-  end;
+    if Doors[I] <> nil then
+    begin
+      FreeAndNil(Doors[I].Scene);
+      FreeAndNil(Doors[I]);
+    end;
 
   FreeAndNil(FakeWall);
 

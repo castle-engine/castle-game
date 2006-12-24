@@ -50,5 +50,11 @@ Group {
   Scale { scaleFactor 0.05 0.05 0.05 }
 
   WWWInline { name "e1m1.wrl" }
+
+  # TODO: for now, elevator4_9.wrl is extracted from main VRML files,
+  # but it's static. In the future elevator4_9.wrl will be more
+  # dynamic.
+  WWWInline { name "elevator4_9.wrl" }
+
   WWWInline { name "e1m1_blender.wrl" }
 }
