@@ -37,6 +37,115 @@ const
   DefaultGlobalAmbientLight: TVector4Single = (0.2, 0.2, 0.2, 1.0);
 
 type
+  TLevel = class;
+
+  { This is a base class for various objects that can be added to the level.
+
+    What's an "object on the level" ? Well, theoretically anything.
+    In the future, all items and creatures and even the player
+    could be also treated as "some objects on the level".
+    For now, "object on the level" means a static VRML scene (TVRMLFlatSceneGL)
+    or VRML animation (TVRMLAnimationGL) that is added to the level.
+    Such "object on the level" has additional capabilities, not available
+    to normal static parts of the scene. It can appear/disappear from the scene,
+    it can move on the scene, etc. --- each TLevelObject descendant defines some
+    particular behaviors and limitations that it implements.
+
+    This can be used for things such as moving doors, elavators,
+    push buttons, and much more. Roughly speaking, anything that from
+    the perspective of the player is part of the level, but internally
+    it's not as static as normal level parts.
+
+    Note that you can achieve everything that any TLevelObject gives you
+    by overriding TLevel methods instead. Overriding TLevel methods
+    is more flexible, but it's also more tiresome --- since you have to
+    repeat some dummy tasks every time (see where TLevel implementations
+    handles @link(Objects) to know approximately what you may want to
+    override in your TLevel descendats).
+    Implementing and using universal (reusable) TLevelObject descendants
+    is a better idea. }
+  TLevelObject = class
+    procedure Render(const Frustum: TFrustum); virtual; abstract;
+
+    function MoveAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const CameraRadius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+
+    function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+
+    function RayCollision(
+      out IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+  end;
+
+  TObjectsListItem_2 = TLevelObject;
+  {$I objectslist_2.inc}
+  TLevelObjectsList = TObjectsList_2;
+
+  { This a VRML scene that moves on the level.
+
+    It's basically just a TVRMLFlatSceneGL instance,
+    loaded with LoadLevelScene, always with a DefaultTriangleOctree.
+    It has a SceneTranslation function (that must be actually defined
+    in a descendant) that always says how this object is translated from
+    it's original position.
+
+    It can also be told to not participate in collision detection
+    (useful to make "fake" geometric walls, i.e. things that
+    are rendered but are not in fact seen by game mechanics,
+    do not occlude creatures view etc.). See @link(Collides).
+
+    It can also be told that given scene doesn't exist at all for now.
+    This is useful for objects that disappear completely from the level
+    when something happens. See @link(Exists).
+
+    It has methods to render and query it, that take into account
+    the Scene translated by SceneTranslation. }
+  TLevelMovingObject = class(TLevelObject)
+  private
+    FParentLevel: TLevel;
+    FScene: TVRMLFlatSceneGL;
+    FExists: boolean;
+    FCollides: boolean;
+  public
+    { Constructor. This loads scene (using LoadLevelScene). }
+    constructor Create(AParentLevel: TLevel;
+      const SceneFileName: string; PrepareBackground: boolean);
+    destructor Destroy; override;
+
+    property ParentLevel: TLevel read FParentLevel;
+    property Scene: TVRMLFlatSceneGL read FScene;
+
+    { @noAutoLinkHere
+      TODO: ignored for now. }
+    property Exists: boolean read FExists default true;
+
+    { @noAutoLinkHere
+      Note that if not @link(Exists) then this doesn't matter
+      (not existing objects never participate in collision detection).
+      TODO: ignored for now. }
+    property Collides: boolean read FCollides default true;
+
+    function SceneTranslation(const AnimationTime: Single):
+      TVector3_Single; virtual; abstract;
+
+    function MoveAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const CameraRadius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function RayCollision(
+      out IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+  end;
+
   TLevel = class
   private
     FScene: TVRMLFlatSceneGL;
@@ -48,6 +157,7 @@ type
     FNavigationSpeed: Single;
     FLevelBox: TBox3d;
     FItems: TItemsOnLevelList;
+    FObjects: TLevelObjectsList;
     FHeadlight: TGLHeadlight;
 
     { Used only within constructor.
@@ -85,6 +195,14 @@ type
     FFootstepsSound: TSoundType;
     FGlobalAmbientLight: TVector4Single;
     FThunderEffect: TThunderEffect;
+
+    { Check collision (following MoveAllowedSimple mechanics) with
+      all Objects (not with the base level geometry). }
+    function ObjectsMoveAllowedSimple(
+      const CameraPos: TVector3Single;
+      const NewPos: TVector3Single;
+      const BecauseOfGravity: boolean;
+      const MovingObjectCameraRadius: Single): boolean;
   protected
     FBossCreature: TCreature;
 
@@ -184,6 +302,33 @@ type
       by level object. }
     property Creatures: TCreaturesList read FCreatures;
 
+    { Other objects (not items, not creatures) on the level.
+      Objects on this list are owned by level object.
+
+      Note that you @italic(can) modify this property
+      during TLevel lifetime. However, you have to be aware
+      of a couple of limitations:
+      @orderedList(
+        @item(You cannot modify this
+          when something iterates over these Objects.)
+
+        @item(Usually you shouldn't create some TLevelObject
+          instances when the game is running (as creating them sometimes needs
+          some small but noticeable time, e.g. to build TVRMLFlatSceneGL octree).
+
+          So even if you modify this property while the game plays,
+          you should have already prepared instances (created in level
+          constructor) to put on this list.)
+
+        @item(Beware that this changes indexes of items, and they may
+          be important for your SpecialObjectPicked.)
+      )
+      Usually, this means that it's more comfortable to just not modify
+      Objects list after you added all you need in the constructor.
+      You can instead toggle objects state by properties like
+      @link(TLevelMovingObject.Exists). }
+    property Objects: TLevelObjectsList read FObjects;
+
     property LightCastingShadowsPosition: TVector3Single
       read FLightCastingShadowsPosition;
 
@@ -191,7 +336,7 @@ type
       OctreeItemIndex: Integer): boolean; virtual;
 
     { LineOfSight, MoveAllowed and GetCameraHeight perform
-      collision detection with the level.
+      collision detection with the level and level objects.
 
       Note that MoveAllowed and GetCameraHeight treat transparent
       objects as others --- i.e., they collide. You have to override
@@ -259,14 +404,18 @@ type
       const Item: TOctreeItem): boolean; virtual;
 
     { Override this to allow player to pick some additional objects,
-      not contained in @link(Scene). Ray0 and RayVector describe picking
+      not contained in @link(Scene) or @link(Objects).
+      Ray0 and RayVector describe picking
       ray, RayVector is always normalized (i.e. has length 1).
       If there was a pick: set IntersectionDistance and return
       something >= 0. Otherwise return -1.
 
       Returned index will be passed to SpecialObjectPicked.
-      In the future, TLevel may show some property like SpecialObjects
-      that will allow to explicitly enumerate special objects. }
+
+      Default implementation in this class checks here collision
+      with all items in @link(Objects) list, in case of collision
+      it returns their index. So in descendants, if you override this,
+      you should use indexes larger than maximum @link(Objects) size to be safe. }
     function SpecialObjectsTryPick(var IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single): Integer; virtual;
 
@@ -536,28 +685,23 @@ type
       SpecialObjectIndex: Integer); override;
   end;
 
-  TDoomLevelDoor = class
+  TDoomLevelDoor = class(TLevelMovingObject)
   private
     UsedSound: TALAllocatedSource;
     procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
     procedure PlaySound(SoundType: TSoundType);
   public
-    constructor Create;
+    constructor Create(AParentLevel: TLevel;
+      const SceneFileName: string);
     destructor Destroy; override;
 
     { Constant fields, i.e. once set in TDoomE1M1Level constructor.
       Scene should have door placed in closed position.
       @groupBegin }
-    SceneFileName: string;
     OpenCloseTime: Single;
     OpenMove: TVector3_Single;
     StayOpenTime: Single;
     { @groupEnd }
-
-    { Constants fields set in level constructor
-      (uniformly for all doors). }
-    ParentLevel: TLevel;
-    Scene: TVRMLFlatSceneGL;
 
     { Variable fields. They may change during level lifetime.
       They are initialized automatically in level constructor
@@ -571,41 +715,27 @@ type
     procedure DoClose;
     procedure RevertDoOpen;
 
-    function SceneTranslation(const AnimationTime: Single): TVector3_Single;
+    function SceneTranslation(const AnimationTime: Single):
+      TVector3_Single; override;
 
     function CompletelyOpen: boolean;
     function CompletelyClosed: boolean;
 
-    function MoveAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const CameraRadius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
-
-    function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+    procedure Render(const Frustum: TFrustum); override;
   end;
 
   TDoomE1M1Level = class(TLevel)
   private
-    { If you want to add a new door, just increase high index of this array
-      and then init your door in TDoomE1M1Level constructor. }
-    Doors: array[0..3] of TDoomLevelDoor;
-
-    { Check collision only with doors --- but not with real level geometry
-      (i.e. not with things handled by inherited
-      MoveAllowed, MoveAllowedSimple). }
-    function MoveAllowedAdditionalSimple(
-      const CameraPos: TVector3Single;
-      const NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean;
-
     procedure RenameCreatures(Node: TVRMLNode);
 
     FHintOpenDoorBox: TBox3d;
     HintOpenDoorShown: boolean;
 
     FakeWall: TVRMLFlatSceneGL;
+
+    Elevator49: TVRMLFlatSceneGL;
+    Elevator49Down: boolean;
+    Elevator49DownBox: TBox3d;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -618,25 +748,9 @@ type
     class function Title: string; override;
     class function Number: Integer; override;
 
-    function LineOfSight(
-      const Pos1, Pos2: TVector3Single): boolean; override;
-
-    function MoveAllowed(const CameraPos: TVector3Single;
-      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean; override;
-
-    function MoveAllowedSimple(const CameraPos: TVector3Single;
-      const NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean; override;
-
     procedure Render(const Frustum: TFrustum); override;
 
     procedure Idle(const CompSpeed: Single); override;
-
-    function SpecialObjectsTryPick(var IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single): Integer; override;
 
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer); override;
@@ -688,10 +802,86 @@ uses SysUtils, OpenGLh, BackgroundGL,
 
 {$define read_implementation}
 {$I objectslist_1.inc}
+{$I objectslist_2.inc}
 
 function CastleLevelsPath: string;
 begin
   Result := ProgramDataPath + 'data' + PathDelim + 'levels' + PathDelim;
+end;
+
+{ TLevelMovingObject --------------------------------------------------------- }
+
+constructor TLevelMovingObject.Create(AParentLevel: TLevel;
+  const SceneFileName: string; PrepareBackground: boolean);
+begin
+  inherited Create;
+  FParentLevel := AParentLevel;
+  FScene := ParentLevel.LoadLevelScene(SceneFileName, true, PrepareBackground);
+  FExists := true;
+  FCollides := true;
+end;
+
+destructor TLevelMovingObject.Destroy;
+begin
+  FreeAndNil(FScene);
+  inherited;
+end;
+
+function TLevelMovingObject.MoveAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const CameraRadius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  T: TVector3_Single;
+begin
+  { I have to check collision between
+      Scene + SceneTranslation and (OldPos, ProposedNewPos).
+    So it's equivalent to checking for collision between
+      Scene and (OldPos, ProposedNewPos) - SceneTranslation
+    And this way I can use Scene.DefaultTriangleOctree.MoveAllowedSimple. }
+
+  T := SceneTranslation(ParentLevel.AnimationTime);
+  Result := Scene.DefaultTriangleOctree.MoveAllowedSimple(
+    VectorSubtract(OldPos, T.Data),
+    VectorSubtract(ProposedNewPos, T.Data),
+    CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
+end;
+
+function TLevelMovingObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  T: TVector3_Single;
+begin
+  { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+    use Scene.DefaultTriangleOctree.SegmentCollsion with
+    SceneTranslation. }
+
+  T := SceneTranslation(ParentLevel.AnimationTime);
+  Result := Scene.DefaultTriangleOctree.SegmentCollision(
+    VectorSubtract(Pos1, T.Data),
+    VectorSubtract(Pos2, T.Data),
+    false, NoItemIndex, false, ItemsToIgnoreFunc)
+    <> NoItemIndex;
+end;
+
+function TLevelMovingObject.RayCollision(
+  out IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  T: TVector3_Single;
+begin
+  { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+    use Scene.DefaultTriangleOctree.RayCollsion with
+    SceneTranslation. }
+
+  T := SceneTranslation(ParentLevel.AnimationTime);
+  Result := Scene.DefaultTriangleOctree.RayCollision(
+    IntersectionDistance,
+    VectorSubtract(Ray0, T.Data),
+    RayVector,
+    false, NoItemIndex, false, ItemsToIgnoreFunc)
+    <> NoItemIndex;
 end;
 
 { TLevel --------------------------------------------------------------------- }
@@ -846,6 +1036,8 @@ begin
     Scene.CreateTriangleOctree('Loading level (triangle octree)');
   Scene.DefaultShapeStateOctree :=
     Scene.CreateShapeStateOctree('Loading level (ShapeState octree)');
+
+  FObjects := TLevelObjectsList.Create;
 end;
 
 destructor TLevel.Destroy;
@@ -858,6 +1050,7 @@ begin
   FreeAndNil(FScene);
   FreeWithContentsAndNil(FItems);
   FreeWithContentsAndNil(FCreatures);
+  FreeWithContentsAndNil(FObjects);
   inherited;
 end;
 
@@ -1044,10 +1237,42 @@ end;
 
 function TLevel.LineOfSight(
   const Pos1, Pos2: TVector3Single): boolean;
+var
+  I: Integer;
 begin
   Result := Scene.DefaultTriangleOctree.SegmentCollision(
     Pos1, Pos2, false, NoItemIndex, false,
     @Scene.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex;
+
+  if not Result then
+    Exit;
+
+  for I := 0 to Objects.High do
+    if Objects[I].SegmentCollision(Pos1, Pos2,
+      @Scene.DefaultTriangleOctree.IgnoreTransparentItem) then
+    begin
+      Result := false;
+      Exit;
+    end;
+end;
+
+function TLevel.ObjectsMoveAllowedSimple(
+  const CameraPos: TVector3Single;
+  const NewPos: TVector3Single;
+  const BecauseOfGravity: boolean;
+  const MovingObjectCameraRadius: Single): boolean;
+var
+  I: Integer;
+begin
+  for I := 0 to Objects.High do
+    if not Objects[I].MoveAllowedSimple(CameraPos, NewPos,
+      MovingObjectCameraRadius, @CollisionIgnoreItem) then
+    begin
+      Result := false;
+      Exit;
+    end;
+
+  Result := true;
 end;
 
 function TLevel.MoveAllowed(const CameraPos: TVector3Single;
@@ -1059,7 +1284,9 @@ begin
     Scene.DefaultTriangleOctree.MoveAllowed(
       CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius,
       NoItemIndex, @CollisionIgnoreItem) and
-    Box3dPointInside(NewPos, LevelBox);
+    Box3dPointInside(NewPos, LevelBox) and
+    ObjectsMoveAllowedSimple(
+      CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
 end;
 
 function TLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
@@ -1071,7 +1298,9 @@ begin
     Box3dPointInside(NewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveAllowedSimple(
       CameraPos, NewPos, MovingObjectCameraRadius,
-      NoItemIndex, @CollisionIgnoreItem);
+      NoItemIndex, @CollisionIgnoreItem) and
+    ObjectsMoveAllowedSimple(
+      CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
 end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
@@ -1081,6 +1310,8 @@ begin
     CameraPos, HomeCameraUp,
     IsAboveTheGround, SqrHeightAboveTheGround,
     NoItemIndex, @CollisionIgnoreItem);
+  { TODO: for all Objects override this. Only for Doom E1M1 doors this
+    didn't need overriding, since all doors opened down. }
 end;
 
 function TLevel.PlayerMoveAllowed(Navigator: TMatrixWalker;
@@ -1112,8 +1343,13 @@ begin
 end;
 
 procedure TLevel.Render(const Frustum: TFrustum);
+var
+  I: Integer;
 begin
   Scene.RenderFrustumOctree(Frustum);
+
+  for I := 0 to Objects.High do
+    Objects[I].Render(Frustum);
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single);
@@ -1133,8 +1369,20 @@ end;
 
 function TLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single): Integer;
+var
+  I: Integer;
+  ThisIntersectionDistance: Single;
 begin
   Result := -1;
+
+  for I := 0 to Objects.High do
+    if Objects[I].RayCollision(ThisIntersectionDistance, Ray0, RayVector, nil) and
+       ( (Result = -1) or
+         (ThisIntersectionDistance < IntersectionDistance) ) then
+    begin
+      IntersectionDistance := ThisIntersectionDistance;
+      Result := I;
+    end;
 end;
 
 procedure TLevel.SpecialObjectPicked(const Distance: Single;
@@ -2160,9 +2408,10 @@ end;
 
 { TDoomLevelDoor ------------------------------------------------------------- }
 
-constructor TDoomLevelDoor.Create;
+constructor TDoomLevelDoor.Create(AParentLevel: TLevel;
+  const SceneFileName: string);
 begin
-  inherited;
+  inherited Create(AParentLevel, SceneFileName, false);
 end;
 
 destructor TDoomLevelDoor.Destroy;
@@ -2253,41 +2502,24 @@ begin
     (ParentLevel.AnimationTime - OpenStateChangeTime > OpenCloseTime);
 end;
 
-function TDoomLevelDoor.MoveAllowedSimple(
-  const OldPos, ProposedNewPos: TVector3Single;
-  const CameraRadius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
-var
-  T: TVector3_Single;
+procedure TDoomLevelDoor.Render(const Frustum: TFrustum);
 begin
-  { I have to check collision between
-      Scene + SceneTranslation and (OldPos, ProposedNewPos).
-    So it's equivalent to checking for collision between
-      Scene and (OldPos, ProposedNewPos) - SceneTranslation
-    And this way I can use Scene.DefaultTriangleOctree.MoveAllowedSimple. }
+  { TODO: this should be implemented in TLevelMovingObject, in a manner
+    that is able to use Scene.RenderFrustum always (by translating the
+    frustum) }
 
-  T := SceneTranslation(ParentLevel.AnimationTime);
-  Result := Scene.DefaultTriangleOctree.MoveAllowedSimple(
-    VectorSubtract(OldPos, T.Data),
-    VectorSubtract(ProposedNewPos, T.Data),
-    CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
-end;
-
-function TDoomLevelDoor.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
-var
-  T: TVector3_Single;
-begin
-  { We use the same trick as in TDoomLevelDoor.MoveAllowedSimple to
-    use Scene.DefaultTriangleOctree.SegmentCollsion with
-    SceneTranslation. }
-
-  T := SceneTranslation(ParentLevel.AnimationTime);
-  Result := Scene.DefaultTriangleOctree.SegmentCollision(
-    VectorSubtract(Pos1, T.Data),
-    VectorSubtract(Pos2, T.Data),
-    false, NoItemIndex, false, ItemsToIgnoreFunc)
-    <> NoItemIndex;
+  { The completely closed door is the most common case
+    (since all doors close automatically, and initially all are closed...).
+    Fortunately, it's also the case when we have constructed an octree,
+    so we can efficiently render it by RenderFrustum call. }
+  if CompletelyClosed then
+    Scene.RenderFrustum(Frustum) else
+    begin
+      glPushMatrix;
+        glTranslatev(SceneTranslation(ParentLevel.AnimationTime));
+        Scene.Render(nil);
+      glPopMatrix;
+    end;
 end;
 
 { TDoomE1M1Level ------------------------------------------------------------- }
@@ -2295,12 +2527,33 @@ end;
 constructor TDoomE1M1Level.Create;
 var
   DoomDoorsPathPrefix: string;
-  I: Integer;
-  Door: TDoomLevelDoor;
+
+  function MakeDoor(const FileName: string): TDoomLevelDoor;
+  begin
+    Result := TDoomLevelDoor.Create(Self, DoomDoorsPathPrefix + FileName);
+
+    { Although I didn't know it initially, it turns out that all doors
+      on Doom E1M1 level (maybe all doors totally ?) have the same
+      values for parameters below. }
+    Result.OpenCloseTime := 1.0;
+    Result.OpenMove.Init(0, 0, 3.5);
+    Result.StayOpenTime := 5.0;
+
+    { All doors are initially closed. }
+    Result.Open := false;
+
+    { We set Result.OpenStateChangeTime to a past time, to be sure
+      that we don't treat the door as "closing right now". }
+    Result.OpenStateChangeTime := - 10 * Result.OpenCloseTime;
+
+    Result.UsedSound := nil;
+  end;
+
 begin
   inherited;
 
-  PlayedMusicSound := stDoomE1M1Music;
+  {}//PlayedMusicSound := stDoomE1M1Music;
+  {TODO: use elevator}
 
   if Headlight <> nil then
   begin
@@ -2309,70 +2562,27 @@ begin
     Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
   end;
 
-  Doors[0] := TDoomLevelDoor.Create;
-  Doors[0].SceneFileName := 'door2_3_closed.wrl';
-  Doors[0].OpenCloseTime := 1.0;
-  Doors[0].OpenMove.Init(0, 0, 7/2);
-  Doors[0].StayOpenTime := 5.0;
-
-  Doors[1] := TDoomLevelDoor.Create;
-  Doors[1].SceneFileName := 'door4_5_closed.wrl';
-  Doors[1].OpenCloseTime := 1.0;
-  Doors[1].OpenMove.Init(0, 0, 3.5);
-  Doors[1].StayOpenTime := 5.0;
-
-  Doors[2] := TDoomLevelDoor.Create;
-  Doors[2].SceneFileName := 'door4_7_closed.wrl';
-  Doors[2].OpenCloseTime := 1.0;
-  Doors[2].OpenMove.Init(0, 0, 3.5);
-  Doors[2].StayOpenTime := 5.0;
-
-  Doors[3] := TDoomLevelDoor.Create;
-  Doors[3].SceneFileName := 'door5_6_closed.wrl';
-  Doors[3].OpenCloseTime := 1.0;
-  Doors[3].OpenMove.Init(0, 0, 3.5);
-  Doors[3].StayOpenTime := 5.0;
-
   DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +
     PathDelim;
 
-  for I := Low(Doors) to High(Doors) do
-  begin
-    Door := Doors[I];
-
-    Door.ParentLevel := Self;
-
-    { prepare Door.Scene }
-    Door.Scene := LoadLevelScene(DoomDoorsPathPrefix + Door.SceneFileName,
-      true, false);
-
-    { All doors are initially closed.
-      We set Door.OpenStateChangeTime to a past time, to be sure
-      that we don't treat the door as "closing right now". }
-    Door.Open := false;
-    Door.OpenStateChangeTime := - 10 * Door.OpenCloseTime;
-
-    Door.UsedSound := nil;
-  end;
+  Objects.Add(MakeDoor('door2_3_closed.wrl'));
+  Objects.Add(MakeDoor('door4_5_closed.wrl'));
+  Objects.Add(MakeDoor('door4_7_closed.wrl'));
+  Objects.Add(MakeDoor('door5_6_closed.wrl'));
 
   FakeWall := LoadLevelScene(DoomDoorsPathPrefix + 'fake_wall_final.wrl',
     false, false);
+
+  Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
+    true, false);
 
   HintOpenDoorShown := false;
 end;
 
 destructor TDoomE1M1Level.Destroy;
-var
-  I: Integer;
 begin
-  for I := Low(Doors) to High(Doors) do
-    if Doors[I] <> nil then
-    begin
-      FreeAndNil(Doors[I].Scene);
-      FreeAndNil(Doors[I]);
-    end;
-
   FreeAndNil(FakeWall);
+  FreeAndNil(Elevator49);
 
   inherited;
 end;
@@ -2397,108 +2607,13 @@ begin
   Result := 90;
 end;
 
-function TDoomE1M1Level.LineOfSight(
-  const Pos1, Pos2: TVector3Single): boolean;
-var
-  I: Integer;
-  Door: TDoomLevelDoor;
-begin
-  Result := inherited;
-
-  if not Result then
-    Exit;
-
-  for I := Low(Doors) to High(Doors) do
-  begin
-    Door := Doors[I];
-
-    if Door.SegmentCollision(Pos1, Pos2,
-      @Scene.DefaultTriangleOctree.IgnoreTransparentItem) then
-    begin
-      Result := false;
-      Exit;
-    end;
-  end;
-end;
-
-function TDoomE1M1Level.MoveAllowedAdditionalSimple(
-  const CameraPos: TVector3Single;
-  const NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
-var
-  I: Integer;
-begin
-  for I := Low(Doors) to High(Doors) do
-  begin
-    if not Doors[I].MoveAllowedSimple(CameraPos, NewPos,
-      MovingObjectCameraRadius, nil) then
-    begin
-      Result := false;
-      Exit;
-    end;
-  end;
-
-  Result := true;
-end;
-
-function TDoomE1M1Level.MoveAllowed(const CameraPos: TVector3Single;
-  const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
-begin
-  Result := inherited;
-
-  Result := Result and MoveAllowedAdditionalSimple(
-    CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
-end;
-
-function TDoomE1M1Level.MoveAllowedSimple(const CameraPos: TVector3Single;
-  const NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
-begin
-  Result := inherited;
-
-  Result := Result and MoveAllowedAdditionalSimple(
-    CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
-end;
-
-{
-procedure TDoomE1M1Level.GetCameraHeight(const CameraPos: TVector3Single;
-  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
-
-No need to override, since all doors open upward ?
-}
-
 procedure TDoomE1M1Level.Render(const Frustum: TFrustum);
-var
-  I: Integer;
-  Door: TDoomLevelDoor;
 begin
   inherited;
 
   { FakeWall is always rendered. That's it.
     It never participates in collision detection, line of sight collision, etc. }
   FakeWall.RenderFrustum(Frustum);
-
-  for I := Low(Doors) to High(Doors) do
-  begin
-    Door := Doors[I];
-
-    { The completely closed door is the most common case
-      (since all doors close automatically, and initially all are closed...).
-      Fortunately, it's also the case when we have constructed an octree,
-      so we can efficiently render it by RenderFrustum call. }
-    if Door.CompletelyClosed then
-      Door.Scene.RenderFrustum(Frustum) else
-      begin
-        glPushMatrix;
-          glTranslatev(Door.SceneTranslation(AnimationTime));
-          Door.Scene.Render(nil);
-        glPopMatrix;
-      end;
-  end;
 end;
 
 procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
@@ -2536,33 +2651,35 @@ begin
     entering into collision with player/creature because of
     door move). }
   NewAnimationTime := AnimationTime + CompSpeed / 50;
-  for I := Low(Doors) to High(Doors) do
-  begin
-    Door := Doors[I];
+  for I := 0 to Objects.High do
+    if Objects[I] is TDoomLevelDoor then
+    begin
+      Door := TDoomLevelDoor(Objects[I]);
 
-    if (not Door.Open) and
-      (AnimationTime - Door.OpenStateChangeTime < Door.OpenCloseTime) and
-      SomethingWillBlockClosingDoor(Door, NewAnimationTime) then
-      Door.RevertDoOpen;
-  end;
+      if (not Door.Open) and
+        (AnimationTime - Door.OpenStateChangeTime < Door.OpenCloseTime) and
+        SomethingWillBlockClosingDoor(Door, NewAnimationTime) then
+        Door.RevertDoOpen;
+    end;
 
   inherited;
 
-  for I := Low(Doors) to High(Doors) do
-  begin
-    Door := Doors[I];
+  for I := 0 to Objects.High do
+    if Objects[I] is TDoomLevelDoor then
+    begin
+      Door := TDoomLevelDoor(Objects[I]);
 
-    if Door.Open and
-      (AnimationTime - Door.OpenStateChangeTime >
-        Door.OpenCloseTime + Door.StayOpenTime) then
-      Door.DoClose;
+      if Door.Open and
+        (AnimationTime - Door.OpenStateChangeTime >
+          Door.OpenCloseTime + Door.StayOpenTime) then
+        Door.DoClose;
 
-    { If the door open/close sound is longer than the Door.OpenCloseTime,
-      stop this sound after the door is completely opened/closed. }
-    if (AnimationTime - Door.OpenStateChangeTime > Door.OpenCloseTime) and
-      (Door.UsedSound <> nil) then
-      Door.UsedSound.DoUsingEnd;
-  end;
+      { If the door open/close sound is longer than the Door.OpenCloseTime,
+        stop this sound after the door is completely opened/closed. }
+      if (AnimationTime - Door.OpenStateChangeTime > Door.OpenCloseTime) and
+        (Door.UsedSound <> nil) then
+        Door.UsedSound.DoUsingEnd;
+    end;
 
   if (not HintOpenDoorShown) and
     Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then
@@ -2572,53 +2689,24 @@ begin
   end;
 end;
 
-function TDoomE1M1Level.SpecialObjectsTryPick(var IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single): Integer;
-
-  procedure MakeBonusScene(Scene: TVRMLFlatSceneGL; SpecialObjectIndex: Integer);
-  var
-    ThisIntersectionDistance: Single;
-  begin
-    if (Scene.DefaultTriangleOctree.RayCollision(
-      ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex,
-      false, nil) <> NoItemIndex) and
-      ( (Result = -1) or
-        (ThisIntersectionDistance < IntersectionDistance) ) then
-    begin
-      IntersectionDistance := ThisIntersectionDistance;
-      Result := SpecialObjectIndex;
-    end;
-  end;
-
-var
-  I: Integer;
-  Door: TDoomLevelDoor;
-begin
-  Result := inherited SpecialObjectsTryPick(
-    IntersectionDistance, Ray0, RayVector);
-
-  for I := Low(Doors) to High(Doors) do
-  begin
-    Door := Doors[I];
-
-    { Only if the door is completely closed
-      (and not during closing right now) we allow player to "pick" it
-      (i.e. which will cause open). }
-    if Door.CompletelyClosed then
-      MakeBonusScene(Door.Scene, I);
-  end;
-end;
-
 procedure TDoomE1M1Level.SpecialObjectPicked(const Distance: Single;
   SpecialObjectIndex: Integer);
+var
+  Door: TDoomLevelDoor;
 begin
   inherited;
 
-  if Between(SpecialObjectIndex, Low(Doors), High(Doors)) then
+  if Between(SpecialObjectIndex, 0, Objects.High) and
+     (Objects[SpecialObjectIndex] is TDoomLevelDoor) then
   begin
+    Door := TDoomLevelDoor(Objects[SpecialObjectIndex]);
     if Distance > 7 then
       TimeMessage('You see a door. You''re too far to open it from here') else
-      Doors[SpecialObjectIndex].DoOpen;
+    { Only if the door is completely closed
+      (and not during closing right now) we allow player to open it. }
+    if not Door.CompletelyClosed then
+      TimeMessage('You see a door. It''s already open') else
+      Door.DoOpen;
   end;
 end;
 
@@ -2642,6 +2730,7 @@ begin
   inherited;
   RemoveBoxNodeCheck(FHintOpenDoorBox, 'HintOpenDoorBox');
   Scene.RootNode.EnumerateNodes(@RenameCreatures, true);
+  RemoveBoxNodeCheck(Elevator49DownBox, 'Elevator49DownBox');
 end;
 
 procedure TDoomE1M1Level.PrepareNewPlayer(NewPlayer: TPlayer);

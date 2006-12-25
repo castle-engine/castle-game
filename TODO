@@ -45,6 +45,13 @@
   2 alien death animations, depending on the direction of attack
   (I have direction of attack for knockback anyway) ?
 
+- on Doom level: no way to turn off music ?
+  alSourcef(MusicPlayer.FAllocatedSource.ALSource,
+        AL_GAIN, MusicVolume * SoundInfos[MusicPlayer.PlayedSound].Gain);
+  doesn't mute the music !
+  In fact, it doesn't seem to affect music at all. Strange, as it works
+  for other music !
+
 ----------------------------------------
 
 - knockback for player sword (or for some other short-range weapon ?)
