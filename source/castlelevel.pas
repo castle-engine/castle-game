@@ -97,6 +97,10 @@ type
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); virtual; abstract;
   end;
 
   TObjectsListItem_2 = TLevelObject;
@@ -155,6 +159,7 @@ type
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
   end;
 
@@ -229,6 +234,7 @@ type
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
   end;
 
@@ -717,11 +723,12 @@ type
     FHintOpenDoorBox: TBox3d;
     HintOpenDoorBoxShown: boolean;
 
-    FGateExit: TVRMLFlatSceneGL;
+    FGateExit: TLevelStaticObject;
 
     FDoEndSequence: boolean;
 
     FEndSequence: TVRMLFlatSceneGL;
+    procedure SetDoEndSequence(Value: boolean);
   protected
     procedure ChangeLevelScene; override;
   public
@@ -745,26 +752,7 @@ type
     { True means that GateExit will not be rendered (or collided)
       and EndSequence will be rendered. }
     property DoEndSequence: boolean
-      read FDoEndSequence write FDoEndSequence default false;
-
-    function LineOfSight(
-      const Pos1, Pos2: TVector3Single): boolean; override;
-
-    function MoveAllowed(const CameraPos: TVector3Single;
-      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean; override;
-
-    function MoveAllowedSimple(const CameraPos: TVector3Single;
-      const NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean; override;
-
-    procedure GetCameraHeight(const CameraPos: TVector3Single;
-      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single); override;
-
-    function SpecialObjectsTryPick(var IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single): Integer; override;
+      read FDoEndSequence write SetDoEndSequence default false;
 
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer); override;
@@ -953,6 +941,7 @@ begin
 end;
 
 procedure TLevelStaticObject.GetCameraHeight(const CameraPos: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 var
   IsAboveThis: boolean;
@@ -961,9 +950,9 @@ begin
   if Exists and Collides then
   begin
     Scene.DefaultTriangleOctree.GetCameraHeight(
-      CameraPos, HomeCameraUp,
+      CameraPos, ParentLevel.HomeCameraUp,
       IsAboveThis, SqrHeightAboveThis,
-      NoItemIndex, @CollisionIgnoreItem);
+      NoItemIndex, ItemsToIgnoreFunc);
 
     if IsAboveThis then
     begin
@@ -1057,6 +1046,37 @@ begin
     RayVector,
     false, NoItemIndex, false, ItemsToIgnoreFunc)
     <> NoItemIndex;
+end;
+
+procedure TLevelMovingObject.GetCameraHeight(const CameraPos: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+var
+  IsAboveThis: boolean;
+  SqrHeightAboveThis: Single;
+  T: TVector3_Single;
+begin
+  if Exists and Collides then
+  begin
+    T := SceneTranslation(ParentLevel.AnimationTime);
+
+    Scene.DefaultTriangleOctree.GetCameraHeight(
+      VectorSubtract(CameraPos, T.Data),
+      ParentLevel.HomeCameraUp,
+      IsAboveThis, SqrHeightAboveThis,
+      NoItemIndex, ItemsToIgnoreFunc);
+
+    if IsAboveThis then
+    begin
+      if not IsAboveTheGround then
+      begin
+        IsAboveTheGround := IsAboveThis;
+        SqrHeightAboveTheGround := SqrHeightAboveThis;
+      end else
+        SqrHeightAboveTheGround :=
+          Min(SqrHeightAboveTheGround, SqrHeightAboveThis);
+    end;
+  end;
 end;
 
 { TLevel --------------------------------------------------------------------- }
@@ -1489,7 +1509,7 @@ begin
     NoItemIndex, @CollisionIgnoreItem);
 
   for I := 0 to Objects.High do
-    Objects[I].GetCameraHeight(CameraPos,
+    Objects[I].GetCameraHeight(CameraPos, @CollisionIgnoreItem,
       IsAboveTheGround, SqrHeightAboveTheGround);
 end;
 
@@ -2213,9 +2233,9 @@ begin
     'end_sequence' + PathDelim + 'end_sequence_final.wrl',
     false, true);
 
-  FGateExit := LoadLevelScene(
-    CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
-    true, false);
+  FGateExit := TLevelStaticObject.Create(Self,
+    CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl', false);
+  Objects.Add(FGateExit);
 
   BossIndex := Creatures.FindKind(SpiderQueen);
   if BossIndex <> -1 then
@@ -2226,8 +2246,13 @@ destructor TCagesLevel.Destroy;
 begin
   FreeAndNil(FSpidersAppearing);
   FreeAndNil(FEndSequence);
-  FreeAndNil(FGateExit);
   inherited;
+end;
+
+procedure TCagesLevel.SetDoEndSequence(Value: boolean);
+begin
+  FDoEndSequence := Value;
+  FGateExit.Exists := not DoEndSequence;
 end;
 
 procedure TCagesLevel.ChangeLevelScene;
@@ -2424,115 +2449,10 @@ begin
     glPopMatrix;
   end;
 
-  if not DoEndSequence then
-    FGateExit.RenderFrustum(Frustum);
-
   inherited;
 
   if DoEndSequence then
     EndSequence.RenderFrustum(Frustum);
-end;
-
-function TCagesLevel.LineOfSight(
-  const Pos1, Pos2: TVector3Single): boolean;
-begin
-  Result := inherited;
-
-  if not DoEndSequence then
-  begin
-    Result := Result and
-      (FGateExit.DefaultTriangleOctree.SegmentCollision(
-        Pos1, Pos2, false, NoItemIndex, false,
-        @FGateExit.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
-  end;
-end;
-
-function TCagesLevel.MoveAllowed(const CameraPos: TVector3Single;
-  const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
-begin
-  Result := inherited;
-
-  if not DoEndSequence then
-  begin
-    Result := Result and
-      FGateExit.DefaultTriangleOctree.MoveAllowedSimple(
-        CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
-  end;
-end;
-
-function TCagesLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
-  const NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
-begin
-  Result := inherited;
-
-  if not DoEndSequence then
-  begin
-    Result := Result and
-      FGateExit.DefaultTriangleOctree.MoveAllowedSimple(
-        CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
-  end;
-end;
-
-procedure TCagesLevel.GetCameraHeight(const CameraPos: TVector3Single;
-  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
-
-  procedure MakeBonusScene(BonusScene: TVRMLFlatSceneGL);
-  var
-    IsAboveTheBonusScene: boolean;
-    SqrHeightAboveTheBonusScene: Single;
-  begin
-    BonusScene.DefaultTriangleOctree.GetCameraHeight(
-      CameraPos, HomeCameraUp,
-      IsAboveTheBonusScene, SqrHeightAboveTheBonusScene,
-      NoItemIndex, nil);
-
-    if IsAboveTheBonusScene then
-    begin
-      if not IsAboveTheGround then
-      begin
-        IsAboveTheGround := IsAboveTheBonusScene;
-        SqrHeightAboveTheGround := SqrHeightAboveTheBonusScene;
-      end else
-        SqrHeightAboveTheGround :=
-          Min(SqrHeightAboveTheGround, SqrHeightAboveTheBonusScene);
-    end;
-  end;
-
-begin
-  inherited GetCameraHeight(CameraPos, IsAboveTheGround, SqrHeightAboveTheGround);
-
-  if not DoEndSequence then
-    MakeBonusScene(FGateExit);
-end;
-
-function TCagesLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single): Integer;
-
-  procedure MakeBonusScene(Scene: TVRMLFlatSceneGL; SpecialObjectIndex: Integer);
-  var
-    ThisIntersectionDistance: Single;
-  begin
-    if (Scene.DefaultTriangleOctree.RayCollision(
-      ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex,
-      false, nil) <> NoItemIndex) and
-      ( (Result = -1) or
-        (ThisIntersectionDistance < IntersectionDistance) ) then
-    begin
-      IntersectionDistance := ThisIntersectionDistance;
-      Result := SpecialObjectIndex;
-    end;
-  end;
-
-begin
-  Result := inherited SpecialObjectsTryPick(
-    IntersectionDistance, Ray0, RayVector);
-
-  if not DoEndSequence then
-    MakeBonusScene(FGateExit, 0);
 end;
 
 procedure TCagesLevel.SpecialObjectPicked(const Distance: Single;
