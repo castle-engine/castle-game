@@ -65,7 +65,25 @@ type
     Implementing and using universal (reusable) TLevelObject descendants
     is a better idea. }
   TLevelObject = class
-    procedure Render(const Frustum: TFrustum); virtual; abstract;
+  private
+    FParentLevel: TLevel;
+  public
+    constructor Create(AParentLevel: TLevel);
+
+    property ParentLevel: TLevel read FParentLevel;
+
+    { This should render given object.
+
+      It can be optimized to not
+      render the object if it's not inside the Frustum.
+
+      It will be called twice for each rendered frame:
+      first time with ATransparent = @false, second time with
+      ATransparent = @true. You should render only fully opaque
+      parts in the first pass and only the transparent parts in the
+      second pass. for the reason see TObjectKind.Transparent comments. }
+    procedure Render(const Frustum: TFrustum;
+      const ATransparent: boolean); virtual; abstract;
 
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
@@ -85,6 +103,61 @@ type
   {$I objectslist_2.inc}
   TLevelObjectsList = TObjectsList_2;
 
+  { This a VRML scene that can appear/disappear from the level.
+
+    It's basically just a TVRMLFlatSceneGL instance
+    (loaded with LoadLevelScene, always with a DefaultTriangleOctree).
+    Plus properties @link(Exists) and @link(Collides) which allow you
+    to hide this object from evrything (or only from the collision detection).
+
+    You could as well use TLevelMovingObject with SceneTranslation always
+    set to zero vector, but this class may be able to work a little faster. }
+  TLevelStaticObject = class(TLevelObject)
+  private
+    FExists: boolean;
+    FCollides: boolean;
+    FScene: TVRMLFlatSceneGL;
+    FTransparent: boolean;
+  public
+    constructor Create(AParentLevel: TLevel;
+      const SceneFileName: string; PrepareBackground: boolean);
+    destructor Destroy; override;
+
+    property Scene: TVRMLFlatSceneGL read FScene;
+
+    { This level object must be either completely transparent or
+      completely opaque. This property determines which one it is. }
+    property Transparent: boolean read FTransparent write FTransparent
+      default false;
+
+    { @noAutoLinkHere }
+    property Exists: boolean read FExists write FExists default true;
+
+    { @noAutoLinkHere
+      Note that if not @link(Exists) then this doesn't matter
+      (not existing objects never participate in collision detection). }
+    property Collides: boolean read FCollides write FCollides default true;
+
+    procedure Render(const Frustum: TFrustum;
+      const ATransparent: boolean); override;
+
+    function MoveAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const CameraRadius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function RayCollision(
+      out IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
+  end;
+
   { This a VRML scene that moves on the level.
 
     It's basically just a TVRMLFlatSceneGL instance,
@@ -103,21 +176,31 @@ type
     when something happens. See @link(Exists).
 
     It has methods to render and query it, that take into account
-    the Scene translated by SceneTranslation. }
+    the Scene translated by SceneTranslation.
+
+    Note that if SceneTranslation actually changes over time then
+    you have to take care of at least one additional thing yourself:
+    what happens when collision occurs because of the move of this object ?
+    I.e. something blocks it's move ? See e.g. the Doom level Idle
+    method to see how it can be handled. }
   TLevelMovingObject = class(TLevelObject)
   private
-    FParentLevel: TLevel;
     FScene: TVRMLFlatSceneGL;
     FExists: boolean;
     FCollides: boolean;
+    FTransparent: boolean;
   public
     { Constructor. This loads scene (using LoadLevelScene). }
     constructor Create(AParentLevel: TLevel;
       const SceneFileName: string; PrepareBackground: boolean);
     destructor Destroy; override;
 
-    property ParentLevel: TLevel read FParentLevel;
     property Scene: TVRMLFlatSceneGL read FScene;
+
+    { This level object must be either completely transparent or
+      completely opaque. This property determines which one it is. }
+    property Transparent: boolean read FTransparent write FTransparent
+      default false;
 
     { @noAutoLinkHere
       TODO: ignored for now. }
@@ -144,6 +227,9 @@ type
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
   end;
 
   TLevel = class
@@ -517,11 +603,10 @@ type
     FHintButtonBox: TBox3d;
     FHintButtonShown: boolean;
 
-    StairsBlocker: TVRMLFlatSceneGL;
-    StairsBlockerExists: boolean;
+    StairsBlocker: TLevelStaticObject;
 
-    { Check collision only with Symbol, Button, StairsBlocker
-      --- but not with real level geometry
+    { Check collision only with Symbol, Button
+      --- but not with real level and level objects geometry
       (i.e. not with things handled by inherited
       MoveAllowed, MoveAllowedSimple). }
     function MoveAllowedAdditionalSimple(
@@ -721,7 +806,8 @@ type
     function CompletelyOpen: boolean;
     function CompletelyClosed: boolean;
 
-    procedure Render(const Frustum: TFrustum); override;
+    procedure Render(const Frustum: TFrustum;
+      const ATransparent: boolean); override;
   end;
 
   TDoomE1M1Level = class(TLevel)
@@ -731,7 +817,7 @@ type
     FHintOpenDoorBox: TBox3d;
     HintOpenDoorShown: boolean;
 
-    FakeWall: TVRMLFlatSceneGL;
+    FakeWall: TLevelStaticObject;
 
     Elevator49: TVRMLFlatSceneGL;
     Elevator49Down: boolean;
@@ -747,8 +833,6 @@ type
 
     class function Title: string; override;
     class function Number: Integer; override;
-
-    procedure Render(const Frustum: TFrustum); override;
 
     procedure Idle(const CompSpeed: Single); override;
 
@@ -809,13 +893,104 @@ begin
   Result := ProgramDataPath + 'data' + PathDelim + 'levels' + PathDelim;
 end;
 
+{ TLevelObject --------------------------------------------------------------- }
+
+constructor TLevelObject.Create(AParentLevel: TLevel);
+begin
+  inherited Create;
+  FParentLevel := AParentLevel;
+end;
+
+{ TLevelStaticObject --------------------------------------------------------- }
+
+constructor TLevelStaticObject.Create(AParentLevel: TLevel;
+  const SceneFileName: string; PrepareBackground: boolean);
+begin
+  inherited Create(AParentLevel);
+  FScene := ParentLevel.LoadLevelScene(SceneFileName, true, PrepareBackground);
+  FExists := true;
+  FCollides := true;
+end;
+
+destructor TLevelStaticObject.Destroy;
+begin
+  FreeAndNil(FScene);
+  inherited;
+end;
+
+function TLevelStaticObject.MoveAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const CameraRadius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := (not Exists) or (not Collides) or
+    Scene.DefaultTriangleOctree.MoveAllowedSimple(
+      OldPos, ProposedNewPos,
+      CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
+end;
+
+function TLevelStaticObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := Exists and Collides and
+    (Scene.DefaultTriangleOctree.SegmentCollision(
+      Pos1, Pos2,
+      false, NoItemIndex, false, ItemsToIgnoreFunc)
+      <> NoItemIndex);
+end;
+
+function TLevelStaticObject.RayCollision(
+  out IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := Exists and Collides and
+    (Scene.DefaultTriangleOctree.RayCollision(
+      IntersectionDistance,
+      Ray0, RayVector,
+      false, NoItemIndex, false, ItemsToIgnoreFunc)
+      <> NoItemIndex);
+end;
+
+procedure TLevelStaticObject.GetCameraHeight(const CameraPos: TVector3Single;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+var
+  IsAboveThis: boolean;
+  SqrHeightAboveThis: Single;
+begin
+  if Exists and Collides then
+  begin
+    Scene.DefaultTriangleOctree.GetCameraHeight(
+      CameraPos, HomeCameraUp,
+      IsAboveThis, SqrHeightAboveThis,
+      NoItemIndex, @CollisionIgnoreItem);
+
+    if IsAboveThis then
+    begin
+      if not IsAboveTheGround then
+      begin
+        IsAboveTheGround := IsAboveThis;
+        SqrHeightAboveTheGround := SqrHeightAboveThis;
+      end else
+        SqrHeightAboveTheGround :=
+          Min(SqrHeightAboveTheGround, SqrHeightAboveThis);
+    end;
+  end;
+end;
+
+procedure TLevelStaticObject.Render(const Frustum: TFrustum;
+  const ATransparent: boolean);
+begin
+  if Exists and (ATransparent = Transparent) then
+    Scene.RenderFrustum(Frustum);
+end;
+
 { TLevelMovingObject --------------------------------------------------------- }
 
 constructor TLevelMovingObject.Create(AParentLevel: TLevel;
   const SceneFileName: string; PrepareBackground: boolean);
 begin
-  inherited Create;
-  FParentLevel := AParentLevel;
+  inherited Create(AParentLevel);
   FScene := ParentLevel.LoadLevelScene(SceneFileName, true, PrepareBackground);
   FExists := true;
   FCollides := true;
@@ -1305,13 +1480,17 @@ end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
   out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
+var
+  I: Integer;
 begin
   Scene.DefaultTriangleOctree.GetCameraHeight(
     CameraPos, HomeCameraUp,
     IsAboveTheGround, SqrHeightAboveTheGround,
     NoItemIndex, @CollisionIgnoreItem);
-  { TODO: for all Objects override this. Only for Doom E1M1 doors this
-    didn't need overriding, since all doors opened down. }
+
+  for I := 0 to Objects.High do
+    Objects[I].GetCameraHeight(CameraPos,
+      IsAboveTheGround, SqrHeightAboveTheGround);
 end;
 
 function TLevel.PlayerMoveAllowed(Navigator: TMatrixWalker;
@@ -1346,10 +1525,15 @@ procedure TLevel.Render(const Frustum: TFrustum);
 var
   I: Integer;
 begin
+  { First pass rendering Objects: render non-transparent parts }
+  for I := 0 to Objects.High do
+    Objects[I].Render(Frustum, false);
+
   Scene.RenderFrustumOctree(Frustum);
 
+  { Second pass rendering Objects: render transparent parts }
   for I := 0 to Objects.High do
-    Objects[I].Render(Frustum);
+    Objects[I].Render(Frustum, true);
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single);
@@ -1467,9 +1651,9 @@ begin
     true, [ 0, 0.5 ], 30, roSeparateShapeStatesNoTransform, 0.01, false, false,
     true);
 
-  StairsBlocker := LoadLevelScene(
-    CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl', true, false);
-  StairsBlockerExists := true;
+  StairsBlocker := TLevelStaticObject.Create(Self,
+    CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl', false);
+  Objects.Add(StairsBlocker);
 
   if Headlight <> nil then
   begin
@@ -1482,7 +1666,6 @@ end;
 destructor TCastleHallLevel.Destroy;
 begin
   FreeAndNil(Button);
-  FreeAndNil(StairsBlocker);
   FreeAndNil(Symbol);
   inherited;
 end;
@@ -1524,14 +1707,6 @@ begin
       Pos1, Pos2, false, NoItemIndex, false,
       @Button.FirstScene.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
 
-  if Result and StairsBlockerExists then
-  begin
-    Result :=
-      (StairsBlocker.DefaultTriangleOctree.SegmentCollision(
-        Pos1, Pos2, false, NoItemIndex, false,
-        @StairsBlocker.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
-  end;
-
   if Result and (not SymbolOpen) then
   begin
     Result :=
@@ -1550,13 +1725,6 @@ begin
   Result :=
     Button.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
       CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
-
-  if Result and StairsBlockerExists then
-  begin
-    Result :=
-      StairsBlocker.DefaultTriangleOctree.MoveAllowedSimple(
-        CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
-  end;
 
   if Result and (not SymbolOpen) then
   begin
@@ -1619,9 +1787,6 @@ begin
   if not SymbolOpen then
     MakeBonusScene(Symbol.FirstScene);
 
-  if StairsBlockerExists then
-    MakeBonusScene(StairsBlocker);
-
   MakeBonusScene(Button.FirstScene);
 end;
 
@@ -1634,9 +1799,6 @@ begin
   if ButtonPressed then
     Button.SceneFromTime(AnimationTime - ButtonPressedTime).Render(nil) else
     Button.SceneFromTime(0).RenderFrustum(Frustum);
-
-  if StairsBlockerExists then
-    StairsBlocker.RenderFrustum(Frustum);
 
   { Note that we render Symbol before inherited, i.e. before rendering
     real level --- to allow alpha objects on level to be rendered as last. }
@@ -1707,10 +1869,7 @@ begin
   Result := inherited SpecialObjectsTryPick(
     IntersectionDistance, Ray0, RayVector);
 
-  MakeBonusScene(Button.FirstScene, 0);
-
-  if StairsBlockerExists then
-    MakeBonusScene(StairsBlocker, 1);
+  MakeBonusScene(Button.FirstScene, 1);
 end;
 
 procedure TCastleHallLevel.SpecialObjectPicked(const Distance: Single;
@@ -1719,7 +1878,11 @@ begin
   inherited;
 
   case SpecialObjectIndex of
-    0:
+    0:begin
+        TimeMessage('You are not able to open it');
+        Sound(stPlayerInteractFailed);
+      end;
+    1:
       begin
         if Distance < 10.0 then
         begin
@@ -1732,10 +1895,6 @@ begin
           end;
         end else
           TimeMessage('You see a button. You cannot reach it from here');
-      end;
-    1:begin
-        TimeMessage('You are not able to open it');
-        Sound(stPlayerInteractFailed);
       end;
   end;
 end;
@@ -1752,10 +1911,10 @@ end;
 
 procedure TCastleHallLevel.DestroyStairsBlocker;
 begin
-  if StairsBlockerExists then
+  if StairsBlocker.Exists then
   begin
-    StairsBlockerExists := false;
-    Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.BoundingBox));
+    StairsBlocker.Exists := false;
+    Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.Scene.BoundingBox));
   end;
 end;
 
@@ -2502,24 +2661,28 @@ begin
     (ParentLevel.AnimationTime - OpenStateChangeTime > OpenCloseTime);
 end;
 
-procedure TDoomLevelDoor.Render(const Frustum: TFrustum);
+procedure TDoomLevelDoor.Render(const Frustum: TFrustum;
+  const ATransparent: boolean);
 begin
-  { TODO: this should be implemented in TLevelMovingObject, in a manner
-    that is able to use Scene.RenderFrustum always (by translating the
-    frustum) }
+  if Exists and (ATransparent = Transparent) then
+  begin
+    { TODO: this should be implemented in TLevelMovingObject, in a manner
+      that is able to use Scene.RenderFrustum always (by translating the
+      frustum) }
 
-  { The completely closed door is the most common case
-    (since all doors close automatically, and initially all are closed...).
-    Fortunately, it's also the case when we have constructed an octree,
-    so we can efficiently render it by RenderFrustum call. }
-  if CompletelyClosed then
-    Scene.RenderFrustum(Frustum) else
-    begin
-      glPushMatrix;
-        glTranslatev(SceneTranslation(ParentLevel.AnimationTime));
-        Scene.Render(nil);
-      glPopMatrix;
-    end;
+    { The completely closed door is the most common case
+      (since all doors close automatically, and initially all are closed...).
+      Fortunately, it's also the case when we have constructed an octree,
+      so we can efficiently render it by RenderFrustum call. }
+    if CompletelyClosed then
+      Scene.RenderFrustum(Frustum) else
+      begin
+        glPushMatrix;
+          glTranslatev(SceneTranslation(ParentLevel.AnimationTime));
+          Scene.Render(nil);
+        glPopMatrix;
+      end;
+  end;
 end;
 
 { TDoomE1M1Level ------------------------------------------------------------- }
@@ -2570,8 +2733,14 @@ begin
   Objects.Add(MakeDoor('door4_7_closed.wrl'));
   Objects.Add(MakeDoor('door5_6_closed.wrl'));
 
-  FakeWall := LoadLevelScene(DoomDoorsPathPrefix + 'fake_wall_final.wrl',
-    false, false);
+  FakeWall := TLevelStaticObject.Create(Self,
+    DoomDoorsPathPrefix + 'fake_wall_final.wrl', false);
+  { Although TLevelStaticObject will create useless triangle octree
+    for FakeWall, it's not a problem: FakeWall is very small, so it's
+    octree will be generated very fast and will be very small in memory.
+    Not a problem to worry. }
+  FakeWall.Collides := false;
+  Objects.Add(FakeWall);
 
   Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
     true, false);
@@ -2581,7 +2750,6 @@ end;
 
 destructor TDoomE1M1Level.Destroy;
 begin
-  FreeAndNil(FakeWall);
   FreeAndNil(Elevator49);
 
   inherited;
@@ -2605,15 +2773,6 @@ end;
 class function TDoomE1M1Level.Number: Integer;
 begin
   Result := 90;
-end;
-
-procedure TDoomE1M1Level.Render(const Frustum: TFrustum);
-begin
-  inherited;
-
-  { FakeWall is always rendered. That's it.
-    It never participates in collision detection, line of sight collision, etc. }
-  FakeWall.RenderFrustum(Frustum);
 end;
 
 procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
