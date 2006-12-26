@@ -209,17 +209,86 @@ type
       default false;
 
     { @noAutoLinkHere
-      TODO: ignored for now. }
-    property Exists: boolean read FExists default true;
+
+      TODO: ignored for now. Trivial to implement, but wouldn't be tested for now. }
+    property Exists: boolean read FExists write FExists default true;
 
     { @noAutoLinkHere
       Note that if not @link(Exists) then this doesn't matter
       (not existing objects never participate in collision detection).
-      TODO: ignored for now. }
-    property Collides: boolean read FCollides default true;
+
+      TODO: ignored for now. Trivial to implement, but wouldn't be tested for now. }
+    property Collides: boolean read FCollides write FCollides default true;
 
     function SceneTranslation(const AnimationTime: Single):
       TVector3_Single; virtual; abstract;
+
+    function MoveAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const CameraRadius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function RayCollision(
+      out IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
+  end;
+
+  { This a VRML scene that can be animated.
+    Basically, a TVRMLGLAnimation wrapper.
+
+    After passing here an animation
+    (that should be created with LoadLevelAnimation) the animation
+    instance is owned by this object.
+
+    For now, collision will be checked (only if @link(Collides) and @link(Exists),
+    naturally) by checking always with Animation.FirstScene.DefaultTriangleOctree.
+    So you should create this octree, and make sure that the animation is done
+    such that the first animation frame is always larger than the others.
+
+    Although it seems like a totally stupid to check with collisions,
+    it's suitable for many purposes (see e.g. uses on "castle hall" level),
+    it's simple and not memory-consuming, and you don't have to take
+    any action when animation frame changes (because AnimationTime changes
+    don't change the colliding geometry, so the animation is static from
+    the point of view of collision checking routines).
+
+    In the future other collision methods may be available.
+    First of all, checking with sum of all bounding boxes, or with particular
+    scene time box, should be available.
+
+    You should take care of setting AnimationTime as appropriate if you
+    want to really use this animation. }
+  TLevelAnimatedObject = class(TLevelObject)
+  private
+    FAnimation: TVRMLGLAnimation;
+    FAnimationTime: Single;
+    FExists: boolean;
+    FCollides: boolean;
+    FTransparent: boolean;
+  public
+    constructor Create(AParentLevel: TLevel; AnAnimation: TVRMLGLAnimation);
+    destructor Destroy; override;
+
+    property Animation: TVRMLGLAnimation read FAnimation;
+    property AnimationTime: Single read FAnimationTime write FAnimationTime;
+    property Exists: boolean read FExists write FExists default true;
+    property Collides: boolean read FCollides write FCollides default true;
+
+    { This level object must be either completely transparent or
+      completely opaque. This property determines which one it is. }
+    property Transparent: boolean read FTransparent write FTransparent
+      default false;
+
+    procedure Render(const Frustum: TFrustum;
+      const ATransparent: boolean); override;
 
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
@@ -843,6 +912,91 @@ begin
           Min(SqrHeightAboveTheGround, SqrHeightAboveThis);
     end;
   end;
+end;
+
+{ TLevelAnimatedObject ------------------------------------------------------- }
+
+constructor TLevelAnimatedObject.Create(AParentLevel: TLevel;
+  AnAnimation: TVRMLGLAnimation);
+begin
+  inherited Create(AParentLevel);
+  FAnimation := AnAnimation;
+  FCollides := true;
+  FExists := true;
+end;
+
+destructor TLevelAnimatedObject.Destroy;
+begin
+  FreeAndNil(FAnimation);
+  inherited;
+end;
+
+function TLevelAnimatedObject.MoveAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const CameraRadius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := (not Exists) or (not Collides) or
+    Animation.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
+      OldPos, ProposedNewPos,
+      CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
+end;
+
+function TLevelAnimatedObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := Exists and Collides and
+    (Animation.FirstScene.DefaultTriangleOctree.SegmentCollision(
+      Pos1, Pos2,
+      false, NoItemIndex, false, ItemsToIgnoreFunc)
+      <> NoItemIndex);
+end;
+
+function TLevelAnimatedObject.RayCollision(
+  out IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := Exists and Collides and
+    (Animation.FirstScene.DefaultTriangleOctree.RayCollision(
+      IntersectionDistance,
+      Ray0, RayVector,
+      false, NoItemIndex, false, ItemsToIgnoreFunc)
+      <> NoItemIndex);
+end;
+
+procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+var
+  IsAboveThis: boolean;
+  SqrHeightAboveThis: Single;
+begin
+  if Exists and Collides then
+  begin
+    Animation.FirstScene.DefaultTriangleOctree.GetCameraHeight(
+      CameraPos, ParentLevel.HomeCameraUp,
+      IsAboveThis, SqrHeightAboveThis,
+      NoItemIndex, ItemsToIgnoreFunc);
+
+    if IsAboveThis then
+    begin
+      if not IsAboveTheGround then
+      begin
+        IsAboveTheGround := IsAboveThis;
+        SqrHeightAboveTheGround := SqrHeightAboveThis;
+      end else
+        SqrHeightAboveTheGround :=
+          Min(SqrHeightAboveTheGround, SqrHeightAboveThis);
+    end;
+  end;
+end;
+
+procedure TLevelAnimatedObject.Render(const Frustum: TFrustum;
+  const ATransparent: boolean);
+begin
+  if Exists and (ATransparent = Transparent) then
+    Animation.SceneFromTime(AnimationTime).RenderFrustum(Frustum);
 end;
 
 { TLevel --------------------------------------------------------------------- }

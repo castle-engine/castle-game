@@ -1,5 +1,4 @@
 - TLevelMovingObject: use this to make elevator49
-  make TLevelObject descendant to include TVRMLAnimationGL
 
 - footsteps sound used on castle hall and doom level has some awful
   noise at the end. You don't hear it when the music plays, but when

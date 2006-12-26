@@ -12,11 +12,11 @@ type
   private
     SymbolOpen: boolean;
     SymbolOpenTime: Single;
-    Symbol: TVRMLGLAnimation;
+    Symbol: TLevelAnimatedObject;
 
     ButtonPressed: boolean;
     ButtonPressedTime: Single;
-    Button: TVRMLGLAnimation;
+    Button: TLevelAnimatedObject;
 
     { HintButtonBox, indicating when to display hint about pressing a button. }
     FHintButtonBox: TBox3d;
@@ -24,22 +24,11 @@ type
 
     StairsBlocker: TLevelStaticObject;
 
-    { Check collision only with Symbol, Button
-      --- but not with real level and level objects geometry
-      (i.e. not with things handled by inherited
-      MoveAllowed, MoveAllowedSimple). }
-    function MoveAllowedAdditionalSimple(
-      const CameraPos: TVector3Single;
-      const NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean;
-
     FLevelExitBox: TBox3d;
   protected
     procedure ChangeLevelScene; override;
   public
     constructor Create; override;
-    destructor Destroy; override;
 
     class function SceneFileName: string; override;
     class function LightSetFileName: string; override;
@@ -47,28 +36,7 @@ type
     class function Title: string; override;
     class function Number: Integer; override;
 
-    function LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
-      override;
-
-    function MoveAllowed(const CameraPos: TVector3Single;
-      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean; override;
-
-    function MoveAllowedSimple(const CameraPos: TVector3Single;
-      const NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean; override;
-
-    procedure GetCameraHeight(const CameraPos: TVector3Single;
-      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
-      override;
-
-    procedure Render(const Frustum: TFrustum); override;
     procedure Idle(const CompSpeed: Single); override;
-
-    function SpecialObjectsTryPick(var IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single): Integer; override;
 
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer); override;
@@ -140,7 +108,7 @@ type
 
     FDoEndSequence: boolean;
 
-    FEndSequence: TVRMLFlatSceneGL;
+    FEndSequence: TLevelStaticObject;
     procedure SetDoEndSequence(Value: boolean);
   protected
     procedure ChangeLevelScene; override;
@@ -159,8 +127,6 @@ type
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
     procedure Render(const Frustum: TFrustum); override;
-
-    property EndSequence: TVRMLFlatSceneGL read FEndSequence;
 
     { True means that GateExit will not be rendered (or collided)
       and EndSequence will be rendered. }
@@ -269,17 +235,21 @@ begin
 
   CastleHallLevelPath := CastleLevelsPath + 'castle_hall' + PathDelim;
 
-  Symbol := LoadLevelAnimation(
+  Symbol := TLevelAnimatedObject.Create(Self,
+    LoadLevelAnimation(
     [ LoadAsVRML(CastleHallLevelPath + 'castle_hall_symbol_closed.wrl'),
       LoadAsVRML(CastleHallLevelPath + 'castle_hall_symbol_open.wrl') ],
     true, [ 0, 1.5 ], 30, roSeparateShapeStatesNoTransform, 0.1, false, false,
-    true);
+    true));
+  Objects.Add(Symbol);
 
-  Button := LoadLevelAnimation(
+  Button := TLevelAnimatedObject.Create(Self,
+    LoadLevelAnimation(
     [ LoadAsVRML(CastleHallLevelPath + 'castle_hall_button_not_pressed.wrl'),
       LoadAsVRML(CastleHallLevelPath + 'castle_hall_button_pressed.wrl') ],
     true, [ 0, 0.5 ], 30, roSeparateShapeStatesNoTransform, 0.01, false, false,
-    true);
+    true));
+  Objects.Add(Button);
 
   StairsBlocker := TLevelStaticObject.Create(Self,
     CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl', false);
@@ -291,13 +261,6 @@ begin
     Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
     Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
   end;
-end;
-
-destructor TCastleHallLevel.Destroy;
-begin
-  FreeAndNil(Button);
-  FreeAndNil(Symbol);
-  inherited;
 end;
 
 procedure TCastleHallLevel.ChangeLevelScene;
@@ -327,114 +290,6 @@ begin
   Result := 2;
 end;
 
-function TCastleHallLevel.LineOfSight(
-  const Pos1, Pos2: TVector3Single): boolean;
-begin
-  Result := inherited;
-
-  Result := Result and
-    (Button.FirstScene.DefaultTriangleOctree.SegmentCollision(
-      Pos1, Pos2, false, NoItemIndex, false,
-      @Button.FirstScene.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex);
-
-  if Result and (not SymbolOpen) then
-  begin
-    Result :=
-      Symbol.FirstScene.DefaultTriangleOctree.SegmentCollision(
-        Pos1, Pos2, false, NoItemIndex, false,
-        @Symbol.FirstScene.DefaultTriangleOctree.IgnoreTransparentItem) = NoItemIndex;
-  end;
-end;
-
-function TCastleHallLevel.MoveAllowedAdditionalSimple(
-  const CameraPos: TVector3Single;
-  const NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
-begin
-  Result :=
-    Button.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
-      CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
-
-  if Result and (not SymbolOpen) then
-  begin
-    Result :=
-      Symbol.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
-        CameraPos, NewPos, MovingObjectCameraRadius, NoItemIndex, nil);
-  end;
-end;
-
-function TCastleHallLevel.MoveAllowed(const CameraPos: TVector3Single;
-  const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
-begin
-  Result := inherited;
-
-  Result := Result and MoveAllowedAdditionalSimple(
-    CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
-end;
-
-function TCastleHallLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
-  const NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
-begin
-  Result := inherited;
-
-  Result := Result and MoveAllowedAdditionalSimple(
-    CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
-end;
-
-procedure TCastleHallLevel.GetCameraHeight(const CameraPos: TVector3Single;
-  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
-
-  procedure MakeBonusScene(BonusScene: TVRMLFlatSceneGL);
-  var
-    IsAboveTheBonusScene: boolean;
-    SqrHeightAboveTheBonusScene: Single;
-  begin
-    BonusScene.DefaultTriangleOctree.GetCameraHeight(
-      CameraPos, HomeCameraUp,
-      IsAboveTheBonusScene, SqrHeightAboveTheBonusScene,
-      NoItemIndex, nil);
-
-    if IsAboveTheBonusScene then
-    begin
-      if not IsAboveTheGround then
-      begin
-        IsAboveTheGround := IsAboveTheBonusScene;
-        SqrHeightAboveTheGround := SqrHeightAboveTheBonusScene;
-      end else
-        SqrHeightAboveTheGround :=
-          Min(SqrHeightAboveTheGround, SqrHeightAboveTheBonusScene);
-    end;
-  end;
-
-begin
-  inherited GetCameraHeight(CameraPos, IsAboveTheGround, SqrHeightAboveTheGround);
-
-  if not SymbolOpen then
-    MakeBonusScene(Symbol.FirstScene);
-
-  MakeBonusScene(Button.FirstScene);
-end;
-
-procedure TCastleHallLevel.Render(const Frustum: TFrustum);
-begin
-  if SymbolOpen then
-    Symbol.SceneFromTime(AnimationTime - SymbolOpenTime).Render(nil) else
-    Symbol.SceneFromTime(0).RenderFrustum(Frustum);
-
-  if ButtonPressed then
-    Button.SceneFromTime(AnimationTime - ButtonPressedTime).Render(nil) else
-    Button.SceneFromTime(0).RenderFrustum(Frustum);
-
-  { Note that we render Symbol before inherited, i.e. before rendering
-    real level --- to allow alpha objects on level to be rendered as last. }
-  inherited;
-end;
-
 procedure TCastleHallLevel.Idle(const CompSpeed: Single);
 const
   WerewolfStartPosition: TVector3Single = (0, 0, -4);
@@ -443,17 +298,24 @@ var
 begin
   inherited;
 
+  if SymbolOpen then
+    Symbol.AnimationTime := AnimationTime - SymbolOpenTime;
+
+  if ButtonPressed then
+    Button.AnimationTime := AnimationTime - ButtonPressedTime;
+
   if Box3dPointInside(Player.Navigator.CameraPos, FLevelExitBox) then
   begin
     LevelFinished(TCagesLevel.Create);
   end;
 
   if ButtonPressed and
-    (AnimationTime - ButtonPressedTime > Button.TimeDuration) then
+    (AnimationTime - ButtonPressedTime > Button.Animation.TimeDuration) then
   begin
     if not SymbolOpen then
     begin
       SymbolOpen := true;
+      Symbol.Collides := false;
       SymbolOpenTime := AnimationTime;
 
       WerewolfCreature := Werewolf.CreateDefaultCreature(
@@ -477,55 +339,29 @@ begin
   end;
 end;
 
-function TCastleHallLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single): Integer;
-
-  procedure MakeBonusScene(Scene: TVRMLFlatSceneGL; SpecialObjectIndex: Integer);
-  var
-    ThisIntersectionDistance: Single;
-  begin
-    if (Scene.DefaultTriangleOctree.RayCollision(
-      ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex,
-      false, nil) <> NoItemIndex) and
-      ( (Result = -1) or
-        (ThisIntersectionDistance < IntersectionDistance) ) then
-    begin
-      IntersectionDistance := ThisIntersectionDistance;
-      Result := SpecialObjectIndex;
-    end;
-  end;
-
-begin
-  Result := inherited SpecialObjectsTryPick(
-    IntersectionDistance, Ray0, RayVector);
-
-  MakeBonusScene(Button.FirstScene, 1);
-end;
-
 procedure TCastleHallLevel.SpecialObjectPicked(const Distance: Single;
   SpecialObjectIndex: Integer);
 begin
   inherited;
 
-  case SpecialObjectIndex of
-    0:begin
-        TimeMessage('You are not able to open it');
-        Sound(stPlayerInteractFailed);
-      end;
-    1:
+  if Objects[SpecialObjectIndex] = StairsBlocker then
+  begin
+    TimeMessage('You are not able to open it');
+    Sound(stPlayerInteractFailed);
+  end else
+  if Objects[SpecialObjectIndex] = Button then
+  begin
+    if Distance < 10.0 then
+    begin
+      if ButtonPressed then
+        TimeMessage('Button is already pressed') else
       begin
-        if Distance < 10.0 then
-        begin
-          if ButtonPressed then
-            TimeMessage('Button is already pressed') else
-          begin
-            ButtonPressed := true;
-            ButtonPressedTime := AnimationTime;
-            TimeMessage('You press the button');
-          end;
-        end else
-          TimeMessage('You see a button. You cannot reach it from here');
+        ButtonPressed := true;
+        ButtonPressedTime := AnimationTime;
+        TimeMessage('You press the button');
       end;
+    end else
+      TimeMessage('You see a button. You cannot reach it from here');
   end;
 end;
 
@@ -839,9 +675,21 @@ begin
 
   HintOpenDoorBoxShown := false;
 
-  FEndSequence := LoadLevelScene(CastleLevelsPath +
-    'end_sequence' + PathDelim + 'end_sequence_final.wrl',
-    false, true);
+  FEndSequence := TLevelStaticObject.Create(Self,
+    CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
+    true { true: load background of EndSequence; we will use it });
+  FEndSequence.Exists := false;
+  { Even when FEndSequence will exist, we will not check for collisions
+    with it --- no reason to waste time, no collisions will be possible
+    as player's move along the EndSequence will be programmed. }
+  FEndSequence.Collides := false;
+  { Actually, FEndSequence is not transparent as a whole. But part of it
+    is transparent, so it must be rendered after main level scene.
+    Fortunately, this is our only transparent object, so it will be rendered
+    *right after* main level geometry, which means that both it's non-transparent
+    and transparent parts will render correctly. }
+  FEndSequence.Transparent := true;
+  Objects.Add(FEndSequence);
 
   FGateExit := TLevelStaticObject.Create(Self,
     CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl', false);
@@ -855,13 +703,13 @@ end;
 destructor TCagesLevel.Destroy;
 begin
   FreeAndNil(FSpidersAppearing);
-  FreeAndNil(FEndSequence);
   inherited;
 end;
 
 procedure TCagesLevel.SetDoEndSequence(Value: boolean);
 begin
   FDoEndSequence := Value;
+  FEndSequence.Exists := DoEndSequence;
   FGateExit.Exists := not DoEndSequence;
 end;
 
@@ -1060,45 +908,37 @@ begin
   end;
 
   inherited;
-
-  if DoEndSequence then
-    EndSequence.RenderFrustum(Frustum);
 end;
 
 procedure TCagesLevel.SpecialObjectPicked(const Distance: Single;
   SpecialObjectIndex: Integer);
-var
-  SpiderQueenIndex: Integer;
 begin
   inherited;
 
-  case SpecialObjectIndex of
-    0:begin
-        if Distance > 10 then
-          TimeMessage('You see a door. You''re too far to open it from here') else
+  if Objects[SpecialObjectIndex] = FGateExit then
+  begin
+    if Distance > 10 then
+      TimeMessage('You see a door. You''re too far to open it from here') else
+    begin
+      if Player.Items.FindKind(RedKeyItemKind) <> -1 then
+      begin
+        if (BossCreature <> nil) and (not BossCreature.Dead) then
         begin
-          if Player.Items.FindKind(RedKeyItemKind) <> -1 then
-          begin
-            SpiderQueenIndex := Creatures.FindKind(SpiderQueen);
-            if (SpiderQueenIndex <> -1) and
-              (not Creatures[SpiderQueenIndex].Dead) then
-            begin
-              Player.Knockback(2 + Random(5), 2, Vector3Single(0, -1, 0));
-              Sound(stEvilLaugh);
-              TimeMessage('No exit for the one who does not fight');
-            end else
-              LevelFinished(nil);
-          end else
-            TimeMessage('You need an appropriate key to open this door');
-        end;
-      end;
+          Player.Knockback(2 + Random(5), 2, Vector3Single(0, -1, 0));
+          Sound(stEvilLaugh);
+          TimeMessage('No exit for the one who does not fight');
+        end else
+          LevelFinished(nil);
+      end else
+        TimeMessage('You need an appropriate key to open this door');
+    end;
   end;
 end;
 
 function TCagesLevel.Background: TBackgroundGL;
 begin
   if DoEndSequence then
-    Result := EndSequence.Background else
+    Result := FEndSequence.Scene.Background else
     Result := inherited;
 end;
 

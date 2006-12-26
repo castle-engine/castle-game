@@ -956,7 +956,7 @@ begin
   FAllItemsArea.Width := MaxItemWidth;
   if MaxAccessoryWidth <> 0.0 then
     FAllItemsArea.Width += MarginBeforeAccessory + MaxAccessoryWidth;
-  FAllItemsArea.Height := (MenuFont.RowHeight + SpaceBetweenItems) * Items.Count;
+  FAllItemsArea.Height := (MenuFont.RowHeight + Integer(SpaceBetweenItems)) * Items.Count;
 
   FAllItemsArea.Width += 2 * AllItemsAreaMargin;
   FAllItemsArea.Height += 2 * AllItemsAreaMargin;
@@ -998,7 +998,7 @@ begin
   begin
     Areas.Items[I].X0 := PositionXMove + AllItemsAreaMargin;
     Areas.Items[I].Y0 := PositionYMove + AllItemsAreaMargin
-      + (Areas.High - I) * (MenuFont.RowHeight + SpaceBetweenItems);
+      + (Areas.High - I) * (MenuFont.RowHeight + Integer(SpaceBetweenItems));
   end;
   FAllItemsArea.X0 := PositionXMove;
   FAllItemsArea.Y0 := PositionYMove;

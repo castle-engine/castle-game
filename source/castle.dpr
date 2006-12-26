@@ -184,9 +184,16 @@ begin
 end.
 
 {
+  For now: do
+    make clean
+  always before compiling, to avoid FPC 2.0.4 getting lost in the dependencies.
+  This may cause Internal Error, but it can also cause some unit to not get
+  recompiled when they should... It's a good thing that FPC is so goddamn
+  fast that this workaround doesn't hurt us so much.
+
   Local Variables:
-  compile-command: "fpcdebug castle.dpr --exe-output-dir ../"
-  kam-compile-release-command-win32: "clean_glwindow_unit; fpcrelease --exe-output-dir ../"
-  kam-compile-release-command-unix: "clean_glwindow_unit; fpcrelease -dGLWINDOW_XLIB --exe-output-dir ../"
+  compile-command: "make clean; fpcdebug castle.dpr --exe-output-dir ../"
+  kam-compile-release-command-win32: "clean_glwindow_unit; make clean; fpcrelease --exe-output-dir ../"
+  kam-compile-release-command-unix: "clean_glwindow_unit; make clean; fpcrelease -dGLWINDOW_XLIB --exe-output-dir ../"
   End:
 }
