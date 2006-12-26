@@ -26,7 +26,8 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   Classes, ParseParametersUnit, GLWinMessages, KambiGLUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
-  CastleCreatures, CastleObjectKinds, CastlePlay, CastleLog;
+  CastleCreatures, CastleObjectKinds, CastlePlay, CastleLog,
+  CastleLevelSpecific;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -155,6 +156,14 @@ begin
     each item is counted as PrepareRenderSteps steps,
     when loading levels user would have to know what an "octree" is. }
   Progress.UseDescribePosition := false;
+
+  { See CastleLevel initialization comments for why it's called here. }
+  LevelsAvailable.AddLevelClass(TGateLevel, true);
+  LevelsAvailable.AddLevelClass(TCastleHallLevel);
+  LevelsAvailable.AddLevelClass(TTowerLevel);
+  LevelsAvailable.AddLevelClass(TCagesLevel);
+  LevelsAvailable.AddLevelClass(TDoomE1M1Level);
+  LevelsAvailable.LoadFromConfig;
 
   { init OpenAL (after initing Glw and Progress, because ALContextInit
     wants to display progress of "Loading sounds") }

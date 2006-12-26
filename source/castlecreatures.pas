@@ -1065,7 +1065,7 @@ implementation
 uses SysUtils, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
-  CastleTimeMessages, CastleItems, Object3dAsVRML;
+  CastleTimeMessages, CastleItems, Object3dAsVRML, CastleLevelSpecific;
 
 {$define read_implementation}
 {$I objectslist_1.inc}

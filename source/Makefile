@@ -30,4 +30,4 @@ apidoc:
 	dot -Grankdir=LR -Tjpg -oapidoc/GVUses.jpg apidoc/GVUses.dot
 
 clean:
-	rm -Rf apidoc
+	rm -Rf apidoc *.o *.ppu

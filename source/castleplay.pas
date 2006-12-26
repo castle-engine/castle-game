@@ -113,7 +113,8 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleKeys, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, GLHeadlight, CastleThunder,
-  CastleTimeMessages, BackgroundGL, CastleControlsMenu;
+  CastleTimeMessages, BackgroundGL, CastleControlsMenu,
+  CastleLevelSpecific;
 
 var
   GLList_Draw2dBegin: TGLuint;
@@ -388,9 +389,7 @@ begin
   if RenderShadowsPossible and RenderShadows then
     ClearBuffers := ClearBuffers or GL_STENCIL_BUFFER_BIT;
 
-  if (Level is TCagesLevel) and TCagesLevel(Level).DoEndSequence then
-    UsedBackground := TCagesLevel(Level).EndSequence.Background else
-    UsedBackground := Level.Scene.Background;
+  UsedBackground := Level.Background;
 
   if UsedBackground <> nil then
   begin
