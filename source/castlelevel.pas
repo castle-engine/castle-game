@@ -409,6 +409,10 @@ type
       const EqualityEpsilon: Single;
       ATimeLoop, ATimeBackwards: boolean;
       CreateDefaultTriangleOctree: boolean): TVRMLGLAnimation;
+
+    { See @link(SpecialObjectPicked), you can call this from
+      overriden SpecialObjectPicked. }
+    procedure TimeMessageInteractFailed(const S: string);
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -580,12 +584,27 @@ type
       const Ray0, RayVector: TVector3Single): Integer; virtual;
 
     { Override this to take some action when some special object was picked.
-      This will be called only if you overriden also SpecialObjectsTryPick.
+      This will be called only if you overrided also SpecialObjectsTryPick,
+      or you added some objects to @link(Objects) list.
+
+      Set InteractionOccured to true (it will be false on enter)
+      if indeed some interaction occured. Note that "interaction occured"
+      is not the same as "interaction succeeded". This means that
+      even if you just did a message like "You cannot open this door",
+      you should still set InteractionOccured to @true.
+      When InteractionOccured is @false then picking routine may try
+      to pick other points around the screen center.
+
+      The right way to signal to uset that interaction occured
+      but failed (like the "You cannot open this door" example above)
+      is to make a @code(Sound(stPlayerInteractFailed)).
+      In fact, you can call TimeMessageInteractFailed to do
+      TimeMessage and @code(Sound(stPlayerInteractFailed)) at once.
 
       Never call this when Player is Dead. Implementation of this may
       assume that Player is not Dead. }
     procedure SpecialObjectPicked(const Distance: Single;
-      SpecialObjectIndex: Integer); virtual;
+      SpecialObjectIndex: Integer; var InteractionOccured: boolean); virtual;
 
     property HomeCameraPos: TVector3Single read FHomeCameraPos;
     property HomeCameraDir: TVector3Single read FHomeCameraDir;
@@ -1505,7 +1524,7 @@ begin
 end;
 
 procedure TLevel.SpecialObjectPicked(const Distance: Single;
-  SpecialObjectIndex: Integer);
+  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
 begin
   { Nothing to do in this class. }
 end;
@@ -1565,6 +1584,12 @@ end;
 function TLevel.Background: TBackgroundGL;
 begin
   Result := Scene.Background;
+end;
+
+procedure TLevel.TimeMessageInteractFailed(const S: string);
+begin
+  TimeMessage(S);
+  Sound(stPlayerInteractFailed);
 end;
 
 { TLevelsAvailableList ------------------------------------------------------- }

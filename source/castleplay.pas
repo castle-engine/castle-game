@@ -742,9 +742,9 @@ procedure DoInteract;
         end;
       poSpecialObject:
         begin
+          Result := false;
           Level.SpecialObjectPicked(
-            IntersectionDistance, SpecialObjectIndex);
-          Result := true;
+            IntersectionDistance, SpecialObjectIndex, Result);
         end;
       else
         Result := false;

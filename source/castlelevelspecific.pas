@@ -39,7 +39,7 @@ type
     procedure Idle(const CompSpeed: Single); override;
 
     procedure SpecialObjectPicked(const Distance: Single;
-      SpecialObjectIndex: Integer); override;
+      SpecialObjectIndex: Integer; var InteractionOccured: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
@@ -134,7 +134,7 @@ type
       read FDoEndSequence write SetDoEndSequence default false;
 
     procedure SpecialObjectPicked(const Distance: Single;
-      SpecialObjectIndex: Integer); override;
+      SpecialObjectIndex: Integer; var InteractionOccured: boolean); override;
 
     function Background: TBackgroundGL; override;
   end;
@@ -206,7 +206,7 @@ type
     procedure Idle(const CompSpeed: Single); override;
 
     procedure SpecialObjectPicked(const Distance: Single;
-      SpecialObjectIndex: Integer); override;
+      SpecialObjectIndex: Integer; var InteractionOccured: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
@@ -340,28 +340,29 @@ begin
 end;
 
 procedure TCastleHallLevel.SpecialObjectPicked(const Distance: Single;
-  SpecialObjectIndex: Integer);
+  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
 begin
   inherited;
 
   if Objects[SpecialObjectIndex] = StairsBlocker then
   begin
-    TimeMessage('You are not able to open it');
-    Sound(stPlayerInteractFailed);
+    InteractionOccured := true;
+    TimeMessageInteractFailed('You are not able to open it');
   end else
   if Objects[SpecialObjectIndex] = Button then
   begin
+    InteractionOccured := true;
     if Distance < 10.0 then
     begin
       if ButtonPressed then
-        TimeMessage('Button is already pressed') else
+        TimeMessageInteractFailed('Button is already pressed') else
       begin
         ButtonPressed := true;
         ButtonPressedTime := AnimationTime;
         TimeMessage('You press the button');
       end;
     end else
-      TimeMessage('You see a button. You cannot reach it from here');
+      TimeMessageInteractFailed('You see a button. You cannot reach it from here');
   end;
 end;
 
@@ -911,14 +912,16 @@ begin
 end;
 
 procedure TCagesLevel.SpecialObjectPicked(const Distance: Single;
-  SpecialObjectIndex: Integer);
+  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
 begin
   inherited;
 
   if Objects[SpecialObjectIndex] = FGateExit then
   begin
+    InteractionOccured := true;
     if Distance > 10 then
-      TimeMessage('You see a door. You''re too far to open it from here') else
+      TimeMessageInteractFailed(
+        'You see a door. You''re too far to open it from here') else
     begin
       if Player.Items.FindKind(RedKeyItemKind) <> -1 then
       begin
@@ -930,7 +933,7 @@ begin
         end else
           LevelFinished(nil);
       end else
-        TimeMessage('You need an appropriate key to open this door');
+        TimeMessageInteractFailed('You need an appropriate key to open this door');
     end;
   end;
 end;
@@ -1226,7 +1229,7 @@ begin
 end;
 
 procedure TDoomE1M1Level.SpecialObjectPicked(const Distance: Single;
-  SpecialObjectIndex: Integer);
+  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
 var
   Door: TDoomLevelDoor;
 begin
@@ -1235,13 +1238,14 @@ begin
   if Between(SpecialObjectIndex, 0, Objects.High) and
      (Objects[SpecialObjectIndex] is TDoomLevelDoor) then
   begin
+    InteractionOccured := true;
     Door := TDoomLevelDoor(Objects[SpecialObjectIndex]);
     if Distance > 7 then
-      TimeMessage('You see a door. You''re too far to open it from here') else
+      TimeMessageInteractFailed('You see a door. You''re too far to open it from here') else
     { Only if the door is completely closed
       (and not during closing right now) we allow player to open it. }
     if not Door.CompletelyClosed then
-      TimeMessage('You see a door. It''s already open') else
+      TimeMessageInteractFailed('You see a door. It''s already open') else
       Door.DoOpen;
   end;
 end;
