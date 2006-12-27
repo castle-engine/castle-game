@@ -394,20 +394,14 @@ type
     function LoadLevelScene(const FileName: string;
       CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;
 
-    { Load TVRMLGLAnimation from file, doing common tasks.
+    { Load TVRMLGLAnimation from *.kanim file, doing common tasks.
       @unorderedList(
         @item sets Attributes according to AnimationAttributesSet
         @item optionally creates triangle octree for the FirstScene
         @item call PrepareRender
       ) }
     function LoadLevelAnimation(
-      const RootNodes: array of TVRMLNode;
-      AOwnsFirstRootNode: boolean;
-      const ATimes: array of Single;
-      ScenesPerTime: Cardinal;
-      AOptimization: TGLRendererOptimization;
-      const EqualityEpsilon: Single;
-      ATimeLoop, ATimeBackwards: boolean;
+      const FileName: string;
       CreateDefaultTriangleOctree: boolean): TVRMLGLAnimation;
 
     { See @link(SpecialObjectPicked), you can call this from
@@ -1556,18 +1550,10 @@ begin
 end;
 
 function TLevel.LoadLevelAnimation(
-  const RootNodes: array of TVRMLNode;
-  AOwnsFirstRootNode: boolean;
-  const ATimes: array of Single;
-  ScenesPerTime: Cardinal;
-  AOptimization: TGLRendererOptimization;
-  const EqualityEpsilon: Single;
-  ATimeLoop, ATimeBackwards: boolean;
+  const FileName: string;
   CreateDefaultTriangleOctree: boolean): TVRMLGLAnimation;
 begin
-  Result := TVRMLGLAnimation.Create(RootNodes, AOwnsFirstRootNode,
-    ATimes, ScenesPerTime, AOptimization, EqualityEpsilon,
-    ATimeLoop, ATimeBackwards, GLContextCache);
+  Result := TVRMLGLAnimation.CreateFromFile(FileName, GLContextCache);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
 

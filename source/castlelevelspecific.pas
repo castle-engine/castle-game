@@ -236,19 +236,11 @@ begin
   CastleHallLevelPath := CastleLevelsPath + 'castle_hall' + PathDelim;
 
   Symbol := TLevelAnimatedObject.Create(Self,
-    LoadLevelAnimation(
-    [ LoadAsVRML(CastleHallLevelPath + 'castle_hall_symbol_closed.wrl'),
-      LoadAsVRML(CastleHallLevelPath + 'castle_hall_symbol_open.wrl') ],
-    true, [ 0, 1.5 ], 30, roSeparateShapeStatesNoTransform, 0.1, false, false,
-    true));
+    LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true));
   Objects.Add(Symbol);
 
   Button := TLevelAnimatedObject.Create(Self,
-    LoadLevelAnimation(
-    [ LoadAsVRML(CastleHallLevelPath + 'castle_hall_button_not_pressed.wrl'),
-      LoadAsVRML(CastleHallLevelPath + 'castle_hall_button_pressed.wrl') ],
-    true, [ 0, 0.5 ], 30, roSeparateShapeStatesNoTransform, 0.01, false, false,
-    true));
+    LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true));
   Objects.Add(Button);
 
   StairsBlocker := TLevelStaticObject.Create(Self,

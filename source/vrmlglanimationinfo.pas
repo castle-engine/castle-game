@@ -1,20 +1,20 @@
 {
   Copyright 2006 Michalis Kamburelis.
 
-  This file is part of "castle".
+  This file is part of "Kambi VRML game engine".
 
-  "castle" is free software; you can redistribute it and/or modify
+  "Kambi VRML game engine" is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
   (at your option) any later version.
 
-  "castle" is distributed in the hope that it will be useful,
+  "Kambi VRML game engine" is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with "castle"; if not, write to the Free Software
+  along with "Kambi VRML game engine"; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
@@ -50,13 +50,39 @@ type
       ATimeLoop, ATimeBackwards: boolean;
       ACache: TVRMLOpenGLRendererContextCache = nil);
 
+    { Constructor that loads animation settings from a *.kanim file.
+      File format is described in ../../doc/kanim_format.txt file. }
+    {constructor CreateFromFile(const FileName: string;
+      ACache: TVRMLOpenGLRendererContextCache = nil);}
+
     property ModelFileNames[I: Cardinal]: string read GetModelFileNames;
     function ModelFileNamesCount: Cardinal;
+
+    { These properties are just initialized in our constructor
+      and then used when calling CreateAnimation.
+      You can freely change them after creation.
+
+      In particular, this way you can change whatever setting was read
+      from *.kanim file if you used CreateFromFile.
+
+      @groupBegin }
+    property ScenesPerTime: Cardinal read FScenesPerTime write FScenesPerTime;
+    property Optimization: TGLRendererOptimization
+      read FOptimization write FOptimization;
+    property EqualityEpsilon: Single read FEqualityEpsilon write FEqualityEpsilon;
+    property TimeLoop: boolean read FTimeLoop write FTimeLoop;
+    property TimeBackwards: boolean read FTimeBackwards write FTimeBackwards;
+    property Cache: TVRMLOpenGLRendererContextCache
+      read FCache write FCache;
+    { @groupEnd }
 
     { Remember that you're responsible for returned TVRMLGLAnimation
       instance after calling this function.
 
       @param(FirstRootNodesPool
+        If non-nil, this can be used to slightly reduce animation loading
+        time and memory use:
+
         We check whether we have AModelFileNames[0] among FirstRootNodesPool.
         If yes, then we will reuse this FirstRootNodesPool.Objects[]
         (and create animation with OwnsFirstRootNode = false).
@@ -127,7 +153,9 @@ begin
     Writeln('  RootNodes[I] from "', FModelFileNames[I], '"');
   {$endif}
 
-  FirstRootNodeIndex := FirstRootNodesPool.IndexOf(FModelFileNames[0]);
+  if FirstRootNodesPool <> nil then
+    FirstRootNodeIndex := FirstRootNodesPool.IndexOf(FModelFileNames[0]) else
+    FirstRootNodeIndex := -1;
   OwnsFirstRootNode := FirstRootNodeIndex = -1;
   if not OwnsFirstRootNode then
     RootNodes[0] := FirstRootNodesPool.Objects[FirstRootNodeIndex] as TVRMLNode else
