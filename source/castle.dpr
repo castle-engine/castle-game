@@ -187,7 +187,8 @@ end.
   For now: do
     make clean
   always before compiling, to avoid FPC 2.0.4 getting lost in the dependencies.
-  This may cause Internal Error, but it can also cause some unit to not get
+  This may cause Internal Error 200310221,
+  but it can also cause some unit to not get
   recompiled when they should... It's a good thing that FPC is so goddamn
   fast that this workaround doesn't hurt us so much.
 

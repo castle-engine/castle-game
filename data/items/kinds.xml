@@ -10,20 +10,58 @@
   When you manually change this file, you can also force reloading this file
   into the game by command "Reload items/kinds.xml file"
   in "Debug options" menu. This way you can test various settings
-  without restarting the game.
+  without restarting the game. (But note that some item settings don't
+  immediately change if you reload this file while the game runs.)
 -->
 
 <CONFIG>
   <LifePotion
     transparent="True"
+    model_file_name="life_potion_processed.wrl"
+    name="Potion of Life"
+    image_file_name="life_potion.png"
   />
 
   <Sword
-    actual_attack_time="0.294">
+    actual_attack_time="0.294"
+    model_file_name="sword.wrl"
+    name="Sword"
+    image_file_name="sword.png"
+  >
+    <screen_image file_name="sword.png" align_left="false" align_bottom="true" />
     <damage const="20.0" random="20.0" />
   </Sword>
 
   <Bow
     actual_attack_time="0.0"
+    model_file_name="bow.wrl"
+    name="Bow"
+    image_file_name="bow.png"
+  >
+    <screen_image file_name="bow.png" align_left="false" align_bottom="true" />
+  </Bow>
+
+  <ScrFlying
+    model_file_name="scroll_final.wrl"
+    name="Scroll Of Flying"
+    image_file_name="scroll.png"
+  />
+
+  <Key
+    model_file_name="key.wrl"
+    name="Key"
+    image_file_name="key.png"
+  />
+
+  <RedKey
+    model_file_name="red_key.wrl"
+    name="Red Key"
+    image_file_name="red_key.png"
+  />
+
+  <Arrow
+    model_file_name="quiver.wrl"
+    name="Arrow"
+    image_file_name="quiver.png"
   />
 </CONFIG>

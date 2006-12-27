@@ -53,7 +53,13 @@ type
     Note that this unit handles all destruction of TItemKind instances
     (and also creates most (all, for now) instances of TItemKind).
     You're free to create new descendants and instances of TItemKind
-    outside this unit, but then leave freeing them to this unit. }
+    outside this unit, but then leave freeing them to this unit.
+
+    Note that after creating an instance of this item,
+    before you do anything else, you have to initialize some of it's
+    properties by calling LoadFromFile. In this class, this initializes
+    it's ModelFileName, Name amd ImageFileName --- in descendants, more
+    required properties may be initialized here. }
   TItemKind = class(TObjectKind)
   private
     FModelFileName: string;
@@ -73,10 +79,15 @@ type
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo);
+
+    function GetStringCheckNonEmpty(KindsConfig: TKamXMLConfig;
+      const AttrName: string): string;
   public
-    constructor Create(const AModelFileName, AVRMLNodeName, AName,
-      AImageFileName: string);
+    { The constructor. }
+    constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
+
+    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
 
     property ModelFileName: string read FModelFileName;
 
@@ -163,10 +174,7 @@ type
     { Constryctor. You can pass
       AAttackAnimationInfo = nil to get
       AAttackAnimation = nil. }
-    constructor Create(const AModelFileName, AVRMLNodeName, AName,
-      AImageFileName, AScreenImageFileName: string;
-      AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
-      AEquippingSound: TSoundType;
+    constructor Create(const AVRMLNodeName: string;
       AAttackAnimationInfo: TVRMLGLAnimationInfo);
     destructor Destroy; override;
 
@@ -195,7 +203,8 @@ type
 
     { Sound to make on equipping. Each weapon can have it's own
       equipping sound. }
-    property EquippingSound: TSoundType read FEquippingSound;
+    property EquippingSound: TSoundType
+      read FEquippingSound write FEquippingSound;
 
     { This is an animation of attack with this weapon.
       TimeBegin must be 0. }
@@ -232,10 +241,7 @@ type
     FDamageConst: Single;
     FDamageRandom: Single;
   public
-    constructor Create(const AModelFileName, AVRMLNodeName, AName,
-      AImageFileName, AScreenImageFileName: string;
-      AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
-      AEquippingSound: TSoundType;
+    constructor Create(const AVRMLNodeName: string;
       AAttackAnimationInfo: TVRMLGLAnimationInfo);
 
     property DamageConst: Single read FDamageConst write FDamageConst
@@ -401,13 +407,9 @@ uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
 
 { TItemKind ------------------------------------------------------------ }
 
-constructor TItemKind.Create(const AModelFileName, AVRMLNodeName, AName,
-  AImageFileName: string);
+constructor TItemKind.Create(const AVRMLNodeName: string);
 begin
   inherited Create(AVRMLNodeName);
-  FModelFileName := AModelFileName;
-  FName := AName;
-  FImageFileName := AImageFileName;
   ItemsKinds.Add(Self);
 end;
 
@@ -416,6 +418,24 @@ begin
   FreeAndNil(FImage);
   FreeAndNil(FScene);
   inherited;
+end;
+
+function TItemKind.GetStringCheckNonEmpty(
+  KindsConfig: TKamXMLConfig; const AttrName: string): string;
+begin
+  Result := KindsConfig.GetValue(VRMLNodeName + '/' + AttrName, '');
+  if Result = '' then
+    raise Exception.CreateFmt('Empty "%s" attribute for item "%s"',
+      [AttrName, VRMLNodeName]);
+end;
+
+procedure TItemKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+begin
+  inherited;
+
+  FModelFileName := GetStringCheckNonEmpty(KindsConfig, 'model_file_name');
+  FName := GetStringCheckNonEmpty(KindsConfig, 'name');
+  FImageFileName := GetStringCheckNonEmpty(KindsConfig, 'image_file_name');
 end;
 
 function TItemKind.Scene: TVRMLFlatSceneGL;
@@ -577,18 +597,11 @@ end;
 
 { TItemWeaponKind ------------------------------------------------------------ }
 
-constructor TItemWeaponKind.Create(const AModelFileName, AVRMLNodeName, AName,
-  AImageFileName, AScreenImageFileName: string;
-  AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
-  AEquippingSound: TSoundType;
+constructor TItemWeaponKind.Create(
+  const AVRMLNodeName: string;
   AAttackAnimationInfo: TVRMLGLAnimationInfo);
 begin
-  inherited Create(AModelFileName, AVRMLNodeName, AName,
-    AImageFileName);
-  FScreenImageFileName := AScreenImageFileName;
-  FScreenImageAlignLeft := AScreenImageAlignLeft;
-  FScreenImageAlignBottom := AScreenImageAlignBottom;
-  FEquippingSound := AEquippingSound;
+  inherited Create(AVRMLNodeName);
   FAttackAnimationInfo := AAttackAnimationInfo;
 end;
 
@@ -672,15 +685,16 @@ begin
 
   ActualAttackTime := KindsConfig.GetFloat(VRMLNodeName + '/actual_attack_time',
     DefaultItemActualAttackTime);
+
+  FScreenImageFileName := GetStringCheckNonEmpty(KindsConfig, 'screen_image/file_name');
+  FScreenImageAlignLeft := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_left', false);
+  FScreenImageAlignBottom := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_bottom', true);
 end;
 
 { TItemShortRangeWeaponKind -------------------------------------------------- }
 
 constructor TItemShortRangeWeaponKind.Create(
-  const AModelFileName, AVRMLNodeName, AName,
-  AImageFileName, AScreenImageFileName: string;
-  AScreenImageAlignLeft, AScreenImageAlignBottom: boolean;
-  AEquippingSound: TSoundType;
+  const AVRMLNodeName: string;
   AAttackAnimationInfo: TVRMLGLAnimationInfo);
 begin
   inherited;
@@ -1028,38 +1042,33 @@ begin
 
   ItemsKinds := TItemKindsList.Create;
 
-  Sword := TItemSwordKind.Create('sword.wrl', 'Sword', 'Sword', 'sword.png',
-    'sword.png', false, true, stSwordEquipping,
+  Sword := TItemSwordKind.Create('Sword',
     TVRMLGLAnimationInfo.Create(
       [ WeaponAnimFileName('sword_1.wrl'),
         WeaponAnimFileName('sword_2.wrl') ],
       [ 0, 0.5 ],
       30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
+  Sword.EquippingSound := stSwordEquipping;
   Sword.SoundAttackStart := stSwordAttackStart;
 
-  Bow := TItemBowKind.Create('bow.wrl', 'Bow', 'Bow', 'bow.png',
-    'bow.png', false, true, stBowEquipping,
+  Bow := TItemBowKind.Create('Bow',
     TVRMLGLAnimationInfo.Create(
       [ WeaponAnimFileName('bow_2.wrl'),
         WeaponAnimFileName('bow.wrl') ],
       [ 0, 0.5 ],
       30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
+  Bow.EquippingSound := stBowEquipping;
   Bow.SoundAttackStart := stBowAttackStart;
 
-  LifePotion := TItemPotionOfLifeKind.Create('life_potion_processed.wrl',
-    'LifePotion', 'Potion of Life', 'life_potion.png');
+  LifePotion := TItemPotionOfLifeKind.Create('LifePotion');
 
-  ScrollOfFlying := TItemScrollOfFlyingKind.Create('scroll_final.wrl',
-    'ScrFlying', 'Scroll Of Flying', 'scroll.png');
+  ScrollOfFlying := TItemScrollOfFlyingKind.Create('ScrFlying');
 
-  KeyItemKind := TItemKind.Create('key.wrl',
-    'Key', 'Key', 'key.png');
+  KeyItemKind := TItemKind.Create('Key');
 
-  RedKeyItemKind := TItemKind.Create('red_key.wrl',
-    'RedKey', 'Red Key', 'red_key.png');
+  RedKeyItemKind := TItemKind.Create('RedKey');
 
-  Quiver := TItemKind.Create('quiver.wrl',
-    'Arrow', 'Arrow', 'quiver.png');
+  Quiver := TItemKind.Create('Arrow');
 
   ItemsKinds.LoadFromFile;
 end;
