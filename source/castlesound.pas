@@ -18,10 +18,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{ For global property. In the future whole castle (and units/)
-  code will be in objfpc mode. }
-{$mode objfpc}
-
 { }
 unit CastleSound;
 
@@ -246,7 +242,7 @@ procedure ReadSoundInfos;
 implementation
 
 uses CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
-  KambiFilesUtils, CastleLog, DOM, XMLRead;
+  KambiFilesUtils, CastleLog, DOM, XMLRead, KambiXMLUtils;
 
 const
   { Each sound has a unique name, used to identify sound in sounds.xml file.
@@ -682,36 +678,6 @@ procedure ReadSoundInfos;
       if SoundNames[Result] = Name then
         Exit;
     raise Exception.CreateFmt('Sound name "%s" not found', [Name]);
-  end;
-
-  { Retrieves from Element attribute Value and returns @true,
-    or (of there is no such attribute) returns @false
-    and does not modify Value. Value is a "var", not "out" param,
-    because in the latter case it's guaranteed that the old Value
-    will not be cleared. }
-  function DOMGetAttribute(const Element: TDOMElement;
-    const AttrName: string; var Value: string): boolean;
-  var
-    AttrNode: TDOMNode;
-  begin
-    AttrNode := Element.Attributes.GetNamedItem(AttrName);
-    Result := AttrNode <> nil;
-    if Result then
-    begin
-      Check(AttrNode.NodeType = ATTRIBUTE_NODE,
-        'All element attributes must have ATTRIBUTE_NODE');
-      Value := (AttrNode as TDOMAttr).Value;
-    end;
-  end;
-
-  function DOMGetSingleAttribute(const Element: TDOMElement;
-    const AttrName: string; var Value: Single): boolean;
-  var
-    ValueStr: string;
-  begin
-    Result := DOMGetAttribute(Element, AttrName, ValueStr);
-    if Result then
-      Value := StrToFloat(ValueStr);
   end;
 
 var
