@@ -37,7 +37,7 @@ type
     FOptimization: TGLRendererOptimization;
     FTimeLoop, FTimeBackwards: boolean;
     FCache: TVRMLOpenGLRendererContextCache;
-    FEpsilonEquality: Single;
+    FEqualityEpsilon: Single;
 
     function GetModelFileNames(I: Cardinal): string;
   public
@@ -46,7 +46,7 @@ type
       const ATimes: array of Single;
       AScenesPerTime: Cardinal;
       AOptimization: TGLRendererOptimization;
-      const AEpsilonEquality: Single;
+      const AEqualityEpsilon: Single;
       ATimeLoop, ATimeBackwards: boolean;
       ACache: TVRMLOpenGLRendererContextCache = nil);
 
@@ -83,7 +83,7 @@ constructor TVRMLGLAnimationInfo.Create(
   const ATimes: array of Single;
   AScenesPerTime: Cardinal;
   AOptimization: TGLRendererOptimization;
-  const AEpsilonEquality: Single;
+  const AEqualityEpsilon: Single;
   ATimeLoop, ATimeBackwards: boolean;
   ACache: TVRMLOpenGLRendererContextCache);
 var
@@ -103,7 +103,7 @@ begin
 
   FScenesPerTime := AScenesPerTime;
   FOptimization := AOptimization;
-  FEpsilonEquality := AEpsilonEquality;
+  FEqualityEpsilon := AEqualityEpsilon;
   FTimeLoop := ATimeLoop;
   FTimeBackwards := ATimeBackwards;
   FCache := ACache;
@@ -137,7 +137,7 @@ begin
     RootNodes[I] := LoadAsVRML(FModelFileNames[I], false);
 
   Result := TVRMLGLAnimation.Create(RootNodes, OwnsFirstRootNode, FTimes,
-    FScenesPerTime, FOptimization, FEpsilonEquality,
+    FScenesPerTime, FOptimization, FEqualityEpsilon,
     FTimeLoop, FTimeBackwards, FCache);
 end;
 
