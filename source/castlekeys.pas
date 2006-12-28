@@ -252,7 +252,7 @@ begin
   CastleKey_RightStrafe := TKeyConfiguration.Create('Move right', 'move_right', kgBasic, WalkerDefaultKey_RightRot);
   CastleKey_LeftRot := TKeyConfiguration.Create('Turn left', 'turn_left', kgBasic, WalkerDefaultKey_LeftStrafe);
   CastleKey_RightRot := TKeyConfiguration.Create('Turn right', 'turn_right', kgBasic, WalkerDefaultKey_RightStrafe);
-  CastleKey_UpRotate := TKeyConfiguration.Create('Loop up', 'look_up', kgBasic, WalkerDefaultKey_UpRotate);
+  CastleKey_UpRotate := TKeyConfiguration.Create('Look up', 'look_up', kgBasic, WalkerDefaultKey_UpRotate);
   CastleKey_DownRotate := TKeyConfiguration.Create('Look down', 'look_down', kgBasic, WalkerDefaultKey_DownRotate);
   CastleKey_HomeUp := TKeyConfiguration.Create('Look straight', 'look_straight', kgBasic, WalkerDefaultKey_HomeUp);
   CastleKey_UpMove := TKeyConfiguration.Create('Jump (or fly/swim up)', 'move_up', kgBasic, K_Space);
