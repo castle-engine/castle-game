@@ -246,6 +246,7 @@ begin
   Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
   Items.AddObject('Set player speed', PlayerSpeedSlider);
   Items.Add('Reload player.xml file');
+  Items.Add('Fly');
   Items.Add('Back');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -284,7 +285,8 @@ begin
     4: ;
     5: ;
     6: Player.LoadFromFile;
-    7: CurrentMenu := DebugMenu;
+    7: Player.FlyingModeTimeoutBegin(60 * 60);
+    8: CurrentMenu := DebugMenu;
   end;
 end;
 
