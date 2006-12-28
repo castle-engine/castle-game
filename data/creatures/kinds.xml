@@ -10,6 +10,9 @@
   When you manually change this file, you can also force reloading this file
   into the game by command "Reload creatures/kinds.xml file"
   in "Debug options" menu.
+
+  For available sound names see ../sounds/index.xml. Empty (or not specified)
+  sound name always means "no sound for this event".
 -->
 
 <CONFIG>
@@ -21,6 +24,9 @@
     life_to_run_away="1.0"
     default_max_life="90.0"
     max_height_acceptable_to_fall="1.4"
+
+    sound_sudden_pain="alien_sudden_pain"
+    sound_dying="alien_dying"
   />
 
   <Werewolf
@@ -36,6 +42,10 @@
     chance_to_hurt="0.3"
     max_height_acceptable_to_fall="1.4"
     life_to_run_away="0.2"
+
+    sound_sudden_pain="werewolf_sudden_pain"
+    sound_attack_start="werewolf_attack_start"
+    sound_dying="werewolf_dying"
   >
 
     <!-- Werewolf is quite big and has MiddlePosition high and doesn't fly,
@@ -54,6 +64,9 @@
     close_direction_to_target_speed="0.02"
     pause_between_sound_idle="2.5"
     transparent="True"
+
+    sound_explosion="ball_missile_explode"
+    sound_idle="ball_missile_idle"
   >
 
     <short_range_attack knockback_distance="5">
@@ -73,6 +86,10 @@
     max_knocked_back_distance="4.2"
     sound_dying_tied_to_creature="False"
     max_height_acceptable_to_fall="1.4"
+
+    sound_sudden_pain="ghost_sudden_pain"
+    sound_attack_start="ghost_attack_start"
+    sound_dying="ghost_dying"
   >
 
     <short_range_attack knockback_distance="0.0">
@@ -90,6 +107,10 @@
     max_knocked_back_distance="2.0"
     max_angle_to_attack="1.04"
     max_height_acceptable_to_fall="1.4"
+
+    sound_sudden_pain="spider_sudden_pain"
+    sound_attack_start="spider_attack_start"
+    sound_dying="spider_dying"
   >
 
     <!-- Spider is quite flat and has MiddlePosition low and doesn't fly.
@@ -118,6 +139,10 @@
     min_life_loss_to_hurt="0.05"
     chance_to_hurt="0.3"
     life_to_run_away="0.25"
+
+    sound_sudden_pain="spider_queen_sudden_pain"
+    sound_attack_start="spider_queen_attack_start"
+    sound_dying="spider_queen_dying"
   >
 
     <!-- SpiderQueen is large, so again the same reasoning applies
@@ -141,6 +166,9 @@
     flying="True"
     default_max_life="1.0"
     close_direction_to_player="False"
+
+    sound_explosion="thrown_web_hit"
+    sound_idle="thrown_web_idle"
   >
 
     <short_range_attack knockback_distance="5">
@@ -157,6 +185,8 @@
     hits_player="False"
     hits_creatures="True"
     move_speed="2.0"
+
+    sound_explosion="arrow_hit"
   >
 
     <short_range_attack knockback_distance="5">

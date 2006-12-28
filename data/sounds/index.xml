@@ -29,13 +29,13 @@
    For more details see declaration of TSoundInfo record in CastleSound unit.
 
    Note that you can change this file while the game is running,
-   and reload it by "Reload sounds.xml" command from the debug menu.
+   and reload it by "Reload sounds/index.xml" command from the debug menu.
    This allows you to easily test various sound settings without
    restarting the actual game program.
-   Note that when using "Reload sounds.xml" command:
+   Note that when using "Reload sounds/index.xml" command:
    - Don't change the "file_name" attribute. I.e. you must exit
      and run the game again to use new sound file_name.
-     "Reload sounds.xml" is useful only when playing with other sound
+     "Reload sounds/index.xml" is useful only when playing with other sound
      attributes.
    - Changes will only be reflected in newly started sounds,
      not in currently played sounds.

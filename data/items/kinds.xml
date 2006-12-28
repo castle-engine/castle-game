@@ -12,6 +12,9 @@
   in "Debug options" menu. This way you can test various settings
   without restarting the game. (But note that some item settings don't
   immediately change if you reload this file while the game runs.)
+
+  For available sound names see ../sounds/index.xml. Empty (or not specified)
+  sound name always means "no sound for this event".
 -->
 
 <CONFIG>
@@ -27,6 +30,9 @@
     model_file_name="sword.wrl"
     name="Sword"
     image_file_name="sword.png"
+
+    equipping_sound="sword_equipping"
+    sound_attack_start="sword_attack_start"
   >
     <screen_image file_name="sword.png" align_left="false" align_bottom="true" />
     <damage const="20.0" random="20.0" />
@@ -37,6 +43,9 @@
     model_file_name="bow.wrl"
     name="Bow"
     image_file_name="bow.png"
+
+    equipping_sound="bow_equipping"
+    sound_attack_start="bow_attack_start"
   >
     <screen_image file_name="bow.png" align_left="false" align_bottom="true" />
   </Bow>

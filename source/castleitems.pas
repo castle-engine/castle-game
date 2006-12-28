@@ -689,6 +689,11 @@ begin
   FScreenImageFileName := GetStringCheckNonEmpty(KindsConfig, 'screen_image/file_name');
   FScreenImageAlignLeft := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_left', false);
   FScreenImageAlignBottom := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_bottom', true);
+
+  EquippingSound := SoundFromName(
+    KindsConfig.GetValue(VRMLNodeName + '/equipping_sound', ''));
+  SoundAttackStart := SoundFromName(
+    KindsConfig.GetValue(VRMLNodeName + '/sound_attack_start', ''));
 end;
 
 { TItemShortRangeWeaponKind -------------------------------------------------- }
@@ -1048,8 +1053,6 @@ begin
         WeaponAnimFileName('sword_2.wrl') ],
       [ 0, 0.5 ],
       30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
-  Sword.EquippingSound := stSwordEquipping;
-  Sword.SoundAttackStart := stSwordAttackStart;
 
   Bow := TItemBowKind.Create('Bow',
     TVRMLGLAnimationInfo.Create(
@@ -1057,8 +1060,6 @@ begin
         WeaponAnimFileName('bow.wrl') ],
       [ 0, 0.5 ],
       30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
-  Bow.EquippingSound := stBowEquipping;
-  Bow.SoundAttackStart := stBowAttackStart;
 
   LifePotion := TItemPotionOfLifeKind.Create('LifePotion');
 

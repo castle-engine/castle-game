@@ -1111,7 +1111,12 @@ begin
 
   FallDownLifeLossScale :=
     KindsConfig.GetFloat(VRMLNodeName + '/fall_down_life_loss_scale',
-    DefaultFallDownLifeLossScale)
+    DefaultFallDownLifeLossScale);
+
+  SoundSuddenPain := SoundFromName(
+    KindsConfig.GetValue(VRMLNodeName + '/sound_sudden_pain', ''));
+  SoundDying := SoundFromName(
+    KindsConfig.GetValue(VRMLNodeName + '/sound_dying', ''));
 end;
 
 function TCreatureKind.CameraRadius: Single;
@@ -1336,6 +1341,9 @@ begin
   RandomWalkDistance :=
     KindsConfig.GetFloat(VRMLNodeName + '/random_walk_distance',
     DefaultCreatureRandomWalkDistance);
+
+  SoundAttackStart := SoundFromName(
+    KindsConfig.GetValue(VRMLNodeName + '/sound_attack_start', ''));
 end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
@@ -1565,6 +1573,11 @@ begin
   HitsCreatures :=
     KindsConfig.GetValue(VRMLNodeName + '/hits_creatures',
     DefaultHitsCreatures);
+
+  SoundExplosion := SoundFromName(
+    KindsConfig.GetValue(VRMLNodeName + '/sound_explosion', ''));
+  SoundIdle := SoundFromName(
+    KindsConfig.GetValue(VRMLNodeName + '/sound_idle', ''));
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }
@@ -3304,8 +3317,6 @@ begin
       [ 0.0, 0.1 ],
       AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache)
     );
-  Alien.SoundSuddenPain := stAlienSuddenPain;
-  Alien.SoundDying := stAlienDying;
 
   Werewolf := TWerewolfKind.Create(
     'Werewolf',
@@ -3341,9 +3352,6 @@ begin
       [ 0.0, 0.3 ],
       AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache)
     );
-  Werewolf.SoundSuddenPain := stWerewolfSuddenPain;
-  Werewolf.SoundAttackStart := stWerewolfAttackStart;
-  Werewolf.SoundDying := stWerewolfDying;
 
   BallMissile := TMissileCreatureKind.Create(
     'BallMissile',
@@ -3353,8 +3361,6 @@ begin
       [ 0, 0.5 ],
       AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, false, GLContextCache)
     );
-  BallMissile.SoundExplosion := stBallMissileExplode;
-  BallMissile.SoundIdle := stBallMissileIdle;
 
   Ghost := TGhostKind.Create(
     'Ghost',
@@ -3390,9 +3396,6 @@ begin
       [ 0.0, 0.3 ],
       AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache)
     );
-  Ghost.SoundSuddenPain := stGhostSuddenPain;
-  Ghost.SoundAttackStart := stGhostAttackStart;
-  Ghost.SoundDying := stGhostDying;
 
   Spider := TSpiderKind.Create(
     'Spider',
@@ -3443,9 +3446,6 @@ begin
       [ 0, 0.3 ],
       AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache)
     );
-  Spider.SoundSuddenPain := stSpiderSuddenPain;
-  Spider.SoundAttackStart := stSpiderAttackStart;
-  Spider.SoundDying := stSpiderDying;
 
   SpiderQueen := TSpiderQueenKind.Create(
     'SpiderQueen',
@@ -3504,9 +3504,6 @@ begin
       [ 0, 0.3, 0.6, 1.0 ],
       AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache)
     );
-  SpiderQueen.SoundSuddenPain := stSpiderQueenSuddenPain;
-  SpiderQueen.SoundAttackStart := stSpiderQueenAttackStart;
-  SpiderQueen.SoundDying := stSpiderQueenDying;
 
   ThrownWeb := TMissileCreatureKind.Create(
     'ThrownWeb',
@@ -3515,8 +3512,6 @@ begin
       [ 0 ],
       AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache)
     );
-  ThrownWeb.SoundExplosion := stThrownWebHit;
-  ThrownWeb.SoundIdle := stThrownWebIdle;
 
   Arrow := TMissileCreatureKind.Create(
     'Arrow',
@@ -3525,7 +3520,6 @@ begin
       [ 0 ],
       AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache)
     );
-  Arrow.SoundExplosion := stArrowHit;
 
   CreaturesKinds.LoadFromFile;
 end;

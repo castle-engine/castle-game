@@ -239,13 +239,20 @@ property ALMaxAllocatedSources: Cardinal
 
 procedure ReadSoundInfos;
 
+{ Return sound with given name.
+  Available names are defined in implementation of this unit,
+  and inside ../data/sounds/index.xml.
+  Always for SoundName = '' it will return stNone.
+  @raises Exception On invalid SoundName }
+function SoundFromName(const SoundName: string): TSoundType;
+
 implementation
 
 uses CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
   KambiFilesUtils, CastleLog, DOM, XMLRead, KambiXMLUtils;
 
 const
-  { Each sound has a unique name, used to identify sound in sounds.xml file.
+  { Each sound has a unique name, used to identify sound in sounds/index.xml file.
     For stNone sound name is always ''. }
   SoundNames: array [TSoundType] of string =
   ( '',
@@ -343,8 +350,8 @@ var
 
     However, for the sake of debugging/testing the game,
     and for content designers, the actual values of SoundInfos are loaded
-    at initialization from sounds.xml file, and later can be changed by
-    "Reload sounds.xml" command. }
+    at initialization from sounds/index.xml file, and later can be changed by
+    "Reload sounds/index.xml" command. }
   SoundInfos: array[TSoundType] of TSoundInfo;
 
   { Values on this array are useful only when ALContextInited
@@ -689,10 +696,10 @@ var
   S: string;
   I: Integer;
 begin
-  ReadXMLFile(SoundConfig, ProgramDataPath + 'data' + PathDelim + 'sounds.xml');
+  ReadXMLFile(SoundConfig, ProgramDataPath + 'data' + PathDelim + 'sounds/index.xml');
   try
     Check(SoundConfig.DocumentElement.TagName = 'sounds',
-      'Root node of sounds.xml must be <sounds>');
+      'Root node of sounds/index.xml must be <sounds>');
 
     { Init all SoundInfos to default values }
     for ST := Succ(stNone) to High(ST) do
@@ -713,7 +720,7 @@ begin
         begin
           SoundElement := SoundNode as TDOMElement;
           Check(SoundElement.TagName = 'sound',
-            'Each child of sounds.xml root node must be the <sound> element');
+            'Each child of sounds/index.xml root node must be the <sound> element');
 
           ST := SoundByName(SoundElement.GetAttribute('name'));
 
@@ -750,6 +757,14 @@ begin
   finally
     FreeAndNil(SoundConfig);
   end;
+end;
+
+function SoundFromName(const SoundName: string): TSoundType;
+begin
+  for Result := Low(Result) to High(Result) do
+    if SoundName = SoundNames[Result] then
+      Exit;
+  raise Exception.CreateFmt('Unknown sound name "%s"', [SoundName]);
 end;
 
 initialization

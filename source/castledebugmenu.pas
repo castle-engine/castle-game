@@ -149,7 +149,7 @@ begin
   Items.AddObject('Render for level screenshot',
     DebugRenderForLevelScreenshotArgument);
   Items.Add('Change to level');
-  Items.Add('Reload sounds.xml');
+  Items.Add('Reload sounds/index.xml');
   Items.Add('Edit lights');
   Items.Add('Force thunder now');
   Items.Add('Back to game');
