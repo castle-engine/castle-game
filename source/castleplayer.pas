@@ -713,6 +713,7 @@ begin
     Navigator.Key_RightStrafe := K_None;
 
     Navigator.JumpMouseButtonActive := false;
+    Navigator.UpMoveMouseButtonActive := false;
 
     Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
@@ -742,6 +743,7 @@ begin
     Navigator.Key_RightStrafe := K_None;
 
     Navigator.JumpMouseButtonActive := false;
+    Navigator.UpMoveMouseButtonActive := false;
 
     Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
@@ -764,6 +766,9 @@ begin
       Navigator.Key_UpMove := CastleKey_UpMove.Value;
       Navigator.Key_DownMove := CastleKey_DownMove.Value;
 
+      Navigator.JumpMouseButtonActive := false;
+      Navigator.UpMoveMouseButtonActive := true;
+
       { Navigator.HeadBobbing and
         Navigator.CameraPreferredHeight and
         Navigator.FallingDownStartSpeed and
@@ -784,6 +789,9 @@ begin
         Navigator.Key_UpMove := CastleKey_UpMove.Value;
         Navigator.Key_DownMove := CastleKey_DownMove.Value;
 
+        Navigator.JumpMouseButtonActive := false;
+        Navigator.UpMoveMouseButtonActive := true;
+
         Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
         Navigator.FallingDownSpeedIncrease := 1.0;
         Navigator.HeadBobbing := 0.0;
@@ -802,6 +810,9 @@ begin
         Navigator.Key_Crouch := CastleKey_DownMove.Value;
         Navigator.Key_UpMove := K_None;
         Navigator.Key_DownMove := K_None;
+        
+        Navigator.JumpMouseButtonActive := true;
+        Navigator.UpMoveMouseButtonActive := false;
 
         Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
         Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
@@ -814,8 +825,6 @@ begin
         Navigator.MoveVertSpeed := 1.0;
       end;
     end;
-
-    Navigator.JumpMouseButtonActive := true;
 
     Navigator.Key_Forward := CastleKey_Forward.Value;
     Navigator.Key_Backward := CastleKey_Backward.Value;
