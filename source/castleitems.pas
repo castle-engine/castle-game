@@ -171,11 +171,6 @@ type
   protected
     procedure FreePrepareRender; override;
   public
-    { Constryctor. You can pass
-      AAttackAnimationInfo = nil to get
-      AAttackAnimation = nil. }
-    constructor Create(const AVRMLNodeName: string;
-      AAttackAnimationInfo: TVRMLGLAnimationInfo);
     destructor Destroy; override;
 
     { Because whole screen is quite large, we want our ScreenImage
@@ -241,8 +236,7 @@ type
     FDamageConst: Single;
     FDamageRandom: Single;
   public
-    constructor Create(const AVRMLNodeName: string;
-      AAttackAnimationInfo: TVRMLGLAnimationInfo);
+    constructor Create(const AVRMLNodeName: string);
 
     property DamageConst: Single read FDamageConst write FDamageConst
       default DefaultItemDamageConst;
@@ -597,14 +591,6 @@ end;
 
 { TItemWeaponKind ------------------------------------------------------------ }
 
-constructor TItemWeaponKind.Create(
-  const AVRMLNodeName: string;
-  AAttackAnimationInfo: TVRMLGLAnimationInfo);
-begin
-  inherited Create(AVRMLNodeName);
-  FAttackAnimationInfo := AAttackAnimationInfo;
-end;
-
 destructor TItemWeaponKind.Destroy;
 begin
   FreeAndNil(FAttackAnimation);
@@ -694,13 +680,15 @@ begin
     KindsConfig.GetValue(VRMLNodeName + '/equipping_sound', ''));
   SoundAttackStart := SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_attack_start', ''));
+
+  { TODO: TItemWeaponKind impl allows to have FAttackAnimationInfo = nil
+    if you don't want attack animation, but line below doesn't allow it. }
+  FAttackAnimationInfo := AnimationFromConfig(KindsConfig, 'attack');
 end;
 
 { TItemShortRangeWeaponKind -------------------------------------------------- }
 
-constructor TItemShortRangeWeaponKind.Create(
-  const AVRMLNodeName: string;
-  AAttackAnimationInfo: TVRMLGLAnimationInfo);
+constructor TItemShortRangeWeaponKind.Create(const AVRMLNodeName: string);
 begin
   inherited;
   FDamageConst := DefaultItemDamageConst;
@@ -1032,43 +1020,17 @@ begin
 end;
 
 procedure DoInitialization;
-
-  function WeaponAnimFileName(const ModelFileName: string): string;
-  begin
-    Result := ProgramDataPath + 'data' + PathDelim +
-      'items' + PathDelim + 'attack_animations' + PathDelim + ModelFileName;
-  end;
-
-const
-  AnimOptimization = roSeparateShapeStatesNoTransform;
-  AnimEpsilonEquality = 0.0;
 begin
   Glw.OnCloseList.AppendItem(@GLWindowClose);
 
   ItemsKinds := TItemKindsList.Create;
 
-  Sword := TItemSwordKind.Create('Sword',
-    TVRMLGLAnimationInfo.Create(
-      [ WeaponAnimFileName('sword_1.wrl'),
-        WeaponAnimFileName('sword_2.wrl') ],
-      [ 0, 0.5 ],
-      30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
-
-  Bow := TItemBowKind.Create('Bow',
-    TVRMLGLAnimationInfo.Create(
-      [ WeaponAnimFileName('bow_2.wrl'),
-        WeaponAnimFileName('bow.wrl') ],
-      [ 0, 0.5 ],
-      30, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache));
-
+  Sword := TItemSwordKind.Create('Sword');
+  Bow := TItemBowKind.Create('Bow');
   LifePotion := TItemPotionOfLifeKind.Create('LifePotion');
-
   ScrollOfFlying := TItemScrollOfFlyingKind.Create('ScrFlying');
-
   KeyItemKind := TItemKind.Create('Key');
-
   RedKeyItemKind := TItemKind.Create('RedKey');
-
   Quiver := TItemKind.Create('Arrow');
 
   ItemsKinds.LoadFromFile;

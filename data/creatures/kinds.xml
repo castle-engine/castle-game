@@ -13,6 +13,13 @@
 
   For available sound names see ../sounds/index.xml. Empty (or not specified)
   sound name always means "no sound for this event".
+
+  Notes about animation specification:
+  - scenes_per_time is here used only as the multiplier for the
+    default value set in the program (currently 30).
+    This means that usually you want to pass scenes_per_time="1".
+  - optimization and equality_epsilon set here *are honoured*.
+    (Although default values (see kanim_format.txt) are often OK.)
 -->
 
 <CONFIG>
@@ -27,7 +34,46 @@
 
     sound_sudden_pain="alien_sudden_pain"
     sound_dying="alien_dying"
-  />
+  >
+    <stand_animation>
+      <animation scenes_per_time="1" loop="true" backwards="true">
+        <frame file_name="alien/alien_still_final.wrl" time="0.00" />
+      </animation>
+    </stand_animation>
+    <stand_to_walk_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="alien/alien_still_final.wrl" time="0.00" />
+        <frame file_name="alien/alien_walk_1_final.wrl" time="0.50" />
+      </animation>
+    </stand_to_walk_animation>
+    <walk_animation>
+      <animation scenes_per_time="1" loop="true" backwards="true">
+        <frame file_name="alien/alien_walk_1_final.wrl" time="0.00" />
+        <frame file_name="alien/alien_walk_2_final.wrl" time="0.50" />
+      </animation>
+    </walk_animation>
+    <attack_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="alien/alien_still_final.wrl" time="0.00" />
+        <frame file_name="alien/alien_attack_2_final.wrl" time="0.30" />
+        <frame file_name="alien/alien_attack_1_final.wrl" time="0.60" />
+        <frame file_name="alien/alien_still_final.wrl" time="1.00" />
+      </animation>
+    </attack_animation>
+    <dying_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="alien/alien_still_final.wrl" time="0.00" />
+        <frame file_name="alien/alien_dying_1_final.wrl" time="0.10" />
+        <frame file_name="alien/alien_dying_2_final.wrl" time="0.50" />
+      </animation>
+    </dying_animation>
+    <hurt_animation>
+      <animation scenes_per_time="1" loop="false" backwards="true">
+        <frame file_name="alien/alien_still_final.wrl" time="0.00" />
+        <frame file_name="alien/alien_dying_1_final.wrl" time="0.10" />
+      </animation>
+    </hurt_animation>
+  </Alien>
 
   <Werewolf
     actual_attack_time="0.3"
@@ -55,6 +101,44 @@
     <short_range_attack knockback_distance="2.0">
       <damage const="10" random="10"/>
     </short_range_attack>
+
+    <stand_animation>
+      <animation scenes_per_time="1" loop="true" backwards="true">
+        <frame file_name="werewolf/werewolf_still_final.wrl" time="0.00" />
+      </animation>
+    </stand_animation>
+    <stand_to_walk_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="werewolf/werewolf_still_final.wrl" time="0.00" />
+      </animation>
+    </stand_to_walk_animation>
+    <walk_animation>
+      <animation scenes_per_time="1" loop="true" backwards="true">
+        <frame file_name="werewolf/werewolf_still_final.wrl" time="0.00" />
+        <frame file_name="werewolf/werewolf_walk_2_final.wrl" time="0.50" />
+      </animation>
+    </walk_animation>
+    <attack_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="werewolf/werewolf_still_final.wrl" time="0.00" />
+        <frame file_name="werewolf/werewolf_attack_1_final.wrl" time="0.15" />
+        <frame file_name="werewolf/werewolf_attack_2_final.wrl" time="0.30" />
+        <frame file_name="werewolf/werewolf_still_final.wrl" time="0.50" />
+      </animation>
+    </attack_animation>
+    <dying_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="werewolf/werewolf_still_final.wrl" time="0.00" />
+        <frame file_name="werewolf/werewolf_hurt_final.wrl" time="0.30" />
+        <frame file_name="werewolf/werewolf_dead_final.wrl" time="0.80" />
+      </animation>
+    </dying_animation>
+    <hurt_animation>
+      <animation scenes_per_time="1" loop="false" backwards="true">
+        <frame file_name="werewolf/werewolf_still_final.wrl" time="0.00" />
+        <frame file_name="werewolf/werewolf_hurt_final.wrl" time="0.30" />
+      </animation>
+    </hurt_animation>
   </Werewolf>
 
   <BallMissile
@@ -72,6 +156,13 @@
     <short_range_attack knockback_distance="5">
       <damage const="10" random="10"/>
     </short_range_attack>
+
+    <fly_animation>
+      <animation scenes_per_time="1" loop="true" backwards="false">
+        <frame file_name="ball_missile/ball_missile_1_final.wrl" time="0.00" />
+        <frame file_name="ball_missile/ball_missile_2_final.wrl" time="0.50" />
+      </animation>
+    </fly_animation>
   </BallMissile>
 
   <Ghost
@@ -95,6 +186,44 @@
     <short_range_attack knockback_distance="0.0">
       <damage const="7" random="8"/>
     </short_range_attack>
+
+    <stand_animation>
+      <animation scenes_per_time="1" loop="true" backwards="true">
+        <frame file_name="ghost/ghost_stand_1_final.wrl" time="0.00" />
+        <frame file_name="ghost/ghost_stand_2_final.wrl" time="1.00" />
+      </animation>
+    </stand_animation>
+    <stand_to_walk_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="ghost/ghost_stand_1_final.wrl" time="0.00" />
+        <frame file_name="ghost/ghost_walk_2_final.wrl" time="0.50" />
+      </animation>
+    </stand_to_walk_animation>
+    <walk_animation>
+      <animation scenes_per_time="1" loop="true" backwards="true">
+        <frame file_name="ghost/ghost_stand_1_final.wrl" time="0.00" />
+        <frame file_name="ghost/ghost_walk_2_final.wrl" time="0.50" />
+      </animation>
+    </walk_animation>
+    <attack_animation>
+      <animation scenes_per_time="1" loop="false" backwards="true">
+        <frame file_name="ghost/ghost_stand_1_final.wrl" time="0.00" />
+        <frame file_name="ghost/ghost_attack_2_final.wrl" time="0.20" />
+      </animation>
+    </attack_animation>
+    <dying_animation>
+      <animation scenes_per_time="1" loop="false" backwards="true">
+        <frame file_name="ghost/ghost_stand_1_final.wrl" time="0.00" />
+        <frame file_name="ghost/ghost_dying_2_final.wrl" time="0.30" />
+        <frame file_name="ghost/ghost_dying_3_final.wrl" time="1.00" />
+      </animation>
+    </dying_animation>
+    <hurt_animation>
+      <animation scenes_per_time="1" loop="false" backwards="true">
+        <frame file_name="ghost/ghost_stand_1_final.wrl" time="0.00" />
+        <frame file_name="ghost/ghost_walk_2_final.wrl" time="0.30" />
+      </animation>
+    </hurt_animation>
   </Ghost>
 
   <Spider
@@ -122,6 +251,50 @@
     <short_range_attack knockback_distance="0.1">
       <damage const="10" random="10"/>
     </short_range_attack>
+
+    <stand_animation>
+      <animation scenes_per_time="1" loop="true" backwards="true">
+        <frame file_name="spider/spider_stand.wrl" time="0.00" />
+      </animation>
+    </stand_animation>
+    <stand_to_walk_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="spider/spider_stand.wrl" time="0.00" />
+      </animation>
+    </stand_to_walk_animation>
+    <walk_animation>
+      <!-- This animation really needs more frames to look smoothly -->
+      <animation scenes_per_time="5" loop="true" backwards="false">
+        <frame file_name="spider/spider_stand.wrl" time="0.00" />
+        <frame file_name="spider/spider_walk_2.wrl" time="0.04" />
+        <frame file_name="spider/spider_walk_3.wrl" time="0.08" />
+        <frame file_name="spider/spider_walk_4.wrl" time="0.12" />
+        <frame file_name="spider/spider_walk_5.wrl" time="0.16" />
+        <frame file_name="spider/spider_stand.wrl" time="0.20" />
+      </animation>
+    </walk_animation>
+    <attack_animation>
+      <animation scenes_per_time="1" loop="false" backwards="true">
+        <frame file_name="spider/spider_stand.wrl" time="0.00" />
+        <frame file_name="spider/spider_attack_2.wrl" time="0.125" />
+        <frame file_name="spider/spider_attack_3.wrl" time="0.25" />
+      </animation>
+    </attack_animation>
+    <dying_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="spider/spider_stand.wrl" time="0.00" />
+        <frame file_name="spider/spider_hurt_2.wrl" time="0.30" />
+        <frame file_name="spider/spider_dying_3.wrl" time="0.60" />
+        <frame file_name="spider/spider_dying_4.wrl" time="1.00" />
+        <frame file_name="spider/spider_dying_5.wrl" time="2.00" />
+      </animation>
+    </dying_animation>
+    <hurt_animation>
+      <animation scenes_per_time="1" loop="false" backwards="true">
+        <frame file_name="spider/spider_stand.wrl" time="0.00" />
+        <frame file_name="spider/spider_hurt_2.wrl" time="0.30" />
+      </animation>
+    </hurt_animation>
   </Spider>
 
   <SpiderQueen
@@ -160,6 +333,60 @@
     />
     <!-- max_angle_to_attack > Pi means "no limits".
          This makes the trick with jumping/flying on SpiderQueen much harder. -->
+
+    <stand_animation>
+      <animation scenes_per_time="1" loop="true" backwards="true">
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.00" />
+      </animation>
+    </stand_animation>
+    <stand_to_walk_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.00" />
+      </animation>
+    </stand_to_walk_animation>
+    <walk_animation>
+      <!-- This animation really needs more frames to look smoothly. -->
+      <animation scenes_per_time="5" loop="true" backwards="false">
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.00" />
+        <frame file_name="spider_queen/spider_queen_walk_2.wrl" time="0.04" />
+        <frame file_name="spider_queen/spider_queen_walk_3.wrl" time="0.08" />
+        <frame file_name="spider_queen/spider_queen_walk_4.wrl" time="0.12" />
+        <frame file_name="spider_queen/spider_queen_walk_5.wrl" time="0.16" />
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.20" />
+      </animation>
+    </walk_animation>
+    <attack_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.00" />
+        <frame file_name="spider_queen/spider_queen_attack_2.wrl" time="0.20" />
+        <frame file_name="spider_queen/spider_queen_attack_3.wrl" time="0.40" />
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.60" />
+      </animation>
+    </attack_animation>
+    <dying_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.00" />
+        <frame file_name="spider_queen/spider_queen_dying_2.wrl" time="0.50" />
+        <frame file_name="spider_queen/spider_queen_dying_3.wrl" time="1.50" />
+      </animation>
+    </dying_animation>
+    <hurt_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <!-- While this isn't a real animation (first file_name is the same
+             as the second), it has non-zero time and this way spider_queen
+             may get a little knockback. -->
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.00" />
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.10" />
+      </animation>
+    </hurt_animation>
+    <throw_web_attack_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="0.00" />
+        <frame file_name="spider_queen/spider_queen_attack_2.wrl" time="0.30" />
+        <frame file_name="spider_queen/spider_queen_attack_alt.wrl" time="0.60" />
+        <frame file_name="spider_queen/spider_queen_stand.wrl" time="1.00" />
+      </animation>
+    </throw_web_attack_animation>
   </SpiderQueen>
 
   <ThrownWeb
@@ -174,6 +401,12 @@
     <short_range_attack knockback_distance="5">
       <damage const="10" random="10"/>
     </short_range_attack>
+
+    <fly_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="web/web.wrl" time="0.00" />
+      </animation>
+    </fly_animation>
   </ThrownWeb>
 
   <Arrow
@@ -192,5 +425,11 @@
     <short_range_attack knockback_distance="5">
       <damage const="20" random="20"/>
     </short_range_attack>
+
+    <fly_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="arrow/arrow.wrl" time="0.00" />
+      </animation>
+    </fly_animation>
   </Arrow>
 </CONFIG>

@@ -70,6 +70,9 @@ type
 
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool }
     procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
+
+    function AnimationFromConfig(KindsConfig: TKamXMLConfig;
+      const AnimationName: string): TVRMLGLAnimationInfo; virtual;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
@@ -134,7 +137,7 @@ type
 
 implementation
 
-uses SysUtils, ProgressUnit, Object3dAsVRML, CastleLog;
+uses SysUtils, ProgressUnit, Object3dAsVRML, CastleLog, DOM, CastleWindow;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
@@ -266,6 +269,21 @@ begin
       false);
   end;
   Progress.Step;
+end;
+
+function TObjectKind.AnimationFromConfig(KindsConfig: TKamXMLConfig;
+  const AnimationName: string): TVRMLGLAnimationInfo;
+var
+  Element: TDOMElement;
+begin
+  Element := KindsConfig.PathElement(
+    VRMLNodeName + '/' + AnimationName + '_animation/animation');
+  if Element = nil then
+    raise Exception.CreateFmt('No <%s_animation>/<animation> elements for object "%s"',
+      [AnimationName, VRMLNodeName]);
+  Result := TVRMLGLAnimationInfo.CreateFromDOMElement(
+    Element, ExtractFilePath(KindsConfig.FileName),
+    GLContextCache);
 end;
 
 end.

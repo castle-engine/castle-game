@@ -96,6 +96,9 @@ type
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo);
+
+    function AnimationFromConfig(KindsConfig: TKamXMLConfig;
+      const AnimationName: string): TVRMLGLAnimationInfo; override;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -258,14 +261,7 @@ type
   protected
     procedure FreePrepareRender; override;
   public
-    constructor Create(
-      const AVRMLNodeName: string;
-      AStandAnimationInfo: TVRMLGLAnimationInfo;
-      AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
-      AWalkAnimationInfo: TVRMLGLAnimationInfo;
-      AAttackAnimationInfo: TVRMLGLAnimationInfo;
-      ADyingAnimationInfo: TVRMLGLAnimationInfo;
-      AHurtAnimationInfo: TVRMLGLAnimationInfo);
+    constructor Create(const AVRMLNodeName: string);
 
     destructor Destroy; override;
 
@@ -471,16 +467,6 @@ type
   protected
     procedure FreePrepareRender; override;
   public
-    constructor Create(
-      const AVRMLNodeName: string;
-      AStandAnimationInfo: TVRMLGLAnimationInfo;
-      AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
-      AWalkAnimationInfo: TVRMLGLAnimationInfo;
-      AAttackAnimationInfo: TVRMLGLAnimationInfo;
-      ADyingAnimationInfo: TVRMLGLAnimationInfo;
-      AHurtAnimationInfo: TVRMLGLAnimationInfo;
-      AThrowWebAttackAnimationInfo: TVRMLGLAnimationInfo);
-
     destructor Destroy; override;
 
     procedure CloseGL; override;
@@ -549,9 +535,7 @@ type
   protected
     procedure FreePrepareRender; override;
   public
-    constructor Create(
-      const AVRMLNodeName: string;
-      AAnimationInfo: TVRMLGLAnimationInfo);
+    constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
 
     procedure PrepareRender; override;
@@ -1062,7 +1046,7 @@ var
 
 implementation
 
-uses SysUtils, OpenGLh, CastleWindow, GLWindow,
+uses SysUtils, DOM, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
   CastleTimeMessages, CastleItems, Object3dAsVRML, CastleLevelSpecific;
@@ -1135,6 +1119,13 @@ begin
     false, true, RenderShadowsPossible, false);
 end;
 
+function TCreatureKind.AnimationFromConfig(KindsConfig: TKamXMLConfig;
+  const AnimationName: string): TVRMLGLAnimationInfo;
+begin
+  Result := inherited;
+  Result.ScenesPerTime := Result.ScenesPerTime * CreatureAnimationScenesPerTime;
+end;
+
 { TCreaturesKindsList -------------------------------------------------------- }
 
 procedure TCreaturesKindsList.PrepareRender;
@@ -1199,23 +1190,9 @@ end;
 
 { TWalkAttackCreatureKind ---------------------------------------------------- }
 
-constructor TWalkAttackCreatureKind.Create(
-  const AVRMLNodeName: string;
-  AStandAnimationInfo: TVRMLGLAnimationInfo;
-  AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
-  AWalkAnimationInfo: TVRMLGLAnimationInfo;
-  AAttackAnimationInfo: TVRMLGLAnimationInfo;
-  ADyingAnimationInfo: TVRMLGLAnimationInfo;
-  AHurtAnimationInfo: TVRMLGLAnimationInfo);
+constructor TWalkAttackCreatureKind.Create(const AVRMLNodeName: string);
 begin
   inherited Create(AVRMLNodeName);
-
-  FStandAnimationInfo := AStandAnimationInfo;
-  FStandToWalkAnimationInfo := AStandToWalkAnimationInfo;
-  FWalkAnimationInfo := AWalkAnimationInfo;
-  FAttackAnimationInfo := AAttackAnimationInfo;
-  FDyingAnimationInfo := ADyingAnimationInfo;
-  FHurtAnimationInfo := AHurtAnimationInfo;
 
   MoveSpeed := DefaultMoveSpeed;
   FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
@@ -1344,6 +1321,13 @@ begin
 
   SoundAttackStart := SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_attack_start', ''));
+
+  FStandAnimationInfo := AnimationFromConfig(KindsConfig, 'stand');
+  FStandToWalkAnimationInfo := AnimationFromConfig(KindsConfig, 'stand_to_walk');
+  FWalkAnimationInfo := AnimationFromConfig(KindsConfig, 'walk');
+  FAttackAnimationInfo := AnimationFromConfig(KindsConfig, 'attack');
+  FDyingAnimationInfo := AnimationFromConfig(KindsConfig, 'dying');
+  FHurtAnimationInfo := AnimationFromConfig(KindsConfig, 'hurt');
 end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
@@ -1383,28 +1367,6 @@ begin
 end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
-
-constructor TSpiderQueenKind.Create(
-  const AVRMLNodeName: string;
-  AStandAnimationInfo: TVRMLGLAnimationInfo;
-  AStandToWalkAnimationInfo: TVRMLGLAnimationInfo;
-  AWalkAnimationInfo: TVRMLGLAnimationInfo;
-  AAttackAnimationInfo: TVRMLGLAnimationInfo;
-  ADyingAnimationInfo: TVRMLGLAnimationInfo;
-  AHurtAnimationInfo: TVRMLGLAnimationInfo;
-  AThrowWebAttackAnimationInfo: TVRMLGLAnimationInfo);
-begin
-  inherited Create(
-    AVRMLNodeName,
-    AStandAnimationInfo,
-    AStandToWalkAnimationInfo,
-    AWalkAnimationInfo,
-    AAttackAnimationInfo,
-    ADyingAnimationInfo,
-    AHurtAnimationInfo);
-
-  FThrowWebAttackAnimationInfo := AThrowWebAttackAnimationInfo;
-end;
 
 destructor TSpiderQueenKind.Destroy;
 begin
@@ -1459,6 +1421,9 @@ begin
     KindsConfig.GetFloat(VRMLNodeName + '/throw_web/max_angle_to_attack', 0.0);
   ActualThrowWebAttackTime :=
     KindsConfig.GetFloat(VRMLNodeName + '/throw_web/actual_attack_time', 0.0);
+
+  FThrowWebAttackAnimationInfo :=
+    AnimationFromConfig(KindsConfig, 'throw_web_attack');
 end;
 
 { TGhostKind ------------------------------------------------------------- }
@@ -1493,12 +1458,9 @@ end;
 
 { TMissileCreatureKind ---------------------------------------------------- }
 
-constructor TMissileCreatureKind.Create(
-  const AVRMLNodeName: string;
-  AAnimationInfo: TVRMLGLAnimationInfo);
+constructor TMissileCreatureKind.Create(const AVRMLNodeName: string);
 begin
   inherited Create(AVRMLNodeName);
-  FAnimationInfo := AAnimationInfo;
   Flying := true;
   FMoveSpeed := DefaultMissileMoveSpeed;
   FCloseDirectionToPlayer := DefaultCloseDirectionToPlayer;
@@ -1578,6 +1540,8 @@ begin
     KindsConfig.GetValue(VRMLNodeName + '/sound_explosion', ''));
   SoundIdle := SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_idle', ''));
+
+  FAnimationInfo := AnimationFromConfig(KindsConfig, 'fly');
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }
@@ -3258,268 +3222,19 @@ begin
 end;
 
 procedure DoInitialization;
-const
-  AnimOptimization = roSeparateShapeStatesNoTransform;
-  AnimEpsilonEquality = 0.001;
-
-  function CreatureFileName(const FileName: string): string;
-  begin
-    Result := ProgramDataPath + 'data' + PathDelim +
-      'creatures' + PathDelim + FileName;
-  end;
-
-  function AlienFileName(const FileName: string): string;
-  begin
-    Result := CreatureFileName('alien' + PathDelim + FileName);
-  end;
-
-var
-  AnimScenesPerTime: Cardinal;
 begin
-  AnimScenesPerTime := CreatureAnimationScenesPerTime;
-
   Glw.OnCloseList.AppendItem(@GLWindowClose);
 
   CreaturesKinds := TCreaturesKindsList.Create;
 
-  Alien := TBallThrowerCreatureKind.Create(
-    'Alien',
-    TVRMLGLAnimationInfo.Create(
-      [ AlienFileName('alien_still_final.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ AlienFileName('alien_still_final.wrl'),
-        AlienFileName('alien_walk_1_final.wrl') ],
-      [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ AlienFileName('alien_walk_1_final.wrl'),
-        AlienFileName('alien_walk_2_final.wrl') ],
-      [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ AlienFileName('alien_still_final.wrl'),
-        AlienFileName('alien_attack_2_final.wrl'),
-        AlienFileName('alien_attack_1_final.wrl'),
-        AlienFileName('alien_still_final.wrl') ],
-      [ 0, 0.3, 0.6, 1.0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ AlienFileName('alien_still_final.wrl'),
-        AlienFileName('alien_dying_1_final.wrl'),
-        AlienFileName('alien_dying_2_final.wrl') ],
-      [ 0.0, 0.1, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ AlienFileName('alien_still_final.wrl'),
-        AlienFileName('alien_dying_1_final.wrl') ],
-      [ 0.0, 0.1 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache)
-    );
-
-  Werewolf := TWerewolfKind.Create(
-    'Werewolf',
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
-        CreatureFileName('werewolf' + PathDelim + 'werewolf_walk_2_final.wrl') ],
-      [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
-        CreatureFileName('werewolf' + PathDelim + 'werewolf_attack_1_final.wrl'),
-        CreatureFileName('werewolf' + PathDelim + 'werewolf_attack_2_final.wrl'),
-        CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl') ],
-      [ 0, 0.3 / 2, 0.6 / 2, 1.0 / 2 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
-        CreatureFileName('werewolf' + PathDelim + 'werewolf_hurt_final.wrl'),
-        CreatureFileName('werewolf' + PathDelim + 'werewolf_dead_final.wrl') ],
-      [ 0.0, 0.3, 0.8 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('werewolf' + PathDelim + 'werewolf_still_final.wrl'),
-        CreatureFileName('werewolf' + PathDelim + 'werewolf_hurt_final.wrl') ],
-      [ 0.0, 0.3 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache)
-    );
-
-  BallMissile := TMissileCreatureKind.Create(
-    'BallMissile',
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('ball_missile' + PathDelim + 'ball_missile_1_final.wrl'),
-        CreatureFileName('ball_missile' + PathDelim + 'ball_missile_2_final.wrl') ],
-      [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, false, GLContextCache)
-    );
-
-  Ghost := TGhostKind.Create(
-    'Ghost',
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
-        CreatureFileName('ghost' + PathDelim + 'ghost_stand_2_final.wrl') ],
-      [ 0, 1 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
-        CreatureFileName('ghost' + PathDelim + 'ghost_walk_2_final.wrl') ],
-      [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
-        CreatureFileName('ghost' + PathDelim + 'ghost_walk_2_final.wrl') ],
-      [ 0, 0.5 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
-        CreatureFileName('ghost' + PathDelim + 'ghost_attack_2_final.wrl') ],
-      [ 0, 0.2 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
-        CreatureFileName('ghost' + PathDelim + 'ghost_dying_2_final.wrl'),
-        CreatureFileName('ghost' + PathDelim + 'ghost_dying_3_final.wrl') ],
-      [ 0.0, 0.3, 1.0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('ghost' + PathDelim + 'ghost_stand_1_final.wrl'),
-        CreatureFileName('ghost' + PathDelim + 'ghost_walk_2_final.wrl') ],
-      [ 0.0, 0.3 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache)
-    );
-
-  Spider := TSpiderKind.Create(
-    'Spider',
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    { WalkAnimation }
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_walk_2.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_walk_3.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_walk_4.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_walk_5.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_stand.wrl') ],
-      [   0 / 5,
-        0.2 / 5,
-        0.4 / 5,
-        0.6 / 5,
-        0.8 / 5,
-        1 / 5 ],
-      { This animation really needs more frames to look smoothly. }
-      AnimScenesPerTime * 5, AnimOptimization, AnimEpsilonEquality, true, false, GLContextCache),
-    { AttackAnimation }
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_attack_2.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_attack_3.wrl') ],
-      [ 0, 0.125, 0.25 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache),
-    { DyingAnimation }
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_hurt_2.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_dying_3.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_dying_4.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_dying_5.wrl') ],
-      [ 0, 0.3, 0.6, 1.0, 2.0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    { HurtAnimation }
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider' + PathDelim + 'spider_stand.wrl'),
-        CreatureFileName('spider' + PathDelim + 'spider_hurt_2.wrl') ],
-      [ 0, 0.3 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, true, GLContextCache)
-    );
-
-  SpiderQueen := TSpiderQueenKind.Create(
-    'SpiderQueen',
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, true, true, GLContextCache),
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    { WalkAnimation }
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_walk_2.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_walk_3.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_walk_4.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_walk_5.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      [   0 / 5,
-        0.2 / 5,
-        0.4 / 5,
-        0.6 / 5,
-        0.8 / 5,
-        1 / 5 ],
-      { This animation really needs more frames to look smoothly. }
-      AnimScenesPerTime * 5, AnimOptimization, AnimEpsilonEquality, true, false, GLContextCache),
-    { AttackAnimation }
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_2.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_3.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      [ 0, 0.2, 0.4, 0.6 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    { DyingAnimation }
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_dying_2.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_dying_3.wrl') ],
-      [ 0, 0.5, 1.5 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    { HurtAnimation }
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      { Non-zero anim to have a little knockback. }
-      [ 0, 0.1 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache),
-    { ThrowWebAttackAnimation }
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_2.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_attack_alt.wrl'),
-        CreatureFileName('spider_queen' + PathDelim + 'spider_queen_stand.wrl') ],
-      [ 0, 0.3, 0.6, 1.0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache)
-    );
-
-  ThrownWeb := TMissileCreatureKind.Create(
-    'ThrownWeb',
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('web' + PathDelim + 'web.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache)
-    );
-
-  Arrow := TMissileCreatureKind.Create(
-    'Arrow',
-    TVRMLGLAnimationInfo.Create(
-      [ CreatureFileName('arrow' + PathDelim + 'arrow.wrl') ],
-      [ 0 ],
-      AnimScenesPerTime, AnimOptimization, AnimEpsilonEquality, false, false, GLContextCache)
-    );
+  Alien := TBallThrowerCreatureKind.Create('Alien');
+  Werewolf := TWerewolfKind.Create('Werewolf');
+  BallMissile := TMissileCreatureKind.Create('BallMissile');
+  Ghost := TGhostKind.Create('Ghost');
+  Spider := TSpiderKind.Create('Spider');
+  SpiderQueen := TSpiderQueenKind.Create('SpiderQueen');
+  ThrownWeb := TMissileCreatureKind.Create('ThrownWeb');
+  Arrow := TMissileCreatureKind.Create('Arrow');
 
   CreaturesKinds.LoadFromFile;
 end;

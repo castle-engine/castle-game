@@ -23,7 +23,8 @@ unit VRMLGLAnimationInfo;
 
 interface
 
-uses Classes, VRMLFlatSceneGL, VRMLGLAnimation, VRMLOpenGLRenderer;
+uses Classes, VRMLFlatSceneGL, VRMLGLAnimation, VRMLOpenGLRenderer,
+  KambiUtils, DOM;
 
 type
   { Simple class to postpone loading vrml files that will be used
@@ -31,15 +32,13 @@ type
     Why ? Because loading all these files can be quite time-consuming. }
   TVRMLGLAnimationInfo = class
   private
-    FModelFileNames: array of string;
-    FTimes: array of Single;
+    FModelFileNames: TDynStringArray;
+    FTimes: TDynSingleArray;
     FScenesPerTime: Cardinal;
     FOptimization: TGLRendererOptimization;
     FTimeLoop, FTimeBackwards: boolean;
     FCache: TVRMLOpenGLRendererContextCache;
     FEqualityEpsilon: Single;
-
-    function GetModelFileNames(I: Cardinal): string;
   public
     constructor Create(
       const AModelFileNames: array of string;
@@ -52,11 +51,18 @@ type
 
     { Constructor that loads animation settings from a *.kanim file.
       File format is described in ../../doc/kanim_format.txt file. }
-    {constructor CreateFromFile(const FileName: string;
-      ACache: TVRMLOpenGLRendererContextCache = nil);}
+    constructor CreateFromFile(const FileName: string;
+      ACache: TVRMLOpenGLRendererContextCache = nil);
 
-    property ModelFileNames[I: Cardinal]: string read GetModelFileNames;
-    function ModelFileNamesCount: Cardinal;
+    { Constructor that loads animation settings from DOM node representing
+      *.kanim file.
+      File format is described in ../../doc/kanim_format.txt file.
+      @seealso TVRMLGLAnimation.LoadFromDOMElement. }
+    constructor CreateFromDOMElement(Element: TDOMElement;
+      const BasePath: string;
+      ACache: TVRMLOpenGLRendererContextCache = nil);
+
+    destructor Destroy; override;
 
     { These properties are just initialized in our constructor
       and then used when calling CreateAnimation.
@@ -66,6 +72,9 @@ type
       from *.kanim file if you used CreateFromFile.
 
       @groupBegin }
+    property ModelFileNames: TDynStringArray read FModelFileNames;
+    property Times: TDynSingleArray read FTimes;
+
     property ScenesPerTime: Cardinal read FScenesPerTime write FScenesPerTime;
     property Optimization: TGLRendererOptimization
       read FOptimization write FOptimization;
@@ -112,71 +121,101 @@ constructor TVRMLGLAnimationInfo.Create(
   const AEqualityEpsilon: Single;
   ATimeLoop, ATimeBackwards: boolean;
   ACache: TVRMLOpenGLRendererContextCache);
-var
-  I: Integer;
 begin
   inherited Create;
 
-  { FModelFileNames := AModelFileNames; }
-  SetLength(FModelFileNames, High(AModelFileNames) + 1);
-  for I := 0 to High(FModelFileNames) do
-    FModelFileNames[I] := AModelFileNames[I];
+  FModelFileNames := TDynStringArray.Create;
+  FTimes := TDynSingleArray.Create;
 
-  { FTimes := ATimes; }
-  SetLength(FTimes, High(ATimes) + 1);
-  for I := 0 to High(FTimes) do
-    FTimes[I] := ATimes[I];
+  FModelFileNames.AppendArray(AModelFileNames);
+  FTimes.AppendArray(ATimes);
 
   FScenesPerTime := AScenesPerTime;
   FOptimization := AOptimization;
   FEqualityEpsilon := AEqualityEpsilon;
   FTimeLoop := ATimeLoop;
   FTimeBackwards := ATimeBackwards;
+
   FCache := ACache;
+end;
+
+constructor TVRMLGLAnimationInfo.CreateFromFile(const FileName: string;
+  ACache: TVRMLOpenGLRendererContextCache);
+begin
+  inherited Create;
+
+  FModelFileNames := TDynStringArray.Create;
+  FTimes := TDynSingleArray.Create;
+
+  TVRMLGLAnimation.LoadFromFile(FileName,
+    FModelFileNames, FTimes, FScenesPerTime, FOptimization,
+    FEqualityEpsilon, FTimeLoop, FTimeBackwards);
+
+  FCache := ACache;
+end;
+
+constructor TVRMLGLAnimationInfo.CreateFromDOMElement(Element: TDOMElement;
+  const BasePath: string;
+  ACache: TVRMLOpenGLRendererContextCache);
+begin
+  inherited Create;
+
+  FModelFileNames := TDynStringArray.Create;
+  FTimes := TDynSingleArray.Create;
+
+  TVRMLGLAnimation.LoadFromDOMElement(Element, BasePath,
+    FModelFileNames, FTimes, FScenesPerTime, FOptimization,
+    FEqualityEpsilon, FTimeLoop, FTimeBackwards);
+
+  FCache := ACache;
+end;
+
+destructor TVRMLGLAnimationInfo.Destroy;
+begin
+  FreeAndNil(FModelFileNames);
+  FreeAndNil(FTimes);
+  inherited;
 end;
 
 function TVRMLGLAnimationInfo.CreateAnimation(
   FirstRootNodesPool: TStringList): TVRMLGLAnimation;
 var
-  RootNodes: array of TVRMLNode;
+  RootNodes: TVRMLNodesList;
   I: Integer;
   FirstRootNodeIndex: Integer;
   OwnsFirstRootNode: boolean;
 begin
-  SetLength(RootNodes, Length(FModelFileNames));
+  RootNodes := TVRMLNodesList.Create;
+  try
+    RootNodes.Count := FModelFileNames.Count;
 
-  { $define DEBUG_ANIMATION_LOADING}
+    { $define DEBUG_ANIMATION_LOADING}
 
-  {$ifdef DEBUG_ANIMATION_LOADING}
-  Writeln('Loading animation:');
-  for I := 0 to High(RootNodes) do
-    Writeln('  RootNodes[I] from "', FModelFileNames[I], '"');
-  {$endif}
+    {$ifdef DEBUG_ANIMATION_LOADING}
+    Writeln('Loading animation:');
+    for I := 0 to RootNodes.High do
+      Writeln('  RootNodes[I] from "', FModelFileNames[I], '"');
+    {$endif}
 
-  if FirstRootNodesPool <> nil then
-    FirstRootNodeIndex := FirstRootNodesPool.IndexOf(FModelFileNames[0]) else
-    FirstRootNodeIndex := -1;
-  OwnsFirstRootNode := FirstRootNodeIndex = -1;
-  if not OwnsFirstRootNode then
-    RootNodes[0] := FirstRootNodesPool.Objects[FirstRootNodeIndex] as TVRMLNode else
-    RootNodes[0] := LoadAsVRML(FModelFileNames[0], false);
+    if FirstRootNodesPool <> nil then
+      FirstRootNodeIndex := FirstRootNodesPool.IndexOf(FModelFileNames[0]) else
+      FirstRootNodeIndex := -1;
+    OwnsFirstRootNode := FirstRootNodeIndex = -1;
+    if not OwnsFirstRootNode then
+      RootNodes[0] := FirstRootNodesPool.Objects[FirstRootNodeIndex] as TVRMLNode else
+      RootNodes[0] := LoadAsVRML(FModelFileNames[0], false);
 
-  for I := 1 to High(RootNodes) do
-    RootNodes[I] := LoadAsVRML(FModelFileNames[I], false);
+    for I := 1 to RootNodes.High do
+      RootNodes[I] := LoadAsVRML(FModelFileNames[I], false);
 
-  Result := TVRMLGLAnimation.Create(RootNodes, OwnsFirstRootNode, FTimes,
-    FScenesPerTime, FOptimization, FEqualityEpsilon,
-    FTimeLoop, FTimeBackwards, FCache);
-end;
+    Result := TVRMLGLAnimation.Create(RootNodes, OwnsFirstRootNode, FTimes,
+      FScenesPerTime, FOptimization, FEqualityEpsilon, FCache);
+    Result.TimeLoop := FTimeLoop;
+    Result.TimeBackwards := FTimeBackwards;
 
-function TVRMLGLAnimationInfo.GetModelFileNames(I: Cardinal): string;
-begin
-  Result := FModelFileNames[I];
-end;
-
-function TVRMLGLAnimationInfo.ModelFileNamesCount: Cardinal;
-begin
-  Result := High(FModelFileNames) + 1;
+  finally
+    FreeAndNil(RootNodes)
+  end;
 end;
 
 end.
