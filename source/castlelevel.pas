@@ -1553,7 +1553,8 @@ function TLevel.LoadLevelAnimation(
   const FileName: string;
   CreateDefaultTriangleOctree: boolean): TVRMLGLAnimation;
 begin
-  Result := TVRMLGLAnimation.CreateFromFile(FileName, GLContextCache);
+  Result := TVRMLGLAnimation.Create(GLContextCache);
+  Result.LoadFromFile(FileName);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
 

@@ -147,7 +147,7 @@ begin
   FModelFileNames := TDynStringArray.Create;
   FTimes := TDynSingleArray.Create;
 
-  TVRMLGLAnimation.LoadFromFile(FileName,
+  TVRMLGLAnimation.LoadFromFileToVars(FileName,
     FModelFileNames, FTimes, FScenesPerTime, FOptimization,
     FEqualityEpsilon, FTimeLoop, FTimeBackwards);
 
@@ -163,7 +163,7 @@ begin
   FModelFileNames := TDynStringArray.Create;
   FTimes := TDynSingleArray.Create;
 
-  TVRMLGLAnimation.LoadFromDOMElement(Element, BasePath,
+  TVRMLGLAnimation.LoadFromDOMElementToVars(Element, BasePath,
     FModelFileNames, FTimes, FScenesPerTime, FOptimization,
     FEqualityEpsilon, FTimeLoop, FTimeBackwards);
 
@@ -208,8 +208,9 @@ begin
     for I := 1 to RootNodes.High do
       RootNodes[I] := LoadAsVRML(FModelFileNames[I], false);
 
-    Result := TVRMLGLAnimation.Create(RootNodes, OwnsFirstRootNode, FTimes,
-      FScenesPerTime, FOptimization, FEqualityEpsilon, FCache);
+    Result := TVRMLGLAnimation.Create(FCache);
+    Result.Load(RootNodes, OwnsFirstRootNode, FTimes,
+      FScenesPerTime, FOptimization, FEqualityEpsilon);
     Result.TimeLoop := FTimeLoop;
     Result.TimeBackwards := FTimeBackwards;
 
