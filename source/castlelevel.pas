@@ -723,7 +723,7 @@ implementation
 uses SysUtils, OpenGLh, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
-  CastleKeys, CastleWindow;
+  CastleInputs, CastleWindow;
 
 {$define read_implementation}
 {$I objectslist_1.inc}

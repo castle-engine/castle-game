@@ -1,8 +1,15 @@
+procedure EventDown(MouseEvent: boolean; Key: TKey;
+  AMouseButton: TMouseButton);
+begin
+  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+    SaveScreen;
+end;
+
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   CurrentMenu.KeyDown(Key, C);
-  if CastleKey_SaveScreen.IsValue(Key) then
-    SaveScreen else
+  EventDown(false, Key, mbLeft);
+
   case C of
     CharEscape: UserQuit := true;
   end;
@@ -18,6 +25,7 @@ procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
   CurrentMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
     Glwin.MousePressed);
+  EventDown(true, K_None, Button);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);

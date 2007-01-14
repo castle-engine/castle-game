@@ -24,7 +24,7 @@ unit CastlePlayer;
 interface
 
 uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh,
-  VRMLSceneWaypoints, CastleKeys, ALSourceAllocator, CastleSound;
+  VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound;
 
 const
   DefaultMaxLife = 100;
@@ -107,7 +107,7 @@ type
       Call this only when EquippedWeapon <> nil. }
     function EquippedWeaponKind: TItemWeaponKind;
 
-    procedure KeyChanged(KeyConfiguration: TKeyConfiguration);
+    procedure InputChanged(InputConfiguration: TInputConfiguration);
 
     { If Swimming = psUnderWater, then this is the time (from Level.AnimationTime)
       of setting Swimming to psUnderWater. }
@@ -182,7 +182,7 @@ type
 
       Some things are synchronized between player properties and this
       Navigator object --- e.g. player's FlyingMode is synchronized
-      with Gravity and some Key_Xxx properties of this navigator.
+      with Gravity and some Input_Xxx properties of this navigator.
       In general, this player object "cooperates" in various ways
       with it's Navigator object, that's why it was most comfortable
       to just put Navigator inside TPlayer.
@@ -361,14 +361,14 @@ begin
   FItems := TItemsList.Create;
 
   FNavigator := TMatrixWalker.Create(nil);
-  Navigator.Key_MoveSpeedInc := K_None; { turn key off }
-  Navigator.Key_MoveSpeedDec := K_None; { turn key off }
+  Navigator.Input_MoveSpeedInc.MakeClear; { turn key off }
+  Navigator.Input_MoveSpeedDec.MakeClear; { turn key off }
   Navigator.CheckModsDown := false;
   Navigator.OnFalledDown := @FalledDown;
 
   HintEscapeKeyShown := false;
 
-  OnKeyChanged.AppendItem(@KeyChanged);
+  OnInputChanged.AppendItem(@InputChanged);
 
   LoadFromFile;
 
@@ -380,8 +380,8 @@ end;
 
 destructor TPlayer.Destroy;
 begin
-  if OnKeyChanged <> nil then
-    OnKeyChanged.DeleteFirstEqual(@KeyChanged);
+  if OnInputChanged <> nil then
+    OnInputChanged.DeleteFirstEqual(@InputChanged);
 
   FreeAndNil(FNavigator);
   FreeWithContentsAndNil(FItems);
@@ -672,11 +672,11 @@ begin
       bother user with mouse cursor displayed over beatiful
       game ending sequence. }
     Navigator.MouseLook := false;
-    Navigator.Key_LeftRot := K_None;
-    Navigator.Key_RightRot := K_None;
-    Navigator.Key_UpRotate := K_None;
-    Navigator.Key_DownRotate := K_None;
-    Navigator.Key_HomeUp := K_None;
+    Navigator.Input_LeftRot.MakeClear;
+    Navigator.Input_RightRot.MakeClear;
+    Navigator.Input_UpRotate.MakeClear;
+    Navigator.Input_DownRotate.MakeClear;
+    Navigator.Input_HomeUp.MakeClear;
   end else
   begin
     { MouseLook is turned on always, even when player is dead.
@@ -688,11 +688,11 @@ begin
       let them work. They work a little strangely (because CameraUp
       is orthogonal to HomeCameraUp), but they still work and player
       can figure it out. }
-    Navigator.Key_LeftRot := CastleKey_LeftRot.Value;
-    Navigator.Key_RightRot := CastleKey_RightRot.Value;
-    Navigator.Key_UpRotate := CastleKey_UpRotate.Value;
-    Navigator.Key_DownRotate := CastleKey_DownRotate.Value;
-    Navigator.Key_HomeUp := CastleKey_HomeUp.Value;
+    Navigator.Input_LeftRot.Assign(CastleInput_LeftRot.Shortcut, false);
+    Navigator.Input_RightRot.Assign(CastleInput_RightRot.Shortcut, false);
+    Navigator.Input_UpRotate.Assign(CastleInput_UpRotate.Shortcut, false);
+    Navigator.Input_DownRotate.Assign(CastleInput_DownRotate.Shortcut, false);
+    Navigator.Input_HomeUp.Assign(CastleInput_HomeUp.Shortcut, false);
   end;
 
   if GameWin then
@@ -702,18 +702,15 @@ begin
     Navigator.PreferHomeUpForMoving := true;
     Navigator.PreferHomeUpForRotations := false;
 
-    Navigator.Key_Jump := K_None;
-    Navigator.Key_Crouch := K_None;
-    Navigator.Key_UpMove := K_None;
-    Navigator.Key_DownMove := K_None;
+    Navigator.Input_Jump.MakeClear;
+    Navigator.Input_Crouch.MakeClear;
+    Navigator.Input_UpMove.MakeClear;
+    Navigator.Input_DownMove.MakeClear;
 
-    Navigator.Key_Forward := K_None;
-    Navigator.Key_Backward := K_None;
-    Navigator.Key_LeftStrafe := K_None;
-    Navigator.Key_RightStrafe := K_None;
-
-    Navigator.JumpMouseButtonActive := false;
-    Navigator.UpMoveMouseButtonActive := false;
+    Navigator.Input_Forward.MakeClear;
+    Navigator.Input_Backward.MakeClear;
+    Navigator.Input_LeftStrafe.MakeClear;
+    Navigator.Input_RightStrafe.MakeClear;
 
     Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
@@ -732,18 +729,15 @@ begin
       is sensible. }
     Navigator.PreferHomeUpForRotations := false;
 
-    Navigator.Key_Jump := K_None;
-    Navigator.Key_Crouch := K_None;
-    Navigator.Key_UpMove := K_None;
-    Navigator.Key_DownMove := K_None;
+    Navigator.Input_Jump.MakeClear;
+    Navigator.Input_Crouch.MakeClear;
+    Navigator.Input_UpMove.MakeClear;
+    Navigator.Input_DownMove.MakeClear;
 
-    Navigator.Key_Forward := K_None;
-    Navigator.Key_Backward := K_None;
-    Navigator.Key_LeftStrafe := K_None;
-    Navigator.Key_RightStrafe := K_None;
-
-    Navigator.JumpMouseButtonActive := false;
-    Navigator.UpMoveMouseButtonActive := false;
+    Navigator.Input_Forward.MakeClear;
+    Navigator.Input_Backward.MakeClear;
+    Navigator.Input_LeftStrafe.MakeClear;
+    Navigator.Input_RightStrafe.MakeClear;
 
     Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
@@ -761,13 +755,10 @@ begin
       Navigator.PreferHomeUpForMoving := false;
       Navigator.PreferHomeUpForRotations := true;
 
-      Navigator.Key_Jump := K_None;
-      Navigator.Key_Crouch := K_None;
-      Navigator.Key_UpMove := CastleKey_UpMove.Value;
-      Navigator.Key_DownMove := CastleKey_DownMove.Value;
-
-      Navigator.JumpMouseButtonActive := false;
-      Navigator.UpMoveMouseButtonActive := true;
+      Navigator.Input_Jump.MakeClear;
+      Navigator.Input_Crouch.MakeClear;
+      Navigator.Input_UpMove.Assign(CastleInput_UpMove.Shortcut, false);
+      Navigator.Input_DownMove.Assign(CastleInput_DownMove.Shortcut, false);
 
       { Navigator.HeadBobbing and
         Navigator.CameraPreferredHeight and
@@ -784,13 +775,10 @@ begin
         Navigator.PreferHomeUpForMoving := false;
         Navigator.PreferHomeUpForRotations := true;
 
-        Navigator.Key_Jump := K_None;
-        Navigator.Key_Crouch := K_None;
-        Navigator.Key_UpMove := CastleKey_UpMove.Value;
-        Navigator.Key_DownMove := CastleKey_DownMove.Value;
-
-        Navigator.JumpMouseButtonActive := false;
-        Navigator.UpMoveMouseButtonActive := true;
+        Navigator.Input_Jump.MakeClear;
+        Navigator.Input_Crouch.MakeClear;
+        Navigator.Input_UpMove.Assign(CastleInput_UpMove.Shortcut, false);
+        Navigator.Input_DownMove.Assign(CastleInput_DownMove.Shortcut, false);
 
         Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
         Navigator.FallingDownSpeedIncrease := 1.0;
@@ -806,13 +794,10 @@ begin
         Navigator.PreferHomeUpForMoving := true;
         Navigator.PreferHomeUpForRotations := true;
 
-        Navigator.Key_Jump := CastleKey_UpMove.Value;
-        Navigator.Key_Crouch := CastleKey_DownMove.Value;
-        Navigator.Key_UpMove := K_None;
-        Navigator.Key_DownMove := K_None;
-        
-        Navigator.JumpMouseButtonActive := true;
-        Navigator.UpMoveMouseButtonActive := false;
+        Navigator.Input_Jump.Assign(CastleInput_UpMove.Shortcut, false);
+        Navigator.Input_Crouch.Assign(CastleInput_DownMove.Shortcut, false);
+        Navigator.Input_UpMove.MakeClear;
+        Navigator.Input_DownMove.MakeClear;
 
         Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
         Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
@@ -826,10 +811,10 @@ begin
       end;
     end;
 
-    Navigator.Key_Forward := CastleKey_Forward.Value;
-    Navigator.Key_Backward := CastleKey_Backward.Value;
-    Navigator.Key_LeftStrafe := CastleKey_LeftStrafe.Value;
-    Navigator.Key_RightStrafe := CastleKey_RightStrafe.Value;
+    Navigator.Input_Forward.Assign(CastleInput_Forward.Shortcut, false);
+    Navigator.Input_Backward.Assign(CastleInput_Backward.Shortcut, false);
+    Navigator.Input_LeftStrafe.Assign(CastleInput_LeftStrafe.Shortcut, false);
+    Navigator.Input_RightStrafe.Assign(CastleInput_RightStrafe.Shortcut, false);
   end;
 end;
 
@@ -1140,7 +1125,7 @@ begin
   Result := Level.Sectors.SectorWithPoint(Navigator.CameraPos);
 end;
 
-procedure TPlayer.KeyChanged(KeyConfiguration: TKeyConfiguration);
+procedure TPlayer.InputChanged(InputConfiguration: TInputConfiguration);
 begin
   UpdateNavigator;
 end;

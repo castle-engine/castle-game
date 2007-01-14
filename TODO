@@ -52,10 +52,6 @@
 
 ----------------------------------------
 
-- Make mouse shortcuts configurable.
-- Make 2 shortcuts possible for a given action. Adjust defaults for AWSD
-  (drop key will have to change).
-
 - knockback for player sword (or for some other short-range weapon ?)
 
 - Traveler's screenshot from geforce 6800gt also shows artifact when rendering life indicator --- it should be rendered with blending (like on Huehnerschaender screenshot), while on Traveler's screenshots it shows white background underneath.
@@ -303,8 +299,6 @@ Cages level:
   - Some moving objects on the level: this is easy to do in my levels. Use it more !
   - more environ sounds: wind blowing.
   - homing missiles make great effect on a vast empty space, like in "Tower" level. Demonstrate this in some "real" level too!
-
-- "Set keys to "Half life 2" scheme" menu command ?
 
 - chooseNewLevel menu: display thumbnails of levels
 

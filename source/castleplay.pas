@@ -111,7 +111,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, CastleCreatures,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
-  KambiFilesUtils, CastleKeys, CastleGameMenu, CastleDebugMenu, CastleSound,
+  KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, GLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
   CastleLevelSpecific;
@@ -817,7 +817,8 @@ begin
   Glw.UpdateMouseLook;
 end;
 
-procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
+procedure EventDown(MouseEvent: boolean; Key: TKey;
+  AMouseButton: TMouseButton);
 
   procedure ChangeInventoryCurrentItem(Change: Integer);
   begin
@@ -983,13 +984,6 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
       TimeMessage(SGameWinMessage);
   end;
 
-  procedure DoGameMenu;
-  begin
-    ShowGameMenu(@Draw);
-    { UseMouseLook possibly changed now. }
-    UpdateMouseLook;
-  end;
-
   procedure DoDebugMenu;
   begin
     ShowDebugMenu(@Draw);
@@ -997,66 +991,74 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 
 begin
   { Basic keys. }
-  if CastleKey_Attack.IsValue(Key) then
+  if CastleInput_Attack.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     DoAttack else
-  if CastleKey_UpMove.IsValue(Key) or
-     CastleKey_DownMove.IsValue(Key) or
-     CastleKey_Forward.IsValue(Key) or
-     CastleKey_Backward.IsValue(Key) or
-     CastleKey_LeftStrafe.IsValue(Key) or
-     CastleKey_RightStrafe.IsValue(Key) then
+  if CastleInput_UpMove.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
+     CastleInput_DownMove.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
+     CastleInput_Forward.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
+     CastleInput_Backward.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
+     CastleInput_LeftStrafe.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
+     CastleInput_RightStrafe.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     MaybeDeadWinMessage else
   if { Note that rotation keys work even when player is dead.
        See comments in TPlayer.UpdateNavigator. }
-     CastleKey_LeftRot.IsValue(Key) or
-     CastleKey_RightRot.IsValue(Key) or
-     CastleKey_UpRotate.IsValue(Key) or
-     CastleKey_DownRotate.IsValue(Key) or
-     CastleKey_HomeUp.IsValue(Key) then
+     CastleInput_LeftRot.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
+     CastleInput_RightRot.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
+     CastleInput_UpRotate.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
+     CastleInput_DownRotate.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
+     CastleInput_HomeUp.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     MaybeWinMessage else
 
   { Items keys. }
-  if CastleKey_InventoryShow.IsValue(Key) then
+  if CastleInput_InventoryShow.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     InventoryVisible := not InventoryVisible else
-  if CastleKey_InventoryPrevious.IsValue(Key) then
+  if CastleInput_InventoryPrevious.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     ChangeInventoryCurrentItem(-1) else
-  if CastleKey_InventoryNext.IsValue(Key) then
+  if CastleInput_InventoryNext.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     ChangeInventoryCurrentItem(+1) else
-  if CastleKey_DropItem.IsValue(Key) then
+  if CastleInput_DropItem.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     DropItem else
-  if CastleKey_UseItem.IsValue(Key) then
+  if CastleInput_UseItem.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     UseItem else
 
   { Other keys. }
-  if CastleKey_SaveScreen.IsValue(Key) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     SaveScreen else
-  if CastleKey_ViewMessages.IsValue(Key) then
+  if CastleInput_ViewMessages.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     ViewGameMessages else
-  if CastleKey_CancelFlying.IsValue(Key) then
+  if CastleInput_CancelFlying.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     CancelFlying else
-  if CastleKey_FPSShow.IsValue(Key) then
+  if CastleInput_FPSShow.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     ShowDebugInfo := not ShowDebugInfo else
-  if CastleKey_Interact.IsValue(Key) then
+  if CastleInput_Interact.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     DoInteract else
-  if CastleKey_DebugMenu.IsValue(Key) then
-    DoDebugMenu else
+  if CastleInput_DebugMenu.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+    DoDebugMenu;
+end;
 
-  { Fixed keys. }
+procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
+
+  procedure DoGameMenu;
+  begin
+    ShowGameMenu(@Draw);
+    { UseMouseLook possibly changed now. }
+    UpdateMouseLook;
+  end;
+
+begin
+  EventDown(false, Key, mbLeft);
   if C = CharEscape then
     DoGameMenu;
+end;
+
+procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+begin
+  EventDown(true, K_None, Button);
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);
 begin
   GameCancel(true);
-end;
-
-procedure MouseDown(Glwin: TGLWindow; Btn: TMouseButton);
-begin
-  case Btn of
-    mbLeft: DoAttack;
-    mbRight: MaybeDeadWinMessage;
-  end;
 end;
 
 type

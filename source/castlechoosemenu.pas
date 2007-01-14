@@ -32,7 +32,7 @@ function ChooseByMenu(ADrawUnderMenu: TDrawFunc;
 
 implementation
 
-uses SysUtils, GLWinModes, KambiGLUtils, CastleKeys, GLWinMessages,
+uses SysUtils, GLWinModes, KambiGLUtils, CastleInputs, GLWinMessages,
   CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleTimeMessages;
 
 var
@@ -76,11 +76,17 @@ begin
   glPopAttrib;
 end;
 
+procedure EventDown(MouseEvent: boolean; Key: TKey;
+  AMouseButton: TMouseButton);
+begin
+  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+    SaveScreen;
+end;
+
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   ChooseMenu.KeyDown(Key, C);
-  if CastleKey_SaveScreen.IsValue(Key) then
-    SaveScreen;
+  EventDown(false, Key, mbLeft);
 end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
@@ -93,6 +99,7 @@ procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
   ChooseMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
     Glwin.MousePressed);
+  EventDown(true, K_None, Button);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);

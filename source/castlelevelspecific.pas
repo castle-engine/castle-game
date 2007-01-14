@@ -235,7 +235,7 @@ implementation
 
 uses KambiFilesUtils, SysUtils, Object3dAsVRML, KambiUtils,
   OpenGLh, KambiGLUtils, KambiStringUtils,
-  CastleCreatures, CastlePlay, CastleTimeMessages, CastleKeys,
+  CastleCreatures, CastlePlay, CastleTimeMessages, CastleInputs,
   CastleItems, CastleThunder;
 
 function CastleLevelsPath: string;
@@ -346,7 +346,7 @@ begin
      Box3dPointInside(Player.Navigator.CameraPos, FHintButtonBox) then
   begin
     TimeMessage('Hint: press this red button with the ' +
-      InteractKeyDescription);
+      InteractInputDescription);
     FHintButtonShown := true;
   end;
 end;
@@ -878,7 +878,7 @@ begin
     begin
       HintOpenDoorBoxShown := true;
       TimeMessage('Hint: open this door using the ' +
-        InteractKeyDescription);
+        InteractInputDescription);
     end;
   end;
 end;
@@ -1236,7 +1236,7 @@ begin
     Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then
   begin
     HintOpenDoorShown := true;
-    TimeMessage('Hint: open doors using the ' + InteractKeyDescription);
+    TimeMessage('Hint: open doors using the ' + InteractInputDescription);
   end;
 end;
 

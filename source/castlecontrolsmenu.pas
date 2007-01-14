@@ -61,7 +61,7 @@ implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
   GLMenu, OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit,
-  OpenGLFonts, CastleKeys, Keys, VectorMath, KambiUtils, CastlePlay,
+  OpenGLFonts, CastleInputs, Keys, VectorMath, KambiUtils, CastlePlay,
   CastleConfig, KambiStringUtils, CastleTimeMessages;
 
 { TCastleMenu descendants interface ------------------------------------------ }
@@ -79,13 +79,13 @@ type
 
   TControlsSubMenu = class(TSubMenu)
   private
-    FGroup: TKeyGroup;
-    procedure KeyChanged(KeyConfiguration: TKeyConfiguration);
+    FGroup: TInputGroup;
+    procedure InputChanged(InputConfiguration: TInputConfiguration);
   public
-    constructor Create(AGroup: TKeyGroup);
+    constructor Create(AGroup: TInputGroup);
     destructor Destroy; override;
 
-    property Group: TKeyGroup read FGroup;
+    property Group: TInputGroup read FGroup;
     procedure CurrentItemSelected; override;
   end;
 
@@ -201,7 +201,7 @@ begin
          AutoOpenInventoryArgument.Value := AutoOpenInventory;
        end;
     7: begin
-         CastleAllKeys.RestoreDefaults;
+         CastleAllInputs.RestoreDefaults;
 
          UseMouseLook := DefaultUseMouseLook;
          UseMouseLookArgument.Value := UseMouseLook;
@@ -235,13 +235,21 @@ end;
 
 { TControlsSubMenu ----------------------------------------------------------- }
 
-constructor TControlsSubMenu.Create(AGroup: TKeyGroup);
+const
+  SNoneInput = '<none>';
 
-  function KeyArgument(const Key: TKey): TGLMenuItemArgument;
+constructor TControlsSubMenu.Create(AGroup: TInputGroup);
+
+  function InputArgument(const S: string): TGLMenuItemArgument;
   begin
     Result := TGLMenuItemArgument.Create(
-      TGLMenuItemArgument.TextWidth('WWWWWWWWWWWW'));
-    Result.Value := KeyToStr(Key);
+      400
+      { This used to be
+        TGLMenuItemArgument.TextWidth(
+          'key "Page Down" or "Page Up" or mouse "medium"')
+        But this is too long... Unfortunately, it seems that some
+        key configurations just will not fit on screen. });
+    Result.Value := S;
   end;
 
 var
@@ -250,10 +258,11 @@ begin
   inherited Create;
   FGroup := AGroup;
 
-  for I := 0 to CastleGroupKeys[Group].High do
+  for I := 0 to CastleGroupInputs[Group].High do
     Items.AddObject(
-      CastleGroupKeys[Group].Items[I].Name,
-      KeyArgument(CastleGroupKeys[Group].Items[I].Value));
+      CastleGroupInputs[Group].Items[I].Name,
+      InputArgument(CastleGroupInputs[Group].Items[I].Shortcut.
+        Description(SNoneInput)));
 
   Items.Add('Back to controls menu');
 
@@ -261,72 +270,106 @@ begin
 
   FixItemsAreas(Glw.Width, Glw.Height);
 
-  OnKeyChanged.AppendItem(@KeyChanged);
+  OnInputChanged.AppendItem(@InputChanged);
 end;
 
 destructor TControlsSubMenu.Destroy;
 begin
-  if OnKeyChanged <> nil then
-    OnKeyChanged.DeleteFirstEqual(@KeyChanged);
+  if OnInputChanged <> nil then
+    OnInputChanged.DeleteFirstEqual(@InputChanged);
   inherited;
 end;
 
 procedure TControlsSubMenu.CurrentItemSelected;
-var
-  KeyConfiguration, ConflictingKey: TKeyConfiguration;
-  NewKey: TKey;
+
+  procedure ChangeKey(InputConfiguration: TInputConfiguration);
+  var
+    ConflictingKey: TInputConfiguration;
+    NewMouseEvent: boolean;
+    NewKey: TKey;
+    NewMouseButton: TMouseButton;
+  begin
+    MessageKeyMouse(Glw, Format(
+      'Press the new key or mouse button for "%s".', [InputConfiguration.Name]),
+      'Cancel [Escape]' + nl + 'Clear [Backspace]', taLeft,
+      NewMouseEvent, NewKey, NewMouseButton);
+
+    if (not NewMouseEvent) and (NewKey = K_Backspace) then
+    begin
+      InputConfiguration.Shortcut.MakeClear;
+    end else
+    if (not NewMouseEvent) and (NewKey = K_Escape) then
+    begin
+      { Don't do anything. }
+    end else
+    if { We silently ignore situation when NewKey/NewMouse already
+         match InputConfiguration.Shortcut. This is meaningless,
+         and otherwise could unnecessarily swap Key1 and Key2 in AddShortcut. }
+       (not InputConfiguration.Shortcut.IsEvent(
+         NewMouseEvent, NewKey, NewMouseButton)) then
+    begin
+      ConflictingKey := CastleAllInputs.SeekMatchingShortcut(NewMouseEvent,
+        NewKey, NewMouseButton);
+
+      if ConflictingKey <> nil then
+      begin
+        { I used to have here a confirmation before clearing ConflictingKey.
+          But this was bad for user experience, as the message would have
+          to be either about "clearing the whole shortcut" or just
+          "clearing part of the shortcut" --- as each shortcut is
+          2 key shortcuts and 1 mouse shortcut.
+          Also, one of the rules is to avoid modal dialog boxes...
+          So now I just uncoditionally remove conflicting key,
+          and make a TimeMessage informing user about it. }
+        if NewMouseEvent then
+        begin
+          TimeMessage(Format('Note: "%s" mouse shortcut cleared for action "%s"',
+            [ MouseButtonStr[ConflictingKey.Shortcut.MouseButton],
+              ConflictingKey.Name ]));
+          ConflictingKey.Shortcut.MouseButtonUse := false;
+        end else
+        if ConflictingKey.Shortcut.Key1 = NewKey then
+        begin
+          TimeMessage(Format('Note: "%s" key shortcut cleared for action "%s"',
+            [ KeyToStr(ConflictingKey.Shortcut.Key1),
+              ConflictingKey.Name ]));
+          ConflictingKey.Shortcut.Key1 := K_None;
+        end else
+        begin
+          Assert(ConflictingKey.Shortcut.Key2 = NewKey);
+
+          TimeMessage(Format('Note: "%s" key shortcut cleared for action "%s"',
+            [ KeyToStr(ConflictingKey.Shortcut.Key2),
+              ConflictingKey.Name ]));
+          ConflictingKey.Shortcut.Key2 := K_None;
+        end;
+      end;
+
+      InputConfiguration.AddShortcut(NewMouseEvent, NewKey, NewMouseButton);
+    end;
+  end;
+
 begin
   inherited;
 
-  if Between(CurrentItem, 0, CastleGroupKeys[Group].High) then
-  begin
-    KeyConfiguration := CastleGroupKeys[Group].Items[CurrentItem];
-    NewKey := MessageKey(Glw, Format(
-      'Press the new key for "%s".' +nl+
-      'Press Escape to cancel.', [KeyConfiguration.Name]), '', taLeft);
-
-    if (NewKey <> K_Escape) and
-       { We silently ignore situation when NewKey = KeyConfiguration.Value.
-         This is meaningless, and otherwise would raise a message
-         that NewKey conflicts with KeyConfiguration. }
-       (NewKey <> KeyConfiguration.Value) then
-    begin
-      ConflictingKey := CastleAllKeys.SeekKeyByValue(NewKey);
-      if ConflictingKey <> nil then
-      begin
-        if MessageYesNo(Glw,
-          Format('Conflict: Key "%s" is already assigned to action "%s".' + nl+
-            nl+
-            'Are you sure you want to assign this key to action "%s" (if yes, ' +
-            'the assignment for action "%s" will be cleared) ?',
-          [ KeyToStr(NewKey),
-            ConflictingKey.Name,
-            KeyConfiguration.Name,
-            ConflictingKey.Name]), taLeft) then
-        begin
-          ConflictingKey.Value := K_None;
-          KeyConfiguration.Value := NewKey;
-        end;
-      end else
-        KeyConfiguration.Value := NewKey;
-    end;
-  end else
-  if CurrentItem = CastleGroupKeys[Group].High + 1 then
+  if Between(CurrentItem, 0, CastleGroupInputs[Group].High) then
+    ChangeKey(CastleGroupInputs[Group].Items[CurrentItem]) else
+  if CurrentItem = CastleGroupInputs[Group].High + 1 then
   begin
     CurrentMenu := ControlsMenu;
   end else
     raise EInternalError.Create('Menu item unknown');
 end;
 
-procedure TControlsSubMenu.KeyChanged(KeyConfiguration: TKeyConfiguration);
+procedure TControlsSubMenu.InputChanged(InputConfiguration: TInputConfiguration);
 var
   I: Integer;
 begin
   { Refresh key names displayed in the menu. }
 
-  for I := 0 to CastleGroupKeys[Group].High do
+  for I := 0 to CastleGroupInputs[Group].High do
     TGLMenuItemArgument(Items.Objects[I]).Value :=
-      KeyToStr(CastleGroupKeys[Group].Items[I].Value);
+      CastleGroupInputs[Group].Items[I].Shortcut.Description(SNoneInput);
 end;
 
 { TBasicControlsMenu ------------------------------------------------------------- }
@@ -364,11 +407,7 @@ begin
     'Escape key:' +nl+
     '  This can be used in game to exit to game menu.' +nl+
     '  In many other cases it can be used to "exit".' +nl+
-    '  This key is not configurable.' +nl+
-    'Controlling game with mouse:' +nl+
-    '  Left mouse click performs attack.' +nl+
-    '  Right mouse click jumps (or flies/swims up).' +nl+
-    '  Moving mouse rotates the view.';
+    '  This key is not configurable.';
 
     { Too much info, not needed, I think that player can figure this out:
     nl+
@@ -414,19 +453,26 @@ begin
   glPopAttrib;
 end;
 
+procedure EventDown(MouseEvent: boolean; Key: TKey;
+  AMouseButton: TMouseButton);
+begin
+  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+    SaveScreen;
+end;
+
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
   CurrentMenu.KeyDown(Key, C);
-  if CastleKey_SaveScreen.IsValue(Key) then
-    SaveScreen else
+  EventDown(false, Key, mbLeft);
+
   if ExitWithEscapeAllowed then
-  case C of
-    CharEscape:
-      begin
-        UserQuit := true;
-        ExitWithEscape := true;
-      end;
-  end;
+    case C of
+      CharEscape:
+        begin
+          UserQuit := true;
+          ExitWithEscape := true;
+        end;
+    end;
 end;
 
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
@@ -439,6 +485,7 @@ procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
   CurrentMenu.MouseDown(Glwin.MouseX - MoveX,
     Glwin.Height - Glwin.MouseY - MoveY, Button, Glwin.MousePressed);
+  EventDown(true, K_None, Button);
 end;
 
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);

@@ -32,7 +32,7 @@ implementation
 uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
-  CastleControlsMenu, CastleKeys, CastleCreatures, CastleChooseMenu,
+  CastleControlsMenu, CastleInputs, CastleCreatures, CastleChooseMenu,
   CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel,
   CastleSound, CastleSoundMenu, VRMLNodes, KambiClassUtils, CastleTimeMessages;
 
