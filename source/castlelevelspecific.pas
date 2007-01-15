@@ -197,6 +197,10 @@ type
 
     procedure Render(const Frustum: TFrustum;
       const ATransparent: boolean); override;
+
+    procedure BeforeIdle(const NewAnimationTime: Single); override;
+
+    procedure Idle; override;
   end;
 
   TDoomE1M1Level = class(TLevel)
@@ -1077,6 +1081,67 @@ begin
   end;
 end;
 
+procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: Single);
+
+  function SomethingWillBlockClosingDoor: boolean;
+  var
+    DoorBox: TBox3d;
+    I: Integer;
+  begin
+    DoorBox := Box3dTranslate(Scene.BoundingBox,
+      SceneTranslation(NewAnimationTime));
+
+    Result := Boxes3dCollision(DoorBox, Player.BoundingBox);
+    if Result then
+      Exit;
+
+    for I := 0 to ParentLevel.Creatures.High do
+    begin
+      Result := Boxes3dCollision(DoorBox, ParentLevel.Creatures[I].BoundingBox);
+      if Result then
+        Exit;
+    end;
+
+    for I := 0 to ParentLevel.Items.High do
+    begin
+      Result := Boxes3dCollision(DoorBox, ParentLevel.Items[I].BoundingBox);
+      if Result then
+        Exit;
+    end;
+  end;
+
+begin
+  inherited;
+
+  { First check the doors that are during closing:
+    if the player or creatures will collide
+    with them after AnimationTime will change,
+    then we must stop and open again (to avoid
+    entering into collision with player/creature because of
+    door move). }
+
+  if (not Open) and
+    (ParentLevel.AnimationTime - OpenStateChangeTime < OpenCloseTime) and
+    SomethingWillBlockClosingDoor then
+    RevertDoOpen;
+end;
+
+procedure TDoomLevelDoor.Idle;
+begin
+  inherited;
+
+  if Open and
+    (ParentLevel.AnimationTime - OpenStateChangeTime >
+      OpenCloseTime + StayOpenTime) then
+    DoClose;
+
+  { If the door open/close sound is longer than the OpenCloseTime,
+    stop this sound after the door is completely opened/closed. }
+  if (ParentLevel.AnimationTime - OpenStateChangeTime > OpenCloseTime) and
+    (UsedSound <> nil) then
+    UsedSound.DoUsingEnd;
+end;
+
 { TDoomE1M1Level ------------------------------------------------------------- }
 
 constructor TDoomE1M1Level.Create;
@@ -1168,69 +1233,8 @@ begin
 end;
 
 procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
-
-  function SomethingWillBlockClosingDoor(const Door: TDoomLevelDoor;
-    const NewAnimationTime: Single): boolean;
-  var
-    DoorBox: TBox3d;
-    I: Integer;
-  begin
-    DoorBox := Box3dTranslate(Door.Scene.BoundingBox,
-      Door.SceneTranslation(NewAnimationTime));
-
-    Result := Boxes3dCollision(DoorBox, Player.BoundingBox);
-    if Result then
-      Exit;
-
-    for I := 0 to Creatures.High do
-    begin
-      Result := Boxes3dCollision(DoorBox, Creatures[I].BoundingBox);
-      if Result then
-        Exit;
-    end;
-  end;
-
-var
-  I: Integer;
-  Door: TDoomLevelDoor;
-  NewAnimationTime: Single;
 begin
-  { First (before calling inherited) check for all the doors
-    that are during closing: if the player or creatures will collide
-    with them after inherited will change AnimationTime,
-    then we must stop and open again (to avoid
-    entering into collision with player/creature because of
-    door move). }
-  NewAnimationTime := AnimationTime + CompSpeed / 50;
-  for I := 0 to Objects.High do
-    if Objects[I] is TDoomLevelDoor then
-    begin
-      Door := TDoomLevelDoor(Objects[I]);
-
-      if (not Door.Open) and
-        (AnimationTime - Door.OpenStateChangeTime < Door.OpenCloseTime) and
-        SomethingWillBlockClosingDoor(Door, NewAnimationTime) then
-        Door.RevertDoOpen;
-    end;
-
   inherited;
-
-  for I := 0 to Objects.High do
-    if Objects[I] is TDoomLevelDoor then
-    begin
-      Door := TDoomLevelDoor(Objects[I]);
-
-      if Door.Open and
-        (AnimationTime - Door.OpenStateChangeTime >
-          Door.OpenCloseTime + Door.StayOpenTime) then
-        Door.DoClose;
-
-      { If the door open/close sound is longer than the Door.OpenCloseTime,
-        stop this sound after the door is completely opened/closed. }
-      if (AnimationTime - Door.OpenStateChangeTime > Door.OpenCloseTime) and
-        (Door.UsedSound <> nil) then
-        Door.UsedSound.DoUsingEnd;
-    end;
 
   if (not HintOpenDoorShown) and
     Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then

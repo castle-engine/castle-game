@@ -102,6 +102,21 @@ type
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); virtual; abstract;
+
+    { This is called at the beginning of TLevel.Idle, @italic(before)
+      ParentLevel.AnimationTime changes to NewAnimationTime.
+
+      This is usefull for taking care of collision detection issues,
+      as our assumption always is that "nothing collides". Which means
+      that if you don't want your TLevelMovingObject to collide
+      with e.g. player or creatures or items, then you should
+      prevent the collision @italic(before it happens).
+      This is the place to do it. }
+    procedure BeforeIdle(const NewAnimationTime: Single); virtual;
+
+    { This is called somewhere from TLevel.Idle, @italic(after)
+      ParentLevel.AnimationTime was updated. }
+    procedure Idle; virtual;
   end;
 
   TObjectsListItem_2 = TLevelObject;
@@ -735,6 +750,16 @@ constructor TLevelObject.Create(AParentLevel: TLevel);
 begin
   inherited Create;
   FParentLevel := AParentLevel;
+end;
+
+procedure TLevelObject.BeforeIdle(const NewAnimationTime: Single);
+begin
+  { Nothing to do in this class. }
+end;
+
+procedure TLevelObject.Idle;
+begin
+  { Nothing to do in this class. }
 end;
 
 { TLevelStaticObject --------------------------------------------------------- }
@@ -1485,8 +1510,19 @@ begin
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single);
+var
+  I: Integer;
+  NewAnimationTime: Single;
 begin
-  FAnimationTime += CompSpeed / 50;
+  NewAnimationTime := AnimationTime + CompSpeed / 50;
+
+  for I := 0 to Objects.High do
+    Objects[I].BeforeIdle(NewAnimationTime);
+
+  FAnimationTime := NewAnimationTime;
+
+  for I := 0 to Objects.High do
+    Objects[I].Idle;
 
   if ThunderEffect <> nil then
     ThunderEffect.Idle;
