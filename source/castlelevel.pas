@@ -200,16 +200,21 @@ type
     the Scene translated by SceneTranslation.
 
     Note that if SceneTranslation actually changes over time then
-    you have to take care of at least one additional thing yourself:
+    you have to think of at least one additional thing yourself:
     what happens when collision occurs because of the move of this object ?
-    I.e. something blocks it's move ? See e.g. the Doom level Idle
-    method to see how it can be handled. }
+    Should the moving object push other objects (player, creatures, items),
+    like the elevator going up ?
+    That's the default behavior, but you can turn it off by setting
+    MovePushesOthers to @false.
+    See e.g. the DoomLevelDoor.BeforeIdle method to see how the behavior
+    "something blocks the move" can be handled. }
   TLevelMovingObject = class(TLevelObject)
   private
     FScene: TVRMLFlatSceneGL;
     FExists: boolean;
     FCollides: boolean;
     FTransparent: boolean;
+    FMovePushesOthers: boolean;
   public
     { Constructor. This loads scene (using LoadLevelScene). }
     constructor Create(AParentLevel: TLevel;
@@ -223,16 +228,12 @@ type
     property Transparent: boolean read FTransparent write FTransparent
       default false;
 
-    { @noAutoLinkHere
-
-      TODO: ignored for now. Trivial to implement, but wouldn't be tested for now. }
+    { @noAutoLinkHere }
     property Exists: boolean read FExists write FExists default true;
 
     { @noAutoLinkHere
       Note that if not @link(Exists) then this doesn't matter
-      (not existing objects never participate in collision detection).
-
-      TODO: ignored for now. Trivial to implement, but wouldn't be tested for now. }
+      (not existing objects never participate in collision detection). }
     property Collides: boolean read FCollides write FCollides default true;
 
     function SceneTranslation(const AnimationTime: Single):
@@ -254,6 +255,39 @@ type
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
+
+    procedure Render(const Frustum: TFrustum;
+      const ATransparent: boolean); override;
+
+    procedure BeforeIdle(const NewAnimationTime: Single); override;
+
+    { If @true (and Exists and Collides are also @true)
+      then moving this object moves everything on it's way.
+      I mean, if you put a creature/player/item on it's way of move,
+      the creature/player/item will be pushed by this object.
+      This is probably a good thing for things like elevators etc.
+
+      Be aware of some limitations of this collision checking:
+      @unorderedList(
+        @item(Collisions between this level object and the basic
+          level geometry and other level objects is not done.
+          Just design your level to make sure that it doesn't ever happen.)
+
+        @item(When pushing the creature/player/item, right now
+          we don't check whether the creature/player/item will not be
+          pushed into collision with something else.
+
+          For now, design your level to minimize the chance that it will ever happen.
+          Although in theory you cannot design your level to guarantee
+          that it will never happen (because e.g. a creature may be pushed
+          into collision with other creature, and since creatures move
+          on their own they can arrange themselves (in theory) in all manners of
+          funny configurations...). But in practice it's not so difficult,
+          just make sure that there is enough space on the way of move.)
+      )
+    }
+    property MovePushesOthers: boolean
+      read FMovePushesOthers write FMovePushesOthers default true;
   end;
 
   { This a VRML scene that can be animated.
@@ -856,6 +890,7 @@ begin
   FScene := ParentLevel.LoadLevelScene(SceneFileName, true, PrepareBackground);
   FExists := true;
   FCollides := true;
+  FMovePushesOthers := true;
 end;
 
 destructor TLevelMovingObject.Destroy;
@@ -871,17 +906,21 @@ function TLevelMovingObject.MoveAllowedSimple(
 var
   T: TVector3_Single;
 begin
-  { I have to check collision between
-      Scene + SceneTranslation and (OldPos, ProposedNewPos).
-    So it's equivalent to checking for collision between
-      Scene and (OldPos, ProposedNewPos) - SceneTranslation
-    And this way I can use Scene.DefaultTriangleOctree.MoveAllowedSimple. }
+  Result := Exists and Collides;
+  if Result then
+  begin
+    { I have to check collision between
+        Scene + SceneTranslation and (OldPos, ProposedNewPos).
+      So it's equivalent to checking for collision between
+        Scene and (OldPos, ProposedNewPos) - SceneTranslation
+      And this way I can use Scene.DefaultTriangleOctree.MoveAllowedSimple. }
 
-  T := SceneTranslation(ParentLevel.AnimationTime);
-  Result := Scene.DefaultTriangleOctree.MoveAllowedSimple(
-    VectorSubtract(OldPos, T.Data),
-    VectorSubtract(ProposedNewPos, T.Data),
-    CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
+    T := SceneTranslation(ParentLevel.AnimationTime);
+    Result := Scene.DefaultTriangleOctree.MoveAllowedSimple(
+      VectorSubtract(OldPos, T.Data),
+      VectorSubtract(ProposedNewPos, T.Data),
+      CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
+  end;
 end;
 
 function TLevelMovingObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
@@ -889,16 +928,20 @@ function TLevelMovingObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
 var
   T: TVector3_Single;
 begin
-  { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
-    use Scene.DefaultTriangleOctree.SegmentCollsion with
-    SceneTranslation. }
+  if Exists and Collides then
+  begin
+    { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+      use Scene.DefaultTriangleOctree.SegmentCollsion with
+      SceneTranslation. }
 
-  T := SceneTranslation(ParentLevel.AnimationTime);
-  Result := Scene.DefaultTriangleOctree.SegmentCollision(
-    VectorSubtract(Pos1, T.Data),
-    VectorSubtract(Pos2, T.Data),
-    false, NoItemIndex, false, ItemsToIgnoreFunc)
-    <> NoItemIndex;
+    T := SceneTranslation(ParentLevel.AnimationTime);
+    Result := Scene.DefaultTriangleOctree.SegmentCollision(
+      VectorSubtract(Pos1, T.Data),
+      VectorSubtract(Pos2, T.Data),
+      false, NoItemIndex, false, ItemsToIgnoreFunc)
+      <> NoItemIndex;
+  end else
+    Result := false;
 end;
 
 function TLevelMovingObject.RayCollision(
@@ -908,17 +951,21 @@ function TLevelMovingObject.RayCollision(
 var
   T: TVector3_Single;
 begin
-  { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
-    use Scene.DefaultTriangleOctree.RayCollsion with
-    SceneTranslation. }
+  if Exists and Collides then
+  begin
+    { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+      use Scene.DefaultTriangleOctree.RayCollsion with
+      SceneTranslation. }
 
-  T := SceneTranslation(ParentLevel.AnimationTime);
-  Result := Scene.DefaultTriangleOctree.RayCollision(
-    IntersectionDistance,
-    VectorSubtract(Ray0, T.Data),
-    RayVector,
-    false, NoItemIndex, false, ItemsToIgnoreFunc)
-    <> NoItemIndex;
+    T := SceneTranslation(ParentLevel.AnimationTime);
+    Result := Scene.DefaultTriangleOctree.RayCollision(
+      IntersectionDistance,
+      VectorSubtract(Ray0, T.Data),
+      RayVector,
+      false, NoItemIndex, false, ItemsToIgnoreFunc)
+      <> NoItemIndex;
+  end else
+    Result := false;
 end;
 
 procedure TLevelMovingObject.GetCameraHeight(const CameraPos: TVector3Single;
@@ -948,6 +995,83 @@ begin
       end else
         SqrHeightAboveTheGround :=
           Min(SqrHeightAboveTheGround, SqrHeightAboveThis);
+    end;
+  end;
+end;
+
+procedure TLevelMovingObject.Render(const Frustum: TFrustum;
+  const ATransparent: boolean);
+var
+  T: TVector3_Single;
+begin
+  if Exists and (ATransparent = Transparent) then
+  begin
+    { TODO: this should be implemented in a manner
+      that is able to use Scene.RenderFrustum always (by translating the
+      frustum) }
+
+    T := SceneTranslation(ParentLevel.AnimationTime);
+
+    { We assume that SceneTranslation = 0,0,0 is the most common case
+      (this is true e.g. for TDoomLevelDoor,
+      since all doors close automatically, and initially all are closed...).
+
+      Fortunately, it's also the case when we have constructed an octree,
+      so we can efficiently render it by RenderFrustum call. }
+
+    if IsZeroVector(T.Data) then
+      Scene.RenderFrustum(Frustum) else
+      begin
+        glPushMatrix;
+          glTranslatev(T.Data);
+          Scene.Render(nil);
+        glPopMatrix;
+      end;
+  end;
+end;
+
+procedure TLevelMovingObject.BeforeIdle(
+  const NewAnimationTime: Single);
+var
+  NewBox: TBox3d;
+  I: Integer;
+  Move: TVector3_Single;
+  CurrentTranslation, NewTranslation: TVector3_Single;
+  Crea: TCreature;
+  Item: TItemOnLevel;
+begin
+  if Exists and Collides and MovePushesOthers then
+  begin
+    CurrentTranslation := SceneTranslation(ParentLevel.AnimationTime);
+    NewTranslation := SceneTranslation(NewAnimationTime);
+
+    { It's an often expected situation that TLevelMovingObject
+      doesn't move at all, and then SceneTranslation doesn't change at all
+      (even when compared precisely, without usual epsilon used to compare
+      floats). So the check below is worth the time, because we expect
+      that usually is will render the rest if the code unnecessary. }
+
+    if not VectorsPerfectlyEqual(CurrentTranslation.Data, NewTranslation.Data) then
+    begin
+      NewBox := Box3dTranslate(Scene.BoundingBox, NewTranslation);
+      Move := NewTranslation - CurrentTranslation;
+
+      if Boxes3dCollision(NewBox, Player.BoundingBox) then
+        Player.Navigator.CameraPos := Player.Navigator.CameraPos + Move;
+
+      for I := 0 to ParentLevel.Creatures.High do
+      begin
+        Crea := ParentLevel.Creatures[I];
+        if Boxes3dCollision(NewBox, Crea.BoundingBox) then
+          Crea.LegsPosition := Crea.LegsPosition + Move;
+      end;
+
+      for I := 0 to ParentLevel.Items.High do
+      begin
+        Item := ParentLevel.Items[I];
+        if Boxes3dCollision(NewBox, Item.BoundingBox) then
+          Item.Position := Item.Position + Move;
+      end;
     end;
   end;
 end;

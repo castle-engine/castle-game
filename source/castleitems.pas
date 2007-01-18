@@ -330,7 +330,7 @@ type
     function ExtractItem: TItem;
 
     { This is the position of the (0, 0, 0) point of item model. }
-    property Position: TVector3Single read FPosition;
+    property Position: TVector3Single read FPosition write FPosition;
 
     { Tests collision of this item with Player (in @link(Player) variable). }
     function PlayerCollision: boolean;

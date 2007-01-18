@@ -195,12 +195,10 @@ type
     function CompletelyOpen: boolean;
     function CompletelyClosed: boolean;
 
-    procedure Render(const Frustum: TFrustum;
-      const ATransparent: boolean); override;
-
     procedure BeforeIdle(const NewAnimationTime: Single); override;
-
     procedure Idle; override;
+
+    property MovePushesOthers default false;
   end;
 
   TDoomE1M1Level = class(TLevel)
@@ -967,6 +965,7 @@ constructor TDoomLevelDoor.Create(AParentLevel: TLevel;
   const SceneFileName: string);
 begin
   inherited Create(AParentLevel, SceneFileName, false);
+  MovePushesOthers := false;
 end;
 
 destructor TDoomLevelDoor.Destroy;
@@ -1055,30 +1054,6 @@ function TDoomLevelDoor.CompletelyClosed: boolean;
 begin
   Result := (not Open) and
     (ParentLevel.AnimationTime - OpenStateChangeTime > OpenCloseTime);
-end;
-
-procedure TDoomLevelDoor.Render(const Frustum: TFrustum;
-  const ATransparent: boolean);
-begin
-  if Exists and (ATransparent = Transparent) then
-  begin
-    { TODO: this should be implemented in TLevelMovingObject, in a manner
-      that is able to use Scene.RenderFrustum always (by translating the
-      frustum) }
-
-    { The completely closed door is the most common case
-      (since all doors close automatically, and initially all are closed...).
-      Fortunately, it's also the case when we have constructed an octree,
-      so we can efficiently render it by RenderFrustum call. }
-    if CompletelyClosed then
-      Scene.RenderFrustum(Frustum) else
-      begin
-        glPushMatrix;
-          glTranslatev(SceneTranslation(ParentLevel.AnimationTime));
-          Scene.Render(nil);
-        glPopMatrix;
-      end;
-  end;
 end;
 
 procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: Single);
