@@ -290,6 +290,79 @@ type
       read FMovePushesOthers write FMovePushesOthers default true;
   end;
 
+  { This is a TLevelMovingObject that moves with a constant speed
+    from SceneTranslation (0, 0, 0) to SceneTranslation TranslationEnd.
+    They are called @italic(begin position) and @italic(end position).
+
+    In practice, this is less flexible than TLevelMovingObject but often
+    more comfortable: you get easy to use GoBeginPosition, GoEndPosition
+    properties, you can easily set sounds by SoundGoBeginPosition and
+    SoundGoEndPosition etc.
+  }
+  TLevelLinearMovingObject = class(TLevelMovingObject)
+  private
+    FEndPosition: boolean;
+    FEndPositionStateChangeTime: Single;
+
+    FSoundGoBeginPosition: TSoundType;
+    FSoundGoEndPosition: TSoundType;
+
+    UsedSound: TALAllocatedSource;
+    procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
+    procedure PlaySound(SoundType: TSoundType);
+  public
+    constructor Create(AParentLevel: TLevel;
+      const SceneFileName: string; PrepareBackground: boolean);
+    destructor Destroy; override;
+
+    { Is this object in @italic(end position), or going to it ?
+      If @false, then this object is in @italic(begin position)
+      or going to it. See also CompletelyEndPosion and CompletelyBeginPosition.
+
+      Initially this is @false, and EndPositionStateChangeTime is set such that
+      we're sure that we're in CompletelyBeginPosion, }
+    property EndPosition: boolean read FEndPosition;
+
+    { Last time EndPosition changed. }
+    property EndPositionStateChangeTime: Single read FEndPositionStateChangeTime;
+
+    function CompletelyEndPosition: boolean;
+    function CompletelyBeginPosition: boolean;
+
+    { This starts going to @italic(begin position), assuming that
+      currently we're in @italic(end position) (i.e. CompletelyEndPosion). }
+    procedure GoBeginPosition;
+
+    { This starts going to @italic(end position), assuming that
+      currently we're in @italic(begin position) (i.e. CompletelyBeginPosion). }
+    procedure GoEndPosition;
+
+    { Call this to stop going from @italic(end position) to @italic(begin position)
+      and go back to @italic(end position). Call this only when currently
+      EndPosition is @false and we were in the middle of going to
+      @italic(begin position).
+
+      If you don't understand this description, here's an example:
+      this is what happens when door on DOOM level gets blocked.
+      In the middle of closing (which ig going to @italic(begin position))
+      it will realize that something blocks it, and open back
+      (go back to @italic(end position)).  }
+    procedure RevertGoEndPosition;
+
+    property SoundGoBeginPosition: TSoundType
+      read FSoundGoBeginPosition write FSoundGoBeginPosition default stNone;
+    property SoundGoEndPosition: TSoundType
+      read FSoundGoEndPosition write FSoundGoEndPosition default stNone;
+
+    MoveTime: Single;
+    TranslationEnd: TVector3_Single;
+
+    function SceneTranslation(const AnimationTime: Single):
+      TVector3_Single; override;
+
+    procedure Idle; override;
+  end;
+
   { This a VRML scene that can be animated.
     Basically, a TVRMLGLAnimation wrapper.
 
@@ -1074,6 +1147,123 @@ begin
       end;
     end;
   end;
+end;
+
+{ TLevelLinearMovingObject --------------------------------------------------- }
+
+constructor TLevelLinearMovingObject.Create(AParentLevel: TLevel;
+  const SceneFileName: string; PrepareBackground: boolean);
+begin
+  inherited;
+
+  FSoundGoEndPosition := stNone;
+  FSoundGoBeginPosition := stNone;
+
+  FEndPosition := false;
+
+  { We set FEndPositionStateChangeTime to a past time, to be sure
+    that we don't treat the door as "closing right now". }
+  FEndPositionStateChangeTime := -1000.0; { TODO: should be implemented better... }
+
+  UsedSound := nil;
+end;
+
+destructor TLevelLinearMovingObject.Destroy;
+begin
+  if UsedSound <> nil then
+  begin
+    { We detach ourselved from UsedSound, but we let UsedSound to eventually
+      continue playing. }
+    UsedSound.OnUsingEnd := nil;
+    UsedSound := nil;
+  end;
+
+  inherited;
+end;
+
+procedure TLevelLinearMovingObject.SoundSourceUsingEnd(Sender: TALAllocatedSource);
+begin
+  Assert(Sender = UsedSound);
+  UsedSound.OnUsingEnd := nil;
+  UsedSound := nil;
+end;
+
+procedure TLevelLinearMovingObject.PlaySound(SoundType: TSoundType);
+begin
+  { The object can play only one sound (going to begin or end position)
+    at a time. }
+  if UsedSound <> nil then
+    UsedSound.DoUsingEnd;
+  UsedSound := Sound3d(SoundType, Box3dMiddle(Scene.BoundingBox));
+  if UsedSound <> nil then
+    UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
+end;
+
+procedure TLevelLinearMovingObject.GoEndPosition;
+begin
+  FEndPosition := true;
+  FEndPositionStateChangeTime := ParentLevel.AnimationTime;
+  PlaySound(SoundGoEndPosition);
+end;
+
+procedure TLevelLinearMovingObject.GoBeginPosition;
+begin
+  FEndPosition := false;
+  FEndPositionStateChangeTime := ParentLevel.AnimationTime;
+  PlaySound(SoundGoBeginPosition);
+end;
+
+procedure TLevelLinearMovingObject.RevertGoEndPosition;
+begin
+  FEndPosition := true;
+  FEndPositionStateChangeTime := { ParentLevel.AnimationTime -
+    (OpenCloseTime - (ParentLevel.AnimationTime - OpenStateChangeTime)) }
+    { simplified : }
+    2 * ParentLevel.AnimationTime - MoveTime - EndPositionStateChangeTime;
+  PlaySound(SoundGoEndPosition);
+end;
+
+function TLevelLinearMovingObject.SceneTranslation(const AnimationTime: Single):
+  TVector3_Single;
+begin
+  if not EndPosition then
+  begin
+    if AnimationTime - EndPositionStateChangeTime > MoveTime then
+      { Completely closed. }
+      Result.Init_Zero else
+      { During closing. }
+      Result := TranslationEnd *
+        (1 - (AnimationTime - EndPositionStateChangeTime) / MoveTime);
+  end else
+  begin
+    if AnimationTime - EndPositionStateChangeTime > MoveTime then
+      { Completely open. }
+      Result := TranslationEnd else
+      { During opening. }
+      Result := TranslationEnd *
+        ((AnimationTime - EndPositionStateChangeTime) / MoveTime);
+  end;
+end;
+
+function TLevelLinearMovingObject.CompletelyEndPosition: boolean;
+begin
+  Result := EndPosition and
+    (ParentLevel.AnimationTime - EndPositionStateChangeTime > MoveTime);
+end;
+
+function TLevelLinearMovingObject.CompletelyBeginPosition: boolean;
+begin
+  Result := (not EndPosition) and
+    (ParentLevel.AnimationTime - EndPositionStateChangeTime > MoveTime);
+end;
+
+procedure TLevelLinearMovingObject.Idle;
+begin
+  { If the SoundGoBegin/EndPosition is longer than the MoveTime,
+    stop this sound once we're completely in Begin/EndPosition. }
+  if (ParentLevel.AnimationTime - EndPositionStateChangeTime > MoveTime) and
+    (UsedSound <> nil) then
+    UsedSound.DoUsingEnd;
 end;
 
 { TLevelAnimatedObject ------------------------------------------------------- }

@@ -159,46 +159,19 @@ type
     function Background: TBackgroundGL; override;
   end;
 
-  TDoomLevelDoor = class(TLevelMovingObject)
-  private
-    UsedSound: TALAllocatedSource;
-    procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
-    procedure PlaySound(SoundType: TSoundType);
+  TDoomLevelDoor = class(TLevelLinearMovingObject)
   public
     constructor Create(AParentLevel: TLevel;
       const SceneFileName: string);
-    destructor Destroy; override;
 
-    { Constant fields, i.e. once set in TDoomE1M1Level constructor.
-      Scene should have door placed in closed position.
-      @groupBegin }
-    OpenCloseTime: Single;
-    OpenMove: TVector3_Single;
     StayOpenTime: Single;
-    { @groupEnd }
-
-    { Variable fields. They may change during level lifetime.
-      They are initialized automatically in level constructor
-      from constant fields above.
-      @groupBegin }
-    Open: boolean;
-    OpenStateChangeTime: Single;
-    { @groupEnd }
-
-    procedure DoOpen;
-    procedure DoClose;
-    procedure RevertDoOpen;
-
-    function SceneTranslation(const AnimationTime: Single):
-      TVector3_Single; override;
-
-    function CompletelyOpen: boolean;
-    function CompletelyClosed: boolean;
 
     procedure BeforeIdle(const NewAnimationTime: Single); override;
     procedure Idle; override;
 
     property MovePushesOthers default false;
+    property SoundGoBeginPosition default stDoorClose;
+    property SoundGoEndPosition default stDoorOpen;
   end;
 
   TDoomE1M1Level = class(TLevel)
@@ -966,94 +939,8 @@ constructor TDoomLevelDoor.Create(AParentLevel: TLevel;
 begin
   inherited Create(AParentLevel, SceneFileName, false);
   MovePushesOthers := false;
-end;
-
-destructor TDoomLevelDoor.Destroy;
-begin
-  if UsedSound <> nil then
-  begin
-    { We detach ourselved from UsedSound, but we let UsedSound to eventually
-      continue playing. }
-    UsedSound.OnUsingEnd := nil;
-    UsedSound := nil;
-  end;
-
-  inherited;
-end;
-
-procedure TDoomLevelDoor.SoundSourceUsingEnd(Sender: TALAllocatedSource);
-begin
-  Assert(Sender = UsedSound);
-  UsedSound.OnUsingEnd := nil;
-  UsedSound := nil;
-end;
-
-procedure TDoomLevelDoor.PlaySound(SoundType: TSoundType);
-begin
-  { Door can play only one sound at a time. }
-  if UsedSound <> nil then
-    UsedSound.DoUsingEnd;
-  UsedSound := Sound3d(SoundType, Box3dMiddle(Scene.BoundingBox));
-  if UsedSound <> nil then
-    UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
-end;
-
-procedure TDoomLevelDoor.DoOpen;
-begin
-  Open := true;
-  OpenStateChangeTime := ParentLevel.AnimationTime;
-  PlaySound(stDoorOpen);
-end;
-
-procedure TDoomLevelDoor.DoClose;
-begin
-  Open := false;
-  OpenStateChangeTime := ParentLevel.AnimationTime;
-  PlaySound(stDoorClose);
-end;
-
-procedure TDoomLevelDoor.RevertDoOpen;
-begin
-  Open := true;
-  OpenStateChangeTime := { ParentLevel.AnimationTime -
-    (OpenCloseTime - (ParentLevel.AnimationTime - OpenStateChangeTime)) }
-    { simplified : }
-    2 * ParentLevel.AnimationTime - OpenCloseTime - OpenStateChangeTime;
-  PlaySound(stDoorOpen);
-end;
-
-function TDoomLevelDoor.SceneTranslation(const AnimationTime: Single):
-  TVector3_Single;
-begin
-  if not Open then
-  begin
-    if AnimationTime - OpenStateChangeTime > OpenCloseTime then
-      { Completely closed. }
-      Result.Init_Zero else
-      { During closing. }
-      Result := OpenMove *
-        (1 - (AnimationTime - OpenStateChangeTime) / OpenCloseTime);
-  end else
-  begin
-    if AnimationTime - OpenStateChangeTime > OpenCloseTime then
-      { Completely open. }
-      Result := OpenMove else
-      { During opening. }
-      Result := OpenMove *
-        ((AnimationTime - OpenStateChangeTime) / OpenCloseTime);
-  end;
-end;
-
-function TDoomLevelDoor.CompletelyOpen: boolean;
-begin
-  Result := Open and
-    (ParentLevel.AnimationTime - OpenStateChangeTime > OpenCloseTime);
-end;
-
-function TDoomLevelDoor.CompletelyClosed: boolean;
-begin
-  Result := (not Open) and
-    (ParentLevel.AnimationTime - OpenStateChangeTime > OpenCloseTime);
+  SoundGoEndPosition := stDoorOpen;
+  SoundGoBeginPosition := stDoorClose;
 end;
 
 procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: Single);
@@ -1095,26 +982,20 @@ begin
     entering into collision with player/creature because of
     door move). }
 
-  if (not Open) and
-    (ParentLevel.AnimationTime - OpenStateChangeTime < OpenCloseTime) and
+  if (not EndPosition) and
+    (ParentLevel.AnimationTime - EndPositionStateChangeTime < MoveTime) and
     SomethingWillBlockClosingDoor then
-    RevertDoOpen;
+    RevertGoEndPosition;
 end;
 
 procedure TDoomLevelDoor.Idle;
 begin
   inherited;
 
-  if Open and
-    (ParentLevel.AnimationTime - OpenStateChangeTime >
-      OpenCloseTime + StayOpenTime) then
-    DoClose;
-
-  { If the door open/close sound is longer than the OpenCloseTime,
-    stop this sound after the door is completely opened/closed. }
-  if (ParentLevel.AnimationTime - OpenStateChangeTime > OpenCloseTime) and
-    (UsedSound <> nil) then
-    UsedSound.DoUsingEnd;
+  if EndPosition and
+    (ParentLevel.AnimationTime - EndPositionStateChangeTime >
+      MoveTime + StayOpenTime) then
+    GoBeginPosition;
 end;
 
 { TDoomE1M1Level ------------------------------------------------------------- }
@@ -1130,18 +1011,9 @@ var
     { Although I didn't know it initially, it turns out that all doors
       on Doom E1M1 level (maybe all doors totally ?) have the same
       values for parameters below. }
-    Result.OpenCloseTime := 1.0;
-    Result.OpenMove.Init(0, 0, 3.5);
+    Result.MoveTime := 1.0;
+    Result.TranslationEnd.Init(0, 0, 3.5);
     Result.StayOpenTime := 5.0;
-
-    { All doors are initially closed. }
-    Result.Open := false;
-
-    { We set Result.OpenStateChangeTime to a past time, to be sure
-      that we don't treat the door as "closing right now". }
-    Result.OpenStateChangeTime := - 10 * Result.OpenCloseTime;
-
-    Result.UsedSound := nil;
   end;
 
 begin
@@ -1235,9 +1107,9 @@ begin
       TimeMessageInteractFailed('You see a door. You''re too far to open it from here') else
     { Only if the door is completely closed
       (and not during closing right now) we allow player to open it. }
-    if not Door.CompletelyClosed then
+    if not Door.CompletelyBeginPosition then
       TimeMessageInteractFailed('You see a door. It''s already open') else
-      Door.DoOpen;
+      Door.GoEndPosition;
   end;
 end;
 
