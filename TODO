@@ -1,4 +1,44 @@
-- TLevelLinearMovingObject with MovePushesOthers: use this to make elevator49
+- finish elevator on Tower:
+  - data/levels/tower/elevator_button.kanim should be an actual animation
+    (that changes). It would be best to make a nice TLevelSimpleAnimtedObject
+    for this (could be reused in most other animations in CastleLevelSpecific).
+  - MovingElevator collision checking works almost by accident:
+
+    because we make collisions using BoundingBox inside MovePushesOthers,
+    the player and creatures will not be correctly pushed.
+
+    Well, actually they are pushed if the are inside the elev, since
+    they usually are in the current BoundingBox too (not only in the future
+    BoundingBox), since the elevator doesn't move too fast,
+    so actually they got pushed. But this was not the way it was supposed
+    to work...
+
+    Maybe that's the good way of work actually ? Although then for
+    safety inside MovePushesOthers we should check both current and future
+    bounding box.
+
+    But that's still too bad... we approximate the whole object by it's
+    bounding box --- it's doomed to fail in some specific cases.
+
+  - TTowerLevel.SpecialObjectPicked:
+    - I would like to react only on ElevatorButton, but I can't since
+      ElevatorButton is not inserted into Objects at all.
+    - check Distance.
+    - react even in the middle of move.
+    - hint for player ?
+
+- TVRMLFlatSceneGL may have param for Render:
+  onlyTransparent, onlyNonTransparent, all.
+  This way we can eliminate Transparent property in many creatures, items,
+  level objects and everything will be able to just have a TVRMLFlatSceneGL
+  that freely mixes transparent and untransparent parts.
+
+- xml config file for levels:
+  - removes the need to fill LevelsAvailable by code at startup
+  - level objects hierarchy could be defined in such file
+  - various boxes (like hint boxes) could be defined in such file
+
+- TLevelLinearMovingObject with MovePushesOthers and: use this to make elevator49
 
 - doom music file is too large!
 
@@ -51,6 +91,10 @@
   for other music !
 
 ----------------------------------------
+
+- keybinding to use "potion of life" if owned (analogy of "m" for "medkit"
+  in tremulous),
+  handy to avoid these potion searching by the "[", "]" keys.
 
 - knockback for player sword (or for some other short-range weapon ?)
 

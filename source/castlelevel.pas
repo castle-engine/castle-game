@@ -117,21 +117,70 @@ type
     { This is called somewhere from TLevel.Idle, @italic(after)
       ParentLevel.AnimationTime was updated. }
     procedure Idle; virtual;
+
+    function BoundingBox: TBox3d; virtual; abstract;
   end;
 
   TObjectsListItem_2 = TLevelObject;
   {$I objectslist_2.inc}
   TLevelObjectsList = TObjectsList_2;
 
+  { This is a TLevelObject descendant that is a @italic(sum of any number
+    of other TLevelObject descendants). In other words, this
+    is a grouping object: it groups other level objects inside as a single level
+    object.
+
+    This is usefull for some purposes, e.g. if you want to sometimes
+    treat some objects as separate and sometimes you want to treat them as
+    one single level object. E.g. you can use this as MovingObject inside
+    TLevelMovingObject, and you can put here a combination of static level
+    object and animated level object --- like an elevetor (static level
+    object) and a lever inside the elevator (animated level object),
+    both moved together by moving level object. }
+  TLevelObjectSum = class(TLevelObject)
+  private
+    FList: TLevelObjectsList;
+  public
+    constructor Create(AParentLevel: TLevel);
+    destructor Destroy; override;
+
+    { List of contained level objects. Objects placed here are owned
+      by this object, i.e. they are freed in our destructor. }
+    property List: TLevelObjectsList read FList;
+
+    procedure Render(const Frustum: TFrustum;
+      const ATransparent: boolean); override;
+
+    function MoveAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const CameraRadius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function RayCollision(
+      out IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
+
+    procedure BeforeIdle(const NewAnimationTime: Single); override;
+
+    procedure Idle; override;
+
+    function BoundingBox: TBox3d; override;
+  end;
+
   { This a VRML scene that can appear/disappear from the level.
 
     It's basically just a TVRMLFlatSceneGL instance
     (loaded with LoadLevelScene, always with a DefaultTriangleOctree).
     Plus properties @link(Exists) and @link(Collides) which allow you
-    to hide this object from evrything (or only from the collision detection).
-
-    You could as well use TLevelMovingObject with SceneTranslation always
-    set to zero vector, but this class may be able to work a little faster. }
+    to hide this object from evrything (or only from the collision detection). }
   TLevelStaticObject = class(TLevelObject)
   private
     FExists: boolean;
@@ -177,13 +226,18 @@ type
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
+
+    function BoundingBox: TBox3d; override;
   end;
 
-  { This a VRML scene that moves on the level.
+  { This an object that moves on the level.
 
-    It's basically just a TVRMLFlatSceneGL instance,
-    loaded with LoadLevelScene, always with a DefaultTriangleOctree.
-    It has a SceneTranslation function (that must be actually defined
+    It is used to move other TLevelObject --- which can be e.g. a static object
+    (basically just a TVRMLFlatSceneGL instance), an animated object,
+    a TLevelObjectSum (allowing you to move a couple of level objects together),
+    or even another TLevelMovingObject.
+
+    It has a Translation function (that must be actually defined
     in a descendant) that always says how this object is translated from
     it's original position.
 
@@ -197,9 +251,9 @@ type
     when something happens. See @link(Exists).
 
     It has methods to render and query it, that take into account
-    the Scene translated by SceneTranslation.
+    the MovingObject translated by Translation.
 
-    Note that if SceneTranslation actually changes over time then
+    Note that if Translation actually changes over time then
     you have to think of at least one additional thing yourself:
     what happens when collision occurs because of the move of this object ?
     Should the moving object push other objects (player, creatures, items),
@@ -210,23 +264,18 @@ type
     "something blocks the move" can be handled. }
   TLevelMovingObject = class(TLevelObject)
   private
-    FScene: TVRMLFlatSceneGL;
+    FMovingObject: TLevelObject;
     FExists: boolean;
     FCollides: boolean;
-    FTransparent: boolean;
     FMovePushesOthers: boolean;
   public
-    { Constructor. This loads scene (using LoadLevelScene). }
-    constructor Create(AParentLevel: TLevel;
-      const SceneFileName: string; PrepareBackground: boolean);
+    { Constructor. }
+    constructor Create(AParentLevel: TLevel);
     destructor Destroy; override;
 
-    property Scene: TVRMLFlatSceneGL read FScene;
-
-    { This level object must be either completely transparent or
-      completely opaque. This property determines which one it is. }
-    property Transparent: boolean read FTransparent write FTransparent
-      default false;
+    { Actual moving object. It is owned
+      by this object, i.e. it is freed in our destructor. }
+    property MovingObject: TLevelObject read FMovingObject write FMovingObject;
 
     { @noAutoLinkHere }
     property Exists: boolean read FExists write FExists default true;
@@ -236,7 +285,7 @@ type
       (not existing objects never participate in collision detection). }
     property Collides: boolean read FCollides write FCollides default true;
 
-    function SceneTranslation(const AnimationTime: Single):
+    function Translation(const AnimationTime: Single):
       TVector3_Single; virtual; abstract;
 
     function MoveAllowedSimple(
@@ -288,10 +337,12 @@ type
     }
     property MovePushesOthers: boolean
       read FMovePushesOthers write FMovePushesOthers default true;
+
+    function BoundingBox: TBox3d; override;
   end;
 
   { This is a TLevelMovingObject that moves with a constant speed
-    from SceneTranslation (0, 0, 0) to SceneTranslation TranslationEnd.
+    from Translation (0, 0, 0) to Translation TranslationEnd.
     They are called @italic(begin position) and @italic(end position).
 
     In practice, this is less flexible than TLevelMovingObject but often
@@ -306,13 +357,16 @@ type
 
     FSoundGoBeginPosition: TSoundType;
     FSoundGoEndPosition: TSoundType;
+    FSoundGoBeginPositionLooping: boolean;
+    FSoundGoEndPositionLooping: boolean;
+    FSoundTracksCurrentPosition: boolean;
 
     UsedSound: TALAllocatedSource;
     procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
-    procedure PlaySound(SoundType: TSoundType);
+    function SoundPosition: TVector3Single;
+    procedure PlaySound(SoundType: TSoundType; Looping: boolean);
   public
-    constructor Create(AParentLevel: TLevel;
-      const SceneFileName: string; PrepareBackground: boolean);
+    constructor Create(AParentLevel: TLevel);
     destructor Destroy; override;
 
     { Is this object in @italic(end position), or going to it ?
@@ -354,10 +408,28 @@ type
     property SoundGoEndPosition: TSoundType
       read FSoundGoEndPosition write FSoundGoEndPosition default stNone;
 
+    property SoundGoBeginPositionLooping: boolean
+      read FSoundGoBeginPositionLooping write FSoundGoBeginPositionLooping
+      default false;
+    property SoundGoEndPositionLooping: boolean
+      read FSoundGoEndPositionLooping write FSoundGoEndPositionLooping
+      default false;
+
+    { If @true then the sound (set by SoundGoBeginPosition or
+      SoundGoEndPosition) 3D position changes as the 3D position of the object
+      changes.
+
+      Otherwise (default) sound is initially made at initial
+      3D position of this object, and then the sound position doesn't change
+      (even if the position of the object changes). }
+    property SoundTracksCurrentPosition: boolean
+      read FSoundTracksCurrentPosition write FSoundTracksCurrentPosition
+      default false;
+
     MoveTime: Single;
     TranslationEnd: TVector3_Single;
 
-    function SceneTranslation(const AnimationTime: Single):
+    function Translation(const AnimationTime: Single):
       TVector3_Single; override;
 
     procedure Idle; override;
@@ -375,7 +447,7 @@ type
     So you should create this octree, and make sure that the animation is done
     such that the first animation frame is always larger than the others.
 
-    Although it seems like a totally stupid to check with collisions,
+    Although it seems like a totally stupid way to check for collisions,
     it's suitable for many purposes (see e.g. uses on "castle hall" level),
     it's simple and not memory-consuming, and you don't have to take
     any action when animation frame changes (because AnimationTime changes
@@ -428,6 +500,8 @@ type
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
+
+    function BoundingBox: TBox3d; override;
   end;
 
   TLevel = class
@@ -845,7 +919,7 @@ implementation
 uses SysUtils, OpenGLh, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
-  CastleInputs, CastleWindow;
+  CastleInputs, CastleWindow, OpenAL, ALUtils;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -954,13 +1028,122 @@ begin
     Scene.RenderFrustum(Frustum);
 end;
 
+function TLevelStaticObject.BoundingBox: TBox3d;
+begin
+  if Exists and Collides then
+    Result := Scene.BoundingBox else
+    Result := EmptyBox3d;
+end;
+
+{ TLevelObjectSum ------------------------------------------------------------ }
+
+constructor TLevelObjectSum.Create(AParentLevel: TLevel);
+begin
+  inherited;
+  FList := TLevelObjectsList.Create;
+end;
+
+destructor TLevelObjectSum.Destroy;
+begin
+  FreeWithContentsAndNil(FList);
+  inherited;
+end;
+
+procedure TLevelObjectSum.Render(const Frustum: TFrustum;
+  const ATransparent: boolean);
+var
+  I: Integer;
+begin
+  for I := 0 to List.High do
+    List.Items[I].Render(Frustum, ATransparent);
+end;
+
+function TLevelObjectSum.MoveAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const CameraRadius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  I: Integer;
+begin
+  Result := true;
+  for I := 0 to List.High do
+  begin
+    Result := List.Items[I].MoveAllowedSimple(OldPos, ProposedNewPos,
+      CameraRadius, ItemsToIgnoreFunc);
+    if not Result then Exit;
+  end;
+end;
+
+function TLevelObjectSum.SegmentCollision(const Pos1, Pos2: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  I: Integer;
+begin
+  Result := false;
+  for I := 0 to List.High do
+  begin
+    Result := List.Items[I].SegmentCollision(Pos1, Pos2, ItemsToIgnoreFunc);
+    if Result then Exit;
+  end;
+end;
+
+function TLevelObjectSum.RayCollision(
+  out IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  I: Integer;
+begin
+  Result := false;
+  for I := 0 to List.High do
+  begin
+    Result := List.Items[I].RayCollision(IntersectionDistance, Ray0, RayVector,
+      ItemsToIgnoreFunc);
+    if Result then Exit;
+  end;
+end;
+
+procedure TLevelObjectSum.GetCameraHeight(const CameraPos: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+var
+  I: Integer;
+begin
+  for I := 0 to List.High do
+    List.Items[I].GetCameraHeight(CameraPos, ItemsToIgnoreFunc,
+      IsAboveTheGround, SqrHeightAboveTheGround);
+end;
+
+procedure TLevelObjectSum.BeforeIdle(const NewAnimationTime: Single);
+var
+  I: Integer;
+begin
+  for I := 0 to List.High do
+    List.Items[I].BeforeIdle(NewAnimationTime);
+end;
+
+procedure TLevelObjectSum.Idle;
+var
+  I: Integer;
+begin
+  for I := 0 to List.High do
+    List.Items[I].Idle;
+end;
+
+function TLevelObjectSum.BoundingBox: TBox3d;
+var
+  I: Integer;
+begin
+  Result := EmptyBox3d;
+  for I := 0 to List.High do
+    Box3dSumTo1st(Result, List.Items[I].BoundingBox);
+end;
+
 { TLevelMovingObject --------------------------------------------------------- }
 
-constructor TLevelMovingObject.Create(AParentLevel: TLevel;
-  const SceneFileName: string; PrepareBackground: boolean);
+constructor TLevelMovingObject.Create(AParentLevel: TLevel);
 begin
   inherited Create(AParentLevel);
-  FScene := ParentLevel.LoadLevelScene(SceneFileName, true, PrepareBackground);
   FExists := true;
   FCollides := true;
   FMovePushesOthers := true;
@@ -968,7 +1151,7 @@ end;
 
 destructor TLevelMovingObject.Destroy;
 begin
-  FreeAndNil(FScene);
+  FreeAndNil(FMovingObject);
   inherited;
 end;
 
@@ -979,20 +1162,20 @@ function TLevelMovingObject.MoveAllowedSimple(
 var
   T: TVector3_Single;
 begin
-  Result := Exists and Collides;
-  if Result then
+  Result := (not Exists) or (not Collides);
+  if not Result then
   begin
     { I have to check collision between
-        Scene + SceneTranslation and (OldPos, ProposedNewPos).
+        MovingObject + Translation and (OldPos, ProposedNewPos).
       So it's equivalent to checking for collision between
-        Scene and (OldPos, ProposedNewPos) - SceneTranslation
-      And this way I can use Scene.DefaultTriangleOctree.MoveAllowedSimple. }
+        MovingObject and (OldPos, ProposedNewPos) - Translation
+      And this way I can use MovingObject.MoveAllowedSimple. }
 
-    T := SceneTranslation(ParentLevel.AnimationTime);
-    Result := Scene.DefaultTriangleOctree.MoveAllowedSimple(
+    T := Translation(ParentLevel.AnimationTime);
+    Result := MovingObject.MoveAllowedSimple(
       VectorSubtract(OldPos, T.Data),
       VectorSubtract(ProposedNewPos, T.Data),
-      CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
+      CameraRadius, ItemsToIgnoreFunc);
   end;
 end;
 
@@ -1001,20 +1184,17 @@ function TLevelMovingObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
 var
   T: TVector3_Single;
 begin
-  if Exists and Collides then
+  Result := Exists and Collides;
+  if Result then
   begin
     { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
-      use Scene.DefaultTriangleOctree.SegmentCollsion with
-      SceneTranslation. }
+      use MovingObject.SegmentCollsion with Translation. }
 
-    T := SceneTranslation(ParentLevel.AnimationTime);
-    Result := Scene.DefaultTriangleOctree.SegmentCollision(
+    T := Translation(ParentLevel.AnimationTime);
+    Result := MovingObject.SegmentCollision(
       VectorSubtract(Pos1, T.Data),
-      VectorSubtract(Pos2, T.Data),
-      false, NoItemIndex, false, ItemsToIgnoreFunc)
-      <> NoItemIndex;
-  end else
-    Result := false;
+      VectorSubtract(Pos2, T.Data), ItemsToIgnoreFunc);
+  end;
 end;
 
 function TLevelMovingObject.RayCollision(
@@ -1024,51 +1204,32 @@ function TLevelMovingObject.RayCollision(
 var
   T: TVector3_Single;
 begin
-  if Exists and Collides then
+  Result := Exists and Collides;
+  if Result then
   begin
     { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
-      use Scene.DefaultTriangleOctree.RayCollsion with
-      SceneTranslation. }
+      use MovingObject.RayCollsion with Translation. }
 
-    T := SceneTranslation(ParentLevel.AnimationTime);
-    Result := Scene.DefaultTriangleOctree.RayCollision(
-      IntersectionDistance,
+    T := Translation(ParentLevel.AnimationTime);
+    Result := MovingObject.RayCollision(IntersectionDistance,
       VectorSubtract(Ray0, T.Data),
-      RayVector,
-      false, NoItemIndex, false, ItemsToIgnoreFunc)
-      <> NoItemIndex;
-  end else
-    Result := false;
+      RayVector, ItemsToIgnoreFunc);
+  end;
 end;
 
 procedure TLevelMovingObject.GetCameraHeight(const CameraPos: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
   var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
 var
-  IsAboveThis: boolean;
-  SqrHeightAboveThis: Single;
   T: TVector3_Single;
 begin
   if Exists and Collides then
   begin
-    T := SceneTranslation(ParentLevel.AnimationTime);
+    T := Translation(ParentLevel.AnimationTime);
 
-    Scene.DefaultTriangleOctree.GetCameraHeight(
-      VectorSubtract(CameraPos, T.Data),
-      ParentLevel.HomeCameraUp,
-      IsAboveThis, SqrHeightAboveThis,
-      NoItemIndex, ItemsToIgnoreFunc);
-
-    if IsAboveThis then
-    begin
-      if not IsAboveTheGround then
-      begin
-        IsAboveTheGround := IsAboveThis;
-        SqrHeightAboveTheGround := SqrHeightAboveThis;
-      end else
-        SqrHeightAboveTheGround :=
-          Min(SqrHeightAboveTheGround, SqrHeightAboveThis);
-    end;
+    MovingObject.GetCameraHeight(
+      VectorSubtract(CameraPos, T.Data), ItemsToIgnoreFunc,
+      IsAboveTheGround, SqrHeightAboveTheGround);
   end;
 end;
 
@@ -1077,27 +1238,26 @@ procedure TLevelMovingObject.Render(const Frustum: TFrustum;
 var
   T: TVector3_Single;
 begin
-  if Exists and (ATransparent = Transparent) then
+  if Exists then
   begin
-    { TODO: this should be implemented in a manner
-      that is able to use Scene.RenderFrustum always (by translating the
-      frustum) }
+    T := Translation(ParentLevel.AnimationTime);
 
-    T := SceneTranslation(ParentLevel.AnimationTime);
-
-    { We assume that SceneTranslation = 0,0,0 is the most common case
+    { We assume that Translation = 0,0,0 is the most common case
       (this is true e.g. for TDoomLevelDoor,
       since all doors close automatically, and initially all are closed...).
 
-      Fortunately, it's also the case when we have constructed an octree,
-      so we can efficiently render it by RenderFrustum call. }
+      In this case we can avoid FrustumMove (although I didn't do any tests,
+      maybe this check is not worth the effort and we don't need to worry
+      about FrustumMove time so much ?). }
 
     if IsZeroVector(T.Data) then
-      Scene.RenderFrustum(Frustum) else
+      MovingObject.Render(Frustum, ATransparent) else
       begin
         glPushMatrix;
           glTranslatev(T.Data);
-          Scene.Render(nil);
+          { MovingObject.Render expects Frustum in it's local coordinates,
+            that's why we subtract Translation here. }
+          MovingObject.Render(FrustumMove(Frustum, (-T).Data), ATransparent);
         glPopMatrix;
       end;
   end;
@@ -1105,6 +1265,15 @@ end;
 
 procedure TLevelMovingObject.BeforeIdle(
   const NewAnimationTime: Single);
+
+  function BoundingBoxAssumeTranslation(
+    const AssumeTranslation: TVector3_Single): TBox3d;
+  begin
+    if Exists and Collides then
+      Result := Box3dTranslate(MovingObject.BoundingBox, AssumeTranslation) else
+      Result := EmptyBox3d;
+  end;
+
 var
   NewBox: TBox3d;
   I: Integer;
@@ -1115,18 +1284,18 @@ var
 begin
   if Exists and Collides and MovePushesOthers then
   begin
-    CurrentTranslation := SceneTranslation(ParentLevel.AnimationTime);
-    NewTranslation := SceneTranslation(NewAnimationTime);
+    CurrentTranslation := Translation(ParentLevel.AnimationTime);
+    NewTranslation := Translation(NewAnimationTime);
 
     { It's an often expected situation that TLevelMovingObject
-      doesn't move at all, and then SceneTranslation doesn't change at all
+      doesn't move at all, and then Translation doesn't change at all
       (even when compared precisely, without usual epsilon used to compare
       floats). So the check below is worth the time, because we expect
       that usually is will render the rest if the code unnecessary. }
 
     if not VectorsPerfectlyEqual(CurrentTranslation.Data, NewTranslation.Data) then
     begin
-      NewBox := Box3dTranslate(Scene.BoundingBox, NewTranslation);
+      NewBox := BoundingBoxAssumeTranslation(NewTranslation);
       Move := NewTranslation - CurrentTranslation;
 
       if Boxes3dCollision(NewBox, Player.BoundingBox) then
@@ -1149,10 +1318,17 @@ begin
   end;
 end;
 
+function TLevelMovingObject.BoundingBox: TBox3d;
+begin
+  if Exists and Collides then
+    Result := Box3dTranslate(MovingObject.BoundingBox,
+      Translation(ParentLevel.AnimationTime)) else
+    Result := EmptyBox3d;
+end;
+
 { TLevelLinearMovingObject --------------------------------------------------- }
 
-constructor TLevelLinearMovingObject.Create(AParentLevel: TLevel;
-  const SceneFileName: string; PrepareBackground: boolean);
+constructor TLevelLinearMovingObject.Create(AParentLevel: TLevel);
 begin
   inherited;
 
@@ -1188,13 +1364,20 @@ begin
   UsedSound := nil;
 end;
 
-procedure TLevelLinearMovingObject.PlaySound(SoundType: TSoundType);
+function TLevelLinearMovingObject.SoundPosition: TVector3Single;
+begin
+  Result := Box3dMiddle(BoundingBox);
+end;
+
+procedure TLevelLinearMovingObject.PlaySound(SoundType: TSoundType;
+  Looping: boolean);
 begin
   { The object can play only one sound (going to begin or end position)
     at a time. }
   if UsedSound <> nil then
     UsedSound.DoUsingEnd;
-  UsedSound := Sound3d(SoundType, Box3dMiddle(Scene.BoundingBox));
+  UsedSound := Sound3d(SoundType, SoundPosition, Looping);
+
   if UsedSound <> nil then
     UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
 end;
@@ -1203,14 +1386,14 @@ procedure TLevelLinearMovingObject.GoEndPosition;
 begin
   FEndPosition := true;
   FEndPositionStateChangeTime := ParentLevel.AnimationTime;
-  PlaySound(SoundGoEndPosition);
+  PlaySound(SoundGoEndPosition, SoundGoEndPositionLooping);
 end;
 
 procedure TLevelLinearMovingObject.GoBeginPosition;
 begin
   FEndPosition := false;
   FEndPositionStateChangeTime := ParentLevel.AnimationTime;
-  PlaySound(SoundGoBeginPosition);
+  PlaySound(SoundGoBeginPosition, SoundGoBeginPositionLooping);
 end;
 
 procedure TLevelLinearMovingObject.RevertGoEndPosition;
@@ -1220,10 +1403,10 @@ begin
     (OpenCloseTime - (ParentLevel.AnimationTime - OpenStateChangeTime)) }
     { simplified : }
     2 * ParentLevel.AnimationTime - MoveTime - EndPositionStateChangeTime;
-  PlaySound(SoundGoEndPosition);
+  PlaySound(SoundGoEndPosition, SoundGoEndPositionLooping);
 end;
 
-function TLevelLinearMovingObject.SceneTranslation(const AnimationTime: Single):
+function TLevelLinearMovingObject.Translation(const AnimationTime: Single):
   TVector3_Single;
 begin
   if not EndPosition then
@@ -1259,7 +1442,12 @@ end;
 
 procedure TLevelLinearMovingObject.Idle;
 begin
-  { If the SoundGoBegin/EndPosition is longer than the MoveTime,
+  { Update sound position when object is moving }
+  if (UsedSound <> nil) and SoundTracksCurrentPosition then
+    alSourceVector3f(UsedSound.ALSource, AL_POSITION, SoundPosition);
+
+  { If the SoundGoBegin/EndPosition is longer than the MoveTime
+    (or it's looping),
     stop this sound once we're completely in Begin/EndPosition. }
   if (ParentLevel.AnimationTime - EndPositionStateChangeTime > MoveTime) and
     (UsedSound <> nil) then
@@ -1349,6 +1537,13 @@ procedure TLevelAnimatedObject.Render(const Frustum: TFrustum;
 begin
   if Exists and (ATransparent = Transparent) then
     Animation.SceneFromTime(AnimationTime).RenderFrustum(Frustum);
+end;
+
+function TLevelAnimatedObject.BoundingBox: TBox3d;
+begin
+  if Exists and Collides then
+    Result := Animation.FirstScene.BoundingBox else
+    Result := EmptyBox3d;
 end;
 
 { TLevel --------------------------------------------------------------------- }

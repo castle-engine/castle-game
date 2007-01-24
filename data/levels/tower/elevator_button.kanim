@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<animation
+  scenes_per_time="30"
+  equality_epsilon="0.01"
+  loop="false"
+  backwards="false">
+  <frame file_name="elevator_button.wrl" time="0" />
+</animation>

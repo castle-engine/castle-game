@@ -125,6 +125,7 @@
     default_importance="max"/>
   <sound name="door_open" default_importance="level_event"/>
   <sound name="door_close" default_importance="level_event"/>
+  <sound name="elevator" default_importance="level_event"/>
 
   <!-- Creatures sounds. -->
   <sound name="creature_falled_down"

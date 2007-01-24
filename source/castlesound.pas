@@ -84,6 +84,7 @@ type
     stDoomE1M1Music,
     stDoorOpen,
     stDoorClose,
+    stElevator,
     { @groupEnd }
 
     { Creatures sounds.
@@ -288,6 +289,7 @@ const
     'doom_e1m1',
     'door_open',
     'door_close',
+    'elevator',
     'creature_falled_down',
     'alien_sudden_pain',
     'alien_dying',

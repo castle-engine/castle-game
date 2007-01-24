@@ -106,6 +106,10 @@ type
   end;
 
   TTowerLevel = class(TLevel)
+  private
+    MovingElevator: TLevelLinearMovingObject;
+    Elevator: TLevelStaticObject;
+    ElevatorButton: TLevelAnimatedObject;
   public
     constructor Create; override;
 
@@ -114,6 +118,9 @@ type
 
     class function Title: string; override;
     class function Number: Integer; override;
+
+    procedure SpecialObjectPicked(const Distance: Single;
+      SpecialObjectIndex: Integer; var InteractionOccured: boolean); override;
   end;
 
   TCagesLevel = class(TLevel)
@@ -605,6 +612,9 @@ end;
 { TTowerLevel ---------------------------------------------------------------- }
 
 constructor TTowerLevel.Create;
+var
+  ElevatorButtonSum: TLevelObjectSum;
+  TowerLevelPath: string;
 begin
   inherited;
 
@@ -614,6 +624,29 @@ begin
     Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
     Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
   end;
+
+  TowerLevelPath := CastleLevelsPath + 'tower' + PathDelim;
+
+  Elevator := TLevelStaticObject.Create(
+    Self, TowerLevelPath + 'elevator.wrl', false);
+
+  ElevatorButton := TLevelAnimatedObject.Create(Self, LoadLevelAnimation(
+    TowerLevelPath + 'elevator_button.kanim', true));
+
+  ElevatorButtonSum := TLevelObjectSum.Create(Self);
+  ElevatorButtonSum.List.Add(Elevator);
+  ElevatorButtonSum.List.Add(ElevatorButton);
+
+  MovingElevator := TLevelLinearMovingObject.Create(Self);
+  MovingElevator.MovingObject := ElevatorButtonSum;
+  MovingElevator.MoveTime := 10.0;
+  MovingElevator.TranslationEnd.Init(0, 0, 122);
+  MovingElevator.SoundGoEndPosition := stElevator;
+  MovingElevator.SoundGoEndPositionLooping := true;
+  MovingElevator.SoundGoBeginPosition := stElevator;
+  MovingElevator.SoundGoBeginPositionLooping := true;
+  MovingElevator.SoundTracksCurrentPosition := true;
+  Objects.Add(MovingElevator);
 end;
 
 class function TTowerLevel.SceneFileName: string;
@@ -634,6 +667,26 @@ end;
 class function TTowerLevel.Number: Integer;
 begin
   Result := 99;
+end;
+
+procedure TTowerLevel.SpecialObjectPicked(const Distance: Single;
+  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
+begin
+  inherited;
+
+  if Objects[SpecialObjectIndex] = MovingElevator then
+  begin
+    if MovingElevator.CompletelyEndPosition then
+    begin
+      MovingElevator.GoBeginPosition;
+      InteractionOccured := true;
+    end else
+    if MovingElevator.CompletelyBeginPosition then
+    begin
+      MovingElevator.GoEndPosition;
+      InteractionOccured := true;
+    end;
+  end;
 end;
 
 { TCagesLevel ---------------------------------------------------------------- }
@@ -937,7 +990,8 @@ end;
 constructor TDoomLevelDoor.Create(AParentLevel: TLevel;
   const SceneFileName: string);
 begin
-  inherited Create(AParentLevel, SceneFileName, false);
+  inherited Create(AParentLevel);
+  MovingObject := TLevelStaticObject.Create(AParentLevel, SceneFileName, false);
   MovePushesOthers := false;
   SoundGoEndPosition := stDoorOpen;
   SoundGoBeginPosition := stDoorClose;
@@ -950,8 +1004,9 @@ procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: Single);
     DoorBox: TBox3d;
     I: Integer;
   begin
-    DoorBox := Box3dTranslate(Scene.BoundingBox,
-      SceneTranslation(NewAnimationTime));
+    DoorBox := Box3dTranslate(
+      (MovingObject as TLevelStaticObject).Scene.BoundingBox,
+      Translation(NewAnimationTime));
 
     Result := Boxes3dCollision(DoorBox, Player.BoundingBox);
     if Result then
