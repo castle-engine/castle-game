@@ -1,7 +1,4 @@
 - finish elevator on Tower:
-  - data/levels/tower/elevator_button.kanim should be an actual animation
-    (that changes). It would be best to make a nice TLevelSimpleAnimtedObject
-    for this (could be reused in most other animations in CastleLevelSpecific).
   - MovingElevator collision checking works almost by accident:
 
     because we make collisions using BoundingBox inside MovePushesOthers,

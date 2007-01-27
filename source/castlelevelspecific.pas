@@ -30,13 +30,8 @@ uses VRMLGLAnimation, VRMLFlatSceneGL, Boxes3d, VectorMath,
 type
   TCastleHallLevel = class(TLevel)
   private
-    SymbolOpen: boolean;
-    SymbolOpenTime: Single;
-    Symbol: TLevelAnimatedObject;
-
-    ButtonPressed: boolean;
-    ButtonPressedTime: Single;
-    Button: TLevelAnimatedObject;
+    Symbol: TLevelSimpleAnimatedObject;
+    Button: TLevelSimpleAnimatedObject;
 
     { HintButtonBox, indicating when to display hint about pressing a button. }
     FHintButtonBox: TBox3d;
@@ -109,7 +104,7 @@ type
   private
     MovingElevator: TLevelLinearMovingObject;
     Elevator: TLevelStaticObject;
-    ElevatorButton: TLevelAnimatedObject;
+    ElevatorButton: TLevelSimpleAnimatedObject;
   public
     constructor Create; override;
 
@@ -237,11 +232,11 @@ begin
 
   CastleHallLevelPath := CastleLevelsPath + 'castle_hall' + PathDelim;
 
-  Symbol := TLevelAnimatedObject.Create(Self,
+  Symbol := TLevelSimpleAnimatedObject.Create(Self,
     LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true));
   Objects.Add(Symbol);
 
-  Button := TLevelAnimatedObject.Create(Self,
+  Button := TLevelSimpleAnimatedObject.Create(Self,
     LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true));
   Objects.Add(Button);
 
@@ -292,25 +287,18 @@ var
 begin
   inherited;
 
-  if SymbolOpen then
-    Symbol.AnimationTime := AnimationTime - SymbolOpenTime;
-
-  if ButtonPressed then
-    Button.AnimationTime := AnimationTime - ButtonPressedTime;
-
   if Box3dPointInside(Player.Navigator.CameraPos, FLevelExitBox) then
   begin
     LevelFinished(TCagesLevel.Create);
   end;
 
-  if ButtonPressed and
-    (AnimationTime - ButtonPressedTime > Button.Animation.TimeDuration) then
+  if Button.Started and
+    (AnimationTime - Button.PlayStartTime > Button.Animation.TimeDuration) then
   begin
-    if not SymbolOpen then
+    if not Symbol.Started then
     begin
-      SymbolOpen := true;
+      Symbol.Play;
       Symbol.Collides := false;
-      SymbolOpenTime := AnimationTime;
 
       WerewolfCreature := Werewolf.CreateDefaultCreature(
         WerewolfStartPosition,
@@ -348,11 +336,10 @@ begin
     InteractionOccured := true;
     if Distance < 10.0 then
     begin
-      if ButtonPressed then
+      if Button.Started then
         TimeMessageInteractFailed('Button is already pressed') else
       begin
-        ButtonPressed := true;
-        ButtonPressedTime := AnimationTime;
+        Button.Play;
         TimeMessage('You press the button');
       end;
     end else
@@ -630,7 +617,7 @@ begin
   Elevator := TLevelStaticObject.Create(
     Self, TowerLevelPath + 'elevator.wrl', false);
 
-  ElevatorButton := TLevelAnimatedObject.Create(Self, LoadLevelAnimation(
+  ElevatorButton := TLevelSimpleAnimatedObject.Create(Self, LoadLevelAnimation(
     TowerLevelPath + 'elevator_button.kanim', true));
 
   ElevatorButtonSum := TLevelObjectSum.Create(Self);
@@ -678,11 +665,13 @@ begin
   begin
     if MovingElevator.CompletelyEndPosition then
     begin
+      ElevatorButton.Play;
       MovingElevator.GoBeginPosition;
       InteractionOccured := true;
     end else
     if MovingElevator.CompletelyBeginPosition then
     begin
+      ElevatorButton.Play;
       MovingElevator.GoEndPosition;
       InteractionOccured := true;
     end;

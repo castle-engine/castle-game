@@ -309,6 +309,7 @@ type
       const ATransparent: boolean); override;
 
     procedure BeforeIdle(const NewAnimationTime: Single); override;
+    procedure Idle; override;
 
     { If @true (and Exists and Collides are also @true)
       then moving this object moves everything on it's way.
@@ -502,6 +503,25 @@ type
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
 
     function BoundingBox: TBox3d; override;
+  end;
+
+  { This is the TLevelAnimatedObject descendant that is easier to use:
+    instead of taking care of AnimationTime, you only call it's Play method.
+    When the animation is stopped, AnimationTime is kept at 0. }
+  TLevelSimpleAnimatedObject = class(TLevelAnimatedObject)
+  private
+    FStarted: boolean;
+    FPlayStartTime: Single;
+  public
+    constructor Create(AParentLevel: TLevel; AnAnimation: TVRMLGLAnimation);
+
+    property Started: boolean read FStarted;
+    property PlayStartTime: Single read FPlayStartTime;
+
+    procedure Play;
+    procedure Stop;
+
+    procedure Idle; override;
   end;
 
   TLevel = class
@@ -1282,6 +1302,8 @@ var
   Crea: TCreature;
   Item: TItemOnLevel;
 begin
+  MovingObject.BeforeIdle(NewAnimationTime);
+
   if Exists and Collides and MovePushesOthers then
   begin
     CurrentTranslation := Translation(ParentLevel.AnimationTime);
@@ -1318,6 +1340,11 @@ begin
   end;
 end;
 
+procedure TLevelMovingObject.Idle;
+begin
+  MovingObject.Idle;
+end;
+
 function TLevelMovingObject.BoundingBox: TBox3d;
 begin
   if Exists and Collides then
@@ -1346,13 +1373,11 @@ end;
 
 destructor TLevelLinearMovingObject.Destroy;
 begin
+  { Otherwise, if you exit from the game while some sound was played,
+    and the sound was e.g. looping (like the elevator on "Tower" level),
+    the sound will never get stopped. }
   if UsedSound <> nil then
-  begin
-    { We detach ourselved from UsedSound, but we let UsedSound to eventually
-      continue playing. }
-    UsedSound.OnUsingEnd := nil;
-    UsedSound := nil;
-  end;
+    UsedSound.DoUsingEnd;
 
   inherited;
 end;
@@ -1442,6 +1467,8 @@ end;
 
 procedure TLevelLinearMovingObject.Idle;
 begin
+  inherited;
+
   { Update sound position when object is moving }
   if (UsedSound <> nil) and SoundTracksCurrentPosition then
     alSourceVector3f(UsedSound.ALSource, AL_POSITION, SoundPosition);
@@ -1544,6 +1571,34 @@ begin
   if Exists and Collides then
     Result := Animation.FirstScene.BoundingBox else
     Result := EmptyBox3d;
+end;
+
+{ TLevelSimpleAnimatedObject ------------------------------------------------- }
+
+constructor TLevelSimpleAnimatedObject.Create(
+  AParentLevel: TLevel; AnAnimation: TVRMLGLAnimation);
+begin
+  inherited;
+  FStarted := false;
+end;
+
+procedure TLevelSimpleAnimatedObject.Play;
+begin
+  FStarted := true;
+  FPlayStartTime := ParentLevel.AnimationTime;
+end;
+
+procedure TLevelSimpleAnimatedObject.Stop;
+begin
+  FStarted := false;
+end;
+
+procedure TLevelSimpleAnimatedObject.Idle;
+begin
+  inherited;
+  if Started then
+    AnimationTime := ParentLevel.AnimationTime - FPlayStartTime else
+    AnimationTime := 0;
 end;
 
 { TLevel --------------------------------------------------------------------- }

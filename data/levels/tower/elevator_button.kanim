@@ -6,4 +6,6 @@
   loop="false"
   backwards="false">
   <frame file_name="elevator_button.wrl" time="0" />
+  <frame file_name="elevator_button_pressed.wrl" time="0.2" />
+  <frame file_name="elevator_button.wrl" time="1" />
 </animation>
