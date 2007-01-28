@@ -110,6 +110,9 @@ type
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
 
+    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+
     { @returns(A collision as TCollisionInfo instance, or @nil if no collision).
       You're responsible for freeing this TCollisionInfo instance. }
     function RayCollision(
@@ -185,6 +188,9 @@ type
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
+    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
@@ -244,6 +250,9 @@ type
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
+    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
@@ -294,6 +303,7 @@ type
     FExists: boolean;
     FCollides: boolean;
     FMovePushesOthers: boolean;
+    FMovePushesOthersUsesBoxes: boolean;
   public
     { Constructor. }
     constructor Create(AParentLevel: TLevel);
@@ -320,6 +330,9 @@ type
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function RayCollision(
@@ -364,6 +377,45 @@ type
     }
     property MovePushesOthers: boolean
       read FMovePushesOthers write FMovePushesOthers default true;
+
+    { This controls how MovePushesOthers works.
+      There are two methods how this may work:
+      @orderedList(
+        @item(When MovePushesOthersUsesBoxes, then we check each
+          possible collider (being it player, creature or item) bounding box
+          with bounding box of this level object. If there's a collision,
+          then we decide that the collider moves along with this level object
+          --- because it's inside this level object (e.g. inside
+          the elevator), or it's pushed by this object.
+
+          Disadvantage: we approximate whole level object as it's bounding box.
+          It's good only if level object's bounding box is a good approximation
+          of it's actual shape. And the level object is relatively small
+          --- because even when e.g. player is flying and is exactly in the
+          middle of the elevator, he is moved instantly with the elevator
+          (instead of hitting elevator floor/ceiling first).
+        )
+
+        @item(When not MovePushesOthersUsesBoxes, then we try to check
+          using precise octree of level objects (assuming they are
+          used in SphereCollision overrides). And for player and creature,
+          we use their spheres instead of their bounding boxes.
+          This is the way of checking that more resembles reality
+          (as we use the actual geometry within the octrees instead of
+          just the bounding box).
+
+          Disadvantage: if player/creature is pushed up by this level object,
+          it takes some time for them to "raise up" to a standing position
+          (because we compare using their spheres). Conversely,
+          if the level object moves down, it takes some time for a
+          player/creature to actually fall down on the level object.
+          This means that if the level object doesn't move too fast,
+          you get strange effect when e.g. player is standing within
+          the level object: the player position seems to bounce within
+          the elevator.) }
+    property MovePushesOthersUsesBoxes: boolean
+      read FMovePushesOthersUsesBoxes write FMovePushesOthersUsesBoxes
+      default true;
 
     function BoundingBox: TBox3d; override;
   end;
@@ -529,6 +581,9 @@ type
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function RayCollision(
@@ -1086,6 +1141,16 @@ begin
       <> NoItemIndex);
 end;
 
+function TLevelStaticObject.SphereCollision(
+  const Pos: TVector3Single; const Radius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := Exists and Collides and
+    (Scene.DefaultTriangleOctree.SphereCollision(
+      Pos, Radius,  NoItemIndex, ItemsToIgnoreFunc)
+      <> NoItemIndex);
+end;
+
 function TLevelStaticObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
@@ -1203,6 +1268,20 @@ begin
   end;
 end;
 
+function TLevelObjectSum.SphereCollision(
+  const Pos: TVector3Single; const Radius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  I: Integer;
+begin
+  Result := false;
+  for I := 0 to List.High do
+  begin
+    Result := List.Items[I].SphereCollision(Pos, Radius, ItemsToIgnoreFunc);
+    if Result then Exit;
+  end;
+end;
+
 function TLevelObjectSum.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
@@ -1260,6 +1339,7 @@ begin
   FExists := true;
   FCollides := true;
   FMovePushesOthers := true;
+  FMovePushesOthersUsesBoxes := true;
 end;
 
 destructor TLevelMovingObject.Destroy;
@@ -1307,6 +1387,24 @@ begin
     Result := MovingObject.SegmentCollision(
       VectorSubtract(Pos1, T.Data),
       VectorSubtract(Pos2, T.Data), ItemsToIgnoreFunc);
+  end;
+end;
+
+function TLevelMovingObject.SphereCollision(
+  const Pos: TVector3Single; const Radius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  T: TVector3_Single;
+begin
+  Result := Exists and Collides;
+  if Result then
+  begin
+    { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+      use MovingObject.SphereCollsion with Translation. }
+
+    T := Translation(ParentLevel.AnimationTime);
+    Result := MovingObject.SphereCollision(
+      VectorSubtract(Pos, T.Data),  Radius, ItemsToIgnoreFunc);
   end;
 end;
 
@@ -1390,8 +1488,24 @@ procedure TLevelMovingObject.BeforeIdle(
       Result := EmptyBox3d;
   end;
 
+  function SphereCollisionAssumeTranslation(
+    const AssumeTranslation: TVector3_Single;
+    const Pos: TVector3Single; const Radius: Single;
+    const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  begin
+    Result := Exists and Collides;
+    if Result then
+    begin
+      { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+        use MovingObject.SphereCollsion with Translation. }
+
+      Result := MovingObject.SphereCollision(
+        VectorSubtract(Pos, AssumeTranslation.Data),  Radius, ItemsToIgnoreFunc);
+    end;
+  end;
+
 var
-  NewBox: TBox3d;
+  CurrentBox, NewBox, Box: TBox3d;
   I: Integer;
   Move: TVector3_Single;
   CurrentTranslation, NewTranslation: TVector3_Single;
@@ -1413,23 +1527,60 @@ begin
 
     if not VectorsPerfectlyEqual(CurrentTranslation.Data, NewTranslation.Data) then
     begin
+      CurrentBox := BoundingBox;
       NewBox := BoundingBoxAssumeTranslation(NewTranslation);
       Move := NewTranslation - CurrentTranslation;
 
-      if Boxes3dCollision(NewBox, Player.BoundingBox) then
-        Player.Navigator.CameraPos := Player.Navigator.CameraPos + Move;
-
-      for I := 0 to ParentLevel.Creatures.High do
+      if MovePushesOthersUsesBoxes then
       begin
-        Crea := ParentLevel.Creatures[I];
-        if Boxes3dCollision(NewBox, Crea.BoundingBox) then
-          Crea.LegsPosition := Crea.LegsPosition + Move;
+        Box := Player.BoundingBox;
+        if Boxes3dCollision(NewBox, Box) or
+           Boxes3dCollision(CurrentBox, Box) then
+          Player.Navigator.CameraPos := Player.Navigator.CameraPos + Move;
+
+        for I := 0 to ParentLevel.Creatures.High do
+        begin
+          Crea := ParentLevel.Creatures[I];
+          Box := Crea.BoundingBox;
+          if Boxes3dCollision(NewBox, Box) or
+             Boxes3dCollision(CurrentBox, Box) then
+            Crea.LegsPosition := Crea.LegsPosition + Move;
+        end;
+      end else
+      begin
+        if SphereCollisionAssumeTranslation(NewTranslation,
+          Player.Navigator.CameraPos, ParentLevel.CameraRadius,
+          @ParentLevel.CollisionIgnoreItem) then
+          Player.Navigator.CameraPos := Player.Navigator.CameraPos + Move;
+
+        for I := 0 to ParentLevel.Creatures.High do
+        begin
+          Crea := ParentLevel.Creatures[I];
+          if SphereCollisionAssumeTranslation(NewTranslation,
+            Crea.MiddlePosition, Crea.Kind.CameraRadius,
+            @ParentLevel.CollisionIgnoreItem) then
+            Crea.LegsPosition := Crea.LegsPosition + Move;
+        end;
       end;
 
+      { TODO: check for collisions with Items is not correct:
+        we just check our boxes with item's BoundingBox.
+        This is correct for MovePushesOthersUsesBoxes, but not when
+        MovePushesOthersUsesBoxes = @false.
+
+        The correct way for MovePushesOthersUsesBoxes = @false
+        would be to use our octree (more precisely, the octree
+        that is potentially stored somewhere in MovingObject)
+        with BoundingBox. This requires that we implement in
+        TVRMLTriangleOctree some way to check for collision with Box3d,
+        and then make BoxCollision available as TLevelObject method
+        (overridden everywhere, using appropriate octree when possible). }
       for I := 0 to ParentLevel.Items.High do
       begin
         Item := ParentLevel.Items[I];
-        if Boxes3dCollision(NewBox, Item.BoundingBox) then
+        Box := Item.BoundingBox;
+        if Boxes3dCollision(NewBox, Box) or
+           Boxes3dCollision(CurrentBox, Box) then
           Item.Position := Item.Position + Move;
       end;
     end;
@@ -1635,6 +1786,16 @@ begin
     (Animation.FirstScene.DefaultTriangleOctree.SegmentCollision(
       Pos1, Pos2,
       false, NoItemIndex, false, ItemsToIgnoreFunc)
+      <> NoItemIndex);
+end;
+
+function TLevelAnimatedObject.SphereCollision(
+  const Pos: TVector3Single; const Radius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := Exists and Collides and
+    (Animation.FirstScene.DefaultTriangleOctree.SphereCollision(
+      Pos, Radius, NoItemIndex, ItemsToIgnoreFunc)
       <> NoItemIndex);
 end;
 
