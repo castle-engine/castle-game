@@ -670,17 +670,13 @@ begin
 
   if CollisionInfo.Hierarchy.IsLast(ElevatorButton) then
   begin
-    if MovingElevator.CompletelyEndPosition then
+    InteractionOccured := true;
+    if Distance > 10 then
+      TimeMessageInteractFailed(
+        'You see a button. You''re too far to reach it from here') else
     begin
       ElevatorButton.Play;
-      MovingElevator.GoBeginPosition;
-      InteractionOccured := true;
-    end else
-    if MovingElevator.CompletelyBeginPosition then
-    begin
-      ElevatorButton.Play;
-      MovingElevator.GoEndPosition;
-      InteractionOccured := true;
+      MovingElevator.GoOtherPosition;
     end;
   end;
 end;

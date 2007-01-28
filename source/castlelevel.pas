@@ -430,6 +430,18 @@ type
       (go back to @italic(end position)).  }
     procedure RevertGoEndPosition;
 
+    { Just like RevertGoEndPosition, but this should be used in the middle
+      of the move from @italic(begin position) to @italic(end position),
+      to go back to @italic(begin position). }
+    procedure RevertGoBeginPosition;
+
+    { This goes to the @italic(other) position.
+      Which means that if we're completely in @italic(end position)
+      or in the middle of move to @italic(end position), this goes
+      back to @italic(begin position). And if we're in @italic(begin position),
+      this goes back to @italic(end position). }
+    procedure GoOtherPosition;
+
     property SoundGoBeginPosition: TSoundType
       read FSoundGoBeginPosition write FSoundGoBeginPosition default stNone;
     property SoundGoEndPosition: TSoundType
@@ -1509,10 +1521,33 @@ procedure TLevelLinearMovingObject.RevertGoEndPosition;
 begin
   FEndPosition := true;
   FEndPositionStateChangeTime := { ParentLevel.AnimationTime -
-    (OpenCloseTime - (ParentLevel.AnimationTime - OpenStateChangeTime)) }
+    (MoveTime - (ParentLevel.AnimationTime - EndPositionStateChangeTime)) }
     { simplified : }
     2 * ParentLevel.AnimationTime - MoveTime - EndPositionStateChangeTime;
   PlaySound(SoundGoEndPosition, SoundGoEndPositionLooping);
+end;
+
+procedure TLevelLinearMovingObject.RevertGoBeginPosition;
+begin
+  FEndPosition := false;
+  FEndPositionStateChangeTime := { ParentLevel.AnimationTime -
+    (MoveTime - (ParentLevel.AnimationTime - EndPositionStateChangeTime)) }
+    { simplified : }
+    2 * ParentLevel.AnimationTime - MoveTime - EndPositionStateChangeTime;
+  PlaySound(SoundGoEndPosition, SoundGoBeginPositionLooping);
+end;
+
+procedure TLevelLinearMovingObject.GoOtherPosition;
+begin
+  if CompletelyEndPosition then
+    GoBeginPosition else
+  if CompletelyBeginPosition then
+    GoEndPosition else
+  begin
+    if EndPosition then
+      RevertGoBeginPosition else
+      RevertGoEndPosition;
+  end;
 end;
 
 function TLevelLinearMovingObject.Translation(const AnimationTime: Single):

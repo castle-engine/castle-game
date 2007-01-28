@@ -17,9 +17,7 @@
     But that's still too bad... we approximate the whole object by it's
     bounding box --- it's doomed to fail in some specific cases.
 
-  - TTowerLevel.SpecialObjectPicked:
-    - check Distance.
-    - react even in the middle of move.
+  - TTowerLevel.Picked:
     - hint for player ?
 
 - TVRMLFlatSceneGL may have param for Render:
