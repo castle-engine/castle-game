@@ -674,9 +674,11 @@ procedure DoInteract;
     TPickedObjectType = (poNone, poLevel, poItem, poSpecialObject);
   var
     Ray0: TVector3Single;
-    LevelCollisionIndex, ItemCollisionIndex, SpecialObjectIndex, I: integer;
+    ItemCollisionIndex, SpecialObjectIndex, I: integer;
     IntersectionDistance, ThisIntersectionDistance: Single;
     PickedObjectType: TPickedObjectType;
+    LevelCollisionObjectIndex: Integer;
+    LevelCollisionInfo: TCollisionInfo;
   begin
     Ray0 := Player.Navigator.CameraPos;
 
@@ -687,14 +689,14 @@ procedure DoInteract;
     IntersectionDistance := MaxSingle;
     PickedObjectType := poNone;
 
-    { Now start picking, by doing various tests for collisions between
-      Ray0 and RayVector. The pick that has smallest IntersectionDistance
+    { Now start picking, by doing various tests for collisions with ray
+      (Ray0, RayVector). The pick that has smallest IntersectionDistance
       "wins". }
 
-    { Collision with Level.Scene }
-    LevelCollisionIndex := Level.Scene.DefaultTriangleOctree.RayCollision(
-      ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex, false, nil);
-    if (LevelCollisionIndex <> NoItemIndex) and
+    { Collision with Level (Scene and Objects) }
+    LevelCollisionInfo := Level.TryPick(
+      ThisIntersectionDistance, LevelCollisionObjectIndex, Ray0, RayVector);
+    if (LevelCollisionInfo <> nil) and
        ( (PickedObjectType = poNone) or
          (ThisIntersectionDistance < IntersectionDistance) ) then
     begin
@@ -731,9 +733,9 @@ procedure DoInteract;
     case PickedObjectType of
       poLevel:
         begin
-          Result := Level.TrianglePicked(IntersectionDistance,
-            Level.Scene.DefaultTriangleOctree.OctreeItems.
-              Items[LevelCollisionIndex]);
+          Result := false;
+          Level.Picked(IntersectionDistance,
+            LevelCollisionInfo, LevelCollisionObjectIndex, Result);
         end;
       poItem:
         begin
@@ -749,6 +751,9 @@ procedure DoInteract;
       else
         Result := false;
     end;
+
+    { No matter what happened, remember to always free LevelCollisionInfo }
+    FreeAndNil(LevelCollisionInfo);
   end;
 
   function TryInteractAround(const XChange, YChange: Integer): boolean;

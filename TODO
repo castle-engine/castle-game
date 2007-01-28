@@ -18,8 +18,6 @@
     bounding box --- it's doomed to fail in some specific cases.
 
   - TTowerLevel.SpecialObjectPicked:
-    - I would like to react only on ElevatorButton, but I can't since
-      ElevatorButton is not inserted into Objects at all.
     - check Distance.
     - react even in the middle of move.
     - hint for player ?
@@ -34,6 +32,7 @@
   - removes the need to fill LevelsAvailable by code at startup
   - level objects hierarchy could be defined in such file
   - various boxes (like hint boxes) could be defined in such file
+  - the base level scene can be TLevelStaticObject too !
 
 - TLevelLinearMovingObject with MovePushesOthers and: use this to make elevator49
 

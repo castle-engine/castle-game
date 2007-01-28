@@ -39,6 +39,22 @@ const
 
 type
   TLevel = class;
+  TLevelObjectsList = class;
+
+  { This represents a collision with level. }
+  TCollisionInfo = class
+  public
+    constructor Create;
+    destructor Destroy; override;
+    { Hierarchy is a list of TLevelObjects that are hit, from the container
+      to the most detailed one (e.g., if you place an object within
+      TLevelMovingObject.MovingOject, and you hit it --- then Hierarchy
+      will contain first TLevelMovingObject, then TLevelMovingObject.MovingObject).
+      Hierarchy is empty if the level Scene itself was hit. }
+    Hierarchy: TLevelObjectsList;
+    { OctreeItem is the item that was hit, from appropriate object triangle octree. }
+    OctreeItem: POctreeItem;
+  end;
 
   { This is a base class for various objects that can be added to the level.
 
@@ -94,10 +110,12 @@ type
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
 
+    { @returns(A collision as TCollisionInfo instance, or @nil if no collision).
+      You're responsible for freeing this TCollisionInfo instance. }
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; virtual; abstract;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
@@ -123,7 +141,15 @@ type
 
   TObjectsListItem_2 = TLevelObject;
   {$I objectslist_2.inc}
-  TLevelObjectsList = TObjectsList_2;
+  TLevelObjectsList = class(TObjectsList_2)
+  public
+    { Checks RayCollision on all items, returning collision with smallest
+      IntersectionDistance. Returns @nil if no collision. }
+    function RayCollision(
+      out IntersectionDistance: Single; out Index: Integer;
+      const Ray0, RayVector: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+  end;
 
   { This is a TLevelObject descendant that is a @italic(sum of any number
     of other TLevelObject descendants). In other words, this
@@ -162,7 +188,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
@@ -221,7 +247,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
@@ -299,7 +325,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
@@ -496,7 +522,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
@@ -620,8 +646,8 @@ type
       const FileName: string;
       CreateDefaultTriangleOctree: boolean): TVRMLGLAnimation;
 
-    { See @link(SpecialObjectPicked), you can call this from
-      overriden SpecialObjectPicked. }
+    { See @link(SpecialObjectPicked) and @link(Picked), you can call this from
+      overriden implementations of these. }
     procedure TimeMessageInteractFailed(const S: string);
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
@@ -695,7 +721,7 @@ type
           constructor) to put on this list.)
 
         @item(Beware that this changes indexes of items, and they may
-          be important for your SpecialObjectPicked.)
+          be important for your @link(Picked).)
       )
       Usually, this means that it's more comfortable to just not modify
       Objects list after you added all you need in the constructor.
@@ -769,14 +795,6 @@ type
       This is updated in our Idle. }
     property AnimationTime: Single read FAnimationTime;
 
-    { Call this when player picked some triangle on the level.
-      Distance is the exact distance to picked point.
-
-      Returns whether something was done with response to this pick
-      (some message displayed, something happened ?) }
-    function TrianglePicked(const Distance: Single;
-      const Item: TOctreeItem): boolean; virtual;
-
     { Override this to allow player to pick some additional objects,
       not contained in @link(Scene) or @link(Objects).
       Ray0 and RayVector describe picking
@@ -784,18 +802,12 @@ type
       If there was a pick: set IntersectionDistance and return
       something >= 0. Otherwise return -1.
 
-      Returned index will be passed to SpecialObjectPicked.
-
-      Default implementation in this class checks here collision
-      with all items in @link(Objects) list, in case of collision
-      it returns their index. So in descendants, if you override this,
-      you should use indexes larger than maximum @link(Objects) size to be safe. }
+      Returned index will be passed to SpecialObjectPicked. }
     function SpecialObjectsTryPick(var IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single): Integer; virtual;
 
     { Override this to take some action when some special object was picked.
-      This will be called only if you overrided also SpecialObjectsTryPick,
-      or you added some objects to @link(Objects) list.
+      This will be called only if you overrided also SpecialObjectsTryPick.
 
       Set InteractionOccured to true (it will be false on enter)
       if indeed some interaction occured. Note that "interaction occured"
@@ -805,7 +817,7 @@ type
       When InteractionOccured is @false then picking routine may try
       to pick other points around the screen center.
 
-      The right way to signal to uset that interaction occured
+      The right way to signal to user that interaction occured
       but failed (like the "You cannot open this door" example above)
       is to make a @code(Sound(stPlayerInteractFailed)).
       In fact, you can call TimeMessageInteractFailed to do
@@ -815,6 +827,23 @@ type
       assume that Player is not Dead. }
     procedure SpecialObjectPicked(const Distance: Single;
       SpecialObjectIndex: Integer; var InteractionOccured: boolean); virtual;
+
+    { This tests for collisions with level base Scene and level @link(Objects). }
+    function TryPick(out IntersectionDistance: Single;
+      out LevelObjectIndex: Integer;
+      const Ray0, RayVector: TVector3Single): TCollisionInfo;
+
+    { This is called when level was picked --- either the level Scene
+      itself, or one of @link(Objects) on the level.
+
+      @param CollisionInfo contains all details.
+      @param(LevelObjectIndex contains index to @link(Objects), or -1
+        if it was the Scene itself.)
+      @param(Distance,InteractionOccured see SpecialObjectPicked)
+    }
+    procedure Picked(const Distance: Single; CollisionInfo: TCollisionInfo;
+      LevelObjectIndex: Integer;
+      var InteractionOccured: boolean); virtual;
 
     property HomeCameraPos: TVector3Single read FHomeCameraPos;
     property HomeCameraDir: TVector3Single read FHomeCameraDir;
@@ -945,6 +974,19 @@ uses SysUtils, OpenGLh, Object3dAsVRML,
 {$I objectslist_1.inc}
 {$I objectslist_2.inc}
 
+{ TCollisionInfo ------------------------------------------------------------- }
+
+constructor TCollisionInfo.Create;
+begin
+  inherited;
+  Hierarchy := TLevelObjectsList.Create;
+end;
+
+destructor TCollisionInfo.Destroy;
+begin
+  FreeAndNil(Hierarchy);
+end;
+
 { TLevelObject --------------------------------------------------------------- }
 
 constructor TLevelObject.Create(AParentLevel: TLevel);
@@ -961,6 +1003,37 @@ end;
 procedure TLevelObject.Idle;
 begin
   { Nothing to do in this class. }
+end;
+
+{ TLevelObjectsList ---------------------------------------------------------- }
+
+function TLevelObjectsList.RayCollision(
+  out IntersectionDistance: Single; out Index: Integer;
+  const Ray0, RayVector: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+var
+  I: Integer;
+  ThisIntersectionDistance: Single;
+  ThisCollision: TCollisionInfo;
+begin
+  Result := nil;
+  IntersectionDistance := 0; { Only to silence compiler warning }
+  for I := 0 to High do
+  begin
+    ThisCollision := Items[I].RayCollision(
+      ThisIntersectionDistance, Ray0, RayVector, nil);
+    if ThisCollision <> nil then
+    begin
+      if (Result = nil) or (ThisIntersectionDistance < IntersectionDistance) then
+      begin
+        IntersectionDistance := ThisIntersectionDistance;
+        Index := I;
+        SysUtils.FreeAndNil(Result);
+        Result := ThisCollision;
+      end else
+        SysUtils.FreeAndNil(ThisCollision);
+    end;
+  end;
 end;
 
 { TLevelStaticObject --------------------------------------------------------- }
@@ -1004,14 +1077,25 @@ end;
 function TLevelStaticObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+var
+  OctreeItemIndex: Integer;
 begin
-  Result := Exists and Collides and
-    (Scene.DefaultTriangleOctree.RayCollision(
+  Result := nil;
+  if Exists and Collides then
+  begin
+    OctreeItemIndex := Scene.DefaultTriangleOctree.RayCollision(
       IntersectionDistance,
       Ray0, RayVector,
-      false, NoItemIndex, false, ItemsToIgnoreFunc)
-      <> NoItemIndex);
+      false, NoItemIndex, false, ItemsToIgnoreFunc);
+    if OctreeItemIndex <> NoItemIndex then
+    begin
+      Result := TCollisionInfo.Create;
+      Result.OctreeItem :=
+        Scene.DefaultTriangleOctree.OctreeItems.Pointers[OctreeItemIndex];
+      Result.Hierarchy.Add(Self);
+    end;
+  end;
 end;
 
 procedure TLevelStaticObject.GetCameraHeight(const CameraPos: TVector3Single;
@@ -1110,17 +1194,14 @@ end;
 function TLevelObjectSum.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
 var
-  I: Integer;
+  Index: Integer;
 begin
-  Result := false;
-  for I := 0 to List.High do
-  begin
-    Result := List.Items[I].RayCollision(IntersectionDistance, Ray0, RayVector,
-      ItemsToIgnoreFunc);
-    if Result then Exit;
-  end;
+  Result := List.RayCollision(IntersectionDistance, Index, Ray0, RayVector,
+    ItemsToIgnoreFunc);
+  if Result <> nil then
+    Result.Hierarchy.Insert(0, Self);
 end;
 
 procedure TLevelObjectSum.GetCameraHeight(const CameraPos: TVector3Single;
@@ -1220,12 +1301,12 @@ end;
 function TLevelMovingObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
 var
   T: TVector3_Single;
 begin
-  Result := Exists and Collides;
-  if Result then
+  Result := nil;
+  if Exists and Collides then
   begin
     { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
       use MovingObject.RayCollsion with Translation. }
@@ -1234,6 +1315,9 @@ begin
     Result := MovingObject.RayCollision(IntersectionDistance,
       VectorSubtract(Ray0, T.Data),
       RayVector, ItemsToIgnoreFunc);
+
+    if Result <> nil then
+      Result.Hierarchy.Insert(0, Self);
   end;
 end;
 
@@ -1522,14 +1606,25 @@ end;
 function TLevelAnimatedObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+var
+  OctreeItemIndex: Integer;
+  Octree: TVRMLTriangleOctree;
 begin
-  Result := Exists and Collides and
-    (Animation.FirstScene.DefaultTriangleOctree.RayCollision(
-      IntersectionDistance,
+  Result := nil;
+  if Exists and Collides then
+  begin
+    Octree := Animation.FirstScene.DefaultTriangleOctree;
+    OctreeItemIndex := Octree.RayCollision(IntersectionDistance,
       Ray0, RayVector,
-      false, NoItemIndex, false, ItemsToIgnoreFunc)
-      <> NoItemIndex);
+      false, NoItemIndex, false, ItemsToIgnoreFunc);
+    if OctreeItemIndex <> NoItemIndex then
+    begin
+      Result := TCollisionInfo.Create;
+      Result.OctreeItem := Octree.OctreeItems.Pointers[OctreeItemIndex];
+      Result.Hierarchy.Add(Self);
+    end;
+  end;
 end;
 
 procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
@@ -2092,33 +2187,80 @@ begin
     ThunderEffect.Idle;
 end;
 
-function TLevel.TrianglePicked(const Distance: Single;
-  const Item: TOctreeItem): boolean;
-begin
-  { Nothing to do in this class. }
-  Result := false;
-end;
-
 function TLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single): Integer;
-var
-  I: Integer;
-  ThisIntersectionDistance: Single;
 begin
   Result := -1;
-
-  for I := 0 to Objects.High do
-    if Objects[I].RayCollision(ThisIntersectionDistance, Ray0, RayVector, nil) and
-       ( (Result = -1) or
-         (ThisIntersectionDistance < IntersectionDistance) ) then
-    begin
-      IntersectionDistance := ThisIntersectionDistance;
-      Result := I;
-    end;
 end;
 
 procedure TLevel.SpecialObjectPicked(const Distance: Single;
   SpecialObjectIndex: Integer; var InteractionOccured: boolean);
+begin
+  { Nothing to do in this class. }
+end;
+
+{ $define DEBUG_PICK}
+
+function TLevel.TryPick(out IntersectionDistance: Single;
+  out LevelObjectIndex: Integer;
+  const Ray0, RayVector: TVector3Single): TCollisionInfo;
+var
+  OctreeItemIndex: Integer;
+  ThisIntersectionDistance: Single;
+  ThisCollision: TCollisionInfo;
+  ThisLevelObjectIndex: Integer;
+  {$ifdef DEBUG_PICK}
+  S: string;
+  I: Integer;
+  {$endif DEBUG_PICK}
+begin
+  { First, assume no collision }
+  Result := nil;
+
+  { Collision with Level.Scene }
+  OctreeItemIndex := Scene.DefaultTriangleOctree.RayCollision(
+    ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex, false, nil);
+  if OctreeItemIndex <> NoItemIndex then
+  begin
+    IntersectionDistance := ThisIntersectionDistance;
+    LevelObjectIndex := -1;
+    Result := TCollisionInfo.Create;
+    Result.OctreeItem := Scene.DefaultTriangleOctree.OctreeItems.Pointers[
+      OctreeItemIndex];
+  end;
+
+  { Collisions with Objects[] }
+  ThisCollision := Objects.RayCollision(
+    ThisIntersectionDistance, ThisLevelObjectIndex,
+    Ray0, RayVector, nil);
+  if ThisCollision <> nil then
+  begin
+    if (Result = nil) or (ThisIntersectionDistance < IntersectionDistance) then
+    begin
+      IntersectionDistance := ThisIntersectionDistance;
+      LevelObjectIndex := ThisLevelObjectIndex;
+      FreeAndNil(Result);
+      Result := ThisCollision;
+    end else
+      FreeAndNil(ThisCollision);
+  end;
+
+  {$ifdef DEBUG_PICK}
+  if Result <> nil then
+  begin
+    S := 'TLevel.TryPick: [';
+    for I := 0 to Result.Hierarchy.High do
+      S += Result.Hierarchy[I].ClassName + ' ';
+    S += Format('], index %d, distance %f',
+      [LevelObjectIndex, IntersectionDistance]);
+    TimeMessage(S);
+  end;
+  {$endif DEBUG_PICK}
+end;
+
+procedure TLevel.Picked(const Distance: Single;
+  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  var InteractionOccured: boolean);
 begin
   { Nothing to do in this class. }
 end;

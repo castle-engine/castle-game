@@ -53,8 +53,9 @@ type
 
     procedure Idle(const CompSpeed: Single); override;
 
-    procedure SpecialObjectPicked(const Distance: Single;
-      SpecialObjectIndex: Integer; var InteractionOccured: boolean); override;
+    procedure Picked(const Distance: Single;
+      CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+      var InteractionOccured: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
@@ -114,8 +115,9 @@ type
     class function Title: string; override;
     class function Number: Integer; override;
 
-    procedure SpecialObjectPicked(const Distance: Single;
-      SpecialObjectIndex: Integer; var InteractionOccured: boolean); override;
+    procedure Picked(const Distance: Single;
+      CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+      var InteractionOccured: boolean); override;
   end;
 
   TCagesLevel = class(TLevel)
@@ -155,8 +157,9 @@ type
     property DoEndSequence: boolean
       read FDoEndSequence write SetDoEndSequence default false;
 
-    procedure SpecialObjectPicked(const Distance: Single;
-      SpecialObjectIndex: Integer; var InteractionOccured: boolean); override;
+    procedure Picked(const Distance: Single;
+      CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+      var InteractionOccured: boolean); override;
 
     function Background: TBackgroundGL; override;
   end;
@@ -202,8 +205,9 @@ type
 
     procedure Idle(const CompSpeed: Single); override;
 
-    procedure SpecialObjectPicked(const Distance: Single;
-      SpecialObjectIndex: Integer; var InteractionOccured: boolean); override;
+    procedure Picked(const Distance: Single;
+      CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+      var InteractionOccured: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
@@ -321,17 +325,19 @@ begin
   end;
 end;
 
-procedure TCastleHallLevel.SpecialObjectPicked(const Distance: Single;
-  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
+
+procedure TCastleHallLevel.Picked(const Distance: Single;
+  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  var InteractionOccured: boolean);
 begin
   inherited;
 
-  if Objects[SpecialObjectIndex] = StairsBlocker then
+  if CollisionInfo.Hierarchy.IsLast(StairsBlocker) then
   begin
     InteractionOccured := true;
     TimeMessageInteractFailed('You are not able to open it');
   end else
-  if Objects[SpecialObjectIndex] = Button then
+  if CollisionInfo.Hierarchy.IsLast(Button) then
   begin
     InteractionOccured := true;
     if Distance < 10.0 then
@@ -656,12 +662,13 @@ begin
   Result := 99;
 end;
 
-procedure TTowerLevel.SpecialObjectPicked(const Distance: Single;
-  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
+procedure TTowerLevel.Picked(const Distance: Single;
+  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  var InteractionOccured: boolean);
 begin
   inherited;
 
-  if Objects[SpecialObjectIndex] = MovingElevator then
+  if CollisionInfo.Hierarchy.IsLast(ElevatorButton) then
   begin
     if MovingElevator.CompletelyEndPosition then
     begin
@@ -940,12 +947,13 @@ begin
   inherited;
 end;
 
-procedure TCagesLevel.SpecialObjectPicked(const Distance: Single;
-  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
+procedure TCagesLevel.Picked(const Distance: Single;
+  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  var InteractionOccured: boolean);
 begin
   inherited;
 
-  if Objects[SpecialObjectIndex] = FGateExit then
+  if CollisionInfo.Hierarchy.IsLast(FGateExit) then
   begin
     InteractionOccured := true;
     if Distance > 10 then
@@ -1135,18 +1143,19 @@ begin
   end;
 end;
 
-procedure TDoomE1M1Level.SpecialObjectPicked(const Distance: Single;
-  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
+procedure TDoomE1M1Level.Picked(const Distance: Single;
+  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  var InteractionOccured: boolean);
 var
   Door: TDoomLevelDoor;
 begin
   inherited;
 
-  if Between(SpecialObjectIndex, 0, Objects.High) and
-     (Objects[SpecialObjectIndex] is TDoomLevelDoor) then
+  if (CollisionInfo.Hierarchy.Count > 0) and
+    (CollisionInfo.Hierarchy.First is TDoomLevelDoor) then
   begin
+    Door := TDoomLevelDoor(CollisionInfo.Hierarchy.First);
     InteractionOccured := true;
-    Door := TDoomLevelDoor(Objects[SpecialObjectIndex]);
     if Distance > 7 then
       TimeMessageInteractFailed('You see a door. You''re too far to open it from here') else
     { Only if the door is completely closed
