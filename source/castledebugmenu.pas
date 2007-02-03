@@ -171,8 +171,7 @@ procedure TDebugMenu.CurrentItemSelected;
       for I := 0 to LevelsAvailable.High do
       begin
         S.Append(Format('Level %d "%s"',
-          [ LevelsAvailable[I].LevelClass.Number,
-            LevelsAvailable[I].LevelClass.Title ]));
+          [ LevelsAvailable[I].Number, LevelsAvailable[I].Title ]));
       end;
       S.Append('Cancel');
 
@@ -180,7 +179,7 @@ procedure TDebugMenu.CurrentItemSelected;
 
       if Index <> LevelsAvailable.Count then
       begin
-        LevelFinished(LevelsAvailable[Index].LevelClass.Create);
+        LevelFinished(LevelsAvailable[Index].CreateLevel);
         UserQuit := true;
       end;
     finally S.Free end;

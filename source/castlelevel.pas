@@ -671,6 +671,12 @@ type
       const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean;
+
+    FName: string;
+    FSceneFileName: string;
+    FTitle: string;
+    FNumber: Integer;
+    FLightSetFileName: string;
   protected
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
@@ -720,14 +726,27 @@ type
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
       be sure to initialize Progress.UserInterface before calling this. }
-    constructor Create; virtual;
+    constructor Create(
+      const AName: string;
+      const ASceneFileName, ALightSetFileName: string;
+      const ATitle: string; const ANumber: Integer); virtual;
 
     destructor Destroy; override;
 
+    { This is an internal name for this level.
+      Should follow the same
+      rules as Pascal identifier: 1st character (_ or letter),
+      then any number of letters or _ or digits.
+
+      All available levels must have different Name.
+
+      @noAutoLinkHere }
+    property Name: string read FName;
+
     { These will be used in constructor to load level.
       @groupBegin }
-    class function SceneFileName: string; virtual; abstract;
-    class function LightSetFileName: string; virtual; abstract;
+    property SceneFileName: string read FSceneFileName;
+    property LightSetFileName: string read FLightSetFileName;
     { @groupEnd }
 
     { }
@@ -931,14 +950,14 @@ type
       read FFootstepsSound write FFootstepsSound default DefaultFootstepsSound;
 
     { This is the nice name of the level. }
-    class function Title: string; virtual; abstract;
+    property Title: string read FTitle;
 
     { This is level number, shown for the player in the menu.
       This *does not* determine the order in which levels are played,
       as levels do not have to be played in linear order.
       However, they are displayed in menu in linear order, and that's
       why this is needed. }
-    class function Number: Integer; virtual; abstract;
+    property Number: Integer read FNumber;
 
     { This will be called when new player starts game on this level.
       This is supposed to equip the player with some basic weapon/items.
@@ -997,9 +1016,21 @@ type
 
   TLevelAvailable = class
   public
-    LevelClass: TLevelClass;
     AvailableForNewGame: boolean;
     DefaultAvailableForNewGame: boolean;
+
+    { Class to use when constructing this level. }
+    LevelClass: TLevelClass;
+
+    { These will be passed to TLevel constructor --- see appropriate TLevel
+      properties for description. }
+    Name: string;
+    SceneFileName: string;
+    LightSetFileName: string;
+    Title: string;
+    Number: Integer;
+
+    function CreateLevel: TLevel;
   end;
 
   TObjectsListItem_1 = TLevelAvailable;
@@ -1008,11 +1039,8 @@ type
   private
     function IsSmallerByNumber(const A, B: TLevelAvailable): boolean;
   public
-    procedure AddLevelClass(LevelClass: TLevelClass;
-      DefaultAvailableForNewGame: boolean = false);
-
-    { raises EInternalError if LevelClass not on the list. }
-    function FindLevelClass(LevelClass: TLevelClass): TLevelAvailable;
+    { raises Exception if such Name is not on the list. }
+    function FindName(const AName: string): TLevelAvailable;
 
     procedure SortByNumber;
 
@@ -1894,7 +1922,10 @@ end;
 
 { TLevel --------------------------------------------------------------------- }
 
-constructor TLevel.Create;
+constructor TLevel.Create(
+  const AName: string;
+  const ASceneFileName, ALightSetFileName: string;
+  const ATitle: string; const ANumber: Integer);
 
   procedure RemoveItemsToRemove;
   var
@@ -1911,6 +1942,12 @@ var
   NavigationNode: TNodeNavigationInfo;
 begin
   inherited Create;
+
+  FName := AName;
+  FSceneFileName := ASceneFileName;
+  FLightSetFileName := ALightSetFileName;
+  FTitle := ATitle;
+  FNumber := ANumber;
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -2027,8 +2064,7 @@ begin
     FPlayedMusicSound := stNone;
     FFootstepsSound := DefaultFootstepsSound;
 
-    LevelsAvailable.FindLevelClass(TLevelClass(Self.ClassType)).
-      AvailableForNewGame := true;
+    LevelsAvailable.FindName(Name).AvailableForNewGame := true;
 
     FGlobalAmbientLight := DefaultGlobalAmbientLight;
 
@@ -2517,37 +2553,32 @@ begin
   Sound(stPlayerInteractFailed);
 end;
 
-{ TLevelsAvailableList ------------------------------------------------------- }
+{ TLevelAvailable ------------------------------------------------------------ }
 
-procedure TLevelsAvailableList.AddLevelClass(LevelClass: TLevelClass;
-  DefaultAvailableForNewGame: boolean);
-var
-  LevelAvailable: TLevelAvailable;
+function TLevelAvailable.CreateLevel: TLevel;
 begin
-  LevelAvailable := TLevelAvailable.Create;
-  Add(LevelAvailable);
-  LevelAvailable.LevelClass := LevelClass;
-  LevelAvailable.DefaultAvailableForNewGame := DefaultAvailableForNewGame;
+  Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
+    Title, Number);
 end;
 
-function TLevelsAvailableList.FindLevelClass(
-  LevelClass: TLevelClass): TLevelAvailable;
+{ TLevelsAvailableList ------------------------------------------------------- }
+
+function TLevelsAvailableList.FindName(const AName: string): TLevelAvailable;
 var
   I: Integer;
 begin
   for I := 0 to High do
-    if Items[I].LevelClass = LevelClass then
+    if Items[I].Name = AName then
       Exit(Items[I]);
 
-  raise EInternalError.CreateFmt(
-    'Level %d "%s" not found on LevelsAvailable list',
-    [LevelClass.Number, LevelClass.Title]);
+  raise Exception.CreateFmt(
+    'Level "%s" not found on LevelsAvailable list', [AName]);
 end;
 
 function TLevelsAvailableList.IsSmallerByNumber(
   const A, B: TLevelAvailable): boolean;
 begin
-  Result := A.LevelClass.Number < B.LevelClass.Number;
+  Result := A.Number < B.Number;
 end;
 
 procedure TLevelsAvailableList.SortByNumber;
@@ -2561,7 +2592,7 @@ var
 begin
   for I := 0 to High do
     Items[I].AvailableForNewGame := ConfigFile.GetValue(
-      'levels_available/' + LowerCase(Items[I].LevelClass.ClassName),
+      'levels_available/' + Items[I].Name,
       Items[I].DefaultAvailableForNewGame);
 end;
 
@@ -2571,7 +2602,7 @@ var
 begin
   for I := 0 to High do
     ConfigFile.SetDeleteValue(
-      'levels_available/' + LowerCase(Items[I].LevelClass.ClassName),
+      'levels_available/' + Items[I].Name,
       Items[I].AvailableForNewGame,
       Items[I].DefaultAvailableForNewGame);
 end;

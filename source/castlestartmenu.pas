@@ -112,12 +112,12 @@ var
   The idea is that in the future there will be LoadGame procedure,
   that will also call PlayGame, but creating / initializing
   TPlayer and TLevel instances differently. }
-procedure NewGame(NewGameLevelClass: TLevelClass);
+procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
 var
   LocalPlayer: TPlayer;
   LocalLevel: TLevel;
 begin
-  LocalLevel := NewGameLevelClass.Create;
+  LocalLevel := NewGameLevelAvailable.CreateLevel;
   try
     LocalPlayer := TPlayer.Create;
     try
@@ -585,8 +585,8 @@ begin
     begin
       LevelsAvailableForNewGame.Add(LevelsAvailable[I]);
       Items.Add(Format('%d: %s',
-        [ LevelsAvailable[I].LevelClass.Number,
-          LevelsAvailable[I].LevelClass.Title ]));
+        [ LevelsAvailable[I].Number,
+          LevelsAvailable[I].Title ]));
     end;
   Items.Add('Cancel');
 
@@ -606,7 +606,7 @@ begin
   inherited;
 
   if CurrentItem <> LevelsAvailableForNewGame.Count then
-    NewGame(LevelsAvailableForNewGame[CurrentItem].LevelClass);
+    NewGame(LevelsAvailableForNewGame[CurrentItem]);
 
   CurrentMenu := MainMenu;
 end;

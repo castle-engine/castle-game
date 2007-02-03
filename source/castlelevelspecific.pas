@@ -43,13 +43,10 @@ type
   protected
     procedure ChangeLevelScene; override;
   public
-    constructor Create; override;
-
-    class function SceneFileName: string; override;
-    class function LightSetFileName: string; override;
-
-    class function Title: string; override;
-    class function Number: Integer; override;
+    constructor Create(
+      const AName: string;
+      const ASceneFileName, ALightSetFileName: string;
+      const ATitle: string; const ANumber: Integer); override;
 
     procedure Idle(const CompSpeed: Single); override;
 
@@ -85,14 +82,11 @@ type
   protected
     procedure ChangeLevelScene; override;
   public
-    constructor Create; override;
+    constructor Create(
+      const AName: string;
+      const ASceneFileName, ALightSetFileName: string;
+      const ATitle: string; const ANumber: Integer); override;
     destructor Destroy; override;
-
-    class function SceneFileName: string; override;
-    class function LightSetFileName: string; override;
-
-    class function Title: string; override;
-    class function Number: Integer; override;
 
     function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
       OctreeItemIndex: Integer): boolean; override;
@@ -107,13 +101,10 @@ type
     Elevator: TLevelStaticObject;
     ElevatorButton: TLevelSimpleAnimatedObject;
   public
-    constructor Create; override;
-
-    class function SceneFileName: string; override;
-    class function LightSetFileName: string; override;
-
-    class function Title: string; override;
-    class function Number: Integer; override;
+    constructor Create(
+      const AName: string;
+      const ASceneFileName, ALightSetFileName: string;
+      const ATitle: string; const ANumber: Integer); override;
 
     procedure Picked(const Distance: Single;
       CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
@@ -137,14 +128,11 @@ type
   protected
     procedure ChangeLevelScene; override;
   public
-    constructor Create; override;
+    constructor Create(
+      const AName: string;
+      const ASceneFileName, ALightSetFileName: string;
+      const ATitle: string; const ANumber: Integer); override;
     destructor Destroy; override;
-
-    class function SceneFileName: string; override;
-    class function LightSetFileName: string; override;
-
-    class function Title: string; override;
-    class function Number: Integer; override;
 
     procedure Idle(const CompSpeed: Single); override;
 
@@ -194,14 +182,11 @@ type
   protected
     procedure ChangeLevelScene; override;
   public
-    constructor Create; override;
+    constructor Create(
+      const AName: string;
+      const ASceneFileName, ALightSetFileName: string;
+      const ATitle: string; const ANumber: Integer); override;
     destructor Destroy; override;
-
-    class function SceneFileName: string; override;
-    class function LightSetFileName: string; override;
-
-    class function Title: string; override;
-    class function Number: Integer; override;
 
     procedure Idle(const CompSpeed: Single); override;
 
@@ -211,6 +196,8 @@ type
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
+
+function CastleLevelsPath: string;
 
 implementation
 
@@ -226,7 +213,10 @@ end;
 
 { TCastleHallLevel ----------------------------------------------------------- }
 
-constructor TCastleHallLevel.Create;
+constructor TCastleHallLevel.Create(
+  const AName: string;
+  const ASceneFileName, ALightSetFileName: string;
+  const ATitle: string; const ANumber: Integer);
 var
   CastleHallLevelPath: string;
 begin
@@ -263,26 +253,6 @@ begin
   RemoveBoxNodeCheck(FHintButtonBox, 'HintButtonBox');
 end;
 
-class function TCastleHallLevel.SceneFileName: string;
-begin
-  Result := CastleLevelsPath + 'castle_hall' + PathDelim + 'castle_hall_final.wrl';
-end;
-
-class function TCastleHallLevel.LightSetFileName: string;
-begin
-  Result := CastleLevelsPath + 'castle_hall' + PathDelim + 'castle_hall_lights.wrl';
-end;
-
-class function TCastleHallLevel.Title: string;
-begin
-  Result := 'Castle Hall';
-end;
-
-class function TCastleHallLevel.Number: Integer;
-begin
-  Result := 2;
-end;
-
 procedure TCastleHallLevel.Idle(const CompSpeed: Single);
 const
   WerewolfStartPosition: TVector3Single = (0, 0, -4);
@@ -293,7 +263,7 @@ begin
 
   if Box3dPointInside(Player.Navigator.CameraPos, FLevelExitBox) then
   begin
-    LevelFinished(TCagesLevel.Create);
+    LevelFinished(LevelsAvailable.FindName('cages').CreateLevel);
   end;
 
   if Button.Started and
@@ -374,7 +344,10 @@ end;
 
 { TGateLevel ----------------------------------------------------------------- }
 
-constructor TGateLevel.Create;
+constructor TGateLevel.Create(
+  const AName: string;
+  const ASceneFileName, ALightSetFileName: string;
+  const ATitle: string; const ANumber: Integer);
 begin
   inherited;
 
@@ -442,26 +415,6 @@ begin
     RemoveBoxNodeCheck(TempBox, 'SwordGhost_' + IntToStr(I));
     SwordAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
   end;
-end;
-
-class function TGateLevel.SceneFileName: string;
-begin
-  Result := CastleLevelsPath + 'gate' + PathDelim + 'gate_final.wrl';
-end;
-
-class function TGateLevel.LightSetFileName: string;
-begin
-  Result := CastleLevelsPath + 'gate' + PathDelim + 'gate_lights.wrl';
-end;
-
-class function TGateLevel.Title: string;
-begin
-  Result := 'The Gate';
-end;
-
-class function TGateLevel.Number: Integer;
-begin
-  Result := 1;
 end;
 
 procedure TGateLevel.Idle(const CompSpeed: Single);
@@ -541,7 +494,7 @@ begin
       TimeMessage('Better find a wepon first to protect yourself in the castle');
       RejectGateExitBox;
     end else
-      LevelFinished(TCastleHallLevel.Create);
+      LevelFinished(LevelsAvailable.FindName('castle_hall').CreateLevel);
   end else
   begin
     Teleport1Rotate += 0.2 * CompSpeed;
@@ -604,7 +557,10 @@ end;
 
 { TTowerLevel ---------------------------------------------------------------- }
 
-constructor TTowerLevel.Create;
+constructor TTowerLevel.Create(
+  const AName: string;
+  const ASceneFileName, ALightSetFileName: string;
+  const ATitle: string; const ANumber: Integer);
 var
   ElevatorButtonSum: TLevelObjectSum;
   TowerLevelPath: string;
@@ -642,26 +598,6 @@ begin
   Objects.Add(MovingElevator);
 end;
 
-class function TTowerLevel.SceneFileName: string;
-begin
-  Result := CastleLevelsPath + 'tower' + PathDelim + 'basic_castle_final.wrl';
-end;
-
-class function TTowerLevel.LightSetFileName: string;
-begin
-  Result := CastleLevelsPath + 'tower' + PathDelim + 'basic_castle_lights.wrl';
-end;
-
-class function TTowerLevel.Title: string;
-begin
-  Result := 'Tower';
-end;
-
-class function TTowerLevel.Number: Integer;
-begin
-  Result := 99;
-end;
-
 procedure TTowerLevel.Picked(const Distance: Single;
   CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
   var InteractionOccured: boolean);
@@ -683,7 +619,10 @@ end;
 
 { TCagesLevel ---------------------------------------------------------------- }
 
-constructor TCagesLevel.Create;
+constructor TCagesLevel.Create(
+  const AName: string;
+  const ASceneFileName, ALightSetFileName: string;
+  const ATitle: string; const ANumber: Integer);
 var
   BossIndex: Integer;
 begin
@@ -751,26 +690,6 @@ begin
   inherited;
 
   RemoveBoxNodeCheck(FHintOpenDoorBox, 'HintOpenDoorBox');
-end;
-
-class function TCagesLevel.SceneFileName: string;
-begin
-  Result := CastleLevelsPath + 'cages' + PathDelim + 'cages_final.wrl';
-end;
-
-class function TCagesLevel.LightSetFileName: string;
-begin
-  Result := CastleLevelsPath + 'cages' + PathDelim + 'cages_lights.wrl';
-end;
-
-class function TCagesLevel.Title: string;
-begin
-  Result := 'Cages';
-end;
-
-class function TCagesLevel.Number: Integer;
-begin
-  Result := 3;
 end;
 
 const
@@ -1048,7 +967,10 @@ end;
 
 { TDoomE1M1Level ------------------------------------------------------------- }
 
-constructor TDoomE1M1Level.Create;
+constructor TDoomE1M1Level.Create(
+  const AName: string;
+  const ASceneFileName, ALightSetFileName: string;
+  const ATitle: string; const ANumber: Integer);
 var
   DoomDoorsPathPrefix: string;
 
@@ -1105,26 +1027,6 @@ begin
   FreeAndNil(Elevator49);
 
   inherited;
-end;
-
-class function TDoomE1M1Level.SceneFileName: string;
-begin
-  Result := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' + PathDelim + 'e1m1_final.wrl';
-end;
-
-class function TDoomE1M1Level.LightSetFileName: string;
-begin
-  Result := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' + PathDelim + 'e1m1_lights.wrl';
-end;
-
-class function TDoomE1M1Level.Title: string;
-begin
-  Result := 'Doom E1M1';
-end;
-
-class function TDoomE1M1Level.Number: Integer;
-begin
-  Result := 90;
 end;
 
 procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
