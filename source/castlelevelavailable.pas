@@ -23,12 +23,14 @@ unit CastleLevelAvailable;
 
 interface
 
-uses CastleLevel, KambiUtils, KambiClassUtils;
+uses CastleLevel, KambiUtils, KambiClassUtils, DOM;
 
 {$define read_interface}
 
 type
   TLevelAvailable = class
+  private
+    procedure LoadFromDOMElement(Element: TDOMElement; const BasePath: string);
   public
     AvailableForNewGame: boolean;
     DefaultAvailableForNewGame: boolean;
@@ -58,8 +60,17 @@ type
 
     procedure SortByNumber;
 
+    { This loads and saves AvailableForNewGame properties of every item. }
     procedure LoadFromConfig;
     procedure SaveToConfig;
+
+    { This fills this list with items read from levels/index.xml.
+
+      All AvailableForNewGame are initially set to @false
+      (LoadFromConfig will set them to something read from user's
+      config file or to DefaultAvailableForNewGame if nothing in user's
+      config file). }
+    procedure LoadFromFile;
   end;
 
 var
@@ -74,12 +85,83 @@ var
 
 implementation
 
-uses SysUtils, CastleConfig;
+uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
+  CastleLevelSpecific, XMLRead;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
 
 { TLevelAvailable ------------------------------------------------------------ }
+
+procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
+  const BasePath: string);
+
+  procedure MissingRequiredAttribute(const AttrName: string);
+  begin
+    raise Exception.CreateFmt(
+      'Missing required attribute "%s" of <level> element', [AttrName]);
+  end;
+
+  { Like DOMGetAttribute, but reads TLevelClass value. }
+  function DOMGetLevelClassAttribute(const Element: TDOMElement;
+    const AttrName: string; var Value: TLevelClass): boolean;
+  var
+    ValueStr: string;
+  begin
+    Result := DOMGetAttribute(Element, AttrName, ValueStr);
+    if Result then
+    begin
+      { TODO: I would like to use RTTI here.
+        Also CastleLevelSpecific will be removed from uses clause then. }
+      if ValueStr = 'TLevel' then
+        Value := TLevel else
+      if ValueStr = 'TCagesLevel' then
+        Value := TCagesLevel else
+      if ValueStr = 'TGateLevel' then
+        Value := TGateLevel else
+      if ValueStr = 'TCastleHallLevel' then
+        Value := TCastleHallLevel else
+      if ValueStr = 'TDoomE1M1Level' then
+        Value := TDoomE1M1Level else
+      if ValueStr = 'TTowerLevel' then
+        Value := TTowerLevel else
+        raise Exception.CreateFmt('Unknown level class "%s"', [ValueStr]);
+    end;
+  end;
+
+begin
+  Check(Element.TagName = 'level',
+    'Each child of levels/index.xml root node must be the <level> element');
+
+  { Required atttributes }
+
+  if not DOMGetAttribute(Element, 'name', Name) then
+    MissingRequiredAttribute('name');
+
+  if not DOMGetAttribute(Element, 'scene_file_name', SceneFileName) then
+    MissingRequiredAttribute('scene_file_name');
+  SceneFileName := CombinePaths(BasePath, SceneFileName);
+
+  if not DOMGetAttribute(Element, 'light_set_file_name', LightSetFileName) then
+    MissingRequiredAttribute('light_set_file_name');
+  LightSetFileName := CombinePaths(BasePath, LightSetFileName);
+
+  if not DOMGetAttribute(Element, 'title', Title) then
+    MissingRequiredAttribute('title');
+
+  if not DOMGetIntegerAttribute(Element, 'number', Number) then
+    MissingRequiredAttribute('number');
+
+  { Optional attributes }
+
+  if not DOMGetBooleanAttribute(Element, 'default_available_for_new_game',
+    DefaultAvailableForNewGame) then
+    DefaultAvailableForNewGame := false;
+
+  if not DOMGetLevelClassAttribute(Element, 'implementation_class',
+    LevelClass) then
+    LevelClass := TLevel;
+end;
 
 function TLevelAvailable.CreateLevel: TLevel;
 begin
@@ -134,10 +216,45 @@ begin
       Items[I].DefaultAvailableForNewGame);
 end;
 
+procedure TLevelsAvailableList.LoadFromFile;
+var
+  Document: TXMLDocument;
+  LevelsList: TDOMNodeList;
+  LevelNode: TDOMNode;
+  I: Integer;
+  NewLevelAvailable: TLevelAvailable;
+  BasePath: string;
+begin
+  BasePath := ProgramDataPath + 'data' +  PathDelim + 'levels' + PathDelim;
+  ReadXMLFile(Document, BasePath + 'index.xml');
+  try
+    Check(Document.DocumentElement.TagName = 'levels',
+      'Root node of levels/index.xml must be <levels>');
+
+    LevelsList := Document.DocumentElement.ChildNodes;
+    try
+      for I := 0 to LevelsList.Count - 1 do
+      begin
+        LevelNode := LevelsList.Item[I];
+        if LevelNode.NodeType = ELEMENT_NODE then
+        begin
+          NewLevelAvailable := TLevelAvailable.Create;
+          Add(NewLevelAvailable);
+          NewLevelAvailable.AvailableForNewGame := false;
+          NewLevelAvailable.LoadFromDOMElement(LevelNode as TDOMElement,
+            BasePath);
+        end;
+      end;
+    finally LevelsList.Release; end;
+  finally
+    SysUtils.FreeAndNil(Document);
+  end;
+end;
+
 initialization
   LevelsAvailable := TLevelsAvailableList.Create;
-  { LevelsAvailable.LoadFromConfig; will be called from main program,
-    because it must be called after LevelsAvailable list if filled. }
+  LevelsAvailable.LoadFromFile;
+  LevelsAvailable.LoadFromConfig;
 finalization
   LevelsAvailable.SaveToConfig;
   FreeWithContentsAndNil(LevelsAvailable);

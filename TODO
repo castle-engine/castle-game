@@ -8,8 +8,7 @@
   level objects and everything will be able to just have a TVRMLFlatSceneGL
   that freely mixes transparent and untransparent parts.
 
-- xml config file for levels:
-  - removes the need to fill LevelsAvailable by code at startup
+- levels/index.xml:
   - level objects hierarchy could be defined in such file
   - various boxes (like hint boxes) could be defined in such file
   - the base level scene can be TLevelStaticObject too !

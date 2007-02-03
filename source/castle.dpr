@@ -26,8 +26,7 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   Classes, ParseParametersUnit, GLWinMessages, KambiGLUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
-  CastleCreatures, CastleObjectKinds, CastlePlay, CastleLog,
-  CastleLevelSpecific, CastleLevelAvailable;
+  CastleCreatures, CastleObjectKinds, CastlePlay, CastleLog;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -84,62 +83,6 @@ begin
     6: InitializeLog;
     else raise EInternalError.Create('OptionProc');
   end;
-end;
-
-{ This will be removed from here to XML data file. }
-procedure FillLevelsAvailable;
-var
-  LevelAvailable: TLevelAvailable;
-begin
-  LevelAvailable := TLevelAvailable.Create;
-  LevelsAvailable.Add(LevelAvailable);
-  LevelAvailable.Name := 'gate';
-  LevelAvailable.LevelClass := TGateLevel;
-  LevelAvailable.DefaultAvailableForNewGame := true;
-  LevelAvailable.SceneFileName := CastleLevelsPath + 'gate' + PathDelim + 'gate_final.wrl';
-  LevelAvailable.LightSetFileName := CastleLevelsPath + 'gate' + PathDelim + 'gate_lights.wrl';
-  LevelAvailable.Title := 'The Gate';
-  LevelAvailable.Number := 1;
-
-  LevelAvailable := TLevelAvailable.Create;
-  LevelsAvailable.Add(LevelAvailable);
-  LevelAvailable.Name := 'castle_hall';
-  LevelAvailable.LevelClass := TCastleHallLevel;
-  LevelAvailable.DefaultAvailableForNewGame := false;
-  LevelAvailable.SceneFileName := CastleLevelsPath + 'castle_hall' + PathDelim + 'castle_hall_final.wrl';
-  LevelAvailable.LightSetFileName := CastleLevelsPath + 'castle_hall' + PathDelim + 'castle_hall_lights.wrl';
-  LevelAvailable.Title := 'Castle Hall';
-  LevelAvailable.Number := 2;
-
-  LevelAvailable := TLevelAvailable.Create;
-  LevelsAvailable.Add(LevelAvailable);
-  LevelAvailable.Name := 'cages';
-  LevelAvailable.LevelClass := TCagesLevel;
-  LevelAvailable.DefaultAvailableForNewGame := false;
-  LevelAvailable.SceneFileName := CastleLevelsPath + 'cages' + PathDelim + 'cages_final.wrl';
-  LevelAvailable.LightSetFileName := CastleLevelsPath + 'cages' + PathDelim + 'cages_lights.wrl';
-  LevelAvailable.Title := 'Cages';
-  LevelAvailable.Number := 3;
-
-  LevelAvailable := TLevelAvailable.Create;
-  LevelsAvailable.Add(LevelAvailable);
-  LevelAvailable.Name := 'tower';
-  LevelAvailable.LevelClass := TTowerLevel;
-  LevelAvailable.DefaultAvailableForNewGame := false;
-  LevelAvailable.SceneFileName := CastleLevelsPath + 'tower' + PathDelim + 'basic_castle_final.wrl';
-  LevelAvailable.LightSetFileName := CastleLevelsPath + 'tower' + PathDelim + 'basic_castle_lights.wrl';
-  LevelAvailable.Title := 'Tower';
-  LevelAvailable.Number := 99;
-
-  LevelAvailable := TLevelAvailable.Create;
-  LevelsAvailable.Add(LevelAvailable);
-  LevelAvailable.Name := 'doom_e1m1';
-  LevelAvailable.LevelClass := TDoomE1M1Level;
-  LevelAvailable.DefaultAvailableForNewGame := false;
-  LevelAvailable.SceneFileName := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' + PathDelim + 'e1m1_final.wrl';
-  LevelAvailable.LightSetFileName := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' + PathDelim + 'e1m1_lights.wrl';
-  LevelAvailable.Title := 'Doom E1M1';
-  LevelAvailable.Number := 90;
 end;
 
 { main -------------------------------------------------------------------- }
@@ -212,10 +155,6 @@ begin
     each item is counted as PrepareRenderSteps steps,
     when loading levels user would have to know what an "octree" is. }
   Progress.UseDescribePosition := false;
-
-  { See CastleLevel initialization comments for why it's called here. }
-  FillLevelsAvailable;
-  LevelsAvailable.LoadFromConfig;
 
   { init OpenAL (after initing Glw and Progress, because ALContextInit
     wants to display progress of "Loading sounds") }

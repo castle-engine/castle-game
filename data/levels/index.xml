@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+
+<!--
+  List of available levels.
+  Each level properties should be mostly self-explanatory, see TLevel
+  properties documentation if in doubt.
+
+  - default_available_for_new_game is optional attribute.
+    Default value is "false", which means that the level is initially
+    not available for the player (when he chooses "New Game" from menu).
+    Practically, default_available_for_new_game should be "true" only
+    for the starting game level.
+
+  - implementation_class is also optional attribute.
+    Default value is "TLevel", which means that the level will be
+    handled with vanilla TLevel implementation.
+    Many advanced tricks are possible by implementing in the game code
+    (CastleLevelSpecific unit) a descendant class of TLevel that does
+    something special, then you should set this attribute to the name
+    of that class.
+
+  Rest of the attributes is required.
+  Filenames are specified relative to directory of this XML file.
+  As path delimiter use slash "/".
+-->
+
+<levels>
+  <level
+    name="gate"
+    scene_file_name="gate/gate_final.wrl"
+    light_set_file_name="gate/gate_lights.wrl"
+    title="The Gate"
+    number="1"
+    default_available_for_new_game="true"
+    implementation_class="TGateLevel" />
+
+  <level
+    name="castle_hall"
+    scene_file_name="castle_hall/castle_hall_final.wrl"
+    light_set_file_name="castle_hall/castle_hall_lights.wrl"
+    title="Castle Hall"
+    number="2"
+    implementation_class="TCastleHallLevel" />
+
+  <level
+    name="cages"
+    scene_file_name="cages/cages_final.wrl"
+    light_set_file_name="cages/cages_lights.wrl"
+    title="Cages"
+    number="3"
+    implementation_class="TCagesLevel" />
+
+  <level
+    name="tower"
+    scene_file_name="tower/basic_castle_final.wrl"
+    light_set_file_name="tower/basic_castle_lights.wrl"
+    title="Tower"
+    number="99"
+    implementation_class="TTowerLevel" />
+
+  <level
+    name="doom_e1m1"
+    scene_file_name="doom/e1m1/e1m1_final.wrl"
+    light_set_file_name="doom/e1m1/e1m1_lights.wrl"
+    title="Doom E1M1"
+    number="90"
+    implementation_class="TDoomE1M1Level" />
+
+<!--
+  <level
+    name=""
+    scene_file_name=""
+    light_set_file_name=""
+    title=""
+    number=""
+    default_available_for_new_game=""
+    implementation_class="" />
+-->
+
+</levels>

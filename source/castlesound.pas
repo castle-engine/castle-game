@@ -698,7 +698,8 @@ var
   S: string;
   I: Integer;
 begin
-  ReadXMLFile(SoundConfig, ProgramDataPath + 'data' + PathDelim + 'sounds/index.xml');
+  ReadXMLFile(SoundConfig, ProgramDataPath + 'data' +
+    PathDelim + 'sounds' + PathDelim + 'index.xml');
   try
     Check(SoundConfig.DocumentElement.TagName = 'sounds',
       'Root node of sounds/index.xml must be <sounds>');
