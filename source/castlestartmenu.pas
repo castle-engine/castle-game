@@ -38,7 +38,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, ALUtils, OpenAL, KambiClassUtils, CastleSoundMenu,
-  CastleTimeMessages;
+  CastleTimeMessages, CastleLevelAvailable;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 

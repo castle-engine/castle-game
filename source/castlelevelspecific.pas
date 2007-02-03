@@ -204,7 +204,7 @@ implementation
 uses KambiFilesUtils, SysUtils, Object3dAsVRML, KambiUtils,
   OpenGLh, KambiGLUtils, KambiStringUtils,
   CastleCreatures, CastlePlay, CastleTimeMessages, CastleInputs,
-  CastleItems, CastleThunder;
+  CastleItems, CastleThunder, CastleLevelAvailable;
 
 function CastleLevelsPath: string;
 begin

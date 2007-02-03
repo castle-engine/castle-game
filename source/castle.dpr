@@ -27,7 +27,7 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
   CastleCreatures, CastleObjectKinds, CastlePlay, CastleLog,
-  CastleLevelSpecific;
+  CastleLevelSpecific, CastleLevelAvailable;
 
 { parsing parameters --------------------------------------------------------- }
 
