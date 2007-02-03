@@ -66,6 +66,14 @@
     number="90"
     implementation_class="TDoomE1M1Level" />
 
+  <level
+    name="hello_world"
+    scene_file_name="hello_world/hello_world_final.wrl"
+    light_set_file_name="hello_world/hello_world_lights.wrl"
+    title="Hello world"
+    number="95"
+    implementation_class="TLevel" />
+
 <!--
   <level
     name=""

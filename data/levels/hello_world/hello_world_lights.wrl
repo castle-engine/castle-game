@@ -1,0 +1,8 @@
+#VRML V1.0 ascii
+
+Group {
+	PointLight {
+		color 1 1 1
+		location 0 0 10
+	}
+}

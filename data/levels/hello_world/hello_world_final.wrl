@@ -1,0 +1,19 @@
+#VRML V1.0 ascii
+
+Group {
+  # Just for testing lights from view3dscene
+  WWWInline { name "hello_world_lights.wrl" separate FALSE }
+
+  PerspectiveCamera  {
+    position -1.16851270198822 -4.064300537109375 1.924523591995239
+    orientation 0.988631725311279 -0.1063187494874 -0.106318920850754 1.582229495048523
+  }
+
+  NavigationInfo {
+    avatarSize [ 0.5, 2 ]
+    speed 1.0
+    headlight FALSE
+  }
+
+  WWWInline { name "hello_world.wrl" }
+}
