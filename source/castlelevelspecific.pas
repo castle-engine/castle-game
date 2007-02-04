@@ -32,10 +32,7 @@ type
   private
     Symbol: TLevelSimpleAnimatedObject;
     Button: TLevelSimpleAnimatedObject;
-
-    { HintButtonBox, indicating when to display hint about pressing a button. }
-    FHintButtonBox: TBox3d;
-    FHintButtonShown: boolean;
+    HintButton: TLevelHintArea;
 
     StairsBlocker: TLevelStaticObject;
 
@@ -116,8 +113,7 @@ type
     FSpidersAppearing: TDynVector3SingleArray;
     NextSpidersAppearingTime: Single;
 
-    FHintOpenDoorBox: TBox3d;
-    HintOpenDoorBoxShown: boolean;
+    HintOpenDoor: TLevelHintArea;
 
     FGateExit: TLevelStaticObject;
 
@@ -171,8 +167,7 @@ type
   private
     procedure RenameCreatures(Node: TVRMLNode);
 
-    FHintOpenDoorBox: TBox3d;
-    HintOpenDoorShown: boolean;
+    HintOpenDoor: TLevelHintArea;
 
     FakeWall: TLevelStaticObject;
 
@@ -187,8 +182,6 @@ type
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ANumber: Integer); override;
     destructor Destroy; override;
-
-    procedure Idle(const CompSpeed: Single); override;
 
     procedure Picked(const Distance: Single;
       CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
@@ -241,9 +234,14 @@ end;
 
 procedure TCastleHallLevel.ChangeLevelScene;
 begin
+  HintButton := TLevelHintArea.Create(Self);
+  HintButton.VRMLName := 'HintButtonBox';
+  HintButton.Message := 'Hint: press this red button with the %i';
+  Objects.Add(HintButton);
+
   inherited;
+
   RemoveBoxNodeCheck(FLevelExitBox, 'LevelExitBox');
-  RemoveBoxNodeCheck(FHintButtonBox, 'HintButtonBox');
 end;
 
 procedure TCastleHallLevel.Idle(const CompSpeed: Single);
@@ -278,16 +276,7 @@ begin
       Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
     end;
   end;
-
-  if (not FHintButtonShown) and
-     Box3dPointInside(Player.Navigator.CameraPos, FHintButtonBox) then
-  begin
-    TimeMessage('Hint: press this red button with the ' +
-      InteractInputDescription);
-    FHintButtonShown := true;
-  end;
 end;
-
 
 procedure TCastleHallLevel.Picked(const Distance: Single;
   CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
@@ -621,8 +610,6 @@ begin
   FSpidersAppearing := TDynVector3SingleArray.Create;
   NextSpidersAppearingTime := 0;
 
-  HintOpenDoorBoxShown := false;
-
   FEndSequence := TLevelStaticObject.Create(Self,
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
     true { true: load background of EndSequence; we will use it });
@@ -663,9 +650,12 @@ end;
 
 procedure TCagesLevel.ChangeLevelScene;
 begin
-  inherited;
+  HintOpenDoor := TLevelHintArea.Create(Self);
+  HintOpenDoor.VRMLName := 'HintOpenDoorBox';
+  HintOpenDoor.Message := 'Hint: open this door using the %i';
+  Objects.Add(HintOpenDoor);
 
-  RemoveBoxNodeCheck(FHintOpenDoorBox, 'HintOpenDoorBox');
+  inherited;
 end;
 
 const
@@ -787,15 +777,9 @@ begin
         Inc(I);
       end;
     end;
-
-    if (not HintOpenDoorBoxShown) and
-      Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then
-    begin
-      HintOpenDoorBoxShown := true;
-      TimeMessage('Hint: open this door using the ' +
-        InteractInputDescription);
-    end;
-  end;
+  end else
+    { No longer any need to show this hint. }
+    HintOpenDoor.MessageDone := true;
 end;
 
 procedure TCagesLevel.PrepareNewPlayer(NewPlayer: TPlayer);
@@ -987,8 +971,6 @@ begin
 
   Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
     true, false);
-
-  HintOpenDoorShown := false;
 end;
 
 destructor TDoomE1M1Level.Destroy;
@@ -996,18 +978,6 @@ begin
   FreeAndNil(Elevator49);
 
   inherited;
-end;
-
-procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
-begin
-  inherited;
-
-  if (not HintOpenDoorShown) and
-    Box3dPointInside(Player.Navigator.CameraPos, FHintOpenDoorBox) then
-  begin
-    HintOpenDoorShown := true;
-    TimeMessage('Hint: open doors using the ' + InteractInputDescription);
-  end;
 end;
 
 procedure TDoomE1M1Level.Picked(const Distance: Single;
@@ -1050,8 +1020,13 @@ end;
 
 procedure TDoomE1M1Level.ChangeLevelScene;
 begin
+  HintOpenDoor := TLevelHintArea.Create(Self);
+  HintOpenDoor.VRMLName := 'HintOpenDoorBox';
+  HintOpenDoor.Message := 'Hint: open doors using the %i';
+  Objects.Add(HintOpenDoor);
+
   inherited;
-  RemoveBoxNodeCheck(FHintOpenDoorBox, 'HintOpenDoorBox');
+
   Scene.RootNode.EnumerateNodes(@RenameCreatures, true);
   RemoveBoxNodeCheck(Elevator49DownBox, 'Elevator49DownBox');
 end;

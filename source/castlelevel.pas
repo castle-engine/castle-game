@@ -140,6 +140,11 @@ type
     procedure Idle; virtual;
 
     function BoundingBox: TBox3d; virtual; abstract;
+
+    { Called from TLevel constructor. This is the place when you
+      can modify ParentLevel.Scene.RootNode, e.g. by calling
+      RemoveBoxNode. }
+    procedure ChangeLevelScene; virtual;
   end;
 
   TObjectsListItem_2 = TLevelObject;
@@ -617,6 +622,85 @@ type
     procedure Idle; override;
   end;
 
+  { This is an abstract class for a special group of objects:
+    they define an invisible and non-colliding areas on the level
+    that...well, have @italic(some purpose). What exactly this
+    "purpose" is, is defined in each TLevelArea descendant.
+
+    This class defines only a properties to define the area.
+    For now, each area is just one TBox3d. }
+  TLevelArea = class(TLevelObject)
+  private
+    FVRMLName: string;
+    FBox: TBox3d;
+    { Area. Default value is EmptyBox3d. }
+    property Box: TBox3d read FBox write FBox;
+  public
+    constructor Create(AParentLevel: TLevel);
+
+    { Name used to recognize this object's area in level VRML file.
+
+      If this object is present during ChangeLevelScene call from
+      TLevel constructor then the shape with a parent named like VRMLName
+      will be removed from VRML file, and it's BoundingBox will be used
+      as Box3d of this object.
+
+      This way you can easily configure area of this object in Blender:
+      just add a cube, set it's mesh name to match with this VRMLName,
+      and then this cube defines Box3d of this object. }
+    property VRMLName: string read FVRMLName write FVRMLName;
+
+    function PointInside(const Point: TVector3Single): boolean;
+
+    procedure Render(const Frustum: TFrustum;
+      const ATransparent: boolean); override;
+    function MoveAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const CameraRadius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+    function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+    function RayCollision(
+      out IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
+    function BoundingBox: TBox3d; override;
+
+    procedure ChangeLevelScene; override;
+  end;
+
+  { This defines area on the level that causes
+    a TimeMessage to be displayed when player enters inside.
+    The natural use for it is to display various hint messages when player
+    is close to something. }
+  TLevelHintArea = class(TLevelArea)
+  private
+    FMessage: string;
+    FMessageDone: boolean;
+  public
+    { Message to this display when player enters Box3d.
+      Some formatting strings are allowed inside:
+      @unorderedList(
+        @item(%% produces InteractInputDescription in the message.)
+        @item(%% produces one % in the message.)
+      )
+      @noAutoLinkHere }
+    property Message: string read FMessage write FMessage;
+
+    { Was the @link(Message) already displayed ? If @true,
+      then it will not be displayed again (unless you will
+      reset MessageDone to @false from your TLevel descendant code). }
+    property MessageDone: boolean read FMessageDone write FMessageDone
+      default false;
+
+    procedure Idle; override;
+  end;
+
   TLevel = class
   private
     FScene: TVRMLFlatSceneGL;
@@ -697,7 +781,10 @@ type
       that change the Scene.RootNode (e.g. you can do here tricks like
       extracting some specific objects using RemoveBoxNode).
       Be very cautious what you do here --- remember that this is called
-      while TLevel.Create constructor did not finish it's work yet ! }
+      while TLevel.Create constructor did not finish it's work yet !
+
+      This is your only chance to insert into Objects list some
+      object that has meaningfull ChangeLevelScene method. }
     procedure ChangeLevelScene; virtual;
 
     { Just load TVRMLFlatSceneGL from file, doing some common tasks:
@@ -1051,6 +1138,11 @@ begin
 end;
 
 procedure TLevelObject.Idle;
+begin
+  { Nothing to do in this class. }
+end;
+
+procedure TLevelObject.ChangeLevelScene;
 begin
   { Nothing to do in this class. }
 end;
@@ -1875,6 +1967,91 @@ begin
     AnimationTime := 0;
 end;
 
+{ TLevelArea ----------------------------------------------------------------- }
+
+constructor TLevelArea.Create(AParentLevel: TLevel);
+begin
+  inherited;
+  FBox := EmptyBox3d;
+end;
+
+procedure TLevelArea.Render(const Frustum: TFrustum;
+  const ATransparent: boolean);
+begin
+  { This object is invisible and non-colliding. }
+end;
+
+function TLevelArea.MoveAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const CameraRadius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  { This object is invisible and non-colliding. }
+  Result := true;
+end;
+
+function TLevelArea.SegmentCollision(const Pos1, Pos2: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  { This object is invisible and non-colliding. }
+  Result := false;
+end;
+
+function TLevelArea.SphereCollision(const Pos: TVector3Single; const Radius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  { This object is invisible and non-colliding. }
+  Result := false;
+end;
+
+function TLevelArea.RayCollision(
+  out IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+begin
+  { This object is invisible and non-colliding. }
+  Result := nil;
+end;
+
+procedure TLevelArea.GetCameraHeight(const CameraPos: TVector3Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single);
+begin
+  { This object is invisible and non-colliding. }
+end;
+
+function TLevelArea.BoundingBox: TBox3d;
+begin
+  { This object is invisible and non-colliding. }
+  Result := EmptyBox3d;
+end;
+
+procedure TLevelArea.ChangeLevelScene;
+begin
+  inherited;
+  ParentLevel.RemoveBoxNodeCheck(FBox, VRMLName);
+end;
+
+function TLevelArea.PointInside(const Point: TVector3Single): boolean;
+begin
+  Result := Box3dPointInside(Point, Box);
+end;
+
+{ TLevelHintArea ----------------------------------------------------------- }
+
+procedure TLevelHintArea.Idle;
+var
+  ReplaceInteractInput: TPercentReplace;
+begin
+  if (not MessageDone) and PointInside(Player.Navigator.CameraPos) then
+  begin
+    ReplaceInteractInput.C := 'i';
+    ReplaceInteractInput.S := InteractInputDescription;
+    TimeMessage(SPercentReplace(Message, [ReplaceInteractInput], true));
+    MessageDone := true;
+  end;
+end;
+
 { TLevel --------------------------------------------------------------------- }
 
 constructor TLevel.Create(
@@ -1919,6 +2096,8 @@ begin
       use HomeCameraPos. FHomeCameraDir, FHomeCameraUp will be
       actually changed later in this procedure. }
     Scene.GetPerspectiveViewpoint(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
+
+    FObjects := TLevelObjectsList.Create;
 
     ChangeLevelScene;
 
@@ -2033,8 +2212,6 @@ begin
     Scene.CreateTriangleOctree('Loading level (triangle octree)');
   Scene.DefaultShapeStateOctree :=
     Scene.CreateShapeStateOctree('Loading level (ShapeState octree)');
-
-  FObjects := TLevelObjectsList.Create;
 end;
 
 destructor TLevel.Destroy;
@@ -2077,8 +2254,11 @@ begin
 end;
 
 procedure TLevel.ChangeLevelScene;
+var
+  I: Integer;
 begin
-  { Nothing to do in this class. }
+  for I := 0 to Objects.High do
+    Objects[I].ChangeLevelScene;
 end;
 
 procedure TLevel.TraverseForItems(Node: TVRMLNode;
