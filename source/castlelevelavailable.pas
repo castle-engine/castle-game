@@ -46,6 +46,8 @@ type
     Title: string;
     Number: Integer;
 
+    LevelDOMElement: TDOMElement;
+
     function CreateLevel: TLevel;
   end;
 
@@ -53,8 +55,14 @@ type
   {$I objectslist_1.inc}
   TLevelsAvailableList = class(TObjectsList_1)
   private
+    { We keep Document reference through lifetime of this object,
+      because each TLevelAvailable instance needs a reference to
+      LevelDOMElement (this is parsed during TLevel.Create). }
+    Document: TXMLDocument;
     function IsSmallerByNumber(const A, B: TLevelAvailable): boolean;
   public
+    destructor Destroy; override;
+
     { raises Exception if such Name is not on the list. }
     function FindName(const AName: string): TLevelAvailable;
 
@@ -133,6 +141,8 @@ begin
   Check(Element.TagName = 'level',
     'Each child of levels/index.xml root node must be the <level> element');
 
+  LevelDOMElement := Element;
+
   { Required atttributes }
 
   if not DOMGetAttribute(Element, 'name', Name) then
@@ -166,11 +176,17 @@ end;
 function TLevelAvailable.CreateLevel: TLevel;
 begin
   Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
-    Title, Number);
+    Title, Number, LevelDOMElement);
   AvailableForNewGame := true;
 end;
 
 { TLevelsAvailableList ------------------------------------------------------- }
+
+destructor TLevelsAvailableList.Destroy;
+begin
+  SysUtils.FreeAndNil(Document);
+  inherited;
+end;
 
 function TLevelsAvailableList.FindName(const AName: string): TLevelAvailable;
 var
@@ -218,37 +234,35 @@ end;
 
 procedure TLevelsAvailableList.LoadFromFile;
 var
-  Document: TXMLDocument;
   LevelsList: TDOMNodeList;
   LevelNode: TDOMNode;
   I: Integer;
   NewLevelAvailable: TLevelAvailable;
   BasePath: string;
 begin
+  SysUtils.FreeAndNil(Document);
+
   BasePath := ProgramDataPath + 'data' +  PathDelim + 'levels' + PathDelim;
   ReadXMLFile(Document, BasePath + 'index.xml');
-  try
-    Check(Document.DocumentElement.TagName = 'levels',
-      'Root node of levels/index.xml must be <levels>');
 
-    LevelsList := Document.DocumentElement.ChildNodes;
-    try
-      for I := 0 to LevelsList.Count - 1 do
+  Check(Document.DocumentElement.TagName = 'levels',
+    'Root node of levels/index.xml must be <levels>');
+
+  LevelsList := Document.DocumentElement.ChildNodes;
+  try
+    for I := 0 to LevelsList.Count - 1 do
+    begin
+      LevelNode := LevelsList.Item[I];
+      if LevelNode.NodeType = ELEMENT_NODE then
       begin
-        LevelNode := LevelsList.Item[I];
-        if LevelNode.NodeType = ELEMENT_NODE then
-        begin
-          NewLevelAvailable := TLevelAvailable.Create;
-          Add(NewLevelAvailable);
-          NewLevelAvailable.AvailableForNewGame := false;
-          NewLevelAvailable.LoadFromDOMElement(LevelNode as TDOMElement,
-            BasePath);
-        end;
+        NewLevelAvailable := TLevelAvailable.Create;
+        Add(NewLevelAvailable);
+        NewLevelAvailable.AvailableForNewGame := false;
+        NewLevelAvailable.LoadFromDOMElement(LevelNode as TDOMElement,
+          BasePath);
       end;
-    finally LevelsList.Release; end;
-  finally
-    SysUtils.FreeAndNil(Document);
-  end;
+    end;
+  finally LevelsList.Release; end;
 end;
 
 initialization

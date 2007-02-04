@@ -29,7 +29,7 @@ uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
-  BackgroundGL, VRMLGLHeadlight;
+  BackgroundGL, VRMLGLHeadlight, DOM;
 
 {$define read_interface}
 
@@ -761,6 +761,8 @@ type
     FTitle: string;
     FNumber: Integer;
     FLightSetFileName: string;
+
+    procedure LoadFromDOMElement(Element: TDOMElement);
   protected
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
@@ -816,7 +818,8 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer); virtual;
+      const ATitle: string; const ANumber: Integer;
+      DOMElement: TDOMElement); virtual;
 
     destructor Destroy; override;
 
@@ -1106,7 +1109,7 @@ implementation
 uses SysUtils, OpenGLh, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
-  CastleInputs, CastleWindow, OpenAL, ALUtils;
+  CastleInputs, CastleWindow, OpenAL, ALUtils, KambiXMLUtils;
 
 {$define read_implementation}
 {$I objectslist_2.inc}
@@ -2057,7 +2060,8 @@ end;
 constructor TLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer);
+  const ATitle: string; const ANumber: Integer;
+  DOMElement: TDOMElement);
 
   procedure RemoveItemsToRemove;
   var
@@ -2098,6 +2102,8 @@ begin
     Scene.GetPerspectiveViewpoint(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
 
     FObjects := TLevelObjectsList.Create;
+
+    LoadFromDOMElement(DOMElement);
 
     ChangeLevelScene;
 
@@ -2195,9 +2201,6 @@ begin
     FLightCastingShadowsPosition := Box3dMiddle(Scene.BoundingBox);
     FLightCastingShadowsPosition[2] := Scene.BoundingBox[1, 2];
 
-    FPlayedMusicSound := stNone;
-    FFootstepsSound := DefaultFootstepsSound;
-
     FGlobalAmbientLight := DefaultGlobalAmbientLight;
 
     Progress.Step;
@@ -2226,6 +2229,38 @@ begin
   FreeWithContentsAndNil(FCreatures);
   FreeWithContentsAndNil(FObjects);
   inherited;
+end;
+
+procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
+var
+  ObjectsList: TDOMNodeList;
+  ObjectNode: TDOMNode;
+  SoundName: string;
+begin
+  { Load Objects }
+{  ObjectsList := DOMElement.ChildNodes;
+  try
+    for I := 0 to ObjectsList.Count - 1 do
+    begin
+      ObjectNode := ObjectsList.Item[I];
+      if ObjectNode.NodeType = ELEMENT_NODE then
+      begin
+        NewObject := LevelObjectFromDOMElement(ObjectNode as TDOMElement);
+        Objects.Add(NewObject);
+      end;
+    end;
+  finally ObjectsList.Release end;
+}
+  { Load other level properties (that are not read in
+    TLevelAvailable.LoadFromDOMElement) }
+
+  if DOMGetAttribute(Element, 'played_music_sound', SoundName) then
+    PlayedMusicSound := SoundFromName(SoundName) else
+    PlayedMusicSound := stNone;
+
+  if DOMGetAttribute(Element, 'footsteps_sound', SoundName) then
+    FootstepsSound := SoundFromName(SoundName) else
+    FootstepsSound := DefaultFootstepsSound;
 end;
 
 function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;

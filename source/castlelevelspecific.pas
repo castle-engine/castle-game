@@ -25,7 +25,7 @@ interface
 
 uses VRMLGLAnimation, VRMLFlatSceneGL, Boxes3d, VectorMath,
   CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL,
-  ALSourceAllocator, CastleSound, Matrix, VRMLNodes;
+  ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM;
 
 type
   TCastleHallLevel = class(TLevel)
@@ -43,7 +43,8 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer); override;
+      const ATitle: string; const ANumber: Integer;
+      DOMElement: TDOMElement); override;
 
     procedure Idle(const CompSpeed: Single); override;
 
@@ -82,7 +83,8 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer); override;
+      const ATitle: string; const ANumber: Integer;
+      DOMElement: TDOMElement); override;
     destructor Destroy; override;
 
     function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
@@ -101,7 +103,8 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer); override;
+      const ATitle: string; const ANumber: Integer;
+      DOMElement: TDOMElement); override;
 
     procedure Picked(const Distance: Single;
       CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
@@ -127,7 +130,8 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer); override;
+      const ATitle: string; const ANumber: Integer;
+      DOMElement: TDOMElement); override;
     destructor Destroy; override;
 
     procedure Idle(const CompSpeed: Single); override;
@@ -180,7 +184,8 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer); override;
+      const ATitle: string; const ANumber: Integer;
+      DOMElement: TDOMElement); override;
     destructor Destroy; override;
 
     procedure Picked(const Distance: Single;
@@ -209,13 +214,12 @@ end;
 constructor TCastleHallLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer);
+  const ATitle: string; const ANumber: Integer;
+  DOMElement: TDOMElement);
 var
   CastleHallLevelPath: string;
 begin
   inherited;
-
-  PlayedMusicSound := stCastleHallMusic;
 
   CastleHallLevelPath := CastleLevelsPath + 'castle_hall' + PathDelim;
 
@@ -329,13 +333,10 @@ end;
 constructor TGateLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer);
+  const ATitle: string; const ANumber: Integer;
+  DOMElement: TDOMElement);
 begin
   inherited;
-
-  PlayedMusicSound := stGateMusic;
-
-  FFootstepsSound := stPlayerFootstepsGrass;
 
   TeleportOpaque := LoadLevelScene(
     CastleLevelsPath + 'gate' + PathDelim + 'teleport_opaque.wrl',
@@ -542,7 +543,8 @@ end;
 constructor TTowerLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer);
+  const ATitle: string; const ANumber: Integer;
+  DOMElement: TDOMElement);
 var
   ElevatorButtonSum: TLevelObjectSum;
   TowerLevelPath: string;
@@ -597,13 +599,12 @@ end;
 constructor TCagesLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer);
+  const ATitle: string; const ANumber: Integer;
+  DOMElement: TDOMElement);
 var
   BossIndex: Integer;
 begin
   inherited;
-
-  PlayedMusicSound := stCagesMusic;
 
   ThunderEffect := TThunderEffect.Create;
 
@@ -930,7 +931,8 @@ end;
 constructor TDoomE1M1Level.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer);
+  const ATitle: string; const ANumber: Integer;
+  DOMElement: TDOMElement);
 var
   DoomDoorsPathPrefix: string;
 
@@ -949,7 +951,6 @@ var
 begin
   inherited;
 
-  {}//PlayedMusicSound := stDoomE1M1Music;
   {TODO: use elevator}
 
   DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +

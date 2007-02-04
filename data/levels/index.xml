@@ -19,6 +19,8 @@
     something special, then you should set this attribute to the name
     of that class.
 
+  - _sound attributes: you can use here a name from ../sounds/index.xml
+
   Rest of the attributes is required.
   Filenames are specified relative to directory of this XML file.
   As path delimiter use slash "/".
@@ -32,7 +34,11 @@
     title="The Gate"
     number="1"
     default_available_for_new_game="true"
-    implementation_class="TGateLevel" />
+    implementation_class="TGateLevel"
+
+    played_music_sound="gate_music"
+    footsteps_sound="player_footsteps_grass"
+  />
 
   <level
     name="castle_hall"
@@ -40,7 +46,11 @@
     light_set_file_name="castle_hall/castle_hall_lights.wrl"
     title="Castle Hall"
     number="2"
-    implementation_class="TCastleHallLevel" />
+    implementation_class="TCastleHallLevel"
+
+    played_music_sound="castle_hall_music"
+    footsteps_sound="player_footsteps_concrete"
+  />
 
   <level
     name="cages"
@@ -48,7 +58,11 @@
     light_set_file_name="cages/cages_lights.wrl"
     title="Cages"
     number="3"
-    implementation_class="TCagesLevel" />
+    implementation_class="TCagesLevel"
+
+    played_music_sound="cages_music_with_rain"
+    footsteps_sound="player_footsteps_concrete"
+  />
 
   <level
     name="tower"
@@ -56,7 +70,10 @@
     light_set_file_name="tower/basic_castle_lights.wrl"
     title="Tower"
     number="99"
-    implementation_class="TTowerLevel" />
+    implementation_class="TTowerLevel"
+
+    footsteps_sound="player_footsteps_grass"
+  />
 
   <level
     name="doom_e1m1"
@@ -64,7 +81,11 @@
     light_set_file_name="doom/e1m1/e1m1_lights.wrl"
     title="Doom E1M1"
     number="90"
-    implementation_class="TDoomE1M1Level" />
+    implementation_class="TDoomE1M1Level"
+
+    played_music_sound="doom_e1m1"
+    footsteps_sound="player_footsteps_concrete"
+  />
 
   <level
     name="hello_world"
@@ -72,17 +93,8 @@
     light_set_file_name="hello_world/hello_world_lights.wrl"
     title="Hello world"
     number="95"
-    implementation_class="TLevel" />
+    implementation_class="TLevel"
 
-<!--
-  <level
-    name=""
-    scene_file_name=""
-    light_set_file_name=""
-    title=""
-    number=""
-    default_available_for_new_game=""
-    implementation_class="" />
--->
-
+    footsteps_sound="player_footsteps_concrete"
+  />
 </levels>
