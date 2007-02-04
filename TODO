@@ -1,7 +1,3 @@
-- finish elevator on Tower:
-  - TTowerLevel.Picked:
-    - hint for player ?
-
 - TVRMLFlatSceneGL may have param for Render:
   onlyTransparent, onlyNonTransparent, all.
   This way we can eliminate Transparent property in many creatures, items,
@@ -10,7 +6,6 @@
 
 - levels/index.xml:
   - level objects hierarchy could be defined in such file
-  - various boxes (like hint boxes) could be defined in such file
   - the base level scene can be TLevelStaticObject too !
 
 - TLevelLinearMovingObject with MovePushesOthers and: use this to make elevator49

@@ -32,7 +32,6 @@ type
   private
     Symbol: TLevelSimpleAnimatedObject;
     Button: TLevelSimpleAnimatedObject;
-    HintButton: TLevelHintArea;
 
     StairsBlocker: TLevelStaticObject;
 
@@ -124,8 +123,6 @@ type
 
     FEndSequence: TLevelStaticObject;
     procedure SetDoEndSequence(Value: boolean);
-  protected
-    procedure ChangeLevelScene; override;
   public
     constructor Create(
       const AName: string;
@@ -170,8 +167,6 @@ type
   TDoomE1M1Level = class(TLevel)
   private
     procedure RenameCreatures(Node: TVRMLNode);
-
-    HintOpenDoor: TLevelHintArea;
 
     FakeWall: TLevelStaticObject;
 
@@ -238,13 +233,7 @@ end;
 
 procedure TCastleHallLevel.ChangeLevelScene;
 begin
-  HintButton := TLevelHintArea.Create(Self);
-  HintButton.VRMLName := 'HintButtonBox';
-  HintButton.Message := 'Hint: press this red button with the %i';
-  Objects.Add(HintButton);
-
   inherited;
-
   RemoveBoxNodeCheck(FLevelExitBox, 'LevelExitBox');
 end;
 
@@ -611,6 +600,10 @@ begin
   FSpidersAppearing := TDynVector3SingleArray.Create;
   NextSpidersAppearingTime := 0;
 
+  { TODO: this is not nice; I should add TLevelObject.Name for such
+    purposes, and use here Objects.FindName('hint_button_box'). }
+  HintOpenDoor := Objects.Items[0] as TLevelHintArea;
+
   FEndSequence := TLevelStaticObject.Create(Self,
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
     true { true: load background of EndSequence; we will use it });
@@ -647,16 +640,6 @@ begin
   FDoEndSequence := Value;
   FEndSequence.Exists := DoEndSequence;
   FGateExit.Exists := not DoEndSequence;
-end;
-
-procedure TCagesLevel.ChangeLevelScene;
-begin
-  HintOpenDoor := TLevelHintArea.Create(Self);
-  HintOpenDoor.VRMLName := 'HintOpenDoorBox';
-  HintOpenDoor.Message := 'Hint: open this door using the %i';
-  Objects.Add(HintOpenDoor);
-
-  inherited;
 end;
 
 const
@@ -1021,11 +1004,6 @@ end;
 
 procedure TDoomE1M1Level.ChangeLevelScene;
 begin
-  HintOpenDoor := TLevelHintArea.Create(Self);
-  HintOpenDoor.VRMLName := 'HintOpenDoorBox';
-  HintOpenDoor.Message := 'Hint: open doors using the %i';
-  Objects.Add(HintOpenDoor);
-
   inherited;
 
   Scene.RootNode.EnumerateNodes(@RenameCreatures, true);

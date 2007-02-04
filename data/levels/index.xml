@@ -49,8 +49,13 @@
     implementation_class="TCastleHallLevel"
 
     played_music_sound="castle_hall_music"
-    footsteps_sound="player_footsteps_concrete"
-  />
+    footsteps_sound="player_footsteps_concrete">
+
+    <area vrml_name="HintButtonBox">
+      <hint>Hint: press this red button with the %i</hint>
+    </area>
+
+  </level>
 
   <level
     name="cages"
@@ -61,8 +66,13 @@
     implementation_class="TCagesLevel"
 
     played_music_sound="cages_music_with_rain"
-    footsteps_sound="player_footsteps_concrete"
-  />
+    footsteps_sound="player_footsteps_concrete">
+
+    <area vrml_name="HintOpenDoorBox">
+      <hint>Hint: open this door using the %i</hint>
+    </area>
+
+  </level>
 
   <level
     name="tower"
@@ -72,8 +82,13 @@
     number="99"
     implementation_class="TTowerLevel"
 
-    footsteps_sound="player_footsteps_grass"
-  />
+    footsteps_sound="player_footsteps_grass">
+
+    <area vrml_name="HintElevButton">
+      <hint>Hint: press the elevator button using the %i</hint>
+    </area>
+
+  </level>
 
   <level
     name="doom_e1m1"
@@ -84,8 +99,13 @@
     implementation_class="TDoomE1M1Level"
 
     played_music_sound="doom_e1m1"
-    footsteps_sound="player_footsteps_concrete"
-  />
+    footsteps_sound="player_footsteps_concrete">
+
+    <area vrml_name="HintOpenDoorBox">
+      <hint>Hint: open doors using the %i</hint>
+    </area>
+
+  </level>
 
   <level
     name="hello_world"

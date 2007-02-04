@@ -2232,15 +2232,52 @@ begin
 end;
 
 procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
+
+  procedure MissingRequiredAttribute(const AttrName, ElementName: string);
+  begin
+    raise Exception.CreateFmt(
+      'Missing required attribute "%s" of <%s> element', [AttrName, ElementName]);
+  end;
+  
+  function LevelHintAreaFromDOMElement(Element: TDOMElement): TLevelHintArea;
+  begin
+    Result := TLevelHintArea.Create(Self);
+    Result.Message := DOMGetTextData(Element);
+  end;
+
+  function LevelAreaFromDOMElement(Element: TDOMElement): TLevelArea;
+  var
+    Child: TDOMElement;
+  begin
+    Child := DOMGetOneChildElement(Element);
+    if Child.TagName = 'hint' then
+      Result := LevelHintAreaFromDOMElement(Child) else
+      raise Exception.CreateFmt('Not allowed children element of <area>: "%s"',
+        [Child.TagName]);
+
+    if not DOMGetAttribute(Element, 'vrml_name', Result.FVRMLName) then
+      MissingRequiredAttribute('vrml_name', 'area');
+  end;
+
+  function LevelObjectFromDOMElement(Element: TDOMElement): TLevelObject;
+  begin
+    if Element.TagName = 'area' then
+      Result := LevelAreaFromDOMElement(Element) else
+      raise Exception.CreateFmt('Not allowed children element of <level>: "%s"',
+        [Element.TagName]);
+  end;
+
 var
   ObjectsList: TDOMNodeList;
   ObjectNode: TDOMNode;
   SoundName: string;
+  I: Integer;
+  NewObject: TLevelObject;
 begin
   { Load Objects }
-{  ObjectsList := DOMElement.ChildNodes;
+  ObjectsList := Element.ChildNodes;
   try
-    for I := 0 to ObjectsList.Count - 1 do
+    for I := 0 to Integer(ObjectsList.Count) - 1 do
     begin
       ObjectNode := ObjectsList.Item[I];
       if ObjectNode.NodeType = ELEMENT_NODE then
@@ -2250,7 +2287,7 @@ begin
       end;
     end;
   finally ObjectsList.Release end;
-}
+
   { Load other level properties (that are not read in
     TLevelAvailable.LoadFromDOMElement) }
 
