@@ -18,6 +18,13 @@ Group {
     headlight FALSE
   }
 
+  KambiHeadLight {
+    color 1 1 0.29
+    spot TRUE
+    spotCutOffAngle 0.6981317008 # 40 degree
+    spotDropOffRate 0.001
+  }
+
   Separator {
     Rotation { rotation 1 0 0 1.57 }
 

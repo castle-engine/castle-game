@@ -112,7 +112,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   BFNT_BitstreamVeraSans_Unit, CastleCreatures,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
-  CastleVideoOptions, Keys, CastleConfig, GLHeadlight, CastleThunder,
+  CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
   CastleLevelSpecific;
 
@@ -519,7 +519,7 @@ begin
   Player.Navigator.CancelFallingDown;
 
   { Init Level.Headlight }
-  TGLHeadlight.RenderOrDisable(Level.Headlight, 0);
+  TVRMLGLHeadlight.RenderOrDisable(Level.Headlight, 0);
 
   if Level.ThunderEffect <> nil then
     Level.ThunderEffect.InitGLLight(1);

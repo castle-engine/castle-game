@@ -237,13 +237,6 @@ begin
   StairsBlocker := TLevelStaticObject.Create(Self,
     CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl', false);
   Objects.Add(StairsBlocker);
-
-  if Headlight <> nil then
-  begin
-    Headlight.AmbientColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
-    Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
-    Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
-  end;
 end;
 
 procedure TCastleHallLevel.ChangeLevelScene;
@@ -567,13 +560,6 @@ var
 begin
   inherited;
 
-  if Headlight <> nil then
-  begin
-    Headlight.AmbientColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
-    Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
-    Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
-  end;
-
   TowerLevelPath := CastleLevelsPath + 'tower' + PathDelim;
 
   Elevator := TLevelStaticObject.Create(
@@ -631,16 +617,6 @@ begin
   PlayedMusicSound := stCagesMusic;
 
   ThunderEffect := TThunderEffect.Create;
-
-  if Headlight <> nil then
-  begin
-    Headlight.DiffuseColor := Vector4Single(1, 1, 0.29, 1.0);
-    Headlight.SpecularColor := Vector4Single(1, 1, 0.29, 1.0);
-    Headlight.Spot := true;
-//    Headlight.Attenuation := Vector3Single(1, 0.1, 0);
-    Headlight.SpotCutoff := 40;
-    Headlight.SpotExponent := 0.1;
-  end;
 
   FSpidersAppearing := TDynVector3SingleArray.Create;
   NextSpidersAppearingTime := 0;
@@ -991,13 +967,6 @@ begin
 
   {}//PlayedMusicSound := stDoomE1M1Music;
   {TODO: use elevator}
-
-  if Headlight <> nil then
-  begin
-    Headlight.AmbientColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
-    Headlight.DiffuseColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
-    Headlight.SpecularColor := Vector4Single(0.5, 0.5, 0.5, 1.0);
-  end;
 
   DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +
     PathDelim;

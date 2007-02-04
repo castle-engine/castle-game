@@ -27,9 +27,9 @@ interface
 uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
-  KambiUtils, KambiClassUtils, CastlePlayer, GLHeadlight, CastleThunder,
+  KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
-  BackgroundGL;
+  BackgroundGL, VRMLGLHeadlight;
 
 {$define read_interface}
 
@@ -629,7 +629,7 @@ type
     FLevelBox: TBox3d;
     FItems: TItemsOnLevelList;
     FObjects: TLevelObjectsList;
-    FHeadlight: TGLHeadlight;
+    FHeadlight: TVRMLGLHeadlight;
 
     { Used only within constructor.
       We will process the scene graph, and sometimes it's not comfortable
@@ -980,17 +980,15 @@ type
     property GlobalAmbientLight: TVector4Single
       read FGlobalAmbientLight write FGlobalAmbientLight;
 
-    { Properties of default level's headlight.
+    { Properties of level's headlight.
       @Nil if no headlight should be used by default for this level.
 
       Note for descendants: TLevel sets this to nil if NavigationInfo.headlight
       field of level's VRML is FALSE. Otherwise TLevel initializes it by
-      TGLHeadlight.Create, i.e. creates an instance of TGLHeadlight
-      with default params. Descendants can change the properties of this instance
-      in their constructor.
+      Scene.CreateHeadLight, i.e. uses KambiHeadLight VRML node if present.
 
       TLevel destructor frees this object. }
-    property Headlight: TGLHeadlight read FHeadlight;
+    property Headlight: TVRMLGLHeadlight read FHeadlight;
 
     { For thunder effect. nil if no thunder effect should be done for this level.
 
@@ -1982,7 +1980,7 @@ begin
       FNavigationSpeed := 1.0;
 
     if (NavigationNode <> nil) and NavigationNode.FdHeadlight.Value then
-      FHeadlight := TGLHeadlight.Create else
+      FHeadlight := Scene.CreateHeadlight else
       FHeadlight := nil;
 
     FProjectionNear := CameraRadius * 0.75;

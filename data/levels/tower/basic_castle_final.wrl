@@ -19,6 +19,17 @@ Group{
     headlight TRUE
   }
 
+  KambiHeadLight {
+    ambientIntensity 0.5
+    intensity 0.5
+    color 1 1 1
+  }
+
+  Fog {
+    visibilityRange 200
+    color 0 0 0
+  }
+
   PerspectiveCamera {
     position -1.3881112099 -94.8213851929 -0.8746259093
     orientation 0.999027609825134 0.031415648758411 0.030929347500205 1.571789145469666
