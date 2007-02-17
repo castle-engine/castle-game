@@ -60,7 +60,7 @@ type
   private
     FGateExitBox: TBox3d;
 
-    TeleportOpaque, TeleportTransp: TVRMLFlatSceneGL;
+    Teleport: TVRMLFlatSceneGL;
     FTeleport1Box, FTeleport2Box: TBox3d;
 
     Teleport1Rotate: Single;
@@ -327,12 +327,8 @@ constructor TGateLevel.Create(
 begin
   inherited;
 
-  TeleportOpaque := LoadLevelScene(
-    CastleLevelsPath + 'gate' + PathDelim + 'teleport_opaque.wrl',
-    false, false);
-
-  TeleportTransp := LoadLevelScene(
-    CastleLevelsPath + 'gate' + PathDelim + 'teleport_transp.wrl',
+  Teleport := LoadLevelScene(
+    CastleLevelsPath + 'gate' + PathDelim + 'teleport.wrl',
     false, false);
 
   SacrilegeAmbushDone := false;
@@ -341,8 +337,7 @@ end;
 
 destructor TGateLevel.Destroy;
 begin
-  FreeAndNil(TeleportOpaque);
-  FreeAndNil(TeleportTransp);
+  FreeAndNil(Teleport);
   inherited;
 end;
 
@@ -507,25 +502,24 @@ procedure TGateLevel.Render(const Frustum: TFrustum);
   procedure RenderTeleport(
     const TeleportRotation: Single;
     const TeleportBox: TBox3d;
-    TeleportScene: TVRMLFlatSceneGL);
+    TransparentGroup: TTransparentGroup);
   begin
     if FrustumBox3dCollisionPossibleSimple(Frustum, TeleportBox) then
     begin
       glPushMatrix;
         glTranslatev(Box3dMiddle(TeleportBox));
         glRotatef(TeleportRotation, 1, 1, 0);
-        TeleportScene.Render(nil, tgAll);
-        { TODO: this can be impl nicer now, with tgOpaque and tgTransp }
+        Teleport.Render(nil, TransparentGroup);
       glPopMatrix;
     end;
   end;
 
 begin
-  RenderTeleport(Teleport1Rotate, FTeleport1Box, TeleportOpaque);
-  RenderTeleport(Teleport2Rotate, FTeleport2Box, TeleportOpaque);
+  RenderTeleport(Teleport1Rotate, FTeleport1Box, tgOpaque);
+  RenderTeleport(Teleport2Rotate, FTeleport2Box, tgOpaque);
   inherited;
-  RenderTeleport(Teleport1Rotate, FTeleport1Box, TeleportTransp);
-  RenderTeleport(Teleport2Rotate, FTeleport2Box, TeleportTransp);
+  RenderTeleport(Teleport1Rotate, FTeleport1Box, tgTransparent);
+  RenderTeleport(Teleport2Rotate, FTeleport2Box, tgTransparent);
 end;
 
 { TTowerLevel ---------------------------------------------------------------- }

@@ -7,7 +7,7 @@ This file contains some internal notes: how this is organized.
 
 First of all, this is *not* the best example how "The Castle"
 levels should be done. If you want to educate yourself how to
-create new levels, go see any other level (like ../../cages/).
+create new levels, go see any other level (like ../../hello_world/).
 
 This level needed some tricks to get things working.
 
