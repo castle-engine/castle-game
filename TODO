@@ -1,9 +1,3 @@
-- TVRMLFlatSceneGL may have param for Render:
-  onlyTransparent, onlyNonTransparent, all.
-  This way we can eliminate Transparent property in many creatures, items,
-  level objects and everything will be able to just have a TVRMLFlatSceneGL
-  that freely mixes transparent and untransparent parts.
-
 - levels/index.xml:
   - level objects hierarchy could be defined in such file
   - the base level scene can be TLevelStaticObject too !

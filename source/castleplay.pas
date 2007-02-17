@@ -114,7 +114,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
-  CastleLevelSpecific;
+  CastleLevelSpecific, VRMLFlatSceneGL;
 
 var
   GLList_Draw2dBegin: TGLuint;
@@ -352,14 +352,14 @@ procedure Draw(Glwin: TGLWindow);
       Level.Creatures.Items[I].RenderBackShadowQuads;
   end;
 
-  procedure RenderCreaturesItems(const Transparent: boolean);
+  procedure RenderCreaturesItems(TransparentGroup: TTransparentGroup);
   begin
     { When GameWin, don't render creatures (as we don't check
       collisions when MovingPlayerEndSequence). }
     if not GameWin then
-      Level.Creatures.Render(Player.Navigator.Frustum, Transparent);
+      Level.Creatures.Render(Player.Navigator.Frustum, TransparentGroup);
     if not DebugRenderForLevelScreenshot then
-      Level.Items.Render(Player.Navigator.Frustum, Transparent);
+      Level.Items.Render(Player.Navigator.Frustum, TransparentGroup);
   end;
 
 const
@@ -446,7 +446,7 @@ begin
       So I just render them here, when the lights are turned on
       and ignoring stencil buffer. I have to do this *after*
       glClear(GL_DEPTH_BUFFER_BIT) above. }
-    RenderCreaturesItems(false);
+    RenderCreaturesItems(tgOpaque);
 
     { setup stencil : don't modify stencil, stencil test passes only for =0 }
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -469,7 +469,7 @@ begin
     end;
   end else
   begin
-    RenderCreaturesItems(false);
+    RenderCreaturesItems(tgOpaque);
     Level.Render(Player.Navigator.Frustum);
   end;
 
@@ -478,13 +478,8 @@ begin
     then all transparent objects. Otherwise transparent objects
     (that must be rendered without updating depth buffer) could get brutally
     covered by non-transparent objects (that are in fact further away from
-    the camera).
-
-    For simplicity, I decided that for now creatures and items are not allowed
-    to be partially transparent and partially opaque.
-    So we first render all non-transparent creatures and items,
-    then the level, then all transparent creatures and items. }
-  RenderCreaturesItems(true);
+    the camera). }
+  RenderCreaturesItems(tgTransparent);
 
   Player.RenderAttack;
 

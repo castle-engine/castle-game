@@ -19,7 +19,6 @@
 
 <CONFIG>
   <LifePotion
-    transparent="True"
     model_file_name="life_potion_processed.wrl"
     name="Potion of Life"
     image_file_name="life_potion.png"

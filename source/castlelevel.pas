@@ -98,9 +98,9 @@ type
       first time with ATransparent = @false, second time with
       ATransparent = @true. You should render only fully opaque
       parts in the first pass and only the transparent parts in the
-      second pass. for the reason see TObjectKind.Transparent comments. }
+      second pass. For the reason see TVRMLFlatSceneGL.Render comments. }
     procedure Render(const Frustum: TFrustum;
-      const ATransparent: boolean); virtual; abstract;
+      TransparentGroup: TTransparentGroup); virtual; abstract;
 
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
@@ -183,7 +183,7 @@ type
     property List: TLevelObjectsList read FList;
 
     procedure Render(const Frustum: TFrustum;
-      const ATransparent: boolean); override;
+      TransparentGroup: TTransparentGroup); override;
 
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
@@ -223,18 +223,12 @@ type
     FExists: boolean;
     FCollides: boolean;
     FScene: TVRMLFlatSceneGL;
-    FTransparent: boolean;
   public
     constructor Create(AParentLevel: TLevel;
       const SceneFileName: string; PrepareBackground: boolean);
     destructor Destroy; override;
 
     property Scene: TVRMLFlatSceneGL read FScene;
-
-    { This level object must be either completely transparent or
-      completely opaque. This property determines which one it is. }
-    property Transparent: boolean read FTransparent write FTransparent
-      default false;
 
     { @noAutoLinkHere }
     property Exists: boolean read FExists write FExists default true;
@@ -245,7 +239,7 @@ type
     property Collides: boolean read FCollides write FCollides default true;
 
     procedure Render(const Frustum: TFrustum;
-      const ATransparent: boolean); override;
+      TransparentGroup: TTransparentGroup); override;
 
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
@@ -350,7 +344,7 @@ type
       var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single); override;
 
     procedure Render(const Frustum: TFrustum;
-      const ATransparent: boolean); override;
+      TransparentGroup: TTransparentGroup); override;
 
     procedure BeforeIdle(const NewAnimationTime: Single); override;
     procedure Idle; override;
@@ -562,7 +556,6 @@ type
     FAnimationTime: Single;
     FExists: boolean;
     FCollides: boolean;
-    FTransparent: boolean;
   public
     constructor Create(AParentLevel: TLevel; AnAnimation: TVRMLGLAnimation);
     destructor Destroy; override;
@@ -572,13 +565,8 @@ type
     property Exists: boolean read FExists write FExists default true;
     property Collides: boolean read FCollides write FCollides default true;
 
-    { This level object must be either completely transparent or
-      completely opaque. This property determines which one it is. }
-    property Transparent: boolean read FTransparent write FTransparent
-      default false;
-
     procedure Render(const Frustum: TFrustum;
-      const ATransparent: boolean); override;
+      TransparentGroup: TTransparentGroup); override;
 
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
@@ -653,7 +641,7 @@ type
     function PointInside(const Point: TVector3Single): boolean;
 
     procedure Render(const Frustum: TFrustum;
-      const ATransparent: boolean); override;
+      TransparentGroup: TTransparentGroup); override;
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
@@ -1281,10 +1269,10 @@ begin
 end;
 
 procedure TLevelStaticObject.Render(const Frustum: TFrustum;
-  const ATransparent: boolean);
+  TransparentGroup: TTransparentGroup);
 begin
-  if Exists and (ATransparent = Transparent) then
-    Scene.RenderFrustum(Frustum);
+  if Exists then
+    Scene.RenderFrustum(Frustum, TransparentGroup);
 end;
 
 function TLevelStaticObject.BoundingBox: TBox3d;
@@ -1309,12 +1297,12 @@ begin
 end;
 
 procedure TLevelObjectSum.Render(const Frustum: TFrustum;
-  const ATransparent: boolean);
+  TransparentGroup: TTransparentGroup);
 var
   I: Integer;
 begin
   for I := 0 to List.High do
-    List.Items[I].Render(Frustum, ATransparent);
+    List.Items[I].Render(Frustum, TransparentGroup);
 end;
 
 function TLevelObjectSum.MoveAllowedSimple(
@@ -1526,7 +1514,7 @@ begin
 end;
 
 procedure TLevelMovingObject.Render(const Frustum: TFrustum;
-  const ATransparent: boolean);
+  TransparentGroup: TTransparentGroup);
 var
   T: TVector3_Single;
 begin
@@ -1543,13 +1531,13 @@ begin
       about FrustumMove time so much ?). }
 
     if IsZeroVector(T.Data) then
-      MovingObject.Render(Frustum, ATransparent) else
+      MovingObject.Render(Frustum, TransparentGroup) else
       begin
         glPushMatrix;
           glTranslatev(T.Data);
           { MovingObject.Render expects Frustum in it's local coordinates,
             that's why we subtract Translation here. }
-          MovingObject.Render(FrustumMove(Frustum, (-T).Data), ATransparent);
+          MovingObject.Render(FrustumMove(Frustum, (-T).Data), TransparentGroup);
         glPopMatrix;
       end;
   end;
@@ -1929,10 +1917,10 @@ begin
 end;
 
 procedure TLevelAnimatedObject.Render(const Frustum: TFrustum;
-  const ATransparent: boolean);
+  TransparentGroup: TTransparentGroup);
 begin
-  if Exists and (ATransparent = Transparent) then
-    Animation.SceneFromTime(AnimationTime).RenderFrustum(Frustum);
+  if Exists then
+    Animation.SceneFromTime(AnimationTime).RenderFrustum(Frustum, TransparentGroup);
 end;
 
 function TLevelAnimatedObject.BoundingBox: TBox3d;
@@ -1979,7 +1967,7 @@ begin
 end;
 
 procedure TLevelArea.Render(const Frustum: TFrustum;
-  const ATransparent: boolean);
+  TransparentGroup: TTransparentGroup);
 begin
   { This object is invisible and non-colliding. }
 end;
@@ -2188,7 +2176,7 @@ begin
 
     Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
       (ProjectionNear, ProjectionFar);
-    Scene.PrepareRender(true, true, false, false);
+    Scene.PrepareRender([tgAll], true, true, false, false);
 
     FLightSet := TVRMLLightSetGL.Create(LoadAsVRML(LightSetFileName),
       true,
@@ -2238,7 +2226,7 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
     raise Exception.CreateFmt(
       'Missing required attribute "%s" of <%s> element', [AttrName, ElementName]);
   end;
-  
+
   function LevelHintAreaFromDOMElement(Element: TDOMElement): TLevelHintArea;
   begin
     Result := TLevelHintArea.Create(Self);
@@ -2596,13 +2584,13 @@ var
 begin
   { First pass rendering Objects: render non-transparent parts }
   for I := 0 to Objects.High do
-    Objects[I].Render(Frustum, false);
+    Objects[I].Render(Frustum, tgOpaque);
 
-  Scene.RenderFrustumOctree(Frustum);
+  Scene.RenderFrustumOctree(Frustum, tgAll);
 
   { Second pass rendering Objects: render transparent parts }
   for I := 0 to Objects.High do
-    Objects[I].Render(Frustum, true);
+    Objects[I].Render(Frustum, tgTransparent);
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single);
@@ -2721,7 +2709,8 @@ begin
     true, roSeparateShapeStates, GLContextCache);
   AttributesSet(Result.Attributes, btIncrease);
 
-  Result.PrepareRender(PrepareBackground,
+  Result.PrepareRender([tgOpaque, tgTransparent],
+    PrepareBackground,
     true { true, because this is almost always needed anyway }, false, false);
 
   if CreateDefaultTriangleOctree then
@@ -2737,7 +2726,7 @@ begin
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
 
-  Result.PrepareRender(false,
+  Result.PrepareRender([tgOpaque, tgTransparent], false,
     { DoPrepareBoundingBox is true, because this is almost always needed anyway }
     true,
     false, false, false, false);

@@ -78,7 +78,8 @@ type
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
-      AnimInfo: TVRMLGLAnimationInfo);
+      AnimInfo: TVRMLGLAnimationInfo;
+      TransparentGroups: TTransparentGroups);
 
     function GetStringCheckNonEmpty(KindsConfig: TKamXMLConfig;
       const AttrName: string): string;
@@ -343,7 +344,8 @@ type
       Pass current viewing Frustum to allow optimizing this
       (when item for sure is not within Frustum, we don't have
       to push it to OpenGL). }
-    procedure Render(const Frustum: TFrustum);
+    procedure Render(const Frustum: TFrustum;
+      TransparentGroup: TTransparentGroup);
 
     procedure Idle(const CompSpeed: Single);
 
@@ -364,7 +366,8 @@ type
   {$I objectslist_1.inc}
   TItemsOnLevelList = class(TObjectsList_1)
     { Call Render for all items. }
-    procedure Render(const Frustum: TFrustum; const Transparent: boolean);
+    procedure Render(const Frustum: TFrustum;
+      TransparentGroup: TTransparentGroup);
     { Call Idle for all items. }
     procedure Idle(const CompSpeed: Single);
     { Check collision with all items, returns index of first collider
@@ -500,7 +503,7 @@ begin
       true, roSeparateShapeStates, GLContextCache);
 
     AttributesSet(Scene.Attributes, BlendingType);
-    Scene.PrepareRender(false, true, false, false);
+    Scene.PrepareRender([tgOpaque, tgTransparent], false, true, false, false);
   end;
 
   Progress.Step;
@@ -526,10 +529,11 @@ end;
 procedure TItemKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TVRMLGLAnimation;
-  AnimInfo: TVRMLGLAnimationInfo);
+  AnimInfo: TVRMLGLAnimationInfo;
+  TransparentGroups: TTransparentGroups);
 begin
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
-    false, true, false, false);
+    TransparentGroups, false, true, false, false);
 end;
 
 { TItemKindsList ------------------------------------------------------------- }
@@ -645,7 +649,8 @@ end;
 procedure TItemWeaponKind.PrepareRender;
 begin
   inherited;
-  CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationInfo);
+  CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationInfo,
+    [tgAll]);
 end;
 
 function TItemWeaponKind.PrepareRenderSteps: Cardinal;
@@ -843,17 +848,19 @@ begin
   Result := Boxes3dCollision(BoundingBox, Player.BoundingBox);
 end;
 
-procedure TItemOnLevel.Render(const Frustum: TFrustum);
+procedure TItemOnLevel.Render(const Frustum: TFrustum;
+  TransparentGroup: TTransparentGroup);
 begin
   if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
   begin
     glPushMatrix;
       glTranslatev(Position);
       glRotatev(FRotation, UnitVector3Single[2]);
-      Item.Kind.Scene.Render(nil);
+      Item.Kind.Scene.Render(nil, TransparentGroup);
     glPopMatrix;
 
-    if RenderBoundingBoxes then
+    if RenderBoundingBoxes and
+       (TransparentGroup in [tgAll, tgOpaque]) then
     begin
       glPushAttrib(GL_ENABLE_BIT);
         glDisable(GL_LIGHTING);
@@ -952,13 +959,12 @@ end;
 { TItemsOnLevelList -------------------------------------------------- }
 
 procedure TItemsOnLevelList.Render(const Frustum: TFrustum;
-  const Transparent: boolean);
+  TransparentGroup: TTransparentGroup);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    if Items[I].Item.Kind.Transparent = Transparent then
-      Items[I].Render(Frustum);
+    Items[I].Render(Frustum, TransparentGroup);
 end;
 
 procedure TItemsOnLevelList.Idle(const CompSpeed: Single);

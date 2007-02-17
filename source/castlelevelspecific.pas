@@ -514,7 +514,8 @@ procedure TGateLevel.Render(const Frustum: TFrustum);
       glPushMatrix;
         glTranslatev(Box3dMiddle(TeleportBox));
         glRotatef(TeleportRotation, 1, 1, 0);
-        TeleportScene.Render(nil);
+        TeleportScene.Render(nil, tgAll);
+        { TODO: this can be impl nicer now, with tgOpaque and tgTransp }
       glPopMatrix;
     end;
   end;
@@ -612,12 +613,6 @@ begin
     with it --- no reason to waste time, no collisions will be possible
     as player's move along the EndSequence will be programmed. }
   FEndSequence.Collides := false;
-  { Actually, FEndSequence is not transparent as a whole. But part of it
-    is transparent, so it must be rendered after main level scene.
-    Fortunately, this is our only transparent object, so it will be rendered
-    *right after* main level geometry, which means that both it's non-transparent
-    and transparent parts will render correctly. }
-  FEndSequence.Transparent := true;
   Objects.Add(FEndSequence);
 
   FGateExit := TLevelStaticObject.Create(Self,
@@ -799,7 +794,7 @@ begin
   begin
     glPushMatrix;
       glTranslatev(FSpidersAppearing.Items[I]);
-      Spider.StandAnimation.Scenes[0].Render(nil);
+      Spider.StandAnimation.Scenes[0].Render(nil, tgAll);
     glPopMatrix;
   end;
 

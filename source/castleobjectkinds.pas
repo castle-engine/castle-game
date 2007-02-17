@@ -24,16 +24,12 @@ unit CastleObjectKinds;
 interface
 
 uses Classes, KambiXMLCfg, VRMLGLAnimation, VRMLGLAnimationInfo,
-  CastleVideoOptions;
-
-const
-  DefaultTransparent = false;
+  CastleVideoOptions, VRMLFlatSceneGL;
 
 type
   { This is a common class for item kind and creature kind. }
   TObjectKind = class
   private
-    FTransparent: boolean;
     FVRMLNodeName: string;
     FPrepareRenderDone: boolean;
     FBlendingType: TBlendingType;
@@ -64,6 +60,7 @@ type
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo;
+      TransparentGroups: TTransparentGroups;
       DoPrepareBackground, DoPrepareBoundingBox,
       DoPrepareTrianglesListNotOverTriangulate,
       DoPrepareTrianglesListOverTriangulate: boolean);
@@ -99,30 +96,6 @@ type
       Make this in 'CamelCase' to be consistent. }
     property VRMLNodeName: string read FVRMLNodeName;
 
-    { Should the creature be rendered as transparent or opaque ?
-      Each item/creature should either use only partially-transparent
-      materials or only fully opaque materials.
-
-      When you leave Transparent = @false while the creature uses
-      transparent materials, then the transparent parts of the
-      creatures may be completely covered (hidden) by non-transparent objects
-      (non-transparent parts of level, other non-transparent creatures
-      and items). This depends on rendering order of creatures/items,
-      which depends on the order of creatures/items in Level.Creatures
-      and Level.Items lists, so no, you can't depend on this artifact
-      --- in some situations it will happen, in others not.
-
-      When you leave Transparent = @true while the creature does not use
-      transparent materials, then the same bad artifact will happen,
-      but the other way around: this time non-transparent parts of
-      *this* item/creature will hide *other* transparent items/creatures
-      or transparent level parts, even when they shouldn't hide them
-      (because they are after them).
-
-      For more reasoning, see CastlePlay.Draw routine. }
-    property Transparent: boolean
-      read FTransparent write FTransparent default DefaultTransparent;
-
     property BlendingType: TBlendingType
       read FBlendingType write FBlendingType default DefaultBlendingType;
 
@@ -143,7 +116,6 @@ constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
   inherited Create;
   FVRMLNodeName := AVRMLNodeName;
-  FTransparent := DefaultTransparent;
   FBlendingType := DefaultBlendingType;
   FirstRootNodesPool := TStringList.Create;
 end;
@@ -198,9 +170,6 @@ const
 var
   SBlendingType: string;
 begin
-  Transparent := KindsConfig.GetValue(VRMLNodeName + '/transparent',
-    DefaultTransparent);
-
   SBlendingType := KindsConfig.GetValue(VRMLNodeName + '/blending_type',
     SBlendingTypeIncrease);
   if SBlendingType = SBlendingTypeIncrease then
@@ -241,6 +210,7 @@ procedure TObjectKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo;
+  TransparentGroups: TTransparentGroups;
   DoPrepareBackground, DoPrepareBoundingBox,
   DoPrepareTrianglesListNotOverTriangulate,
   DoPrepareTrianglesListOverTriangulate: boolean);
@@ -261,7 +231,9 @@ begin
           Anim.Scenes[0].TrianglesCount(true) ]));
 
     AnimationAttributesSet(Anim.Attributes, BlendingType);
-    Anim.PrepareRender(DoPrepareBackground, DoPrepareBoundingBox,
+    Anim.PrepareRender(
+      TransparentGroups,
+      DoPrepareBackground, DoPrepareBoundingBox,
       DoPrepareTrianglesListNotOverTriangulate,
       DoPrepareTrianglesListOverTriangulate, false,
       { It's temporary false --- see ../TODO file about

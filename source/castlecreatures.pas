@@ -716,7 +716,8 @@ type
 
     function BoundingBox: TBox3d; virtual;
 
-    procedure Render(const Frustum: TFrustum); virtual;
+    procedure Render(const Frustum: TFrustum;
+      TransparentGroup: TTransparentGroup); virtual;
 
     procedure RenderFrontShadowQuads(
       const LightPosition, CameraPosition: TVector3Single); virtual;
@@ -826,7 +827,8 @@ type
   TObjectsListItem_1 = TCreature;
   {$I objectslist_1.inc}
   TCreaturesList = class(TObjectsList_1)
-    procedure Render(const Frustum: TFrustum; const Transparent: boolean);
+    procedure Render(const Frustum: TFrustum;
+      TransparentGroup: TTransparentGroup);
     procedure Idle(const CompSpeed: Single);
 
     { Remove from this list all creatures that return
@@ -1116,6 +1118,10 @@ procedure TCreatureKind.CreateAnimationIfNeeded(
   AnimInfo: TVRMLGLAnimationInfo);
 begin
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
+    { all creature animations are displayed in 3D screen along
+      with other objects, so they must use separate tgOpaque, tgTransparent
+      rendering }
+    [tgOpaque, tgTransparent],
     false, true, RenderShadowsPossible, false);
 end;
 
@@ -1710,7 +1716,8 @@ begin
   Result := BoundingBoxAssumingLegs(LegsPosition, Direction);
 end;
 
-procedure TCreature.Render(const Frustum: TFrustum);
+procedure TCreature.Render(const Frustum: TFrustum;
+  TransparentGroup: TTransparentGroup);
 
   procedure RenderBoundingGeometry;
   var
@@ -1738,10 +1745,11 @@ begin
   begin
     glPushMatrix;
       glMultMatrix(SceneTransform);
-      CurrentScene.Render(nil);
+      CurrentScene.Render(nil, TransparentGroup);
     glPopMatrix;
 
-    if RenderBoundingBoxes then
+    if RenderBoundingBoxes and
+       (TransparentGroup in [tgAll, tgOpaque]) then
       RenderBoundingGeometry;
   end;
 end;
@@ -2002,13 +2010,12 @@ end;
 { TCreatures ----------------------------------------------------------------- }
 
 procedure TCreaturesList.Render(const Frustum: TFrustum;
-  const Transparent: boolean);
+  TransparentGroup: TTransparentGroup);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    if Items[I].Kind.Transparent = Transparent then
-      Items[I].Render(Frustum);
+    Items[I].Render(Frustum, TransparentGroup);
 end;
 
 procedure TCreaturesList.Idle(const CompSpeed: Single);

@@ -342,7 +342,7 @@ uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, OpenAL, CastleControlsMenu,
-  CastleTimeMessages, KambiXMLCfg;
+  CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -1109,7 +1109,7 @@ begin
     begin
       glClear(GL_DEPTH_BUFFER_BIT);
       glLoadIdentity;
-      Anim.SceneFromTime(AttackTime).Render(nil);
+      Anim.SceneFromTime(AttackTime).Render(nil, tgAll);
     end else
       Attacking := false;
   end;
