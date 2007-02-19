@@ -562,8 +562,8 @@ end;
     LifeText: string;
   begin
     glRasterPos2i(XMove + IndicatorMargin, IndicatorMargin);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.5);
 
       LifeMapped := Round(MapRange(ALife, 0, AMaxLife, 0, IndicatorHeight));
 
@@ -583,7 +583,7 @@ end;
         glDisable(GL_SCISSOR_TEST);
       end;
 
-    glDisable(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
 
     if PrintText then
     begin
