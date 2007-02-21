@@ -117,4 +117,17 @@
 
     footsteps_sound="player_footsteps_concrete"
   />
+
+<!--
+  <level
+    name="althana"
+    scene_file_name="/win/mojepasy/openGL/castle/althana/althana_final.wrl"
+    light_set_file_name="/win/mojepasy/openGL/castle/althana/althana_lights.wrl"
+    title="Althana"
+    number="96"
+    implementation_class="TLevel"
+
+    footsteps_sound="player_footsteps_concrete"
+  />
+-->
 </levels>
