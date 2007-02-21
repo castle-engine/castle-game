@@ -1,0 +1,3 @@
+Outline done by drawing along the path.
+Inside by filling with gradient, except for boss where inside by filling
+with pattern.
