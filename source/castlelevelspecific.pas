@@ -170,8 +170,9 @@ type
 
     FakeWall: TLevelStaticObject;
 
-    Elevator49: TVRMLFlatSceneGL;
-    Elevator49Down: boolean;
+    MovingElevator49: TLevelLinearMovingObject;
+    Elevator49: TLevelStaticObject;
+
     Elevator49DownBox: TBox3d;
   protected
     procedure ChangeLevelScene; override;
@@ -188,6 +189,8 @@ type
       var InteractionOccured: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
+
+    procedure Idle(const CompSpeed: Single); override;
   end;
 
 function CastleLevelsPath: string;
@@ -923,8 +926,6 @@ var
 begin
   inherited;
 
-  {TODO: use elevator}
-
   DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +
     PathDelim;
 
@@ -942,14 +943,24 @@ begin
   FakeWall.Collides := false;
   Objects.Add(FakeWall);
 
-  Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
-    true, false);
+  Elevator49 := TLevelStaticObject.Create(
+    Self, DoomDoorsPathPrefix + 'elevator4_9_final.wrl', false);
+
+  MovingElevator49 := TLevelLinearMovingObject.Create(Self);
+  MovingElevator49.MovingObject := TLevelObjectSum.Create(Self);
+  TLevelObjectSum(MovingElevator49.MovingObject).List.Add(Elevator49);
+  MovingElevator49.MoveTime := 3.0;
+  MovingElevator49.TranslationEnd.Init(0, 0, -6.7);
+  MovingElevator49.SoundGoEndPosition := stElevator;
+  MovingElevator49.SoundGoEndPositionLooping := true;
+  MovingElevator49.SoundGoBeginPosition := stElevator;
+  MovingElevator49.SoundGoBeginPositionLooping := true;
+  MovingElevator49.SoundTracksCurrentPosition := true;
+  Objects.Add(MovingElevator49);
 end;
 
 destructor TDoomE1M1Level.Destroy;
 begin
-  FreeAndNil(Elevator49);
-
   inherited;
 end;
 
@@ -1005,6 +1016,17 @@ begin
 
   NewPlayer.PickItem(TItem.Create(Bow, 1));
   NewPlayer.PickItem(TItem.Create(Quiver, 10));
+end;
+
+procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
+begin
+  inherited;
+
+  if MovingElevator49.CompletelyBeginPosition and
+     Box3dPointInside(Player.Navigator.CameraPos, Elevator49DownBox) then
+  begin
+    MovingElevator49.GoEndPosition;
+  end;
 end;
 
 end.
