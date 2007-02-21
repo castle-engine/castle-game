@@ -1,0 +1,26 @@
+#VRML V2.0 utf8
+
+# String of the bow must be expressed as a line to be rendered
+# as a line in OpenGL.
+#
+# Otherwise (if you express string as a thin
+# e.g. cylinder) rendering results will suck --- when you'll look
+# at the bow from large distance, you will see that parts of the
+# string "disappear". This is the result of how polys are rendered.
+# Rendering instead a simple line will give better results.
+#
+# This also means that I have to express this line in direct VRML,
+# not in Blender, since Blender VRML exporters can't export a simple line...
+Shape {
+  appearance Appearance { }
+  geometry IndexedLineSet {
+    coord Coordinate {
+      point [  0.216 0.318 0.208
+               0.216 0.318 2.374 ]
+    }
+    coordIndex [ 0 1 ]
+    color Color { color [ 1 1 1 ] }
+    colorIndex [ 0 0 ]
+  }
+}
+Inline { url "bow.wrl" }

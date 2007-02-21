@@ -47,7 +47,7 @@
 
   <Bow
     actual_attack_time="0.0"
-    model_file_name="bow.wrl"
+    model_file_name="bow_final.wrl"
     name="Bow"
     image_file_name="bow.png"
 
