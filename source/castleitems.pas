@@ -623,10 +623,10 @@ begin
     try
       if ScreenImageAlignLeft then
         X := 0 else
-        X := RequiredScreenWidth - ScreenImage.Width;
+        X := Cardinal(Glw.Width) - ScreenImage.Width;
       if ScreenImageAlignBottom then
         Y := 0 else
-        Y := RequiredScreenHeight - ScreenImage.Height;
+        Y := Cardinal(Glw.Height) - ScreenImage.Height;
 
       glLoadIdentity;
       glRasterPos2i(X, Y);

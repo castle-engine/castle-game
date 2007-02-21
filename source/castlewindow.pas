@@ -33,26 +33,12 @@ var
   { @noAutoLinkHere }
   Glw: TGLWindowNavigated;
 
-const
-  RequiredScreenWidth = 800;
-  RequiredScreenHeight = 600;
-
-  MiddleScreenWidth = RequiredScreenWidth div 2;
-  MiddleScreenHeight = RequiredScreenHeight div 2;
-
-function RequiredScreenSize: string;
-
 var
   GLContextCache: TVRMLOpenGLRendererContextCache;
 
 implementation
 
 uses SysUtils;
-
-function RequiredScreenSize: string;
-begin
-  Result := Format('%d x %d', [RequiredScreenWidth, RequiredScreenHeight]);
-end;
 
 { initialization / finalization ---------------------------------------------- }
 

@@ -197,11 +197,12 @@ procedure Draw2D(Draw2DData: Integer);
     InventorySlotWidth = 100;
     InventorySlotHeight = 100;
     InventorySlotMargin = 2;
-    InventorySlotsVisibleInColumn = RequiredScreenHeight div InventorySlotHeight;
+  var
+    InventorySlotsVisibleInColumn: Integer;
 
     function ItemSlotX(I: Integer): Integer;
     begin
-      Result := RequiredScreenWidth - InventorySlotWidth *
+      Result := Glw.Width - InventorySlotWidth *
         ((I div InventorySlotsVisibleInColumn) + 1);
     end;
 
@@ -215,6 +216,8 @@ procedure Draw2D(Draw2DData: Integer);
     I, X, Y: Integer;
     S: string;
   begin
+    InventorySlotsVisibleInColumn := Glw.Height div InventorySlotHeight;
+
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
       { Draw at least InventorySlotsVisibleInColumn slots,
@@ -274,7 +277,7 @@ procedure Draw2D(Draw2DData: Integer);
   procedure DoShowDebugInfo;
   begin
     glColorv(Vector3Single(0.7, 0.7, 0.7));
-    glRasterPos2i(0, RequiredScreenHeight -
+    glRasterPos2i(0, Glw.Height -
       Font_BFNT_BitstreamVeraSans.RowHeight * 2 - 10 { margin });
 
     { Don't display precise Glw.FpsFrameTime and Glw.FpsRealTime
@@ -295,7 +298,7 @@ procedure Draw2D(Draw2DData: Integer);
   procedure DoShowDeadInfo;
   begin
     glColorv(Vector3Single(1, 0, 0));
-    glRasterPos2i(0, RequiredScreenHeight -
+    glRasterPos2i(0, Glw.Height -
       Font_BFNT_BitstreamVeraSans.RowHeight * 3 - 15 { margin });
     Font_BFNT_BitstreamVeraSans.Print(SDeadMessage);
   end;
@@ -303,7 +306,7 @@ procedure Draw2D(Draw2DData: Integer);
   procedure DoShowGameWinInfo;
   begin
     glColorv(Vector3Single(0.8, 0.8, 0.8));
-    glRasterPos2i(0, RequiredScreenHeight -
+    glRasterPos2i(0, Glw.Height -
       Font_BFNT_BitstreamVeraSans.RowHeight * 3 - 15 { margin });
     Font_BFNT_BitstreamVeraSans.Print(SGameWinMessage);
   end;
@@ -488,7 +491,7 @@ begin
     glPushAttrib(GL_ENABLE_BIT);
       glDisable(GL_LIGHTING);
       glProjectionPushPopOrtho2D(@Draw2d, 0,
-        0, RequiredScreenWidth, 0, RequiredScreenHeight);
+        0, Glw.Width, 0, Glw.Height);
     glPopAttrib;
   end;
 end;
@@ -756,7 +759,8 @@ procedure DoInteract;
     RayVector: TVector3Single;
   begin
     RayVector := PrimaryRay(
-      MiddleScreenWidth + XChange, MiddleScreenHeight + YChange,
+      Glw.Width div 2 + XChange,
+      Glw.Height div 2 + YChange,
       Glw.Width, Glw.Height,
       Player.Navigator.CameraPos, Player.Navigator.CameraDir,
       Player.Navigator.CameraUp,
@@ -1240,12 +1244,12 @@ begin
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
       glColor4f(0, 0, 0, DarkAreaAlpha);
-      glRecti(0, 0, RequiredScreenWidth, DarkAreaHeight);
+      glRecti(0, 0, Glw.Width, DarkAreaHeight);
       for I := 0 to DarkAreaFadeHeight - 1 do
       begin
         glColor4f(0, 0, 0,
           DarkAreaAlpha * (DarkAreaFadeHeight - 1 - I) / DarkAreaFadeHeight);
-        glRecti(0, DarkAreaHeight + I, RequiredScreenWidth, DarkAreaHeight + I + 1);
+        glRecti(0, DarkAreaHeight + I, Glw.Width, DarkAreaHeight + I + 1);
       end;
     glDisable(GL_BLEND);
   finally glEndList end;

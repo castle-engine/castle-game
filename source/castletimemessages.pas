@@ -65,8 +65,8 @@ end;
 
 procedure TimeMessagesDraw;
 begin
-  TimeMessagesManager.Draw2d(RequiredScreenWidth, RequiredScreenHeight,
-    Glw.Width, Glw.Height);
+  TimeMessagesManager.Draw2d(Glw.Width, Glw.Height,
+                             Glw.Width, Glw.Height);
 end;
 
 procedure TimeMessagesClear;

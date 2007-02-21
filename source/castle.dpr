@@ -23,10 +23,31 @@
 program castle;
 
 uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
-  Classes, ParseParametersUnit, GLWinMessages, KambiGLUtils,
+  Classes, ParseParametersUnit, GLWinMessages, KambiGLUtils, KambiStringUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
   CastleCreatures, CastleObjectKinds, CastlePlay, CastleLog;
+
+{ requested screen size ------------------------------------------------------ }
+
+const
+  DefaultRequestedScreenWidth = 800;
+  DefaultRequestedScreenHeight = 600;
+
+var
+  RequestedScreenWidth: Integer = DefaultRequestedScreenWidth;
+  RequestedScreenHeight: Integer = DefaultRequestedScreenHeight;
+
+function RequestedScreenSize: string;
+begin
+  Result := Format('%dx%d', [RequestedScreenWidth, RequestedScreenHeight]);
+end;
+
+function DefaultRequestedScreenSize: string;
+begin
+  Result := Format('%dx%d',
+    [DefaultRequestedScreenWidth, DefaultRequestedScreenHeight]);
+end;
 
 { parsing parameters --------------------------------------------------------- }
 
@@ -35,14 +56,15 @@ var
   WasParam_NoScreenChange: boolean = false;
 
 const
-  Options: array[0..6]of TOption =
+  Options: array[0..7]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short: #0; Long: 'no-sound'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
     (Short:'n'; Long: 'no-screen-change'; Argument: oaNone),
     (Short: #0; Long: 'no-shadows'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
-    (Short: #0; Long: 'debug-log'; Argument: oaNone)
+    (Short: #0; Long: 'debug-log'; Argument: oaNone),
+    (Short: #0; Long: 'screen-size'; Argument: oaRequired)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -60,10 +82,13 @@ begin
            '  --no-sound            Turn off sound' +nl+
            '  -n / --no-screen-resize' +nl+
            '                        Do not try to resize the screen.' +nl+
-           '                        If your screen size is not ' +
-             RequiredScreenSize +nl+
+           '                        If your screen size is not the required' +nl+
+           '                        size (set by --screen-size)' +nl+
            '                        then will run in windowed mode.' +nl+
            '  --no-shadows          Disable initializing and using shadows.' +nl+
+           '  --screen-size WIDTHxHEIGHT' +nl+
+           '                        Change the screen size (default is ' +
+             DefaultRequestedScreenSize + ').' +nl+
            nl+
            Glw.ParseParametersHelp([poDisplay], true) +nl+
            nl+
@@ -81,6 +106,10 @@ begin
     4: RenderShadowsPossible := false;
     5: WasParam_DebugNoCreatures := true;
     6: InitializeLog;
+    7: begin
+         DeFormat(Argument, '%dx%d',
+           [@RequestedScreenWidth, @RequestedScreenHeight]);
+       end;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
@@ -97,27 +126,27 @@ begin
   Glw.ParseParameters([poDisplay]);
   ParseParameters(Options, @OptionProc, nil);
 
-  Glw.Width := RequiredScreenWidth;
-  Glw.Height := RequiredScreenHeight;
+  Glw.Width := RequestedScreenWidth;
+  Glw.Height := RequestedScreenHeight;
   Glw.ColorBits := ColorDepthBits;
   if WasParam_NoScreenChange or (not AllowScreenChange) then
   begin
     Glw.FullScreen :=
-      (Glwm.ScreenWidth = RequiredScreenWidth) and
-      (Glwm.ScreenHeight = RequiredScreenHeight);
+      (Glwm.ScreenWidth = RequestedScreenWidth) and
+      (Glwm.ScreenHeight = RequestedScreenHeight);
   end else
   begin
     Glw.FullScreen := true;
-    if (Glwm.ScreenWidth <> RequiredScreenWidth) or
-       (Glwm.ScreenHeight <> RequiredScreenHeight) or
+    if (Glwm.ScreenWidth <> RequestedScreenWidth) or
+       (Glwm.ScreenHeight <> RequestedScreenHeight) or
        (VideoFrequency <> 0) or
        (ColorDepthBits <> 0) then
     begin
       Glwm.VideoColorBits := ColorDepthBits;
       Glwm.VideoFrequency := VideoFrequency;
       Glwm.VideoResize := true;
-      Glwm.VideoResizeWidth := RequiredScreenWidth;
-      Glwm.VideoResizeHeight := RequiredScreenHeight;
+      Glwm.VideoResizeWidth := RequestedScreenWidth;
+      Glwm.VideoResizeHeight := RequestedScreenHeight;
 
       if not Glwm.TryVideoChange then
       begin
@@ -130,8 +159,8 @@ begin
           nl+
           'Now I will just continue with default system settings. ');
         Glw.FullScreen :=
-          (Glwm.ScreenWidth = RequiredScreenWidth) and
-          (Glwm.ScreenHeight = RequiredScreenHeight);
+          (Glwm.ScreenWidth = RequestedScreenWidth) and
+          (Glwm.ScreenHeight = RequestedScreenHeight);
         AllowScreenChange := false;
       end;
     end;

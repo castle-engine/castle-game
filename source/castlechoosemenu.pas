@@ -72,7 +72,7 @@ begin
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glProjectionPushPopOrtho2D(@Draw2d, 0,
-      0, RequiredScreenWidth, 0, RequiredScreenHeight);
+      0, Glwin.Width, 0, Glwin.Height);
   glPopAttrib;
 end;
 

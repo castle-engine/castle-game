@@ -146,7 +146,7 @@ begin
       glTranslatef(AllItemsArea.X0,
         AllItemsArea.Y0 - SubMenuTitleFont.RowHeight, 0);
       SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
-        RequiredScreenWidth - 2 * Round(AllItemsArea.X0), 0, 0, true, 0);
+        Glw.Width - 2 * Round(AllItemsArea.X0), 0, 0, true, 0);
     glPopMatrix;
   end;
 end;
@@ -449,7 +449,7 @@ begin
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glProjectionPushPopOrtho2D(@Draw2d, 0,
-      0, RequiredScreenWidth, 0, RequiredScreenHeight);
+      0, Glwin.Width, 0, Glwin.Height);
   glPopAttrib;
 end;
 
@@ -518,8 +518,8 @@ begin
 
   if ADrawCentered then
   begin
-    MoveX := - WholeAreaX0 + (RequiredScreenWidth - (WholeAreaX1 - WholeAreaX0)) / 2;
-    MoveY := - WholeAreaY0 + (RequiredScreenHeight - (WholeAreaY1 - WholeAreaY0)) / 2;
+    MoveX := - WholeAreaX0 + (Glw.Width - (WholeAreaX1 - WholeAreaX0)) / 2;
+    MoveY := - WholeAreaY0 + (Glw.Height - (WholeAreaY1 - WholeAreaY0)) / 2;
   end else
   begin
     MoveX := 0;

@@ -575,10 +575,10 @@ end;
         glCallList(GLList_BlankIndicatorImage) else
       begin
         glEnable(GL_SCISSOR_TEST);
-          glScissor(IndicatorMargin, IndicatorMargin, RequiredScreenWidth, LifeMapped);
+          glScissor(IndicatorMargin, IndicatorMargin, Glw.Width, LifeMapped);
           glCallList(GLList_FullIndicatorImage);
           glScissor(IndicatorMargin, IndicatorMargin + LifeMapped,
-            RequiredScreenWidth, RequiredScreenHeight);
+            Glw.Width, Glw.Height);
           glCallList(GLList_BlankIndicatorImage);
         glDisable(GL_SCISSOR_TEST);
       end;
@@ -606,13 +606,13 @@ begin
     RenderLifeIndicator(
       Level.BossCreature.Life,
       Level.BossCreature.MaxLife,
-      GLList_BossIndicatorImage, RequiredScreenWidth - 150, false);
+      GLList_BossIndicatorImage, Glw.Width - 150, false);
   end;
 
   if FlyingMode then
   begin
     glColorv(White3Single);
-    glRasterPos2i(0, RequiredScreenHeight -
+    glRasterPos2i(0, Glw.Height -
       Font_BFNT_BitstreamVeraSans.RowHeight - 5 { margin });
     Font_BFNT_BitstreamVeraSans.Print(Format('Flying (%d more seconds)',
       [Floor(FFlyingModeTimeout)]));
@@ -621,7 +621,7 @@ begin
   glLoadIdentity;
   if Dead then
     DrawGLBlackOutRect(Red3Single, 1.0, 0, 0,
-      RequiredScreenWidth, RequiredScreenHeight) else
+      Glw.Width, Glw.Height) else
   begin
     { The problem with drawing such water screen:
       Player eyes may be equal to water level,
@@ -650,7 +650,7 @@ begin
     { Apply black out effect on the possibly watery effect.
       Yes, they both must mix. }
     DrawGLBlackOutRect(BlackOutColor, BlackOutIntensity, 0, 0,
-      RequiredScreenWidth, RequiredScreenHeight);
+      Glw.Width, Glw.Height);
   end;
 end;
 
