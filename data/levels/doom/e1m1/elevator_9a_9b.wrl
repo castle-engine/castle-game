@@ -1,0 +1,110 @@
+#VRML V1.0 ascii
+
+# Blender V2.0
+
+# 'Switch' is used as a hack, to ensure it is not part of the drawing
+
+Separator {
+Switch {
+	DEF Elev9a9b
+	Separator {
+		Texture2 {
+			filename //../../../textures/doom/floor4_8.png
+			wrapS REPEAT 
+			wrapT REPEAT 
+		}
+		Coordinate3 {
+			point [
+				 -2000.000000 40.000000 -384.000000,
+				 -2016.000000 40.000000 -384.000000,
+				 -2016.000000 40.000000 -448.000000,
+				 -2000.000000 40.000000 -448.000000,
+				 -2064.000000 40.000000 -448.000000,
+				 -2064.000000 40.000000 -384.000000,
+			]
+		}
+		TextureCoordinate2 {
+			point [
+				 1.000000 1.000000,
+				 1.000000 0.000000,
+				 0.750000 0.000000,
+				 0.750000 1.000000,
+				 0.000000 0.000000,
+				 0.000000 1.000000,
+				 0.750000 1.000000,
+				 0.750000 0.000000,
+			]
+		}
+		IndexedFaceSet {
+			coordIndex [
+				 0, 3, 2, 1, -1,
+				 4, 5, 1, 2, -1,
+			]
+			textureCoordIndex [
+				 0, 1, 2, 3, -1,
+				 4, 5, 6, 7, -1,
+			]
+		}
+	}
+	DEF Elev9a9b_001
+	Separator {
+		Texture2 {
+			filename //../../../textures/doom/browngrn.png
+			wrapS REPEAT 
+			wrapT REPEAT 
+		}
+		Coordinate3 {
+			point [
+				 -2000.000000 -112.000000 -384.000000,
+				 -2000.000000 -112.000000 -448.000000,
+				 -2000.000000 40.000000 -448.000000,
+				 -2000.000000 40.000000 -384.000000,
+			]
+		}
+		TextureCoordinate2 {
+			point [
+				 1.000000 1.000000,
+				 1.000000 -0.190329,
+				 0.000000 -0.190329,
+				 -0.000000 1.000000,
+			]
+		}
+		IndexedFaceSet {
+			coordIndex [
+				 3, 0, 1, 2, -1,
+			]
+			textureCoordIndex [
+				 0, 1, 2, 3, -1,
+			]
+		}
+	}
+
+	# Hidden Objects, in invisible layers
+
+}
+
+# Visible Objects
+
+Separator {
+	Separator {
+		MatrixTransform {
+		matrix 
+			1.000000 0.000000 0.000000 0.000000
+			0.000000 1.000000 0.000000 0.000000
+			0.000000 0.000000 1.000000 0.000000
+			-1520.000000 64.000000 -3456.000000 1.000000
+		}
+		USE Elev9a9b_001
+	}
+	Separator {
+		MatrixTransform {
+		matrix 
+			1.000000 0.000000 0.000000 0.000000
+			0.000000 1.000000 0.000000 0.000000
+			0.000000 0.000000 1.000000 0.000000
+			-1520.000000 64.000000 -3456.000000 1.000000
+		}
+		USE Elev9a9b
+	}
+}
+}

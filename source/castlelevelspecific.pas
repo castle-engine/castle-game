@@ -172,8 +172,11 @@ type
 
     MovingElevator49: TLevelLinearMovingObject;
     Elevator49: TLevelStaticObject;
-
     Elevator49DownBox: TBox3d;
+
+    MovingElevator9a9b: TLevelLinearMovingObject;
+    Elevator9a9b: TLevelStaticObject;
+    Elevator9a9bPickBox: TBox3d;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -947,8 +950,7 @@ begin
     Self, DoomDoorsPathPrefix + 'elevator4_9_final.wrl', false);
 
   MovingElevator49 := TLevelLinearMovingObject.Create(Self);
-  MovingElevator49.MovingObject := TLevelObjectSum.Create(Self);
-  TLevelObjectSum(MovingElevator49.MovingObject).List.Add(Elevator49);
+  MovingElevator49.MovingObject := Elevator49;
   MovingElevator49.MoveTime := 3.0;
   MovingElevator49.TranslationEnd.Init(0, 0, -6.7);
   MovingElevator49.SoundGoEndPosition := stElevator;
@@ -957,6 +959,20 @@ begin
   MovingElevator49.SoundGoBeginPositionLooping := true;
   MovingElevator49.SoundTracksCurrentPosition := true;
   Objects.Add(MovingElevator49);
+
+  Elevator9a9b := TLevelStaticObject.Create(
+    Self, DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl', false);
+
+  MovingElevator9a9b := TLevelLinearMovingObject.Create(Self);
+  MovingElevator9a9b.MovingObject := Elevator9a9b;
+  MovingElevator9a9b.MoveTime := 3.0;
+  MovingElevator9a9b.TranslationEnd.Init(0, 0, -7.5);
+  MovingElevator9a9b.SoundGoEndPosition := stElevator;
+  MovingElevator9a9b.SoundGoEndPositionLooping := true;
+  MovingElevator9a9b.SoundGoBeginPosition := stElevator;
+  MovingElevator9a9b.SoundGoBeginPositionLooping := true;
+  MovingElevator9a9b.SoundTracksCurrentPosition := true;
+  Objects.Add(MovingElevator9a9b);
 end;
 
 destructor TDoomE1M1Level.Destroy;
@@ -984,6 +1000,16 @@ begin
     if not Door.CompletelyBeginPosition then
       TimeMessageInteractFailed('You see a door. It''s already open') else
       Door.GoEndPosition;
+  end else
+  if CollisionInfo.Hierarchy.IsLast(Elevator9a9b) and
+     MovingElevator9a9b.CompletelyBeginPosition and
+     Box3dPointInside(Player.Navigator.CameraPos, Elevator9a9bPickBox) then
+  begin
+    InteractionOccured := true;
+    if Distance > 10 then
+      TimeMessageInteractFailed(
+        'You''re too far to reach it from here') else
+      MovingElevator9a9b.GoEndPosition;
   end;
 end;
 
@@ -1008,6 +1034,7 @@ begin
 
   Scene.RootNode.EnumerateNodes(@RenameCreatures, true);
   RemoveBoxNodeCheck(Elevator49DownBox, 'Elevator49DownBox');
+  RemoveBoxNodeCheck(Elevator9a9bPickBox, 'Elev9a9bPickBox');
 end;
 
 procedure TDoomE1M1Level.PrepareNewPlayer(NewPlayer: TPlayer);
@@ -1027,6 +1054,13 @@ begin
   begin
     MovingElevator49.GoEndPosition;
   end;
+
+  if MovingElevator9a9b.CompletelyEndPosition and
+     (AnimationTime - MovingElevator9a9b.EndPositionStateChangeTime >
+       MovingElevator9a9b.MoveTime +
+       { This is the time for staying in lowered position. }
+       2.0) then
+    MovingElevator9a9b.GoBeginPosition;
 end;
 
 end.

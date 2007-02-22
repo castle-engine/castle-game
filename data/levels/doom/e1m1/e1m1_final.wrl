@@ -7,6 +7,11 @@ Group {
 #     WWWInline { name "elevator4_9_final.wrl" }
 #   }
 
+#   Separator {
+#     Translation { translation 0 0 -7.5 }
+#     WWWInline { name "elevator_9a_9b_final.wrl" }
+#   }
+
   NavigationInfo {
     avatarSize [ 0.5, 2 ]
     speed 1.0

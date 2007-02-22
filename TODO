@@ -10,11 +10,10 @@
 
 - doom: in each room, check:
 
-  interactive doors/elevators (left: from 4 to 9, in 9)
   lava (left: rooms 4, 8)
   interactive barrels (left: rooms 4, 5, 8, 9)
   items to pick up (left: rooms 4, 5, 8, 9)
-  creatures (left: room 9)
+  creatures (left: room 9: imp and sergeant at the secret items in 9a)
 
   finish things on castle-doom page.
 
@@ -23,9 +22,10 @@
   - room 6: creatures should see through texture with alpha channel
   - creatures should see through fake "barrier" texture (in some
     special cases if creatures will be able to do something)
-  - implement all doom e1m1 secrets. The secret that allow the speedwalk:
+  - The secret that allow the speedwalk:
     what was it? Check WWW for list of known E1M1 secrets.
-  - room 4 is a little too dark, especially areas around the entrances to room 8 and 9
+  - if you know how, you can cause bad collisions and get out of the level
+    on elevator 9a-9b
 
 - test kolizji ze strzalami jest chyba za latwy: kiedy potwor stoi obok
   sciany, jest latwo strzelic w sciane zamiast potwora.
