@@ -8,19 +8,13 @@
 - on castle_hall level, stand very close the box that has the button on it.
   Press "crouch". You start slowly getting falling down effect.
 
-- doom: in each room, check:
-
-  lava (left: rooms 4, 8)
-  interactive barrels (left: rooms 4, 5, 8, 9)
-  items to pick up (left: rooms 4, 5, 8)
-
-  finish things on castle-doom page.
-
-  use data/levels/doom/logo/doom_title.png, since I did it..
-
-  - room 6: creatures should see through texture with alpha channel
-  - creatures should see through fake "barrier" texture (in some
-    special cases if creatures will be able to do something)
+- doom:
+  - make lava work (rooms 4, 8)
+  - make small and blue armor for doom level (items' stubs are already placed
+    in blend file, on layer 9/10)
+  - make barrels visible and explosive
+  - use data/levels/doom/logo/doom_title.png, since I did it..
+  - room 5: creatures should see through texture with alpha channel
   - The secret that allow the speedwalk:
     what was it? Check WWW for list of known E1M1 secrets.
   - if you know how, you can cause bad collisions and get out of the level
