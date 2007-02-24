@@ -47,10 +47,6 @@
   - level objects hierarchy could be defined in such file
   - the base level scene can be TLevelStaticObject too !
 
-- keybinding to use "potion of life" if owned (analogy of "m" for "medkit"
-  in tremulous),
-  handy to avoid these potion searching by the "[", "]" keys.
-
 - knockback for player sword (or for some other short-range weapon ?)
 
 - The reson why FreeRootNodes = false for now:

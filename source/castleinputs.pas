@@ -116,6 +116,7 @@ var
   CastleInput_InventoryPrevious: TInputConfiguration;
   CastleInput_InventoryNext: TInputConfiguration;
   CastleInput_UseItem: TInputConfiguration;
+  CastleInput_UseLifePotion: TInputConfiguration;
   CastleInput_DropItem: TInputConfiguration;
 
   { Other shortcuts. }
@@ -347,6 +348,8 @@ begin
     TInputShortcut.Create(K_RightBracket, K_None, false, mbLeft));
   CastleInput_UseItem := TInputConfiguration.Create('Use (or equip) selected inventory item', 'item_use', kgItems,
     TInputShortcut.Create(K_Enter, K_None, false, mbLeft));
+  CastleInput_UseLifePotion := TInputConfiguration.Create('Use life potion', 'life_potion_use', kgItems,
+    TInputShortcut.Create(K_L, K_None, false, mbLeft));
   CastleInput_DropItem := TInputConfiguration.Create('Drop selected inventory item', 'item_drop', kgItems,
     TInputShortcut.Create(K_R, K_None, false, mbLeft));
 

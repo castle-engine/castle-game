@@ -973,6 +973,42 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
       TimeMessage('Nothing to use - select some item first');
   end;
 
+  procedure UseLifePotion;
+  var
+    UsedItem: TItem;
+    UsedItemIndex: Integer;
+  begin
+    if GameWin then
+    begin
+      TimeMessage(SGameWinMessage);
+      Exit;
+    end;
+
+    if Player.Dead then
+    begin
+      TimeMessage(SDeadMessage);
+      Exit;
+    end;
+
+    UsedItemIndex := Player.Items.FindKind(LifePotion);
+    if UsedItemIndex <> -1 then
+    begin
+      UsedItem := Player.Items[UsedItemIndex];
+      UsedItem.Kind.Use(UsedItem);
+      if UsedItem.Quantity = 0 then
+      begin
+        { I seek for UsedItemIndex once again, because using item
+          could change item indexes. }
+        UsedItemIndex := Player.Items.IndexOf(UsedItem);
+        if UsedItemIndex <> -1 then
+          Player.DeleteItem(UsedItemIndex).Free;
+      end;
+
+      UpdateInventoryCurrentItemAfterDelete;
+    end else
+      TimeMessage('You don''t have any life potion');
+  end;
+
   procedure CancelFlying;
   begin
     if GameWin then
@@ -1024,6 +1060,8 @@ begin
     DropItem else
   if CastleInput_UseItem.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     UseItem else
+  if CastleInput_UseLifePotion.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+    UseLifePotion else
 
   { Other keys. }
   if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
