@@ -15,8 +15,6 @@
   - make barrels visible and explosive
   - use data/levels/doom/logo/doom_title.png, since I did it..
   - room 5: creatures should see through texture with alpha channel
-  - The secret that allow the speedwalk:
-    what was it? Check WWW for list of known E1M1 secrets.
   - if you know how, you can cause bad collisions and get out of the level
     on elevator 9a-9b
 
