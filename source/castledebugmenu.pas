@@ -69,6 +69,7 @@ type
 
   TDebugCreaturesMenu = class(TCastleMenu)
     RenderShadowQuadsArgument: TGLMenuBooleanArgument;
+    DebugTimeStopForCreaturesArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
   end;
@@ -153,6 +154,7 @@ begin
   Items.Add('Reload sounds/index.xml');
   Items.Add('Edit lights');
   Items.Add('Force thunder now');
+  Items.Add('Restart current level (preserving camera)');
   Items.Add('Back to game');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -196,6 +198,24 @@ procedure TDebugMenu.CurrentItemSelected;
       MessageOK(Glw, 'Thunder effect not defined for this level.', taLeft);
   end;
 
+  procedure RestartLevel;
+  var
+    Pos, Dir, Up: TVector3Single;
+  begin
+    Pos := Player.Navigator.CameraPos;
+    Dir := Player.Navigator.CameraDir;
+    Up := Player.Navigator.CameraUp;
+
+    LevelFinished(LevelsAvailable.FindName(Level.Name).CreateLevel);
+    LevelFinishedFlush;
+
+    Player.Navigator.CameraPos := Pos;
+    Player.Navigator.CameraDir := Dir;
+    Player.Navigator.CameraUp := Up;
+
+    UserQuit := true;
+  end;
+
 begin
   inherited;
 
@@ -220,7 +240,8 @@ begin
          CurrentMenu := EditLevelLightsMenu;
        end;
     8: ForceThunder;
-    9: UserQuit := true;
+    9: RestartLevel;
+    10:UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -312,12 +333,15 @@ begin
   inherited Create;
 
   RenderShadowQuadsArgument := TGLMenuBooleanArgument.Create(RenderShadowQuads);
+  DebugTimeStopForCreaturesArgument := TGLMenuBooleanArgument.Create(
+    DebugTimeStopForCreatures);
 
   Items.Add('Creatures on level: show info, kill');
   Items.Add('Add creature to level');
   Items.Add('Reload creatures/kinds.xml file');
   Items.Add('Reload animations of specific creature');
   Items.AddObject('Render shadow quads', RenderShadowQuadsArgument);
+  Items.AddObject('Time stop for creatures', DebugTimeStopForCreaturesArgument);
   Items.Add('Back');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -413,7 +437,11 @@ begin
          RenderShadowQuads := not RenderShadowQuads;
          RenderShadowQuadsArgument.Value := RenderShadowQuads;
        end;
-    5: CurrentMenu := DebugMenu;
+    5: begin
+         DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
+         DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
+       end;
+    6: CurrentMenu := DebugMenu;
   end;
 end;
 

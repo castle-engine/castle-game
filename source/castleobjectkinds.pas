@@ -55,7 +55,10 @@ type
 
       So this may be helpful to use in PrepareRender implementations.
 
-      It uses FirstRootNodesPool. It calls Progress.Step 2 times. }
+      It uses FirstRootNodesPool. It calls Progress.Step 2 times.
+
+      @param(AnimationName is here only for debug purposes (it may be used
+      by some debug messages etc.)) }
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
@@ -68,6 +71,8 @@ type
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool }
     procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
 
+    { @param(AnimationName determines the XML element name, so it must
+      be a valid part of XML name) }
     function AnimationFromConfig(KindsConfig: TKamXMLConfig;
       const AnimationName: string): TVRMLGLAnimationInfo; virtual;
   public

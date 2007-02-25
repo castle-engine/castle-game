@@ -589,6 +589,36 @@ type
       read FHitsCreatures write FHitsCreatures default DefaultHitsCreatures;
   end;
 
+  { This is a really dumb creature that just stays still during the whole
+    game. Basically this is just TVRMLGLAnimation that is displayed as
+    a creature. }
+  TStillCreatureKind = class(TCreatureKind)
+  private
+    FAnimation: TVRMLGLAnimation;
+    FAnimationInfo: TVRMLGLAnimationInfo;
+  protected
+    procedure FreePrepareRender; override;
+  public
+    constructor Create(const AVRMLNodeName: string);
+    destructor Destroy; override;
+
+    procedure PrepareRender; override;
+    function PrepareRenderSteps: Cardinal; override;
+    procedure CloseGL; override;
+
+    { Missile uses the same animation all the time.
+      In the simplest case, you can just place here a single scene. }
+    property Animation: TVRMLGLAnimation read FAnimation;
+
+    function CreateDefaultCreature(
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AnimationTime: Single;
+      const MaxLife: Single): TCreature; override;
+
+    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
+  end;
+
   TCreature = class
   private
     FKind: TCreatureKind;
@@ -1030,6 +1060,16 @@ type
     function RemoveMeFromLevel: boolean; override;
   end;
 
+  TStillCreature = class(TCreature)
+  public
+    { Shortcut for TStillCreatureKind(Kind). }
+    function StillKind: TStillCreatureKind;
+
+    function CurrentScene: TVRMLFlatSceneGL; override;
+
+    function RemoveMeFromLevel: boolean; override;
+  end;
+
 var
   CreaturesKinds: TCreaturesKindsList;
 
@@ -1041,6 +1081,7 @@ var
   SpiderQueen: TSpiderQueenKind;
   ThrownWeb: TMissileCreatureKind;
   Arrow: TMissileCreatureKind;
+  Barrel: TStillCreatureKind;
 
   WasParam_DebugNoCreatures: boolean = false;
 
@@ -1548,6 +1589,63 @@ begin
     KindsConfig.GetValue(VRMLNodeName + '/sound_idle', ''));
 
   FAnimationInfo := AnimationFromConfig(KindsConfig, 'fly');
+end;
+
+{ TStillCreatureKind ---------------------------------------------------- }
+
+constructor TStillCreatureKind.Create(const AVRMLNodeName: string);
+begin
+  inherited Create(AVRMLNodeName);
+end;
+
+destructor TStillCreatureKind.Destroy;
+begin
+  FreeAndNil(FAnimation);
+  FreeAndNil(FAnimationInfo);
+  inherited;
+end;
+
+procedure TStillCreatureKind.FreePrepareRender;
+begin
+  FreeAndNil(FAnimation);
+  inherited;
+end;
+
+procedure TStillCreatureKind.PrepareRender;
+begin
+  inherited;
+  CreateAnimationIfNeeded('Stand', FAnimation, FAnimationInfo);
+
+  CameraRadiusFromPrepareRender :=
+    Box3dXYRadius(Animation.Scenes[0].BoundingBox);
+end;
+
+function TStillCreatureKind.PrepareRenderSteps: Cardinal;
+begin
+  Result := (inherited PrepareRenderSteps) + 2;
+end;
+
+procedure TStillCreatureKind.CloseGL;
+begin
+  inherited;
+  if Animation <> nil then Animation.CloseGL;
+end;
+
+function TStillCreatureKind.CreateDefaultCreature(
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AnimationTime: Single;
+  const MaxLife: Single): TCreature;
+begin
+  Result := TStillCreature.Create(Self, ALegsPosition, ADirection,
+    MaxLife, AnimationTime);
+end;
+
+procedure TStillCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+begin
+  inherited;
+
+  FAnimationInfo := AnimationFromConfig(KindsConfig, 'stand');
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }
@@ -3207,6 +3305,24 @@ begin
   Result := false;
 end;
 
+{ TStillCreature ----------------------------------------------------------- }
+
+function TStillCreature.StillKind: TStillCreatureKind;
+begin
+  Result := TStillCreatureKind(Kind);
+end;
+
+function TStillCreature.CurrentScene: TVRMLFlatSceneGL;
+begin
+  Result := StillKind.Animation.SceneFromTime(Level.AnimationTime);
+end;
+
+function TStillCreature.RemoveMeFromLevel: boolean;
+begin
+  { TODO: do explosion anim. }
+  Result := Life <= 0.0;
+end;
+
 { initialization / finalization ---------------------------------------------- }
 
 procedure GLWindowClose(Glwin: TGLWindow);
@@ -3242,6 +3358,7 @@ begin
   SpiderQueen := TSpiderQueenKind.Create('SpiderQueen');
   ThrownWeb := TMissileCreatureKind.Create('ThrownWeb');
   Arrow := TMissileCreatureKind.Create('Arrow');
+  Barrel := TStillCreatureKind.Create('DoomBarrel');
 
   CreaturesKinds.LoadFromFile;
 end;

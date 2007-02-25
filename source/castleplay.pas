@@ -64,6 +64,12 @@ var
   with different NextLevel. }
 procedure LevelFinished(NextLevel: TLevel);
 
+{ If some LevelFinished call is scheduled, this will force changing
+  level @italic(now). Don't use this, unless you know that you can
+  safely change the level now (which means that old level will be
+  destroyed, along with all it's items, creatures etc. references). }
+procedure LevelFinishedFlush;
+
 { Saves a screen, causing also appropriate TimeMessage. }
 procedure SaveScreen;
 
@@ -102,6 +108,7 @@ var
 
 var
   DebugRenderForLevelScreenshot: boolean = false;
+  DebugTimeStopForCreatures: boolean = false;
 
 implementation
 
@@ -599,7 +606,7 @@ begin
   Level.Idle(CompSpeed);
   Level.Items.Idle(CompSpeed);
 
-  if not GameWin then
+  if (not GameWin) and (not DebugTimeStopForCreatures) then
     Level.Creatures.Idle(CompSpeed);
   Level.Creatures.RemoveFromLevel;
 
@@ -623,19 +630,24 @@ begin
 
   Player.Idle(CompSpeed);
 
-  if LevelFinishedSchedule then
-  begin
-    LevelFinishedSchedule := false;
-    FreeAndNil(Level);
-    Level := LevelFinishedNextLevel;
-    InitNewLevel;
-  end;
+  LevelFinishedFlush;
 
   if GameWin and (Level is TCagesLevel) then
   begin
     if TCagesLevel(Level).DoEndSequence then
       ModifyPlayerEndSequence(GameWinPosition2, GameWinDirection, GameWinUp) else
       ModifyPlayerEndSequence(GameWinPosition1, GameWinDirection, GameWinUp);
+  end;
+end;
+
+procedure LevelFinishedFlush;
+begin
+  if LevelFinishedSchedule then
+  begin
+    LevelFinishedSchedule := false;
+    FreeAndNil(Level);
+    Level := LevelFinishedNextLevel;
+    InitNewLevel;
   end;
 end;
 

@@ -429,4 +429,15 @@
       </animation>
     </fly_animation>
   </Arrow>
+
+  <DoomBarrel
+    camera_radius="1.0"
+    default_max_life="1.0"
+  >
+    <stand_animation>
+      <animation scenes_per_time="1" loop="false" backwards="false">
+        <frame file_name="barrel/barrel.wrl" time="0.00" />
+      </animation>
+    </stand_animation>
+  </DoomBarrel>
 </CONFIG>

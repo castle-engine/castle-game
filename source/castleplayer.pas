@@ -203,8 +203,8 @@ type
           should stay constant).)
         @item(Navigator.ProjectionMatrix, to update it in game's
           OnResize or such.)
-        @item(You can call Navigator.KeyDown and Idle.
-          It's OK to just assign Navigator to Glw.Navigator.)
+        @item(You can call Navigator.KeyDown, MouseDown, Idle.
+          In fact it's OK to just assign Navigator to Glw.Navigator.)
         @item(You can assign things to Navigator.OnMatrixChanged.)
       )
 
