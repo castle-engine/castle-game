@@ -715,14 +715,14 @@ type
     { Checks AssumeMiddlePosition height above the level and other creatures.
 
       I don't check height above the player, this is not needed
-      (GetCameraHeight is needed only for "growing up" and "falling down";
+      (GetCameraHeightZ is needed only for "growing up" and "falling down";
       in case of "growing up", creature doesn't have to "grow up"
       when standing on player's head. In case of "falling down" ---
       we don't have to take this into account. Things will work correctly
       anyway.) }
-    procedure GetCameraHeight(
+    procedure GetCameraHeightZ(
       const AssumeMiddlePosition: TVector3Single;
-      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
+      out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
 
     procedure ShortRangeAttackHurt;
   public
@@ -772,7 +772,7 @@ type
       How precisely this is calculated for given creature depends
       on MiddlePositionFromLegs implementation in this class.
 
-      All collision detection (MoveAllowed, GetCameraHeight)
+      All collision detection (MoveAllowed, GetCameraHeightZ)
       should be done using MiddlePosition, and then appropriately translated
       back to LegsPosition. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
@@ -825,7 +825,7 @@ type
       read FLastAttackDirection write SetLastAttackDirection;
 
     { If @false, then TCreaturesList.MoveAllowedSimple and
-      TCreaturesList.GetCameraHeight will ignore this
+      TCreaturesList.GetCameraHeightZ will ignore this
       creature, which means that collisions between this creature
       and player/other creatures will not be checked.
       You should set this to @false only in exceptional situations,
@@ -890,8 +890,8 @@ type
       You can pass IgnoreCreature <> nil if you want to ignore
       collisions with given creature (this will obviously be useful
       when checking for collisions for this creature). }
-    procedure GetCameraHeight(const Position: TVector3Single;
-      var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single;
+    procedure GetCameraHeightZ(const Position: TVector3Single;
+      var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
       IgnoreCreature: TCreature);
 
     { Searches for item of given Kind. Returns index of first found,
@@ -1914,17 +1914,17 @@ begin
       OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
-procedure TCreature.GetCameraHeight(
+procedure TCreature.GetCameraHeightZ(
   const AssumeMiddlePosition: TVector3Single;
-  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
+  out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
 begin
   { Check creature<->level collision. }
-  Level.GetCameraHeight(AssumeMiddlePosition,
-    IsAboveTheGround, SqrHeightAboveTheGround);
+  Level.GetCameraHeightZ(AssumeMiddlePosition,
+    IsAboveTheGround, HeightAboveTheGround);
 
   { Check creature<->other creatures collision. }
-  Level.Creatures.GetCameraHeight(AssumeMiddlePosition,
-    IsAboveTheGround, SqrHeightAboveTheGround, Self);
+  Level.Creatures.GetCameraHeightZ(AssumeMiddlePosition,
+    IsAboveTheGround, HeightAboveTheGround, Self);
 end;
 
 procedure TCreature.Idle(const CompSpeed: Single);
@@ -1992,7 +1992,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     HeightMargin = 1.01;
   var
     IsAboveTheGround: boolean;
-    SqrHeightAboveTheGround, HeightAboveTheGround: Single;
+    HeightAboveTheGround: Single;
     OldIsFallingDown: boolean;
     FallingDownDistance: Single;
   begin
@@ -2006,11 +2006,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     OldIsFallingDown := FIsFallingDown;
     OldMiddlePosition := MiddlePosition;
 
-    GetCameraHeight(OldMiddlePosition, IsAboveTheGround,
-      SqrHeightAboveTheGround);
-    if IsAboveTheGround then
-      { We will need it anyway. OK, I'll pay this Sqrt. }
-      HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
+    GetCameraHeightZ(OldMiddlePosition, IsAboveTheGround, HeightAboveTheGround);
 
     if (not IsAboveTheGround) or
       (HeightAboveTheGround > HeightBetweenLegsAndMiddle * HeightMargin) then
@@ -2192,15 +2188,15 @@ begin
   Result := nil;
 end;
 
-procedure TCreaturesList.GetCameraHeight(
+procedure TCreaturesList.GetCameraHeightZ(
   const Position: TVector3Single;
-  var IsAboveTheGround: boolean; var SqrHeightAboveTheGround: Single;
+  var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
   IgnoreCreature: TCreature);
 
   { If the Point is inside the Box then it answers IsAboveTheBox := false. }
   procedure GetPointHeightAboveBox3d(const Point: TVector3Single;
     const Box: TBox3d;
-    out IsAboveTheBox: boolean; out SqrHeightAboveTheBox: Single);
+    out IsAboveTheBox: boolean; out HeightAboveTheBox: Single);
   begin
     { We use here the assumption that HomeCameraUp is (0, 0, 1). }
 
@@ -2210,31 +2206,31 @@ procedure TCreaturesList.GetCameraHeight(
       (Point[2] >= Box[1, 2]);
 
     if IsAboveTheBox then
-      SqrHeightAboveTheBox := Sqr(Point[2] - Box[1, 2]);
+      HeightAboveTheBox := Point[2] - Box[1, 2];
   end;
 
 var
   I: Integer;
   IsAboveTheBox: boolean;
-  SqrHeightAboveTheBox: Single;
+  HeightAboveTheBox: Single;
 begin
   for I := 0 to High do
     if (Items[I] <> IgnoreCreature) and
        (Items[I].CollisionsWithCreaturesAndPlayer) then
     begin
       GetPointHeightAboveBox3d(Position, Items[I].BoundingBox,
-        IsAboveTheBox, SqrHeightAboveTheBox);
+        IsAboveTheBox, HeightAboveTheBox);
 
       if IsAboveTheBox then
       begin
         if not IsAboveTheGround then
         begin
           IsAboveTheGround := true;
-          SqrHeightAboveTheGround := SqrHeightAboveTheBox;
+          HeightAboveTheGround := HeightAboveTheBox;
         end else
-        if SqrHeightAboveTheBox < SqrHeightAboveTheGround then
+        if HeightAboveTheBox < HeightAboveTheGround then
         begin
-          SqrHeightAboveTheGround := SqrHeightAboveTheBox;
+          HeightAboveTheGround := HeightAboveTheBox;
         end;
       end;
     end;
@@ -2534,16 +2530,16 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         boolean;
       var
         IsAboveTheGround: boolean;
-        SqrHeightAboveTheGround: Single;
+        HeightAboveTheGround: Single;
       begin
         Result := false;
         if not Kind.Flying then
         begin
-          GetCameraHeight(NewMiddlePosition, IsAboveTheGround,
-            SqrHeightAboveTheGround);
+          GetCameraHeightZ(NewMiddlePosition, IsAboveTheGround,
+            HeightAboveTheGround);
           if (not IsAboveTheGround) or
-            (SqrHeightAboveTheGround > Sqr(WAKind.MaxHeightAcceptableToFall +
-              HeightBetweenLegsAndMiddle)) then
+            (HeightAboveTheGround > WAKind.MaxHeightAcceptableToFall +
+              HeightBetweenLegsAndMiddle) then
             Result := true;
         end;
       end;

@@ -681,7 +681,7 @@ const
   CreaturesCountToAddSpiders = 20;
 var
   IsAboveTheGround: boolean;
-  SqrHeightAboveTheGround: Single;
+  HeightAboveTheGround: Single;
   I: Integer;
   SpiderCreature: TCreature;
   SpiderPosition, SpiderDirection: TVector3Single;
@@ -723,13 +723,13 @@ begin
     I := 0;
     { 2 lines below only to get rid of compiler warnings }
     IsAboveTheGround := false;
-    SqrHeightAboveTheGround := 0;
+    HeightAboveTheGround := 0;
     while I < FSpidersAppearing.Count do
     begin
-      GetCameraHeight(FSpidersAppearing.Items[I], IsAboveTheGround,
-        SqrHeightAboveTheGround);
+      GetCameraHeightZ(FSpidersAppearing.Items[I], IsAboveTheGround,
+        HeightAboveTheGround);
       if IsAboveTheGround and
-        (SqrHeightAboveTheGround < Sqr(Spider.CameraRadius * 2)) then
+        (HeightAboveTheGround < Spider.CameraRadius * 2) then
       begin
         SpiderPosition := FSpidersAppearing.Items[I];
         SpiderDirection :=
@@ -750,7 +750,7 @@ begin
           here. }
         if IsAboveTheGround then
           MinTo1st(SpiderMoveDistance,
-            Sqrt(SqrHeightAboveTheGround) - Spider.CameraRadius);
+            HeightAboveTheGround - Spider.CameraRadius);
 
         FSpidersAppearing.Items[I][2] -= SpiderMoveDistance;
         Inc(I);

@@ -878,7 +878,7 @@ const
   FallingDownSpeed = 0.2;
 var
   IsAboveTheGround: boolean;
-  SqrHeightAboveTheGround, HeightAboveTheGround: Single;
+  HeightAboveTheGround: Single;
   ShiftedPosition: TVector3Single;
   ProposedNewShiftedPosition, NewShiftedPosition: TVector3Single;
   FallingDownLength: Single;
@@ -897,20 +897,17 @@ begin
     For the same reason, I use sphere around ShiftedPosition
     when doing Level.MoveAllowed below. }
 
-  Level.GetCameraHeight(ShiftedPosition, IsAboveTheGround,
-    SqrHeightAboveTheGround);
+  Level.GetCameraHeightZ(ShiftedPosition, IsAboveTheGround,
+    HeightAboveTheGround);
   if (not IsAboveTheGround) or
-     (SqrHeightAboveTheGround > Sqr(PositionRadius)) then
+     (HeightAboveTheGround > PositionRadius) then
   begin
     { Item falls down because of gravity. }
 
     FallingDownLength := CompSpeed * FallingDownSpeed;
 
     if IsAboveTheGround then
-    begin
-      HeightAboveTheGround := Sqrt(SqrHeightAboveTheGround);
       MinTo1st(FallingDownLength, HeightAboveTheGround - PositionRadius);
-    end;
 
     ProposedNewShiftedPosition := ShiftedPosition;
     ProposedNewShiftedPosition[2] -= FallingDownLength;
