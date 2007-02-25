@@ -17,6 +17,8 @@
   - room 5: creatures should see through texture with alpha channel
   - if you know how, you can cause bad collisions and get out of the level
     on elevator 9a-9b
+  - still too dark. Secret on 9a-9b should be activated differently ?
+    Or wall should be specially visible ?
 
 - test kolizji ze strzalami jest chyba za latwy: kiedy potwor stoi obok
   sciany, jest latwo strzelic w sciane zamiast potwora.
