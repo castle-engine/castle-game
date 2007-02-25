@@ -4,3 +4,58 @@ Documentation in HTML format is available in documentation/ subdirectory,
 start reading from documentation/castle.html.
 
 WWW page: [http://www.camelot.homedns.org/~michalis/castle.php]
+
+----------------------------------------
+Some design docs (interesting only for programmers):
+
+Collisions:
+
+- Everywhere in the game GetCameraHeight returns normal HeightAboveTheGround.
+  Usually in my general units (kambi_vrml_game_engine units) I don't make
+  any assumptions about HomeCameraUp, it can be any vector --- which means
+  that SqrHeightAboveTheGround is easier to calculate,
+  and calculating actual HeightAboveTheGround costs us Sqrt call.
+  But in this game, we know that HomeCameraUp is always (0, 0, 1),
+  and this means that actual HeightAboveTheGround can be calculated
+  easily (by TVRMLTriangleOctree.GetCameraHeightZ), without the cost
+  of Sqrt.
+
+- Creatures collisions are done somtimes by a Sphere and sometimes by
+  the bounding Box.
+
+  Sphere doesn't change. I.e. throughout entire creature life, it's
+  bounding sphere has the same radius.
+
+  Box does change. It always corresponds to the bounding box of the actual
+  animation frame, so it closely represents current creature state.
+  E.g. dead humanoid creature will have low and wide box, while alive
+  will have tall and thin box.
+
+  This means that sometimes Box is better, sometimes the Sphere.
+
+  E.g. you cannot guarantee that creature Box will never collide
+  with the level/player/other creatures etc. --- because each
+  animation frame change changes also the Box, so the creature's Box
+  may suddenly enter collision with something just because the time
+  changed and next animation frame has larger BoundingBox.
+  I cannot just stop animation in the middle (preventing such collision),
+  because I don't know what to do with such animation then...
+  So I just allow such collisions. Code that uses creature collision
+  by bounding box has to be prepared for this possibility.
+
+  On the other hand, I can guarantee that creature's Sphere never
+  enters colliding state. That's easy, since creature's Sphere moves
+  only when creature Position changes. So I can prevent creature move
+  before it enters colliding state.
+
+  Also, for non-flying creatures, the Sphere is placed above the ground,
+  and this allows creature to climb the stairs --- just like the player.
+  Creature just walks into the stairs, and then "growing up" mechanism
+  (using GetCameraHeight) pushes them up. This creates a short time
+  when creature's lower parts collide with the stairs, but this is
+  almost unnoticeable for the player, since "growing up" works fast.
+
+  A minor Sphere advantage right now is also that
+  - We already have TVRMLTriangleOctree.SphereCollision implemented,
+    while TVRMLTriangleOctree.BoxCollision is still not implemented
+    (but inevitably will be done one day...).
