@@ -431,7 +431,7 @@
   </Arrow>
 
   <DoomBarrel
-    camera_radius="1.0"
+    camera_radius="0.5"
     default_max_life="1.0"
   >
     <stand_animation>

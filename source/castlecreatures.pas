@@ -112,7 +112,7 @@ type
       You should make sure that it's something <> 0 for collision detection.
 
       This is always calculated like:
-      Of CameraRadiusFromFile <> 0, then take it.
+      If CameraRadiusFromFile <> 0, then take it.
       Otherwise take CameraRadiusFromPrepareRender.
       So there are 2 ways to initialize this:
       1. Set this in creatures/kinds.xml file.

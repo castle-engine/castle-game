@@ -336,7 +336,9 @@ begin
   DebugTimeStopForCreaturesArgument := TGLMenuBooleanArgument.Create(
     DebugTimeStopForCreatures);
 
-  Items.Add('Creatures on level: show info, kill');
+  Items.Add('Show info about creatures on level');
+  Items.Add('Kill all creatures');
+  Items.Add('Kill all non-still creatures');
   Items.Add('Add creature to level');
   Items.Add('Reload creatures/kinds.xml file');
   Items.Add('Reload animations of specific creature');
@@ -368,8 +370,8 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
 
   procedure ShowLevelCreaturesInfo;
   var
-    I: Integer;
     S: TStringList;
+    I: Integer;
   begin
     S := TStringList.Create;
     try
@@ -385,16 +387,33 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
             FloatToNiceStr(Level.Creatures[I].MaxLife),
             FloatToNiceStr(Level.Creatures[I].Kind.CameraRadius) ]));
 
-      S.Append('Kill all creatures ?');
-
-      if MessageYesNo(Glw, S, taLeft) then
-        for I := 0 to Level.Creatures.High do
-          if Level.Creatures[I].Life > 0 then
-          begin
-            Level.Creatures[I].Life := 0;
-            Level.Creatures[I].LastAttackDirection := ZeroVector3Single;
-          end;
+      MessageOK(Glw, S, taLeft);
     finally S.Free end;
+  end;
+
+  procedure KillAll;
+  var
+    I: Integer;
+  begin
+    for I := 0 to Level.Creatures.High do
+      if Level.Creatures[I].Life > 0 then
+      begin
+        Level.Creatures[I].Life := 0;
+        Level.Creatures[I].LastAttackDirection := ZeroVector3Single;
+      end;
+  end;
+
+  procedure KillAllNonStill;
+  var
+    I: Integer;
+  begin
+    for I := 0 to Level.Creatures.High do
+      if (not (Level.Creatures[I] is TStillCreature)) and
+        (Level.Creatures[I].Life > 0) then
+      begin
+        Level.Creatures[I].Life := 0;
+        Level.Creatures[I].LastAttackDirection := ZeroVector3Single;
+      end;
   end;
 
   procedure AddLevelCreature;
@@ -430,18 +449,20 @@ begin
 
   case CurrentItem of
     0: ShowLevelCreaturesInfo;
-    1: AddLevelCreature;
-    2: CreaturesKinds.LoadFromFile;
-    3: ReloadCreatureAnimation;
-    4: begin
+    1: KillAll;
+    2: KillAllNonStill;
+    3: AddLevelCreature;
+    4: CreaturesKinds.LoadFromFile;
+    5: ReloadCreatureAnimation;
+    6: begin
          RenderShadowQuads := not RenderShadowQuads;
          RenderShadowQuadsArgument.Value := RenderShadowQuads;
        end;
-    5: begin
+    7: begin
          DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
          DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
        end;
-    6: CurrentMenu := DebugMenu;
+    8: CurrentMenu := DebugMenu;
   end;
 end;
 
