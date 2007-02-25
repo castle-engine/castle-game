@@ -48,6 +48,7 @@ procedure ShowControlsMenuEscape(ADrawUnderMenu: TDrawFunc;
 
 const
   DefaultUseMouseLook = true;
+  DefaultInvertVerticalMouseLook = false;
 
 var
   UseMouseLook: boolean;
@@ -56,6 +57,8 @@ var
     and are saved/loaded to/from config file in this unit. }
   MouseLookHorizontalSensitivity: Single;
   MouseLookVerticalSensitivity: Single;
+
+  InvertVerticalMouseLook: boolean;
 
 implementation
 
@@ -72,6 +75,7 @@ type
     MouseLookVerticalSensitivitySlider: TGLMenuFloatSlider;
     AutoOpenInventoryArgument: TGLMenuBooleanArgument;
     UseMouseLookArgument: TGLMenuBooleanArgument;
+    InvertVerticalMouseLookArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -163,6 +167,8 @@ begin
     0.01, 0.3, MouseLookVerticalSensitivity);
   AutoOpenInventoryArgument := TGLMenuBooleanArgument.Create(AutoOpenInventory);
   UseMouseLookArgument := TGLMenuBooleanArgument.Create(UseMouseLook);
+  InvertVerticalMouseLookArgument :=
+    TGLMenuBooleanArgument.Create(InvertVerticalMouseLook);
 
   Items.Add('Configure basic controls');
   Items.Add('Configure items controls');
@@ -172,6 +178,7 @@ begin
     MouseLookHorizontalSensitivitySlider);
   Items.AddObject('Mouse look vertical sensitivity',
     MouseLookVerticalSensitivitySlider);
+  Items.AddObject('Invert vertical mouse look', InvertVerticalMouseLookArgument);
   Items.AddObject('Auto show inventory on pickup',
     AutoOpenInventoryArgument);
   Items.Add('Restore to defaults');
@@ -197,14 +204,21 @@ begin
     4: ;
     5: ;
     6: begin
+         InvertVerticalMouseLook := not InvertVerticalMouseLook;
+         InvertVerticalMouseLookArgument.Value := InvertVerticalMouseLook;
+       end;
+    7: begin
          AutoOpenInventory := not AutoOpenInventory;
          AutoOpenInventoryArgument.Value := AutoOpenInventory;
        end;
-    7: begin
+    8: begin
          CastleAllInputs.RestoreDefaults;
 
          UseMouseLook := DefaultUseMouseLook;
          UseMouseLookArgument.Value := UseMouseLook;
+
+         InvertVerticalMouseLook := DefaultInvertVerticalMouseLook;
+         InvertVerticalMouseLookArgument.Value := InvertVerticalMouseLook;
 
          MouseLookHorizontalSensitivity := DefaultMouseLookHorizontalSensitivity;
          MouseLookVerticalSensitivity   := DefaultMouseLookVerticalSensitivity  ;
@@ -216,7 +230,7 @@ begin
 
          MessageOK(Glw, 'All keys and settings restored to defaults.');
        end;
-    8: UserQuit := true;
+    9: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -613,6 +627,8 @@ initialization
     'mouse/vertical_sensitivity', DefaultMouseLookVerticalSensitivity);
   UseMouseLook := ConfigFile.GetValue(
     'mouse/use_mouse_look', DefaultUseMouseLook);
+  InvertVerticalMouseLook := ConfigFile.GetValue(
+    'mouse/invert_vertical_mouse_look', DefaultInvertVerticalMouseLook);
 finalization
   ConfigFile.SetDeleteFloat('mouse/horizontal_sensitivity',
     MouseLookHorizontalSensitivity, DefaultMouseLookHorizontalSensitivity);
@@ -620,4 +636,6 @@ finalization
     MouseLookVerticalSensitivity, DefaultMouseLookVerticalSensitivity);
   ConfigFile.SetDeleteValue('mouse/use_mouse_look',
     UseMouseLook, DefaultUseMouseLook);
+  ConfigFile.SetDeleteValue('mouse/invert_vertical_mouse_look',
+    InvertVerticalMouseLook, DefaultInvertVerticalMouseLook);
 end.

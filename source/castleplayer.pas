@@ -663,6 +663,7 @@ begin
 
   Navigator.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
   Navigator.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
+  Navigator.InvertVerticalMouseLook := InvertVerticalMouseLook;
 
   if GameWin then
   begin
