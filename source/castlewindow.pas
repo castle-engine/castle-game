@@ -45,6 +45,7 @@ uses SysUtils;
 initialization
   Glw := TGLWindowNavigated.Create;
   Glw.OwnsNavigator := false;
+  Glw.SetDemoOptions(K_None, #0, false);
 
   GLContextCache := TVRMLOpenGLRendererContextCache.Create;
   GLContextCache.UseTextureFileNames := true;
