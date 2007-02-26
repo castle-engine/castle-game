@@ -889,15 +889,15 @@ begin
   ShiftedPosition[2] += PositionRadius;
 
   { Note that I'm using ShiftedPosition, not Position,
-    and later I'm comparing "SqrHeightAboveTheGround > Sqr(PositionRadius)",
-    instead of "SqrHeightAboveTheGround > 0".
+    and later I'm comparing "HeightAboveTheGround > PositionRadius",
+    instead of "HeightAboveTheGround > 0".
     Otherwise, I risk that when item will be placed perfectly on the ground,
     it may "slip through" this ground down.
 
     For the same reason, I use sphere around ShiftedPosition
     when doing Level.MoveAllowed below. }
 
-  Level.GetCameraHeightZ(ShiftedPosition, IsAboveTheGround,
+  Level.GetCameraHeight(ShiftedPosition, IsAboveTheGround,
     HeightAboveTheGround);
   if (not IsAboveTheGround) or
      (HeightAboveTheGround > PositionRadius) then

@@ -120,7 +120,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; virtual; abstract;
 
-    procedure GetCameraHeightZ(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single); virtual; abstract;
 
@@ -201,7 +201,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeightZ(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single); override;
 
@@ -257,7 +257,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeightZ(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single); override;
 
@@ -339,7 +339,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeightZ(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single); override;
 
@@ -584,7 +584,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeightZ(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single); override;
 
@@ -654,7 +654,7 @@ type
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
-    procedure GetCameraHeightZ(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single); override;
     function BoundingBox: TBox3d; override;
@@ -899,10 +899,10 @@ type
     function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
       OctreeItemIndex: Integer): boolean; virtual;
 
-    { LineOfSight, MoveAllowed and GetCameraHeightZ perform
+    { LineOfSight, MoveAllowed and GetCameraHeight perform
       collision detection with the level and level objects.
 
-      Note that MoveAllowed and GetCameraHeightZ treat transparent
+      Note that MoveAllowed and GetCameraHeight treat transparent
       objects as others --- i.e., they collide. You have to override
       CollisionIgnoreItem to eventually change this for some items
       (transparent or opaque) to make them not colliding.
@@ -927,12 +927,12 @@ type
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean; virtual;
 
-    procedure GetCameraHeightZ(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const CameraPos: TVector3Single;
       out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
       virtual;
     { @groupEnd }
 
-    { PlayerMoveAllowed and PlayerGetCameraHeight just
+    { PlayerMoveAllowed and PlayerGetCameraHeightSqr just
       call appropriate non-player methods above.
       They use Navigator.CameraPos, and they use level's CameraRadius
       (i.e. they assume that it's the player who's moving).
@@ -945,7 +945,7 @@ type
       const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
 
-    procedure PlayerGetCameraHeight(Navigator: TMatrixWalker;
+    procedure PlayerGetCameraHeightSqr(Navigator: TMatrixWalker;
       out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
     { Call this to render level things. Frustum is current player's frustum. }
@@ -1241,7 +1241,7 @@ begin
   end;
 end;
 
-procedure TLevelStaticObject.GetCameraHeightZ(const CameraPos: TVector3Single;
+procedure TLevelStaticObject.GetCameraHeight(const CameraPos: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single);
 var
@@ -1360,14 +1360,14 @@ begin
     Result.Hierarchy.Insert(0, Self);
 end;
 
-procedure TLevelObjectSum.GetCameraHeightZ(const CameraPos: TVector3Single;
+procedure TLevelObjectSum.GetCameraHeight(const CameraPos: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single);
 var
   I: Integer;
 begin
   for I := 0 to List.High do
-    List.Items[I].GetCameraHeightZ(CameraPos, ItemsToIgnoreFunc,
+    List.Items[I].GetCameraHeight(CameraPos, ItemsToIgnoreFunc,
       IsAboveTheGround, HeightAboveTheGround);
 end;
 
@@ -1496,7 +1496,7 @@ begin
   end;
 end;
 
-procedure TLevelMovingObject.GetCameraHeightZ(const CameraPos: TVector3Single;
+procedure TLevelMovingObject.GetCameraHeight(const CameraPos: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single);
 var
@@ -1506,7 +1506,7 @@ begin
   begin
     T := Translation(ParentLevel.AnimationTime);
 
-    MovingObject.GetCameraHeightZ(
+    MovingObject.GetCameraHeight(
       VectorSubtract(CameraPos, T.Data), ItemsToIgnoreFunc,
       IsAboveTheGround, HeightAboveTheGround);
   end;
@@ -1888,7 +1888,7 @@ begin
   end;
 end;
 
-procedure TLevelAnimatedObject.GetCameraHeightZ(const CameraPos: TVector3Single;
+procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single);
 var
@@ -2002,7 +2002,7 @@ begin
   Result := nil;
 end;
 
-procedure TLevelArea.GetCameraHeightZ(const CameraPos: TVector3Single;
+procedure TLevelArea.GetCameraHeight(const CameraPos: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single);
 begin
@@ -2533,7 +2533,7 @@ begin
       CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
 end;
 
-procedure TLevel.GetCameraHeightZ(const CameraPos: TVector3Single;
+procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
   out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
 var
   I: Integer;
@@ -2544,7 +2544,7 @@ begin
     NoItemIndex, @CollisionIgnoreItem);
 
   for I := 0 to Objects.High do
-    Objects[I].GetCameraHeightZ(CameraPos, @CollisionIgnoreItem,
+    Objects[I].GetCameraHeight(CameraPos, @CollisionIgnoreItem,
       IsAboveTheGround, HeightAboveTheGround);
 end;
 
@@ -2564,17 +2564,17 @@ begin
       Navigator.CameraPos, NewPos, nil) = nil);
 end;
 
-procedure TLevel.PlayerGetCameraHeight(Navigator: TMatrixWalker;
+procedure TLevel.PlayerGetCameraHeightSqr(Navigator: TMatrixWalker;
   out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 var
   HeightAboveTheGround: Single;
 begin
   { Check is player standing over level. }
-  GetCameraHeightZ(Navigator.CameraPos, IsAboveTheGround,
+  GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
     HeightAboveTheGround);
 
   { Check is player standing over one of the creatures. }
-  Creatures.GetCameraHeightZ(Navigator.CameraPos, IsAboveTheGround,
+  Creatures.GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
     HeightAboveTheGround, nil);
 
   { Below is a waste of time. Because Navigator requires a callback

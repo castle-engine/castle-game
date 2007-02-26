@@ -726,7 +726,7 @@ begin
     HeightAboveTheGround := 0;
     while I < FSpidersAppearing.Count do
     begin
-      GetCameraHeightZ(FSpidersAppearing.Items[I], IsAboveTheGround,
+      GetCameraHeight(FSpidersAppearing.Items[I], IsAboveTheGround,
         HeightAboveTheGround);
       if IsAboveTheGround and
         (HeightAboveTheGround < Spider.CameraRadius * 2) then

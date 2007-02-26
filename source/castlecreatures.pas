@@ -715,12 +715,12 @@ type
     { Checks AssumeMiddlePosition height above the level and other creatures.
 
       I don't check height above the player, this is not needed
-      (GetCameraHeightZ is needed only for "growing up" and "falling down";
+      (GetCameraHeight is needed only for "growing up" and "falling down";
       in case of "growing up", creature doesn't have to "grow up"
       when standing on player's head. In case of "falling down" ---
       we don't have to take this into account. Things will work correctly
       anyway.) }
-    procedure GetCameraHeightZ(
+    procedure GetCameraHeight(
       const AssumeMiddlePosition: TVector3Single;
       out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
 
@@ -772,7 +772,7 @@ type
       How precisely this is calculated for given creature depends
       on MiddlePositionFromLegs implementation in this class.
 
-      All collision detection (MoveAllowed, GetCameraHeightZ)
+      All collision detection (MoveAllowed, GetCameraHeight)
       should be done using MiddlePosition, and then appropriately translated
       back to LegsPosition. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
@@ -825,7 +825,7 @@ type
       read FLastAttackDirection write SetLastAttackDirection;
 
     { If @false, then TCreaturesList.MoveAllowedSimple and
-      TCreaturesList.GetCameraHeightZ will ignore this
+      TCreaturesList.GetCameraHeight will ignore this
       creature, which means that collisions between this creature
       and player/other creatures will not be checked.
       You should set this to @false only in exceptional situations,
@@ -884,13 +884,13 @@ type
     { Height of Position over creatures' bounding boxes.
 
       Assumes IsAboveTheGround is already initialized
-      (and if true, then SqrHeightAboveTheGround is already initialized too).
+      (and if true, then HeightAboveTheGround is already initialized too).
       It will update them.
 
       You can pass IgnoreCreature <> nil if you want to ignore
       collisions with given creature (this will obviously be useful
       when checking for collisions for this creature). }
-    procedure GetCameraHeightZ(const Position: TVector3Single;
+    procedure GetCameraHeight(const Position: TVector3Single;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
       IgnoreCreature: TCreature);
 
@@ -1914,16 +1914,16 @@ begin
       OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
-procedure TCreature.GetCameraHeightZ(
+procedure TCreature.GetCameraHeight(
   const AssumeMiddlePosition: TVector3Single;
   out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
 begin
   { Check creature<->level collision. }
-  Level.GetCameraHeightZ(AssumeMiddlePosition,
+  Level.GetCameraHeight(AssumeMiddlePosition,
     IsAboveTheGround, HeightAboveTheGround);
 
   { Check creature<->other creatures collision. }
-  Level.Creatures.GetCameraHeightZ(AssumeMiddlePosition,
+  Level.Creatures.GetCameraHeight(AssumeMiddlePosition,
     IsAboveTheGround, HeightAboveTheGround, Self);
 end;
 
@@ -2006,7 +2006,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     OldIsFallingDown := FIsFallingDown;
     OldMiddlePosition := MiddlePosition;
 
-    GetCameraHeightZ(OldMiddlePosition, IsAboveTheGround, HeightAboveTheGround);
+    GetCameraHeight(OldMiddlePosition, IsAboveTheGround, HeightAboveTheGround);
 
     if (not IsAboveTheGround) or
       (HeightAboveTheGround > HeightBetweenLegsAndMiddle * HeightMargin) then
@@ -2188,7 +2188,7 @@ begin
   Result := nil;
 end;
 
-procedure TCreaturesList.GetCameraHeightZ(
+procedure TCreaturesList.GetCameraHeight(
   const Position: TVector3Single;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
   IgnoreCreature: TCreature);
@@ -2535,7 +2535,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         Result := false;
         if not Kind.Flying then
         begin
-          GetCameraHeightZ(NewMiddlePosition, IsAboveTheGround,
+          GetCameraHeight(NewMiddlePosition, IsAboveTheGround,
             HeightAboveTheGround);
           if (not IsAboveTheGround) or
             (HeightAboveTheGround > WAKind.MaxHeightAcceptableToFall +

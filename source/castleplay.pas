@@ -513,7 +513,7 @@ begin
 
   { Init Player.Navigator properties }
   Player.Navigator.OnMoveAllowed := @Level.PlayerMoveAllowed;
-  Player.Navigator.OnGetCameraHeight := @Level.PlayerGetCameraHeight;
+  Player.Navigator.OnGetCameraHeight := @Level.PlayerGetCameraHeightSqr;
 
   { Init initial camera pos }
   Player.Navigator.Init(Level.HomeCameraPos, Level.HomeCameraDir,
