@@ -74,6 +74,14 @@ type
     procedure CurrentItemSelected; override;
   end;
 
+  TDebugLevelMenu = class(TCastleMenu)
+    LevelOctreeMaxDepthSlider: TGLMenuIntegerSlider;
+    LevelOctreeMaxLeafItemsCountSlider: TGLMenuIntegerSlider;
+    constructor Create;
+    procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
+  end;
+
   TEditLevelLightsMenu = class(TCastleMenu)
     AmbientColorSlider: array[0..2] of TGLMenuFloatSlider;
     constructor Create;
@@ -129,6 +137,7 @@ var
   DebugMenu: TDebugMenu;
   DebugPlayerMenu: TDebugPlayerMenu;
   DebugCreaturesMenu: TDebugCreaturesMenu;
+  DebugLevelMenu: TDebugLevelMenu;
   DebugItemsMenu: TDebugItemsMenu;
   EditLevelLightsMenu: TEditLevelLightsMenu;
   EditOneLightMenu: TEditOneLightMenu;
@@ -147,46 +156,19 @@ begin
   Items.Add('Player debug menu');
   Items.Add('Creatures debug menu');
   Items.Add('Items debug menu');
+  Items.Add('Level debug menu');
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
   Items.AddObject('Render for level screenshot',
     DebugRenderForLevelScreenshotArgument);
-  Items.Add('Change to level');
   Items.Add('Reload sounds/index.xml');
   Items.Add('Edit lights');
   Items.Add('Force thunder now');
-  Items.Add('Restart current level (preserving camera)');
   Items.Add('Back to game');
 
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TDebugMenu.CurrentItemSelected;
-
-  procedure ChangeToLevel;
-  var
-    S: TStringList;
-    I, Index: Integer;
-  begin
-    S := TStringList.Create;
-    try
-      LevelsAvailable.SortByNumber;
-
-      for I := 0 to LevelsAvailable.High do
-      begin
-        S.Append(Format('Level %d "%s"',
-          [ LevelsAvailable[I].Number, LevelsAvailable[I].Title ]));
-      end;
-      S.Append('Cancel');
-
-      Index := ChooseByMenu(DrawUnderMenu, S);
-
-      if Index <> LevelsAvailable.Count then
-      begin
-        LevelFinished(LevelsAvailable[Index].CreateLevel);
-        UserQuit := true;
-      end;
-    finally S.Free end;
-  end;
 
   procedure ForceThunder;
   begin
@@ -198,24 +180,6 @@ procedure TDebugMenu.CurrentItemSelected;
       MessageOK(Glw, 'Thunder effect not defined for this level.', taLeft);
   end;
 
-  procedure RestartLevel;
-  var
-    Pos, Dir, Up: TVector3Single;
-  begin
-    Pos := Player.Navigator.CameraPos;
-    Dir := Player.Navigator.CameraDir;
-    Up := Player.Navigator.CameraUp;
-
-    LevelFinished(LevelsAvailable.FindName(Level.Name).CreateLevel);
-    LevelFinishedFlush;
-
-    Player.Navigator.CameraPos := Pos;
-    Player.Navigator.CameraDir := Dir;
-    Player.Navigator.CameraUp := Up;
-
-    UserQuit := true;
-  end;
-
 begin
   inherited;
 
@@ -223,16 +187,16 @@ begin
     0: CurrentMenu := DebugPlayerMenu;
     1: CurrentMenu := DebugCreaturesMenu;
     2: CurrentMenu := DebugItemsMenu;
-    3: begin
+    3: CurrentMenu := DebugLevelMenu;
+    4: begin
          RenderBoundingBoxes := not RenderBoundingBoxes;
          RenderBoundingBoxesArgument.Value := RenderBoundingBoxes;
        end;
-    4: begin
+    5: begin
          DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
          DebugRenderForLevelScreenshotArgument.Value :=
            DebugRenderForLevelScreenshot;
        end;
-    5: ChangeToLevel;
     6: ReadSoundInfos;
     7: begin
          FreeAndNil(EditLevelLightsMenu);
@@ -240,8 +204,7 @@ begin
          CurrentMenu := EditLevelLightsMenu;
        end;
     8: ForceThunder;
-    9: RestartLevel;
-    10:UserQuit := true;
+    9: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -463,6 +426,96 @@ begin
          DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
        end;
     8: CurrentMenu := DebugMenu;
+  end;
+end;
+
+{ TDebugLevelMenu -------------------------------------------------------- }
+
+constructor TDebugLevelMenu.Create;
+begin
+  inherited Create;
+
+  LevelOctreeMaxDepthSlider := TGLMenuIntegerSlider.Create(
+    -1, 40, DebugLevelOctreeMaxDepth);
+  LevelOctreeMaxLeafItemsCountSlider := TGLMenuIntegerSlider.Create(
+    -1, 40, DebugLevelOctreeMaxLeafItemsCount);
+
+  Items.Add('Change to level');
+  Items.Add('Restart current level (preserving camera)');
+  Items.AddObject('Future level octree max depth',
+    LevelOctreeMaxDepthSlider);
+  Items.AddObject('Future level octree max leaf items count',
+    LevelOctreeMaxLeafItemsCountSlider);
+  Items.Add('Back');
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TDebugLevelMenu.CurrentItemSelected;
+
+  procedure ChangeToLevel;
+  var
+    S: TStringList;
+    I, Index: Integer;
+  begin
+    S := TStringList.Create;
+    try
+      LevelsAvailable.SortByNumber;
+
+      for I := 0 to LevelsAvailable.High do
+      begin
+        S.Append(Format('Level %d "%s"',
+          [ LevelsAvailable[I].Number, LevelsAvailable[I].Title ]));
+      end;
+      S.Append('Cancel');
+
+      Index := ChooseByMenu(DrawUnderMenu, S);
+
+      if Index <> LevelsAvailable.Count then
+      begin
+        LevelFinished(LevelsAvailable[Index].CreateLevel);
+        UserQuit := true;
+      end;
+    finally S.Free end;
+  end;
+
+  procedure RestartLevel;
+  var
+    Pos, Dir, Up: TVector3Single;
+  begin
+    Pos := Player.Navigator.CameraPos;
+    Dir := Player.Navigator.CameraDir;
+    Up := Player.Navigator.CameraUp;
+
+    LevelFinished(LevelsAvailable.FindName(Level.Name).CreateLevel);
+    LevelFinishedFlush;
+
+    Player.Navigator.CameraPos := Pos;
+    Player.Navigator.CameraDir := Dir;
+    Player.Navigator.CameraUp := Up;
+
+    UserQuit := true;
+  end;
+
+begin
+  inherited;
+
+  case CurrentItem of
+    0: ChangeToLevel;
+    1: RestartLevel;
+    2, 3: ;
+    4: CurrentMenu := DebugMenu;
+  end;
+end;
+
+procedure TDebugLevelMenu.CurrentItemAccessoryValueChanged;
+begin
+  inherited;
+
+  case CurrentItem of
+    2: DebugLevelOctreeMaxDepth := LevelOctreeMaxDepthSlider.Value;
+    3: DebugLevelOctreeMaxLeafItemsCount :=
+         LevelOctreeMaxLeafItemsCountSlider.Value;
   end;
 end;
 
@@ -964,6 +1017,7 @@ begin
   DebugMenu := TDebugMenu.Create;
   DebugPlayerMenu := TDebugPlayerMenu.Create;
   DebugCreaturesMenu := TDebugCreaturesMenu.Create;
+  DebugLevelMenu := TDebugLevelMenu.Create;
   DebugItemsMenu := TDebugItemsMenu.Create;
   CurrentMenu := DebugMenu;
 end;
@@ -977,6 +1031,7 @@ begin
   FreeAndNil(EditHeadlightMenu);
   FreeAndNil(DebugItemsMenu);
   FreeAndNil(DebugCreaturesMenu);
+  FreeAndNil(DebugLevelMenu);
   FreeAndNil(DebugPlayerMenu);
 end;
 

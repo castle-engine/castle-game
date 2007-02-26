@@ -1090,6 +1090,14 @@ type
 
   TLevelClass = class of TLevel;
 
+var
+  { Properties of the Level octree constructed in TLevel constructor.
+    -1 means "use default values", which means values taken from
+    Level description in XML (or just VRMLTriangleOctree unit
+    defaults). }
+  DebugLevelOctreeMaxDepth: Integer = -1;
+  DebugLevelOctreeMaxLeafItemsCount: Integer = -1;
+
 {$undef read_interface}
 
 implementation
@@ -2062,6 +2070,7 @@ const
   SectorsMargin = 0.5;
 var
   NavigationNode: TNodeNavigationInfo;
+  OctreeMaxDepth, OctreeMaxLeafItemsCount: Integer;
 begin
   inherited Create;
 
@@ -2194,11 +2203,25 @@ begin
     Progress.Fini;
   end;
 
+  { calculate OctreeMaxDepth }
+  OctreeMaxDepth := DebugLevelOctreeMaxDepth;
+  { TODO: take from XML file }
+  if OctreeMaxDepth = -1 then
+    OctreeMaxDepth := DefTriangleOctreeMaxDepth;
+
+  { calculate OctreeMaxLeafItemsCount }
+  OctreeMaxLeafItemsCount := DebugLevelOctreeMaxLeafItemsCount;
+  { TODO: take from XML file }
+  if OctreeMaxLeafItemsCount = -1 then
+    OctreeMaxLeafItemsCount := DefTriangleOctreeMaxLeafItemsCount;
+
   { Loading octree have their own Progress, so we load them outside our
     progress. }
 
   Scene.DefaultTriangleOctree :=
-    Scene.CreateTriangleOctree('Loading level (triangle octree)');
+    Scene.CreateTriangleOctree(
+      OctreeMaxDepth, OctreeMaxLeafItemsCount,
+      'Loading level (triangle octree)');
   Scene.DefaultShapeStateOctree :=
     Scene.CreateShapeStateOctree('Loading level (ShapeState octree)');
 end;

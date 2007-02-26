@@ -21,6 +21,27 @@
 
   - _sound attributes: you can use here a name from ../sounds/index.xml
 
+  - TODO: planned, when "Debug menu" will show that will be useful:
+    octree_max_depth, octree_max_leaf_items_count:
+    octree generation parameters. Default value is -1,
+    and it means that the default values in VRMLTriangleOctree unit
+    (see e.g. [http://www.camelot.homedns.org/~michalis/src/pascal/docs/html/VRMLTriangleOctree.html]
+    or just look in the sources) will be used.
+
+    It's adviced to use these options only if you see a real difference
+    in FPS between "real" FPS and "rendering" FPS. This may mean that
+    AI and collision detection take a long time, and this may be cured
+    by a better octree parameters. You can control these parameters at runtime
+    from "Debug menu", so it's most comfortable to first test your parameters
+    using "Debug menu" and then write them to this file.
+
+    For educational purposes, you can make an experiment and set
+    octree_max_depth = 0: this forces a one-leaf tree, effectively
+    making octree searching work like a normal sequence searching.
+    You should see dramatic loss of game speed. Look at FPS: while
+    the rendering speed will stay the same, the "real" FPS will
+    drow down, since AI and collision detection will eat a lot of CPU.
+
   Rest of the attributes is required.
   Filenames are specified relative to directory of this XML file.
   As path delimiter use slash "/".

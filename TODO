@@ -1,5 +1,10 @@
 - doom music file is too large!
 
+- doom level with many creatures is awfully slow -- 200 FPS, but only 30 real.
+  So AI takes a lot of work.
+  It seems that it's DoGravity. For sure with "Time stop for creatures"
+  there is no longer such difference between render and real FPS.
+
 - bow must work better to really appreciate the doom level !
 - fire over barrels - pixel pracht finally ?
 - werewolf cannot crawl inside DOOM E1M1 corridor between room 1st and 3rd
