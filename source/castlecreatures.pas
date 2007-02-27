@@ -641,6 +641,22 @@ type
     UsedSounds: TALAllocatedSourcesList;
 
     procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
+
+    procedure SetLegsPosition(const Value: TVector3Single);
+    procedure SetDirection(const Value: TVector3Single);
+
+    { It turns out that it's more speed-optimal to keep BoundingBox
+      precalculated (and waste time on updating it each time we change
+      Direction or LegsPosition) instead of making BoundingBox
+      a function that always calculates it's result.
+
+      This is especially noticeable when there are many creatures on the level:
+      then a lot of time is wasted in DoGravity, and main time of this
+      is inside TCreaturesList.GetCameraHeight, and main time of this
+      would be spend within BoundingBox calculations. Yes, this is
+      checked with profiler. }
+    FBoundingBox: TBox3d;
+    procedure RecalculateBoundingBox;
   protected
     { Return matrix that takes into account current LegsPosition and Direction.
       Multiply CurrentScene geometry by this matrix to get current geometry. }
@@ -744,7 +760,7 @@ type
 
     property Kind: TCreatureKind read FKind;
 
-    function BoundingBox: TBox3d; virtual;
+    property BoundingBox: TBox3d read FBoundingBox;
 
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); virtual;
@@ -756,11 +772,16 @@ type
 
     procedure Idle(const CompSpeed: Single); virtual;
 
+    { Return current scene to be rendered.
+      Note that this is called at the end of our constructor
+      (through RecalculateBoundingBox),
+      so it must be implemented to work even when Level is not assigned yet. }
     function CurrentScene: TVRMLFlatSceneGL; virtual; abstract;
 
     { This is the position of the (0, 0, 0) point of creature model
       (or rather, currently used model! Creatures are animated after all). }
-    property LegsPosition: TVector3Single read FLegsPosition write FLegsPosition;
+    property LegsPosition: TVector3Single read FLegsPosition
+      write SetLegsPosition;
 
     { This is the height of MiddlePosition above LegsPosition.
       In this class, just a shortcut for CurrentScene.BoundingBox[1, 2].
@@ -801,7 +822,7 @@ type
       It always must be normalized.
 
       In constructor, when setting this from ADirection, we normalize it. }
-    property Direction: TVector3Single read FDirection write FDirection;
+    property Direction: TVector3Single read FDirection write SetDirection;
 
     { When this function returns true, the creature will be removed
       from Level.Creatures list (this will be done in game's OnIdle,
@@ -1667,25 +1688,33 @@ constructor TCreature.Create(AKind: TCreatureKind;
 begin
   inherited Create;
 
-  { If --debug-no-creatures, then we actually load the creature now.
+  { If --debug-no-creatures, then we actually load the creature kind now.
     If not, then we depend on CreaturesKinds.PrepareRender call
-    to call our PrepareRender (this *may* happen after TCreature creation
-    --- when loading new creatures designed on a level, TLevel constructor
-    creates creatures and then PlayGame calls CreaturesKinds.PrepareRender). }
+    to call PrepareRender on creature's kind. }
   if WasParam_DebugNoCreatures then
     if not AKind.PrepareRenderDone then
       AKind.RedoPrepareRender;
 
   FKind := AKind;
+
   FLegsPosition := ALegsPosition;
   FDirection := Normalized(ADirection);
-  FMaxLife := AMaxLife;
 
+  FMaxLife := AMaxLife;
   FLife := MaxLife;
 
   SavedShadowQuads := TDynQuad3SingleArray.Create;
 
   UsedSounds := TALAllocatedSourcesList.Create;
+
+  { FLegsPosition and FDirection changed, so RecalculateBoundingBox must be
+    called. At this point CurrentScene is needed (by RecalculateBoundingBox),
+    and CurrentScene may require some animations to be loaded -- so we check
+    PrepareRenderDone. }
+  if not Kind.PrepareRenderDone then
+    raise EInternalError.CreateFmt('PrepareRender of creature kind "%s" not done',
+      [Kind.VRMLNodeName]);
+  RecalculateBoundingBox;
 end;
 
 destructor TCreature.Destroy;
@@ -1809,9 +1838,21 @@ begin
   Result := BoundingBoxAssumingLegs(AssumeLegsPosition, AssumeDirection);
 end;
 
-function TCreature.BoundingBox: TBox3d;
+procedure TCreature.SetLegsPosition(const Value: TVector3Single);
 begin
-  Result := BoundingBoxAssumingLegs(LegsPosition, Direction);
+  FLegsPosition := Value;
+  RecalculateBoundingBox;
+end;
+
+procedure TCreature.SetDirection(const Value: TVector3Single);
+begin
+  FDirection := Value;
+  RecalculateBoundingBox;
+end;
+
+procedure TCreature.RecalculateBoundingBox;
+begin
+  FBoundingBox := BoundingBoxAssumingLegs(LegsPosition, Direction);
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum;
@@ -1977,7 +2018,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
         NewMiddlePosition, true);
 
       if Result then
-        FLegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
+        LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
 
   const
@@ -2042,6 +2083,20 @@ procedure TCreature.Idle(const CompSpeed: Single);
   end;
 
 begin
+  { CurrentScene (possibly) changed, since Level.AnimationTime changed now.
+    So recalculate bounding box.
+
+    Note that this is somewhat too late:
+    Level.AnimationTime changed earlier (some other code possibly already
+    checked our BoundingBox and got wrong answer, because our Idle
+    didn't update BoundingBoxyet). But in practice this is not a problem,
+    since BoundingBox doesn't change too rapidly --- and we're always
+    prepared for unpredictable changes of BoundingBox anyway (since they
+    are caused by animation frame changes). So we don't depend on
+    "BoundingBox of the creature doesn't collide with others", even if
+    we try to achieve this. }
+  RecalculateBoundingBox;
+
   UpdateUsedSounds;
 
   if not Kind.Flying then
@@ -2390,6 +2445,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       if not Kind.Flying then
         MakeVectorsOrthoOnTheirPlane(FDirection, Level.HomeCameraUp);
       NormalizeTo1st(FDirection);
+      RecalculateBoundingBox;
     end;
   end;
 
@@ -2576,7 +2632,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         MoveAllowedSimple(OldMiddlePosition, NewMiddlePosition, false);
 
       if Result then
-        FLegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
+        LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
 
     procedure InitAlternativeTarget;
@@ -2854,7 +2910,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
       if MoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
         NewMiddlePosition, false) then
-        FLegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
+        LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
   end;
 
@@ -2897,7 +2953,9 @@ var
   StateTime: Single;
 begin
   { Time from the change to this state. }
-  StateTime := Level.AnimationTime - StateChangeTime;
+  if Level <> nil then
+    StateTime := Level.AnimationTime - StateChangeTime else
+    StateTime := 0;
 
   case FState of
     wasStand:
@@ -3117,7 +3175,9 @@ begin
   if State = wasSpecial1 then
   begin
     { Time from the change to this state. }
-    StateTime := Level.AnimationTime - StateChangeTime;
+    if Level <> nil then
+      StateTime := Level.AnimationTime - StateChangeTime else
+      StateTime := 0;
 
     Result := SQKind.ThrowWebAttackAnimation.SceneFromTime(StateTime);
   end else
@@ -3199,7 +3259,7 @@ begin
   if Level.MoveAllowedSimple(LegsPosition, NewLegsPosition,
     false, Kind.CameraRadius) then
   begin
-    FLegsPosition := NewLegsPosition;
+    LegsPosition := NewLegsPosition;
   end else
     ExplodeWithLevel;
 
@@ -3248,7 +3308,9 @@ end;
 
 function TMissileCreature.CurrentScene: TVRMLFlatSceneGL;
 begin
-  Result := MissileKind.Animation.SceneFromTime(Level.AnimationTime);
+  if Level <> nil then
+    Result := MissileKind.Animation.SceneFromTime(Level.AnimationTime) else
+    Result := MissileKind.Animation.SceneFromTime(0);
 end;
 
 function TMissileCreature.RemoveMeFromLevel: boolean;
@@ -3310,7 +3372,9 @@ end;
 
 function TStillCreature.CurrentScene: TVRMLFlatSceneGL;
 begin
-  Result := StillKind.Animation.SceneFromTime(Level.AnimationTime);
+  if Level <> nil then
+    Result := StillKind.Animation.SceneFromTime(Level.AnimationTime) else
+    Result := StillKind.Animation.SceneFromTime(0);
 end;
 
 function TStillCreature.RemoveMeFromLevel: boolean;

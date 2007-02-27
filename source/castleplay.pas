@@ -1138,8 +1138,6 @@ var
   SavedMode: TGLMode;
   PlayGameHelper: TPlayGameHelper;
 begin
-  CreaturesKinds.PrepareRender;
-  ItemsKinds.PrepareRender;
   TimeMessagesClear;
 
   GameWin := false;

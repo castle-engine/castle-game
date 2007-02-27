@@ -117,6 +117,13 @@ var
   LocalPlayer: TPlayer;
   LocalLevel: TLevel;
 begin
+  { All kinds must be prepared before instances are created.
+    TObjectKind constructors are allowed to depend on this.
+    So we must prepare everything before creating the level
+    (since TLevel constructor creates some creatures and items on the level).  }
+  CreaturesKinds.PrepareRender;
+  ItemsKinds.PrepareRender;
+
   LocalLevel := NewGameLevelAvailable.CreateLevel;
   try
     LocalPlayer := TPlayer.Create;
