@@ -1,24 +1,26 @@
-- load level music only when it's needed
-
 - bow must work better to really appreciate the doom level !
-- fire over barrels - pixel pracht finally ?
-- werewolf cannot crawl inside DOOM E1M1 corridor between room 1st and 3rd
-  too large bounding sphere
 
-- on castle_hall level, stand very close the box that has the button on it.
-  Press "crouch". You start slowly getting falling down effect.
+- fire over barrels - pixel pracht finally ?
+
+- werewolf cannot crawl inside DOOM E1M1 corridor between room 1st and 3rd
+  too large bounding sphere. Make werewolf sphere better, and possibly
+  lower ? Check carefully where CameraRadius is used, and check various
+  states of Werewolf (remember about Dead state).
 
 - doom:
   - make lava work (rooms 4, 8)
   - make small and blue armor for doom level (items' stubs are already placed
     in blend file, on layer 9/10)
-  - make barrels visible and explosive
+  - make barrels explode nicely
   - use data/levels/doom/logo/doom_title.png, since I did it..
   - room 5: creatures should see through texture with alpha channel
   - if you know how, you can cause bad collisions and get out of the level
     on elevator 9a-9b
   - still too dark. Secret on 9a-9b should be activated differently ?
-    Or wall should be specially visible ?
+    Or wall should be specially visible ? Maybe more visible the
+    alternative entrance there (through the barrels) --- different wall
+    color ?
+  - exit level should work
 
 - test kolizji ze strzalami jest chyba za latwy: kiedy potwor stoi obok
   sciany, jest latwo strzelic w sciane zamiast potwora.
@@ -26,7 +28,7 @@
   Ew. eksplozje na strzaly tez moga pomoc ?
 
 - ball missile should hit other creatures too (helpful on crowdy places
-  on Doom level)
+  on Doom level), barrels too
 
 - the fact that alien dying falls on it's back means that usually
   after alien falls dead (killed with a sword) it makes strange
@@ -42,6 +44,10 @@
   for other music !
 
 ----------------------------------------
+
+- load level music only when it's needed
+- on castle_hall level, stand very close the box that has the button on it.
+  Press "crouch". You start slowly getting falling down effect.
 
 - levels/index.xml:
   - level objects hierarchy could be defined in such file
