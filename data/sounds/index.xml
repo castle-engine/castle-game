@@ -121,7 +121,7 @@
     default_importance="player"/>
   <sound name="evil_laugh"
     default_importance="level_event"/>
-  <sound name="doom_e1m1" file_name="doom/e1m1.wav"
+  <sound name="doom_e1m1" file_name="doom/e1m1.ogg"
     default_importance="max"/>
   <sound name="door_open" default_importance="level_event"/>
   <sound name="door_close" default_importance="level_event"/>
