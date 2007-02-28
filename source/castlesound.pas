@@ -397,7 +397,7 @@ begin
         begin
           if SoundInfos[ST].FileName <> '' then
           begin
-            SoundBuffers[ST] := TALSoundWAV.alCreateBufferDataFromFile(
+            SoundBuffers[ST] := TALSoundFile.alCreateBufferDataFromFile(
               ProgramDataPath + PathDelim + 'data' + PathDelim +
               'sounds' + PathDelim + SoundInfos[ST].FileName);
           end;

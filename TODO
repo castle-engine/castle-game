@@ -1,4 +1,10 @@
 - doom music file is too large!
+  This is almost fixed now by OggVorbis impl. Remains one small TODO
+  in OggVorbis impl (see SoundFile unit) and to prepare appropriate
+  distribution (to include vorbis libs for Windows, and to advice
+  to install vorbis stuff under Linux).
+
+- load level music only when it's needed
 
 - bow must work better to really appreciate the doom level !
 - fire over barrels - pixel pracht finally ?
