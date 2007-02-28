@@ -492,7 +492,7 @@ dist-making to-dos:
 
 - Makefile to pack distro of my game: add at some point svn log:
   svn log -v file:///home/michal/svn/kambi-svn-repos/ \
-    castle/trunk kambi_pascal_units/trunk > ChangeLog
+    castle/trunk kambi_vrml_game_engine/trunk > ChangeLog
 
 - real exe installer for Windows,
   include OpenAL installer
