@@ -122,17 +122,14 @@
   Reported on PGD:
   1.Loading time (creating display lists for animations) is ridicuously long.
     Confirmed on Majka.
-
-  2.Volumetric fog somehow gets applied to upper rock parts.
-    Confirmed on Majka.
-    Probably fixed by recent volumetric fix for Mesa.
-
+  (2 fixed)
   3.2d controls problems --- sword should be with alpha-test, item slots' borders should be with blending. But on Radeon screenshots they all look as if they were drawn "just like that", covering things underneath.
     No problems on Majka Windows.
     Maybe glProjectionPushPop will silently fix this ?
 
   4.Switching task (Alt+Tab) craps graphics when switching back to game (although this is known to happen on older Windowses (98 and like) with crappy graphic drivers, it definitely should not happen on XP with latest ATI drivers).
     No such problems on Majka Windows.
+    No such problems on ii.uni computers with Radeon.
 
   On Majka Windows:
   5.Switching task (Alt+Tab) while "Loading creatures" craps things --- or maybe I was impatient ?
@@ -149,30 +146,6 @@
 
   - Check changing ColorsBits and VideoFrequency on Radeon, maybe will help for some problems ?
     Check disabling lockArrays in renderer.
-
-- mouse sensitivity problems:
-
-  There's also the problem with wrong mouse sensitivity, it seems that the mouse sensitivity values get assigned completely wrong. Sometimes it gets 9.0, sometimes it gets some ridiculous large value (though it's not MaxSingle). I understand now that this was also meant by Traveler in "Something else I noticed is that changed controls are not loaded properly again when restarting the game. I think you are converting values incorrectly.". This is very strange, because these values are actually changed only when reading them from config file, or setting them to default, or moving the slider in the menu. And converting is done using the plain StrToFloat / FloatToStr routines. And, needless to say, I don't experience these problems --- neither on Linux nor on Windows (XP and 2000 Prof). So they may indicate some memory corruption.
-
-  function StrToFloatDef(const s: string; DefValue: Extended): Extended;
-
-  Was there a bug about this in FPC ? I don't remember, but I have this
-  in my KambiStringUtils.
-  No, the bug that I remembered was for Hex2Dec.
-
-  maybe it was the problem with wrong overloads choosing ?
-  Compile in objfpc mode for test.
-
-  Possibly fixed by rename GetValue -> GetFloat (that was needed anyway
-  for code cleanliness)
-
-  Maybe add a sanity check for mouseSensit values to MatrixWalker
-  --- if outside range, use default ? Just in case it's some real bug
-  in FPC etc.
-
-  I should close this issue after doing more tests on other computers
-  (Windows in uni ?).
-  No problems on Majka Windows.
 
 - Paul: going up the steps could do with a smoother animation
 
