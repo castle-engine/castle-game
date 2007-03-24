@@ -47,7 +47,7 @@ build-unix:
 build-win32:
 	cd source/kambi_vrml_game_engine/; \
 	  fpc $(FPC_WIN32_OPTIONS) @kambi.cfg ../castle.dpr
-	mv source/castle ./
+	mv source/castle.exe ./castle.exe
 
 # ------------------------------------------------------------
 # Cleaning targets.
