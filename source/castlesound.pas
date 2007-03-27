@@ -251,7 +251,7 @@ implementation
 
 uses CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
   KambiFilesUtils, CastleLog, DOM, XMLRead, KambiXMLUtils,
-  SoundFile, VorbisFile;
+  SoundFile, VorbisFile, KambiStringUtils;
 
 const
   { Each sound has a unique name, used to identify sound in sounds/index.xml file.
@@ -570,7 +570,7 @@ begin
         SourceAllocator.MaxAllocatedSources ]));
     S.Append('');
     S.Append('OggVorbis handling method: ' + TSoundOggVorbis.VorbisMethod);
-    S.Append('vorbisfile library available: ' + BoolToStr(VorbisFileInited));
+    S.Append('vorbisfile library available: ' + BoolToStr[VorbisFileInited]);
   end;
 end;
 
