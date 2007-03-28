@@ -1,7 +1,3 @@
-- bow must work better to really appreciate the doom level !
-
-- fire over barrels - pixel pracht finally ?
-
 - werewolf cannot crawl inside DOOM E1M1 corridor between room 1st and 3rd
   too large bounding sphere. Make werewolf sphere better, and possibly
   lower ? Check carefully where CameraRadius is used, and check various
@@ -22,10 +18,18 @@
     color ?
   - exit level should work
 
+----------------------------------------
+
+- bow must work better to really appreciate the doom level !
+
+- fire over barrels - pixel pracht finally ?
+
 - test kolizji ze strzalami jest chyba za latwy: kiedy potwor stoi obok
   sciany, jest latwo strzelic w sciane zamiast potwora.
   Solution: traktuj strzale jako odcinek ?
   Ew. eksplozje na strzaly tez moga pomoc ?
+  Actually: the arrow geometry is much too large (it's clearly visible
+  if you stop the time for creatures).
 
 - ball missile should hit other creatures too (helpful on crowdy places
   on Doom level), barrels too
@@ -36,16 +40,8 @@
   2 alien death animations, depending on the direction of attack
   (I have direction of attack for knockback anyway) ?
 
-- on Doom level: no way to turn off music ?
-  alSourcef(MusicPlayer.FAllocatedSource.ALSource,
-        AL_GAIN, MusicVolume * SoundInfos[MusicPlayer.PlayedSound].Gain);
-  doesn't mute the music !
-  In fact, it doesn't seem to affect music at all. Strange, as it works
-  for other music !
-
-----------------------------------------
-
 - load level music only when it's needed
+
 - on castle_hall level, stand very close the box that has the button on it.
   Press "crouch". You start slowly getting falling down effect.
 
