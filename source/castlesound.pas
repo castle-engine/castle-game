@@ -594,6 +594,38 @@ begin
         SoundBuffers[PlayedSound],
         MusicVolume * SoundInfos[PlayedSound].Gain, 0, 1);
 
+      { This is a workaround needed on Apple OpenAL implementation
+        (although I think that at some time I experienced similar
+        problems (that would be cured by this workaround) on Linux
+        (Loki OpenAL implementation)).
+
+        The problem: music on some
+        levels doesn't play. This happens seemingly random: sometimes
+        when you load a level music starts playing, sometimes it's
+        silent. Then when you go to another level, then go back to the
+        same level, music plays.
+
+        Investigation: I found that sometimes changing the buffer
+        of the sound doesn't work immediately. Simple
+          Writeln(SoundBuffers[PlayedSound], ' ',
+            alGetSource1ui(FAllocatedSource.ALSource, AL_BUFFER));
+        right after alCommonSourceSetup shows this (may output
+        two different values). Then if you wait a little, OpenAL
+        reports correct buffer. This probably means that OpenAL
+        internally finishes some tasks related to loading buffer
+        into source. Whatever it is, it seems that it doesn't
+        occur (or rather, is not noticeable) on normal game sounds
+        that are short --- but it's noticeable delay with larger
+        sounds, like typical music. (in any case, I can move
+        this workaround to alCommonSourceSetup at some point,
+        should the need arise).
+
+        So the natural workaround below follows. For OpenAL implementations
+        that immediately load the buffer, this will not cause any delay. }
+      while SoundBuffers[PlayedSound] <>
+        alGetSource1ui(FAllocatedSource.ALSource, AL_BUFFER) do
+        Delay(10);
+
       alSourcePlay(FAllocatedSource.ALSource);
 
       FAllocatedSource.OnUsingEnd :=
