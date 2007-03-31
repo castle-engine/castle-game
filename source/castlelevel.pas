@@ -1814,7 +1814,7 @@ begin
               Crea.LegsPosition := Crea.LegsPosition + Move;
           end else
           begin
-            if BoxeCollisionAssumeTranslation(NewTranslation,
+            if BoxCollisionAssumeTranslation(NewTranslation,
               Crea.BoundingBox,
               @ParentLevel.CollisionIgnoreItem) then
               Crea.LegsPosition := Crea.LegsPosition + Move;
