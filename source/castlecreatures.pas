@@ -68,6 +68,8 @@ const
   DefaultHitsPlayer = true;
   DefaultHitsCreatures = false;
 
+  DefaultMiddlePositionHeight = 1.0;
+
 type
   TCreature = class;
 
@@ -86,6 +88,8 @@ type
     FShortRangeAttackKnockbackDistance: Single;
 
     FFallDownLifeLossScale: Single;
+
+    FMiddlePositionHeight: Single;
   protected
     { In descendants only PrepareRender can (and should!) set this. }
     CameraRadiusFromPrepareRender: Single;
@@ -202,6 +206,17 @@ type
       read FFallDownLifeLossScale
       write FFallDownLifeLossScale
       default DefaultFallDownLifeLossScale;
+
+    { This determines how the creature's MiddlePosition will be calculated.
+      Actually, this determines how the HeightBetweenLegsAndMiddle
+      will be calculated, and this is used to calculate MiddlePosition.
+      HeightBetweenLegsAndMiddle is just current scene box height
+      multiplied by this, so 1.0 means that MiddlePosition is at the top
+      of the box, 0.0 means at the bottom, 0.5 means at the middle etc. }
+    property MiddlePositionHeight: Single
+      read FMiddlePositionHeight
+      write FMiddlePositionHeight
+      default DefaultMiddlePositionHeight;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -784,7 +799,8 @@ type
       write SetLegsPosition;
 
     { This is the height of MiddlePosition above LegsPosition.
-      In this class, just a shortcut for CurrentScene.BoundingBox[1, 2].
+      Calculated in this class using CurrentScene.BoundingBox[1, 2]
+      and Kind.MiddlePositionHeight.
       Note that while CurrentScene may change, this also may change. }
     function HeightBetweenLegsAndMiddle: Single; virtual;
 
@@ -1069,8 +1085,6 @@ type
     function CollisionsWithCreaturesAndPlayer: boolean; override;
 
     function RemoveMeFromLevel: boolean; override;
-
-    function HeightBetweenLegsAndMiddle: Single; override;
   end;
 
   { This is TCreature that has a kind always of TMissileCreatureKind. }
@@ -1146,6 +1160,7 @@ begin
   FShortRangeAttackDamageRandom := DefaultShortRangeAttackDamageRandom;
   FShortRangeAttackKnockbackDistance := DefaultShortRangeAttackKnockbackDistance;
   FFallDownLifeLossScale := DefaultFallDownLifeLossScale;
+  FMiddlePositionHeight := DefaultMiddlePositionHeight;
   CreaturesKinds.Add(Self);
 end;
 
@@ -1175,6 +1190,10 @@ begin
   FallDownLifeLossScale :=
     KindsConfig.GetFloat(VRMLNodeName + '/fall_down_life_loss_scale',
     DefaultFallDownLifeLossScale);
+
+  MiddlePositionHeight :=
+    KindsConfig.GetFloat(VRMLNodeName + '/middle_position_height',
+    DefaultMiddlePositionHeight);
 
   SoundSuddenPain := SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_sudden_pain', ''));
@@ -1523,9 +1542,9 @@ begin
 
   CameraRadiusFromPrepareRender :=
     Max(Box3dXYRadius(ReferenceScene.BoundingBox),
-    { I can do here "/ 2" thanks to implementation of
-      TGhostCreature.HeightBetweenLegsAndMiddle, that sets uses
-      CurrentScene.BoundingBox[1, 2] / 2. }
+    { I can do here "/ 2" thanks to the fact that middle_position_height
+      of ghost is 0.5 (so I have room for another "BoundingBox[1, 2] / 2"
+      for radius). }
     ReferenceScene.BoundingBox[1, 2] / 2);
 end;
 
@@ -1782,7 +1801,7 @@ end;
 
 function TCreature.HeightBetweenLegsAndMiddle: Single;
 begin
-  Result := CurrentScene.BoundingBox[1, 2];
+  Result := CurrentScene.BoundingBox[1, 2] * Kind.MiddlePositionHeight;
 end;
 
 function TCreature.MiddlePositionFromLegs(
@@ -3273,11 +3292,6 @@ function TGhostCreature.RemoveMeFromLevel: boolean;
 begin
   Result := (State = wasDying) and
     (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd);
-end;
-
-function TGhostCreature.HeightBetweenLegsAndMiddle: Single;
-begin
-  Result := CurrentScene.BoundingBox[1, 2] / 2;
 end;
 
 { TMissileCreature ----------------------------------------------------------- }
