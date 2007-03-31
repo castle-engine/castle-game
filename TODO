@@ -3,6 +3,9 @@
   lower ? Check carefully where CameraRadius is used, and check various
   states of Werewolf (remember about Dead state).
 
+- eliminate entirely CameraRadiusFromPrepareRender ?
+  Alwats force to specify this in xml file ?
+
 - doom:
   - make lava work (rooms 4, 8)
   - make small and blue armor for doom level (items' stubs are already placed
@@ -11,7 +14,7 @@
   - use data/levels/doom/logo/doom_title.png, since I did it..
   - room 5: creatures should see through texture with alpha channel
   - if you know how, you can cause bad collisions and get out of the level
-    on elevator 9a-9b
+    on elevator 9a-9b because of MovePushesOthers problems.
   - still too dark. Secret on 9a-9b should be activated differently ?
     Or wall should be specially visible ? Maybe more visible the
     alternative entrance there (through the barrels) --- different wall
@@ -30,6 +33,8 @@
   Ew. eksplozje na strzaly tez moga pomoc ?
   Actually: the arrow geometry is much too large (it's clearly visible
   if you stop the time for creatures).
+  Actually, for now: smaller camera radius of the arrow (and checking collisions
+  with this sphere, not box) would help.
 
 - ball missile should hit other creatures too (helpful on crowdy places
   on Doom level), barrels too

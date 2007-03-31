@@ -33,29 +33,56 @@ Collisions:
 
   This means that sometimes Box is better, sometimes the Sphere.
 
-  E.g. you cannot guarantee that creature Box will never collide
-  with the level/player/other creatures etc. --- because each
-  animation frame change changes also the Box, so the creature's Box
-  may suddenly enter collision with something just because the time
-  changed and next animation frame has larger BoundingBox.
-  I cannot just stop animation in the middle (preventing such collision),
-  because I don't know what to do with such animation then...
-  So I just allow such collisions. Code that uses creature collision
-  by bounding box has to be prepared for this possibility.
+  Sphere advantages:
+  1. You cannot guarantee that creature Box will never collide
+     with the level/player/other creatures etc. --- because each
+     animation frame change changes also the Box, so the creature's Box
+     may suddenly enter collision with something just because the time
+     changed and next animation frame has larger BoundingBox.
+     I cannot just stop animation in the middle (preventing such collision),
+     because I don't know what to do with such animation then...
+     So I just allow such collisions. Code that uses creature collision
+     by bounding box has to be prepared for this possibility.
 
-  On the other hand, I can guarantee that creature's Sphere never
-  enters colliding state. That's easy, since creature's Sphere moves
-  only when creature Position changes. So I can prevent creature move
-  before it enters colliding state.
+     On the other hand, I can guarantee that creature's Sphere never
+     enters colliding state. That's easy, since creature's Sphere moves
+     only when creature Position changes.
+     So I can prevent creature move before it enters colliding state.
+     (well, actually bounding sphere center (MiddlePosition)
+     also changes with time, as usually it's calculated
+     looking at current bounding box... But this is not a problem as long
+     as sphere radius is chosen to be small enough.)
 
-  Also, for non-flying creatures, the Sphere is placed above the ground,
-  and this allows creature to climb the stairs --- just like the player.
-  Creature just walks into the stairs, and then "growing up" mechanism
-  (using GetCameraHeight) pushes them up. This creates a short time
-  when creature's lower parts collide with the stairs, but this is
-  almost unnoticeable for the player, since "growing up" works fast.
+  2, Also, for non-flying creatures, the Sphere is placed above the ground,
+     and this allows creature to climb the stairs --- just like the player.
+     Creature just walks into the stairs, and then "growing up" mechanism
+     (using GetCameraHeight) pushes them up. This creates a short time
+     when creature's lower parts collide with the stairs, but this is
+     almost unnoticeable for the player, since "growing up" works fast.
 
-  A minor Sphere advantage right now is also that
-  - We already have TVRMLTriangleOctree.SphereCollision implemented,
-    while TVRMLTriangleOctree.BoxCollision is still not implemented
-    (but inevitably will be done one day...).
+  Sphere disadvantage:
+  3. Well, Sphere is far from perfect as bounding volume --- it's too small,
+     sometimes also too large, sometimes both at the same time...
+
+     Since the Sphere radius remains always the same, it must be good
+     for all creature animation frames. This problem is somewhat cured
+     by new (as of this writing, 2007-03) UseBoundingSphere feature,
+     that allows you to use bounding box when you know that you will
+     not need Sphere advantages anymore. E.g. when creature is dead,
+     we don't need the advantages 1. and 2. above --- dead creature
+     may be stuck in a wall, and it doesn't have to climb stairs.
+     This means that what happens during the creature's Dying animation
+     doesn't affect CameraRadius.
+
+     But still it may be a problem sometimes, if some creature states
+     have entirely different animations and bounding boxes. Then you
+     will be forced to choose one universal CameraRadius for all creature
+     states.
+
+     - Obviously you can't set radius too small, because if it's much smaller
+       than actual creature's geometry then the creature will noticeably collide
+       with level geometry and other creatures.
+
+     - On the other hand, you can't set radius too large
+       (or move creature's MiddlePosition, that decides where's the Sphere center,
+       much lower). This would block stair climbing.
