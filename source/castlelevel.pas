@@ -77,7 +77,7 @@ type
     by overriding TLevel methods instead. Overriding TLevel methods
     is more flexible, but it's also more tiresome --- since you have to
     repeat some dummy tasks every time (see where TLevel implementations
-    handles @link(Objects) to know approximately what you may want to
+    handles @link(TLevel.Objects) to know approximately what you may want to
     override in your TLevel descendats).
     Implementing and using universal (reusable) TLevelObject descendants
     is a better idea. }
@@ -107,10 +107,18 @@ type
       const CameraRadius: Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
 
+    function MoveBoxAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const ProposedNewBox: TBox3d;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+
+    function BoxCollision(const Box: TBox3d;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
 
     { @returns(A collision as TCollisionInfo instance, or @nil if no collision).
@@ -190,10 +198,18 @@ type
       const CameraRadius: Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
+    function MoveBoxAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const ProposedNewBox: TBox3d;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function BoxCollision(const Box: TBox3d;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function RayCollision(
@@ -246,10 +262,18 @@ type
       const CameraRadius: Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
+    function MoveBoxAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const ProposedNewBox: TBox3d;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function BoxCollision(const Box: TBox3d;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function RayCollision(
@@ -328,10 +352,18 @@ type
       const CameraRadius: Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
+    function MoveBoxAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const ProposedNewBox: TBox3d;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function BoxCollision(const Box: TBox3d;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function RayCollision(
@@ -397,7 +429,8 @@ type
 
         @item(When not MovePushesOthersUsesBoxes, then we try to check
           using precise octree of level objects (assuming they are
-          used in SphereCollision overrides). And for player and creature,
+          used in SphereCollision/BoxCollision overrides).
+          And for player and creatures with UseBoundingSphere = @true,
           we use their spheres instead of their bounding boxes.
           This is the way of checking that more resembles reality
           (as we use the actual geometry within the octrees instead of
@@ -411,7 +444,7 @@ type
           This means that if the level object doesn't move too fast,
           you get strange effect when e.g. player is standing within
           the level object: the player position seems to bounce within
-          the elevator.) }
+          the elevator.)) }
     property MovePushesOthersUsesBoxes: boolean
       read FMovePushesOthersUsesBoxes write FMovePushesOthersUsesBoxes
       default true;
@@ -573,10 +606,18 @@ type
       const CameraRadius: Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
+    function MoveBoxAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const ProposedNewBox: TBox3d;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+
+    function BoxCollision(const Box: TBox3d;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
 
     function RayCollision(
@@ -646,9 +687,15 @@ type
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+    function MoveBoxAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const ProposedNewBox: TBox3d;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
+      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+    function BoxCollision(const ABox: TBox3d;
       const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
     function RayCollision(
       out IntersectionDistance: Single;
@@ -737,12 +784,18 @@ type
     FThunderEffect: TThunderEffect;
 
     { Check collision (following MoveAllowedSimple mechanics) with
-      all Objects (not with the base level geometry). }
+      all Objects (not with the base level geometry).
+      @groupBegin }
     function ObjectsMoveAllowedSimple(
       const CameraPos: TVector3Single;
       const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean;
+    function ObjectsMoveBoxAllowedSimple(
+      const OldPos, ProposedNewPos: TVector3Single;
+      const ProposedNewBox: TBox3d;
+      const BecauseOfGravity: boolean): boolean;
+    { @groupEnd }
 
     FName: string;
     FSceneFileName: string;
@@ -926,6 +979,11 @@ type
       const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean; virtual;
+
+    function MoveBoxAllowedSimple(
+      const CameraPos, NewPos: TVector3Single;
+      const NewBox: TBox3d;
+      const BecauseOfGravity: boolean): boolean; virtual;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
@@ -1205,6 +1263,17 @@ begin
       CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
 end;
 
+function TLevelStaticObject.MoveBoxAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const ProposedNewBox: TBox3d;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := (not Exists) or (not Collides) or
+    Scene.DefaultTriangleOctree.MoveBoxAllowedSimple(
+      OldPos, ProposedNewPos, ProposedNewBox,
+      NoItemIndex, ItemsToIgnoreFunc);
+end;
+
 function TLevelStaticObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
@@ -1222,6 +1291,15 @@ begin
   Result := Exists and Collides and
     (Scene.DefaultTriangleOctree.SphereCollision(
       Pos, Radius,  NoItemIndex, ItemsToIgnoreFunc)
+      <> NoItemIndex);
+end;
+
+function TLevelStaticObject.BoxCollision(const Box: TBox3d;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := Exists and Collides and
+    (Scene.DefaultTriangleOctree.BoxCollision(
+      Box,  NoItemIndex, ItemsToIgnoreFunc)
       <> NoItemIndex);
 end;
 
@@ -1328,6 +1406,22 @@ begin
   end;
 end;
 
+function TLevelObjectSum.MoveBoxAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const ProposedNewBox: TBox3d;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  I: Integer;
+begin
+  Result := true;
+  for I := 0 to List.High do
+  begin
+    Result := List.Items[I].MoveBoxAllowedSimple(OldPos, ProposedNewPos,
+      ProposedNewBox, ItemsToIgnoreFunc);
+    if not Result then Exit;
+  end;
+end;
+
 function TLevelObjectSum.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 var
@@ -1351,6 +1445,19 @@ begin
   for I := 0 to List.High do
   begin
     Result := List.Items[I].SphereCollision(Pos, Radius, ItemsToIgnoreFunc);
+    if Result then Exit;
+  end;
+end;
+
+function TLevelObjectSum.BoxCollision(const Box: TBox3d;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  I: Integer;
+begin
+  Result := false;
+  for I := 0 to List.High do
+  begin
+    Result := List.Items[I].BoxCollision(Box, ItemsToIgnoreFunc);
     if Result then Exit;
   end;
 end;
@@ -1445,6 +1552,33 @@ begin
   end;
 end;
 
+function TLevelMovingObject.MoveBoxAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const ProposedNewBox: TBox3d;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  T: TVector3_Single;
+  B: TBox3d;
+begin
+  Result := (not Exists) or (not Collides);
+  if not Result then
+  begin
+    { I have to check collision between
+        MovingObject + Translation and (OldPos, ProposedNewPos).
+      So it's equivalent to checking for collision between
+        MovingObject and (OldPos, ProposedNewPos) - Translation
+      And this way I can use MovingObject.MoveBoxAllowedSimple. }
+
+    T := Translation(ParentLevel.AnimationTime);
+    B[0] := VectorSubtract(ProposedNewBox[0], T.Data);
+    B[1] := VectorSubtract(ProposedNewBox[1], T.Data);
+    Result := MovingObject.MoveBoxAllowedSimple(
+      VectorSubtract(OldPos, T.Data),
+      VectorSubtract(ProposedNewPos, T.Data),
+      B, ItemsToIgnoreFunc);
+  end;
+end;
+
 function TLevelMovingObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 var
@@ -1478,6 +1612,24 @@ begin
     T := Translation(ParentLevel.AnimationTime);
     Result := MovingObject.SphereCollision(
       VectorSubtract(Pos, T.Data),  Radius, ItemsToIgnoreFunc);
+  end;
+end;
+
+function TLevelMovingObject.BoxCollision(
+  const Box: TBox3d;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+var
+  T: TVector3_Single;
+begin
+  Result := Exists and Collides;
+  if Result then
+  begin
+    { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+      use MovingObject.BoxCollsion with Translation. }
+
+    T := Translation(ParentLevel.AnimationTime);
+    Result := MovingObject.BoxCollision(
+      Box3dAntiTranslate(Box, T.Data),  ItemsToIgnoreFunc);
   end;
 end;
 
@@ -1573,7 +1725,23 @@ procedure TLevelMovingObject.BeforeIdle(
         use MovingObject.SphereCollsion with Translation. }
 
       Result := MovingObject.SphereCollision(
-        VectorSubtract(Pos, AssumeTranslation.Data),  Radius, ItemsToIgnoreFunc);
+        VectorSubtract(Pos, AssumeTranslation.Data), Radius, ItemsToIgnoreFunc);
+    end;
+  end;
+
+  function BoxCollisionAssumeTranslation(
+    const AssumeTranslation: TVector3_Single;
+    const Box: TBox3d;
+    const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  begin
+    Result := Exists and Collides;
+    if Result then
+    begin
+      { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+        use MovingObject.BoxCollsion with Translation. }
+
+      Result := MovingObject.BoxCollision(
+        Box3dAntiTranslate(Box, AssumeTranslation.Data), ItemsToIgnoreFunc);
     end;
   end;
 
@@ -1619,6 +1787,15 @@ begin
              Boxes3dCollision(CurrentBox, Box) then
             Crea.LegsPosition := Crea.LegsPosition + Move;
         end;
+
+        for I := 0 to ParentLevel.Items.High do
+        begin
+          Item := ParentLevel.Items[I];
+          Box := Item.BoundingBox;
+          if Boxes3dCollision(NewBox, Box) or
+             Boxes3dCollision(CurrentBox, Box) then
+            Item.Position := Item.Position + Move;
+        end;
       end else
       begin
         if SphereCollisionAssumeTranslation(NewTranslation,
@@ -1629,32 +1806,29 @@ begin
         for I := 0 to ParentLevel.Creatures.High do
         begin
           Crea := ParentLevel.Creatures[I];
-          if SphereCollisionAssumeTranslation(NewTranslation,
-            Crea.MiddlePosition, Crea.Kind.CameraRadius,
-            @ParentLevel.CollisionIgnoreItem) then
-            Crea.LegsPosition := Crea.LegsPosition + Move;
+          if Crea.UseBoundingSphere then
+          begin
+            if SphereCollisionAssumeTranslation(NewTranslation,
+              Crea.MiddlePosition, Crea.Kind.CameraRadius,
+              @ParentLevel.CollisionIgnoreItem) then
+              Crea.LegsPosition := Crea.LegsPosition + Move;
+          end else
+          begin
+            if BoxeCollisionAssumeTranslation(NewTranslation,
+              Crea.BoundingBox,
+              @ParentLevel.CollisionIgnoreItem) then
+              Crea.LegsPosition := Crea.LegsPosition + Move;
+          end;
         end;
-      end;
 
-      { TODO: check for collisions with Items is not correct:
-        we just check our boxes with item's BoundingBox.
-        This is correct for MovePushesOthersUsesBoxes, but not when
-        MovePushesOthersUsesBoxes = @false.
-
-        The correct way for MovePushesOthersUsesBoxes = @false
-        would be to use our octree (more precisely, the octree
-        that is potentially stored somewhere in MovingObject)
-        with BoundingBox. This requires that we implement in
-        TVRMLTriangleOctree some way to check for collision with Box3d,
-        and then make BoxCollision available as TLevelObject method
-        (overridden everywhere, using appropriate octree when possible). }
-      for I := 0 to ParentLevel.Items.High do
-      begin
-        Item := ParentLevel.Items[I];
-        Box := Item.BoundingBox;
-        if Boxes3dCollision(NewBox, Box) or
-           Boxes3dCollision(CurrentBox, Box) then
-          Item.Position := Item.Position + Move;
+        for I := 0 to ParentLevel.Items.High do
+        begin
+          Item := ParentLevel.Items[I];
+          if BoxCollisionAssumeTranslation(NewTranslation,
+            Item.BoundingBox,
+            @ParentLevel.CollisionIgnoreItem) then
+            Item.Position := Item.Position + Move;
+        end;
       end;
     end;
   end;
@@ -1852,6 +2026,17 @@ begin
       CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
 end;
 
+function TLevelAnimatedObject.MoveBoxAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const ProposedNewBox: TBox3d;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := (not Exists) or (not Collides) or
+    Animation.FirstScene.DefaultTriangleOctree.MoveBoxAllowedSimple(
+      OldPos, ProposedNewPos, ProposedNewBox,
+      NoItemIndex, ItemsToIgnoreFunc);
+end;
+
 function TLevelAnimatedObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
@@ -1869,6 +2054,16 @@ begin
   Result := Exists and Collides and
     (Animation.FirstScene.DefaultTriangleOctree.SphereCollision(
       Pos, Radius, NoItemIndex, ItemsToIgnoreFunc)
+      <> NoItemIndex);
+end;
+
+function TLevelAnimatedObject.BoxCollision(
+  const Box: TBox3d;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  Result := Exists and Collides and
+    (Animation.FirstScene.DefaultTriangleOctree.BoxCollision(
+      Box, NoItemIndex, ItemsToIgnoreFunc)
       <> NoItemIndex);
 end;
 
@@ -1987,6 +2182,15 @@ begin
   Result := true;
 end;
 
+function TLevelArea.MoveBoxAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const ProposedNewBox: TBox3d;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  { This object is invisible and non-colliding. }
+  Result := true;
+end;
+
 function TLevelArea.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
@@ -1994,7 +2198,15 @@ begin
   Result := false;
 end;
 
-function TLevelArea.SphereCollision(const Pos: TVector3Single; const Radius: Single;
+function TLevelArea.SphereCollision(
+  const Pos: TVector3Single; const Radius: Single;
+  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+begin
+  { This object is invisible and non-colliding. }
+  Result := false;
+end;
+
+function TLevelArea.BoxCollision(const ABox: TBox3d;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   { This object is invisible and non-colliding. }
@@ -2528,6 +2740,25 @@ begin
   Result := true;
 end;
 
+function TLevel.ObjectsMoveBoxAllowedSimple(
+  const OldPos, ProposedNewPos: TVector3Single;
+  const ProposedNewBox: TBox3d;
+  const BecauseOfGravity: boolean): boolean;
+var
+  I: Integer;
+begin
+  for I := 0 to Objects.High do
+    if not Objects[I].MoveBoxAllowedSimple(
+      OldPos, ProposedNewPos, ProposedNewBox,
+      @CollisionIgnoreItem) then
+    begin
+      Result := false;
+      Exit;
+    end;
+
+  Result := true;
+end;
+
 function TLevel.MoveAllowed(const CameraPos: TVector3Single;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
@@ -2554,6 +2785,20 @@ begin
       NoItemIndex, @CollisionIgnoreItem) and
     ObjectsMoveAllowedSimple(
       CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
+end;
+
+function TLevel.MoveBoxAllowedSimple(const CameraPos: TVector3Single;
+  const NewPos: TVector3Single;
+  const NewBox: TBox3d;
+  const BecauseOfGravity: boolean): boolean;
+begin
+  Result :=
+    Box3dPointInside(NewPos, LevelBox) and
+    Scene.DefaultTriangleOctree.MoveBoxAllowedSimple(
+      CameraPos, NewPos, NewBox,
+      NoItemIndex, @CollisionIgnoreItem) and
+    ObjectsMoveBoxAllowedSimple(
+      CameraPos, NewPos, NewBox, BecauseOfGravity);
 end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;

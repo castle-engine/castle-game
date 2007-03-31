@@ -873,6 +873,21 @@ type
       it will continue to be played independent of this creature. }
     procedure Sound3d(const SoundType: TSoundType; const SoundHeight: Single;
       TiedToCreature: boolean = true);
+
+    { Is using bounding sphere (sphere centered at MiddlePosition with
+      radius Kind.CameraRadius) allowed ?
+
+      If @false, then all collision
+      detection routines @italic(must) use bounding box instead of the
+      sphere. Since UseBoundingSphere = @false usually means that
+      Kind.CameraRadius is not appropriate for this creature state.
+
+      In this class, this is implemented to return @code(not Dead).
+      This is usually sensible, since only alive creatures need bounding
+      sphere advantages (stairs climbing), and using sphere with dead
+      creatures would unnecessarily force the sphere radius to be small
+      and MiddlePosition to be high. }
+    function UseBoundingSphere: boolean; virtual;
   end;
 
   TObjectsListItem_1 = TCreature;
@@ -1924,35 +1939,59 @@ function TCreature.MoveAllowed(
   out NewMiddlePosition: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  Result :=
-    { Check creature<->level collision. }
-    Level.MoveAllowed(
+  { Check creature<->level collision. }
+  if UseBoundingSphere then
+  begin
+    Result := Level.MoveAllowed(
       OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
-      BecauseOfGravity, Kind.CameraRadius) and
-    { Check creature<->player collision. }
-    (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
-    { Check creature<->other creatures collision. }
-    (Level.Creatures.MoveAllowedSimple(
-      BoundingBox,
+      BecauseOfGravity, Kind.CameraRadius);
+  end else
+  begin
+    NewMiddlePosition := ProposedNewMiddlePosition;
+    Result := Level.MoveBoxAllowedSimple(
+      OldMiddlePosition, NewMiddlePosition,
       BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
-      OldMiddlePosition, NewMiddlePosition, Self) = nil);
+      BecauseOfGravity);
+  end;
+
+  if Result then
+    Result :=
+      { Check creature<->player collision. }
+      (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
+      { Check creature<->other creatures collision. }
+      (Level.Creatures.MoveAllowedSimple(
+        BoundingBox,
+        BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
+        OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
 function TCreature.MoveAllowedSimple(
   const OldMiddlePosition, NewMiddlePosition: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  Result :=
-    { Check creature<->level collision. }
-    Level.MoveAllowedSimple(OldMiddlePosition, NewMiddlePosition,
-      BecauseOfGravity, Kind.CameraRadius) and
-    { Check creature<->player collision. }
-    (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
-    { Check creature<->other creatures collision. }
-    (Level.Creatures.MoveAllowedSimple(
-      BoundingBox,
+  { Check creature<->level collision. }
+  if UseBoundingSphere then
+  begin
+    Result := Level.MoveAllowedSimple(
+      OldMiddlePosition, NewMiddlePosition,
+      BecauseOfGravity, Kind.CameraRadius);
+  end else
+  begin
+    Result := Level.MoveBoxAllowedSimple(
+      OldMiddlePosition, NewMiddlePosition,
       BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
-      OldMiddlePosition, NewMiddlePosition, Self) = nil);
+      BecauseOfGravity);
+  end;
+
+  if Result then
+    Result :=
+      { Check creature<->player collision. }
+      (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
+      { Check creature<->other creatures collision. }
+      (Level.Creatures.MoveAllowedSimple(
+        BoundingBox,
+        BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
+        OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
 procedure TCreature.GetCameraHeight(
@@ -2154,6 +2193,11 @@ begin
     Player.Knockback(Damage, Kind.ShortRangeAttackKnockbackDistance,
       Direction) else
     Player.Life := Player.Life - Damage;
+end;
+
+function TCreature.UseBoundingSphere: boolean;
+begin
+  Result := not Dead;
 end;
 
 { TCreatures ----------------------------------------------------------------- }
@@ -3253,9 +3297,16 @@ var
 begin
   inherited;
 
+  { Note that for now missiles are removed from level as soon as they are dead,
+    so I don't bother with checking here Dead. Or UseBoundingSphere
+    --- you can safely assume that UseBoundingSphere is @true here,
+    and use Level.MoveAllowedSimple instead of Level.MoveBoxAllowedSimple. }
+
   NewLegsPosition := VectorAdd(LegsPosition,
     VectorScale(Direction, MissileKind.MoveSpeed * CompSpeed));
 
+  { TODO: shouldn't it be MiddlePosition here ? Also MiddlePosition should
+    move lower. }
   if Level.MoveAllowedSimple(LegsPosition, NewLegsPosition,
     false, Kind.CameraRadius) then
   begin
