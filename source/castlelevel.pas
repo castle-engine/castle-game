@@ -2656,6 +2656,14 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
 
     { calculate CreatureKind }
     CreatureKind := CreaturesKinds.FindByVRMLNodeName(CreatureKindName);
+    { The creature kind may be unprepared here only because
+      --debug-no-creatures was specified. In this case, leave this
+      creature kind unprepared and don't add this creature. }
+    if not CreatureKind.PrepareRenderDone then
+    begin
+      Assert(WasParam_DebugNoCreatures);
+      Exit;
+    end;
 
     { calculate CreatureDirection }
     { TODO --- CreatureDirection configurable.
@@ -2690,8 +2698,7 @@ begin
     Parent := Node.ParentNodes[ParentIndex];
     if IsPrefix(CreaturePrefix, Parent.NodeName) then
     begin
-      if not WasParam_DebugNoCreatures then
-        CreateNewCreature(SEnding(Parent.NodeName, Length(CreaturePrefix) + 1));
+      CreateNewCreature(SEnding(Parent.NodeName, Length(CreaturePrefix) + 1));
       { Don't remove Parent now --- will be removed later.
         This avoids problems with removing nodes while traversing. }
       ItemsToRemove.Add(Parent);

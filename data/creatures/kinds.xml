@@ -401,6 +401,8 @@
     default_max_life="1.0"
     close_direction_to_player="False"
 
+    middle_position_height="0.0"
+
     sound_explosion="thrown_web_hit"
     sound_idle="thrown_web_idle"
   >

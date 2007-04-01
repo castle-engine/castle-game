@@ -94,7 +94,9 @@ begin
            nl+
            'Debug options (don''t use unless you know what you''re doing):' +nl+
            '  --debug-log           Write various log info on stdout' +nl+
-           '  --debug-no-creatures  Disable loading creatures animations');
+           '  --debug-no-creatures  Creatures animations will be loaded' +nl+
+           '                        only when you explicitly request them' +nl+
+           '                        from debug menu');
          ProgramBreak;
        end;
     1: WasParam_NoSound := true;

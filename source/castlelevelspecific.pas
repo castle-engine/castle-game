@@ -700,7 +700,10 @@ begin
 
     { Maybe appear new spiders }
     if (Level.Creatures.Count < CreaturesCountToAddSpiders) and
-       (not WasParam_DebugNoCreatures) then
+       { Spider.PrepareRenderDone may be false here only if
+         --debug-no-creatures was specified. In this case,
+         leave Spider unprepared and don't use spider's on this level. }
+       Spider.PrepareRenderDone then
     begin
       if NextSpidersAppearingTime = 0 then
       begin
