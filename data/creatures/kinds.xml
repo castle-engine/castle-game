@@ -153,6 +153,8 @@
     close_direction_to_target_speed="0.02"
     pause_between_sound_idle="2.5"
 
+    middle_position_height="0.0"
+
     sound_explosion="ball_missile_explode"
     sound_idle="ball_missile_idle"
   >
@@ -415,13 +417,15 @@
   </ThrownWeb>
 
   <Arrow
-    camera_radius="1.0"
     flying="True"
     default_max_life="1.0"
     close_direction_to_player="False"
     hits_player="False"
     hits_creatures="True"
     move_speed="2.0"
+
+    middle_position_height="0.0"
+    camera_radius="0.3"
 
     sound_explosion="arrow_hit"
   >

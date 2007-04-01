@@ -3303,10 +3303,9 @@ end;
 
 procedure TMissileCreature.Idle(const CompSpeed: Single);
 var
-  NewLegsPosition: TVector3Single;
+  NewMiddlePosition: TVector3Single;
   AngleBetween, AngleChange: Single;
   NewDirection, TargetDirection: TVector3Single;
-  Box: TBox3d;
   I: Integer;
 begin
   inherited;
@@ -3316,28 +3315,32 @@ begin
     --- you can safely assume that UseBoundingSphere is @true here,
     and use Level.MoveAllowedSimple instead of Level.MoveBoxAllowedSimple. }
 
-  NewLegsPosition := VectorAdd(LegsPosition,
+  NewMiddlePosition := VectorAdd(MiddlePosition,
     VectorScale(Direction, MissileKind.MoveSpeed * CompSpeed));
 
-  { TODO: shouldn't it be MiddlePosition here ? Also MiddlePosition should
-    move lower. }
-  if Level.MoveAllowedSimple(LegsPosition, NewLegsPosition,
+  if Level.MoveAllowedSimple(MiddlePosition, NewMiddlePosition,
     false, Kind.CameraRadius) then
   begin
-    LegsPosition := NewLegsPosition;
+    LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
   end else
     ExplodeWithLevel;
 
+  { Check bounding Box of the missile <-> player's BoundingBox.
+    Maybe I'll switch to using bounding Sphere here one day ?  }
   if MissileKind.HitsPlayer and LegsCollisionWithPlayer(LegsPosition) then
     ExplodeWithPlayer;
 
   if MissileKind.HitsCreatures then
   begin
-    Box := BoundingBox;
+    { Check bounding Sphere of the missile <-> creature's BoundingBox.
+      Bounding Sphere is better for arrow, that has very large geometry
+      but small enough bounding Sphere (because bounding Sphere radius
+      is adjusted by creatures/kinds.xml). }
     for I := 0 to Level.Creatures.Count - 1 do
       if (Level.Creatures[I] <> Self) and
          (Level.Creatures[I].CollisionsWithCreaturesAndPlayer) and
-         (Boxes3dCollision(Box, Level.Creatures[I].BoundingBox)) then
+         (Box3dSphereSimpleCollision(Level.Creatures[I].BoundingBox,
+           MiddlePosition, Kind.CameraRadius)) then
       begin
         ExplodeWithCreature(Level.Creatures[I]);
         { TODO: projectiles shouldn't do here "break". }
