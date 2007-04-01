@@ -1226,7 +1226,6 @@ procedure TCreatureKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
 begin
   inherited;
   AnimInfo.ScenesPerTime :=
-    { TODO: should this really be multiplied ? }
     AnimInfo.ScenesPerTime * CreatureAnimationScenesPerTime;
 end;
 
