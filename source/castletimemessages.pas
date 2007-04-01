@@ -42,6 +42,8 @@ procedure TimeMessage(const S: string);
 { This must be called within 2d projection. }
 procedure TimeMessagesDraw;
 
+function TimeMessagesDrawNeeded: boolean;
+
 procedure TimeMessagesClear;
 
 procedure TimeMessagesIdle;
@@ -67,6 +69,11 @@ procedure TimeMessagesDraw;
 begin
   TimeMessagesManager.Draw2d(Glw.Width, Glw.Height,
                              Glw.Width, Glw.Height);
+end;
+
+function TimeMessagesDrawNeeded: boolean;
+begin
+  Result := TimeMessagesManager.DrawNeeded;
 end;
 
 procedure TimeMessagesClear;

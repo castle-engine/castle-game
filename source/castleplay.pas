@@ -124,7 +124,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   CastleLevelSpecific, VRMLFlatSceneGL;
 
 var
-  GLList_Draw2dBegin: TGLuint;
+  GLList_TimeMessagesBackground: TGLuint;
 
   GLList_InventorySlot: TGLuint;
   InventoryVisible: boolean;
@@ -321,9 +321,14 @@ procedure Draw2D(Draw2DData: Integer);
 begin
   Player.RenderWeapon2D;
 
-  glCallList(GLList_Draw2dBegin);
+  glLoadIdentity;
+  glRasterPos2i(0, 0);
 
-  TimeMessagesDraw;
+  if TimeMessagesDrawNeeded then
+  begin
+    glCallList(GLList_TimeMessagesBackground);
+    TimeMessagesDraw;
+  end;
 
   if InventoryVisible then
     DoDrawInventory;
@@ -1282,9 +1287,9 @@ const
 var
   I: Integer;
 begin
-  { Calculate GLList_Draw2dBegin }
-  GLList_Draw2dBegin := glGenListsCheck(1, 'CastlePlay.GLWindowInit');
-  glNewList(GLList_Draw2dBegin, GL_COMPILE);
+  { Calculate GLList_TimeMessagesBackground }
+  GLList_TimeMessagesBackground := glGenListsCheck(1, 'CastlePlay.GLWindowInit');
+  glNewList(GLList_TimeMessagesBackground, GL_COMPILE);
   try
     glLoadIdentity;
     glRasterPos2i(0, 0);
@@ -1313,7 +1318,7 @@ begin
   FreeAndNil(Font_BFNT_BitstreamVeraSans);
   FreeAndNil(Font_BFNT_BitstreamVeraSans_m10);
 
-  glFreeDisplayList(GLList_Draw2dBegin);
+  glFreeDisplayList(GLList_TimeMessagesBackground);
   glFreeDisplayList(GLList_InventorySlot);
 end;
 
