@@ -688,7 +688,7 @@ begin
 
   { TODO: TItemWeaponKind impl allows to have FAttackAnimationInfo = nil
     if you don't want attack animation, but line below doesn't allow it. }
-  FAttackAnimationInfo := AnimationFromConfig(KindsConfig, 'attack');
+  AnimationFromConfig(FAttackAnimationInfo, KindsConfig, 'attack');
 end;
 
 { TItemShortRangeWeaponKind -------------------------------------------------- }

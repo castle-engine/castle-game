@@ -73,8 +73,8 @@ type
 
     { @param(AnimationName determines the XML element name, so it must
       be a valid part of XML name) }
-    function AnimationFromConfig(KindsConfig: TKamXMLConfig;
-      const AnimationName: string): TVRMLGLAnimationInfo; virtual;
+    procedure AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
+      KindsConfig: TKamXMLConfig; const AnimationName: string); virtual;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
@@ -248,17 +248,19 @@ begin
   Progress.Step;
 end;
 
-function TObjectKind.AnimationFromConfig(KindsConfig: TKamXMLConfig;
-  const AnimationName: string): TVRMLGLAnimationInfo;
+procedure TObjectKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
+  KindsConfig: TKamXMLConfig; const AnimationName: string);
 var
   Element: TDOMElement;
 begin
+  FreeAndNil(AnimInfo);
+
   Element := KindsConfig.PathElement(
     VRMLNodeName + '/' + AnimationName + '_animation/animation');
   if Element = nil then
     raise Exception.CreateFmt('No <%s_animation>/<animation> elements for object "%s"',
       [AnimationName, VRMLNodeName]);
-  Result := TVRMLGLAnimationInfo.CreateFromDOMElement(
+  AnimInfo := TVRMLGLAnimationInfo.CreateFromDOMElement(
     Element, ExtractFilePath(KindsConfig.FileName),
     GLContextCache);
 end;

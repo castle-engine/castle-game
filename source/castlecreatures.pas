@@ -101,8 +101,8 @@ type
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo);
 
-    function AnimationFromConfig(KindsConfig: TKamXMLConfig;
-      const AnimationName: string): TVRMLGLAnimationInfo; override;
+    procedure AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
+      KindsConfig: TKamXMLConfig; const AnimationName: string); override;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -1221,11 +1221,13 @@ begin
     false, true, RenderShadowsPossible, false);
 end;
 
-function TCreatureKind.AnimationFromConfig(KindsConfig: TKamXMLConfig;
-  const AnimationName: string): TVRMLGLAnimationInfo;
+procedure TCreatureKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
+  KindsConfig: TKamXMLConfig; const AnimationName: string);
 begin
-  Result := inherited;
-  Result.ScenesPerTime := Result.ScenesPerTime * CreatureAnimationScenesPerTime;
+  inherited;
+  AnimInfo.ScenesPerTime :=
+    { TODO: should this really be multiplied ? }
+    AnimInfo.ScenesPerTime * CreatureAnimationScenesPerTime;
 end;
 
 { TCreaturesKindsList -------------------------------------------------------- }
@@ -1424,12 +1426,12 @@ begin
   SoundAttackStart := SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_attack_start', ''));
 
-  FStandAnimationInfo := AnimationFromConfig(KindsConfig, 'stand');
-  FStandToWalkAnimationInfo := AnimationFromConfig(KindsConfig, 'stand_to_walk');
-  FWalkAnimationInfo := AnimationFromConfig(KindsConfig, 'walk');
-  FAttackAnimationInfo := AnimationFromConfig(KindsConfig, 'attack');
-  FDyingAnimationInfo := AnimationFromConfig(KindsConfig, 'dying');
-  FHurtAnimationInfo := AnimationFromConfig(KindsConfig, 'hurt');
+  AnimationFromConfig(FStandAnimationInfo, KindsConfig, 'stand');
+  AnimationFromConfig(FStandToWalkAnimationInfo, KindsConfig, 'stand_to_walk');
+  AnimationFromConfig(FWalkAnimationInfo, KindsConfig, 'walk');
+  AnimationFromConfig(FAttackAnimationInfo, KindsConfig, 'attack');
+  AnimationFromConfig(FDyingAnimationInfo, KindsConfig, 'dying');
+  AnimationFromConfig(FHurtAnimationInfo, KindsConfig, 'hurt');
 end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
@@ -1524,8 +1526,7 @@ begin
   ActualThrowWebAttackTime :=
     KindsConfig.GetFloat(VRMLNodeName + '/throw_web/actual_attack_time', 0.0);
 
-  FThrowWebAttackAnimationInfo :=
-    AnimationFromConfig(KindsConfig, 'throw_web_attack');
+  AnimationFromConfig(FThrowWebAttackAnimationInfo, KindsConfig, 'throw_web_attack');
 end;
 
 { TGhostKind ------------------------------------------------------------- }
@@ -1643,7 +1644,7 @@ begin
   SoundIdle := SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_idle', ''));
 
-  FAnimationInfo := AnimationFromConfig(KindsConfig, 'fly');
+  AnimationFromConfig(FAnimationInfo, KindsConfig, 'fly');
 end;
 
 { TStillCreatureKind ---------------------------------------------------- }
@@ -1700,7 +1701,7 @@ procedure TStillCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
 begin
   inherited;
 
-  FAnimationInfo := AnimationFromConfig(KindsConfig, 'stand');
+  AnimationFromConfig(FAnimationInfo, KindsConfig, 'stand');
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }
