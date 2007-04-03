@@ -808,6 +808,10 @@ type
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
 
+    { Instance of boss creature, if any, on the level. @nil if no boss creature
+      exists on this level. }
+    property BossCreature: TCreature read FBossCreature;
+
     { See [http://www.camelot.homedns.org/~michalis/castle-development.php]
       for description of LevelBox and WaterBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
@@ -1134,9 +1138,11 @@ type
     property ThunderEffect: TThunderEffect
       read FThunderEffect write FThunderEffect;
 
-    { Instance of boss creature, if any, on the level. @nil is no boss creature
-      exists on this level. }
-    property BossCreature: TCreature read FBossCreature;
+    { This returns whether and what to show on boss creature indicator.
+      Default implementation in this class uses BossCreature property:
+      if it's non-nil and BossCreature is alive, then indicator shows
+      BossCreature life. }
+    function BossCreatureIndicator(out Life, MaxLife: Single): boolean; virtual;
 
     { Returns the background that you should use before calling Render
       of this level. @nil if no background should be rendered.
@@ -3029,6 +3035,16 @@ procedure TLevel.TimeMessageInteractFailed(const S: string);
 begin
   TimeMessage(S);
   Sound(stPlayerInteractFailed);
+end;
+
+function TLevel.BossCreatureIndicator(out Life, MaxLife: Single): boolean;
+begin
+  Result := (BossCreature <> nil) and (not BossCreature.Dead);
+  if Result then
+  begin
+    Life := BossCreature.Life;
+    MaxLife := BossCreature.MaxLife;
+  end;
 end;
 
 end.

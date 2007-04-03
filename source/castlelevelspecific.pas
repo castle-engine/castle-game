@@ -25,7 +25,11 @@ interface
 
 uses VRMLGLAnimation, VRMLFlatSceneGL, Boxes3d, VectorMath,
   CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL,
-  ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM;
+  ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM,
+  CastleCreatures;
+
+const
+  CastleHallWerewolvesCount = 5;
 
 type
   TCastleHallLevel = class(TLevel)
@@ -36,6 +40,10 @@ type
     StairsBlocker: TLevelStaticObject;
 
     FLevelExitBox: TBox3d;
+
+    WerewolfAppearPosition: array [0..CastleHallWerewolvesCount - 1] of TVector3Single;
+    WerewolfAppeared: boolean;
+    WerewolfCreature: array [0..CastleHallWerewolvesCount - 1] of TCreature;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -53,7 +61,7 @@ type
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
-    procedure DestroyStairsBlocker;
+    function BossCreatureIndicator(out Life, MaxLife: Single): boolean; override;
   end;
 
   TGateLevel = class(TLevel)
@@ -202,7 +210,7 @@ implementation
 
 uses KambiFilesUtils, SysUtils, Object3dAsVRML, KambiUtils,
   OpenGLh, KambiGLUtils, KambiStringUtils,
-  CastleCreatures, CastlePlay, CastleTimeMessages, CastleInputs,
+  CastlePlay, CastleTimeMessages, CastleInputs,
   CastleItems, CastleThunder, CastleLevelAvailable;
 
 function CastleLevelsPath: string;
@@ -238,16 +246,69 @@ begin
 end;
 
 procedure TCastleHallLevel.ChangeLevelScene;
+
+  function BoxDownPosition(const Box: TBox3d): TVector3Single;
+  begin
+    Result[0] := (Box[0, 0] + Box[1, 0]) / 2;
+    Result[1] := (Box[0, 1] + Box[1, 1]) / 2;
+    Result[2] := Box[0, 2];
+  end;
+
+var
+  TempBox: TBox3d;
+  I: Integer;
 begin
   inherited;
   RemoveBoxNodeCheck(FLevelExitBox, 'LevelExitBox');
+
+  for I := 0 to CastleHallWerewolvesCount - 1 do
+  begin
+    RemoveBoxNodeCheck(TempBox, 'WerewolfAppear_' + IntToStr(I));
+    WerewolfAppearPosition[I] := BoxDownPosition(TempBox);
+  end;
 end;
 
 procedure TCastleHallLevel.Idle(const CompSpeed: Single);
-const
-  WerewolfStartPosition: TVector3Single = (0, 0, -4);
-var
-  WerewolfCreature: TCreature;
+
+  procedure WerewolfAppear;
+  var
+    I: Integer;
+  begin
+    Assert(not WerewolfAppeared);
+
+    for I := 0 to CastleHallWerewolvesCount - 1 do
+    begin
+      WerewolfCreature[I] := Werewolf.CreateDefaultCreature(
+        WerewolfAppearPosition[I],
+        VectorSubtract(Player.Navigator.CameraPos, WerewolfAppearPosition[I]),
+        AnimationTime, Werewolf.DefaultMaxLife);
+      Creatures.Add(WerewolfCreature[I]);
+    end;
+
+    WerewolfAppeared := true;
+
+    WerewolfCreature[0].Sound3d(stWerewolfHowling, 1.0);
+  end;
+
+  function WerewolfAliveCount: Cardinal;
+  var
+    I: Integer;
+  begin
+    Result := 0;
+    for I := 0 to CastleHallWerewolvesCount - 1 do
+      if not WerewolfCreature[I].Dead then
+        Inc(Result);
+  end;
+
+  procedure DestroyStairsBlocker;
+  begin
+    if StairsBlocker.Exists then
+    begin
+      StairsBlocker.Exists := false;
+      Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.Scene.BoundingBox));
+    end;
+  end;
+
 begin
   inherited;
 
@@ -263,18 +324,14 @@ begin
     begin
       Symbol.Play;
       Symbol.Collides := false;
-
-      WerewolfCreature := Werewolf.CreateDefaultCreature(
-        WerewolfStartPosition,
-        Vector3Single(0, 1, 0), AnimationTime, Werewolf.DefaultMaxLife);
-      Creatures.Add(WerewolfCreature);
-      WerewolfCreature.Sound3d(stWerewolfHowling, 1.0);
-
-      FBossCreature := WerewolfCreature;
-
       Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
+
+      WerewolfAppear;
     end;
   end;
+
+  if WerewolfAppeared and (WerewolfAliveCount = 0) then
+    DestroyStairsBlocker;
 end;
 
 procedure TCastleHallLevel.Picked(const Distance: Single;
@@ -314,12 +371,28 @@ begin
   NewPlayer.PickItem(TItem.Create(Sword, 1));
 end;
 
-procedure TCastleHallLevel.DestroyStairsBlocker;
+function TCastleHallLevel.BossCreatureIndicator(
+  out Life, MaxLife: Single): boolean;
+var
+  AliveCount: Cardinal;
+  I: Integer;
 begin
-  if StairsBlocker.Exists then
+  Result := WerewolfAppeared;
+  if Result then
   begin
-    StairsBlocker.Exists := false;
-    Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.Scene.BoundingBox));
+    Life := 0;
+    MaxLife := 0;
+    AliveCount := 0;
+    for I := 0 to CastleHallWerewolvesCount - 1 do
+    begin
+      MaxLife += WerewolfCreature[I].MaxLife;
+      if not WerewolfCreature[I].Dead then
+      begin
+        Inc(AliveCount);
+        Life += WerewolfCreature[I].Life;
+      end;
+    end;
+    Result := AliveCount <> 0;
   end;
 end;
 

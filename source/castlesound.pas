@@ -435,7 +435,7 @@ begin
         alDeleteBuffers(1, @SoundBuffers[ST]);
 
     { EndAL may take a while on Unix OpenAL, so provide feedback
-      for user here (otherwise he (she?) may think that program hanged. }
+      for user here (otherwise he (she?) may think that program hanged). }
     Progress.Init(1, 'Closing sound device, please wait');
     try
       EndAL;

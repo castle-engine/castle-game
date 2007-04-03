@@ -598,14 +598,20 @@ end;
   end;
 
 procedure TPlayer.Render2D;
+var
+  BossCreatureIndicator: boolean;
+  BossCreatureLife: Single;
+  BossCreatureMaxLife: Single;
 begin
   RenderLifeIndicator(Life, MaxLife, GLList_RedIndicatorImage, 0, true);
 
-  if (Level.BossCreature <> nil) and (not Level.BossCreature.Dead) then
+  BossCreatureIndicator := Level.BossCreatureIndicator(
+    BossCreatureLife, BossCreatureMaxLife);
+  if BossCreatureIndicator then
   begin
     RenderLifeIndicator(
-      Level.BossCreature.Life,
-      Level.BossCreature.MaxLife,
+      BossCreatureLife,
+      BossCreatureMaxLife,
       GLList_BossIndicatorImage, Glw.Width - 150, false);
   end;
 

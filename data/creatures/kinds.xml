@@ -79,11 +79,11 @@
 
   <Werewolf
     actual_attack_time="0.3"
-    move_speed="0.15"
+    move_speed="0.3"
     max_attack_distance="4.2"
     preferred_attack_distance="4.2"
     min_delay_between_attacks="2.0"
-    default_max_life="1500.0"
+    default_max_life="300.0"
     max_knocked_back_distance="4.2"
     max_angle_to_attack="1.04"
     min_life_loss_to_hurt="0.05"
@@ -91,8 +91,8 @@
     max_height_acceptable_to_fall="1.4"
     life_to_run_away="0.2"
 
-    middle_position_height="0.6"
-    camera_radius="1.4"
+    middle_position_height="0.7"
+    camera_radius="1.0"
 
     sound_sudden_pain="werewolf_sudden_pain"
     sound_attack_start="werewolf_attack_start"
@@ -103,8 +103,8 @@
          so without this special large max_angle_to_attack value,
          player could avoid attacks just by crouching. -->
 
-    <short_range_attack knockback_distance="2.0">
-      <damage const="10" random="10"/>
+    <short_range_attack knockback_distance="6.0">
+      <damage const="5" random="5"/>
     </short_range_attack>
 
     <stand_animation>
@@ -120,7 +120,7 @@
     <walk_animation>
       <animation scenes_per_time="1" loop="true" backwards="true">
         <frame file_name="werewolf/werewolf_still_final.wrl" time="0.00" />
-        <frame file_name="werewolf/werewolf_walk_2_final.wrl" time="0.50" />
+        <frame file_name="werewolf/werewolf_walk_2_final.wrl" time="0.2" />
       </animation>
     </walk_animation>
     <attack_animation>

@@ -1048,7 +1048,6 @@ type
 
   TWerewolfCreature = class(TWalkAttackCreature)
   public
-    procedure Idle(const CompSpeed: Single); override;
     procedure ActualAttack; override;
   end;
 
@@ -1142,7 +1141,7 @@ implementation
 uses SysUtils, DOM, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
-  CastleTimeMessages, CastleItems, Object3dAsVRML, CastleLevelSpecific;
+  CastleTimeMessages, CastleItems, Object3dAsVRML;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -3117,15 +3116,6 @@ begin
     Sound3d(stWerewolfActualAttackHit, 1.0);
     ShortRangeAttackHurt;
   end;
-end;
-
-procedure TWerewolfCreature.Idle(const CompSpeed: Single);
-begin
-  inherited;
-
-  if (FState = wasDying) and
-     (Level is TCastleHallLevel) then
-    TCastleHallLevel(Level).DestroyStairsBlocker;
 end;
 
 { TSpiderCreature ---------------------------------------------------------- }
