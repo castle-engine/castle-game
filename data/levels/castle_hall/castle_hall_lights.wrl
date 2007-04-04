@@ -26,7 +26,13 @@ Group {
 
   PointLight { location  10  10 100  color 0.3 0.3 0.3 }
   PointLight { location -10 -10 100  color 0.3 0.3 0.3 }
-  
+
+  # Add some lights initially turned off, so that the total number
+  # of lights equals number of werewolves appearing.
+  PointLight { on FALSE }
+  PointLight { on FALSE }
+  PointLight { on FALSE }
+
 #   PointLight { location  100  100 0  color 0.3 0.3 0.3 }
 #   PointLight { location -100 -100 0  color 0.3 0.3 0.3 }
 }

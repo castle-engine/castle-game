@@ -273,6 +273,7 @@ procedure TCastleHallLevel.Idle(const CompSpeed: Single);
   procedure WerewolfAppear;
   var
     I: Integer;
+    LightNode: TNodeGeneralPositionalLight;
   begin
     Assert(not WerewolfAppeared);
 
@@ -288,6 +289,21 @@ procedure TCastleHallLevel.Idle(const CompSpeed: Single);
     WerewolfAppeared := true;
 
     WerewolfCreature[0].Sound3d(stWerewolfHowling, 1.0);
+
+    { change the lights }
+    Headlight.AmbientIntensity := 0.8;
+    Headlight.Color := Vector3Single(1, 0, 0);
+    Headlight.Intensity := 0.2;
+    Level.Headlight.Render(0, false { it should be already enabled });
+
+    for I := 0 to CastleHallWerewolvesCount - 1 do
+    begin
+      LightNode := LightSet.Lights.Items[I].LightNode as
+        TNodeGeneralPositionalLight;
+      LightNode.FdColor.Value := Vector3Single(1, 0, 0);
+      LightNode.FdAttenuation.Value := Vector3Single(1, 0.1, 0);
+    end;
+    LightSet.CalculateLights;
   end;
 
   function WerewolfAliveCount: Cardinal;
@@ -307,6 +323,21 @@ procedure TCastleHallLevel.Idle(const CompSpeed: Single);
       StairsBlocker.Exists := false;
       Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.Scene.BoundingBox));
     end;
+  end;
+
+  procedure WerewolfShowLights;
+  var
+    I: Integer;
+    LightNode: TNodeGeneralPositionalLight;
+  begin
+    for I := 0 to CastleHallWerewolvesCount - 1 do
+    begin
+      LightNode := LightSet.Lights.Items[I].LightNode as
+        TNodeGeneralPositionalLight;
+      LightNode.FdOn.Value := not WerewolfCreature[I].Dead;
+      LightNode.FdLocation.Value := WerewolfCreature[I].MiddlePosition;
+    end;
+    LightSet.CalculateLights;
   end;
 
 begin
@@ -332,6 +363,9 @@ begin
 
   if WerewolfAppeared and (WerewolfAliveCount = 0) then
     DestroyStairsBlocker;
+
+  if WerewolfAppeared then
+    WerewolfShowLights;
 end;
 
 procedure TCastleHallLevel.Picked(const Distance: Single;
