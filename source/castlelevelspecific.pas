@@ -816,6 +816,7 @@ var
   SpiderCreature: TCreature;
   SpiderPosition, SpiderDirection: TVector3Single;
   SpiderMoveDistance: Single;
+  GroundItem: POctreeItem;
 begin
   inherited;
 
@@ -860,7 +861,7 @@ begin
     while I < FSpidersAppearing.Count do
     begin
       GetCameraHeight(FSpidersAppearing.Items[I], IsAboveTheGround,
-        HeightAboveTheGround);
+        HeightAboveTheGround, GroundItem);
       if IsAboveTheGround and
         (HeightAboveTheGround < Spider.CameraRadius * 2) then
       begin

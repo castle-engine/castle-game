@@ -25,7 +25,8 @@ interface
 
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints,
-  CastleObjectKinds, ALSourceAllocator, KambiXMLCfg;
+  CastleObjectKinds, ALSourceAllocator, KambiXMLCfg,
+  VRMLTriangleOctree;
 
 {$define read_interface}
 
@@ -939,13 +940,16 @@ type
 
       Assumes IsAboveTheGround is already initialized
       (and if true, then HeightAboveTheGround is already initialized too).
-      It will update them.
+      It will update them. Note that GroundItem is updated to @nil if
+      camera will be found standing over one of the creatures
+      (since creatures are not represented as any POctreeItem).
 
       You can pass IgnoreCreature <> nil if you want to ignore
       collisions with given creature (this will obviously be useful
       when checking for collisions for this creature). }
     procedure GetCameraHeight(const Position: TVector3Single;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
+      var GroundItem: POctreeItem;
       IgnoreCreature: TCreature);
 
     { Searches for item of given Kind. Returns index of first found,
@@ -2057,14 +2061,19 @@ end;
 procedure TCreature.GetCameraHeight(
   const AssumeMiddlePosition: TVector3Single;
   out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
+var
+  GroundItem: POctreeItem;
 begin
   { Check creature<->level collision. }
   Level.GetCameraHeight(AssumeMiddlePosition,
-    IsAboveTheGround, HeightAboveTheGround);
+    IsAboveTheGround, HeightAboveTheGround, GroundItem);
 
   { Check creature<->other creatures collision. }
   Level.Creatures.GetCameraHeight(AssumeMiddlePosition,
-    IsAboveTheGround, HeightAboveTheGround, Self);
+    IsAboveTheGround, HeightAboveTheGround, GroundItem, Self);
+
+  { I ignore calculated GroundItem for now.
+    I could return it... but for now, nothing needs it. }
 end;
 
 procedure TCreature.Idle(const CompSpeed: Single);
@@ -2350,6 +2359,7 @@ end;
 procedure TCreaturesList.GetCameraHeight(
   const Position: TVector3Single;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
+  var GroundItem: POctreeItem;
   IgnoreCreature: TCreature);
 
   { If the Point is inside the Box then it answers IsAboveTheBox := false. }
@@ -2386,10 +2396,12 @@ begin
         begin
           IsAboveTheGround := true;
           HeightAboveTheGround := HeightAboveTheBox;
+          GroundItem := nil;
         end else
         if HeightAboveTheBox < HeightAboveTheGround then
         begin
           HeightAboveTheGround := HeightAboveTheBox;
+          GroundItem := nil;
         end;
       end;
     end;

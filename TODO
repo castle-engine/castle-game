@@ -17,6 +17,11 @@
 
 ----------------------------------------
 
+- weapons should be rendered correctly in 3d.
+  - Sword should also glow red when "castle hall" glows red --- even
+    the static sword should be rendered in 3d.
+  - weapon "swaying" (when you walk, your weapon moves with your steps)
+
 - bow must work better to really appreciate the doom level !
 
 - fire over barrels - pixel pracht finally ?

@@ -395,7 +395,8 @@ implementation
 
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
   KambiGLUtils, CastlePlay, KambiFilesUtils, ProgressUnit,
-  CastleCreatures, CastleVideoOptions, CastleTimeMessages;
+  CastleCreatures, CastleVideoOptions, CastleTimeMessages,
+  VRMLTriangleOctree;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -882,6 +883,7 @@ var
   ShiftedPosition: TVector3Single;
   ProposedNewShiftedPosition, NewShiftedPosition: TVector3Single;
   FallingDownLength: Single;
+  GroundItem: POctreeItem;
 begin
   FRotation += 3 * CompSpeed;
 
@@ -898,7 +900,7 @@ begin
     when doing Level.MoveAllowed below. }
 
   Level.GetCameraHeight(ShiftedPosition, IsAboveTheGround,
-    HeightAboveTheGround);
+    HeightAboveTheGround, GroundItem);
   if (not IsAboveTheGround) or
      (HeightAboveTheGround > PositionRadius) then
   begin
