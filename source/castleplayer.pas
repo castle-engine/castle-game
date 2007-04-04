@@ -24,7 +24,8 @@ unit CastlePlayer;
 interface
 
 uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh,
-  VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound;
+  VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
+  VRMLTriangleOctree;
 
 const
   DefaultMaxLife = 100;
@@ -143,6 +144,8 @@ type
     { This must be valid and non-zero when FKnockbackDistance > 0 }
     FKnockbackDirection: TVector3Single;
     KnockBackSpeed: Single;
+
+    FGround: POctreeItem;
   public
     constructor Create;
     destructor Destroy; override;
@@ -334,6 +337,8 @@ type
       This is called from constructor, you can also call this
       later (for debug purposes, if you changed something). }
     procedure LoadFromFile;
+
+    property Ground: POctreeItem read FGround write FGround;
   end;
 
 implementation
@@ -904,6 +909,11 @@ procedure TPlayer.Idle(const CompSpeed: Single);
   var
     NewFootstepsSoundPlaying: TSoundType;
   begin
+    {$ifdef DEBUG_GROUND}
+    if (Ground <> nil) and (Ground^.State.Texture <> nil) then
+      Writeln('ground ', Ground^.State.Texture.TextureDescription);
+    {$endif DEBUG_GROUND}
+
     { The meaning of ReallyWalkingOnTheGroundTime and
       TimeToChangeFootstepsSoundPlaying:
       Navigator.IsWalkingOnTheGround can change quite rapidly

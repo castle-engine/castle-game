@@ -1013,6 +1013,10 @@ type
 
       In addition, PlayerMoveAllowed checks collisions with Creatures.
 
+      In addition, PlayerGetCameraHeightSqr sets Player.Ground
+      (to the ground item under the player, or to @nil
+      if player is not IsAboveTheGround).
+
       @groupBegin }
     function PlayerMoveAllowed(Navigator: TMatrixWalker;
       const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
@@ -2878,14 +2882,19 @@ begin
   Creatures.GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
     HeightAboveTheGround, GroundItem, nil);
 
-  { Below is a waste of time. Because Navigator requires a callback
-    that passes only SqrHeightAboveTheGround, we Sqr here the
-    HeightAboveTheGround... Inside Navigator will possibly call Sqrt
-    on this, thus wasting time on useless Sqrt operation.
-    For now this is not a problem, in the future Navigator should
-    be extended to have callback that returns ready HeightAboveTheGround. }
   if IsAboveTheGround then
+  begin
+    { Below is a waste of time. Because Navigator requires a callback
+      that passes only SqrHeightAboveTheGround, we Sqr here the
+      HeightAboveTheGround... Inside Navigator will possibly call Sqrt
+      on this, thus wasting time on useless Sqrt operation.
+      For now this is not a problem, in the future Navigator should
+      be extended to have callback that returns ready HeightAboveTheGround. }
     SqrHeightAboveTheGround := Sqr(HeightAboveTheGround);
+
+    Player.Ground := GroundItem;
+  end else
+    Player.Ground := nil;
 end;
 
 procedure TLevel.Render(const Frustum: TFrustum);
