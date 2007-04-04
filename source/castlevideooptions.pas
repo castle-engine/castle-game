@@ -98,6 +98,8 @@ var
   { You can set this to true for testing purposes. }
   RenderBoundingBoxes: boolean = false;
 
+  RenderDebugCaptions: boolean = false;
+
 const
   DefaultRenderShadows = false;
 

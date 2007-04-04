@@ -27,7 +27,7 @@ unit CastleWindow;
 
 interface
 
-uses GLWindow, VRMLOpenGLRenderer;
+uses GLWindow, VRMLOpenGLRenderer, OpenGLTTFonts;
 
 var
   { @noAutoLinkHere }
@@ -36,11 +36,35 @@ var
 var
   GLContextCache: TVRMLOpenGLRendererContextCache;
 
+  { Just a generally usable OpenGL outline (3D) font. }
+  Font3d: TGLOutlineFont;
+
 implementation
 
-uses SysUtils;
+uses SysUtils, VRMLNodes;
 
 { initialization / finalization ---------------------------------------------- }
+
+const
+  Font3dFamily = ffSans;
+  Font3dBold = false;
+  Font3dItalic = false;
+
+procedure GLWindowInit(Glwin: TGLWindow);
+begin
+  Font3d := GLContextCache.Fonts_IncReference(
+    Font3dFamily, Font3dBold, Font3dItalic,
+    TNodeFontStyle_2.ClassTTF_Font(Font3dFamily, Font3dBold, Font3dItalic));
+end;
+
+procedure GLWindowClose(Glwin: TGLWindow);
+begin
+  if (GLContextCache <> nil) and (Font3d <> nil) then
+  begin
+    GLContextCache.Fonts_DecReference(Font3dFamily, Font3dBold, Font3dItalic);
+    Font3d := nil;
+  end;
+end;
 
 initialization
   Glw := TGLWindowNavigated.Create;
@@ -49,8 +73,16 @@ initialization
 
   GLContextCache := TVRMLOpenGLRendererContextCache.Create;
   GLContextCache.UseTextureFileNames := true;
-finalization
-  FreeAndNil(GLContextCache);
 
+  Glw.OnInitList.AppendItem(@GLWindowInit);
+  Glw.OnCloseList.AppendItem(@GLWindowClose);
+finalization
+  { Fonts_DecReference must be called before freeing GLContextCache.
+    It's called from Glw.Close. But Glw.Close may be called when
+    FreeAndNil(Glw) below, so to make sure we call Fonts_DecReference
+    (by our GLWindowClose) right now. }
+  GLWindowClose(Glw);
+
+  FreeAndNil(GLContextCache);
   FreeAndNil(Glw);
 end.

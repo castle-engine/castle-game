@@ -47,6 +47,7 @@ type
 
   TDebugMenu = class(TCastleMenu)
     RenderBoundingBoxesArgument: TGLMenuBooleanArgument;
+    RenderDebugCaptionsArgument: TGLMenuBooleanArgument;
     DebugRenderForLevelScreenshotArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
@@ -150,6 +151,7 @@ begin
   inherited Create;
 
   RenderBoundingBoxesArgument := TGLMenuBooleanArgument.Create(RenderBoundingBoxes);
+  RenderDebugCaptionsArgument := TGLMenuBooleanArgument.Create(RenderDebugCaptions);
   DebugRenderForLevelScreenshotArgument := TGLMenuBooleanArgument.Create(
     DebugRenderForLevelScreenshot);
 
@@ -158,6 +160,7 @@ begin
   Items.Add('Items debug menu');
   Items.Add('Level debug menu');
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
+  Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
   Items.AddObject('Render for level screenshot',
     DebugRenderForLevelScreenshotArgument);
   Items.Add('Reload sounds/index.xml');
@@ -193,18 +196,22 @@ begin
          RenderBoundingBoxesArgument.Value := RenderBoundingBoxes;
        end;
     5: begin
+         RenderDebugCaptions := not RenderDebugCaptions;
+         RenderDebugCaptionsArgument.Value := RenderDebugCaptions;
+       end;
+    6: begin
          DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
          DebugRenderForLevelScreenshotArgument.Value :=
            DebugRenderForLevelScreenshot;
        end;
-    6: ReadSoundInfos;
-    7: begin
+    7: ReadSoundInfos;
+    8: begin
          FreeAndNil(EditLevelLightsMenu);
          EditLevelLightsMenu := TEditLevelLightsMenu.Create;
          CurrentMenu := EditLevelLightsMenu;
        end;
-    8: ForceThunder;
-    9: UserQuit := true;
+    9: ForceThunder;
+    10: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;

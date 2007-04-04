@@ -756,6 +756,8 @@ type
       out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
 
     procedure ShortRangeAttackHurt;
+
+    function DebugCaption: string; virtual;
   public
     { Constructor. Note for AnimationTime: usually I will take
       AnimationTime from global Level.AnimationTime, but in the case of
@@ -1000,6 +1002,8 @@ type
     IdleSqrDistanceToLastSeenPlayer: Single;
 
     procedure SetLife(const Value: Single); override;
+
+    function DebugCaption: string; override;
   public
     constructor Create(AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
@@ -1912,18 +1916,45 @@ procedure TCreature.Render(const Frustum: TFrustum;
     glPopAttrib;
   end;
 
+  procedure DoRenderDebugCaptions;
+  const
+    FontSize = 0.5;
+  begin
+    glPushMatrix;
+      glTranslatef(0, 0, CurrentScene.BoundingBox[1, 2]);
+      glRotatef(90, 0, 0, 1);
+      glRotatef(90, 1, 0, 0);
+      glScalef(FontSize / Font3d.RowHeight, FontSize / Font3d.RowHeight, 1);
+
+      glPushAttrib(GL_ENABLE_BIT);
+        glDisable(GL_LIGHTING);
+        glEnable(GL_DEPTH_TEST);
+        glColorv(White3Single);
+        Font3d.PrintAndMove(DebugCaption);
+      glPopAttrib;
+    glPopMatrix;
+  end;
+
 begin
   if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
   begin
     glPushMatrix;
       glMultMatrix(SceneTransform);
       CurrentScene.Render(nil, TransparentGroup);
+      if RenderDebugCaptions then
+        DoRenderDebugCaptions;
     glPopMatrix;
 
     if RenderBoundingBoxes and
        (TransparentGroup in [tgAll, tgOpaque]) then
       RenderBoundingGeometry;
   end;
+end;
+
+function TCreature.DebugCaption: string;
+begin
+  Result := Format('%s [%s / %s]',
+    [Kind.VRMLNodeName, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
 end;
 
 procedure TCreature.RenderFrontShadowQuads(
@@ -2607,6 +2638,23 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       (IdleSqrDistanceToLastSeenPlayer < Sqr(WAKind.MaxAttackDistance / 4));
   end;
 
+  procedure InitAlternativeTarget;
+  var
+    Distance: Single;
+  begin
+    Distance := WAKind.RandomWalkDistance;
+
+    AlternativeTarget := MiddlePosition;
+    AlternativeTarget[0] += Random * Distance * 2 - Distance;
+    AlternativeTarget[1] += Random * Distance * 2 - Distance;
+    if WAKind.Flying then
+      AlternativeTarget[2] += Random * Distance * 2 - Distance;
+
+    HasAlternativeTarget := true;
+
+    AlternativeTargetTime := Level.AnimationTime;
+  end;
+
   procedure DoStand;
   var
     DirectionToPlayer: TVector3Single;
@@ -2621,6 +2669,24 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       if WantToRunAway or
          WantToWalkToPlayer(AngleRadBetweenDirectionToPlayer) then
         SetState(wasWalk) else
+      if (not Kind.Flying) and
+         (AngleRadBetweenDirectionToPlayer < 0.01) and
+         (BoundingBox[0][0] <= LastSeenPlayer[0]) and
+         (BoundingBox[1][0] >= LastSeenPlayer[0]) and
+         (BoundingBox[0][1] <= LastSeenPlayer[1]) and
+         (BoundingBox[1][1] >= LastSeenPlayer[1]) then
+      begin
+        { Then the player (or it's LastSeenPlayer) is right above or below us.
+          Since we can't fly, we can't get there. Standing in place
+          is one possibility, but it's not really good
+          - We become easier target to shoot for player with the bow.
+          - Most importantly, this way player can stand on our head and
+            slash us with a sword without any risk. (This was almost
+            a standard technique on killing Werewolf or SpiderQueen bosses).
+          So we move a little --- just for the sake of moving. }
+        SetState(wasWalk);
+        InitAlternativeTarget;
+      end else
       begin
         { Continue wasStand state }
         RotateDirectionToFaceTarget(DirectionToPlayer,
@@ -2695,23 +2761,6 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
       if Result then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
-    end;
-
-    procedure InitAlternativeTarget;
-    var
-      Distance: Single;
-    begin
-      Distance := WAKind.RandomWalkDistance;
-
-      AlternativeTarget := MiddlePosition;
-      AlternativeTarget[0] += Random * Distance * 2 - Distance;
-      AlternativeTarget[1] += Random * Distance * 2 - Distance;
-      if WAKind.Flying then
-        AlternativeTarget[2] += Random * Distance * 2 - Distance;
-
-      HasAlternativeTarget := true;
-
-      AlternativeTargetTime := Level.AnimationTime;
     end;
 
     { Go the way to LastSeenPlayer, *not* by using waypoints.
@@ -3082,6 +3131,14 @@ begin
   { Check one last time for WAKind.MaxAttackDistance }
   Result := Boxes3dCollision(Box3dTranslate(B,
     VectorScale(Direction, WAKind.MaxAttackDistance)), PB);
+end;
+
+function TWalkAttackCreature.DebugCaption: string;
+const
+  StateName: array [TWalkAttackCreatureState] of string =
+  ( 'Stand', 'Walk', 'Attack', 'Dying', 'Hurt', 'Special1' );
+begin
+  Result := (inherited DebugCaption) + ' ' + StateName[State];
 end;
 
 { TBallThrowerCreature ------------------------------------------------------- }
