@@ -43,7 +43,7 @@ type
 
     WerewolfAppearPosition: array [0..CastleHallWerewolvesCount - 1] of TVector3Single;
     WerewolfAppeared: boolean;
-    WerewolfCreature: array [0..CastleHallWerewolvesCount - 1] of TCreature;
+    WerewolfCreature: array [0..CastleHallWerewolvesCount - 1] of TWerewolfCreature;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -282,13 +282,13 @@ procedure TCastleHallLevel.Idle(const CompSpeed: Single);
       WerewolfCreature[I] := Werewolf.CreateDefaultCreature(
         WerewolfAppearPosition[I],
         VectorSubtract(Player.Navigator.CameraPos, WerewolfAppearPosition[I]),
-        AnimationTime, Werewolf.DefaultMaxLife);
+        AnimationTime, Werewolf.DefaultMaxLife) as TWerewolfCreature;
       Creatures.Add(WerewolfCreature[I]);
     end;
 
     WerewolfAppeared := true;
 
-    WerewolfCreature[0].Sound3d(stWerewolfHowling, 1.0);
+    WerewolfCreature[0].Howl(true);
 
     { change the lights }
     Headlight.AmbientIntensity := 0.8;
@@ -306,15 +306,8 @@ procedure TCastleHallLevel.Idle(const CompSpeed: Single);
     LightSet.CalculateLights;
   end;
 
-  function WerewolfAliveCount: Cardinal;
-  var
-    I: Integer;
-  begin
-    Result := 0;
-    for I := 0 to CastleHallWerewolvesCount - 1 do
-      if not WerewolfCreature[I].Dead then
-        Inc(Result);
-  end;
+var
+  WerewolfAliveCount: Cardinal;
 
   procedure DestroyStairsBlocker;
   begin
@@ -330,14 +323,42 @@ procedure TCastleHallLevel.Idle(const CompSpeed: Single);
     I: Integer;
     LightNode: TNodeGeneralPositionalLight;
   begin
-    for I := 0 to CastleHallWerewolvesCount - 1 do
+    if WerewolfAliveCount = 0 then
     begin
-      LightNode := LightSet.Lights.Items[I].LightNode as
+      { turn light over stairs to next level }
+      LightNode := LightSet.Lights.Items[0].LightNode as
         TNodeGeneralPositionalLight;
-      LightNode.FdOn.Value := not WerewolfCreature[I].Dead;
-      LightNode.FdLocation.Value := WerewolfCreature[I].MiddlePosition;
+      LightNode.FdLocation.Value := Box3dMiddle(StairsBlocker.Scene.BoundingBox);
+      LightNode.FdOn.Value := true;
+
+      for I := 1 to CastleHallWerewolvesCount - 1 do
+      begin
+        LightNode := LightSet.Lights.Items[I].LightNode as
+          TNodeGeneralPositionalLight;
+        LightNode.FdOn.Value := false;
+      end;
+    end else
+    begin
+      { turn light for each alive werewolf }
+      for I := 0 to CastleHallWerewolvesCount - 1 do
+      begin
+        LightNode := LightSet.Lights.Items[I].LightNode as
+          TNodeGeneralPositionalLight;
+        LightNode.FdOn.Value := not WerewolfCreature[I].Dead;
+        LightNode.FdLocation.Value := WerewolfCreature[I].MiddlePosition;
+      end;
     end;
     LightSet.CalculateLights;
+  end;
+
+  function GetWerewolfAliveCount: Cardinal;
+  var
+    I: Integer;
+  begin
+    Result := 0;
+    for I := 0 to CastleHallWerewolvesCount - 1 do
+      if not WerewolfCreature[I].Dead then
+        Inc(Result);
   end;
 
 begin
@@ -361,11 +382,13 @@ begin
     end;
   end;
 
-  if WerewolfAppeared and (WerewolfAliveCount = 0) then
-    DestroyStairsBlocker;
-
   if WerewolfAppeared then
+  begin
+    WerewolfAliveCount := GetWerewolfAliveCount;
     WerewolfShowLights;
+    if WerewolfAliveCount = 0 then
+      DestroyStairsBlocker;
+  end;
 end;
 
 procedure TCastleHallLevel.Picked(const Distance: Single;

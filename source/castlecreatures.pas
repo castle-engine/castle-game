@@ -1051,8 +1051,19 @@ type
   end;
 
   TWerewolfCreature = class(TWalkAttackCreature)
+  private
+    NextHowlTime: Single;
   public
+    constructor Create(AKind: TCreatureKind;
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AMaxLife: Single;
+      const AnimationTime: Single);
+
     procedure ActualAttack; override;
+    procedure Idle(const CompSpeed: Single); override;
+
+    procedure Howl(ForceHowl: boolean);
   end;
 
   TSpiderCreature = class(TWalkAttackCreature)
@@ -3166,6 +3177,16 @@ end;
 
 { TWerewolfCreature ---------------------------------------------------------- }
 
+constructor TWerewolfCreature.Create(AKind: TCreatureKind;
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AMaxLife: Single;
+  const AnimationTime: Single);
+begin
+  inherited;
+  NextHowlTime := AnimationTime + Random * 60.0;
+end;
+
 procedure TWerewolfCreature.ActualAttack;
 begin
   if ShortRangeActualAttackHits then
@@ -3173,6 +3194,25 @@ begin
     Sound3d(stWerewolfActualAttackHit, 1.0);
     ShortRangeAttackHurt;
   end;
+end;
+
+procedure TWerewolfCreature.Idle(const CompSpeed: Single);
+begin
+  inherited;
+
+  if (not Dead) and (Level.AnimationTime > NextHowlTime) then
+    Howl(false);
+end;
+
+procedure TWerewolfCreature.Howl(ForceHowl: boolean);
+begin
+  { Howl only if player was seen, and only while walking/standing
+    (not in the middle of attack e.g., since that would sound stupid). }
+  if ForceHowl or (HasLastSeenPlayer and (State in [wasWalk, wasStand])) then
+    Sound3d(stWerewolfHowling, 1.0);
+
+  { Whether you actually howled or not, schedule next howl. }
+  NextHowlTime := Level.AnimationTime + Random * 60.0;
 end;
 
 { TSpiderCreature ---------------------------------------------------------- }
