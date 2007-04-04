@@ -13,7 +13,10 @@
     color ?
   - exit level should work
 
-- castle hall improvements: make some werewolf howl from time to time
+- castle hall improvements:
+  - make some werewolf howl from time to time
+  - make darker lights
+  - test playability with werewolves once again
 
 ----------------------------------------
 
