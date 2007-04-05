@@ -346,8 +346,8 @@ implementation
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
-  VRMLGLAnimation, ALUtils, OpenAL, CastleControlsMenu,
-  CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL;
+  VRMLGLAnimation, ALUtils, OpenAL, VRMLNodes, CastleControlsMenu,
+  CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL, CastleTextures;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -909,11 +909,6 @@ procedure TPlayer.Idle(const CompSpeed: Single);
   var
     NewFootstepsSoundPlaying: TSoundType;
   begin
-    {$ifdef DEBUG_GROUND}
-    if (Ground <> nil) and (Ground^.State.Texture <> nil) then
-      Writeln('ground ', Ground^.State.Texture.TextureDescription);
-    {$endif DEBUG_GROUND}
-
     { The meaning of ReallyWalkingOnTheGroundTime and
       TimeToChangeFootstepsSoundPlaying:
       Navigator.IsWalkingOnTheGround can change quite rapidly
@@ -940,7 +935,9 @@ procedure TPlayer.Idle(const CompSpeed: Single);
     if Navigator.IsWalkingOnTheGround then
     begin
       ReallyWalkingOnTheGroundTime := Level.AnimationTime;
-      NewFootstepsSoundPlaying := Level.FootstepsSound;
+      if not TextureRulesList.GroundFootstepsSound(
+        Ground, NewFootstepsSoundPlaying) then
+        NewFootstepsSoundPlaying := Level.FootstepsSound;
     end else
     if Level.AnimationTime - ReallyWalkingOnTheGroundTime >
       TimeToChangeFootstepsSoundPlaying then

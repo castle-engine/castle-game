@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<!--
+  Some configuration of textures.
+  For now, all rules concern the situation when player stands
+  on given texture (i.e. it's used as ground texture).
+-->
+
+<textures>
+  <texture base_name="airbase_radar_panels"
+    footsteps_sound="player_footsteps_concrete" />
+  <texture base_name="wood_clear"
+    footsteps_sound="player_footsteps_concrete" />
+  <texture base_name="marble"
+    footsteps_sound="player_footsteps_concrete" />
+
+  <!--
+  <texture base_name="nukage3"
+    footsteps_sound="player_footsteps_lava">
+    <lava>
+      <damage const="5" random="5" time="1.0" />
+    </lava>
+  </texture>
+  -->
+</textures>
