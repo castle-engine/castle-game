@@ -982,6 +982,21 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       end;
 
       FootstepsSoundPlaying := NewFootstepsSoundPlaying;
+    end else
+    if FootstepsSoundPlaying <> stNone then
+    begin
+      { So FootstepsSoundPlaying = NewFootstepsSoundPlaying for sure.
+        Make sure that the AL sound is really playing.
+
+        The decision to not use looping sound means that
+        end of footsteps sound should be detected
+        almost immediately (otherwise player will hear a little pause
+        in footsteps, due to the time of OnTimer that calls RefreshUsed
+        of source allocator --- it's very short pause, but it's noticeable,
+        since footsteps should be rhytmic). I prefer to not rely on RefreshUsed
+        for this and instead just check this here. }
+      if not alSourcePlayingOrPaused(AllocatedFootstepsSource.ALSource) then
+        alSourcePlay(AllocatedFootstepsSource.ALSource);
     end;
 
     Assert(
