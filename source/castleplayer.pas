@@ -339,6 +339,8 @@ type
     procedure LoadFromFile;
 
     property Ground: POctreeItem read FGround write FGround;
+
+    procedure LevelChanged;
   end;
 
 implementation
@@ -1252,6 +1254,14 @@ begin
       PlayerConfig.GetFloat('player/head_bobbing_distance',
       DefaultHeadBobbingDistance);
   finally SysUtils.FreeAndNil(PlayerConfig); end;
+end;
+
+procedure TPlayer.LevelChanged;
+begin
+  { Without this, ReallyWalkingOnTheGroundTime could pretend that
+    player is walking on the ground, while in fact the player is just
+    standing still after new level loaded. }
+  ReallyWalkingOnTheGroundTime := -1000.0;
 end;
 
 { GLWindow init / close ------------------------------------------------------ }

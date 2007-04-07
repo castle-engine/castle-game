@@ -651,6 +651,7 @@ begin
   begin
     LevelFinishedSchedule := false;
     FreeAndNil(Level);
+    Player.LevelChanged;
     Level := LevelFinishedNextLevel;
     InitNewLevel;
   end;
