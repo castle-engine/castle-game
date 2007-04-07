@@ -366,7 +366,7 @@ begin
 
   if Box3dPointInside(Player.Navigator.CameraPos, FLevelExitBox) then
   begin
-    LevelFinished(LevelsAvailable.FindName('cages').CreateLevel);
+    LevelFinished('cages');
   end;
 
   if Button.Started and
@@ -597,7 +597,7 @@ begin
       TimeMessage('Better find a wepon first to protect yourself in the castle');
       RejectGateExitBox;
     end else
-      LevelFinished(LevelsAvailable.FindName('castle_hall').CreateLevel);
+      LevelFinished('castle_hall');
   end else
   begin
     Teleport1Rotate += 0.2 * CompSpeed;
@@ -613,7 +613,10 @@ begin
     end;
 
     if (not SwordAmbushDone) and
-      (Player.Items.FindKind(Sword) <> -1) then
+      (Player.Items.FindKind(Sword) <> -1) and
+      { not Ghost.PrepareRenderDone may happen only when run with
+        --debug-no-creatures }
+      Ghost.PrepareRenderDone then
     begin
       SwordAmbushDone := true;
       SwordAmbush;
@@ -956,7 +959,7 @@ begin
           Sound(stEvilLaugh);
           TimeMessage('No exit for the one who does not fight');
         end else
-          LevelFinished(nil);
+          LevelFinished('');
       end else
         TimeMessageInteractFailed('You need an appropriate key to open this door');
     end;

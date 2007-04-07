@@ -480,7 +480,7 @@ procedure TDebugLevelMenu.CurrentItemSelected;
 
       if Index <> LevelsAvailable.Count then
       begin
-        LevelFinished(LevelsAvailable[Index].CreateLevel);
+        LevelFinished(LevelsAvailable[Index].Name);
         UserQuit := true;
       end;
     finally S.Free end;
@@ -494,7 +494,7 @@ procedure TDebugLevelMenu.CurrentItemSelected;
     Dir := Player.Navigator.CameraDir;
     Up := Player.Navigator.CameraUp;
 
-    LevelFinished(LevelsAvailable.FindName(Level.Name).CreateLevel);
+    LevelFinished(Level.Name);
     LevelFinishedFlush;
 
     Player.Navigator.CameraPos := Pos;

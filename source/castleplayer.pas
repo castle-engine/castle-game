@@ -1262,6 +1262,16 @@ begin
     player is walking on the ground, while in fact the player is just
     standing still after new level loaded. }
   ReallyWalkingOnTheGroundTime := -1000.0;
+
+  if FootstepsSoundPlaying <> stNone then
+  begin
+    { Stop footsteps sound. }
+    AllocatedFootstepsSource.DoUsingEnd;
+    { AllocatedFootstepsSourceUsingEnd should set this to nil. }
+    Assert(AllocatedFootstepsSource = nil);
+
+    FootstepsSoundPlaying := stNone;
+  end;
 end;
 
 { GLWindow init / close ------------------------------------------------------ }

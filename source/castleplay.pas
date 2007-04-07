@@ -55,14 +55,14 @@ var
     @noAutoLinkHere }
   Level: TLevel;
 
-{ If NextLevel = nil, then end the game.
-  Else free current Level and set Level to NextLevel.
+{ If NextLevel = '', then end the game,
+  else free current Level and set Level to NextLevel.
 
   Note that this doesn't work immediately, but will perform
   at nearest possibility. While LevelFinished is scheduled but not
   performed yet, you of course can't call LevelFinished once again
-  with different NextLevel. }
-procedure LevelFinished(NextLevel: TLevel);
+  with different NextLevelName. }
+procedure LevelFinished(NextLevelName: string);
 
 { If some LevelFinished call is scheduled, this will force changing
   level @italic(now). Don't use this, unless you know that you can
@@ -121,7 +121,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
-  CastleLevelSpecific, VRMLFlatSceneGL;
+  CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable;
 
 var
   GLList_TimeMessagesBackground: TGLuint;
@@ -153,9 +153,9 @@ var
   DisplayFpsRealTime: Single;
 
   LevelFinishedSchedule: boolean = false;
-  { If LevelFinishedSchedule, then this is non-nil, and should be the next
-    value of Level. }
-  LevelFinishedNextLevel: TLevel;
+  { If LevelFinishedSchedule, then this is not-'', and should be the name
+    of next Level to load. }
+  LevelFinishedNextLevelName: string;
 
 const
   SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
@@ -516,6 +516,8 @@ begin
     So we must call EventResize on each Level change. }
   Glw.EventResize;
 
+  Player.LevelChanged;
+
   { Init Player.Navigator properties }
   Player.Navigator.OnMoveAllowed := @Level.PlayerMoveAllowed;
   Player.Navigator.OnGetCameraHeight := @Level.PlayerGetCameraHeightSqr;
@@ -646,13 +648,23 @@ begin
 end;
 
 procedure LevelFinishedFlush;
+var
+  NewLevel: TLevel;
 begin
   if LevelFinishedSchedule then
   begin
     LevelFinishedSchedule := false;
+
+    NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel;
+
+    { First TLevel constructuctor was called.
+      This actully loaded the level, displaying some progress bar.
+      Background of this progress bar is our old Level --- so Level variable
+      must stay valid and non-nil during loading of new level.
+      Only after NewLevel is initialized, we quickly change Level variable. }
     FreeAndNil(Level);
-    Player.LevelChanged;
-    Level := LevelFinishedNextLevel;
+    Level := NewLevel;
+
     InitNewLevel;
   end;
 end;
@@ -1234,21 +1246,22 @@ begin
   end;
 end;
 
-procedure LevelFinished(NextLevel: TLevel);
+procedure LevelFinished(NextLevelName: string);
 begin
-  if NextLevel = nil then
+  if NextLevelName = '' then
   begin
     TimeMessage('Congratulations, game finished');
     GameWin := true;
     MusicPlayer.PlayedSound := stGameWinMusic;
   end else
   begin
-    if LevelFinishedSchedule and (LevelFinishedNextLevel <> NextLevel) then
+    if LevelFinishedSchedule and
+      (LevelFinishedNextLevelName <> NextLevelName) then
       raise EInternalError.Create(
         'You cannot call LevelFinished while previous LevelFinished is not done yet');
 
     LevelFinishedSchedule := true;
-    LevelFinishedNextLevel := NextLevel;
+    LevelFinishedNextLevelName := NextLevelName;
   end;
 end;
 
