@@ -48,7 +48,7 @@
 -->
 
 <levels
-  demo_level_name="tower">
+  demo_level_name="gate_demo">
 
   <level
     name="gate"
@@ -61,6 +61,15 @@
 
     played_music_sound="gate_music"
     footsteps_sound="player_footsteps_grass"
+  />
+
+  <level
+    name="gate_demo"
+    scene_file_name="gate_demo/gate_final.wrl"
+    light_set_file_name="gate_demo/gate_lights.wrl"
+    title="The Gate (version for demo)"
+    number="101"
+    implementation_class="TLevel"
   />
 
   <level
