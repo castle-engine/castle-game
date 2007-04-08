@@ -1,6 +1,24 @@
 #VRML V1.0 ascii
 
 Group{
+
+# commented out things below were used for making menu_bg.png image
+# from this level (but actually this level changed so much since
+# then that this is mostly useless now).
+#
+#   WWWInline { name "basic_castle_lights.wrl" separate FALSE }
+#   PerspectiveCamera {
+#     position 6.020590782165527 -97.895431518554687 5.877294063568115
+#     direction -0.299134641885757 0.60658472776413 0.183122679591179
+#     up 0.115590639412403 -0.234395816922188 0.965244650840759
+#   }
+#   NavigationInfo {
+#     avatarSize [ 0.5, 2 ]
+#     speed 1.0
+#     headlight TRUE
+#     type "FLY"
+#   }
+
   Separator {
     Rotation { rotation 1 0 0 1.57 }
     Background {

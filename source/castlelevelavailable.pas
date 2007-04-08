@@ -60,6 +60,7 @@ type
       LevelDOMElement (this is parsed during TLevel.Create). }
     Document: TXMLDocument;
     function IsSmallerByNumber(const A, B: TLevelAvailable): boolean;
+    FDemoLevelName: string;
   public
     destructor Destroy; override;
 
@@ -79,6 +80,8 @@ type
       config file or to DefaultAvailableForNewGame if nothing in user's
       config file). }
     procedure LoadFromFile;
+
+    property DemoLevelName: string read FDemoLevelName write FDemoLevelName;
   end;
 
 var
@@ -247,6 +250,9 @@ begin
 
   Check(Document.DocumentElement.TagName = 'levels',
     'Root node of levels/index.xml must be <levels>');
+
+  Check(DOMGetAttribute(Document.DocumentElement, 'demo_level_name',
+    FDemoLevelName), '<levels> must have attribute "demo_level_name"');
 
   LevelsList := Document.DocumentElement.ChildNodes;
   try

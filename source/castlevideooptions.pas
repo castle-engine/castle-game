@@ -133,9 +133,16 @@ var
   { 0 means "use system default" }
   VideoFrequency: Cardinal;
 
+{ ViewAngleDegX and ViewAngleDegY specify field of view in the game.
+  You can freely change ViewAngleDegX at runtime, just make sure
+  that our OnResize will be called after. }
+var
+  ViewAngleDegX: Single = 70.0;
+function ViewAngleDegY: Single;
+
 implementation
 
-uses KambiUtils, CastleConfig;
+uses KambiUtils, CastleConfig, CastleWindow, RaysWindow;
 
 procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes;
   BlendingType: TBlendingType);
@@ -171,6 +178,12 @@ begin
   { Despite the comments in the interface, this is the same thing
     as AttributesSet for now. }
   AttributesSet(Attributes, BlendingType);
+end;
+
+function ViewAngleDegY: Single;
+begin
+  Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX,
+    Glw.Height / Glw.Width);
 end;
 
 initialization

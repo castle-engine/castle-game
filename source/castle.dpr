@@ -192,7 +192,7 @@ begin
   DrawInitialBackground;
   ALContextInit(WasParam_NoSound);
   try
-    ShowStartMenu(Glw.OnDraw);
+    ShowStartMenu;
   finally
     { Usually Glw.Closed = false here.
       But this is finally...end clause so we try hard to avoid raising

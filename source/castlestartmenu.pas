@@ -27,7 +27,7 @@ uses GLWindow;
 
 { Show menu, ask user what to do, do what the user wants
   (e.g. load level and call PlayGame), when user wants to quit -- return. }
-procedure ShowStartMenu(ADrawUnderMenu: TDrawFunc);
+procedure ShowStartMenu;
 
 implementation
 
@@ -38,7 +38,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, ALUtils, OpenAL, KambiClassUtils, CastleSoundMenu,
-  CastleTimeMessages, CastleLevelAvailable;
+  CastleTimeMessages, CastleLevelAvailable, CastleDemoLevel;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -99,7 +99,6 @@ var
   SoundMenu: TSoundMenu;
   ChooseNewLevelMenu: TChooseNewLevelMenu;
   ChangeOpenALDeviceMenu: TChangeOpenALDeviceMenu;
-  DrawUnderMenu: TDrawFunc;
 
 { NewGame ------------------------------------------------------------- }
 
@@ -208,7 +207,7 @@ begin
 
   case CurrentItem of
     0: ChooseNewGame;
-    1: ShowControlsMenu(DrawUnderMenu, false, false);
+    1: ShowControlsMenu(@DemoLevelDraw, false, false);
     2: CurrentMenu := VideoMenu;
     3: CurrentMenu := SoundMenu;
     4: ShowCreditsMessage;
@@ -629,7 +628,7 @@ end;
 
 procedure Draw(Glwin: TGLWindow);
 begin
-  DrawUnderMenu(Glwin);
+  DemoLevelDraw(Glwin);
 
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
@@ -682,38 +681,41 @@ begin
     UserQuit := true;
 end;
 
-procedure ShowStartMenu(ADrawUnderMenu: TDrawFunc);
+procedure ShowStartMenu;
 var
   SavedMode: TGLMode;
 begin
-  DrawUnderMenu := ADrawUnderMenu;
-
-  MusicPlayer.PlayedSound := stIntroMusic;
+  DemoLevelBegin;
   try
-    SavedMode := TGLMode.Create(glw, 0, false);
+    MusicPlayer.PlayedSound := stIntroMusic;
     try
-      SavedMode.FakeMouseDown := false;
-      { This shouldn't change projection matrix anyway. }
-      SavedMode.RestoreProjectionMatrix := false;
+      SavedMode := TGLMode.Create(glw, 0, false);
+      try
+        SavedMode.FakeMouseDown := false;
+        { This shouldn't change projection matrix anyway. }
+        SavedMode.RestoreProjectionMatrix := false;
 
-      SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
-        nil, false, true { FPSActive should not be needed anymore, but I leave it. },
-        false, K_None, #0, false, false);
+        SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
+          nil, false, true { FPSActive should not be needed anymore, but I leave it. },
+          false, K_None, #0, false, false);
 
-      Glw.OnKeyDown := @KeyDown;
-      Glw.OnMouseDown := @MouseDown;
-      Glw.OnMouseUp := @MouseUp;
-      Glw.OnMouseMove := @MouseMove;
-      Glw.OnIdle := @Idle;
+        Glw.OnKeyDown := @KeyDown;
+        Glw.OnMouseDown := @MouseDown;
+        Glw.OnMouseUp := @MouseUp;
+        Glw.OnMouseMove := @MouseMove;
+        Glw.OnIdle := @Idle;
 
-      UserQuit := false;
+        UserQuit := false;
 
-      repeat
-        Glwm.ProcessMessage(true);
-      until UserQuit;
+        repeat
+          Glwm.ProcessMessage(true);
+        until UserQuit;
 
-    finally FreeAndNil(SavedMode); end;
-  finally MusicPlayer.PlayedSound := stNone; end;
+      finally FreeAndNil(SavedMode); end;
+    finally MusicPlayer.PlayedSound := stNone; end;
+  finally
+    DemoLevelEnd;
+  end;
 end;
 
 { initialization / finalization ---------------------------------------------- }

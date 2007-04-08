@@ -47,7 +47,9 @@
   As path delimiter use slash "/".
 -->
 
-<levels>
+<levels
+  demo_level_name="tower">
+
   <level
     name="gate"
     scene_file_name="gate/gate_final.wrl"

@@ -73,13 +73,6 @@ procedure LevelFinishedFlush;
 { Saves a screen, causing also appropriate TimeMessage. }
 procedure SaveScreen;
 
-{ ViewAngleDegX and ViewAngleDegY specify field of view in the game.
-  You can freely change ViewAngleDegX at runtime, just make sure
-  that our OnResize will be called after. }
-var
-  ViewAngleDegX: Single = 70.0;
-function ViewAngleDegY: Single;
-
 var
   { These fonts can be used globally by anything in this game.
     They are initialized in Glw.OnInit and finalized in Glw.OnClose in this unit. }
@@ -160,12 +153,6 @@ var
 const
   SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
   SGameWinMessage = 'Game finished. Press [Escape] to exit to menu';
-
-function ViewAngleDegY: Single;
-begin
-  Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX,
-    Glw.Height / Glw.Width);
-end;
 
 { If ALActive then update listener POSITION and ORIENTATION
   based on Player.Navigator.Camera* }
