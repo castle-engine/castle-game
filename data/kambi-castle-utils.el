@@ -212,6 +212,28 @@ on MESH-NAME to be correctly interpreted."
   (write-file "gate_processed.wrl")
 )
 
+(defun kam-process-gate-water-core ()
+  (interactive)
+  (kam-remove-vertex-col-material-one-mesh "MeshWater")
+  (kam-add-material-for-mesh "MeshWater" "MatWater")
+  (kam-simple-replace-buffer "DEF MatWater
+	Material {" "DEF MatWater
+	Material {
+          fogImmune TRUE")
+)
+
+(defun kam-process-gate-water-1 ()
+  (interactive)
+  (kam-process-gate-water-core)
+  (write-file "water_1_processed.wrl")
+)
+
+(defun kam-process-gate-water-2 ()
+  (interactive)
+  (kam-process-gate-water-core)
+  (write-file "water_2_processed.wrl")
+)
+
 (defun kam-process-cages ()
   (interactive)
   (kam-fix-vertex-col-material "MeshCage")

@@ -48,7 +48,7 @@ type
 
     LevelDOMElement: TDOMElement;
 
-    function CreateLevel: TLevel;
+    function CreateLevel(Demo: boolean = false): TLevel;
   end;
 
   TObjectsListItem_1 = TLevelAvailable;
@@ -130,6 +130,8 @@ procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
         Value := TCagesLevel else
       if ValueStr = 'TGateLevel' then
         Value := TGateLevel else
+      if ValueStr = 'TGateDemoLevel' then
+        Value := TGateDemoLevel else
       if ValueStr = 'TCastleHallLevel' then
         Value := TCastleHallLevel else
       if ValueStr = 'TDoomE1M1Level' then
@@ -176,10 +178,10 @@ begin
     LevelClass := TLevel;
 end;
 
-function TLevelAvailable.CreateLevel: TLevel;
+function TLevelAvailable.CreateLevel(Demo: boolean): TLevel;
 begin
   Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
-    Title, Number, LevelDOMElement);
+    Title, Number, LevelDOMElement, Demo);
   AvailableForNewGame := true;
 end;
 

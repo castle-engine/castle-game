@@ -69,7 +69,7 @@
     light_set_file_name="gate_demo/gate_lights.wrl"
     title="The Gate (version for demo)"
     number="101"
-    implementation_class="TLevel"
+    implementation_class="TGateDemoLevel"
   />
 
   <level
@@ -160,6 +160,17 @@
     implementation_class="TLevel"
 
     footsteps_sound="player_footsteps_concrete"
+  />
+
+  <level
+    name="chojnowice"
+    scene_file_name="/win/mojepasy/openGL/castle/grzegorz/chojnowice/chojnowice_final.wrl"
+    light_set_file_name="/win/mojepasy/openGL/castle/grzegorz/chojnowice/chojnowice_lights.wrl"
+    title="Chojnowice"
+    number="201"
+    implementation_class="TLevel"
+
+    footsteps_sound="player_footsteps_grass"
   />
 -->
 </levels>

@@ -51,7 +51,8 @@ type
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ANumber: Integer;
-      DOMElement: TDOMElement); override;
+      DOMElement: TDOMElement;
+      ADemo: boolean); override;
 
     procedure Idle(const CompSpeed: Single); override;
 
@@ -91,7 +92,8 @@ type
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ANumber: Integer;
-      DOMElement: TDOMElement); override;
+      DOMElement: TDOMElement;
+      ADemo: boolean); override;
     destructor Destroy; override;
 
     function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
@@ -111,7 +113,8 @@ type
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ANumber: Integer;
-      DOMElement: TDOMElement); override;
+      DOMElement: TDOMElement;
+      ADemo: boolean); override;
 
     procedure Picked(const Distance: Single;
       CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
@@ -136,7 +139,8 @@ type
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ANumber: Integer;
-      DOMElement: TDOMElement); override;
+      DOMElement: TDOMElement;
+      ADemo: boolean); override;
     destructor Destroy; override;
 
     procedure Idle(const CompSpeed: Single); override;
@@ -192,7 +196,8 @@ type
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ANumber: Integer;
-      DOMElement: TDOMElement); override;
+      DOMElement: TDOMElement;
+      ADemo: boolean); override;
     destructor Destroy; override;
 
     procedure Picked(const Distance: Single;
@@ -202,6 +207,16 @@ type
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
     procedure Idle(const CompSpeed: Single); override;
+  end;
+
+  TGateDemoLevel = class(TLevel)
+  public
+    constructor Create(
+      const AName: string;
+      const ASceneFileName, ALightSetFileName: string;
+      const ATitle: string; const ANumber: Integer;
+      DOMElement: TDOMElement;
+      ADemo: boolean); override;
   end;
 
 function CastleLevelsPath: string;
@@ -224,7 +239,8 @@ constructor TCastleHallLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ANumber: Integer;
-  DOMElement: TDOMElement);
+  DOMElement: TDOMElement;
+  ADemo: boolean);
 var
   CastleHallLevelPath: string;
 begin
@@ -459,7 +475,8 @@ constructor TGateLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ANumber: Integer;
-  DOMElement: TDOMElement);
+  DOMElement: TDOMElement;
+  ADemo: boolean);
 begin
   inherited;
 
@@ -667,7 +684,8 @@ constructor TTowerLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ANumber: Integer;
-  DOMElement: TDOMElement);
+  DOMElement: TDOMElement;
+  ADemo: boolean);
 var
   ElevatorButtonSum: TLevelObjectSum;
   TowerLevelPath: string;
@@ -723,7 +741,8 @@ constructor TCagesLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ANumber: Integer;
-  DOMElement: TDOMElement);
+  DOMElement: TDOMElement;
+  ADemo: boolean);
 var
   BossIndex: Integer;
 begin
@@ -1047,7 +1066,8 @@ constructor TDoomE1M1Level.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ANumber: Integer;
-  DOMElement: TDOMElement);
+  DOMElement: TDOMElement;
+  ADemo: boolean);
 var
   DoomDoorsPathPrefix: string;
 
@@ -1198,6 +1218,27 @@ begin
        { This is the time for staying in lowered position. }
        2.0) then
     MovingElevator9a9b.GoBeginPosition;
+end;
+
+{ TGateDemoLevel ------------------------------------------------------------- }
+
+constructor TGateDemoLevel.Create(
+  const AName: string;
+  const ASceneFileName, ALightSetFileName: string;
+  const ATitle: string; const ANumber: Integer;
+  DOMElement: TDOMElement;
+  ADemo: boolean);
+var
+  Water: TLevelSimpleAnimatedObject;
+begin
+  inherited;
+
+  Water := TLevelSimpleAnimatedObject.Create(Self,
+    LoadLevelAnimation(CastleLevelsPath + 'gate_demo' +
+      PathDelim + 'water.kanim', true));
+  Objects.Add(Water);
+
+  Water.Play;
 end;
 
 end.

@@ -60,6 +60,8 @@ procedure DemoLevelEnd;
 }
 procedure DemoLevelDraw(Glwin: TGLWindow);
 
+procedure DemoLevelIdle(Glwin: TGLWindow);
+
 implementation
 
 uses SysUtils,
@@ -77,7 +79,8 @@ var
 procedure DemoLevelBegin;
 begin
   { initialize DemoLevel }
-  DemoLevel := LevelsAvailable.FindName(LevelsAvailable.DemoLevelName).CreateLevel;
+  DemoLevel := LevelsAvailable.FindName(LevelsAvailable.DemoLevelName).
+    CreateLevel(true);
 
   { initialize DemoNavigator }
   DemoNavigator := TMatrixWalker.Create(@Glw.PostRedisplayOnMatrixChanged);
@@ -165,6 +168,14 @@ begin
     glCallList(GLList_Caption);
 
   glPopAttrib;
+end;
+
+procedure DemoLevelIdle(Glwin: TGLWindow);
+var
+  CompSpeed: Single;
+begin
+  CompSpeed := Glwin.IdleCompSpeed;
+  DemoLevel.Idle(CompSpeed);
 end;
 
 { initialization / finalization ---------------------------------------------- }

@@ -1,9 +1,7 @@
 - finish intro:
-  - put there some actually good level
-  - some level with animation (make level.Idle called by DemoLevelIdle)
   - when loading intro: maybe change the text (from "loading level xxx" to
     "loading background" or something like this)
-  - when loading intro: octrees not needed ?
+  - add some shadow ?
 
 - doom:
   - make lava work (rooms 4, 8)

@@ -207,7 +207,7 @@ begin
 
   case CurrentItem of
     0: ChooseNewGame;
-    1: ShowControlsMenu(@DemoLevelDraw, false, false);
+    1: ShowControlsMenu(@DemoLevelDraw, @DemoLevelIdle, false, false);
     2: CurrentMenu := VideoMenu;
     3: CurrentMenu := SoundMenu;
     4: ShowCreditsMessage;
@@ -671,6 +671,8 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
+  DemoLevelIdle(Glwin);
+
   CurrentMenu.Idle(Glwin.IdleCompSpeed);
   TimeMessagesIdle;
 end;

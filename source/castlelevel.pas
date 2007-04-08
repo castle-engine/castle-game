@@ -810,6 +810,8 @@ type
     FLightSetFileName: string;
 
     procedure LoadFromDOMElement(Element: TDOMElement);
+
+    FDemo: boolean;
   protected
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
@@ -870,7 +872,8 @@ type
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ANumber: Integer;
-      DOMElement: TDOMElement); virtual;
+      DOMElement: TDOMElement;
+      ADemo: boolean); virtual;
 
     destructor Destroy; override;
 
@@ -1092,7 +1095,9 @@ type
     { Actually, this must be (0, 0, 1) for this game.
       Some things in this game are prepared to handle any
       HomeCameraUp value --- some not (for simplicity, and sometimes
-      code efficiency). }
+      code efficiency).
+
+      When loading for demo, this doesn't have to be (0, 0, 1). }
     property HomeCameraUp: TVector3Single read FHomeCameraUp;
 
     property Sectors: TSceneSectorsList read FSectors;
@@ -1165,6 +1170,8 @@ type
       The default implementation in this class is what
       is usually most natural: return Scene.Background. }
     function Background: TBackgroundGL; virtual;
+
+    property Demo: boolean read FDemo write FDemo;
   end;
 
   TLevelClass = class of TLevel;
@@ -2292,7 +2299,8 @@ constructor TLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ANumber: Integer;
-  DOMElement: TDOMElement);
+  DOMElement: TDOMElement;
+  ADemo: boolean);
 
   procedure RemoveItemsToRemove;
   var
@@ -2316,6 +2324,7 @@ begin
   FLightSetFileName := ALightSetFileName;
   FTitle := ATitle;
   FNumber := ANumber;
+  FDemo := ADemo;
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -2410,8 +2419,9 @@ begin
       NavigationSpeed);
 
     { Check and fix HomeCameraUp. }
-    if not VectorsEqual(Normalized(HomeCameraUp),
-      Vector3Single(0, 0, 1), 0.001) then
+    if (not Demo) and
+       (not VectorsEqual(Normalized(HomeCameraUp),
+         Vector3Single(0, 0, 1), 0.001)) then
       raise EInternalError.CreateFmt(
         'Initial camera up vector must be +Z, but is %s',
         [ VectorToRawStr(Normalized(HomeCameraUp)) ]) else
@@ -2455,12 +2465,15 @@ begin
   { Loading octree have their own Progress, so we load them outside our
     progress. }
 
-  Scene.DefaultTriangleOctree :=
-    Scene.CreateTriangleOctree(
-      OctreeMaxDepth, OctreeMaxLeafItemsCount,
-      'Loading level (triangle octree)');
-  Scene.DefaultShapeStateOctree :=
-    Scene.CreateShapeStateOctree('Loading level (ShapeState octree)');
+  if not Demo then
+  begin
+    Scene.DefaultTriangleOctree :=
+      Scene.CreateTriangleOctree(
+        OctreeMaxDepth, OctreeMaxLeafItemsCount,
+        'Loading level (triangle octree)');
+    Scene.DefaultShapeStateOctree :=
+      Scene.CreateShapeStateOctree('Loading level (ShapeState octree)');
+  end;
 end;
 
 destructor TLevel.Destroy;
@@ -2905,7 +2918,9 @@ begin
   for I := 0 to Objects.High do
     Objects[I].Render(Frustum, tgOpaque);
 
-  Scene.RenderFrustumOctree(Frustum, tgAll);
+  if not Demo then
+    Scene.RenderFrustumOctree(Frustum, tgAll) else
+    Scene.RenderFrustum(Frustum, tgAll);
 
   { Second pass rendering Objects: render transparent parts }
   for I := 0 to Objects.High do

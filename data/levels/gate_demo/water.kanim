@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<animation
+  scenes_per_time="30"
+  equality_epsilon="0.1"
+  loop="true"
+  backwards="true">
+  <frame file_name="water_1_processed.wrl" time="0" />
+  <frame file_name="water_2_processed.wrl" time="3" />
+</animation>

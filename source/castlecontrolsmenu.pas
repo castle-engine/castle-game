@@ -36,13 +36,17 @@ type
     procedure Draw; override;
   end;
 
+{ Show menu that allows player to confugure controls.
+  AIdleUnderMenu may be @nil. }
 procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
+  AIdleUnderMenu: TGLWindowFunc;
   ADrawFadeRect, ADrawCentered: boolean);
 
 { This is like ShowControlsMenu, but user can quit with
   escape key. AExitWithEscape will be set to @true or @false,
   depending on whether user used escape to exit. }
 procedure ShowControlsMenuEscape(ADrawUnderMenu: TDrawFunc;
+  AIdleUnderMenu: TGLWindowFunc;
   ADrawFadeRect, ADrawCentered: boolean;
   out AExitWithEscape: boolean);
 
@@ -439,6 +443,7 @@ const
 
 var
   DrawUnderMenu: TDrawFunc;
+  IdleUnderMenu: TGLWindowFunc;
   DrawFadeRect: boolean;
   GLList_DrawFadeRect: TGLuint;
   MoveX, MoveY: Single;
@@ -510,6 +515,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
+  if Assigned(IdleUnderMenu) then IdleUnderMenu(Glwin);
   CurrentMenu.Idle(Glwin.IdleCompSpeed);
   TimeMessagesIdle;
 end;
@@ -520,12 +526,14 @@ begin
 end;
 
 procedure ShowControlsMenuCore(ADrawUnderMenu: TDrawFunc;
+  AIdleUnderMenu: TGLWindowFunc;
   ADrawFadeRect, ADrawCentered, AExitWithEscapeAllowed: boolean;
   out AExitWithEscape: boolean);
 var
   SavedMode: TGLMode;
 begin
   DrawUnderMenu := ADrawUnderMenu;
+  IdleUnderMenu := AIdleUnderMenu;
   DrawFadeRect := ADrawFadeRect;
   ExitWithEscapeAllowed := AExitWithEscapeAllowed;
   ExitWithEscape := false;
@@ -568,19 +576,23 @@ begin
 end;
 
 procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
+  AIdleUnderMenu: TGLWindowFunc;
   ADrawFadeRect, ADrawCentered: boolean);
 var
   Dummy: boolean;
 begin
-  ShowControlsMenuCore(ADrawUnderMenu, ADrawFadeRect, ADrawCentered,
+  ShowControlsMenuCore(ADrawUnderMenu, AIdleUnderMenu,
+    ADrawFadeRect, ADrawCentered,
     false, Dummy);
 end;
 
 procedure ShowControlsMenuEscape(ADrawUnderMenu: TDrawFunc;
+  AIdleUnderMenu: TGLWindowFunc;
   ADrawFadeRect, ADrawCentered: boolean;
   out AExitWithEscape: boolean);
 begin
-  ShowControlsMenuCore(ADrawUnderMenu, ADrawFadeRect, ADrawCentered,
+  ShowControlsMenuCore(ADrawUnderMenu, AIdleUnderMenu,
+    ADrawFadeRect, ADrawCentered,
     true, AExitWithEscape);
 end;
 

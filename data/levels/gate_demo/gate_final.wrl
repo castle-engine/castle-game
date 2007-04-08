@@ -4,9 +4,12 @@ Group {
   # Just for testing lights from view3dscene
   WWWInline { name "gate_lights.wrl" separate FALSE }
 
-  PerspectiveCamera {
-    position -225.95603942871094 -384.51846313476562 1.740513443946838
-    orientation 0.948485970497131 -0.224025249481201 -0.224025085568428 1.623659729957581
+  Viewpoint  {
+    position 34.287651062011719 -341.46368408203125 -1.348464250564575
+    orientation 0.704630672931671 0.522189974784851 0.480430454015732 1.991259574890137
+    # alternative representation of "orientation" :
+    # direction -0.190682798624039 0.057995587587357 0.016631172969937
+    # up 0.079557709395885 -0.024196714162827 0.99653697013855
   }
 
   NavigationInfo {
@@ -38,4 +41,5 @@ Group {
   }
 
   WWWInline { name "gate_processed.wrl" }
+  #WWWInline { name "water_1_processed.wrl" }
 }
