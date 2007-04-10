@@ -1,9 +1,6 @@
 - finish intro:
-  - when loading intro: maybe change the text (from "loading level xxx" to
-    "loading background" or something like this)
   - add some shadow ?
-  - make loading gate level faster (maybe gprof will help ? gate is the slowest loading level...
-    otherwise, just make gate_demo really hacked)
+  - demo level has very small FPS ! why ? The water anim looks jagged because of this...
 
 - doom:
   - make lava work (rooms 4, 8)
