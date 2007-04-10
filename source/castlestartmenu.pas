@@ -699,7 +699,9 @@ begin
 
         SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
           nil, false, true { FPSActive should not be needed anymore, but I leave it. },
-          false, K_None, #0, false, false);
+          false, K_None, #0,
+          { show fps on caption --- useful to test FPS of demo level true}false,
+          false);
 
         Glw.OnKeyDown := @KeyDown;
         Glw.OnMouseDown := @MouseDown;
