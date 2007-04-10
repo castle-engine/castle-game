@@ -44,14 +44,20 @@ Group {
     }
   }
 
-  PerspectiveCamera {
-    position -52.858566284179688 180.4088134765625 1.656345009803772
-    direction 0.00284720514901 -0.199979782104492 -0.000000017483666
-    up 0 0 1
+  # Camera settings "encoded" in the VRML declaration below :
+  # direction 0.002847204683349 -0.199979737401009 -0.000000017483663
+  # up 1.77317521776743E-010 -0.000000043708827 1
+  # gravityUp 0 0 1
+  Separator {
+    Transform {
+      translation -52.858566284179687 180.4088134765625 1.656345009803772
+      rotation 1 0 0 1.570796370506287
+    }
+    PerspectiveCamera {
+      position 0 0 0 # camera position is expressed by translation
+      orientation -0.000003070474804 -1 0 3.127356767654419
+    }
   }
-
-  # creatures, items (locations set by picking a point in view3dscene
-  # and using "Selected object info" feature)
 
   # rotate to make up vector as +Z
   Rotation { rotation 1 0 0 1.57 }

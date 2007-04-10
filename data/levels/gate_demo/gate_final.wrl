@@ -4,18 +4,26 @@ Group {
   # Just for testing lights from view3dscene
   WWWInline { name "gate_lights.wrl" separate FALSE }
 
-  Viewpoint  {
-    position 34.287651062011719 -341.46368408203125 -1.348464250564575
-    orientation 0.704630672931671 0.522189974784851 0.480430454015732 1.991259574890137
-    # alternative representation of "orientation" :
-    # direction -0.190682798624039 0.057995587587357 0.016631172969937
-    # up 0.079557709395885 -0.024196714162827 0.99653697013855
+  # Camera settings "encoded" in the VRML declaration below :
+  # direction -0.190682768821716 0.057995583862066 0.016631152480841
+  # up 0.079557605087757 -0.024196594953537 0.996536552906036
+  # gravityUp 0 0 1
+  Separator {
+    Transform {
+      translation 34.287651062011719 -341.46368408203125 -1.348464250564575
+      rotation 1 0 0 1.570796370506287
+    }
+    PerspectiveCamera {
+      position 0 0 0 # camera position is expressed by translation
+      orientation 0.056064303964376 0.99756246805191 -0.041548863053322 1.277875304222107
+    }
   }
 
   NavigationInfo {
     avatarSize [ 0.5, 2 ]
     speed 1.0
     headlight FALSE
+    type "FLY"
   }
 
   Separator {

@@ -20,9 +20,19 @@ Group{
     headlight TRUE
   }
 
-  PerspectiveCamera {
-    position 31.349884033203125 165.97708129882812 2.59186840057373
-    orientation 0.999533712863922 0.021591991186142 0.021591406315565 1.571262836456299
+  # Camera settings "encoded" in the VRML declaration below :
+  # direction -0.008636678569019 0.199813440442085 2.06672421398935E-008
+  # up 5.90786726206716E-007 -0.000000121648895 1
+  # gravityUp 0 0 1
+  Separator {
+    Transform {
+      translation 31.349884033203125 165.97708129882812 2.59186840057373
+      rotation 1 0 0 1.570796370506287
+    }
+    PerspectiveCamera {
+      position 0 0 0 # camera position is expressed by translation
+      orientation 1.38167126806366E-006 0.999994397163391 0 0.043196484446526
+    }
   }
 
   WWWInline { name "end_sequence_processed.wrl" }

@@ -1,16 +1,20 @@
 #VRML V1.0 ascii
 
 Group {
-  PerspectiveCamera {
-    position 26.214962005615234 -121.93414306640625 1.813444495201111
-    orientation 0.999973058700562 -0.005195290781558 -0.005190430209041 1.570823311805725
+  # Camera settings "encoded" in the VRML declaration below :
+  # direction 0.002077144337818 0.199989229440689 8.74361560931902E-009
+  # up -0.000004861481102 -0.000000036941465 1
+  # gravityUp 0 0 1
+  Separator {
+    Transform {
+      translation 26.214962005615234 -121.93414306640625 1.813444495201111
+      rotation 1 0 0 1.570796370506287
+    }
+    PerspectiveCamera {
+      position 0 0 0 # camera position is expressed by translation
+      orientation 8.71105132471683E-010 -1.000556349754333 0 0.010381013154984
+    }
   }
-
-  # Testing camera pos, near the torch
-#   PerspectiveCamera {
-#     position 30.363103866577148 96.169647216796875 1.799999952316284
-#     orientation 0.947798371315002 -0.22547522187233 -0.225475758314133 1.624384164810181
-#   }
 
   NavigationInfo {
     avatarSize [ 0.5, 2 ]

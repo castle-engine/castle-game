@@ -1,3 +1,7 @@
+- make castle work with new camera GravityUp/InitialCameraUp instead of HomeCameraUp
+  remove the check for HomeCameraUp = +Z, now it's for GravityUp and should be done even for Demo case
+  gate_demo level should be loadable now
+
 - finish intro:
   - when loading intro: maybe change the text (from "loading level xxx" to
     "loading background" or something like this)
