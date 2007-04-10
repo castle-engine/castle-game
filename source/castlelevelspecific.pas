@@ -890,7 +890,7 @@ begin
         SpiderPosition := FSpidersAppearing.Items[I];
         SpiderDirection :=
           VectorSubtract(Player.Navigator.CameraPos, SpiderPosition);
-        MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.HomeCameraUp);
+        MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.GravityUp);
         SpiderCreature := Spider.CreateDefaultCreature(
           SpiderPosition, SpiderDirection, AnimationTime, Spider.DefaultMaxLife);
         Creatures.Add(SpiderCreature);

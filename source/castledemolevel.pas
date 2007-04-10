@@ -84,9 +84,10 @@ begin
 
   { initialize DemoNavigator }
   DemoNavigator := TMatrixWalker.Create(@Glw.PostRedisplayOnMatrixChanged);
-  DemoNavigator.Init(DemoLevel.HomeCameraPos,
-    DemoLevel.HomeCameraDir,
-    DemoLevel.HomeCameraUp, 0.0, 0.0 { unused, we don't use Gravity here });
+  DemoNavigator.Init(DemoLevel.InitialCameraPos,
+    DemoLevel.InitialCameraDir,
+    DemoLevel.InitialCameraUp,
+    DemoLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
 end;
 
 procedure DemoLevelEnd;

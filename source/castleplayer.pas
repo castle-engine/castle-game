@@ -196,7 +196,7 @@ type
 
       You are allowed to read and write:
       @unorderedList(
-        @item(Navigator.CameraPos, CameraDir, CameraUp and HomeCameraXxx ---
+        @item(Navigator.CameraPos, CameraDir, CameraUp and InitialCameraXxx ---
           these are exactly player's camera settings.)
         @item(Navigator.CameraPreferredHeight. In fact, it's OK to just call
           Navigator.Init.)
@@ -690,7 +690,7 @@ begin
     Navigator.Input_RightRot.MakeClear;
     Navigator.Input_UpRotate.MakeClear;
     Navigator.Input_DownRotate.MakeClear;
-    Navigator.Input_HomeUp.MakeClear;
+    Navigator.Input_GravityUp.MakeClear;
   end else
   begin
     { MouseLook is turned on always, even when player is dead.
@@ -700,21 +700,21 @@ begin
     { Rotation keys work always, even when player is dead.
       Initially I disabled them, but after some thought:
       let them work. They work a little strangely (because CameraUp
-      is orthogonal to HomeCameraUp), but they still work and player
+      is orthogonal to GravityUp), but they still work and player
       can figure it out. }
     Navigator.Input_LeftRot.Assign(CastleInput_LeftRot.Shortcut, false);
     Navigator.Input_RightRot.Assign(CastleInput_RightRot.Shortcut, false);
     Navigator.Input_UpRotate.Assign(CastleInput_UpRotate.Shortcut, false);
     Navigator.Input_DownRotate.Assign(CastleInput_DownRotate.Shortcut, false);
-    Navigator.Input_HomeUp.Assign(CastleInput_HomeUp.Shortcut, false);
+    Navigator.Input_GravityUp.Assign(CastleInput_GravityUp.Shortcut, false);
   end;
 
   if GameWin then
   begin
-    { PreferHomeUpXxx should be ignored actually, because rotations
+    { PreferGravityUpXxx should be ignored actually, because rotations
       don't work now. }
-    Navigator.PreferHomeUpForMoving := true;
-    Navigator.PreferHomeUpForRotations := false;
+    Navigator.PreferGravityUpForMoving := true;
+    Navigator.PreferGravityUpForRotations := false;
 
     Navigator.Input_Jump.MakeClear;
     Navigator.Input_Crouch.MakeClear;
@@ -738,10 +738,10 @@ begin
   end else
   if Dead then
   begin
-    Navigator.PreferHomeUpForMoving := true;
-    { This is the only case when PreferHomeUpForRotations := false
+    Navigator.PreferGravityUpForMoving := true;
+    { This is the only case when PreferGravityUpForRotations := false
       is sensible. }
-    Navigator.PreferHomeUpForRotations := false;
+    Navigator.PreferGravityUpForRotations := false;
 
     Navigator.Input_Jump.MakeClear;
     Navigator.Input_Crouch.MakeClear;
@@ -766,8 +766,8 @@ begin
   begin
     if FlyingMode then
     begin
-      Navigator.PreferHomeUpForMoving := false;
-      Navigator.PreferHomeUpForRotations := true;
+      Navigator.PreferGravityUpForMoving := false;
+      Navigator.PreferGravityUpForRotations := true;
 
       Navigator.Input_Jump.MakeClear;
       Navigator.Input_Crouch.MakeClear;
@@ -786,8 +786,8 @@ begin
     begin
       if Swimming <> psNo then
       begin
-        Navigator.PreferHomeUpForMoving := false;
-        Navigator.PreferHomeUpForRotations := true;
+        Navigator.PreferGravityUpForMoving := false;
+        Navigator.PreferGravityUpForRotations := true;
 
         Navigator.Input_Jump.MakeClear;
         Navigator.Input_Crouch.MakeClear;
@@ -805,8 +805,8 @@ begin
         Navigator.MoveVertSpeed := 0.5;
       end else
       begin
-        Navigator.PreferHomeUpForMoving := true;
-        Navigator.PreferHomeUpForRotations := true;
+        Navigator.PreferGravityUpForMoving := true;
+        Navigator.PreferGravityUpForRotations := true;
 
         Navigator.Input_Jump.Assign(CastleInput_UpMove.Shortcut, false);
         Navigator.Input_Crouch.Assign(CastleInput_DownMove.Shortcut, false);

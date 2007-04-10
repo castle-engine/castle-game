@@ -109,7 +109,7 @@ type
 
     { If @true, then the creature flies. Otherwise it always tries to move only
       horizontally (which means that Direction is always orthogonal
-      to Level.HomeCameraUp), and it falls down when Position is above
+      to Level.GravityUp), and it falls down when Position is above
       the ground. }
     property Flying: boolean read FFlying write FFlying default DefaultFlying;
 
@@ -2367,7 +2367,7 @@ procedure TCreaturesList.GetCameraHeight(
     const Box: TBox3d;
     out IsAboveTheBox: boolean; out HeightAboveTheBox: Single);
   begin
-    { We use here the assumption that HomeCameraUp is (0, 0, 1). }
+    { We use here the assumption that GravityUp is (0, 0, 1). }
 
     IsAboveTheBox := (not IsEmptyBox3d(Box)) and
       (Box[0, 0] <= Point[0]) and (Point[0] <= Box[1, 0]) and
@@ -2504,7 +2504,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     { calculate DirectionToTarget }
     DirectionToTarget := VectorSubtract(Target, MiddlePosition);
     if not Kind.Flying then
-      MakeVectorsOrthoOnTheirPlane(DirectionToTarget, Level.HomeCameraUp);
+      MakeVectorsOrthoOnTheirPlane(DirectionToTarget, Level.GravityUp);
 
     { calculate AngleRadBetweenDirectionToTarget }
     AngleRadBetweenDirectionToTarget :=
@@ -2553,13 +2553,13 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
       { From time to time it's good to fix Direction, to make sure it's
         1. normalized,
-        2. and orthogonal to HomeCameraUp if not Flying
+        2. and orthogonal to GravityUp if not Flying
         Otherwise rounding errors could accumulate and cause some nasty things.
 
         Actually, I didn't observe anything bad caused by the above,
         but I'm safeguarding anyway, for safety. }
       if not Kind.Flying then
-        MakeVectorsOrthoOnTheirPlane(FDirection, Level.HomeCameraUp);
+        MakeVectorsOrthoOnTheirPlane(FDirection, Level.GravityUp);
       NormalizeTo1st(FDirection);
       RecalculateBoundingBox;
     end;

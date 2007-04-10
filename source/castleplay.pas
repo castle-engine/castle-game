@@ -510,8 +510,8 @@ begin
   Player.Navigator.OnGetCameraHeight := @Level.PlayerGetCameraHeightSqr;
 
   { Init initial camera pos }
-  Player.Navigator.Init(Level.HomeCameraPos, Level.HomeCameraDir,
-    Level.HomeCameraUp, Level.CameraPreferredHeight,
+  Player.Navigator.Init(Level.InitialCameraPos, Level.InitialCameraDir,
+    Level.InitialCameraUp, Level.GravityUp, Level.CameraPreferredHeight,
     0.0 { Level.CameraPreferredHeight is already corrected if necessary,
           so I pass here 0.0 instead of CameraRadius } );
 
@@ -887,14 +887,14 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
         1. show visually player that the item was dropped
         2. to avoid automatically picking it again
 
-        Note that I take PushVector from CameraDirInHomePlane,
+        Note that I take PushVector from CameraDirInGravityPlane,
         not from CameraDir, otherwise when player is looking
         down he could be able to put item "inside the ground".
         Collision detection with the level below would actually
         prevent putting item "inside the ground", but the item
         would be too close to the player --- he could pick it up
         immediately. }
-      PushVector := Player.Navigator.CameraDirInHomePlane;
+      PushVector := Player.Navigator.CameraDirInGravityPlane;
       PushVectorLength := Max(
         Player.Navigator.RealCameraPreferredHeight,
         Box3dSizeX(ItemBox) * 2,
@@ -1063,7 +1063,7 @@ begin
      CastleInput_RightRot.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
      CastleInput_UpRotate.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
      CastleInput_DownRotate.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_HomeUp.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+     CastleInput_GravityUp.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
     MaybeWinMessage else
 
   { Items keys. }
@@ -1170,13 +1170,6 @@ begin
           only --- at least in objfpc mode, see
           [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
         Player.Navigator.OnMatrixChanged := @PlayGameHelper.MatrixChanged;
-
-        { tests:
-          InfoWrite(Format('%f %f %f %f',
-            [VectorLen(Player.Navigator.HomeCameraDir),
-            VectorLen(Player.Navigator.CameraDir),
-            Player.Navigator.CameraPreferredHeight,
-            Player.Navigator.MoveSpeed])); }
 
         { Note that this sets AutoRedisplay to true. }
         SetStandardGLWindowState(Glw, @Draw, @CloseQuery, @Resize,

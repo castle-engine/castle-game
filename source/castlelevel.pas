@@ -772,9 +772,10 @@ type
     procedure TraverseForCreatures(Node: TVRMLNode;
       State: TVRMLGraphTraverseState);
 
-    FHomeCameraPos: TVector3Single;
-    FHomeCameraDir: TVector3Single;
-    FHomeCameraUp: TVector3Single;
+    FInitialCameraPos: TVector3Single;
+    FInitialCameraDir: TVector3Single;
+    FInitialCameraUp: TVector3Single;
+    FGravityUp: TVector3Single;
 
     FAnimationTime: Single;
 
@@ -1089,16 +1090,15 @@ type
       LevelObjectIndex: Integer;
       var InteractionOccured: boolean); virtual;
 
-    property HomeCameraPos: TVector3Single read FHomeCameraPos;
-    property HomeCameraDir: TVector3Single read FHomeCameraDir;
+    property InitialCameraPos: TVector3Single read FInitialCameraPos;
+    property InitialCameraDir: TVector3Single read FInitialCameraDir;
+    property InitialCameraUp : TVector3Single read FInitialCameraUp;
 
     { Actually, this must be (0, 0, 1) for this game.
       Some things in this game are prepared to handle any
-      HomeCameraUp value --- some not (for simplicity, and sometimes
-      code efficiency).
-
-      When loading for demo, this doesn't have to be (0, 0, 1). }
-    property HomeCameraUp: TVector3Single read FHomeCameraUp;
+      GravityUp value --- but some not (for simplicity, and sometimes
+      code efficiency). }
+    property GravityUp: TVector3Single read FGravityUp;
 
     property Sectors: TSceneSectorsList read FSectors;
     property Waypoints: TSceneWaypointsList read FWaypoints;
@@ -2336,11 +2336,12 @@ begin
 
     AttributesSet(Scene.Attributes, btIncrease);
 
-    { Calculate HomeCameraPos, HomeCameraDir, HomeCameraUp.
+    { Calculate InitialCameraPos, InitialCameraDir, InitialCameraUp.
       Must be done before initializing creatures, as they right now
-      use HomeCameraPos. FHomeCameraDir, FHomeCameraUp will be
+      use InitialCameraPos. FInitialCameraDir, FInitialCameraUp will be
       actually changed later in this procedure. }
-    Scene.GetPerspectiveViewpoint(FHomeCameraPos, FHomeCameraDir, FHomeCameraUp);
+    Scene.GetPerspectiveViewpoint(FInitialCameraPos,
+      FInitialCameraDir, FInitialCameraUp, FGravityUp);
 
     FObjects := TLevelObjectsList.Create;
 
@@ -2412,21 +2413,20 @@ begin
     FProjectionNear := CameraRadius * 0.75;
     FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
 
-    { Fix HomeCameraDir length. Uses CameraRadius and NavigationSpeed. }
-    VectorAdjustToLengthTo1st(FHomeCameraDir, CameraRadius *
+    { Fix InitialCameraDir length. Uses CameraRadius and NavigationSpeed. }
+    VectorAdjustToLengthTo1st(FInitialCameraDir, CameraRadius *
       0.8 * { I multiply just to get the same thing
       that view3dscene does at this time. }
       NavigationSpeed);
 
-    { Check and fix HomeCameraUp. }
-    if (not Demo) and
-       (not VectorsEqual(Normalized(HomeCameraUp),
-         Vector3Single(0, 0, 1), 0.001)) then
+    { Check and fix GravityUp. }
+    if not VectorsEqual(Normalized(GravityUp),
+             Vector3Single(0, 0, 1), 0.001) then
       raise EInternalError.CreateFmt(
-        'Initial camera up vector must be +Z, but is %s',
-        [ VectorToRawStr(Normalized(HomeCameraUp)) ]) else
-      { Make HomeCameraUp = (0, 0, 1) more "precisely" }
-      FHomeCameraUp := Vector3Single(0, 0, 1);
+        'Gravity up vector must be +Z, but is %s',
+        [ VectorToRawStr(Normalized(GravityUp)) ]) else
+      { Make GravityUp = (0, 0, 1) more "precisely" }
+      FGravityUp := Vector3Single(0, 0, 1);
 
     Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
       (ProjectionNear, ProjectionFar);
@@ -2707,9 +2707,9 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
     { TODO --- CreatureDirection configurable.
       Right now, it just points to the player start pos --- this is
       more-or-less sensible, usually. }
-    CreatureDirection := VectorSubtract(HomeCameraPos, CreaturePosition);
+    CreatureDirection := VectorSubtract(InitialCameraPos, CreaturePosition);
     if not CreatureKind.Flying then
-      MakeVectorsOrthoOnTheirPlane(CreatureDirection, HomeCameraUp);
+      MakeVectorsOrthoOnTheirPlane(CreatureDirection, GravityUp);
 
     { make sure that MaxLife is initialized now }
     if not IsMaxLife then

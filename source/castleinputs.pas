@@ -107,7 +107,7 @@ var
   CastleInput_RightStrafe: TInputConfiguration;
   CastleInput_UpRotate: TInputConfiguration;
   CastleInput_DownRotate: TInputConfiguration;
-  CastleInput_HomeUp: TInputConfiguration;
+  CastleInput_GravityUp: TInputConfiguration;
   CastleInput_UpMove: TInputConfiguration;
   CastleInput_DownMove: TInputConfiguration;
 
@@ -332,7 +332,7 @@ begin
     TInputShortcut.Create(K_PageDown, K_None, false, mbLeft));
   CastleInput_DownRotate := TInputConfiguration.Create('Look down', 'look_down', kgBasic,
     TInputShortcut.Create(K_Delete, K_None, false, mbLeft));
-  CastleInput_HomeUp := TInputConfiguration.Create('Look straight', 'look_straight', kgBasic,
+  CastleInput_GravityUp := TInputConfiguration.Create('Look straight', 'look_straight', kgBasic,
     TInputShortcut.Create(K_End, K_None, false, mbLeft));
   CastleInput_UpMove := TInputConfiguration.Create('Jump (or fly/swim up)', 'move_up', kgBasic,
     TInputShortcut.Create(K_Space, K_None, true, mbRight));
