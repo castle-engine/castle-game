@@ -376,6 +376,7 @@ Cages level:
 - put some vertical crates around GlassPrison on basic_castle
 
 - shadows under the creatures:
+  - use glStencilOpSeparate if available
   - need to be optimized to enabled by default.
     Then set DefaultRenderShadows to true, and remove the warning in
     CastleStartMenu when changing RenderShadows.
