@@ -649,11 +649,6 @@ type
     FallingDownStartHeight: Single;
     FIsFallingDown: boolean;
 
-    { We use our own SavedShadowQuads, to not waste so much memory
-      (otherwise each CurrentScene would use it's own
-      DefaultSavedShadowQuads instance) }
-    SavedShadowQuads: TDynQuad3SingleArray;
-
     UsedSounds: TALAllocatedSourcesList;
 
     procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
@@ -783,10 +778,7 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); virtual;
 
-    procedure RenderFrontShadowQuads(
-      const LightPosition, CameraPosition: TVector3Single); virtual;
-
-    procedure RenderBackShadowQuads; virtual;
+    procedure RenderShadowQuads(const LightPosition: TVector3Single); virtual;
 
     procedure Idle(const CompSpeed: Single); virtual;
 
@@ -1755,8 +1747,6 @@ begin
   FMaxLife := AMaxLife;
   FLife := MaxLife;
 
-  SavedShadowQuads := TDynQuad3SingleArray.Create;
-
   UsedSounds := TALAllocatedSourcesList.Create;
 
   { FLegsPosition and FDirection changed, so RecalculateBoundingBox must be
@@ -1789,7 +1779,6 @@ begin
     FreeAndNil(UsedSounds);
   end;
 
-  FreeAndNil(SavedShadowQuads);
   inherited;
 end;
 
@@ -1972,16 +1961,10 @@ begin
     [Kind.VRMLNodeName, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
 end;
 
-procedure TCreature.RenderFrontShadowQuads(
-  const LightPosition, CameraPosition: TVector3Single);
+procedure TCreature.RenderShadowQuads(
+  const LightPosition: TVector3Single);
 begin
-  CurrentScene.RenderFrontShadowQuads(LightPosition, CameraPosition,
-    SceneTransform, SavedShadowQuads);
-end;
-
-procedure TCreature.RenderBackShadowQuads;
-begin
-  CurrentScene.RenderBackShadowQuads(SavedShadowQuads);
+  CurrentScene.RenderShadowQuads(LightPosition, SceneTransform);
 end;
 
 function TCreature.MiddleCollisionWithPlayer(

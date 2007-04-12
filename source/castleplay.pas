@@ -114,7 +114,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
-  CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable;
+  CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable, CastleLog;
 
 var
   GLList_TimeMessagesBackground: TGLuint;
@@ -149,6 +149,14 @@ var
   { If LevelFinishedSchedule, then this is not-'', and should be the name
     of next Level to load. }
   LevelFinishedNextLevelName: string;
+
+  { These will ideally be initialized to GL_INCR/DECR_WRAP (available
+    in OpenGL >= 2.0) or GL_INCR/DECR_WRAP_EXT (available if EXT_stencil_wrap).
+    Actually values with and without _EXT are the same.
+
+    If OpenGL will not have these available, then they will be equal to
+    old GL_INCR/DECT constants (without wrapping). }
+  StencilOpIncrWrap, StencilOpDecrWrap: TGLenum;
 
 const
   SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
@@ -334,24 +342,13 @@ end;
 
 procedure Draw(Glwin: TGLWindow);
 
-  procedure RenderFrontShadowQuads;
+  procedure RenderShadowQuads;
   var
     I: Integer;
   begin
     for I := 0 to Level.Creatures.High do
-    begin
-      Level.Creatures.Items[I].RenderFrontShadowQuads(
-        Level.LightCastingShadowsPosition,
-        Player.Navigator.CameraPos);
-    end;
-  end;
-
-  procedure RenderBackShadowQuads;
-  var
-    I: Integer;
-  begin
-    for I := 0 to Level.Creatures.High do
-      Level.Creatures.Items[I].RenderBackShadowQuads;
+      Level.Creatures.Items[I].RenderShadowQuads(
+        Level.LightCastingShadowsPosition);
   end;
 
   procedure RenderCreaturesItems(TransparentGroup: TTransparentGroup);
@@ -380,7 +377,9 @@ const
 
     So it's important that this constant spans a couple of bits.
     More precisely, it should be the maximum number of possibly overlapping
-    front shadow quads from any possible camera view. }
+    front shadow quads from any possible camera view. Practically speaking,
+    it will always be too little (for complicated shadow casters),
+    but stencil_wrap will hopefully in this case minimize artifacts. }
   StencilShadowBits = $FF;
 var
   ClearBuffers: TGLbitfield;
@@ -422,20 +421,28 @@ begin
     glEnable(GL_STENCIL_TEST);
       { Note that stencil buffer is set to all 0 now. }
 
-      glPushAttrib(GL_ENABLE_BIT);
+      glPushAttrib(GL_ENABLE_BIT
+        { saves Enable(GL_DEPTH_TEST), Enable(GL_CULL_FACE) });
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+
         { Calculate shadows to the stencil buffer.
           Don't write anything to depth or color buffers. }
         glSetDepthAndColorWriteable(GL_FALSE);
+          glStencilFunc(GL_ALWAYS, 0, 0);
+
           { For each fragment that passes depth-test, *increase* it's stencil
             value by 1. Render front facing shadow quads. }
-          glStencilFunc(GL_ALWAYS, 0, 0);
-          glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
-          RenderFrontShadowQuads;
+          glStencilOp(GL_KEEP, GL_KEEP, StencilOpIncrWrap);
+          glCullFace(GL_BACK);
+          RenderShadowQuads;
+
           { For each fragment that passes depth-test, *decrease* it's stencil
             value by 1. Render back facing shadow quads. }
-          glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
-          RenderBackShadowQuads;
+          glStencilOp(GL_KEEP, GL_KEEP, StencilOpDecrWrap);
+          glCullFace(GL_FRONT);
+          RenderShadowQuads;
+
         glSetDepthAndColorWriteable(GL_TRUE);
       glPopAttrib;
     glDisable(GL_STENCIL_TEST);
@@ -466,7 +473,7 @@ begin
         glDepthMask(GL_FALSE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
-        RenderFrontShadowQuads;
+        RenderShadowQuads;
       glPopAttrib;
     end;
   end else
@@ -1305,6 +1312,22 @@ begin
 
   Font_BFNT_BitstreamVeraSans_m10 := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans_m10);
   Font_BFNT_BitstreamVeraSans     := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
+
+  { calcualte StencilOpIncrWrap, StencilOpDecrWrap }
+  if (GLVersion.Major >= 2) or GL_EXT_stencil_wrap then
+  begin
+    StencilOpIncrWrap := GL_INCR_WRAP_EXT;
+    StencilOpDecrWrap := GL_DECR_WRAP_EXT;
+    if WasParam_DebugLog then
+      WritelnLog(ltOpenGLInitialization, 'GL_INCR/DECR_WRAP available');
+  end else
+  begin
+    StencilOpIncrWrap := GL_INCR;
+    StencilOpDecrWrap := GL_DECR;
+    if WasParam_DebugLog then
+      WritelnLog(ltOpenGLInitialization, 'GL_INCR/DECR_WRAP not available' +
+        ' - shadows will have artifacts');
+  end
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);
