@@ -424,24 +424,33 @@ begin
       glPushAttrib(GL_ENABLE_BIT
         { saves Enable(GL_DEPTH_TEST), Enable(GL_CULL_FACE) });
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        if glStencilOpSeparate = nil then
+          glEnable(GL_CULL_FACE);
 
         { Calculate shadows to the stencil buffer.
           Don't write anything to depth or color buffers. }
         glSetDepthAndColorWriteable(GL_FALSE);
           glStencilFunc(GL_ALWAYS, 0, 0);
 
-          { For each fragment that passes depth-test, *increase* it's stencil
-            value by 1. Render front facing shadow quads. }
-          glStencilOp(GL_KEEP, GL_KEEP, StencilOpIncrWrap);
-          glCullFace(GL_BACK);
-          RenderShadowQuads;
+          if glStencilOpSeparate = nil then
+          begin
+            { For each fragment that passes depth-test, *increase* it's stencil
+              value by 1. Render front facing shadow quads. }
+            glStencilOp(GL_KEEP, GL_KEEP, StencilOpIncrWrap);
+            glCullFace(GL_BACK);
+            RenderShadowQuads;
 
-          { For each fragment that passes depth-test, *decrease* it's stencil
-            value by 1. Render back facing shadow quads. }
-          glStencilOp(GL_KEEP, GL_KEEP, StencilOpDecrWrap);
-          glCullFace(GL_FRONT);
-          RenderShadowQuads;
+            { For each fragment that passes depth-test, *decrease* it's stencil
+              value by 1. Render back facing shadow quads. }
+            glStencilOp(GL_KEEP, GL_KEEP, StencilOpDecrWrap);
+            glCullFace(GL_FRONT);
+            RenderShadowQuads;
+          end else
+          begin
+            glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, StencilOpIncrWrap);
+            glStencilOpSeparate(GL_BACK , GL_KEEP, GL_KEEP, StencilOpDecrWrap);
+            RenderShadowQuads;
+          end;
 
         glSetDepthAndColorWriteable(GL_TRUE);
       glPopAttrib;
@@ -1278,6 +1287,29 @@ procedure GLWindowInit(Glwin: TGLWindow);
       PlayerControlFileName(BaseName), [TAlphaImage], [], 0, 0);
   end;
 
+  procedure InitializeShadows;
+  var
+    WrapAvailable: boolean;
+  begin
+    { calcualte StencilOpIncrWrap, StencilOpDecrWrap }
+    WrapAvailable := (GLVersion.Major >= 2) or GL_EXT_stencil_wrap;
+    if WrapAvailable then
+    begin
+      StencilOpIncrWrap := GL_INCR_WRAP_EXT;
+      StencilOpDecrWrap := GL_DECR_WRAP_EXT;
+    end else
+    begin
+      StencilOpIncrWrap := GL_INCR;
+      StencilOpDecrWrap := GL_DECR;
+    end;
+    if WasParam_DebugLog then
+      WritelnLog(ltOpenGLInitialization,
+        Format('GL_INCR/DECR_WRAP_EXT available: %s' + nl +
+               'glStencilOpSeparate available: %s',
+               [ BoolToStr[WrapAvailable],
+                 BoolToStr[glStencilOpSeparate <> nil] ]));
+  end;
+
 const
   { Note: this constant must be synchronized with
     TimeMessagesManager.MaxMessagesCount }
@@ -1313,21 +1345,7 @@ begin
   Font_BFNT_BitstreamVeraSans_m10 := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans_m10);
   Font_BFNT_BitstreamVeraSans     := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
 
-  { calcualte StencilOpIncrWrap, StencilOpDecrWrap }
-  if (GLVersion.Major >= 2) or GL_EXT_stencil_wrap then
-  begin
-    StencilOpIncrWrap := GL_INCR_WRAP_EXT;
-    StencilOpDecrWrap := GL_DECR_WRAP_EXT;
-    if WasParam_DebugLog then
-      WritelnLog(ltOpenGLInitialization, 'GL_INCR/DECR_WRAP available');
-  end else
-  begin
-    StencilOpIncrWrap := GL_INCR;
-    StencilOpDecrWrap := GL_DECR;
-    if WasParam_DebugLog then
-      WritelnLog(ltOpenGLInitialization, 'GL_INCR/DECR_WRAP not available' +
-        ' - shadows will have artifacts');
-  end
+  InitializeShadows;
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);
