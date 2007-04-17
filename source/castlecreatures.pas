@@ -1964,7 +1964,7 @@ end;
 procedure TCreature.RenderShadowQuads(
   const LightPosition: TVector3Single);
 begin
-  CurrentScene.RenderShadowQuads(LightPosition, SceneTransform);
+  CurrentScene.RenderSilhouetteShadowQuads(LightPosition, SceneTransform);
 end;
 
 function TCreature.MiddleCollisionWithPlayer(
