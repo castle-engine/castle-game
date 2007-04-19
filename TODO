@@ -4,7 +4,7 @@
     check w sgk_shadows ile mamy edge'ow, jak wygladaja --- moze mam
     ich za duzo przez pomylke ?
   - also quad_strip for shadow quads would be great
-  - to docs: all creatures must be composed from convex things
+  - to docs: all creatures must be composed from a number of closed manifold parts
 
 - finish intro:
   - add some shadow ?
