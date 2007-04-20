@@ -1,3 +1,6 @@
+- actually use new alien model
+  check does it remove shadow artifacts ?
+
 - new shadows:
   - Render IndexedShapeSihouetteShadowQuads ?
     Tylko ze iterowanie po wszystkich edge'ach to tez nienajlepszy pomysl...
