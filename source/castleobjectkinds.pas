@@ -24,7 +24,7 @@ unit CastleObjectKinds;
 interface
 
 uses Classes, KambiXMLCfg, VRMLGLAnimation, VRMLGLAnimationInfo,
-  CastleVideoOptions, VRMLFlatSceneGL;
+  CastleVideoOptions, VRMLFlatScene, VRMLFlatSceneGL;
 
 type
   { This is a common class for item kind and creature kind. }
@@ -49,6 +49,8 @@ type
       we will free and clear objects on this list. }
     FirstRootNodesPool: TStringList;
 
+    ManifoldEdgesPool: TStringList;
+
     { This creates Anim from given AnimInfo, only if Anim = nil.
       Then it sets attributes for the animation and then prepares
       the animation by calling animation's @noAutoLink(PrepareRender).
@@ -71,6 +73,12 @@ type
 
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool }
     procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
+
+    { Similar to AddFirstRootNodesPool, this allows us to share one
+      ManifoldEdges instance between different animations, if they
+      start from the same VRML scene. }
+    procedure AddManifoldEdgesPool(AnimInfo: TVRMLGLAnimationInfo;
+      ManifoldEdges: TDynManifoldEdgeArray);
 
     { @param(AnimationName determines the XML element name, so it must
       be a valid part of XML name) }
@@ -125,6 +133,7 @@ begin
   FVRMLNodeName := AVRMLNodeName;
   FBlendingType := DefaultBlendingType;
   FirstRootNodesPool := TStringList.Create;
+  ManifoldEdgesPool := TStringList.Create;
 end;
 
 destructor TObjectKind.Destroy;
@@ -137,6 +146,10 @@ begin
     FirstRootNodesPool.Objects[I] := nil;
   end;
   FreeAndNil(FirstRootNodesPool);
+
+  { No need to free ManifoldEdgesPool objects --- they will be freed with
+    TVRMLFlatSceneGL instances that own them. }
+  FreeAndNil(ManifoldEdgesPool);
 
   inherited;
 end;
@@ -213,6 +226,16 @@ begin
     FirstRootNodesPool.AddObject(FileName, LoadAsVRML(FileName, false));
 end;
 
+procedure TObjectKind.AddManifoldEdgesPool(AnimInfo: TVRMLGLAnimationInfo;
+  ManifoldEdges: TDynManifoldEdgeArray);
+var
+  FileName: string;
+begin
+  FileName := AnimInfo.ModelFileNames[0];
+  if ManifoldEdgesPool.IndexOf(FileName) = -1 then
+    ManifoldEdgesPool.AddObject(FileName, ManifoldEdges);
+end;
+
 procedure TObjectKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TVRMLGLAnimation;
@@ -222,6 +245,11 @@ procedure TObjectKind.CreateAnimationIfNeeded(
   DoPrepareTrianglesListNotOverTriangulate,
   DoPrepareTrianglesListOverTriangulate,
   DoManifoldEdges: boolean);
+var
+  FileName: string;
+  FileNameIndex: Integer;
+  IsSharedManifoldEdges: boolean;
+  SharedManifoldEdges: TDynManifoldEdgeArray;
 begin
   if (AnimInfo <> nil) and (Anim = nil) then
     Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
@@ -229,6 +257,20 @@ begin
 
   if Anim <> nil then
   begin
+    { calculate IsSharedManifoldEdges, SharedManifoldEdges }
+    IsSharedManifoldEdges := false;
+    if (AnimInfo <> nil) then
+    begin
+      FileName := AnimInfo.ModelFileNames[0];
+      FileNameIndex := ManifoldEdgesPool.IndexOf(FileName);
+      if FileNameIndex <> -1 then
+      begin
+        IsSharedManifoldEdges := true;
+        SharedManifoldEdges :=
+          ManifoldEdgesPool.Objects[FileNameIndex] as TDynManifoldEdgeArray;
+      end;
+    end;
+
     { Write info before PrepareRender, otherwise it could not
       be available after freeing scene RootNodes in Anim.PrepareRender. }
     if WasParam_DebugLog then
@@ -244,11 +286,14 @@ begin
       DoPrepareBackground, DoPrepareBoundingBox,
       DoPrepareTrianglesListNotOverTriangulate,
       DoPrepareTrianglesListOverTriangulate,
-      DoManifoldEdges,
+      DoManifoldEdges and (not IsSharedManifoldEdges),
       false,
       { It's temporary false --- see ../TODO file about
         "Wrong Alien dying anim" problem. }
       false);
+
+    if DoManifoldEdges and IsSharedManifoldEdges then
+      Anim.ShareManifoldEdges(SharedManifoldEdges);
 
     if WasParam_DebugLog and DoManifoldEdges then
       WritelnLog(ltAnimationInfo, Format(

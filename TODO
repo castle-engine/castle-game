@@ -1,6 +1,6 @@
 - new shadows:
   - to docs: all creatures must be composed from a number of closed manifold parts (with triangles oriented CCW on the outside), otherwise shadow animation will be awfully slow. Check --debug-log to check whether model satisfies this.
-  - ManifoldEdges are the same for all scenes within the same animation. use this, otherwise creature loading is long and takes a lot of time. Hm, actually it's not the same, since Triangles are not the same... shit. But I can just remove Vertexes from TManifoldEdge ! I can take them from firs 2 points of first Triangle !
+  - fix existing models to be manifold
 
 - finish intro:
   - add some shadow ?
