@@ -2430,7 +2430,7 @@ begin
 
     Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
       (ProjectionNear, ProjectionFar);
-    Scene.PrepareRender([tgAll], true, true, false, false, false);
+    Scene.PrepareRender([tgAll], [prBackground, prBoundingBox]);
 
     FLightSet := TVRMLLightSetGL.Create(LoadAsVRML(LightSetFileName),
       true,
@@ -3038,15 +3038,18 @@ end;
 
 function TLevel.LoadLevelScene(const FileName: string;
   CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;
+var
+  Options: TPrepareRenderOptions;
 begin
   Result := TVRMLFlatSceneGL.Create(LoadAsVRML(FileName),
     true, roSeparateShapeStates, GLContextCache);
   AttributesSet(Result.Attributes, btIncrease);
 
-  Result.PrepareRender([tgOpaque, tgTransparent],
-    PrepareBackground,
-    true { true, because this is almost always needed anyway }, false, 
-    false, false);
+  Options := [prBoundingBox { BoundingBox is practically always needed }];
+  if PrepareBackground then
+    Include(Options, prBackground);
+
+  Result.PrepareRender([tgOpaque, tgTransparent], Options);
 
   if CreateDefaultTriangleOctree then
     Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
@@ -3061,10 +3064,9 @@ begin
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
 
-  Result.PrepareRender([tgOpaque, tgTransparent], false,
-    { DoPrepareBoundingBox is true, because this is almost always needed anyway }
-    true,
-    false, false, false, false, false);
+  Result.PrepareRender([tgOpaque, tgTransparent],
+    [prBoundingBox { BoundingBox is practically always needed }],
+    false, false);
 
   if CreateDefaultTriangleOctree then
     Result.FirstScene.DefaultTriangleOctree :=

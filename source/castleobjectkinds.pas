@@ -66,10 +66,7 @@ type
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo;
       TransparentGroups: TTransparentGroups;
-      DoPrepareBackground, DoPrepareBoundingBox,
-      DoPrepareTrianglesListNotOverTriangulate,
-      DoPrepareTrianglesListOverTriangulate,
-      DoManifoldEdges: boolean);
+      Options: TPrepareRenderOptions);
 
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool }
     procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
@@ -241,15 +238,13 @@ procedure TObjectKind.CreateAnimationIfNeeded(
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo;
   TransparentGroups: TTransparentGroups;
-  DoPrepareBackground, DoPrepareBoundingBox,
-  DoPrepareTrianglesListNotOverTriangulate,
-  DoPrepareTrianglesListOverTriangulate,
-  DoManifoldEdges: boolean);
+  Options: TPrepareRenderOptions);
 var
   FileName: string;
   FileNameIndex: Integer;
   IsSharedManifoldEdges: boolean;
   SharedManifoldEdges: TDynManifoldEdgeArray;
+  ActualOptions: TPrepareRenderOptions;
 begin
   if (AnimInfo <> nil) and (Anim = nil) then
     Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
@@ -280,24 +275,24 @@ begin
           Anim.ScenesCount,
           Anim.Scenes[0].TrianglesCount(true) ]));
 
+    { calculate ActualOptions: Options, but possibly without prManifoldEdges }
+    ActualOptions := Options;
+    if IsSharedManifoldEdges then
+      Exclude(ActualOptions, prManifoldEdges);
+
     AnimationAttributesSet(Anim.Attributes, BlendingType);
-    Anim.PrepareRender(
-      TransparentGroups,
-      DoPrepareBackground, DoPrepareBoundingBox,
-      DoPrepareTrianglesListNotOverTriangulate,
-      DoPrepareTrianglesListOverTriangulate,
-      DoManifoldEdges and (not IsSharedManifoldEdges),
+    Anim.PrepareRender(TransparentGroups, ActualOptions,
       false,
       { It's temporary false --- see ../TODO file about
         "Wrong Alien dying anim" problem. }
       false);
 
-    if DoManifoldEdges and IsSharedManifoldEdges then
+    if (prManifoldEdges in Options) and IsSharedManifoldEdges then
       Anim.ShareManifoldEdges(SharedManifoldEdges);
 
-    if WasParam_DebugLog and DoManifoldEdges then
+    if WasParam_DebugLog and (prManifoldEdges in Options) then
       WritelnLog(ltAnimationInfo, Format(
-        '%s animation model is a closed manifold (efficient shadows): %s',
+        '%s animation: correct manifold ? %s',
         [ VRMLNodeName + '.' + AnimationName,
           BoolToStr[Anim.FirstScene.ManifoldEdges <> nil] ]));
   end;

@@ -7,6 +7,30 @@
   - depth-fail now
   - it's still too slow on some levels (doom e1m1)
 
+- play game (without --debug-no-creatures). Then finish it, and enter gate level:
+  (probably something goes wrong when "loading creatures" is called for the 2nd time)
+  castle: Exception EAccessViolation (at address 0x805B928) :
+  Access violation
+  An unhandled exception occurred at $0805B928 :
+  EAccessViolation : Access violation
+    $0805B928
+    $0805B17D
+    $080E8E65  TOBJECTKIND__CREATEANIMATIONIFNEEDED,  line 265 of CastleObjectKinds.pas
+    $080E082A  TCREATUREKIND__CREATEANIMATIONIFNEEDED,  line 1232 of CastleCreatures.pas
+    $080E11F9  TWALKATTACKCREATUREKIND__PREPARERENDER,  line 1361 of CastleCreatures.pas
+    $080E09C4  TCREATURESKINDSLIST__PREPARERENDER,  line 1263 of CastleCreatures.pas
+    $080CBA00  NEWGAME,  line 123 of CastleStartMenu.pas
+    $080CE0D5  TCHOOSENEWLEVELMENU__CURRENTITEMSELECTED,  line 615 of CastleStartMenu.pas
+    $081EF5A9  TGLMENU__KEYDOWN,  line 1095 of GLMenu.pas
+    $080CE269  KEYDOWN,  line 649 of CastleStartMenu.pas
+    $080729FA
+    $080747DC
+    $08074B78
+    $0807223A
+    $0806FE37
+    $B7D7E250  AREAS_finalize,  line 85 of /win/mojepasy/units/kambi_vrml_game_engine/opengl/KambiGLUtils.pas
+    $B7AB298B  AREAS_finalize,  line 85 of /win/mojepasy/units/kambi_vrml_game_engine/opengl/KambiGLUtils.pas
+
 - finish intro:
   - add some shadow ?
 

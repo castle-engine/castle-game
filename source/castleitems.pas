@@ -504,8 +504,7 @@ begin
       true, roSeparateShapeStates, GLContextCache);
 
     AttributesSet(Scene.Attributes, BlendingType);
-    Scene.PrepareRender([tgOpaque, tgTransparent], false, true,
-      false, false, false);
+    Scene.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox]);
   end;
 
   Progress.Step;
@@ -535,7 +534,7 @@ procedure TItemKind.CreateAnimationIfNeeded(
   TransparentGroups: TTransparentGroups);
 begin
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
-    TransparentGroups, false, true, false, false, false);
+    TransparentGroups, [prBoundingBox]);
 end;
 
 { TItemKindsList ------------------------------------------------------------- }

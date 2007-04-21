@@ -1222,13 +1222,18 @@ procedure TCreatureKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo);
+var
+  Options: TPrepareRenderOptions;
 begin
+  Options := [prBoundingBox];
+  if RenderShadowsPossible then
+    Options := Options + prShadowQuads;
+
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
     { all creature animations are displayed in 3D screen along
       with other objects, so they must use separate tgOpaque, tgTransparent
       rendering }
-    [tgOpaque, tgTransparent],
-    false, true, RenderShadowsPossible, false, RenderShadowsPossible);
+    [tgOpaque, tgTransparent], Options);
 end;
 
 procedure TCreatureKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
