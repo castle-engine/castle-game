@@ -172,6 +172,8 @@ begin
   end;
   FirstRootNodesPool.Clear;
 
+  ManifoldEdgesPool.Clear;
+
   FPrepareRenderDone := false;
 end;
 
@@ -227,10 +229,13 @@ procedure TObjectKind.AddManifoldEdgesPool(AnimInfo: TVRMLGLAnimationInfo;
   ManifoldEdges: TDynManifoldEdgeArray);
 var
   FileName: string;
+  Index: Integer;
 begin
   FileName := AnimInfo.ModelFileNames[0];
-  if ManifoldEdgesPool.IndexOf(FileName) = -1 then
-    ManifoldEdgesPool.AddObject(FileName, ManifoldEdges);
+  Index := ManifoldEdgesPool.IndexOf(FileName);
+  if Index = -1 then
+    ManifoldEdgesPool.AddObject(FileName, ManifoldEdges) else
+    ManifoldEdgesPool.Objects[Index] := ManifoldEdges;
 end;
 
 procedure TObjectKind.CreateAnimationIfNeeded(
