@@ -2430,7 +2430,7 @@ begin
 
     Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
       (ProjectionNear, ProjectionFar);
-    Scene.PrepareRender([tgAll], true, true, false, false);
+    Scene.PrepareRender([tgAll], true, true, false, false, false);
 
     FLightSet := TVRMLLightSetGL.Create(LoadAsVRML(LightSetFileName),
       true,
@@ -3045,7 +3045,8 @@ begin
 
   Result.PrepareRender([tgOpaque, tgTransparent],
     PrepareBackground,
-    true { true, because this is almost always needed anyway }, false, false);
+    true { true, because this is almost always needed anyway }, false, 
+    false, false);
 
   if CreateDefaultTriangleOctree then
     Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
@@ -3063,7 +3064,7 @@ begin
   Result.PrepareRender([tgOpaque, tgTransparent], false,
     { DoPrepareBoundingBox is true, because this is almost always needed anyway }
     true,
-    false, false, false, false);
+    false, false, false, false, false);
 
   if CreateDefaultTriangleOctree then
     Result.FirstScene.DefaultTriangleOctree :=

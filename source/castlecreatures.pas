@@ -1228,7 +1228,7 @@ begin
       with other objects, so they must use separate tgOpaque, tgTransparent
       rendering }
     [tgOpaque, tgTransparent],
-    false, true, RenderShadowsPossible, false);
+    false, true, RenderShadowsPossible, false, RenderShadowsPossible);
 end;
 
 procedure TCreatureKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
@@ -1964,7 +1964,7 @@ end;
 procedure TCreature.RenderShadowQuads(
   const LightPosition: TVector3Single);
 begin
-  CurrentScene.RenderSilhouetteShadowQuads(LightPosition, SceneTransform);
+  CurrentScene.RenderShadowQuads(LightPosition, SceneTransform);
 end;
 
 function TCreature.MiddleCollisionWithPlayer(

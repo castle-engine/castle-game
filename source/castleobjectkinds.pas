@@ -66,7 +66,8 @@ type
       TransparentGroups: TTransparentGroups;
       DoPrepareBackground, DoPrepareBoundingBox,
       DoPrepareTrianglesListNotOverTriangulate,
-      DoPrepareTrianglesListOverTriangulate: boolean);
+      DoPrepareTrianglesListOverTriangulate,
+      DoManifoldEdges: boolean);
 
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool }
     procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
@@ -115,7 +116,8 @@ type
 
 implementation
 
-uses SysUtils, ProgressUnit, Object3dAsVRML, CastleLog, DOM, CastleWindow;
+uses SysUtils, ProgressUnit, Object3dAsVRML, CastleLog, DOM, CastleWindow,
+  KambiStringUtils;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
@@ -218,7 +220,8 @@ procedure TObjectKind.CreateAnimationIfNeeded(
   TransparentGroups: TTransparentGroups;
   DoPrepareBackground, DoPrepareBoundingBox,
   DoPrepareTrianglesListNotOverTriangulate,
-  DoPrepareTrianglesListOverTriangulate: boolean);
+  DoPrepareTrianglesListOverTriangulate,
+  DoManifoldEdges: boolean);
 begin
   if (AnimInfo <> nil) and (Anim = nil) then
     Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
@@ -240,10 +243,18 @@ begin
       TransparentGroups,
       DoPrepareBackground, DoPrepareBoundingBox,
       DoPrepareTrianglesListNotOverTriangulate,
-      DoPrepareTrianglesListOverTriangulate, false,
+      DoPrepareTrianglesListOverTriangulate,
+      DoManifoldEdges,
+      false,
       { It's temporary false --- see ../TODO file about
         "Wrong Alien dying anim" problem. }
       false);
+
+    if WasParam_DebugLog and DoManifoldEdges then
+      WritelnLog(ltAnimationInfo, Format(
+        '%s animation model is a closed manifold (efficient shadows): %s',
+        [ VRMLNodeName + '.' + AnimationName,
+          BoolToStr[Anim.FirstScene.ManifoldEdges <> nil] ]));
   end;
   Progress.Step;
 end;
