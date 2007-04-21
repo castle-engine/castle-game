@@ -1,6 +1,11 @@
 - new shadows:
   - to docs: all creatures must be composed from a number of closed manifold parts (with triangles oriented CCW on the outside), otherwise shadow animation will be awfully slow. Check --debug-log to check whether model satisfies this.
-  - fix existing models to be manifold
+  - fix existing models to be manifold: Spider, SpiderQueen
+    ThrownWeb shouldn't make a shadow ! (it's one plane, and the trick lies in alpha test). Make in kinds.xml, by default creature doesn't make shadow ?
+  - make better lights, to show shadows better. In castle hall: shadow of werewolf on the wall ? In gate: shadow of ghosts over the wall ?
+  - to engine features add note that we have shadows
+  - depth-fail now
+  - it's still too slow on some levels (doom e1m1)
 
 - finish intro:
   - add some shadow ?
