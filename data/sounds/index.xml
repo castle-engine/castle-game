@@ -87,6 +87,12 @@
   <sound name="player_lava_pain" file_name="doom/dsplpain.wav"
     default_importance="player"/>
 
+  <!-- From
+    http://www.flashkit.com/soundfx/Nature/River/Splash-Supershe-7931/index.php
+  -->
+  <sound name="player_footsteps_watery"
+    default_importance="player"/>
+
   <!-- Items sounds. -->
   <sound name="sword_equipping"
     default_importance="player"/>

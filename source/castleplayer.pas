@@ -93,6 +93,12 @@ type
     procedure FalledDown(Navigator: TMatrixWalker; const FallenHeight: Single);
     procedure SetLife(const Value: Single);
 
+    { This sets life, just like SetLife.
+      But in case of life loss, the fadeout is done with specified
+      Color (while SetLife always uses red color). }
+    procedure SetLifeCustomBlackOut(const Value: Single;
+      const Color: TVector3Single);
+
     { This means that weapon AttackAnimation is being done.
       This also means that EquippedWeapon <> nil. }
     Attacking: boolean;
@@ -963,7 +969,8 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       begin
         LavaLastDamageTime := Level.AnimationTime;
         Sound(stPlayerLavaPain);
-        { TODO: lower Life. Make blackout green. }
+        SetLifeCustomBlackout(Life - (GroundRule.LavaDamageConst +
+          Random * GroundRule.LavaDamageRandom), Green3Single);
       end;
     end;
     IsLava := NewIsLava;
@@ -1154,7 +1161,8 @@ begin
   end;
 end;
 
-procedure TPlayer.SetLife(const Value: Single);
+procedure TPlayer.SetLifeCustomBlackOut(const Value: Single;
+  const Color: TVector3Single);
 begin
   if (Life > 0) and (Value <= 0) then
   begin
@@ -1164,10 +1172,15 @@ begin
   end else
   if (Life - Value) > 1 then
   begin
-    RedOut;
+    BlackOut(Color);
     Sound(stPlayerSuddenPain);
   end;
   FLife := Value;
+end;
+
+procedure TPlayer.SetLife(const Value: Single);
+begin
+  SetLifeCustomBlackOut(Value, Red3Single);
 end;
 
 function TPlayer.Dead: boolean;

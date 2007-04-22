@@ -58,6 +58,7 @@ type
     stPlayerFootstepsGrass,
     stPlayerInteractFailed,
     stPlayerLavaPain,
+    stPlayerFootstepsWatery,
     { @groupEnd }
 
     { Items sounds.
@@ -273,6 +274,7 @@ const
     'player_footsteps_grass',
     'player_interact_failed',
     'player_lava_pain',
+    'player_footsteps_watery',
     'sword_equipping',
     'sword_attack_start',
     'arrow_fired',

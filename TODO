@@ -11,7 +11,7 @@
   - add some shadow ?
 
 - doom:
-  - make lava work (rooms 4, 8)
+  - activate after main game finished
   - make small and blue armor for doom level (items' stubs are already placed
     in blend file, on layer 9/10)
   - make barrels explode nicely
