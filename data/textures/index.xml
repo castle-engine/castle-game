@@ -14,12 +14,15 @@
   <texture base_name="marble"
     footsteps_sound="player_footsteps_concrete" />
 
-  <!--
-  <texture base_name="nukage3"
-    footsteps_sound="player_footsteps_lava">
+  <texture base_name="nukage3">
+    <lava>
+      <damage const="5" random="5" time="1.5" />
+    </lava>
+  </texture>
+
+  <texture base_name="water_grayscale">
     <lava>
       <damage const="5" random="5" time="1.0" />
     </lava>
   </texture>
-  -->
 </textures>

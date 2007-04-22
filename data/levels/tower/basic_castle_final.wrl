@@ -68,5 +68,14 @@ Group{
 #     visibilityRange 200
 #   }
 
+#   Fog {
+#     color 1 0 0
+#     fogType "LINEAR"
+#     volumetric TRUE
+#     volumetricDirection 0 0 -1
+#     volumetricVisibilityStart 0
+#     visibilityRange 50
+#   }
+
   WWWInline { name "basic_castle.wrl" }
 }

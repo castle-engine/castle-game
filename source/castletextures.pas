@@ -23,15 +23,20 @@ unit CastleTextures;
 
 interface
 
-uses KambiUtils, KambiClassUtils, CastleSound, VRMLTriangleOctree;
+uses KambiUtils, KambiClassUtils, CastleSound, VRMLTriangleOctree, DOM;
 
 {$define read_interface}
 
 type
   TTextureRule = class
+  private
+    procedure LoadFromDOMElement(Element: TDOMElement);
+  public
     BaseName: string;
 
     HasFootstepsSound: boolean;
+    { This is footsteps sound, relevant (and for sure not stNone)
+      if HasFootstepsSound. }
     FootstepsSound: TSoundType;
 
     Lava: boolean;
@@ -44,27 +49,24 @@ type
   {$I objectslist_1.inc}
   TTextureRulesList = class(TObjectsList_1)
   private
-    GroundFootstepsSound_Cache: boolean;
-    GroundFootstepsSound_LastGround: POctreeItem;
-    GroundFootstepsSound_LastSound: TSoundType;
-    GroundFootstepsSound_LastResult: boolean;
+    GroundRule_Cache: boolean;
+    GroundRule_LastGround: POctreeItem;
+    GroundRule_LastResult: TTextureRule;
   public
     { Load contents of this object from textures/index.xml file. }
     procedure LoadFromFile;
 
-    { Checks for footsteps sound on this Ground.
+    { Checks for TTextureRule on this Ground.
 
       This checks looking at Ground texture and then looking at TTextureRule
-      for given texture. If there is a matching texture rule with
-      HasFootstepsSound, then we return @true and it's FootstepsSound.
-      In other words: if the appropriate texture was specified
-      in textures/index.xml file with @code(footsteps_sound) attribute,
-      then the appropriate sound is returned.
+      for given texture. In other words: if the appropriate texture
+      was specified in textures/index.xml file
+      then the appropriate TTextureRule is returned.
+      Otherwise @nil is returned.
 
-      Ground = @nil is allowed here (and will always result in @false
+      Ground = @nil is allowed here (and will always result in @nil
       returned). }
-    function GroundFootstepsSound(Ground: POctreeItem;
-      out Sound: TSoundType): boolean;
+    function GroundRule(Ground: POctreeItem): TTextureRule;
   end;
 
 var
@@ -74,10 +76,56 @@ var
 
 implementation
 
-uses SysUtils, DOM, XMLRead, KambiXMLUtils, KambiFilesUtils, VRMLNodes;
+uses SysUtils, XMLRead, KambiXMLUtils, KambiFilesUtils, VRMLNodes;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
+
+{ TTextureRule --------------------------------------------------------------- }
+
+procedure TTextureRule.LoadFromDOMElement(Element: TDOMElement);
+var
+  FootstepsSoundName: string;
+  SubElement, LavaDamage: TDOMElement;
+  SubElements: TDOMNodeList;
+  I: Integer;
+begin
+  if not DOMGetAttribute(Element, 'base_name', BaseName) then
+    raise Exception.Create('<texture> element must have "base_name" attribute');
+
+  HasFootstepsSound := DOMGetAttribute(Element,
+    'footsteps_sound', FootstepsSoundName) and
+    (FootstepsSoundName <> '');
+  if HasFootstepsSound then
+    FootstepsSound := SoundFromName(FootstepsSoundName);
+
+  SubElements := Element.ChildNodes;
+  try
+    for I := 0 to Integer(SubElements.Count) - 1 do
+      if SubElements.Item[I].NodeType = ELEMENT_NODE then
+      begin
+        SubElement := SubElements.Item[I] as TDOMElement;
+
+        if SubElement.TagName = 'lava' then
+        begin
+          Lava := true;
+          LavaDamage := DOMGetOneChildElement(SubElement);
+          if (LavaDamage = nil) or (LavaDamage.TagName <> 'damage') then
+            raise Exception.Create('Missing <damage> inside <lava> element');
+          if not DOMGetSingleAttribute(LavaDamage, 'const', LavaDamageConst) then
+            LavaDamageConst := 0;
+          if not DOMGetSingleAttribute(LavaDamage, 'random', LavaDamageRandom) then
+            LavaDamageRandom := 0;
+          if not DOMGetSingleAttribute(LavaDamage, 'time', LavaDamageTime) then
+            LavaDamageTime := 0;
+        end else
+          raise Exception.CreateFmt('Unknown element inside <texture>: "%s"',
+            [SubElement.TagName]);
+      end;
+  finally SubElements.Release; end;
+end;
+
+{ TTextureRulesList ---------------------------------------------------------- }
 
 procedure TTextureRulesList.LoadFromFile;
 var
@@ -86,7 +134,6 @@ var
   TextureElements: TDOMNodeList;
   TextureRule: TTextureRule;
   I: Integer;
-  BaseName, FootstepsSoundName: string;
 begin
   FreeContents;
 
@@ -108,17 +155,7 @@ begin
           TextureRule := TTextureRule.Create;
           Add(TextureRule);
 
-          if not DOMGetAttribute(TextureElement, 'base_name', BaseName) then
-            raise Exception.Create('<texture> element must have "base_name" attribute');
-          TextureRule.BaseName := BaseName;
-
-          TextureRule.HasFootstepsSound := DOMGetAttribute(TextureElement,
-            'footsteps_sound', FootstepsSoundName) and
-            (FootstepsSoundName <> '');
-          if TextureRule.HasFootstepsSound then
-            TextureRule.FootstepsSound := SoundFromName(FootstepsSoundName);
-
-          { TODO: read Lava properties }
+          TextureRule.LoadFromDOMElement(TextureElement);
         end;
     finally TextureElements.Release; end;
   finally
@@ -126,22 +163,22 @@ begin
   end;
 end;
 
-function TTextureRulesList.GroundFootstepsSound(Ground: POctreeItem;
-  out Sound: TSoundType): boolean;
+function TTextureRulesList.GroundRule(Ground: POctreeItem): TTextureRule;
 var
   HasTextureUrl: boolean;
   TextureUrl: string;
   I: Integer;
 begin
-  { Results of GroundFootstepsSound are cached, since this is very often
+  { Results of GroundRule are cached, since this is very often
     asked with the same Ground pointer. }
-  if GroundFootstepsSound_Cache and
-    (GroundFootstepsSound_LastGround = Ground) then
+  if GroundRule_Cache and
+    (GroundRule_LastGround = Ground) then
   begin
-    Sound := GroundFootstepsSound_LastSound;
-    Result := GroundFootstepsSound_LastResult;
+    Result := GroundRule_LastResult;
     Exit;
   end;
+
+  Result := nil;
 
   HasTextureUrl := false;
 
@@ -166,24 +203,22 @@ begin
   end;
 
   if HasTextureUrl then
+  begin
     TextureUrl := DeleteFileExt(ExtractFileName(TextureUrl));
 
-  Result := false;
-  for I := 0 to Count - 1 do
-  begin
-    if SameText(Items[I].BaseName, TextureUrl) then
+    for I := 0 to Count - 1 do
     begin
-      Result := Items[I].HasFootstepsSound;
-      if Result then
-        Sound := Items[I].FootstepsSound;
-      break;
+      if SameText(Items[I].BaseName, TextureUrl) then
+      begin
+        Result := Items[I];
+        break;
+      end;
     end;
   end;
 
-  GroundFootstepsSound_Cache := true;
-  GroundFootstepsSound_LastGround := Ground;
-  GroundFootstepsSound_LastSound := Sound;
-  GroundFootstepsSound_LastResult := Result;
+  GroundRule_Cache := true;
+  GroundRule_LastGround := Ground;
+  GroundRule_LastResult := Result;
 end;
 
 initialization

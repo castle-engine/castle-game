@@ -25,7 +25,7 @@ interface
 
 uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh,
   VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
-  VRMLTriangleOctree;
+  VRMLTriangleOctree, CastleTextures;
 
 const
   DefaultMaxLife = 100;
@@ -121,6 +121,14 @@ type
       swimming session). }
     SwimLastSoundTime: Single;
 
+    { Did last Idle detected that we're on lava ? }
+    IsLava: boolean;
+    { Relevant if IsLava, this is Level.AnimationTime when
+      last time lava damage was done. When player steps on lava for the
+      first time, he immediately gets damage, so LavaLastDamageTime is
+      always valid when IsLava. }
+    LavaLastDamageTime: Single;
+
     AllocatedSwimmingChangeSource: TALAllocatedSource;
     procedure AllocatedSwimmingChangeSourceUsingEnd(Sender: TALAllocatedSource);
 
@@ -129,6 +137,14 @@ type
 
     FSwimming: TPlayerSwimming;
     procedure SetSwimming(const Value: TPlayerSwimming);
+
+    { Did last Idle detected that we are on the ground. }
+    IsOnTheGround: boolean;
+    { <> @nil if IsOnTheGround and last ground had some TTextureRule. }
+    GroundRule: TTextureRule;
+    ReallyIsOnTheGroundTime: Single;
+
+    FGround: POctreeItem;
 
     { There always must be satisfied:
         AllocatedFootstepsSource <> nil
@@ -144,8 +160,6 @@ type
     { This must be valid and non-zero when FKnockbackDistance > 0 }
     FKnockbackDirection: TVector3Single;
     KnockBackSpeed: Single;
-
-    FGround: POctreeItem;
   public
     constructor Create;
     destructor Destroy; override;
@@ -349,7 +363,7 @@ uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, OpenAL, VRMLNodes, CastleControlsMenu,
-  CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL, CastleTextures;
+  CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -904,7 +918,59 @@ procedure TPlayer.Idle(const CompSpeed: Single);
     end;
   end;
 
-  { Update FootstepsSoundPlaying and related variables. }
+  { Update IsOnTheGround and related variables. }
+  procedure UpdateIsOnTheGround;
+  const
+    { TimeToChangeOnTheGround and ReallyIsOnTheGroundTime play here the
+      analogous role as ReallyWalkingOnTheGroundTime and
+      TimeToChangeFootstepsSoundPlaying, see UpdateFootstepsSoundPlaying. }
+    TimeToChangeIsOnTheGround = 0.5;
+  begin
+    if Level = nil then
+    begin
+      GroundRule := nil;
+      IsOnTheGround := false;
+    end else
+    if Navigator.IsOnTheGround then
+    begin
+      ReallyIsOnTheGroundTime := Level.AnimationTime;
+      IsOnTheGround := true;
+      GroundRule := TextureRulesList.GroundRule(Ground);
+    end else
+    if Level.AnimationTime - ReallyIsOnTheGroundTime >
+      TimeToChangeIsOnTheGround then
+    begin
+      GroundRule := nil;
+      IsOnTheGround := false;
+    end else
+    begin
+      { Leave GroundRule and IsOnTheGround unchanged. }
+    end;
+  end;
+
+  { Update IsLava and related variables, hurt player if on lava.
+    Must be called after UpdateIsOnTheGround (depends on GroundRule). }
+  procedure UpdateLava;
+  var
+    NewIsLava: boolean;
+  begin
+    NewIsLava := (GroundRule <> nil) and GroundRule.Lava;
+    if NewIsLava then
+    begin
+      if (not IsLava) or
+         (Level.AnimationTime - LavaLastDamageTime
+           > GroundRule.LavaDamageTime) then
+      begin
+        LavaLastDamageTime := Level.AnimationTime;
+        Sound(stPlayerLavaPain);
+        { TODO: lower Life. Make blackout green. }
+      end;
+    end;
+    IsLava := NewIsLava;
+  end;
+
+  { Update FootstepsSoundPlaying and related variables.
+    Must be called after UpdateIsOnTheGround (depends on GroundRule). }
   procedure UpdateFootstepsSoundPlaying;
   const
     TimeToChangeFootstepsSoundPlaying = 0.5;
@@ -930,15 +996,17 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       Navigator.IsWalkingOnTheGround = @false
       for at least TimeToChangeFootstepsSoundPlaying seconds. }
 
+    { calculate NewFootstepsSoundPlaying }
     if Level = nil then
-    begin
-      NewFootstepsSoundPlaying := stNone;
-    end else
+      NewFootstepsSoundPlaying := stNone else
     if Navigator.IsWalkingOnTheGround then
     begin
       ReallyWalkingOnTheGroundTime := Level.AnimationTime;
-      if not TextureRulesList.GroundFootstepsSound(
-        Ground, NewFootstepsSoundPlaying) then
+      { Since Navigator.IsWalkingOnTheGroundm then for sure
+        Navigator.IsOnTheGround, so UpdateIsOnTheGround updated
+        GroundRule field. }
+      if (GroundRule <> nil) and GroundRule.HasFootstepsSound then
+        NewFootstepsSoundPlaying := GroundRule.FootstepsSound else
         NewFootstepsSoundPlaying := Level.FootstepsSound;
     end else
     if Level.AnimationTime - ReallyWalkingOnTheGroundTime >
@@ -1057,6 +1125,8 @@ begin
     TimeMessage('Hint: press "Escape" for game menu');
   end;
 
+  UpdateIsOnTheGround;
+  UpdateLava;
   UpdateFootstepsSoundPlaying;
 
   DoKnockback;
@@ -1272,6 +1342,12 @@ begin
 
     FootstepsSoundPlaying := stNone;
   end;
+
+  ReallyIsOnTheGroundTime := -1000;
+  IsOnTheGround := false;
+  GroundRule := nil;
+
+  IsLava := false;
 end;
 
 { GLWindow init / close ------------------------------------------------------ }
