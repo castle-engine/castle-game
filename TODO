@@ -1,17 +1,6 @@
 - new shadows:
-  - to docs: all creatures must be composed from a number of closed manifold parts (with triangles oriented CCW on the outside), otherwise shadow animation will be awfully slow. Check --debug-log to check whether model satisfies this.
   - fix existing models to be manifold: Spider, SpiderQueen
     ThrownWeb shouldn't make a shadow ! (it's one plane, and the trick lies in alpha test). Make in kinds.xml, by default creature doesn't make shadow ?
-  - make better lights, to show shadows better. In castle hall: shadow of werewolf on the wall ? In gate: shadow of ghosts over the wall ?
-  - to engine features add note that we have shadows
-  - depth-fail now
-  - it's still too slow on some levels (doom e1m1)
-
-- to docs:
-
-  A bonus "DOOM E1M1" level is available to you from "New Game" menu
-  once you finish the main game (you can also switch to this level from
-  the debug menu, if you're impatient).
 
 - finish intro:
   - add some shadow ?
@@ -25,9 +14,17 @@
 - alien:
   bake texture with ambient occlusion ?
   decimate more now ?
+  (maybe DOOM e1m1 will go fast enough then ?)
 
 ----------------------------------------
 post-0.7.0 release:
+
+- new shadows:
+  - make better lights, to show shadows better.
+    In castle hall: shadow of werewolf on the wall ?
+    In gate: shadow of ghosts over the wall ?
+  - depth-fail now
+  - it's still too slow on some levels (doom e1m1)
 
 - doom:
   - creatures should take hurt from lava too, and should know that they
