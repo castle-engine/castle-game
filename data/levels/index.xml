@@ -42,6 +42,13 @@
     the rendering speed will stay the same, the "real" FPS will
     drow down, since AI and collision detection will eat a lot of CPU.
 
+  - loading_bg: filename of image file to display while loading the
+    level (under the progress bar). Optional.
+  - loading_bar_y_position: between 0 and 1, indicates position
+    of progress bar when loading level. Should be synchronized
+    with loading_bg image, to look right. Optional, default value
+    is 0.5 which simply means "middle of the screen".
+
   Rest of the attributes is required.
   Filenames are specified relative to directory of this XML file.
   As path delimiter use slash "/".
@@ -127,8 +134,10 @@
     scene_file_name="doom/e1m1/e1m1_final.wrl"
     light_set_file_name="doom/e1m1/e1m1_lights.wrl"
     title="Doom E1M1"
-    number="90"
+    number="666"
     implementation_class="TDoomE1M1Level"
+    loading_bg="doom/logo/doom_title.png"
+    loading_bar_y_position="0.2"
 
     played_music_sound="doom_e1m1"
     footsteps_sound="player_footsteps_concrete">

@@ -7,22 +7,17 @@
   - depth-fail now
   - it's still too slow on some levels (doom e1m1)
 
+- to docs:
+
+  A bonus "DOOM E1M1" level is available to you from "New Game" menu
+  once you finish the main game (you can also switch to this level from
+  the debug menu, if you're impatient).
+
 - finish intro:
   - add some shadow ?
 
 - doom:
-  - activate after main game finished
-  - make small and blue armor for doom level (items' stubs are already placed
-    in blend file, on layer 9/10)
   - make barrels explode nicely
-  - use data/levels/doom/logo/doom_title.png, since I did it..
-  - room 5: creatures should see through texture with alpha channel
-  - if you know how, you can cause bad collisions and get out of the level
-    on elevator 9a-9b because of MovePushesOthers problems.
-  - still too dark. Secret on 9a-9b should be activated differently ?
-    Or wall should be specially visible ? Maybe more visible the
-    alternative entrance there (through the barrels) --- different wall
-    color ?
   - exit level should work
 
 - test on some user playability with werewolves once again
@@ -32,6 +27,21 @@
   decimate more now ?
 
 ----------------------------------------
+post-0.7.0 release:
+
+- doom:
+  - creatures should take hurt from lava too, and should know that they
+    don't want to step on lava. Room with lava on e1m1 may require some
+    waypoints for sensible creature move.
+  - make small and blue armor for doom level (items' stubs are already placed
+    in blend file, on layer 9/10)
+  - room 5: creatures should see through texture with alpha channel
+  - if you know how, you can cause bad collisions and get out of the level
+    on elevator 9a-9b because of MovePushesOthers problems.
+  - still too dark. Secret on 9a-9b should be activated differently ?
+    Or wall should be specially visible ? Maybe more visible the
+    alternative entrance there (through the barrels) --- different wall
+    color ?
 
 - weapons should be rendered correctly in 3d.
   - Sword should also glow red when "castle hall" glows red --- even

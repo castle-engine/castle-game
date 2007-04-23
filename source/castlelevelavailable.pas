@@ -23,7 +23,7 @@ unit CastleLevelAvailable;
 
 interface
 
-uses CastleLevel, KambiUtils, KambiClassUtils, DOM;
+uses CastleLevel, KambiUtils, KambiClassUtils, DOM, OpenGLh, ProgressGL;
 
 {$define read_interface}
 
@@ -32,6 +32,8 @@ type
   private
     procedure LoadFromDOMElement(Element: TDOMElement; const BasePath: string);
   public
+    destructor Destroy; override;
+
     AvailableForNewGame: boolean;
     DefaultAvailableForNewGame: boolean;
 
@@ -45,6 +47,11 @@ type
     LightSetFileName: string;
     Title: string;
     Number: Integer;
+
+    LoadingBarYPosition: Single;
+
+    { Loading level background image (in OpenGL list), 0 if none. }
+    GLList_LoadingBgImage: TGLuint;
 
     LevelDOMElement: TDOMElement;
 
@@ -97,12 +104,22 @@ var
 implementation
 
 uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
-  CastleLevelSpecific, XMLRead;
+  CastleLevelSpecific, XMLRead, CastleWindow, KambiGLUtils,
+  Images, GLWindow, GLWinModes;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
 
 { TLevelAvailable ------------------------------------------------------------ }
+
+destructor TLevelAvailable.Destroy;
+begin
+  { Thanks to GLWindowClose implementation, we can be sure that gl context
+    is active now, so it's not a problem to call glFreeDisplayList now. }
+
+  glFreeDisplayList(GLList_LoadingBgImage);
+  inherited;
+end;
 
 procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
   const BasePath: string);
@@ -142,6 +159,8 @@ procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
     end;
   end;
 
+var
+  LoadingBgFileName: string;
 begin
   Check(Element.TagName = 'level',
     'Each child of levels/index.xml root node must be the <level> element');
@@ -176,13 +195,90 @@ begin
   if not DOMGetLevelClassAttribute(Element, 'implementation_class',
     LevelClass) then
     LevelClass := TLevel;
+
+  if DOMGetAttribute(Element, 'loading_bg', LoadingBgFileName) then
+  begin
+    LoadingBgFileName := CombinePaths(BasePath, LoadingBgFileName);
+    GLList_LoadingBgImage := LoadImageToDispList(LoadingBgFileName,
+      [TRGBImage], [], Glw.Width, Glw.Height);
+  end else
+    glFreeDisplayList(GLList_LoadingBgImage);
+
+  if not DOMGetSingleAttribute(Element, 'loading_bar_y_position',
+    LoadingBarYPosition) then
+    LoadingBarYPosition := DefaultBarYPosition;
+end;
+
+procedure DrawCreateLevel(Glwin: TGLWindow);
+begin
+  glClear(GL_COLOR_BUFFER_BIT);
+  glLoadIdentity;
+  glRasterPos2i(0, 0);
+  glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    glCallList(TLevelAvailable(Glwin.UserData).GLList_LoadingBgImage);
+  glPopAttrib;
 end;
 
 function TLevelAvailable.CreateLevel(Demo: boolean): TLevel;
+
+  procedure CreateLevelCore;
+  begin
+    Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
+      Title, Number, LevelDOMElement, Demo);
+    if not Demo then
+      AvailableForNewGame := true;
+  end;
+
+  procedure CreateLevelNoBackground;
+  var
+    SavedBarYPosition: Single;
+  begin
+    SavedBarYPosition := ProgressGLInterface.BarYPosition;
+    ProgressGLInterface.BarYPosition := LoadingBarYPosition;
+    try
+      CreateLevelCore;
+    finally
+      ProgressGLInterface.BarYPosition := SavedBarYPosition;
+    end;
+  end;
+
+  procedure DelayIfNeeded;
+  begin
+    Delay(2000);
+  end;
+
+var
+  SavedMode: TGLMode;
 begin
-  Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
-    Title, Number, LevelDOMElement, Demo);
-  AvailableForNewGame := true;
+  if GLList_LoadingBgImage <> 0 then
+  begin
+    SavedMode := TGLMode.Create(Glw, 0, true);
+    try
+      SavedMode.FakeMouseDown := false;
+
+      SetStdNoCloseGLWindowState(Glw, @DrawCreateLevel, @Resize2D,
+        Self, false,
+        true { FPSActive should not be needed anymore, but I leave it. },
+        false, K_None, false, false);
+
+      Glw.EventResize;
+
+      CreateLevelNoBackground;
+
+      { This is just a dirty hack to make user to actually see the
+        "DOOM E1M1" loading background --- otherwise loading of doom
+        level goes so fast that it's practically not noticeable.
+        Maybe in the future I'll remove this hack (if level loading
+        will be slow enough to actually make time for user to see
+        background image), or make this hack more intelligent
+        (like checking how much time was spent inside CreateLevelNoBackground
+        and doing Delay() only if necessary). }
+      DelayIfNeeded;
+
+    finally FreeAndNil(SavedMode) end;
+  end else
+    CreateLevelNoBackground;
 end;
 
 { TLevelsAvailableList ------------------------------------------------------- }
@@ -273,11 +369,32 @@ begin
   finally LevelsList.Release; end;
 end;
 
-initialization
-  LevelsAvailable := TLevelsAvailableList.Create;
+{ initialization / finalization ---------------------------------------------- }
+
+procedure GLWindowInit(Glwin: TGLWindow);
+begin
+  { Do this now (not at initialization), because loading available
+    levels requires knowledge of Glw window sizes (because LoadingBg
+    image is scaled to this size). }
   LevelsAvailable.LoadFromFile;
   LevelsAvailable.LoadFromConfig;
+end;
+
+procedure GLWindowClose(Glwin: TGLWindow);
+begin
+  if LevelsAvailable <> nil then
+  begin
+    LevelsAvailable.SaveToConfig;
+    FreeWithContentsAndNil(LevelsAvailable);
+  end;
+end;
+
+initialization
+  LevelsAvailable := TLevelsAvailableList.Create;
+  Glw.OnInitList.AppendItem(@GLWindowInit);
+  Glw.OnCloseList.AppendItem(@GLWindowClose);
 finalization
-  LevelsAvailable.SaveToConfig;
-  FreeWithContentsAndNil(LevelsAvailable);
+  { Call CloseGLW in case OnClose event would happen after finalization
+    of this unit. }
+  GLWindowClose(Glw);
 end.

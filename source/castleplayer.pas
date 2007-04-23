@@ -968,9 +968,12 @@ procedure TPlayer.Idle(const CompSpeed: Single);
            > GroundRule.LavaDamageTime) then
       begin
         LavaLastDamageTime := Level.AnimationTime;
-        Sound(stPlayerLavaPain);
-        SetLifeCustomBlackout(Life - (GroundRule.LavaDamageConst +
-          Random * GroundRule.LavaDamageRandom), Green3Single);
+        if not Dead then
+        begin
+          Sound(stPlayerLavaPain);
+          SetLifeCustomBlackout(Life - (GroundRule.LavaDamageConst +
+            Random * GroundRule.LavaDamageRandom), Green3Single);
+        end;
       end;
     end;
     IsLava := NewIsLava;
