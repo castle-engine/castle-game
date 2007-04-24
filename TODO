@@ -1,9 +1,9 @@
 - new shadows:
-  - fix existing models to be manifold: SpiderQueen
-    ThrownWeb shouldn't make a shadow ! (it's one plane, and the trick lies in alpha test). Make in kinds.xml, by default creature doesn't make shadow ?
-
-    mail to Olgierd, with shadow_volume_test program (krótka instrukcja u¿ycia jest w komentarzu na pocz±tku programu)
+  - ThrownWeb shouldn't make a shadow ! (it's one plane, and the trick lies in alpha test). Make in kinds.xml, by default creature doesn't make shadow ?
+  - mail to Olgierd, with shadow_volume_test program (krótka instrukcja u¿ycia jest w komentarzu na pocz±tku programu)
     and screenshot from "The Castle"
+
+- bbox of spider queen is sometimes really too big
 
 - finish intro:
   - add some shadow ?
