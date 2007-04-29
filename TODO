@@ -1,5 +1,7 @@
 - new shadows:
   - ThrownWeb shouldn't make a shadow ! (it's one plane, and the trick lies in alpha test). Make in kinds.xml, by default creature doesn't make shadow ?
+  - allow to confugure light casting shadows (from level index.xml: either position, or name of VRML light inside)
+  - don't turn off all lights, turn off only some (maybe only the one casting shadows)
   - mail to Olgierd, with shadow_volume_test program (krótka instrukcja u¿ycia jest w komentarzu na pocz±tku programu)
     and screenshot from "The Castle"
 
