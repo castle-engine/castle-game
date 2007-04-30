@@ -9,9 +9,8 @@
 # default: make sure that various files are up-to-date, and show info
 default: info
 	$(MAKE) -C source/
-	$(MAKE) -C data/items/models/
-	$(MAKE) -C data/items/images/
-	$(MAKE) -C data/items/equipped/
+	$(MAKE) -C data/items/life_potion/
+	$(MAKE) -C data/items/sword/
 	$(MAKE) -C data/levels/
 
 VERSION := $(shell ./castle --version)

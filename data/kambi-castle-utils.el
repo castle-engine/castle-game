@@ -195,7 +195,7 @@ on MESH-NAME to be correctly interpreted."
 		MaterialBinding { value PER_VERTEX_INDEXED }"
                 "USE MatInside")
   (kam-fix-blender-filename)
-  (write-file "life_potion_processed.wrl")
+  (write-file "model_processed.wrl")
 )
 
 (defun kam-process-gate ()

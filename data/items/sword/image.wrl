@@ -8,5 +8,5 @@ Group {
   PointLight {
     location 3 3 3
   }
-  WWWInline { name "../models/sword.wrl" }
+  WWWInline { name "model.wrl" }
 }

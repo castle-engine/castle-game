@@ -1,7 +1,7 @@
 #VRML V1.0 ascii
 
 # I generated life_potion.png image using
-#   view3dscene --geometry 400x400 life_potion.wrl
+#   view3dscene --geometry 400x400 image.wrl
 # doing screenshot, then I modified the image (scaled down and added
 # alpha channel) using GIMP. This is *not* automated in the Makefile
 # in this directory.
@@ -14,5 +14,5 @@ Group {
   PointLight {
     location 3 3 3
   }
-  WWWInline { name "../models/life_potion_processed.wrl" }
+  WWWInline { name "model_processed.wrl" }
 }

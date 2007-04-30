@@ -1,8 +1,8 @@
-ALL_OUTPUT := life_potion_processed.wrl
+ALL_OUTPUT := model_processed.wrl
 
 all: $(ALL_OUTPUT)
 
-life_potion_processed.wrl: life_potion.wrl
+model_processed.wrl: model.wrl
 	emacs --batch -l ../../kambi-castle-utils.el $< \
 	  -f kam-process-life-potion
 

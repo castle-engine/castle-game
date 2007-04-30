@@ -1,7 +1,7 @@
 #VRML V1.0 ascii
 
-# I generated scroll.png image using
-#   view3dscene --geometry 400x400 scroll.wrl
+# I generated image.png image using
+#   view3dscene --geometry 400x400 image.wrl
 # doing screenshot, then I modified the image (scaled down and added
 # alpha channel) using GIMP. This is *not* automated in the Makefile
 # in this directory.
@@ -19,5 +19,5 @@ Group {
   PointLight {
     location 3 3 3
   }
-  WWWInline { name "../models/scroll_final.wrl" }
+  WWWInline { name "model_final.wrl" }
 }
