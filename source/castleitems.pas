@@ -428,12 +428,20 @@ begin
 end;
 
 procedure TItemKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+var
+  BasePath: string;
 begin
   inherited;
 
+  BasePath := ExtractFilePath(KindsConfig.FileName);
+
   FModelFileName := GetStringCheckNonEmpty(KindsConfig, 'model_file_name');
+  FModelFileName := CombinePaths(BasePath, FModelFileName);
+
   FName := GetStringCheckNonEmpty(KindsConfig, 'name');
+
   FImageFileName := GetStringCheckNonEmpty(KindsConfig, 'image_file_name');
+  FImageFileName := CombinePaths(BasePath, FImageFileName);
 end;
 
 function TItemKind.Scene: TVRMLFlatSceneGL;
@@ -444,9 +452,7 @@ end;
 function TItemKind.Image: TImage;
 begin
   if FImage = nil then
-    FImage := LoadImage(
-      ProgramDataPath + 'data' + PathDelim +
-      'items' + PathDelim + 'images' + PathDelim + ImageFileName, [], []);
+    FImage := LoadImage(ImageFileName, [], []);
   Result := FImage;
 end;
 
@@ -498,9 +504,7 @@ procedure TItemKind.PrepareRender;
 begin
   if FScene = nil then
   begin
-    FScene := TVRMLFlatSceneGL.Create(LoadAsVRML(
-      ProgramDataPath + 'data' + PathDelim +
-      'items' + PathDelim + 'models' + PathDelim + ModelFileName, false),
+    FScene := TVRMLFlatSceneGL.Create(LoadAsVRML(ModelFileName, false),
       true, roSeparateShapeStates, GLContextCache);
 
     AttributesSet(Scene.Attributes, BlendingType);
@@ -607,9 +611,7 @@ end;
 function TItemWeaponKind.ScreenImage: TImage;
 begin
   if FScreenImage = nil then
-    FScreenImage := LoadImage(
-      ProgramDataPath + 'data' + PathDelim +
-      'items' + PathDelim + 'equipped' + PathDelim + ScreenImageFileName, [], []);
+    FScreenImage := LoadImage(ScreenImageFileName, [], []);
   Result := FScreenImage;
 end;
 
@@ -672,13 +674,19 @@ begin
 end;
 
 procedure TItemWeaponKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+var
+  BasePath: string;
 begin
   inherited;
 
   ActualAttackTime := KindsConfig.GetFloat(VRMLNodeName + '/actual_attack_time',
     DefaultItemActualAttackTime);
 
+  BasePath := ExtractFilePath(KindsConfig.FileName);
+
   FScreenImageFileName := GetStringCheckNonEmpty(KindsConfig, 'screen_image/file_name');
+  FScreenImageFileName := CombinePaths(BasePath, FScreenImageFileName);
+
   FScreenImageAlignLeft := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_left', false);
   FScreenImageAlignBottom := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_bottom', true);
 

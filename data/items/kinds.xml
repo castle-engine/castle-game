@@ -15,77 +15,82 @@
 
   For available sound names see ../sounds/index.xml. Empty (or not specified)
   sound name always means "no sound for this event".
+
+  Paths should be relative to the location of this file
+  (i.e. data/items/ subdir inside "The Castle" data).
+  As path delimiter use slashes ("/"), the engine will make sure they
+  are handled OK on all platforms.
 -->
 
 <CONFIG>
   <LifePotion
-    model_file_name="life_potion_processed.wrl"
+    model_file_name="life_potion/model_processed.wrl"
     name="Potion of Life"
-    image_file_name="life_potion.png"
+    image_file_name="life_potion/image.png"
   />
 
   <Sword
     actual_attack_time="0.294"
-    model_file_name="sword.wrl"
+    model_file_name="sword/model.wrl"
     name="Sword"
-    image_file_name="sword.png"
+    image_file_name="sword/image.png"
 
     equipping_sound="sword_equipping"
     sound_attack_start="sword_attack_start"
   >
-    <screen_image file_name="sword.png" align_left="false" align_bottom="true" />
+    <screen_image file_name="sword/equipped.png" align_left="false" align_bottom="true" />
     <damage const="20.0" random="20.0" />
 
     <attack_animation>
       <animation scenes_per_time="30" equality_epsilon="0"
         loop="false" backwards="false">
-        <frame file_name="attack_animations/sword_1.wrl" time="0" />
-        <frame file_name="attack_animations/sword_2.wrl" time="0.5" />
+        <frame file_name="sword/attack_1.wrl" time="0" />
+        <frame file_name="sword/attack_2.wrl" time="0.5" />
       </animation>
     </attack_animation>
   </Sword>
 
   <Bow
     actual_attack_time="0.0"
-    model_file_name="bow_final.wrl"
+    model_file_name="bow/model_final.wrl"
     name="Bow"
-    image_file_name="bow.png"
+    image_file_name="bow/image.png"
 
     equipping_sound="bow_equipping"
     sound_attack_start="bow_attack_start"
   >
-    <screen_image file_name="bow.png" align_left="false" align_bottom="true" />
+    <screen_image file_name="bow/equipped.png" align_left="false" align_bottom="true" />
 
     <attack_animation>
       <animation scenes_per_time="30" equality_epsilon="0"
         loop="false" backwards="false">
-        <frame file_name="attack_animations/bow_2.wrl" time="0" />
-        <frame file_name="attack_animations/bow.wrl" time="0.5" />
+        <frame file_name="bow/attack_2.wrl" time="0" />
+        <frame file_name="bow/attack_1.wrl" time="0.5" />
       </animation>
     </attack_animation>
   </Bow>
 
   <ScrFlying
-    model_file_name="scroll_final.wrl"
+    model_file_name="scroll/model_final.wrl"
     name="Scroll Of Flying"
-    image_file_name="scroll.png"
+    image_file_name="scroll/image.png"
   />
 
   <Key
-    model_file_name="key.wrl"
+    model_file_name="key/model.wrl"
     name="Key"
-    image_file_name="key.png"
+    image_file_name="key/image.png"
   />
 
   <RedKey
-    model_file_name="red_key.wrl"
+    model_file_name="red_key/model.wrl"
     name="Red Key"
-    image_file_name="red_key.png"
+    image_file_name="red_key/image.png"
   />
 
   <Arrow
-    model_file_name="quiver.wrl"
+    model_file_name="quiver/model.wrl"
     name="Arrow"
-    image_file_name="quiver.png"
+    image_file_name="quiver/image.png"
   />
 </CONFIG>

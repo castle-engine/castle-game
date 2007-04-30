@@ -13,5 +13,5 @@ Group {
 
   Rotation { rotation 1 0 0 2 }
 
-  WWWInline { name "../models/bow_final.wrl" }
+  WWWInline { name "model_final.wrl" }
 }

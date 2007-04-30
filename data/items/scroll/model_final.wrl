@@ -4,5 +4,5 @@ Group {
   ShapeHints {
     creaseAngle 4 # > Pi
   }
-  WWWInline { name "scroll.wrl" }
+  WWWInline { name "model.wrl" }
 }

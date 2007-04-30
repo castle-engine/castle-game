@@ -8,6 +8,6 @@ Group {
   PointLight {
     location -0.570138692855835 -0.783580601215363 3.139318227767944
   }
-  WWWInline { name "../models/sword.wrl" }
+  WWWInline { name "sword.wrl" }
 }
 

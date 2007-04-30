@@ -1,0 +1,7 @@
+# -*- mode: makefile -*-
+# Make variables for automatically generating items' images.
+
+IMAGE_WIDTH := 95
+IMAGE_HEIGHT := $(IMAGE_WIDTH)
+
+IMAGE_RAYHUNTER_CALL := rayhunter classic 3 $(IMAGE_WIDTH) $(IMAGE_HEIGHT)
