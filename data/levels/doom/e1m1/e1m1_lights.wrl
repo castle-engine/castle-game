@@ -12,9 +12,16 @@ Group {
 		direction 1 1 1
 	}
 	DirectionalLight {
+		kambiShadows TRUE
 		direction 1 -1 -1
 	}
 	DirectionalLight {
 		direction -1 1 1
+	}
+	DEF FakeShadowPosition PointLight {
+		on FALSE
+		kambiShadows TRUE
+		kambiShadowsMain TRUE
+		location 0 0 1000
 	}
 }

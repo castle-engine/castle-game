@@ -6,5 +6,12 @@ Group {
 	PointLight {
 		color 0.899999976158142 0.899999976158142 1
 		location 10 10 100
+                kambiShadows TRUE
 	}
+        DEF FakeShadowPosition PointLight {
+            on FALSE
+            kambiShadows TRUE
+            kambiShadowsMain TRUE
+            location 0 0 1000
+        }
 }

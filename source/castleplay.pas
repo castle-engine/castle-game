@@ -342,15 +342,6 @@ end;
 
 procedure Draw(Glwin: TGLWindow);
 
-  procedure RenderShadowQuads;
-  var
-    I: Integer;
-  begin
-    for I := 0 to Level.Creatures.High do
-      Level.Creatures.Items[I].RenderShadowQuads(
-        Level.LightCastingShadowsPosition);
-  end;
-
   procedure RenderCreaturesItems(TransparentGroup: TTransparentGroup);
   begin
     { When GameWin, don't render creatures (as we don't check
@@ -361,62 +352,61 @@ procedure Draw(Glwin: TGLWindow);
       Level.Items.Render(Player.Navigator.Frustum, TransparentGroup);
   end;
 
-const
-  { Which stencil bits should be tested when determining which things
-    are in the scene ?
-
-    Not only *while rendering* shadow quads but also *after this rendering*
-    value in stencil buffer may be > 1 (so you need more than 1 bit
-    to hold it in stencil buffer).
-
-    Why ? It's obvious that *while rendering* (e.g. right after rendering
-    all front quads) this value may be > 1. But when the point
-    is in the shadow because it's inside more than one shadow
-    (cast by 2 different shadow quads) then even *after rendering*
-    this point will have value > 1.
-
-    So it's important that this constant spans a couple of bits.
-    More precisely, it should be the maximum number of possibly overlapping
-    front shadow quads from any possible camera view. Practically speaking,
-    it will always be too little (for complicated shadow casters),
-    but stencil_wrap will hopefully in this case minimize artifacts. }
-  StencilShadowBits = $FF;
-var
-  ClearBuffers: TGLbitfield;
-  UsedBackground: TBackgroundGL;
-begin
-  ClearBuffers := GL_DEPTH_BUFFER_BIT;
-
-  if RenderShadowsPossible and RenderShadows then
-    ClearBuffers := ClearBuffers or GL_STENCIL_BUFFER_BIT;
-
-  UsedBackground := Level.Background;
-
-  if UsedBackground <> nil then
+  procedure RenderNoShadows;
   begin
-    glLoadMatrix(Glw.Navigator.RotationOnlyMatrix);
-    UsedBackground.Render;
-  end else
-    ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
+    RenderCreaturesItems(tgOpaque);
+    Level.Render(Player.Navigator.Frustum);
+  end;
 
-  { Now clear buffers indicated in ClearBuffers. }
-  glClear(ClearBuffers);
+  procedure RenderWithShadows;
+  var
+    MainLightPosition: TVector3Single;
 
-  glLoadMatrix(Glw.Navigator.Matrix);
+    procedure RenderShadowQuads;
+    var
+      I: Integer;
+      C: TCreature;
+    begin
+      for I := 0 to Level.Creatures.High do
+      begin
+        C := Level.Creatures.Items[I];
+        if C.Kind.CastsShadow then
+          C.RenderShadowQuads(MainLightPosition);
+      end;
+    end;
 
-  TThunderEffect.RenderOrDisable(Level.ThunderEffect, 1);
-  Level.LightSet.RenderLights;
+  const
+    { Which stencil bits should be tested when determining which things
+      are in the scene ?
 
-  if RenderShadowsPossible and RenderShadows then
+      Not only *while rendering* shadow quads but also *after this rendering*
+      value in stencil buffer may be > 1 (so you need more than 1 bit
+      to hold it in stencil buffer).
+
+      Why ? It's obvious that *while rendering* (e.g. right after rendering
+      all front quads) this value may be > 1. But when the point
+      is in the shadow because it's inside more than one shadow
+      (cast by 2 different shadow quads) then even *after rendering*
+      this point will have value > 1.
+
+      So it's important that this constant spans a couple of bits.
+      More precisely, it should be the maximum number of possibly overlapping
+      front shadow quads from any possible camera view. Practically speaking,
+      it will always be too little (for complicated shadow casters),
+      but stencil_wrap will hopefully in this case minimize artifacts. }
+    StencilShadowBits = $FF;
   begin
     glPushAttrib(GL_LIGHTING_BIT);
-      { Headlight will stay on here, but lights in Level.LightSet are off.
-        More precise would be to turn off only the light that
-        is casting shadows (Level.LightCastingShadowsPosition),
-        but, well, this is only an approximation :) }
-      Level.LightSet.TurnLightsOff;
+    try
+      { Headlight will stay on here, but lights in Level.LightSet are off. }
+      if not Level.LightSet.TurnLightsOffForShadows(MainLightPosition) then
+      begin
+        RenderNoShadows;
+        Exit;
+      end;
+
       Level.Render(Player.Navigator.Frustum);
-    glPopAttrib;
+    finally glPopAttrib() end;
 
     glEnable(GL_STENCIL_TEST);
       { Note that stencil buffer is set to all 0 now. }
@@ -456,15 +446,41 @@ begin
       glPopAttrib;
     glDisable(GL_STENCIL_TEST);
 
+    { Creatures and items are never in shadow (this looks bad).
+      So I render them here, when the lights are turned on
+      and ignoring stencil buffer. }
+    RenderCreaturesItems(tgOpaque);
+
     { Now render everything once again, with lights turned on.
       But render only things not in shadow. }
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    { Creatures and items are never in shadow (this looks bad).
-      So I just render them here, when the lights are turned on
-      and ignoring stencil buffer. I have to do this *after*
-      glClear(GL_DEPTH_BUFFER_BIT) above. }
-    RenderCreaturesItems(tgOpaque);
+    { Render things which are never in shadow for the 2nd time.
+
+      Where should I render things which are never in shadow ?
+      On one hand, they can be visible on top of normal parts of the level,
+      so when doing Level.Render below to render non-shadowed level parts,
+      these things must be stored inside depth buffer. So they have to
+      be rendered glClear(GL_DEPTH_BUFFER_BIT).
+      On the other hand, these things can be occluded by other
+      parts of the level --- even the ones that are currently in the shadow.
+      So when rendering them, the depth buffer must contain everything
+      on the level --- not only it's shadowed parts.
+      So they must be rendered to color buffer here, before
+      glClear(GL_DEPTH_BUFFER_BIT).
+      Which means, in summary, that they have to be rendered 2 times:
+      1. before glClear(GL_DEPTH_BUFFER_BIT),
+         they are rendered to color buffer and depth buffer
+      2. after glClear(GL_DEPTH_BUFFER_BIT), they are rendered
+         only to depth buffer (rendering them for the second time
+         to the color buffer would be bad --- they would be unconditionally
+         visible through shadows then).
+
+      TODO: damn. Right now, transparent parts of the creatures/items will
+      be visible through the shadows. }
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+      RenderCreaturesItems(tgOpaque);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     { setup stencil : don't modify stencil, stencil test passes only for =0 }
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -485,11 +501,37 @@ begin
         RenderShadowQuads;
       glPopAttrib;
     end;
-  end else
-  begin
-    RenderCreaturesItems(tgOpaque);
-    Level.Render(Player.Navigator.Frustum);
   end;
+
+var
+  ClearBuffers: TGLbitfield;
+  UsedBackground: TBackgroundGL;
+begin
+  ClearBuffers := GL_DEPTH_BUFFER_BIT;
+
+  if RenderShadowsPossible and RenderShadows then
+    ClearBuffers := ClearBuffers or GL_STENCIL_BUFFER_BIT;
+
+  UsedBackground := Level.Background;
+
+  if UsedBackground <> nil then
+  begin
+    glLoadMatrix(Glw.Navigator.RotationOnlyMatrix);
+    UsedBackground.Render;
+  end else
+    ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
+
+  { Now clear buffers indicated in ClearBuffers. }
+  glClear(ClearBuffers);
+
+  glLoadMatrix(Glw.Navigator.Matrix);
+
+  TThunderEffect.RenderOrDisable(Level.ThunderEffect, 1);
+  Level.LightSet.RenderLights;
+
+  if RenderShadowsPossible and RenderShadows then
+    RenderWithShadows else
+    RenderNoShadows;
 
   { Rendering order of Creatures, Items and Level:
     You know the problem. We must first render all non-transparent objects,

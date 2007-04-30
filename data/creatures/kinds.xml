@@ -405,6 +405,8 @@
 
     sound_explosion="thrown_web_hit"
     sound_idle="thrown_web_idle"
+
+    casts_shadow="False"
   >
 
     <short_range_attack knockback_distance="5">

@@ -781,7 +781,6 @@ type
 
     FSectors: TSceneSectorsList;
     FWaypoints: TSceneWaypointsList;
-    FLightCastingShadowsPosition: TVector3Single;
 
     FWaterBox: TBox3d;
     FAboveWaterBox: TBox3d;
@@ -959,9 +958,6 @@ type
       You can instead toggle objects state by properties like
       @link(TLevelMovingObject.Exists). }
     property Objects: TLevelObjectsList read FObjects;
-
-    property LightCastingShadowsPosition: TVector3Single
-      read FLightCastingShadowsPosition;
 
     function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
       OctreeItemIndex: Integer): boolean; virtual;
@@ -2438,10 +2434,6 @@ begin
       { GL_LIGHT1 is reserved for thunder effect in cages level.
         So first light is GL_LIGHT2. }
       2, -1);
-
-    { Calculate LightCastingShadowsPosition }
-    FLightCastingShadowsPosition := Box3dMiddle(Scene.BoundingBox);
-    FLightCastingShadowsPosition[2] := Scene.BoundingBox[1, 2];
 
     FGlobalAmbientLight := DefaultGlobalAmbientLight;
 

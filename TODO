@@ -1,11 +1,47 @@
 - new shadows:
-  - ThrownWeb shouldn't make a shadow ! (it's one plane, and the trick lies in alpha test). Make in kinds.xml, by default creature doesn't make shadow ?
-  - allow to confugure light casting shadows (from level index.xml: either position, or name of VRML light inside)
-  - don't turn off all lights, turn off only some (maybe only the one casting shadows)
   - mail to Olgierd, with shadow_volume_test program (krótka instrukcja u¿ycia jest w komentarzu na pocz±tku programu)
-    and screenshot from "The Castle"
+    and screenshot from "The Castle" (castle_hall legs effect ?)
+  - to docs:
 
-- bbox of spider queen is sometimes really too big
+    Unless your creature is marked with casts_shadow="False" in
+    creatures/kinds.xml, in which case you can ignore this issue.
+    The default value of <tt>casts_shadow</tt> is
+    "True" &mdash; to encourage you to make all creatures cast a shadow.
+    Let's show people these beatiful shadows !
+
+  - eventually, allow items and creatures to be in shadow.
+    This should finally close the issue that right now transparent
+    items/creatures can be visible through the walls, if the wall
+    part is in the shadow. (see TODO in castleplay).
+
+  - "kambiShadows, default FALSE, for all light nodes.
+    And kambiShadowsMain, default FALSE, maningfull only if kambiShadows = TRUE.
+    TODO: useful only for castle right now.
+    TODO: for directional light should work too.
+    TODO: for headlight should be too.
+    TODO: demo level when this light actually moves.
+    TODO: use them in shadow_volume_tests
+
+    castle docs: first light with
+    kambiShadowsMain = kambiShadows = TRUE is shadow casting light,
+    other lights with kambiShadows are also turned off where shadow
+    is (cite docs from TurnLighttsOffForShadows).
+    So usually you want exactly one with kambiShadowsMain = TRUE.
+    If no such light, then no shadows on level.
+    This way you can control how shadows on the level look like:
+    - which light casts shadows
+    - which lights are turned off inside shadow
+    - which are left on inside the shadow
+
+    Note that you can set the light with kambiShadows = kambiShadowsMain = TRUE
+    to have on = FALSE. This is the way to make "fake light" ---
+    i.e., this light will determine the shadow position (it will
+    be treated as light source when calculating shadow placement),
+    but will actually not make the scene lighter (you should make
+    some other lights kambiShadows = TRUE then). This is suitable scenario
+    when there is no comfortable main light on the scene,
+    so you want to add this, but you don't want to make the scene
+    actually lighter.
 
 - finish intro:
   - add some shadow ?
@@ -15,6 +51,8 @@
   - exit level should work
 
 - test on some user playability with werewolves once again
+
+- make gate light darker ? like szymon proposed ? test on kocury.
 
 - alien:
   bake texture with ambient occlusion ?
@@ -26,7 +64,6 @@ post-0.7.0 release:
 
 - new shadows:
   - make better lights, to show shadows better.
-    In castle hall: shadow of werewolf on the wall ?
     In gate: shadow of ghosts over the wall ?
   - depth-fail now
   - it's still too slow on some levels (doom e1m1)

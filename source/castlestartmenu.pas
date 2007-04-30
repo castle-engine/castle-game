@@ -383,11 +383,21 @@ begin
          end else
          begin
            if RenderShadows then
-             MessageOK(Glw, 'Shadows are basically implemented and work, ' +
-               'but they slow down rendering very much and there are some unresolved issues. ' +
-               'That''s the reason why for PGD competition entry ' +
-               'shadows are disabled by default. ' +
-               'You have been warned!', taLeft);
+             MessageOK(Glw, 'In 0.7.0 release of "The Castle", shadows ' +
+               'were much improved. They still slow down rendering noticeably, ' +
+               'but if you have decent graphic card and OpenGL ' +
+               'drivers, the main game levels should be quite playable ' +
+               'with shadows on. Still, there are some issues:' +nl+
+               nl+
+               '- Bonus "Doom" level is not really playable with shadows --- ' +
+               'too slow for now.' +nl+
+               nl+
+               '- Depth-pass only. I know, I know, it''s lame. Well, just ' +
+               'wait for the next release, or ... contribute ! :)' +nl+
+               nl+
+               'You have been warned! ...And, in case you''ll find that ' +
+               'shadows work smoothly ' +
+               'on your hardware: enjoy! :)', taLeft);
          end;
        end;
     4: ;

@@ -10,6 +10,7 @@ Group {
 	}
 	DirectionalLight {
 		intensity 0.44017094373703
+		kambiShadows TRUE
 		direction 0.010538369417191 0.197130039334297 -0.347894430160522
 	}
 	SpotLight {
@@ -28,5 +29,11 @@ Group {
 		color 1 0.91880339384079 0.034188035875559
 		location 86.841522216796875 130.67515563964844 3.222983360290527
 		attenuation 1 0 0.009999999776483
+	}
+	DEF FakeShadowPosition PointLight {
+		on FALSE
+		kambiShadows TRUE
+		kambiShadowsMain TRUE
+		location 0 0 1000
 	}
 }

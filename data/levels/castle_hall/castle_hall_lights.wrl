@@ -24,15 +24,27 @@ Group {
 #     color 0.8 0.8 0.8
 #   }
 
-  PointLight { location  10  10 100  color 0.3 0.3 0.3 }
-  PointLight { location -10 -10 100  color 0.3 0.3 0.3 }
+  # This will be used as fake light to determine shadow placement
+  # when werewolves will appear. It will always stay with on = FALSE.
+  # The position of this is crucial: it makes the cool effect of
+  # long shadow legs on the ground when werewolves appear on the level.
+  DEF FakeShadowPosition PointLight { location 0 0 1 on FALSE }
+
+  PointLight {
+    location  10  10 100
+    color 0.3 0.3 0.3
+    kambiShadows TRUE
+    kambiShadowsMain TRUE
+  }
+  PointLight {
+    location -10 -10 100
+    color 0.3 0.3 0.3
+    kambiShadows TRUE
+  }
 
   # Add some lights initially turned off, so that the total number
   # of lights equals number of werewolves appearing.
   PointLight { on FALSE }
   PointLight { on FALSE }
   PointLight { on FALSE }
-
-#   PointLight { location  100  100 0  color 0.3 0.3 0.3 }
-#   PointLight { location -100 -100 0  color 0.3 0.3 0.3 }
 }

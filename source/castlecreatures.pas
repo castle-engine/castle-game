@@ -71,6 +71,8 @@ const
 
   DefaultMiddlePositionHeight = 1.0;
 
+  DefaultCastsShadow = true;
+
 type
   TCreature = class;
 
@@ -91,6 +93,8 @@ type
     FFallDownLifeLossScale: Single;
 
     FMiddlePositionHeight: Single;
+
+    FCastsShadow: boolean;
   protected
     { In descendants only PrepareRender can (and should!) set this. }
     CameraRadiusFromPrepareRender: Single;
@@ -218,6 +222,9 @@ type
       read FMiddlePositionHeight
       write FMiddlePositionHeight
       default DefaultMiddlePositionHeight;
+
+    property CastsShadow: boolean read FCastsShadow write FCastsShadow
+      default DefaultCastsShadow;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -1171,6 +1178,7 @@ begin
   FShortRangeAttackKnockbackDistance := DefaultShortRangeAttackKnockbackDistance;
   FFallDownLifeLossScale := DefaultFallDownLifeLossScale;
   FMiddlePositionHeight := DefaultMiddlePositionHeight;
+  FCastsShadow := DefaultCastsShadow;
   CreaturesKinds.Add(Self);
 end;
 
@@ -1204,6 +1212,9 @@ begin
   MiddlePositionHeight :=
     KindsConfig.GetFloat(VRMLNodeName + '/middle_position_height',
     DefaultMiddlePositionHeight);
+
+  CastsShadow :=
+    KindsConfig.GetValue(VRMLNodeName + '/casts_shadow', DefaultCastsShadow);
 
   SoundSuddenPain := SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_sudden_pain', ''));

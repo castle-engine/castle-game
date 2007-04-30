@@ -98,6 +98,8 @@ type
     IntensitySlider: TGLMenuFloatSlider;
     AmbientIntensitySlider: TGLMenuFloatSlider;
     OnArgument: TGLMenuBooleanArgument;
+    ShadowsArgument: TGLMenuBooleanArgument;
+    ShadowsMainArgument: TGLMenuBooleanArgument;
     constructor Create(ALight: TNodeGeneralLight);
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -803,6 +805,9 @@ begin
   AmbientIntensitySlider := TGLMenuFloatSlider.Create(
     -1, 1, Light.FdAmbientIntensity.Value);
   OnArgument := TGLMenuBooleanArgument.Create(Light.FdOn.Value);
+  ShadowsArgument := TGLMenuBooleanArgument.Create(Light.FdKambiShadows.Value);
+  ShadowsMainArgument := TGLMenuBooleanArgument.Create(
+    Light.FdKambiShadowsMain.Value);
 
   Items.AddObject('Red color', RedColorSlider);
   Items.AddObject('Green color', GreenColorSlider);
@@ -810,6 +815,8 @@ begin
   Items.AddObject('Intensity', IntensitySlider);
   Items.AddObject('Ambient intensity', AmbientIntensitySlider);
   Items.AddObject('On', OnArgument);
+  Items.AddObject('Shadows', ShadowsArgument);
+  Items.AddObject('Shadows main light', ShadowsMainArgument);
   Items.Add('Point/SpotLight: Change location');
   Items.Add('Point/SpotLight: Change attenuation');
   Items.Add('DirectionalLight: Change direction');
@@ -859,6 +866,16 @@ begin
          Level.LightSet.CalculateLights;
        end;
     6: begin
+         ShadowsArgument.Value := not ShadowsArgument.Value;
+         Light.FdKambiShadows.Value := ShadowsArgument.Value;
+         Level.LightSet.CalculateLights;
+       end;
+    7: begin
+         ShadowsMainArgument.Value := not ShadowsMainArgument.Value;
+         Light.FdKambiShadowsMain.Value := ShadowsMainArgument.Value;
+         Level.LightSet.CalculateLights;
+       end;
+    8: begin
          if Light is TNodeGeneralPositionalLight then
          begin
            Vector := TNodeGeneralPositionalLight(Light).FdLocation.Value;
@@ -871,7 +888,7 @@ begin
            end;
          end;
        end;
-    7: begin
+    9: begin
          if Light is TNodeGeneralPositionalLight then
          begin
            Vector := TNodeGeneralPositionalLight(Light).FdAttenuation.Value;
@@ -883,7 +900,7 @@ begin
            end;
          end;
        end;
-    8: begin
+    10:begin
          if Light is TNodeGeneralDirectionalLight then
          begin
            Vector := TNodeGeneralDirectionalLight(Light).FdDirection.Value;
@@ -896,7 +913,7 @@ begin
            end;
          end;
        end;
-    9: begin
+    11:begin
          if Light is TNodeSpotLight_1 then
          begin
            Vector := TNodeSpotLight_1(Light).FdDirection.Value;
@@ -909,7 +926,7 @@ begin
            end;
          end;
        end;
-    10:begin
+    12:begin
          if Light is TNodeSpotLight_1 then
          begin
            Value := TNodeSpotLight_1(Light).FdDropOffRate.Value;
@@ -920,7 +937,7 @@ begin
            end;
          end;
        end;
-    11:begin
+    13:begin
          if Light is TNodeSpotLight_1 then
          begin
            Value := TNodeSpotLight_1(Light).FdCutOffAngle.Value;
@@ -931,7 +948,7 @@ begin
            end;
          end;
        end;
-    12:CurrentMenu := EditLevelLightsMenu;
+    14:CurrentMenu := EditLevelLightsMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
