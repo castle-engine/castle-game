@@ -477,7 +477,25 @@ procedure Draw(Glwin: TGLWindow);
          visible through shadows then).
 
       TODO: damn. Right now, transparent parts of the creatures/items will
-      be visible through the shadows. }
+      be visible through the shadows.
+
+      And what about transparent parts (they should be rendered but cannot
+      affect depth buffer) ? Well, clearly, they have to be rendered
+      before glClear(GL_DEPTH_BUFFER_BIT) (for the same reason that
+      opaque parts must: because they can be occluded by any level
+      part, shadowed or not). But rendering non-shadowed parts may then
+      cover them (since they cannot be rendered to depth buffer).
+      So I should render them once again, but *only at the places
+      where Level.Render below passed the stencil test (=0) and the depth test.
+      But the second condition is not so easy (I would have to change stencil
+      buffer once again, based on Level.Render hits).
+      The simpler version, to just render them second time everywhere where
+      were not in shadow, i.e. stencil test (=0) passes would be no good:
+      we would render transparent things twice in the places on the level
+      when they are not in shadow.
+
+      So for now transparent creatures/items will be visible through the walls,
+      in the places where shadow falls on the wall. }
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
       RenderCreaturesItems(tgOpaque);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
