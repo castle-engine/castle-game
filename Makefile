@@ -127,7 +127,7 @@ dist-core:
 	cp -R ../trunk/ $(TMP_DIST_PATH)
 	mv $(TMP_DIST_PATH)trunk/ $(TMP_DIST_PATH)castle
 	make -C $(TMP_DIST_PATH)castle/ clean clean_private
-	areFilenamesLower -i Makefile -i README $(TMP_DIST_PATH)castle/data/
+	areFilenamesLower -i Makefile -i Makefile.common -i README $(TMP_DIST_PATH)castle/data/
 # Add libpng and zlib for Windows
 	cp -f /win/mojewww/camelot/private/win32_libpng_and_zlib/* $(TMP_DIST_PATH)castle/
 # Add documentation/ subdirectory
