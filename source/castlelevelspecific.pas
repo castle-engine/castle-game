@@ -189,6 +189,8 @@ type
     MovingElevator9a9b: TLevelLinearMovingObject;
     Elevator9a9b: TLevelStaticObject;
     Elevator9a9bPickBox: TBox3d;
+
+    ExitButton: TLevelStaticObject;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -224,9 +226,9 @@ function CastleLevelsPath: string;
 implementation
 
 uses KambiFilesUtils, SysUtils, Object3dAsVRML, KambiUtils,
-  OpenGLh, KambiGLUtils, KambiStringUtils,
+  OpenGLh, KambiGLUtils, KambiStringUtils, GLWinMessages,
   CastlePlay, CastleTimeMessages, CastleInputs,
-  CastleItems, CastleThunder, CastleLevelAvailable;
+  CastleItems, CastleThunder, CastleLevelAvailable, CastleWindow;
 
 function CastleLevelsPath: string;
 begin
@@ -1142,6 +1144,10 @@ begin
   MovingElevator9a9b.SoundGoBeginPositionLooping := true;
   MovingElevator9a9b.SoundTracksCurrentPosition := true;
   Objects.Add(MovingElevator9a9b);
+
+  ExitButton := TLevelStaticObject.Create(Self,
+    DoomDoorsPathPrefix + 'exit_button_final.wrl', false);
+  Objects.Add(ExitButton);
 end;
 
 destructor TDoomE1M1Level.Destroy;
@@ -1179,6 +1185,34 @@ begin
       TimeMessageInteractFailed(
         'You''re too far to reach it from here') else
       MovingElevator9a9b.GoEndPosition;
+  end else
+  if CollisionInfo.Hierarchy.IsLast(ExitButton) then
+  begin
+    InteractionOccured := true;
+    if Distance > 5 then
+      TimeMessageInteractFailed(
+        'You''re too far to reach it from here') else
+      begin
+        Sound(stDoomExitButton);
+        Player.Life := 0;
+        MessageOK(Glw,
+          'Congratulations ! You finished the game. ' +
+          'Now you can just die and go to hell.' +nl+
+          nl+
+          'Seriously: I was just too lazy to implement any kind of real ' +
+          '"game finished" sequence for the "Doom" level. So I figured ' +
+          'out that I may as well kill the player now, just in case ' +
+          'you didn''t see the death animation yet ? :)' +nl+
+          nl+
+          'Now really seriously: I hope you enjoyed the game. ' +
+          'This is only the beginning of a development of a real game ' +
+          '--- you know, with real storyline, and just everything much ' +
+          'much better. ' +
+          'So check out for updates on our WWW page ' +
+          '[http://www.camelot.homedns.org/~michalis/castle.php]. ' +
+          'Oh, and this is open-source game, so if you can, ' +
+          'you''re most welcome to contribute!', taLeft);
+      end;
   end;
 end;
 

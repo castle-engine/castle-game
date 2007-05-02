@@ -1,7 +1,5 @@
-- doom:
-  - exit level should work
-
 - test on some user playability with werewolves once again
+- radeon issues fix before 0.7.0
 
 ----------------------------------------
 post-0.7.0 release:

@@ -134,6 +134,8 @@
   <sound name="door_open" default_importance="level_event"/>
   <sound name="door_close" default_importance="level_event"/>
   <sound name="elevator" default_importance="level_event"/>
+  <sound name="doom_exit_button" file_name="doom/dsswtchn.wav"
+    default_importance="level_event"/>
 
   <!-- Creatures sounds. -->
   <sound name="creature_falled_down"

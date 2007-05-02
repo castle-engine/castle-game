@@ -1,0 +1,8 @@
+#VRML V1.0 ascii
+
+Group {
+  Rotation { rotation 1 0 0 1.57 }
+  Scale { scaleFactor 0.05 0.05 0.05 }
+
+  WWWInline { name "exit_button.wrl" }
+}
