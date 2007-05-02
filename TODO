@@ -1,13 +1,7 @@
-- finish intro:
-  - add some shadow ?
-
 - doom:
-  - make barrels explode nicely
   - exit level should work
 
 - test on some user playability with werewolves once again
-
-- make gate light darker ? like szymon proposed ? test on kocury.
 
 - alien:
   bake texture with ambient occlusion ?
@@ -16,6 +10,11 @@
 
 ----------------------------------------
 post-0.7.0 release:
+
+- finish intro:
+  - add some shadow ?
+
+- make gate light darker ? like szymon proposed ? test on kocury.
 
 - new shadows:
   - make better lights, to show shadows better.
@@ -45,6 +44,7 @@ post-0.7.0 release:
     CastleStartMenu when changing RenderShadows.
 
 - doom:
+  - make barrels explode nicely
   - creatures should take hurt from lava too, and should know that they
     don't want to step on lava. Room with lava on e1m1 may require some
     waypoints for sensible creature move.
