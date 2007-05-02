@@ -1,5 +1,8 @@
 - test on some user playability with werewolves once again
 - radeon issues fix before 0.7.0
+- gravity doesn't work on dead creatures ? Can be seen on the doom level
+  (this initially dead creature), also when you kill alien above the
+  castle_hall symbol, he doesn't fall down when the symbol gets opened
 
 ----------------------------------------
 post-0.7.0 release:

@@ -191,6 +191,7 @@ type
     Elevator9a9bPickBox: TBox3d;
 
     ExitButton: TLevelStaticObject;
+    ExitMessagePending: boolean;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -1195,23 +1196,7 @@ begin
       begin
         Sound(stDoomExitButton);
         Player.Life := 0;
-        MessageOK(Glw,
-          'Congratulations ! You finished the game. ' +
-          'Now you can just die and go to hell.' +nl+
-          nl+
-          'Seriously: I was just too lazy to implement any kind of real ' +
-          '"game finished" sequence for the "Doom" level. So I figured ' +
-          'out that I may as well kill the player now, just in case ' +
-          'you didn''t see the death animation yet ? :)' +nl+
-          nl+
-          'Now really seriously: I hope you enjoyed the game. ' +
-          'This is only the beginning of a development of a real game ' +
-          '--- you know, with real storyline, and just everything much ' +
-          'much better. ' +
-          'So check out for updates on our WWW page ' +
-          '[http://www.camelot.homedns.org/~michalis/castle.php]. ' +
-          'Oh, and this is open-source game, so if you can, ' +
-          'you''re most welcome to contribute!', taLeft);
+        ExitMessagePending := true;
       end;
   end;
 end;
@@ -1264,6 +1249,30 @@ begin
        { This is the time for staying in lowered position. }
        2.0) then
     MovingElevator9a9b.GoBeginPosition;
+
+  if ExitMessagePending and (not Player.Navigator.FallingOnTheGround) then
+  begin
+    { ExitMessagePending is displayed when player FallOnTheGround effect
+      (when dying) ended. }
+    MessageOK(Glw,
+      'Congratulations ! You finished the game. ' +
+      'Now you can just die and go to hell.' +nl+
+      nl+
+      'Seriously: I was just too lazy to implement any kind of real ' +
+      '"game finished" sequence for the "Doom" level. So I figured ' +
+      'out that I may as well kill the player now, just in case ' +
+      'you didn''t see the death animation yet ? :)' +nl+
+      nl+
+      'Now really seriously: I hope you enjoyed the game. ' +
+      'This is only the beginning of a development of a real game ' +
+      '--- you know, with real storyline, and just everything much ' +
+      'much better. ' +
+      'So check out for updates on our WWW page ' +
+      '[http://www.camelot.homedns.org/~michalis/castle.php]. ' +
+      'Oh, and this is open-source game, so if you can, ' +
+      'you''re most welcome to contribute!', taLeft);
+    ExitMessagePending := false;
+  end;
 end;
 
 { TGateDemoLevel ------------------------------------------------------------- }
