@@ -389,11 +389,11 @@ begin
                'drivers, the main game levels should be quite playable ' +
                'with shadows on. Still, there are some issues:' +nl+
                nl+
-               '- Bonus "Doom" level is not really playable with shadows --- ' +
-               'too slow for now.' +nl+
-               nl+
                '- Depth-pass only. I know, I know, it''s lame. Well, just ' +
                'wait for the next release, or ... contribute ! :)' +nl+
+               nl+
+               '- Bonus "Doom" level is much slowed down with shadows. ' +
+               'It can be playable, but at your own risk.' +nl+
                nl+
                'You have been warned! ...And, in case you''ll find that ' +
                'shadows work smoothly ' +

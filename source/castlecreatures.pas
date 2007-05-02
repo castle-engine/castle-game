@@ -785,7 +785,7 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); virtual;
 
-    procedure RenderShadowQuads(const LightPosition: TVector3Single); virtual;
+    procedure RenderShadowQuads(const LightPosition: TVector4Single); virtual;
 
     procedure Idle(const CompSpeed: Single); virtual;
 
@@ -1979,7 +1979,7 @@ begin
 end;
 
 procedure TCreature.RenderShadowQuads(
-  const LightPosition: TVector3Single);
+  const LightPosition: TVector4Single);
 begin
   CurrentScene.RenderShadowQuads(LightPosition, SceneTransform);
 end;

@@ -20,7 +20,7 @@ post-0.7.0 release:
 - new shadows:
   - make better lights, to show shadows better.
     In gate: shadow of ghosts over the wall ?
-  - depth-fail now
+  - depth-fail (with alternative depth-pass when it's safe)
   - it's still too slow on some levels (doom e1m1)
 
   - eventually, allow items and creatures to be in shadow.
@@ -31,9 +31,18 @@ post-0.7.0 release:
   - kambiShadows and kambiShadowsMain:
     - useful only for castle right now, use more: at least in
       shadow_volume_tests, maybe in view3dscene option too ?
-    - for directional light should work too
     - for headlight should be too
     - demo castle level when this light actually moves
+
+  - frustum culling: it's done, but in a lame way: frustum + light pos
+    are just took to one bounding box. This means that it works
+    only for positional lights, and that it's much larger bounding
+    volume than it has to (I should make a "pyramid" between
+    frustum and light; ideally, this should be a convex hull of max 7 points)
+
+  - need to be optimized more to enabled by default.
+    Then set DefaultRenderShadows to true, and remove the warning in
+    CastleStartMenu when changing RenderShadows.
 
 - doom:
   - creatures should take hurt from lava too, and should know that they
@@ -413,26 +422,6 @@ Cages level:
   better after stage 4 deadline.
 
 - put some vertical crates around GlassPrison on basic_castle
-
-- shadows under the creatures:
-  - use glStencilOpSeparate if available
-  - need to be optimized to enabled by default.
-    Then set DefaultRenderShadows to true, and remove the warning in
-    CastleStartMenu when changing RenderShadows.
-
-  GDC2003_ShadowVolumes.pdf has many interesting ideas.
-  Idea to eliminate occluders based on Frustum+LightPos seems suitable for me
-  and relatively easy, implement ?
-
-  Implement and use (when you have to) ZFail,
-  test like descr in GDC2003_ShadowVolumes.pdf.
-
-  Add creature option CastsShadow (def true) to turn shadows off
-  for some creatures. For ball missile turn them off.
-
-  LightCastingShadowsPosition should be cofigurable.
-  Can be inited from LightSet.Lights[0].TransfLocation
-  (but this doesn't give so much results usually...)
 
 - "shrink" spell (that was *coool* in DUKE 3D !)
   "freeze" (it's from DUKE 3D also)

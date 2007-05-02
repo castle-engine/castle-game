@@ -360,7 +360,9 @@ procedure Draw(Glwin: TGLWindow);
 
   procedure RenderWithShadows;
   var
-    MainLightPosition: TVector3Single;
+    MainLightPosition: TVector4Single;
+    MainLightPosition3: TVector3Single absolute MainLightPosition;
+    FrustumLightBox: TBox3d;
 
     procedure RenderShadowQuads;
     var
@@ -370,7 +372,17 @@ procedure Draw(Glwin: TGLWindow);
       for I := 0 to Level.Creatures.High do
       begin
         C := Level.Creatures.Items[I];
-        if C.Kind.CastsShadow then
+        if C.Kind.CastsShadow and
+          { Frustum culling for shadow volumes:
+            If the light is positional (so we have FrustumLightBox),
+            and C.BoundingBox is outiside FrustumLightBox, there's
+            no need to render shadow quads for this creature.
+            This is a very usefull optimization in certain cases
+            (level with many creatures, spread evenly on the level;
+            on Doom level, for example, it wasn't hard to find place
+            where this optimization improved FPS to 40 from 17). }
+          ( (MainLightPosition[3] <> 1) or
+            Boxes3dCollision(C.BoundingBox, FrustumLightBox) ) then
           C.RenderShadowQuads(MainLightPosition);
       end;
     end;
@@ -407,6 +419,10 @@ procedure Draw(Glwin: TGLWindow);
 
       Level.Render(Player.Navigator.Frustum);
     finally glPopAttrib() end;
+
+    if MainLightPosition[3] = 1 then
+      FrustumLightBox := FrustumAndPointBoundingBox(Player.Navigator.Frustum,
+        MainLightPosition3);
 
     glEnable(GL_STENCIL_TEST);
       { Note that stencil buffer is set to all 0 now. }
