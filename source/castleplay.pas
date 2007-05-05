@@ -351,6 +351,13 @@ procedure Draw(Glwin: TGLWindow);
   begin
     RenderCreaturesItems(tgOpaque);
     Level.Render(Player.Navigator.Frustum);
+    { Rendering order of Creatures, Items and Level:
+      You know the problem. We must first render all non-transparent objects,
+      then all transparent objects. Otherwise transparent objects
+      (that must be rendered without updating depth buffer) could get brutally
+      covered by non-transparent objects (that are in fact further away from
+      the camera). }
+    RenderCreaturesItems(tgTransparent);
   end;
 
   procedure RenderWithShadows;
@@ -392,6 +399,12 @@ procedure Draw(Glwin: TGLWindow);
       but stencil_wrap will hopefully in this case minimize artifacts. }
     StencilShadowBits = $FF;
   begin
+    { Creatures and items are never in shadow (this looks bad).
+      So I render them here, when the lights are turned on
+      and ignoring stencil buffer. They are rendered fully before
+      any Level.Render --- since they are always opaque. }
+    RenderCreaturesItems(tgOpaque);
+
     glPushAttrib(GL_LIGHTING_BIT);
     try
       { Headlight will stay on here, but lights in Level.LightSet are off. }
@@ -447,66 +460,74 @@ procedure Draw(Glwin: TGLWindow);
       glPopAttrib;
     glDisable(GL_STENCIL_TEST);
 
-    { Creatures and items are never in shadow (this looks bad).
-      So I render them here, when the lights are turned on
-      and ignoring stencil buffer. }
-    RenderCreaturesItems(tgOpaque);
-
     { Now render everything once again, with lights turned on.
-      But render only things not in shadow. }
-    glClear(GL_DEPTH_BUFFER_BIT);
+      But render only things not in shadow.
 
-    { Render things which are never in shadow for the 2nd time.
+      ----------------------------------------
+      Long (but maybe educational) explanation why glDepthFunc(GL_LEQUAL)
+      below is crucial:
 
-      Where should I render things which are never in shadow ?
-      On one hand, they can be visible on top of normal parts of the level,
-      so when doing Level.Render below to render non-shadowed level parts,
-      these things must be stored inside depth buffer. So they have to
-      be rendered glClear(GL_DEPTH_BUFFER_BIT).
-      On the other hand, these things can be occluded by other
-      parts of the level --- even the ones that are currently in the shadow.
-      So when rendering them, the depth buffer must contain everything
-      on the level --- not only it's shadowed parts.
-      So they must be rendered to color buffer here, before
-      glClear(GL_DEPTH_BUFFER_BIT).
-      Which means, in summary, that they have to be rendered 2 times:
-      1. before glClear(GL_DEPTH_BUFFER_BIT),
-         they are rendered to color buffer and depth buffer
-      2. after glClear(GL_DEPTH_BUFFER_BIT), they are rendered
-         only to depth buffer (rendering them for the second time
-         to the color buffer would be bad --- they would be unconditionally
-         visible through shadows then).
+      What should I do with depth buffer ? Now it contains opaque
+      never-shadowed things (creatures/items), and whole Level.Render.
+      At some time (see revision 2048 in Kambi SVN repository on kocury) I called
+      glClear(GL_DEPTH_BUFFER_BIT) before rendering level for the
+      second time. While this seems to work, the 2nd pass leaves the depth-buffer
+      untouched on shadowed places. So it creates a whole
+      lot of problems for rendering never-shadowed things:
+      1. I have to render them before glClear(GL_DEPTH_BUFFER_BIT),
+         since they can be occluded by any level parts (shadowed on not).
+      2. I have to render them once again (but only into depth buffer,
+         i.e. with temporary
+         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE))
+         after glClear(GL_DEPTH_BUFFER_BIT), since they can occlude
+         non-shadowed level parts.
 
-      TODO: damn. Right now, transparent parts of the creatures/items will
-      be visible through the shadows.
-
-      And what about transparent parts (they should be rendered but cannot
-      affect depth buffer) ? Well, clearly, they have to be rendered
+      This is easy doable for opaque parts. But what about transparent
+      parts of never-shadowed things ? In other words, where should the
+      call RenderCreaturesItems(tgTransparent) be done ?
+      They should be rendered but they don't affect depth buffer.
+      Well, clearly, they have to be rendered
       before glClear(GL_DEPTH_BUFFER_BIT) (for the same reason that
       opaque parts must: because they can be occluded by any level
       part, shadowed or not). But rendering non-shadowed parts may then
       cover them (since they cannot be rendered to depth buffer).
       So I should render them once again, but *only at the places
-      where Level.Render below passed the stencil test (=0) and the depth test.
+      where Level.Render below passed the stencil test (=0) and the depth test*.
       But the second condition is not so easy (I would have to change stencil
       buffer once again, based on Level.Render hits).
+
       The simpler version, to just render them second time everywhere where
       were not in shadow, i.e. stencil test (=0) passes would be no good:
       we would render transparent things twice in the places on the level
       when they are not in shadow.
 
-      So for now transparent creatures/items will be visible through the walls,
-      in the places where shadow falls on the wall. }
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-      RenderCreaturesItems(tgOpaque);
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+      So basically, it's all doable, but not trivial, and (more important)
+      I'm losing rendering time on handling this. And without taking proper care
+      about transparent parts of never-shadowed things,
+      transparent creatures/items will be visible through the walls,
+      in the places where shadow falls on the wall.
 
-    { setup stencil : don't modify stencil, stencil test passes only for =0 }
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-    glStencilFunc(GL_EQUAL, 0, StencilShadowBits);
-    glEnable(GL_STENCIL_TEST);
-      Level.Render(Player.Navigator.Frustum);
-    glDisable(GL_STENCIL_TEST);
+      This was all talking assuming that we do glClear(GL_DEPTH_BUFFER_BIT)
+      before the 2nd pass. But do we really have to ? No!
+      It's enough to just set depth test GL_LEQUAL (instead of default
+      GL_LESS) and then the 2nd pass will naturally cover the level
+      rendered in the 1st pass. That's all, it's easy to implement,
+      works perfectly, and is fast.
+
+      End of long explanation about glDepthFunc(GL_LEQUAL).
+      ----------------------------------------
+    }
+
+    glPushAttrib(GL_DEPTH_BUFFER_BIT { for glDepthFunc });
+      glDepthFunc(GL_LEQUAL);
+
+      { setup stencil : don't modify stencil, stencil test passes only for =0 }
+      glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+      glStencilFunc(GL_EQUAL, 0, StencilShadowBits);
+      glEnable(GL_STENCIL_TEST);
+        Level.Render(Player.Navigator.Frustum);
+      glDisable(GL_STENCIL_TEST);
+    glPopAttrib();
 
     if CastleVideoOptions.RenderShadowQuads then
     begin
@@ -520,6 +541,8 @@ procedure Draw(Glwin: TGLWindow);
         RenderShadowQuads;
       glPopAttrib;
     end;
+
+    RenderCreaturesItems(tgTransparent);
   end;
 
 var
@@ -551,14 +574,6 @@ begin
   if RenderShadowsPossible and RenderShadows then
     RenderWithShadows else
     RenderNoShadows;
-
-  { Rendering order of Creatures, Items and Level:
-    You know the problem. We must first render all non-transparent objects,
-    then all transparent objects. Otherwise transparent objects
-    (that must be rendered without updating depth buffer) could get brutally
-    covered by non-transparent objects (that are in fact further away from
-    the camera). }
-  RenderCreaturesItems(tgTransparent);
 
   Player.RenderAttack;
 

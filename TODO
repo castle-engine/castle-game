@@ -1,5 +1,3 @@
-- shadows: use glDepthFunc(GL_LEQUAL) trick instead of clearing depth buffer,
-  this will make rendering transp creatures/items always good
 - test on some user playability with werewolves once again
 - radeon issues fix before 0.7.0
 - gravity doesn't work on dead creatures ? Can be seen on the doom level
@@ -24,12 +22,8 @@ post-0.7.0 release:
     In gate: shadow of ghosts over the wall ?
   - depth-fail (with alternative depth-pass when it's safe)
   - it's still too slow on some levels (doom e1m1)
-
-  - eventually, allow items and creatures to be in shadow.
-    This should finally close the issue that right now transparent
-    items/creatures can be visible through the walls, if the wall
-    part is in the shadow. (see TODO in castleplay).
-
+  - allow items to cast shadows
+  - eventually, allow items and creatures to be in shadow
   - kambiShadows and kambiShadowsMain:
     - useful only for castle right now, use more: at least in
       shadow_volume_tests, maybe in view3dscene option too ?
