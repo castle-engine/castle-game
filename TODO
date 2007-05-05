@@ -1,11 +1,25 @@
-- test on some user playability with werewolves once again
 - radeon issues fix before 0.7.0
 - gravity doesn't work on dead creatures ? Can be seen on the doom level
   (this initially dead creature), also when you kill alien above the
   castle_hall symbol, he doesn't fall down when the symbol gets opened
 
+- Kasia usability test:
+  - make gate level easier:
+    - scroll of flying should be avail in the pit with the sword, don't make no-exit situation on the 1st level (confirmed me and others)
+    - column jumping must be even easier (confirmed me and others)
+    - message "to open the door"... is confusing, since there are no door visible (confirmed by me and Grzegorz)
+  - gamewin sequence: make the key sound, that the door is opened (easy to do, planned anyway)
+  - when exiting level using "end game", there's a bug that often makes us enter the level immediately again... (confirmed by me)
+
 ----------------------------------------
 post-0.7.0 release:
+
+- Kasia usability test:
+  - mouse over yes/no message boxes should work (confirmed Eric)
+  - after the death, it's confusing that you have to click escape and "end game". People try usually "back to game". Maybe after death/gamewin, make escape go straight back to main start menu ? (confirmed others)
+  - spider on the gate level is not really interesting. Make spider ambush ? On the cart --- suddenly a group of spiders crawls from an egg ? Or on the sword pit --- suddenly group of spiders crawls from underneath ?
+  - wall sliding should be more smooth --- there are places where wall sliding doesn't catch. (confirmed by Eric)
+  - enter/exit on levels should be more black, to suggest more that these are enter/exit, not a normal wall
 
 - when fps is low, and no fullscreen, the mouse sometimes gets
   outside of the window.
