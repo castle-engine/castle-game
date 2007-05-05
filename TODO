@@ -1,3 +1,5 @@
+- shadows: use glDepthFunc(GL_LEQUAL) trick instead of clearing depth buffer,
+  this will make rendering transp creatures/items always good
 - test on some user playability with werewolves once again
 - radeon issues fix before 0.7.0
 - gravity doesn't work on dead creatures ? Can be seen on the doom level
@@ -6,6 +8,11 @@
 
 ----------------------------------------
 post-0.7.0 release:
+
+- when fps is low, and no fullscreen, the mouse sometimes gets
+  outside of the window.
+  This causes additional problems, since then it's easy to
+  accidentaly switch to other program while playing the game.
 
 - finish intro:
   - add some shadow ?

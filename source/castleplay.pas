@@ -114,7 +114,8 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
-  CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable, CastleLog;
+  CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable, CastleLog,
+  ShadowVolumesUtils;
 
 var
   GLList_TimeMessagesBackground: TGLuint;
@@ -150,13 +151,7 @@ var
     of next Level to load. }
   LevelFinishedNextLevelName: string;
 
-  { These will ideally be initialized to GL_INCR/DECR_WRAP (available
-    in OpenGL >= 2.0) or GL_INCR/DECR_WRAP_EXT (available if EXT_stencil_wrap).
-    Actually values with and without _EXT are the same.
-
-    If OpenGL will not have these available, then they will be equal to
-    old GL_INCR/DECT constants (without wrapping). }
-  StencilOpIncrWrap, StencilOpDecrWrap: TGLenum;
+  ShadowVolumesHelper: TShadowVolumesHelper;
 
 const
   SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
@@ -192,7 +187,7 @@ begin
   UpdateNavigatorProjectionMatrix;
 end;
 
-procedure Draw2D(Draw2DData: Integer);
+procedure Draw2D(Draw2DData: Pointer);
 
   procedure DoDrawInventory;
   const
@@ -361,8 +356,6 @@ procedure Draw(Glwin: TGLWindow);
   procedure RenderWithShadows;
   var
     MainLightPosition: TVector4Single;
-    MainLightPosition3: TVector3Single absolute MainLightPosition;
-    FrustumLightBox: TBox3d;
 
     procedure RenderShadowQuads;
     var
@@ -373,16 +366,7 @@ procedure Draw(Glwin: TGLWindow);
       begin
         C := Level.Creatures.Items[I];
         if C.Kind.CastsShadow and
-          { Frustum culling for shadow volumes:
-            If the light is positional (so we have FrustumLightBox),
-            and C.BoundingBox is outiside FrustumLightBox, there's
-            no need to render shadow quads for this creature.
-            This is a very usefull optimization in certain cases
-            (level with many creatures, spread evenly on the level;
-            on Doom level, for example, it wasn't hard to find place
-            where this optimization improved FPS to 40 from 17). }
-          ( (MainLightPosition[3] <> 1) or
-            Boxes3dCollision(C.BoundingBox, FrustumLightBox) ) then
+          ShadowVolumesHelper.ShadowMaybeVisible(C.BoundingBox) then
           C.RenderShadowQuads(MainLightPosition);
       end;
     end;
@@ -420,9 +404,8 @@ procedure Draw(Glwin: TGLWindow);
       Level.Render(Player.Navigator.Frustum);
     finally glPopAttrib() end;
 
-    if MainLightPosition[3] = 1 then
-      FrustumLightBox := FrustumAndPointBoundingBox(Player.Navigator.Frustum,
-        MainLightPosition3);
+    ShadowVolumesHelper.FrustumCullingInit(Player.Navigator.Frustum,
+      MainLightPosition);
 
     glEnable(GL_STENCIL_TEST);
       { Note that stencil buffer is set to all 0 now. }
@@ -442,19 +425,21 @@ procedure Draw(Glwin: TGLWindow);
           begin
             { For each fragment that passes depth-test, *increase* it's stencil
               value by 1. Render front facing shadow quads. }
-            glStencilOp(GL_KEEP, GL_KEEP, StencilOpIncrWrap);
+            glStencilOp(GL_KEEP, GL_KEEP, ShadowVolumesHelper.StencilOpIncrWrap);
             glCullFace(GL_BACK);
             RenderShadowQuads;
 
             { For each fragment that passes depth-test, *decrease* it's stencil
               value by 1. Render back facing shadow quads. }
-            glStencilOp(GL_KEEP, GL_KEEP, StencilOpDecrWrap);
+            glStencilOp(GL_KEEP, GL_KEEP, ShadowVolumesHelper.StencilOpDecrWrap);
             glCullFace(GL_FRONT);
             RenderShadowQuads;
           end else
           begin
-            glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, StencilOpIncrWrap);
-            glStencilOpSeparate(GL_BACK , GL_KEEP, GL_KEEP, StencilOpDecrWrap);
+            glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP,
+              ShadowVolumesHelper.StencilOpIncrWrap);
+            glStencilOpSeparate(GL_BACK , GL_KEEP, GL_KEEP,
+              ShadowVolumesHelper.StencilOpDecrWrap);
             RenderShadowQuads;
           end;
 
@@ -581,7 +566,7 @@ begin
   begin
     glPushAttrib(GL_ENABLE_BIT);
       glDisable(GL_LIGHTING);
-      glProjectionPushPopOrtho2D(@Draw2d, 0,
+      glProjectionPushPopOrtho2D(@Draw2d, nil,
         0, Glw.Width, 0, Glw.Height);
     glPopAttrib;
   end;
@@ -1364,25 +1349,14 @@ procedure GLWindowInit(Glwin: TGLWindow);
   end;
 
   procedure InitializeShadows;
-  var
-    WrapAvailable: boolean;
   begin
-    { calcualte StencilOpIncrWrap, StencilOpDecrWrap }
-    WrapAvailable := (GLVersion.Major >= 2) or GL_EXT_stencil_wrap;
-    if WrapAvailable then
-    begin
-      StencilOpIncrWrap := GL_INCR_WRAP_EXT;
-      StencilOpDecrWrap := GL_DECR_WRAP_EXT;
-    end else
-    begin
-      StencilOpIncrWrap := GL_INCR;
-      StencilOpDecrWrap := GL_DECR;
-    end;
+    ShadowVolumesHelper := TShadowVolumesHelper.Create;
+    ShadowVolumesHelper.InitGL;
     if WasParam_DebugLog then
       WritelnLog(ltOpenGLInitialization,
         Format('GL_INCR/DECR_WRAP_EXT available: %s' + nl +
                'glStencilOpSeparate available: %s',
-               [ BoolToStr[WrapAvailable],
+               [ BoolToStr[ShadowVolumesHelper.WrapAvailable],
                  BoolToStr[glStencilOpSeparate <> nil] ]));
   end;
 
@@ -1431,6 +1405,8 @@ begin
 
   glFreeDisplayList(GLList_TimeMessagesBackground);
   glFreeDisplayList(GLList_InventorySlot);
+
+  FreeAndNil(ShadowVolumesHelper);
 end;
 
 initialization

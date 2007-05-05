@@ -450,7 +450,7 @@ var
   ExitWithEscapeAllowed: boolean;
   ExitWithEscape: boolean;
 
-procedure Draw2d(Draw2DData: Integer);
+procedure Draw2d(Draw2DData: Pointer);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
@@ -467,7 +467,7 @@ begin
 
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
-    glProjectionPushPopOrtho2D(@Draw2d, 0,
+    glProjectionPushPopOrtho2D(@Draw2d, nil,
       0, Glwin.Width, 0, Glwin.Height);
   glPopAttrib;
 end;
