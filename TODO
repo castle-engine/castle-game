@@ -1,7 +1,4 @@
 - radeon issues fix before 0.7.0
-- gravity doesn't work on dead creatures ? Can be seen on the doom level
-  (this initially dead creature), also when you kill alien above the
-  castle_hall symbol, he doesn't fall down when the symbol gets opened
 
 - Kasia usability test:
   - make gate level easier:
@@ -10,6 +7,7 @@
     - message "to open the door"... is confusing, since there are no door visible (confirmed by me and Grzegorz)
   - gamewin sequence: make the key sound, that the door is opened (easy to do, planned anyway)
   - when exiting level using "end game", there's a bug that often makes us enter the level immediately again... (confirmed by me)
+    I think it's when you select new game level by mouse click.
 
 ----------------------------------------
 post-0.7.0 release:

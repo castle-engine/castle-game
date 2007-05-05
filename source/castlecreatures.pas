@@ -2143,7 +2143,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     IsAboveTheGround: boolean;
     HeightAboveTheGround: Single;
     OldIsFallingDown: boolean;
-    FallingDownDistance: Single;
+    FallingDownDistance, MaximumFallingDownDistance: Single;
   begin
     { Gravity does it's work here.
       This is extremely simplified version of Gravity work in MatrixNavigation.
@@ -2168,8 +2168,43 @@ procedure TCreature.Idle(const CompSpeed: Single);
 
       FallingDownDistance := FallingDownSpeed * CompSpeed;
       if IsAboveTheGround then
-        MinTo1st(FallingDownDistance,
-          HeightAboveTheGround - HeightBetweenLegsAndMiddle);
+      begin
+        MaximumFallingDownDistance :=
+          HeightAboveTheGround - HeightBetweenLegsAndMiddle;
+
+        { If you will fall down by exactly
+          HeightAboveTheGround - HeightBetweenLegsAndMiddle,
+          then you will get exatly into collision with the ground.
+          So actually this is too large MaximumFallingDownDistance.
+
+          But actually it's OK when UseBoundingSphere, because then
+          MoveVertical (actually MoveAllowed) can correct new position,
+          so actually it will be slightly above the ground. So falling
+          down will work.
+
+          But when not UseBoundingSphere, the situation is worse,
+          because then MoveAllowed actually calls MoveAllowedSimple.
+          And MoveAllowedSimple will always simply reject such move
+          with MaximumFallingDownDistance.
+          If FPS is low (so we would like to fall down at once
+          by large distance), this is noticeable: in such case, instead
+          of falling down, creature hangs over the ground,
+          because MoveAllowedSimple simply doesn't allow it fall
+          exactly by HeightAboveTheGround - HeightBetweenLegsAndMiddle.
+          So MaximumFallingDownDistance has to be a little smaller in this case.
+          In particular, this was noticeable for the initially dead alien
+          creature on "Doom" level, when shadows were on (when shadows were on,
+          FPS is low, that's why the bug was noticeable only with shadows = on).
+
+          TODO: the better version would be to improve
+          MoveAllowed for not UseBoundingSphere case, instead of
+          workarounding it here with this epsilon,
+          but this requires implementing "wall-sliding" for the whole box3d
+          in our octree. }
+        if not UseBoundingSphere then
+          MaximumFallingDownDistance -= 0.01;
+        MinTo1st(FallingDownDistance, MaximumFallingDownDistance);
+      end;
 
       if not MoveVertical(-FallingDownDistance) then
         FIsFallingDown := false;
