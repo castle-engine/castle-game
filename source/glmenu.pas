@@ -138,7 +138,7 @@ type
     (as "Yes" or "No").
 
     Don't access MaximumValueWidth or inherited Value (as string)
-    when using this class --- this class should handle this yourself. }
+    when using this class --- this class should handle this by itself. }
   TGLMenuBooleanArgument = class(TGLMenuItemArgument)
   private
     FBooleanValue: boolean;

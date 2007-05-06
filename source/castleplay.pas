@@ -1250,8 +1250,6 @@ begin
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
       GL_ENABLE_BIT, true);
     try
-      SavedMode.FakeMouseDown := false;
-
       { init navigator }
       Glw.Navigator := Player.Navigator;
       try

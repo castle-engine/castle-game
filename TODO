@@ -6,8 +6,6 @@
     - column jumping must be even easier (confirmed me and others)
     - message "to open the door"... is confusing, since there are no door visible (confirmed by me and Grzegorz)
   - gamewin sequence: make the key sound, that the door is opened (easy to do, planned anyway)
-  - when exiting level using "end game", there's a bug that often makes us enter the level immediately again... (confirmed by me)
-    I think it's when you select new game level by mouse click.
 
 ----------------------------------------
 post-0.7.0 release:

@@ -1004,7 +1004,6 @@ begin
 
   SavedMode := TGLMode.Create(Glw, 0, true);
   try
-    SavedMode.FakeMouseDown := false;
     { This is needed, because when changing ViewAngleDegX we will call
       Glw.OnResize to set new projection matrix, and this
       new projection matrix should stay for the game. }

@@ -550,7 +550,6 @@ begin
 
   SavedMode := TGLMode.Create(glw, 0, false);
   try
-    SavedMode.FakeMouseDown := false;
     { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;
 
