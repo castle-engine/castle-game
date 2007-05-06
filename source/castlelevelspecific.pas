@@ -624,7 +624,10 @@ begin
       TimeMessage('Better find a wepon first to protect yourself in the castle');
       RejectGateExitBox;
     end else
+    begin
+      Sound(stKeyDoorUse);
       LevelFinished('castle_hall');
+    end;
   end else
   begin
     Teleport1Rotate += 0.2 * CompSpeed;
