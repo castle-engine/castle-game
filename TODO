@@ -353,6 +353,10 @@ Cages level:
   Creature's CameraRadius is a hack, and should be preferably removed.
   Same thing for items<->level.
 
+- sometimes spider_queen may get stuck in the ground --- 
+  that's because camera sphere
+  middle changes with anim. Maybe make it non-changing ?
+
 - "Restore defaults" in Sound options.
 
 - Eric stage 4 comment:

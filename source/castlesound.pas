@@ -339,9 +339,11 @@ type
     FileName: string;
 
     { XxxGain are mapped directly on respective OpenAL source properties.
-      Note that Gain and MaxGain > 1 are allowed (because OpenAL allows them),
+      Note that Gain > 1 is allowed (because OpenAL allows it),
       although OpenAL may clip them for the resulting sound (after all
       calculations taking into account 3d position will be done).
+      MaxGain is not allowed to be > 1 (under Windows impl, Linux impl
+      allows it, but that's about it).
 
       When sound is used for MusicPlayer.PlayedSound:
       1. MinGain, MaxGain are ignored
@@ -782,6 +784,12 @@ begin
           DOMGetSingleAttribute(SoundElement, 'gain', SoundInfos[ST].Gain);
           DOMGetSingleAttribute(SoundElement, 'min_gain', SoundInfos[ST].MinGain);
           DOMGetSingleAttribute(SoundElement, 'max_gain', SoundInfos[ST].MaxGain);
+
+          { MaxGain is max 1. Although some OpenAL implementations allow > 1,
+            Windows impl (from Creative) doesn't. For consistent results,
+            we don't allow it anywhere. }
+          if SoundInfos[ST].MaxGain > 1 then
+            SoundInfos[ST].MaxGain := 1;
 
           if DOMGetAttribute(SoundElement, 'default_importance', S) then
             case ArrayPosStr(S,
