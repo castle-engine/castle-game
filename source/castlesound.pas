@@ -68,6 +68,7 @@ type
     stArrowFired,
     stArrowHit,
     stKeyUse,
+    stKeyDoorUse,
     stBowAttackStart,
     stBowEquipping,
     { @groupEnd }
@@ -281,6 +282,7 @@ const
     'arrow_fired',
     'arrow_hit',
     'key_use',
+    'key_door_use',
     'bow_equipping',
     'bow_attack_start',
     'gate_music',

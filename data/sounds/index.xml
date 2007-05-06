@@ -105,6 +105,8 @@
   <!-- TODO: key_use sound is not used for now. -->
   <sound name="key_use"
     default_importance="player"/>
+  <sound name="key_door_use"
+    default_importance="player"/>
   <sound name="bow_equipping" file_name=""
     default_importance="player"/>
   <sound name="bow_attack_start" file_name=""

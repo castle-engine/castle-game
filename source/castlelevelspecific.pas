@@ -794,6 +794,10 @@ end;
 
 procedure TCagesLevel.SetDoEndSequence(Value: boolean);
 begin
+  { Changing from false to true ? Make sound. }
+  if (not FDoEndSequence) and Value then
+    Sound(stKeyDoorUse);
+
   FDoEndSequence := Value;
   FEndSequence.Exists := DoEndSequence;
   FGateExit.Exists := not DoEndSequence;
