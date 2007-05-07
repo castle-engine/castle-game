@@ -487,12 +487,20 @@ constructor TGateLevel.Create(
   const ATitle: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ADemo: boolean);
+var
+  Cart: TLevelSimpleAnimatedObject;
+  GateLevelPath: string;
 begin
   inherited;
 
-  Teleport := LoadLevelScene(
-    CastleLevelsPath + 'gate' + PathDelim + 'teleport.wrl',
-    false, false);
+  GateLevelPath := CastleLevelsPath + 'gate' + PathDelim;
+
+  Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false, false);
+
+  Cart := TLevelSimpleAnimatedObject.Create(Self, LoadLevelAnimation(
+    GateLevelPath + 'cart.kanim', true));
+  Objects.Add(Cart);
+  Cart.Play;
 
   SacrilegeAmbushDone := false;
   SwordAmbushDone := false;

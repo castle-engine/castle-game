@@ -38,14 +38,7 @@ Group {
     }
   }
 
-  Fog {
-    color 0.6 0.6 0.6
-    fogType "LINEAR"
-    volumetric TRUE
-    volumetricDirection 0 0 -1
-    volumetricVisibilityStart -30
-    visibilityRange 50
-  }
+  WWWInline { name "gate_fog.wrl" }
 
   WWWInline { name "gate_processed.wrl" }
 }

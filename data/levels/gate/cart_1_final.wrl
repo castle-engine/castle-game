@@ -1,0 +1,25 @@
+#VRML V1.0 ascii
+
+Group {
+  # Camera added by Kambi by hand, only to test animation comfortably
+  # in demo_animation.
+  #
+  # Camera settings "encoded" in the VRML declaration below :
+  # direction 0.011689215898514 0.027450373396277 -0.011695011518896
+  # up 0.142981737852097 0.335771232843399 0.931028485298157
+  # gravityUp 0 0 1
+  Separator {
+    Transform {
+      translation -125.25559997558594 -362.61062622070312 5.444771289825439
+      rotation 1 0 0 1.570796370506287
+    }
+    PerspectiveCamera {
+      position 0 0 0 # camera position is expressed by translation
+      orientation -0.673075795173645 -0.726709246635437 -0.137342005968094 0.547476410865784
+    }
+  }
+
+  WWWInline { name "gate_fog.wrl" }
+
+  WWWInline { name "cart_1.wrl" }
+}

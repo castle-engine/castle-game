@@ -1,5 +1,10 @@
 - radeon issues fix before 0.7.0
 
+- finish cart:
+  - sound of (polish:) skrzypienie
+  - collisions with sum of first scene and last scene octree
+  - then move scroll of flying (cart becomes just an excuse to show animation)
+
 - Kasia usability test:
   - make gate level easier:
     - scroll of flying should be avail in the pit with the sword, don't make no-exit situation on the 1st level (confirmed me and others)
@@ -351,7 +356,7 @@ Cages level:
   Creature's CameraRadius is a hack, and should be preferably removed.
   Same thing for items<->level.
 
-- sometimes spider_queen may get stuck in the ground --- 
+- sometimes spider_queen may get stuck in the ground ---
   that's because camera sphere
   middle changes with anim. Maybe make it non-changing ?
 
