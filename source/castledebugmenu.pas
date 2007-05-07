@@ -311,7 +311,8 @@ begin
   Items.Add('Show info about creatures on level');
   Items.Add('Kill all creatures');
   Items.Add('Kill all non-still creatures');
-  Items.Add('Add creature to level');
+  Items.Add('Add creature to level before player');
+  Items.Add('Add creature to level exactly on player');
   Items.Add('Reload creatures/kinds.xml file');
   Items.Add('Reload animations of specific creature');
   Items.AddObject('Render shadow quads', RenderShadowQuadsArgument);
@@ -388,7 +389,7 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
       end;
   end;
 
-  procedure AddLevelCreature;
+  procedure AddLevelCreature(DirectionAttenuation: Single);
   var
     Position: TVector3Single;
     Direction: TVector3Single;
@@ -397,7 +398,7 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
     if ChooseCreatureKind(Kind) then
     begin
       Position := VectorAdd(Player.Navigator.CameraPos,
-        VectorAdjustToLength(Player.Navigator.CameraDir, 10));
+        VectorAdjustToLength(Player.Navigator.CameraDir, DirectionAttenuation));
       Direction := Player.Navigator.CameraDir;
 
       Level.Creatures.Add(
@@ -423,18 +424,19 @@ begin
     0: ShowLevelCreaturesInfo;
     1: KillAll;
     2: KillAllNonStill;
-    3: AddLevelCreature;
-    4: CreaturesKinds.LoadFromFile;
-    5: ReloadCreatureAnimation;
-    6: begin
+    3: AddLevelCreature(10);
+    4: AddLevelCreature(0);
+    5: CreaturesKinds.LoadFromFile;
+    6: ReloadCreatureAnimation;
+    7: begin
          RenderShadowQuads := not RenderShadowQuads;
          RenderShadowQuadsArgument.Value := RenderShadowQuads;
        end;
-    7: begin
+    8: begin
          DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
          DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
        end;
-    8: CurrentMenu := DebugMenu;
+    9: CurrentMenu := DebugMenu;
   end;
 end;
 
