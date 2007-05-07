@@ -574,6 +574,13 @@ type
     So you should create this octree, and make sure that the animation is done
     such that the first animation frame is always larger than the others.
 
+    You can also set CollisionUseLastScene, then collision will be done
+    versus the sum of Animation.FirstScene.DefaultTriangleOctree +
+    Animation.LastScene.DefaultTriangleOctree. CollisionUseLastScene
+    is useful is the object is moving, but the move is very slight,
+    so that the sum of first and last scenes geometry is good enough
+    approximation of the whole geometry at any point of the animation.
+
     Although it seems like a totally stupid way to check for collisions,
     it's suitable for many purposes (see e.g. uses on "castle hall" level),
     it's simple and not memory-consuming, and you don't have to take
@@ -593,6 +600,7 @@ type
     FAnimationTime: Single;
     FExists: boolean;
     FCollides: boolean;
+    FCollisionUseLastScene: boolean;
   public
     constructor Create(AParentLevel: TLevel; AnAnimation: TVRMLGLAnimation);
     destructor Destroy; override;
@@ -601,6 +609,10 @@ type
     property AnimationTime: Single read FAnimationTime write FAnimationTime;
     property Exists: boolean read FExists write FExists default true;
     property Collides: boolean read FCollides write FCollides default true;
+
+    property CollisionUseLastScene: boolean
+      read FCollisionUseLastScene
+      write FCollisionUseLastScene default false;
 
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
@@ -859,7 +871,8 @@ type
       ) }
     function LoadLevelAnimation(
       const FileName: string;
-      CreateDefaultTriangleOctree: boolean): TVRMLGLAnimation;
+      CreateFirstDefaultTriangleOctree,
+      CreateLastDefaultTriangleOctree: boolean): TVRMLGLAnimation;
 
     { See @link(SpecialObjectPicked) and @link(Picked), you can call this from
       overriden implementations of these. }
@@ -2047,9 +2060,13 @@ function TLevelAnimatedObject.MoveAllowedSimple(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
-    Animation.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
-      OldPos, ProposedNewPos,
-      CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
+    (Animation.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
+       OldPos, ProposedNewPos,
+       CameraRadius, NoItemIndex, ItemsToIgnoreFunc) and
+       ( (not CollisionUseLastScene) or
+         Animation.LastScene.DefaultTriangleOctree.MoveAllowedSimple(
+           OldPos, ProposedNewPos,
+           CameraRadius, NoItemIndex, ItemsToIgnoreFunc) ));
 end;
 
 function TLevelAnimatedObject.MoveBoxAllowedSimple(
@@ -2058,19 +2075,28 @@ function TLevelAnimatedObject.MoveBoxAllowedSimple(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
-    Animation.FirstScene.DefaultTriangleOctree.MoveBoxAllowedSimple(
-      OldPos, ProposedNewPos, ProposedNewBox,
-      NoItemIndex, ItemsToIgnoreFunc);
+    (Animation.FirstScene.DefaultTriangleOctree.MoveBoxAllowedSimple(
+       OldPos, ProposedNewPos, ProposedNewBox,
+       NoItemIndex, ItemsToIgnoreFunc) and
+       ( (not CollisionUseLastScene) or
+         Animation.LastScene.DefaultTriangleOctree.MoveBoxAllowedSimple(
+           OldPos, ProposedNewPos, ProposedNewBox,
+           NoItemIndex, ItemsToIgnoreFunc) ));
 end;
 
 function TLevelAnimatedObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    (Animation.FirstScene.DefaultTriangleOctree.SegmentCollision(
-      Pos1, Pos2,
-      false, NoItemIndex, false, ItemsToIgnoreFunc)
-      <> NoItemIndex);
+    ( (Animation.FirstScene.DefaultTriangleOctree.SegmentCollision(
+         Pos1, Pos2,
+         false, NoItemIndex, false, ItemsToIgnoreFunc)
+         <> NoItemIndex) or
+      (CollisionUseLastScene and
+        (Animation.LastScene.DefaultTriangleOctree.SegmentCollision(
+           Pos1, Pos2,
+           false, NoItemIndex, false, ItemsToIgnoreFunc)
+           <> NoItemIndex) ));
 end;
 
 function TLevelAnimatedObject.SphereCollision(
@@ -2078,9 +2104,13 @@ function TLevelAnimatedObject.SphereCollision(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    (Animation.FirstScene.DefaultTriangleOctree.SphereCollision(
-      Pos, Radius, NoItemIndex, ItemsToIgnoreFunc)
-      <> NoItemIndex);
+    ( (Animation.FirstScene.DefaultTriangleOctree.SphereCollision(
+         Pos, Radius, NoItemIndex, ItemsToIgnoreFunc)
+         <> NoItemIndex) or
+      (CollisionUseLastScene and
+        (Animation.LastScene.DefaultTriangleOctree.SphereCollision(
+           Pos, Radius, NoItemIndex, ItemsToIgnoreFunc)
+           <> NoItemIndex) ));
 end;
 
 function TLevelAnimatedObject.BoxCollision(
@@ -2088,9 +2118,13 @@ function TLevelAnimatedObject.BoxCollision(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    (Animation.FirstScene.DefaultTriangleOctree.BoxCollision(
-      Box, NoItemIndex, ItemsToIgnoreFunc)
-      <> NoItemIndex);
+    ( (Animation.FirstScene.DefaultTriangleOctree.BoxCollision(
+         Box, NoItemIndex, ItemsToIgnoreFunc)
+         <> NoItemIndex) or
+      (CollisionUseLastScene and
+        (Animation.LastScene.DefaultTriangleOctree.BoxCollision(
+           Box, NoItemIndex, ItemsToIgnoreFunc)
+           <> NoItemIndex) ));
 end;
 
 function TLevelAnimatedObject.RayCollision(
@@ -2113,6 +2147,20 @@ begin
       Result := TCollisionInfo.Create;
       Result.OctreeItem := Octree.OctreeItems.Pointers[OctreeItemIndex];
       Result.Hierarchy.Add(Self);
+    end else
+    if CollisionUseLastScene then
+    begin
+      { try the same thing on LastScene }
+      Octree := Animation.LastScene.DefaultTriangleOctree;
+      OctreeItemIndex := Octree.RayCollision(IntersectionDistance,
+        Ray0, RayVector,
+        false, NoItemIndex, false, ItemsToIgnoreFunc);
+      if OctreeItemIndex <> NoItemIndex then
+      begin
+        Result := TCollisionInfo.Create;
+        Result.OctreeItem := Octree.OctreeItems.Pointers[OctreeItemIndex];
+        Result.Hierarchy.Add(Self);
+      end
     end;
   end;
 end;
@@ -2121,14 +2169,14 @@ procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
   var GroundItem: POctreeItem);
-var
-  IsAboveThis: boolean;
-  HeightAboveThis: Single;
-  GroundItemIndexThis: Integer;
-begin
-  if Exists and Collides then
+
+  procedure MakeScene(Scene: TVRMLFlatScene);
+  var
+    IsAboveThis: boolean;
+    HeightAboveThis: Single;
+    GroundItemIndexThis: Integer;
   begin
-    Animation.FirstScene.DefaultTriangleOctree.GetCameraHeightZ(
+    Scene.DefaultTriangleOctree.GetCameraHeightZ(
       CameraPos,
       IsAboveThis, HeightAboveThis, GroundItemIndexThis,
       NoItemIndex, ItemsToIgnoreFunc);
@@ -2138,9 +2186,17 @@ begin
     begin
       IsAboveTheGround := true;
       HeightAboveTheGround := HeightAboveThis;
-      GroundItem := Animation.FirstScene.DefaultTriangleOctree.OctreeItems.
+      GroundItem := Scene.DefaultTriangleOctree.OctreeItems.
         Pointers[GroundItemIndexThis];
     end;
+  end;
+
+begin
+  if Exists and Collides then
+  begin
+    MakeScene(Animation.FirstScene);
+    if CollisionUseLastScene then
+      MakeScene(Animation.LastScene);
   end;
 end;
 
@@ -2154,7 +2210,11 @@ end;
 function TLevelAnimatedObject.BoundingBox: TBox3d;
 begin
   if Exists and Collides then
-    Result := Animation.FirstScene.BoundingBox else
+  begin
+    Result := Animation.FirstScene.BoundingBox;
+    if CollisionUseLastScene then
+      Box3dSumTo1st(Result, Animation.LastScene.BoundingBox);
+  end else
     Result := EmptyBox3d;
 end;
 
@@ -3049,7 +3109,8 @@ end;
 
 function TLevel.LoadLevelAnimation(
   const FileName: string;
-  CreateDefaultTriangleOctree: boolean): TVRMLGLAnimation;
+  CreateFirstDefaultTriangleOctree,
+  CreateLastDefaultTriangleOctree: boolean): TVRMLGLAnimation;
 begin
   Result := TVRMLGLAnimation.Create(GLContextCache);
   Result.LoadFromFile(FileName);
@@ -3060,9 +3121,13 @@ begin
     [prBoundingBox { BoundingBox is practically always needed }],
     false, false);
 
-  if CreateDefaultTriangleOctree then
+  if CreateFirstDefaultTriangleOctree then
     Result.FirstScene.DefaultTriangleOctree :=
       Result.FirstScene.CreateTriangleOctree('');
+
+  if CreateLastDefaultTriangleOctree then
+    Result.LastScene.DefaultTriangleOctree :=
+      Result.LastScene.CreateTriangleOctree('');
 end;
 
 function TLevel.Background: TBackgroundGL;

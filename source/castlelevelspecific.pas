@@ -252,11 +252,11 @@ begin
   CastleHallLevelPath := CastleLevelsPath + 'castle_hall' + PathDelim;
 
   Symbol := TLevelSimpleAnimatedObject.Create(Self,
-    LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true));
+    LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false));
   Objects.Add(Symbol);
 
   Button := TLevelSimpleAnimatedObject.Create(Self,
-    LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true));
+    LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false));
   Objects.Add(Button);
 
   StairsBlocker := TLevelStaticObject.Create(Self,
@@ -498,7 +498,8 @@ begin
   Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false, false);
 
   Cart := TLevelSimpleAnimatedObject.Create(Self, LoadLevelAnimation(
-    GateLevelPath + 'cart.kanim', true));
+    GateLevelPath + 'cart.kanim', true, true));
+  Cart.CollisionUseLastScene := true;
   Objects.Add(Cart);
   Cart.Play;
 
@@ -719,7 +720,7 @@ begin
     Self, TowerLevelPath + 'elevator.wrl', false);
 
   ElevatorButton := TLevelSimpleAnimatedObject.Create(Self, LoadLevelAnimation(
-    TowerLevelPath + 'elevator_button.kanim', true));
+    TowerLevelPath + 'elevator_button.kanim', true, false));
 
   ElevatorButtonSum := TLevelObjectSum.Create(Self);
   ElevatorButtonSum.List.Add(Elevator);
@@ -1305,7 +1306,7 @@ begin
 
   Water := TLevelSimpleAnimatedObject.Create(Self,
     LoadLevelAnimation(CastleLevelsPath + 'gate_demo' +
-      PathDelim + 'water.kanim', true));
+      PathDelim + 'water.kanim', true, false));
   Objects.Add(Water);
 
   Water.Play;
