@@ -89,6 +89,7 @@ type
     stDoorClose,
     stElevator,
     stDoomExitButton,
+    stCreak,
     { @groupEnd }
 
     { Creatures sounds.
@@ -299,6 +300,7 @@ const
     'door_close',
     'elevator',
     'doom_exit_button',
+    'creak',
     'creature_falled_down',
     'alien_sudden_pain',
     'alien_dying',

@@ -85,6 +85,9 @@ type
     SwordAmbushDone: boolean;
 
     FSacrilegeBox: TBox3d;
+
+    CartLastSoundTime: Single;
+    CartSoundPosition: TVector3Single;
   protected
     procedure ChangeLevelScene; override;
   public
@@ -503,6 +506,8 @@ begin
   Objects.Add(Cart);
   Cart.Play;
 
+  CartSoundPosition := Box3dMiddle(Cart.Animation.FirstScene.BoundingBox);
+
   SacrilegeAmbushDone := false;
   SwordAmbushDone := false;
 end;
@@ -618,6 +623,9 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
     end;
   end;
 
+const
+  { In seconds. }
+  CartSoundRepeatTime = 5.0;
 begin
   inherited;
 
@@ -660,6 +668,12 @@ begin
       SwordAmbushDone := true;
       SwordAmbush;
     end;
+  end;
+
+  if AnimationTime - CartLastSoundTime > CartSoundRepeatTime then
+  begin
+    CartLastSoundTime := AnimationTime;
+    Sound3d(stCreak, CartSoundPosition);
   end;
 end;
 

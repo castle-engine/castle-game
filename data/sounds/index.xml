@@ -138,6 +138,10 @@
   <sound name="elevator" default_importance="level_event"/>
   <sound name="doom_exit_button" file_name="doom/dsswtchn.wav"
     default_importance="level_event"/>
+  <!-- From
+    http://www.flashkit.com/soundfx/Domestic/Doors/Door_Cre-J_Fairba-8439/index.php
+  -->
+  <sound name="creak" default_importance="level_event" gain="0.3" />
 
   <!-- Creatures sounds. -->
   <sound name="creature_falled_down"
