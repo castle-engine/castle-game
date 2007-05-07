@@ -1,12 +1,5 @@
 - radeon issues fix before 0.7.0
 
-- finish cart:
-  - then move scroll of flying (cart becomes just an excuse to show animation)
-
-- Kasia usability test:
-  - make gate level easier:
-    - scroll of flying should be avail in the pit with the sword, don't make no-exit situation on the 1st level (confirmed me and others)
-
 ----------------------------------------
 post-0.7.0 release:
 
@@ -218,9 +211,6 @@ post-0.7.0 release:
     is lower.
   - crosshair for bow
   - showing arrow in shooting anim for bow
-
-- gate
-  - need an actual door inside GateExitBox to make the message valid.
 
 - intro moving when the game starts (either movie from the game --- or just some
   nice anim, moving camera around the level.)

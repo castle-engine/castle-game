@@ -625,7 +625,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
 
 const
   { In seconds. }
-  CartSoundRepeatTime = 5.0;
+  CartSoundRepeatTime = 10.0;
 begin
   inherited;
 
