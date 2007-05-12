@@ -1,6 +1,12 @@
+- make paths not contain /win (in gate_processed, and check others)
+- provide for Windows users OpenAL libs, if they want
+
 - radeon issues fix before 0.7.0
 
 - doom level test: is it possible to pass ?
+
+- texture on doom level when exiting from the pool: fight in depth buffer,
+  I have two polys on the same position.
 
 ----------------------------------------
 post-0.7.0 release:
@@ -11,11 +17,17 @@ post-0.7.0 release:
   - spider on the gate level is not really interesting. Make spider ambush ? On the cart --- suddenly a group of spiders crawls from an egg ? Or on the sword pit --- suddenly group of spiders crawls from underneath ?
   - wall sliding should be more smooth --- there are places where wall sliding doesn't catch. (confirmed by Eric)
   - enter/exit on levels should be more black, to suggest more that these are enter/exit, not a normal wall
-
-- when fps is low, and no fullscreen, the mouse sometimes gets
-  outside of the window.
-  This causes additional problems, since then it's easy to
-  accidentaly switch to other program while playing the game.
+  - items should automatically hide if they were uncovered by automatic show ?
+    Users usually don't know immediately how to close them, and play
+    with items list visible for a long the time, cluttering the screen.
+    Maybe automatically hide items after some time without using 
+    (no [, ], pickup or Enter used). This way "i" (when items are visible)
+    becomes a shortcut to hide items quick, but eventually they'll hide
+    anyway.
+  - when fps is low, and no fullscreen, the mouse sometimes gets
+    outside of the window.
+    This causes additional problems, since then it's easy to
+    accidentaly switch to other program while playing the game.
 
 - finish intro:
   - add some shadow ?
@@ -166,9 +178,15 @@ post-0.7.0 release:
   Reported on PGD:
   1.Loading time (creating display lists for animations) is ridicuously long.
     Confirmed on Majka.
+    It's slow on IIUni now, but doable... around 3-4 minutes.
+    Eats almost 500 MB of memory, which means that with Radeon, computers
+    with 512 MB may not be enough --- all hells breaks loose when
+    part of our memory is swapped to disk.
+
   (2 fixed)
   3.2d controls problems --- sword should be with alpha-test, item slots' borders should be with blending. But on Radeon screenshots they all look as if they were drawn "just like that", covering things underneath.
     No problems on Majka Windows.
+    No problems on IIUni-107 Windows.
     Maybe glProjectionPushPop will silently fix this ?
 
   4.Switching task (Alt+Tab) craps graphics when switching back to game (although this is known to happen on older Windowses (98 and like) with crappy graphic drivers, it definitely should not happen on XP with latest ATI drivers).
@@ -179,6 +197,9 @@ post-0.7.0 release:
   5.Switching task (Alt+Tab) while "Loading creatures" craps things --- or maybe I was impatient ?
 
   6.FPS is awfully low.
+    Note: FPS seems much better with "render for level screenshot" = yes.
+    I'm probably doing something un-optimal on Radeon when drawing
+    2d controls. Make sure exactly what it is.
 
   7.Switching task (Alt+Tab) and going back to game causes "can't change display settings" warning.
 
