@@ -5,9 +5,6 @@
 
 - doom level test: is it possible to pass ?
 
-- texture on doom level when exiting from the pool: fight in depth buffer,
-  I have two polys on the same position.
-
 ----------------------------------------
 post-0.7.0 release:
 
