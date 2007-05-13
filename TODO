@@ -1,4 +1,3 @@
-- make paths not contain /win (in gate_processed, and check others)
 - provide for Windows users OpenAL libs, if they want
 
 - radeon issues fix before 0.7.0
