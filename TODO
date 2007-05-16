@@ -2,7 +2,7 @@
 
 - add to notes:
   On Radeon (Windows, with closed ATI drivers): around 500 MB free memory is required. Which means that practically a PC with 512 MB is usually not enough (OS, not to mention any other programs like WWW browser, will usually eat much more than 12 MB), so you usually need > 512 MB memory (like 1 GB or more). On some Radeon models this may be different --- your mileage may vary, as they say.
-  Also note that "Loading creatures" may take really long time --- a couple of minutes. I know that this sucks, but that's it. If you'll have enough free memory, the game should be playable after a couple of minutes.
+  Also note that "Loading creatures" may take really long time --- a couple of minutes. I know that this sucks, but that's it. If you'll have enough free memory, the game should be playable after a couple of minutes. Fortunately, "Loading creatures" takes a long time only when you enter new game for the first time (so when you change levels, or if you die and will retry the level, you will not have to wait again).
 
   Note that I tested the game also on ATI Radeon cards inside MacBookPro (with closed ATI drivers, tested both under Linux and Mac OS X) and the game (since 0.7.0 version) runs perfectly fine there. (they have 2 GB of memory, and "Loading creatures" went relatively fast).
 
