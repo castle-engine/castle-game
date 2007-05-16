@@ -1,6 +1,15 @@
 - provide for Windows users OpenAL libs, if they want
 
+- add to notes:
+  On Radeon (Windows, with closed ATI drivers): around 500 MB free memory is required. Which means that practically a PC with 512 MB is usually not enough (OS, not to mention any other programs like WWW browser, will usually eat much more than 12 MB), so you usually need > 512 MB memory (like 1 GB or more). On some Radeon models this may be different --- your mileage may vary, as they say.
+  Also note that "Loading creatures" may take really long time --- a couple of minutes. I know that this sucks, but that's it. If you'll have enough free memory, the game should be playable after a couple of minutes.
+
+  Note that I tested the game also on ATI Radeon cards inside MacBookPro (with closed ATI drivers, tested both under Linux and Mac OS X) and the game (since 0.7.0 version) runs perfectly fine there. (they have 2 GB of memory, and "Loading creatures" went relatively fast).
+
 - radeon issues fix before 0.7.0
+  IIUni tests:
+  - test "9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game."
+  - test "10.view3dscene: with status text, FPS is much lower."
 
 ----------------------------------------
 post-0.7.0 release:
@@ -14,7 +23,7 @@ post-0.7.0 release:
   - items should automatically hide if they were uncovered by automatic show ?
     Users usually don't know immediately how to close them, and play
     with items list visible for a long the time, cluttering the screen.
-    Maybe automatically hide items after some time without using 
+    Maybe automatically hide items after some time without using
     (no [, ], pickup or Enter used). This way "i" (when items are visible)
     becomes a shortcut to hide items quick, but eventually they'll hide
     anyway.
@@ -172,32 +181,40 @@ post-0.7.0 release:
   Reported on PGD:
   1.Loading time (creating display lists for animations) is ridicuously long.
     Confirmed on Majka.
-    It's slow on IIUni now, but doable... around 3-4 minutes.
+    It's very slow on IIUni now, but doable... around 3-4 minutes.
     Eats almost 500 MB of memory, which means that with Radeon, computers
     with 512 MB may not be enough --- all hells breaks loose when
     part of our memory is swapped to disk.
+    That's it for Radeon, for now.
 
   (2 fixed)
   3.2d controls problems --- sword should be with alpha-test, item slots' borders should be with blending. But on Radeon screenshots they all look as if they were drawn "just like that", covering things underneath.
     No problems on Majka Windows.
     No problems on IIUni-107 Windows.
     Maybe glProjectionPushPop will silently fix this ?
+    Probably so. Ignore for 0.7.0.
 
   4.Switching task (Alt+Tab) craps graphics when switching back to game (although this is known to happen on older Windowses (98 and like) with crappy graphic drivers, it definitely should not happen on XP with latest ATI drivers).
     No such problems on Majka Windows.
     No such problems on ii.uni computers with Radeon.
+    Has to be ignored ? Just update your drivers ?
 
   On Majka Windows:
   5.Switching task (Alt+Tab) while "Loading creatures" craps things --- or maybe I was impatient ?
+    Has to be ignored ? Just update your drivers ?
 
   6.FPS is awfully low.
     Note: FPS seems much better with "render for level screenshot" = yes.
     I'm probably doing something un-optimal on Radeon when drawing
     2d controls. Make sure exactly what it is.
+    Later: this is somewhat difficult to reproduce on IIUni...
+    Ignore for 0.7.0 ?
 
   7.Switching task (Alt+Tab) and going back to game causes "can't change display settings" warning.
+    Confirmed on on IIUni. Ignore for 0.7.0.
 
   8.Using ctrl+alt+del to bring taskmgr -> taskmgr.exe fails. Well, this is definitely Radeon's problem. But maybe I'm just overloading the system too much ?
+    Confirmed on on IIUni. Ignore for 0.7.0.
 
   9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game.
 
