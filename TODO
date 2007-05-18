@@ -9,6 +9,8 @@
 - radeon issues fix before 0.7.0
   IIUni tests:
   - test "9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game."
+    When run with --debug-no-creatures, music is OK.
+    Didn't manage to run without --debug-no-creatures.
   - test "10.view3dscene: with status text, FPS is much lower."
 
 ----------------------------------------
