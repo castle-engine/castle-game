@@ -128,8 +128,8 @@ dist-core:
 	mv $(TMP_DIST_PATH)trunk/ $(TMP_DIST_PATH)castle
 	make -C $(TMP_DIST_PATH)castle/ clean clean_private
 	areFilenamesLower -i Makefile -i Makefile.common -i README $(TMP_DIST_PATH)castle/data/
-# Add libpng and zlib for Windows
-	cp -f /win/mojewww/camelot/private/win32_libpng_and_zlib/* $(TMP_DIST_PATH)castle/
+# Add libpng, zlib, openal for Windows
+	cp -f /win/mojewww/camelot/private/update_archives/win32_dlls/* $(TMP_DIST_PATH)castle/
 # Add documentation/ subdirectory
 	mkdir $(TMP_DIST_PATH)castle/documentation/
 #         Trzeba najpierw zrobiæ make clean bo dotychczasowe le¿±ce tam HTMLe
