@@ -59,10 +59,14 @@ clean:
 			   -iname '*.blend1' ')' -print \
 	     | xargs rm -f
 	rm -f castle-*.tar.gz
-	$(MAKE) -C source/ clean
+# I recurse into source/ subdir only if it exists ---
+# this is useful because this may be called by update_archives.sh
+# script inside a temporary copy of castle files, where source/
+# subdirectory isn't supposed to exist.
+	if [ -d source/ ]; then $(MAKE) -C source/ clean; fi
 
 # Remove private files that Michalis keeps inside his castle/trunk/,
-# but he doesn't want to upload them for PGD compo.
+# but he doesn't want to upload them for public.
 #
 # These things are *not* automatically generated (automatically generated
 # stuff is removed always by `clean'). So this target is supposed to be
