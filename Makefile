@@ -50,6 +50,10 @@ build-win32:
 # ------------------------------------------------------------
 # Cleaning targets.
 
+# Clean files which are easily recoverable, or just temporary trash
+# (after compilers or editors).
+# This includes dist archives.
+# This does not include compiled binaries.
 clean:
 	find . -type f '(' -iname '*.ow'  -or -iname '*.ppw' -or -iname '*.aw' -or \
 	                   -iname '*.o'   -or -iname '*.ppu' -or -iname '*.a' -or \
@@ -64,6 +68,9 @@ clean:
 # script inside a temporary copy of castle files, where source/
 # subdirectory isn't supposed to exist.
 	if [ -d source/ ]; then $(MAKE) -C source/ clean; fi
+
+clean_binaries:
+	rm -f castle castle.exe
 
 # Remove private files that Michalis keeps inside his castle/trunk/,
 # but he doesn't want to upload them for public.
