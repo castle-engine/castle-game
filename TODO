@@ -1,3 +1,4 @@
+- make sure it's ok with mesa now, in particular check shadows (on ii there were problems)
 ----------------------------------------
 post-0.7.0 release:
 
@@ -281,10 +282,6 @@ cages level:
 - windows: don't look like windows
 - player can fly through windows --- not good.
 - stairs beginning cages and ending castle_hall: endings should be more black, current vertex colouring is not black enough
-
-- when debug menu "give me 20 items" is used, InventoryCurrentItem
-  may remain -1. Fix by placing InventoryCurrentItem as inside
-  read-only TPlayer property.
 
 - gate:
   - Wall of fence around the level, to get rid of invisible walls.

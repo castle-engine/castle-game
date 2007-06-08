@@ -485,6 +485,12 @@ procedure TDebugLevelMenu.CurrentItemSelected;
       if Index <> LevelsAvailable.Count then
       begin
         LevelFinished(LevelsAvailable[Index].Name);
+        { Flush LevelFinished now, to give new items when new level is loaded.
+          Otherwise, some sounds (like equipping the sword, if player gets
+          his first weapon) could be done before loading level progress,
+          which sounds awkward for player. }
+        LevelFinishedFlush;
+        Level.PrepareNewPlayer(Player);
         UserQuit := true;
       end;
     finally S.Free end;

@@ -166,6 +166,8 @@ type
     { This must be valid and non-zero when FKnockbackDistance > 0 }
     FKnockbackDirection: TVector3Single;
     KnockBackSpeed: Single;
+
+    FInventoryCurrentItem: Integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -246,7 +248,10 @@ type
     { This adds Item to Items, with appropriate GameMessage.
       Returns index inside Items to this item (note that this
       may be actually an index to some other TItem instance
-      that was stacked with given Item). }
+      that was stacked with given Item).
+
+      This takes care of adjusting InventoryCurrentItem if needed
+      (if no item was selected, then newly picked item becomes selected). }
     function PickItem(Item: TItem): Integer;
 
     { Drops given item. ItemIndex must be valid (between 0 and Items.Count - 1).
@@ -361,6 +366,31 @@ type
     property Ground: POctreeItem read FGround write FGround;
 
     procedure LevelChanged;
+
+    { Currently selected inventory item.
+
+      Note: while we try to always sensibly update InventoryCurrentItem,
+      to keep the assumptions that
+      @orderedList(
+        @item(Items.Count = 0 => InventoryCurrentItem = -1)
+        @item(Items.Count > 0 =>
+         InventoryCurrentItem between 0 and Items.Count - 1))
+
+      but you should @italic(nowhere) depend on these assuptions.
+      That's because I want to allow myself freedom to modify Items
+      in various situations, so InventoryCurrentItem can become
+      invalid in many situations.
+
+      So every code should check that
+      @unorderedList(
+        @item(If InventoryCurrentItem between 0 and Items.Count - 1
+          then InventoryCurrentItem is selected)
+        @item( Else no item is selected (possibly Items.Count = 0,
+          possibly not)))
+    }
+    property InventoryCurrentItem: Integer
+      read FInventoryCurrentItem write FInventoryCurrentItem
+      default -1;
   end;
 
 implementation
@@ -385,7 +415,9 @@ begin
   inherited Create;
   FLife := DefaultMaxLife;
   FMaxLife := DefaultMaxLife;
+
   FItems := TItemsList.Create;
+  FInventoryCurrentItem := -1;
 
   FNavigator := TMatrixWalker.Create(nil);
   Navigator.Input_MoveSpeedInc.MakeClear; { turn key off }
@@ -478,6 +510,10 @@ begin
   { Automatically equip the weapon. }
   if (Item.Kind is TItemWeaponKind) and (EquippedWeapon = nil) then
     EquippedWeapon := Item;
+
+  { Update InventoryCurrentItem. }
+  if not Between(InventoryCurrentItem, 0, Items.Count - 1) then
+    InventoryCurrentItem := Result;
 end;
 
 function TPlayer.DropItem(ItemIndex: Integer): TItem;

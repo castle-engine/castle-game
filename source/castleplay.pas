@@ -122,24 +122,6 @@ var
 
   GLList_InventorySlot: TGLuint;
   InventoryVisible: boolean;
-  { Note: while we try to always sensibly update InventoryCurrentItem,
-    to keep the assumptions that
-    1. Player.Items.Count = 0 => InventoryCurrentItem = -1
-    2. Player.Items.Count > 0 =>
-       InventoryCurrentItem between 0 and Player.Items.Count - 1
-
-    but you should *nowhere* depend on these assuptions.
-    That's because I want to allow myself freedom to modify Items
-    in various situations, so InventoryCurrentItem can become
-    invalid in many situations.
-
-    So every code should check that
-    - If InventoryCurrentItem between 0 and Player.Items.Count - 1
-      that InventoryCurrentItem is selected
-    - Else no item is selected (possibly Player.Items.Count = 0,
-      possibly not) }
-  InventoryCurrentItem: Integer;
-
   ShowDebugInfo: boolean;
 
   DisplayFpsUpdateTick: TMilisecTime;
@@ -244,15 +226,15 @@ procedure Draw2D(Draw2DData: Pointer);
       end;
     glDisable(GL_ALPHA_TEST);
 
-    if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
+    if Between(Player.InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
       glColor4f(0.8, 0.8, 0.8, 1);
       DrawGLRectBorder(
-        ItemSlotX(InventoryCurrentItem) + InventorySlotMargin,
-        ItemSlotY(InventoryCurrentItem) + InventorySlotMargin,
-        ItemSlotX(InventoryCurrentItem)
+        ItemSlotX(Player.InventoryCurrentItem) + InventorySlotMargin,
+        ItemSlotY(Player.InventoryCurrentItem) + InventorySlotMargin,
+        ItemSlotX(Player.InventoryCurrentItem)
           + InventorySlotWidth - InventorySlotMargin,
-        ItemSlotY(InventoryCurrentItem)
+        ItemSlotY(Player.InventoryCurrentItem)
           + InventorySlotHeight - InventorySlotMargin);
     end;
 
@@ -683,7 +665,7 @@ const
   GameWinDirection: TVector3Single = (0, 1, 0);
   GameWinUp: TVector3Single = (0, 0, 1);
 var
-  PickItemIndex, PlayerItemIndex: Integer;
+  PickItemIndex: Integer;
 begin
   CompSpeed := Glw.IdleCompSpeed;
 
@@ -701,13 +683,9 @@ begin
     PickItemIndex := Level.Items.PlayerCollision;
     if PickItemIndex <> -1 then
     begin
-      PlayerItemIndex := Player.PickItem(Level.Items[PickItemIndex].ExtractItem);
+      Player.PickItem(Level.Items[PickItemIndex].ExtractItem);
       Level.Items.FreeAndNil(PickItemIndex);
       Level.Items.Delete(PickItemIndex);
-
-      { update InventoryCurrentItem. }
-      if not Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
-        InventoryCurrentItem := PlayerItemIndex;
 
       if AutoOpenInventory then
         InventoryVisible := true;
@@ -936,13 +914,13 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
   procedure ChangeInventoryCurrentItem(Change: Integer);
   begin
     if Player.Items.Count = 0 then
-      InventoryCurrentItem := -1 else
-    if InventoryCurrentItem >= Player.Items.Count then
-      InventoryCurrentItem := Player.Items.Count - 1 else
-    if InventoryCurrentItem < 0 then
-      InventoryCurrentItem := 0 else
-      InventoryCurrentItem := ChangeIntCycle(
-        InventoryCurrentItem, Change, Player.Items.Count - 1);
+      Player.InventoryCurrentItem := -1 else
+    if Player.InventoryCurrentItem >= Player.Items.Count then
+      Player.InventoryCurrentItem := Player.Items.Count - 1 else
+    if Player.InventoryCurrentItem < 0 then
+      Player.InventoryCurrentItem := 0 else
+      Player.InventoryCurrentItem := ChangeIntCycle(
+        Player.InventoryCurrentItem, Change, Player.Items.Count - 1);
   end;
 
   procedure UpdateInventoryCurrentItemAfterDelete;
@@ -950,8 +928,8 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
     { update InventoryCurrentItem.
       Note that if Player.Items.Count = 0 now, then this will
       correctly set InventoryCurrentItem to -1. }
-    if InventoryCurrentItem >= Player.Items.Count then
-      InventoryCurrentItem := Player.Items.Count - 1;
+    if Player.InventoryCurrentItem >= Player.Items.Count then
+      Player.InventoryCurrentItem := Player.Items.Count - 1;
   end;
 
   procedure DropItem;
@@ -1028,12 +1006,12 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
       Exit;
     end;
 
-    if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
+    if Between(Player.InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
-      if GetItemDropPosition(Player.Items[InventoryCurrentItem].Kind,
+      if GetItemDropPosition(Player.Items[Player.InventoryCurrentItem].Kind,
         DropPosition) then
       begin
-        DropppedItem := Player.DropItem(InventoryCurrentItem);
+        DropppedItem := Player.DropItem(Player.InventoryCurrentItem);
         if DropppedItem <> nil then
         begin
           UpdateInventoryCurrentItemAfterDelete;
@@ -1062,9 +1040,9 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
       Exit;
     end;
 
-    if Between(InventoryCurrentItem, 0, Player.Items.Count - 1) then
+    if Between(Player.InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
-      UsedItem := Player.Items[InventoryCurrentItem];
+      UsedItem := Player.Items[Player.InventoryCurrentItem];
       UsedItem.Kind.Use(UsedItem);
       if UsedItem.Quantity = 0 then
       begin
@@ -1242,7 +1220,6 @@ begin
   Level := ALevel;
   Player := APlayer;
   InventoryVisible := false;
-  InventoryCurrentItem := -1;
   LevelFinishedSchedule := false;
   try
 
@@ -1289,12 +1266,7 @@ begin
         GLWinMessagesTheme.RectColor[3] := 0.4;
 
         if PrepareNewPlayer then
-        begin
           Level.PrepareNewPlayer(Player);
-          { Adjust InventoryCurrentItem, as player possibly got some items here. }
-          if Player.Items.Count > 0 then
-            InventoryCurrentItem := 0;
-        end;
 
         repeat
           Glwm.ProcessMessage(true);
