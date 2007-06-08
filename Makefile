@@ -38,13 +38,13 @@ FPC_WIN32_OPTIONS := -dRELEASE
 endif
 
 build-unix:
-	cd source/kambi_vrml_game_engine/; \
-	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg ../castle.dpr
+	cd ../kambi_vrml_game_engine/ && \
+	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg ../castle/source/castle.dpr
 	mv source/castle ./
 
 build-win32:
-	cd source/kambi_vrml_game_engine/; \
-	  fpc $(FPC_WIN32_OPTIONS) @kambi.cfg ../castle.dpr
+	cd ../kambi_vrml_game_engine/ && \
+	  fpc $(FPC_WIN32_OPTIONS) @kambi.cfg ../castle/source/castle.dpr
 	mv source/castle.exe ./castle.exe
 
 # ------------------------------------------------------------
@@ -60,6 +60,7 @@ clean:
 	                   -iname '*.dcu' -or -iname '*.dpu' -or \
 			   -iname '*~' -or \
 	                   -iname '*.~???' -or \
+			   -iname 'castle.compiled' -or \
 			   -iname '*.blend1' ')' -print \
 	     | xargs rm -f
 	rm -f castle-*.tar.gz
@@ -139,15 +140,17 @@ dist-core:
 	mv $(TMP_DIST_PATH)trunk/ $(TMP_DIST_PATH)castle
 	make -C $(TMP_DIST_PATH)castle/ clean clean_private
 	areFilenamesLower -i Makefile -i Makefile.common -i README $(TMP_DIST_PATH)castle/data/
-# Add libpng, zlib, openal for Windows
+# Add libpng, zlib, openal, oggvorbis for Windows
+# TODO: this is bad, copy only needed DLLs from win32_dlls/,
+# and not README, README~ etc. files
 	cp -f /win/mojewww/camelot/private/update_archives/win32_dlls/* $(TMP_DIST_PATH)castle/
 # Add documentation/ subdirectory
 	mkdir $(TMP_DIST_PATH)castle/documentation/
 #         Trzeba najpierw zrobiæ make clean bo dotychczasowe le¿±ce tam HTMLe
 #         mog³y byæ wygenerowane z innymi LOCALLY_AVAIL
-	cd $(CAMELOT_LOCAL_PATH)private/local_html_versions/; \
-	  $(MAKE) clean ; \
-	  $(MAKE) $(DOCUMENTATION_HTML_FILES) LOCALLY_AVAIL="$(DOCUMENTATION_HTML_FILES)" ; \
+	cd $(CAMELOT_LOCAL_PATH)private/local_html_versions/ && \
+	  $(MAKE) clean && \
+	  $(MAKE) $(DOCUMENTATION_HTML_FILES) LOCALLY_AVAIL="$(DOCUMENTATION_HTML_FILES)" && \
 	  cp $(DOCUMENTATION_HTML_FILES) $(TMP_DIST_PATH)castle/documentation/
 # Setup right permissions of things (in castle/trunk/ and libpng/zlib)
 # (because they are kept on FAT filesystem)
@@ -157,11 +160,11 @@ dist-core:
 	chmod 755 $(TMP_DIST_PATH)castle/castle
 # Copy and clean kambi_vrml_game_engine sources
 ifdef DIST_WITH_SRC
-	cd /win/mojewww/camelot/private/update_archives/; ./update_pascal_src.sh kambi_vrml_game_engine
+	cd /win/mojewww/camelot/private/update_archives/ && ./update_pascal_src.sh kambi_vrml_game_engine
 	cp /win/mojewww/camelot/src/pascal/kambi_vrml_game_engine-src.tar.gz $(TMP_DIST_PATH)castle/source/
-	cd $(TMP_DIST_PATH)castle/source/; tar xzf kambi_vrml_game_engine-src.tar.gz
+	cd $(TMP_DIST_PATH)castle/source/ && tar xzf kambi_vrml_game_engine-src.tar.gz
 	rm -f $(TMP_DIST_PATH)castle/source/kambi_vrml_game_engine-src.tar.gz
-	mv $(TMP_DIST_PATH)castle/source/COPYING $(TMP_DIST_PATH)castle/COPYING
+	mv $(TMP_DIST_PATH)castle/source/kambi_vrml_game_engine/COPYING $(TMP_DIST_PATH)castle/COPYING
 else
 	cp /usr/share/common-licenses/GPL-2 $(TMP_DIST_PATH)castle/COPYING
 endif
@@ -177,7 +180,7 @@ ifndef DIST_WITH_SRC
 	  ')' -exec rm -f '{}' ';'
 endif
 # Pack things
-	cd $(TMP_DIST_PATH); tar -c $(DIST_TAR_FILTER) -f \
+	cd $(TMP_DIST_PATH) && tar -c $(DIST_TAR_FILTER) -f \
 	  $(DIST_ARCHIVE_FILENAME) castle/
 	mv $(TMP_DIST_PATH)$(DIST_ARCHIVE_FILENAME) .
 
