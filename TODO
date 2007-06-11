@@ -521,9 +521,8 @@ dist-making to-dos:
 - real packages for Linux, depend (as recommend:) on OpenAL packages
 
 ----------------------------------------
-Each time before uploading release (to PGD and/or camelot):
+Each time before uploading release:
 
-- make sure Version (in castlehelp.pas) is good
 - test data/ things easy to forget:
   - All textures in VRML files must have relative filenames
       find data/ -type f -iname '*.wrl' | \
@@ -532,40 +531,29 @@ Each time before uploading release (to PGD and/or camelot):
         grep --invert-match "filename //../"
   - All sounds that are intended to be spatialized must be mono:
       wavidentify data/sounds/*.wav | grep stereo
-- under Linux and Windows:
-  - build debug exe from this dir, test
-      make -C /win/mojepasy/units/ clean
-      open source/castle.dpr,
-      C-F9
-      ./castle
-  - build release exe from this dir, test
-      make -C /win/mojepasy/units/ clean
-      open source/castle.dpr,
-      C-F10
-      ./castle
-  - On either Linux or Windows:
-    run generate_versions (this must be done before making dists,
-    because dists contain HTML files generated from our PHP files,
-    and there is recorded version of "The Castle"; so generate_versions
-    *must* be run *after new version is compiled* and
-    *before make dist is called*)
-  - make dist
-  - extract created dist
+
+- make sure Version (in castlehelp.pas) is good
+- Remember to test whether FPC version used was correct
+  (to avoid accidentaly compiling with some SVN intermediate version etc.)
+- make release like for all other programs, see
+  /win/mojewww/camelot/private/update_archives/README.
+
+- extract created dist
   - test running from extracted created dist
       rm -f ~/.castle.data
       ln -s /tmp/ggg/castle/ ~/.castle.data
       ./castle
       rm -f ~/.castle.data
       ln -s /win/mojepasy/openGL/castle/trunk/ ~/.castle.data
-  - Remember to test whether FPC version used was correct
-    (to avoid accidentaly compiling with some SVN intermediate version etc.)
   - test building from extracted created dist (using `make build-xxx')
+
 - upload to WWW:
   copy tar.gz to /win/mojewww/camelot/,
   upload to http://stoma.name/michalis
   upload to http://camelot.homedns.org/~michalis/ as usual
     (generate_versions should be already done,
     make md5, upload, html_apply_ontheway),
+
 - make svntag
   check by
     svn list file:///home/michal/svn/kambi-svn-repos/castle/tags/
