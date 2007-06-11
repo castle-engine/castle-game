@@ -49,7 +49,7 @@ begin
   MessageOK(Glw,
     SCastleVersionWWW + nl +
     nl+
-    'Author: Michalis Kamburelis, aka Kambi <michalis@camelot.homedns.org>' +nl+
+    'Author: Michalis Kamburelis, aka Kambi <michalis.kambi@gmail.com>' +nl+
     nl+
     'Szymon Stoma and Kaska Zaremba designed and modelled the scenario ' +
     'on "The Gate" level, provided models for many objects (keys, ' +
