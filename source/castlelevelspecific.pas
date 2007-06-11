@@ -29,7 +29,7 @@ uses VRMLGLAnimation, VRMLFlatSceneGL, Boxes3d, VectorMath,
   CastleCreatures;
 
 const
-  CastleHallWerewolvesCount = 5;
+  CastleHallWerewolvesCount = 4;
 
 type
   TCastleHallLevel = class(TLevel)
