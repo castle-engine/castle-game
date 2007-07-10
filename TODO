@@ -1,5 +1,14 @@
-----------------------------------------
-post-0.7.0 release:
+- make gamma correction.
+    Windows: http://www.delphi3d.net/articles/viewarticle.php?article=gamma.htm
+
+- test with 2.1.4, what is the speed improvement ? post to pgd forums.
+- test IIUni Windows sound
+
+- Plany na bardzo najbli¿sz± przysz³o¶æ to
+  przej¶cie z camelot.homedns.org na sourceforge.net
+  (Dino, thanks for all the fish :) ). Oraz skoñczenie cieni.
+
+- VRML 97 test level, see TODO.vrml97 notes and castle-development.php
 
 - Kasia usability test:
   - mouse over yes/no message boxes should work (confirmed Eric)
