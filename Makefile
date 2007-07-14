@@ -13,7 +13,7 @@ default: info
 	$(MAKE) -C data/items/sword/
 	$(MAKE) -C data/levels/
 
-VERSION := $(shell ./castle --version)
+VERSION := $(shell castle --version)
 
 info:
 	@echo 'Version is '$(VERSION)
@@ -92,8 +92,8 @@ clean_private:
 # Set SVN tag.
 
 svntag:
-	svn copy file:///home/michal/svn/kambi-svn-repos/castle/trunk/ \
-	         file:///home/michal/svn/kambi-svn-repos/castle/tags/$(VERSION) \
+	svn copy svn://kocury/castle/trunk/ \
+	         svn://kocury/castle/tags/$(VERSION) \
 	  -m "Tagging the $(VERSION) version of 'The Castle'."
 
 # eof ------------------------------------------------------------
