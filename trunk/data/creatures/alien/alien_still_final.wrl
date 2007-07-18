@@ -1,6 +1,0 @@
-#VRML V1.0 ascii
-
-Group {
-  WWWInline { name "alien_header.wrl" separate FALSE }
-  WWWInline { name "alien_still.wrl" }
-}

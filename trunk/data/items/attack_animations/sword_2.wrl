@@ -1,9 +1,0 @@
-#VRML V1.0 ascii
-
-Group {
-  Rotation {
-    rotation 0 1 0 +0.7
-  }
-  WWWInline { name "sword_header.wrl" separate FALSE }
-  WWWInline { name "../models/sword.wrl" }
-}
