@@ -1,8 +1,0 @@
-#VRML V1.0 ascii
-
-Group {
-  ShapeHints {
-    creaseAngle 4 # > Pi
-  }
-  WWWInline { name "scroll.wrl" }
-}
