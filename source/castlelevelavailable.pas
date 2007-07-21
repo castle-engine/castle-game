@@ -105,7 +105,7 @@ implementation
 
 uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
   CastleLevelSpecific, XMLRead, CastleWindow, KambiGLUtils,
-  Images, GLWindow, GLWinModes;
+  Images, GLWindow, GLWinModes, KambiTimeUtils;
 
 {$define read_implementation}
 {$I objectslist_1.inc}

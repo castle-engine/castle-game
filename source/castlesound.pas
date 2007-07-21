@@ -256,7 +256,7 @@ implementation
 
 uses CastleConfig, ProgressUnit, OpenAL, ALUtils, KambiUtils,
   KambiFilesUtils, CastleLog, DOM, XMLRead, KambiXMLUtils,
-  SoundFile, VorbisFile, KambiStringUtils;
+  SoundFile, VorbisFile, KambiStringUtils, KambiTimeUtils;
 
 const
   { Each sound has a unique name, used to identify sound in sounds/index.xml file.

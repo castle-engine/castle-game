@@ -42,7 +42,7 @@ procedure WritelnLog(const LogType: TLogType; const LogMessage: string);
 implementation
 
 uses Classes, KambiUtils, KambiClassUtils, GLWinMessages, CastleHelp,
-  SysUtils;
+  SysUtils, KambiTimeUtils;
 
 procedure GLWinMessageLog(Text: TStringList);
 begin
