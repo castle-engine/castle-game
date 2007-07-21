@@ -18,6 +18,12 @@ VERSION := $(shell castle --version)
 info:
 	@echo 'Version is '$(VERSION)
 
+# Simple install.
+# You may as well symlink to /usr/local/share/castle, for system-wide install.
+install:
+	rm -f $(HOME)/.castle.data
+	ln -s $(shell pwd) $(HOME)/.castle.data
+
 # ------------------------------------------------------------
 # Building targets.
 #
