@@ -832,7 +832,7 @@ type
       exists on this level. }
     property BossCreature: TCreature read FBossCreature;
 
-    { See [http://www.camelot.homedns.org/~michalis/castle-development.php]
+    { See [http://vrmlengine.sourceforge.net/castle-development.php]
       for description of LevelBox and WaterBox trick.
       Remember that this may change Scene.BoundingBox (in case we will
       find and remove the node from Scene). }

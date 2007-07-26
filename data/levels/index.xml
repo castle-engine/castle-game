@@ -25,7 +25,7 @@
     octree_max_depth, octree_max_leaf_items_count:
     octree generation parameters. Default value is -1,
     and it means that the default values in VRMLTriangleOctree unit
-    (see e.g. [http://www.camelot.homedns.org/~michalis/src/pascal/docs/html/VRMLTriangleOctree.html]
+    (see e.g. [http://vrmlengine.sourceforge.net/apidoc/html/VRMLTriangleOctree.html]
     or just look in the sources) will be used.
 
     It's adviced to use these options only if you see a real difference

@@ -5,8 +5,7 @@
 - test IIUni Windows sound
 
 - Plany na bardzo najbli¿sz± przysz³o¶æ to
-  przej¶cie z camelot.homedns.org na sourceforge.net
-  (Dino, thanks for all the fish :) ). Oraz skoñczenie cieni.
+  ... oraz skoñczenie cieni.
 
 - VRML 97 test level, see TODO.vrml97 notes and castle-development.php
 
@@ -557,13 +556,10 @@ Each time before uploading release:
   - test building from extracted created dist (using `make build-xxx')
 
 - upload to WWW:
-  copy tar.gz to /win/mojewww/camelot/,
-  upload to http://stoma.name/michalis
-  upload to http://camelot.homedns.org/~michalis/ as usual
-    (generate_versions should be already done,
-    make md5, upload, html_apply_ontheway),
+  release on SourceForge as usual (verify that file uploaded ok)
 
-- make svntag
+- TODO: this needs update for SF SVN
+  make svntag
   check by
     svn list file:///home/michal/svn/kambi-svn-repos/castle/tags/
 

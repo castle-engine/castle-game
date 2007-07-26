@@ -41,7 +41,7 @@ function SCastleVersionWWW: string;
 begin
   Result :=
     ApplicationName + ' version ' + Version + '.' +nl+
-    'WWW: http://www.camelot.homedns.org/~michalis/castle.php';
+    'WWW: http://vrmlengine.sourceforge.net/castle.php';
 end;
 
 procedure ShowCreditsMessage;
