@@ -68,6 +68,8 @@ const
 
   DefaultHitsPlayer = true;
   DefaultHitsCreatures = false;
+  DefaultFallsDown = false;
+  DefaultFallsDownSpeed = 0.003;
 
   DefaultMiddlePositionHeight = 1.0;
 
@@ -555,6 +557,8 @@ type
     FSoundIdle: TSoundType;
     FHitsPlayer: boolean;
     FHitsCreatures: boolean;
+    FFallsDown: boolean;
+    FFallsDownSpeed: Single;
   protected
     procedure FreePrepareRender; override;
   public
@@ -610,6 +614,12 @@ type
       read FHitsPlayer write FHitsPlayer default DefaultHitsPlayer;
     property HitsCreatures: boolean
       read FHitsCreatures write FHitsCreatures default DefaultHitsCreatures;
+
+    property FallsDown: boolean
+      read FFallsDown write FFallsDown default DefaultFallsDown;
+
+    property FallsDownSpeed: Single
+      read FFallsDownSpeed write FFallsDownSpeed default DefaultFallsDownSpeed;
   end;
 
   { This is a really dumb creature that just stays still during the whole
@@ -1597,6 +1607,8 @@ begin
   FPauseBetweenSoundIdle := DefaultPauseBetweenSoundIdle;
   FHitsPlayer := DefaultHitsPlayer;
   FHitsCreatures := DefaultHitsCreatures;
+  FFallsDown := DefaultFallsDown;
+  FFallsDownSpeed := DefaultFallsDownSpeed;
 end;
 
 destructor TMissileCreatureKind.Destroy;
@@ -1664,6 +1676,11 @@ begin
   HitsCreatures :=
     KindsConfig.GetValue(VRMLNodeName + '/hits_creatures',
     DefaultHitsCreatures);
+  FFallsDown :=
+    KindsConfig.GetValue(VRMLNodeName + '/falls_down', DefaultFallsDown);
+  FFallsDownSpeed :=
+    KindsConfig.GetFloat(VRMLNodeName + '/falls_down_speed',
+    DefaultFallsDownSpeed);
 
   SoundExplosion := SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_explosion', ''));
@@ -3480,6 +3497,22 @@ begin
         { TODO: projectiles shouldn't do here "break". }
         break;
       end;
+  end;
+
+  if MissileKind.FallsDown and
+     (MissileKind.FallsDownSpeed <> 0) then
+  begin
+    NewDirection := Direction;
+    NewDirection[2] -= MissileKind.FallsDownSpeed * CompSpeed;
+
+    { Above makes Direction potentially not normalized, but very slowly
+      (MissileKind.FallsDownSpeed is very small...) so it would be a waste
+      of time to call Normalize(Sqrt) each Idle. Call it only when it's really
+      much needed. }
+    if not Between(VectorLenSqr(NewDirection), Sqr(0.8), Sqr(1.2)) then
+      NormalizeTo1st(NewDirection);
+
+    Direction := NewDirection;
   end;
 
   if MissileKind.CloseDirectionToPlayer and

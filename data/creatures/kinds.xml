@@ -432,6 +432,9 @@
     camera_radius="0.3"
 
     sound_explosion="arrow_hit"
+
+    falls_down="True"
+    falls_down_speed="0.003"
   >
 
     <short_range_attack knockback_distance="5">
