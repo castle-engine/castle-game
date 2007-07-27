@@ -659,6 +659,18 @@ var
     end;
   end;
 
+  procedure SickProjection;
+  var
+    S, C: Extended;
+  begin
+    SinCos(Level.AnimationTime * Player.SickProjectionSpeed, S, C);
+    ProjectionGLPerspective(
+      ViewAngleDegY + ViewAngleDegY * C * 0.03,
+      Glwin.Width / Glwin.Height +
+      Glwin.Width / Glwin.Height * S * 0.03,
+      Level.ProjectionNear, Level.ProjectionFar);
+  end;
+
 const
   GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
   GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
@@ -673,6 +685,9 @@ begin
 
   Level.Idle(CompSpeed);
   Level.Items.Idle(CompSpeed);
+
+  if Player.Swimming = psUnderWater then
+    SickProjection;
 
   if (not GameWin) and (not DebugTimeStopForCreatures) then
     Level.Creatures.Idle(CompSpeed);

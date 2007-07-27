@@ -168,6 +168,7 @@ type
     KnockBackSpeed: Single;
 
     FInventoryCurrentItem: Integer;
+    FSickProjectionSpeed: Single;
   public
     constructor Create;
     destructor Destroy; override;
@@ -391,6 +392,9 @@ type
     property InventoryCurrentItem: Integer
       read FInventoryCurrentItem write FInventoryCurrentItem
       default -1;
+
+    property SickProjectionSpeed: Single
+      read FSickProjectionSpeed write FSickProjectionSpeed;
   end;
 
 implementation
@@ -1375,6 +1379,8 @@ begin
     Navigator.HeadBobbingDistance :=
       PlayerConfig.GetFloat('player/head_bobbing_distance',
       DefaultHeadBobbingDistance);
+    SickProjectionSpeed := PlayerConfig.GetFloat('player/sick_projection_speed',
+      10.0);
   finally SysUtils.FreeAndNil(PlayerConfig); end;
 end;
 

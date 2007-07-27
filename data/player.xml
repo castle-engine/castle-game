@@ -17,6 +17,7 @@
 <CONFIG>
   <player
     knock_back_speed="0.3"
+    sick_projection_speed="2"
     head_bobbing_distance="25.0">
     <!-- head_bobbing_distance is adjusted to match
          nicely with our footsteps sound
