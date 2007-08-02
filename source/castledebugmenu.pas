@@ -206,7 +206,7 @@ begin
          DebugRenderForLevelScreenshotArgument.Value :=
            DebugRenderForLevelScreenshot;
        end;
-    7: ReadSoundInfos;
+    7: SoundEngine.ReadSoundInfos;
     8: begin
          FreeAndNil(EditLevelLightsMenu);
          EditLevelLightsMenu := TEditLevelLightsMenu.Create;

@@ -118,7 +118,7 @@ begin
     LastBeginTime := Level.AnimationTime;
     NextBeginTime := Level.AnimationTime + 10 + Random(20);
 
-    {ThunderAllocatedSound := }Sound(stThunder);
+    {ThunderAllocatedSound := }SoundEngine.Sound(stThunder);
   end;
 end;
 

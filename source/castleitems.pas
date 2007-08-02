@@ -26,7 +26,7 @@ interface
 uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
   KambiClassUtils, Images, OpenGLh, CastleSound,
   VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds,
-  KambiXMLCfg;
+  KambiXMLCfg, GameSoundEngine;
 
 const
   DefaultItemDamageConst = 5.0;
@@ -593,7 +593,7 @@ begin
     Player.Life := Min(Player.Life + 50, Player.MaxLife);
     TimeMessage(Format('You drink "%s"', [Item.Kind.Name]));
     Item.Quantity := Item.Quantity - 1;
-    Sound(stPlayerPotionDrink);
+    SoundEngine.Sound(stPlayerPotionDrink);
   end else
     TimeMessage('You feel quite alright, no need to waste this potion');
 end;
@@ -690,9 +690,9 @@ begin
   FScreenImageAlignLeft := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_left', false);
   FScreenImageAlignBottom := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_bottom', true);
 
-  EquippingSound := SoundFromName(
+  EquippingSound := SoundEngine.SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/equipping_sound', ''));
-  SoundAttackStart := SoundFromName(
+  SoundAttackStart := SoundEngine.SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_attack_start', ''));
 
   { TODO: TItemWeaponKind impl allows to have FAttackAnimationInfo = nil
@@ -754,7 +754,7 @@ begin
   if QuiverIndex = -1 then
   begin
     TimeMessage('You have no arrows');
-    Sound(stPlayerInteractFailed);
+    SoundEngine.Sound(stPlayerInteractFailed);
   end else
   begin
     { delete arrow from player }
@@ -769,7 +769,7 @@ begin
     Missile := Arrow.CreateDefaultCreature(MissilePosition, MissileDirection,
       Level.AnimationTime, Arrow.DefaultMaxLife);
     Level.Creatures.Add(Missile);
-    Sound(stArrowFired);
+    SoundEngine.Sound(stArrowFired);
   end;
 end;
 
@@ -780,7 +780,7 @@ begin
   TimeMessage(Format('You cast spell from "%s"', [Item.Kind.Name]));
   Player.FlyingModeTimeoutBegin(30.0);
   Item.Quantity := Item.Quantity - 1;
-  Sound(stPlayerCastFlyingSpell);
+  SoundEngine.Sound(stPlayerCastFlyingSpell);
 end;
 
 { TItem ------------------------------------------------------------ }

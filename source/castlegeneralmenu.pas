@@ -43,13 +43,13 @@ uses SysUtils, GLWindow, CastleWindow, CastleSound;
 procedure TCastleMenu.CurrentItemChanged;
 begin
   inherited;
-  Sound(stMenuCurrentItemChanged);
+  SoundEngine.Sound(stMenuCurrentItemChanged);
 end;
 
 procedure TCastleMenu.CurrentItemSelected;
 begin
   inherited;
-  Sound(stMenuCurrentItemSelected);
+  SoundEngine.Sound(stMenuCurrentItemSelected);
 end;
 
 procedure TCastleMenu.SomethingChanged;

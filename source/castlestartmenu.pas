@@ -38,7 +38,8 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, ALUtils, OpenAL, KambiClassUtils, CastleSoundMenu,
-  CastleTimeMessages, CastleLevelAvailable, CastleDemoLevel;
+  CastleTimeMessages, CastleLevelAvailable, CastleDemoLevel,
+  GameSoundEngine;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -131,9 +132,9 @@ begin
     finally FreeAndNil(LocalPlayer) end;
   finally FreeAndNil(LocalLevel) end;
 
-  MusicPlayer.PlayedSound := stIntroMusic;
-  SoundMenu.SoundVolumeSlider.Value := SoundVolume;
-  SoundMenu.MusicVolumeSlider.Value := MusicVolume;
+  SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
+  SoundMenu.SoundVolumeSlider.Value := SoundEngine.SoundVolume;
+  SoundMenu.MusicVolumeSlider.Value := SoundEngine.MusicPlayer.MusicVolume;
   TimeMessagesClear;
 end;
 
@@ -499,8 +500,8 @@ constructor TSoundMenu.Create;
 begin
   inherited Create;
 
-  SoundVolumeSlider := TSoundVolumeSlider.Create(SoundVolume);
-  MusicVolumeSlider := TSoundVolumeSlider.Create(MusicVolume);
+  SoundVolumeSlider := TSoundVolumeSlider.Create(SoundEngine.SoundVolume);
+  MusicVolumeSlider := TSoundVolumeSlider.Create(SoundEngine.MusicPlayer.MusicVolume);
 
   OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
   OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
@@ -533,8 +534,8 @@ end;
 procedure TSoundMenu.CurrentItemAccessoryValueChanged;
 begin
   case CurrentItem of
-    1: SoundVolume := SoundVolumeSlider.Value;
-    2: MusicVolume := MusicVolumeSlider.Value;
+    1: SoundEngine.SoundVolume := SoundVolumeSlider.Value;
+    2: SoundEngine.MusicPlayer.MusicVolume := MusicVolumeSlider.Value;
   end;
 end;
 
@@ -571,15 +572,15 @@ begin
 
   if CurrentItem < OpenALDevices.Count then
   begin
-    ALContextClose;
+    SoundEngine.ALContextClose;
 
     OpenALRestart;
 
     ALCDevice := OpenALDevices[CurrentItem];
     SoundMenu.OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
-    ALContextInit(false);
+    SoundEngine.ALContextInit(false);
     if not ALActive then
-      MessageOK(Glw, SoundInitializationReport, taLeft);
+      MessageOK(Glw, SoundEngine.SoundInitializationReport, taLeft);
   end;
 
   CurrentMenu := SoundMenu;
@@ -699,7 +700,7 @@ var
 begin
   DemoLevelBegin;
   try
-    MusicPlayer.PlayedSound := stIntroMusic;
+    SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
     try
       SavedMode := TGLMode.Create(glw, 0, false);
       try
@@ -725,7 +726,7 @@ begin
         until UserQuit;
 
       finally FreeAndNil(SavedMode); end;
-    finally MusicPlayer.PlayedSound := stNone; end;
+    finally SoundEngine.MusicPlayer.PlayedSound := stNone; end;
   finally
     DemoLevelEnd;
   end;

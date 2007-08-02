@@ -599,7 +599,7 @@ begin
 
   glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
 
-  MusicPlayer.PlayedSound := Level.PlayedMusicSound;
+  SoundEngine.MusicPlayer.PlayedSound := Level.PlayedMusicSound;
 
   { First TimeMessage for this level. }
   TimeMessage('Loaded level "' + Level.Title + '"');
@@ -746,7 +746,7 @@ begin
   if ALActive then
   begin
     CheckAL('game loop (check in OnTimer)');
-    ALRefreshUsedSources;
+    SoundEngine.ALRefreshUsedSources;
   end;
 end;
 
@@ -902,7 +902,7 @@ begin
       if not TryInteractAroundSquare(50) then
         if not TryInteractAroundSquare(100) then
           if not TryInteractAroundSquare(200) then
-            Sound(stPlayerInteractFailed);
+            SoundEngine.Sound(stPlayerInteractFailed);
 end;
 
 procedure MaybeDeadWinMessage;
@@ -1309,7 +1309,7 @@ begin
   begin
     TimeMessage('Congratulations, game finished');
     GameWin := true;
-    MusicPlayer.PlayedSound := stGameWinMusic;
+    SoundEngine.MusicPlayer.PlayedSound := stGameWinMusic;
   end else
   begin
     if LevelFinishedSchedule and
@@ -1329,7 +1329,7 @@ begin
   FileName := FnameAutoInc(ApplicationName + '_screen_%d.png');
   Glw.SaveScreen(FileName);
   TimeMessage('Screen saved to ' + FileName);
-  Sound(stSaveScreen);
+  SoundEngine.Sound(stSaveScreen);
 end;
 
 { initialization / finalization ---------------------------------------------- }

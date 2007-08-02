@@ -25,7 +25,7 @@ interface
 
 uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh,
   VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
-  VRMLTriangleOctree, CastleTextures;
+  VRMLTriangleOctree, CastleTextures, GameSoundEngine;
 
 const
   DefaultMaxLife = 100;
@@ -496,7 +496,7 @@ begin
     S += Format(' (quantity %d)', [Item.Quantity]);
   TimeMessage(S);
 
-  Sound(stPlayerPickItem);
+  SoundEngine.Sound(stPlayerPickItem);
 
   Result := Items.Stackable(Item);
   if Result <> -1 then
@@ -560,7 +560,7 @@ begin
     S += Format(' (quantity %d)', [Result.Quantity]);
   TimeMessage(S);
 
-  Sound(stPlayerDropItem);
+  SoundEngine.Sound(stPlayerDropItem);
 end;
 
 function TPlayer.DeleteItem(ItemIndex: Integer): TItem;
@@ -608,7 +608,7 @@ begin
       TimeMessage(Format('You''re using weapon "%s" now',
         [EquippedWeapon.Kind.Name]));
       Assert(EquippedWeapon.Kind is TItemWeaponKind);
-      Sound(EquippedWeaponKind.EquippingSound);
+      SoundEngine.Sound(EquippedWeaponKind.EquippingSound);
     end;
 
     { Any attack done with previous weapon must be stopped now. }
@@ -942,7 +942,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
               TimeMessage('You''re drowning');
             SwimLastDrownTime := Level.AnimationTime;
             Life := Life - (5 + Random(10));
-            Sound(stPlayerDrowning);
+            SoundEngine.Sound(stPlayerDrowning);
           end;
         end;
       end;
@@ -956,7 +956,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
            (Level.AnimationTime - SwimLastSoundTime > SwimSoundPauseSeconds) ) then
       begin
         SwimLastSoundTime := Level.AnimationTime;
-        AllocatedSwimmingSource := Sound(stPlayerSwimming);
+        AllocatedSwimmingSource := SoundEngine.Sound(stPlayerSwimming);
         if AllocatedSwimmingSource <> nil then
           AllocatedSwimmingSource.OnUsingEnd :=
             @AllocatedSwimmingSourceUsingEnd;
@@ -1010,7 +1010,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
         LavaLastDamageTime := Level.AnimationTime;
         if not Dead then
         begin
-          Sound(stPlayerLavaPain);
+          SoundEngine.Sound(stPlayerLavaPain);
           SetLifeCustomBlackout(Life - (GroundRule.LavaDamageConst +
             Random * GroundRule.LavaDamageRandom), Green3Single);
         end;
@@ -1087,7 +1087,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       if NewFootstepsSoundPlaying <> stNone then
       begin
         { Start footsteps sound. }
-        AllocatedFootstepsSource := Sound(NewFootstepsSoundPlaying, false);
+        AllocatedFootstepsSource := SoundEngine.Sound(NewFootstepsSoundPlaying, false);
         if AllocatedFootstepsSource <> nil then
         begin
           { Lower the position, to be on our feet. }
@@ -1198,7 +1198,7 @@ procedure TPlayer.FalledDown(Navigator: TMatrixWalker;
 begin
   if (Swimming = psNo) and (FallenHeight > 4.0) then
   begin
-    Sound(stPlayerFalledDown);
+    SoundEngine.Sound(stPlayerFalledDown);
     if FallenHeight > Navigator.MaxJumpDistance * 1.5 then
       Life := Life - Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
   end;
@@ -1210,13 +1210,13 @@ begin
   if (Life > 0) and (Value <= 0) then
   begin
     TimeMessage('You die');
-    Sound(stPlayerDies);
+    SoundEngine.Sound(stPlayerDies);
     Navigator.FallOnTheGround;
   end else
   if (Life - Value) > 1 then
   begin
     BlackOut(Color);
-    Sound(stPlayerSuddenPain);
+    SoundEngine.Sound(stPlayerSuddenPain);
   end;
   FLife := Value;
 end;
@@ -1237,7 +1237,7 @@ begin
   begin
     if EquippedWeapon <> nil then
     begin
-      Sound(EquippedWeaponKind.SoundAttackStart);
+      SoundEngine.Sound(EquippedWeaponKind.SoundAttackStart);
       AttackStartTime := Level.AnimationTime;
       Attacking := true;
       ActualAttackDone := false;
@@ -1303,7 +1303,7 @@ begin
         of each other). }
       if AllocatedSwimmingChangeSource = nil then
       begin
-        AllocatedSwimmingChangeSource := Sound(stPlayerSwimmingChange);
+        AllocatedSwimmingChangeSource := SoundEngine.Sound(stPlayerSwimmingChange);
         if AllocatedSwimmingChangeSource <> nil then
           AllocatedSwimmingChangeSource.OnUsingEnd :=
             @AllocatedSwimmingChangeSourceUsingEnd;

@@ -26,7 +26,7 @@ interface
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSourceAllocator, KambiXMLCfg,
-  VRMLTriangleOctree;
+  VRMLTriangleOctree, GameSoundEngine;
 
 {$define read_interface}
 
@@ -1226,9 +1226,9 @@ begin
   CastsShadow :=
     KindsConfig.GetValue(VRMLNodeName + '/casts_shadow', DefaultCastsShadow);
 
-  SoundSuddenPain := SoundFromName(
+  SoundSuddenPain := SoundEngine.SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_sudden_pain', ''));
-  SoundDying := SoundFromName(
+  SoundDying := SoundEngine.SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_dying', ''));
 end;
 
@@ -1459,7 +1459,7 @@ begin
     KindsConfig.GetFloat(VRMLNodeName + '/random_walk_distance',
     DefaultCreatureRandomWalkDistance);
 
-  SoundAttackStart := SoundFromName(
+  SoundAttackStart := SoundEngine.SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_attack_start', ''));
 
   AnimationFromConfig(FStandAnimationInfo, KindsConfig, 'stand');
@@ -1682,9 +1682,9 @@ begin
     KindsConfig.GetFloat(VRMLNodeName + '/falls_down_speed',
     DefaultFallsDownSpeed);
 
-  SoundExplosion := SoundFromName(
+  SoundExplosion := SoundEngine.SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_explosion', ''));
-  SoundIdle := SoundFromName(
+  SoundIdle := SoundEngine.SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_idle', ''));
 
   AnimationFromConfig(FAnimationInfo, KindsConfig, 'fly');
@@ -1831,7 +1831,7 @@ var
   SoundPosition: TVector3Single;
 begin
   SoundPosition := VLerpLegsMiddlePosition(SoundHeight);
-  NewSource := CastleSound.Sound3d(SoundType, SoundPosition);
+  NewSource := SoundEngine.Sound3d(SoundType, SoundPosition);
   if TiedToCreature and (NewSource <> nil) then
   begin
     UsedSounds.Add(NewSource);
@@ -3563,7 +3563,7 @@ begin
     --- because when the creature will be destroyed (and missile will
     be destroyed in nearest RemoveFromLevel pass), we want this sound
     to go on. }
-  CastleSound.Sound3d(MissileKind.SoundExplosion, LegsPosition);
+  SoundEngine.Sound3d(MissileKind.SoundExplosion, LegsPosition);
 
   Life := 0.0;
 

@@ -187,7 +187,7 @@ begin
   { init OpenAL (after initing Glw and Progress, because ALContextInit
     wants to display progress of "Loading sounds") }
   DrawInitialBackground;
-  ALContextInit(WasParam_NoSound);
+  SoundEngine.ALContextInit(WasParam_NoSound);
   try
     ShowStartMenu;
   finally
@@ -198,7 +198,7 @@ begin
     if Glw.Closed then
       Progress.UserInterface := ProgressNullInterface;
 
-    ALContextClose;
+    SoundEngine.ALContextClose;
   end;
 end.
 

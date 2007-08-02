@@ -29,12 +29,11 @@ uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
-  BackgroundGL, VRMLGLHeadlight, DOM;
+  BackgroundGL, VRMLGLHeadlight, DOM, GameSoundEngine;
 
 {$define read_interface}
 
 const
-  DefaultFootstepsSound = stPlayerFootstepsConcrete;
   DefaultGlobalAmbientLight: TVector4Single = (0.2, 0.2, 0.2, 1.0);
 
 type
@@ -1115,8 +1114,9 @@ type
     property PlayedMusicSound: TSoundType
       read FPlayedMusicSound write FPlayedMusicSound default stNone;
 
+    { This is read from level XML file, stPlayerFootstepsConcrete by default. }
     property FootstepsSound: TSoundType
-      read FFootstepsSound write FFootstepsSound default DefaultFootstepsSound;
+      read FFootstepsSound write FFootstepsSound;
 
     { This is the nice name of the level. }
     property Title: string read FTitle;
@@ -1934,7 +1934,7 @@ begin
     at a time. }
   if UsedSound <> nil then
     UsedSound.DoUsingEnd;
-  UsedSound := Sound3d(SoundType, SoundPosition, Looping);
+  UsedSound := SoundEngine.Sound3d(SoundType, SoundPosition, Looping);
 
   if UsedSound <> nil then
     UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
@@ -2603,12 +2603,12 @@ begin
     TLevelAvailable.LoadFromDOMElement) }
 
   if DOMGetAttribute(Element, 'played_music_sound', SoundName) then
-    PlayedMusicSound := SoundFromName(SoundName) else
+    PlayedMusicSound := SoundEngine.SoundFromName(SoundName) else
     PlayedMusicSound := stNone;
 
   if DOMGetAttribute(Element, 'footsteps_sound', SoundName) then
-    FootstepsSound := SoundFromName(SoundName) else
-    FootstepsSound := DefaultFootstepsSound;
+    FootstepsSound := SoundEngine.SoundFromName(SoundName) else
+    FootstepsSound := stPlayerFootstepsConcrete;
 end;
 
 function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
@@ -3138,7 +3138,7 @@ end;
 procedure TLevel.TimeMessageInteractFailed(const S: string);
 begin
   TimeMessage(S);
-  Sound(stPlayerInteractFailed);
+  SoundEngine.Sound(stPlayerInteractFailed);
 end;
 
 function TLevel.BossCreatureIndicator(out Life, MaxLife: Single): boolean;

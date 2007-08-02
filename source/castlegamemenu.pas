@@ -100,8 +100,8 @@ constructor TGameSoundMenu.Create;
 begin
   inherited Create;
 
-  SoundVolumeSlider := TSoundVolumeSlider.Create(SoundVolume);
-  MusicVolumeSlider := TSoundVolumeSlider.Create(MusicVolume);
+  SoundVolumeSlider := TSoundVolumeSlider.Create(SoundEngine.SoundVolume);
+  MusicVolumeSlider := TSoundVolumeSlider.Create(SoundEngine.MusicPlayer.MusicVolume);
 
   Items.Add('View sound information');
   Items.AddObject('Volume', SoundVolumeSlider);
@@ -127,8 +127,8 @@ end;
 procedure TGameSoundMenu.CurrentItemAccessoryValueChanged;
 begin
   case CurrentItem of
-    1: SoundVolume := SoundVolumeSlider.Value;
-    2: MusicVolume := MusicVolumeSlider.Value;
+    1: SoundEngine.SoundVolume := SoundVolumeSlider.Value;
+    2: SoundEngine.MusicPlayer.MusicVolume := MusicVolumeSlider.Value;
   end;
 end;
 
@@ -160,8 +160,8 @@ var
 begin
   DrawUnderMenu := ADrawUnderMenu;
 
-  GameSoundMenu.SoundVolumeSlider.Value := SoundVolume;
-  GameSoundMenu.MusicVolumeSlider.Value := MusicVolume;
+  GameSoundMenu.SoundVolumeSlider.Value := SoundEngine.SoundVolume;
+  GameSoundMenu.MusicVolumeSlider.Value := SoundEngine.MusicPlayer.MusicVolume;
 
   SavedMode := TGLMode.Create(Glw, 0, true);
   try

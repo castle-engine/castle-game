@@ -1,3 +1,6 @@
+- changing al device doesn't work in "the castle" ?
+  broken by GameSoundEngine changes, or by some openal changes ?
+
 - make gamma correction.
     Windows: http://www.delphi3d.net/articles/viewarticle.php?article=gamma.htm
 

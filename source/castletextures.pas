@@ -23,7 +23,8 @@ unit CastleTextures;
 
 interface
 
-uses KambiUtils, KambiClassUtils, CastleSound, VRMLTriangleOctree, DOM;
+uses KambiUtils, KambiClassUtils, CastleSound, VRMLTriangleOctree, DOM,
+  GameSoundEngine;
 
 {$define read_interface}
 
@@ -97,7 +98,7 @@ begin
     'footsteps_sound', FootstepsSoundName) and
     (FootstepsSoundName <> '');
   if HasFootstepsSound then
-    FootstepsSound := SoundFromName(FootstepsSoundName);
+    FootstepsSound := SoundEngine.SoundFromName(FootstepsSoundName);
 
   SubElements := Element.ChildNodes;
   try
@@ -136,6 +137,8 @@ var
   I: Integer;
 begin
   FreeContents;
+
+  Assert(SoundEngine <> nil);
 
   ReadXMLFile(TextureConfig, ProgramDataPath + 'data' +
     PathDelim + 'textures' + PathDelim + 'index.xml');

@@ -175,8 +175,11 @@ type
     procedure Idle; override;
 
     property MovePushesOthers default false;
+
+    { No way to express this:
     property SoundGoBeginPosition default stDoorClose;
     property SoundGoEndPosition default stDoorOpen;
+    }
   end;
 
   TDoomE1M1Level = class(TLevel)
@@ -343,7 +346,7 @@ var
     if StairsBlocker.Exists then
     begin
       StairsBlocker.Exists := false;
-      Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.Scene.BoundingBox));
+      SoundEngine.Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.Scene.BoundingBox));
     end;
   end;
 
@@ -405,7 +408,7 @@ begin
     begin
       Symbol.Play;
       Symbol.Collides := false;
-      Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
+      SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
 
       WerewolfAppear;
     end;
@@ -584,7 +587,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
       Player.Navigator.CameraPos := Destination;
       Player.Navigator.CancelFallingDown;
 
-      Sound(stTeleport);
+      SoundEngine.Sound(stTeleport);
     end;
   end;
 
@@ -594,7 +597,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
     CreaturePosition, CreatureDirection: TVector3Single;
     Creature: TCreature;
   begin
-    Sound(stSacrilegeAmbush);
+    SoundEngine.Sound(stSacrilegeAmbush);
     for I := 0 to High(SacrilegeAmbushStartingPosition) do
     begin
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
@@ -642,7 +645,7 @@ begin
       RejectGateExitBox;
     end else
     begin
-      Sound(stKeyDoorUse);
+      SoundEngine.Sound(stKeyDoorUse);
       LevelFinished('castle_hall');
     end;
   end else
@@ -673,7 +676,7 @@ begin
   if AnimationTime - CartLastSoundTime > CartSoundRepeatTime then
   begin
     CartLastSoundTime := AnimationTime;
-    Sound3d(stCreak, CartSoundPosition);
+    SoundEngine.Sound3d(stCreak, CartSoundPosition);
   end;
 end;
 
@@ -822,7 +825,7 @@ procedure TCagesLevel.SetDoEndSequence(Value: boolean);
 begin
   { Changing from false to true ? Make sound. }
   if (not FDoEndSequence) and Value then
-    Sound(stKeyDoorUse);
+    SoundEngine.Sound(stKeyDoorUse);
 
   FDoEndSequence := Value;
   FEndSequence.Exists := DoEndSequence;
@@ -1015,7 +1018,7 @@ begin
         if (BossCreature <> nil) and (not BossCreature.Dead) then
         begin
           Player.Knockback(2 + Random(5), 2, Vector3Single(0, -1, 0));
-          Sound(stEvilLaugh);
+          SoundEngine.Sound(stEvilLaugh);
           TimeMessage('No exit for the one who does not fight');
         end else
         begin
@@ -1224,7 +1227,7 @@ begin
       TimeMessageInteractFailed(
         'You''re too far to reach it from here') else
       begin
-        Sound(stDoomExitButton);
+        SoundEngine.Sound(stDoomExitButton);
         Player.Life := 0;
         ExitMessagePending := true;
       end;
