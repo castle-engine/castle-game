@@ -199,7 +199,7 @@ begin
   if DOMGetAttribute(Element, 'loading_bg', LoadingBgFileName) then
   begin
     LoadingBgFileName := CombinePaths(BasePath, LoadingBgFileName);
-    GLList_LoadingBgImage := LoadImageToDispList(LoadingBgFileName,
+    GLList_LoadingBgImage := LoadImageToDisplayList(LoadingBgFileName,
       [TRGBImage], [], Glw.Width, Glw.Height);
   end else
     glFreeDisplayList(GLList_LoadingBgImage);

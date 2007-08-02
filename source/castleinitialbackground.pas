@@ -64,7 +64,7 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  GLList_ScreenImage := LoadImageToDispList(ProgramDataPath + 'data' +
+  GLList_ScreenImage := LoadImageToDisplayList(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'initial_background.png',
     [TRGBImage], [], Glw.Width, Glw.Height);
 end;

@@ -459,7 +459,7 @@ end;
 function TItemKind.GLList_DrawImage: TGLuint;
 begin
   if FGLList_DrawImage = 0 then
-    FGLList_DrawImage := ImageDrawToDispList(Image);
+    FGLList_DrawImage := ImageDrawToDisplayList(Image);
   Result := FGLList_DrawImage;
 end;
 

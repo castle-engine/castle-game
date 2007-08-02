@@ -1344,7 +1344,7 @@ procedure GLWindowInit(Glwin: TGLWindow);
 
   function LoadPlayerControlToDisplayList(const BaseName: string): TGLuint;
   begin
-    Result := LoadImageToDispList(
+    Result := LoadImageToDisplayList(
       PlayerControlFileName(BaseName), [TAlphaImage], [], 0, 0);
   end;
 

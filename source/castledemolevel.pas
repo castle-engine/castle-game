@@ -188,7 +188,7 @@ begin
   ImageCaption := LoadImage(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'caption.png', [], [], 0, 0);
   try
-    GLList_Caption := ImageDrawToDispList(ImageCaption);
+    GLList_Caption := ImageDrawToDisplayList(ImageCaption);
     CaptionWidth := ImageCaption.Width;
     CaptionHeight := ImageCaption.Height;
   finally FreeAndNil(ImageCaption) end;
