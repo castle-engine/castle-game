@@ -572,13 +572,9 @@ begin
 
   if CurrentItem < OpenALDevices.Count then
   begin
-    SoundEngine.ALContextClose;
-
-    OpenALRestart;
-
-    ALCDevice := OpenALDevices[CurrentItem];
+    SoundEngine.ALChangeDevice(OpenALDevices[CurrentItem]);
+    { ALCDevice value changed now to new value. }
     SoundMenu.OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
-    SoundEngine.ALContextInit(false);
     if not ALActive then
       MessageOK(Glw, SoundEngine.SoundInitializationReport, taLeft);
   end;

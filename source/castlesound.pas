@@ -19,9 +19,7 @@
 }
 
 { Everything related to playing sound in "The Castle".
-  In particular, TCastleSoundEngine descendant from TGameSoundEngine.
-
-  Note that this unit saves/restores ALCDevice value to/from config file. }
+  In particular, TCastleSoundEngine descendant from TGameSoundEngine. }
 unit CastleSound;
 
 interface
@@ -242,33 +240,14 @@ begin
   AddSoundImportanceName('default_creature', DefaultCreatureSoundImportance);
   AddSoundImportanceName('minor_non_spatial', MinorNonSpatialSoundImportance);
 
-  SoundVolume := ConfigFile.GetFloat('sound/volume',
-    DefaultSoundVolume);
-  MusicPlayer.MusicVolume := ConfigFile.GetFloat('sound/music/volume',
-    DefaultMusicVolume);
-  ALMinAllocatedSources := ConfigFile.GetValue(
-    'sound/allocated_sources/min', DefaultALMinAllocatedSources);
-  ALMaxAllocatedSources := ConfigFile.GetValue(
-    'sound/allocated_sources/max', DefaultALMaxAllocatedSources);
-
-  ALCDevice := ConfigFile.GetValue('sound/device', BestALCDevice);
+  LoadFromConfig(ConfigFile);
 end;
 
 destructor TCastleSoundEngine.Destroy;
 begin
   if ConfigFile <> nil then
-  begin
-    ConfigFile.SetDeleteFloat('sound/volume',
-      SoundVolume, DefaultSoundVolume);
-    if MusicPlayer <> nil then
-      ConfigFile.SetDeleteFloat('sound/music/volume',
-        MusicPlayer.MusicVolume, DefaultMusicVolume);
-    ConfigFile.SetDeleteValue('sound/allocated_sources/min',
-      ALMinAllocatedSources, DefaultALMinAllocatedSources);
-    ConfigFile.SetDeleteValue('sound/allocated_sources/max',
-      ALMaxAllocatedSources, DefaultALMaxAllocatedSources);
-    ConfigFile.SetDeleteValue('sound/device', ALCDevice, BestALCDevice);
-  end;
+    SaveToConfig(ConfigFile);
+
   inherited;
 end;
 
