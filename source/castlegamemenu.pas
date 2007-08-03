@@ -34,7 +34,8 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleInputs, CastleCreatures, CastleChooseMenu,
   CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel,
-  CastleSound, CastleSoundMenu, VRMLNodes, KambiClassUtils, CastleTimeMessages;
+  CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
+  GLSoundMenu;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -45,9 +46,11 @@ type
   end;
 
   TGameSoundMenu = class(TCastleMenu)
-    SoundVolumeSlider: TGLMenuVolumeSlider;
-    MusicVolumeSlider: TGLMenuVolumeSlider;
+    SoundInfo: TGLSoundInfoMenuItem;
+    SoundVolume: TGLSoundVolumeMenuItem;
+    MusicVolume: TGLMusicVolumeMenuItem;
     constructor Create;
+    destructor Destroy; override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
@@ -100,15 +103,20 @@ constructor TGameSoundMenu.Create;
 begin
   inherited Create;
 
-  SoundVolumeSlider := TGLMenuVolumeSlider.Create(SoundEngine.SoundVolume);
-  MusicVolumeSlider := TGLMenuVolumeSlider.Create(SoundEngine.MusicPlayer.MusicVolume);
-
-  Items.Add('View sound information');
-  Items.AddObject('Volume', SoundVolumeSlider);
-  Items.AddObject('Music volume', MusicVolumeSlider);
+  SoundInfo := TGLSoundInfoMenuItem.Create(Glw, Self, SoundEngine);
+  SoundVolume := TGLSoundVolumeMenuItem.Create(Glw, Self, SoundEngine);
+  MusicVolume := TGLMusicVolumeMenuItem.Create(Glw, Self, SoundEngine);
   Items.Add('Back to game menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+destructor TGameSoundMenu.Destroy;
+begin
+  FreeAndNil(SoundInfo);
+  FreeAndNil(SoundVolume);
+  FreeAndNil(MusicVolume);
+  inherited;
 end;
 
 procedure TGameSoundMenu.CurrentItemSelected;
@@ -116,7 +124,7 @@ begin
   inherited;
 
   case CurrentItem of
-    0: ViewSoundInfo;
+    0: SoundInfo.Selected;
     1: ;
     2: ;
     3: CurrentMenu := GameMenu;
@@ -127,8 +135,8 @@ end;
 procedure TGameSoundMenu.CurrentItemAccessoryValueChanged;
 begin
   case CurrentItem of
-    1: SoundEngine.SoundVolume := SoundVolumeSlider.Value;
-    2: SoundEngine.MusicPlayer.MusicVolume := MusicVolumeSlider.Value;
+    1: SoundVolume.AccessoryValueChanged;
+    2: MusicVolume.AccessoryValueChanged;
   end;
 end;
 
@@ -160,8 +168,8 @@ var
 begin
   DrawUnderMenu := ADrawUnderMenu;
 
-  GameSoundMenu.SoundVolumeSlider.Value := SoundEngine.SoundVolume;
-  GameSoundMenu.MusicVolumeSlider.Value := SoundEngine.MusicPlayer.MusicVolume;
+  GameSoundMenu.SoundVolume.RefreshAccessory;
+  GameSoundMenu.MusicVolume.RefreshAccessory;
 
   SavedMode := TGLMode.Create(Glw, 0, true);
   try

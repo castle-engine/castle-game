@@ -37,9 +37,9 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
-  KambiStringUtils, ALUtils, OpenAL, KambiClassUtils, CastleSoundMenu,
+  KambiStringUtils, ALUtils, OpenAL, KambiClassUtils,
   CastleTimeMessages, CastleLevelAvailable, CastleDemoLevel,
-  GameSoundEngine;
+  GameSoundEngine, GLSoundMenu;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -67,10 +67,13 @@ type
   end;
 
   TSoundMenu = class(TSubMenu)
-    SoundVolumeSlider: TGLMenuVolumeSlider;
-    MusicVolumeSlider: TGLMenuVolumeSlider;
+    SoundInfo: TGLSoundInfoMenuItem;
+    SoundVolume: TGLSoundVolumeMenuItem;
+    MusicVolume: TGLMusicVolumeMenuItem;
+
     OpenALDeviceArgument: TGLMenuItemArgument;
     constructor Create;
+    destructor Destroy; override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
@@ -133,8 +136,8 @@ begin
   finally FreeAndNil(LocalLevel) end;
 
   SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
-  SoundMenu.SoundVolumeSlider.Value := SoundEngine.SoundVolume;
-  SoundMenu.MusicVolumeSlider.Value := SoundEngine.MusicPlayer.MusicVolume;
+  SoundMenu.SoundVolume.RefreshAccessory;
+  SoundMenu.MusicVolume.RefreshAccessory;
   TimeMessagesClear;
 end;
 
@@ -500,15 +503,12 @@ constructor TSoundMenu.Create;
 begin
   inherited Create;
 
-  SoundVolumeSlider := TGLMenuVolumeSlider.Create(SoundEngine.SoundVolume);
-  MusicVolumeSlider := TGLMenuVolumeSlider.Create(SoundEngine.MusicPlayer.MusicVolume);
-
   OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
   OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
 
-  Items.Add('View sound information');
-  Items.AddObject('Volume', SoundVolumeSlider);
-  Items.AddObject('Music volume', MusicVolumeSlider);
+  SoundInfo := TGLSoundInfoMenuItem.Create(Glw, Self, SoundEngine);
+  SoundVolume := TGLSoundVolumeMenuItem.Create(Glw, Self, SoundEngine);
+  MusicVolume := TGLMusicVolumeMenuItem.Create(Glw, Self, SoundEngine);
   Items.AddObject('Sound output device', OpenALDeviceArgument);
   Items.Add('Back to main menu');
 
@@ -517,12 +517,20 @@ begin
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
+destructor TSoundMenu.Destroy;
+begin
+  FreeAndNil(SoundInfo);
+  FreeAndNil(SoundVolume);
+  FreeAndNil(MusicVolume);
+  inherited;
+end;
+
 procedure TSoundMenu.CurrentItemSelected;
 begin
   inherited;
 
   case CurrentItem of
-    0: ViewSoundInfo;
+    0: SoundInfo.Selected;
     1: ;
     2: ;
     3: CurrentMenu := ChangeOpenALDeviceMenu;
@@ -534,8 +542,8 @@ end;
 procedure TSoundMenu.CurrentItemAccessoryValueChanged;
 begin
   case CurrentItem of
-    1: SoundEngine.SoundVolume := SoundVolumeSlider.Value;
-    2: SoundEngine.MusicPlayer.MusicVolume := MusicVolumeSlider.Value;
+    1: SoundVolume.AccessoryValueChanged;
+    2: MusicVolume.AccessoryValueChanged;
   end;
 end;
 
