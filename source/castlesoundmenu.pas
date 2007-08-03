@@ -25,12 +25,6 @@ interface
 
 uses GLMenu;
 
-type
-  TSoundVolumeSlider = class(TGLMenuFloatSlider)
-    constructor Create(const AValue: Single);
-    function ValueToStr(const AValue: Single): string; override;
-  end;
-
 procedure ViewSoundInfo;
 
 implementation
@@ -51,20 +45,6 @@ begin
 
     MessageOK(Glw, S, taLeft);
   finally S.Free end;
-end;
-
-{ TSoundVolumeSlider ---------------------------------------------------- }
-
-constructor TSoundVolumeSlider.Create(const AValue: Single);
-begin
-  inherited Create(0, 1, AValue);
-end;
-
-function TSoundVolumeSlider.ValueToStr(const AValue: Single): string;
-begin
-  if AValue = 0.0 then
-    Result := 'Off' else
-    Result := inherited ValueToStr(AValue);
 end;
 
 end.

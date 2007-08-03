@@ -45,8 +45,8 @@ type
   end;
 
   TGameSoundMenu = class(TCastleMenu)
-    SoundVolumeSlider: TSoundVolumeSlider;
-    MusicVolumeSlider: TSoundVolumeSlider;
+    SoundVolumeSlider: TGLMenuVolumeSlider;
+    MusicVolumeSlider: TGLMenuVolumeSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -100,8 +100,8 @@ constructor TGameSoundMenu.Create;
 begin
   inherited Create;
 
-  SoundVolumeSlider := TSoundVolumeSlider.Create(SoundEngine.SoundVolume);
-  MusicVolumeSlider := TSoundVolumeSlider.Create(SoundEngine.MusicPlayer.MusicVolume);
+  SoundVolumeSlider := TGLMenuVolumeSlider.Create(SoundEngine.SoundVolume);
+  MusicVolumeSlider := TGLMenuVolumeSlider.Create(SoundEngine.MusicPlayer.MusicVolume);
 
   Items.Add('View sound information');
   Items.AddObject('Volume', SoundVolumeSlider);

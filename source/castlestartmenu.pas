@@ -67,8 +67,8 @@ type
   end;
 
   TSoundMenu = class(TSubMenu)
-    SoundVolumeSlider: TSoundVolumeSlider;
-    MusicVolumeSlider: TSoundVolumeSlider;
+    SoundVolumeSlider: TGLMenuVolumeSlider;
+    MusicVolumeSlider: TGLMenuVolumeSlider;
     OpenALDeviceArgument: TGLMenuItemArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
@@ -500,8 +500,8 @@ constructor TSoundMenu.Create;
 begin
   inherited Create;
 
-  SoundVolumeSlider := TSoundVolumeSlider.Create(SoundEngine.SoundVolume);
-  MusicVolumeSlider := TSoundVolumeSlider.Create(SoundEngine.MusicPlayer.MusicVolume);
+  SoundVolumeSlider := TGLMenuVolumeSlider.Create(SoundEngine.SoundVolume);
+  MusicVolumeSlider := TGLMenuVolumeSlider.Create(SoundEngine.MusicPlayer.MusicVolume);
 
   OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
   OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
