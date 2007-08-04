@@ -114,7 +114,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
-  CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable, CastleLog,
+  CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable,
   ShadowVolumesUtils, KambiTimeUtils;
 
 var
@@ -1352,12 +1352,6 @@ procedure GLWindowInit(Glwin: TGLWindow);
   begin
     ShadowVolumesHelper := TShadowVolumesHelper.Create;
     ShadowVolumesHelper.InitGL;
-    if WasParam_DebugLog then
-      WritelnLog(ltOpenGLInitialization,
-        Format('GL_INCR/DECR_WRAP_EXT available: %s' + nl +
-               'glStencilOpSeparate available: %s',
-               [ BoolToStr[ShadowVolumesHelper.WrapAvailable],
-                 BoolToStr[glStencilOpSeparate <> nil] ]));
   end;
 
 const

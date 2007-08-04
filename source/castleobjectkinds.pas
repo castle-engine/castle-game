@@ -121,8 +121,8 @@ type
 
 implementation
 
-uses SysUtils, ProgressUnit, Object3dAsVRML, CastleLog, DOM, CastleWindow,
-  KambiStringUtils;
+uses SysUtils, ProgressUnit, Object3dAsVRML, DOM, CastleWindow,
+  KambiStringUtils, KambiLog;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin
@@ -273,8 +273,8 @@ begin
 
     { Write info before PrepareRender, otherwise it could not
       be available after freeing scene RootNodes in Anim.PrepareRender. }
-    if WasParam_DebugLog then
-      WritelnLog(ltAnimationInfo,
+    if Log then
+      WritelnLog('Animation info',
         Format('%40s %3d scenes * %8d triangles',
         [ VRMLNodeName + '.' + AnimationName + ' animation: ',
           Anim.ScenesCount,
@@ -295,8 +295,8 @@ begin
     if (prManifoldEdges in Options) and IsSharedManifoldEdges then
       Anim.ShareManifoldEdges(SharedManifoldEdges);
 
-    if WasParam_DebugLog and (prManifoldEdges in Options) then
-      WritelnLog(ltAnimationInfo, Format(
+    if Log and (prManifoldEdges in Options) then
+      WritelnLog('Animation info', Format(
         '%s animation: correct manifold ? %s',
         [ VRMLNodeName + '.' + AnimationName,
           BoolToStr[Anim.FirstScene.ManifoldEdges <> nil] ]));

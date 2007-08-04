@@ -24,10 +24,10 @@ program castle;
 
 uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   Classes, ParseParametersUnit, GLWinMessages, KambiGLUtils, KambiStringUtils,
-  KambiTimeUtils,
+  KambiTimeUtils, KambiLog,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
-  CastleCreatures, CastleObjectKinds, CastlePlay, CastleLog;
+  CastleCreatures, CastleObjectKinds, CastlePlay;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -108,7 +108,7 @@ begin
     3: WasParam_NoScreenChange := true;
     4: RenderShadowsPossible := false;
     5: WasParam_DebugNoCreatures := true;
-    6: InitializeLog;
+    6: InitializeLog(Version);
     7: begin
          DeFormat(Argument, '%dx%d',
            [@RequestedScreenWidth, @RequestedScreenHeight]);
@@ -171,8 +171,6 @@ begin
   if RenderShadowsPossible then
     Glw.StencilBufferBits := 8;
   Glw.Init;
-  if WasParam_DebugLog then
-    WritelnLog(ltOpenGLInitialization, GLCapsString);
 
   { init progress }
   ProgressGLInterface.Window := Glw;

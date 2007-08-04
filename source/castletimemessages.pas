@@ -50,7 +50,7 @@ procedure TimeMessagesIdle;
 
 implementation
 
-uses SysUtils, GLWindow, CastleWindow, KambiClassUtils, CastleLog;
+uses SysUtils, GLWindow, CastleWindow, KambiClassUtils;
 
 var
   TimeMessagesManager: TTimeMessagesManager;
@@ -60,9 +60,6 @@ begin
   if TimeMessagesManager <> nil then
     TimeMessagesManager.Show(S);
   TimeMessagesList.Insert(0, S);
-
-  if WasParam_DebugLog then
-    WritelnLog(ltTimeMessage, S);
 end;
 
 procedure TimeMessagesDraw;

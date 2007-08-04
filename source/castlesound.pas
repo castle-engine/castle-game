@@ -132,7 +132,6 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure ALContextInit(WasParam_NoSound: boolean); override;
   end;
 
 var
@@ -151,7 +150,7 @@ var
 
 implementation
 
-uses CastleLog, CastleConfig, ALUtils;
+uses CastleConfig, ALUtils;
 
 constructor TCastleSoundEngine.Create;
 
@@ -249,13 +248,6 @@ begin
     SaveToConfig(ConfigFile);
 
   inherited;
-end;
-
-procedure TCastleSoundEngine.ALContextInit(WasParam_NoSound: boolean);
-begin
-  inherited;
-  if WasParam_DebugLog then
-    WritelnLog(ltSoundInitialization, SoundInitializationReport);
 end;
 
 { initialization ------------------------------------------------------------- }
