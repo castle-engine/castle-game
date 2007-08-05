@@ -154,9 +154,11 @@ begin
   Items.Add('Credits');
   Items.Add('Quit');
 
-  Position := Vector2Single(20, 480);
-  PositionRelativeX := prLowerBorder;
-  PositionRelativeY := prHigherBorder;
+  Position.Init(20, 480);
+  PositionRelativeScreenX := prLowerBorder;
+  PositionRelativeScreenY := prLowerBorder;
+  PositionRelativeMenuX := prLowerBorder;
+  PositionRelativeMenuY := prHigherBorder;
 
   DrawBackgroundRectangle := false;
 

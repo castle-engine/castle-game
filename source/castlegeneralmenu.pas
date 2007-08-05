@@ -29,16 +29,29 @@ type
   { Just TGLMenu that calls Glw.PostRedisplay and plays a sound
     on each CurrentItem change. }
   TCastleMenu = class(TGLMenu)
+  public
+    constructor Create;
     procedure CurrentItemChanged; override;
     procedure SomethingChanged; override;
     procedure CurrentItemSelected; override;
   end;
+
+var
+  DebugMenuDesigner: boolean = false;
 
 implementation
 
 uses SysUtils, GLWindow, CastleWindow, CastleSound;
 
 { TCastleMenu ---------------------------------------------------------------- }
+
+constructor TCastleMenu.Create;
+begin
+  inherited;
+  { Don't set DesignerModeWindow, we do tricks that make setting mouse
+    position in GLMenu not working. See TGLMenu.DesignerMode comments. }
+  DesignerMode := DebugMenuDesigner;
+end;
 
 procedure TCastleMenu.CurrentItemChanged;
 begin

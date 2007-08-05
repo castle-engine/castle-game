@@ -127,9 +127,11 @@ constructor TSubMenu.Create;
 begin
   inherited Create;
 
-  Position := Vector2Single(20, 440);
-  PositionRelativeX := prLowerBorder;
-  PositionRelativeY := prHigherBorder;
+  Position.Init(20, 440);
+  PositionRelativeScreenX := prLowerBorder;
+  PositionRelativeScreenY := prLowerBorder;
+  PositionRelativeMenuX := prLowerBorder;
+  PositionRelativeMenuY := prHigherBorder;
 
   DrawBackgroundRectangle := false;
 end;
@@ -143,7 +145,7 @@ begin
   glColorv(SubMenuTextColor);
 
   glPushMatrix;
-    glTranslatef(Position[0], Position[1] - 20, 0);
+    glTranslatef(Position.Data[0], Position.Data[1] - 20, 0);
     glRasterPos2i(0, 0);
     SubMenuTitleFont.Print(SubMenuTitle + ' :');
   glPopMatrix;

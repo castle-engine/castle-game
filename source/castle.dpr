@@ -27,7 +27,7 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   KambiTimeUtils, KambiLog,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
-  CastleCreatures, CastleObjectKinds, CastlePlay;
+  CastleCreatures, CastleObjectKinds, CastlePlay, CastleGeneralMenu;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -57,7 +57,7 @@ var
   WasParam_NoScreenChange: boolean = false;
 
 const
-  Options: array[0..7]of TOption =
+  Options: array[0..8]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short: #0; Long: 'no-sound'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
@@ -65,7 +65,8 @@ const
     (Short: #0; Long: 'no-shadows'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
     (Short: #0; Long: 'debug-log'; Argument: oaNone),
-    (Short: #0; Long: 'screen-size'; Argument: oaRequired)
+    (Short: #0; Long: 'screen-size'; Argument: oaRequired),
+    (Short: #0; Long: 'debug-menu-designer'; Argument: oaNone)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -97,7 +98,8 @@ begin
            '  --debug-log           Write various log info on stdout' +nl+
            '  --debug-no-creatures  Creatures animations will be loaded' +nl+
            '                        only when you explicitly request them' +nl+
-           '                        from debug menu');
+           '                        from debug menu' +nl+
+           '  --debug-menu-designer   Run menus is designer mode');
          ProgramBreak;
        end;
     1: WasParam_NoSound := true;
@@ -113,6 +115,7 @@ begin
          DeFormat(Argument, '%dx%d',
            [@RequestedScreenWidth, @RequestedScreenHeight]);
        end;
+    8: DebugMenuDesigner := true;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
