@@ -12,7 +12,6 @@
       <MainUnit Value="0"/>
       <IconPath Value="./"/>
       <TargetFileExt Value=""/>
-      <ActiveEditorIndexAtStart Value="0"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -34,15 +33,13 @@
         <PackageName Value="kambi_glwindow"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="9">
+    <Units Count="13">
       <Unit0>
         <Filename Value="castle.dpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="0"/>
         <UsageCount Value="21"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="castleconfig.pas"/>
@@ -89,8 +86,8 @@
       <Unit7>
         <Filename Value="castlesound.pas"/>
         <UnitName Value="CastleSound"/>
-        <CursorPos X="1" Y="181"/>
-        <TopLine Value="156"/>
+        <CursorPos X="56" Y="27"/>
+        <TopLine Value="11"/>
         <UsageCount Value="10"/>
       </Unit7>
       <Unit8>
@@ -100,6 +97,34 @@
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit8>
+      <Unit9>
+        <Filename Value="../../kambi_vrml_game_engine/opengl/glwinmessages.pas"/>
+        <UnitName Value="GLWinMessages"/>
+        <CursorPos X="30" Y="1095"/>
+        <TopLine Value="1079"/>
+        <UsageCount Value="10"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="castletimemessages.pas"/>
+        <UnitName Value="CastleTimeMessages"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
+        <UsageCount Value="10"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="castlegeneralmenu.pas"/>
+        <UnitName Value="CastleGeneralMenu"/>
+        <CursorPos X="6" Y="26"/>
+        <TopLine Value="10"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="castlechoosemenu.pas"/>
+        <UnitName Value="CastleChooseMenu"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
+        <UsageCount Value="10"/>
+      </Unit12>
     </Units>
     <JumpHistory Count="0" HistoryIndex="-1"/>
   </ProjectOptions>
