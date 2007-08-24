@@ -214,7 +214,7 @@ end.
 
   Local Variables:
   compile-command: "make clean && fpcdebug castle.dpr --exe-output-dir ../"
-  kam-compile-release-command-win32: "clean_glwindow_unit && make clean && fpcrelease --exe-output-dir ../"
-  kam-compile-release-command-unix: "clean_glwindow_unit && make clean && fpcreleaseb -dGLWINDOW_XLIB"
+  kam-compile-release-command-unix:  "make clean && make -C ../ build-unix  && mv -fv ../castle      ~/bin/"
+  kam-compile-release-command-win32: "make clean && make -C ../ build-win32 && mv -fv ../castle.exe c:/bin/"
   End:
 }
