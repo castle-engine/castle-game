@@ -39,7 +39,7 @@
         <IsPartOfProject Value="True"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
       </Unit0>
       <Unit1>
         <Filename Value="castleconfig.pas"/>
