@@ -40,6 +40,12 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
   (kam-simple-re-replace from-string to-string (point-min))
 )
 
+(defun string-repeat (STR COUNT)
+  (let ((RESULT ""))
+    (dotimes (i COUNT RESULT) (setq RESULT (concat RESULT STR))  )
+  )
+)
+
 ;; Processing VRML files -------------------------------------------------------
 
 (defun kam-fix-blender-filename ()
@@ -162,6 +168,33 @@ on MESH-NAME to be correctly interpreted."
       vrml-code))
 )
 
+(defconst vrml-white-spaces-regexp "[\t\n ]+")
+(defconst vrml-float-regexp "\\(\\|-\\)[0-9]+\\.[0-9]+")
+
+(defun vrml-floats-regexp (COUNT)
+  (string-repeat (concat vrml-white-spaces-regexp vrml-float-regexp) COUNT)
+)
+
+;; blender really stupidly records VRML 1.0 camera as transformation
+;; (screwing gravityUp)
+(defun vrml-remove-stupid-blender-start-transform ()
+  (interactive)
+
+  (kam-simple-re-replace-buffer
+    (concat "# Visible Objects\n\nSeparator {\n"
+        vrml-white-spaces-regexp "MatrixTransform {"
+	vrml-white-spaces-regexp "matrix"
+        (vrml-floats-regexp 16)
+        vrml-white-spaces-regexp "}"
+	vrml-white-spaces-regexp "PerspectiveCamera {"
+	vrml-white-spaces-regexp "focalDistance"
+        (vrml-floats-regexp 1)
+        vrml-white-spaces-regexp "}"
+    )
+    (concat "# Visible Objects\n\nSeparator {\n" )
+  )
+)
+
 ;; Processing specific VRML files ----------------------------------------------
 
 (defun kam-process-castle-hall ()
@@ -200,6 +233,7 @@ on MESH-NAME to be correctly interpreted."
 
 (defun kam-process-gate ()
   (interactive)
+  (vrml-remove-stupid-blender-start-transform)
   (kam-fix-vertex-col-material "MeshRocks")
   (kam-remove-vertex-col-material-one-mesh "MeshWater")
   (kam-add-material-for-mesh "MeshWater" "MatWater")
