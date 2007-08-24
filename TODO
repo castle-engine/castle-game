@@ -55,6 +55,13 @@
     Then set DefaultRenderShadows to true, and remove the warning in
     CastleStartMenu when changing RenderShadows.
 
+  - make cart (any TLevelObject actually) casting shadows
+
+- make castle gate with shadows baked on ground.
+  This is done in gate blender model, and once I used it actually in the game
+  --- but it looks too ugly. We must be able to handle much larger
+  texture sizes to actually use this on the gate level.
+
 - doom:
   - make barrels explode nicely
   - creatures should take hurt from lava too, and should know that they
