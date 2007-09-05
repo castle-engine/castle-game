@@ -2363,7 +2363,7 @@ constructor TLevel.Create(
     I: Integer;
   begin
     for I := 0 to ItemsToRemove.Count - 1 do
-      ItemsToRemove.Items[I].FreeRemovingFromAllParentNodes;
+      ItemsToRemove.Items[I].FreeRemovingFromAllParents;
     Scene.ChangedAll;
   end;
 
@@ -2624,7 +2624,7 @@ begin
       as it should not be visible).
       This way we can comfortably set such boxes from Blender. }
     Box := Scene.ShapeStates[BoxNodeIndex].BoundingBox;
-    Scene.ShapeStates[BoxNodeIndex].ShapeNode.FreeRemovingFromAllParentNodes;
+    Scene.ShapeStates[BoxNodeIndex].ShapeNode.FreeRemovingFromAllParents;
     Scene.ChangedAll;
   end;
 end;
@@ -2706,6 +2706,10 @@ begin
       Break;
     end;
   end;
+
+  { TODO: should check ParentFields for VRML 2.0 too ? The goal is actually to
+    detect things with ItemPrefix in blender. so we have to see what
+    blender VRML 2.0 exporter does. }
 end;
 
 procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
@@ -2795,6 +2799,10 @@ begin
       Break;
     end;
   end;
+
+  { TODO: should check ParentFields for VRML 2.0 too ? The goal is actually to
+    detect things with ItemPrefix in blender. so we have to see what
+    blender VRML 2.0 exporter does. }
 end;
 
 function TLevel.LineOfSight(
