@@ -252,7 +252,7 @@ procedure TDebugPlayerMenu.CurrentItemSelected;
     Value: Single;
   begin
     Value := Player.MaxLife;
-    if MessageInputQuerySingle(Glw, 'Set Player.MaxLife',
+    if MessageInputQuery(Glw, 'Set Player.MaxLife',
       Value, taLeft) then
       Player.MaxLife := Value;
   end;
@@ -652,12 +652,12 @@ procedure TEditHeadlightMenu.CurrentItemSelected;
     Value: Single;
   begin
     Value := Level.Headlight.SpotCutOffAngle;
-    if MessageInputQuerySingle(Glw, 'Change headlight SpotCutOffAngle',
+    if MessageInputQuery(Glw, 'Change headlight SpotCutOffAngle',
       Value, taLeft) then
       Level.Headlight.SpotCutOffAngle := Value;
 
     Value := Level.Headlight.SpotDropOffRate;
-    if MessageInputQuerySingle(Glw, 'Change headlight SpotDropOffRate',
+    if MessageInputQuery(Glw, 'Change headlight SpotDropOffRate',
       Value, taLeft) then
       Level.Headlight.SpotDropOffRate := Value;
   end;
@@ -938,7 +938,7 @@ begin
          if Light is TNodeSpotLight_1 then
          begin
            Value := TNodeSpotLight_1(Light).FdDropOffRate.Value;
-           if MessageInputQuerySingle(Glw, 'Change dropOffRate', Value, taLeft) then
+           if MessageInputQuery(Glw, 'Change dropOffRate', Value, taLeft) then
            begin
              TNodeSpotLight_1(Light).FdDropOffRate.Value := Value;
              Level.LightSet.CalculateLights;
@@ -949,7 +949,7 @@ begin
          if Light is TNodeSpotLight_1 then
          begin
            Value := TNodeSpotLight_1(Light).FdCutOffAngle.Value;
-           if MessageInputQuerySingle(Glw, 'Change cutOffAngle', Value, taLeft) then
+           if MessageInputQuery(Glw, 'Change cutOffAngle', Value, taLeft) then
            begin
              TNodeSpotLight_1(Light).FdCutOffAngle.Value := Value;
              Level.LightSet.CalculateLights;

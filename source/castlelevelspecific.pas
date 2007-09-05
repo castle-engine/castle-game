@@ -171,7 +171,7 @@ type
 
     StayOpenTime: Single;
 
-    procedure BeforeIdle(const NewAnimationTime: Single); override;
+    procedure BeforeIdle(const NewAnimationTime: TAnimationTime); override;
     procedure Idle; override;
 
     property MovePushesOthers default false;
@@ -1052,7 +1052,7 @@ begin
   SoundGoBeginPosition := stDoorClose;
 end;
 
-procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: Single);
+procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: TAnimationTime);
 
   function SomethingWillBlockClosingDoor: boolean;
   var
