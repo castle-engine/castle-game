@@ -204,17 +204,9 @@ begin
 end.
 
 {
-  For now: do
-    make clean
-  always before compiling, to avoid FPC 2.0.4 getting lost in the dependencies.
-  This may cause Internal Error 200310221,
-  but it can also cause some unit to not get
-  recompiled when they should... It's a good thing that FPC is so goddamn
-  fast that this workaround doesn't hurt us so much.
-
   Local Variables:
-  compile-command: "make clean && fpcdebug castle.dpr --exe-output-dir ../"
-  kam-compile-release-command-unix:  "make clean && make -C ../ build-unix  && mv -fv ../castle      ~/bin/"
-  kam-compile-release-command-win32: "make clean && make -C ../ build-win32 && mv -fv ../castle.exe c:/bin/"
+  compile-command: "fpcdebug castle.dpr --exe-output-dir ../"
+  kam-compile-release-command-unix:  "make -C ../ build-unix  && mv -fv ../castle      ~/bin/"
+  kam-compile-release-command-win32: "make -C ../ build-win32 && mv -fv ../castle.exe c:/bin/"
   End:
 }
