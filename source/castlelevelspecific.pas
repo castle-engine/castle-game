@@ -1323,8 +1323,13 @@ begin
 
   Water := TLevelSimpleAnimatedObject.Create(Self,
     LoadLevelAnimation(CastleLevelsPath + 'gate_demo' +
-      PathDelim + 'water.kanim', true, false));
+      PathDelim + 'water.kanim', false, false));
   Objects.Add(Water);
+
+  { No octrees created for water (because in normal usage, player will not
+    walk on this level). For safety, Collides set to @false, in case
+    user enters this level by debug menu. }
+  Water.Collides := false;
 
   Water.Play;
 end;

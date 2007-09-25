@@ -579,6 +579,8 @@ type
     naturally) by checking always with Animation.FirstScene.DefaultTriangleOctree.
     So you should create this octree, and make sure that the animation is done
     such that the first animation frame is always larger than the others.
+    You don't have to make the octree only if you're sure that object will
+    always be not @link(Collides) or not @link(Exists).
 
     You can also set CollisionUseLastScene, then collision will be done
     versus the sum of Animation.FirstScene.DefaultTriangleOctree +
@@ -873,7 +875,7 @@ type
     { Load TVRMLGLAnimation from *.kanim file, doing common tasks.
       @unorderedList(
         @item sets Attributes according to AnimationAttributesSet
-        @item optionally creates triangle octree for the FirstScene
+        @item optionally creates triangle octree for the FirstScene and/or LastScene
         @item call PrepareRender
         @item FreeExternalResources, since they will not be needed anymore
       ) }
