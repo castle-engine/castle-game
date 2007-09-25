@@ -32,15 +32,36 @@ install:
 # compiled with appropriate options (suitable for release or debugging,
 # and that GLWindow unit uses proper backend).
 #
-# Call make with DEBUG=t to get debug build, otherwise release build
-# will be done.
+# For some debug compilation features, use DEBUG=xxx make option:
+# - DEBUG=t
+#   makes normal debug build (debug checks, etc.)
+# - DEBUG=callgrind
+#   makes a compilation for valgrind speed profiling.
+#   This doesn't use debug checks, but also doesn't use
+#   optimizations, see ../kambi_vrml_game_engine/kambi.cfg for reasoning.
+# - DEBUG=massif
+#   means that code for memory profiling will be compiled.
+# Otherwise optimized release build will be done.
 
-ifdef DEBUG
+ifeq ($(DEBUG),t)
 FPC_UNIX_OPTIONS := -dDEBUG
 FPC_WIN32_OPTIONS := -dDEBUG
 else
+
+ifeq ($(DEBUG),callgrind)
+FPC_UNIX_OPTIONS := -gl -gv -dGLWINDOW_XLIB
+FPC_WIN32_OPTIONS := -gl -gv
+else
+
+ifeq ($(DEBUG),massif)
+FPC_UNIX_OPTIONS := -gl -gv -dRELEASE -dGLWINDOW_XLIB
+FPC_WIN32_OPTIONS := -gl -gv -dRELEASE
+else
+
 FPC_UNIX_OPTIONS := -dRELEASE -dGLWINDOW_XLIB
 FPC_WIN32_OPTIONS := -dRELEASE
+endif
+endif
 endif
 
 build-unix:

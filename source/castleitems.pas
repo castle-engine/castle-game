@@ -509,6 +509,7 @@ begin
 
     AttributesSet(Scene.Attributes, BlendingType);
     Scene.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox]);
+    Scene.FreeExternalResources;
   end;
 
   Progress.Step;

@@ -292,6 +292,8 @@ begin
         "Wrong Alien dying anim" problem. }
       false);
 
+    Anim.FreeExternalResources;
+
     if (prManifoldEdges in Options) and IsSharedManifoldEdges then
       Anim.ShareManifoldEdges(SharedManifoldEdges);
 

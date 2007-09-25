@@ -865,6 +865,7 @@ type
         @item sets Attributes according to AttributesSet
         @item optionally create triangle octree
         @item call PrepareRender, optionally with PrepareBackground = @true
+        @item FreeExternalResources, since they will not be needed anymore
       ) }
     function LoadLevelScene(const FileName: string;
       CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;
@@ -874,6 +875,7 @@ type
         @item sets Attributes according to AnimationAttributesSet
         @item optionally creates triangle octree for the FirstScene
         @item call PrepareRender
+        @item FreeExternalResources, since they will not be needed anymore
       ) }
     function LoadLevelAnimation(
       const FileName: string;
@@ -2495,6 +2497,8 @@ begin
       (ProjectionNear, ProjectionFar);
     Scene.PrepareRender([tgAll], [prBackground, prBoundingBox]);
 
+    Scene.FreeExternalResources;
+
     FLightSet := TVRMLLightSetGL.Create(LoadAsVRML(LightSetFileName),
       true,
       { GL_LIGHT0 is reserved for headlight. }
@@ -3120,6 +3124,8 @@ begin
 
   if CreateDefaultTriangleOctree then
     Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
+
+  Result.FreeExternalResources;
 end;
 
 function TLevel.LoadLevelAnimation(
@@ -3143,6 +3149,8 @@ begin
   if CreateLastDefaultTriangleOctree then
     Result.LastScene.DefaultTriangleOctree :=
       Result.LastScene.CreateTriangleOctree('');
+
+  Result.FreeExternalResources;
 end;
 
 function TLevel.Background: TBackgroundGL;
