@@ -284,18 +284,18 @@ type
     FMaxHeightAcceptableToFall: Single;
     FRandomWalkDistance: Single;
   protected
-    procedure FreePrepareRender; override;
-  public
-    constructor Create(const AVRMLNodeName: string);
-
-    destructor Destroy; override;
-
     { Make all TVRMLGLAnimation properties non-nil. I.e. load them from their
       XxxInfo counterparts.
 
       Also calculates CameraRadiusFromPrepareRender
       from StandAnimation.Scenes[0]. }
-    procedure PrepareRender; override;
+    procedure PrepareRenderInternal; override;
+
+    procedure FreePrepareRender; override;
+  public
+    constructor Create(const AVRMLNodeName: string);
+
+    destructor Destroy; override;
 
     function PrepareRenderSteps: Cardinal; override;
 
@@ -490,13 +490,13 @@ type
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
   protected
+    procedure PrepareRenderInternal; override;
     procedure FreePrepareRender; override;
   public
     destructor Destroy; override;
 
     procedure CloseGL; override;
 
-    procedure PrepareRender; override;
     function PrepareRenderSteps: Cardinal; override;
 
     function CreateDefaultCreature(
@@ -528,8 +528,9 @@ type
   end;
 
   TGhostKind = class(TWalkAttackCreatureKind)
-    procedure PrepareRender; override;
-
+  protected
+    procedure PrepareRenderInternal; override;
+  public
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
@@ -560,12 +561,12 @@ type
     FFallsDown: boolean;
     FFallsDownSpeed: Single;
   protected
+    procedure PrepareRenderInternal; override;
     procedure FreePrepareRender; override;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
 
-    procedure PrepareRender; override;
     function PrepareRenderSteps: Cardinal; override;
     procedure CloseGL; override;
 
@@ -630,12 +631,12 @@ type
     FAnimation: TVRMLGLAnimation;
     FAnimationInfo: TVRMLGLAnimationInfo;
   protected
+    procedure PrepareRenderInternal; override;
     procedure FreePrepareRender; override;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
 
-    procedure PrepareRender; override;
     function PrepareRenderSteps: Cardinal; override;
     procedure CloseGL; override;
 
@@ -1374,7 +1375,7 @@ begin
   inherited;
 end;
 
-procedure TWalkAttackCreatureKind.PrepareRender;
+procedure TWalkAttackCreatureKind.PrepareRenderInternal;
 begin
   inherited;
 
@@ -1529,7 +1530,7 @@ begin
   if ThrowWebAttackAnimation <> nil then ThrowWebAttackAnimation.CloseGL;
 end;
 
-procedure TSpiderQueenKind.PrepareRender;
+procedure TSpiderQueenKind.PrepareRenderInternal;
 begin
   inherited;
   CreateAnimationIfNeeded('ThrowWebAttack',
@@ -1575,7 +1576,7 @@ end;
 
 { TGhostKind ------------------------------------------------------------- }
 
-procedure TGhostKind.PrepareRender;
+procedure TGhostKind.PrepareRenderInternal;
 var
   ReferenceScene: TVRMLFlatSceneGL;
 begin
@@ -1632,7 +1633,7 @@ begin
   inherited;
 end;
 
-procedure TMissileCreatureKind.PrepareRender;
+procedure TMissileCreatureKind.PrepareRenderInternal;
 begin
   inherited;
   CreateAnimationIfNeeded('Move', FAnimation, FAnimationInfo);
@@ -1718,7 +1719,7 @@ begin
   inherited;
 end;
 
-procedure TStillCreatureKind.PrepareRender;
+procedure TStillCreatureKind.PrepareRenderInternal;
 begin
   inherited;
   CreateAnimationIfNeeded('Stand', FAnimation, FAnimationInfo);

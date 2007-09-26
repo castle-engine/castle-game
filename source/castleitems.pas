@@ -71,6 +71,7 @@ type
     FBoundingBoxRotated: TBox3d;
     FBoundingBoxRotatedCalculated: boolean;
   protected
+    procedure PrepareRenderInternal; override;
     procedure FreePrepareRender; override;
 
     { This is like @inherited, but it passes proper values for boolean parameters
@@ -132,7 +133,6 @@ type
       to account the fact that Scene may be rotated around +Z vector. }
     function BoundingBoxRotated: TBox3d;
 
-    procedure PrepareRender; override;
     function PrepareRenderSteps: Cardinal; override;
     procedure CloseGL; override;
   end;
@@ -170,6 +170,7 @@ type
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
+    procedure PrepareRenderInternal; override;
     procedure FreePrepareRender; override;
   public
     destructor Destroy; override;
@@ -209,7 +210,6 @@ type
 
     procedure Use(Item: TItem); override;
 
-    procedure PrepareRender; override;
     function PrepareRenderSteps: Cardinal; override;
     procedure CloseGL; override;
 
@@ -500,7 +500,7 @@ begin
   Result := FBoundingBoxRotated;
 end;
 
-procedure TItemKind.PrepareRender;
+procedure TItemKind.PrepareRenderInternal;
 begin
   if FScene = nil then
   begin
@@ -650,7 +650,7 @@ begin
   Player.EquippedWeapon := Item;
 end;
 
-procedure TItemWeaponKind.PrepareRender;
+procedure TItemWeaponKind.PrepareRenderInternal;
 begin
   inherited;
   CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationInfo,

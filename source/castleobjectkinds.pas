@@ -33,6 +33,8 @@ type
     FVRMLNodeName: string;
     FPrepareRenderDone: boolean;
     FBlendingType: TBlendingType;
+    { This is internal for PrepareRender. }
+    AnimationsPrepared: TVRMLGLAnimationsList;
   protected
     { This should release everything done by PrepareRender.
 
@@ -55,7 +57,7 @@ type
       Then it sets attributes for the animation and then prepares
       the animation by calling animation's @noAutoLink(PrepareRender).
 
-      So this may be helpful to use in PrepareRender implementations.
+      So this may be helpful to use in PrepareRenderInside implementations.
 
       It uses FirstRootNodesPool. It calls Progress.Step 2 times.
 
@@ -81,13 +83,17 @@ type
       be a valid part of XML name) }
     procedure AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
       KindsConfig: TKamXMLConfig; const AnimationName: string); virtual;
+
+    { Prepare anything needed when starting new game.
+      It can call Progress.Step PrepareRenderSteps times.
+      It has a funny name to differentiate from PrepareRender,
+      that should be called outside. }
+    procedure PrepareRenderInternal; virtual;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
 
-    { Prepare anything needed when starting new game.
-      It can call Progress.Step PrepareRenderSteps times. }
-    procedure PrepareRender; virtual;
+    procedure PrepareRender;
 
     function PrepareRenderSteps: Cardinal; virtual;
 
@@ -131,6 +137,7 @@ begin
   FBlendingType := DefaultBlendingType;
   FirstRootNodesPool := TStringList.Create;
   ManifoldEdgesPool := TStringList.Create;
+  AnimationsPrepared := TVRMLGLAnimationsList.Create;
 end;
 
 destructor TObjectKind.Destroy;
@@ -148,12 +155,54 @@ begin
     TVRMLFlatSceneGL instances that own them. }
   FreeAndNil(ManifoldEdgesPool);
 
+  FreeAndNil(AnimationsPrepared);
+
   inherited;
 end;
 
 procedure TObjectKind.PrepareRender;
+var
+  I: Integer;
 begin
   FPrepareRenderDone := true;
+
+  Assert(AnimationsPrepared.Count = 0);
+
+  try
+    PrepareRenderInternal;
+
+    { During AnimationsPrepared we collect prepared animations,
+      to now handle them in general.
+
+      For now, we just call FreeResources on them. It would be bad
+      to call Anim.FreeResources inside CreateAnimationIfNeeded,
+      right after preparing animation, since then animations for
+      the same object kind would not share the texture image
+      (in ImagesCache). And usually the same texture image is used
+      in all animations.
+
+      On the other hand, we want to call FreeResources on them at some
+      time, to free memory. }
+
+    for I := 0 to AnimationsPrepared.Count - 1 do
+    begin
+      { TODO: frRootNode is temporary not here --- see ../TODO file about
+        "Wrong Alien dying anim" problem. }
+
+      AnimationsPrepared[I].FreeResources([frTextureImageInNodes,
+        { TrianglesList was created if ManifoldEdges were requested.
+          We don't need it anymore. }
+        frTrianglesListNotOverTriangulate]);
+    end;
+  finally
+    { keep AnimationsPrepared empty when outside of PrepareRender. }
+    AnimationsPrepared.Clear;
+  end;
+end;
+
+procedure TObjectKind.PrepareRenderInternal;
+begin
+  { Nothing to do here in this class. }
 end;
 
 function TObjectKind.PrepareRenderSteps: Cardinal;
@@ -288,14 +337,6 @@ begin
     AnimationAttributesSet(Anim.Attributes, BlendingType);
     Anim.PrepareRender(TransparentGroups, ActualOptions, false);
 
-    { TODO: frRootNode is temporary not here --- see ../TODO file about
-      "Wrong Alien dying anim" problem. }
-
-    Anim.FreeResources([frTextureImageInNodes,
-      { TrianglesList was created if ManifoldEdges were requested.
-        We don't need it anymore. }
-      frTrianglesListNotOverTriangulate]);
-
     if (prManifoldEdges in Options) and IsSharedManifoldEdges then
       Anim.ShareManifoldEdges(SharedManifoldEdges);
 
@@ -304,6 +345,8 @@ begin
         '%s animation: correct manifold ? %s',
         [ VRMLNodeName + '.' + AnimationName,
           BoolToStr[Anim.FirstScene.ManifoldEdges <> nil] ]));
+
+    AnimationsPrepared.Add(Anim);
   end;
   Progress.Step;
 end;
