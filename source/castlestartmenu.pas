@@ -39,7 +39,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, ALUtils, OpenAL, KambiClassUtils,
   CastleTimeMessages, CastleLevelAvailable, CastleDemoLevel,
-  GameSoundEngine, GLSoundMenu;
+  GameSoundEngine, GLSoundMenu, KambiLog, KambiTimeUtils;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -119,7 +119,11 @@ procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
 var
   LocalPlayer: TPlayer;
   LocalLevel: TLevel;
+  TimeBegin: TProcessTimerResult;
 begin
+  if Log then
+    TimeBegin := ProcessTimerNow;
+
   { All kinds must be prepared before instances are created.
     TObjectKind constructors are allowed to depend on this.
     So we must prepare everything before creating the level
@@ -131,6 +135,11 @@ begin
   try
     LocalPlayer := TPlayer.Create;
     try
+      if Log then
+        WritelnLog('New game', Format(
+          'Loading new game (creatures, items, player, level) time: %f seconds',
+          [ ProcessTimerDiff(ProcessTimerNow, TimeBegin) / ProcessTimersPerSec ]));
+
       PlayGame(LocalLevel, LocalPlayer, true);
     finally FreeAndNil(LocalPlayer) end;
   finally FreeAndNil(LocalLevel) end;

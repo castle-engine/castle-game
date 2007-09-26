@@ -1169,7 +1169,7 @@ implementation
 uses SysUtils, DOM, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
-  CastleTimeMessages, CastleItems, Object3dAsVRML;
+  CastleTimeMessages, CastleItems, Object3dAsVRML, KambiLog, KambiTimeUtils;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -1271,6 +1271,7 @@ procedure TCreaturesKindsList.PrepareRender;
 var
   I: Integer;
   PrepareRenderSteps: Cardinal;
+  TimeBegin: TProcessTimerResult;
 begin
   if not WasParam_DebugNoCreatures then
   begin
@@ -1278,11 +1279,18 @@ begin
     for I := 0 to High do
       PrepareRenderSteps +=  Items[I].PrepareRenderSteps;
 
+    if Log then
+      TimeBegin := ProcessTimerNow;
+
     Progress.Init(PrepareRenderSteps, 'Loading creatures');
     try
       for I := 0 to High do
         Items[I].PrepareRender;
     finally Progress.Fini; end;
+
+    if Log then
+      WritelnLog('Loading creatures time', Format('%f seconds',
+        [ ProcessTimerDiff(ProcessTimerNow, TimeBegin) / ProcessTimersPerSec ]));
   end;
 end;
 
