@@ -2499,7 +2499,7 @@ begin
       (ProjectionNear, ProjectionFar);
     Scene.PrepareRender([tgAll], [prBackground, prBoundingBox]);
 
-    Scene.FreeExternalResources;
+    Scene.FreeResources([frTextureImageInNodes]);
 
     FLightSet := TVRMLLightSetGL.Create(LoadAsVRML(LightSetFileName),
       true,
@@ -2538,6 +2538,9 @@ begin
         'Loading level (triangle octree)');
     Scene.DefaultShapeStateOctree :=
       Scene.CreateShapeStateOctree('Loading level (ShapeState octree)');
+
+    { TrianglesList was created for triangle octree. We don't need it anymore. }
+    Scene.FreeResources([frTrianglesListNotOverTriangulate]);
   end;
 end;
 
@@ -3127,7 +3130,7 @@ begin
   if CreateDefaultTriangleOctree then
     Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
 
-  Result.FreeExternalResources;
+  Result.FreeResources([frTextureImageInNodes]);
 end;
 
 function TLevel.LoadLevelAnimation(
@@ -3142,7 +3145,7 @@ begin
 
   Result.PrepareRender([tgOpaque, tgTransparent],
     [prBoundingBox { BoundingBox is practically always needed }],
-    false, false);
+    false);
 
   if CreateFirstDefaultTriangleOctree then
     Result.FirstScene.DefaultTriangleOctree :=
@@ -3152,7 +3155,7 @@ begin
     Result.LastScene.DefaultTriangleOctree :=
       Result.LastScene.CreateTriangleOctree('');
 
-  Result.FreeExternalResources;
+  Result.FreeResources([frTextureImageInNodes]);
 end;
 
 function TLevel.Background: TBackgroundGL;

@@ -286,13 +286,15 @@ begin
       Exclude(ActualOptions, prManifoldEdges);
 
     AnimationAttributesSet(Anim.Attributes, BlendingType);
-    Anim.PrepareRender(TransparentGroups, ActualOptions,
-      false,
-      { It's temporary false --- see ../TODO file about
-        "Wrong Alien dying anim" problem. }
-      false);
+    Anim.PrepareRender(TransparentGroups, ActualOptions, false);
 
-    Anim.FreeExternalResources;
+    { TODO: frRootNode is temporary not here --- see ../TODO file about
+      "Wrong Alien dying anim" problem. }
+
+    Anim.FreeResources([frTextureImageInNodes,
+      { TrianglesList was created if ManifoldEdges were requested.
+        We don't need it anymore. }
+      frTrianglesListNotOverTriangulate]);
 
     if (prManifoldEdges in Options) and IsSharedManifoldEdges then
       Anim.ShareManifoldEdges(SharedManifoldEdges);

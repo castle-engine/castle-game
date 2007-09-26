@@ -396,7 +396,7 @@ implementation
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
   KambiGLUtils, CastlePlay, KambiFilesUtils, ProgressUnit,
   CastleCreatures, CastleVideoOptions, CastleTimeMessages,
-  VRMLTriangleOctree;
+  VRMLFlatScene, VRMLTriangleOctree;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -509,7 +509,7 @@ begin
 
     AttributesSet(Scene.Attributes, BlendingType);
     Scene.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox]);
-    Scene.FreeExternalResources;
+    Scene.FreeResources([frTextureImageInNodes]);
   end;
 
   Progress.Step;
