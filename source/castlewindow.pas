@@ -72,7 +72,6 @@ initialization
   Glw.SetDemoOptions(K_None, #0, false);
 
   GLContextCache := TVRMLOpenGLRendererContextCache.Create;
-  GLContextCache.UseTextureFileNames := true;
 
   Glw.OnInitList.AppendItem(@GLWindowInit);
   Glw.OnCloseList.AppendItem(@GLWindowClose);
