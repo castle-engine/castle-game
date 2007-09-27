@@ -159,6 +159,16 @@
     footsteps_sound="player_footsteps_concrete"
   />
 
+  <level
+    name="fountain"
+    scene_file_name="fountain/fountain_final.wrl"
+    light_set_file_name="fountain/fountain_lights.wrl"
+    title="Fountain"
+    number="15"
+    implementation_class="TLevel"
+    footsteps_sound="player_footsteps_concrete"
+  />
+
 <!--
   <level
     name="althana"
