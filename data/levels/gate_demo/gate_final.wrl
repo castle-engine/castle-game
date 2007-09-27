@@ -21,7 +21,7 @@ Group {
 
   NavigationInfo {
     avatarSize [ 0.5, 2 ]
-    speed 1.0
+    speed 20
     headlight FALSE
     type "FLY"
   }

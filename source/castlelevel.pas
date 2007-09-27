@@ -2480,11 +2480,20 @@ begin
     FProjectionNear := CameraRadius * 0.75;
     FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
 
-    { Fix InitialCameraDir length. Uses CameraRadius and NavigationSpeed. }
-    VectorAdjustToLengthTo1st(FInitialCameraDir, CameraRadius *
-      0.8 * { I multiply just to get the same thing
-      that view3dscene does at this time. }
-      NavigationSpeed);
+    (*Fix InitialCameraDir length, using NavigationSpeed.
+
+      TODO: this is bad if I'm going to change default NavigationSpeed
+      used in all levels. Then this will change both horizontal and
+      vertical moving speed. I should rather make NavigationSpeed
+      in "the castle" affect only horizontal move speed,
+      vertical move speed should be set such that it's equivalent to
+      previous code that was setting camera dir length to
+        CameraRadius * 0.8 * NavigationSpeed
+      which means
+        0.5 * 0.8 * 1
+      And CameraDir length should be just set to always 1 here.
+    *)
+    VectorAdjustToLengthTo1st(FInitialCameraDir, NavigationSpeed / 50);
 
     { Check and fix GravityUp. }
     if not VectorsEqual(Normalized(GravityUp),
