@@ -770,7 +770,8 @@ type
     FCameraPreferredHeight: Single;
     FProjectionNear: Single;
     FProjectionFar: Single;
-    FNavigationSpeed: Single;
+    FMoveHorizontalSpeed: Single;
+    FMoveVerticalSpeed: Single;
     FLevelBox: TBox3d;
     FItems: TItemsOnLevelList;
     FObjects: TLevelObjectsList;
@@ -924,7 +925,8 @@ type
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
     property ProjectionNear: Single read FProjectionNear;
     property ProjectionFar: Single read FProjectionFar;
-    property NavigationSpeed: Single read FNavigationSpeed;
+    property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
+    property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
 
     { Player position should always be within this box. }
     property LevelBox: TBox3d read FLevelBox;
@@ -2383,6 +2385,7 @@ const
 var
   NavigationNode: TNodeNavigationInfo;
   OctreeMaxDepth, OctreeMaxLeafItemsCount: Integer;
+  NavigationSpeed: Single;
 begin
   inherited Create;
 
@@ -2470,8 +2473,8 @@ begin
       DefaultCrouchHeight, DefaultHeadBobbing);
 
     if NavigationNode <> nil then
-      FNavigationSpeed := NavigationNode.FdSpeed.Value else
-      FNavigationSpeed := 1.0;
+      NavigationSpeed := NavigationNode.FdSpeed.Value else
+      NavigationSpeed := 1.0;
 
     if (NavigationNode <> nil) and NavigationNode.FdHeadlight.Value then
       FHeadlight := Scene.CreateHeadlight else
@@ -2480,20 +2483,14 @@ begin
     FProjectionNear := CameraRadius * 0.75;
     FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
 
-    (*Fix InitialCameraDir length, using NavigationSpeed.
+    { Fix InitialCameraDir length, and set MoveXxxSpeed.
 
-      TODO: this is bad if I'm going to change default NavigationSpeed
-      used in all levels. Then this will change both horizontal and
-      vertical moving speed. I should rather make NavigationSpeed
-      in "the castle" affect only horizontal move speed,
-      vertical move speed should be set such that it's equivalent to
-      previous code that was setting camera dir length to
-        CameraRadius * 0.8 * NavigationSpeed
-      which means
-        0.5 * 0.8 * 1
-      And CameraDir length should be just set to always 1 here.
-    *)
-    VectorAdjustToLengthTo1st(FInitialCameraDir, NavigationSpeed / 50);
+      We want to have horizontal and vertical speeds controlled independently,
+      so we just normalize InitialCameraDir and set speeds in appropriate
+      MoveXxxSpeed. }
+    NormalizeTo1st(FInitialCameraDir);
+    FMoveHorizontalSpeed := NavigationSpeed / 50;
+    FMoveVerticalSpeed := 0.4;
 
     { Check and fix GravityUp. }
     if not VectorsEqual(Normalized(GravityUp),

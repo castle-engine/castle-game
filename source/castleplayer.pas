@@ -728,7 +728,29 @@ begin
 end;
 
 procedure TPlayer.UpdateNavigator;
+var
+  LevelMoveHorizontalSpeed: Single;
+  LevelMoveVerticalSpeed: Single;
+  LevelCameraRadius: Single;
+  LevelCameraPreferredHeight: Single;
 begin
+  if Level <> nil then
+  begin
+    LevelMoveHorizontalSpeed := Level.MoveHorizontalSpeed;
+    LevelMoveVerticalSpeed := Level.MoveVerticalSpeed;
+    LevelCameraRadius := Level.CameraRadius;
+    LevelCameraPreferredHeight := Level.CameraPreferredHeight;
+  end else
+  begin
+    { This must work even when Level = nil. So we secure ourselves here,
+      if Level = nil then we just apply some default values. They don't matter
+      much, as user will not be able to play anyway without a Level loaded. }
+    LevelMoveHorizontalSpeed := 1.0;
+    LevelMoveVerticalSpeed := 1.0;
+    LevelCameraRadius := 0.0;
+    LevelCameraPreferredHeight := 0.0;
+  end;
+
   Navigator.Gravity := (not FlyingMode) and (not GameWin);
   { Note that when not Navigator.Gravity then FallingDownEffect will not
     work anyway. }
@@ -789,12 +811,10 @@ begin
     Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
     Navigator.HeadBobbing := 0.0;
-    if Level <> nil then
-      Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01 else
-      Navigator.CameraPreferredHeight := 0;
+    Navigator.CameraPreferredHeight := LevelCameraRadius * 1.01;
 
-    Navigator.MoveSpeed := 1.0;
-    Navigator.MoveVertSpeed := 1.0;
+    Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
+    Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed;
   end else
   if Dead then
   begin
@@ -816,12 +836,10 @@ begin
     Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
     Navigator.HeadBobbing := 0.0;
-    if Level <> nil then
-      Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01 else
-      Navigator.CameraPreferredHeight := 0;
+    Navigator.CameraPreferredHeight := LevelCameraRadius * 1.01;
 
-    Navigator.MoveSpeed := 1.0;
-    Navigator.MoveVertSpeed := 1.0;
+    Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
+    Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed;
   end else
   begin
     if FlyingMode then
@@ -840,8 +858,8 @@ begin
         Navigator.FallingDownSpeedIncrease
         ... don't matter here, because Gravity is false. }
 
-      Navigator.MoveSpeed := 1.0;
-      Navigator.MoveVertSpeed := 1.0;
+      Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
+      Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed;
     end else
     begin
       if Swimming <> psNo then
@@ -857,12 +875,10 @@ begin
         Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
         Navigator.FallingDownSpeedIncrease := 1.0;
         Navigator.HeadBobbing := 0.0;
-        if Level <> nil then
-          Navigator.CameraPreferredHeight := Level.CameraRadius * 1.01 else
-          Navigator.CameraPreferredHeight := 0;
+        Navigator.CameraPreferredHeight := LevelCameraRadius * 1.01;
 
-        Navigator.MoveSpeed := 0.5;
-        Navigator.MoveVertSpeed := 0.5;
+        Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed / 2;
+        Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed / 2;
       end else
       begin
         Navigator.PreferGravityUpForMoving := true;
@@ -876,12 +892,10 @@ begin
         Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
         Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
         Navigator.HeadBobbing := DefaultHeadBobbing;
-        if Level <> nil then
-          Navigator.CameraPreferredHeight := Level.CameraPreferredHeight else
-          Navigator.CameraPreferredHeight := 0;
+        Navigator.CameraPreferredHeight := LevelCameraPreferredHeight;
 
-        Navigator.MoveSpeed := 1.0;
-        Navigator.MoveVertSpeed := 1.0;
+        Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
+        Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed;
       end;
     end;
 

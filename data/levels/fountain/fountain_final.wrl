@@ -2,7 +2,7 @@
 
 NavigationInfo {
   avatarSize [ 0.5, 2 ]
-  speed 20
+  speed 10
   headlight FALSE
 }
 
