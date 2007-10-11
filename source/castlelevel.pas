@@ -2637,7 +2637,7 @@ function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
 var
   BoxNodeIndex: Integer;
 begin
-  BoxNodeIndex := Scene.ShapeStates.IndexOfShapeWithParentNamed(NodeName);
+  BoxNodeIndex := Scene.ShapeStates.IndexOfBlenderMesh(NodeName);
   Result := BoxNodeIndex <> -1;
   if Result then
   begin

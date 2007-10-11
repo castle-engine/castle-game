@@ -20,6 +20,44 @@ Background {
 	skyAngle [ 1.57 ]
 }
 
+DEF OB_ObjLevelBox Transform {
+	translation -0.115111 -0.038370 0.000000
+	rotation 1.000000 0.000000 0.000000 0.000000
+	scale 3.500000 3.500000 1.000000
+	children [
+		DEF ME_LevelBox Group {
+			children [
+				Shape {
+					appearance Appearance {
+					}
+					geometry IndexedLineSet {
+						coord DEF coord_LevelBox Coordinate {
+							point [
+5.7000002861 5.69999885559 0.0
+ 5.7000002861 -5.70000171661 0.0
+ -5.7000002861 -5.7000002861 0.0
+ -5.69999790192 5.70000171661 0.0
+ -5.7000002861 -5.7000002861 7.90000009537
+ 5.7000002861 -5.70000171661 7.90000009537
+ 5.7000002861 5.69999885559 7.90000009537
+ -5.69999790192 5.70000171661 7.90000009537
+ 							]
+						}
+						
+						coordIndex [
+0 1 2 3 -1, 
+4 5 6 7 -1, 
+3 2 4 7 -1, 
+1 5 4 2 -1, 
+0 6 5 1 -1, 
+6 0 3 7 -1, 
+						]
+					}
+				}
+			]
+		}
+	]
+}
 DEF OB_FountainCore Transform {
 	translation 0.000000 0.000000 1.000000
 	rotation 1.000000 0.000000 0.000000 1.570796
