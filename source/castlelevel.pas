@@ -787,10 +787,17 @@ type
       early. }
     ItemsToRemove: TVRMLNodesList;
 
-    procedure TraverseForItems(Node: TVRMLNode; State: TVRMLGraphTraverseState);
+    procedure TraverseForItems(
+      BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
+      BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
+      ShapeNode: TNodeGeneralShape;
+      State: TVRMLGraphTraverseState);
 
     FCreatures: TCreaturesList;
-    procedure TraverseForCreatures(Node: TVRMLNode;
+    procedure TraverseForCreatures(
+      BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
+      BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
+      ShapeNode: TNodeGeneralShape;
       State: TVRMLGraphTraverseState);
 
     FInitialCameraPos: TVector3Single;
@@ -2423,11 +2430,11 @@ begin
     try
       { Initialize Items }
       FItems := TItemsOnLevelList.Create;
-      Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, @TraverseForItems);
+      Scene.RootNode.TraverseBlenderObjects(@TraverseForItems);
 
       { Initialize Creatures }
       FCreatures := TCreaturesList.Create;
-      Scene.RootNode.TraverseFromDefaultState(TNodeGeneralShape, @TraverseForCreatures);
+      Scene.RootNode.TraverseBlenderObjects(@TraverseForCreatures);
 
       RemoveItemsToRemove;
     finally ItemsToRemove.Free end;
@@ -2666,7 +2673,10 @@ begin
     Objects[I].ChangeLevelScene;
 end;
 
-procedure TLevel.TraverseForItems(Node: TVRMLNode;
+procedure TLevel.TraverseForItems(
+  BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
+  BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
+  ShapeNode: TNodeGeneralShape;
   State: TVRMLGraphTraverseState);
 
   procedure CreateNewItem(const ItemNodeName: string);
@@ -2701,7 +2711,7 @@ procedure TLevel.TraverseForItems(Node: TVRMLNode;
       raise Exception.CreateFmt('Item kind with VRMLNodeName "%s" doesn''t exist',
         [ItemKindVRMLNodeName]);
 
-    ItemStubBoundingBox := (Node as TNodeGeneralShape).BoundingBox(State);
+    ItemStubBoundingBox := ShapeNode.BoundingBox(State);
     ItemPosition[0] := (ItemStubBoundingBox[0, 0] + ItemStubBoundingBox[1, 0]) / 2;
     ItemPosition[1] := (ItemStubBoundingBox[0, 1] + ItemStubBoundingBox[1, 1]) / 2;
     ItemPosition[2] := ItemStubBoundingBox[0, 2];
@@ -2712,29 +2722,20 @@ procedure TLevel.TraverseForItems(Node: TVRMLNode;
 
 const
   ItemPrefix = 'Item';
-var
-  ParentIndex: Integer;
-  Parent: TVRMLNode;
 begin
-  for ParentIndex := 0 to Node.ParentNodesCount - 1 do
+  if IsPrefix(ItemPrefix, BlenderMeshName) then
   begin
-    Parent := Node.ParentNodes[ParentIndex];
-    if IsPrefix(ItemPrefix, Parent.NodeName) then
-    begin
-      CreateNewItem(SEnding(Parent.NodeName, Length(ItemPrefix) + 1));
-      { Don't remove Parent now --- will be removed later.
-        This avoids problems with removing nodes while traversing. }
-      ItemsToRemove.Add(Parent);
-      Break;
-    end;
+    CreateNewItem(SEnding(BlenderMeshName, Length(ItemPrefix) + 1));
+    { Don't remove BlenderObjectNode now --- will be removed later.
+      This avoids problems with removing nodes while traversing. }
+    ItemsToRemove.Add(BlenderObjectNode);
   end;
-
-  { TODO: should check ParentFields for VRML 2.0 too ? The goal is actually to
-    detect things with ItemPrefix in blender. so we have to see what
-    blender VRML 2.0 exporter does. }
 end;
 
-procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
+procedure TLevel.TraverseForCreatures(
+  BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
+  BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
+  ShapeNode: TNodeGeneralShape;
   State: TVRMLGraphTraverseState);
 
   procedure CreateNewCreature(const CreatureNodeName: string);
@@ -2765,7 +2766,7 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
     end;
 
     { calculate CreaturePosition }
-    StubBoundingBox := (Node as TNodeGeneralShape).BoundingBox(State);
+    StubBoundingBox := ShapeNode.BoundingBox(State);
     CreaturePosition[0] := (StubBoundingBox[0, 0] + StubBoundingBox[1, 0]) / 2;
     CreaturePosition[1] := (StubBoundingBox[0, 1] + StubBoundingBox[1, 1]) / 2;
     CreaturePosition[2] := StubBoundingBox[0, 2];
@@ -2805,26 +2806,14 @@ procedure TLevel.TraverseForCreatures(Node: TVRMLNode;
 
 const
   CreaturePrefix = 'Crea';
-var
-  ParentIndex: Integer;
-  Parent: TVRMLNode;
 begin
-  for ParentIndex := 0 to Node.ParentNodesCount - 1 do
+  if IsPrefix(CreaturePrefix, BlenderMeshName) then
   begin
-    Parent := Node.ParentNodes[ParentIndex];
-    if IsPrefix(CreaturePrefix, Parent.NodeName) then
-    begin
-      CreateNewCreature(SEnding(Parent.NodeName, Length(CreaturePrefix) + 1));
-      { Don't remove Parent now --- will be removed later.
-        This avoids problems with removing nodes while traversing. }
-      ItemsToRemove.Add(Parent);
-      Break;
-    end;
+    CreateNewCreature(SEnding(BlenderMeshName, Length(CreaturePrefix) + 1));
+    { Don't remove BlenderObjectNode now --- will be removed later.
+      This avoids problems with removing nodes while traversing. }
+    ItemsToRemove.Add(BlenderObjectNode);
   end;
-
-  { TODO: should check ParentFields for VRML 2.0 too ? The goal is actually to
-    detect things with ItemPrefix in blender. so we have to see what
-    blender VRML 2.0 exporter does. }
 end;
 
 function TLevel.LineOfSight(
