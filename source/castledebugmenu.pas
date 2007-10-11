@@ -829,7 +829,7 @@ begin
   Items.Add('Point/SpotLight: Change attenuation');
   Items.Add('DirectionalLight: Change direction');
   Items.Add('SpotLight: Change direction');
-  Items.Add('SpotLight: Change dropOffRate');
+  Items.Add('SpotLight: Change beamWidth/dropOffRate');
   Items.Add('SpotLight: Change cutOffAngle');
   Items.Add('Back');
 
@@ -932,6 +932,17 @@ begin
              TNodeSpotLight_1(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
+         end else
+         if Light is TNodeSpotLight_2 then
+         begin
+           Vector := TNodeSpotLight_2(Light).FdDirection.Value;
+           if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
+             '(Input "P" to use current player''s direction)',
+             Vector, taLeft, Player.Navigator.CameraDir) then
+           begin
+             TNodeSpotLight_2(Light).FdDirection.Value := Vector;
+             Level.LightSet.CalculateLights;
+           end;
          end;
        end;
     12:begin
@@ -943,6 +954,15 @@ begin
              TNodeSpotLight_1(Light).FdDropOffRate.Value := Value;
              Level.LightSet.CalculateLights;
            end;
+         end else
+         if Light is TNodeSpotLight_2 then
+         begin
+           Value := TNodeSpotLight_2(Light).FdBeamWidth.Value;
+           if MessageInputQuery(Glw, 'Change beamWidth', Value, taLeft) then
+           begin
+             TNodeSpotLight_2(Light).FdBeamWidth.Value := Value;
+             Level.LightSet.CalculateLights;
+           end;
          end;
        end;
     13:begin
@@ -952,6 +972,15 @@ begin
            if MessageInputQuery(Glw, 'Change cutOffAngle', Value, taLeft) then
            begin
              TNodeSpotLight_1(Light).FdCutOffAngle.Value := Value;
+             Level.LightSet.CalculateLights;
+           end;
+         end else
+         if Light is TNodeSpotLight_2 then
+         begin
+           Value := TNodeSpotLight_2(Light).FdCutOffAngle.Value;
+           if MessageInputQuery(Glw, 'Change cutOffAngle', Value, taLeft) then
+           begin
+             TNodeSpotLight_2(Light).FdCutOffAngle.Value := Value;
              Level.LightSet.CalculateLights;
            end;
          end;
