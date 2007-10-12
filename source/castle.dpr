@@ -206,7 +206,7 @@ end.
 {
   Local Variables:
   compile-command: "fpcdebug castle.dpr --exe-output-dir ../"
-  kam-compile-release-command-unix:  "make -C ../ build-unix  && mv -fv ../castle      ~/bin/"
-  kam-compile-release-command-win32: "make -C ../ build-win32 && mv -fv ../castle.exe c:/bin/"
+  kam-compile-release-command-unix:    "make -C ../ build-unix    && mv -fv ../castle      ~/bin/"
+  kam-compile-release-command-windows: "make -C ../ build-windows && mv -fv ../castle.exe c:/bin/"
   End:
 }

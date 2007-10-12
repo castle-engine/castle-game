@@ -45,21 +45,21 @@ install:
 
 ifeq ($(DEBUG),t)
 FPC_UNIX_OPTIONS := -dDEBUG
-FPC_WIN32_OPTIONS := -dDEBUG
+FPC_WINDOWS_OPTIONS := -dDEBUG
 else
 
 ifeq ($(DEBUG),valgrind)
 FPC_UNIX_OPTIONS := -gl -gv -dRELEASE -dGLWINDOW_XLIB
-FPC_WIN32_OPTIONS := -gl -gv -dRELEASE
+FPC_WINDOWS_OPTIONS := -gl -gv -dRELEASE
 else
 
 ifeq ($(DEBUG),gprof)
 FPC_UNIX_OPTIONS := -pg -dRELEASE -dGLWINDOW_XLIB
-FPC_WIN32_OPTIONS := -pg -dRELEASE
+FPC_WINDOWS_OPTIONS := -pg -dRELEASE
 else
 
 FPC_UNIX_OPTIONS := -dRELEASE -dGLWINDOW_XLIB
-FPC_WIN32_OPTIONS := -dRELEASE
+FPC_WINDOWS_OPTIONS := -dRELEASE
 endif
 endif
 endif
@@ -69,9 +69,9 @@ build-unix:
 	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg ../castle/source/castle.dpr
 	mv source/castle ./
 
-build-win32:
+build-windows:
 	cd ../kambi_vrml_game_engine/ && \
-	  fpc $(FPC_WIN32_OPTIONS) @kambi.cfg ../castle/source/castle.dpr
+	  fpc $(FPC_WINDOWS_OPTIONS) @kambi.cfg ../castle/source/castle.dpr
 	mv source/castle.exe ./castle.exe
 
 # ------------------------------------------------------------

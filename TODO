@@ -315,7 +315,7 @@ cages level:
   - from queen lair, passage to this 2nd hidden room --- some treasures there
   - make real doors that you must click to open them
 
-- "Color depth" and "Display Frequency" are ignored on non-Win32 targets.
+- "Color depth" and "Display Frequency" are ignored on non-Windows targets.
   (Seems that judges and most people test on Windows, so no time (it's already 4th May)
   to do this for Unix (xvf86mode) now.
 
