@@ -1,1 +1,1 @@
-../../../../terragen/gen_make_skycube.sh 0 > background_render_script.tgs
+../../../../terragen/background_render_script_mk.sh 0 > background_render_script.tgs
