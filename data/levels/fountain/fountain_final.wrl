@@ -21,12 +21,22 @@ Transform {
 
 Transform {
   rotation 1 0 0 1.5707963705062866
+
   children Background {
-    groundColor [ 0.1 0.1 0.1, 0.0565629 0.2208154 0.4 ]
-    groundAngle [ 1.57 ]
-    skyColor [ 0.1 0.1 0.1, 0.0565629 0.2208154 0.4 ]
-    skyAngle [ 1.57 ]
+    backUrl "../../skies/sunset/sunset_back.png"
+    bottomUrl "../../skies/sunset/sunset_bottom.png"
+    frontUrl "../../skies/sunset/sunset_front.png"
+    leftUrl "../../skies/sunset/sunset_left.png"
+    rightUrl "../../skies/sunset/sunset_right.png"
+    topUrl "../../skies/sunset/sunset_top.png"
   }
+
+#   children Background {
+#     groundColor [ 0.1 0.1 0.1, 0.0565629 0.2208154 0.4 ]
+#     groundAngle [ 1.57 ]
+#     skyColor [ 0.1 0.1 0.1, 0.0565629 0.2208154 0.4 ]
+#     skyAngle [ 1.57 ]
+#   }
 }
 
 Inline { url "fountain.wrl" }

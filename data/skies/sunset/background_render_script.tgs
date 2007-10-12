@@ -1,0 +1,39 @@
+; -*- buffer-read-only: t -*-
+; Do not edit, this is automatically generated file.
+; Edit gen_make_skycube.sh instead.
+
+InitAnim "rendered_background" 1
+
+; Zero CloudVelo, so that clouds will not move (to keep clouds position the same
+; on each rendered image).
+; I'm not sure whether setting CloudPos 0 0 is really needed, Terragen will
+; probably use the same cloud setting anyway (and this is all I want) if I will
+; not call CloudPos at any place.
+CloudPos 0 0
+CloudVel 0 0
+
+CamPos 128 128 0
+CamB 0
+
+; Zoom 1 = field of view 90 degrees
+Zoom 1
+
+; render 6 views now
+
+TarPos 128  1000 0
+FRend
+TarPos -1000 128 0
+FRend
+TarPos 128 -1000 0
+FRend
+TarPos  1000 128 0
+FRend
+
+TarPos 128 128 -1000
+CamB 90
+FRend
+
+TarPos 128 128  1000
+CamB -90
+FRend
+
