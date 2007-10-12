@@ -1,6 +1,6 @@
 ; -*- buffer-read-only: t -*-
 ; Do not edit, this is automatically generated file.
-; Edit gen_make_skycube.sh instead.
+; Edit background_render_script_mk.sh instead.
 
 InitAnim "rendered_background" 1
 
