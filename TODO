@@ -1,6 +1,6 @@
 - fountain finish:
   trees, bushes around (natural LevelBox)
-  bake shadows ?
+  bake shadows ? Too bad looking, still... Maybe try SV shadows for level ? Adjust to handle non-perfectly-manifold meshes correctly (borders, with 1 neighbor, are acceptable, although it must output ratio of borders to total --- otherwise it will be real slow, and still > 2 neighbors is not acceptable)
   light changing (fire pots in the corner(s) ?)
   footsteps: splashes on water
   fountain: water sparkling (use blender's particle animation)
