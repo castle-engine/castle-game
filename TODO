@@ -1,3 +1,12 @@
+- fountain finish:
+  trees, bushes around (natural LevelBox)
+  material, textures (marble on columns, lighter marble for sides, some stone for fountain)
+  bake shadows ?
+  light changing (fire pots in the corner(s) ?)
+  footsteps: splashes on water
+  fountain: water sparkling (use blender's particle animation)
+  sounds: some birds, water sparkling
+
 - make gamma correction.
     Windows: http://www.delphi3d.net/articles/viewarticle.php?article=gamma.htm
 
@@ -6,8 +15,6 @@
 
 - Plany na bardzo najbli¿sz± przysz³o¶æ to
   ... oraz skoñczenie cieni.
-
-- VRML 97 test level, see TODO.vrml97 notes and castle-development.php
 
 - Kasia usability test:
   - mouse over yes/no message boxes should work (confirmed Eric)
