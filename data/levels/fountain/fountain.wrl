@@ -30,8 +30,7 @@ DEF OB_ItemLifePotion_001 Transform {
 				Shape {
 					appearance Appearance {
 					}
-					geometry IndexedFaceSet {
-						solid FALSE
+					geometry IndexedLineSet {
 						coord DEF coord_ItemLifePotion Coordinate {
 							point [
 1.0 1.00000011921 -1.00000011921
@@ -77,8 +76,7 @@ DEF OB_Cube Transform {
 				Shape {
 					appearance Appearance {
 					}
-					geometry IndexedFaceSet {
-						solid FALSE
+					geometry IndexedLineSet {
 						coord DEF coord_CreaAlien Coordinate {
 							point [
 1.0 1.00000011921 -1.00000011921
