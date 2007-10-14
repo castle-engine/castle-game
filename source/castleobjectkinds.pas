@@ -73,11 +73,11 @@ type
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool }
     procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
 
-    { Similar to AddFirstRootNodesPool, this allows us to share one
-      ManifoldEdges instance between different animations, if they
-      start from the same VRML scene. }
+    { Similar to AddFirstRootNodesPool, this allows us to share
+      ManifoldEdges / BorderEdges instances between different animations,
+      if they start from the same VRML scene. }
     procedure AddManifoldEdgesPool(AnimInfo: TVRMLGLAnimationInfo;
-      ManifoldEdges: TDynManifoldEdgeArray);
+      AnimationToShareEdges: TVRMLGLAnimation);
 
     { @param(AnimationName determines the XML element name, so it must
       be a valid part of XML name) }
@@ -151,8 +151,8 @@ begin
   end;
   FreeAndNil(FirstRootNodesPool);
 
-  { No need to free ManifoldEdgesPool objects --- they will be freed with
-    TVRMLFlatSceneGL instances that own them. }
+  { No need to free ManifoldEdgesPool objects --- they are animations,
+    will be freed from other places (usually from FreePrepareRender). }
   FreeAndNil(ManifoldEdgesPool);
 
   FreeAndNil(AnimationsPrepared);
@@ -190,7 +190,7 @@ begin
         "Wrong Alien dying anim" problem. }
 
       AnimationsPrepared[I].FreeResources([frTextureImageInNodes,
-        { TrianglesList was created if ManifoldEdges were requested.
+        { TrianglesList was created if ManifoldEdges / BorderEdges were requested.
           We don't need it anymore. }
         frTrianglesListNotOverTriangulate]);
     end;
@@ -275,7 +275,7 @@ begin
 end;
 
 procedure TObjectKind.AddManifoldEdgesPool(AnimInfo: TVRMLGLAnimationInfo;
-  ManifoldEdges: TDynManifoldEdgeArray);
+  AnimationToShareEdges: TVRMLGLAnimation);
 var
   FileName: string;
   Index: Integer;
@@ -283,8 +283,8 @@ begin
   FileName := AnimInfo.ModelFileNames[0];
   Index := ManifoldEdgesPool.IndexOf(FileName);
   if Index = -1 then
-    ManifoldEdgesPool.AddObject(FileName, ManifoldEdges) else
-    ManifoldEdgesPool.Objects[Index] := ManifoldEdges;
+    ManifoldEdgesPool.AddObject(FileName, AnimationToShareEdges) else
+    ManifoldEdgesPool.Objects[Index] := AnimationToShareEdges;
 end;
 
 procedure TObjectKind.CreateAnimationIfNeeded(
@@ -296,8 +296,9 @@ procedure TObjectKind.CreateAnimationIfNeeded(
 var
   FileName: string;
   FileNameIndex: Integer;
-  IsSharedManifoldEdges: boolean;
+  IsSharedManifoldAndBorderEdges: boolean;
   SharedManifoldEdges: TDynManifoldEdgeArray;
+  SharedBorderEdges: TDynBorderEdgeArray;
   ActualOptions: TPrepareRenderOptions;
 begin
   if (AnimInfo <> nil) and (Anim = nil) then
@@ -306,17 +307,20 @@ begin
 
   if Anim <> nil then
   begin
-    { calculate IsSharedManifoldEdges, SharedManifoldEdges }
-    IsSharedManifoldEdges := false;
+    { calculate IsSharedManifoldAndBorderEdges, SharedManifoldEdges,
+      SharedBorderEdges }
+    IsSharedManifoldAndBorderEdges := false;
     if (AnimInfo <> nil) then
     begin
       FileName := AnimInfo.ModelFileNames[0];
       FileNameIndex := ManifoldEdgesPool.IndexOf(FileName);
       if FileNameIndex <> -1 then
       begin
-        IsSharedManifoldEdges := true;
-        SharedManifoldEdges :=
-          ManifoldEdgesPool.Objects[FileNameIndex] as TDynManifoldEdgeArray;
+        IsSharedManifoldAndBorderEdges := true;
+        SharedManifoldEdges := (ManifoldEdgesPool.Objects[FileNameIndex] as
+          TVRMLGLAnimation).ManifoldEdges;
+        SharedBorderEdges := (ManifoldEdgesPool.Objects[FileNameIndex] as
+          TVRMLGLAnimation).BorderEdges;
       end;
     end;
 
@@ -329,22 +333,25 @@ begin
           Anim.ScenesCount,
           Anim.Scenes[0].TrianglesCount(true) ]));
 
-    { calculate ActualOptions: Options, but possibly without prManifoldEdges }
+    { calculate ActualOptions: Options, but possibly without
+      prManifoldAndBorderEdges }
     ActualOptions := Options;
-    if IsSharedManifoldEdges then
-      Exclude(ActualOptions, prManifoldEdges);
+    if IsSharedManifoldAndBorderEdges then
+      Exclude(ActualOptions, prManifoldAndBorderEdges);
 
     AnimationAttributesSet(Anim.Attributes, BlendingType);
     Anim.PrepareRender(TransparentGroups, ActualOptions, false);
 
-    if (prManifoldEdges in Options) and IsSharedManifoldEdges then
-      Anim.ShareManifoldEdges(SharedManifoldEdges);
+    if (prManifoldAndBorderEdges in Options) and
+      IsSharedManifoldAndBorderEdges then
+      Anim.ShareManifoldAndBorderEdges(SharedManifoldEdges, SharedBorderEdges);
 
-    if Log and (prManifoldEdges in Options) then
+    if Log and (prManifoldAndBorderEdges in Options) then
       WritelnLog('Animation info', Format(
-        '%s animation: correct manifold ? %s',
+        '%s animation: %d manifold edges, %d border edges',
         [ VRMLNodeName + '.' + AnimationName,
-          BoolToStr[Anim.FirstScene.ManifoldEdges <> nil] ]));
+          Anim.FirstScene.ManifoldEdges.Count,
+          Anim.FirstScene.BorderEdges.Count ] ));
 
     AnimationsPrepared.Add(Anim);
   end;

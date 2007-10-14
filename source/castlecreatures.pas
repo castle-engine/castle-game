@@ -1387,7 +1387,7 @@ begin
   AddFirstRootNodesPool(FHurtAnimationInfo       );
 
   CreateAnimationIfNeeded('Stand'      , FStandAnimation      , FStandAnimationInfo      );
-  AddManifoldEdgesPool(FStandAnimationInfo, FStandAnimation.ManifoldEdges);
+  AddManifoldEdgesPool(FStandAnimationInfo, FStandAnimation);
   CreateAnimationIfNeeded('StandToWalk', FStandToWalkAnimation, FStandToWalkAnimationInfo);
   CreateAnimationIfNeeded('Walk'       , FWalkAnimation       , FWalkAnimationInfo       );
   CreateAnimationIfNeeded('Attack'     , FAttackAnimation     , FAttackAnimationInfo     );
