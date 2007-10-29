@@ -39,7 +39,8 @@ DEF OB_Button Transform {
 						}
 					}
 					geometry IndexedFaceSet {
-						solid FALSE
+						solid TRUE
+                                                creaseAngle 1
 						coord DEF coord_MeshButton Coordinate {
 							point [
 0.0399999916553 0.0399999916553 0.0

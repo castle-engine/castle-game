@@ -1,4 +1,7 @@
-- check all level objects shadows rendering (e.g. elevator on tower and doom levels)
+- check all level objects shadows rendering:
+  - MovingElevator on tower
+  - FEndSequence, gate exit on cages
+  - doom level doors, fake wall, MovingElevator49, MovingElevator9a9b, ExitButton
 - move render squads to main debug menu
 - mention in docs that level objects get shadows too, and so the same considerations as for creatures apply
 
