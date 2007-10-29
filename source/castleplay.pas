@@ -349,15 +349,13 @@ procedure Draw(Glwin: TGLWindow);
     procedure RenderShadowQuads;
     var
       I: Integer;
-      C: TCreature;
     begin
       for I := 0 to Level.Creatures.High do
       begin
-        C := Level.Creatures.Items[I];
-        if C.Kind.CastsShadow and
-          ShadowVolumesHelper.ShadowMaybeVisible(C.BoundingBox) then
-          C.RenderShadowQuads(MainLightPosition);
+        Level.Creatures.Items[I].RenderShadowQuads(MainLightPosition,
+          ShadowVolumesHelper);
       end;
+      Level.RenderShadowQuads(MainLightPosition, ShadowVolumesHelper);
     end;
 
   const

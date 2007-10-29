@@ -26,7 +26,7 @@ interface
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSourceAllocator, KambiXMLCfg,
-  VRMLTriangleOctree, GameSoundEngine;
+  VRMLTriangleOctree, GameSoundEngine, ShadowVolumesUtils;
 
 {$define read_interface}
 
@@ -796,7 +796,12 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); virtual;
 
-    procedure RenderShadowQuads(const LightPosition: TVector4Single); virtual;
+    { Render shadow quads for all the thinds rendered by @link(Render).
+      It renders shadow quads only if Kind.CastsShadow and
+      shadow volume is not culled (so ShadowVolumesHelper should
+      have FrustumCullingInit already initialized). }
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper); virtual;
 
     procedure Idle(const CompSpeed: Single); virtual;
 
@@ -2005,9 +2010,12 @@ begin
 end;
 
 procedure TCreature.RenderShadowQuads(
-  const LightPosition: TVector4Single);
+  const LightPosition: TVector4Single;
+  ShadowVolumesHelper: TShadowVolumesHelper);
 begin
-  CurrentScene.RenderShadowQuads(LightPosition, SceneTransform);
+  if Kind.CastsShadow and
+     ShadowVolumesHelper.ShadowMaybeVisible(BoundingBox) then
+    CurrentScene.RenderShadowQuads(LightPosition, false, SceneTransform);
 end;
 
 function TCreature.MiddleCollisionWithPlayer(

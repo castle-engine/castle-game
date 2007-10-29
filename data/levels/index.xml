@@ -121,7 +121,8 @@
     number="99"
     implementation_class="TTowerLevel"
 
-    footsteps_sound="player_footsteps_grass">
+    footsteps_sound="player_footsteps_grass"
+  >
 
     <area vrml_name="HintElevButton">
       <hint>Hint: press the elevator button using the %i</hint>

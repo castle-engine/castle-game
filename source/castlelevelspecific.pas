@@ -26,7 +26,7 @@ interface
 uses VRMLGLAnimation, VRMLFlatSceneGL, Boxes3d, VectorMath,
   CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL,
   ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM,
-  CastleCreatures;
+  CastleCreatures, ShadowVolumesUtils;
 
 const
   CastleHallWerewolvesCount = 4;
@@ -78,8 +78,8 @@ type
     Teleport1Destination: TVector3Single;
     Teleport2Destination: TVector3Single;
 
-    SacrilegeAmbushStartingPosition: array[0..5]of TVector3Single;
-    SwordAmbushStartingPosition: array[0..2]of TVector3Single;
+    SacrilegeAmbushStartingPosition: array [0..5] of TVector3Single;
+    SwordAmbushStartingPosition: array [0..2] of TVector3Single;
 
     SacrilegeAmbushDone: boolean;
     SwordAmbushDone: boolean;
@@ -104,6 +104,9 @@ type
     procedure Idle(const CompSpeed: Single); override;
 
     procedure Render(const Frustum: TFrustum); override;
+
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper); override;
   end;
 
   TTowerLevel = class(TLevel)
@@ -151,6 +154,9 @@ type
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
     procedure Render(const Frustum: TFrustum); override;
+
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper); override;
 
     { True means that GateExit will not be rendered (or collided)
       and EndSequence will be rendered. }
@@ -717,6 +723,13 @@ begin
   RenderTeleport(Teleport2Rotate, FTeleport2Box, tgTransparent);
 end;
 
+procedure TGateLevel.RenderShadowQuads(const LightPosition: TVector4Single;
+  ShadowVolumesHelper: TShadowVolumesHelper);
+begin
+  { TODO: render teleport shadow quads }
+  inherited;
+end;
+
 { TTowerLevel ---------------------------------------------------------------- }
 
 constructor TTowerLevel.Create(
@@ -997,6 +1010,13 @@ begin
     glPopMatrix;
   end;
 
+  inherited;
+end;
+
+procedure TCagesLevel.RenderShadowQuads(const LightPosition: TVector4Single;
+  ShadowVolumesHelper: TShadowVolumesHelper);
+begin
+  { TODO: render spiders shadow quads }
   inherited;
 end;
 

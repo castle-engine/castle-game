@@ -29,7 +29,8 @@ uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
-  BackgroundGL, VRMLGLHeadlight, DOM, GameSoundEngine;
+  BackgroundGL, VRMLGLHeadlight, DOM, GameSoundEngine,
+  ShadowVolumesUtils;
 
 {$define read_interface}
 
@@ -108,6 +109,31 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); virtual; abstract;
 
+    { Render shadow quads for all the things rendered by @link(Render).
+      It does shadow volumes culling inside  (so ShadowVolumesHelper should
+      have FrustumCullingInit already initialized).
+
+      ParentTransform and ParentTransformIsIdentity describe the transformation
+      of this object set by parent level object.
+      Level objects may be organized in hierarchy when
+      parent transforms it's children. When ParentTransformIsIdentity,
+      ParentTransform must be IdentityMatrix4Single (it's not guaranteed
+      that when ParentTransformIsIdentity = @true, Transform value will be
+      ignored !).
+
+      @italic(Implementation note:) In @link(Render), it was possible
+      to implement this by glPush/PopMatrix and FrustumMove tricks.
+      But RenderShadowQuads needs actual transformation explicitly:
+      ShadowMaybeVisible needs actual box position in world coordinates,
+      so bounding box has to be transformed by ParentTransform.
+      And TVRMLFlatSceneGL.RenderShadowQuads needs explicit ParentTransform
+      to correctly detect front/back sides (for silhouette edges and
+      volume capping). }
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper;
+      const ParentTransformIsIdentity: boolean;
+      const ParentTransform: TMatrix4Single); virtual; abstract;
+
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
@@ -154,6 +180,12 @@ type
       ParentLevel.AnimationTime was updated. }
     procedure Idle; virtual;
 
+    { Bounding box for collisions.
+
+      Note that for non-colliding objects, this can
+      be empty, even though something is visible on the level. In other words,
+      this is not suitable for render culling --- this is only for detecting
+      collisions. }
     function BoundingBox: TBox3d; virtual; abstract;
 
     { Called from TLevel constructor. This is the place when you
@@ -199,6 +231,11 @@ type
 
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
+
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper;
+      const ParentTransformIsIdentity: boolean;
+      const ParentTransform: TMatrix4Single); override;
 
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
@@ -264,6 +301,11 @@ type
 
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
+
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper;
+      const ParentTransformIsIdentity: boolean;
+      const ParentTransform: TMatrix4Single); override;
 
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
@@ -387,6 +429,11 @@ type
 
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
+
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper;
+      const ParentTransformIsIdentity: boolean;
+      const ParentTransform: TMatrix4Single); override;
 
     procedure BeforeIdle(const NewAnimationTime: TAnimationTime); override;
     procedure Idle; override;
@@ -625,6 +672,11 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
 
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper;
+      const ParentTransformIsIdentity: boolean;
+      const ParentTransform: TMatrix4Single); override;
+
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
@@ -708,6 +760,11 @@ type
 
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper;
+      const ParentTransformIsIdentity: boolean;
+      const ParentTransform: TMatrix4Single); override;
+
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
@@ -840,6 +897,7 @@ type
     procedure LoadFromDOMElement(Element: TDOMElement);
 
     FDemo: boolean;
+    FSceneDynamicShadows: boolean;
   protected
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
@@ -874,7 +932,9 @@ type
       @unorderedList(
         @item sets Attributes according to AttributesSet
         @item optionally create triangle octree
-        @item call PrepareRender, optionally with PrepareBackground = @true
+        @item(call PrepareRender, with prBoundingBox, prShadowQuads
+          (if shadows enabled by RenderShadowsPossible), optionally
+          with prBackground)
         @item FreeExternalResources, since they will not be needed anymore
       ) }
     function LoadLevelScene(const FileName: string;
@@ -884,7 +944,8 @@ type
       @unorderedList(
         @item sets Attributes according to AnimationAttributesSet
         @item optionally creates triangle octree for the FirstScene and/or LastScene
-        @item call PrepareRender
+        @item(call PrepareRender, with prBoundingBox, prShadowQuads
+          (if shadows enabled by RenderShadowsPossible))
         @item FreeExternalResources, since they will not be needed anymore
       ) }
     function LoadLevelAnimation(
@@ -1057,8 +1118,15 @@ type
     procedure PlayerGetCameraHeightSqr(Navigator: TMatrixWalker;
       out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
-    { Call this to render level things. Frustum is current player's frustum. }
+    { Call this to render level things: level scene and level objects
+      in @link(Objects). Frustum is current player's frustum. }
     procedure Render(const Frustum: TFrustum); virtual;
+
+    { Render shadow quads for all the things rendered by @link(Render).
+      It does shadow volumes culling inside  (so ShadowVolumesHelper should
+      have FrustumCullingInit already initialized). }
+    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+      ShadowVolumesHelper: TShadowVolumesHelper); virtual;
 
     { Call this to allow level object to update some things,
       animate level objects etc. }
@@ -1201,6 +1269,17 @@ type
     function Background: TBackgroundGL; virtual;
 
     property Demo: boolean read FDemo write FDemo;
+
+    { If @true, we will render dynamic shadows (shadow volumes) for
+      all scene geometry. This allows the whole level to use dynamic
+      shadows. It's normally read from data/levels/index.xml,
+      attribute scene_dynamic_shadows.
+
+      TODO: this is experimental for now, and doesn't look good and is not fast
+      enough on most levels for now. To make it work OK, z-fail must be done,
+      and dyn shadows from more than one light need to be done. }
+    property SceneDynamicShadows: boolean
+      read FSceneDynamicShadows write FSceneDynamicShadows default false;
   end;
 
   TLevelClass = class of TLevel;
@@ -1417,6 +1496,27 @@ begin
     Scene.RenderFrustum(Frustum, TransparentGroup);
 end;
 
+procedure TLevelStaticObject.RenderShadowQuads(
+  const LightPosition: TVector4Single;
+  ShadowVolumesHelper: TShadowVolumesHelper;
+  const ParentTransformIsIdentity: boolean;
+  const ParentTransform: TMatrix4Single);
+var
+  Box: TBox3d;
+begin
+  if Exists then
+  begin
+    { calculate Box for shadow volume culling }
+    Box := Scene.BoundingBox;
+    if not ParentTransformIsIdentity then
+      Box := BoundingBoxTransform(Box, ParentTransform);
+
+    if ShadowVolumesHelper.ShadowMaybeVisible(Box) then
+      Scene.RenderShadowQuads(LightPosition, ParentTransformIsIdentity,
+        ParentTransform);
+  end;
+end;
+
 function TLevelStaticObject.BoundingBox: TBox3d;
 begin
   if Exists and Collides then
@@ -1445,6 +1545,19 @@ var
 begin
   for I := 0 to List.High do
     List.Items[I].Render(Frustum, TransparentGroup);
+end;
+
+procedure TLevelObjectSum.RenderShadowQuads(
+  const LightPosition: TVector4Single;
+  ShadowVolumesHelper: TShadowVolumesHelper;
+  const ParentTransformIsIdentity: boolean;
+  const ParentTransform: TMatrix4Single);
+var
+  I: Integer;
+begin
+  for I := 0 to List.High do
+    List.Items[I].RenderShadowQuads(LightPosition, ShadowVolumesHelper,
+      ParentTransformIsIdentity, ParentTransform);
 end;
 
 function TLevelObjectSum.MoveAllowedSimple(
@@ -1758,6 +1871,32 @@ begin
           MovingObject.Render(FrustumMove(Frustum, (-T).Data), TransparentGroup);
         glPopMatrix;
       end;
+  end;
+end;
+
+procedure TLevelMovingObject.RenderShadowQuads(
+  const LightPosition: TVector4Single;
+  ShadowVolumesHelper: TShadowVolumesHelper;
+  const ParentTransformIsIdentity: boolean;
+  const ParentTransform: TMatrix4Single);
+var
+  T: TVector3_Single;
+begin
+  if Exists then
+  begin
+    T := Translation(ParentLevel.AnimationTime);
+
+    { We assume that Translation = 0,0,0 is the most common case
+      (this is true e.g. for TDoomLevelDoor,
+      since all doors close automatically, and initially all are closed...).
+
+      In this case we can avoid matrix multiplication. }
+
+    if IsZeroVector(T.Data) then
+      MovingObject.RenderShadowQuads(LightPosition, ShadowVolumesHelper,
+        ParentTransformIsIdentity, ParentTransform) else
+      MovingObject.RenderShadowQuads(LightPosition, ShadowVolumesHelper,
+        false, MultMatrices(TranslationMatrix(T.Data), ParentTransform));
   end;
 end;
 
@@ -2227,6 +2366,30 @@ begin
     Animation.SceneFromTime(AnimationTime).RenderFrustum(Frustum, TransparentGroup);
 end;
 
+procedure TLevelAnimatedObject.RenderShadowQuads(
+  const LightPosition: TVector4Single;
+  ShadowVolumesHelper: TShadowVolumesHelper;
+  const ParentTransformIsIdentity: boolean;
+  const ParentTransform: TMatrix4Single);
+var
+  Scene: TVRMLFlatSceneGL;
+  Box: TBox3d;
+begin
+  if Exists then
+  begin
+    Scene := Animation.SceneFromTime(AnimationTime);
+
+    { calculate Box for shadow volume culling }
+    Box := Scene.BoundingBox;
+    if not ParentTransformIsIdentity then
+      Box := BoundingBoxTransform(Box, ParentTransform);
+
+    if ShadowVolumesHelper.ShadowMaybeVisible(Box) then
+      Scene.RenderShadowQuads(LightPosition, ParentTransformIsIdentity,
+        ParentTransform);
+  end;
+end;
+
 function TLevelAnimatedObject.BoundingBox: TBox3d;
 begin
   if Exists and Collides then
@@ -2276,6 +2439,15 @@ end;
 
 procedure TLevelArea.Render(const Frustum: TFrustum;
   TransparentGroup: TTransparentGroup);
+begin
+  { This object is invisible and non-colliding. }
+end;
+
+procedure TLevelArea.RenderShadowQuads(
+  const LightPosition: TVector4Single;
+  ShadowVolumesHelper: TShadowVolumesHelper;
+  const ParentTransformIsIdentity: boolean;
+  const ParentTransform: TMatrix4Single);
 begin
   { This object is invisible and non-colliding. }
 end;
@@ -2393,6 +2565,7 @@ var
   NavigationNode: TNodeNavigationInfo;
   OctreeMaxDepth, OctreeMaxLeafItemsCount: Integer;
   NavigationSpeed: Single;
+  Options: TPrepareRenderOptions;
 begin
   inherited Create;
 
@@ -2510,7 +2683,13 @@ begin
 
     Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
       (ProjectionNear, ProjectionFar);
-    Scene.PrepareRender([tgAll], [prBackground, prBoundingBox]);
+
+    { calcualte Options for PrepareRender }
+    Options := [prBackground, prBoundingBox];
+    if RenderShadowsPossible and SceneDynamicShadows then
+      Options := Options + prShadowQuads;
+
+    Scene.PrepareRender([tgAll], Options);
 
     Scene.FreeResources([frTextureImageInNodes]);
 
@@ -2638,6 +2817,9 @@ begin
   if DOMGetAttribute(Element, 'footsteps_sound', SoundName) then
     FootstepsSound := SoundEngine.SoundFromName(SoundName) else
     FootstepsSound := stPlayerFootstepsConcrete;
+
+  FSceneDynamicShadows := false; { default value }
+  DOMGetBooleanAttribute(Element, 'scene_dynamic_shadows', FSceneDynamicShadows);
 end;
 
 function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
@@ -2998,6 +3180,23 @@ begin
     Objects[I].Render(Frustum, tgTransparent);
 end;
 
+procedure TLevel.RenderShadowQuads(const LightPosition: TVector4Single;
+  ShadowVolumesHelper: TShadowVolumesHelper);
+var
+  I: Integer;
+begin
+  for I := 0 to Objects.High do
+    Objects[I].RenderShadowQuads(LightPosition, ShadowVolumesHelper,
+      true, IdentityMatrix4Single);
+
+  if SceneDynamicShadows then
+  begin
+    { Useless to optimize this by ShadowVolumesHelper.ShadowMaybeVisible,
+      Scene will be visible practically always. }
+    Scene.RenderShadowQuads(LightPosition, true, IdentityMatrix4Single);
+  end;
+end;
+
 procedure TLevel.Idle(const CompSpeed: Single);
 var
   I: Integer;
@@ -3116,9 +3315,12 @@ begin
     true, roSeparateShapeStates, GLContextCache);
   AttributesSet(Result.Attributes, btIncrease);
 
+  { calculate Options for PrepareRender }
   Options := [prBoundingBox { BoundingBox is practically always needed }];
   if PrepareBackground then
     Include(Options, prBackground);
+  if RenderShadowsPossible then
+    Options := Options + prShadowQuads;
 
   Result.PrepareRender([tgOpaque, tgTransparent], Options);
 
@@ -3132,15 +3334,20 @@ function TLevel.LoadLevelAnimation(
   const FileName: string;
   CreateFirstDefaultTriangleOctree,
   CreateLastDefaultTriangleOctree: boolean): TVRMLGLAnimation;
+var
+  Options: TPrepareRenderOptions;
 begin
   Result := TVRMLGLAnimation.Create(GLContextCache);
   Result.LoadFromFile(FileName);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
 
-  Result.PrepareRender([tgOpaque, tgTransparent],
-    [prBoundingBox { BoundingBox is practically always needed }],
-    false);
+  { calculate Options for PrepareRender }
+  Options := [prBoundingBox { BoundingBox is practically always needed }];
+  if RenderShadowsPossible then
+    Options := Options + prShadowQuads;
+
+  Result.PrepareRender([tgOpaque, tgTransparent], Options, false);
 
   if CreateFirstDefaultTriangleOctree then
     Result.FirstScene.DefaultTriangleOctree :=
