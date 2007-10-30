@@ -1,5 +1,4 @@
 - move render squads to main debug menu
-- mention in docs that level objects get shadows too, and so the same considerations as for creatures apply
 
 - fountain finish:
   trees, bushes around (natural LevelBox)
