@@ -74,7 +74,7 @@ var
   DemoNavigator: TMatrixWalker;
 
   GLList_Caption: TGLuint;
-  CaptionWidth, CaptionHeight: Cardinal;
+  {CaptionWidth, }CaptionHeight: Cardinal;
 
 procedure DemoLevelBegin;
 begin
@@ -189,7 +189,7 @@ begin
     PathDelim + 'menu_bg' + PathDelim + 'caption.png', [], [], 0, 0);
   try
     GLList_Caption := ImageDrawToDisplayList(ImageCaption);
-    CaptionWidth := ImageCaption.Width;
+    {CaptionWidth := ImageCaption.Width; useless for now}
     CaptionHeight := ImageCaption.Height;
   finally FreeAndNil(ImageCaption) end;
 end;

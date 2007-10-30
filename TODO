@@ -1,7 +1,3 @@
-- check all level objects shadows rendering:
-  - MovingElevator on tower
-  - FEndSequence, gate exit on cages
-  - doom level doors, fake wall, MovingElevator49, MovingElevator9a9b, ExitButton
 - move render squads to main debug menu
 - mention in docs that level objects get shadows too, and so the same considerations as for creatures apply
 
@@ -67,8 +63,6 @@
   - need to be optimized more to enabled by default.
     Then set DefaultRenderShadows to true, and remove the warning in
     CastleStartMenu when changing RenderShadows.
-
-  - make cart (any TLevelObject actually) casting shadows
 
 - make castle gate with shadows baked on ground.
   This is done in gate blender model, and once I used it actually in the game

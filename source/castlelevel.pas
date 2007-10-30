@@ -91,6 +91,7 @@ type
   TLevelObject = class
   private
     FParentLevel: TLevel;
+    FCastsShadow: boolean;
   public
     constructor Create(AParentLevel: TLevel);
 
@@ -110,6 +111,7 @@ type
       TransparentGroup: TTransparentGroup); virtual; abstract;
 
     { Render shadow quads for all the things rendered by @link(Render).
+      Does nothing if not CastsShadow.
       It does shadow volumes culling inside  (so ShadowVolumesHelper should
       have FrustumCullingInit already initialized).
 
@@ -133,6 +135,9 @@ type
       ShadowVolumesHelper: TShadowVolumesHelper;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); virtual; abstract;
+
+    property CastsShadow: boolean read FCastsShadow write FCastsShadow
+      default true;
 
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
@@ -1323,6 +1328,7 @@ constructor TLevelObject.Create(AParentLevel: TLevel);
 begin
   inherited Create;
   FParentLevel := AParentLevel;
+  FCastsShadow := true;
 end;
 
 procedure TLevelObject.BeforeIdle(const NewAnimationTime: TAnimationTime);
@@ -1504,7 +1510,7 @@ procedure TLevelStaticObject.RenderShadowQuads(
 var
   Box: TBox3d;
 begin
-  if Exists then
+  if Exists and CastsShadow then
   begin
     { calculate Box for shadow volume culling }
     Box := Scene.BoundingBox;
@@ -1555,9 +1561,12 @@ procedure TLevelObjectSum.RenderShadowQuads(
 var
   I: Integer;
 begin
-  for I := 0 to List.High do
-    List.Items[I].RenderShadowQuads(LightPosition, ShadowVolumesHelper,
-      ParentTransformIsIdentity, ParentTransform);
+  if CastsShadow then
+  begin
+    for I := 0 to List.High do
+      List.Items[I].RenderShadowQuads(LightPosition, ShadowVolumesHelper,
+        ParentTransformIsIdentity, ParentTransform);
+  end;
 end;
 
 function TLevelObjectSum.MoveAllowedSimple(
@@ -1882,7 +1891,7 @@ procedure TLevelMovingObject.RenderShadowQuads(
 var
   T: TVector3_Single;
 begin
-  if Exists then
+  if Exists and CastsShadow then
   begin
     T := Translation(ParentLevel.AnimationTime);
 
@@ -2375,7 +2384,7 @@ var
   Scene: TVRMLFlatSceneGL;
   Box: TBox3d;
 begin
-  if Exists then
+  if Exists and CastsShadow then
   begin
     Scene := Animation.SceneFromTime(AnimationTime);
 

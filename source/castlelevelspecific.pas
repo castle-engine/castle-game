@@ -265,14 +265,17 @@ begin
 
   Symbol := TLevelSimpleAnimatedObject.Create(Self,
     LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false));
+  Symbol.CastsShadow := false; { shadow would not be visible anyway }
   Objects.Add(Symbol);
 
   Button := TLevelSimpleAnimatedObject.Create(Self,
     LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false));
+  Button.CastsShadow := false; { strange ghost shadow on symbol would be visible }
   Objects.Add(Button);
 
   StairsBlocker := TLevelStaticObject.Create(Self,
     CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl', false);
+  StairsBlocker.CastsShadow := false; { shadow would not be visible anyway }
   Objects.Add(StairsBlocker);
 end;
 
@@ -765,6 +768,9 @@ begin
   MovingElevator.SoundGoBeginPosition := stElevator;
   MovingElevator.SoundGoBeginPositionLooping := true;
   MovingElevator.SoundTracksCurrentPosition := true;
+  { no shadow, because looks bad: tower level has uninteresting light
+    and elevator triggers artifacts because of BorderEdges. }
+  MovingElevator.CastsShadow := false;
   Objects.Add(MovingElevator);
 end;
 
@@ -817,10 +823,12 @@ begin
     with it --- no reason to waste time, no collisions will be possible
     as player's move along the EndSequence will be programmed. }
   FEndSequence.Collides := false;
+  FEndSequence.CastsShadow := false; { shadow is not visible anyway }
   Objects.Add(FEndSequence);
 
   FGateExit := TLevelStaticObject.Create(Self,
     CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl', false);
+  FGateExit.CastsShadow := false; { shadow is not visible anyway }
   Objects.Add(FGateExit);
 
   BossIndex := Creatures.FindKind(SpiderQueen);
@@ -1070,6 +1078,7 @@ begin
   MovePushesOthers := false;
   SoundGoEndPosition := stDoorOpen;
   SoundGoBeginPosition := stDoorClose;
+  CastsShadow := false; { looks bad }
 end;
 
 procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: TAnimationTime);
@@ -1169,6 +1178,7 @@ begin
     octree will be generated very fast and will be very small in memory.
     Not a problem to worry. }
   FakeWall.Collides := false;
+  FakeWall.CastsShadow := false;
   Objects.Add(FakeWall);
 
   Elevator49 := TLevelStaticObject.Create(
@@ -1183,6 +1193,7 @@ begin
   MovingElevator49.SoundGoBeginPosition := stElevator;
   MovingElevator49.SoundGoBeginPositionLooping := true;
   MovingElevator49.SoundTracksCurrentPosition := true;
+  MovingElevator49.CastsShadow := false;
   Objects.Add(MovingElevator49);
 
   Elevator9a9b := TLevelStaticObject.Create(
@@ -1197,10 +1208,12 @@ begin
   MovingElevator9a9b.SoundGoBeginPosition := stElevator;
   MovingElevator9a9b.SoundGoBeginPositionLooping := true;
   MovingElevator9a9b.SoundTracksCurrentPosition := true;
+  MovingElevator9a9b.CastsShadow := false;
   Objects.Add(MovingElevator9a9b);
 
   ExitButton := TLevelStaticObject.Create(Self,
     DoomDoorsPathPrefix + 'exit_button_final.wrl', false);
+  ExitButton.CastsShadow := false;
   Objects.Add(ExitButton);
 end;
 
@@ -1344,12 +1357,12 @@ begin
   Water := TLevelSimpleAnimatedObject.Create(Self,
     LoadLevelAnimation(CastleLevelsPath + 'gate_demo' +
       PathDelim + 'water.kanim', false, false));
-  Objects.Add(Water);
-
+  Water.CastsShadow := false; { water shadow would look awkward }
   { No octrees created for water (because in normal usage, player will not
     walk on this level). For safety, Collides set to @false, in case
     user enters this level by debug menu. }
   Water.Collides := false;
+  Objects.Add(Water);
 
   Water.Play;
 end;
