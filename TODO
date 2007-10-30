@@ -1,5 +1,3 @@
-- move render squads to main debug menu
-
 - fountain finish:
   trees, bushes around (natural LevelBox)
   bake shadows ? Too bad looking, still... Maybe try SV shadows for level ? Adjust to handle non-perfectly-manifold meshes correctly (borders, with 1 neighbor, are acceptable, although it must output ratio of borders to total --- otherwise it will be real slow, and still > 2 neighbors is not acceptable)

@@ -48,6 +48,7 @@ type
   TDebugMenu = class(TCastleMenu)
     RenderBoundingBoxesArgument: TGLMenuBooleanArgument;
     RenderDebugCaptionsArgument: TGLMenuBooleanArgument;
+    RenderShadowQuadsArgument: TGLMenuBooleanArgument;
     DebugRenderForLevelScreenshotArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
@@ -69,7 +70,6 @@ type
   end;
 
   TDebugCreaturesMenu = class(TCastleMenu)
-    RenderShadowQuadsArgument: TGLMenuBooleanArgument;
     DebugTimeStopForCreaturesArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
@@ -154,6 +154,7 @@ begin
 
   RenderBoundingBoxesArgument := TGLMenuBooleanArgument.Create(RenderBoundingBoxes);
   RenderDebugCaptionsArgument := TGLMenuBooleanArgument.Create(RenderDebugCaptions);
+  RenderShadowQuadsArgument := TGLMenuBooleanArgument.Create(RenderShadowQuads);
   DebugRenderForLevelScreenshotArgument := TGLMenuBooleanArgument.Create(
     DebugRenderForLevelScreenshot);
 
@@ -163,6 +164,7 @@ begin
   Items.Add('Level debug menu');
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
   Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
+  Items.AddObject('Render shadow quads', RenderShadowQuadsArgument);
   Items.AddObject('Render for level screenshot',
     DebugRenderForLevelScreenshotArgument);
   Items.Add('Reload sounds/index.xml');
@@ -202,18 +204,22 @@ begin
          RenderDebugCaptionsArgument.Value := RenderDebugCaptions;
        end;
     6: begin
+         RenderShadowQuads := not RenderShadowQuads;
+         RenderShadowQuadsArgument.Value := RenderShadowQuads;
+       end;
+    7: begin
          DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
          DebugRenderForLevelScreenshotArgument.Value :=
            DebugRenderForLevelScreenshot;
        end;
-    7: SoundEngine.ReadSoundInfos;
-    8: begin
+    8: SoundEngine.ReadSoundInfos;
+    9: begin
          FreeAndNil(EditLevelLightsMenu);
          EditLevelLightsMenu := TEditLevelLightsMenu.Create;
          CurrentMenu := EditLevelLightsMenu;
        end;
-    9: ForceThunder;
-    10: UserQuit := true;
+    10:ForceThunder;
+    11:UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -304,7 +310,6 @@ constructor TDebugCreaturesMenu.Create;
 begin
   inherited Create;
 
-  RenderShadowQuadsArgument := TGLMenuBooleanArgument.Create(RenderShadowQuads);
   DebugTimeStopForCreaturesArgument := TGLMenuBooleanArgument.Create(
     DebugTimeStopForCreatures);
 
@@ -315,7 +320,6 @@ begin
   Items.Add('Add creature to level exactly on player');
   Items.Add('Reload creatures/kinds.xml file');
   Items.Add('Reload animations of specific creature');
-  Items.AddObject('Render shadow quads', RenderShadowQuadsArgument);
   Items.AddObject('Time stop for creatures', DebugTimeStopForCreaturesArgument);
   Items.Add('Back');
 
@@ -429,14 +433,10 @@ begin
     5: CreaturesKinds.LoadFromFile;
     6: ReloadCreatureAnimation;
     7: begin
-         RenderShadowQuads := not RenderShadowQuads;
-         RenderShadowQuadsArgument.Value := RenderShadowQuads;
-       end;
-    8: begin
          DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
          DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
        end;
-    9: CurrentMenu := DebugMenu;
+    8: CurrentMenu := DebugMenu;
   end;
 end;
 
