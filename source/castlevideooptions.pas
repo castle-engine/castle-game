@@ -119,7 +119,7 @@ var
 
   { You can set this to true for debug purposes.
     This is meaningull only if RenderShadowsPossible and RenderShadows. }
-  RenderShadowQuads: boolean = false;
+  DebugRenderShadowVolume: boolean = false;
 
 const
   DefaultColorDepthBits = 0;

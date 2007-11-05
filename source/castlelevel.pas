@@ -125,13 +125,13 @@ type
 
       @italic(Implementation note:) In @link(Render), it was possible
       to implement this by glPush/PopMatrix and FrustumMove tricks.
-      But RenderShadowQuads needs actual transformation explicitly:
+      But RenderShadowVolume needs actual transformation explicitly:
       ShadowMaybeVisible needs actual box position in world coordinates,
       so bounding box has to be transformed by ParentTransform.
-      And TVRMLFlatSceneGL.RenderShadowQuads needs explicit ParentTransform
+      And TVRMLFlatSceneGL.RenderShadowVolume needs explicit ParentTransform
       to correctly detect front/back sides (for silhouette edges and
       volume capping). }
-    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(const LightPosition: TVector4Single;
       ShadowVolumesHelper: TShadowVolumesHelper;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); virtual; abstract;
@@ -237,7 +237,7 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
 
-    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(const LightPosition: TVector4Single;
       ShadowVolumesHelper: TShadowVolumesHelper;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
@@ -307,7 +307,7 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
 
-    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(const LightPosition: TVector4Single;
       ShadowVolumesHelper: TShadowVolumesHelper;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
@@ -435,7 +435,7 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
 
-    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(const LightPosition: TVector4Single;
       ShadowVolumesHelper: TShadowVolumesHelper;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
@@ -677,7 +677,7 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
 
-    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(const LightPosition: TVector4Single;
       ShadowVolumesHelper: TShadowVolumesHelper;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
@@ -765,7 +765,7 @@ type
 
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
-    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(const LightPosition: TVector4Single;
       ShadowVolumesHelper: TShadowVolumesHelper;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
@@ -937,7 +937,7 @@ type
       @unorderedList(
         @item sets Attributes according to AttributesSet
         @item optionally create triangle octree
-        @item(call PrepareRender, with prBoundingBox, prShadowQuads
+        @item(call PrepareRender, with prBoundingBox, prShadowVolume
           (if shadows enabled by RenderShadowsPossible), optionally
           with prBackground)
         @item FreeExternalResources, since they will not be needed anymore
@@ -949,7 +949,7 @@ type
       @unorderedList(
         @item sets Attributes according to AnimationAttributesSet
         @item optionally creates triangle octree for the FirstScene and/or LastScene
-        @item(call PrepareRender, with prBoundingBox, prShadowQuads
+        @item(call PrepareRender, with prBoundingBox, prShadowVolume
           (if shadows enabled by RenderShadowsPossible))
         @item FreeExternalResources, since they will not be needed anymore
       ) }
@@ -1130,7 +1130,7 @@ type
     { Render shadow quads for all the things rendered by @link(Render).
       It does shadow volumes culling inside  (so ShadowVolumesHelper should
       have FrustumCullingInit already initialized). }
-    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(const LightPosition: TVector4Single;
       ShadowVolumesHelper: TShadowVolumesHelper); virtual;
 
     { Call this to allow level object to update some things,
@@ -1502,7 +1502,7 @@ begin
     Scene.RenderFrustum(Frustum, TransparentGroup);
 end;
 
-procedure TLevelStaticObject.RenderShadowQuads(
+procedure TLevelStaticObject.RenderShadowVolume(
   const LightPosition: TVector4Single;
   ShadowVolumesHelper: TShadowVolumesHelper;
   const ParentTransformIsIdentity: boolean;
@@ -1518,7 +1518,7 @@ begin
       Box := BoundingBoxTransform(Box, ParentTransform);
 
     if ShadowVolumesHelper.ShadowMaybeVisible(Box) then
-      Scene.RenderShadowQuads(LightPosition, ParentTransformIsIdentity,
+      Scene.RenderShadowVolume(LightPosition, ParentTransformIsIdentity,
         ParentTransform);
   end;
 end;
@@ -1553,7 +1553,7 @@ begin
     List.Items[I].Render(Frustum, TransparentGroup);
 end;
 
-procedure TLevelObjectSum.RenderShadowQuads(
+procedure TLevelObjectSum.RenderShadowVolume(
   const LightPosition: TVector4Single;
   ShadowVolumesHelper: TShadowVolumesHelper;
   const ParentTransformIsIdentity: boolean;
@@ -1564,7 +1564,7 @@ begin
   if CastsShadow then
   begin
     for I := 0 to List.High do
-      List.Items[I].RenderShadowQuads(LightPosition, ShadowVolumesHelper,
+      List.Items[I].RenderShadowVolume(LightPosition, ShadowVolumesHelper,
         ParentTransformIsIdentity, ParentTransform);
   end;
 end;
@@ -1883,7 +1883,7 @@ begin
   end;
 end;
 
-procedure TLevelMovingObject.RenderShadowQuads(
+procedure TLevelMovingObject.RenderShadowVolume(
   const LightPosition: TVector4Single;
   ShadowVolumesHelper: TShadowVolumesHelper;
   const ParentTransformIsIdentity: boolean;
@@ -1902,9 +1902,9 @@ begin
       In this case we can avoid matrix multiplication. }
 
     if IsZeroVector(T.Data) then
-      MovingObject.RenderShadowQuads(LightPosition, ShadowVolumesHelper,
+      MovingObject.RenderShadowVolume(LightPosition, ShadowVolumesHelper,
         ParentTransformIsIdentity, ParentTransform) else
-      MovingObject.RenderShadowQuads(LightPosition, ShadowVolumesHelper,
+      MovingObject.RenderShadowVolume(LightPosition, ShadowVolumesHelper,
         false, MultMatrices(TranslationMatrix(T.Data), ParentTransform));
   end;
 end;
@@ -2375,7 +2375,7 @@ begin
     Animation.SceneFromTime(AnimationTime).RenderFrustum(Frustum, TransparentGroup);
 end;
 
-procedure TLevelAnimatedObject.RenderShadowQuads(
+procedure TLevelAnimatedObject.RenderShadowVolume(
   const LightPosition: TVector4Single;
   ShadowVolumesHelper: TShadowVolumesHelper;
   const ParentTransformIsIdentity: boolean;
@@ -2394,7 +2394,7 @@ begin
       Box := BoundingBoxTransform(Box, ParentTransform);
 
     if ShadowVolumesHelper.ShadowMaybeVisible(Box) then
-      Scene.RenderShadowQuads(LightPosition, ParentTransformIsIdentity,
+      Scene.RenderShadowVolume(LightPosition, ParentTransformIsIdentity,
         ParentTransform);
   end;
 end;
@@ -2452,7 +2452,7 @@ begin
   { This object is invisible and non-colliding. }
 end;
 
-procedure TLevelArea.RenderShadowQuads(
+procedure TLevelArea.RenderShadowVolume(
   const LightPosition: TVector4Single;
   ShadowVolumesHelper: TShadowVolumesHelper;
   const ParentTransformIsIdentity: boolean;
@@ -2696,7 +2696,7 @@ begin
     { calcualte Options for PrepareRender }
     Options := [prBackground, prBoundingBox];
     if RenderShadowsPossible and SceneDynamicShadows then
-      Options := Options + prShadowQuads;
+      Options := Options + prShadowVolume;
 
     Scene.PrepareRender([tgAll], Options);
 
@@ -3189,20 +3189,20 @@ begin
     Objects[I].Render(Frustum, tgTransparent);
 end;
 
-procedure TLevel.RenderShadowQuads(const LightPosition: TVector4Single;
+procedure TLevel.RenderShadowVolume(const LightPosition: TVector4Single;
   ShadowVolumesHelper: TShadowVolumesHelper);
 var
   I: Integer;
 begin
   for I := 0 to Objects.High do
-    Objects[I].RenderShadowQuads(LightPosition, ShadowVolumesHelper,
+    Objects[I].RenderShadowVolume(LightPosition, ShadowVolumesHelper,
       true, IdentityMatrix4Single);
 
   if SceneDynamicShadows then
   begin
     { Useless to optimize this by ShadowVolumesHelper.ShadowMaybeVisible,
       Scene will be visible practically always. }
-    Scene.RenderShadowQuads(LightPosition, true, IdentityMatrix4Single);
+    Scene.RenderShadowVolume(LightPosition, true, IdentityMatrix4Single);
   end;
 end;
 
@@ -3329,7 +3329,7 @@ begin
   if PrepareBackground then
     Include(Options, prBackground);
   if RenderShadowsPossible then
-    Options := Options + prShadowQuads;
+    Options := Options + prShadowVolume;
 
   Result.PrepareRender([tgOpaque, tgTransparent], Options);
 
@@ -3354,7 +3354,7 @@ begin
   { calculate Options for PrepareRender }
   Options := [prBoundingBox { BoundingBox is practically always needed }];
   if RenderShadowsPossible then
-    Options := Options + prShadowQuads;
+    Options := Options + prShadowVolume;
 
   Result.PrepareRender([tgOpaque, tgTransparent], Options, false);
 

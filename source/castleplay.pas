@@ -346,16 +346,16 @@ procedure Draw(Glwin: TGLWindow);
   var
     MainLightPosition: TVector4Single;
 
-    procedure RenderShadowQuads;
+    procedure RenderShadowVolume;
     var
       I: Integer;
     begin
       for I := 0 to Level.Creatures.High do
       begin
-        Level.Creatures.Items[I].RenderShadowQuads(MainLightPosition,
+        Level.Creatures.Items[I].RenderShadowVolume(MainLightPosition,
           ShadowVolumesHelper);
       end;
-      Level.RenderShadowQuads(MainLightPosition, ShadowVolumesHelper);
+      Level.RenderShadowVolume(MainLightPosition, ShadowVolumesHelper);
     end;
 
   const
@@ -419,16 +419,16 @@ procedure Draw(Glwin: TGLWindow);
             { Render front facing shadow quads. }
             ShadowVolumesHelper.SetStencilOpForFront;
             glCullFace(GL_BACK);
-            RenderShadowQuads;
+            RenderShadowVolume;
 
             { Render back facing shadow quads. }
             ShadowVolumesHelper.SetStencilOpForBack;
             glCullFace(GL_FRONT);
-            RenderShadowQuads;
+            RenderShadowVolume;
           end else
           begin
             ShadowVolumesHelper.SetStencilOpSeparate;
-            RenderShadowQuads;
+            RenderShadowVolume;
           end;
 
         glSetDepthAndColorWriteable(GL_TRUE);
@@ -504,7 +504,7 @@ procedure Draw(Glwin: TGLWindow);
       glDisable(GL_STENCIL_TEST);
     glPopAttrib();
 
-    if CastleVideoOptions.RenderShadowQuads then
+    if CastleVideoOptions.DebugRenderShadowVolume then
     begin
       glPushAttrib(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT or GL_ENABLE_BIT);
         glEnable(GL_DEPTH_TEST);
@@ -513,7 +513,7 @@ procedure Draw(Glwin: TGLWindow);
         glDepthMask(GL_FALSE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
-        RenderShadowQuads;
+        RenderShadowVolume;
       glPopAttrib;
     end;
 

@@ -48,7 +48,7 @@ type
   TDebugMenu = class(TCastleMenu)
     RenderBoundingBoxesArgument: TGLMenuBooleanArgument;
     RenderDebugCaptionsArgument: TGLMenuBooleanArgument;
-    RenderShadowQuadsArgument: TGLMenuBooleanArgument;
+    DebugRenderShadowVolumeArgument: TGLMenuBooleanArgument;
     DebugRenderForLevelScreenshotArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
@@ -154,7 +154,7 @@ begin
 
   RenderBoundingBoxesArgument := TGLMenuBooleanArgument.Create(RenderBoundingBoxes);
   RenderDebugCaptionsArgument := TGLMenuBooleanArgument.Create(RenderDebugCaptions);
-  RenderShadowQuadsArgument := TGLMenuBooleanArgument.Create(RenderShadowQuads);
+  DebugRenderShadowVolumeArgument := TGLMenuBooleanArgument.Create(DebugRenderShadowVolume);
   DebugRenderForLevelScreenshotArgument := TGLMenuBooleanArgument.Create(
     DebugRenderForLevelScreenshot);
 
@@ -164,7 +164,7 @@ begin
   Items.Add('Level debug menu');
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
   Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
-  Items.AddObject('Render shadow quads', RenderShadowQuadsArgument);
+  Items.AddObject('Render shadow volumes', DebugRenderShadowVolumeArgument);
   Items.AddObject('Render for level screenshot',
     DebugRenderForLevelScreenshotArgument);
   Items.Add('Reload sounds/index.xml');
@@ -204,8 +204,8 @@ begin
          RenderDebugCaptionsArgument.Value := RenderDebugCaptions;
        end;
     6: begin
-         RenderShadowQuads := not RenderShadowQuads;
-         RenderShadowQuadsArgument.Value := RenderShadowQuads;
+         DebugRenderShadowVolume := not DebugRenderShadowVolume;
+         DebugRenderShadowVolumeArgument.Value := DebugRenderShadowVolume;
        end;
     7: begin
          DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;

@@ -796,11 +796,11 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); virtual;
 
-    { Render shadow quads for all the thinds rendered by @link(Render).
-      It renders shadow quads only if Kind.CastsShadow and
+    { Render shadow volumes for all the thinds rendered by @link(Render).
+      It renders shadow volume only if Kind.CastsShadow and
       shadow volume is not culled (so ShadowVolumesHelper should
       have FrustumCullingInit already initialized). }
-    procedure RenderShadowQuads(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(const LightPosition: TVector4Single;
       ShadowVolumesHelper: TShadowVolumesHelper); virtual;
 
     procedure Idle(const CompSpeed: Single); virtual;
@@ -1254,7 +1254,7 @@ var
 begin
   Options := [prBoundingBox];
   if RenderShadowsPossible then
-    Options := Options + prShadowQuads;
+    Options := Options + prShadowVolume;
 
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
     { all creature animations are displayed in 3D screen along
@@ -2009,13 +2009,13 @@ begin
     [Kind.VRMLNodeName, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
 end;
 
-procedure TCreature.RenderShadowQuads(
+procedure TCreature.RenderShadowVolume(
   const LightPosition: TVector4Single;
   ShadowVolumesHelper: TShadowVolumesHelper);
 begin
   if Kind.CastsShadow and
      ShadowVolumesHelper.ShadowMaybeVisible(BoundingBox) then
-    CurrentScene.RenderShadowQuads(LightPosition, false, SceneTransform);
+    CurrentScene.RenderShadowVolume(LightPosition, false, SceneTransform);
 end;
 
 function TCreature.MiddleCollisionWithPlayer(
