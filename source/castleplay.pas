@@ -416,23 +416,18 @@ procedure Draw(Glwin: TGLWindow);
 
           if glStencilOpSeparate = nil then
           begin
-            { For each fragment that passes depth-test, *increase* it's stencil
-              value by 1. Render front facing shadow quads. }
-            glStencilOp(GL_KEEP, GL_KEEP, ShadowVolumesHelper.StencilOpIncrWrap);
+            { Render front facing shadow quads. }
+            ShadowVolumesHelper.SetStencilOpForFront;
             glCullFace(GL_BACK);
             RenderShadowQuads;
 
-            { For each fragment that passes depth-test, *decrease* it's stencil
-              value by 1. Render back facing shadow quads. }
-            glStencilOp(GL_KEEP, GL_KEEP, ShadowVolumesHelper.StencilOpDecrWrap);
+            { Render back facing shadow quads. }
+            ShadowVolumesHelper.SetStencilOpForBack;
             glCullFace(GL_FRONT);
             RenderShadowQuads;
           end else
           begin
-            glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP,
-              ShadowVolumesHelper.StencilOpIncrWrap);
-            glStencilOpSeparate(GL_BACK , GL_KEEP, GL_KEEP,
-              ShadowVolumesHelper.StencilOpDecrWrap);
+            ShadowVolumesHelper.SetStencilOpSeparate;
             RenderShadowQuads;
           end;
 

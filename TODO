@@ -1,3 +1,13 @@
+- z-fail finish:
+  - TVRMLFlatSceneGL.RenderAllShadowVolume: honour LightCap, DarkCap
+    (for now it's only in silhouette implementation)
+  - ShadowVolumesHelper: ShadowVolumesHelper.InitializeObject(Box),
+    this Box can be used both for ShadowVolumesHelper.ShadowMaybeVisible,
+    to decide whether z-fail is needed, and (in case z-fail needed) to check
+    whether we have to render LightCap
+  - TVRMLFlatSceneGL.RenderShadowVolume: remove default values for LightCap, DarkCap
+  - avoid direct ShadowVolumesHelper.ZFail use in shadow_volume_test
+
 - fountain finish:
   trees, bushes around (natural LevelBox)
   bake shadows ? Too bad looking, still... Maybe try SV shadows for level ? Adjust to handle non-perfectly-manifold meshes correctly (borders, with 1 neighbor, are acceptable, although it must output ratio of borders to total --- otherwise it will be real slow, and still > 2 neighbors is not acceptable)
@@ -41,7 +51,6 @@
 - new shadows:
   - make better lights, to show shadows better.
     In gate: shadow of ghosts over the wall ?
-  - depth-fail (with alternative depth-pass when it's safe)
   - it's still too slow on some levels (doom e1m1)
   - allow items to cast shadows
   - eventually, allow items and creatures to be in shadow
