@@ -1506,19 +1506,11 @@ procedure TLevelStaticObject.RenderShadowVolume(
   ShadowVolumesHelper: TShadowVolumesHelper;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
-var
-  Box: TBox3d;
 begin
   if Exists and CastsShadow then
   begin
-    { calculate Box for shadow volume culling }
-    Box := Scene.BoundingBox;
-    if not ParentTransformIsIdentity then
-      Box := BoundingBoxTransform(Box, ParentTransform);
-
-    ShadowVolumesHelper.InitScene(Box);
-    Scene.RenderShadowVolume(ShadowVolumesHelper, ParentTransformIsIdentity,
-      ParentTransform);
+    Scene.InitAndRenderShadowVolume(ShadowVolumesHelper,
+      ParentTransformIsIdentity, ParentTransform);
   end;
 end;
 
@@ -2376,22 +2368,12 @@ procedure TLevelAnimatedObject.RenderShadowVolume(
   ShadowVolumesHelper: TShadowVolumesHelper;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
-var
-  Scene: TVRMLFlatSceneGL;
-  Box: TBox3d;
 begin
   if Exists and CastsShadow then
   begin
-    Scene := Animation.SceneFromTime(AnimationTime);
-
-    { calculate Box for shadow volume culling }
-    Box := Scene.BoundingBox;
-    if not ParentTransformIsIdentity then
-      Box := BoundingBoxTransform(Box, ParentTransform);
-
-    ShadowVolumesHelper.InitScene(Box);
-    Scene.RenderShadowVolume(ShadowVolumesHelper, ParentTransformIsIdentity,
-      ParentTransform);
+    Animation.SceneFromTime(AnimationTime).
+      InitAndRenderShadowVolume(ShadowVolumesHelper,
+        ParentTransformIsIdentity, ParentTransform);
   end;
 end;
 
