@@ -105,7 +105,7 @@ type
 
     procedure Render(const Frustum: TFrustum); override;
 
-    procedure RenderShadowVolume(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(
       ShadowVolumesHelper: TShadowVolumesHelper); override;
   end;
 
@@ -155,7 +155,7 @@ type
 
     procedure Render(const Frustum: TFrustum); override;
 
-    procedure RenderShadowVolume(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(
       ShadowVolumesHelper: TShadowVolumesHelper); override;
 
     { True means that GateExit will not be rendered (or collided)
@@ -726,7 +726,7 @@ begin
   RenderTeleport(Teleport2Rotate, FTeleport2Box, tgTransparent);
 end;
 
-procedure TGateLevel.RenderShadowVolume(const LightPosition: TVector4Single;
+procedure TGateLevel.RenderShadowVolume(
   ShadowVolumesHelper: TShadowVolumesHelper);
 begin
   { TODO: render teleport shadow quads }
@@ -1021,7 +1021,7 @@ begin
   inherited;
 end;
 
-procedure TCagesLevel.RenderShadowVolume(const LightPosition: TVector4Single;
+procedure TCagesLevel.RenderShadowVolume(
   ShadowVolumesHelper: TShadowVolumesHelper);
 begin
   { TODO: render spiders shadow quads }

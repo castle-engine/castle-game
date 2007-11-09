@@ -800,7 +800,7 @@ type
       It renders shadow volume only if Kind.CastsShadow and
       shadow volume is not culled (so ShadowVolumesHelper should
       have FrustumCullingInit already initialized). }
-    procedure RenderShadowVolume(const LightPosition: TVector4Single;
+    procedure RenderShadowVolume(
       ShadowVolumesHelper: TShadowVolumesHelper); virtual;
 
     procedure Idle(const CompSpeed: Single); virtual;
@@ -2010,14 +2010,12 @@ begin
 end;
 
 procedure TCreature.RenderShadowVolume(
-  const LightPosition: TVector4Single;
   ShadowVolumesHelper: TShadowVolumesHelper);
 begin
   if Kind.CastsShadow then
   begin
     ShadowVolumesHelper.InitScene(BoundingBox);
-    CurrentScene.RenderShadowVolume(LightPosition, false, SceneTransform,
-      ShadowVolumesHelper);
+    CurrentScene.RenderShadowVolume(ShadowVolumesHelper, false, SceneTransform);
   end;
 end;
 

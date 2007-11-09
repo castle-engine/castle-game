@@ -359,10 +359,9 @@ procedure Draw(Glwin: TGLWindow);
     begin
       for I := 0 to Level.Creatures.High do
       begin
-        Level.Creatures.Items[I].RenderShadowVolume(MainLightPosition,
-          SVHelper);
+        Level.Creatures.Items[I].RenderShadowVolume(SVHelper);
       end;
-      Level.RenderShadowVolume(MainLightPosition, SVHelper);
+      Level.RenderShadowVolume(SVHelper);
     end;
 
   const
