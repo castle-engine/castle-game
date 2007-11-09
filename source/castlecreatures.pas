@@ -26,7 +26,7 @@ interface
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSourceAllocator, KambiXMLCfg,
-  VRMLTriangleOctree, GameSoundEngine, ShadowVolumesUtils;
+  VRMLTriangleOctree, GameSoundEngine, ShadowVolumesHelper;
 
 {$define read_interface}
 
@@ -2013,9 +2013,12 @@ procedure TCreature.RenderShadowVolume(
   const LightPosition: TVector4Single;
   ShadowVolumesHelper: TShadowVolumesHelper);
 begin
-  if Kind.CastsShadow and
-     ShadowVolumesHelper.ShadowMaybeVisible(BoundingBox) then
-    CurrentScene.RenderShadowVolume(LightPosition, false, SceneTransform);
+  if Kind.CastsShadow then
+  begin
+    ShadowVolumesHelper.InitScene(BoundingBox);
+    CurrentScene.RenderShadowVolume(LightPosition, false, SceneTransform,
+      ShadowVolumesHelper);
+  end;
 end;
 
 function TCreature.MiddleCollisionWithPlayer(

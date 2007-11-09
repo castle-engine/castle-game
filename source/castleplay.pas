@@ -115,7 +115,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
   CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable,
-  ShadowVolumesUtils, KambiTimeUtils;
+  ShadowVolumesHelper, KambiTimeUtils;
 
 var
   GLList_TimeMessagesBackground: TGLuint;
@@ -133,7 +133,7 @@ var
     of next Level to load. }
   LevelFinishedNextLevelName: string;
 
-  ShadowVolumesHelper: TShadowVolumesHelper;
+  SVHelper: TShadowVolumesHelper;
 
 const
   SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
@@ -150,6 +150,13 @@ begin
   end;
 end;
 
+function ProjectionFar: Single;
+begin
+  if RenderShadowsPossible and RenderShadows then
+    Result := ZFarInfinity else
+    Result := Level.ProjectionFar;
+end;
+
 procedure Resize(Glwin: TGLWindow);
 
   procedure UpdateNavigatorProjectionMatrix;
@@ -164,7 +171,7 @@ begin
   { update glViewport and projection }
   glViewport(0, 0, Glwin.Width, Glwin.Height);
   ProjectionGLPerspective(ViewAngleDegY, Glwin.Width / Glwin.Height,
-    Level.ProjectionNear, Level.ProjectionFar);
+    Level.ProjectionNear, ProjectionFar);
 
   UpdateNavigatorProjectionMatrix;
 end;
@@ -353,9 +360,9 @@ procedure Draw(Glwin: TGLWindow);
       for I := 0 to Level.Creatures.High do
       begin
         Level.Creatures.Items[I].RenderShadowVolume(MainLightPosition,
-          ShadowVolumesHelper);
+          SVHelper);
       end;
-      Level.RenderShadowVolume(MainLightPosition, ShadowVolumesHelper);
+      Level.RenderShadowVolume(MainLightPosition, SVHelper);
     end;
 
   const
@@ -397,8 +404,7 @@ procedure Draw(Glwin: TGLWindow);
       Level.Render(Player.Navigator.Frustum);
     finally glPopAttrib() end;
 
-    ShadowVolumesHelper.FrustumCullingInit(Player.Navigator.Frustum,
-      MainLightPosition);
+    SVHelper.InitFrustumAndLight(Player.Navigator.Frustum, MainLightPosition);
 
     glEnable(GL_STENCIL_TEST);
       { Note that stencil buffer is set to all 0 now. }
@@ -417,17 +423,17 @@ procedure Draw(Glwin: TGLWindow);
           if glStencilOpSeparate = nil then
           begin
             { Render front facing shadow quads. }
-            ShadowVolumesHelper.SetStencilOpForFront;
+            SVHelper.SetStencilOpForFront;
             glCullFace(GL_BACK);
             RenderShadowVolume;
 
             { Render back facing shadow quads. }
-            ShadowVolumesHelper.SetStencilOpForBack;
+            SVHelper.SetStencilOpForBack;
             glCullFace(GL_FRONT);
             RenderShadowVolume;
           end else
           begin
-            ShadowVolumesHelper.SetStencilOpSeparate;
+            SVHelper.SetStencilOpSeparate;
             RenderShadowVolume;
           end;
 
@@ -661,7 +667,7 @@ var
       ViewAngleDegY + ViewAngleDegY * C * 0.03,
       Glwin.Width / Glwin.Height +
       Glwin.Width / Glwin.Height * S * 0.03,
-      Level.ProjectionNear, Level.ProjectionFar);
+      Level.ProjectionNear, ProjectionFar);
   end;
 
 const
@@ -1343,8 +1349,8 @@ procedure GLWindowInit(Glwin: TGLWindow);
 
   procedure InitializeShadows;
   begin
-    ShadowVolumesHelper := TShadowVolumesHelper.Create;
-    ShadowVolumesHelper.InitGL;
+    SVHelper := TShadowVolumesHelper.Create;
+    SVHelper.InitGLContext;
   end;
 
 const
@@ -1393,7 +1399,7 @@ begin
   glFreeDisplayList(GLList_TimeMessagesBackground);
   glFreeDisplayList(GLList_InventorySlot);
 
-  FreeAndNil(ShadowVolumesHelper);
+  FreeAndNil(SVHelper);
 end;
 
 initialization

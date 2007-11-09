@@ -1,12 +1,18 @@
 - z-fail finish:
   - TVRMLFlatSceneGL.RenderAllShadowVolume: honour LightCap, DarkCap
     (for now it's only in silhouette implementation)
-  - ShadowVolumesHelper: ShadowVolumesHelper.InitializeObject(Box),
-    this Box can be used both for ShadowVolumesHelper.ShadowMaybeVisible,
-    to decide whether z-fail is needed, and (in case z-fail needed) to check
-    whether we have to render LightCap
-  - TVRMLFlatSceneGL.RenderShadowVolume: remove default values for LightCap, DarkCap
-  - avoid direct ShadowVolumesHelper.ZFail use in shadow_volume_test
+  - ShadowVolumesHelper: actually decided whether ZFail needed,
+    rendering will have to be update since stencil op may need changes
+    in the middle of rendering because of ZPass/ZFail switches
+  - RenderShadowVolume should already take Transform, TransformIsIdentity,
+    it has BoundingBox, so it can calculate BoxTransformed,
+    and call InitScene on it's own ?
+  - check is
+    FrustumBox3dCollisionPossibleSimple
+    and
+    FrustumBox3dCollisionPossible
+
+    ok with infinite frustum ? In fact, just check all VectorMath and Boxes3d.
 
 - fountain finish:
   trees, bushes around (natural LevelBox)

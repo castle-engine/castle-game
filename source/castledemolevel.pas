@@ -66,7 +66,7 @@ implementation
 
 uses SysUtils,
   MatrixNavigation, OpenGLh, BackgroundGL, KambiGLUtils, VRMLGLHeadlight,
-  KambiFilesUtils, Images,
+  KambiFilesUtils, Images, VectorMath,
   CastleWindow, CastleLevel, CastleLevelAvailable, CastleVideoOptions;
 
 var
@@ -96,6 +96,13 @@ begin
   FreeAndNil(DemoNavigator);
 end;
 
+function ProjectionFar: Single;
+begin
+  if RenderShadowsPossible and RenderShadows then
+    Result := ZFarInfinity else
+    Result := DemoLevel.ProjectionFar;
+end;
+
 procedure DemoLevelDraw(Glwin: TGLWindow);
 
   procedure ProjectionPushSet;
@@ -112,8 +119,9 @@ procedure DemoLevelDraw(Glwin: TGLWindow);
     glMatrixMode(GL_PROJECTION);
       glPushMatrix;
       glLoadIdentity;
-      gluPerspective(ViewAngleDegY, Glwin.Width / Glwin.Height,
-        DemoLevel.ProjectionNear, DemoLevel.ProjectionFar);
+      glMultMatrix(PerspectiveProjMatrixDeg(
+        ViewAngleDegY, Glwin.Width / Glwin.Height,
+        DemoLevel.ProjectionNear, ProjectionFar));
     glMatrixMode(GL_MODELVIEW);
     UpdateNavigatorProjectionMatrix;
   end;

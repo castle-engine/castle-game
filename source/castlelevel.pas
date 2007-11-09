@@ -30,7 +30,7 @@ uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
   BackgroundGL, VRMLGLHeadlight, DOM, GameSoundEngine,
-  ShadowVolumesUtils;
+  ShadowVolumesHelper;
 
 {$define read_interface}
 
@@ -1517,9 +1517,9 @@ begin
     if not ParentTransformIsIdentity then
       Box := BoundingBoxTransform(Box, ParentTransform);
 
-    if ShadowVolumesHelper.ShadowMaybeVisible(Box) then
-      Scene.RenderShadowVolume(LightPosition, ParentTransformIsIdentity,
-        ParentTransform);
+    ShadowVolumesHelper.InitScene(Box);
+    Scene.RenderShadowVolume(LightPosition, ParentTransformIsIdentity,
+      ParentTransform, ShadowVolumesHelper);
   end;
 end;
 
@@ -2393,9 +2393,9 @@ begin
     if not ParentTransformIsIdentity then
       Box := BoundingBoxTransform(Box, ParentTransform);
 
-    if ShadowVolumesHelper.ShadowMaybeVisible(Box) then
-      Scene.RenderShadowVolume(LightPosition, ParentTransformIsIdentity,
-        ParentTransform);
+    ShadowVolumesHelper.InitScene(Box);
+    Scene.RenderShadowVolume(LightPosition, ParentTransformIsIdentity,
+      ParentTransform, ShadowVolumesHelper);
   end;
 end;
 
@@ -3200,9 +3200,11 @@ begin
 
   if SceneDynamicShadows then
   begin
-    { Useless to optimize this by ShadowVolumesHelper.ShadowMaybeVisible,
+    { Useless to optimize this by shadow culling in ShadowVolumesHelper,
       Scene will be visible practically always. }
-    Scene.RenderShadowVolume(LightPosition, true, IdentityMatrix4Single);
+    ShadowVolumesHelper.InitSceneAlwaysVisible;
+    Scene.RenderShadowVolume(LightPosition, true, IdentityMatrix4Single,
+      ShadowVolumesHelper);
   end;
 end;
 
