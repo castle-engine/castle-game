@@ -1,6 +1,4 @@
 - z-fail finish:
-  - TVRMLFlatSceneGL.RenderAllShadowVolume: honour LightCap, DarkCap
-    (for now it's only in silhouette implementation)
   - ShadowVolumesHelper: actually decided whether ZFail needed,
     rendering will have to be update since stencil op may need changes
     in the middle of rendering because of ZPass/ZFail switches
