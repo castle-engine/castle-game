@@ -449,12 +449,12 @@ procedure Draw(Glwin: TGLWindow);
 
           if glStencilOpSeparate = nil then
           begin
-            { Render front facing shadow quads. }
+            { Render front facing shadow shadow volume faces. }
             SVHelper.StencilSetupKind := ssForFront;
             glCullFace(GL_BACK);
             RenderShadowVolume;
 
-            { Render back facing shadow quads. }
+            { Render back facing shadow shadow volume faces. }
             SVHelper.StencilSetupKind := ssForBack;
             glCullFace(GL_FRONT);
             RenderShadowVolume;

@@ -1,6 +1,4 @@
 - z-fail finish:
-  - Finish docs: how to use SVs in our engine, simply.
-
   - check is
     FrustumBox3dCollisionPossibleSimple
     and
