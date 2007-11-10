@@ -432,6 +432,7 @@ procedure Draw(Glwin: TGLWindow);
     finally glPopAttrib() end;
 
     SVHelper.InitFrustumAndLight(Player.Navigator.Frustum, MainLightPosition);
+    SVHelper.Count := ShowDebugInfo;
 
     glEnable(GL_STENCIL_TEST);
       { Note that stencil buffer is set to all 0 now. }
@@ -456,8 +457,10 @@ procedure Draw(Glwin: TGLWindow);
 
             { Render back facing shadow shadow volume faces. }
             SVHelper.StencilSetupKind := ssForBack;
+            SVHelper.Count := false;
             glCullFace(GL_FRONT);
             RenderShadowVolume;
+            SVHelper.Count := ShowDebugInfo;
           end else
           begin
             SVHelper.StencilSetupKind := ssSeparate;
@@ -539,6 +542,7 @@ procedure Draw(Glwin: TGLWindow);
 
     if CastleVideoOptions.DebugRenderShadowVolume then
     begin
+      SVHelper.Count := false;
       glPushAttrib(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT or GL_ENABLE_BIT);
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
@@ -548,6 +552,7 @@ procedure Draw(Glwin: TGLWindow);
         glEnable(GL_BLEND);
         RenderShadowVolume;
       glPopAttrib;
+      SVHelper.Count := ShowDebugInfo;
     end;
 
     RenderCreaturesItems(tgTransparent);
