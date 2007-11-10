@@ -1,10 +1,10 @@
 - z-fail finish:
   - check is
-    FrustumBox3dCollisionPossibleSimple
-    and
-    FrustumBox3dCollisionPossible
+    FrustumSphereCollisionPossible
+    FrustumSphereCollisionPossibleSimple
+    FrustumMove
 
-    ok with infinite frustum ? In fact, just check all VectorMath and Boxes3d.
+    ok with infinite frustum ? In fact, just check all VectorMath and Boxes3d.pas
 
 - fountain finish:
   trees, bushes around (natural LevelBox)
