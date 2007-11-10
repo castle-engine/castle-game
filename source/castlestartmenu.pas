@@ -398,21 +398,20 @@ begin
          end else
          begin
            if RenderShadows then
-             MessageOK(Glw, 'In 0.7.0 release of "The Castle", shadows ' +
-               'were much improved. They still slow down rendering noticeably, ' +
-               'but if you have decent graphic card and OpenGL ' +
+             MessageOK(Glw,
+               'Be warned that on older graphic cards, shadows may slow ' +
+               'down rendering noticeably. Although on decent graphic card and OpenGL ' +
                'drivers, the main game levels should be quite playable ' +
-               'with shadows on. Still, there are some issues:' +nl+
+               'with shadows on.' +nl+
                nl+
-               '- Depth-pass only. I know, I know, it''s lame. Well, just ' +
-               'wait for the next release, or ... contribute ! :)' +nl+
-               nl+
-               '- Bonus "Doom" level is much slowed down with shadows. ' +
+               'Bonus "Doom" level is much slowed down with shadows. ' +
                'It can be playable, but at your own risk.' +nl+
                nl+
-               'You have been warned! ...And, in case you''ll find that ' +
-               'shadows work smoothly ' +
-               'on your hardware: enjoy! :)', taLeft);
+               'Please report any problems you encounter with shadows. ' +
+               'Since 0.8.0 release, both z-fail and z-pass are implemented, ' +
+               'so shadows should work 100% OK always. I would like to turn ' +
+               'shadows on by default in the future, so please report any ' +
+               'problems.', taLeft);
          end;
        end;
     4: ;
