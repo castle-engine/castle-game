@@ -1,7 +1,5 @@
 - z-fail finish:
   - check is
-    FrustumSphereCollisionPossible
-    FrustumSphereCollisionPossibleSimple
     FrustumMove
 
     ok with infinite frustum ? In fact, just check all VectorMath and Boxes3d.pas
