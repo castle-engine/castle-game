@@ -1,6 +1,5 @@
 - z-fail finish:
-  - Make ZFail detection for directional lights.
-    Finish docs: how to use SVs in our engine, simply.
+  - Finish docs: how to use SVs in our engine, simply.
 
   - check is
     FrustumBox3dCollisionPossibleSimple
