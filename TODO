@@ -1,7 +1,7 @@
 - z-fail finish:
-  - ShadowVolumesHelper: actually decided whether ZFail needed,
-    rendering will have to be update since stencil op may need changes
-    in the middle of rendering because of ZPass/ZFail switches
+  - Make ZFail detection for directional lights.
+    Finish docs: how to use SVs in our engine, simply.
+
   - check is
     FrustumBox3dCollisionPossibleSimple
     and

@@ -260,11 +260,22 @@ procedure Draw2D(Draw2DData: Pointer);
     end;
   end;
 
-  procedure DoShowDebugInfo;
+  const
+    { line number 1 is for "flying" text in Player.Draw2D }
+    LineDeadOrWinner = 2;
+    LineFPS = 3;
+    LineShadowVolumesCounts = 4;
+
+  procedure RasterPosLine(const Line: Cardinal);
+  begin
+    glRasterPos2i(0, Glw.Height -
+      Font_BFNT_BitstreamVeraSans.RowHeight * Line - 10 { margin });
+  end;
+
+  procedure DoShowFPS;
   begin
     glColorv(Vector3Single(0.7, 0.7, 0.7));
-    glRasterPos2i(0, Glw.Height -
-      Font_BFNT_BitstreamVeraSans.RowHeight * 2 - 10 { margin });
+    RasterPosLine(LineFPS);
 
     { Don't display precise Glw.FpsFrameTime and Glw.FpsRealTime
       each time --- this would cause too much move for player.
@@ -281,19 +292,33 @@ procedure Draw2D(Draw2DData: Pointer);
       Format('FPS : %f (real : %f)', [DisplayFpsFrameTime, DisplayFpsRealTime]));
   end;
 
+  procedure DoShowShadowVolumesCounts;
+  begin
+    if RenderShadowsPossible and RenderShadows then
+    begin
+      glColorv(Vector3Single(0.7, 0.7, 0.7));
+      RasterPosLine(LineShadowVolumesCounts);
+      Font_BFNT_BitstreamVeraSans.Print(Format(
+        'No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
+        [ SVHelper.CountShadowsNotVisible,
+          SVHelper.CountZPass,
+          SVHelper.CountZFailNoLightCap,
+          SVHelper.CountZFailAndLightCap,
+          SVHelper.CountScenes ]));
+    end;
+  end;
+
   procedure DoShowDeadInfo;
   begin
     glColorv(Vector3Single(1, 0, 0));
-    glRasterPos2i(0, Glw.Height -
-      Font_BFNT_BitstreamVeraSans.RowHeight * 3 - 15 { margin });
+    RasterPosLine(LineDeadOrWinner);
     Font_BFNT_BitstreamVeraSans.Print(SDeadMessage);
   end;
 
   procedure DoShowGameWinInfo;
   begin
     glColorv(Vector3Single(0.8, 0.8, 0.8));
-    glRasterPos2i(0, Glw.Height -
-      Font_BFNT_BitstreamVeraSans.RowHeight * 3 - 15 { margin });
+    RasterPosLine(LineDeadOrWinner);
     Font_BFNT_BitstreamVeraSans.Print(SGameWinMessage);
   end;
 
@@ -313,7 +338,10 @@ begin
     DoDrawInventory;
 
   if ShowDebugInfo then
-    DoShowDebugInfo;
+  begin
+    DoShowFPS;
+    DoShowShadowVolumesCounts;
+  end;
 
   if Player.Dead then
     DoShowDeadInfo;
@@ -422,17 +450,17 @@ procedure Draw(Glwin: TGLWindow);
           if glStencilOpSeparate = nil then
           begin
             { Render front facing shadow quads. }
-            SVHelper.SetStencilOpForFront;
+            SVHelper.StencilSetupKind := ssForFront;
             glCullFace(GL_BACK);
             RenderShadowVolume;
 
             { Render back facing shadow quads. }
-            SVHelper.SetStencilOpForBack;
+            SVHelper.StencilSetupKind := ssForBack;
             glCullFace(GL_FRONT);
             RenderShadowVolume;
           end else
           begin
-            SVHelper.SetStencilOpSeparate;
+            SVHelper.StencilSetupKind := ssSeparate;
             RenderShadowVolume;
           end;
 
