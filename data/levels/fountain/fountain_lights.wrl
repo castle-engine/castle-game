@@ -8,7 +8,7 @@ PointLight {
 	ambientIntensity 0.2991453409194946
 	kambiShadows TRUE
 	kambiShadowsMain TRUE
-	location 0 100 10
+	location -10 100 90
 }
 PointLight {
 	intensity 0.3012820482254028

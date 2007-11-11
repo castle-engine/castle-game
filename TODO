@@ -1,6 +1,5 @@
 - fountain finish:
   trees, bushes around (natural LevelBox)
-  bake shadows ? Too bad looking, still... Maybe try SV shadows for level ? Adjust to handle non-perfectly-manifold meshes correctly (borders, with 1 neighbor, are acceptable, although it must output ratio of borders to total --- otherwise it will be real slow, and still > 2 neighbors is not acceptable)
   light changing (fire pots in the corner(s) ?)
   footsteps: splashes on water
   fountain: water sparkling (use blender's particle animation)
@@ -11,9 +10,6 @@
 
 - test with 2.2.0 what is the speed improvement over 2.0.4 ? post to pgd forums.
 - test IIUni Windows sound
-
-- Plany na bardzo najbli¿sz± przysz³o¶æ to
-  ... oraz skoñczenie cieni.
 
 - Kasia usability test:
   - mouse over yes/no message boxes should work (confirmed Eric)
