@@ -11,18 +11,18 @@ PointLight {
 	location 0 100 10
 }
 PointLight {
-	intensity 0.2000000029802322
+	intensity 0.3012820482254028
 	location 40 0 10
 }
 PointLight {
-	intensity 0.2000000029802322
+	intensity 0.3098290562629699
 	location -40 0 10
 }
 PointLight {
-	intensity 0.2000000029802322
+	intensity 0.3055555522441864
 	location 0 40 10
 }
 PointLight {
-	intensity 0.2000000029802322
+	intensity 0.3012820482254028
 	location 0 -40 10
 }

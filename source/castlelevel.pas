@@ -1278,11 +1278,7 @@ type
     { If @true, we will render dynamic shadows (shadow volumes) for
       all scene geometry. This allows the whole level to use dynamic
       shadows. It's normally read from data/levels/index.xml,
-      attribute scene_dynamic_shadows.
-
-      TODO: this is experimental for now, and doesn't look good and is not fast
-      enough on most levels for now. To make it work OK, z-fail must be done,
-      and dyn shadows from more than one light need to be done. }
+      attribute scene_dynamic_shadows. }
     property SceneDynamicShadows: boolean
       read FSceneDynamicShadows write FSceneDynamicShadows default false;
   end;
@@ -3180,7 +3176,7 @@ begin
     { Useless to optimize this by shadow culling in ShadowVolumesHelper,
       Scene will be visible practically always. }
     ShadowVolumesHelper.InitSceneAlwaysVisible;
-    Scene.RenderShadowVolume(ShadowVolumesHelper,true, IdentityMatrix4Single);
+    Scene.RenderShadowVolume(ShadowVolumesHelper, true, IdentityMatrix4Single);
   end;
 end;
 

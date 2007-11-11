@@ -168,6 +168,7 @@
     number="15"
     implementation_class="TLevel"
     footsteps_sound="player_footsteps_concrete"
+    scene_dynamic_shadows="True"
   />
 
 <!--
