@@ -440,31 +440,31 @@ procedure Draw(Glwin: TGLWindow);
       glPushAttrib(GL_ENABLE_BIT
         { saves Enable(GL_DEPTH_TEST), Enable(GL_CULL_FACE) });
         glEnable(GL_DEPTH_TEST);
-        if glStencilOpSeparate = nil then
-          glEnable(GL_CULL_FACE);
 
         { Calculate shadows to the stencil buffer.
           Don't write anything to depth or color buffers. }
         glSetDepthAndColorWriteable(GL_FALSE);
           glStencilFunc(GL_ALWAYS, 0, 0);
 
-          if glStencilOpSeparate = nil then
+          if SVHelper.StencilTwoSided then
           begin
+            SVHelper.StencilSetupKind := ssFrontAndBack;
+            RenderShadowVolume;
+          end else
+          begin
+            glEnable(GL_CULL_FACE);
+
             { Render front facing shadow shadow volume faces. }
-            SVHelper.StencilSetupKind := ssForFront;
+            SVHelper.StencilSetupKind := ssFront;
             glCullFace(GL_BACK);
             RenderShadowVolume;
 
             { Render back facing shadow shadow volume faces. }
-            SVHelper.StencilSetupKind := ssForBack;
+            SVHelper.StencilSetupKind := ssBack;
             SVHelper.Count := false;
             glCullFace(GL_FRONT);
             RenderShadowVolume;
             SVHelper.Count := ShowDebugInfo;
-          end else
-          begin
-            SVHelper.StencilSetupKind := ssSeparate;
-            RenderShadowVolume;
           end;
 
         glSetDepthAndColorWriteable(GL_TRUE);
