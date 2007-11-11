@@ -50,12 +50,6 @@
     - for headlight should be too
     - demo castle level when this light actually moves
 
-  - frustum culling: it's done, but in a lame way: frustum + light pos
-    are just took to one bounding box. This means that it works
-    only for positional lights, and that it's much larger bounding
-    volume than it has to (I should make a "pyramid" between
-    frustum and light; ideally, this should be a convex hull of max 7 points)
-
   - need to be optimized more to enabled by default.
     Then set DefaultRenderShadows to true, and remove the warning in
     CastleStartMenu when changing RenderShadows.
