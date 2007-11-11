@@ -399,13 +399,11 @@ begin
          begin
            if RenderShadows then
              MessageOK(Glw,
-               'Be warned that on older graphic cards, shadows may slow ' +
-               'down rendering noticeably. Although on decent graphic card and OpenGL ' +
-               'drivers, the main game levels should be quite playable ' +
-               'with shadows on.' +nl+
-               nl+
-               'Bonus "Doom" level is much slowed down with shadows. ' +
-               'It can be playable, but at your own risk.' +nl+
+               'Warning: this feature requires a good graphic card, otherwise ' +
+               'shadows will slow down the game noticeably. ' +
+               'That said, with decent graphic card and OpenGL ' +
+               'drivers, the main game levels are definitely playable ' +
+               'with shadows. So enjoy !' +nl+
                nl+
                'Please report any problems you encounter with shadows. ' +
                'Since 0.8.0 release, both z-fail and z-pass are implemented, ' +
@@ -605,6 +603,7 @@ end;
 constructor TChooseNewLevelMenu.Create;
 var
   I: Integer;
+  S: string;
 begin
   inherited;
 
@@ -615,9 +614,12 @@ begin
     if LevelsAvailable[I].AvailableForNewGame then
     begin
       LevelsAvailableForNewGame.Add(LevelsAvailable[I]);
-      Items.Add(Format('%d: %s',
+      S := Format('%d: %s',
         [ LevelsAvailable[I].Number,
-          LevelsAvailable[I].Title ]));
+          LevelsAvailable[I].Title ]);
+      if LevelsAvailable[I].TitleHint <> '' then
+        S += ' (' + LevelsAvailable[I].TitleHint + ')';
+      Items.Add(S);
     end;
   Items.Add('Cancel');
 

@@ -896,6 +896,7 @@ type
     FName: string;
     FSceneFileName: string;
     FTitle: string;
+    FTitleHint: string;
     FNumber: Integer;
     FLightSetFileName: string;
 
@@ -968,7 +969,7 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer;
+      const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ADemo: boolean); virtual;
 
@@ -1213,6 +1214,8 @@ type
 
     { This is the nice name of the level. }
     property Title: string read FTitle;
+
+    property TitleHint: string read FTitleHint;
 
     { This is level number, shown for the player in the menu.
       This *does not* determine the order in which levels are played,
@@ -2528,7 +2531,7 @@ end;
 constructor TLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer;
+  const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ADemo: boolean);
 
@@ -2555,6 +2558,7 @@ begin
   FSceneFileName := ASceneFileName;
   FLightSetFileName := ALightSetFileName;
   FTitle := ATitle;
+  FTitleHint := ATitleHint;
   FNumber := ANumber;
   FDemo := ADemo;
 

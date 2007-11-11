@@ -46,6 +46,7 @@ type
     SceneFileName: string;
     LightSetFileName: string;
     Title: string;
+    TitleHint: string;
     Number: Integer;
 
     LoadingBarYPosition: Single;
@@ -188,6 +189,9 @@ begin
 
   { Optional attributes }
 
+  if not DOMGetAttribute(Element, 'title_hint', TitleHint) then
+    TitleHint := '';
+
   if not DOMGetBooleanAttribute(Element, 'default_available_for_new_game',
     DefaultAvailableForNewGame) then
     DefaultAvailableForNewGame := false;
@@ -225,7 +229,7 @@ function TLevelAvailable.CreateLevel(Demo: boolean): TLevel;
   procedure CreateLevelCore;
   begin
     Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
-      Title, Number, LevelDOMElement, Demo);
+      Title, TitleHint, Number, LevelDOMElement, Demo);
     if not Demo then
       AvailableForNewGame := true;
   end;

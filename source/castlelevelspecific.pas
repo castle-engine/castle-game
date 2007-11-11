@@ -50,7 +50,7 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer;
+      const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ADemo: boolean); override;
 
@@ -94,7 +94,7 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer;
+      const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ADemo: boolean); override;
     destructor Destroy; override;
@@ -118,7 +118,7 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer;
+      const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ADemo: boolean); override;
 
@@ -144,7 +144,7 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer;
+      const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ADemo: boolean); override;
     destructor Destroy; override;
@@ -210,7 +210,7 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer;
+      const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ADemo: boolean); override;
     destructor Destroy; override;
@@ -229,7 +229,7 @@ type
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
-      const ATitle: string; const ANumber: Integer;
+      const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ADemo: boolean); override;
   end;
@@ -253,7 +253,7 @@ end;
 constructor TCastleHallLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer;
+  const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ADemo: boolean);
 var
@@ -499,7 +499,7 @@ end;
 constructor TGateLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer;
+  const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ADemo: boolean);
 var
@@ -738,7 +738,7 @@ end;
 constructor TTowerLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer;
+  const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ADemo: boolean);
 var
@@ -798,7 +798,7 @@ end;
 constructor TCagesLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer;
+  const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ADemo: boolean);
 var
@@ -1142,7 +1142,7 @@ end;
 constructor TDoomE1M1Level.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer;
+  const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ADemo: boolean);
 var
@@ -1346,7 +1346,7 @@ end;
 constructor TGateDemoLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
-  const ATitle: string; const ANumber: Integer;
+  const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ADemo: boolean);
 var
