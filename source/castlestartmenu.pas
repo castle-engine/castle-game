@@ -63,6 +63,9 @@ type
     ColorDepthArgument: TGLMenuItemArgument;
     VideoFrequencyArgument: TGLMenuItemArgument;
     constructor Create;
+    procedure SetTextureMinificationQuality(
+      Value: TTextureMinificationQuality;
+      UpdateSlider: boolean);
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
@@ -130,7 +133,7 @@ begin
     So we must prepare everything before creating the level
     (since TLevel constructor creates some creatures and items on the level). }
   if not ConserveResourcesOnlyForCurrentLevel then
-    CreaturesKinds.PrepareRender;
+    RequireAllCreatures;
   ItemsKinds.PrepareRender;
 
   LocalLevel := NewGameLevelAvailable.CreateLevel;
@@ -334,6 +337,25 @@ begin
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
+procedure TVideoMenu.SetTextureMinificationQuality(
+  Value: TTextureMinificationQuality;
+  UpdateSlider: boolean);
+begin
+  if TextureMinificationQuality <> Value then
+  begin
+    TextureMinificationQuality := Value;
+    if UpdateSlider then
+      TextureMinificationQualitySlider.Value := Ord(TextureMinificationQuality);
+
+    { All items and creatures must be reloaded after
+      texture minification filter changed. Creatures are only loaded
+      if not ConserveResourcesOnlyForCurrentLevel. }
+    ItemsKinds.FreePrepareRender;
+    if not ConserveResourcesOnlyForCurrentLevel then
+      UnRequireAllCreatures;
+  end;
+end;
+
 procedure TVideoMenu.CurrentItemSelected;
 
   procedure ViewVideoInfo;
@@ -424,15 +446,7 @@ begin
          RenderShadows := DefaultRenderShadows;
          RenderShadowsArgument.Value := RenderShadows;
 
-         if TextureMinificationQuality <> DefaultTextureMinificationQuality then
-         begin
-           TextureMinificationQuality := DefaultTextureMinificationQuality;
-           TextureMinificationQualitySlider.Value := Ord(TextureMinificationQuality);
-           { All items and creatures must be reloaded after
-             texture minification filter changed. }
-           ItemsKinds.FreePrepareRender;
-           CreaturesKinds.FreePrepareRender;
-         end;
+         SetTextureMinificationQuality(DefaultTextureMinificationQuality, true);
 
          if CreatureAnimationScenesPerTime <> DefaultCreatureAnimationScenesPerTime then
          begin
@@ -482,19 +496,12 @@ begin
 end;
 
 procedure TVideoMenu.CurrentItemAccessoryValueChanged;
-var
-  NewTextureMinificationQuality: TTextureMinificationQuality;
 begin
   case CurrentItem of
     1: begin
-         NewTextureMinificationQuality :=
-           TTextureMinificationQuality(TextureMinificationQualitySlider.Value);
-         if TextureMinificationQuality <> NewTextureMinificationQuality then
-         begin
-           TextureMinificationQuality := NewTextureMinificationQuality;
-           ItemsKinds.FreePrepareRender;
-           CreaturesKinds.FreePrepareRender;
-         end;
+         SetTextureMinificationQuality(
+           TTextureMinificationQuality(TextureMinificationQualitySlider.Value),
+           false);
        end;
     4: begin
          if CreatureAnimationScenesPerTime <>

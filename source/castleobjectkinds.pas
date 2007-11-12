@@ -75,7 +75,7 @@ type
       KindsConfig: TKamXMLConfig; const AnimationName: string); virtual;
 
     { Prepare anything needed when starting new game.
-      It can call Progress.Step PrepareRenderSteps times.
+      It must call Progress.Step PrepareRenderSteps times.
       It has a funny name to differentiate from PrepareRender,
       that should be called outside. }
     procedure PrepareRenderInternal; virtual;
@@ -85,6 +85,13 @@ type
 
     procedure PrepareRender;
 
+    { How many times Progress.Step will be called during PrepareRender
+      of this object.
+
+      In this class this returns 1 and PrepareRender will actually do one
+      dummy Progress.Step call. That's because this must be > 0,
+      some code depends on it, and will optimize out (i.e. not call)
+      PrepareRender if sum of some PrepareRenderSteps will be 0. }
     function PrepareRenderSteps: Cardinal; virtual;
 
     { Are we between PrepareRender and FreePrepareRender. }
@@ -166,6 +173,9 @@ var
 begin
   FPrepareRenderDone := true;
 
+  { call this to satisfy Progress.Step = 1 in this class. }
+  Progress.Step;
+
   Assert(AnimationsPrepared.Count = 0);
 
   try
@@ -207,7 +217,7 @@ end;
 
 function TObjectKind.PrepareRenderSteps: Cardinal;
 begin
-  Result := 0;
+  Result := 1;
 end;
 
 procedure TObjectKind.FreePrepareRender;

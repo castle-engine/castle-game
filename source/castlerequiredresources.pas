@@ -28,18 +28,39 @@ uses Classes;
 var
   { Should we conserve memory by keeping only the required creatures ?
 
-    If not, all creatures will be loaded each time you start a game.
-    If yes, RequireCreatures and UnRequireCreatures will load/free
-    resources for creatures, to only keep creatures that are required
-    at least once. }
+    Actually, all RequireCreatures / UnRequireCreatures mechanism
+    works the same, regardless of this setting. But if this is
+    @false, then RequireAllCreatures should be called at first new game
+    start, and in effect, all creatures will always have RequiredCount > 0. }
   ConserveResourcesOnlyForCurrentLevel: boolean = true;
 
 procedure RequireCreatures(Names: TStringList);
 procedure UnRequireCreatures(Names: TStringList);
 
+{ This requires all creatures, incrementing their RequiredCount by 1.
+  UnRequire unrequires all creatures, incrementing their RequiredCount by 1.
+
+  It's used to implement ConserveResourcesOnlyForCurrentLevel = @false case.
+
+  They are implemented as "saturate" operations. Contrary to normal
+  RequireCreatures, UnRequireCreatures that depend on suming the RequiredCount.
+  Which means that calling RequireAllCreatures twice in a row does nothing,
+  calling UnRequireAllCreatures without calling RequireAllCreatures does nothing
+  etc. We have internal variable whether were in "require all mode", and
+  only when this variable changes --- we actually change RequiredCount of all
+  creatures.
+
+  This allows you to use these procedures more carelessly, they don't have
+  to be "paired" like normal RequireCreatures, UnRequireCreatures.
+
+  @groupBegin }
+procedure RequireAllCreatures;
+procedure UnRequireAllCreatures;
+{ @groupEnd }
+
 implementation
 
-uses SysUtils, CastleCreatures, KambiLog, ProgressUnit;
+uses SysUtils, CastleCreatures, KambiLog, ProgressUnit, KambiTimeUtils;
 
 {
 procedure DebugOutputRequiredCounts;
@@ -52,23 +73,46 @@ begin
 end;
 }
 
-procedure RequireCreatures(Names: TStringList);
+{ ----------------------------------------------------------------------------
+  TCreatureKindFunc and sample implementations of it }
+
+type
+  TCreatureKindFunc = function (Kind: TCreatureKind): boolean;
+
+function CreatureKind_Always(Kind: TCreatureKind): boolean;
+begin
+  Result := true;
+end;
+
+var
+  KindNames: TStringList;
+
+function CreatureKind_Names(Kind: TCreatureKind): boolean;
+begin
+  Result := KindNames.IndexOf(Kind.VRMLNodeName) <> -1;
+end;
+
+{ ----------------------------------------------------------------------------
+  [Un]RequireCreaturesCore using TCreatureKindFunc }
+
+procedure RequireCreaturesCore(Func: TCreatureKindFunc);
 var
   I: Integer;
   Kind: TCreatureKind;
   PrepareRenderSteps: Cardinal;
+  TimeBegin: TProcessTimerResult;
 begin
-  if ConserveResourcesOnlyForCurrentLevel then
-  begin
-    { We iterate two times over Names, first time only to calculate
-      PrepareRenderSteps, 2nd time does actual work.
-      1st time increments RequiredCount (as 2nd pass may be optimized
-      out, if not needed). }
+  { We iterate two times over Names, first time only to calculate
+    PrepareRenderSteps, 2nd time does actual work.
+    1st time increments RequiredCount (as 2nd pass may be optimized
+    out, if not needed). }
 
-    PrepareRenderSteps := 0;
-    for I := 0 to Names.Count - 1 do
+  PrepareRenderSteps := 0;
+  for I := 0 to CreaturesKinds.Count - 1 do
+  begin
+    Kind := CreaturesKinds[I];
+    if Func(Kind) then
     begin
-      Kind := CreaturesKinds.FindByVRMLNodeName(Names[I]);
       Kind.RequiredCount := Kind.RequiredCount + 1;
       if Kind.RequiredCount = 1 then
       begin
@@ -76,40 +120,45 @@ begin
         PrepareRenderSteps += Kind.PrepareRenderSteps;
       end;
     end;
+  end;
 
-    if PrepareRenderSteps <> 0 then
-    begin
-      Progress.Init(PrepareRenderSteps, 'Loading creatures');
-      try
-        for I := 0 to Names.Count - 1 do
+  if PrepareRenderSteps <> 0 then
+  begin
+    if Log then
+      TimeBegin := ProcessTimerNow;
+
+    Progress.Init(PrepareRenderSteps, 'Loading creatures');
+    try
+      for I := 0 to CreaturesKinds.Count - 1 do
+      begin
+        Kind := CreaturesKinds[I];
+        if Func(Kind) and (Kind.RequiredCount = 1) then
         begin
-          Kind := CreaturesKinds.FindByVRMLNodeName(Names[I]);
-          if Kind.RequiredCount = 1 then
-          begin
-            if Log then
-              WritelnLog('resources required',
-                Format('Creature "%s" becomes required, loading',
-                [Names[I]]));
-
-            Kind.PrepareRender;
-          end;
+          if Log then
+            WritelnLog('Resources', Format(
+              'Creature "%s" becomes required, loading', [Kind.VRMLNodeName]));
+          Kind.PrepareRender;
         end;
-      finally Progress.Fini end;
-    end;
+      end;
+    finally Progress.Fini end;
+
+    if Log then
+      WritelnLog('Loading creatures time', Format('%f seconds',
+        [ ProcessTimerDiff(ProcessTimerNow, TimeBegin) / ProcessTimersPerSec ]));
   end;
 end;
 
-procedure UnRequireCreatures(Names: TStringList);
+procedure UnRequireCreaturesCore(Func: TCreatureKindFunc);
 var
   I: Integer;
   Kind: TCreatureKind;
 begin
-  if ConserveResourcesOnlyForCurrentLevel then
+  for I := 0 to CreaturesKinds.Count - 1 do
   begin
-    for I := 0 to Names.Count - 1 do
-    begin
-      Kind := CreaturesKinds.FindByVRMLNodeName(Names[I]);
+    Kind := CreaturesKinds[I];
 
+    if Func(Kind) then
+    begin
       { If everything went OK, I could place here an assertion
         Assert(Kind.RequiredCount > 0);
         However, if creature loading inside RequireCreatures will fail,
@@ -126,14 +175,49 @@ begin
       if Kind.RequiredCount = 0 then
       begin
         if Log then
-          WritelnLog('resources required',
-            Format('Creature "%s" is no longer required, freeing',
-            [Names[I]]));
+          WritelnLog('Resources', Format(
+            'Creature "%s" is no longer required, freeing', [Kind.VRMLNodeName]));
         Assert(Kind.PrepareRenderDone);
 
         Kind.FreePrepareRender;
       end;
     end;
+  end;
+end;
+
+{ ----------------------------------------------------------------------------
+  Public comfortable [Un]RequireCreatures }
+
+procedure RequireCreatures(Names: TStringList);
+begin
+  KindNames := Names;
+  RequireCreaturesCore(@CreatureKind_Names);
+end;
+
+procedure UnRequireCreatures(Names: TStringList);
+begin
+  KindNames := Names;
+  UnRequireCreaturesCore(@CreatureKind_Names);
+end;
+
+var
+  RequireAllMode: boolean = false;
+
+procedure RequireAllCreatures;
+begin
+  if not RequireAllMode then
+  begin
+    RequireAllMode := true;
+    RequireCreaturesCore(@CreatureKind_Always);
+  end;
+end;
+
+procedure UnRequireAllCreatures;
+begin
+  if RequireAllMode then
+  begin
+    RequireAllMode := false;
+    UnRequireCreaturesCore(@CreatureKind_Always);
   end;
 end;
 

@@ -1,12 +1,19 @@
 - ConserveResourcesOnlyForCurrentLevel finish:
   - controllable from menu ?
-  - debug-no-creatures cooperate: allocate creatures using RequireCreature
-    only (actually, the non-conserve case can also be handled by just
-    incrementing them all once ?)
+
   - some creatures should be always needed, like arrow
   - some creatures are dependencies of others, like ThrownWeb from SpiderQueen
     or BallMissile from Alien
   - check how it works on ii.uni pracownia ? on crypto ? on kocur.ii ?
+  - level restart after death (without reloading all creatures) would be useful now
+
+  - restore debug-no-creatures work, using RequireCreatures, see
+    ./castlecreatures.pas:1779:  if WasParam_DebugNoCreatures then
+    ./castlelevel.pas:2969:      Assert(WasParam_DebugNoCreatures)
+
+    Fix
+    ./castledebugmenu.pas:421:      Kind.RedoPrepareRender;
+    ./castledebugmenu.pas:586:      Kind.RedoPrepareRender;
 
 - fountain finish:
   trees, bushes around (natural LevelBox)

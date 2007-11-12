@@ -240,13 +240,6 @@ type
   {$I objectslist_2.inc}
   TCreaturesKindsList = class(TObjectsList_2)
   public
-    { Calls PrepareRender for all items.
-      This does Progress.Init, Step, Fini. }
-    procedure PrepareRender;
-
-    { Call FreePrepareRender for all items. }
-    procedure FreePrepareRender;
-
     { Find item with given VRMLNodeName.
       @raises Exception if not found. }
     function FindByVRMLNodeName(const AVRMLNodeName: string): TCreatureKind;
@@ -1279,41 +1272,6 @@ begin
 end;
 
 { TCreaturesKindsList -------------------------------------------------------- }
-
-procedure TCreaturesKindsList.PrepareRender;
-var
-  I: Integer;
-  PrepareRenderSteps: Cardinal;
-  TimeBegin: TProcessTimerResult;
-begin
-  if not WasParam_DebugNoCreatures then
-  begin
-    PrepareRenderSteps := 0;
-    for I := 0 to High do
-      PrepareRenderSteps += Items[I].PrepareRenderSteps;
-
-    if Log then
-      TimeBegin := ProcessTimerNow;
-
-    Progress.Init(PrepareRenderSteps, 'Loading creatures');
-    try
-      for I := 0 to High do
-        Items[I].PrepareRender;
-    finally Progress.Fini; end;
-
-    if Log then
-      WritelnLog('Loading creatures time', Format('%f seconds',
-        [ ProcessTimerDiff(ProcessTimerNow, TimeBegin) / ProcessTimersPerSec ]));
-  end;
-end;
-
-procedure TCreaturesKindsList.FreePrepareRender;
-var
-  I: Integer;
-begin
-  for I := 0 to High do
-    Items[I].FreePrepareRender;
-end;
 
 function TCreaturesKindsList.FindByVRMLNodeName(
   const AVRMLNodeName: string): TCreatureKind;

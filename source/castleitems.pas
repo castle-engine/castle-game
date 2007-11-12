@@ -551,7 +551,7 @@ var
 begin
   PrepareRenderSteps := 0;
   for I := 0 to High do
-    PrepareRenderSteps +=  Items[I].PrepareRenderSteps;
+    PrepareRenderSteps += Items[I].PrepareRenderSteps;
 
   Progress.Init(PrepareRenderSteps, 'Loading items');
   try
