@@ -11,10 +11,6 @@
     ./castlecreatures.pas:1779:  if WasParam_DebugNoCreatures then
     ./castlelevel.pas:2969:      Assert(WasParam_DebugNoCreatures)
 
-    Fix
-    ./castledebugmenu.pas:421:      Kind.RedoPrepareRender;
-    ./castledebugmenu.pas:586:      Kind.RedoPrepareRender;
-
 - fountain finish:
   trees, bushes around (natural LevelBox)
   light changing (fire pots in the corner(s) ?)

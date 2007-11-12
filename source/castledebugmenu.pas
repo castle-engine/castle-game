@@ -336,7 +336,8 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
     S := TStringList.Create;
     try
       for I := 0 to CreaturesKinds.High do
-        S.Append('Creature ' + CreaturesKinds[I].VRMLNodeName);
+        S.Append(Format('Creature %s (%d users)',
+          [CreaturesKinds[I].VRMLNodeName, CreaturesKinds[I].RequiredCount]));
       S.Append('Cancel');
       ResultIndex := ChooseByMenu(DrawUnderMenu, S);
       Result := ResultIndex <> CreaturesKinds.High + 1;
@@ -418,7 +419,12 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
     Kind: TCreatureKind;
   begin
     if ChooseCreatureKind(Kind) then
-      Kind.RedoPrepareRender;
+    begin
+      if Kind.RequiredCount = 0 then
+        MessageOK(Glw, Format('Creature "%s" is not used by anything, ' +
+          'cannot reload',  [Kind.VRMLNodeName])) else
+        Kind.RedoPrepareRender;
+    end;
   end;
 
 begin

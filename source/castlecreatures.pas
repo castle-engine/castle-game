@@ -1749,9 +1749,9 @@ begin
     If not, then we depend on CreaturesKinds.PrepareRender
     or RequireCreatures calls
     to call PrepareRender on creature's kind. }
-  if WasParam_DebugNoCreatures then
+  { if WasParam_DebugNoCreatures then
     if not AKind.PrepareRenderDone then
-      AKind.RedoPrepareRender;
+      AKind.RedoPrepareRender; }
 
   FKind := AKind;
 
