@@ -25,7 +25,7 @@ interface
 
 uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh,
   VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
-  VRMLTriangleOctree, CastleTextures, GameSoundEngine;
+  VRMLTriangleOctree, CastleTextures, GameSoundEngine, Classes;
 
 const
   DefaultMaxLife = 100;
@@ -169,6 +169,8 @@ type
 
     FInventoryCurrentItem: Integer;
     FSickProjectionSpeed: Single;
+
+    FRequiredCreatures: TStringList;
   public
     constructor Create;
     destructor Destroy; override;
@@ -395,6 +397,14 @@ type
 
     property SickProjectionSpeed: Single
       read FSickProjectionSpeed write FSickProjectionSpeed;
+
+    { Creatures that have to be prepared for mere presence of player on a level.
+      This is a place for any creatures that may be created by player
+      actions. For example player may always have a bow and shoot an arrow,
+      so this should contain Arrow creature.
+
+      It's loaded from player.xml }
+    property RequiredCreatures: TStringList read FRequiredCreatures;
   end;
 
 implementation
@@ -403,7 +413,8 @@ uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, OpenAL, VRMLNodes, CastleControlsMenu,
-  CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL;
+  CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL,
+  CastleRequiredResources;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -433,7 +444,11 @@ begin
 
   OnInputChanged.AppendItem(@InputChanged);
 
+  FRequiredCreatures := TStringList.Create;
+
   LoadFromFile;
+
+  RequireCreatures(RequiredCreatures);
 
   { Although it will be called in every OnIdle anyway,
     we also call it here to be sure that right after TPlayer constructor
@@ -457,6 +472,12 @@ begin
 
   if AllocatedSwimmingSource <> nil then
     AllocatedSwimmingSource.DoUsingEnd;
+
+  if RequiredCreatures <> nil then
+  begin
+    UnRequireCreatures(RequiredCreatures);
+    FreeAndNil(FRequiredCreatures);
+  end;
 
   inherited;
 end;
@@ -1395,6 +1416,8 @@ begin
       DefaultHeadBobbingDistance);
     SickProjectionSpeed := PlayerConfig.GetFloat('player/sick_projection_speed',
       10.0);
+
+    LoadRequiredResources(PlayerConfig.PathElement('player'), FRequiredCreatures);
   finally SysUtils.FreeAndNil(PlayerConfig); end;
 end;
 

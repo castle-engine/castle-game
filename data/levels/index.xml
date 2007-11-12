@@ -72,7 +72,6 @@
     <required_resources>
       <creature name="Ghost" />
       <creature name="Spider" />
-      <creature name="Arrow" />
     </required_resources>
   </level>
 
@@ -106,7 +105,6 @@
       <creature name="Alien" />
       <creature name="Werewolf" />
       <creature name="BallMissile" />
-      <creature name="Arrow" />
     </required_resources>
 
   </level>
@@ -130,7 +128,6 @@
       <creature name="Spider" />
       <creature name="SpiderQueen" />
       <creature name="ThrownWeb" />
-      <creature name="Arrow" />
     </required_resources>
 
   </level>
@@ -153,7 +150,6 @@
     <required_resources>
       <creature name="Alien" />
       <creature name="BallMissile" />
-      <creature name="Arrow" />
     </required_resources>
 
   </level>
@@ -181,7 +177,6 @@
       <creature name="Werewolf" />
       <creature name="BallMissile" />
       <creature name="Ghost" />
-      <creature name="Arrow" />
       <creature name="DoomBarrel" />
     </required_resources>
 
@@ -198,9 +193,6 @@
     footsteps_sound="player_footsteps_concrete">
 
     <required_resources>
-      <creature name="Alien" />
-      <creature name="BallMissile" />
-      <creature name="Arrow" />
     </required_resources>
 
   </level>
@@ -220,7 +212,6 @@
     <required_resources>
       <creature name="Alien" />
       <creature name="BallMissile" />
-      <creature name="Arrow" />
     </required_resources>
 
   </level>

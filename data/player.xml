@@ -28,5 +28,9 @@
       speed_multiply="2.0"
       power="0.09"
     />
+
+    <required_resources>
+      <creature name="Arrow" />
+    </required_resources>
   </player>
 </CONFIG>

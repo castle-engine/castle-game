@@ -110,7 +110,8 @@ implementation
 
 uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
   CastleLevelSpecific, XMLRead, CastleWindow, KambiGLUtils,
-  Images, GLWindow, GLWinModes, KambiTimeUtils;
+  Images, GLWindow, GLWinModes, KambiTimeUtils,
+  CastleRequiredResources;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -172,39 +173,6 @@ procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
     end;
   end;
 
-  procedure LoadRequiredResources;
-  var
-    RequiredResources, Resource: TDOMElement;
-    Children: TDOMNodeList;
-    ResourceName: string;
-    I: Integer;
-    Node: TDOMNode;
-  begin
-    RequiredCreatures.Clear;
-
-    RequiredResources := DOMGetChildElement(Element, 'required_resources',
-      true);
-
-    Children := RequiredResources.ChildNodes;
-    try
-      for I := 0 to Integer(Children.Count) - 1 do
-      begin
-        Node := Children.Item[I];
-        if Node.NodeType = ELEMENT_NODE then
-        begin
-          Resource := Node as TDOMElement;
-          if Resource.TagName <> 'creature' then
-            raise Exception.CreateFmt(
-              'Element "%s" is not allowed in <required_resources>',
-              [Resource.TagName]);
-          if not DOMGetAttribute(Resource, 'name', ResourceName) then
-            raise Exception.Create('<creature> must have a "name" attribute');
-          RequiredCreatures.Append(ResourceName);
-        end;
-      end;
-    finally Children.Release end;
-  end;
-
 var
   LoadingBgFileName: string;
 begin
@@ -257,7 +225,7 @@ begin
     LoadingBarYPosition) then
     LoadingBarYPosition := DefaultBarYPosition;
 
-  LoadRequiredResources;
+  LoadRequiredResources(Element, RequiredCreatures);
 end;
 
 procedure DrawCreateLevel(Glwin: TGLWindow);

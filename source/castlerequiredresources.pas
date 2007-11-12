@@ -23,7 +23,7 @@ unit CastleRequiredResources;
 
 interface
 
-uses Classes, CastleCreatures;
+uses Classes, DOM, CastleCreatures;
 
 type
   { We have three different memory behaviors. }
@@ -116,9 +116,19 @@ procedure RequireCreature(Kind: TCreatureKind);
 procedure UnRequireCreature(Kind: TCreatureKind);
 { @groupEnd }
 
+{ Loads a <resources_required> XML element (required child of given
+  ParentElement) into a RequiredCreatures list.
+
+  Passs here a created RequiredCreatures instance. It's contents
+  will be wiped by this procedure at the beginning. }
+procedure LoadRequiredResources(
+  ParentElement: TDOMElement;
+  RequiredCreatures: TStringList);
+
 implementation
 
-uses SysUtils, KambiLog, ProgressUnit, KambiTimeUtils, CastleConfig;
+uses SysUtils, KambiLog, ProgressUnit, KambiTimeUtils, CastleConfig,
+  KambiXMLUtils;
 
 { ----------------------------------------------------------------------------
   TCreatureKindFunc and sample implementations of it }
@@ -293,6 +303,44 @@ begin
   SpecificKind := Kind;
   UnRequireCreaturesCore(@CreatureKind_Specific);
 end;
+
+{ XML stuff ------------------------------------------------------------------ }
+
+procedure LoadRequiredResources(
+  ParentElement: TDOMElement;
+  RequiredCreatures: TStringList);
+var
+  RequiredResources, Resource: TDOMElement;
+  Children: TDOMNodeList;
+  ResourceName: string;
+  I: Integer;
+  Node: TDOMNode;
+begin
+  RequiredCreatures.Clear;
+
+  RequiredResources := DOMGetChildElement(ParentElement, 'required_resources',
+    true);
+
+  Children := RequiredResources.ChildNodes;
+  try
+    for I := 0 to Integer(Children.Count) - 1 do
+    begin
+      Node := Children.Item[I];
+      if Node.NodeType = ELEMENT_NODE then
+      begin
+        Resource := Node as TDOMElement;
+        if Resource.TagName <> 'creature' then
+          raise Exception.CreateFmt(
+            'Element "%s" is not allowed in <required_resources>',
+            [Resource.TagName]);
+        if not DOMGetAttribute(Resource, 'name', ResourceName) then
+          raise Exception.Create('<creature> must have a "name" attribute');
+        RequiredCreatures.Append(ResourceName);
+      end;
+    end;
+  finally Children.Release end;
+end;
+
 
 initialization
   ConserveResources := ConfigFile.GetValue(
