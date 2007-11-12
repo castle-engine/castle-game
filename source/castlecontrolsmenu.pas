@@ -138,7 +138,7 @@ end;
 
 procedure TSubMenu.Draw;
 const
-  SubMenuTextColor: TVector3Single = (0.7, 0.7, 0.7);
+  SubMenuTextColor: TVector3Single = (0.9, 0.9, 0.9);
 begin
   inherited;
 

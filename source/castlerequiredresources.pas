@@ -53,16 +53,21 @@ var
   { Current resource strategy.
 
     Doesn't change during game run. Initializeed from
-    ConserveResourcesForCurrentLevel and --debug-no-creatures presence. }
+    ConserveResources and --debug-no-creatures presence. }
   ResourcesStrategy: TResourcesStrategy;
 
-  { Should we conserve memory by keeping only the required creatures ?
+const
+  DefaultConserveResources = true;
+
+var
+  { Should we conserve memory by keeping only the required creatures
+    for current level ?
 
     Actually, all RequireCreatures / UnRequireCreatures mechanism
     works the same, regardless of this setting. But if this is
     @false, then RequireAllCreatures should be called at first new game
     start, and in effect, all creatures will always have RequiredCount > 0. }
-  ConserveResourcesForCurrentLevel: boolean = false;
+  ConserveResources: boolean;
 
 { These increment/decrement RequiredCount for creatures on given list.
 
@@ -101,9 +106,10 @@ procedure UnRequireAllCreatures;
 { These increment/decrement RequiredCount only for specified creature.
 
   It's used to implement ResourcesStrategy = rsKeepOnlyForExistingItems case.
-  Ignored for other ResourcesStrategy values. (Although actually this
-  could be left to work with all ResourcesStrategy values, it's no harm;
-  it's ignored only for speed purposes.)
+  For ResourcesStrategy = rsKeepOnlyForCurrentLevel this is also needed,
+  in case user will use debug menu to add some creature to level
+  (that was not listed in level's required resources).
+  So these calls are honoured for all ResourcesStrategy values.
 
   @groupBegin }
 procedure RequireCreature(Kind: TCreatureKind);
@@ -112,18 +118,7 @@ procedure UnRequireCreature(Kind: TCreatureKind);
 
 implementation
 
-uses SysUtils, KambiLog, ProgressUnit, KambiTimeUtils;
-
-{
-procedure DebugOutputRequiredCounts;
-var
-  I: Integer;
-begin
-  for I := 0 to CreaturesKinds.Count - 1 do
-    Writeln(CreaturesKinds.Items[I].VRMLNodeName, ' ',
-      CreaturesKinds.Items[I].RequiredCount);
-end;
-}
+uses SysUtils, KambiLog, ProgressUnit, KambiTimeUtils, CastleConfig;
 
 { ----------------------------------------------------------------------------
   TCreatureKindFunc and sample implementations of it }
@@ -289,24 +284,24 @@ end;
 
 procedure RequireCreature(Kind: TCreatureKind);
 begin
-  if ResourcesStrategy = rsDebugKeepOnlyForExistingItems then
-  begin
-    SpecificKind := Kind;
-    RequireCreaturesCore(@CreatureKind_Specific);
-  end;
+  SpecificKind := Kind;
+  RequireCreaturesCore(@CreatureKind_Specific);
 end;
 
 procedure UnRequireCreature(Kind: TCreatureKind);
 begin
-  if ResourcesStrategy = rsDebugKeepOnlyForExistingItems then
-  begin
-    SpecificKind := Kind;
-    UnRequireCreaturesCore(@CreatureKind_Specific);
-  end;
+  SpecificKind := Kind;
+  UnRequireCreaturesCore(@CreatureKind_Specific);
 end;
 
 initialization
-  if ConserveResourcesForCurrentLevel then
+  ConserveResources := ConfigFile.GetValue(
+    'video_options/conserve_resources', DefaultConserveResources);
+
+  if ConserveResources then
     ResourcesStrategy := rsKeepOnlyForCurrentLevel else
     ResourcesStrategy := rsKeepAllLoaded;
+finalization
+  ConfigFile.SetDeleteValue('video_options/conserve_resources',
+    ConserveResources, DefaultConserveResources);
 end.

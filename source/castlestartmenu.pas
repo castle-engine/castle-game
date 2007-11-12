@@ -62,6 +62,7 @@ type
     CreatureAnimationSlider: TGLMenuIntegerSlider;
     ColorDepthArgument: TGLMenuItemArgument;
     VideoFrequencyArgument: TGLMenuItemArgument;
+    ConserveResourcesArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure SetTextureMinificationQuality(
       Value: TTextureMinificationQuality;
@@ -294,6 +295,8 @@ begin
     TGLMenuItemArgument.TextWidth(SSystemDefault));
   VideoFrequencyArgument.Value := VideoFrequencyToStr(VideoFrequency);
 
+  ConserveResourcesArgument := TGLMenuBooleanArgument.Create(ConserveResources);
+
   Items.Add('View video information');
   Items.AddObject('Texture quality', TextureMinificationQualitySlider);
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
@@ -301,6 +304,7 @@ begin
   Items.AddObject('Creature animation smoothness', CreatureAnimationSlider);
   Items.AddObject('Color depth', ColorDepthArgument);
   Items.AddObject('Display frequency', VideoFrequencyArgument);
+  Items.AddObject('Conserve memory', ConserveResourcesArgument);
   Items.Add('Restore to defaults');
   Items.Add('Back to main menu');
 
@@ -394,6 +398,17 @@ procedure TVideoMenu.CurrentItemSelected;
     end;
   end;
 
+  procedure SetConserveResources(Value: boolean);
+  begin
+    if ConserveResources <> Value then
+    begin
+      ConserveResources := Value;
+      ConserveResourcesArgument.Value := ConserveResources;
+      SubMenuAdditionalInfo := SRestartTheGame;
+    end;
+  end;
+
+
 begin
   inherited;
 
@@ -436,7 +451,8 @@ begin
     4: ;
     5: ChangeColorDepthBits;
     6: ChangeVideoFrequency;
-    7: begin
+    7: SetConserveResources(not ConserveResources);
+    8: begin
          AllowScreenChange := DefaultAllowScreenChange;
          AllowScreenChangeArgument.Value := AllowScreenChange;
 
@@ -483,11 +499,13 @@ begin
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
+         SetConserveResources(DefaultConserveResources);
+
          SomethingChanged;
 
          MessageOK(Glw, 'All video settings restored to defaults.', taLeft);
        end;
-    8: CurrentMenu := MainMenu;
+    9: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
