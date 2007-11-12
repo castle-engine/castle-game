@@ -1166,8 +1166,6 @@ var
   Arrow: TMissileCreatureKind;
   Barrel: TStillCreatureKind;
 
-  WasParam_DebugNoCreatures: boolean = false;
-
 {$undef read_interface}
 
 implementation
@@ -1175,7 +1173,8 @@ implementation
 uses SysUtils, DOM, OpenGLh, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
-  CastleTimeMessages, CastleItems, Object3dAsVRML, KambiLog, KambiTimeUtils;
+  CastleTimeMessages, CastleItems, Object3dAsVRML, KambiLog, KambiTimeUtils,
+  CastleRequiredResources;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -1745,15 +1744,9 @@ constructor TCreature.Create(AKind: TCreatureKind;
 begin
   inherited Create;
 
-  { If --debug-no-creatures, then we actually load the creature kind now.
-    If not, then we depend on CreaturesKinds.PrepareRender
-    or RequireCreatures calls
-    to call PrepareRender on creature's kind. }
-  { if WasParam_DebugNoCreatures then
-    if not AKind.PrepareRenderDone then
-      AKind.RedoPrepareRender; }
-
   FKind := AKind;
+
+  RequireCreature(Kind);
 
   FLegsPosition := ALegsPosition;
   FDirection := Normalized(ADirection);
@@ -1792,6 +1785,9 @@ begin
     end;
     FreeAndNil(UsedSounds);
   end;
+
+  if Kind <> nil then
+    UnRequireCreature(Kind);
 
   inherited;
 end;

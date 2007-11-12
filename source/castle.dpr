@@ -27,7 +27,8 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   KambiTimeUtils, KambiLog,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
-  CastleCreatures, CastleObjectKinds, CastlePlay, CastleGeneralMenu;
+  CastleCreatures, CastleObjectKinds, CastlePlay, CastleGeneralMenu,
+  CastleRequiredResources;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -109,7 +110,7 @@ begin
        end;
     3: WasParam_NoScreenChange := true;
     4: RenderShadowsPossible := false;
-    5: WasParam_DebugNoCreatures := true;
+    5: ResourcesStrategy := rsDebugKeepOnlyForExistingItems;
     6: InitializeLog(Version);
     7: begin
          DeFormat(Argument, '%dx%d',

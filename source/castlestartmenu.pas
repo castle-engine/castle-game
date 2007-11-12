@@ -132,8 +132,7 @@ begin
     TObjectKind constructors are allowed to depend on this.
     So we must prepare everything before creating the level
     (since TLevel constructor creates some creatures and items on the level). }
-  if not ConserveResourcesOnlyForCurrentLevel then
-    RequireAllCreatures;
+  RequireAllCreatures;
   ItemsKinds.PrepareRender;
 
   LocalLevel := NewGameLevelAvailable.CreateLevel;
@@ -348,11 +347,9 @@ begin
       TextureMinificationQualitySlider.Value := Ord(TextureMinificationQuality);
 
     { All items and creatures must be reloaded after
-      texture minification filter changed. Creatures are only loaded
-      if not ConserveResourcesOnlyForCurrentLevel. }
+      texture minification filter changed. }
     ItemsKinds.FreePrepareRender;
-    if not ConserveResourcesOnlyForCurrentLevel then
-      UnRequireAllCreatures;
+    UnRequireAllCreatures;
   end;
 end;
 

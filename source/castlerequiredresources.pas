@@ -23,24 +23,64 @@ unit CastleRequiredResources;
 
 interface
 
-uses Classes;
+uses Classes, CastleCreatures;
+
+type
+  { We have three different memory behaviors. }
+  TResourcesStrategy = (
+    { This means that resources are preferably loaded all at once, and kept
+      in memory.
+
+      Advantage: you have to wait only once, then everything
+      is fast. Disadvantage: huge memory use throughout whole program. }
+    rsKeepAllLoaded,
+    { Resources are loaded only for current level, when level changes
+      resources no longer needed are freed.
+
+      Advantage: you have to wait
+      only at loading level time, and memory use moderate.
+      Disadvantage: every level load needs to initialize it's creatures.
+      If you frequently change between game levels, this means that you
+      have to load each time. }
+    rsKeepOnlyForCurrentLevel,
+
+    { Resources are only loaded when creature instance is explicitly
+      created... this is only for debug purposes, set by --debug-no-creatures. }
+    rsDebugKeepOnlyForExistingItems
+  );
 
 var
+  { Current resource strategy.
+
+    Doesn't change during game run. Initializeed from
+    ConserveResourcesForCurrentLevel and --debug-no-creatures presence. }
+  ResourcesStrategy: TResourcesStrategy;
+
   { Should we conserve memory by keeping only the required creatures ?
 
     Actually, all RequireCreatures / UnRequireCreatures mechanism
     works the same, regardless of this setting. But if this is
     @false, then RequireAllCreatures should be called at first new game
     start, and in effect, all creatures will always have RequiredCount > 0. }
-  ConserveResourcesOnlyForCurrentLevel: boolean = true;
+  ConserveResourcesForCurrentLevel: boolean = false;
 
+{ These increment/decrement RequiredCount for creatures on given list.
+
+  It's used to implement ResourcesStrategy = rsKeepOnlyForCurrentLevel case.
+  Ignored for other ResourcesStrategy values. (Although actually this could
+  be left working even when ResourcesStrategy = rsKeepAllLoaded, it's no harm
+  in this case.)
+
+  @groupBegin }
 procedure RequireCreatures(Names: TStringList);
 procedure UnRequireCreatures(Names: TStringList);
+{ @groupEnd }
 
 { This requires all creatures, incrementing their RequiredCount by 1.
-  UnRequire unrequires all creatures, incrementing their RequiredCount by 1.
+  UnRequire unrequires all creatures, decrementing their RequiredCount by 1.
 
-  It's used to implement ConserveResourcesOnlyForCurrentLevel = @false case.
+  It's used to implement ResourcesStrategy = rsKeepAllLoaded case.
+  Ignored for other ResourcesStrategy values.
 
   They are implemented as "saturate" operations. Contrary to normal
   RequireCreatures, UnRequireCreatures that depend on suming the RequiredCount.
@@ -58,9 +98,21 @@ procedure RequireAllCreatures;
 procedure UnRequireAllCreatures;
 { @groupEnd }
 
+{ These increment/decrement RequiredCount only for specified creature.
+
+  It's used to implement ResourcesStrategy = rsKeepOnlyForExistingItems case.
+  Ignored for other ResourcesStrategy values. (Although actually this
+  could be left to work with all ResourcesStrategy values, it's no harm;
+  it's ignored only for speed purposes.)
+
+  @groupBegin }
+procedure RequireCreature(Kind: TCreatureKind);
+procedure UnRequireCreature(Kind: TCreatureKind);
+{ @groupEnd }
+
 implementation
 
-uses SysUtils, CastleCreatures, KambiLog, ProgressUnit, KambiTimeUtils;
+uses SysUtils, KambiLog, ProgressUnit, KambiTimeUtils;
 
 {
 procedure DebugOutputRequiredCounts;
@@ -90,6 +142,14 @@ var
 function CreatureKind_Names(Kind: TCreatureKind): boolean;
 begin
   Result := KindNames.IndexOf(Kind.VRMLNodeName) <> -1;
+end;
+
+var
+  SpecificKind: TCreatureKind;
+
+function CreatureKind_Specific(Kind: TCreatureKind): boolean;
+begin
+  Result := Kind = SpecificKind;
 end;
 
 { ----------------------------------------------------------------------------
@@ -190,14 +250,20 @@ end;
 
 procedure RequireCreatures(Names: TStringList);
 begin
-  KindNames := Names;
-  RequireCreaturesCore(@CreatureKind_Names);
+  if ResourcesStrategy = rsKeepOnlyForCurrentLevel then
+  begin
+    KindNames := Names;
+    RequireCreaturesCore(@CreatureKind_Names);
+  end;
 end;
 
 procedure UnRequireCreatures(Names: TStringList);
 begin
-  KindNames := Names;
-  UnRequireCreaturesCore(@CreatureKind_Names);
+  if ResourcesStrategy = rsKeepOnlyForCurrentLevel then
+  begin
+    KindNames := Names;
+    UnRequireCreaturesCore(@CreatureKind_Names);
+  end;
 end;
 
 var
@@ -205,7 +271,7 @@ var
 
 procedure RequireAllCreatures;
 begin
-  if not RequireAllMode then
+  if (ResourcesStrategy = rsKeepAllLoaded) and (not RequireAllMode) then
   begin
     RequireAllMode := true;
     RequireCreaturesCore(@CreatureKind_Always);
@@ -214,11 +280,33 @@ end;
 
 procedure UnRequireAllCreatures;
 begin
-  if RequireAllMode then
+  if (ResourcesStrategy = rsKeepAllLoaded) and RequireAllMode then
   begin
     RequireAllMode := false;
     UnRequireCreaturesCore(@CreatureKind_Always);
   end;
 end;
 
+procedure RequireCreature(Kind: TCreatureKind);
+begin
+  if ResourcesStrategy = rsDebugKeepOnlyForExistingItems then
+  begin
+    SpecificKind := Kind;
+    RequireCreaturesCore(@CreatureKind_Specific);
+  end;
+end;
+
+procedure UnRequireCreature(Kind: TCreatureKind);
+begin
+  if ResourcesStrategy = rsDebugKeepOnlyForExistingItems then
+  begin
+    SpecificKind := Kind;
+    UnRequireCreaturesCore(@CreatureKind_Specific);
+  end;
+end;
+
+initialization
+  if ConserveResourcesForCurrentLevel then
+    ResourcesStrategy := rsKeepOnlyForCurrentLevel else
+    ResourcesStrategy := rsKeepAllLoaded;
 end.

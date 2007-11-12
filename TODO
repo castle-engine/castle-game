@@ -7,10 +7,6 @@
   - check how it works on ii.uni pracownia ? on crypto ? on kocur.ii ?
   - level restart after death (without reloading all creatures) would be useful now
 
-  - restore debug-no-creatures work, using RequireCreatures, see
-    ./castlecreatures.pas:1779:  if WasParam_DebugNoCreatures then
-    ./castlelevel.pas:2969:      Assert(WasParam_DebugNoCreatures)
-
 - fountain finish:
   trees, bushes around (natural LevelBox)
   light changing (fire pots in the corner(s) ?)
