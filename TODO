@@ -6,6 +6,7 @@
   - some creatures should be always needed, like arrow
   - some creatures are dependencies of others, like ThrownWeb from SpiderQueen
     or BallMissile from Alien
+  - check how it works on ii.uni pracownia ? on crypto ? on kocur.ii ?
 
 - fountain finish:
   trees, bushes around (natural LevelBox)
