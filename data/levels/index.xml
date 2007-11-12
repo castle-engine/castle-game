@@ -68,7 +68,13 @@
 
     played_music_sound="gate_music"
     footsteps_sound="player_footsteps_grass"
-  />
+  >
+    <required_resources>
+      <creature name="Ghost" />
+      <creature name="Spider" />
+      <creature name="Arrow" />
+    </required_resources>
+  </level>
 
   <level
     name="gate_demo"
@@ -77,7 +83,9 @@
     title="Demo"
     number="101"
     implementation_class="TGateDemoLevel"
-  />
+  >
+    <required_resources />
+  </level>
 
   <level
     name="castle_hall"
@@ -93,6 +101,13 @@
     <area vrml_name="HintButtonBox">
       <hint>Hint: press this red button with the %i</hint>
     </area>
+
+    <required_resources>
+      <creature name="Alien" />
+      <creature name="Werewolf" />
+      <creature name="BallMissile" />
+      <creature name="Arrow" />
+    </required_resources>
 
   </level>
 
@@ -111,6 +126,13 @@
       <hint>Hint: open this door using the %i</hint>
     </area>
 
+    <required_resources>
+      <creature name="Spider" />
+      <creature name="SpiderQueen" />
+      <creature name="ThrownWeb" />
+      <creature name="Arrow" />
+    </required_resources>
+
   </level>
 
   <level
@@ -127,6 +149,12 @@
     <area vrml_name="HintElevButton">
       <hint>Hint: press the elevator button using the %i</hint>
     </area>
+
+    <required_resources>
+      <creature name="Alien" />
+      <creature name="BallMissile" />
+      <creature name="Arrow" />
+    </required_resources>
 
   </level>
 
@@ -148,6 +176,15 @@
       <hint>Hint: open doors using the %i</hint>
     </area>
 
+    <required_resources>
+      <creature name="Alien" />
+      <creature name="Werewolf" />
+      <creature name="BallMissile" />
+      <creature name="Ghost" />
+      <creature name="Arrow" />
+      <creature name="DoomBarrel" />
+    </required_resources>
+
   </level>
 
   <level
@@ -158,8 +195,15 @@
     number="95"
     implementation_class="TLevel"
 
-    footsteps_sound="player_footsteps_concrete"
-  />
+    footsteps_sound="player_footsteps_concrete">
+
+    <required_resources>
+      <creature name="Alien" />
+      <creature name="BallMissile" />
+      <creature name="Arrow" />
+    </required_resources>
+
+  </level>
 
   <level
     name="fountain"
@@ -171,7 +215,15 @@
     implementation_class="TLevel"
     footsteps_sound="player_footsteps_concrete"
     scene_dynamic_shadows="True"
-  />
+  >
+
+    <required_resources>
+      <creature name="Alien" />
+      <creature name="BallMissile" />
+      <creature name="Arrow" />
+    </required_resources>
+
+  </level>
 
 <!--
   <level

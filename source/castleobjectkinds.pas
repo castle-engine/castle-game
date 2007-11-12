@@ -36,16 +36,6 @@ type
     { This is internal for PrepareRender. }
     AnimationsPrepared: TVRMLGLAnimationsList;
   protected
-    { This should release everything done by PrepareRender.
-
-      When such thing should be called ? E.g. because PrepareRender
-      must be done once again, because some attributes (e.g. things
-      set by AnimationAttributesSet) changed.
-
-      In this class this just sets PrepareRenderDone to @false,
-      and takes care of clearing FirstRootNodesPool. }
-    procedure FreePrepareRender; virtual;
-
     { Use this in PrepareRender to share RootNodes[0]
       of your animations in subclasses. In our destructor and FreePrepareRender
       we will free and clear objects on this list. }
@@ -99,6 +89,16 @@ type
 
     { Are we between PrepareRender and FreePrepareRender. }
     property PrepareRenderDone: boolean read FPrepareRenderDone;
+
+    { This should release everything done by PrepareRender.
+
+      When such thing should be called ? E.g. because PrepareRender
+      must be done once again, because some attributes (e.g. things
+      set by AnimationAttributesSet) changed.
+
+      In this class this just sets PrepareRenderDone to @false,
+      and takes care of clearing FirstRootNodesPool. }
+    procedure FreePrepareRender; virtual;
 
     { Free any association with current OpenGL context. }
     procedure CloseGL; virtual;

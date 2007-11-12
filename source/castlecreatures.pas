@@ -97,6 +97,7 @@ type
     FMiddlePositionHeight: Single;
 
     FCastsShadow: boolean;
+    FRequiredCount: Cardinal;
   protected
     { In descendants only PrepareRender can (and should!) set this. }
     CameraRadiusFromPrepareRender: Single;
@@ -227,6 +228,12 @@ type
 
     property CastsShadow: boolean read FCastsShadow write FCastsShadow
       default DefaultCastsShadow;
+
+    { This is used by RequireCreatures, UnRequireCreatures to count
+      how many times this kind is required. Idea is that when this drops
+      to zero, we can FreePrepareRender to free resources. }
+    property RequiredCount: Cardinal
+      read FRequiredCount write FRequiredCount default 0;
   end;
 
   TObjectsListItem_2 = TCreatureKind;
@@ -1283,7 +1290,7 @@ begin
   begin
     PrepareRenderSteps := 0;
     for I := 0 to High do
-      PrepareRenderSteps +=  Items[I].PrepareRenderSteps;
+      PrepareRenderSteps += Items[I].PrepareRenderSteps;
 
     if Log then
       TimeBegin := ProcessTimerNow;
@@ -1781,7 +1788,8 @@ begin
   inherited Create;
 
   { If --debug-no-creatures, then we actually load the creature kind now.
-    If not, then we depend on CreaturesKinds.PrepareRender call
+    If not, then we depend on CreaturesKinds.PrepareRender
+    or RequireCreatures calls
     to call PrepareRender on creature's kind. }
   if WasParam_DebugNoCreatures then
     if not AKind.PrepareRenderDone then

@@ -30,7 +30,7 @@ uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
   BackgroundGL, VRMLGLHeadlight, DOM, GameSoundEngine,
-  ShadowVolumesHelper;
+  ShadowVolumesHelper, Classes;
 
 {$define read_interface}
 
@@ -904,6 +904,8 @@ type
 
     FDemo: boolean;
     FSceneDynamicShadows: boolean;
+
+    FRequiredCreatures: TStringList;
   protected
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
@@ -965,12 +967,16 @@ type
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
-      be sure to initialize Progress.UserInterface before calling this. }
+      be sure to initialize Progress.UserInterface before calling this.
+
+      Note that ARequiredCreatures reference is simply copied (as we don't
+      require anywhere to modify it). }
     constructor Create(
       const AName: string;
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
+      ARequiredCreatures: TStringList;
       ADemo: boolean); virtual;
 
     destructor Destroy; override;
@@ -1303,7 +1309,8 @@ implementation
 uses SysUtils, OpenGLh, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
-  CastleInputs, CastleWindow, OpenAL, ALUtils, KambiXMLUtils;
+  CastleInputs, CastleWindow, OpenAL, ALUtils, KambiXMLUtils,
+  CastleRequiredResources;
 
 {$define read_implementation}
 {$I objectslist_2.inc}
@@ -2533,6 +2540,7 @@ constructor TLevel.Create(
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
+  ARequiredCreatures: TStringList;
   ADemo: boolean);
 
   procedure RemoveItemsToRemove;
@@ -2561,6 +2569,9 @@ begin
   FTitleHint := ATitleHint;
   FNumber := ANumber;
   FDemo := ADemo;
+  FRequiredCreatures := ARequiredCreatures;
+
+  RequireCreatures(FRequiredCreatures);
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -2733,6 +2744,8 @@ begin
   FreeWithContentsAndNil(FItems);
   FreeWithContentsAndNil(FCreatures);
   FreeWithContentsAndNil(FObjects);
+  if FRequiredCreatures <> nil then
+    UnRequireCreatures(FRequiredCreatures);
   inherited;
 end;
 
@@ -2768,6 +2781,12 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
   begin
     if Element.TagName = 'area' then
       Result := LevelAreaFromDOMElement(Element) else
+    if Element.TagName = 'required_resources' then
+      begin
+        { this is handled in TLevelAvailable, and doesn't produce any
+          TLevelObject. }
+        Result := nil;
+      end else
       raise Exception.CreateFmt('Not allowed children element of <level>: "%s"',
         [Element.TagName]);
   end;
@@ -2788,7 +2807,8 @@ begin
       if ObjectNode.NodeType = ELEMENT_NODE then
       begin
         NewObject := LevelObjectFromDOMElement(ObjectNode as TDOMElement);
-        Objects.Add(NewObject);
+        if NewObject <> nil then
+          Objects.Add(NewObject);
       end;
     end;
   finally ObjectsList.Release end;

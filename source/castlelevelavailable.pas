@@ -23,7 +23,8 @@ unit CastleLevelAvailable;
 
 interface
 
-uses CastleLevel, KambiUtils, KambiClassUtils, DOM, OpenGLh, ProgressGL;
+uses CastleLevel, KambiUtils, Classes,
+  KambiClassUtils, DOM, OpenGLh, ProgressGL;
 
 {$define read_interface}
 
@@ -32,6 +33,7 @@ type
   private
     procedure LoadFromDOMElement(Element: TDOMElement; const BasePath: string);
   public
+    constructor Create;
     destructor Destroy; override;
 
     AvailableForNewGame: boolean;
@@ -55,6 +57,8 @@ type
     GLList_LoadingBgImage: TGLuint;
 
     LevelDOMElement: TDOMElement;
+
+    RequiredCreatures: TStringList;
 
     function CreateLevel(Demo: boolean = false): TLevel;
   end;
@@ -113,8 +117,16 @@ uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
 
 { TLevelAvailable ------------------------------------------------------------ }
 
+constructor TLevelAvailable.Create;
+begin
+  inherited;
+  RequiredCreatures := TStringList.Create;
+end;
+
 destructor TLevelAvailable.Destroy;
 begin
+  FreeAndNil(RequiredCreatures);
+
   { Thanks to GLWindowClose implementation, we can be sure that gl context
     is active now, so it's not a problem to call glFreeDisplayList now. }
 
@@ -158,6 +170,39 @@ procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
         Value := TTowerLevel else
         raise Exception.CreateFmt('Unknown level class "%s"', [ValueStr]);
     end;
+  end;
+
+  procedure LoadRequiredResources;
+  var
+    RequiredResources, Resource: TDOMElement;
+    Children: TDOMNodeList;
+    ResourceName: string;
+    I: Integer;
+    Node: TDOMNode;
+  begin
+    RequiredCreatures.Clear;
+
+    RequiredResources := DOMGetChildElement(Element, 'required_resources',
+      true);
+
+    Children := RequiredResources.ChildNodes;
+    try
+      for I := 0 to Integer(Children.Count) - 1 do
+      begin
+        Node := Children.Item[I];
+        if Node.NodeType = ELEMENT_NODE then
+        begin
+          Resource := Node as TDOMElement;
+          if Resource.TagName <> 'creature' then
+            raise Exception.CreateFmt(
+              'Element "%s" is not allowed in <required_resources>',
+              [Resource.TagName]);
+          if not DOMGetAttribute(Resource, 'name', ResourceName) then
+            raise Exception.Create('<creature> must have a "name" attribute');
+          RequiredCreatures.Append(ResourceName);
+        end;
+      end;
+    finally Children.Release end;
   end;
 
 var
@@ -211,6 +256,8 @@ begin
   if not DOMGetSingleAttribute(Element, 'loading_bar_y_position',
     LoadingBarYPosition) then
     LoadingBarYPosition := DefaultBarYPosition;
+
+  LoadRequiredResources;
 end;
 
 procedure DrawCreateLevel(Glwin: TGLWindow);
@@ -229,7 +276,7 @@ function TLevelAvailable.CreateLevel(Demo: boolean): TLevel;
   procedure CreateLevelCore;
   begin
     Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
-      Title, TitleHint, Number, LevelDOMElement, Demo);
+      Title, TitleHint, Number, LevelDOMElement, RequiredCreatures, Demo);
     if not Demo then
       AvailableForNewGame := true;
   end;

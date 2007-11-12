@@ -26,7 +26,7 @@ interface
 uses VRMLGLAnimation, VRMLFlatSceneGL, Boxes3d, VectorMath,
   CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL,
   ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM,
-  CastleCreatures, ShadowVolumesHelper;
+  CastleCreatures, ShadowVolumesHelper, Classes;
 
 const
   CastleHallWerewolvesCount = 4;
@@ -52,6 +52,7 @@ type
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
+      ARequiredCreatures: TStringList;
       ADemo: boolean); override;
 
     procedure Idle(const CompSpeed: Single); override;
@@ -96,6 +97,7 @@ type
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
+      ARequiredCreatures: TStringList;
       ADemo: boolean); override;
     destructor Destroy; override;
 
@@ -120,6 +122,7 @@ type
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
+      ARequiredCreatures: TStringList;
       ADemo: boolean); override;
 
     procedure Picked(const Distance: Single;
@@ -146,6 +149,7 @@ type
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
+      ARequiredCreatures: TStringList;
       ADemo: boolean); override;
     destructor Destroy; override;
 
@@ -212,6 +216,7 @@ type
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
+      ARequiredCreatures: TStringList;
       ADemo: boolean); override;
     destructor Destroy; override;
 
@@ -231,6 +236,7 @@ type
       const ASceneFileName, ALightSetFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
+      ARequiredCreatures: TStringList;
       ADemo: boolean); override;
   end;
 
@@ -255,6 +261,7 @@ constructor TCastleHallLevel.Create(
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
+  ARequiredCreatures: TStringList;
   ADemo: boolean);
 var
   CastleHallLevelPath: string;
@@ -501,6 +508,7 @@ constructor TGateLevel.Create(
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
+  ARequiredCreatures: TStringList;
   ADemo: boolean);
 var
   Cart: TLevelSimpleAnimatedObject;
@@ -740,6 +748,7 @@ constructor TTowerLevel.Create(
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
+  ARequiredCreatures: TStringList;
   ADemo: boolean);
 var
   ElevatorButtonSum: TLevelObjectSum;
@@ -800,6 +809,7 @@ constructor TCagesLevel.Create(
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
+  ARequiredCreatures: TStringList;
   ADemo: boolean);
 var
   BossIndex: Integer;
@@ -1144,6 +1154,7 @@ constructor TDoomE1M1Level.Create(
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
+  ARequiredCreatures: TStringList;
   ADemo: boolean);
 var
   DoomDoorsPathPrefix: string;
@@ -1348,6 +1359,7 @@ constructor TGateDemoLevel.Create(
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
+  ARequiredCreatures: TStringList;
   ADemo: boolean);
 var
   Water: TLevelSimpleAnimatedObject;

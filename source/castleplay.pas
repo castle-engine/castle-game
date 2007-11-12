@@ -760,7 +760,7 @@ begin
 
     NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel;
 
-    { First TLevel constructuctor was called.
+    { First TLevel constructor was called.
       This actully loaded the level, displaying some progress bar.
       Background of this progress bar is our old Level --- so Level variable
       must stay valid and non-nil during loading of new level.
