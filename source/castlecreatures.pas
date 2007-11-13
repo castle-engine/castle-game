@@ -1513,7 +1513,7 @@ end;
 
 procedure TSpiderQueenKind.FreePrepareRender;
 begin
-  FreeAndNil(ThrowWebAttackAnimation);
+  FreeAndNil(FThrowWebAttackAnimation);
   inherited;
 end;
 
