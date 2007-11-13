@@ -1,7 +1,7 @@
 - ConserveResource finish:
   - some creatures are dependencies of others, like ThrownWeb from SpiderQueen
     or BallMissile from Alien
-  - check how it works on ii.uni pracownia ? on crypto ? on kocur.ii ?
+  - check how it works on crypto ? on kocur.ii ?
     update castle.php - is conserve memory helpful ?
   - level restart after death (without reloading all creatures) would be useful now
 
@@ -182,37 +182,12 @@
 
 - Radeon problems
 
-  IIUni tests:
+  IIUni tests (retest this after "converse memory" feature) :
   - test "9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game."
     When run with --debug-no-creatures, music is OK.
     Didn't manage to run without --debug-no-creatures.
-  - test "10.view3dscene: with status text, FPS is much lower."
 
   Reported on PGD:
-  1.Loading time (creating display lists for animations) is ridicuously long.
-    Confirmed on Majka.
-    It's very slow on IIUni now, but doable... around 3-4 minutes.
-    Eats almost 500 MB of memory, which means that with Radeon, computers
-    with 512 MB may not be enough --- all hells breaks loose when
-    part of our memory is swapped to disk.
-    That's it for Radeon, for now.
-
-  (2 fixed)
-  3.2d controls problems --- sword should be with alpha-test, item slots' borders should be with blending. But on Radeon screenshots they all look as if they were drawn "just like that", covering things underneath.
-    No problems on Majka Windows.
-    No problems on IIUni-107 Windows.
-    Maybe glProjectionPushPop will silently fix this ?
-    Probably so. Ignore for 0.7.0.
-
-  4.Switching task (Alt+Tab) craps graphics when switching back to game (although this is known to happen on older Windowses (98 and like) with crappy graphic drivers, it definitely should not happen on XP with latest ATI drivers).
-    No such problems on Majka Windows.
-    No such problems on ii.uni computers with Radeon.
-    Has to be ignored ? Just update your drivers ?
-
-  On Majka Windows:
-  5.Switching task (Alt+Tab) while "Loading creatures" craps things --- or maybe I was impatient ?
-    Has to be ignored ? Just update your drivers ?
-
   6.FPS is awfully low.
     Note: FPS seems much better with "render for level screenshot" = yes.
     I'm probably doing something un-optimal on Radeon when drawing
@@ -227,8 +202,6 @@
     Confirmed on on IIUni. Ignore for 0.7.0.
 
   9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game.
-
-  10.view3dscene: with status text, FPS is much lower.
 
   - Check changing ColorsBits and VideoFrequency on Radeon, maybe will help for some problems ?
     Check disabling lockArrays in renderer.
