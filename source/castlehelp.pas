@@ -58,6 +58,11 @@ begin
     'And probably some more stuff that I don''t remember right now :) ' +
     'Thanks!' +nl+
     nl+
+    'Grzegorz Hermanowicz (herrmannek) implemented underwater "sick" ' +
+    'projection effect and started gravity for arrows implementation, ' +
+    'thanks ! Finally we have a 2nd guy with SVN write access, ' +
+    'so if something gets broken --- that''s totally not me :)' + nl+
+    nl+
     'Compiled with ' + SCompilerDescription +'.', taLeft);
 end;
 
