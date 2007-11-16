@@ -1,8 +1,7 @@
 - ConserveResource finish:
   - some creatures are dependencies of others, like ThrownWeb from SpiderQueen
     or BallMissile from Alien
-  - check how it works on crypto ? on kocur.ii ?
-    update castle.php - is conserve memory helpful ?
+  - check how it works on crypto ?
   - level restart after death (without reloading all creatures) would be useful now
 
 - fountain finish:
