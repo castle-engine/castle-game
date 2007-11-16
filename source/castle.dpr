@@ -28,7 +28,7 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, OpenAL, ALUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
   CastleCreatures, CastleObjectKinds, CastlePlay, CastleGeneralMenu,
-  CastleRequiredResources;
+  CastleRequiredResources, CastleCredits;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -76,7 +76,8 @@ begin
   case OptionNum of
     0: begin
          InfoWrite(
-           SCastleVersionWWW +nl+
+           SCastleVersion +nl+
+           SCastleWWW +nl+
            nl+
            'Options:' +nl+
            HelpOptionHelp +nl+
@@ -193,6 +194,8 @@ begin
   try
     ShowStartMenu;
   finally
+    CredistGLContextRelease;
+
     { Usually Glw.Closed = false here.
       But this is finally...end clause so we try hard to avoid raising
       another exception here --- so we safeguard and eventually change

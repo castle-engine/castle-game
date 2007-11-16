@@ -26,9 +26,8 @@ interface
 const
   Version = '0.8.0';
 
-function SCastleVersionWWW: string;
-
-procedure ShowCreditsMessage;
+function SCastleVersion: string;
+function SCastleWWW: string;
 
 procedure ViewGameMessages;
 
@@ -37,33 +36,14 @@ implementation
 uses SysUtils, Classes, GLWinMessages, CastleWindow, KambiUtils,
   CastleTimeMessages;
 
-function SCastleVersionWWW: string;
+function SCastleVersion: string;
 begin
-  Result :=
-    ApplicationName + ' version ' + Version + '.' +nl+
-    'WWW: http://vrmlengine.sourceforge.net/castle.php';
+  Result := ApplicationName + ' version ' + Version + '.';
 end;
 
-procedure ShowCreditsMessage;
+function SCastleWWW: string;
 begin
-  MessageOK(Glw,
-    SCastleVersionWWW + nl +
-    nl+
-    'Author: Michalis Kamburelis, aka Kambi <michalis.kambi@gmail.com>' +nl+
-    nl+
-    'Szymon Stoma and Kaska Zaremba designed and modelled the scenario ' +
-    'on "The Gate" level, provided models for many objects (keys, ' +
-    'bow, quiver, arrows, ball_missile), ' +
-    'provided some sounds and a large amount of feedback. ' +
-    'And probably some more stuff that I don''t remember right now :) ' +
-    'Thanks!' +nl+
-    nl+
-    'Grzegorz Hermanowicz (herrmannek) implemented underwater "sick" ' +
-    'projection effect and started gravity for arrows implementation, ' +
-    'thanks ! Finally we have a 2nd guy with SVN write access, ' +
-    'so if something gets broken --- that''s totally not me :)' + nl+
-    nl+
-    'Compiled with ' + SCompilerDescription +'.', taLeft);
+  Result := 'WWW: http://vrmlengine.sourceforge.net/castle.php';
 end;
 
 procedure ViewGameMessages;

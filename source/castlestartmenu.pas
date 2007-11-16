@@ -40,7 +40,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   KambiStringUtils, ALUtils, OpenAL, KambiClassUtils,
   CastleTimeMessages, CastleLevelAvailable, CastleDemoLevel,
   GameSoundEngine, GLSoundMenu, KambiLog, KambiTimeUtils,
-  CastleRequiredResources;
+  CastleRequiredResources, CastleCredits;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -230,7 +230,7 @@ begin
     1: ShowControlsMenu(@DemoLevelDraw, @DemoLevelIdle, false, false);
     2: CurrentMenu := VideoMenu;
     3: CurrentMenu := SoundMenu;
-    4: ShowCreditsMessage;
+    4: ShowCredits(@DemoLevelDraw, @DemoLevelIdle);
     5: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;

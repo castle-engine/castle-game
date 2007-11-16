@@ -1,0 +1,71 @@
+#VRML V2.0 utf8
+
+# PointLight {
+#   location 0 0 0
+#   ambientIntensity 0.2
+# }
+
+DirectionalLight {
+  direction 0 0 -1
+  ambientIntensity 0.5
+}
+
+Transform {
+  translation 0 0 -17
+  scale 1.1 1 1
+  children Shape {
+    appearance Appearance { material Material {
+      ambientIntensity 0.5
+      diffuseColor 1 1 1
+      transparency 0
+    } }
+    geometry Text {
+      string [ "$SCastleVersion"
+               "$SCastleWWW"
+               ""
+               ""
+               "Author: Michalis Kamburelis,"
+               "aka Kambi <michalis.kambi@gmail.com>"
+               ""
+               ""
+               "Szymon Stoma and Kaska Zaremba"
+               "designed and modelled the scenario"
+               "on \"The Gate\" level,"
+               "provided models for many objects"
+               "(keys, bow, quiver, arrows, ball_missile),"
+               "provided some sounds"
+               "and a large amount of feedback."
+               "And probably some more stuff"
+               " that I don't remember right now :)"
+               "Thanks!"
+               ""
+               ""
+               "Grzegorz Hermanowicz (herrmannek)"
+               "implemented underwater \"sick\""
+               "projection effect and started gravity"
+               "for arrows implementation,"
+               "thanks !"
+               "Finally we have a 2nd guy with"
+               "SVN write access, so if something"
+               "gets broken --- that's totally not me :)"
+               ""
+               ""
+               "Compiled with $SCompilerDescription." ]
+      fontStyle FontStyle {
+        size 1
+        justify "MIDDLE"
+        family "SANS"
+        style "BOLD"
+      }
+      kambiDepth 0.5
+    }
+  }
+}
+
+DEF MainInfo WorldInfo {
+   title "credits for \"The Castle\""
+   info [ "the following two lines mean animation speed and animation time end",
+          "1.5"
+          "24"
+        ]
+}
