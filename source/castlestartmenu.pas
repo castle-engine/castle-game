@@ -123,12 +123,10 @@ var
 procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
 var
   LocalPlayer: TPlayer;
-  LocalLevel: TLevel;
+  LocalLevel, NewLocalLevel: TLevel;
   TimeBegin: TProcessTimerResult;
+  WantsStart: boolean;
 begin
-  if Log then
-    TimeBegin := ProcessTimerNow;
-
   { All kinds must be prepared before instances are created.
     TObjectKind constructors are allowed to depend on this.
     So we must prepare everything before creating the level
@@ -138,15 +136,30 @@ begin
 
   LocalLevel := NewGameLevelAvailable.CreateLevel;
   try
-    LocalPlayer := TPlayer.Create;
-    try
-      if Log then
-        WritelnLog('New game', Format(
-          'Loading new game (creatures, items, player, level) time: %f seconds',
-          [ ProcessTimerDiff(ProcessTimerNow, TimeBegin) / ProcessTimersPerSec ]));
 
-      PlayGame(LocalLevel, LocalPlayer, true);
-    finally FreeAndNil(LocalPlayer) end;
+    { We loop here, using WantsStart, because user may want to restart
+      the level. TPlayer instance can be created each time again when
+      restarting, but the replace of LocalLevel with NewLocalLevel must
+      be handled in appropriate order (so that restarting leve doesn't
+      free and reload all creature animations again, in case of "conserve memory"). }
+
+    WantsStart := true;
+    while WantsStart do
+    begin
+      LocalPlayer := TPlayer.Create;
+      try
+        PlayGame(LocalLevel, LocalPlayer, true);
+
+        WantsStart := GameEnded and (GameEndedWantsRestart <> '');
+        if WantsStart then
+        begin
+          NewLocalLevel := LevelsAvailable.FindName(GameEndedWantsRestart).CreateLevel;
+          FreeAndNil(LocalLevel);
+          LocalLevel := NewLocalLevel;
+        end;
+      finally FreeAndNil(LocalPlayer) end;
+    end;
+
   finally FreeAndNil(LocalLevel) end;
 
   SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;

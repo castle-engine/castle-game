@@ -2,7 +2,6 @@
   - some creatures are dependencies of others, like ThrownWeb from SpiderQueen
     or BallMissile from Alien
   - check how it works on crypto ?
-  - level restart after death (without reloading all creatures) would be useful now
 
 - fountain finish:
   trees, bushes around (natural LevelBox)
@@ -19,7 +18,6 @@
 
 - Kasia usability test:
   - mouse over yes/no message boxes should work (confirmed Eric)
-  - after the death, it's confusing that you have to click escape and "end game". People try usually "back to game". Maybe after death/gamewin, make escape go straight back to main start menu ? (confirmed others)
   - spider on the gate level is not really interesting. Make spider ambush ? On the cart --- suddenly a group of spiders crawls from an egg ? Or on the sword pit --- suddenly group of spiders crawls from underneath ?
   - wall sliding should be more smooth --- there are places where wall sliding doesn't catch. (confirmed by Eric)
   - enter/exit on levels should be more black, to suggest more that these are enter/exit, not a normal wall

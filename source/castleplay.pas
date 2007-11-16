@@ -82,6 +82,10 @@ var
 var
   { Read-only from outside of this unit. }
   GameEnded: boolean;
+  { This is important only if GameEnded. Will be a level name (<> '')
+    if user wants to immediately restart the game. Caller of PlayGame
+    should use this. }
+  GameEndedWantsRestart: string;
 
   { Read-only from outside of this unit. Initially false when starting
     PlayGame. }
@@ -136,8 +140,8 @@ var
   SVHelper: TShadowVolumesHelper;
 
 const
-  SDeadMessage = 'You''re dead. Press [Escape] to exit to menu';
-  SGameWinMessage = 'Game finished. Press [Escape] to exit to menu';
+  SDeadMessage = 'You''re dead';
+  SGameWinMessage = 'Game finished';
 
 { If ALActive then update listener POSITION and ORIENTATION
   based on Player.Navigator.Camera* }
@@ -263,8 +267,10 @@ procedure Draw2D(Draw2DData: Pointer);
   const
     { line number 1 is for "flying" text in Player.Draw2D }
     LineDeadOrWinner = 2;
-    LineFPS = 3;
-    LineShadowVolumesCounts = 4;
+    LinePressEscape = 3;
+    LinePressAttack = 4;
+    LineFPS = 5;
+    LineShadowVolumesCounts = 6;
 
   procedure RasterPosLine(const Line: Cardinal);
   begin
@@ -308,18 +314,39 @@ procedure Draw2D(Draw2DData: Pointer);
     end;
   end;
 
+  procedure DoShowDeadOrFinishedKeys;
+
+    const
+      SPressEscapeToExit = 'Press [Escape] to exit to menu.';
+
+    function SPressAttackToRestart: string;
+    begin
+      Result := 'Press [Attack] (' +
+        CastleInput_Attack.Shortcut.Description('not assigned') +
+        ') to restart the level.';
+    end;
+
+  begin
+    RasterPosLine(LinePressEscape);
+    Font_BFNT_BitstreamVeraSans.Print(SPressEscapeToExit);
+    RasterPosLine(LinePressAttack);
+    Font_BFNT_BitstreamVeraSans.Print(SPressAttackToRestart);
+  end;
+
   procedure DoShowDeadInfo;
   begin
     glColorv(Vector3Single(1, 0, 0));
     RasterPosLine(LineDeadOrWinner);
-    Font_BFNT_BitstreamVeraSans.Print(SDeadMessage);
+    Font_BFNT_BitstreamVeraSans.Print(SDeadMessage + '.');
+    DoShowDeadOrFinishedKeys;
   end;
 
   procedure DoShowGameWinInfo;
   begin
     glColorv(Vector3Single(0.8, 0.8, 0.8));
     RasterPosLine(LineDeadOrWinner);
-    Font_BFNT_BitstreamVeraSans.Print(SGameWinMessage);
+    Font_BFNT_BitstreamVeraSans.Print(SGameWinMessage + '.');
+    DoShowDeadOrFinishedKeys;
   end;
 
 begin
@@ -785,16 +812,20 @@ procedure GameCancel(RequireConfirmation: boolean);
 begin
   if Player.Dead or GameWin or (not RequireConfirmation) or
     MessageYesNo(Glw, 'Are you sure you want to end the game ?', taLeft) then
+  begin
+    GameEndedWantsRestart := '';
     GameEnded := true;
+  end;
 end;
 
 procedure DoAttack;
 begin
-  if GameWin then
-    TimeMessage(SGameWinMessage) else
-  if not Player.Dead then
-    Player.Attack else
-    TimeMessage(SDeadMessage);
+  if GameWin or Player.Dead then
+  begin
+    GameEndedWantsRestart := Level.Name;
+    GameEnded := true;
+  end else
+    Player.Attack;
 end;
 
 procedure DoInteract;
@@ -1223,7 +1254,11 @@ procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 begin
   EventDown(false, Key, mbLeft);
   if C = CharEscape then
-    DoGameMenu;
+  begin
+    if Player.Dead or GameWin then
+      GameCancel(false) else
+      DoGameMenu;
+  end;
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
@@ -1306,6 +1341,7 @@ begin
         InitNewLevel;
 
         GameEnded := false;
+        GameEndedWantsRestart := '';
 
         glEnable(GL_LIGHTING);
 
