@@ -1,5 +1,16 @@
 #VRML V2.0 utf8
 
+EXTERNPROTO Text3D [
+  exposedField MFString string
+  exposedField SFNode fontStyle
+  exposedField MFFloat length
+  exposedField SFFloat maxExtent
+  exposedField SFFloat depth
+  exposedField SFBool solid
+] [ "urn:vrmlengine.sourceforge.net:node:Text3D",
+    "http://vrmlengine.sourceforge.net/fallback_prototypes.wrl#Text3D",
+    "../../../www/htdocs/fallback_prototypes.wrl#Text3D" ]
+
 # PointLight {
 #   location 0 0 0
 #   ambientIntensity 0.2
