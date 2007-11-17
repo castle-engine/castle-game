@@ -456,7 +456,6 @@ begin
                'drivers, the main game levels are definitely playable ' +
                'with shadows. So enjoy !' +nl+
                nl+
-               'Please report any problems you encounter with shadows. ' +
                'Since 0.8.0 release, both z-fail and z-pass are implemented, ' +
                'so shadows should work 100% OK always. I would like to turn ' +
                'shadows on by default in the future, so please report any ' +
