@@ -23,7 +23,8 @@ unit CastleControlsMenu;
 
 interface
 
-uses GLWindow, OpenGLh, CastleGeneralMenu, MatrixNavigation;
+uses GLWindow, OpenGLh, CastleGeneralMenu, MatrixNavigation,
+  OpenGLFonts, OpenGLBmpFonts;
 
 type
   TSubMenu = class(TCastleMenu)
@@ -64,11 +65,15 @@ var
 
   InvertVerticalMouseLook: boolean;
 
+  { Font used for menu SubMenuTitle.
+    Initialized / finalized in GLWindow Init/Close here. }
+  SubMenuTitleFont: TGLBitmapFont_Abstract;
+
 implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
-  GLMenu, OpenGLBmpFonts, BFNT_BitstreamVeraSansMono_m18_Unit,
-  OpenGLFonts, CastleInputs, Keys, VectorMath, KambiUtils, CastlePlay,
+  GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
+  CastleInputs, Keys, VectorMath, KambiUtils, CastlePlay,
   CastleConfig, KambiStringUtils, CastleTimeMessages;
 
 { TCastleMenu descendants interface ------------------------------------------ }
@@ -119,7 +124,6 @@ var
   BasicControlsMenu: TBasicControlsMenu;
   ItemsControlsMenu: TItemsControlsMenu;
   OtherControlsMenu: TOtherControlsMenu;
-  SubMenuTitleFont: TGLBitmapFont_Abstract;
 
 { TSubMenu ------------------------------------------------------------- }
 
@@ -286,7 +290,7 @@ begin
 
   Items.Add('Back to controls menu');
 
-  SpaceBetweenItems := 2;
+  RegularSpaceBetweenItems := 2;
 
   FixItemsAreas(Glw.Width, Glw.Height);
 

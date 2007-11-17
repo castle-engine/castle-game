@@ -92,9 +92,12 @@ type
 
   TChooseNewLevelMenu = class(TSubMenu)
     LevelsAvailableForNewGame: TLevelsAvailableList;
+    FirstDemoLevelIndex: Cardinal;
     constructor Create;
     destructor Destroy; override;
     procedure CurrentItemSelected; override;
+    function SpaceBetweenItems(const NextItemIndex: Cardinal): Cardinal; override;
+    procedure Draw; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -668,10 +671,9 @@ begin
        not LevelsAvailable[I].Demo then
       AddLevel(I);
 
-  { Add separator between non-demo and demo levels }
-  Items.Add('Demo levels --------------------------------------------');
-  LevelsAvailableForNewGame.Add(nil);
+  FirstDemoLevelIndex := LevelsAvailableForNewGame.Count;
 
+  { Add demo levels }
   for I := 0 to LevelsAvailable.Count - 1 do
     if LevelsAvailable[I].AvailableForNewGame and
        LevelsAvailable[I].Demo then
@@ -688,6 +690,31 @@ destructor TChooseNewLevelMenu.Destroy;
 begin
   FreeAndNil(LevelsAvailableForNewGame);
   inherited;
+end;
+
+function TChooseNewLevelMenu.SpaceBetweenItems(
+  const NextItemIndex: Cardinal): Cardinal;
+begin
+  Result := inherited SpaceBetweenItems(NextItemIndex);
+  if NextItemIndex = FirstDemoLevelIndex then
+    Result += Cardinal(SubMenuTitleFont.RowHeight) * 2;
+end;
+
+procedure TChooseNewLevelMenu.Draw;
+const
+  SubMenuTextColor: TVector3Single = (0.7, 0.7, 0.7);
+begin
+  inherited;
+
+  glColorv(SubMenuTextColor);
+
+  glPushMatrix;
+    glTranslatef(Position.Data[0],
+      Areas.Items[FirstDemoLevelIndex].Y0 +
+      Areas.Items[FirstDemoLevelIndex].Height + 5 { margin }, 0);
+    glRasterPos2i(0, 0);
+    SubMenuTitleFont.Print('Bonus demo levels :');
+  glPopMatrix;
 end;
 
 procedure TChooseNewLevelMenu.CurrentItemSelected;
