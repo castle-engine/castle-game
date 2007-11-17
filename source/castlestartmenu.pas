@@ -697,7 +697,11 @@ function TChooseNewLevelMenu.SpaceBetweenItems(
 begin
   Result := inherited SpaceBetweenItems(NextItemIndex);
   if NextItemIndex = FirstDemoLevelIndex then
-    Result += Cardinal(SubMenuTitleFont.RowHeight) * 2;
+    Result += Cardinal(SubMenuTitleFont.RowHeight) * 2 else
+  if NextItemIndex = Items.Count - 1 then
+    { some separator is needed before "cancel" button now,
+      since otherwise it seems to attached to "demo" levels section. }
+    Result += 10;
 end;
 
 procedure TChooseNewLevelMenu.Draw;
