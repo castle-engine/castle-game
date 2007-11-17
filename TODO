@@ -13,9 +13,6 @@
 - make gamma correction.
     Windows: http://www.delphi3d.net/articles/viewarticle.php?article=gamma.htm
 
-- test with 2.2.0 what is the speed improvement over 2.0.4 ? post to pgd forums.
-- test IIUni Windows sound
-
 - Kasia usability test:
   - mouse over yes/no message boxes should work (confirmed Eric)
   - spider on the gate level is not really interesting. Make spider ambush ? On the cart --- suddenly a group of spiders crawls from an egg ? Or on the sword pit --- suddenly group of spiders crawls from underneath ?
@@ -33,7 +30,7 @@
     This causes additional problems, since then it's easy to
     accidentaly switch to other program while playing the game.
 
-- finish intro:
+- finish menu background level:
   - add some shadow ?
 
 - make gate light darker ? like szymon proposed ? test on kocury.
@@ -183,8 +180,10 @@
   - test "9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game."
     When run with --debug-no-creatures, music is OK.
     Didn't manage to run without --debug-no-creatures.
+    Retest now with "conserve memory" feature.
 
-  Reported on PGD:
+  Reported on PGD
+  (Retest now with "conserve memory" feature) :
   6.FPS is awfully low.
     Note: FPS seems much better with "render for level screenshot" = yes.
     I'm probably doing something un-optimal on Radeon when drawing
