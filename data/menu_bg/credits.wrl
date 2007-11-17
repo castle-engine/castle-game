@@ -19,7 +19,7 @@ Transform {
       diffuseColor 1 1 1
       transparency 0
     } }
-    geometry Text {
+    geometry Text3D {
       string [ "$SCastleVersion"
                "$SCastleWWW"
                ""
@@ -57,7 +57,7 @@ Transform {
         family "SANS"
         style "BOLD"
       }
-      kambiDepth 0.5
+      depth 0.5
     }
   }
 }
