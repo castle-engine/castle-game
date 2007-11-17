@@ -60,6 +60,8 @@ type
 
     RequiredCreatures: TStringList;
 
+    Demo: boolean;
+
     function CreateLevel(MenuBackground: boolean = false): TLevel;
   end;
 
@@ -201,6 +203,9 @@ begin
     MissingRequiredAttribute('number');
 
   { Optional attributes }
+
+  if not DOMGetBooleanAttribute(Element, 'demo', Demo) then
+    Demo := false;
 
   if not DOMGetAttribute(Element, 'title_hint', TitleHint) then
     TitleHint := '';

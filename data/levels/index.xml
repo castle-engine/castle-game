@@ -140,6 +140,9 @@
     number="99"
     implementation_class="TTowerLevel"
 
+    demo="True"
+    default_available_for_new_game="True"
+
     footsteps_sound="player_footsteps_grass"
   >
 
@@ -164,6 +167,9 @@
     implementation_class="TDoomE1M1Level"
     loading_bg="doom/logo/doom_title.png"
     loading_bar_y_position="0.2"
+
+    demo="True"
+    default_available_for_new_game="True"
 
     played_music_sound="doom_e1m1"
     footsteps_sound="player_footsteps_concrete">
@@ -190,6 +196,9 @@
     number="95"
     implementation_class="TLevel"
 
+    demo="True"
+    default_available_for_new_game="True"
+
     footsteps_sound="player_footsteps_concrete">
 
     <required_resources>
@@ -207,6 +216,9 @@
     implementation_class="TLevel"
     footsteps_sound="player_footsteps_concrete"
     scene_dynamic_shadows="True"
+
+    demo="True"
+    default_available_for_new_game="True"
   >
 
     <required_resources>

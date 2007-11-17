@@ -1,3 +1,6 @@
+- make separator demo/not demonot selectable.
+  Make this visible better than '--------'
+
 - ConserveResource finish:
   - some creatures are dependencies of others, like ThrownWeb from SpiderQueen
     or BallMissile from Alien

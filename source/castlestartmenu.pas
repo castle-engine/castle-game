@@ -637,26 +637,46 @@ end;
 { TChooseNewLevelMenu ------------------------------------------------------- }
 
 constructor TChooseNewLevelMenu.Create;
+
+  { Add level to LevelsAvailableForNewGame and Items lists.
+    Index is an index into LevelsAvailable array for this level. }
+  procedure AddLevel(Index: Integer);
+  var
+    S: string;
+    L: TLevelAvailable;
+  begin
+    L := LevelsAvailable[Index];
+    LevelsAvailableForNewGame.Add(L);
+    S := Format('%d: %s', [ L.Number, L.Title ]);
+    if L.TitleHint <> '' then
+      S += ' (' + L.TitleHint + ')';
+    Items.Add(S);
+  end;
+
 var
   I: Integer;
-  S: string;
 begin
   inherited;
 
   LevelsAvailableForNewGame := TLevelsAvailableList.Create;
 
   LevelsAvailable.SortByNumber;
+
+  { Add non-demo levels }
   for I := 0 to LevelsAvailable.Count - 1 do
-    if LevelsAvailable[I].AvailableForNewGame then
-    begin
-      LevelsAvailableForNewGame.Add(LevelsAvailable[I]);
-      S := Format('%d: %s',
-        [ LevelsAvailable[I].Number,
-          LevelsAvailable[I].Title ]);
-      if LevelsAvailable[I].TitleHint <> '' then
-        S += ' (' + LevelsAvailable[I].TitleHint + ')';
-      Items.Add(S);
-    end;
+    if LevelsAvailable[I].AvailableForNewGame and
+       not LevelsAvailable[I].Demo then
+      AddLevel(I);
+
+  { Add separator between non-demo and demo levels }
+  Items.Add('Demo levels --------------------------------------------');
+  LevelsAvailableForNewGame.Add(nil);
+
+  for I := 0 to LevelsAvailable.Count - 1 do
+    if LevelsAvailable[I].AvailableForNewGame and
+       LevelsAvailable[I].Demo then
+      AddLevel(I);
+
   Items.Add('Cancel');
 
   SubMenuTitle := 'Choose initial level';
@@ -674,10 +694,18 @@ procedure TChooseNewLevelMenu.CurrentItemSelected;
 begin
   inherited;
 
-  if CurrentItem <> LevelsAvailableForNewGame.Count then
+  if CurrentItem = LevelsAvailableForNewGame.Count then
+  begin
+    CurrentMenu := MainMenu;
+  end else
+  if LevelsAvailableForNewGame[CurrentItem] = nil then
+  begin
+    { separator between non-demo and demo levels, do nothing }
+  end else
+  begin
     NewGame(LevelsAvailableForNewGame[CurrentItem]);
-
-  CurrentMenu := MainMenu;
+    CurrentMenu := MainMenu;
+  end;
 end;
 
 { global things -------------------------------------------------------------- }
