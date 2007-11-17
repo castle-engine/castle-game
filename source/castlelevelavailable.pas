@@ -171,6 +171,8 @@ procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
         Value := TDoomE1M1Level else
       if ValueStr = 'TTowerLevel' then
         Value := TTowerLevel else
+      if ValueStr = 'TFountainLevel' then
+        Value := TFountainLevel else
         raise Exception.CreateFmt('Unknown level class "%s"', [ValueStr]);
     end;
   end;

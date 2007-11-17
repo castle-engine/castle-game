@@ -240,6 +240,11 @@ type
       AMenuBackground: boolean); override;
   end;
 
+  TFountainLevel = class(TLevel)
+  public
+    procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
+  end;
+
 function CastleLevelsPath: string;
 
 implementation
@@ -1374,6 +1379,18 @@ begin
   Objects.Add(Water);
 
   Water.Play;
+end;
+
+{ TFountainLevel ------------------------------------------------------------- }
+
+procedure TFountainLevel.PrepareNewPlayer(NewPlayer: TPlayer);
+begin
+  inherited;
+
+  { Give player 1 sword. Otherwise player would start the level
+    without any weapon, and there's no weapon to be found on
+    the level... }
+  NewPlayer.PickItem(TItem.Create(Sword, 1));
 end;
 
 end.

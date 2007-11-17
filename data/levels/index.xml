@@ -213,7 +213,7 @@
     title="Fountain"
     title_hint="shadows ON adviced"
     number="15"
-    implementation_class="TLevel"
+    implementation_class="TFountainLevel"
     footsteps_sound="player_footsteps_concrete"
     scene_dynamic_shadows="True"
 
