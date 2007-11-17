@@ -1443,6 +1443,8 @@ begin
   GroundRule := nil;
 
   IsLava := false;
+
+  Attacking := false;
 end;
 
 { GLWindow init / close ------------------------------------------------------ }
