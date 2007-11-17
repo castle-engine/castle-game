@@ -53,7 +53,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      ADemo: boolean); override;
+      AMenuBackground: boolean); override;
 
     procedure Idle(const CompSpeed: Single); override;
 
@@ -98,7 +98,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      ADemo: boolean); override;
+      AMenuBackground: boolean); override;
     destructor Destroy; override;
 
     function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
@@ -123,7 +123,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      ADemo: boolean); override;
+      AMenuBackground: boolean); override;
 
     procedure Picked(const Distance: Single;
       CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
@@ -150,7 +150,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      ADemo: boolean); override;
+      AMenuBackground: boolean); override;
     destructor Destroy; override;
 
     procedure Idle(const CompSpeed: Single); override;
@@ -217,7 +217,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      ADemo: boolean); override;
+      AMenuBackground: boolean); override;
     destructor Destroy; override;
 
     procedure Picked(const Distance: Single;
@@ -229,7 +229,7 @@ type
     procedure Idle(const CompSpeed: Single); override;
   end;
 
-  TGateDemoLevel = class(TLevel)
+  TGateBackgroundLevel = class(TLevel)
   public
     constructor Create(
       const AName: string;
@@ -237,7 +237,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      ADemo: boolean); override;
+      AMenuBackground: boolean); override;
   end;
 
 function CastleLevelsPath: string;
@@ -262,7 +262,7 @@ constructor TCastleHallLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  ADemo: boolean);
+  AMenuBackground: boolean);
 var
   CastleHallLevelPath: string;
 begin
@@ -509,7 +509,7 @@ constructor TGateLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  ADemo: boolean);
+  AMenuBackground: boolean);
 var
   Cart: TLevelSimpleAnimatedObject;
   GateLevelPath: string;
@@ -749,7 +749,7 @@ constructor TTowerLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  ADemo: boolean);
+  AMenuBackground: boolean);
 var
   ElevatorButtonSum: TLevelObjectSum;
   TowerLevelPath: string;
@@ -810,7 +810,7 @@ constructor TCagesLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  ADemo: boolean);
+  AMenuBackground: boolean);
 var
   BossIndex: Integer;
 begin
@@ -1155,7 +1155,7 @@ constructor TDoomE1M1Level.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  ADemo: boolean);
+  AMenuBackground: boolean);
 var
   DoomDoorsPathPrefix: string;
 
@@ -1352,22 +1352,22 @@ begin
   end;
 end;
 
-{ TGateDemoLevel ------------------------------------------------------------- }
+{ TGateBackgroundLevel ------------------------------------------------------- }
 
-constructor TGateDemoLevel.Create(
+constructor TGateBackgroundLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  ADemo: boolean);
+  AMenuBackground: boolean);
 var
   Water: TLevelSimpleAnimatedObject;
 begin
   inherited;
 
   Water := TLevelSimpleAnimatedObject.Create(Self,
-    LoadLevelAnimation(CastleLevelsPath + 'gate_demo' +
+    LoadLevelAnimation(CastleLevelsPath + 'gate_background' +
       PathDelim + 'water.kanim', false, false));
   Water.CastsShadow := false; { water shadow would look awkward }
   { No octrees created for water (because in normal usage, player will not

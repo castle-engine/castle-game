@@ -4,7 +4,7 @@ all:
 	$(MAKE) -C end_sequence/ all
 	$(MAKE) -C castle_hall/ all
 	$(MAKE) -C gate/ all
-	$(MAKE) -C gate_demo/ all
+	$(MAKE) -C gate_background/ all
 
 .PHONY: clean
 clean:
@@ -13,4 +13,4 @@ clean:
 	$(MAKE) -C end_sequence/ clean
 	$(MAKE) -C castle_hall/ clean
 	$(MAKE) -C gate/ clean
-	$(MAKE) -C gate_demo/ clean
+	$(MAKE) -C gate_background/ clean

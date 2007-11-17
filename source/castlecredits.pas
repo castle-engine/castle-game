@@ -79,7 +79,7 @@ begin
   ProjectionPushSet;
   try
     { We want to use depth buffer in CreditsModel, but don't want to mix
-      with demo level depth values (as we even use different near/far
+      with background level depth values (as we even use different near/far
       projection values). }
     glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -148,7 +148,7 @@ begin
   try
     SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
       nil,
-      true { AutoRedisplay for demo level updates },
+      true { AutoRedisplay for background level updates },
       true { FPSActive should not be needed anymore, but I leave it. },
       false, K_None, #0, false, false);
 

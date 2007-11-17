@@ -902,7 +902,7 @@ type
 
     procedure LoadFromDOMElement(Element: TDOMElement);
 
-    FDemo: boolean;
+    FMenuBackground: boolean;
     FSceneDynamicShadows: boolean;
 
     FRequiredCreatures: TStringList;
@@ -977,7 +977,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      ADemo: boolean); virtual;
+      AMenuBackground: boolean); virtual;
 
     destructor Destroy; override;
 
@@ -1282,7 +1282,7 @@ type
       is usually most natural: return Scene.Background. }
     function Background: TBackgroundGL; virtual;
 
-    property Demo: boolean read FDemo write FDemo;
+    property MenuBackground: boolean read FMenuBackground write FMenuBackground;
 
     { If @true, we will render dynamic shadows (shadow volumes) for
       all scene geometry. This allows the whole level to use dynamic
@@ -2541,7 +2541,7 @@ constructor TLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  ADemo: boolean);
+  AMenuBackground: boolean);
 
   procedure RemoveItemsToRemove;
   var
@@ -2568,7 +2568,7 @@ begin
   FTitle := ATitle;
   FTitleHint := ATitleHint;
   FNumber := ANumber;
-  FDemo := ADemo;
+  FMenuBackground := AMenuBackground;
   FRequiredCreatures := ARequiredCreatures;
 
   RequireCreatures(FRequiredCreatures);
@@ -2719,7 +2719,7 @@ begin
   { Loading octree have their own Progress, so we load them outside our
     progress. }
 
-  if not Demo then
+  if not MenuBackground then
   begin
     Scene.DefaultTriangleOctree :=
       Scene.CreateTriangleOctree(
@@ -3177,7 +3177,7 @@ begin
   for I := 0 to Objects.High do
     Objects[I].Render(Frustum, tgOpaque);
 
-  if not Demo then
+  if not MenuBackground then
     Scene.RenderFrustumOctree(Frustum, tgAll) else
     Scene.RenderFrustum(Frustum, tgAll);
 

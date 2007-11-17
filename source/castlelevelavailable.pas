@@ -60,7 +60,7 @@ type
 
     RequiredCreatures: TStringList;
 
-    function CreateLevel(Demo: boolean = false): TLevel;
+    function CreateLevel(MenuBackground: boolean = false): TLevel;
   end;
 
   TObjectsListItem_1 = TLevelAvailable;
@@ -72,7 +72,7 @@ type
       LevelDOMElement (this is parsed during TLevel.Create). }
     Document: TXMLDocument;
     function IsSmallerByNumber(const A, B: TLevelAvailable): boolean;
-    FDemoLevelName: string;
+    FMenuBackgroundLevelName: string;
   public
     destructor Destroy; override;
 
@@ -93,7 +93,7 @@ type
       config file). }
     procedure LoadFromFile;
 
-    property DemoLevelName: string read FDemoLevelName write FDemoLevelName;
+    property MenuBackgroundLevelName: string read FMenuBackgroundLevelName write FMenuBackgroundLevelName;
   end;
 
 var
@@ -161,8 +161,8 @@ procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
         Value := TCagesLevel else
       if ValueStr = 'TGateLevel' then
         Value := TGateLevel else
-      if ValueStr = 'TGateDemoLevel' then
-        Value := TGateDemoLevel else
+      if ValueStr = 'TGateBackgroundLevel' then
+        Value := TGateBackgroundLevel else
       if ValueStr = 'TCastleHallLevel' then
         Value := TCastleHallLevel else
       if ValueStr = 'TDoomE1M1Level' then
@@ -239,13 +239,13 @@ begin
   glPopAttrib;
 end;
 
-function TLevelAvailable.CreateLevel(Demo: boolean): TLevel;
+function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
 
   procedure CreateLevelCore;
   begin
     Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
-      Title, TitleHint, Number, LevelDOMElement, RequiredCreatures, Demo);
-    if not Demo then
+      Title, TitleHint, Number, LevelDOMElement, RequiredCreatures, MenuBackground);
+    if not MenuBackground then
       AvailableForNewGame := true;
   end;
 
@@ -366,8 +366,8 @@ begin
   Check(Document.DocumentElement.TagName = 'levels',
     'Root node of levels/index.xml must be <levels>');
 
-  Check(DOMGetAttribute(Document.DocumentElement, 'demo_level_name',
-    FDemoLevelName), '<levels> must have attribute "demo_level_name"');
+  Check(DOMGetAttribute(Document.DocumentElement, 'background_level_name',
+    FMenuBackgroundLevelName), '<levels> must have attribute "background_level_name"');
 
   LevelsList := Document.DocumentElement.ChildNodes;
   try

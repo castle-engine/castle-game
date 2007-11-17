@@ -18,12 +18,12 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{ Handling of the demo displayed under the start menu.
+{ Handling of the background level displayed under the start menu.
 
   The idea is to reuse here most of our engine, so e.g. we have here
   a "real" game level --- TLevel instance and other things.
   Eventually, we will also add here creatures and items from our game,
-  so we can make this demo to really show off some features and tease
+  so we can make this background level to really show off some features and tease
   the player before (s)he clicks "New Game".
   At the same time, I have here the ability to insert some special
   things that cannot be really added to the game (e.g. some 2D effect
@@ -35,18 +35,18 @@
   but different. CastlePlay unit has global Player and Level instances.
   This unit doesn't use them (so it's a design decision that this
   unit @italic(doesn't use CastlePlay unit (even in the implementation))).
-  This unit has internal DemoLevel instance and such.
+  This unit has internal BackgroundLevel instance and such.
 }
-unit CastleDemoLevel;
+unit CastleBackgroundLevel;
 
 interface
 
 uses GLWindow;
 
-procedure DemoLevelBegin;
-procedure DemoLevelEnd;
+procedure BackgroundLevelBegin;
+procedure BackgroundLevelEnd;
 
-{ Draw demo level.
+{ Draw background level.
 
   @italic(This procedure doesn't require you to set any particular
   3d projection matrix). This procedure will always set it's own
@@ -58,9 +58,9 @@ procedure DemoLevelEnd;
 
   Actually, this will draw some 2d item: game caption.
 }
-procedure DemoLevelDraw(Glwin: TGLWindow);
+procedure BackgroundLevelDraw(Glwin: TGLWindow);
 
-procedure DemoLevelIdle(Glwin: TGLWindow);
+procedure BackgroundLevelIdle(Glwin: TGLWindow);
 
 implementation
 
@@ -70,40 +70,40 @@ uses SysUtils,
   CastleWindow, CastleLevel, CastleLevelAvailable, CastleVideoOptions;
 
 var
-  DemoLevel: TLevel;
-  DemoNavigator: TMatrixWalker;
+  BackgroundLevel: TLevel;
+  BackgroundNavigator: TMatrixWalker;
 
   GLList_Caption: TGLuint;
   {CaptionWidth, }CaptionHeight: Cardinal;
 
-procedure DemoLevelBegin;
+procedure BackgroundLevelBegin;
 begin
-  { initialize DemoLevel }
-  DemoLevel := LevelsAvailable.FindName(LevelsAvailable.DemoLevelName).
+  { initialize BackgroundLevel }
+  BackgroundLevel := LevelsAvailable.FindName(LevelsAvailable.MenuBackgroundLevelName).
     CreateLevel(true);
 
-  { initialize DemoNavigator }
-  DemoNavigator := TMatrixWalker.Create(@Glw.PostRedisplayOnMatrixChanged);
-  DemoNavigator.Init(DemoLevel.InitialCameraPos,
-    DemoLevel.InitialCameraDir,
-    DemoLevel.InitialCameraUp,
-    DemoLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
+  { initialize BackgroundNavigator }
+  BackgroundNavigator := TMatrixWalker.Create(@Glw.PostRedisplayOnMatrixChanged);
+  BackgroundNavigator.Init(BackgroundLevel.InitialCameraPos,
+    BackgroundLevel.InitialCameraDir,
+    BackgroundLevel.InitialCameraUp,
+    BackgroundLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
 end;
 
-procedure DemoLevelEnd;
+procedure BackgroundLevelEnd;
 begin
-  FreeAndNil(DemoLevel);
-  FreeAndNil(DemoNavigator);
+  FreeAndNil(BackgroundLevel);
+  FreeAndNil(BackgroundNavigator);
 end;
 
 function ProjectionFar: Single;
 begin
   if RenderShadowsPossible and RenderShadows then
     Result := ZFarInfinity else
-    Result := DemoLevel.ProjectionFar;
+    Result := BackgroundLevel.ProjectionFar;
 end;
 
-procedure DemoLevelDraw(Glwin: TGLWindow);
+procedure BackgroundLevelDraw(Glwin: TGLWindow);
 
   procedure ProjectionPushSet;
 
@@ -112,7 +112,7 @@ procedure DemoLevelDraw(Glwin: TGLWindow);
       ProjectionMatrix: TMatrix4f;
     begin
       glGetFloatv(GL_PROJECTION_MATRIX, @ProjectionMatrix);
-      DemoNavigator.ProjectionMatrix := ProjectionMatrix;
+      BackgroundNavigator.ProjectionMatrix := ProjectionMatrix;
     end;
 
   begin
@@ -121,7 +121,7 @@ procedure DemoLevelDraw(Glwin: TGLWindow);
       glLoadIdentity;
       glMultMatrix(PerspectiveProjMatrixDeg(
         ViewAngleDegY, Glwin.Width / Glwin.Height,
-        DemoLevel.ProjectionNear, ProjectionFar));
+        BackgroundLevel.ProjectionNear, ProjectionFar));
     glMatrixMode(GL_MODELVIEW);
     UpdateNavigatorProjectionMatrix;
   end;
@@ -143,28 +143,28 @@ begin
     try
 
       ClearBuffers := GL_DEPTH_BUFFER_BIT;
-      UsedBackground := DemoLevel.Background;
+      UsedBackground := BackgroundLevel.Background;
 
       if UsedBackground <> nil then
       begin
-        glLoadMatrix(DemoNavigator.RotationOnlyMatrix);
+        glLoadMatrix(BackgroundNavigator.RotationOnlyMatrix);
         UsedBackground.Render;
       end else
         ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
 
       glClear(ClearBuffers);
 
-      { Set headlight. Must be done before glLoadMatrix(DemoNavigator.Matrix)
+      { Set headlight. Must be done before glLoadMatrix(BackgroundNavigator.Matrix)
         below, since TVRMLGLHeadlight.RenderOrDisable may change the matrix. }
-      TVRMLGLHeadlight.RenderOrDisable(DemoLevel.Headlight, 0);
+      TVRMLGLHeadlight.RenderOrDisable(BackgroundLevel.Headlight, 0);
 
-      glLoadMatrix(DemoNavigator.Matrix);
+      glLoadMatrix(BackgroundNavigator.Matrix);
 
-      DemoLevel.LightSet.RenderLights;
+      BackgroundLevel.LightSet.RenderLights;
 
       glPushAttrib(GL_ENABLE_BIT);
         glEnable(GL_LIGHTING);
-        DemoLevel.Render(DemoNavigator.Frustum);
+        BackgroundLevel.Render(BackgroundNavigator.Frustum);
       glPopAttrib;
 
     finally ProjectionPop end;
@@ -179,12 +179,12 @@ begin
   glPopAttrib;
 end;
 
-procedure DemoLevelIdle(Glwin: TGLWindow);
+procedure BackgroundLevelIdle(Glwin: TGLWindow);
 var
   CompSpeed: Single;
 begin
   CompSpeed := Glwin.IdleCompSpeed;
-  DemoLevel.Idle(CompSpeed);
+  BackgroundLevel.Idle(CompSpeed);
 end;
 
 { initialization / finalization ---------------------------------------------- }

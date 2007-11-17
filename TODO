@@ -48,7 +48,7 @@
     - useful only for castle right now, use more: at least in
       shadow_volume_tests, maybe in view3dscene option too ?
     - for headlight should be too
-    - demo castle level when this light actually moves
+    - background castle level when this light actually moves
   - dyn shadows from more than one light need to be done
     (additive rendering of lights), then scene_dynamic_shadows will
     allow for more interesting shadows also

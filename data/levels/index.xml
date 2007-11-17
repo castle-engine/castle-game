@@ -55,7 +55,7 @@
 -->
 
 <levels
-  demo_level_name="gate_demo">
+  background_level_name="gate_background">
 
   <level
     name="gate"
@@ -76,12 +76,12 @@
   </level>
 
   <level
-    name="gate_demo"
-    scene_file_name="gate_demo/gate_final.wrl"
-    light_set_file_name="gate_demo/gate_lights.wrl"
-    title="Demo"
+    name="gate_background"
+    scene_file_name="gate_background/gate_final.wrl"
+    light_set_file_name="gate_background/gate_lights.wrl"
+    title="Background"
     number="101"
-    implementation_class="TGateDemoLevel"
+    implementation_class="TGateBackgroundLevel"
   >
     <required_resources />
   </level>

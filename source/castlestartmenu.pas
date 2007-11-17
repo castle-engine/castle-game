@@ -38,7 +38,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, ALUtils, OpenAL, KambiClassUtils,
-  CastleTimeMessages, CastleLevelAvailable, CastleDemoLevel,
+  CastleTimeMessages, CastleLevelAvailable, CastleBackgroundLevel,
   GameSoundEngine, GLSoundMenu, KambiLog, KambiTimeUtils,
   CastleRequiredResources, CastleCredits;
 
@@ -124,7 +124,6 @@ procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
 var
   LocalPlayer: TPlayer;
   LocalLevel, NewLocalLevel: TLevel;
-  TimeBegin: TProcessTimerResult;
   WantsStart: boolean;
 begin
   { All kinds must be prepared before instances are created.
@@ -240,10 +239,10 @@ begin
 
   case CurrentItem of
     0: ChooseNewGame;
-    1: ShowControlsMenu(@DemoLevelDraw, @DemoLevelIdle, false, false);
+    1: ShowControlsMenu(@BackgroundLevelDraw, @BackgroundLevelIdle, false, false);
     2: CurrentMenu := VideoMenu;
     3: CurrentMenu := SoundMenu;
-    4: ShowCredits(@DemoLevelDraw, @DemoLevelIdle);
+    4: ShowCredits(@BackgroundLevelDraw, @BackgroundLevelIdle);
     5: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
@@ -692,7 +691,7 @@ end;
 
 procedure Draw(Glwin: TGLWindow);
 begin
-  DemoLevelDraw(Glwin);
+  BackgroundLevelDraw(Glwin);
 
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
@@ -735,7 +734,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  DemoLevelIdle(Glwin);
+  BackgroundLevelIdle(Glwin);
 
   CurrentMenu.Idle(Glwin.IdleCompSpeed);
   TimeMessagesIdle;
@@ -751,7 +750,7 @@ procedure ShowStartMenu;
 var
   SavedMode: TGLMode;
 begin
-  DemoLevelBegin;
+  BackgroundLevelBegin;
   try
     SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
     try
@@ -763,7 +762,7 @@ begin
         SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
           nil, false, true { FPSActive should not be needed anymore, but I leave it. },
           false, K_None, #0,
-          { show fps on caption --- useful to test FPS of demo level true}false,
+          { show fps on caption --- useful to test FPS of background level true}false,
           false);
 
         Glw.OnKeyDown := @KeyDown;
@@ -781,7 +780,7 @@ begin
       finally FreeAndNil(SavedMode); end;
     finally SoundEngine.MusicPlayer.PlayedSound := stNone; end;
   finally
-    DemoLevelEnd;
+    BackgroundLevelEnd;
   end;
 end;
 
