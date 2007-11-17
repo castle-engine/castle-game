@@ -196,8 +196,19 @@ begin
 
     for I := 0 to AnimationsPrepared.Count - 1 do
     begin
-      { TODO: frRootNode is temporary not here --- see ../TODO file about
-        "Wrong Alien dying anim" problem. }
+      { I could add here frRootNode.
+
+        There were weird problems for 0.7.0
+        with this (most probably FPC 2.0.4 bug --- see TODO file
+        in revision 2231 about "wrong anim when Alien dying" problem).
+        Later, these problems disappeared
+        (most probably fixed in FPC 2.2.0, but also many things
+        changed since 0.7.0, including some creature loading code).
+
+        But since "conserve memory" feature this is not really useful
+        much, it saves only 6 MB memory for DOOM level (most resource
+        costly level for now). So it's not turned on, as it's still risky
+        (freeing RootNode always was risky) and has little use. }
 
       AnimationsPrepared[I].FreeResources([frTextureImageInNodes,
         { TrianglesList was created if ManifoldEdges / BorderEdges were requested.
