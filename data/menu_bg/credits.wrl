@@ -11,13 +11,13 @@ DirectionalLight {
 }
 
 Transform {
-  translation 0 0 -17
+  translation 0 -8 -17
   scale 1.1 1 1
   children Shape {
     appearance Appearance { material Material {
       ambientIntensity 0.5
-      diffuseColor 1 1 1
-      transparency 0
+      diffuseColor 1 1 0.5
+      transparency 0.4
     } }
     geometry Text3D {
       string [ "$SCastleVersion"
@@ -65,7 +65,7 @@ Transform {
 DEF MainInfo WorldInfo {
    title "credits for \"The Castle\""
    info [ "the following two lines mean animation speed and animation time end",
-          "1.5"
-          "24"
+          "2"
+          "22"
         ]
 }

@@ -123,11 +123,22 @@ begin
     UserQuit := true;
 end;
 
+{ $define DEBUG_ALWAYS_RELOAD_CREDITS}
+
+{$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
+procedure InitGLW(Glwin: TGLWindow); forward;
+{$endif}
+
 procedure ShowCredits(ADrawUnderCredits: TDrawFunc;
   AIdleUnderCredits: TGLWindowFunc);
 var
   SavedMode: TGLMode;
 begin
+  {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
+  CredistGLContextRelease;
+  InitGLW(Glw);
+  {$endif}
+
   DrawUnderCredits := ADrawUnderCredits;
   IdleUnderCredits := AIdleUnderCredits;
   AnimationTime := 0;
