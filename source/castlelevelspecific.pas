@@ -1061,9 +1061,6 @@ begin
         end else
         begin
           LevelFinished('');
-          { As a price, the DOOM bonus level becomes available once
-            you finish main game. }
-          LevelsAvailable.FindName('doom_e1m1').AvailableForNewGame := true;
         end;
       end else
         TimeMessageInteractFailed('You need an appropriate key to open this door');
