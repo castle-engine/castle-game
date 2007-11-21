@@ -1,3 +1,8 @@
+- clean bump tests: make good fountain VRML with bump nodes,
+  remove temporary temp_fountain_demobump (blend, wrl), it shouldn't
+  be needed anymore
+  (make ModelInverseTransform in VRML available)
+
 - when loading creatures required by player for doom level, for a second
   the menu background level flashes between DOOM level splash and doom level gameplay.
   That's because of the way Doom level splash is done.
