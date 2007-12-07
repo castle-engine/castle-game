@@ -165,7 +165,7 @@ DEF OB_FountainCore Transform {
 					}
 					geometry IndexedFaceSet {
 						solid TRUE
-						creaseAngle 4 # > Pi, completely smooth
+						creaseAngle 4.000000
 						coord DEF coord_FountainCore Coordinate {
 							point [
 -0.497018605471 4.0 -1.17661738396
@@ -7376,6 +7376,7 @@ DEF OB_WaterSurface Transform {
 					}
 					geometry IndexedFaceSet {
 						solid TRUE
+						creaseAngle 0.000000
 						coord DEF coord_WaterSurface Coordinate {
 							point [
 3.40523910522 3.4052259922 -0.299999982119
@@ -7763,7 +7764,7 @@ DEF OB_Tube Transform {
 					}
 					geometry IndexedFaceSet {
 						solid TRUE
-						creaseAngle 0.5235987756 # Pi / 6 = 30 degrees
+						creaseAngle 0.523599
 						coord DEF coord_Fountain Coordinate {
 							point [
 3.60624694824 3.60624694824 -3.80000019073
@@ -9054,6 +9055,7 @@ DEF OB_Curve_011 Transform {
 					}
 					geometry IndexedFaceSet {
 						solid TRUE
+						creaseAngle 0.000000
 						coord DEF coord_CornerUpperCeiling Coordinate {
 							point [
 -4.32842636108 3.49999904633 0.0
@@ -9225,7 +9227,7 @@ DEF OB_Curve_007 Transform {
 					}
 					geometry IndexedFaceSet {
 						solid TRUE
-						creaseAngle 0.5235987756 # Pi / 6 = 30 degrees
+						creaseAngle 0.523599
 						coord DEF coord_Column Coordinate {
 							point [
 -2.74264097214 3.49999928474 -7.07106781006
@@ -9670,6 +9672,7 @@ DEF OB_Ground Transform {
 					}
 					geometry IndexedFaceSet {
 						solid TRUE
+						creaseAngle 0.000000
 						coord DEF coord_Ground Coordinate {
 							point [
 5.7000002861 5.69999885559 0.0
