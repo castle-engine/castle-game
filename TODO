@@ -104,12 +104,6 @@
 - ball missile should hit other creatures too (helpful on crowdy places
   on Doom level), barrels too
 
-- the fact that alien dying falls on it's back means that usually
-  after alien falls dead (killed with a sword) it makes strange
-  collision detection problems. It would be most natural to make
-  2 alien death animations, depending on the direction of attack
-  (I have direction of attack for knockback anyway) ?
-
 - load level music only when it's needed
 
 - on castle_hall level, stand very close the box that has the button on it.

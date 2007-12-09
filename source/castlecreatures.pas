@@ -110,7 +110,8 @@ type
       AnimInfo: TVRMLGLAnimationInfo);
 
     procedure AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
-      KindsConfig: TKamXMLConfig; const AnimationName: string); override;
+      KindsConfig: TKamXMLConfig; const AnimationName: string;
+      NilIfNoElement: boolean = false); override;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -260,6 +261,7 @@ type
     FWalkAnimation: TVRMLGLAnimation;
     FAttackAnimation: TVRMLGLAnimation;
     FDyingAnimation: TVRMLGLAnimation;
+    FDyingBackAnimation: TVRMLGLAnimation;
     FHurtAnimation: TVRMLGLAnimation;
 
     FStandAnimationInfo: TVRMLGLAnimationInfo;
@@ -267,6 +269,7 @@ type
     FWalkAnimationInfo: TVRMLGLAnimationInfo;
     FAttackAnimationInfo: TVRMLGLAnimationInfo;
     FDyingAnimationInfo: TVRMLGLAnimationInfo;
+    FDyingBackAnimationInfo: TVRMLGLAnimationInfo;
     FHurtAnimationInfo: TVRMLGLAnimationInfo;
 
     FMoveSpeed: Single;
@@ -339,6 +342,14 @@ type
       animations. Note that we can display this animation infinitely,
       so it must work good after Time > it's TimeEnd. }
     property DyingAnimation: TVRMLGLAnimation read FDyingAnimation;
+
+    { This is an optional dying animation. May be @nil, and corresponding
+      DyingBackAnimationInfo may be @nil. If not @nil, this will be used
+      if creature is killed by hitting it in the back (and normal
+      DyingAnimation is used only when it's killed by hitting from the front).
+
+      The direction of last hit is taken from LastAttackDirection. }
+    property DyingBackAnimation: TVRMLGLAnimation read FDyingBackAnimation;
 
     { Animation when the creature will be hurt.
       Beginning must be on time 0.
@@ -972,8 +983,8 @@ type
     function FindKind(Kind: TCreatureKind): Integer;
   end;
 
-  TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack, wasDying, wasHurt,
-    wasSpecial1);
+  TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack,
+    wasDying, wasDyingBack, wasHurt, wasSpecial1);
 
   { This is TCreature that has a kind always of TWalkAttackCreatureKind. }
   TWalkAttackCreature = class(TCreature)
@@ -1263,11 +1274,13 @@ begin
 end;
 
 procedure TCreatureKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
-  KindsConfig: TKamXMLConfig; const AnimationName: string);
+  KindsConfig: TKamXMLConfig; const AnimationName: string;
+  NilIfNoElement: boolean);
 begin
   inherited;
-  AnimInfo.ScenesPerTime :=
-    AnimInfo.ScenesPerTime * CreatureAnimationScenesPerTime;
+  if AnimInfo <> nil then
+    AnimInfo.ScenesPerTime :=
+      AnimInfo.ScenesPerTime * CreatureAnimationScenesPerTime;
 end;
 
 { TCreaturesKindsList -------------------------------------------------------- }
@@ -1332,6 +1345,7 @@ begin
   FreeAndNil(FWalkAnimation);
   FreeAndNil(FAttackAnimation);
   FreeAndNil(FDyingAnimation);
+  FreeAndNil(FDyingBackAnimation);
   FreeAndNil(FHurtAnimation);
 
   FreeAndNil(FStandAnimationInfo);
@@ -1339,6 +1353,7 @@ begin
   FreeAndNil(FWalkAnimationInfo);
   FreeAndNil(FAttackAnimationInfo);
   FreeAndNil(FDyingAnimationInfo);
+  FreeAndNil(FDyingBackAnimationInfo);
   FreeAndNil(FHurtAnimationInfo);
 
   inherited;
@@ -1353,6 +1368,7 @@ begin
   AddFirstRootNodesPool(FWalkAnimationInfo       );
   AddFirstRootNodesPool(FAttackAnimationInfo     );
   AddFirstRootNodesPool(FDyingAnimationInfo      );
+  AddFirstRootNodesPool(FDyingBackAnimationInfo  );
   AddFirstRootNodesPool(FHurtAnimationInfo       );
 
   CreateAnimationIfNeeded('Stand'      , FStandAnimation      , FStandAnimationInfo      );
@@ -1361,6 +1377,7 @@ begin
   CreateAnimationIfNeeded('Walk'       , FWalkAnimation       , FWalkAnimationInfo       );
   CreateAnimationIfNeeded('Attack'     , FAttackAnimation     , FAttackAnimationInfo     );
   CreateAnimationIfNeeded('Dying'      , FDyingAnimation      , FDyingAnimationInfo      );
+  CreateAnimationIfNeeded('DyingBack'  , FDyingBackAnimation  , FDyingBackAnimationInfo  );
   CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationInfo       );
 
   CameraRadiusFromPrepareRender :=
@@ -1380,6 +1397,7 @@ begin
   FreeAndNil(FWalkAnimation);
   FreeAndNil(FAttackAnimation);
   FreeAndNil(FDyingAnimation);
+  FreeAndNil(FDyingBackAnimation);
   FreeAndNil(FHurtAnimation);
 
   inherited;
@@ -1393,6 +1411,7 @@ begin
   if WalkAnimation <> nil then WalkAnimation.CloseGL;
   if AttackAnimation <> nil then AttackAnimation.CloseGL;
   if DyingAnimation <> nil then DyingAnimation.CloseGL;
+  if DyingBackAnimation <> nil then DyingBackAnimation.CloseGL;
   if HurtAnimation <> nil then HurtAnimation.CloseGL;
 end;
 
@@ -1445,6 +1464,7 @@ begin
   AnimationFromConfig(FWalkAnimationInfo, KindsConfig, 'walk');
   AnimationFromConfig(FAttackAnimationInfo, KindsConfig, 'attack');
   AnimationFromConfig(FDyingAnimationInfo, KindsConfig, 'dying');
+  AnimationFromConfig(FDyingBackAnimationInfo, KindsConfig, 'dying_back', true);
   AnimationFromConfig(FHurtAnimationInfo, KindsConfig, 'hurt');
 end;
 
@@ -3080,12 +3100,26 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     end;
   end;
 
+  { @true if last attack was from the back of the creature,
+    @false if from the front or unknown (when LastAttackDirection is zero). }
+  function WasLackAttackBack: boolean;
+  begin
+    try
+      Result := AngleRadBetweenVectors(LastAttackDirection, Direction) < Pi/2;
+    except
+      on EVectorMathInvalidOp do Result := false;
+    end;
+  end;
+
 begin
   inherited;
 
-  if Dead then
+  if Dead and not (State in [wasDying, wasDyingBack]) then
   begin
-    SetState(wasDying);
+    if (WAKind.DyingBackAnimation <> nil) and
+       WasLackAttackBack then
+      SetState(wasDyingBack) else
+      SetState(wasDying);
     Exit;
   end;
 
@@ -3107,7 +3141,7 @@ begin
     wasStand: DoStand;
     wasWalk: DoWalk;
     wasAttack: DoAttack;
-    wasDying: ;
+    wasDying, wasDyingBack: ;
     wasHurt: DoHurt;
     wasSpecial1: { Should be handled in descendants. };
     else raise EInternalError.Create('FState ?');
@@ -3135,6 +3169,8 @@ begin
       Result := WAKind.AttackAnimation.SceneFromTime(StateTime);
     wasDying:
       Result := WAKind.DyingAnimation.SceneFromTime(StateTime);
+    wasDyingBack:
+      Result := WAKind.DyingBackAnimation.SceneFromTime(StateTime);
     wasHurt:
       Result := WAKind.HurtAnimation.SceneFromTime(StateTime);
     else raise EInternalError.Create('FState ?');
@@ -3191,7 +3227,7 @@ end;
 function TWalkAttackCreature.DebugCaption: string;
 const
   StateName: array [TWalkAttackCreatureState] of string =
-  ( 'Stand', 'Walk', 'Attack', 'Dying', 'Hurt', 'Special1' );
+  ( 'Stand', 'Walk', 'Attack', 'Dying', 'DyingBack', 'Hurt', 'Special1' );
 begin
   Result := (inherited DebugCaption) + ' ' + StateName[State];
 end;
@@ -3568,6 +3604,7 @@ procedure TMissileCreature.ExplodeWithCreature(Creature: TCreature);
 begin
   ExplodeCore;
   { TODO: knockback for creatures should be done here. }
+  Creature.LastAttackDirection := Direction;
   Creature.Life := Creature.Life -
     (Kind.ShortRangeAttackDamageConst +
       Random * Kind.ShortRangeAttackDamageRandom);

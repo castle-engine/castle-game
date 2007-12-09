@@ -60,7 +60,8 @@ type
       TransparentGroups: TTransparentGroups;
       Options: TPrepareRenderOptions);
 
-    { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool }
+    { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool.
+      AnimInfo may be @nil, then this is ignored. }
     procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
 
     { Similar to AddFirstRootNodesPool, this allows us to share
@@ -69,10 +70,20 @@ type
     procedure AddManifoldEdgesPool(AnimInfo: TVRMLGLAnimationInfo;
       AnimationToShareEdges: TVRMLGLAnimation);
 
-    { @param(AnimationName determines the XML element name, so it must
-      be a valid part of XML name) }
+    { Create AnimInfo instance, reading animation properties from
+      XML file KindsConfig. The path of responsible XML element
+      depends on VRMLNodeName and given AnimationName.
+
+      If NilIfNoElement, then this will just set AnimInfo to @nil
+      if appropriate XML element file not found. Otherwise
+      (when NilIfNoElement = @false, this is default),
+      error will be raised.
+
+      @param(AnimationName determines the XML element name, so it must
+        be a valid part of XML name) }
     procedure AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
-      KindsConfig: TKamXMLConfig; const AnimationName: string); virtual;
+      KindsConfig: TKamXMLConfig; const AnimationName: string;
+      NilIfNoElement: boolean = false); virtual;
 
     { Prepare anything needed when starting new game.
       It must call Progress.Step PrepareRenderSteps times.
@@ -290,9 +301,12 @@ procedure TObjectKind.AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
 var
   FileName: string;
 begin
-  FileName := AnimInfo.ModelFileNames[0];
-  if FirstRootNodesPool.IndexOf(FileName) = -1 then
-    FirstRootNodesPool.AddObject(FileName, LoadAsVRML(FileName, false));
+  if AnimInfo <> nil then
+  begin
+    FileName := AnimInfo.ModelFileNames[0];
+    if FirstRootNodesPool.IndexOf(FileName) = -1 then
+      FirstRootNodesPool.AddObject(FileName, LoadAsVRML(FileName, false));
+  end;
 end;
 
 procedure TObjectKind.AddManifoldEdgesPool(AnimInfo: TVRMLGLAnimationInfo;
@@ -380,7 +394,8 @@ begin
 end;
 
 procedure TObjectKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
-  KindsConfig: TKamXMLConfig; const AnimationName: string);
+  KindsConfig: TKamXMLConfig; const AnimationName: string;
+  NilIfNoElement: boolean);
 var
   Element: TDOMElement;
 begin
@@ -389,11 +404,17 @@ begin
   Element := KindsConfig.PathElement(
     VRMLNodeName + '/' + AnimationName + '_animation/animation');
   if Element = nil then
-    raise Exception.CreateFmt('No <%s_animation>/<animation> elements for object "%s"',
-      [AnimationName, VRMLNodeName]);
-  AnimInfo := TVRMLGLAnimationInfo.CreateFromDOMElement(
-    Element, ExtractFilePath(KindsConfig.FileName),
-    GLContextCache);
+  begin
+    if not NilIfNoElement then
+      raise Exception.CreateFmt(
+        'No <%s_animation>/<animation> elements for object "%s"',
+        [AnimationName, VRMLNodeName]);
+  end else
+  begin
+    AnimInfo := TVRMLGLAnimationInfo.CreateFromDOMElement(
+      Element, ExtractFilePath(KindsConfig.FileName),
+      GLContextCache);
+  end;
 end;
 
 end.
