@@ -5,6 +5,7 @@ all:
 	$(MAKE) -C castle_hall/ all
 	$(MAKE) -C gate/ all
 	$(MAKE) -C gate_background/ all
+	$(MAKE) -C fountain/ all
 
 .PHONY: clean
 clean:
@@ -14,3 +15,4 @@ clean:
 	$(MAKE) -C castle_hall/ clean
 	$(MAKE) -C gate/ clean
 	$(MAKE) -C gate_background/ clean
+	$(MAKE) -C fountain/ clean

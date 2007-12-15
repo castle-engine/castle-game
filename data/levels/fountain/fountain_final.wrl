@@ -39,4 +39,4 @@ Transform {
 #   }
 }
 
-Inline { url "fountain.wrl" }
+Inline { url "fountain_processed.wrl" }
