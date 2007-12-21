@@ -32,8 +32,8 @@ procedure DrawInitialBackground;
 
 implementation
 
-uses SysUtils, OpenGLh, GLWindow, KambiGLUtils, CastleWindow, KambiFilesUtils,
-  Images, CastleTimeMessages;
+uses SysUtils, OpenGLh, GLWindow, KambiGLUtils, GLImages,
+  CastleWindow, KambiFilesUtils, Images, CastleTimeMessages;
 
 var
   GLList_ScreenImage: TGLuint;

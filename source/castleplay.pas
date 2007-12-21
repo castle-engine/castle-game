@@ -119,7 +119,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
   CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable,
-  ShadowVolumesHelper, KambiTimeUtils;
+  ShadowVolumesHelper, KambiTimeUtils, GLImages;
 
 var
   GLList_TimeMessagesBackground: TGLuint;

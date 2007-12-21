@@ -65,8 +65,8 @@ procedure BackgroundLevelIdle(Glwin: TGLWindow);
 implementation
 
 uses SysUtils,
-  MatrixNavigation, OpenGLh, BackgroundGL, KambiGLUtils, VRMLGLHeadlight,
-  KambiFilesUtils, Images, VectorMath,
+  MatrixNavigation, OpenGLh, BackgroundGL, KambiGLUtils, GLImages,
+  VRMLGLHeadlight, KambiFilesUtils, Images, VectorMath,
   CastleWindow, CastleLevel, CastleLevelAvailable, CastleVideoOptions;
 
 var

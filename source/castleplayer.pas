@@ -413,7 +413,7 @@ uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, KambiGLUtils, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, OpenAL, VRMLNodes, CastleControlsMenu,
-  CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL,
+  CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL, GLImages,
   CastleRequiredResources;
 
 var
