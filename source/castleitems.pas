@@ -24,7 +24,7 @@ unit CastleItems;
 interface
 
 uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
-  KambiClassUtils, Images, OpenGLh, CastleSound,
+  KambiClassUtils, Images, GL, GLU, GLExt, CastleSound,
   VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds,
   KambiXMLCfg, GameSoundEngine;
 

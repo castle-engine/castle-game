@@ -1181,7 +1181,7 @@ var
 
 implementation
 
-uses SysUtils, DOM, OpenGLh, CastleWindow, GLWindow,
+uses SysUtils, DOM, GL, GLU, GLExt, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
   CastleTimeMessages, CastleItems, Object3dAsVRML, KambiLog, KambiTimeUtils,

@@ -1306,7 +1306,7 @@ var
 
 implementation
 
-uses SysUtils, OpenGLh, Object3dAsVRML,
+uses SysUtils, GL, GLU, GLExt, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
   CastleInputs, CastleWindow, OpenAL, ALUtils, KambiXMLUtils,

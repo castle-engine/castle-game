@@ -250,7 +250,7 @@ function CastleLevelsPath: string;
 implementation
 
 uses KambiFilesUtils, SysUtils, Object3dAsVRML, KambiUtils,
-  OpenGLh, KambiGLUtils, KambiStringUtils, GLWinMessages,
+  GL, GLU, GLExt, KambiGLUtils, KambiStringUtils, GLWinMessages,
   CastlePlay, CastleTimeMessages, CastleInputs,
   CastleItems, CastleThunder, CastleLevelAvailable, CastleWindow;
 

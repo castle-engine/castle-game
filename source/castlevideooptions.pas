@@ -23,7 +23,7 @@ unit CastleVideoOptions;
 
 interface
 
-uses OpenGLh, VRMLFlatSceneGL;
+uses GL, GLU, GLExt, VRMLFlatSceneGL;
 
 type
   { This determines OpenGL blending factors used when rendering given model. }

@@ -32,7 +32,7 @@ procedure ShowStartMenu;
 implementation
 
 uses SysUtils, Classes, KambiUtils, GLWinModes,
-  OpenGLh, KambiGLUtils, GLWinMessages, CastleWindow,
+  GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,

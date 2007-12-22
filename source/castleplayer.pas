@@ -23,9 +23,10 @@ unit CastlePlayer;
 
 interface
 
-uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, OpenGLh,
+uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, GL, GLU, GLExt,
   VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
-  VRMLTriangleOctree, CastleTextures, GameSoundEngine, Classes;
+  VRMLTriangleOctree, CastleTextures, GameSoundEngine, Classes,
+  KambiGLUtils;
 
 const
   DefaultMaxLife = 100;
@@ -411,7 +412,7 @@ implementation
 
 uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
-  GLWindow, KambiGLUtils, Images, KambiFilesUtils,
+  GLWindow, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, OpenAL, VRMLNodes, CastleControlsMenu,
   CastleTimeMessages, KambiXMLCfg, VRMLFlatSceneGL, GLImages,
   CastleRequiredResources;
