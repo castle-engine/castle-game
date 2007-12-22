@@ -24,7 +24,7 @@ unit CastleLevelAvailable;
 interface
 
 uses CastleLevel, KambiUtils, Classes,
-  KambiClassUtils, DOM, GL, GLU, GLExt, ProgressGL;
+  KambiClassUtils, DOM, GL, GLU, KambiGLUtils, ProgressGL;
 
 {$define read_interface}
 
@@ -111,7 +111,7 @@ var
 implementation
 
 uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
-  CastleLevelSpecific, XMLRead, CastleWindow, KambiGLUtils, GLImages,
+  CastleLevelSpecific, XMLRead, CastleWindow, GLImages,
   Images, GLWindow, GLWinModes, KambiTimeUtils,
   CastleRequiredResources;
 
