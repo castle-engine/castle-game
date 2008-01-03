@@ -2582,6 +2582,12 @@ begin
     FAnimationTime := 0.0;
 
     AttributesSet(Scene.Attributes, btIncrease);
+    Scene.Attributes.BumpMapping := BumpMapping;
+    { TODO: For now, BumpMappingLightPosition is constant and just set here.
+      In the future: initial position of this should be from levels/index.xml,
+      and it can be updated during runtime by TLevel subclasses
+      if BumpMappingMethod = bmGLSL. }
+    Scene.BumpMappingLightPosition := Vector3Single(3, 3, 5);
 
     { Calculate InitialCameraPos, InitialCameraDir, InitialCameraUp.
       Must be done before initializing creatures, as they right now

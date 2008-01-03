@@ -140,6 +140,12 @@ var
   ViewAngleDegX: Single = 70.0;
 function ViewAngleDegY: Single;
 
+const
+  DefaultBumpMapping = true;
+
+var
+  BumpMapping: boolean;
+
 implementation
 
 uses KambiUtils, CastleConfig, CastleWindow, RaysWindow;
@@ -202,6 +208,8 @@ initialization
     'video_options/color_depth_bits', DefaultColorDepthBits);
   VideoFrequency := ConfigFile.GetValue(
     'video_options/frequency', DefaultVideoFrequency);
+  BumpMapping := ConfigFile.GetValue(
+    'video_options/bump_mapping', DefaultBumpMapping);
 finalization
   ConfigFile.SetDeleteValue(
     'video_options/texture_minification_quality',
@@ -221,4 +229,6 @@ finalization
   ConfigFile.SetDeleteValue(
     'video_options/frequency',
     VideoFrequency, DefaultVideoFrequency);
+  ConfigFile.SetDeleteValue('video_options/bump_mapping',
+    BumpMapping, DefaultBumpMapping);
 end.

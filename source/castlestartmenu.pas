@@ -63,6 +63,7 @@ type
     ColorDepthArgument: TGLMenuItemArgument;
     VideoFrequencyArgument: TGLMenuItemArgument;
     ConserveResourcesArgument: TGLMenuBooleanArgument;
+    BumpMappingArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure SetTextureMinificationQuality(
       Value: TTextureMinificationQuality;
@@ -312,6 +313,8 @@ begin
 
   ConserveResourcesArgument := TGLMenuBooleanArgument.Create(ConserveResources);
 
+  BumpMappingArgument := TGLMenuBooleanArgument.Create(BumpMapping);
+
   Items.Add('View video information');
   Items.AddObject('Texture quality', TextureMinificationQualitySlider);
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
@@ -320,6 +323,7 @@ begin
   Items.AddObject('Color depth', ColorDepthArgument);
   Items.AddObject('Display frequency', VideoFrequencyArgument);
   Items.AddObject('Conserve memory', ConserveResourcesArgument);
+  Items.AddObject('Bump mapping', BumpMappingArgument);
   Items.Add('Restore to defaults');
   Items.Add('Back to main menu');
 
@@ -467,6 +471,10 @@ begin
     6: ChangeVideoFrequency;
     7: SetConserveResources(not ConserveResources);
     8: begin
+         BumpMapping := not BumpMapping;
+         BumpMappingArgument.Value := BumpMapping;
+       end;
+    9: begin
          AllowScreenChange := DefaultAllowScreenChange;
          AllowScreenChangeArgument.Value := AllowScreenChange;
 
@@ -515,11 +523,14 @@ begin
 
          SetConserveResources(DefaultConserveResources);
 
+         BumpMapping := DefaultBumpMapping;
+         BumpMappingArgument.Value := BumpMapping;
+
          SomethingChanged;
 
          MessageOK(Glw, 'All video settings restored to defaults.', taLeft);
        end;
-    9: CurrentMenu := MainMenu;
+    10: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
