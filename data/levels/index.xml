@@ -211,7 +211,7 @@
     scene_file_name="fountain/fountain_final.wrl"
     light_set_file_name="fountain/fountain_lights.wrl"
     title="Fountain"
-    title_hint="shadows ON adviced"
+    title_hint="shadows and bump mapping ON adviced"
     number="15"
     implementation_class="TFountainLevel"
     footsteps_sound="player_footsteps_concrete"
@@ -226,6 +226,12 @@
       <creature name="BallMissile" />
     </required_resources>
 
+    <bump_mapping_light>
+      <ambient_color_shadows>0.24 0.24 0.24</ambient_color_shadows>
+      <ambient_color_lighted>0.24 0.24 0.24</ambient_color_lighted>
+      <diffuse_color>1 1 1</diffuse_color>
+      <position>3 23 5</position>
+    </bump_mapping_light>
   </level>
 
 <!--

@@ -446,17 +446,16 @@ procedure Draw(Glwin: TGLWindow);
       any Level.Render --- since they are always opaque. }
     RenderCreaturesItems(tgOpaque);
 
-    glPushAttrib(GL_LIGHTING_BIT);
-    try
-      { Headlight will stay on here, but lights in Level.LightSet are off. }
-      if not Level.LightSet.TurnLightsOffForShadows(MainLightPosition) then
-      begin
-        RenderNoShadows;
-        Exit;
-      end;
-
-      Level.Render(Player.Navigator.Frustum);
-    finally glPopAttrib() end;
+    if Level.PushLightsOff(MainLightPosition) then
+    begin
+      try
+        Level.Render(Player.Navigator.Frustum);
+      finally Level.PopLightsOff; end;
+    end else
+    begin
+      RenderNoShadows;
+      Exit;
+    end;
 
     SVHelper.InitFrustumAndLight(Player.Navigator.Frustum, MainLightPosition);
     SVHelper.Count := ShowDebugInfo;

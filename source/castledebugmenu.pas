@@ -35,7 +35,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   CastleControlsMenu, CastleInputs, CastleCreatures, CastleChooseMenu,
   CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel,
   CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
-  CastleLevelAvailable;
+  CastleLevelAvailable, Boxes3d;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -116,6 +116,15 @@ type
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
+  TEditBumpMappingLightMenu = class(TCastleMenu)
+    PositionSlider: array [0..2] of TGLMenuFloatSlider;
+    AmbientColorSlider: array [boolean, 0..2] of TGLMenuFloatSlider;
+    DiffuseColorSlider: array [0..2] of TGLMenuFloatSlider;
+    constructor Create;
+    procedure CurrentItemSelected; override;
+    procedure CurrentItemAccessoryValueChanged; override;
+  end;
+
 { TViewAngleSlider ----------------------------------------------------------- }
 
 constructor TViewAngleSlider.Create;
@@ -145,6 +154,7 @@ var
   EditLevelLightsMenu: TEditLevelLightsMenu;
   EditOneLightMenu: TEditOneLightMenu;
   EditHeadlightMenu: TEditHeadlightMenu;
+  EditBumpMappingLightMenu: TEditBumpMappingLightMenu;
 
 { TDebugMenu ------------------------------------------------------------ }
 
@@ -711,6 +721,102 @@ begin
   end;
 end;
 
+{ TEditBumpMappingLightMenu -------------------------------------------------- }
+
+constructor TEditBumpMappingLightMenu.Create;
+var
+  I: Integer;
+  LevelBoxSizes: TVector3Single;
+begin
+  inherited;
+
+  LevelBoxSizes := Box3dSizes(Level.LevelBox);
+  for I := 0 to 2 do
+    PositionSlider[I] := TGLMenuFloatSlider.Create(
+      Level.LevelBox[0, I] - LevelBoxSizes[I],
+      Level.LevelBox[1, I] + LevelBoxSizes[I],
+      Level.Scene.BumpMappingLightPosition[I]);
+
+  for I := 0 to 2 do
+  begin
+    AmbientColorSlider[false, I] := TGLMenuFloatSlider.Create(0, 1,
+      Level.BumpMappingLightAmbientColor[false][I]);
+    AmbientColorSlider[true, I] := TGLMenuFloatSlider.Create(0, 1,
+      Level.BumpMappingLightAmbientColor[true][I]);
+  end;
+
+  for I := 0 to 2 do
+    DiffuseColorSlider[I] := TGLMenuFloatSlider.Create(0, 1,
+      Level.BumpMappingLightDiffuseColor[I]);
+
+  Items.AddObject('Position X', PositionSlider[0]);
+  Items.AddObject('Position Y', PositionSlider[1]);
+  Items.AddObject('Position Z', PositionSlider[2]);
+
+  Items.AddObject('Ambient shadowed red'  , AmbientColorSlider[false, 0]);
+  Items.AddObject('Ambient shadowed green', AmbientColorSlider[false, 1]);
+  Items.AddObject('Ambient shadowed blue' , AmbientColorSlider[false, 2]);
+
+  Items.AddObject('Ambient lighted red'  , AmbientColorSlider[true, 0]);
+  Items.AddObject('Ambient lighted green', AmbientColorSlider[true, 1]);
+  Items.AddObject('Ambient lighted blue' , AmbientColorSlider[true, 2]);
+
+  Items.AddObject('Diffuse red'  , DiffuseColorSlider[0]);
+  Items.AddObject('Diffuse green', DiffuseColorSlider[1]);
+  Items.AddObject('Diffuse blue' , DiffuseColorSlider[2]);
+
+  Items.Add('Back');
+
+  FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TEditBumpMappingLightMenu.CurrentItemSelected;
+begin
+  case CurrentItem of
+    0..11: ;
+    12: CurrentMenu := EditLevelLightsMenu;
+    else raise EInternalError.Create('Menu item unknown');
+  end;
+end;
+
+procedure TEditBumpMappingLightMenu.CurrentItemAccessoryValueChanged;
+var
+  Index: Integer;
+  V: TVector3Single;
+  C: TVector4Single;
+begin
+  case CurrentItem of
+    0..2:
+      begin
+        Index := CurrentItem;
+        V := Level.Scene.BumpMappingLightPosition;
+        V[Index] := PositionSlider[Index].Value;
+        Level.Scene.BumpMappingLightPosition := V;
+      end;
+    3..5:
+      begin
+        Index := CurrentItem - 3;
+        C := Level.BumpMappingLightAmbientColor[false];
+        C[Index] := AmbientColorSlider[false, Index].Value;
+        Level.BumpMappingLightAmbientColor[false] := C;
+      end;
+    6..8:
+      begin
+        Index := CurrentItem - 6;
+        C := Level.BumpMappingLightAmbientColor[true];
+        C[Index] := AmbientColorSlider[true, Index].Value;
+        Level.BumpMappingLightAmbientColor[true] := C;
+      end;
+    9..11:
+      begin
+        Index := CurrentItem - 9;
+        C := Level.BumpMappingLightDiffuseColor;
+        C[Index] := DiffuseColorSlider[Index].Value;
+        Level.BumpMappingLightDiffuseColor := C;
+      end;
+  end;
+end;
+
 { TEditLevelLightsMenu ------------------------------------------------------- }
 
 constructor TEditLevelLightsMenu.Create;
@@ -739,6 +845,7 @@ begin
   Items.AddObject('Global ambient light green', AmbientColorSlider[1]);
   Items.AddObject('Global ambient light blue' , AmbientColorSlider[2]);
   Items.Add('Edit headlight');
+  Items.Add('Edit bump mapping light');
   Items.Add('Back to debug menu');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -778,7 +885,14 @@ begin
            MessageOK(Glw, 'No headlight in level ' +
              ' (set NavigationInfo.headlight to TRUE to get headlight)', taLeft);
        end;
-    6: CurrentMenu := DebugMenu;
+    6: begin
+         { recreate EditBumpMappingLightMenu, since light properties possibly
+           changed by outside action (e.g. some TLevel.Idle ?) }
+         FreeAndNil(EditBumpMappingLightMenu);
+         EditBumpMappingLightMenu := TEditBumpMappingLightMenu.Create;
+         CurrentMenu := EditBumpMappingLightMenu;
+       end;
+    7: CurrentMenu := DebugMenu;
     else
        begin
          FreeAndNil(EditOneLightMenu);
@@ -1095,6 +1209,7 @@ begin
   FreeAndNil(EditLevelLightsMenu);
   FreeAndNil(EditOneLightMenu);
   FreeAndNil(EditHeadlightMenu);
+  FreeAndNil(EditBumpMappingLightMenu);
   FreeAndNil(DebugItemsMenu);
   FreeAndNil(DebugCreaturesMenu);
   FreeAndNil(DebugLevelMenu);

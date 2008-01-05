@@ -906,6 +906,13 @@ type
     FSceneDynamicShadows: boolean;
 
     FRequiredCreatures: TStringList;
+
+    FBumpMappingLightAmbientColor: array [boolean] of TVector4Single;
+    function GetBumpMappingLightAmbientColor(const Lighted: boolean): TVector4Single;
+    procedure SetBumpMappingLightAmbientColor(const Lighted: boolean; const Value: TVector4Single);
+
+    FBumpMappingLightDiffuseColor: TVector4Single;
+    procedure SetBumpMappingLightDiffuseColor(const Value: TVector4Single);
   protected
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
@@ -1290,6 +1297,28 @@ type
       attribute scene_dynamic_shadows. }
     property SceneDynamicShadows: boolean
       read FSceneDynamicShadows write FSceneDynamicShadows default false;
+
+    { Turn off lights not supposed to light in the shadow, and detect position
+      (if any) of the main light that produces shadows.
+
+      Returns @true, sets MainLightPosition if there's light that produces shadows.
+      In this case you should follow by rendering the scene without lighting,
+      and calling PopLightsOff.
+
+      Returns @false if there's no such light, and in this case no lights are
+      turned off (you should revert to no-shadows algorithm in this case). }
+    function PushLightsOff(out MainLightPosition: TVector4Single): boolean;
+    procedure PopLightsOff;
+
+    { Ambient color of light used for bump mapping,
+      for shadowed (@false) and lighted (@true) versions. }
+    property BumpMappingLightAmbientColor[Lighted: boolean]: TVector4Single
+      read GetBumpMappingLightAmbientColor
+      write SetBumpMappingLightAmbientColor;
+
+    { Diffuse color of light used for bump mapping. }
+    property BumpMappingLightDiffuseColor: TVector4Single
+      read FBumpMappingLightDiffuseColor write SetBumpMappingLightDiffuseColor;
   end;
 
   TLevelClass = class of TLevel;
@@ -1310,7 +1339,7 @@ uses SysUtils, GL, GLU, GLExt, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
   CastleInputs, CastleWindow, OpenAL, ALUtils, KambiXMLUtils,
-  CastleRequiredResources;
+  CastleRequiredResources, VRMLOpenGLRenderer;
 
 {$define read_implementation}
 {$I objectslist_2.inc}
@@ -2583,11 +2612,6 @@ begin
 
     AttributesSet(Scene.Attributes, btIncrease);
     Scene.Attributes.BumpMapping := BumpMapping;
-    { TODO: For now, BumpMappingLightPosition is constant and just set here.
-      In the future: initial position of this should be from levels/index.xml,
-      and it can be updated during runtime by TLevel subclasses
-      if BumpMappingMethod = bmGLSL. }
-    Scene.BumpMappingLightPosition := Vector3Single(3, 3, 5);
 
     { Calculate InitialCameraPos, InitialCameraDir, InitialCameraUp.
       Must be done before initializing creatures, as they right now
@@ -2787,14 +2811,53 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
   begin
     if Element.TagName = 'area' then
       Result := LevelAreaFromDOMElement(Element) else
-    if Element.TagName = 'required_resources' then
-      begin
-        { this is handled in TLevelAvailable, and doesn't produce any
-          TLevelObject. }
-        Result := nil;
-      end else
+    if (Element.TagName = 'required_resources') or
+       (Element.TagName = 'bump_mapping_light') then
+    begin
+      { These are handled elsewhere, and don't produce any TLevelObject. }
+      Result := nil;
+    end else
       raise Exception.CreateFmt('Not allowed children element of <level>: "%s"',
         [Element.TagName]);
+  end;
+
+  procedure ReadBumpMappingLightProperties(BMElement: TDOMElement);
+
+    function Vector3SingleFromElementData(const ChildName: string;
+      const DefaultValue: TVector3Single): TVector3Single;
+    var
+      E: TDOMElement;
+    begin
+      E := DOMGetChildElement(BMElement, ChildName, false);
+      if E <> nil then
+        Result := Vector3SingleFromStr(DOMGetTextData(E)) else
+        Result := DefaultValue;
+    end;
+
+    function Vector4SingleFromElementData(const ChildName: string;
+      const DefaultValue: TVector4Single): TVector4Single;
+    var
+      E: TDOMElement;
+    begin
+      E := DOMGetChildElement(BMElement, ChildName, false);
+      if E <> nil then
+        Result := Vector4Single(Vector3SingleFromStr(DOMGetTextData(E)), 1) else
+        Result := DefaultValue;
+    end;
+
+  const
+    DefaultBumpMappingLightPosition: TVector3Single = (0, 0, 0);
+  begin
+    { Later: it can be updated during runtime by TLevel subclasses
+      if BumpMappingMethod = bmGLSL. }
+    Scene.BumpMappingLightPosition := Vector3SingleFromElementData(
+      'position', DefaultBumpMappingLightPosition);
+    BumpMappingLightAmbientColor[false] := Vector4SingleFromElementData(
+      'ambient_color_shadows', DefaultBumpMappingLightAmbientColor);
+    BumpMappingLightAmbientColor[true] := Vector4SingleFromElementData(
+      'ambient_color_lighted', DefaultBumpMappingLightAmbientColor);
+    BumpMappingLightDiffuseColor := Vector4SingleFromElementData(
+      'diffuse_color', DefaultBumpMappingLightDiffuseColor);
   end;
 
 var
@@ -2803,6 +2866,7 @@ var
   SoundName: string;
   I: Integer;
   NewObject: TLevelObject;
+  BMElement: TDOMElement;
 begin
   { Load Objects }
   ObjectsList := Element.ChildNodes;
@@ -2832,6 +2896,10 @@ begin
 
   FSceneDynamicShadows := false; { default value }
   DOMGetBooleanAttribute(Element, 'scene_dynamic_shadows', FSceneDynamicShadows);
+
+  BMElement := DOMGetChildElement(Element, 'bump_mapping_light', false);
+  if BMElement <> nil then
+    ReadBumpMappingLightProperties(BMElement);
 end;
 
 function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
@@ -3392,6 +3460,54 @@ begin
     Life := BossCreature.Life;
     MaxLife := BossCreature.MaxLife;
   end;
+end;
+
+function TLevel.PushLightsOff(out MainLightPosition: TVector4Single): boolean;
+begin
+  glPushAttrib(GL_LIGHTING_BIT);
+
+  { Headlight will stay on here, but lights in Level.LightSet are off. }
+  Result := LightSet.TurnLightsOffForShadows(MainLightPosition);
+
+  if not Result then
+  begin
+    glPopAttrib();
+    Exit;
+  end;
+
+  Scene.BumpMappingLightAmbientColor := FBumpMappingLightAmbientColor[false];
+  Scene.BumpMappingLightDiffuseColor := Black4Single;
+end;
+
+procedure TLevel.PopLightsOff;
+begin
+  glPopAttrib();
+
+  Scene.BumpMappingLightAmbientColor := FBumpMappingLightAmbientColor[true];
+  Scene.BumpMappingLightDiffuseColor := FBumpMappingLightDiffuseColor;
+end;
+
+function TLevel.GetBumpMappingLightAmbientColor(const Lighted: boolean):
+  TVector4Single;
+begin
+  Result := FBumpMappingLightAmbientColor[Lighted];
+end;
+
+procedure TLevel.SetBumpMappingLightAmbientColor(const Lighted: boolean;
+  const Value: TVector4Single);
+begin
+  FBumpMappingLightAmbientColor[Lighted] := Value;
+
+  { Scene.BumpMappingLightAmbientColor should normally correspond to
+    BumpMappingLightAmbientColor[true], so update it if it changed. }
+  if Lighted then
+    Scene.BumpMappingLightAmbientColor := Value;
+end;
+
+procedure TLevel.SetBumpMappingLightDiffuseColor(const Value: TVector4Single);
+begin
+  FBumpMappingLightDiffuseColor := Value;
+  Scene.BumpMappingLightDiffuseColor := Value;
 end;
 
 end.
