@@ -2611,7 +2611,9 @@ begin
     FAnimationTime := 0.0;
 
     AttributesSet(Scene.Attributes, btIncrease);
-    Scene.Attributes.BumpMapping := BumpMapping;
+    if BumpMapping then
+      Scene.Attributes.BumpMappingMaximum := High(TBumpMappingMethod) else
+      Scene.Attributes.BumpMappingMaximum := bmNone;
 
     { Calculate InitialCameraPos, InitialCameraDir, InitialCameraUp.
       Must be done before initializing creatures, as they right now
