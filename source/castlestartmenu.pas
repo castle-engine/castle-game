@@ -37,7 +37,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
-  KambiStringUtils, ALUtils, OpenAL, KambiClassUtils,
+  KambiStringUtils, ALUtils, KambiOpenAL, KambiClassUtils,
   CastleTimeMessages, CastleLevelAvailable, CastleBackgroundLevel,
   GameSoundEngine, GLSoundMenu, KambiLog, KambiTimeUtils,
   CastleRequiredResources, CastleCredits;

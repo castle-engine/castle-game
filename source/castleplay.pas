@@ -109,7 +109,7 @@ var
 
 implementation
 
-uses Math, SysUtils, KambiUtils, GLWindow, OpenAL, ALUtils,
+uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
   MatrixNavigation, VectorMath, Boxes3d, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,

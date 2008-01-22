@@ -1183,7 +1183,7 @@ implementation
 
 uses SysUtils, DOM, GL, GLU, GLExt, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
-  CastleLevel, CastleVideoOptions, OpenAL, ALUtils,
+  CastleLevel, CastleVideoOptions, KambiOpenAL, ALUtils,
   CastleTimeMessages, CastleItems, Object3dAsVRML, KambiLog, KambiTimeUtils,
   CastleRequiredResources;
 
