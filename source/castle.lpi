@@ -2,7 +2,7 @@
 <CONFIG>
   <ProjectOptions>
     <PathDelim Value="/"/>
-    <Version Value="5"/>
+    <Version Value="6"/>
     <General>
       <Flags>
         <MainUnitHasUsesSectionForAllUnits Value="False"/>
@@ -27,15 +27,15 @@
     </RunParams>
     <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="kambi_units"/>
+        <PackageName Value="kambi_glwindow"/>
       </Item1>
       <Item2>
-        <PackageName Value="kambi_glwindow"/>
+        <PackageName Value="kambi_units"/>
       </Item2>
     </RequiredPackages>
     <Units Count="13">
       <Unit0>
-        <Filename Value="castle.dpr"/>
+        <Filename Value="castle.pasprogram"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>

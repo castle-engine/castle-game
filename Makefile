@@ -66,12 +66,12 @@ endif
 
 build-unix:
 	cd ../kambi_vrml_game_engine/ && \
-	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg ../castle/source/castle.dpr
+	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg ../castle/source/castle.pasprogram
 	mv source/castle ./
 
 build-windows:
 	cd ../kambi_vrml_game_engine/ && \
-	  fpc $(FPC_WINDOWS_OPTIONS) @kambi.cfg ../castle/source/castle.dpr
+	  fpc $(FPC_WINDOWS_OPTIONS) @kambi.cfg ../castle/source/castle.pasprogram
 	mv source/castle.exe ./castle.exe
 
 # ------------------------------------------------------------
