@@ -1,5 +1,5 @@
 {
-  Copyright 2006,2007 Michalis Kamburelis.
+  Copyright 2006-2008 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -16,6 +16,8 @@
   You should have received a copy of the GNU General Public License
   along with "castle"; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  ----------------------------------------------------------------------------
 }
 
 { }
@@ -26,7 +28,7 @@ interface
 uses GLWindow;
 
 { Show menu, ask user what to do, do what the user wants
-  (e.g. load level and call PlayGame), when user wants to quit -- return. }
+  (e.g. load level and call PlayGame), when user wants to quit --- return. }
 procedure ShowStartMenu;
 
 implementation
@@ -40,7 +42,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   KambiStringUtils, ALUtils, KambiOpenAL, KambiClassUtils,
   CastleTimeMessages, CastleLevelAvailable, CastleBackgroundLevel,
   GameSoundEngine, GLSoundMenu, KambiLog, KambiTimeUtils,
-  CastleRequiredResources, CastleCredits;
+  CastleRequiredResources, CastleCredits, GLAntiAliasing;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -55,6 +57,11 @@ type
     function ValueToStr(const AValue: Integer): string; override;
   end;
 
+  TAntiAliasingSlider = class(TGLMenuIntegerSlider)
+    constructor Create;
+    function ValueToStr(const AValue: Integer): string; override;
+  end;
+
   TVideoMenu = class(TSubMenu)
     TextureMinificationQualitySlider: TGLMenuIntegerSlider;
     AllowScreenChangeArgument: TGLMenuBooleanArgument;
@@ -64,9 +71,13 @@ type
     VideoFrequencyArgument: TGLMenuItemArgument;
     ConserveResourcesArgument: TGLMenuBooleanArgument;
     BumpMappingArgument: TGLMenuBooleanArgument;
+    AntiAliasingSlider: TAntiAliasingSlider;
     constructor Create;
     procedure SetTextureMinificationQuality(
       Value: TTextureMinificationQuality;
+      UpdateSlider: boolean);
+    procedure SetAntiAliasing(
+      Value: TAntiAliasing;
       UpdateSlider: boolean);
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -252,6 +263,19 @@ begin
   end;
 end;
 
+{ TAntiAliasingSlider ------------------------------------------ }
+
+constructor TAntiAliasingSlider.Create;
+begin
+  inherited Create(0, MaxAntiAliasing, AntiAliasing);
+end;
+
+function TAntiAliasingSlider.ValueToStr(
+  const AValue: Integer): string;
+begin
+  Result := AntiAliasingToStr(AValue);
+end;
+
 { TTextureMinificationQualitySlider ------------------------------------------ }
 
 constructor TTextureMinificationQualitySlider.Create;
@@ -315,6 +339,8 @@ begin
 
   BumpMappingArgument := TGLMenuBooleanArgument.Create(BumpMapping);
 
+  AntiAliasingSlider := TAntiAliasingSlider.Create;
+
   Items.Add('View video information');
   Items.AddObject('Texture quality', TextureMinificationQualitySlider);
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
@@ -324,6 +350,7 @@ begin
   Items.AddObject('Display frequency', VideoFrequencyArgument);
   Items.AddObject('Conserve memory', ConserveResourcesArgument);
   Items.AddObject('Bump mapping', BumpMappingArgument);
+  Items.AddObject('Anti-aliasing', AntiAliasingSlider);
   Items.Add('Restore to defaults');
   Items.Add('Back to main menu');
 
@@ -356,6 +383,8 @@ begin
 
   SubMenuAdditionalInfo := '';
 
+  RegularSpaceBetweenItems := 5;
+
   FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
@@ -373,6 +402,19 @@ begin
       texture minification filter changed. }
     ItemsKinds.FreePrepareRender;
     UnRequireAllCreatures;
+  end;
+end;
+
+procedure TVideoMenu.SetAntiAliasing(
+  Value: TAntiAliasing;
+  UpdateSlider: boolean);
+begin
+  if AntiAliasing <> Value then
+  begin
+    AntiAliasing := Value;
+    if UpdateSlider then
+      AntiAliasingSlider.Value := AntiAliasing;
+    SubMenuAdditionalInfo := SRestartTheGame;
   end;
 end;
 
@@ -474,7 +516,8 @@ begin
          BumpMapping := not BumpMapping;
          BumpMappingArgument.Value := BumpMapping;
        end;
-    9: begin
+    9: ;
+    10:begin
          AllowScreenChange := DefaultAllowScreenChange;
          AllowScreenChangeArgument.Value := AllowScreenChange;
 
@@ -526,11 +569,13 @@ begin
          BumpMapping := DefaultBumpMapping;
          BumpMappingArgument.Value := BumpMapping;
 
+         SetAntiAliasing(DefaultAntiAliasing, true);
+
          SomethingChanged;
 
          MessageOK(Glw, 'All video settings restored to defaults.', taLeft);
        end;
-    10: CurrentMenu := MainMenu;
+    11: CurrentMenu := MainMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -551,6 +596,7 @@ begin
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
        end;
+    9: SetAntiAliasing(AntiAliasingSlider.Value, false);
   end;
 end;
 
