@@ -28,7 +28,7 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, ALUtils,
   CastleWindow, CastleStartMenu, CastleLevel, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
   CastleCreatures, CastleObjectKinds, CastlePlay, CastleGeneralMenu,
-  CastleRequiredResources, CastleCredits;
+  CastleRequiredResources, CastleCredits, GLAntiAliasing;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -175,6 +175,7 @@ begin
   Glw.ResizeAllowed := raOnlyAtInit;
   if RenderShadowsPossible then
     Glw.StencilBufferBits := 8;
+  Glw.MultiSampling := AntiAliasingGlwMultiSampling;
   Glw.Init;
 
   { init progress }

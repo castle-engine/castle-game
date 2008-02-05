@@ -148,7 +148,7 @@ var
 
 implementation
 
-uses KambiUtils, CastleConfig, CastleWindow, RaysWindow;
+uses KambiUtils, CastleConfig, CastleWindow, RaysWindow, GLAntiAliasing;
 
 procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes;
   BlendingType: TBlendingType);
@@ -210,6 +210,8 @@ initialization
     'video_options/frequency', DefaultVideoFrequency);
   BumpMapping := ConfigFile.GetValue(
     'video_options/bump_mapping', DefaultBumpMapping);
+  AntiAliasing := ConfigFile.GetValue(
+    'video_options/anti_aliasing', DefaultAntiAliasing);
 finalization
   ConfigFile.SetDeleteValue(
     'video_options/texture_minification_quality',
@@ -231,4 +233,6 @@ finalization
     VideoFrequency, DefaultVideoFrequency);
   ConfigFile.SetDeleteValue('video_options/bump_mapping',
     BumpMapping, DefaultBumpMapping);
+  ConfigFile.SetDeleteValue('video_options/anti_aliasing',
+    AntiAliasing, DefaultAntiAliasing);
 end.
