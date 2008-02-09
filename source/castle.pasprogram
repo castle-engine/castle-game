@@ -128,6 +128,14 @@ end;
   (turning off anti-aliasing (multi-sample buffers) and
   shadows (stencil buffer)) if better GL context not available. }
 
+procedure LogReinit(E: Exception; const WhatTurnedOff: string);
+begin
+  if Log then
+    WritelnLog('GL context',
+      Format('GL context init failed with message "%s".' +
+        ' %s turned off, trying to init once again', [E.Message, WhatTurnedOff]));
+end;
+
 procedure TryInitContext;
 begin
   Glw.Init;
@@ -138,13 +146,13 @@ begin
   try
     Glw.Init;
   except
-    on EGLContextNotPossible do
+    on E: EGLContextNotPossible do
     begin
       if RenderShadowsPossible then
       begin
         RenderShadowsPossible := false;
         Glw.StencilBufferBits := 0;
-        if Log then WritelnLog('GL context', 'stencil buffer turned off, trying to init once again');
+        LogReinit(E, 'Stencil buffer');
         TryInitContext;
       end else
         raise;
@@ -160,20 +168,20 @@ begin
   try
     Glw.Init;
   except
-    on EGLContextNotPossible do
+    on E: EGLContextNotPossible do
     begin
       if AntiAliasing > 0 then
       begin
         AntiAliasing := 0;
         Glw.MultiSampling := AntiAliasingGlwMultiSampling;
-        if Log then WritelnLog('GL context', 'anti-aliasing turned off, trying to init once again');
+        LogReinit(E, 'Anti-aliasing');
         TryInitContext_Shadows;
       end else
       if RenderShadowsPossible then
       begin
         RenderShadowsPossible := false;
         Glw.StencilBufferBits := 0;
-        if Log then WritelnLog('GL context', 'stencil buffer turned off, trying to init once again');
+        LogReinit(E, 'Stencil buffer');
         TryInitContext;
       end else
         raise;
