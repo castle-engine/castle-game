@@ -1,7 +1,5 @@
-- clean bump tests: make good fountain VRML with bump nodes,
-  remove temporary temp_fountain_demobump (blend, wrl), it shouldn't
-  be needed anymore
-  (make ModelInverseTransform in VRML available)
+- make real bump mapping demos:
+  - add bump maps everywhere ?, make some lights dynamic
 
 - when loading creatures required by player for doom level, for a second
   the menu background level flashes between DOOM level splash and doom level gameplay.
@@ -10,7 +8,6 @@
 - ConserveResource finish:
   - some creatures are dependencies of others, like ThrownWeb from SpiderQueen
     or BallMissile from Alien
-  - check how it works on crypto ?
 
 - fountain finish:
   trees, bushes around (natural LevelBox)
