@@ -119,8 +119,8 @@ clean_private:
 # Set SVN tag.
 
 svntag:
-	svn copy svn://kocury/castle/trunk/ \
-	         svn://kocury/castle/tags/$(VERSION) \
+	svn copy https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/trunk/castle \
+	         https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/tags/castle/$(VERSION) \
 	  -m "Tagging the $(VERSION) version of 'The Castle'."
 
 # eof ------------------------------------------------------------
