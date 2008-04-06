@@ -93,6 +93,17 @@
   - Sword should also glow red when "castle hall" glows red --- even
     the static sword should be rendered in 3d.
   - weapon "swaying" (when you walk, your weapon moves with your steps)
+  - also, sword must "feel" better (Szymon):
+    - render weapon (both when static and when attacking) as truly 3d,
+      truly inside the level (so sword size must match level/creatures
+      proportions etc.)
+    - some anim of blood when hit (more feedback that you hit)
+    - design just better (and more, maybe randomized) animations
+      of sword attack. Do them in Blender, not by hand, like current
+      anim.
+    - better checking for collision with sword? Maybe actually calculate
+      oriented bounding box of the sword for collision with creatures each
+      frame?
 
 - bow must work better to really appreciate the doom level !
 
@@ -169,10 +180,6 @@
 Stage 6:
 Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the game.
 
-- maybe load/free creatures animations for specific levels ?
-  This would make memory requirements lower, but loading
-  time would suffer --- for each level "Loading creatures".
-
 - gate:
   - use S&K red light with maxed intensity to shine on the top of the sword.
   - one tree is inside murek, move it
@@ -191,7 +198,9 @@ Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the gam
   same for spider_queen --- it can't climb back to MeshTunnel.
 
 - spider queen:
-  lay eggs, produce normal spiders.
+  - lay eggs, produce normal spiders.
+  - remove/fix dying sound, it's too shriek (making it more quiet doesn't
+    help for all positions)
 
 - alien:
   more aliens on castle_hall ?
@@ -214,10 +223,6 @@ cages level:
     b) endless sea (level=island)
 
     Hmm, both are good ideas. I don't want to surround the whole level with sea (I want the level to "feel" like in the middle of the forest). Actually, maybe I'll use all three ideas ---- on the left side of the level I could do a cliff, on the right and bottom I could use wall of fance, and add a little "opening on the sea" on the right side where the river ends.
-
-  - is this a good idea to just force player to restart if he
-    jumped into the grave ? I think yes, but later maybe some
-    alt way should be possible ?
 
 - cages level:
   - on the other side of the wall, also a door, but blocked by rocks
@@ -285,11 +290,6 @@ Cages level:
 - choosing Min/MaxALAllocatedSounds from menu.
 
 - why with wide angle the corner geometry is sometimes clipped ?
-
-- Creatures<->level collision checking should be done using
-  creature's bounding box, not CameraRadius.
-  Creature's CameraRadius is a hack, and should be preferably removed.
-  Same thing for items<->level.
 
 - sometimes spider_queen may get stuck in the ground ---
   that's because camera sphere
