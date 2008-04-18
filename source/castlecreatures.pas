@@ -697,6 +697,8 @@ type
       checked with profiler. }
     FBoundingBox: TBox3d;
     procedure RecalculateBoundingBox;
+
+    FSoundDyingEnabled: boolean;
   protected
     { Return matrix that takes into account current LegsPosition and Direction.
       Multiply CurrentScene geometry by this matrix to get current geometry. }
@@ -880,6 +882,13 @@ type
 
     { Shortcut for Life <= 0. }
     function Dead: boolean;
+
+    { You can set this to @false to force the creature to die without
+      making any sound. This is really seldom needed, usefull only to avoid
+      a loud shriek noise when you kill many creatures at once.
+      Primarily for use by debug menu "kill all creatures" and similar things. }
+    property SoundDyingEnabled: boolean read FSoundDyingEnabled
+      write FSoundDyingEnabled default true;
 
     { Each time you decrease life of this creature, set this property.
       This is the direction from where the attack came.
@@ -1774,6 +1783,8 @@ begin
   FMaxLife := AMaxLife;
   FLife := MaxLife;
 
+  FSoundDyingEnabled := true;
+
   UsedSounds := TALAllocatedSourcesList.Create;
 
   { FLegsPosition and FDirection changed, so RecalculateBoundingBox must be
@@ -2273,7 +2284,8 @@ begin
   if (Life > 0) and (Value <= 0) then
   begin
     { When dies, we don't play SoundSuddenPain sound. We will play SoundDying. }
-    Sound3d(Kind.SoundDying, 1.0, Kind.SoundDyingTiedToCreature);
+    if SoundDyingEnabled then
+      Sound3d(Kind.SoundDying, 1.0, Kind.SoundDyingTiedToCreature);
   end else
   if (Life > 0) and (Life - Value > 5) then
   begin

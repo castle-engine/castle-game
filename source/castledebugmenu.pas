@@ -386,6 +386,7 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
     for I := 0 to Level.Creatures.High do
       if Level.Creatures[I].Life > 0 then
       begin
+        Level.Creatures[I].SoundDyingEnabled := false;
         Level.Creatures[I].Life := 0;
         Level.Creatures[I].LastAttackDirection := ZeroVector3Single;
       end;
@@ -399,6 +400,7 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
       if (not (Level.Creatures[I] is TStillCreature)) and
         (Level.Creatures[I].Life > 0) then
       begin
+        Level.Creatures[I].SoundDyingEnabled := false;
         Level.Creatures[I].Life := 0;
         Level.Creatures[I].LastAttackDirection := ZeroVector3Single;
       end;
