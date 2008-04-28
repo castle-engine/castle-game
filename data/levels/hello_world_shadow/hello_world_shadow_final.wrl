@@ -25,5 +25,17 @@ Group {
     headlight FALSE
   }
 
+  Separator {
+    Rotation { rotation 1 0 0 1.57 }
+
+    Background {
+           groundColor [ 0.1 0.1 0.1, 	0.0565629 0.2208154 0.4 ]
+           groundAngle [ 1.57 ]
+           skyColor [ 0.1 0.1 0.1, 	0.0565629 0.2208154 0.4 ]
+           skyAngle [ 1.57 ]
+    }
+  }
+
+
   WWWInline { name "hello_world_shadow.wrl" }
 }
