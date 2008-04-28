@@ -120,9 +120,11 @@ type
     PositionSlider: array [0..2] of TGLMenuFloatSlider;
     AmbientColorSlider: array [boolean, 0..2] of TGLMenuFloatSlider;
     DiffuseColorSlider: array [0..2] of TGLMenuFloatSlider;
+    LockMainShadowsLightArgument: TGLMenuBooleanArgument;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
+    procedure DoLockMainShadowsLight;
   end;
 
 { TViewAngleSlider ----------------------------------------------------------- }
@@ -725,6 +727,12 @@ end;
 
 { TEditBumpMappingLightMenu -------------------------------------------------- }
 
+var
+  { Static var, so that it's preserved between TEditBumpMappingLightMenu
+    creation/destruction. Not saved to any config file, this is only
+    for testing after all. }
+  LockMainShadowsLight: boolean = false;
+
 constructor TEditBumpMappingLightMenu.Create;
 var
   I: Integer;
@@ -751,6 +759,9 @@ begin
     DiffuseColorSlider[I] := TGLMenuFloatSlider.Create(0, 1,
       Level.BumpMappingLightDiffuseColor[I]);
 
+  LockMainShadowsLightArgument :=
+    TGLMenuBooleanArgument.Create(LockMainShadowsLight);
+
   Items.AddObject('Position X', PositionSlider[0]);
   Items.AddObject('Position Y', PositionSlider[1]);
   Items.AddObject('Position Z', PositionSlider[2]);
@@ -767,16 +778,46 @@ begin
   Items.AddObject('Diffuse green', DiffuseColorSlider[1]);
   Items.AddObject('Diffuse blue' , DiffuseColorSlider[2]);
 
+  Items.AddObject('Lock main shadows light', LockMainShadowsLightArgument);
+
   Items.Add('Back');
 
   FixItemsAreas(Glw.Width, Glw.Height);
+end;
+
+procedure TEditBumpMappingLightMenu.DoLockMainShadowsLight;
+var
+  I: Integer;
+  LightNode: TNodeGeneralLight;
+begin
+  if LockMainShadowsLight then
+  begin
+    for I := 0 to Level.LightSet.Lights.High do
+    begin
+      LightNode := Level.LightSet.Lights.Items[I].LightNode;
+      if (LightNode is TNodeGeneralPositionalLight) and
+         LightNode.FdKambiShadows.Value and
+         LightNode.FdKambiShadowsMain.Value then
+      begin
+        TNodeGeneralPositionalLight(LightNode).FdLocation.Value :=
+          Level.Scene.BumpMappingLightPosition;
+        Level.LightSet.CalculateLights;
+        Break;
+      end;
+    end;
+  end;
 end;
 
 procedure TEditBumpMappingLightMenu.CurrentItemSelected;
 begin
   case CurrentItem of
     0..11: ;
-    12: CurrentMenu := EditLevelLightsMenu;
+    12: begin
+          LockMainShadowsLightArgument.Value := not LockMainShadowsLightArgument.Value;
+          LockMainShadowsLight := LockMainShadowsLightArgument.Value;
+          DoLockMainShadowsLight;
+        end;
+    13: CurrentMenu := EditLevelLightsMenu;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -794,6 +835,7 @@ begin
         V := Level.Scene.BumpMappingLightPosition;
         V[Index] := PositionSlider[Index].Value;
         Level.Scene.BumpMappingLightPosition := V;
+        DoLockMainShadowsLight;
       end;
     3..5:
       begin
