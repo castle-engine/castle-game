@@ -2,7 +2,7 @@
 
 Group {
   # Just for testing lights from view3dscene
-  WWWInline { name "hello_world_lights.wrl" separate FALSE }
+  WWWInline { name "hello_world_shadow_lights.wrl" separate FALSE }
 
   # Camera settings "encoded" in the VRML declaration below :
   # direction 0.042524755001068 0.19542683660984 -0.000000005639484
@@ -25,5 +25,5 @@ Group {
     headlight FALSE
   }
 
-  WWWInline { name "hello_world.wrl" }
+  WWWInline { name "hello_world_shadow.wrl" }
 }

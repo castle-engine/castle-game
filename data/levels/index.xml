@@ -203,7 +203,24 @@
 
     <required_resources>
     </required_resources>
+  </level>
 
+
+  <level
+    name="hello_world_shadow"
+    scene_file_name="hello_world_shadow/hello_world_shadow_final.wrl"
+    light_set_file_name="hello_world_shadow/hello_world_shadow_lights.wrl"
+    title="Hello world (static shadow)"
+    number="96"
+    implementation_class="TLevel"
+
+    demo="True"
+    default_available_for_new_game="True"
+
+    footsteps_sound="player_footsteps_concrete">
+
+    <required_resources>
+    </required_resources>
   </level>
 
   <level
