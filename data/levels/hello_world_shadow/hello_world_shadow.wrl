@@ -3230,7 +3230,7 @@ DEF OB_Plane Transform {
 							transparency 0.0
 						}
 						texture DEF shadow_baked_png ImageTexture {
-							url "/home/michalis/sources/vrmlengine/trunk/castle/data/levels/hello_world_shadow/shadow_baked.png"
+							url "shadow_baked.png"
 						}
 					}
 					geometry IndexedFaceSet {
