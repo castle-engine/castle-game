@@ -713,9 +713,9 @@ type
 
       LegsPositionFromMiddle must always specify reverse function.
 
-      VLerpLegsMiddlePosition must always be equal to
-      VLerp(A, LegsPosition, MiddlePosition)
-      (but usually can be calculated more efficiently than calling VLerp).
+      LerpLegsMiddlePosition must always be equal to
+      Lerp(A, LegsPosition, MiddlePosition)
+      (but usually can be calculated more efficiently than calling Lerp).
 
       In this class they calculate MiddlePosition as LegsPosition
       moved higher than HeightBetweenLegsAndMiddle.
@@ -730,7 +730,7 @@ type
       const AssumeLegsPosition: TVector3Single): TVector3Single; virtual;
     function LegsPositionFromMiddle(
       const AssumeMiddlePosition: TVector3Single): TVector3Single; virtual;
-    function VLerpLegsMiddlePosition(
+    function LerpLegsMiddlePosition(
       const A: Single): TVector3Single; virtual;
     { @groupEnd }
 
@@ -918,7 +918,7 @@ type
       --- SoundHeight = 0 means LegsPosition, SoundHeight = 1 means MiddlePosition,
       SoundHeight between means ... well, between LegsPosition and MiddlePosition.
       This can also be higher than 1 or lower than 0, should be treated like
-      vlerp between LegsPosition and MiddlePosition.
+      lerp between LegsPosition and MiddlePosition.
 
       If TiedToCreature then the sounds position will be updated
       as the creature will move, and when the creature object will
@@ -1837,7 +1837,7 @@ var
   NewSource: TALAllocatedSource;
   SoundPosition: TVector3Single;
 begin
-  SoundPosition := VLerpLegsMiddlePosition(SoundHeight);
+  SoundPosition := LerpLegsMiddlePosition(SoundHeight);
   NewSource := SoundEngine.Sound3d(SoundType, SoundPosition);
   if TiedToCreature and (NewSource <> nil) then
   begin
@@ -1866,7 +1866,7 @@ begin
   Result[2] -= HeightBetweenLegsAndMiddle;
 end;
 
-function TCreature.VLerpLegsMiddlePosition(const A: Single): TVector3Single;
+function TCreature.LerpLegsMiddlePosition(const A: Single): TVector3Single;
 begin
   Result := LegsPosition;
   Result[2] += HeightBetweenLegsAndMiddle * A;
@@ -2113,7 +2113,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
   begin
     for I := 0 to UsedSounds.High do
     begin
-      SoundPosition := VLerpLegsMiddlePosition(
+      SoundPosition := LerpLegsMiddlePosition(
         TCreatureSoundSourceData(UsedSounds[I].UserData).SoundHeight);
       alSourceVector3f(UsedSounds[I].ALSource, AL_POSITION, SoundPosition);
     end;
@@ -3255,7 +3255,7 @@ var
 begin
   if HasLastSeenPlayer then
   begin
-    MissilePosition := VLerpLegsMiddlePosition(FiringMissileHeight);
+    MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
     Missile := BallMissile.CreateDefaultCreature(
       MissilePosition, MissileDirection,
@@ -3435,7 +3435,7 @@ var
 begin
   if HasLastSeenPlayer then
   begin
-    MissilePosition := VLerpLegsMiddlePosition(FiringMissileHeight);
+    MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
     Missile := ThrownWeb.CreateDefaultCreature(
       MissilePosition, MissileDirection,
