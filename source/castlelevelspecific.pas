@@ -321,7 +321,7 @@ const
   procedure WerewolfAppear;
   var
     I: Integer;
-    LightNode: TNodeGeneralPositionalLight;
+    LightNode: TVRMLPositionalLightNode;
   begin
     Assert(not WerewolfAppeared);
 
@@ -347,7 +347,7 @@ const
     for I := 0 to CastleHallWerewolvesCount - 1 do
     begin
       LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].LightNode as
-        TNodeGeneralPositionalLight;
+        TVRMLPositionalLightNode;
       LightNode.FdColor.Value := Vector3Single(1, 0, 0);
       LightNode.FdAttenuation.Value := Vector3Single(1, 0.1, 0);
       LightNode.FdKambiShadows.Value := true;
@@ -374,20 +374,20 @@ var
   procedure WerewolfShowLights;
   var
     I: Integer;
-    LightNode: TNodeGeneralPositionalLight;
+    LightNode: TVRMLPositionalLightNode;
   begin
     if WerewolfAliveCount = 0 then
     begin
       { turn light over stairs to next level }
       LightNode := LightSet.Lights.Items[WerewolfFirstLight].LightNode as
-        TNodeGeneralPositionalLight;
+        TVRMLPositionalLightNode;
       LightNode.FdLocation.Value := Box3dMiddle(StairsBlocker.Scene.BoundingBox);
       LightNode.FdOn.Value := true;
 
       for I := 1 to CastleHallWerewolvesCount - 1 do
       begin
         LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].LightNode as
-          TNodeGeneralPositionalLight;
+          TVRMLPositionalLightNode;
         LightNode.FdOn.Value := false;
       end;
     end else
@@ -396,7 +396,7 @@ var
       for I := 0 to CastleHallWerewolvesCount - 1 do
       begin
         LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].LightNode as
-          TNodeGeneralPositionalLight;
+          TVRMLPositionalLightNode;
         LightNode.FdOn.Value := not WerewolfCreature[I].Dead;
         LightNode.FdLocation.Value := WerewolfCreature[I].MiddlePosition;
       end;

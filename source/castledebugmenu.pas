@@ -91,7 +91,7 @@ type
   end;
 
   TEditOneLightMenu = class(TCastleMenu)
-    Light: TNodeGeneralLight;
+    Light: TVRMLLightNode;
     RedColorSlider: TGLMenuFloatSlider;
     GreenColorSlider: TGLMenuFloatSlider;
     BlueColorSlider: TGLMenuFloatSlider;
@@ -100,7 +100,7 @@ type
     OnArgument: TGLMenuBooleanArgument;
     ShadowsArgument: TGLMenuBooleanArgument;
     ShadowsMainArgument: TGLMenuBooleanArgument;
-    constructor Create(ALight: TNodeGeneralLight);
+    constructor Create(ALight: TVRMLLightNode);
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
@@ -788,18 +788,18 @@ end;
 procedure TEditBumpMappingLightMenu.DoLockMainShadowsLight;
 var
   I: Integer;
-  LightNode: TNodeGeneralLight;
+  LightNode: TVRMLLightNode;
 begin
   if LockMainShadowsLight then
   begin
     for I := 0 to Level.LightSet.Lights.High do
     begin
       LightNode := Level.LightSet.Lights.Items[I].LightNode;
-      if (LightNode is TNodeGeneralPositionalLight) and
+      if (LightNode is TVRMLPositionalLightNode) and
          LightNode.FdKambiShadows.Value and
          LightNode.FdKambiShadowsMain.Value then
       begin
-        TNodeGeneralPositionalLight(LightNode).FdLocation.Value :=
+        TVRMLPositionalLightNode(LightNode).FdLocation.Value :=
           Level.Scene.BumpMappingLightPosition;
         Level.LightSet.CalculateLights;
         Break;
@@ -866,7 +866,7 @@ end;
 constructor TEditLevelLightsMenu.Create;
 var
   I: Integer;
-  LightNode: TNodeGeneralLight;
+  LightNode: TVRMLLightNode;
 begin
   inherited Create;
 
@@ -961,7 +961,7 @@ end;
 
 { TEditOneLightMenu ---------------------------------------------------------- }
 
-constructor TEditOneLightMenu.Create(ALight: TNodeGeneralLight);
+constructor TEditOneLightMenu.Create(ALight: TVRMLLightNode);
 begin
   inherited Create;
 
@@ -1048,39 +1048,39 @@ begin
          Level.LightSet.CalculateLights;
        end;
     8: begin
-         if Light is TNodeGeneralPositionalLight then
+         if Light is TVRMLPositionalLightNode then
          begin
-           Vector := TNodeGeneralPositionalLight(Light).FdLocation.Value;
+           Vector := TVRMLPositionalLightNode(Light).FdLocation.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change location' +nl+
              '(Input "P" to use current player''s location)',
              Vector, taLeft, Player.Navigator.CameraPos) then
            begin
-             TNodeGeneralPositionalLight(Light).FdLocation.Value := Vector;
+             TVRMLPositionalLightNode(Light).FdLocation.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;
        end;
     9: begin
-         if Light is TNodeGeneralPositionalLight then
+         if Light is TVRMLPositionalLightNode then
          begin
-           Vector := TNodeGeneralPositionalLight(Light).FdAttenuation.Value;
+           Vector := TVRMLPositionalLightNode(Light).FdAttenuation.Value;
            if MessageInputQueryVector3Single(Glw, 'Change attenuation',
              Vector, taLeft) then
            begin
-             TNodeGeneralPositionalLight(Light).FdAttenuation.Value := Vector;
+             TVRMLPositionalLightNode(Light).FdAttenuation.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;
        end;
     10:begin
-         if Light is TNodeGeneralDirectionalLight then
+         if Light is TVRMLDirectionalLightNode then
          begin
-           Vector := TNodeGeneralDirectionalLight(Light).FdDirection.Value;
+           Vector := TVRMLDirectionalLightNode(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Navigator.CameraDir) then
            begin
-             TNodeGeneralDirectionalLight(Light).FdDirection.Value := Vector;
+             TVRMLDirectionalLightNode(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
            end;
          end;
