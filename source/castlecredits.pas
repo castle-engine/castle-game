@@ -94,7 +94,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  AnimationTime := AnimationTime + Glwin.IdleCompSpeed / 50;
+  AnimationTime := AnimationTime + Glwin.IdleSpeed;
   if AnimationTime > AnimationEnd then
     UserQuit := true;
 

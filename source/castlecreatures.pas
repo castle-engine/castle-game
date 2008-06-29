@@ -2194,7 +2194,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
 
       FIsFallingDown := true;
 
-      FallingDownDistance := FallingDownSpeed * CompSpeed;
+      FallingDownDistance := FallingDownSpeed * CompSpeed * 50;
       if IsAboveTheGround then
       begin
         MaximumFallingDownDistance :=
@@ -2244,7 +2244,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
         (HeightAboveTheGround < HeightBetweenLegsAndMiddle / HeightMargin) then
       begin
         { Growing up }
-        MoveVertical(Min(GrowingUpSpeed * CompSpeed,
+        MoveVertical(Min(GrowingUpSpeed * CompSpeed * 50,
           HeightBetweenLegsAndMiddle - HeightAboveTheGround));
       end;
     end;
@@ -2609,7 +2609,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       { Rotate Direction, to be closer to DirectionToTarget }
 
       { calculate AngleRadChange }
-      AngleRadChange := AngleRadChangeSpeed * CompSpeed;
+      AngleRadChange := AngleRadChangeSpeed * CompSpeed * 50;
       MinTo1st(AngleRadChange, AngleRadBetweenDirectionToTarget);
 
       Direction := RotatePointAroundAxisRad(AngleRadChange, Direction,
@@ -2820,7 +2820,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
     begin
       OldMiddlePosition := MiddlePosition;
       NewMiddlePosition := VectorAdd(OldMiddlePosition,
-        VectorScale(Direction, WAKind.MoveSpeed * CompSpeed));
+        VectorScale(Direction, WAKind.MoveSpeed * CompSpeed * 50));
 
       Result :=
         { First check to not step into some deep fall.
@@ -3091,7 +3091,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       OldMiddlePosition := MiddlePosition;
 
       { Calculate CurrentKnockBackDistance, update KnockedBackDistance }
-      CurrentKnockBackDistance := KnockedBackSpeed * CompSpeed;
+      CurrentKnockBackDistance := KnockedBackSpeed * CompSpeed * 50;
       if CurrentKnockBackDistance >
         WAKind.MaxKnockedBackDistance - KnockedBackDistance then
       begin
@@ -3495,7 +3495,7 @@ begin
     and use Level.MoveAllowedSimple instead of Level.MoveBoxAllowedSimple. }
 
   NewMiddlePosition := VectorAdd(MiddlePosition,
-    VectorScale(Direction, MissileKind.MoveSpeed * CompSpeed));
+    VectorScale(Direction, MissileKind.MoveSpeed * CompSpeed * 50));
 
   if Level.MoveAllowedSimple(MiddlePosition, NewMiddlePosition,
     false, Kind.CameraRadius) then
@@ -3531,7 +3531,7 @@ begin
      (MissileKind.FallsDownSpeed <> 0) then
   begin
     NewDirection := Direction;
-    NewDirection[2] -= MissileKind.FallsDownSpeed * CompSpeed;
+    NewDirection[2] -= MissileKind.FallsDownSpeed * CompSpeed * 50;
 
     { Above makes Direction potentially not normalized, but very slowly
       (MissileKind.FallsDownSpeed is very small...) so it would be a waste
@@ -3549,7 +3549,7 @@ begin
     TargetDirection := VectorSubtract(Player.Navigator.CameraPos,
       LegsPosition);
     AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
-    AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed;
+    AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed * 50;
     if AngleBetween <= AngleChange then
       Direction := Normalized(TargetDirection) else
     begin

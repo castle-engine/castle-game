@@ -894,7 +894,7 @@ var
   FallingDownLength: Single;
   GroundItem: POctreeItem;
 begin
-  FRotation += 3 * CompSpeed;
+  FRotation += 3 * CompSpeed * 50;
 
   ShiftedPosition := Position;
   ShiftedPosition[2] += PositionRadius;
@@ -915,7 +915,7 @@ begin
   begin
     { Item falls down because of gravity. }
 
-    FallingDownLength := CompSpeed * FallingDownSpeed;
+    FallingDownLength := CompSpeed * 50 * FallingDownSpeed;
 
     if IsAboveTheGround then
       MinTo1st(FallingDownLength, HeightAboveTheGround - PositionRadius);

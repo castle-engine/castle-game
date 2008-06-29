@@ -672,8 +672,8 @@ begin
     end;
   end else
   begin
-    Teleport1Rotate += 0.2 * CompSpeed;
-    Teleport2Rotate += 0.2 * CompSpeed;
+    Teleport1Rotate += 0.2 * CompSpeed * 50;
+    Teleport2Rotate += 0.2 * CompSpeed * 50;
     TeleportWork(FTeleport1Box, Teleport1Destination);
     TeleportWork(FTeleport2Box, Teleport2Destination);
 
@@ -926,7 +926,7 @@ begin
     { Torch light modify, to make an illusion of unstable light }
     LightSet.Lights.Items[0].LightNode.FdIntensity.Value := Clamped(
         LightSet.Lights.Items[0].LightNode.FdIntensity.Value +
-          MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed,
+          MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed  * 50,
         0.5, 1);
     LightSet.CalculateLights;
 
@@ -978,7 +978,7 @@ begin
       end else
       begin
         { calculate SpiderMoveDistance }
-        SpiderMoveDistance := SpidersFallingSpeed * CompSpeed;
+        SpiderMoveDistance := SpidersFallingSpeed * CompSpeed * 50;
         { Actually IsAboveTheGround should be always @true, the way the
           "Cages" level is designed. However, I want to be safe here,
           in case someone will edit cages level, so I check IsAboveTheGround

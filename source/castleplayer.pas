@@ -1168,7 +1168,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
     if FKnockbackDistance > 0 then
     begin
       { Calculate CurrentKnockBackDistance, update KnockedBackDistance }
-      CurrentKnockBackDistance := KnockBackSpeed * CompSpeed;
+      CurrentKnockBackDistance := KnockBackSpeed * CompSpeed * 50;
       MinTo1st(CurrentKnockBackDistance, FKnockbackDistance);
       FKnockbackDistance -= CurrentKnockBackDistance;
 
@@ -1184,7 +1184,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
 begin
   if FlyingMode then
   begin
-    FFlyingModeTimeOut := FFlyingModeTimeOut - CompSpeed / 50;
+    FFlyingModeTimeOut := FFlyingModeTimeOut - CompSpeed;
     if not FlyingMode then
     begin
       TimeMessage('You''re no longer flying');
@@ -1196,7 +1196,7 @@ begin
   UpdateSwimming;
 
   if BlackOutIntensity > 0 then
-    BlackOutIntensity -= 0.04 * CompSpeed;
+    BlackOutIntensity -= 0.04 * CompSpeed * 50;
 
   if Attacking and (not ActualAttackDone) and (Level.AnimationTime -
     AttackStartTime >= EquippedWeaponKind.ActualAttackTime) then

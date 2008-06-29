@@ -3285,7 +3285,7 @@ var
   I: Integer;
   NewAnimationTime: TAnimationTime;
 begin
-  NewAnimationTime := AnimationTime + CompSpeed / 50;
+  NewAnimationTime := AnimationTime + CompSpeed;
 
   for I := 0 to Objects.High do
     Objects[I].BeforeIdle(NewAnimationTime);

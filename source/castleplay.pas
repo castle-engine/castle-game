@@ -671,9 +671,9 @@ var
     const TargetDirection: TVector3Single;
     const TargetUp: TVector3Single);
   const
-    PositionChangeSpeed = 0.05;
-    DirectionChangeSpeed = 0.01;
-    UpChangeSpeed = 0.01;
+    PositionChangeSpeed = 0.05 * 50;
+    DirectionChangeSpeed = 0.01 * 50;
+    UpChangeSpeed = 0.01 * 50;
   var
     ToPosition: TVector3Single;
     ToDirection: TVector3Single;
@@ -736,7 +736,7 @@ const
 var
   PickItemIndex: Integer;
 begin
-  CompSpeed := Glw.IdleCompSpeed;
+  CompSpeed := Glw.IdleSpeed;
 
   TimeMessagesIdle;
 
