@@ -330,7 +330,7 @@ procedure TControlsSubMenu.CurrentItemSelected;
          match InputConfiguration.Shortcut. This is meaningless,
          and otherwise could unnecessarily swap Key1 and Key2 in AddShortcut. }
        (not InputConfiguration.Shortcut.IsEvent(
-         NewMouseEvent, NewKey, NewMouseButton)) then
+         NewMouseEvent, NewKey, #0, NewMouseButton)) then
     begin
       ConflictingKey := CastleAllInputs.SeekMatchingShortcut(NewMouseEvent,
         NewKey, NewMouseButton);
@@ -481,7 +481,7 @@ end;
 procedure EventDown(MouseEvent: boolean; Key: TKey;
   AMouseButton: TMouseButton);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     SaveScreen;
 end;
 

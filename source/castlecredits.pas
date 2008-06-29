@@ -109,7 +109,7 @@ end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(false, Key, mbLeft) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(false, Key, #0, mbLeft) then
     SaveScreen else
   if C in [CharEscape, CharEnter, ' '] then
     UserQuit := true;
@@ -117,7 +117,7 @@ end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(true, K_None, Button) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(true, K_None, #0, Button) then
     SaveScreen else
     { any mouse press ends credits }
     UserQuit := true;

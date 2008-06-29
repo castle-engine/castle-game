@@ -1,7 +1,7 @@
 procedure EventDown(MouseEvent: boolean; Key: TKey;
   AMouseButton: TMouseButton);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     SaveScreen;
 end;
 

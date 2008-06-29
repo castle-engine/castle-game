@@ -1194,50 +1194,50 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
 
 begin
   { Basic keys. }
-  if CastleInput_Attack.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_Attack.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     DoAttack else
-  if CastleInput_UpMove.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_DownMove.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_Forward.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_Backward.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_LeftStrafe.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_RightStrafe.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_UpMove.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
+     CastleInput_DownMove.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
+     CastleInput_Forward.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
+     CastleInput_Backward.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
+     CastleInput_LeftStrafe.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
+     CastleInput_RightStrafe.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     MaybeDeadWinMessage else
   if { Note that rotation keys work even when player is dead.
        See comments in TPlayer.UpdateNavigator. }
-     CastleInput_LeftRot.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_RightRot.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_UpRotate.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_DownRotate.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) or
-     CastleInput_GravityUp.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+     CastleInput_LeftRot.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
+     CastleInput_RightRot.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
+     CastleInput_UpRotate.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
+     CastleInput_DownRotate.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
+     CastleInput_GravityUp.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     MaybeWinMessage else
 
   { Items keys. }
-  if CastleInput_InventoryShow.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_InventoryShow.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     InventoryVisible := not InventoryVisible else
-  if CastleInput_InventoryPrevious.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_InventoryPrevious.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     ChangeInventoryCurrentItem(-1) else
-  if CastleInput_InventoryNext.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_InventoryNext.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     ChangeInventoryCurrentItem(+1) else
-  if CastleInput_DropItem.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_DropItem.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     DropItem else
-  if CastleInput_UseItem.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_UseItem.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     UseItem else
-  if CastleInput_UseLifePotion.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_UseLifePotion.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     UseLifePotion else
 
   { Other keys. }
-  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     SaveScreen else
-  if CastleInput_ViewMessages.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_ViewMessages.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     ViewGameMessages else
-  if CastleInput_CancelFlying.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_CancelFlying.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     CancelFlying else
-  if CastleInput_FPSShow.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_FPSShow.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     ShowDebugInfo := not ShowDebugInfo else
-  if CastleInput_Interact.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_Interact.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     DoInteract else
-  if CastleInput_DebugMenu.Shortcut.IsEvent(MouseEvent, Key, AMouseButton) then
+  if CastleInput_DebugMenu.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     DoDebugMenu;
 end;
 
