@@ -216,12 +216,14 @@ begin
         (most probably fixed in FPC 2.2.0, but also many things
         changed since 0.7.0, including some creature loading code).
 
-        But since "conserve memory" feature this is not really useful
-        much, it saves only 6 MB memory for DOOM level (most resource
-        costly level for now). So it's not turned on, as it's still risky
+        But since the invention of "conserve memory" feature,
+        frRootNode is not really useful
+        anymore, it saves only 6 MB memory for DOOM level (most
+        resource-costly level for now). So it's not turned on,
+        as it's still risky
         (freeing RootNode always was risky) and has little use. }
 
-      AnimationsPrepared[I].FreeResources([frTextureImageInNodes,
+      AnimationsPrepared[I].FreeResources([frTextureDataInNodes,
         { TrianglesList was created if ManifoldEdges / BorderEdges were requested.
           We don't need it anymore. }
         frTrianglesListNotOverTriangulate]);

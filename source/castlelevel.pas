@@ -2720,7 +2720,7 @@ begin
 
     Scene.PrepareRender([tgAll], Options);
 
-    Scene.FreeResources([frTextureImageInNodes]);
+    Scene.FreeResources([frTextureDataInNodes]);
 
     FLightSet := TVRMLLightSetGL.Create(LoadAsVRML(LightSetFileName),
       true,
@@ -3410,7 +3410,7 @@ begin
   if CreateDefaultTriangleOctree then
     Result.DefaultTriangleOctree := Result.CreateTriangleOctree('');
 
-  Result.FreeResources([frTextureImageInNodes]);
+  Result.FreeResources([frTextureDataInNodes]);
 end;
 
 function TLevel.LoadLevelAnimation(
@@ -3440,7 +3440,7 @@ begin
     Result.LastScene.DefaultTriangleOctree :=
       Result.LastScene.CreateTriangleOctree('');
 
-  Result.FreeResources([frTextureImageInNodes]);
+  Result.FreeResources([frTextureDataInNodes]);
 end;
 
 function TLevel.Background: TBackgroundGL;

@@ -509,7 +509,7 @@ begin
 
     AttributesSet(Scene.Attributes, BlendingType);
     Scene.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox]);
-    Scene.FreeResources([frTextureImageInNodes]);
+    Scene.FreeResources([frTextureDataInNodes]);
   end;
 
   Progress.Step;
