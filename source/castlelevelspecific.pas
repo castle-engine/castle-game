@@ -181,7 +181,7 @@ type
 
     StayOpenTime: Single;
 
-    procedure BeforeIdle(const NewAnimationTime: TAnimationTime); override;
+    procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
     procedure Idle; override;
 
     property MovePushesOthers default false;
@@ -1093,7 +1093,7 @@ begin
   CastsShadow := false; { looks bad }
 end;
 
-procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: TAnimationTime);
+procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: TKamTime);
 
   function SomethingWillBlockClosingDoor: boolean;
   var

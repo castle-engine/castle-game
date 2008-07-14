@@ -41,13 +41,6 @@ type
   TLevel = class;
   TLevelObjectsList = class;
 
-  { Float time to keep world time in seconds.
-
-    Experience with playing animations in view3dscene shows that
-    "Single" type may be not enough. See comments in view3dscene code
-    for TAnimationTime type. }
-  TAnimationTime = Double;
-
   { This represents a collision with level. }
   TCollisionInfo = class
   public
@@ -179,7 +172,7 @@ type
       with e.g. player or creatures or items, then you should
       prevent the collision @italic(before it happens).
       This is the place to do it. }
-    procedure BeforeIdle(const NewAnimationTime: TAnimationTime); virtual;
+    procedure BeforeIdle(const NewAnimationTime: TKamTime); virtual;
 
     { This is called somewhere from TLevel.Idle, @italic(after)
       ParentLevel.AnimationTime was updated. }
@@ -271,7 +264,7 @@ type
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
       var GroundItem: POctreeItem); override;
 
-    procedure BeforeIdle(const NewAnimationTime: TAnimationTime); override;
+    procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
 
     procedure Idle; override;
 
@@ -400,7 +393,7 @@ type
       (not existing objects never participate in collision detection). }
     property Collides: boolean read FCollides write FCollides default true;
 
-    function Translation(const AnimationTime: TAnimationTime):
+    function Translation(const AnimationTime: TKamTime):
       TVector3_Single; virtual; abstract;
 
     function MoveAllowedSimple(
@@ -440,7 +433,7 @@ type
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
-    procedure BeforeIdle(const NewAnimationTime: TAnimationTime); override;
+    procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
     procedure Idle; override;
 
     { If @true (and Exists and Collides are also @true)
@@ -614,7 +607,7 @@ type
     MoveTime: Single;
     TranslationEnd: TVector3_Single;
 
-    function Translation(const AnimationTime: TAnimationTime):
+    function Translation(const AnimationTime: TKamTime):
       TVector3_Single; override;
 
     procedure Idle; override;
@@ -657,7 +650,7 @@ type
   TLevelAnimatedObject = class(TLevelObject)
   private
     FAnimation: TVRMLGLAnimation;
-    FAnimationTime: TAnimationTime;
+    FAnimationTime: TKamTime;
     FExists: boolean;
     FCollides: boolean;
     FCollisionUseLastScene: boolean;
@@ -666,7 +659,7 @@ type
     destructor Destroy; override;
 
     property Animation: TVRMLGLAnimation read FAnimation;
-    property AnimationTime: TAnimationTime read FAnimationTime write FAnimationTime;
+    property AnimationTime: TKamTime read FAnimationTime write FAnimationTime;
     property Exists: boolean read FExists write FExists default true;
     property Collides: boolean read FCollides write FCollides default true;
 
@@ -867,7 +860,7 @@ type
     FInitialCameraUp: TVector3Single;
     FGravityUp: TVector3Single;
 
-    FAnimationTime: TAnimationTime;
+    FAnimationTime: TKamTime;
 
     FSectors: TSceneSectorsList;
     FWaypoints: TSceneWaypointsList;
@@ -1153,7 +1146,7 @@ type
 
     { This is the time of the level, in seconds. Time 0 when level is created.
       This is updated in our Idle. }
-    property AnimationTime: TAnimationTime read FAnimationTime;
+    property AnimationTime: TKamTime read FAnimationTime;
 
     { Override this to allow player to pick some additional objects,
       not contained in @link(Scene) or @link(Objects).
@@ -1366,7 +1359,7 @@ begin
   FCastsShadow := true;
 end;
 
-procedure TLevelObject.BeforeIdle(const NewAnimationTime: TAnimationTime);
+procedure TLevelObject.BeforeIdle(const NewAnimationTime: TKamTime);
 begin
   { Nothing to do in this class. }
 end;
@@ -1691,7 +1684,7 @@ begin
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
 end;
 
-procedure TLevelObjectSum.BeforeIdle(const NewAnimationTime: TAnimationTime);
+procedure TLevelObjectSum.BeforeIdle(const NewAnimationTime: TKamTime);
 var
   I: Integer;
 begin
@@ -1934,7 +1927,7 @@ begin
 end;
 
 procedure TLevelMovingObject.BeforeIdle(
-  const NewAnimationTime: TAnimationTime);
+  const NewAnimationTime: TKamTime);
 
   function BoundingBoxAssumeTranslation(
     const AssumeTranslation: TVector3_Single): TBox3d;
@@ -2179,7 +2172,7 @@ begin
   end;
 end;
 
-function TLevelLinearMovingObject.Translation(const AnimationTime: TAnimationTime):
+function TLevelLinearMovingObject.Translation(const AnimationTime: TKamTime):
   TVector3_Single;
 begin
   if not EndPosition then
@@ -3283,7 +3276,7 @@ end;
 procedure TLevel.Idle(const CompSpeed: Single);
 var
   I: Integer;
-  NewAnimationTime: TAnimationTime;
+  NewAnimationTime: TKamTime;
 begin
   NewAnimationTime := AnimationTime + CompSpeed;
 

@@ -46,8 +46,8 @@ var
   IdleUnderCredits: TGLWindowFunc;
   UserQuit: boolean;
   CreditsModel: TVRMLFlatSceneGL;
-  AnimationTime: TAnimationTime;
-  AnimationSpeed, AnimationEnd: TAnimationTime;
+  AnimationTime: TKamTime;
+  AnimationSpeed, AnimationEnd: TKamTime;
 
 procedure Draw(Glwin: TGLWindow);
 
