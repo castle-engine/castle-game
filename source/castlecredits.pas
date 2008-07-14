@@ -39,7 +39,7 @@ implementation
 uses SysUtils, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleTimeMessages,
   CastleInputs, CastlePlay, KambiStringUtils, GLWinModes, CastleWindow,
   CastleVideoOptions, VectorMath, VRMLFlatSceneGL, KambiFilesUtils,
-  CastleHelp, KambiUtils, VRMLNodes, CastleLevel, VRMLFields;
+  CastleHelp, KambiUtils, VRMLNodes, CastleLevel, VRMLFields, KambiTimeUtils;
 
 var
   DrawUnderCredits: TDrawFunc;

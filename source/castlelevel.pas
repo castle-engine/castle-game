@@ -30,7 +30,7 @@ uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
   BackgroundGL, VRMLGLHeadlight, DOM, GameSoundEngine,
-  ShadowVolumesHelper, Classes;
+  ShadowVolumesHelper, Classes, KambiTimeUtils;
 
 {$define read_interface}
 
