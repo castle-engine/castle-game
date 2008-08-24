@@ -77,7 +77,7 @@ var
 
 implementation
 
-uses SysUtils, XMLRead, KambiXMLUtils, KambiFilesUtils, VRMLNodes;
+uses SysUtils, KambiXMLRead, KambiXMLUtils, KambiFilesUtils, VRMLNodes;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
