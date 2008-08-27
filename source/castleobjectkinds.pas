@@ -24,7 +24,7 @@ unit CastleObjectKinds;
 interface
 
 uses Classes, KambiXMLCfg, VRMLGLAnimation, VRMLGLAnimationInfo,
-  CastleVideoOptions, VRMLFlatScene, VRMLFlatSceneGL;
+  CastleVideoOptions, VRMLScene, VRMLGLScene;
 
 type
   { This is a common class for item kind and creature kind. }

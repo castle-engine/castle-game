@@ -38,14 +38,14 @@ implementation
 
 uses SysUtils, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleTimeMessages,
   CastleInputs, CastlePlay, KambiStringUtils, GLWinModes, CastleWindow,
-  CastleVideoOptions, VectorMath, VRMLFlatSceneGL, KambiFilesUtils,
+  CastleVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
   CastleHelp, KambiUtils, VRMLNodes, CastleLevel, VRMLFields, KambiTimeUtils;
 
 var
   DrawUnderCredits: TDrawFunc;
   IdleUnderCredits: TGLWindowFunc;
   UserQuit: boolean;
-  CreditsModel: TVRMLFlatSceneGL;
+  CreditsModel: TVRMLGLScene;
   AnimationTime: TKamTime;
   AnimationSpeed, AnimationEnd: TKamTime;
 
@@ -181,7 +181,7 @@ begin
   StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', SCastleWWW);
   StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
-  CreditsModel := TVRMLFlatSceneGL.Create(
+  CreditsModel := TVRMLGLScene.Create(
     ParseVRMLFileFromString(VRMLContents, ''),
     true, roSceneAsAWhole, GLContextCache);
 

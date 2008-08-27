@@ -24,7 +24,7 @@ unit CastleCreatures;
 interface
 
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
-  VRMLGLAnimationInfo, VRMLFlatSceneGL, CastleSound, VRMLSceneWaypoints,
+  VRMLGLAnimationInfo, VRMLGLScene, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSourceAllocator, KambiXMLCfg,
   VRMLTriangleOctree, GameSoundEngine, ShadowVolumesHelper;
 
@@ -822,7 +822,7 @@ type
       Note that this is called at the end of our constructor
       (through RecalculateBoundingBox),
       so it must be implemented to work even when Level is not assigned yet. }
-    function CurrentScene: TVRMLFlatSceneGL; virtual; abstract;
+    function CurrentScene: TVRMLGLScene; virtual; abstract;
 
     { This is the position of the (0, 0, 0) point of creature model
       (or rather, currently used model! Creatures are animated after all). }
@@ -1063,7 +1063,7 @@ type
 
     procedure Idle(const CompSpeed: Single); override;
 
-    function CurrentScene: TVRMLFlatSceneGL; override;
+    function CurrentScene: TVRMLGLScene; override;
 
     { This is the method where you must actually do your attack
       --- fire a missile, lower player's life etc.
@@ -1124,7 +1124,7 @@ type
   public
     procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single); override;
-    function CurrentScene: TVRMLFlatSceneGL; override;
+    function CurrentScene: TVRMLGLScene; override;
   end;
 
   TGhostCreature = class(TWalkAttackCreature)
@@ -1154,7 +1154,7 @@ type
 
     procedure Idle(const CompSpeed: Single); override;
 
-    function CurrentScene: TVRMLFlatSceneGL; override;
+    function CurrentScene: TVRMLGLScene; override;
 
     { Missiles return @false here.
       We will check for collisions when missile moves. }
@@ -1168,7 +1168,7 @@ type
     { Shortcut for TStillCreatureKind(Kind). }
     function StillKind: TStillCreatureKind;
 
-    function CurrentScene: TVRMLFlatSceneGL; override;
+    function CurrentScene: TVRMLGLScene; override;
 
     function RemoveMeFromLevel: boolean; override;
   end;
@@ -1576,7 +1576,7 @@ end;
 
 procedure TGhostKind.PrepareRenderInternal;
 var
-  ReferenceScene: TVRMLFlatSceneGL;
+  ReferenceScene: TVRMLGLScene;
 begin
   inherited;
 
@@ -3160,7 +3160,7 @@ begin
   end;
 end;
 
-function TWalkAttackCreature.CurrentScene: TVRMLFlatSceneGL;
+function TWalkAttackCreature.CurrentScene: TVRMLGLScene;
 var
   StateTime: Single;
 begin
@@ -3410,7 +3410,7 @@ begin
     end;
 end;
 
-function TSpiderQueenCreature.CurrentScene: TVRMLFlatSceneGL;
+function TSpiderQueenCreature.CurrentScene: TVRMLGLScene;
 var
   StateTime: Single;
 begin
@@ -3569,7 +3569,7 @@ begin
   end;
 end;
 
-function TMissileCreature.CurrentScene: TVRMLFlatSceneGL;
+function TMissileCreature.CurrentScene: TVRMLGLScene;
 begin
   if Level <> nil then
     Result := MissileKind.Animation.SceneFromTime(Level.AnimationTime) else
@@ -3634,7 +3634,7 @@ begin
   Result := TStillCreatureKind(Kind);
 end;
 
-function TStillCreature.CurrentScene: TVRMLFlatSceneGL;
+function TStillCreature.CurrentScene: TVRMLGLScene;
 begin
   if Level <> nil then
     Result := StillKind.Animation.SceneFromTime(Level.AnimationTime) else

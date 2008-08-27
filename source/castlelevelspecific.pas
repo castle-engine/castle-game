@@ -23,7 +23,7 @@ unit CastleLevelSpecific;
 
 interface
 
-uses VRMLGLAnimation, VRMLFlatSceneGL, Boxes3d, VectorMath,
+uses VRMLGLAnimation, VRMLGLScene, Boxes3d, VectorMath,
   CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL,
   ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM,
   CastleCreatures, ShadowVolumesHelper, Classes, KambiTimeUtils;
@@ -70,7 +70,7 @@ type
   private
     FGateExitBox: TBox3d;
 
-    Teleport: TVRMLFlatSceneGL;
+    Teleport: TVRMLGLScene;
     FTeleport1Box, FTeleport2Box: TBox3d;
 
     Teleport1Rotate: Single;

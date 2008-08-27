@@ -23,7 +23,7 @@ unit VRMLGLAnimationInfo;
 
 interface
 
-uses Classes, VRMLFlatSceneGL, VRMLGLAnimation, VRMLOpenGLRenderer,
+uses Classes, VRMLGLScene, VRMLGLAnimation, VRMLOpenGLRenderer,
   KambiUtils, DOM;
 
 type

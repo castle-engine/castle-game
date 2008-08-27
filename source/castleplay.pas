@@ -118,7 +118,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
-  CastleLevelSpecific, VRMLFlatSceneGL, CastleLevelAvailable,
+  CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
   ShadowVolumesHelper, KambiTimeUtils, GLImages;
 
 var

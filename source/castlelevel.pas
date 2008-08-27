@@ -24,7 +24,7 @@ unit CastleLevel;
 
 interface
 
-uses VectorMath, VRMLFlatScene, VRMLFlatSceneGL, VRMLLightSetGL, Boxes3d,
+uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
@@ -61,7 +61,7 @@ type
     What's an "object on the level" ? Well, theoretically anything.
     In the future, all items and creatures and even the player
     could be also treated as "some objects on the level".
-    For now, "object on the level" means a static VRML scene (TVRMLFlatSceneGL)
+    For now, "object on the level" means a static VRML scene (TVRMLGLScene)
     or VRML animation (TVRMLAnimationGL) that is added to the level.
     Such "object on the level" has additional capabilities, not available
     to normal static parts of the scene. It can appear/disappear from the scene,
@@ -99,7 +99,7 @@ type
       first time with ATransparent = @false, second time with
       ATransparent = @true. You should render only fully opaque
       parts in the first pass and only the transparent parts in the
-      second pass. For the reason see TVRMLFlatSceneGL.Render comments. }
+      second pass. For the reason see TVRMLGLScene.Render comments. }
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); virtual; abstract;
 
@@ -121,7 +121,7 @@ type
       But RenderShadowVolume needs actual transformation explicitly:
       ShadowMaybeVisible needs actual box position in world coordinates,
       so bounding box has to be transformed by ParentTransform.
-      And TVRMLFlatSceneGL.RenderShadowVolume needs explicit ParentTransform
+      And TVRMLGLScene.RenderShadowVolume needs explicit ParentTransform
       to correctly detect front/back sides (for silhouette edges and
       volume capping). }
     procedure RenderShadowVolume(
@@ -273,7 +273,7 @@ type
 
   { This a VRML scene that can appear/disappear from the level.
 
-    It's basically just a TVRMLFlatSceneGL instance
+    It's basically just a TVRMLGLScene instance
     (loaded with LoadLevelScene, always with a DefaultTriangleOctree).
     Plus properties @link(Exists) and @link(Collides) which allow you
     to hide this object from evrything (or only from the collision detection). }
@@ -281,13 +281,13 @@ type
   private
     FExists: boolean;
     FCollides: boolean;
-    FScene: TVRMLFlatSceneGL;
+    FScene: TVRMLGLScene;
   public
     constructor Create(AParentLevel: TLevel;
       const SceneFileName: string; PrepareBackground: boolean);
     destructor Destroy; override;
 
-    property Scene: TVRMLFlatSceneGL read FScene;
+    property Scene: TVRMLGLScene read FScene;
 
     { @noAutoLinkHere }
     property Exists: boolean read FExists write FExists default true;
@@ -340,7 +340,7 @@ type
   { This an object that moves on the level.
 
     It is used to move other TLevelObject --- which can be e.g. a static object
-    (basically just a TVRMLFlatSceneGL instance), an animated object,
+    (basically just a TVRMLGLScene instance), an animated object,
     a TLevelObjectSum (allowing you to move a couple of level objects together),
     or even another TLevelMovingObject.
 
@@ -819,7 +819,7 @@ type
 
   TLevel = class
   private
-    FScene: TVRMLFlatSceneGL;
+    FScene: TVRMLGLScene;
     FLightSet: TVRMLLightSetGL;
     FCameraRadius: Single;
     FCameraPreferredHeight: Single;
@@ -936,7 +936,7 @@ type
       object that has meaningfull ChangeLevelScene method. }
     procedure ChangeLevelScene; virtual;
 
-    { Just load TVRMLFlatSceneGL from file, doing some common tasks:
+    { Just load TVRMLGLScene from file, doing some common tasks:
       @unorderedList(
         @item sets Attributes according to AttributesSet
         @item optionally create triangle octree
@@ -946,7 +946,7 @@ type
         @item FreeExternalResources, since they will not be needed anymore
       ) }
     function LoadLevelScene(const FileName: string;
-      CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;
+      CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLGLScene;
 
     { Load TVRMLGLAnimation from *.kanim file, doing common tasks.
       @unorderedList(
@@ -998,7 +998,7 @@ type
     { @groupEnd }
 
     { }
-    property Scene: TVRMLFlatSceneGL read FScene;
+    property Scene: TVRMLGLScene read FScene;
     property LightSet: TVRMLLightSetGL read FLightSet;
 
     property CameraRadius: Single read FCameraRadius;
@@ -1049,7 +1049,7 @@ type
 
         @item(Usually you shouldn't create some TLevelObject
           instances when the game is running (as creating them sometimes needs
-          some small but noticeable time, e.g. to build TVRMLFlatSceneGL octree).
+          some small but noticeable time, e.g. to build TVRMLGLScene octree).
 
           So even if you modify this property while the game plays,
           you should have already prepared instances (created in level
@@ -2355,7 +2355,7 @@ procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
   var GroundItem: POctreeItem);
 
-  procedure MakeScene(Scene: TVRMLFlatScene);
+  procedure MakeScene(Scene: TVRMLScene);
   var
     IsAboveThis: boolean;
     HeightAboveThis: Single;
@@ -2597,7 +2597,7 @@ begin
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    FScene := TVRMLFlatSceneGL.Create(LoadAsVRML(SceneFileName, false),
+    FScene := TVRMLGLScene.Create(LoadAsVRML(SceneFileName, false),
       true, roSeparateShapeStates, GLContextCache);
 
     { initialize FAnimationTime. Must be initialized before creating creatures. }
@@ -3383,11 +3383,11 @@ begin
 end;
 
 function TLevel.LoadLevelScene(const FileName: string;
-  CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLFlatSceneGL;
+  CreateDefaultTriangleOctree, PrepareBackground: boolean): TVRMLGLScene;
 var
   Options: TPrepareRenderOptions;
 begin
-  Result := TVRMLFlatSceneGL.Create(LoadAsVRML(FileName),
+  Result := TVRMLGLScene.Create(LoadAsVRML(FileName),
     true, roSeparateShapeStates, GLContextCache);
   AttributesSet(Result.Attributes, btIncrease);
 

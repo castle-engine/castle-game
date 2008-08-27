@@ -23,7 +23,7 @@ unit CastleItems;
 
 interface
 
-uses Boxes3d, VRMLNodes, VRMLFlatSceneGL, VectorMath, KambiUtils,
+uses Boxes3d, VRMLNodes, VRMLGLScene, VectorMath, KambiUtils,
   KambiClassUtils, Images, GL, GLU, KambiGLUtils, CastleSound,
   VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds,
   KambiXMLCfg, GameSoundEngine;
@@ -63,7 +63,7 @@ type
   TItemKind = class(TObjectKind)
   private
     FModelFileName: string;
-    FScene: TVRMLFlatSceneGL;
+    FScene: TVRMLGLScene;
     FName: string;
     FImageFileName: string;
     FImage: TImage;
@@ -97,7 +97,7 @@ type
     property Name: string read FName;
 
     { Note that the Scene is nil if not PrepareRenderDone. }
-    function Scene: TVRMLFlatSceneGL;
+    function Scene: TVRMLGLScene;
 
     { This is a 2d image, to be used for inventory slots etc.
       When you call this for the 1st time, the image will be loaded
@@ -396,7 +396,7 @@ implementation
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
   CastlePlay, KambiFilesUtils, ProgressUnit,
   CastleCreatures, CastleVideoOptions, CastleTimeMessages,
-  VRMLFlatScene, VRMLTriangleOctree, GLImages;
+  VRMLScene, VRMLTriangleOctree, GLImages;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -444,7 +444,7 @@ begin
   FImageFileName := CombinePaths(BasePath, FImageFileName);
 end;
 
-function TItemKind.Scene: TVRMLFlatSceneGL;
+function TItemKind.Scene: TVRMLGLScene;
 begin
   Result := FScene;
 end;
@@ -504,7 +504,7 @@ procedure TItemKind.PrepareRenderInternal;
 begin
   if FScene = nil then
   begin
-    FScene := TVRMLFlatSceneGL.Create(LoadAsVRML(ModelFileName, false),
+    FScene := TVRMLGLScene.Create(LoadAsVRML(ModelFileName, false),
       true, roSeparateShapeStates, GLContextCache);
 
     AttributesSet(Scene.Attributes, BlendingType);
