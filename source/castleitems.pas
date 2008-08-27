@@ -504,8 +504,8 @@ procedure TItemKind.PrepareRenderInternal;
 begin
   if FScene = nil then
   begin
-    FScene := TVRMLGLScene.Create(LoadAsVRML(ModelFileName, false),
-      true, roSeparateShapeStates, GLContextCache);
+    FScene := TVRMLGLScene.Create(ModelFileName, roSeparateShapeStates,
+      GLContextCache);
 
     AttributesSet(Scene.Attributes, BlendingType);
     Scene.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox]);
