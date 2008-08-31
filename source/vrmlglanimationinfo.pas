@@ -209,8 +209,9 @@ begin
       RootNodes[I] := LoadAsVRML(FModelFileNames[I], false);
 
     Result := TVRMLGLAnimation.Create(FCache);
+    Result.Optimization := FOptimization;
     Result.Load(RootNodes, OwnsFirstRootNode, FTimes,
-      FScenesPerTime, FOptimization, FEqualityEpsilon);
+      FScenesPerTime, FEqualityEpsilon);
     Result.TimeLoop := FTimeLoop;
     Result.TimeBackwards := FTimeBackwards;
 
