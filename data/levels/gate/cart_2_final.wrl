@@ -19,7 +19,18 @@ Group {
     }
   }
 
-  WWWInline { name "gate_fog.wrl" }
+  # Fog node, for use on main gate geometry and cart.
+  # When changing this, remember to synchronize both VRML sources!
+  # (cannot use WWWInline for this, as bindable nodes are not searched
+  # within inline nodes)
+  Fog {
+    color 0.6 0.6 0.6
+    fogType "LINEAR"
+    volumetric TRUE
+    volumetricDirection 0 0 -1
+    volumetricVisibilityStart -30
+    visibilityRange 50
+  }
 
   WWWInline { name "cart_2.wrl" }
 }
