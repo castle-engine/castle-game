@@ -24,7 +24,7 @@ unit CastleHelp;
 interface
 
 const
-  Version = '0.8.1';
+  Version = '0.8.2';
 
 function SCastleVersion: string;
 function SCastleWWW: string;
