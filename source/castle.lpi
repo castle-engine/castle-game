@@ -12,7 +12,7 @@
       <MainUnit Value="0"/>
       <IconPath Value="./"/>
       <TargetFileExt Value=""/>
-      <ActiveEditorIndexAtStart Value="2"/>
+      <ActiveEditorIndexAtStart Value="5"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -34,7 +34,7 @@
         <PackageName Value="kambi_glwindow"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="15">
+    <Units Count="18">
       <Unit0>
         <Filename Value="castle.pasprogram"/>
         <IsPartOfProject Value="True"/>
@@ -47,9 +47,11 @@
       <Unit1>
         <Filename Value="castleconfig.pas"/>
         <UnitName Value="CastleConfig"/>
-        <CursorPos X="18" Y="27"/>
-        <TopLine Value="2"/>
+        <CursorPos X="47" Y="52"/>
+        <TopLine Value="34"/>
+        <EditorIndex Value="3"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="castleitems.pas"/>
@@ -146,8 +148,35 @@
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit14>
+      <Unit15>
+        <Filename Value="../../kambi_vrml_game_engine/base/kambidynlib.pas"/>
+        <UnitName Value="KambiDynLib"/>
+        <CursorPos X="1" Y="221"/>
+        <TopLine Value="201"/>
+        <EditorIndex Value="4"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlnodes.pas"/>
+        <UnitName Value="VRMLNodes"/>
+        <CursorPos X="1" Y="4417"/>
+        <TopLine Value="4403"/>
+        <EditorIndex Value="5"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlscene.pas"/>
+        <UnitName Value="VRMLScene"/>
+        <CursorPos X="1" Y="2150"/>
+        <TopLine Value="2136"/>
+        <EditorIndex Value="6"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit17>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="12" HistoryIndex="11">
       <Position1>
         <Filename Value="../../kambi_vrml_game_engine/opengl/glwindow.pas"/>
         <Caret Line="1" Column="1" TopLine="1"/>
@@ -160,10 +189,46 @@
         <Filename Value="castlewindow.pas"/>
         <Caret Line="1" Column="1" TopLine="1"/>
       </Position3>
+      <Position4>
+        <Filename Value="castleconfig.pas"/>
+        <Caret Line="27" Column="18" TopLine="2"/>
+      </Position4>
+      <Position5>
+        <Filename Value="castleconfig.pas"/>
+        <Caret Line="52" Column="47" TopLine="34"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../kambi_vrml_game_engine/base/kambidynlib.pas"/>
+        <Caret Line="221" Column="1" TopLine="201"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlnodes.pas"/>
+        <Caret Line="4417" Column="1" TopLine="4403"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlscene.pas"/>
+        <Caret Line="2150" Column="1" TopLine="2136"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlnodes.pas"/>
+        <Caret Line="4620" Column="1" TopLine="4606"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlnodes.pas"/>
+        <Caret Line="4417" Column="1" TopLine="4403"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlscene.pas"/>
+        <Caret Line="2150" Column="1" TopLine="2136"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlnodes.pas"/>
+        <Caret Line="4620" Column="1" TopLine="4606"/>
+      </Position12>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
-    <Version Value="5"/>
+    <Version Value="8"/>
     <Parsing>
       <SyntaxOptions>
         <IncludeAssertionCode Value="True"/>
@@ -178,7 +243,6 @@
         <OverflowChecks Value="True"/>
         <StackChecks Value="True"/>
       </Checks>
-      <Generate Value="Faster"/>
     </CodeGeneration>
     <Linking>
       <Debugging>
@@ -189,17 +253,24 @@
       <Verbosity>
         <ShowHints Value="False"/>
       </Verbosity>
+      <CustomOptions Value="-Sh"/>
       <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
   <Debugging>
-    <Exceptions Count="2">
+    <Exceptions Count="4">
       <Item1>
         <Name Value="ECodetoolError"/>
       </Item1>
       <Item2>
         <Name Value="EFOpenError"/>
       </Item2>
+      <Item3>
+        <Name Value="BreakIsNodePresent"/>
+      </Item3>
+      <Item4>
+        <Name Value="BreakTryFindNode"/>
+      </Item4>
     </Exceptions>
   </Debugging>
 </CONFIG>
