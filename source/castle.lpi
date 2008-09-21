@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <CONFIG>
   <ProjectOptions>
-    <PathDelim Value="\"/>
+    <PathDelim Value="/"/>
     <Version Value="6"/>
     <General>
       <Flags>
@@ -10,13 +10,12 @@
         <MainUnitHasTitleStatement Value="False"/>
       </Flags>
       <MainUnit Value="0"/>
-      <IconPath Value=".\"/>
+      <IconPath Value="./"/>
       <TargetFileExt Value=""/>
-      <ActiveEditorIndexAtStart Value="0"/>
+      <ActiveEditorIndexAtStart Value="1"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
-      <DestinationDirectory Value="$(TestDir)\publishedproject\"/>
       <IgnoreBinaries Value="False"/>
       <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
       <ExcludeFileFilter Value="*.(bak|ppu|ppw|o|so);*~;backup"/>
@@ -24,7 +23,7 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
-        <LaunchingApplication PathPlusParams="\usr\X11R6\bin\xterm -T 'Lazarus Run Output' -e $(LazarusDir)\tools\runwait.sh $(TargetCmdLine)"/>
+        <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
       </local>
     </RunParams>
     <RequiredPackages Count="2">
@@ -35,7 +34,7 @@
         <PackageName Value="kambi_units"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="19">
+    <Units Count="21">
       <Unit0>
         <Filename Value="castle.pasprogram"/>
         <IsPartOfProject Value="True"/>
@@ -67,21 +66,21 @@
         <UsageCount Value="10"/>
       </Unit3>
       <Unit4>
-        <Filename Value="..\..\..\..\units\kambi_vrml_game_engine\opengl\glwindow.pas"/>
+        <Filename Value="../../../../units/kambi_vrml_game_engine/opengl/glwindow.pas"/>
         <UnitName Value="GLWindow"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit4>
       <Unit5>
-        <Filename Value="..\..\..\..\units\kambi_vrml_game_engine\packages\components\kambiglcontrol.pas"/>
+        <Filename Value="../../../../units/kambi_vrml_game_engine/packages/components/kambiglcontrol.pas"/>
         <UnitName Value="KambiGLControl"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit5>
       <Unit6>
-        <Filename Value="..\..\..\..\units\kambi_vrml_game_engine\base\kambistringutils.pas"/>
+        <Filename Value="../../../../units/kambi_vrml_game_engine/base/kambistringutils.pas"/>
         <UnitName Value="KambiStringUtils"/>
         <CursorPos X="48" Y="66"/>
         <TopLine Value="54"/>
@@ -102,7 +101,7 @@
         <UsageCount Value="10"/>
       </Unit8>
       <Unit9>
-        <Filename Value="..\..\kambi_vrml_game_engine\opengl\glwinmessages.pas"/>
+        <Filename Value="../../kambi_vrml_game_engine/opengl/glwinmessages.pas"/>
         <UnitName Value="GLWinMessages"/>
         <CursorPos X="30" Y="1095"/>
         <TopLine Value="1079"/>
@@ -130,7 +129,7 @@
         <UsageCount Value="10"/>
       </Unit12>
       <Unit13>
-        <Filename Value="..\..\kambi_vrml_game_engine\opengl\glwindow.pas"/>
+        <Filename Value="../../kambi_vrml_game_engine/opengl/glwindow.pas"/>
         <UnitName Value="GLWindow"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
@@ -144,39 +143,59 @@
         <UsageCount Value="10"/>
       </Unit14>
       <Unit15>
-        <Filename Value="..\..\kambi_vrml_game_engine\base\kambidynlib.pas"/>
+        <Filename Value="../../kambi_vrml_game_engine/base/kambidynlib.pas"/>
         <UnitName Value="KambiDynLib"/>
         <CursorPos X="1" Y="221"/>
         <TopLine Value="201"/>
+        <EditorIndex Value="1"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
-        <Filename Value="..\..\kambi_vrml_game_engine\3dmodels\vrmlnodes.pas"/>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlnodes.pas"/>
         <UnitName Value="VRMLNodes"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit16>
       <Unit17>
-        <Filename Value="..\..\kambi_vrml_game_engine\3dmodels\vrmlscene.pas"/>
+        <Filename Value="../../kambi_vrml_game_engine/3dmodels/vrmlscene.pas"/>
         <UnitName Value="VRMLScene"/>
-        <CursorPos X="1" Y="1"/>
-        <TopLine Value="1"/>
+        <CursorPos X="1" Y="2207"/>
+        <TopLine Value="2193"/>
         <UsageCount Value="10"/>
       </Unit17>
       <Unit18>
-        <Filename Value="..\..\kambi_vrml_game_engine\opengl\openglbmpfonts.pas"/>
+        <Filename Value="../../kambi_vrml_game_engine/opengl/openglbmpfonts.pas"/>
         <UnitName Value="OpenGLBmpFonts"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit18>
+      <Unit19>
+        <Filename Value="../../kambi_vrml_game_engine/base/kambistringutils.pas"/>
+        <UnitName Value="KambiStringUtils"/>
+        <CursorPos X="23" Y="608"/>
+        <TopLine Value="594"/>
+        <UsageCount Value="10"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="../../kambi_vrml_game_engine/opengl/glwinmodes.pas"/>
+        <UnitName Value="GLWinModes"/>
+        <CursorPos X="57" Y="31"/>
+        <TopLine Value="17"/>
+        <UsageCount Value="10"/>
+      </Unit20>
     </Units>
-    <JumpHistory Count="0" HistoryIndex="-1"/>
+    <JumpHistory Count="1" HistoryIndex="0">
+      <Position1>
+        <Filename Value="castle.pasprogram"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
+      </Position1>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="8"/>
-    <PathDelim Value="\"/>
     <Parsing>
       <SyntaxOptions>
         <IncludeAssertionCode Value="True"/>
@@ -206,7 +225,7 @@
     </Other>
   </CompilerOptions>
   <Debugging>
-    <Exceptions Count="4">
+    <Exceptions Count="5">
       <Item1>
         <Name Value="ECodetoolError"/>
       </Item1>
@@ -219,6 +238,9 @@
       <Item4>
         <Name Value="BreakTryFindNode"/>
       </Item4>
+      <Item5>
+        <Name Value="BreakFirstViewpointFound"/>
+      </Item5>
     </Exceptions>
   </Debugging>
 </CONFIG>
