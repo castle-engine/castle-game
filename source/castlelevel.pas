@@ -1430,7 +1430,7 @@ begin
   Result := (not Exists) or (not Collides) or
     Scene.DefaultTriangleOctree.MoveAllowedSimple(
       OldPos, ProposedNewPos,
-      CameraRadius, NoItemIndex, ItemsToIgnoreFunc);
+      CameraRadius, false, NoItemIndex, ItemsToIgnoreFunc);
 end;
 
 function TLevelStaticObject.MoveBoxAllowedSimple(
@@ -1441,7 +1441,7 @@ begin
   Result := (not Exists) or (not Collides) or
     Scene.DefaultTriangleOctree.MoveBoxAllowedSimple(
       OldPos, ProposedNewPos, ProposedNewBox,
-      NoItemIndex, ItemsToIgnoreFunc);
+      false, NoItemIndex, ItemsToIgnoreFunc);
 end;
 
 function TLevelStaticObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
@@ -2247,11 +2247,11 @@ begin
   Result := (not Exists) or (not Collides) or
     (Animation.FirstScene.DefaultTriangleOctree.MoveAllowedSimple(
        OldPos, ProposedNewPos,
-       CameraRadius, NoItemIndex, ItemsToIgnoreFunc) and
+       CameraRadius, false, NoItemIndex, ItemsToIgnoreFunc) and
        ( (not CollisionUseLastScene) or
          Animation.LastScene.DefaultTriangleOctree.MoveAllowedSimple(
            OldPos, ProposedNewPos,
-           CameraRadius, NoItemIndex, ItemsToIgnoreFunc) ));
+           CameraRadius, false, NoItemIndex, ItemsToIgnoreFunc) ));
 end;
 
 function TLevelAnimatedObject.MoveBoxAllowedSimple(
@@ -2262,11 +2262,11 @@ begin
   Result := (not Exists) or (not Collides) or
     (Animation.FirstScene.DefaultTriangleOctree.MoveBoxAllowedSimple(
        OldPos, ProposedNewPos, ProposedNewBox,
-       NoItemIndex, ItemsToIgnoreFunc) and
+       false, NoItemIndex, ItemsToIgnoreFunc) and
        ( (not CollisionUseLastScene) or
          Animation.LastScene.DefaultTriangleOctree.MoveBoxAllowedSimple(
            OldPos, ProposedNewPos, ProposedNewBox,
-           NoItemIndex, ItemsToIgnoreFunc) ));
+           false, NoItemIndex, ItemsToIgnoreFunc) ));
 end;
 
 function TLevelAnimatedObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
@@ -3140,7 +3140,7 @@ begin
   Result :=
     Scene.DefaultTriangleOctree.MoveAllowed(
       CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius,
-      NoItemIndex, @CollisionIgnoreItem) and
+      false, NoItemIndex, @CollisionIgnoreItem) and
     Box3dPointInside(NewPos, LevelBox) and
     ObjectsMoveAllowedSimple(
       CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
@@ -3155,7 +3155,7 @@ begin
     Box3dPointInside(NewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveAllowedSimple(
       CameraPos, NewPos, MovingObjectCameraRadius,
-      NoItemIndex, @CollisionIgnoreItem) and
+      false, NoItemIndex, @CollisionIgnoreItem) and
     ObjectsMoveAllowedSimple(
       CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
 end;
@@ -3169,7 +3169,7 @@ begin
     Box3dPointInside(NewPos, LevelBox) and
     Scene.DefaultTriangleOctree.MoveBoxAllowedSimple(
       CameraPos, NewPos, NewBox,
-      NoItemIndex, @CollisionIgnoreItem) and
+      false, NoItemIndex, @CollisionIgnoreItem) and
     ObjectsMoveBoxAllowedSimple(
       CameraPos, NewPos, NewBox, BecauseOfGravity);
 end;
