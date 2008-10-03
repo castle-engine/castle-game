@@ -23,7 +23,7 @@ unit CastleControlsMenu;
 
 interface
 
-uses GLWindow, GL, GLU, GLExt, CastleGeneralMenu, MatrixNavigation,
+uses GLWindow, GL, GLU, GLExt, CastleGeneralMenu, Navigation,
   OpenGLFonts, OpenGLBmpFonts;
 
 type

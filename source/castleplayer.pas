@@ -23,7 +23,7 @@ unit CastlePlayer;
 
 interface
 
-uses Boxes3d, MatrixNavigation, CastleItems, VectorMath, GL, GLU, GLExt,
+uses Boxes3d, Navigation, CastleItems, VectorMath, GL, GLU, GLExt,
   VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
   VRMLTriangleOctree, CastleTextures, GameSoundEngine, Classes,
   KambiGLUtils;
@@ -75,7 +75,7 @@ type
   private
     FLife: Single;
     FMaxLife: Single;
-    FNavigator: TMatrixWalker;
+    FNavigator: TWalkNavigator;
     FItems: TItemsList;
     FEquippedWeapon: TItem;
     FFlyingModeTimeOut: Single; { > 0 means he's flying. In seconds. }
@@ -91,7 +91,7 @@ type
       or Swimming or GameWin change. }
     procedure UpdateNavigator;
 
-    procedure FalledDown(Navigator: TMatrixWalker; const FallenHeight: Single);
+    procedure FalledDown(Navigator: TWalkNavigator; const FallenHeight: Single);
     procedure SetLife(const Value: Single);
 
     { This sets life, just like SetLife.
@@ -242,7 +242,7 @@ type
         @item Navigator.RotationOnlyMatrix, Matrixm, Frustum.
       )
     }
-    property Navigator: TMatrixWalker read FNavigator;
+    property Navigator: TWalkNavigator read FNavigator;
 
     { Return the one of Level.Sectors that contains Navigator.CameraPos.
       Nil if none. Yes, this is just a shortcut for
@@ -435,7 +435,7 @@ begin
   FItems := TItemsList.Create;
   FInventoryCurrentItem := -1;
 
-  FNavigator := TMatrixWalker.Create(nil);
+  FNavigator := TWalkNavigator.Create(nil);
   Navigator.Input_MoveSpeedInc.MakeClear; { turn key off }
   Navigator.Input_MoveSpeedDec.MakeClear; { turn key off }
   Navigator.CheckModsDown := false;
@@ -1229,7 +1229,7 @@ begin
   BlackOut(Red3Single);
 end;
 
-procedure TPlayer.FalledDown(Navigator: TMatrixWalker;
+procedure TPlayer.FalledDown(Navigator: TWalkNavigator;
   const FallenHeight: Single);
 begin
   if (Swimming = psNo) and (FallenHeight > 4.0) then

@@ -65,13 +65,13 @@ procedure BackgroundLevelIdle(Glwin: TGLWindow);
 implementation
 
 uses SysUtils,
-  MatrixNavigation, GL, GLU, GLExt, BackgroundGL, KambiGLUtils, GLImages,
+  Navigation, GL, GLU, GLExt, BackgroundGL, KambiGLUtils, GLImages,
   VRMLGLHeadlight, KambiFilesUtils, Images, VectorMath,
   CastleWindow, CastleLevel, CastleLevelAvailable, CastleVideoOptions;
 
 var
   BackgroundLevel: TLevel;
-  BackgroundNavigator: TMatrixWalker;
+  BackgroundNavigator: TWalkNavigator;
 
   GLList_Caption: TGLuint;
   {CaptionWidth, }CaptionHeight: Cardinal;
@@ -83,7 +83,7 @@ begin
     CreateLevel(true);
 
   { initialize BackgroundNavigator }
-  BackgroundNavigator := TMatrixWalker.Create(@Glw.PostRedisplayOnMatrixChanged);
+  BackgroundNavigator := TWalkNavigator.Create(@Glw.PostRedisplayOnMatrixChanged);
   BackgroundNavigator.Init(BackgroundLevel.InitialCameraPos,
     BackgroundLevel.InitialCameraDir,
     BackgroundLevel.InitialCameraUp,

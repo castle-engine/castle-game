@@ -25,7 +25,7 @@ unit CastleLevel;
 interface
 
 uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
-  VRMLNodes, VRMLFields, CastleItems, MatrixNavigation,
+  VRMLNodes, VRMLFields, CastleItems, Navigation,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
@@ -1123,11 +1123,11 @@ type
       if player is not IsAboveTheGround).
 
       @groupBegin }
-    function PlayerMoveAllowed(Navigator: TMatrixWalker;
+    function PlayerMoveAllowed(Navigator: TWalkNavigator;
       const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
 
-    procedure PlayerGetCameraHeightSqr(Navigator: TMatrixWalker;
+    procedure PlayerGetCameraHeightSqr(Navigator: TWalkNavigator;
       out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
     { Call this to render level things: level scene and level objects
@@ -3193,7 +3193,7 @@ begin
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
 end;
 
-function TLevel.PlayerMoveAllowed(Navigator: TMatrixWalker;
+function TLevel.PlayerMoveAllowed(Navigator: TWalkNavigator;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
@@ -3209,7 +3209,7 @@ begin
       Navigator.CameraPos, NewPos, nil) = nil);
 end;
 
-procedure TLevel.PlayerGetCameraHeightSqr(Navigator: TMatrixWalker;
+procedure TLevel.PlayerGetCameraHeightSqr(Navigator: TWalkNavigator;
   out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 var
   HeightAboveTheGround: Single;

@@ -2174,7 +2174,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     FallingDownDistance, MaximumFallingDownDistance: Single;
   begin
     { Gravity does it's work here.
-      This is extremely simplified version of Gravity work in MatrixNavigation.
+      This is extremely simplified version of Gravity work in Navigation.
       (simplified, because creature doesn't need all these effects). }
 
     { Note that also here we do collision detection using MiddlePosition,

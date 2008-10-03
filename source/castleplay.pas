@@ -111,7 +111,7 @@ implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
-  MatrixNavigation, VectorMath, Boxes3d, Images,
+  Navigation, VectorMath, Boxes3d, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, CastleCreatures,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
@@ -1272,10 +1272,10 @@ end;
 
 type
   TPlayGameHelper = class
-    class procedure MatrixChanged(Navigator: TMatrixNavigator);
+    class procedure MatrixChanged(Navigator: TNavigator);
   end;
 
-class procedure TPlayGameHelper.MatrixChanged(Navigator: TMatrixNavigator);
+class procedure TPlayGameHelper.MatrixChanged(Navigator: TNavigator);
 begin
   Glw.PostRedisplay;
   alUpdateListener;
