@@ -20,6 +20,7 @@ Group {
     avatarSize [ 0.5, 2 ]
     speed 20
     headlight TRUE
+    type "WALK"
   }
 
   KambiHeadLight {

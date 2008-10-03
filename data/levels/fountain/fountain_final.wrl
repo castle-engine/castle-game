@@ -4,6 +4,7 @@ NavigationInfo {
   avatarSize [ 0.5, 2 ]
   speed 10
   headlight FALSE
+  type "WALK"
 }
 
 # Camera settings "encoded" in the VRML declaration below :

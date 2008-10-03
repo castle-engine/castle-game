@@ -18,6 +18,7 @@ Group{
     avatarSize [ 0.5, 2 ]
     speed 20
     headlight TRUE
+    type "WALK"
   }
 
   # Camera settings "encoded" in the VRML declaration below :

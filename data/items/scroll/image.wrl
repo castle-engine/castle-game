@@ -7,9 +7,9 @@
 # in this directory.
 
 Group {
-  # This will cause "Walk" navigation in view3dscene
   NavigationInfo {
     headlight FALSE
+    type "WALK"
   }
 
   PerspectiveCamera {
