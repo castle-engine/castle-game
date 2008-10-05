@@ -339,10 +339,10 @@ const
     WerewolfCreature[0].Howl(true);
 
     { change the lights }
-    Headlight.AmbientIntensity := 0.8;
-    Headlight.Color := Vector3Single(1, 0, 0);
-    Headlight.Intensity := 0.2;
-    Level.Headlight.Render(0, false { it should be already enabled });
+    Scene.Headlight.AmbientIntensity := 0.8;
+    Scene.Headlight.Color := Vector3Single(1, 0, 0);
+    Scene.Headlight.Intensity := 0.2;
+    Level.Scene.Headlight.Render(0, false { it should be already enabled });
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
     begin

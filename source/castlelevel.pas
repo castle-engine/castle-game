@@ -29,7 +29,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
-  BackgroundGL, VRMLGLHeadlight, DOM, GameSoundEngine,
+  BackgroundGL, DOM, GameSoundEngine,
   ShadowVolumesHelper, Classes, KambiTimeUtils;
 
 {$define read_interface}
@@ -830,7 +830,6 @@ type
     FLevelBox: TBox3d;
     FItems: TItemsOnLevelList;
     FObjects: TLevelObjectsList;
-    FHeadlight: TVRMLGLHeadlight;
 
     { Used only within constructor.
       We will process the scene graph, and sometimes it's not comfortable
@@ -1250,16 +1249,6 @@ type
       default GL_LIGHT_MODEL_AMBIENT setting. }
     property GlobalAmbientLight: TVector4Single
       read FGlobalAmbientLight write FGlobalAmbientLight;
-
-    { Properties of level's headlight.
-      @Nil if no headlight should be used by default for this level.
-
-      Note for descendants: TLevel sets this to nil if NavigationInfo.headlight
-      field of level's VRML is FALSE. Otherwise TLevel initializes it by
-      Scene.CreateHeadLight, i.e. uses KambiHeadLight VRML node if present.
-
-      TLevel destructor frees this object. }
-    property Headlight: TVRMLGLHeadlight read FHeadlight;
 
     { For thunder effect. nil if no thunder effect should be done for this level.
 
@@ -2661,8 +2650,7 @@ begin
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
     Scene.ChangedAll;
 
-    NavigationNode := Scene.RootNode.TryFindNode(TNodeNavigationInfo, true)
-      as TNodeNavigationInfo;
+    NavigationNode := Scene.NavigationInfoStack.Top as TNodeNavigationInfo;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
       FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
@@ -2677,10 +2665,6 @@ begin
     if NavigationNode <> nil then
       NavigationSpeed := NavigationNode.FdSpeed.Value else
       NavigationSpeed := 1.0;
-
-    if (NavigationNode <> nil) and NavigationNode.FdHeadlight.Value then
-      FHeadlight := Scene.CreateHeadlight else
-      FHeadlight := nil;
 
     FProjectionNear := CameraRadius * 0.75;
     FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
@@ -2761,7 +2745,6 @@ end;
 destructor TLevel.Destroy;
 begin
   FreeAndNil(FThunderEffect);
-  FreeAndNil(FHeadlight);
   FreeWithContentsAndNil(FSectors);
   FreeWithContentsAndNil(FWaypoints);
   FreeAndNil(FLightSet);

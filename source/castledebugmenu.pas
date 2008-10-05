@@ -626,15 +626,15 @@ begin
   { To better visualize light changes. }
   DrawBackgroundRectangle := false;
 
-  AmbientIntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.AmbientIntensity);
+  AmbientIntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.AmbientIntensity);
 
-  ColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.Color[0]);
-  ColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.Color[1]);
-  ColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.Color[2]);
+  ColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.Color[0]);
+  ColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.Color[1]);
+  ColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.Color[2]);
 
-  IntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.Headlight.Intensity);
+  IntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.Intensity);
 
-  SpotArgument := TGLMenuBooleanArgument.Create(Level.Headlight.Spot);
+  SpotArgument := TGLMenuBooleanArgument.Create(Level.Scene.Headlight.Spot);
 
   Items.AddObject('Ambient intensity'  , AmbientIntensitySlider);
 
@@ -661,25 +661,25 @@ procedure TEditHeadlightMenu.CurrentItemSelected;
   var
     Vector3: TVector3Single;
   begin
-    Vector3 := Level.Headlight.Attenuation;
+    Vector3 := Level.Scene.Headlight.Attenuation;
     if MessageInputQueryVector3Single(Glw, 'Change headlight Attenuation',
       Vector3, taLeft) then
-      Level.Headlight.Attenuation := Vector3;
+      Level.Scene.Headlight.Attenuation := Vector3;
   end;
 
   procedure ChangeSpotProperties;
   var
     Value: Single;
   begin
-    Value := Level.Headlight.SpotCutOffAngle;
+    Value := Level.Scene.Headlight.SpotCutOffAngle;
     if MessageInputQuery(Glw, 'Change headlight SpotCutOffAngle',
       Value, taLeft) then
-      Level.Headlight.SpotCutOffAngle := Value;
+      Level.Scene.Headlight.SpotCutOffAngle := Value;
 
-    Value := Level.Headlight.SpotDropOffRate;
+    Value := Level.Scene.Headlight.SpotDropOffRate;
     if MessageInputQuery(Glw, 'Change headlight SpotDropOffRate',
       Value, taLeft) then
-      Level.Headlight.SpotDropOffRate := Value;
+      Level.Scene.Headlight.SpotDropOffRate := Value;
   end;
 
 begin
@@ -687,16 +687,16 @@ begin
     0..4: Exit;
     5: begin
          ChangeAttenuation;
-         Level.Headlight.Render(0, false { it should be already enabled });
+         Level.Scene.Headlight.Render(0, false { it should be already enabled });
        end;
     6: begin
          SpotArgument.Value := not SpotArgument.Value;
-         Level.Headlight.Spot := SpotArgument.Value;
-         Level.Headlight.Render(0, false { it should be already enabled });
+         Level.Scene.Headlight.Spot := SpotArgument.Value;
+         Level.Scene.Headlight.Render(0, false { it should be already enabled });
        end;
     7: begin
          ChangeSpotProperties;
-         Level.Headlight.Render(0, false { it should be already enabled });
+         Level.Scene.Headlight.Render(0, false { it should be already enabled });
        end;
     8: CurrentMenu := EditLevelLightsMenu;
     else raise EInternalError.Create('Menu item unknown');
@@ -708,18 +708,18 @@ begin
   case CurrentItem of
     0:
       begin
-        Level.Headlight.AmbientIntensity := AmbientIntensitySlider.Value;
-        Level.Headlight.Render(0, false { it should be already enabled });
+        Level.Scene.Headlight.AmbientIntensity := AmbientIntensitySlider.Value;
+        Level.Scene.Headlight.Render(0, false { it should be already enabled });
       end;
     1..3:
       begin
-        Level.Headlight.Color[CurrentItem-1] := ColorSlider[CurrentItem-1].Value;
-        Level.Headlight.Render(0, false { it should be already enabled });
+        Level.Scene.Headlight.Color[CurrentItem-1] := ColorSlider[CurrentItem-1].Value;
+        Level.Scene.Headlight.Render(0, false { it should be already enabled });
       end;
     4:
       begin
-        Level.Headlight.Intensity := IntensitySlider.Value;
-        Level.Headlight.Render(0, false { it should be already enabled });
+        Level.Scene.Headlight.Intensity := IntensitySlider.Value;
+        Level.Scene.Headlight.Render(0, false { it should be already enabled });
       end;
     else Exit;
   end;
@@ -920,7 +920,7 @@ begin
        end;
     2, 3, 4: ;
     5: begin
-         if Level.Headlight <> nil then
+         if Level.Scene.Headlight <> nil then
          begin
            FreeAndNil(EditHeadlightMenu);
            EditHeadlightMenu := TEditHeadlightMenu.Create;
