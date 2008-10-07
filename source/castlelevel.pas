@@ -1911,7 +1911,7 @@ begin
       MovingObject.RenderShadowVolume(ShadowVolumesHelper,
         ParentTransformIsIdentity, ParentTransform) else
       MovingObject.RenderShadowVolume(ShadowVolumesHelper,
-        false, MultMatrices(TranslationMatrix(T.Data), ParentTransform));
+        false, MatrixMult(TranslationMatrix(T.Data), ParentTransform));
   end;
 end;
 
