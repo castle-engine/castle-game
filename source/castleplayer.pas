@@ -1463,7 +1463,7 @@ procedure GLWindowInit(Glwin: TGLWindow);
     Result := LoadImageToDisplayList(
       PlayerControlFileName(BaseName),
       { We want alpha channel, and we expect it to be recorded in the file }
-      [TAlphaImage], [ilcAlphaAdd], 0, 0);
+      [TRGBAlphaImage], [ilcAlphaAdd], 0, 0);
   end;
 
 begin
