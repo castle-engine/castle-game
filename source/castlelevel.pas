@@ -274,7 +274,7 @@ type
   { This a VRML scene that can appear/disappear from the level.
 
     It's basically just a TVRMLGLScene instance
-    (loaded with LoadLevelScene, always with a TriangleOctree).
+    (loaded with LoadLevelScene, always with a OctreeCollisions).
     Plus properties @link(Exists) and @link(Collides) which allow you
     to hide this object from evrything (or only from the collision detection). }
   TLevelStaticObject = class(TLevelObject)
@@ -621,15 +621,15 @@ type
     instance is owned by this object.
 
     For now, collision will be checked (only if @link(Collides) and @link(Exists),
-    naturally) by checking always with Animation.FirstScene.TriangleOctree.
+    naturally) by checking always with Animation.FirstScene.OctreeCollisions.
     So you should create this octree, and make sure that the animation is done
     such that the first animation frame is always larger than the others.
     You don't have to make the octree only if you're sure that object will
     always be not @link(Collides) or not @link(Exists).
 
     You can also set CollisionUseLastScene, then collision will be done
-    versus the sum of Animation.FirstScene.TriangleOctree +
-    Animation.LastScene.TriangleOctree. CollisionUseLastScene
+    versus the sum of Animation.FirstScene.OctreeCollisions +
+    Animation.LastScene.OctreeCollisions. CollisionUseLastScene
     is useful is the object is moving, but the move is very slight,
     so that the sum of first and last scenes geometry is good enough
     approximation of the whole geometry at any point of the animation.
@@ -945,7 +945,7 @@ type
         @item FreeExternalResources, since they will not be needed anymore
       ) }
     function LoadLevelScene(const FileName: string;
-      CreateTriangleOctree, PrepareBackground: boolean): TVRMLGLScene;
+      CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
 
     { Load TVRMLGLAnimation from *.kanim file, doing common tasks.
       @unorderedList(
@@ -957,8 +957,8 @@ type
       ) }
     function LoadLevelAnimation(
       const FileName: string;
-      CreateFirstTriangleOctree,
-      CreateLastTriangleOctree: boolean): TVRMLGLAnimation;
+      CreateFirstOctreeCollisions,
+      CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
 
     { See @link(SpecialObjectPicked) and @link(Picked), you can call this from
       overriden implementations of these. }
@@ -1417,7 +1417,7 @@ function TLevelStaticObject.MoveAllowedSimple(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
-    Scene.TriangleOctree.MoveAllowedSimple(
+    Scene.OctreeCollisions.MoveAllowedSimple(
       OldPos, ProposedNewPos,
       CameraRadius, false, NoItemIndex, ItemsToIgnoreFunc);
 end;
@@ -1428,7 +1428,7 @@ function TLevelStaticObject.MoveBoxAllowedSimple(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
-    Scene.TriangleOctree.MoveBoxAllowedSimple(
+    Scene.OctreeCollisions.MoveBoxAllowedSimple(
       OldPos, ProposedNewPos, ProposedNewBox,
       false, NoItemIndex, ItemsToIgnoreFunc);
 end;
@@ -1437,7 +1437,7 @@ function TLevelStaticObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    (Scene.TriangleOctree.SegmentCollision(
+    (Scene.OctreeCollisions.SegmentCollision(
       Pos1, Pos2,
       false, NoItemIndex, false, ItemsToIgnoreFunc)
       <> NoItemIndex);
@@ -1448,7 +1448,7 @@ function TLevelStaticObject.SphereCollision(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    (Scene.TriangleOctree.SphereCollision(
+    (Scene.OctreeCollisions.SphereCollision(
       Pos, Radius,  NoItemIndex, ItemsToIgnoreFunc)
       <> NoItemIndex);
 end;
@@ -1457,7 +1457,7 @@ function TLevelStaticObject.BoxCollision(const Box: TBox3d;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    (Scene.TriangleOctree.BoxCollision(
+    (Scene.OctreeCollisions.BoxCollision(
       Box,  NoItemIndex, ItemsToIgnoreFunc)
       <> NoItemIndex);
 end;
@@ -1472,7 +1472,7 @@ begin
   Result := nil;
   if Exists and Collides then
   begin
-    OctreeItemIndex := Scene.TriangleOctree.RayCollision(
+    OctreeItemIndex := Scene.OctreeCollisions.RayCollision(
       IntersectionDistance,
       Ray0, RayVector,
       false, NoItemIndex, false, ItemsToIgnoreFunc);
@@ -1480,7 +1480,7 @@ begin
     begin
       Result := TCollisionInfo.Create;
       Result.OctreeItem :=
-        Scene.TriangleOctree.OctreeItems.Pointers[OctreeItemIndex];
+        Scene.OctreeCollisions.OctreeItems.Pointers[OctreeItemIndex];
       Result.Hierarchy.Add(Self);
     end;
   end;
@@ -1497,7 +1497,7 @@ var
 begin
   if Exists and Collides then
   begin
-    Scene.TriangleOctree.GetCameraHeightZ(
+    Scene.OctreeCollisions.GetCameraHeightZ(
       CameraPos,
       IsAboveThis, HeightAboveThis, GroundItemIndexThis,
       NoItemIndex, ItemsToIgnoreFunc);
@@ -1507,7 +1507,7 @@ begin
     begin
       IsAboveTheGround := true;
       HeightAboveTheGround := HeightAboveThis;
-      GroundItem := Scene.TriangleOctree.OctreeItems.Pointers[GroundItemIndexThis];
+      GroundItem := Scene.OctreeCollisions.OctreeItems.Pointers[GroundItemIndexThis];
     end;
   end;
 end;
@@ -2234,11 +2234,11 @@ function TLevelAnimatedObject.MoveAllowedSimple(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
-    (Animation.FirstScene.TriangleOctree.MoveAllowedSimple(
+    (Animation.FirstScene.OctreeCollisions.MoveAllowedSimple(
        OldPos, ProposedNewPos,
        CameraRadius, false, NoItemIndex, ItemsToIgnoreFunc) and
        ( (not CollisionUseLastScene) or
-         Animation.LastScene.TriangleOctree.MoveAllowedSimple(
+         Animation.LastScene.OctreeCollisions.MoveAllowedSimple(
            OldPos, ProposedNewPos,
            CameraRadius, false, NoItemIndex, ItemsToIgnoreFunc) ));
 end;
@@ -2249,11 +2249,11 @@ function TLevelAnimatedObject.MoveBoxAllowedSimple(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
-    (Animation.FirstScene.TriangleOctree.MoveBoxAllowedSimple(
+    (Animation.FirstScene.OctreeCollisions.MoveBoxAllowedSimple(
        OldPos, ProposedNewPos, ProposedNewBox,
        false, NoItemIndex, ItemsToIgnoreFunc) and
        ( (not CollisionUseLastScene) or
-         Animation.LastScene.TriangleOctree.MoveBoxAllowedSimple(
+         Animation.LastScene.OctreeCollisions.MoveBoxAllowedSimple(
            OldPos, ProposedNewPos, ProposedNewBox,
            false, NoItemIndex, ItemsToIgnoreFunc) ));
 end;
@@ -2262,12 +2262,12 @@ function TLevelAnimatedObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    ( (Animation.FirstScene.TriangleOctree.SegmentCollision(
+    ( (Animation.FirstScene.OctreeCollisions.SegmentCollision(
          Pos1, Pos2,
          false, NoItemIndex, false, ItemsToIgnoreFunc)
          <> NoItemIndex) or
       (CollisionUseLastScene and
-        (Animation.LastScene.TriangleOctree.SegmentCollision(
+        (Animation.LastScene.OctreeCollisions.SegmentCollision(
            Pos1, Pos2,
            false, NoItemIndex, false, ItemsToIgnoreFunc)
            <> NoItemIndex) ));
@@ -2278,11 +2278,11 @@ function TLevelAnimatedObject.SphereCollision(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    ( (Animation.FirstScene.TriangleOctree.SphereCollision(
+    ( (Animation.FirstScene.OctreeCollisions.SphereCollision(
          Pos, Radius, NoItemIndex, ItemsToIgnoreFunc)
          <> NoItemIndex) or
       (CollisionUseLastScene and
-        (Animation.LastScene.TriangleOctree.SphereCollision(
+        (Animation.LastScene.OctreeCollisions.SphereCollision(
            Pos, Radius, NoItemIndex, ItemsToIgnoreFunc)
            <> NoItemIndex) ));
 end;
@@ -2292,11 +2292,11 @@ function TLevelAnimatedObject.BoxCollision(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    ( (Animation.FirstScene.TriangleOctree.BoxCollision(
+    ( (Animation.FirstScene.OctreeCollisions.BoxCollision(
          Box, NoItemIndex, ItemsToIgnoreFunc)
          <> NoItemIndex) or
       (CollisionUseLastScene and
-        (Animation.LastScene.TriangleOctree.BoxCollision(
+        (Animation.LastScene.OctreeCollisions.BoxCollision(
            Box, NoItemIndex, ItemsToIgnoreFunc)
            <> NoItemIndex) ));
 end;
@@ -2312,7 +2312,7 @@ begin
   Result := nil;
   if Exists and Collides then
   begin
-    Octree := Animation.FirstScene.TriangleOctree;
+    Octree := Animation.FirstScene.OctreeCollisions;
     OctreeItemIndex := Octree.RayCollision(IntersectionDistance,
       Ray0, RayVector,
       false, NoItemIndex, false, ItemsToIgnoreFunc);
@@ -2325,7 +2325,7 @@ begin
     if CollisionUseLastScene then
     begin
       { try the same thing on LastScene }
-      Octree := Animation.LastScene.TriangleOctree;
+      Octree := Animation.LastScene.OctreeCollisions;
       OctreeItemIndex := Octree.RayCollision(IntersectionDistance,
         Ray0, RayVector,
         false, NoItemIndex, false, ItemsToIgnoreFunc);
@@ -2350,7 +2350,7 @@ procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
     HeightAboveThis: Single;
     GroundItemIndexThis: Integer;
   begin
-    Scene.TriangleOctree.GetCameraHeightZ(
+    Scene.OctreeCollisions.GetCameraHeightZ(
       CameraPos,
       IsAboveThis, HeightAboveThis, GroundItemIndexThis,
       NoItemIndex, ItemsToIgnoreFunc);
@@ -2360,7 +2360,7 @@ procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
     begin
       IsAboveTheGround := true;
       HeightAboveTheGround := HeightAboveThis;
-      GroundItem := Scene.TriangleOctree.OctreeItems.
+      GroundItem := Scene.OctreeCollisions.OctreeItems.
         Pointers[GroundItemIndexThis];
     end;
   end;
@@ -2736,7 +2736,7 @@ begin
 
     Scene.ShapeStateOctreeProgressTitle := 'Loading level (ShapeState octree)';
 
-    Scene.OctreeStrategy := osFull;
+    Scene.Octrees := [okRendering, okDynamicCollisions];
 
     { TrianglesList was created for triangle octree. We don't need it anymore. }
     Scene.FreeResources([frTrianglesListNotOverTriangulate]);
@@ -3062,16 +3062,16 @@ function TLevel.LineOfSight(
 var
   I: Integer;
 begin
-  Result := Scene.TriangleOctree.SegmentCollision(
+  Result := Scene.OctreeCollisions.SegmentCollision(
     Pos1, Pos2, false, NoItemIndex, false,
-    @Scene.TriangleOctree.IgnoreTransparentItem) = NoItemIndex;
+    @Scene.OctreeCollisions.IgnoreTransparentItem) = NoItemIndex;
 
   if not Result then
     Exit;
 
   for I := 0 to Objects.High do
     if Objects[I].SegmentCollision(Pos1, Pos2,
-      @Scene.TriangleOctree.IgnoreTransparentItem) then
+      @Scene.OctreeCollisions.IgnoreTransparentItem) then
     begin
       Result := false;
       Exit;
@@ -3122,7 +3122,7 @@ function TLevel.MoveAllowed(const CameraPos: TVector3Single;
   const MovingObjectCameraRadius: Single): boolean;
 begin
   Result :=
-    Scene.TriangleOctree.MoveAllowed(
+    Scene.OctreeCollisions.MoveAllowed(
       CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius,
       false, NoItemIndex, @CollisionIgnoreItem) and
     Box3dPointInside(NewPos, LevelBox) and
@@ -3137,7 +3137,7 @@ function TLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
 begin
   Result :=
     Box3dPointInside(NewPos, LevelBox) and
-    Scene.TriangleOctree.MoveAllowedSimple(
+    Scene.OctreeCollisions.MoveAllowedSimple(
       CameraPos, NewPos, MovingObjectCameraRadius,
       false, NoItemIndex, @CollisionIgnoreItem) and
     ObjectsMoveAllowedSimple(
@@ -3151,7 +3151,7 @@ function TLevel.MoveBoxAllowedSimple(const CameraPos: TVector3Single;
 begin
   Result :=
     Box3dPointInside(NewPos, LevelBox) and
-    Scene.TriangleOctree.MoveBoxAllowedSimple(
+    Scene.OctreeCollisions.MoveBoxAllowedSimple(
       CameraPos, NewPos, NewBox,
       false, NoItemIndex, @CollisionIgnoreItem) and
     ObjectsMoveBoxAllowedSimple(
@@ -3165,12 +3165,12 @@ var
   I: Integer;
   GroundItemIndex: Integer;
 begin
-  Scene.TriangleOctree.GetCameraHeightZ(
+  Scene.OctreeCollisions.GetCameraHeightZ(
     CameraPos,
     IsAboveTheGround, HeightAboveTheGround, GroundItemIndex,
     NoItemIndex, @CollisionIgnoreItem);
   if IsAboveTheGround then
-    GroundItem := Scene.TriangleOctree.OctreeItems.Pointers[GroundItemIndex];
+    GroundItem := Scene.OctreeCollisions.OctreeItems.Pointers[GroundItemIndex];
 
   for I := 0 to Objects.High do
     Objects[I].GetCameraHeight(CameraPos, @CollisionIgnoreItem,
@@ -3305,14 +3305,14 @@ begin
   Result := nil;
 
   { Collision with Level.Scene }
-  OctreeItemIndex := Scene.TriangleOctree.RayCollision(
+  OctreeItemIndex := Scene.OctreeCollisions.RayCollision(
     ThisIntersectionDistance, Ray0, RayVector, true, NoItemIndex, false, nil);
   if OctreeItemIndex <> NoItemIndex then
   begin
     IntersectionDistance := ThisIntersectionDistance;
     LevelObjectIndex := -1;
     Result := TCollisionInfo.Create;
-    Result.OctreeItem := Scene.TriangleOctree.OctreeItems.Pointers[
+    Result.OctreeItem := Scene.OctreeCollisions.OctreeItems.Pointers[
       OctreeItemIndex];
   end;
 
@@ -3365,7 +3365,7 @@ begin
 end;
 
 function TLevel.LoadLevelScene(const FileName: string;
-  CreateTriangleOctree, PrepareBackground: boolean): TVRMLGLScene;
+  CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
 var
   Options: TPrepareRenderOptions;
 begin
@@ -3381,16 +3381,16 @@ begin
 
   Result.PrepareRender([tgOpaque, tgTransparent], Options);
 
-  if CreateTriangleOctree then
-    Result.OctreeStrategy := osTriangle;
+  if CreateOctreeCollisions then
+    Result.Octrees := [okDynamicCollisions];
 
   Result.FreeResources([frTextureDataInNodes]);
 end;
 
 function TLevel.LoadLevelAnimation(
   const FileName: string;
-  CreateFirstTriangleOctree,
-  CreateLastTriangleOctree: boolean): TVRMLGLAnimation;
+  CreateFirstOctreeCollisions,
+  CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
 var
   Options: TPrepareRenderOptions;
 begin
@@ -3406,11 +3406,11 @@ begin
 
   Result.PrepareRender([tgOpaque, tgTransparent], Options, false);
 
-  if CreateFirstTriangleOctree then
-    Result.FirstScene.OctreeStrategy := osTriangle;
+  if CreateFirstOctreeCollisions then
+    Result.FirstScene.Octrees := [okDynamicCollisions];
 
-  if CreateLastTriangleOctree then
-    Result.LastScene.OctreeStrategy := osTriangle;
+  if CreateLastOctreeCollisions then
+    Result.LastScene.Octrees := [okDynamicCollisions];
 
   Result.FreeResources([frTextureDataInNodes]);
 end;
