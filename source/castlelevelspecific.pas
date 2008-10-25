@@ -101,8 +101,9 @@ type
       AMenuBackground: boolean); override;
     destructor Destroy; override;
 
-    function CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
-      OctreeItemIndex: Integer): boolean; override;
+    function CollisionIgnoreItem(
+      const Octree: TVRMLTriangleOctree;
+      const OctreeItem: POctreeItem): boolean; override;
     procedure Idle(const CompSpeed: Single); override;
 
     procedure Render(const Frustum: TFrustum); override;
@@ -702,16 +703,13 @@ begin
   end;
 end;
 
-function TGateLevel.CollisionIgnoreItem(Octree: TVRMLTriangleOctree;
-  OctreeItemIndex: Integer): boolean;
-var
-  ItemPtr: POctreeItem;
+function TGateLevel.CollisionIgnoreItem(
+  const Octree: TVRMLTriangleOctree;
+  const OctreeItem: POctreeItem): boolean;
 begin
-  Result := inherited;
-
-  ItemPtr := @(Octree.OctreeItems.Items[OctreeItemIndex]);
-  Result := Result or
-    (ItemPtr^.State.LastNodes.Material.NodeName = 'MatWater');
+  Result :=
+    (inherited CollisionIgnoreItem(Octree, OctreeItem)) or
+    (OctreeItem^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
 procedure TGateLevel.Render(const Frustum: TFrustum);
