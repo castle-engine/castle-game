@@ -22,7 +22,7 @@
   - _sound attributes: you can use here a name from ../sounds/index.xml
 
   - TODO: planned, when "Debug menu" will show that will be useful:
-    octree_max_depth, octree_max_leaf_items_count:
+    octree_max_depth, octree_leaf_capacity:
     octree generation parameters. Default value is -1,
     and it means that the default values in VRMLTriangleOctree unit
     (see e.g. [http://vrmlengine.sourceforge.net/apidoc/html/VRMLTriangleOctree.html]

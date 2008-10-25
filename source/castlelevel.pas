@@ -1311,7 +1311,7 @@ var
     Level description in XML (or just VRMLTriangleOctree unit
     defaults). }
   DebugLevelOctreeMaxDepth: Integer = -1;
-  DebugLevelOctreeMaxLeafItemsCount: Integer = -1;
+  DebugLevelOctreeLeafCapacity: Integer = -1;
 
 {$undef read_interface}
 
@@ -2567,7 +2567,7 @@ const
   SectorsMargin = 0.5;
 var
   NavigationNode: TNodeNavigationInfo;
-  OctreeMaxDepth, OctreeMaxLeafItemsCount: Integer;
+  OctreeMaxDepth, OctreeLeafCapacity: Integer;
   NavigationSpeed: Single;
   Options: TPrepareRenderOptions;
 begin
@@ -2719,11 +2719,11 @@ begin
   if OctreeMaxDepth = -1 then
     OctreeMaxDepth := DefTriangleOctreeMaxDepth;
 
-  { calculate OctreeMaxLeafItemsCount }
-  OctreeMaxLeafItemsCount := DebugLevelOctreeMaxLeafItemsCount;
+  { calculate OctreeLeafCapacity }
+  OctreeLeafCapacity := DebugLevelOctreeLeafCapacity;
   { TODO: take from XML file }
-  if OctreeMaxLeafItemsCount = -1 then
-    OctreeMaxLeafItemsCount := DefTriangleOctreeMaxLeafItemsCount;
+  if OctreeLeafCapacity = -1 then
+    OctreeLeafCapacity := DefTriangleOctreeLeafCapacity;
 
   { Loading octree have their own Progress, so we load them outside our
     progress. }
@@ -2731,7 +2731,7 @@ begin
   if not MenuBackground then
   begin
     Scene.TriangleOctreeMaxDepth := OctreeMaxDepth;
-    Scene.TriangleOctreeMaxLeafItemsCount := OctreeMaxLeafItemsCount;
+    Scene.TriangleOctreeLeafCapacity := OctreeLeafCapacity;
     Scene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
 
     Scene.ShapeStateOctreeProgressTitle := 'Loading level (ShapeState octree)';
