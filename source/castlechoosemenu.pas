@@ -110,7 +110,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  ChooseMenu.Idle(Glwin.IdleSpeed);
+  ChooseMenu.Idle(Glwin.Fps.IdleSpeed);
   TimeMessagesIdle;
 end;
 

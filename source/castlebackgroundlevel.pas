@@ -183,7 +183,7 @@ procedure BackgroundLevelIdle(Glwin: TGLWindow);
 var
   CompSpeed: Single;
 begin
-  CompSpeed := Glwin.IdleSpeed;
+  CompSpeed := Glwin.Fps.IdleSpeed;
   BackgroundLevel.Idle(CompSpeed);
 end;
 

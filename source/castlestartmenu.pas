@@ -851,7 +851,7 @@ procedure Idle(Glwin: TGLWindow);
 begin
   BackgroundLevelIdle(Glwin);
 
-  CurrentMenu.Idle(Glwin.IdleSpeed);
+  CurrentMenu.Idle(Glwin.Fps.IdleSpeed);
   TimeMessagesIdle;
 end;
 

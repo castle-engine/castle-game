@@ -290,8 +290,8 @@ procedure Draw2D(Draw2DData: Pointer);
        (TimeTickDiff(DisplayFpsUpdateTick, GetTickCount) >= 1000) then
     begin
       DisplayFpsUpdateTick := GetTickCount;
-      DisplayFpsFrameTime := Glw.FpsFrameTime;
-      DisplayFpsRealTime := Glw.FpsRealTime;
+      DisplayFpsFrameTime := Glw.Fps.FrameTime;
+      DisplayFpsRealTime := Glw.Fps.RealTime;
     end;
 
     Font_BFNT_BitstreamVeraSans.Print(
@@ -736,7 +736,7 @@ const
 var
   PickItemIndex: Integer;
 begin
-  CompSpeed := Glw.IdleSpeed;
+  CompSpeed := Glw.Fps.IdleSpeed;
 
   TimeMessagesIdle;
 
