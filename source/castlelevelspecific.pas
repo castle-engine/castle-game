@@ -24,7 +24,7 @@ unit CastleLevelSpecific;
 interface
 
 uses VRMLGLAnimation, VRMLGLScene, Boxes3d, VectorMath,
-  CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL,
+  CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL, VRMLOctreeUtils,
   ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM,
   CastleCreatures, ShadowVolumesHelper, Classes, KambiTimeUtils;
 

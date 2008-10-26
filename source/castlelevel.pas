@@ -26,7 +26,8 @@ interface
 
 uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, Navigation,
-  VRMLTriangleOctree, CastleCreatures, VRMLSceneWaypoints, CastleSound,
+  VRMLTriangleOctree, VRMLOctreeUtils, 
+  CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
   BackgroundGL, DOM, GameSoundEngine,

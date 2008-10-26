@@ -25,7 +25,7 @@ interface
 
 uses Boxes3d, Navigation, CastleItems, VectorMath, GL, GLU, GLExt,
   VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
-  VRMLTriangleOctree, CastleTextures, GameSoundEngine, Classes,
+  VRMLOctreeUtils, CastleTextures, GameSoundEngine, Classes,
   KambiGLUtils;
 
 const
