@@ -102,7 +102,7 @@ type
     destructor Destroy; override;
 
     function CollisionIgnoreItem(
-      const Octree: TVRMLTriangleOctree;
+      const Octree: TVRMLItemsOctree;
       const OctreeItem: POctreeItem): boolean; override;
     procedure Idle(const CompSpeed: Single); override;
 
@@ -704,7 +704,7 @@ begin
 end;
 
 function TGateLevel.CollisionIgnoreItem(
-  const Octree: TVRMLTriangleOctree;
+  const Octree: TVRMLItemsOctree;
   const OctreeItem: POctreeItem): boolean;
 begin
   Result :=

@@ -26,7 +26,7 @@ interface
 
 uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, Navigation,
-  VRMLTriangleOctree, VRMLOctreeUtils, 
+  VRMLOctreeUtils, 
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
@@ -1065,7 +1065,7 @@ type
     property Objects: TLevelObjectsList read FObjects;
 
     function CollisionIgnoreItem(
-      const Octree: TVRMLTriangleOctree;
+      const Octree: TVRMLItemsOctree;
       const OctreeItem: POctreeItem): boolean; virtual;
 
     { LineOfSight, MoveAllowed and GetCameraHeight perform
@@ -1323,7 +1323,7 @@ uses SysUtils, GL, GLU, GLExt, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
   CastleInputs, CastleWindow, KambiOpenAL, ALUtils, KambiXMLUtils,
-  CastleRequiredResources, VRMLOpenGLRenderer;
+  CastleRequiredResources, VRMLOpenGLRenderer, VRMLTriangleOctree;
 
 {$define read_implementation}
 {$I objectslist_2.inc}
@@ -2308,7 +2308,7 @@ function TLevelAnimatedObject.RayCollision(
   const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
 var
   OctreeItem: POctreeItem;
-  Octree: TVRMLTriangleOctree;
+  Octree: TVRMLItemsOctree;
 begin
   Result := nil;
   if Exists and Collides then
@@ -3346,7 +3346,7 @@ begin
 end;
 
 function TLevel.CollisionIgnoreItem(
-  const Octree: TVRMLTriangleOctree;
+  const Octree: TVRMLItemsOctree;
   const OctreeItem: POctreeItem): boolean;
 begin
   { Don't ignore anything in this class. }
