@@ -23,7 +23,7 @@ unit CastleTextures;
 
 interface
 
-uses KambiUtils, KambiClassUtils, CastleSound, VRMLOctreeUtils, DOM,
+uses KambiUtils, KambiClassUtils, CastleSound, VRMLOctreeItems, DOM,
   GameSoundEngine;
 
 {$define read_interface}

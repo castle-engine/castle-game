@@ -396,7 +396,7 @@ implementation
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
   CastlePlay, KambiFilesUtils, ProgressUnit,
   CastleCreatures, CastleVideoOptions, CastleTimeMessages,
-  VRMLScene, VRMLOctreeUtils, GLImages;
+  VRMLScene, VRMLOctreeItems, GLImages;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
