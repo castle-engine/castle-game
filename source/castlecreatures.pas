@@ -1907,7 +1907,7 @@ end;
 function TCreature.BoundingBoxAssumingLegs(
   const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3d;
 begin
-  Result := BoundingBoxTransform(CurrentScene.BoundingBox,
+  Result := Box3dTransform(CurrentScene.BoundingBox,
     SceneTransformAssuming(AssumeLegsPosition, AssumeDirection));
 end;
 
