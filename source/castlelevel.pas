@@ -2733,7 +2733,7 @@ begin
 
     Scene.ShapeStateOctreeProgressTitle := 'Loading level (ShapeState octree)';
 
-    Scene.Octrees := [okRendering, okDynamicCollisions];
+    Scene.Spatial := [ssRendering, ssDynamicCollisions];
 
     { TrianglesList was created for triangle octree. We don't need it anymore. }
     Scene.FreeResources([frTrianglesListNotOverTriangulate]);
@@ -3376,7 +3376,7 @@ begin
   Result.PrepareRender([tgOpaque, tgTransparent], Options);
 
   if CreateOctreeCollisions then
-    Result.Octrees := [okDynamicCollisions];
+    Result.Spatial := [ssDynamicCollisions];
 
   Result.FreeResources([frTextureDataInNodes]);
 end;
@@ -3401,10 +3401,10 @@ begin
   Result.PrepareRender([tgOpaque, tgTransparent], Options, false);
 
   if CreateFirstOctreeCollisions then
-    Result.FirstScene.Octrees := [okDynamicCollisions];
+    Result.FirstScene.Spatial := [ssDynamicCollisions];
 
   if CreateLastOctreeCollisions then
-    Result.LastScene.Octrees := [okDynamicCollisions];
+    Result.LastScene.Spatial := [ssDynamicCollisions];
 
   Result.FreeResources([frTextureDataInNodes]);
 end;
