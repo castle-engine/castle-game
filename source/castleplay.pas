@@ -404,9 +404,7 @@ procedure Draw(Glwin: TGLWindow);
     RenderCreaturesItems(tgTransparent);
   end;
 
-  procedure RenderWithShadows;
-  var
-    MainLightPosition: TVector4Single;
+  procedure RenderWithShadows(const MainLightPosition: TVector4Single);
 
     procedure RenderShadowVolume;
     var
@@ -446,16 +444,10 @@ procedure Draw(Glwin: TGLWindow);
       any Level.Render --- since they are always opaque. }
     RenderCreaturesItems(tgOpaque);
 
-    if Level.PushLightsOff(MainLightPosition) then
-    begin
-      try
-        Level.Render(Player.Navigator.Frustum);
-      finally Level.PopLightsOff; end;
-    end else
-    begin
-      RenderNoShadows;
-      Exit;
-    end;
+    Level.PushLightsOff;
+    try
+      Level.Render(Player.Navigator.Frustum);
+    finally Level.PopLightsOff; end;
 
     SVHelper.InitFrustumAndLight(Player.Navigator.Frustum, MainLightPosition);
     SVHelper.Count := ShowDebugInfo;
@@ -587,6 +579,7 @@ procedure Draw(Glwin: TGLWindow);
 var
   ClearBuffers: TGLbitfield;
   UsedBackground: TBackgroundGL;
+  MainLightPosition: TVector4Single;
 begin
   ClearBuffers := GL_DEPTH_BUFFER_BIT;
 
@@ -610,8 +603,10 @@ begin
   TThunderEffect.RenderOrDisable(Level.ThunderEffect, 1);
   Level.LightSet.RenderLights;
 
-  if RenderShadowsPossible and RenderShadows then
-    RenderWithShadows else
+  if RenderShadowsPossible and
+     RenderShadows and
+     Level.LightSet.MainLightPosition(MainLightPosition) then
+    RenderWithShadows(MainLightPosition) else
     RenderNoShadows;
 
   Player.RenderAttack;

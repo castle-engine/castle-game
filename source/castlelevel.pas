@@ -26,7 +26,7 @@ interface
 
 uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, Navigation,
-  VRMLOctreeItems, 
+  VRMLOctreeItems,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
@@ -1282,16 +1282,8 @@ type
     property SceneDynamicShadows: boolean
       read FSceneDynamicShadows write FSceneDynamicShadows default false;
 
-    { Turn off lights not supposed to light in the shadow, and detect position
-      (if any) of the main light that produces shadows.
-
-      Returns @true, sets MainLightPosition if there's light that produces shadows.
-      In this case you should follow by rendering the scene without lighting,
-      and calling PopLightsOff.
-
-      Returns @false if there's no such light, and in this case no lights are
-      turned off (you should revert to no-shadows algorithm in this case). }
-    function PushLightsOff(out MainLightPosition: TVector4Single): boolean;
+    { Turn off lights not supposed to light in the shadow. }
+    procedure PushLightsOff;
     procedure PopLightsOff;
 
     { Ambient color of light used for bump mapping,
@@ -3430,18 +3422,12 @@ begin
   end;
 end;
 
-function TLevel.PushLightsOff(out MainLightPosition: TVector4Single): boolean;
+procedure TLevel.PushLightsOff;
 begin
   glPushAttrib(GL_LIGHTING_BIT);
 
   { Headlight will stay on here, but lights in Level.LightSet are off. }
-  Result := LightSet.TurnLightsOffForShadows(MainLightPosition);
-
-  if not Result then
-  begin
-    glPopAttrib();
-    Exit;
-  end;
+  LightSet.TurnLightsOffForShadows;
 
   Scene.BumpMappingLightAmbientColor := FBumpMappingLightAmbientColor[false];
   Scene.BumpMappingLightDiffuseColor := Black4Single;
