@@ -605,7 +605,7 @@ begin
 
   if RenderShadowsPossible and
      RenderShadows and
-     Level.LightSet.MainLightPosition(MainLightPosition) then
+     Level.LightSet.MainLightForShadows(MainLightPosition) then
     RenderWithShadows(MainLightPosition) else
     RenderNoShadows;
 
