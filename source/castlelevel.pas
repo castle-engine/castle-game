@@ -31,7 +31,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
   BackgroundGL, DOM, GameSoundEngine,
-  ShadowVolumesHelper, Classes, KambiTimeUtils;
+  ShadowVolumes, Classes, KambiTimeUtils;
 
 {$define read_interface}
 
@@ -106,7 +106,7 @@ type
 
     { Render shadow quads for all the things rendered by @link(Render).
       Does nothing if not CastsShadow.
-      It does shadow volumes culling inside  (so ShadowVolumesHelper should
+      It does shadow volumes culling inside  (so ShadowVolumes should
       have FrustumCullingInit already initialized).
 
       ParentTransform and ParentTransformIsIdentity describe the transformation
@@ -126,7 +126,7 @@ type
       to correctly detect front/back sides (for silhouette edges and
       volume capping). }
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper;
+      ShadowVolumes: TShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); virtual; abstract;
 
@@ -232,7 +232,7 @@ type
       TransparentGroup: TTransparentGroup); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper;
+      ShadowVolumes: TShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -302,7 +302,7 @@ type
       TransparentGroup: TTransparentGroup); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper;
+      ShadowVolumes: TShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -430,7 +430,7 @@ type
       TransparentGroup: TTransparentGroup); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper;
+      ShadowVolumes: TShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -672,7 +672,7 @@ type
       TransparentGroup: TTransparentGroup); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper;
+      ShadowVolumes: TShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -760,7 +760,7 @@ type
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper;
+      ShadowVolumes: TShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -1136,10 +1136,10 @@ type
     procedure Render(const Frustum: TFrustum); virtual;
 
     { Render shadow quads for all the things rendered by @link(Render).
-      It does shadow volumes culling inside  (so ShadowVolumesHelper should
+      It does shadow volumes culling inside  (so ShadowVolumes should
       have FrustumCullingInit already initialized). }
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper); virtual;
+      ShadowVolumes: TShadowVolumes); virtual;
 
     { Call this to allow level object to update some things,
       animate level objects etc. }
@@ -1513,13 +1513,13 @@ begin
 end;
 
 procedure TLevelStaticObject.RenderShadowVolume(
-  ShadowVolumesHelper: TShadowVolumesHelper;
+  ShadowVolumes: TShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 begin
   if Exists and CastsShadow then
   begin
-    Scene.InitAndRenderShadowVolume(ShadowVolumesHelper,
+    Scene.InitAndRenderShadowVolume(ShadowVolumes,
       ParentTransformIsIdentity, ParentTransform);
   end;
 end;
@@ -1555,7 +1555,7 @@ begin
 end;
 
 procedure TLevelObjectSum.RenderShadowVolume(
-  ShadowVolumesHelper: TShadowVolumesHelper;
+  ShadowVolumes: TShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 var
@@ -1564,7 +1564,7 @@ begin
   if CastsShadow then
   begin
     for I := 0 to List.High do
-      List.Items[I].RenderShadowVolume(ShadowVolumesHelper,
+      List.Items[I].RenderShadowVolume(ShadowVolumes,
         ParentTransformIsIdentity, ParentTransform);
   end;
 end;
@@ -1884,7 +1884,7 @@ begin
 end;
 
 procedure TLevelMovingObject.RenderShadowVolume(
-  ShadowVolumesHelper: TShadowVolumesHelper;
+  ShadowVolumes: TShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 var
@@ -1901,9 +1901,9 @@ begin
       In this case we can avoid matrix multiplication. }
 
     if IsZeroVector(T.Data) then
-      MovingObject.RenderShadowVolume(ShadowVolumesHelper,
+      MovingObject.RenderShadowVolume(ShadowVolumes,
         ParentTransformIsIdentity, ParentTransform) else
-      MovingObject.RenderShadowVolume(ShadowVolumesHelper,
+      MovingObject.RenderShadowVolume(ShadowVolumes,
         false, MatrixMult(TranslationMatrix(T.Data), ParentTransform));
   end;
 end;
@@ -2371,14 +2371,14 @@ begin
 end;
 
 procedure TLevelAnimatedObject.RenderShadowVolume(
-  ShadowVolumesHelper: TShadowVolumesHelper;
+  ShadowVolumes: TShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 begin
   if Exists and CastsShadow then
   begin
     Animation.SceneFromTime(AnimationTime).
-      InitAndRenderShadowVolume(ShadowVolumesHelper,
+      InitAndRenderShadowVolume(ShadowVolumes,
         ParentTransformIsIdentity, ParentTransform);
   end;
 end;
@@ -2437,7 +2437,7 @@ begin
 end;
 
 procedure TLevelArea.RenderShadowVolume(
-  ShadowVolumesHelper: TShadowVolumesHelper;
+  ShadowVolumes: TShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 begin
@@ -3224,20 +3224,20 @@ begin
 end;
 
 procedure TLevel.RenderShadowVolume(
-  ShadowVolumesHelper: TShadowVolumesHelper);
+  ShadowVolumes: TShadowVolumes);
 var
   I: Integer;
 begin
   for I := 0 to Objects.High do
-    Objects[I].RenderShadowVolume(ShadowVolumesHelper,
+    Objects[I].RenderShadowVolume(ShadowVolumes,
       true, IdentityMatrix4Single);
 
   if SceneDynamicShadows then
   begin
-    { Useless to optimize this by shadow culling in ShadowVolumesHelper,
+    { Useless to optimize this by shadow culling in ShadowVolumes,
       Scene will be visible practically always. }
-    ShadowVolumesHelper.InitSceneAlwaysVisible;
-    Scene.RenderShadowVolume(ShadowVolumesHelper, true, IdentityMatrix4Single);
+    ShadowVolumes.InitSceneAlwaysVisible;
+    Scene.RenderShadowVolume(ShadowVolumes, true, IdentityMatrix4Single);
   end;
 end;
 

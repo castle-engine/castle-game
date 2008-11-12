@@ -26,7 +26,7 @@ interface
 uses VRMLGLAnimation, VRMLGLScene, Boxes3d, VectorMath,
   CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL, VRMLOctreeItems,
   ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM,
-  CastleCreatures, ShadowVolumesHelper, Classes, KambiTimeUtils;
+  CastleCreatures, ShadowVolumes, Classes, KambiTimeUtils;
 
 const
   CastleHallWerewolvesCount = 4;
@@ -109,7 +109,7 @@ type
     procedure Render(const Frustum: TFrustum); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper); override;
+      ShadowVolumes: TShadowVolumes); override;
   end;
 
   TTowerLevel = class(TLevel)
@@ -161,7 +161,7 @@ type
     procedure Render(const Frustum: TFrustum); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper); override;
+      ShadowVolumes: TShadowVolumes); override;
 
     { True means that GateExit will not be rendered (or collided)
       and EndSequence will be rendered. }
@@ -738,7 +738,7 @@ begin
 end;
 
 procedure TGateLevel.RenderShadowVolume(
-  ShadowVolumesHelper: TShadowVolumesHelper);
+  ShadowVolumes: TShadowVolumes);
 begin
   { TODO: render teleport shadow quads }
   inherited;
@@ -1035,7 +1035,7 @@ begin
 end;
 
 procedure TCagesLevel.RenderShadowVolume(
-  ShadowVolumesHelper: TShadowVolumesHelper);
+  ShadowVolumes: TShadowVolumes);
 begin
   { TODO: render spiders shadow quads }
   inherited;

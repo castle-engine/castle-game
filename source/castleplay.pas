@@ -119,7 +119,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
   CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
-  ShadowVolumesHelper, KambiTimeUtils, GLImages;
+  ShadowVolumes, KambiTimeUtils, GLImages;
 
 var
   GLList_TimeMessagesBackground: TGLuint;
@@ -137,7 +137,7 @@ var
     of next Level to load. }
   LevelFinishedNextLevelName: string;
 
-  SVHelper: TShadowVolumesHelper;
+  SV: TShadowVolumes;
 
 const
   SDeadMessage = 'You''re dead';
@@ -306,11 +306,11 @@ procedure Draw2D(Draw2DData: Pointer);
       RasterPosLine(LineShadowVolumesCounts);
       Font_BFNT_BitstreamVeraSans.Print(Format(
         'No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
-        [ SVHelper.CountShadowsNotVisible,
-          SVHelper.CountZPass,
-          SVHelper.CountZFailNoLightCap,
-          SVHelper.CountZFailAndLightCap,
-          SVHelper.CountScenes ]));
+        [ SV.CountShadowsNotVisible,
+          SV.CountZPass,
+          SV.CountZFailNoLightCap,
+          SV.CountZFailAndLightCap,
+          SV.CountScenes ]));
     end;
   end;
 
@@ -402,9 +402,9 @@ var
 begin
   for I := 0 to Level.Creatures.High do
   begin
-    Level.Creatures.Items[I].RenderShadowVolume(SVHelper);
+    Level.Creatures.Items[I].RenderShadowVolume(SV);
   end;
-  Level.RenderShadowVolume(SVHelper);
+  Level.RenderShadowVolume(SV);
 end;
 
 class procedure TRenderer.RenderLevel(InShadow: boolean);
@@ -434,9 +434,9 @@ procedure Draw(Glwin: TGLWindow);
 
   procedure RenderWithShadows(const MainLightPosition: TVector4Single);
   begin
-    SVHelper.InitFrustumAndLight(Player.Navigator.Frustum, MainLightPosition);
-    SVHelper.Count := ShowDebugInfo;
-    SVHelper.Render(
+    SV.InitFrustumAndLight(Player.Navigator.Frustum, MainLightPosition);
+    SV.Count := ShowDebugInfo;
+    SV.Render(
       { Creatures and items are never in shadow (this looks bad).
         So I render them here, when the lights are turned on
         and ignoring stencil buffer. They are rendered fully before
@@ -1282,8 +1282,8 @@ procedure GLWindowInit(Glwin: TGLWindow);
 
   procedure InitializeShadows;
   begin
-    SVHelper := TShadowVolumesHelper.Create;
-    SVHelper.InitGLContext;
+    SV := TShadowVolumes.Create;
+    SV.InitGLContext;
   end;
 
 const
@@ -1332,7 +1332,7 @@ begin
   glFreeDisplayList(GLList_TimeMessagesBackground);
   glFreeDisplayList(GLList_InventorySlot);
 
-  FreeAndNil(SVHelper);
+  FreeAndNil(SV);
 end;
 
 initialization

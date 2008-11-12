@@ -26,7 +26,7 @@ interface
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLGLScene, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSourceAllocator, KambiXMLCfg,
-  GameSoundEngine, ShadowVolumesHelper, VRMLOctreeItems;
+  GameSoundEngine, ShadowVolumes, VRMLOctreeItems;
 
 {$define read_interface}
 
@@ -811,10 +811,10 @@ type
 
     { Render shadow volumes for all the thinds rendered by @link(Render).
       It renders shadow volume only if Kind.CastsShadow and
-      shadow volume is not culled (so ShadowVolumesHelper should
+      shadow volume is not culled (so ShadowVolumes should
       have FrustumCullingInit already initialized). }
     procedure RenderShadowVolume(
-      ShadowVolumesHelper: TShadowVolumesHelper); virtual;
+      ShadowVolumes: TShadowVolumes); virtual;
 
     procedure Idle(const CompSpeed: Single); virtual;
 
@@ -2003,12 +2003,12 @@ begin
 end;
 
 procedure TCreature.RenderShadowVolume(
-  ShadowVolumesHelper: TShadowVolumesHelper);
+  ShadowVolumes: TShadowVolumes);
 begin
   if Kind.CastsShadow then
   begin
-    ShadowVolumesHelper.InitScene(BoundingBox);
-    CurrentScene.RenderShadowVolume(ShadowVolumesHelper, false, SceneTransform);
+    ShadowVolumes.InitScene(BoundingBox);
+    CurrentScene.RenderShadowVolume(ShadowVolumes, false, SceneTransform);
   end;
 end;
 
