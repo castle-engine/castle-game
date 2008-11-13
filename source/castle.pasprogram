@@ -122,70 +122,31 @@ begin
   end;
 end;
 
-{ initializing GL context ---------------------------------------------------
-
-  As you see, we try to fall-back on worse GL context versions
-  (turning off anti-aliasing (multi-sample buffers) and
-  shadows (stencil buffer)) if better GL context not available. }
-
-procedure LogReinit(E: Exception; const WhatTurnedOff: string);
-begin
-  if Log then
-    WritelnLog('GL context',
-      Format('GL context init failed with message "%s".' +
-        ' %s turned off, trying to init once again', [E.Message, WhatTurnedOff]));
-end;
-
-procedure TryInitContext;
-begin
-  Glw.Init;
-end;
-
-procedure TryInitContext_Shadows;
-begin
-  try
-    Glw.Init;
-  except
-    on E: EGLContextNotPossible do
-    begin
-      if RenderShadowsPossible then
-      begin
-        RenderShadowsPossible := false;
-        Glw.StencilBufferBits := 0;
-        LogReinit(E, 'Stencil buffer');
-        TryInitContext;
-      end else
-        raise;
-    end;
-  end;
-end;
+{ initializing GL context --------------------------------------------------- }
 
 { Call Glw.Init, when anti-aliasing (multi-sampling) and shadows (stencil
   buffer) are possibly allowed. If EGLContextNotPossible, will try to lower
   requirements and initialize worse GL context. }
-procedure TryInitContext_AA_Shadows;
+procedure InitContext;
+var
+  ErrorMessages: string;
+  IsStencil, IsMultiSampling: boolean;
 begin
-  try
-    Glw.Init;
-  except
-    on E: EGLContextNotPossible do
-    begin
-      if AntiAliasing > 0 then
-      begin
-        AntiAliasing := 0;
-        Glw.MultiSampling := AntiAliasingGlwMultiSampling;
-        LogReinit(E, 'Anti-aliasing');
-        TryInitContext_Shadows;
-      end else
-      if RenderShadowsPossible then
-      begin
-        RenderShadowsPossible := false;
-        Glw.StencilBufferBits := 0;
-        LogReinit(E, 'Stencil buffer');
-        TryInitContext;
-      end else
-        raise;
-    end;
+  IsStencil := RenderShadowsPossible;
+  IsMultiSampling := AntiAliasing > 0;
+
+  Glw.InitOptionalMultiSamplingAndStencil(IsMultiSampling, IsStencil, ErrorMessages);
+
+  if ErrorMessages <> '' then
+  begin
+    { Some requirements were lowered }
+    if IsStencil <> RenderShadowsPossible then
+      RenderShadowsPossible := IsStencil;
+    if IsMultiSampling <> (AntiAliasing > 0) then
+      AntiAliasing := 0;
+
+    if Log then
+      WritelnLogMultiline('GL context', ErrorMessages);
   end;
 end;
 
@@ -243,7 +204,7 @@ begin
   if RenderShadowsPossible then
     Glw.StencilBufferBits := 8;
   Glw.MultiSampling := AntiAliasingGlwMultiSampling;
-  TryInitContext_AA_Shadows;
+  InitContext;
 
   { init progress }
   ProgressGLInterface.Window := Glw;
