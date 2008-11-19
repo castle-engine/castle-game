@@ -67,7 +67,8 @@ implementation
 uses SysUtils,
   Navigation, GL, GLU, GLExt, BackgroundGL, KambiGLUtils, GLImages,
   VRMLGLHeadlight, KambiFilesUtils, Images, VectorMath,
-  CastleWindow, CastleLevel, CastleLevelAvailable, CastleVideoOptions;
+  CastleWindow, CastleLevel, CastleLevelAvailable, CastleVideoOptions,
+  VRMLGLScene;
 
 var
   BackgroundLevel: TLevel;
@@ -164,7 +165,7 @@ begin
 
       glPushAttrib(GL_ENABLE_BIT);
         glEnable(GL_LIGHTING);
-        BackgroundLevel.Render(BackgroundNavigator.Frustum);
+        BackgroundLevel.Render(BackgroundNavigator.Frustum, tgAll);
       glPopAttrib;
 
     finally ProjectionPop end;

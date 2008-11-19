@@ -1133,7 +1133,8 @@ type
 
     { Call this to render level things: level scene and level objects
       in @link(Objects). Frustum is current player's frustum. }
-    procedure Render(const Frustum: TFrustum); virtual;
+    procedure Render(const Frustum: TFrustum;
+      TransparentGroup: TTransparentGroup); virtual;
 
     { Render shadow quads for all the things rendered by @link(Render).
       It does shadow volumes culling inside  (so ShadowVolumes should
@@ -2559,6 +2560,7 @@ var
   OctreeMaxDepth, OctreeLeafCapacity: Integer;
   NavigationSpeed: Single;
   Options: TPrepareRenderOptions;
+  TG: TTransparentGroups;
 begin
   inherited Create;
 
@@ -2684,7 +2686,11 @@ begin
     if RenderShadowsPossible and SceneDynamicShadows then
       Options := Options + prShadowVolume;
 
-    Scene.PrepareRender([tgAll], Options);
+    TG := [tgAll];
+    if RenderShadowsPossible then
+      TG := TG + [tgOpaque, tgTransparent];
+
+    Scene.PrepareRender(TG, Options);
 
     Scene.FreeResources([frTextureDataInNodes]);
 
@@ -3208,19 +3214,41 @@ begin
     Player.Ground := nil;
 end;
 
-procedure TLevel.Render(const Frustum: TFrustum);
+procedure TLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup);
 var
   I: Integer;
 begin
-  { First pass rendering Objects: render non-transparent parts }
-  for I := 0 to Objects.High do
-    Objects[I].Render(Frustum, tgOpaque);
+  case TransparentGroup of
+    tgAll:
+      begin
+        { First pass rendering Objects: render non-transparent parts }
+        for I := 0 to Objects.High do
+          Objects[I].Render(Frustum, tgOpaque);
 
-  Scene.RenderFrustum(Frustum, tgAll);
+        Scene.RenderFrustum(Frustum, tgAll);
 
-  { Second pass rendering Objects: render transparent parts }
-  for I := 0 to Objects.High do
-    Objects[I].Render(Frustum, tgTransparent);
+        { Second pass rendering Objects: render transparent parts }
+        for I := 0 to Objects.High do
+          Objects[I].Render(Frustum, tgTransparent);
+      end;
+    tgOpaque:
+      begin
+        { First pass rendering Objects: render non-transparent parts }
+        for I := 0 to Objects.High do
+          Objects[I].Render(Frustum, tgOpaque);
+
+        Scene.RenderFrustum(Frustum, tgOpaque);
+      end;
+    tgTransparent:
+      begin
+        Scene.RenderFrustum(Frustum, tgTransparent);
+
+        { Second pass rendering Objects: render transparent parts }
+        for I := 0 to Objects.High do
+          Objects[I].Render(Frustum, tgTransparent);
+      end;
+    else raise EInternalError.Create('castleplay 324hsdf32');
+  end;
 end;
 
 procedure TLevel.RenderShadowVolume(

@@ -106,7 +106,7 @@ type
       const OctreeItem: POctreeItem): boolean; override;
     procedure Idle(const CompSpeed: Single); override;
 
-    procedure Render(const Frustum: TFrustum); override;
+    procedure Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup); override;
 
     procedure RenderShadowVolume(
       ShadowVolumes: TShadowVolumes); override;
@@ -158,7 +158,7 @@ type
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
-    procedure Render(const Frustum: TFrustum); override;
+    procedure Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup); override;
 
     procedure RenderShadowVolume(
       ShadowVolumes: TShadowVolumes); override;
@@ -712,7 +712,7 @@ begin
     (OctreeItem^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
-procedure TGateLevel.Render(const Frustum: TFrustum);
+procedure TGateLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup);
 
   procedure RenderTeleport(
     const TeleportRotation: Single;
@@ -730,11 +730,19 @@ procedure TGateLevel.Render(const Frustum: TFrustum);
   end;
 
 begin
-  RenderTeleport(Teleport1Rotate, FTeleport1Box, tgOpaque);
-  RenderTeleport(Teleport2Rotate, FTeleport2Box, tgOpaque);
+  if TransparentGroup in [tgOpaque, tgAll] then
+  begin
+    RenderTeleport(Teleport1Rotate, FTeleport1Box, tgOpaque);
+    RenderTeleport(Teleport2Rotate, FTeleport2Box, tgOpaque);
+  end;
+
   inherited;
-  RenderTeleport(Teleport1Rotate, FTeleport1Box, tgTransparent);
-  RenderTeleport(Teleport2Rotate, FTeleport2Box, tgTransparent);
+
+  if TransparentGroup in [tgTransparent, tgAll] then
+  begin
+    RenderTeleport(Teleport1Rotate, FTeleport1Box, tgTransparent);
+    RenderTeleport(Teleport2Rotate, FTeleport2Box, tgTransparent);
+  end;
 end;
 
 procedure TGateLevel.RenderShadowVolume(
@@ -1003,32 +1011,35 @@ begin
   NewPlayer.PickItem(TItem.Create(Bow, 1));
 end;
 
-procedure TCagesLevel.Render(const Frustum: TFrustum);
+procedure TCagesLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup);
 var
   I: Integer;
 begin
-  { Render spiders before rendering inherited,
-    because spiders are not transparent. }
-  glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glEnable(GL_DEPTH_TEST);
-    glColorv(Black3Single);
-    glBegin(GL_LINES);
-      for I := 0 to FSpidersAppearing.High do
-      begin
-        glVertex3f(FSpidersAppearing.Items[I][0],
-                   FSpidersAppearing.Items[I][1], SpiderZ);
-        glVertexv(FSpidersAppearing.Items[I]);
-      end;
-    glEnd;
-  glPopAttrib;
-
-  for I := 0 to FSpidersAppearing.High do
+  if TransparentGroup in [tgOpaque, tgAll] then
   begin
-    glPushMatrix;
-      glTranslatev(FSpidersAppearing.Items[I]);
-      Spider.StandAnimation.Scenes[0].Render(nil, tgAll);
-    glPopMatrix;
+    { Render spiders before rendering inherited,
+      because spiders are not transparent. }
+    glPushAttrib(GL_ENABLE_BIT);
+      glDisable(GL_LIGHTING);
+      glEnable(GL_DEPTH_TEST);
+      glColorv(Black3Single);
+      glBegin(GL_LINES);
+        for I := 0 to FSpidersAppearing.High do
+        begin
+          glVertex3f(FSpidersAppearing.Items[I][0],
+                     FSpidersAppearing.Items[I][1], SpiderZ);
+          glVertexv(FSpidersAppearing.Items[I]);
+        end;
+      glEnd;
+    glPopAttrib;
+
+    for I := 0 to FSpidersAppearing.High do
+    begin
+      glPushMatrix;
+        glTranslatev(FSpidersAppearing.Items[I]);
+        Spider.StandAnimation.Scenes[0].Render(nil, tgAll);
+      glPopMatrix;
+    end;
   end;
 
   inherited;
