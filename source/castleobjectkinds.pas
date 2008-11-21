@@ -221,13 +221,13 @@ begin
         anymore, it saves only 6 MB memory for DOOM level (most
         resource-costly level for now). So it's not turned on,
         as it's still risky
-        (freeing RootNode always was risky) and has little use. }
+        (freeing RootNode always was risky) and has little use.
 
-      AnimationsPrepared[I].FreeResources([frTextureDataInNodes,
-        { TrianglesListShadowCasters was created
-          if ManifoldEdges / BorderEdges were requested.
-          We don't need it anymore. }
-        frTrianglesListShadowCasters]);
+        Do not free here frTrianglesListShadowCasters
+        or frManifoldAndBorderEdges --- we will need them during
+        rendering to render shadow volumes. }
+
+      AnimationsPrepared[I].FreeResources([frTextureDataInNodes]);
     end;
   finally
     { keep AnimationsPrepared empty when outside of PrepareRender. }
