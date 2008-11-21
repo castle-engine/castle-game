@@ -224,9 +224,10 @@ begin
         (freeing RootNode always was risky) and has little use. }
 
       AnimationsPrepared[I].FreeResources([frTextureDataInNodes,
-        { TrianglesList was created if ManifoldEdges / BorderEdges were requested.
+        { TrianglesListShadowCasters was created
+          if ManifoldEdges / BorderEdges were requested.
           We don't need it anymore. }
-        frTrianglesListNotOverTriangulate]);
+        frTrianglesListShadowCasters]);
     end;
   finally
     { keep AnimationsPrepared empty when outside of PrepareRender. }
