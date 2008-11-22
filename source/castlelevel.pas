@@ -1871,7 +1871,7 @@ begin
       maybe this check is not worth the effort and we don't need to worry
       about FrustumMove time so much ?). }
 
-    if IsZeroVector(T.Data) then
+    if ZeroVector(T.Data) then
       MovingObject.Render(Frustum, TransparentGroup) else
       begin
         glPushMatrix;
@@ -1901,7 +1901,7 @@ begin
 
       In this case we can avoid matrix multiplication. }
 
-    if IsZeroVector(T.Data) then
+    if ZeroVector(T.Data) then
       MovingObject.RenderShadowVolume(ShadowVolumes,
         ParentTransformIsIdentity, ParentTransform) else
       MovingObject.RenderShadowVolume(ShadowVolumes,

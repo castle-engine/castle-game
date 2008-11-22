@@ -557,9 +557,9 @@ var
     ToDirectionLength := VectorLen(ToDirection);
     ToUpLength        := VectorLen(ToUp);
 
-    if IsZero(ToPositionLength) and
-       IsZero(ToDirectionLength) and
-       IsZero(ToUpLength) then
+    if Zero(ToPositionLength) and
+       Zero(ToDirectionLength) and
+       Zero(ToUpLength) then
       TCagesLevel(Level).DoEndSequence := true else
     begin
       if ToPositionLength < CompSpeed * PositionChangeSpeed then
