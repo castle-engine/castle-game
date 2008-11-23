@@ -2577,7 +2577,7 @@ begin
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    FScene := TVRMLGLScene.Create(SceneFileName, roSeparateShapeStates,
+    FScene := TVRMLGLScene.Create(SceneFileName, roSeparateShapes,
       GLContextCache);
 
     { initialize FAnimationTime. Must be initialized before creating creatures. }
@@ -2729,7 +2729,7 @@ begin
     Scene.TriangleOctreeLeafCapacity := OctreeLeafCapacity;
     Scene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
 
-    Scene.ShapeStateOctreeProgressTitle := 'Loading level (ShapeState octree)';
+    Scene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
 
     Scene.Spatial := [ssRendering, ssDynamicCollisions];
 
@@ -2884,7 +2884,7 @@ function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
 var
   BoxNodeIndex: Integer;
 begin
-  BoxNodeIndex := Scene.ShapeStates.IndexOfBlenderMesh(NodeName);
+  BoxNodeIndex := Scene.Shapes.IndexOfBlenderMesh(NodeName);
   Result := BoxNodeIndex <> -1;
   if Result then
   begin
@@ -2892,8 +2892,8 @@ begin
       Box from this node (and we delete this node from the scene,
       as it should not be visible).
       This way we can comfortably set such boxes from Blender. }
-    Box := Scene.ShapeStates[BoxNodeIndex].BoundingBox;
-    Scene.ShapeStates[BoxNodeIndex].GeometryNode.FreeRemovingFromAllParents;
+    Box := Scene.Shapes[BoxNodeIndex].BoundingBox;
+    Scene.Shapes[BoxNodeIndex].GeometryNode.FreeRemovingFromAllParents;
     Scene.ChangedAll;
   end;
 end;
@@ -3387,7 +3387,7 @@ function TLevel.LoadLevelScene(const FileName: string;
 var
   Options: TPrepareRenderOptions;
 begin
-  Result := TVRMLGLScene.Create(FileName, roSeparateShapeStates, GLContextCache);
+  Result := TVRMLGLScene.Create(FileName, roSeparateShapes, GLContextCache);
   AttributesSet(Result.Attributes, btIncrease);
 
   { calculate Options for PrepareRender }

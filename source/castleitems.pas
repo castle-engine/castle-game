@@ -504,7 +504,7 @@ procedure TItemKind.PrepareRenderInternal;
 begin
   if FScene = nil then
   begin
-    FScene := TVRMLGLScene.Create(ModelFileName, roSeparateShapeStates,
+    FScene := TVRMLGLScene.Create(ModelFileName, roSeparateShapes,
       GLContextCache);
 
     AttributesSet(Scene.Attributes, BlendingType);
