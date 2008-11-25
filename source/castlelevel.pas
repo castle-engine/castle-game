@@ -1316,7 +1316,7 @@ uses SysUtils, GL, GLU, GLExt, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
   CastleInputs, CastleWindow, KambiOpenAL, ALUtils, KambiXMLUtils,
-  CastleRequiredResources, VRMLOpenGLRenderer, VRMLTriangleOctree;
+  CastleRequiredResources, VRMLOpenGLRenderer, VRMLTriangleOctree, VRMLShape;
 
 {$define read_implementation}
 {$I objectslist_2.inc}
@@ -2882,18 +2882,18 @@ end;
 
 function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
 var
-  BoxNodeIndex: Integer;
+  BoxShape: TVRMLShape;
 begin
-  BoxNodeIndex := Scene.Shapes.IndexOfBlenderMesh(NodeName);
-  Result := BoxNodeIndex <> -1;
+  BoxShape := Scene.Shapes.FindBlenderMesh(NodeName);
+  Result := BoxShape <> nil;
   if Result then
   begin
     { When node with name NodeName is found, then we calculate our
       Box from this node (and we delete this node from the scene,
       as it should not be visible).
       This way we can comfortably set such boxes from Blender. }
-    Box := Scene.Shapes[BoxNodeIndex].BoundingBox;
-    Scene.Shapes[BoxNodeIndex].GeometryNode.FreeRemovingFromAllParents;
+    Box := BoxShape.BoundingBox;
+    BoxShape.GeometryNode.FreeRemovingFromAllParents;
     Scene.ChangedAll;
   end;
 end;
