@@ -321,8 +321,8 @@ procedure Draw2D(Draw2DData: Pointer);
 
     function SPressAttackToRestart: string;
     begin
-      Result := 'Press [Attack] (' +
-        CastleInput_Attack.Shortcut.Description('not assigned') +
+      Result := 'Press [Interact] (' +
+        CastleInput_Interact.Shortcut.Description('not assigned') +
         ') to restart the level.';
     end;
 
@@ -685,12 +685,19 @@ end;
 
 procedure DoAttack;
 begin
-  if GameWin or Player.Dead then
+  if GameWin then
   begin
-    GameEndedWantsRestart := Level.Name;
-    GameEnded := true;
-  end else
-    Player.Attack;
+    TimeMessage(SGameWinMessage);
+    Exit;
+  end;
+
+  if Player.Dead then
+  begin
+    TimeMessage(SDeadMessage);
+    Exit;
+  end;
+
+  Player.Attack;
 end;
 
 procedure DoInteract;
@@ -810,15 +817,10 @@ procedure DoInteract;
   end;
 
 begin
-  if GameWin then
+  if GameWin or Player.Dead then
   begin
-    TimeMessage(SGameWinMessage);
-    Exit;
-  end;
-
-  if Player.Dead then
-  begin
-    TimeMessage(SDeadMessage);
+    GameEndedWantsRestart := Level.Name;
+    GameEnded := true;
     Exit;
   end;
 
