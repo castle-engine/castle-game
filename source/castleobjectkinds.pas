@@ -384,13 +384,6 @@ begin
       IsSharedManifoldAndBorderEdges then
       Anim.ShareManifoldAndBorderEdges(SharedManifoldEdges, SharedBorderEdges);
 
-    if Log and (prManifoldAndBorderEdges in Options) then
-      WritelnLog('Animation info', Format(
-        '%s animation: %d manifold edges, %d border edges',
-        [ VRMLNodeName + '.' + AnimationName,
-          Anim.FirstScene.ManifoldEdges.Count,
-          Anim.FirstScene.BorderEdges.Count ] ));
-
     AnimationsPrepared.Add(Anim);
   end;
   Progress.Step;
