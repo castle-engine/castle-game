@@ -24,7 +24,7 @@ unit CastleLevelSpecific;
 interface
 
 uses VRMLGLAnimation, VRMLGLScene, Boxes3d, VectorMath,
-  CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL, VRMLOctreeItems,
+  CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL, VRMLTriangle,
   ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM,
   CastleCreatures, ShadowVolumes, Classes, KambiTimeUtils;
 
@@ -102,8 +102,8 @@ type
     destructor Destroy; override;
 
     function CollisionIgnoreItem(
-      const Octree: TVRMLItemsOctree;
-      const OctreeItem: POctreeItem): boolean; override;
+      const Octree: TVRMLBaseTrianglesOctree;
+      const Triangle: PVRMLTriangle): boolean; override;
     procedure Idle(const CompSpeed: Single); override;
 
     procedure Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup); override;
@@ -704,12 +704,12 @@ begin
 end;
 
 function TGateLevel.CollisionIgnoreItem(
-  const Octree: TVRMLItemsOctree;
-  const OctreeItem: POctreeItem): boolean;
+  const Octree: TVRMLBaseTrianglesOctree;
+  const Triangle: PVRMLTriangle): boolean;
 begin
   Result :=
-    (inherited CollisionIgnoreItem(Octree, OctreeItem)) or
-    (OctreeItem^.State.LastNodes.Material.NodeName = 'MatWater');
+    (inherited CollisionIgnoreItem(Octree, Triangle)) or
+    (Triangle^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
 procedure TGateLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup);
@@ -923,7 +923,7 @@ var
   SpiderCreature: TCreature;
   SpiderPosition, SpiderDirection: TVector3Single;
   SpiderMoveDistance: Single;
-  GroundItem: POctreeItem;
+  GroundItem: PVRMLTriangle;
 begin
   inherited;
 

@@ -26,7 +26,7 @@ interface
 
 uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   VRMLNodes, VRMLFields, CastleItems, Navigation,
-  VRMLOctreeItems,
+  VRMLTriangle,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
@@ -53,8 +53,8 @@ type
       will contain first TLevelMovingObject, then TLevelMovingObject.MovingObject).
       Hierarchy is empty if the level Scene itself was hit. }
     Hierarchy: TLevelObjectsList;
-    { OctreeItem is the item that was hit, from appropriate object triangle octree. }
-    OctreeItem: POctreeItem;
+    { Triangle is the item that was hit, from appropriate object triangle octree. }
+    Triangle: PVRMLTriangle;
   end;
 
   { This is a base class for various objects that can be added to the level.
@@ -136,33 +136,33 @@ type
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
 
     function MoveBoxAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const ProposedNewBox: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
 
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
 
     function BoxCollision(const Box: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; virtual; abstract;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
 
     { @returns(A collision as TCollisionInfo instance, or @nil if no collision).
       You're responsible for freeing this TCollisionInfo instance. }
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; virtual; abstract;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; virtual; abstract;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: POctreeItem); virtual; abstract;
+      var GroundItem: PVRMLTriangle); virtual; abstract;
 
     { This is called at the beginning of TLevel.Idle, @italic(before)
       ParentLevel.AnimationTime changes to NewAnimationTime.
@@ -202,7 +202,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single; out Index: Integer;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
   end;
 
   { This is a TLevelObject descendant that is a @italic(sum of any number
@@ -239,31 +239,31 @@ type
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function MoveBoxAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const ProposedNewBox: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function BoxCollision(const Box: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: POctreeItem); override;
+      var GroundItem: PVRMLTriangle); override;
 
     procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
 
@@ -309,31 +309,31 @@ type
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function MoveBoxAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const ProposedNewBox: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function BoxCollision(const Box: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: POctreeItem); override;
+      var GroundItem: PVRMLTriangle); override;
 
     function BoundingBox: TBox3d; override;
   end;
@@ -400,31 +400,31 @@ type
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function MoveBoxAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const ProposedNewBox: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function BoxCollision(const Box: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: POctreeItem); override;
+      var GroundItem: PVRMLTriangle); override;
 
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); override;
@@ -679,31 +679,31 @@ type
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function MoveBoxAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const ProposedNewBox: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function BoxCollision(const Box: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
 
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: POctreeItem); override;
+      var GroundItem: PVRMLTriangle); override;
 
     function BoundingBox: TBox3d; override;
   end;
@@ -767,25 +767,25 @@ type
     function MoveAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const CameraRadius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
     function MoveBoxAllowedSimple(
       const OldPos, ProposedNewPos: TVector3Single;
       const ProposedNewBox: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
     function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
     function BoxCollision(const ABox: TBox3d;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
     procedure GetCameraHeight(const CameraPos: TVector3Single;
-      const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: POctreeItem); override;
+      var GroundItem: PVRMLTriangle); override;
     function BoundingBox: TBox3d; override;
 
     procedure ChangeLevelScene; override;
@@ -1065,8 +1065,8 @@ type
     property Objects: TLevelObjectsList read FObjects;
 
     function CollisionIgnoreItem(
-      const Octree: TVRMLItemsOctree;
-      const OctreeItem: POctreeItem): boolean; virtual;
+      const Octree: TVRMLBaseTrianglesOctree;
+      const Triangle: PVRMLTriangle): boolean; virtual;
 
     { LineOfSight, MoveAllowed and GetCameraHeight perform
       collision detection with the level and level objects.
@@ -1107,7 +1107,7 @@ type
 
     procedure GetCameraHeight(const CameraPos: TVector3Single;
       out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
-      out GroundItem: POctreeItem);
+      out GroundItem: PVRMLTriangle);
       virtual;
     { @groupEnd }
 
@@ -1363,7 +1363,7 @@ end;
 function TLevelObjectsList.RayCollision(
   out IntersectionDistance: Single; out Index: Integer;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
 var
   I: Integer;
   ThisIntersectionDistance: Single;
@@ -1409,92 +1409,92 @@ end;
 function TLevelStaticObject.MoveAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const CameraRadius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
     Scene.OctreeCollisions.MoveAllowedSimple(
       OldPos, ProposedNewPos,
-      CameraRadius, false, nil, ItemsToIgnoreFunc);
+      CameraRadius, false, nil, TrianglesToIgnoreFunc);
 end;
 
 function TLevelStaticObject.MoveBoxAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const ProposedNewBox: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
     Scene.OctreeCollisions.MoveBoxAllowedSimple(
       OldPos, ProposedNewPos, ProposedNewBox,
-      false, nil, ItemsToIgnoreFunc);
+      false, nil, TrianglesToIgnoreFunc);
 end;
 
 function TLevelStaticObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
     (Scene.OctreeCollisions.SegmentCollision(
       Pos1, Pos2,
-      false, nil, false, ItemsToIgnoreFunc)
+      false, nil, false, TrianglesToIgnoreFunc)
       <> nil);
 end;
 
 function TLevelStaticObject.SphereCollision(
   const Pos: TVector3Single; const Radius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
     (Scene.OctreeCollisions.SphereCollision(
-      Pos, Radius,  nil, ItemsToIgnoreFunc)
+      Pos, Radius,  nil, TrianglesToIgnoreFunc)
       <> nil);
 end;
 
 function TLevelStaticObject.BoxCollision(const Box: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
     (Scene.OctreeCollisions.BoxCollision(
-      Box,  nil, ItemsToIgnoreFunc)
+      Box,  nil, TrianglesToIgnoreFunc)
       <> nil);
 end;
 
 function TLevelStaticObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
 var
-  OctreeItem: POctreeItem;
+  Triangle: PVRMLTriangle;
 begin
   Result := nil;
   if Exists and Collides then
   begin
-    OctreeItem := Scene.OctreeCollisions.RayCollision(
+    Triangle := Scene.OctreeCollisions.RayCollision(
       IntersectionDistance,
       Ray0, RayVector,
-      false, nil, false, ItemsToIgnoreFunc);
-    if OctreeItem <> nil then
+      false, nil, false, TrianglesToIgnoreFunc);
+    if Triangle <> nil then
     begin
       Result := TCollisionInfo.Create;
-      Result.OctreeItem := OctreeItem;
+      Result.Triangle := Triangle;
       Result.Hierarchy.Add(Self);
     end;
   end;
 end;
 
 procedure TLevelStaticObject.GetCameraHeight(const CameraPos: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: POctreeItem);
+  var GroundItem: PVRMLTriangle);
 var
   IsAboveThis: boolean;
   HeightAboveThis: Single;
-  GroundItemThis: POctreeItem;
+  GroundItemThis: PVRMLTriangle;
 begin
   if Exists and Collides then
   begin
     Scene.OctreeCollisions.GetCameraHeightZ(
       CameraPos,
       IsAboveThis, HeightAboveThis, GroundItemThis,
-      nil, ItemsToIgnoreFunc);
+      nil, TrianglesToIgnoreFunc);
 
     if IsAboveThis and
       ((not IsAboveTheGround) or (HeightAboveThis < HeightAboveTheGround)) then
@@ -1573,7 +1573,7 @@ end;
 function TLevelObjectSum.MoveAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const CameraRadius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   I: Integer;
 begin
@@ -1581,7 +1581,7 @@ begin
   for I := 0 to List.High do
   begin
     Result := List.Items[I].MoveAllowedSimple(OldPos, ProposedNewPos,
-      CameraRadius, ItemsToIgnoreFunc);
+      CameraRadius, TrianglesToIgnoreFunc);
     if not Result then Exit;
   end;
 end;
@@ -1589,7 +1589,7 @@ end;
 function TLevelObjectSum.MoveBoxAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const ProposedNewBox: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   I: Integer;
 begin
@@ -1597,47 +1597,47 @@ begin
   for I := 0 to List.High do
   begin
     Result := List.Items[I].MoveBoxAllowedSimple(OldPos, ProposedNewPos,
-      ProposedNewBox, ItemsToIgnoreFunc);
+      ProposedNewBox, TrianglesToIgnoreFunc);
     if not Result then Exit;
   end;
 end;
 
 function TLevelObjectSum.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   I: Integer;
 begin
   Result := false;
   for I := 0 to List.High do
   begin
-    Result := List.Items[I].SegmentCollision(Pos1, Pos2, ItemsToIgnoreFunc);
+    Result := List.Items[I].SegmentCollision(Pos1, Pos2, TrianglesToIgnoreFunc);
     if Result then Exit;
   end;
 end;
 
 function TLevelObjectSum.SphereCollision(
   const Pos: TVector3Single; const Radius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   I: Integer;
 begin
   Result := false;
   for I := 0 to List.High do
   begin
-    Result := List.Items[I].SphereCollision(Pos, Radius, ItemsToIgnoreFunc);
+    Result := List.Items[I].SphereCollision(Pos, Radius, TrianglesToIgnoreFunc);
     if Result then Exit;
   end;
 end;
 
 function TLevelObjectSum.BoxCollision(const Box: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   I: Integer;
 begin
   Result := false;
   for I := 0 to List.High do
   begin
-    Result := List.Items[I].BoxCollision(Box, ItemsToIgnoreFunc);
+    Result := List.Items[I].BoxCollision(Box, TrianglesToIgnoreFunc);
     if Result then Exit;
   end;
 end;
@@ -1645,25 +1645,25 @@ end;
 function TLevelObjectSum.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
 var
   Index: Integer;
 begin
   Result := List.RayCollision(IntersectionDistance, Index, Ray0, RayVector,
-    ItemsToIgnoreFunc);
+    TrianglesToIgnoreFunc);
   if Result <> nil then
     Result.Hierarchy.Insert(0, Self);
 end;
 
 procedure TLevelObjectSum.GetCameraHeight(const CameraPos: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: POctreeItem);
+  var GroundItem: PVRMLTriangle);
 var
   I: Integer;
 begin
   for I := 0 to List.High do
-    List.Items[I].GetCameraHeight(CameraPos, ItemsToIgnoreFunc,
+    List.Items[I].GetCameraHeight(CameraPos, TrianglesToIgnoreFunc,
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
 end;
 
@@ -1712,7 +1712,7 @@ end;
 function TLevelMovingObject.MoveAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const CameraRadius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   T: TVector3_Single;
 begin
@@ -1729,14 +1729,14 @@ begin
     Result := MovingObject.MoveAllowedSimple(
       VectorSubtract(OldPos, T.Data),
       VectorSubtract(ProposedNewPos, T.Data),
-      CameraRadius, ItemsToIgnoreFunc);
+      CameraRadius, TrianglesToIgnoreFunc);
   end;
 end;
 
 function TLevelMovingObject.MoveBoxAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const ProposedNewBox: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   T: TVector3_Single;
   B: TBox3d;
@@ -1756,12 +1756,12 @@ begin
     Result := MovingObject.MoveBoxAllowedSimple(
       VectorSubtract(OldPos, T.Data),
       VectorSubtract(ProposedNewPos, T.Data),
-      B, ItemsToIgnoreFunc);
+      B, TrianglesToIgnoreFunc);
   end;
 end;
 
 function TLevelMovingObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   T: TVector3_Single;
 begin
@@ -1774,13 +1774,13 @@ begin
     T := Translation(ParentLevel.AnimationTime);
     Result := MovingObject.SegmentCollision(
       VectorSubtract(Pos1, T.Data),
-      VectorSubtract(Pos2, T.Data), ItemsToIgnoreFunc);
+      VectorSubtract(Pos2, T.Data), TrianglesToIgnoreFunc);
   end;
 end;
 
 function TLevelMovingObject.SphereCollision(
   const Pos: TVector3Single; const Radius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   T: TVector3_Single;
 begin
@@ -1792,13 +1792,13 @@ begin
 
     T := Translation(ParentLevel.AnimationTime);
     Result := MovingObject.SphereCollision(
-      VectorSubtract(Pos, T.Data),  Radius, ItemsToIgnoreFunc);
+      VectorSubtract(Pos, T.Data),  Radius, TrianglesToIgnoreFunc);
   end;
 end;
 
 function TLevelMovingObject.BoxCollision(
   const Box: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 var
   T: TVector3_Single;
 begin
@@ -1810,14 +1810,14 @@ begin
 
     T := Translation(ParentLevel.AnimationTime);
     Result := MovingObject.BoxCollision(
-      Box3dAntiTranslate(Box, T.Data),  ItemsToIgnoreFunc);
+      Box3dAntiTranslate(Box, T.Data),  TrianglesToIgnoreFunc);
   end;
 end;
 
 function TLevelMovingObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
 var
   T: TVector3_Single;
 begin
@@ -1830,7 +1830,7 @@ begin
     T := Translation(ParentLevel.AnimationTime);
     Result := MovingObject.RayCollision(IntersectionDistance,
       VectorSubtract(Ray0, T.Data),
-      RayVector, ItemsToIgnoreFunc);
+      RayVector, TrianglesToIgnoreFunc);
 
     if Result <> nil then
       Result.Hierarchy.Insert(0, Self);
@@ -1838,9 +1838,9 @@ begin
 end;
 
 procedure TLevelMovingObject.GetCameraHeight(const CameraPos: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: POctreeItem);
+  var GroundItem: PVRMLTriangle);
 var
   T: TVector3_Single;
 begin
@@ -1849,7 +1849,7 @@ begin
     T := Translation(ParentLevel.AnimationTime);
 
     MovingObject.GetCameraHeight(
-      VectorSubtract(CameraPos, T.Data), ItemsToIgnoreFunc,
+      VectorSubtract(CameraPos, T.Data), TrianglesToIgnoreFunc,
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
   end;
 end;
@@ -1923,7 +1923,7 @@ procedure TLevelMovingObject.BeforeIdle(
   function SphereCollisionAssumeTranslation(
     const AssumeTranslation: TVector3_Single;
     const Pos: TVector3Single; const Radius: Single;
-    const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+    const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
   begin
     Result := Exists and Collides;
     if Result then
@@ -1932,14 +1932,14 @@ procedure TLevelMovingObject.BeforeIdle(
         use MovingObject.SphereCollsion with Translation. }
 
       Result := MovingObject.SphereCollision(
-        VectorSubtract(Pos, AssumeTranslation.Data), Radius, ItemsToIgnoreFunc);
+        VectorSubtract(Pos, AssumeTranslation.Data), Radius, TrianglesToIgnoreFunc);
     end;
   end;
 
   function BoxCollisionAssumeTranslation(
     const AssumeTranslation: TVector3_Single;
     const Box: TBox3d;
-    const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+    const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
   begin
     Result := Exists and Collides;
     if Result then
@@ -1948,7 +1948,7 @@ procedure TLevelMovingObject.BeforeIdle(
         use MovingObject.BoxCollsion with Translation. }
 
       Result := MovingObject.BoxCollision(
-        Box3dAntiTranslate(Box, AssumeTranslation.Data), ItemsToIgnoreFunc);
+        Box3dAntiTranslate(Box, AssumeTranslation.Data), TrianglesToIgnoreFunc);
     end;
   end;
 
@@ -2225,106 +2225,106 @@ end;
 function TLevelAnimatedObject.MoveAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const CameraRadius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
     (Animation.FirstScene.OctreeCollisions.MoveAllowedSimple(
        OldPos, ProposedNewPos,
-       CameraRadius, false, nil, ItemsToIgnoreFunc) and
+       CameraRadius, false, nil, TrianglesToIgnoreFunc) and
        ( (not CollisionUseLastScene) or
          Animation.LastScene.OctreeCollisions.MoveAllowedSimple(
            OldPos, ProposedNewPos,
-           CameraRadius, false, nil, ItemsToIgnoreFunc) ));
+           CameraRadius, false, nil, TrianglesToIgnoreFunc) ));
 end;
 
 function TLevelAnimatedObject.MoveBoxAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const ProposedNewBox: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := (not Exists) or (not Collides) or
     (Animation.FirstScene.OctreeCollisions.MoveBoxAllowedSimple(
        OldPos, ProposedNewPos, ProposedNewBox,
-       false, nil, ItemsToIgnoreFunc) and
+       false, nil, TrianglesToIgnoreFunc) and
        ( (not CollisionUseLastScene) or
          Animation.LastScene.OctreeCollisions.MoveBoxAllowedSimple(
            OldPos, ProposedNewPos, ProposedNewBox,
-           false, nil, ItemsToIgnoreFunc) ));
+           false, nil, TrianglesToIgnoreFunc) ));
 end;
 
 function TLevelAnimatedObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
     ( (Animation.FirstScene.OctreeCollisions.SegmentCollision(
          Pos1, Pos2,
-         false, nil, false, ItemsToIgnoreFunc)
+         false, nil, false, TrianglesToIgnoreFunc)
          <> nil) or
       (CollisionUseLastScene and
         (Animation.LastScene.OctreeCollisions.SegmentCollision(
            Pos1, Pos2,
-           false, nil, false, ItemsToIgnoreFunc)
+           false, nil, false, TrianglesToIgnoreFunc)
            <> nil) ));
 end;
 
 function TLevelAnimatedObject.SphereCollision(
   const Pos: TVector3Single; const Radius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
     ( (Animation.FirstScene.OctreeCollisions.SphereCollision(
-         Pos, Radius, nil, ItemsToIgnoreFunc)
+         Pos, Radius, nil, TrianglesToIgnoreFunc)
          <> nil) or
       (CollisionUseLastScene and
         (Animation.LastScene.OctreeCollisions.SphereCollision(
-           Pos, Radius, nil, ItemsToIgnoreFunc)
+           Pos, Radius, nil, TrianglesToIgnoreFunc)
            <> nil) ));
 end;
 
 function TLevelAnimatedObject.BoxCollision(
   const Box: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
     ( (Animation.FirstScene.OctreeCollisions.BoxCollision(
-         Box, nil, ItemsToIgnoreFunc)
+         Box, nil, TrianglesToIgnoreFunc)
          <> nil) or
       (CollisionUseLastScene and
         (Animation.LastScene.OctreeCollisions.BoxCollision(
-           Box, nil, ItemsToIgnoreFunc)
+           Box, nil, TrianglesToIgnoreFunc)
            <> nil) ));
 end;
 
 function TLevelAnimatedObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
 var
-  OctreeItem: POctreeItem;
-  Octree: TVRMLItemsOctree;
+  Triangle: PVRMLTriangle;
+  Octree: TVRMLBaseTrianglesOctree;
 begin
   Result := nil;
   if Exists and Collides then
   begin
     Octree := Animation.FirstScene.OctreeCollisions;
-    OctreeItem := Octree.RayCollision(IntersectionDistance,
-      Ray0, RayVector, false, nil, false, ItemsToIgnoreFunc);
-    if OctreeItem <> nil then
+    Triangle := Octree.RayCollision(IntersectionDistance,
+      Ray0, RayVector, false, nil, false, TrianglesToIgnoreFunc);
+    if Triangle <> nil then
     begin
       Result := TCollisionInfo.Create;
-      Result.OctreeItem := OctreeItem;
+      Result.Triangle := Triangle;
       Result.Hierarchy.Add(Self);
     end else
     if CollisionUseLastScene then
     begin
       { try the same thing on LastScene }
       Octree := Animation.LastScene.OctreeCollisions;
-      OctreeItem := Octree.RayCollision(IntersectionDistance,
-        Ray0, RayVector, false, nil, false, ItemsToIgnoreFunc);
-      if OctreeItem <> nil then
+      Triangle := Octree.RayCollision(IntersectionDistance,
+        Ray0, RayVector, false, nil, false, TrianglesToIgnoreFunc);
+      if Triangle <> nil then
       begin
         Result := TCollisionInfo.Create;
-        Result.OctreeItem := OctreeItem;
+        Result.Triangle := Triangle;
         Result.Hierarchy.Add(Self);
       end
     end;
@@ -2332,19 +2332,19 @@ begin
 end;
 
 procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: POctreeItem);
+  var GroundItem: PVRMLTriangle);
 
   procedure MakeScene(Scene: TVRMLScene);
   var
     IsAboveThis: boolean;
     HeightAboveThis: Single;
-    GroundItemThis: POctreeItem;
+    GroundItemThis: PVRMLTriangle;
   begin
     Scene.OctreeCollisions.GetCameraHeightZ(
       CameraPos, IsAboveThis, HeightAboveThis, GroundItemThis,
-      nil, ItemsToIgnoreFunc);
+      nil, TrianglesToIgnoreFunc);
 
     if IsAboveThis and
       ((not IsAboveTheGround) or (HeightAboveThis < HeightAboveTheGround)) then
@@ -2448,7 +2448,7 @@ end;
 function TLevelArea.MoveAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const CameraRadius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   { This object is invisible and non-colliding. }
   Result := true;
@@ -2457,14 +2457,14 @@ end;
 function TLevelArea.MoveBoxAllowedSimple(
   const OldPos, ProposedNewPos: TVector3Single;
   const ProposedNewBox: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   { This object is invisible and non-colliding. }
   Result := true;
 end;
 
 function TLevelArea.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   { This object is invisible and non-colliding. }
   Result := false;
@@ -2472,14 +2472,14 @@ end;
 
 function TLevelArea.SphereCollision(
   const Pos: TVector3Single; const Radius: Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   { This object is invisible and non-colliding. }
   Result := false;
 end;
 
 function TLevelArea.BoxCollision(const ABox: TBox3d;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): boolean;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   { This object is invisible and non-colliding. }
   Result := false;
@@ -2488,16 +2488,16 @@ end;
 function TLevelArea.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
 begin
   { This object is invisible and non-colliding. }
   Result := nil;
 end;
 
 procedure TLevelArea.GetCameraHeight(const CameraPos: TVector3Single;
-  const ItemsToIgnoreFunc: TOctreeItemIgnoreFunc;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: POctreeItem);
+  var GroundItem: PVRMLTriangle);
 begin
   { This object is invisible and non-colliding. }
 end;
@@ -3159,7 +3159,7 @@ end;
 
 procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
   out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
-  out GroundItem: POctreeItem);
+  out GroundItem: PVRMLTriangle);
 var
   I: Integer;
 begin
@@ -3193,7 +3193,7 @@ procedure TLevel.PlayerGetCameraHeightSqr(Navigator: TWalkNavigator;
   out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 var
   HeightAboveTheGround: Single;
-  GroundItem: POctreeItem;
+  GroundItem: PVRMLTriangle;
 begin
   { Check is player standing over level. }
   GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
@@ -3310,7 +3310,7 @@ function TLevel.TryPick(out IntersectionDistance: Single;
   out LevelObjectIndex: Integer;
   const Ray0, RayVector: TVector3Single): TCollisionInfo;
 var
-  OctreeItem: POctreeItem;
+  Triangle: PVRMLTriangle;
   ThisIntersectionDistance: Single;
   ThisCollision: TCollisionInfo;
   ThisLevelObjectIndex: Integer;
@@ -3323,14 +3323,14 @@ begin
   Result := nil;
 
   { Collision with Level.Scene }
-  OctreeItem := Scene.OctreeCollisions.RayCollision(
+  Triangle := Scene.OctreeCollisions.RayCollision(
     ThisIntersectionDistance, Ray0, RayVector, true, nil, false, nil);
-  if OctreeItem <> nil then
+  if Triangle <> nil then
   begin
     IntersectionDistance := ThisIntersectionDistance;
     LevelObjectIndex := -1;
     Result := TCollisionInfo.Create;
-    Result.OctreeItem := OctreeItem;
+    Result.Triangle := Triangle;
   end;
 
   { Collisions with Objects[] }
@@ -3370,8 +3370,8 @@ begin
 end;
 
 function TLevel.CollisionIgnoreItem(
-  const Octree: TVRMLItemsOctree;
-  const OctreeItem: POctreeItem): boolean;
+  const Octree: TVRMLBaseTrianglesOctree;
+  const Triangle: PVRMLTriangle): boolean;
 begin
   { Don't ignore anything in this class. }
   Result := false;

@@ -23,7 +23,7 @@ unit CastleTextures;
 
 interface
 
-uses KambiUtils, KambiClassUtils, CastleSound, VRMLOctreeItems, DOM,
+uses KambiUtils, KambiClassUtils, CastleSound, VRMLTriangle, DOM,
   GameSoundEngine;
 
 {$define read_interface}
@@ -51,7 +51,7 @@ type
   TTextureRulesList = class(TObjectsList_1)
   private
     GroundRule_Cache: boolean;
-    GroundRule_LastGround: POctreeItem;
+    GroundRule_LastGround: PVRMLTriangle;
     GroundRule_LastResult: TTextureRule;
   public
     { Load contents of this object from textures/index.xml file. }
@@ -67,7 +67,7 @@ type
 
       Ground = @nil is allowed here (and will always result in @nil
       returned). }
-    function GroundRule(Ground: POctreeItem): TTextureRule;
+    function GroundRule(Ground: PVRMLTriangle): TTextureRule;
   end;
 
 var
@@ -166,7 +166,7 @@ begin
   end;
 end;
 
-function TTextureRulesList.GroundRule(Ground: POctreeItem): TTextureRule;
+function TTextureRulesList.GroundRule(Ground: PVRMLTriangle): TTextureRule;
 var
   HasTextureUrl: boolean;
   TextureUrl: string;

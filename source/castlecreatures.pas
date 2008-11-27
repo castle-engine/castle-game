@@ -26,7 +26,7 @@ interface
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLGLScene, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSourceAllocator, KambiXMLCfg,
-  GameSoundEngine, ShadowVolumes, VRMLOctreeItems;
+  GameSoundEngine, ShadowVolumes, VRMLTriangle;
 
 {$define read_interface}
 
@@ -977,14 +977,14 @@ type
       (and if true, then HeightAboveTheGround is already initialized too).
       It will update them. Note that GroundItem is updated to @nil if
       camera will be found standing over one of the creatures
-      (since creatures are not represented as any POctreeItem).
+      (since creatures are not represented as any PVRMLTriangle).
 
       You can pass IgnoreCreature <> nil if you want to ignore
       collisions with given creature (this will obviously be useful
       when checking for collisions for this creature). }
     procedure GetCameraHeight(const Position: TVector3Single;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: POctreeItem;
+      var GroundItem: PVRMLTriangle;
       IgnoreCreature: TCreature);
 
     { Searches for item of given Kind. Returns index of first found,
@@ -2090,7 +2090,7 @@ procedure TCreature.GetCameraHeight(
   const AssumeMiddlePosition: TVector3Single;
   out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
 var
-  GroundItem: POctreeItem;
+  GroundItem: PVRMLTriangle;
 begin
   { Check creature<->level collision. }
   Level.GetCameraHeight(AssumeMiddlePosition,
@@ -2423,7 +2423,7 @@ end;
 procedure TCreaturesList.GetCameraHeight(
   const Position: TVector3Single;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: POctreeItem;
+  var GroundItem: PVRMLTriangle;
   IgnoreCreature: TCreature);
 
   { If the Point is inside the Box then it answers IsAboveTheBox := false. }

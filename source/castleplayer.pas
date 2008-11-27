@@ -25,7 +25,7 @@ interface
 
 uses Boxes3d, Navigation, CastleItems, VectorMath, GL, GLU, GLExt,
   VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
-  VRMLOctreeItems, CastleTextures, GameSoundEngine, Classes,
+  VRMLTriangle, CastleTextures, GameSoundEngine, Classes,
   KambiGLUtils;
 
 const
@@ -151,7 +151,7 @@ type
     GroundRule: TTextureRule;
     ReallyIsOnTheGroundTime: Single;
 
-    FGround: POctreeItem;
+    FGround: PVRMLTriangle;
 
     { There always must be satisfied:
         AllocatedFootstepsSource <> nil
@@ -367,7 +367,7 @@ type
       later (for debug purposes, if you changed something). }
     procedure LoadFromFile;
 
-    property Ground: POctreeItem read FGround write FGround;
+    property Ground: PVRMLTriangle read FGround write FGround;
 
     procedure LevelChanged;
 

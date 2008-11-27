@@ -396,7 +396,7 @@ implementation
 uses SysUtils, Classes, Object3dAsVRML, GLWindow, CastleWindow,
   CastlePlay, KambiFilesUtils, ProgressUnit,
   CastleCreatures, CastleVideoOptions, CastleTimeMessages,
-  VRMLScene, VRMLOctreeItems, GLImages;
+  VRMLScene, VRMLTriangle, GLImages;
 
 {$define read_implementation}
 {$I objectslist_1.inc}
@@ -892,7 +892,7 @@ var
   ShiftedPosition: TVector3Single;
   ProposedNewShiftedPosition, NewShiftedPosition: TVector3Single;
   FallingDownLength: Single;
-  GroundItem: POctreeItem;
+  GroundItem: PVRMLTriangle;
 begin
   FRotation += 3 * CompSpeed * 50;
 
