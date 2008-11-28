@@ -19,6 +19,13 @@
 - make gamma correction.
     Windows: http://www.delphi3d.net/articles/viewarticle.php?article=gamma.htm
 
+- rudy usability test:
+  - again, mouse over yes/no message boxes should work
+  - level of oxygen under water should be shown
+  - unfixable? (just don't do this in new game...)
+    - forcing player to jump is just bad
+    - on 1st level, there is a general feeling that "you don't know what to do"
+
 - Kasia usability test:
   - mouse over yes/no message boxes should work (confirmed Eric)
   - spider on the gate level is not really interesting. Make spider ambush ? On the cart --- suddenly a group of spiders crawls from an egg ? Or on the sword pit --- suddenly group of spiders crawls from underneath ?
