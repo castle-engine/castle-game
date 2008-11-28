@@ -1432,10 +1432,9 @@ function TLevelStaticObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    (Scene.OctreeCollisions.SegmentCollision(
+    Scene.OctreeCollisions.IsSegmentCollision(
       Pos1, Pos2,
-      false, nil, false, TrianglesToIgnoreFunc)
-      <> nil);
+      nil, false, TrianglesToIgnoreFunc);
 end;
 
 function TLevelStaticObject.SphereCollision(
@@ -1443,18 +1442,16 @@ function TLevelStaticObject.SphereCollision(
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    (Scene.OctreeCollisions.SphereCollision(
-      Pos, Radius,  nil, TrianglesToIgnoreFunc)
-      <> nil);
+    Scene.OctreeCollisions.IsSphereCollision(
+      Pos, Radius,  nil, TrianglesToIgnoreFunc);
 end;
 
 function TLevelStaticObject.BoxCollision(const Box: TBox3d;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    (Scene.OctreeCollisions.BoxCollision(
-      Box,  nil, TrianglesToIgnoreFunc)
-      <> nil);
+    Scene.OctreeCollisions.IsBoxCollision(
+      Box,  nil, TrianglesToIgnoreFunc);
 end;
 
 function TLevelStaticObject.RayCollision(
@@ -2256,15 +2253,14 @@ function TLevelAnimatedObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    ( (Animation.FirstScene.OctreeCollisions.SegmentCollision(
+    ( (Animation.FirstScene.OctreeCollisions.IsSegmentCollision(
          Pos1, Pos2,
-         false, nil, false, TrianglesToIgnoreFunc)
-         <> nil) or
+         nil, false, TrianglesToIgnoreFunc) ) or
       (CollisionUseLastScene and
-        (Animation.LastScene.OctreeCollisions.SegmentCollision(
+        (Animation.LastScene.OctreeCollisions.IsSegmentCollision(
            Pos1, Pos2,
-           false, nil, false, TrianglesToIgnoreFunc)
-           <> nil) ));
+           nil, false, TrianglesToIgnoreFunc)))
+    );
 end;
 
 function TLevelAnimatedObject.SphereCollision(
@@ -2272,13 +2268,12 @@ function TLevelAnimatedObject.SphereCollision(
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    ( (Animation.FirstScene.OctreeCollisions.SphereCollision(
-         Pos, Radius, nil, TrianglesToIgnoreFunc)
-         <> nil) or
+    ( (Animation.FirstScene.OctreeCollisions.IsSphereCollision(
+         Pos, Radius, nil, TrianglesToIgnoreFunc) ) or
       (CollisionUseLastScene and
-        (Animation.LastScene.OctreeCollisions.SphereCollision(
-           Pos, Radius, nil, TrianglesToIgnoreFunc)
-           <> nil) ));
+        (Animation.LastScene.OctreeCollisions.IsSphereCollision(
+           Pos, Radius, nil, TrianglesToIgnoreFunc)))
+    );
 end;
 
 function TLevelAnimatedObject.BoxCollision(
@@ -2286,13 +2281,12 @@ function TLevelAnimatedObject.BoxCollision(
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
 begin
   Result := Exists and Collides and
-    ( (Animation.FirstScene.OctreeCollisions.BoxCollision(
-         Box, nil, TrianglesToIgnoreFunc)
-         <> nil) or
+    ( (Animation.FirstScene.OctreeCollisions.IsBoxCollision(
+         Box, nil, TrianglesToIgnoreFunc) ) or
       (CollisionUseLastScene and
-        (Animation.LastScene.OctreeCollisions.BoxCollision(
-           Box, nil, TrianglesToIgnoreFunc)
-           <> nil) ));
+        (Animation.LastScene.OctreeCollisions.IsBoxCollision(
+           Box, nil, TrianglesToIgnoreFunc)))
+    );
 end;
 
 function TLevelAnimatedObject.RayCollision(
@@ -3061,9 +3055,9 @@ function TLevel.LineOfSight(
 var
   I: Integer;
 begin
-  Result := Scene.OctreeCollisions.SegmentCollision(
-    Pos1, Pos2, false, nil, false,
-    @Scene.OctreeCollisions.IgnoreTransparentItem) = nil;
+  Result := not Scene.OctreeCollisions.IsSegmentCollision(
+    Pos1, Pos2, nil, false,
+    @Scene.OctreeCollisions.IgnoreTransparentItem);
 
   if not Result then
     Exit;
