@@ -55,8 +55,6 @@
   - allow items to cast shadows
   - eventually, allow items and creatures to be in shadow
   - kambiShadows and kambiShadowsMain:
-    - useful only for castle right now, use more: at least in
-      shadow_volume_tests, maybe in view3dscene option too ?
     - for headlight should be too
     - background castle level when this light actually moves
   - dyn shadows from more than one light need to be done
@@ -85,16 +83,6 @@
     Or wall should be specially visible ? Maybe more visible the
     alternative entrance there (through the barrels) --- different wall
     color ?
-
-- woda idea:
-  Rozmowa z Herman dnia pon 30 kwi 2007 21:37:33 CEST:
-  (2007-04-30 13:46:45) Herman: o wiem jak masz ufajnic wode w swojej grze
-  (2007-04-30 13:46:48) Herman: prosty efekt
-  (2007-04-30 13:46:55) Herman: jak koles ma wode w glowie
-  (2007-04-30 13:47:09) Herman: to zmieniaj ogniskowa
-  (2007-04-30 13:47:31) Herman: ale na zamiane raz na x raz na y
-  (2007-04-30 13:47:38) Herman: jakims cosinuskiem
-  (2007-04-30 13:48:32) Herman: wiekszy zmiana kata widzenia dla x i dla y tylko ze x i y sa przesunite w fazie
 
 - weapons should be rendered correctly in 3d.
   - Sword should also glow red when "castle hall" glows red --- even
