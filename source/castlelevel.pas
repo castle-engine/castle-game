@@ -846,14 +846,14 @@ type
       BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
       BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
       GeometryNode: TVRMLGeometryNode;
-      State: TVRMLGraphTraverseState);
+      StateStack: TVRMLGraphTraverseStateStack);
 
     FCreatures: TCreaturesList;
     procedure TraverseForCreatures(
       BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
       BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
       GeometryNode: TVRMLGeometryNode;
-      State: TVRMLGraphTraverseState);
+      StateStack: TVRMLGraphTraverseStateStack);
 
     FInitialCameraPos: TVector3Single;
     FInitialCameraDir: TVector3Single;
@@ -2911,7 +2911,7 @@ procedure TLevel.TraverseForItems(
   BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
   BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
   GeometryNode: TVRMLGeometryNode;
-  State: TVRMLGraphTraverseState);
+  StateStack: TVRMLGraphTraverseStateStack);
 
   procedure CreateNewItem(const ItemNodeName: string);
   var
@@ -2945,7 +2945,7 @@ procedure TLevel.TraverseForItems(
       raise Exception.CreateFmt('Item kind with VRMLNodeName "%s" doesn''t exist',
         [ItemKindVRMLNodeName]);
 
-    ItemStubBoundingBox := GeometryNode.BoundingBox(State);
+    ItemStubBoundingBox := GeometryNode.BoundingBox(StateStack.Top);
     ItemPosition[0] := (ItemStubBoundingBox[0, 0] + ItemStubBoundingBox[1, 0]) / 2;
     ItemPosition[1] := (ItemStubBoundingBox[0, 1] + ItemStubBoundingBox[1, 1]) / 2;
     ItemPosition[2] := ItemStubBoundingBox[0, 2];
@@ -2970,7 +2970,7 @@ procedure TLevel.TraverseForCreatures(
   BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
   BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
   GeometryNode: TVRMLGeometryNode;
-  State: TVRMLGraphTraverseState);
+  StateStack: TVRMLGraphTraverseStateStack);
 
   procedure CreateNewCreature(const CreatureNodeName: string);
   var
@@ -3000,7 +3000,7 @@ procedure TLevel.TraverseForCreatures(
     end;
 
     { calculate CreaturePosition }
-    StubBoundingBox := GeometryNode.BoundingBox(State);
+    StubBoundingBox := GeometryNode.BoundingBox(StateStack.Top);
     CreaturePosition[0] := (StubBoundingBox[0, 0] + StubBoundingBox[1, 0]) / 2;
     CreaturePosition[1] := (StubBoundingBox[0, 1] + StubBoundingBox[1, 1]) / 2;
     CreaturePosition[2] := StubBoundingBox[0, 2];
