@@ -26,7 +26,7 @@ interface
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLGLScene, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSourceAllocator, KambiXMLCfg,
-  GameSoundEngine, ShadowVolumes, VRMLTriangle;
+  GameSoundEngine, ShadowVolumes, VRMLTriangle, Frustum;
 
 {$define read_interface}
 
@@ -1981,7 +1981,7 @@ procedure TCreature.Render(const Frustum: TFrustum;
   end;
 
 begin
-  if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
+  if Frustum.Box3dCollisionPossibleSimple(BoundingBox) then
   begin
     glPushMatrix;
       glMultMatrix(SceneTransform);

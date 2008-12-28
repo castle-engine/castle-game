@@ -26,7 +26,7 @@ interface
 uses VRMLGLAnimation, VRMLGLScene, Boxes3d, VectorMath,
   CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL, VRMLTriangle,
   ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM,
-  CastleCreatures, ShadowVolumes, Classes, KambiTimeUtils;
+  CastleCreatures, ShadowVolumes, Classes, KambiTimeUtils, Frustum;
 
 const
   CastleHallWerewolvesCount = 4;
@@ -719,7 +719,7 @@ procedure TGateLevel.Render(const Frustum: TFrustum; TransparentGroup: TTranspar
     const TeleportBox: TBox3d;
     TransparentGroup: TTransparentGroup);
   begin
-    if FrustumBox3dCollisionPossibleSimple(Frustum, TeleportBox) then
+    if Frustum.Box3dCollisionPossibleSimple(TeleportBox) then
     begin
       glPushMatrix;
         glTranslatev(Box3dMiddle(TeleportBox));

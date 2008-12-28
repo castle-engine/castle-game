@@ -26,7 +26,7 @@ interface
 uses Boxes3d, VRMLNodes, VRMLGLScene, VectorMath, KambiUtils,
   KambiClassUtils, Images, GL, GLU, KambiGLUtils, CastleSound,
   VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds,
-  KambiXMLCfg, GameSoundEngine;
+  KambiXMLCfg, GameSoundEngine, Frustum;
 
 const
   DefaultItemDamageConst = 5.0;
@@ -861,7 +861,7 @@ end;
 procedure TItemOnLevel.Render(const Frustum: TFrustum;
   TransparentGroup: TTransparentGroup);
 begin
-  if FrustumBox3dCollisionPossibleSimple(Frustum, BoundingBox) then
+  if Frustum.Box3dCollisionPossibleSimple(BoundingBox) then
   begin
     glPushMatrix;
       glTranslatev(Position);
