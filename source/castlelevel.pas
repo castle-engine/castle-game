@@ -118,7 +118,7 @@ type
       ignored !).
 
       @italic(Implementation note:) In @link(Render), it was possible
-      to implement this by glPush/PopMatrix and FrustumMove tricks.
+      to implement this by glPush/PopMatrix and Frustum.Move tricks.
       But RenderShadowVolume needs actual transformation explicitly:
       ShadowMaybeVisible needs actual box position in world coordinates,
       so bounding box has to be transformed by ParentTransform.
@@ -1864,9 +1864,9 @@ begin
       (this is true e.g. for TDoomLevelDoor,
       since all doors close automatically, and initially all are closed...).
 
-      In this case we can avoid FrustumMove (although I didn't do any tests,
+      In this case we can avoid Frustum.Move (although I didn't do any tests,
       maybe this check is not worth the effort and we don't need to worry
-      about FrustumMove time so much ?). }
+      about Frustum.Move time so much ?). }
 
     if ZeroVector(T.Data) then
       MovingObject.Render(Frustum, TransparentGroup) else
@@ -1875,7 +1875,7 @@ begin
           glTranslatev(T.Data);
           { MovingObject.Render expects Frustum in it's local coordinates,
             that's why we subtract Translation here. }
-          MovingObject.Render(FrustumMove(Frustum, (-T).Data), TransparentGroup);
+          MovingObject.Render(Frustum.Move((-T).Data), TransparentGroup);
         glPopMatrix;
       end;
   end;
