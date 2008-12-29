@@ -21,6 +21,8 @@
 { TLevelAvailable class and related things. }
 unit CastleLevelAvailable;
 
+{$I kambiconf.inc}
+
 interface
 
 uses CastleLevel, KambiUtils, Classes,
@@ -29,6 +31,7 @@ uses CastleLevel, KambiUtils, Classes,
 {$define read_interface}
 
 type
+  { }
   TLevelAvailable = class
   private
     procedure LoadFromDOMElement(Element: TDOMElement; const BasePath: string);

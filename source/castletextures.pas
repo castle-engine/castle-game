@@ -21,6 +21,8 @@
 { }
 unit CastleTextures;
 
+{$I kambiconf.inc}
+
 interface
 
 uses KambiUtils, KambiClassUtils, CastleSound, VRMLTriangle, DOM,
@@ -29,6 +31,7 @@ uses KambiUtils, KambiClassUtils, CastleSound, VRMLTriangle, DOM,
 {$define read_interface}
 
 type
+  { }
   TTextureRule = class
   private
     procedure LoadFromDOMElement(Element: TDOMElement);
