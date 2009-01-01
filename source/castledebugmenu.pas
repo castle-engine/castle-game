@@ -76,8 +76,6 @@ type
   end;
 
   TDebugLevelMenu = class(TCastleMenu)
-    LevelOctreeMaxDepthSlider: TGLMenuIntegerSlider;
-    LevelOctreeLeafCapacitySlider: TGLMenuIntegerSlider;
     constructor Create;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -466,17 +464,8 @@ constructor TDebugLevelMenu.Create;
 begin
   inherited Create;
 
-  LevelOctreeMaxDepthSlider := TGLMenuIntegerSlider.Create(
-    -1, 40, DebugLevelOctreeMaxDepth);
-  LevelOctreeLeafCapacitySlider := TGLMenuIntegerSlider.Create(
-    -1, 40, DebugLevelOctreeLeafCapacity);
-
   Items.Add('Change to level');
   Items.Add('Restart current level (preserving camera)');
-  Items.AddObject('Future level octree max depth',
-    LevelOctreeMaxDepthSlider);
-  Items.AddObject('Future level octree leaf capacity',
-    LevelOctreeLeafCapacitySlider);
   Items.Add('Back');
 
   FixItemsAreas(Glw.Width, Glw.Height);
@@ -540,20 +529,13 @@ begin
   case CurrentItem of
     0: ChangeToLevel;
     1: RestartLevel;
-    2, 3: ;
-    4: CurrentMenu := DebugMenu;
+    2: CurrentMenu := DebugMenu;
   end;
 end;
 
 procedure TDebugLevelMenu.CurrentItemAccessoryValueChanged;
 begin
   inherited;
-
-  case CurrentItem of
-    2: DebugLevelOctreeMaxDepth := LevelOctreeMaxDepthSlider.Value;
-    3: DebugLevelOctreeLeafCapacity :=
-         LevelOctreeLeafCapacitySlider.Value;
-  end;
 end;
 
 { TDebugItemsMenu ------------------------------------------------------------ }

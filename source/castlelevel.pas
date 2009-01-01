@@ -1300,14 +1300,6 @@ type
 
   TLevelClass = class of TLevel;
 
-var
-  { Properties of the Level octree constructed in TLevel constructor.
-    -1 means "use default values", which means values taken from
-    Level description in XML (or just VRMLTriangleOctree unit
-    defaults). }
-  DebugLevelOctreeMaxDepth: Integer = -1;
-  DebugLevelOctreeLeafCapacity: Integer = -1;
-
 {$undef read_interface}
 
 implementation
@@ -2551,7 +2543,6 @@ const
   SectorsMargin = 0.5;
 var
   NavigationNode: TNodeNavigationInfo;
-  OctreeMaxDepth, OctreeLeafCapacity: Integer;
   NavigationSpeed: Single;
   Options: TPrepareRenderOptions;
   TG: TTransparentGroups;
@@ -2702,29 +2693,13 @@ begin
     Progress.Fini;
   end;
 
-  { calculate OctreeMaxDepth }
-  OctreeMaxDepth := DebugLevelOctreeMaxDepth;
-  { TODO: take from XML file }
-  if OctreeMaxDepth = -1 then
-    OctreeMaxDepth := DefTriangleOctreeMaxDepth;
-
-  { calculate OctreeLeafCapacity }
-  OctreeLeafCapacity := DebugLevelOctreeLeafCapacity;
-  { TODO: take from XML file }
-  if OctreeLeafCapacity = -1 then
-    OctreeLeafCapacity := DefTriangleOctreeLeafCapacity;
-
   { Loading octree have their own Progress, so we load them outside our
     progress. }
 
   if not MenuBackground then
   begin
-    Scene.TriangleOctreeMaxDepth := OctreeMaxDepth;
-    Scene.TriangleOctreeLeafCapacity := OctreeLeafCapacity;
     Scene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
-
     Scene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
-
     Scene.Spatial := [ssRendering, ssDynamicCollisions];
 
     { TrianglesList was created for triangle octree. We don't need it anymore.
