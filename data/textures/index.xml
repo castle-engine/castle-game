@@ -13,7 +13,8 @@
     footsteps_sound="player_footsteps_concrete" />
   <texture base_name="marble"
     footsteps_sound="player_footsteps_concrete" />
-
+  <texture base_name="047roche"
+    footsteps_sound="player_footsteps_grass" />
 
   <texture base_name="water_grayscale"
     footsteps_sound="player_footsteps_watery">
