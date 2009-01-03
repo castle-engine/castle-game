@@ -2522,6 +2522,16 @@ end;
 
 { TLevel --------------------------------------------------------------------- }
 
+const
+  ssCollisionOctree =
+    {TODO:ssDynamicCollisions.
+       Works fine with ssDynamicCollisions too, and fast.
+       But just needs more tests with ssDynamicCollisions.
+       And spiders in lair (with red key) on "cages" level are under
+       floor level - fixit.
+       For now, it can use ssCollidableTriangles. }
+    ssCollidableTriangles;
+
 constructor TLevel.Create(
   const AName: string;
   const ASceneFileName, ALightSetFileName: string;
@@ -2700,7 +2710,7 @@ begin
   begin
     Scene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
     Scene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
-    Scene.Spatial := [ssRendering, ssDynamicCollisions];
+    Scene.Spatial := [ssRendering, ssCollisionOctree];
 
     { TrianglesList was created for triangle octree. We don't need it anymore.
 
@@ -3369,7 +3379,7 @@ begin
   Result.PrepareRender([tgOpaque, tgTransparent], Options);
 
   if CreateOctreeCollisions then
-    Result.Spatial := [ssDynamicCollisions];
+    Result.Spatial := [ssCollisionOctree];
 
   Result.FreeResources([frTextureDataInNodes]);
 end;
@@ -3394,10 +3404,10 @@ begin
   Result.PrepareRender([tgOpaque, tgTransparent], Options, false);
 
   if CreateFirstOctreeCollisions then
-    Result.FirstScene.Spatial := [ssDynamicCollisions];
+    Result.FirstScene.Spatial := [ssCollisionOctree];
 
   if CreateLastOctreeCollisions then
-    Result.LastScene.Spatial := [ssDynamicCollisions];
+    Result.LastScene.Spatial := [ssCollisionOctree];
 
   Result.FreeResources([frTextureDataInNodes]);
 end;
