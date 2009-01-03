@@ -64,12 +64,12 @@ endif
 endif
 endif
 
-build-unix:
+build-unix: clean_glwindow
 	cd ../kambi_vrml_game_engine/ && \
 	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg ../castle/source/castle.pasprogram
 	mv source/castle ./
 
-build-windows:
+build-windows: clean_glwindow
 	cd ../kambi_vrml_game_engine/ && \
 	  fpc $(FPC_WINDOWS_OPTIONS) @kambi.cfg ../castle/source/castle.pasprogram
 	mv source/castle.exe ./castle.exe
@@ -114,6 +114,22 @@ clean_private:
 	find . -type d '(' -iname '.svn' ')' -print \
 	     | xargs rm -Rf
 	rm -Rf data/sounds/intermediate/
+
+# This program uses GLWindow unit. GLWindow unit may be compiled
+# with various back-ends (e.g. under Unices two most useful back-ends
+# are XLIB and GTK). To make sure that compilation of this program
+# will produce exactly what you need, below we make sure that
+# unit GLWindow will be *always* *rebuild*.
+#
+# Of course this means that compilation time will suffer a little,
+# since GLWindow unit will be possibly rebuild without any real need.
+# Comment out line below if you want.
+clean_glwindow:
+	cd ../kambi_vrml_game_engine/ && \
+	rm -f opengl/glwindow.o \
+	      opengl/glwindow.ppu \
+	      opengl/GLWindow.o \
+	      opengl/GLWindow.ppu
 
 # ----------------------------------------
 # Set SVN tag.
