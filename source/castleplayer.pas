@@ -436,8 +436,13 @@ begin
   FInventoryCurrentItem := -1;
 
   FNavigator := TWalkNavigator.Create(nil);
-  Navigator.Input_MoveSpeedInc.MakeClear; { turn key off }
-  Navigator.Input_MoveSpeedDec.MakeClear; { turn key off }
+
+  { turn off keys that are totally unavailable for the player }
+  Navigator.Input_MoveSpeedInc.MakeClear;
+  Navigator.Input_MoveSpeedDec.MakeClear;
+  Navigator.Input_IncreaseCameraPreferredHeight.MakeClear;
+  Navigator.Input_DecreaseCameraPreferredHeight.MakeClear;
+
   Navigator.CheckModsDown := false;
   Navigator.OnFalledDown := @FalledDown;
 
