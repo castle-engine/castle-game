@@ -786,6 +786,7 @@ begin
   Navigator.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
   Navigator.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
   Navigator.InvertVerticalMouseLook := InvertVerticalMouseLook;
+  Navigator.CameraRadius := LevelCameraRadius;
 
   if GameWin then
   begin
