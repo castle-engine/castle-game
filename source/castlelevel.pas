@@ -845,14 +845,14 @@ type
     procedure TraverseForItems(
       BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
       BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
-      GeometryNode: TVRMLGeometryNode;
+      Geometry: TVRMLGeometryNode;
       StateStack: TVRMLGraphTraverseStateStack);
 
     FCreatures: TCreaturesList;
     procedure TraverseForCreatures(
       BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
       BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
-      GeometryNode: TVRMLGeometryNode;
+      Geometry: TVRMLGeometryNode;
       StateStack: TVRMLGraphTraverseStateStack);
 
     FInitialCameraPos: TVector3Single;
@@ -2872,7 +2872,7 @@ begin
       as it should not be visible).
       This way we can comfortably set such boxes from Blender. }
     Box := BoxShape.BoundingBox;
-    BoxShape.GeometryNode.FreeRemovingFromAllParents;
+    BoxShape.Geometry.FreeRemovingFromAllParents;
     Scene.ChangedAll;
   end;
 end;
@@ -2895,7 +2895,7 @@ end;
 procedure TLevel.TraverseForItems(
   BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
   BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
-  GeometryNode: TVRMLGeometryNode;
+  Geometry: TVRMLGeometryNode;
   StateStack: TVRMLGraphTraverseStateStack);
 
   procedure CreateNewItem(const ItemNodeName: string);
@@ -2930,7 +2930,7 @@ procedure TLevel.TraverseForItems(
       raise Exception.CreateFmt('Item kind with VRMLNodeName "%s" doesn''t exist',
         [ItemKindVRMLNodeName]);
 
-    ItemStubBoundingBox := GeometryNode.BoundingBox(StateStack.Top);
+    ItemStubBoundingBox := Geometry.BoundingBox(StateStack.Top);
     ItemPosition[0] := (ItemStubBoundingBox[0, 0] + ItemStubBoundingBox[1, 0]) / 2;
     ItemPosition[1] := (ItemStubBoundingBox[0, 1] + ItemStubBoundingBox[1, 1]) / 2;
     ItemPosition[2] := ItemStubBoundingBox[0, 2];
@@ -2954,7 +2954,7 @@ end;
 procedure TLevel.TraverseForCreatures(
   BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
   BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
-  GeometryNode: TVRMLGeometryNode;
+  Geometry: TVRMLGeometryNode;
   StateStack: TVRMLGraphTraverseStateStack);
 
   procedure CreateNewCreature(const CreatureNodeName: string);
@@ -2985,7 +2985,7 @@ procedure TLevel.TraverseForCreatures(
     end;
 
     { calculate CreaturePosition }
-    StubBoundingBox := GeometryNode.BoundingBox(StateStack.Top);
+    StubBoundingBox := Geometry.BoundingBox(StateStack.Top);
     CreaturePosition[0] := (StubBoundingBox[0, 0] + StubBoundingBox[1, 0]) / 2;
     CreaturePosition[1] := (StubBoundingBox[0, 1] + StubBoundingBox[1, 1]) / 2;
     CreaturePosition[2] := StubBoundingBox[0, 2];
