@@ -66,12 +66,14 @@ endif
 
 build-unix: clean_glwindow
 	cd ../kambi_vrml_game_engine/ && \
-	  fpc $(FPC_UNIX_OPTIONS) @kambi.cfg ../castle/source/castle.pasprogram
+	  fpc $(FPC_UNIX_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
+	  @kambi.cfg ../castle/source/castle.pasprogram
 	mv source/castle ./
 
 build-windows: clean_glwindow
 	cd ../kambi_vrml_game_engine/ && \
-	  fpc $(FPC_WINDOWS_OPTIONS) @kambi.cfg ../castle/source/castle.pasprogram
+	  fpc $(FPC_WINDOWS_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
+	  @kambi.cfg ../castle/source/castle.pasprogram
 	mv source/castle.exe ./castle.exe
 
 # ------------------------------------------------------------
