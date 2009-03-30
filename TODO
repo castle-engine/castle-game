@@ -29,7 +29,6 @@
 - Kasia usability test:
   - mouse over yes/no message boxes should work (confirmed Eric)
   - spider on the gate level is not really interesting. Make spider ambush ? On the cart --- suddenly a group of spiders crawls from an egg ? Or on the sword pit --- suddenly group of spiders crawls from underneath ?
-  - wall sliding should be more smooth --- there are places where wall sliding doesn't catch. (confirmed by Eric)
   - enter/exit on levels should be more black, to suggest more that these are enter/exit, not a normal wall
   - items should automatically hide if they were uncovered by automatic show ?
     Users usually don't know immediately how to close them, and play
@@ -291,9 +290,6 @@ Cages level:
   middle changes with anim. Maybe make it non-changing ?
 
 - "Restore defaults" in Sound options.
-
-- Eric stage 4 comment:
-  - you can also get "stuck" when colliding against a wall, instead of sliding.
 
 - Enemies:
   - More enemies attacks.
