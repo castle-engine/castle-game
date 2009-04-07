@@ -293,15 +293,13 @@ type
       Also calculates CameraRadiusFromPrepareRender
       from StandAnimation.Scenes[0]. }
     procedure PrepareRenderInternal; override;
-
-    procedure FreePrepareRender; override;
   public
     constructor Create(const AVRMLNodeName: string);
 
     destructor Destroy; override;
 
     function PrepareRenderSteps: Cardinal; override;
-
+    procedure FreePrepareRender; override;
     procedure CloseGL; override;
 
     { This is an animation of standing still.
@@ -502,13 +500,13 @@ type
     FActualThrowWebAttackTime: Single;
   protected
     procedure PrepareRenderInternal; override;
-    procedure FreePrepareRender; override;
   public
     destructor Destroy; override;
 
     procedure CloseGL; override;
 
     function PrepareRenderSteps: Cardinal; override;
+    procedure FreePrepareRender; override;
 
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
@@ -573,12 +571,12 @@ type
     FFallsDownSpeed: Single;
   protected
     procedure PrepareRenderInternal; override;
-    procedure FreePrepareRender; override;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
 
     function PrepareRenderSteps: Cardinal; override;
+    procedure FreePrepareRender; override;
     procedure CloseGL; override;
 
     { Missile uses the same animation all the time.
@@ -643,12 +641,12 @@ type
     FAnimationInfo: TVRMLGLAnimationInfo;
   protected
     procedure PrepareRenderInternal; override;
-    procedure FreePrepareRender; override;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
 
     function PrepareRenderSteps: Cardinal; override;
+    procedure FreePrepareRender; override;
     procedure CloseGL; override;
 
     { Missile uses the same animation all the time.

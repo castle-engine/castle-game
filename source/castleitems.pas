@@ -72,7 +72,6 @@ type
     FBoundingBoxRotatedCalculated: boolean;
   protected
     procedure PrepareRenderInternal; override;
-    procedure FreePrepareRender; override;
 
     { This is like @inherited, but it passes proper values for boolean parameters
       specifying what to prepare. }
@@ -134,6 +133,7 @@ type
     function BoundingBoxRotated: TBox3d;
 
     function PrepareRenderSteps: Cardinal; override;
+    procedure FreePrepareRender; override;
     procedure CloseGL; override;
   end;
 
@@ -171,7 +171,6 @@ type
     FSoundAttackStart: TSoundType;
   protected
     procedure PrepareRenderInternal; override;
-    procedure FreePrepareRender; override;
   public
     destructor Destroy; override;
 
@@ -211,6 +210,7 @@ type
     procedure Use(Item: TItem); override;
 
     function PrepareRenderSteps: Cardinal; override;
+    procedure FreePrepareRender; override;
     procedure CloseGL; override;
 
     { This is the time point within AttackAnimation
