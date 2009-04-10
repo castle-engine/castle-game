@@ -155,11 +155,11 @@ begin
 
       glClear(ClearBuffers);
 
-      { Set headlight. Must be done before glLoadMatrix(BackgroundNavigator.Matrix)
-        below, since TVRMLGLHeadlight.RenderOrDisable may change the matrix. }
-      TVRMLGLHeadlight.RenderOrDisable(BackgroundLevel.Scene.Headlight, 0);
-
       glLoadMatrix(BackgroundNavigator.Matrix);
+
+      { Set headlight }
+      TVRMLGLHeadlight.RenderOrDisable(BackgroundLevel.Scene.Headlight, 0,
+        true, BackgroundNavigator);
 
       BackgroundLevel.LightSet.RenderLights;
 

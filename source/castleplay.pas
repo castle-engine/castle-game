@@ -515,7 +515,8 @@ begin
   Player.Navigator.CancelFallingDown;
 
   { Init Level.Scene.Headlight }
-  TVRMLGLHeadlight.RenderOrDisable(Level.Scene.Headlight, 0);
+  TVRMLGLHeadlight.RenderOrDisable(Level.Scene.Headlight, 0,
+    true, Player.Navigator);
 
   if Level.ThunderEffect <> nil then
     Level.ThunderEffect.InitGLLight(1);
