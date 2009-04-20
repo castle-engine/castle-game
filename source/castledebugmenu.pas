@@ -669,16 +669,19 @@ begin
     0..4: Exit;
     5: begin
          ChangeAttenuation;
-         Level.Scene.Headlight.Render(0, false { it should be already enabled });
+         Level.Scene.Headlight.Render(0, false { it should be already enabled },
+           true, ZeroVector3Single, ZeroVector3Single);
        end;
     6: begin
          SpotArgument.Value := not SpotArgument.Value;
          Level.Scene.Headlight.Spot := SpotArgument.Value;
-         Level.Scene.Headlight.Render(0, false { it should be already enabled });
+         Level.Scene.Headlight.Render(0, false { it should be already enabled },
+           true, ZeroVector3Single, ZeroVector3Single);
        end;
     7: begin
          ChangeSpotProperties;
-         Level.Scene.Headlight.Render(0, false { it should be already enabled });
+         Level.Scene.Headlight.Render(0, false { it should be already enabled },
+           true, ZeroVector3Single, ZeroVector3Single);
        end;
     8: CurrentMenu := EditLevelLightsMenu;
     else raise EInternalError.Create('Menu item unknown');
@@ -691,17 +694,20 @@ begin
     0:
       begin
         Level.Scene.Headlight.AmbientIntensity := AmbientIntensitySlider.Value;
-        Level.Scene.Headlight.Render(0, false { it should be already enabled });
+        Level.Scene.Headlight.Render(0, false { it should be already enabled },
+          true, ZeroVector3Single, ZeroVector3Single);
       end;
     1..3:
       begin
         Level.Scene.Headlight.Color[CurrentItem-1] := ColorSlider[CurrentItem-1].Value;
-        Level.Scene.Headlight.Render(0, false { it should be already enabled });
+        Level.Scene.Headlight.Render(0, false { it should be already enabled },
+          true, ZeroVector3Single, ZeroVector3Single);
       end;
     4:
       begin
         Level.Scene.Headlight.Intensity := IntensitySlider.Value;
-        Level.Scene.Headlight.Render(0, false { it should be already enabled });
+        Level.Scene.Headlight.Render(0, false { it should be already enabled },
+          true, ZeroVector3Single, ZeroVector3Single);
       end;
     else Exit;
   end;
