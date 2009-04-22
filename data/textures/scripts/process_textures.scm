@@ -143,7 +143,9 @@
     ;; (gimp-file-save RUN-NONINTERACTIVE
     ;;   image drawable output-filename output-filename)
 
-    (gimp-image-flip image 1)
+    ;; No longer wanted, our engine handles compressed DDS without
+    ;; the ugly need for inversion.
+    ;; (gimp-image-flip image 1)
 
     (file-dds-save RUN-NONINTERACTIVE
       image drawable output-filename output-filename
