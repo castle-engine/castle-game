@@ -1,11 +1,12 @@
-;; Simple GIMP script to process all textures into normal maps inside
-;; normal_maps subdirectories.
+;; Simple GIMP scripts to process all textures:
+;; - into normal maps inside normal_maps subdirectories (to test bump mapping)
+;; - into compressed DDS images (to test DDS compression)
 ;;
 ;; This is the first GIMP batch mode script of Kambi, thanks for useful
 ;; [http://www.gimp.org/tutorials/Basic_Batch/].
 ;;
 ;; ---------------------------------------------------------------------------
-;;   Copyright 2007 Michalis Kamburelis.
+;;   Copyright 2007,2009 Michalis Kamburelis.
 ;;
 ;;   This file is part of "castle".
 ;;
@@ -74,7 +75,7 @@
                      (substring filename i len))))
 )
 
-;;;; -------------------------------------------------------------------------
+;;;; normal map generation -----------------------------------------------------
 
 (define (kam-normalmap input-filename)
   (let* ((output-filename
@@ -123,3 +124,59 @@
         (kam-normalmap filename)
         (set! filelist (cdr filelist)))))
 )
+
+;;;; dds generation -----------------------------------------------------
+
+(define (kam-dds input-filename)
+  (let* ((output-filename
+          ;; Place output always in .dds format.
+          (kam-file-name-change-ext input-filename ".dds"))
+
+         (image (car (gimp-file-load RUN-NONINTERACTIVE
+                                         input-filename input-filename)))
+         (drawable (car (gimp-image-get-active-layer image))))
+
+    ;; tests:
+    (gimp-message (string-append input-filename " goes to " output-filename))
+
+    ;; Save with default settings:
+    ;; (gimp-file-save RUN-NONINTERACTIVE
+    ;;   image drawable output-filename output-filename)
+
+    (gimp-image-flip image 1)
+
+    (file-dds-save RUN-NONINTERACTIVE
+      image drawable output-filename output-filename
+      ;; 1 = DXT1
+      1
+      ;; gen mipmaps
+      0
+      0 0 -1 0 0 0)
+
+    (gimp-image-delete image))
+)
+
+;; globs is a list of strings = globs to match input filenames to process
+(define (kam-batch-dds-globs globs)
+
+  (while (not (null? globs))
+
+    (let* ((filelist (cadr (file-glob (car globs) 1))))
+      (while (not (null? filelist))
+         (let* ((filename (car filelist)))
+           (kam-dds filename)
+           (set! filelist (cdr filelist)))))
+
+    (set! globs (cdr globs))))
+
+
+(define (kam-batch-dds)
+  (kam-batch-dds-globs '("../*.png"  "../*.jpg"  "../doom/*.png")))
+
+(define (kam-batch-dds-acts)
+  (kam-batch-dds-globs '(
+    "/home/michalis/3dmodels/tremulous-vrml/kambifun/textures/atcs/*.png"
+    "/home/michalis/3dmodels/tremulous-vrml/kambifun/textures/atcs/*.jpg"
+    "/home/michalis/3dmodels/tremulous-vrml/kambifun/textures/atcs/*.tga"
+    "/home/michalis/3dmodels/tremulous-vrml/kambifun/textures/atcs/news/*.tga"
+    )))

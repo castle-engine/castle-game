@@ -1,4 +1,4 @@
 #!/bin/bash
 set -eu
 
-gimp -i -b '(load "mk_normal_maps.scm")' -b '(batch-normalmap)' -b '(gimp-quit 0)'
+gimp -i -b '(load "process_textures.scm")' -b '(kam-batch-normalmap)' -b '(gimp-quit 0)'
