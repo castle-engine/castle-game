@@ -2582,6 +2582,7 @@ begin
     if BumpMapping then
       Scene.Attributes.BumpMappingMaximum := High(TBumpMappingMethod) else
       Scene.Attributes.BumpMappingMaximum := bmNone;
+    Scene.Attributes.UseOcclusionQuery := UseOcclusionQuery;
 
     { Calculate InitialCameraPos, InitialCameraDir, InitialCameraUp.
       Must be done before initializing creatures, as they right now

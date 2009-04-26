@@ -146,6 +146,15 @@ const
 var
   BumpMapping: boolean;
 
+const
+  DefaultUseOcclusionQuery = false;
+var
+  { This determines UseOcclusionQuery for some VRML scenes
+    (I cannot do this generally for absolutely all VRML scenes,
+    as it doesn't behave Ok for scenes rendered multiple times
+    (like for creatures or items)). }
+  UseOcclusionQuery: boolean;
+
 implementation
 
 uses KambiUtils, CastleConfig, CastleWindow, RaysWindow, GLAntiAliasing;
@@ -212,6 +221,8 @@ initialization
     'video_options/bump_mapping', DefaultBumpMapping);
   AntiAliasing := ConfigFile.GetValue(
     'video_options/anti_aliasing', DefaultAntiAliasing);
+  UseOcclusionQuery := ConfigFile.GetValue(
+    'video_options/use_occlusion_query', DefaultUseOcclusionQuery);
 finalization
   ConfigFile.SetDeleteValue(
     'video_options/texture_minification_quality',
@@ -235,4 +246,6 @@ finalization
     BumpMapping, DefaultBumpMapping);
   ConfigFile.SetDeleteValue('video_options/anti_aliasing',
     AntiAliasing, DefaultAntiAliasing);
+  ConfigFile.SetDeleteValue('video_options/use_occlusion_query',
+    UseOcclusionQuery, DefaultUseOcclusionQuery);
 end.
