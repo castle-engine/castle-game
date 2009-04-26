@@ -611,6 +611,8 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
       Player.Navigator.CameraPos := Destination;
       Player.Navigator.CancelFallingDown;
 
+      Scene.ViewChangedSuddenly;
+
       SoundEngine.Sound(stTeleport);
     end;
   end;
