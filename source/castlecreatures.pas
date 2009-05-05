@@ -1951,7 +1951,7 @@ procedure TCreature.Render(const Frustum: TFrustum;
 
       glPushMatrix;
         glTranslatev(MiddlePosition);
-        Q := NewGLUQuadric(GL_FALSE, GLU_NONE, GLU_OUTSIDE, GLU_LINE);
+        Q := NewGLUQuadric(false, GLU_NONE, GLU_OUTSIDE, GLU_LINE);
         try
           gluSphere(Q, Kind.CameraRadius, 10, 10);
         finally gluDeleteQuadric(Q); end;
