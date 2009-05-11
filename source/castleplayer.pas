@@ -239,7 +239,7 @@ type
 
       You are allowed to read:
       @unorderedList(
-        @item Navigator.RotationOnlyMatrix, Matrixm, Frustum.
+        @item Navigator.RotationMatrix, Matrix, Frustum.
       )
     }
     property Navigator: TWalkNavigator read FNavigator;

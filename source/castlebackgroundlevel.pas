@@ -148,7 +148,7 @@ begin
 
       if UsedBackground <> nil then
       begin
-        glLoadMatrix(BackgroundNavigator.RotationOnlyMatrix);
+        glLoadMatrix(BackgroundNavigator.RotationMatrix);
         UsedBackground.Render;
       end else
         ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
