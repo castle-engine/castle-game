@@ -68,7 +68,7 @@ uses SysUtils,
   Navigation, GL, GLU, GLExt, BackgroundGL, KambiGLUtils, GLImages,
   VRMLGLHeadlight, KambiFilesUtils, Images, VectorMath,
   CastleWindow, CastleLevel, CastleLevelAvailable, CastleVideoOptions,
-  VRMLGLScene;
+  VRMLGLScene, RenderStateUnit;
 
 var
   BackgroundLevel: TLevel;
@@ -155,6 +155,7 @@ begin
 
       glClear(ClearBuffers);
 
+      RenderState.CameraFromNavigator(BackgroundNavigator);
       glLoadMatrix(BackgroundNavigator.Matrix);
 
       { Set headlight }

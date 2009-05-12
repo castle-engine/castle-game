@@ -119,7 +119,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   CastleVideoOptions, Keys, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
   CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
-  ShadowVolumes, KambiTimeUtils, GLImages;
+  ShadowVolumes, KambiTimeUtils, GLImages, RenderStateUnit;
 
 var
   GLList_TimeMessagesBackground: TGLuint;
@@ -469,6 +469,7 @@ begin
   { Now clear buffers indicated in ClearBuffers. }
   glClear(ClearBuffers);
 
+  RenderState.CameraFromNavigator(Glw.Navigator);
   glLoadMatrix(Glw.Navigator.Matrix);
 
   TThunderEffect.RenderOrDisable(Level.ThunderEffect, 1);
