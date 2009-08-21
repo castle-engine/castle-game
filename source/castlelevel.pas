@@ -47,6 +47,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+  public
     { Hierarchy is a list of TLevelObjects that are hit, from the container
       to the most detailed one (e.g., if you place an object within
       TLevelMovingObject.MovingOject, and you hit it --- then Hierarchy
@@ -604,7 +605,7 @@ type
     property SoundTracksCurrentPosition: boolean
       read FSoundTracksCurrentPosition write FSoundTracksCurrentPosition
       default false;
-
+  public
     MoveTime: Single;
     TranslationEnd: TVector3_Single;
 
@@ -847,14 +848,14 @@ type
       BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
       Geometry: TVRMLGeometryNode;
       StateStack: TVRMLGraphTraverseStateStack);
-
+  private
     FCreatures: TCreaturesList;
     procedure TraverseForCreatures(
       BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
       BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
       Geometry: TVRMLGeometryNode;
       StateStack: TVRMLGraphTraverseStateStack);
-
+  private
     FInitialCameraPos: TVector3Single;
     FInitialCameraDir: TVector3Single;
     FInitialCameraUp: TVector3Single;
@@ -885,7 +886,7 @@ type
       const ProposedNewBox: TBox3d;
       const BecauseOfGravity: boolean): boolean;
     { @groupEnd }
-
+  private
     FName: string;
     FSceneFileName: string;
     FTitle: string;
@@ -894,7 +895,7 @@ type
     FLightSetFileName: string;
 
     procedure LoadFromDOMElement(Element: TDOMElement);
-
+  private
     FMenuBackground: boolean;
     FSceneDynamicShadows: boolean;
 
@@ -903,7 +904,7 @@ type
     FBumpMappingLightAmbientColor: array [boolean] of TVector4Single;
     function GetBumpMappingLightAmbientColor(const Lighted: boolean): TVector4Single;
     procedure SetBumpMappingLightAmbientColor(const Lighted: boolean; const Value: TVector4Single);
-
+  private
     FBumpMappingLightDiffuseColor: TVector4Single;
     procedure SetBumpMappingLightDiffuseColor(const Value: TVector4Single);
   protected
@@ -2839,7 +2840,7 @@ begin
           Objects.Add(NewObject);
       end;
     end;
-  finally ObjectsList.Release end;
+  finally FreeChildNodes(ObjectsList) end;
 
   { Load other level properties (that are not read in
     TLevelAvailable.LoadFromDOMElement) }

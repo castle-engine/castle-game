@@ -338,7 +338,7 @@ begin
         RequiredCreatures.Append(ResourceName);
       end;
     end;
-  finally Children.Release end;
+  finally FreeChildNodes(Children) end;
 end;
 
 

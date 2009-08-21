@@ -1161,7 +1161,6 @@ procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer;
   PrepareNewPlayer: boolean);
 var
   SavedMode: TGLMode;
-  PlayGameHelper: TPlayGameHelper;
 begin
   TimeMessagesClear;
 
@@ -1181,12 +1180,11 @@ begin
       Glw.Navigator := Player.Navigator;
       try
         { Init Player.Navigator properties }
-        PlayGameHelper := nil;
-        { No need to actually create PlayGameHelper class,
+        { No need to actually create TPlayGameHelper class,
           but I must pass here an instance, not a TPlayGameHelper
           only --- at least in objfpc mode, see
           [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
-        Player.Navigator.OnMatrixChanged := @PlayGameHelper.MatrixChanged;
+        Player.Navigator.OnMatrixChanged := @TPlayGameHelper(nil).MatrixChanged;
 
         { Note that this sets AutoRedisplay to true. }
         SetStandardGLWindowState(Glw, @Draw, @CloseQuery, @Resize,

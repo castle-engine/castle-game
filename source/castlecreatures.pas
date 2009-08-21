@@ -671,7 +671,7 @@ type
     FMaxLife: Single;
     FLastAttackDirection: TVector3Single;
     procedure SetLastAttackDirection(const Value: TVector3Single);
-
+  private
     { For gravity work. }
     FallingDownStartHeight: Single;
     FIsFallingDown: boolean;
@@ -682,7 +682,7 @@ type
 
     procedure SetLegsPosition(const Value: TVector3Single);
     procedure SetDirection(const Value: TVector3Single);
-
+  private
     { It turns out that it's more speed-optimal to keep BoundingBox
       precalculated (and waste time on updating it each time we change
       Direction or LegsPosition) instead of making BoundingBox
@@ -695,7 +695,7 @@ type
       checked with profiler. }
     FBoundingBox: TBox3d;
     procedure RecalculateBoundingBox;
-
+  private
     FSoundDyingEnabled: boolean;
   protected
     { Return matrix that takes into account current LegsPosition and Direction.
@@ -1032,7 +1032,7 @@ type
 
     { Use this in ActualAttack for short range creatures. }
     function ShortRangeActualAttackHits: boolean;
-
+  protected
     { Set by Idle in this class, may be used by descendants
       in their Idle calls (to not calculate the same thing twice). }
     IdleSeesPlayer: boolean;
@@ -1145,6 +1145,7 @@ type
     procedure ExplodeWithPlayer;
     procedure ExplodeWithLevel;
     procedure ExplodeWithCreature(Creature: TCreature);
+  private
     LastSoundIdleTime: Single;
   public
     { Shortcut for TMissileCreatureKind(Kind). }

@@ -126,7 +126,7 @@ begin
           raise Exception.CreateFmt('Unknown element inside <texture>: "%s"',
             [SubElement.TagName]);
       end;
-  finally SubElements.Release; end;
+  finally FreeChildNodes(SubElements); end;
 end;
 
 { TTextureRulesList ---------------------------------------------------------- }
@@ -163,7 +163,7 @@ begin
 
           TextureRule.LoadFromDOMElement(TextureElement);
         end;
-    finally TextureElements.Release; end;
+    finally FreeChildNodes(TextureElements); end;
   finally
     SysUtils.FreeAndNil(TextureConfig);
   end;

@@ -81,7 +81,7 @@ type
     FFlyingModeTimeOut: Single; { > 0 means he's flying. In seconds. }
     function GetFlyingMode: boolean;
     procedure SetEquippedWeapon(Value: TItem);
-
+  private
     { blackout things }
     BlackOutIntensity: TGLfloat;
     BlackOutColor: TVector3f;
@@ -99,7 +99,7 @@ type
       Color (while SetLife always uses red color). }
     procedure SetLifeCustomBlackOut(const Value: Single;
       const Color: TVector3Single);
-
+  private
     { This means that weapon AttackAnimation is being done.
       This also means that EquippedWeapon <> nil. }
     Attacking: boolean;
@@ -116,7 +116,7 @@ type
     function EquippedWeaponKind: TItemWeaponKind;
 
     procedure InputChanged(InputConfiguration: TInputConfiguration);
-
+  private
     { If Swimming = psUnderWater, then this is the time (from Level.AnimationTime)
       of setting Swimming to psUnderWater. }
     SwimBeginTime: Single;
@@ -138,13 +138,13 @@ type
 
     AllocatedSwimmingChangeSource: TALAllocatedSource;
     procedure AllocatedSwimmingChangeSourceUsingEnd(Sender: TALAllocatedSource);
-
+  private
     AllocatedSwimmingSource: TALAllocatedSource;
     procedure AllocatedSwimmingSourceUsingEnd(Sender: TALAllocatedSource);
-
+  private
     FSwimming: TPlayerSwimming;
     procedure SetSwimming(const Value: TPlayerSwimming);
-
+  private
     { Did last Idle detected that we are on the ground. }
     IsOnTheGround: boolean;
     { <> @nil if IsOnTheGround and last ground had some TTextureRule. }
@@ -161,7 +161,7 @@ type
     FootstepsSoundPlaying: TSoundType;
     ReallyWalkingOnTheGroundTime: Single;
     procedure AllocatedFootstepsSourceUsingEnd(Sender: TALAllocatedSource);
-
+  private
     { FKnockbackDistance <= 0 means "no knockback currently" }
     FKnockbackDistance: Single;
     { This must be valid and non-zero when FKnockbackDistance > 0 }

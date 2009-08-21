@@ -179,7 +179,7 @@ type
   public
     constructor Create(AParentLevel: TLevel;
       const SceneFileName: string);
-
+  public
     StayOpenTime: Single;
 
     procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
@@ -196,7 +196,7 @@ type
   TDoomE1M1Level = class(TLevel)
   private
     procedure RenameCreatures(Node: TVRMLNode);
-
+  private
     FakeWall: TLevelStaticObject;
 
     MovingElevator49: TLevelLinearMovingObject;

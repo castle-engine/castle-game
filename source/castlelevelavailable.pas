@@ -39,6 +39,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
+  public
     AvailableForNewGame: boolean;
     DefaultAvailableForNewGame: boolean;
 
@@ -76,8 +77,8 @@ type
       because each TLevelAvailable instance needs a reference to
       LevelDOMElement (this is parsed during TLevel.Create). }
     Document: TXMLDocument;
-    function IsSmallerByNumber(const A, B: TLevelAvailable): boolean;
     FMenuBackgroundLevelName: string;
+    function IsSmallerByNumber(const A, B: TLevelAvailable): boolean;
   public
     destructor Destroy; override;
 
@@ -393,7 +394,7 @@ begin
           BasePath);
       end;
     end;
-  finally LevelsList.Release; end;
+  finally FreeChildNodes(LevelsList); end;
 end;
 
 { initialization / finalization ---------------------------------------------- }
