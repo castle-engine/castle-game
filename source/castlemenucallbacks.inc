@@ -36,7 +36,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  CurrentMenu.Idle(Glwin.Fps.IdleSpeed);
+  CurrentMenu.Idle(Glwin.Fps.IdleSpeed, nil, nil, []);
   TimeMessagesIdle;
 end;
 

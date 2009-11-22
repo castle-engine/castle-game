@@ -146,7 +146,7 @@ procedure Draw2d(Draw2DData: Pointer);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
-  CurrentMenu.Draw;
+  CurrentMenu.Draw(false);
 end;
 
 procedure Draw(Glwin: TGLWindow);

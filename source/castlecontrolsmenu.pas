@@ -34,7 +34,7 @@ type
       the value of this property. }
     SubMenuAdditionalInfo: string;
     constructor Create;
-    procedure Draw; override;
+    procedure Draw(const Focused: boolean); override;
   end;
 
 { Show menu that allows player to confugure controls.
@@ -140,7 +140,7 @@ begin
   DrawBackgroundRectangle := false;
 end;
 
-procedure TSubMenu.Draw;
+procedure TSubMenu.Draw(const Focused: boolean);
 const
   SubMenuTextColor: TVector3Single = (0.9, 0.9, 0.9);
 begin
@@ -464,7 +464,7 @@ begin
   glTranslatef(MoveX, MoveY, 0);
   if DrawFadeRect then
     glCallList(GLList_DrawFadeRect);
-  CurrentMenu.Draw;
+  CurrentMenu.Draw(false);
 end;
 
 procedure Draw(Glwin: TGLWindow);
@@ -522,7 +522,7 @@ end;
 procedure Idle(Glwin: TGLWindow);
 begin
   if Assigned(IdleUnderMenu) then IdleUnderMenu(Glwin);
-  CurrentMenu.Idle(Glwin.Fps.IdleSpeed);
+  CurrentMenu.Idle(Glwin.Fps.IdleSpeed, nil, nil, []);
   TimeMessagesIdle;
 end;
 

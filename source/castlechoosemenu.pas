@@ -62,7 +62,7 @@ procedure Draw2d(Draw2DData: Pointer);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
-  ChooseMenu.Draw;
+  ChooseMenu.Draw(false);
 end;
 
 procedure Draw(Glwin: TGLWindow);
@@ -110,7 +110,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  ChooseMenu.Idle(Glwin.Fps.IdleSpeed);
+  ChooseMenu.Idle(Glwin.Fps.IdleSpeed, nil, nil, []);
   TimeMessagesIdle;
 end;
 

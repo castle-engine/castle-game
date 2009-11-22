@@ -109,7 +109,7 @@ type
     destructor Destroy; override;
     procedure CurrentItemSelected; override;
     function SpaceBetweenItems(const NextItemIndex: Cardinal): Cardinal; override;
-    procedure Draw; override;
+    procedure Draw(const Focused: boolean); override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -760,7 +760,7 @@ begin
     Result += 10;
 end;
 
-procedure TChooseNewLevelMenu.Draw;
+procedure TChooseNewLevelMenu.Draw(const Focused: boolean);
 const
   SubMenuTextColor: TVector3Single = (0.7, 0.7, 0.7);
 begin
@@ -801,7 +801,7 @@ procedure Draw2d(Draw2DData: Pointer);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
-  CurrentMenu.Draw;
+  CurrentMenu.Draw(false);
 end;
 
 procedure Draw(Glwin: TGLWindow);
@@ -851,7 +851,7 @@ procedure Idle(Glwin: TGLWindow);
 begin
   BackgroundLevelIdle(Glwin);
 
-  CurrentMenu.Idle(Glwin.Fps.IdleSpeed);
+  CurrentMenu.Idle(Glwin.Fps.IdleSpeed, nil, nil, []);
   TimeMessagesIdle;
 end;
 
