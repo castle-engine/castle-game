@@ -1191,6 +1191,8 @@ begin
           nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
           K_None, #0, { FpsShowOnCaption } false, { UseNavigator } true);
 
+        Glw.UseControls := false;
+
         { OnTimer should be executed quite often, because footsteps sound
           (done in TPlayer.Idle) relies on the fact that OnUsingEnd
           of it's source will be called more-or-less immediately after
