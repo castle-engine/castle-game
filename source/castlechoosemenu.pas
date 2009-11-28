@@ -32,7 +32,7 @@ function ChooseByMenu(ADrawUnderMenu: TDrawFunc;
 
 implementation
 
-uses SysUtils, GLWinModes, KambiGLUtils, CastleInputs, GLWinMessages,
+uses SysUtils, GLWinModes, KambiGLUtils, CastleInputs, GLWinMessages, GLMenu,
   CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleTimeMessages;
 
 var
@@ -85,32 +85,16 @@ end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  ChooseMenu.KeyDown(Key, C);
   EventDown(false, Key, mbLeft);
-end;
-
-procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
-begin
-  ChooseMenu.MouseMove(NewX, Glwin.Height - NewY,
-    Glwin.MousePressed);
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  ChooseMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
-    Glwin.MousePressed);
   EventDown(true, K_None, Button);
-end;
-
-procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
-begin
-  ChooseMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
-    Glwin.MousePressed);
 end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  ChooseMenu.Idle(Glwin.Fps.IdleSpeed, nil, nil, []);
   TimeMessagesIdle;
 end;
 
@@ -123,6 +107,7 @@ function ChooseByMenu(ADrawUnderMenu: TDrawFunc;
   MenuItems: TStringList): Integer;
 var
   SavedMode: TGLMode;
+  SavedMenu: TCastleMenu;
 begin
   DrawUnderMenu := ADrawUnderMenu;
 
@@ -140,19 +125,21 @@ begin
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
-    Glw.OnMouseUp := @MouseUp;
-    Glw.OnMouseMove := @MouseMove;
     Glw.OnIdle := @Idle;
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
     GLWinMessagesTheme.RectColor[3] := 1.0;
 
-    Selected := false;
+    Glw.UseControls := true;
+    SavedMenu := Glw.Controls.MakeSingle(TGLMenu, ChooseMenu) as TCastleMenu;
 
+    Selected := false;
     repeat
       Glwm.ProcessMessage(true);
     until Selected;
+
+    Glw.Controls.MakeSingle(TCastleMenu, SavedMenu);
 
     Result := SelectedIndex;
   finally FreeAndNil(SavedMode); end;

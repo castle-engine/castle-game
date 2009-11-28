@@ -201,10 +201,10 @@ begin
   inherited;
 
   case CurrentItem of
-    0: CurrentMenu := DebugPlayerMenu;
-    1: CurrentMenu := DebugCreaturesMenu;
-    2: CurrentMenu := DebugItemsMenu;
-    3: CurrentMenu := DebugLevelMenu;
+    0: SetCurrentMenu(CurrentMenu, DebugPlayerMenu);
+    1: SetCurrentMenu(CurrentMenu, DebugCreaturesMenu);
+    2: SetCurrentMenu(CurrentMenu, DebugItemsMenu);
+    3: SetCurrentMenu(CurrentMenu, DebugLevelMenu);
     4: begin
          RenderBoundingBoxes := not RenderBoundingBoxes;
          RenderBoundingBoxesArgument.Value := RenderBoundingBoxes;
@@ -226,7 +226,7 @@ begin
     9: begin
          FreeAndNil(EditLevelLightsMenu);
          EditLevelLightsMenu := TEditLevelLightsMenu.Create;
-         CurrentMenu := EditLevelLightsMenu;
+         SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
        end;
     10:ForceThunder;
     11:UserQuit := true;
@@ -295,7 +295,7 @@ begin
     5: ;
     6: Player.LoadFromFile;
     7: Player.FlyingModeTimeoutBegin(60 * 60);
-    8: CurrentMenu := DebugMenu;
+    8: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
 end;
 
@@ -454,7 +454,7 @@ begin
          DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
          DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
        end;
-    8: CurrentMenu := DebugMenu;
+    8: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
 end;
 
@@ -529,7 +529,7 @@ begin
   case CurrentItem of
     0: ChangeToLevel;
     1: RestartLevel;
-    2: CurrentMenu := DebugMenu;
+    2: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
 end;
 
@@ -595,7 +595,7 @@ begin
     0: GiveItems;
     1: ItemsKinds.LoadFromFile;
     2: ReloadItemAnimation;
-    3: CurrentMenu := DebugMenu;
+    3: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
 end;
 
@@ -683,7 +683,7 @@ begin
          Level.Scene.Headlight.Render(0, false { it should be already enabled },
            true, ZeroVector3Single, ZeroVector3Single);
        end;
-    8: CurrentMenu := EditLevelLightsMenu;
+    8: SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -805,7 +805,7 @@ begin
           LockMainShadowsLight := LockMainShadowsLightArgument.Value;
           DoLockMainShadowsLight;
         end;
-    13: CurrentMenu := EditLevelLightsMenu;
+    13: SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -912,7 +912,7 @@ begin
          begin
            FreeAndNil(EditHeadlightMenu);
            EditHeadlightMenu := TEditHeadlightMenu.Create;
-           CurrentMenu := EditHeadlightMenu;
+           SetCurrentMenu(CurrentMenu, EditHeadlightMenu);
          end else
            MessageOK(Glw, 'No headlight in level ' +
              ' (set NavigationInfo.headlight to TRUE to get headlight)', taLeft);
@@ -922,15 +922,15 @@ begin
            changed by outside action (e.g. some TLevel.Idle ?) }
          FreeAndNil(EditBumpMappingLightMenu);
          EditBumpMappingLightMenu := TEditBumpMappingLightMenu.Create;
-         CurrentMenu := EditBumpMappingLightMenu;
+         SetCurrentMenu(CurrentMenu, EditBumpMappingLightMenu);
        end;
-    7: CurrentMenu := DebugMenu;
+    7: SetCurrentMenu(CurrentMenu, DebugMenu);
     else
        begin
          FreeAndNil(EditOneLightMenu);
          EditOneLightMenu := TEditOneLightMenu.Create(
            Level.LightSet.Lights.Items[CurrentItem].LightNode);
-         CurrentMenu := EditOneLightMenu;
+         SetCurrentMenu(CurrentMenu, EditOneLightMenu);
        end;
   end;
 end;
@@ -1137,7 +1137,7 @@ begin
            end;
          end;
        end;
-    14:CurrentMenu := EditLevelLightsMenu;
+    14:SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -1181,6 +1181,7 @@ end;
 procedure ShowDebugMenu(ADrawUnderMenu: TDrawFunc);
 var
   SavedMode: TGLMode;
+  SavedMenu: TCastleMenu;
 begin
   DrawUnderMenu := ADrawUnderMenu;
 
@@ -1208,17 +1209,17 @@ begin
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
-    Glw.OnMouseUp := @MouseUp;
-    Glw.OnMouseMove := @MouseMove;
     Glw.OnIdle := @Idle;
 
-    CurrentMenu := DebugMenu;
-    UserQuit := false;
+    Glw.UseControls := true;
+    SavedMenu := SetCurrentMenu(CurrentMenu, DebugMenu);
 
+    UserQuit := false;
     repeat
       Glwm.ProcessMessage(true);
     until GameEnded or UserQuit;
 
+    Glw.Controls.MakeSingle(TCastleMenu, SavedMenu);
   finally FreeAndNil(SavedMode); end;
 end;
 
@@ -1231,12 +1232,10 @@ begin
   DebugCreaturesMenu := TDebugCreaturesMenu.Create;
   DebugLevelMenu := TDebugLevelMenu.Create;
   DebugItemsMenu := TDebugItemsMenu.Create;
-  CurrentMenu := DebugMenu;
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);
 begin
-  CurrentMenu := nil;
   FreeAndNil(DebugMenu);
   FreeAndNil(EditLevelLightsMenu);
   FreeAndNil(EditOneLightMenu);

@@ -27,17 +27,32 @@ uses GLMenu;
 
 type
   { Just TGLMenu that calls Glw.PostRedisplay and plays a sound
-    on each CurrentItem change. }
+    on each CurrentItem change.
+
+    Also, it's PositioInside is overridden to always catch all events
+    (cover the whole screen), as we don't need the focus / non-focus stuff,
+    menu is the only control used here.
+    Also, it let's events further down to our callbacks, thanks
+    to ExclusiveEvents being @false. }
   TCastleMenu = class(TGLMenu)
   public
     constructor Create;
+    property ExclusiveEvents default false;
     procedure CurrentItemChanged; override;
     procedure SomethingChanged; override;
     procedure CurrentItemSelected; override;
+    function PositionInside(const X, Y: Single): boolean; override;
   end;
 
 var
   DebugMenuDesigner: boolean = false;
+
+{ Sets CurrentValue, taking care of adding this menu / removing existing menu
+  (when new value is @nil) from Glw.Controls.
+  Also, returns previous TGLMenu present in Glw.Controls (there can be
+  only one). }
+function SetCurrentMenu(var CurrentValue: TCastleMenu;
+  const NewValue: TCastleMenu): TCastleMenu;
 
 implementation
 
@@ -51,6 +66,7 @@ begin
   { Don't set DesignerModeWindow, we do tricks that make setting mouse
     position in GLMenu not working. See TGLMenu.DesignerMode comments. }
   DesignerMode := DebugMenuDesigner;
+  ExclusiveEvents := false;
 end;
 
 procedure TCastleMenu.CurrentItemChanged;
@@ -69,6 +85,18 @@ procedure TCastleMenu.SomethingChanged;
 begin
   inherited;
   Glw.PostRedisplay;
+end;
+
+function TCastleMenu.PositionInside(const X, Y: Single): boolean;
+begin
+  Result := true;
+end;
+
+function SetCurrentMenu(var CurrentValue: TCastleMenu;
+  const NewValue: TCastleMenu): TCastleMenu;
+begin
+  CurrentValue := NewValue;
+  Result := Glw.Controls.MakeSingle(TCastleMenu, NewValue) as TCastleMenu;
 end;
 
 { initialization / finalization ---------------------------------------------- }

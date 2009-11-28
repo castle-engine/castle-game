@@ -88,7 +88,7 @@ begin
     0: UserQuit := true;
     1: ViewGameMessages;
     2: ShowControlsMenuEscape(DrawUnderMenu, nil, true, true, UserQuit);
-    3: CurrentMenu := GameSoundMenu;
+    3: SetCurrentMenu(CurrentMenu, GameSoundMenu);
     4: { At first I did here GameCancel(false), but tests (with Mama)
          show that it's too easy to select this and accidentaly
          end the game. }
@@ -127,7 +127,7 @@ begin
     0: SoundInfo.Selected;
     1: ;
     2: ;
-    3: CurrentMenu := GameMenu;
+    3: SetCurrentMenu(CurrentMenu, GameMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -165,6 +165,7 @@ end;
 procedure ShowGameMenu(ADrawUnderMenu: TDrawFunc);
 var
   SavedMode: TGLMode;
+  SavedMenu: TCastleMenu;
 begin
   DrawUnderMenu := ADrawUnderMenu;
 
@@ -188,17 +189,17 @@ begin
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
-    Glw.OnMouseUp := @MouseUp;
-    Glw.OnMouseMove := @MouseMove;
     Glw.OnIdle := @Idle;
 
-    CurrentMenu := GameMenu;
-    UserQuit := false;
+    Glw.UseControls := true;
+    SavedMenu := SetCurrentMenu(CurrentMenu, GameMenu);
 
+    UserQuit := false;
     repeat
       Glwm.ProcessMessage(true);
     until GameEnded or UserQuit;
 
+    Glw.Controls.MakeSingle(TCastleMenu, SavedMenu);
   finally FreeAndNil(SavedMode); end;
 end;
 
@@ -208,12 +209,10 @@ procedure InitGLW(Glwin: TGLWindow);
 begin
   GameMenu := TGameMenu.Create;
   GameSoundMenu := TGameSoundMenu.Create;
-  CurrentMenu := GameMenu;
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);
 begin
-  CurrentMenu := nil;
   FreeAndNil(GameMenu);
   FreeAndNil(GameSoundMenu);
 end;

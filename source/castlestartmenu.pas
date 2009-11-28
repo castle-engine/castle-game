@@ -216,7 +216,7 @@ procedure TMainMenu.CurrentItemSelected;
       FreeAndNil(ChooseNewLevelMenu);
       ChooseNewLevelMenu := TChooseNewLevelMenu.Create;
 
-      CurrentMenu := ChooseNewLevelMenu;
+      SetCurrentMenu(CurrentMenu, ChooseNewLevelMenu);
     end;
 
   begin
@@ -255,8 +255,8 @@ begin
   case CurrentItem of
     0: ChooseNewGame;
     1: ShowControlsMenu(@BackgroundLevelDraw, @BackgroundLevelIdle, false, false);
-    2: CurrentMenu := VideoMenu;
-    3: CurrentMenu := SoundMenu;
+    2: SetCurrentMenu(CurrentMenu, VideoMenu);
+    3: SetCurrentMenu(CurrentMenu, SoundMenu);
     4: ShowCredits(@BackgroundLevelDraw, @BackgroundLevelIdle);
     5: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
@@ -575,7 +575,7 @@ begin
 
          MessageOK(Glw, 'All video settings restored to defaults.', taLeft);
        end;
-    11: CurrentMenu := MainMenu;
+    11: SetCurrentMenu(CurrentMenu, MainMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -636,8 +636,8 @@ begin
     0: SoundInfo.Selected;
     1: ;
     2: ;
-    3: CurrentMenu := ChangeOpenALDeviceMenu;
-    4: CurrentMenu := MainMenu;
+    3: SetCurrentMenu(CurrentMenu, ChangeOpenALDeviceMenu);
+    4: SetCurrentMenu(CurrentMenu, MainMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -690,7 +690,7 @@ begin
       MessageOK(Glw, SoundEngine.SoundInitializationReport, taLeft);
   end;
 
-  CurrentMenu := SoundMenu;
+  SetCurrentMenu(CurrentMenu, SoundMenu);
 end;
 
 { TChooseNewLevelMenu ------------------------------------------------------- }
@@ -783,7 +783,7 @@ begin
 
   if CurrentItem = LevelsAvailableForNewGame.Count then
   begin
-    CurrentMenu := MainMenu;
+    SetCurrentMenu(CurrentMenu, MainMenu);
   end else
   if LevelsAvailableForNewGame[CurrentItem] = nil then
   begin
@@ -791,7 +791,7 @@ begin
   end else
   begin
     NewGame(LevelsAvailableForNewGame[CurrentItem]);
-    CurrentMenu := MainMenu;
+    SetCurrentMenu(CurrentMenu, MainMenu);
   end;
 end;
 
@@ -824,34 +824,17 @@ end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  CurrentMenu.KeyDown(Key, C);
   EventDown(false, Key, mbLeft);
-end;
-
-procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
-begin
-  CurrentMenu.MouseMove(NewX, Glwin.Height - NewY,
-    Glwin.MousePressed);
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  CurrentMenu.MouseDown(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
-    Glwin.MousePressed);
   EventDown(true, K_None, Button);
-end;
-
-procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
-begin
-  CurrentMenu.MouseUp(Glwin.MouseX, Glwin.Height - Glwin.MouseY, Button,
-    Glwin.MousePressed);
 end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
   BackgroundLevelIdle(Glwin);
-
-  CurrentMenu.Idle(Glwin.Fps.IdleSpeed, nil, nil, []);
   TimeMessagesIdle;
 end;
 
@@ -864,6 +847,7 @@ end;
 procedure ShowStartMenu;
 var
   SavedMode: TGLMode;
+  SavedMenu: TCastleMenu;
 begin
   BackgroundLevelBegin;
   try
@@ -882,16 +866,17 @@ begin
 
         Glw.OnKeyDown := @KeyDown;
         Glw.OnMouseDown := @MouseDown;
-        Glw.OnMouseUp := @MouseUp;
-        Glw.OnMouseMove := @MouseMove;
         Glw.OnIdle := @Idle;
 
-        UserQuit := false;
+        Glw.UseControls := true;
+        SavedMenu := SetCurrentMenu(CurrentMenu, MainMenu);
 
+        UserQuit := false;
         repeat
           Glwm.ProcessMessage(true);
         until UserQuit;
 
+        Glw.Controls.MakeSingle(TCastleMenu, SavedMenu);
       finally FreeAndNil(SavedMode); end;
     finally SoundEngine.MusicPlayer.PlayedSound := stNone; end;
   finally
@@ -907,12 +892,10 @@ begin
   VideoMenu := TVideoMenu.Create;
   SoundMenu := TSoundMenu.Create;
   ChangeOpenALDeviceMenu := TChangeOpenALDeviceMenu.Create;
-  CurrentMenu := MainMenu;
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);
 begin
-  CurrentMenu := nil; { just for safety }
   FreeAndNil(MainMenu);
   FreeAndNil(VideoMenu);
   FreeAndNil(SoundMenu);

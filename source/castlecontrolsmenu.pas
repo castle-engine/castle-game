@@ -37,7 +37,7 @@ type
     procedure Draw(const Focused: boolean); override;
   end;
 
-{ Show menu that allows player to confugure controls.
+{ Show menu that allows player to configure controls.
   AIdleUnderMenu may be @nil. }
 procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
   AIdleUnderMenu: TGLWindowFunc;
@@ -204,9 +204,9 @@ begin
   inherited;
 
   case CurrentItem of
-    0: CurrentMenu := BasicControlsMenu;
-    1: CurrentMenu := ItemsControlsMenu;
-    2: CurrentMenu := OtherControlsMenu;
+    0: SetCurrentMenu(CurrentMenu, BasicControlsMenu);
+    1: SetCurrentMenu(CurrentMenu, ItemsControlsMenu);
+    2: SetCurrentMenu(CurrentMenu, OtherControlsMenu);
     3: begin
          UseMouseLook := not UseMouseLook;
          UseMouseLookArgument.Value := UseMouseLook;
@@ -380,7 +380,7 @@ begin
     ChangeKey(CastleGroupInputs[Group].Items[CurrentItem]) else
   if CurrentItem = CastleGroupInputs[Group].High + 1 then
   begin
-    CurrentMenu := ControlsMenu;
+    SetCurrentMenu(CurrentMenu, ControlsMenu);
   end else
     raise EInternalError.Create('Menu item unknown');
 end;
@@ -487,7 +487,6 @@ end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  CurrentMenu.KeyDown(Key, C);
   EventDown(false, Key, mbLeft);
 
   if ExitWithEscapeAllowed then
@@ -500,24 +499,28 @@ begin
     end;
 end;
 
+{ TODO: why shift by MoveX, MoveY?
 procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
 begin
   CurrentMenu.MouseMove(NewX - MoveX, Glwin.Height - NewY - MoveY,
     Glwin.MousePressed);
 end;
+}
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  CurrentMenu.MouseDown(Glwin.MouseX - MoveX,
-    Glwin.Height - Glwin.MouseY - MoveY, Button, Glwin.MousePressed);
+{ TODO: why shift by MoveX, MoveY?
+CurrentMenu.MouseDown(Glwin.MouseX - MoveX,
+    Glwin.Height - Glwin.MouseY - MoveY, Button, Glwin.MousePressed);}
   EventDown(true, K_None, Button);
 end;
 
+{ TODO: why shift by MoveX, MoveY?
 procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
 begin
   CurrentMenu.MouseUp(Glwin.MouseX - MoveX,
     Glwin.Height - Glwin.MouseY - MoveY, Button, Glwin.MousePressed);
-end;
+end;}
 
 procedure Idle(Glwin: TGLWindow);
 begin
@@ -537,6 +540,7 @@ procedure ShowControlsMenuCore(ADrawUnderMenu: TDrawFunc;
   out AExitWithEscape: boolean);
 var
   SavedMode: TGLMode;
+  SavedMenu: TCastleMenu;
 begin
   DrawUnderMenu := ADrawUnderMenu;
   IdleUnderMenu := AIdleUnderMenu;
@@ -565,16 +569,17 @@ begin
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
-    Glw.OnMouseUp := @MouseUp;
-    Glw.OnMouseMove := @MouseMove;
     Glw.OnIdle := @Idle;
 
-    UserQuit := false;
+    Glw.UseControls := true;
+    SavedMenu := SetCurrentMenu(CurrentMenu, ControlsMenu);
 
+    UserQuit := false;
     repeat
       Glwm.ProcessMessage(true);
     until UserQuit;
 
+    Glw.Controls.MakeSingle(TCastleMenu, SavedMenu);
   finally FreeAndNil(SavedMode); end;
 
   AExitWithEscape := ExitWithEscape;
@@ -620,13 +625,11 @@ begin
   BasicControlsMenu := TBasicControlsMenu.Create;
   ItemsControlsMenu := TItemsControlsMenu.Create;
   OtherControlsMenu := TOtherControlsMenu.Create;
-  CurrentMenu := ControlsMenu;
   SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);
 begin
-  CurrentMenu := nil; { just for safety }
   FreeAndNil(ControlsMenu);
   FreeAndNil(BasicControlsMenu);
   FreeAndNil(ItemsControlsMenu);
