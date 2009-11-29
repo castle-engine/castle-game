@@ -35,6 +35,14 @@ type
     SubMenuAdditionalInfo: string;
     constructor Create;
     procedure Draw(const Focused: boolean); override;
+
+    { Sets Position and PositionRelative* parameters.
+      Sets position suitable for the StartScreen, and then shifts
+      it by MoveX / MoveY. By default TSubMenu is positioned
+      like (MoveX, MoveY) = (0, 0).
+
+      If DoFixItemsAreas, also FixItemsAreas will be called afterwards. }
+    procedure SetPosition(const MoveX, MoveY: Single; const DoFixItemsAreas: boolean);
   end;
 
 { Show menu that allows player to configure controls.
@@ -130,14 +138,19 @@ var
 constructor TSubMenu.Create;
 begin
   inherited Create;
+  SetPosition(0, 0, false);
+  DrawBackgroundRectangle := false;
+end;
 
-  Position.Init(20, 440);
+procedure TSubMenu.SetPosition(const MoveX, MoveY: Single; const DoFixItemsAreas: boolean);
+begin
+  Position.Init(20 + MoveX, 440 + MoveY);
   PositionRelativeScreenX := prLowerBorder;
   PositionRelativeScreenY := prLowerBorder;
   PositionRelativeMenuX := prLowerBorder;
   PositionRelativeMenuY := prHigherBorder;
 
-  DrawBackgroundRectangle := false;
+  if DoFixItemsAreas then FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TSubMenu.Draw(const Focused: boolean);
@@ -452,18 +465,29 @@ var
   IdleUnderMenu: TGLWindowFunc;
   DrawFadeRect: boolean;
   GLList_DrawFadeRect: TGLuint;
-  MoveX, MoveY: Single;
   ExitWithEscapeAllowed: boolean;
   ExitWithEscape: boolean;
+  MoveX, MoveY: Single;
 
 procedure Draw2d(Draw2DData: Pointer);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
 
-  glTranslatef(MoveX, MoveY, 0);
   if DrawFadeRect then
-    glCallList(GLList_DrawFadeRect);
+  begin
+    glPushMatrix;
+      glTranslatef(MoveX, MoveY, 0);
+      glCallList(GLList_DrawFadeRect);
+    glPopMatrix;
+  end;
+
+  { TGLMenu must be drawn with translation (0, 0), otherwise mouse positions
+    in TGLMenu input events do not correspond to displayed menu positions.
+    We will position menu appropriately (doing equivalent of MoveX/Y shift
+    if needed) by initializing positions of all *ControlsMenu
+    in ShowControlsMenuCore. }
+
   CurrentMenu.Draw(false);
 end;
 
@@ -499,28 +523,10 @@ begin
     end;
 end;
 
-{ TODO: why shift by MoveX, MoveY?
-procedure MouseMove(Glwin: TGLWindow; NewX, NewY: Integer);
-begin
-  CurrentMenu.MouseMove(NewX - MoveX, Glwin.Height - NewY - MoveY,
-    Glwin.MousePressed);
-end;
-}
-
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-{ TODO: why shift by MoveX, MoveY?
-CurrentMenu.MouseDown(Glwin.MouseX - MoveX,
-    Glwin.Height - Glwin.MouseY - MoveY, Button, Glwin.MousePressed);}
   EventDown(true, K_None, Button);
 end;
-
-{ TODO: why shift by MoveX, MoveY?
-procedure MouseUp(Glwin: TGLWindow; Button: TMouseButton);
-begin
-  CurrentMenu.MouseUp(Glwin.MouseX - MoveX,
-    Glwin.Height - Glwin.MouseY - MoveY, Button, Glwin.MousePressed);
-end;}
 
 procedure Idle(Glwin: TGLWindow);
 begin
@@ -557,6 +563,11 @@ begin
     MoveX := 0;
     MoveY := 0;
   end;
+
+  ControlsMenu     .SetPosition(MoveX, MoveY, true);
+  BasicControlsMenu.SetPosition(MoveX, MoveY, true);
+  ItemsControlsMenu.SetPosition(MoveX, MoveY, true);
+  OtherControlsMenu.SetPosition(MoveX, MoveY, true);
 
   SavedMode := TGLMode.Create(glw, 0, false);
   try
