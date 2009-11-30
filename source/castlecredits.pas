@@ -150,7 +150,7 @@ begin
       nil,
       true { AutoRedisplay for background level updates },
       true { FPSActive should not be needed anymore, but I leave it. },
-      false, K_None, #0, false, false);
+      false, K_None, #0, false, nil);
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;

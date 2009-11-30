@@ -1176,61 +1176,55 @@ begin
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
       GL_ENABLE_BIT, true);
     try
-      { init navigator }
-      Glw.Navigator := Player.Navigator;
-      try
-        { Init Player.Navigator properties }
-        { No need to actually create TPlayGameHelper class,
-          but I must pass here an instance, not a TPlayGameHelper
-          only --- at least in objfpc mode, see
-          [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
-        Player.Navigator.OnMatrixChanged := @TPlayGameHelper(nil).MatrixChanged;
+      { Init Player.Navigator properties }
+      { No need to actually create TPlayGameHelper class,
+        but I must pass here an instance, not a TPlayGameHelper
+        only --- at least in objfpc mode, see
+        [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
+      Player.Navigator.OnMatrixChanged := @TPlayGameHelper(nil).MatrixChanged;
 
-        { Note that this sets AutoRedisplay to true. }
-        TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, @Resize,
-          nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
-          K_None, #0, { FpsShowOnCaption } false, { UseNavigator } true);
+      { Note that this sets AutoRedisplay to true. }
+      TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, @Resize,
+        nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
+        K_None, #0, { FpsShowOnCaption } false, Player.Navigator);
 
-        Glw.UseControls := false;
+      { OnTimer should be executed quite often, because footsteps sound
+        (done in TPlayer.Idle) relies on the fact that OnUsingEnd
+        of it's source will be called more-or-less immediately after
+        sound stopped. And our Timer calls RefreshUsed that will
+        call OnUsingEnd. }
+      Glwm.TimerMilisec := 100;
+      Glw.OnTimer := @Timer;
 
-        { OnTimer should be executed quite often, because footsteps sound
-          (done in TPlayer.Idle) relies on the fact that OnUsingEnd
-          of it's source will be called more-or-less immediately after
-          sound stopped. And our Timer calls RefreshUsed that will
-          call OnUsingEnd. }
-        Glwm.TimerMilisec := 100;
-        Glw.OnTimer := @Timer;
+      Glw.OnIdle := @Idle;
+      Glw.OnKeyDown := @KeyDown;
+      Glw.OnMouseDown := @MouseDown;
 
-        Glw.OnIdle := @Idle;
-        Glw.OnKeyDown := @KeyDown;
-        Glw.OnMouseDown := @MouseDown;
+      UpdateMouseLook;
 
-        UpdateMouseLook;
+      InitNewLevel;
 
-        InitNewLevel;
+      GameEnded := false;
+      GameEndedWantsRestart := '';
 
-        GameEnded := false;
-        GameEndedWantsRestart := '';
+      glEnable(GL_LIGHTING);
 
-        glEnable(GL_LIGHTING);
+      GLWinMessagesTheme.RectColor[3] := 0.4;
 
-        GLWinMessagesTheme.RectColor[3] := 0.4;
+      if PrepareNewPlayer then
+        Level.PrepareNewPlayer(Player);
 
-        if PrepareNewPlayer then
-          Level.PrepareNewPlayer(Player);
+      repeat
+        Glwm.ProcessMessage(true);
+      until GameEnded;
+    finally
+      { Clear some Player.Navigator callbacks. }
+      Player.Navigator.OnMatrixChanged := nil;
+      Player.Navigator.OnMoveAllowed := nil;
+      Player.Navigator.OnGetCameraHeight := nil;
 
-        repeat
-          Glwm.ProcessMessage(true);
-        until GameEnded;
-      finally
-        Glw.Navigator := nil;
-        { Clear some Player.Navigator callbacks. }
-        Player.Navigator.OnMatrixChanged := nil;
-        Player.Navigator.OnMoveAllowed := nil;
-        Player.Navigator.OnGetCameraHeight := nil;
-      end;
-    finally FreeAndNil(SavedMode); end;
-
+      FreeAndNil(SavedMode);
+    end;
   finally
     { clear global vars, for safety }
     ALevel := Level;

@@ -107,7 +107,6 @@ function ChooseByMenu(ADrawUnderMenu: TDrawFunc;
   MenuItems: TStringList): Integer;
 var
   SavedMode: TGLMode;
-  SavedMenu: TCastleMenu;
 begin
   DrawUnderMenu := ADrawUnderMenu;
 
@@ -121,7 +120,7 @@ begin
 
     TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
       nil, false, true { FPSActive should not be needed anymore, but I leave it. },
-      false, K_None, #0, false, false);
+      false, K_None, #0, false, nil);
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
@@ -131,15 +130,12 @@ begin
       with the menu text. }
     GLWinMessagesTheme.RectColor[3] := 1.0;
 
-    Glw.UseControls := true;
-    SavedMenu := Glw.Controls.MakeSingle(TGLMenu, ChooseMenu) as TCastleMenu;
+    Glw.Controls.MakeSingle(TGLMenu, ChooseMenu);
 
     Selected := false;
     repeat
       Glwm.ProcessMessage(true);
     until Selected;
-
-    Glw.Controls.MakeSingle(TCastleMenu, SavedMenu);
 
     Result := SelectedIndex;
   finally FreeAndNil(SavedMode); end;

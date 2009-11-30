@@ -847,7 +847,6 @@ end;
 procedure ShowStartMenu;
 var
   SavedMode: TGLMode;
-  SavedMenu: TCastleMenu;
 begin
   BackgroundLevelBegin;
   try
@@ -862,21 +861,18 @@ begin
           nil, false, true { FPSActive should not be needed anymore, but I leave it. },
           false, K_None, #0,
           { show fps on caption --- useful to test FPS of background level true}false,
-          false);
+          nil);
 
         Glw.OnKeyDown := @KeyDown;
         Glw.OnMouseDown := @MouseDown;
         Glw.OnIdle := @Idle;
 
-        Glw.UseControls := true;
-        SavedMenu := SetCurrentMenu(CurrentMenu, MainMenu);
+        SetCurrentMenu(CurrentMenu, MainMenu);
 
         UserQuit := false;
         repeat
           Glwm.ProcessMessage(true);
         until UserQuit;
-
-        Glw.Controls.MakeSingle(TCastleMenu, SavedMenu);
       finally FreeAndNil(SavedMode); end;
     finally SoundEngine.MusicPlayer.PlayedSound := stNone; end;
   finally

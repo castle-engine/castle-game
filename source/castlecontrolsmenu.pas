@@ -546,7 +546,6 @@ procedure ShowControlsMenuCore(ADrawUnderMenu: TDrawFunc;
   out AExitWithEscape: boolean);
 var
   SavedMode: TGLMode;
-  SavedMenu: TCastleMenu;
 begin
   DrawUnderMenu := ADrawUnderMenu;
   IdleUnderMenu := AIdleUnderMenu;
@@ -576,21 +575,18 @@ begin
 
     TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
       nil, false, true { FPSActive should not be needed anymore, but I leave it. },
-      false, K_None, #0, false, false);
+      false, K_None, #0, false, nil);
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
     Glw.OnIdle := @Idle;
 
-    Glw.UseControls := true;
-    SavedMenu := SetCurrentMenu(CurrentMenu, ControlsMenu);
+    SetCurrentMenu(CurrentMenu, ControlsMenu);
 
     UserQuit := false;
     repeat
       Glwm.ProcessMessage(true);
     until UserQuit;
-
-    Glw.Controls.MakeSingle(TCastleMenu, SavedMenu);
   finally FreeAndNil(SavedMode); end;
 
   AExitWithEscape := ExitWithEscape;

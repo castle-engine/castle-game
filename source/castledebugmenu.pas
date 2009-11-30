@@ -1181,7 +1181,6 @@ end;
 procedure ShowDebugMenu(ADrawUnderMenu: TDrawFunc);
 var
   SavedMode: TGLMode;
-  SavedMenu: TCastleMenu;
 begin
   DrawUnderMenu := ADrawUnderMenu;
 
@@ -1201,7 +1200,7 @@ begin
 
     TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
       nil, false, true { FPSActive should not be needed anymore, but I leave it. },
-      false, K_None, #0, false, false);
+      false, K_None, #0, false, nil);
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
@@ -1211,15 +1210,12 @@ begin
     Glw.OnMouseDown := @MouseDown;
     Glw.OnIdle := @Idle;
 
-    Glw.UseControls := true;
-    SavedMenu := SetCurrentMenu(CurrentMenu, DebugMenu);
+    SetCurrentMenu(CurrentMenu, DebugMenu);
 
     UserQuit := false;
     repeat
       Glwm.ProcessMessage(true);
     until GameEnded or UserQuit;
-
-    Glw.Controls.MakeSingle(TCastleMenu, SavedMenu);
   finally FreeAndNil(SavedMode); end;
 end;
 

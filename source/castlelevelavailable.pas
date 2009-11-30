@@ -288,7 +288,7 @@ begin
       TGLWindowState.SetStandardNoCloseState(Glw, @DrawCreateLevel, @Resize2D,
         Self, false,
         true { FPSActive should not be needed anymore, but I leave it. },
-        false, K_None, false, false);
+        false, K_None, false, nil);
 
       Glw.EventResize;
 
