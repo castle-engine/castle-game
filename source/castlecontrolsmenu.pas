@@ -81,7 +81,7 @@ implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
   GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
-  CastleInputs, Keys, VectorMath, KambiUtils, CastlePlay,
+  CastleInputs, KeysMouse, VectorMath, KambiUtils, CastlePlay,
   CastleConfig, KambiStringUtils, CastleTimeMessages;
 
 { TCastleMenu descendants interface ------------------------------------------ }

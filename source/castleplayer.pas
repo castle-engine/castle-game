@@ -410,7 +410,7 @@ type
 
 implementation
 
-uses Math, SysUtils, KambiClassUtils, Keys, CastlePlay, GLWinMessages,
+uses Math, SysUtils, KambiClassUtils, KeysMouse, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
   GLWindow, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, KambiOpenAL, VRMLNodes, CastleControlsMenu,

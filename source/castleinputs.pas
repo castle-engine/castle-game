@@ -23,7 +23,7 @@ unit CastleInputs;
 
 interface
 
-uses Keys, Navigation, KambiUtils, KambiClassUtils;
+uses KeysMouse, Navigation, KambiUtils, KambiClassUtils;
 
 {$define read_interface}
 
