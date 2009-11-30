@@ -858,7 +858,7 @@ begin
         { This shouldn't change projection matrix anyway. }
         SavedMode.RestoreProjectionMatrix := false;
 
-        SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
+        TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
           nil, false, true { FPSActive should not be needed anymore, but I leave it. },
           false, K_None, #0,
           { show fps on caption --- useful to test FPS of background level true}false,

@@ -285,7 +285,7 @@ begin
   begin
     SavedMode := TGLMode.Create(Glw, 0, true);
     try
-      SetStdNoCloseGLWindowState(Glw, @DrawCreateLevel, @Resize2D,
+      TGLWindowState.SetStandardNoCloseState(Glw, @DrawCreateLevel, @Resize2D,
         Self, false,
         true { FPSActive should not be needed anymore, but I leave it. },
         false, K_None, false, false);

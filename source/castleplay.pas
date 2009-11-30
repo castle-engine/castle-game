@@ -1187,7 +1187,7 @@ begin
         Player.Navigator.OnMatrixChanged := @TPlayGameHelper(nil).MatrixChanged;
 
         { Note that this sets AutoRedisplay to true. }
-        SetStandardGLWindowState(Glw, @Draw, @CloseQuery, @Resize,
+        TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, @Resize,
           nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
           K_None, #0, { FpsShowOnCaption } false, { UseNavigator } true);
 

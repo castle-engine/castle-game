@@ -1199,7 +1199,7 @@ begin
       new projection matrix should stay for the game. }
     SavedMode.RestoreProjectionMatrix := false;
 
-    SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
+    TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
       nil, false, true { FPSActive should not be needed anymore, but I leave it. },
       false, K_None, #0, false, false);
 

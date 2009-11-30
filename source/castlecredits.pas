@@ -146,7 +146,7 @@ begin
   SavedMode := TGLMode.Create(glw, GL_ENABLE_BIT
     { for glEnable(GL_LIGHTING) }, false);
   try
-    SetStandardGLWindowState(Glw, @Draw, @CloseQuery, Glw.OnResize,
+    TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
       nil,
       true { AutoRedisplay for background level updates },
       true { FPSActive should not be needed anymore, but I leave it. },
