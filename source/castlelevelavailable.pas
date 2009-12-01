@@ -294,7 +294,7 @@ begin
 
       CreateLevelNoBackground;
 
-      { This is just a dirty hack to make user to actually see the
+      { Just a dirty hack to make user to actually see the
         "DOOM E1M1" loading background --- otherwise loading of doom
         level goes so fast that it's practically not noticeable.
         Maybe in the future I'll remove this hack (if level loading

@@ -82,9 +82,9 @@ var
 var
   { Read-only from outside of this unit. }
   GameEnded: boolean;
-  { This is important only if GameEnded. Will be a level name (<> '')
-    if user wants to immediately restart the game. Caller of PlayGame
-    should use this. }
+  { Will be a level name (<> '') if user wants to immediately restart the game.
+    This is important only if GameEnded.
+    Caller of PlayGame should use this. }
   GameEndedWantsRestart: string;
 
   { Read-only from outside of this unit. Initially false when starting
