@@ -102,7 +102,7 @@ type
     { In descendants only PrepareRender can (and should!) set this. }
     CameraRadiusFromPrepareRender: Single;
 
-    { This is like @inherited, but it passes proper values for boolean parameters
+    { Like @inherited, but it passes proper values for boolean parameters
       specifying what to prepare. }
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
@@ -157,7 +157,7 @@ type
       read FSoundDyingTiedToCreature write FSoundDyingTiedToCreature
       default DefaultSoundDyingTiedToCreature;
 
-    { This is a default MaxLife for this Kind.
+    { The default MaxLife for this Kind.
 
       You cannot depend that every creature has this MaxLife ---
       caller can pass any MaxLife value when creating creature by
@@ -230,7 +230,7 @@ type
     property CastsShadow: boolean read FCastsShadow write FCastsShadow
       default DefaultCastsShadow;
 
-    { This is used by RequireCreatures, UnRequireCreatures to count
+    { Used by RequireCreatures, UnRequireCreatures to count
       how many times this kind is required. Idea is that when this drops
       to zero, we can FreePrepareRender to free resources. }
     property RequiredCount: Cardinal
@@ -250,7 +250,7 @@ type
     procedure LoadFromFile;
   end;
 
-  { This is a TCreatureKind that has simple states:
+  { A TCreatureKind that has simple states:
     standing stil, walking (aka running), performing an attack and dying.
     Note that you should specify all animation times in seconds
     (just like Level.AnimationTime). }
@@ -302,23 +302,23 @@ type
     procedure FreePrepareRender; override;
     procedure CloseGL; override;
 
-    { This is an animation of standing still.
+    { An animation of standing still.
       Beginning must be on time 0.
       Beginning and end of it must glue together. }
     property StandAnimation: TVRMLGLAnimation read FStandAnimation;
 
-    { This is an animation when he changes from standing still to walking.
+    { An animation when creature changes from standing still to walking.
       Beginning must be on time 0.
       It's beginnig must glue with beginning of StandAnimation,
       it's ending must glue with beginning of WalkAnimation. }
     property StandToWalkAnimation: TVRMLGLAnimation read FStandToWalkAnimation;
 
-    { This is an animation of walking.
+    { An animation of walking.
       Beginning must be on time 0.
       Beginning and end of it must glue together. }
     property WalkAnimation: TVRMLGLAnimation read FWalkAnimation;
 
-    { This is an animation of attacking.
+    { An animation of attacking.
       Beginning must be on time 0.
       Beginning and end of it should roughly glue with frames WalkAnimation
       and StandAnimation.
@@ -334,14 +334,14 @@ type
       before the attack. }
     property AttackAnimation: TVRMLGLAnimation read FAttackAnimation;
 
-    { This is an animation of dying.
+    { An animation of dying.
       Beginning must be on time 0.
       Beginning should *more-or-less* look like any point of the stand/attack/walk
       animations. Note that we can display this animation infinitely,
       so it must work good after Time > it's TimeEnd. }
     property DyingAnimation: TVRMLGLAnimation read FDyingAnimation;
 
-    { This is an optional dying animation. May be @nil, and corresponding
+    { An optional dying animation. May be @nil, and corresponding
       DyingBackAnimationInfo may be @nil. If not @nil, this will be used
       if creature is killed by hitting it in the back (and normal
       DyingAnimation is used only when it's killed by hitting from the front).
@@ -357,7 +357,7 @@ type
       for TimeDurationWithBack time. }
     property HurtAnimation: TVRMLGLAnimation read FHurtAnimation;
 
-    { This is moving speed --- how much Direction vector will be scaled
+    { The moving speed: how much Direction vector will be scaled
       when moving in wasWalk. }
     property MoveSpeed: Single read FMoveSpeed write FMoveSpeed
       default DefaultMoveSpeed;
@@ -377,7 +377,7 @@ type
       read FMaxAttackDistance write FMaxAttackDistance
       default DefaultMaxAttackDistance;
 
-    { This is the preferred distance between player and the creature
+    { The preferred distance between player and the creature
       to perform the attack. This must always be <= MaxAttackDistance.
       The idea is that the creature can attack player from MaxAttackDistance,
       but still it will walk closer to the player --- until the distance
@@ -386,7 +386,7 @@ type
       read FPreferredAttackDistance write FPreferredAttackDistance
       default DefaultPreferredAttackDistance;
 
-    { This is the time point within AttackAnimation
+    { The time point within AttackAnimation
       at which ActualAttack method will be called.
       Note that actually ActualAttack may be called a *very little* later
       (hopefully it shouldn't be noticeable to the player). }
@@ -547,7 +547,7 @@ type
       const MaxLife: Single): TCreature; override;
   end;
 
-  { This is a missile. As you can see, this is also treated as a creature
+  { A missile. As you can see, this is also treated as a creature
     --- it's just a very dumb creature, that just moves into the given
     direction and explodes on any collision.
 
@@ -583,7 +583,7 @@ type
       In the simplest case, you can just place here a single scene. }
     property Animation: TVRMLGLAnimation read FAnimation;
 
-    { This is moving speed --- how much Direction vector will be scaled
+    { The moving speed: how much Direction vector will be scaled
       when moving. }
     property MoveSpeed: Single read FMoveSpeed write FMoveSpeed
       default DefaultMissileMoveSpeed;
@@ -632,7 +632,7 @@ type
       read FFallsDownSpeed write FFallsDownSpeed default DefaultFallsDownSpeed;
   end;
 
-  { This is a really dumb creature that just stays still during the whole
+  { A really dumb creature that just stays still during the whole
     game. Basically this is just TVRMLGLAnimation that is displayed as
     a creature. }
   TStillCreatureKind = class(TCreatureKind)
@@ -822,18 +822,18 @@ type
       so it must be implemented to work even when Level is not assigned yet. }
     function CurrentScene: TVRMLGLScene; virtual; abstract;
 
-    { This is the position of the (0, 0, 0) point of creature model
+    { The position of the (0, 0, 0) point of creature model
       (or rather, currently used model! Creatures are animated after all). }
     property LegsPosition: TVector3Single read FLegsPosition
       write SetLegsPosition;
 
-    { This is the height of MiddlePosition above LegsPosition.
+    { The height of MiddlePosition above LegsPosition.
       Calculated in this class using CurrentScene.BoundingBox[1, 2]
       and Kind.MiddlePositionHeight.
       Note that while CurrentScene may change, this also may change. }
     function HeightBetweenLegsAndMiddle: Single; virtual;
 
-    { This is the "middle" position of the creature.
+    { The "middle" position of the creature.
       For some creatures it can be considered the position of their "heads".
       How precisely this is calculated for given creature depends
       on MiddlePositionFromLegs implementation in this class.
@@ -993,7 +993,7 @@ type
   TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack,
     wasDying, wasDyingBack, wasHurt, wasSpecial1);
 
-  { This is TCreature that has a kind always of TWalkAttackCreatureKind. }
+  { A TCreature that has a kind always of TWalkAttackCreatureKind. }
   TWalkAttackCreature = class(TCreature)
   private
     FState: TWalkAttackCreatureState;
@@ -1063,7 +1063,7 @@ type
 
     function CurrentScene: TVRMLGLScene; override;
 
-    { This is the method where you must actually do your attack
+    { The method where you must actually do your attack
       --- fire a missile, lower player's life etc.
 
       This happens in the middle of AttackAnimation,
@@ -1138,7 +1138,7 @@ type
     function RemoveMeFromLevel: boolean; override;
   end;
 
-  { This is TCreature that has a kind always of TMissileCreatureKind. }
+  { A TCreature that has a kind always of TMissileCreatureKind. }
   TMissileCreature = class(TCreature)
   private
     procedure ExplodeCore;
