@@ -23,7 +23,7 @@ unit CastleGeneralMenu;
 
 interface
 
-uses GLMenu;
+uses Classes, GLMenu;
 
 type
   { Just TGLMenu that calls Glw.PostRedisplay and plays a sound
@@ -36,7 +36,7 @@ type
     to ExclusiveEvents being @false. }
   TCastleMenu = class(TGLMenu)
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
     procedure CurrentItemChanged; override;
     procedure SomethingChanged; override;
@@ -60,7 +60,7 @@ uses SysUtils, GLWindow, CastleWindow, CastleSound;
 
 { TCastleMenu ---------------------------------------------------------------- }
 
-constructor TCastleMenu.Create;
+constructor TCastleMenu.Create(AOwner: TComponent);
 begin
   inherited;
   { Don't set DesignerModeWindow, we do tricks that make setting mouse

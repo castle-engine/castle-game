@@ -84,7 +84,8 @@ begin
     CreateLevel(true);
 
   { initialize BackgroundNavigator }
-  BackgroundNavigator := TWalkNavigator.Create(@Glw.PostRedisplayOnMatrixChanged);
+  BackgroundNavigator := TWalkNavigator.Create(nil);
+  BackgroundNavigator.OnMatrixChanged := @Glw.PostRedisplayOnMatrixChanged;
   BackgroundNavigator.Init(BackgroundLevel.InitialCameraPos,
     BackgroundLevel.InitialCameraDir,
     BackgroundLevel.InitialCameraUp,

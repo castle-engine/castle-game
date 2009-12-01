@@ -48,7 +48,8 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
 
 type
   TMainMenu = class(TCastleMenu)
-    constructor Create;
+  public
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
   end;
 
@@ -63,6 +64,7 @@ type
   end;
 
   TVideoMenu = class(TSubMenu)
+  public
     TextureMinificationQualitySlider: TGLMenuIntegerSlider;
     AllowScreenChangeArgument: TGLMenuBooleanArgument;
     RenderShadowsArgument: TGLMenuBooleanArgument;
@@ -72,7 +74,7 @@ type
     ConserveResourcesArgument: TGLMenuBooleanArgument;
     BumpMappingArgument: TGLMenuBooleanArgument;
     AntiAliasingSlider: TAntiAliasingSlider;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure SetTextureMinificationQuality(
       Value: TTextureMinificationQuality;
       UpdateSlider: boolean);
@@ -84,28 +86,31 @@ type
   end;
 
   TSoundMenu = class(TSubMenu)
+  public
     SoundInfo: TGLSoundInfoMenuItem;
     SoundVolume: TGLSoundVolumeMenuItem;
     MusicVolume: TGLMusicVolumeMenuItem;
 
     OpenALDeviceArgument: TGLMenuItemArgument;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
   TChangeOpenALDeviceMenu = class(TSubMenu)
+  public
     OpenALDevices: TStringList;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure CurrentItemSelected; override;
   end;
 
   TChooseNewLevelMenu = class(TSubMenu)
+  public
     LevelsAvailableForNewGame: TLevelsAvailableList;
     FirstDemoLevelIndex: Cardinal;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure CurrentItemSelected; override;
     function SpaceBetweenItems(const NextItemIndex: Cardinal): Cardinal; override;
@@ -126,7 +131,7 @@ var
 
 { NewGame ------------------------------------------------------------- }
 
-{ This is just a wrapper that calls PlayGame.
+{ Just a wrapper that calls PlayGame.
 
   Before calling PlayGame it prepares some things (creating player)
   and after calling PlayGame is restores some things
@@ -184,9 +189,9 @@ end;
 
 { TMainMenu ------------------------------------------------------------ }
 
-constructor TMainMenu.Create;
+constructor TMainMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   Items.Add('New game');
   Items.Add('Configure controls');
@@ -214,7 +219,7 @@ procedure TMainMenu.CurrentItemSelected;
     begin
       { Recreate ChooseNewLevelMenu now, to refresh list of levels AvailableForNewGame. }
       FreeAndNil(ChooseNewLevelMenu);
-      ChooseNewLevelMenu := TChooseNewLevelMenu.Create;
+      ChooseNewLevelMenu := TChooseNewLevelMenu.Create(nil);
 
       SetCurrentMenu(CurrentMenu, ChooseNewLevelMenu);
     end;
@@ -315,9 +320,9 @@ begin
     Result := IntToStr(Value);
 end;
 
-constructor TVideoMenu.Create;
+constructor TVideoMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   TextureMinificationQualitySlider := TTextureMinificationQualitySlider.Create;
   AllowScreenChangeArgument := TGLMenuBooleanArgument.Create(AllowScreenChange);
@@ -602,9 +607,9 @@ end;
 
 { TSoundMenu ------------------------------------------------------------- }
 
-constructor TSoundMenu.Create;
+constructor TSoundMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
   OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
@@ -652,7 +657,7 @@ end;
 
 { TChangeOpenALDeviceMenu ---------------------------------------------------- }
 
-constructor TChangeOpenALDeviceMenu.Create;
+constructor TChangeOpenALDeviceMenu.Create(AOwner: TComponent);
 var
   I: Integer;
 begin
@@ -695,7 +700,7 @@ end;
 
 { TChooseNewLevelMenu ------------------------------------------------------- }
 
-constructor TChooseNewLevelMenu.Create;
+constructor TChooseNewLevelMenu.Create(AOwner: TComponent);
 
   { Add level to LevelsAvailableForNewGame and Items lists.
     Index is an index into LevelsAvailable array for this level. }
@@ -884,10 +889,10 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  MainMenu := TMainMenu.Create;
-  VideoMenu := TVideoMenu.Create;
-  SoundMenu := TSoundMenu.Create;
-  ChangeOpenALDeviceMenu := TChangeOpenALDeviceMenu.Create;
+  MainMenu := TMainMenu.Create(nil);
+  VideoMenu := TVideoMenu.Create(nil);
+  SoundMenu := TSoundMenu.Create(nil);
+  ChangeOpenALDeviceMenu := TChangeOpenALDeviceMenu.Create(nil);
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);

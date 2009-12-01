@@ -41,15 +41,16 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
 
 type
   TGameMenu = class(TCastleMenu)
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
   end;
 
   TGameSoundMenu = class(TCastleMenu)
+  public
     SoundInfo: TGLSoundInfoMenuItem;
     SoundVolume: TGLSoundVolumeMenuItem;
     MusicVolume: TGLMusicVolumeMenuItem;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
@@ -67,9 +68,9 @@ var
 
 { TGameMenu ------------------------------------------------------------ }
 
-constructor TGameMenu.Create;
+constructor TGameMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   Items.Add('Back to game');
   Items.Add('View last game messages');
@@ -99,9 +100,9 @@ end;
 
 { TGameSoundMenu ------------------------------------------------------------- }
 
-constructor TGameSoundMenu.Create;
+constructor TGameSoundMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   SoundInfo := TGLSoundInfoMenuItem.Create(Glw, Self, SoundEngine);
   SoundVolume := TGLSoundVolumeMenuItem.Create(Glw, Self, SoundEngine);
@@ -203,8 +204,8 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  GameMenu := TGameMenu.Create;
-  GameSoundMenu := TGameSoundMenu.Create;
+  GameMenu := TGameMenu.Create(nil);
+  GameSoundMenu := TGameSoundMenu.Create(nil);
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);

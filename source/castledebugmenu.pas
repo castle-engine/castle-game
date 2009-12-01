@@ -41,54 +41,62 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
 
 type
   TViewAngleSlider = class(TGLMenuFloatSlider)
+  public
     constructor Create;
     function ValueToStr(const AValue: Single): string; override;
   end;
 
   TDebugMenu = class(TCastleMenu)
+  public
     RenderBoundingBoxesArgument: TGLMenuBooleanArgument;
     RenderDebugCaptionsArgument: TGLMenuBooleanArgument;
     DebugRenderShadowVolumeArgument: TGLMenuBooleanArgument;
     DebugRenderForLevelScreenshotArgument: TGLMenuBooleanArgument;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
   end;
 
   TDebugPlayerMenu = class(TCastleMenu)
+  public
     ViewAngleSlider: TViewAngleSlider;
     RotationHorizontalSpeedSlider: TGLMenuFloatSlider;
     RotationVerticalSpeedSlider: TGLMenuFloatSlider;
     PlayerSpeedSlider: TGLMenuFloatSlider;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
   TDebugItemsMenu = class(TCastleMenu)
-    constructor Create;
+  public
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
   end;
 
   TDebugCreaturesMenu = class(TCastleMenu)
+  public
     DebugTimeStopForCreaturesArgument: TGLMenuBooleanArgument;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
   end;
 
   TDebugLevelMenu = class(TCastleMenu)
-    constructor Create;
+  public
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
   TEditLevelLightsMenu = class(TCastleMenu)
+  public
     AmbientColorSlider: array[0..2] of TGLMenuFloatSlider;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
   TEditOneLightMenu = class(TCastleMenu)
+  public
     Light: TVRMLLightNode;
     RedColorSlider: TGLMenuFloatSlider;
     GreenColorSlider: TGLMenuFloatSlider;
@@ -98,28 +106,30 @@ type
     OnArgument: TGLMenuBooleanArgument;
     ShadowsArgument: TGLMenuBooleanArgument;
     ShadowsMainArgument: TGLMenuBooleanArgument;
-    constructor Create(ALight: TVRMLLightNode);
+    constructor Create(AOwner: TComponent; ALight: TVRMLLightNode); reintroduce;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
   TEditHeadlightMenu = class(TCastleMenu)
+  public
     AmbientIntensitySlider: TGLMenuFloatSlider;
     ColorSlider: array[0..2] of TGLMenuFloatSlider;
     IntensitySlider: TGLMenuFloatSlider;
     SpotArgument: TGLMenuBooleanArgument;
     { Create this only when Level.Headlight <> nil. }
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
 
   TEditBumpMappingLightMenu = class(TCastleMenu)
+  public
     PositionSlider: array [0..2] of TGLMenuFloatSlider;
     AmbientColorSlider: array [boolean, 0..2] of TGLMenuFloatSlider;
     DiffuseColorSlider: array [0..2] of TGLMenuFloatSlider;
     LockMainShadowsLightArgument: TGLMenuBooleanArgument;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
     procedure DoLockMainShadowsLight;
@@ -158,9 +168,9 @@ var
 
 { TDebugMenu ------------------------------------------------------------ }
 
-constructor TDebugMenu.Create;
+constructor TDebugMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   RenderBoundingBoxesArgument := TGLMenuBooleanArgument.Create(RenderBoundingBoxes);
   RenderDebugCaptionsArgument := TGLMenuBooleanArgument.Create(RenderDebugCaptions);
@@ -225,7 +235,7 @@ begin
     8: SoundEngine.ReadSoundInfos;
     9: begin
          FreeAndNil(EditLevelLightsMenu);
-         EditLevelLightsMenu := TEditLevelLightsMenu.Create;
+         EditLevelLightsMenu := TEditLevelLightsMenu.Create(nil);
          SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
        end;
     10:ForceThunder;
@@ -236,9 +246,9 @@ end;
 
 { TDebugPlayerMenu ----------------------------------------------------------- }
 
-constructor TDebugPlayerMenu.Create;
+constructor TDebugPlayerMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   ViewAngleSlider := TViewAngleSlider.Create;
 
@@ -316,9 +326,9 @@ end;
 
 { TDebugCreaturesMenu -------------------------------------------------------- }
 
-constructor TDebugCreaturesMenu.Create;
+constructor TDebugCreaturesMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   DebugTimeStopForCreaturesArgument := TGLMenuBooleanArgument.Create(
     DebugTimeStopForCreatures);
@@ -460,9 +470,9 @@ end;
 
 { TDebugLevelMenu -------------------------------------------------------- }
 
-constructor TDebugLevelMenu.Create;
+constructor TDebugLevelMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   Items.Add('Change to level');
   Items.Add('Restart current level (preserving camera)');
@@ -540,9 +550,9 @@ end;
 
 { TDebugItemsMenu ------------------------------------------------------------ }
 
-constructor TDebugItemsMenu.Create;
+constructor TDebugItemsMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   Items.Add('Give me 20 instances of every possible item');
   Items.Add('Reload items/kinds.xml file');
@@ -601,9 +611,9 @@ end;
 
 { TEditHeadlightMenu --------------------------------------------------------- }
 
-constructor TEditHeadlightMenu.Create;
+constructor TEditHeadlightMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   { To better visualize light changes. }
   DrawBackgroundRectangle := false;
@@ -721,7 +731,7 @@ var
     for testing after all. }
   LockMainShadowsLight: boolean = false;
 
-constructor TEditBumpMappingLightMenu.Create;
+constructor TEditBumpMappingLightMenu.Create(AOwner: TComponent);
 var
   I: Integer;
   LevelBoxSizes: TVector3Single;
@@ -851,12 +861,12 @@ end;
 
 { TEditLevelLightsMenu ------------------------------------------------------- }
 
-constructor TEditLevelLightsMenu.Create;
+constructor TEditLevelLightsMenu.Create(AOwner: TComponent);
 var
   I: Integer;
   LightNode: TVRMLLightNode;
 begin
-  inherited Create;
+  inherited;
 
   { To better visualize changes to Level.GlobalAmbientLight }
   DrawBackgroundRectangle := false;
@@ -911,7 +921,7 @@ begin
          if Level.Scene.Headlight <> nil then
          begin
            FreeAndNil(EditHeadlightMenu);
-           EditHeadlightMenu := TEditHeadlightMenu.Create;
+           EditHeadlightMenu := TEditHeadlightMenu.Create(nil);
            SetCurrentMenu(CurrentMenu, EditHeadlightMenu);
          end else
            MessageOK(Glw, 'No headlight in level ' +
@@ -921,14 +931,14 @@ begin
          { recreate EditBumpMappingLightMenu, since light properties possibly
            changed by outside action (e.g. some TLevel.Idle ?) }
          FreeAndNil(EditBumpMappingLightMenu);
-         EditBumpMappingLightMenu := TEditBumpMappingLightMenu.Create;
+         EditBumpMappingLightMenu := TEditBumpMappingLightMenu.Create(nil);
          SetCurrentMenu(CurrentMenu, EditBumpMappingLightMenu);
        end;
     7: SetCurrentMenu(CurrentMenu, DebugMenu);
     else
        begin
          FreeAndNil(EditOneLightMenu);
-         EditOneLightMenu := TEditOneLightMenu.Create(
+         EditOneLightMenu := TEditOneLightMenu.Create(nil,
            Level.LightSet.Lights.Items[CurrentItem].LightNode);
          SetCurrentMenu(CurrentMenu, EditOneLightMenu);
        end;
@@ -949,9 +959,9 @@ end;
 
 { TEditOneLightMenu ---------------------------------------------------------- }
 
-constructor TEditOneLightMenu.Create(ALight: TVRMLLightNode);
+constructor TEditOneLightMenu.Create(AOwner: TComponent; ALight: TVRMLLightNode);
 begin
-  inherited Create;
+  inherited Create(AOwner);
 
   { To better visualize light changes. }
   DrawBackgroundRectangle := false;
@@ -1223,11 +1233,11 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  DebugMenu := TDebugMenu.Create;
-  DebugPlayerMenu := TDebugPlayerMenu.Create;
-  DebugCreaturesMenu := TDebugCreaturesMenu.Create;
-  DebugLevelMenu := TDebugLevelMenu.Create;
-  DebugItemsMenu := TDebugItemsMenu.Create;
+  DebugMenu := TDebugMenu.Create(nil);
+  DebugPlayerMenu := TDebugPlayerMenu.Create(nil);
+  DebugCreaturesMenu := TDebugCreaturesMenu.Create(nil);
+  DebugLevelMenu := TDebugLevelMenu.Create(nil);
+  DebugItemsMenu := TDebugItemsMenu.Create(nil);
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);

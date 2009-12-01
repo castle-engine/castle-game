@@ -23,17 +23,18 @@ unit CastleControlsMenu;
 
 interface
 
-uses GLWindow, GL, GLU, GLExt, CastleGeneralMenu, Navigation,
+uses Classes, GLWindow, GL, GLU, GLExt, CastleGeneralMenu, Navigation,
   OpenGLFonts, OpenGLBmpFonts;
 
 type
   TSubMenu = class(TCastleMenu)
+  public
     SubMenuTitle: string;
     { Note that you can freely change this at runtime. No need to call
       things like FixItemsAreas or something like that when you change
       the value of this property. }
     SubMenuAdditionalInfo: string;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure Draw(const Focused: boolean); override;
 
     { Sets Position and PositionRelative* parameters.
@@ -51,8 +52,8 @@ procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
   AIdleUnderMenu: TGLWindowFunc;
   ADrawFadeRect, ADrawCentered: boolean);
 
-{ This is like ShowControlsMenu, but user can quit with
-  escape key. AExitWithEscape will be set to @true or @false,
+{ Like ShowControlsMenu, but user can quit with 
+  the escape key. AExitWithEscape will be set to @true or @false,
   depending on whether user used escape to exit. }
 procedure ShowControlsMenuEscape(ADrawUnderMenu: TDrawFunc;
   AIdleUnderMenu: TGLWindowFunc;
@@ -88,12 +89,13 @@ uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
 
 type
   TControlsMenu = class(TSubMenu)
+  public
     MouseLookHorizontalSensitivitySlider: TGLMenuFloatSlider;
     MouseLookVerticalSensitivitySlider: TGLMenuFloatSlider;
     AutoOpenInventoryArgument: TGLMenuBooleanArgument;
     UseMouseLookArgument: TGLMenuBooleanArgument;
     InvertVerticalMouseLookArgument: TGLMenuBooleanArgument;
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
   end;
@@ -103,7 +105,7 @@ type
     FGroup: TInputGroup;
     procedure InputChanged(InputConfiguration: TInputConfiguration);
   public
-    constructor Create(AGroup: TInputGroup);
+    constructor CreateControlsSubMenu(AOwner: TComponent; AGroup: TInputGroup);
     destructor Destroy; override;
 
     property Group: TInputGroup read FGroup;
@@ -111,15 +113,15 @@ type
   end;
 
   TBasicControlsMenu = class(TControlsSubMenu)
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
   end;
 
   TItemsControlsMenu = class(TControlsSubMenu)
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
   end;
 
   TOtherControlsMenu = class(TControlsSubMenu)
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -135,9 +137,9 @@ var
 
 { TSubMenu ------------------------------------------------------------- }
 
-constructor TSubMenu.Create;
+constructor TSubMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
   SetPosition(0, 0, false);
   DrawBackgroundRectangle := false;
 end;
@@ -180,9 +182,9 @@ end;
 
 { TControlsMenu ------------------------------------------------------------- }
 
-constructor TControlsMenu.Create;
+constructor TControlsMenu.Create(AOwner: TComponent);
 begin
-  inherited Create;
+  inherited;
 
   MouseLookHorizontalSensitivitySlider := TGLMenuFloatSlider.Create(
     0.01, 0.3, MouseLookHorizontalSensitivity);
@@ -275,7 +277,8 @@ end;
 const
   SNoneInput = '<none>';
 
-constructor TControlsSubMenu.Create(AGroup: TInputGroup);
+constructor TControlsSubMenu.CreateControlsSubMenu(AOwner: TComponent;
+  AGroup: TInputGroup);
 
   function InputArgument(const S: string): TGLMenuItemArgument;
   begin
@@ -292,7 +295,8 @@ constructor TControlsSubMenu.Create(AGroup: TInputGroup);
 var
   I: Integer;
 begin
-  inherited Create;
+  inherited Create(AOwner);
+
   FGroup := AGroup;
 
   for I := 0 to CastleGroupInputs[Group].High do
@@ -411,18 +415,18 @@ end;
 
 { TBasicControlsMenu ------------------------------------------------------------- }
 
-constructor TBasicControlsMenu.Create;
+constructor TBasicControlsMenu.Create(AOwner: TComponent);
 begin
-  inherited Create(kgBasic);
+  inherited CreateControlsSubMenu(AOwner, kgBasic);
 
   SubMenuTitle := 'Configure basic controls';
 end;
 
 { TItemsControlsMenu --------------------------------------------------------- }
 
-constructor TItemsControlsMenu.Create;
+constructor TItemsControlsMenu.Create(AOwner: TComponent);
 begin
-  inherited Create(kgItems);
+  inherited CreateControlsSubMenu(AOwner, kgItems);
 
   SubMenuTitle := 'Configure items controls';
 
@@ -434,9 +438,9 @@ end;
 
 { TOtherControlsMenu ------------------------------------------------------------- }
 
-constructor TOtherControlsMenu.Create;
+constructor TOtherControlsMenu.Create(AOwner: TComponent);
 begin
-  inherited Create(kgOther);
+  inherited CreateControlsSubMenu(AOwner, kgOther);
 
   SubMenuTitle := 'Configure other controls';
 
@@ -628,10 +632,10 @@ begin
     glDisable(GL_BLEND);
   finally glEndList end;
 
-  ControlsMenu := TControlsMenu.Create;
-  BasicControlsMenu := TBasicControlsMenu.Create;
-  ItemsControlsMenu := TItemsControlsMenu.Create;
-  OtherControlsMenu := TOtherControlsMenu.Create;
+  ControlsMenu := TControlsMenu.Create(nil);
+  BasicControlsMenu := TBasicControlsMenu.Create(nil);
+  ItemsControlsMenu := TItemsControlsMenu.Create(nil);
+  OtherControlsMenu := TOtherControlsMenu.Create(nil);
   SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
 

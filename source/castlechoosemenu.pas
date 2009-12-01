@@ -145,7 +145,7 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  ChooseMenu := TChooseMenu.Create;
+  ChooseMenu := TChooseMenu.Create(nil);
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);
