@@ -1827,7 +1827,7 @@ begin
   Sender.UserData.Free;
   Sender.UserData := nil;
   Sender.OnUsingEnd := nil;
-  UsedSounds.Delete(Sender);
+  UsedSounds.Remove(Sender);
 end;
 
 procedure TCreature.Sound3d(const SoundType: TSoundType; const SoundHeight: Single;
@@ -2358,7 +2358,7 @@ begin
   for I := 0 to High do
     if Items[I].RemoveMeFromLevel then
       FreeAndNil(I);
-  DeleteAll(nil);
+  RemoveAll(nil);
 end;
 
 function TCreaturesList.MoveAllowedSimple(
