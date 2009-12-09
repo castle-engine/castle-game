@@ -465,7 +465,7 @@ end;
 destructor TPlayer.Destroy;
 begin
   if OnInputChanged <> nil then
-    OnInputChanged.DeleteFirstEqual(@InputChanged);
+    OnInputChanged.Remove(@InputChanged);
 
   FreeAndNil(FNavigator);
   FreeWithContentsAndNil(FItems);

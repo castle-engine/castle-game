@@ -317,7 +317,7 @@ end;
 destructor TControlsSubMenu.Destroy;
 begin
   if OnInputChanged <> nil then
-    OnInputChanged.DeleteFirstEqual(@InputChanged);
+    OnInputChanged.Remove(@InputChanged);
   inherited;
 end;
 
