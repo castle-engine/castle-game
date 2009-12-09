@@ -38,6 +38,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
+    property DrawFocused default false;
     procedure CurrentItemChanged; override;
     procedure CurrentItemSelected; override;
     function PositionInside(const X, Y: Single): boolean; override;
@@ -66,6 +67,7 @@ begin
     position in GLMenu not working. See TGLMenu.DesignerMode comments. }
   DesignerMode := DebugMenuDesigner;
   ExclusiveEvents := false;
+  DrawFocused := false;
 end;
 
 procedure TCastleMenu.CurrentItemChanged;

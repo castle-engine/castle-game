@@ -27,7 +27,7 @@ uses Classes, GLWindow, GL, GLU, GLExt;
 
 { Allows user to choose one item from MenuItems.
   Displays menu using TCastleMenu with ADrawUnderMenu background. }
-function ChooseByMenu(ADrawUnderMenu: TDrawFunc;
+function ChooseByMenu(DrawUnderMenu: TDrawFunc;
   MenuItems: TStringList): Integer;
 
 implementation
@@ -55,26 +55,7 @@ end;
 { global things -------------------------------------------------------------- }
 
 var
-  DrawUnderMenu: TDrawFunc;
   ChooseMenu: TChooseMenu;
-
-procedure Draw2d(Draw2DData: Pointer);
-begin
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
-  ChooseMenu.Draw(false);
-end;
-
-procedure Draw(Glwin: TGLWindow);
-begin
-  DrawUnderMenu(Glwin);
-
-  glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glProjectionPushPopOrtho2D(@Draw2d, nil,
-      0, Glwin.Width, 0, Glwin.Height);
-  glPopAttrib;
-end;
 
 procedure EventDown(MouseEvent: boolean; Key: TKey;
   AMouseButton: TMouseButton);
@@ -103,13 +84,11 @@ begin
   MessageOK(Glwin, 'You can''t exit now.');
 end;
 
-function ChooseByMenu(ADrawUnderMenu: TDrawFunc;
+function ChooseByMenu(DrawUnderMenu: TDrawFunc;
   MenuItems: TStringList): Integer;
 var
   SavedMode: TGLMode;
 begin
-  DrawUnderMenu := ADrawUnderMenu;
-
   ChooseMenu.Items.Assign(MenuItems);
   ChooseMenu.FixItemsAreas(Glw.Width, Glw.Height);
 
@@ -118,7 +97,7 @@ begin
     { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;
 
-    TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
+    TGLWindowState.SetStandardState(Glw, DrawUnderMenu, @CloseQuery, Glw.OnResize,
       nil, false, true { FPSActive should not be needed anymore, but I leave it. },
       false, K_None, #0, false, nil);
 

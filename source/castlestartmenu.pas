@@ -114,7 +114,7 @@ type
     destructor Destroy; override;
     procedure CurrentItemSelected; override;
     function SpaceBetweenItems(const NextItemIndex: Cardinal): Cardinal; override;
-    procedure Draw(const Focused: boolean); override;
+    procedure Draw2D(const Focused: boolean); override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -765,7 +765,7 @@ begin
     Result += 10;
 end;
 
-procedure TChooseNewLevelMenu.Draw(const Focused: boolean);
+procedure TChooseNewLevelMenu.Draw2D(const Focused: boolean);
 const
   SubMenuTextColor: TVector3Single = (0.7, 0.7, 0.7);
 begin
@@ -801,24 +801,6 @@ begin
 end;
 
 { global things -------------------------------------------------------------- }
-
-procedure Draw2d(Draw2DData: Pointer);
-begin
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
-  CurrentMenu.Draw(false);
-end;
-
-procedure Draw(Glwin: TGLWindow);
-begin
-  BackgroundLevelDraw(Glwin);
-
-  glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glProjectionPushPopOrtho2D(@Draw2d, nil,
-      0, Glwin.Width, 0, Glwin.Height);
-  glPopAttrib;
-end;
 
 procedure EventDown(MouseEvent: boolean; Key: TKey;
   AMouseButton: TMouseButton);
@@ -862,7 +844,7 @@ begin
         { This shouldn't change projection matrix anyway. }
         SavedMode.RestoreProjectionMatrix := false;
 
-        TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
+        TGLWindowState.SetStandardState(Glw, @BackgroundLevelDraw, @CloseQuery, Glw.OnResize,
           nil, false, true { FPSActive should not be needed anymore, but I leave it. },
           false, K_None, #0,
           { show fps on caption --- useful to test FPS of background level true}false,

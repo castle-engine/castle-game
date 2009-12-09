@@ -35,7 +35,7 @@ type
       the value of this property. }
     SubMenuAdditionalInfo: string;
     constructor Create(AOwner: TComponent); override;
-    procedure Draw(const Focused: boolean); override;
+    procedure Draw2D(const Focused: boolean); override;
 
     { Sets Position and PositionRelative* parameters.
       Sets position suitable for the StartScreen, and then shifts
@@ -52,7 +52,7 @@ procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
   AIdleUnderMenu: TGLWindowFunc;
   ADrawFadeRect, ADrawCentered: boolean);
 
-{ Like ShowControlsMenu, but user can quit with 
+{ Like ShowControlsMenu, but user can quit with
   the escape key. AExitWithEscape will be set to @true or @false,
   depending on whether user used escape to exit. }
 procedure ShowControlsMenuEscape(ADrawUnderMenu: TDrawFunc;
@@ -155,7 +155,7 @@ begin
   if DoFixItemsAreas then FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
-procedure TSubMenu.Draw(const Focused: boolean);
+procedure TSubMenu.Draw2D(const Focused: boolean);
 const
   SubMenuTextColor: TVector3Single = (0.9, 0.9, 0.9);
 begin
@@ -485,20 +485,13 @@ begin
       glCallList(GLList_DrawFadeRect);
     glPopMatrix;
   end;
-
-  { TGLMenu must be drawn with translation (0, 0), otherwise mouse positions
-    in TGLMenu input events do not correspond to displayed menu positions.
-    We will position menu appropriately (doing equivalent of MoveX/Y shift
-    if needed) by initializing positions of all *ControlsMenu
-    in ShowControlsMenuCore. }
-
-  CurrentMenu.Draw(false);
 end;
 
 procedure Draw(Glwin: TGLWindow);
 begin
   DrawUnderMenu(Glwin);
 
+  { TODO: push DrawFadeRect inside 2D projection done anyway for TGLMenu }
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glProjectionPushPopOrtho2D(@Draw2d, nil,
