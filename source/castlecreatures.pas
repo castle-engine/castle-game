@@ -3669,7 +3669,7 @@ end;
 
 procedure DoInitialization;
 begin
-  Glw.OnCloseList.AppendItem(@GLWindowClose);
+  Glw.OnCloseList.Add(@GLWindowClose);
 
   CreaturesKinds := TCreaturesKindsList.Create;
 

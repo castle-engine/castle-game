@@ -75,8 +75,8 @@ initialization
 
   GLContextCache := TVRMLOpenGLRendererContextCache.Create;
 
-  Glw.OnInitList.AppendItem(@GLWindowInit);
-  Glw.OnCloseList.AppendItem(@GLWindowClose);
+  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnCloseList.Add(@GLWindowClose);
 finalization
   { Fonts_DecReference must be called before freeing GLContextCache.
     It's called from Glw.Close. But Glw.Close may be called when

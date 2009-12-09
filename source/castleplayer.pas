@@ -448,7 +448,7 @@ begin
 
   HintEscapeKeyShown := false;
 
-  OnInputChanged.AppendItem(@InputChanged);
+  OnInputChanged.Add(@InputChanged);
 
   FRequiredCreatures := TStringList.Create;
 
@@ -1500,6 +1500,6 @@ begin
 end;
 
 initialization
-  Glw.OnInitList.AppendItem(@GLWindowInit);
-  Glw.OnCloseList.AppendItem(@GLWindowClose);
+  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnCloseList.Add(@GLWindowClose);
 end.

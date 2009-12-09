@@ -893,7 +893,7 @@ const
 
   procedure AppearSpider(const Position: TVector3Single);
   begin
-    FSpidersAppearing.AppendItem(Position);
+    FSpidersAppearing.Add(Position);
   end;
 
   function RandomSpiderXY: TVector3Single;

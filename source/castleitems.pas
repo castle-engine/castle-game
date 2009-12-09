@@ -1035,7 +1035,7 @@ end;
 
 procedure DoInitialization;
 begin
-  Glw.OnCloseList.AppendItem(@GLWindowClose);
+  Glw.OnCloseList.Add(@GLWindowClose);
 
   ItemsKinds := TItemKindsList.Create;
 

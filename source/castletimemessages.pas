@@ -101,8 +101,8 @@ end;
 initialization
   TimeMessagesList := TStringList.Create;
 
-  Glw.OnInitList.AppendItem(@GLWindowInit);
-  Glw.OnCloseList.AppendItem(@GLWindowClose);
+  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnCloseList.Add(@GLWindowClose);
 finalization
   FreeAndNil(TimeMessagesList);
 end.

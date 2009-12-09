@@ -419,8 +419,8 @@ end;
 
 initialization
   LevelsAvailable := TLevelsAvailableList.Create;
-  Glw.OnInitList.AppendItem(@GLWindowInit);
-  Glw.OnCloseList.AppendItem(@GLWindowClose);
+  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnCloseList.Add(@GLWindowClose);
 finalization
   { Call CloseGLW in case OnClose event would happen after finalization
     of this unit. }

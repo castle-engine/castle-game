@@ -311,7 +311,7 @@ begin
 
   FixItemsAreas(Glw.Width, Glw.Height);
 
-  OnInputChanged.AppendItem(@InputChanged);
+  OnInputChanged.Add(@InputChanged);
 end;
 
 destructor TControlsSubMenu.Destroy;
@@ -649,8 +649,8 @@ begin
 end;
 
 initialization
-  Glw.OnInitList.AppendItem(@InitGLW);
-  Glw.OnCloseList.AppendItem(@CloseGLW);
+  Glw.OnInitList.Add(@InitGLW);
+  Glw.OnCloseList.Add(@CloseGLW);
 
   MouseLookHorizontalSensitivity := ConfigFile.GetFloat(
     'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);

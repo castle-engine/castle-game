@@ -1335,8 +1335,8 @@ end;
 
 initialization
   ShowDebugInfo := false;
-  Glw.OnInitList.AppendItem(@GLWindowInit);
-  Glw.OnCloseList.AppendItem(@GLWindowClose);
+  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnCloseList.Add(@GLWindowClose);
 
   AutoOpenInventory := ConfigFile.GetValue(
     'auto_open_inventory', DefaultAutoOpenInventory);

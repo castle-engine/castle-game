@@ -208,7 +208,7 @@ begin
 end;
 
 initialization
-  Glw.OnInitList.AppendItem(@InitGLW);
-  Glw.OnCloseList.AppendItem(@CloseGLW);
+  Glw.OnInitList.Add(@InitGLW);
+  Glw.OnCloseList.Add(@CloseGLW);
 finalization
 end.
