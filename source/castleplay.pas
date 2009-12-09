@@ -1142,10 +1142,10 @@ end;
 
 type
   TPlayGameHelper = class
-    class procedure MatrixChanged(Navigator: TNavigator);
+    class procedure PlayerChange(Sender: TObject);
   end;
 
-class procedure TPlayGameHelper.MatrixChanged(Navigator: TNavigator);
+class procedure TPlayGameHelper.PlayerChange(Sender: TObject);
 begin
   Glw.PostRedisplay;
   alUpdateListener;
@@ -1181,7 +1181,7 @@ begin
         but I must pass here an instance, not a TPlayGameHelper
         only --- at least in objfpc mode, see
         [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
-      Player.Navigator.OnMatrixChanged := @TPlayGameHelper(nil).MatrixChanged;
+      Player.Navigator.OnVisibleChange := @TPlayGameHelper(nil).PlayerChange;
 
       { Note that this sets AutoRedisplay to true. }
       TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, @Resize,
@@ -1219,7 +1219,7 @@ begin
       until GameEnded;
     finally
       { Clear some Player.Navigator callbacks. }
-      Player.Navigator.OnMatrixChanged := nil;
+      Player.Navigator.OnVisibleChange := nil;
       Player.Navigator.OnMoveAllowed := nil;
       Player.Navigator.OnGetCameraHeight := nil;
 

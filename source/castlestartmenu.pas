@@ -576,7 +576,7 @@ begin
 
          SetAntiAliasing(DefaultAntiAliasing, true);
 
-         SomethingChanged;
+         VisibleChange;
 
          MessageOK(Glw, 'All video settings restored to defaults.', taLeft);
        end;

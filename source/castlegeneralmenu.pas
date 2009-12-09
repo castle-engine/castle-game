@@ -39,7 +39,6 @@ type
     constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
     procedure CurrentItemChanged; override;
-    procedure SomethingChanged; override;
     procedure CurrentItemSelected; override;
     function PositionInside(const X, Y: Single): boolean; override;
   end;
@@ -79,12 +78,6 @@ procedure TCastleMenu.CurrentItemSelected;
 begin
   inherited;
   SoundEngine.Sound(stMenuCurrentItemSelected);
-end;
-
-procedure TCastleMenu.SomethingChanged;
-begin
-  inherited;
-  Glw.PostRedisplay;
 end;
 
 function TCastleMenu.PositionInside(const X, Y: Single): boolean;
