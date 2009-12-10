@@ -90,7 +90,7 @@ var
   SavedMode: TGLMode;
 begin
   ChooseMenu.Items.Assign(MenuItems);
-  ChooseMenu.FixItemsAreas(Glw.Width, Glw.Height);
+  ChooseMenu.FixItemsAreas;
 
   SavedMode := TGLMode.Create(Glw, 0, true);
   try

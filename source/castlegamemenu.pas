@@ -77,8 +77,6 @@ begin
   Items.Add('Configure controls');
   Items.Add('Sound options');
   Items.Add('End game');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TGameMenu.CurrentItemSelected;
@@ -108,8 +106,6 @@ begin
   SoundVolume := TGLSoundVolumeMenuItem.Create(Glw, Self, SoundEngine);
   MusicVolume := TGLMusicVolumeMenuItem.Create(Glw, Self, SoundEngine);
   Items.Add('Back to game menu');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 destructor TGameSoundMenu.Destroy;

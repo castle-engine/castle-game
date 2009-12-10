@@ -152,7 +152,7 @@ begin
   PositionRelativeMenuX := prLowerBorder;
   PositionRelativeMenuY := prHigherBorder;
 
-  if DoFixItemsAreas then FixItemsAreas(Glw.Width, Glw.Height);
+  if DoFixItemsAreas then FixItemsAreas;
 end;
 
 procedure TSubMenu.Draw2D(const Focused: boolean);
@@ -210,8 +210,6 @@ begin
   Items.Add('Back to main menu');
 
   SubMenuTitle := 'Configure controls';
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TControlsMenu.CurrentItemSelected;
@@ -308,8 +306,6 @@ begin
   Items.Add('Back to controls menu');
 
   RegularSpaceBetweenItems := 2;
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 
   OnInputChanged.Add(@InputChanged);
 end;

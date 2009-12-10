@@ -207,8 +207,6 @@ begin
   PositionRelativeMenuY := prHigherBorder;
 
   DrawBackgroundRectangle := false;
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TMainMenu.CurrentItemSelected;
@@ -389,8 +387,6 @@ begin
   SubMenuAdditionalInfo := '';
 
   RegularSpaceBetweenItems := 5;
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TVideoMenu.SetTextureMinificationQuality(
@@ -621,8 +617,6 @@ begin
   Items.Add('Back to main menu');
 
   SubMenuTitle := 'Sound options';
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 destructor TSoundMenu.Destroy;
@@ -672,8 +666,6 @@ begin
   Items.Add('Cancel');
 
   SubMenuTitle := 'Change sound output device';
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 destructor TChangeOpenALDeviceMenu.Destroy;
@@ -743,8 +735,6 @@ begin
   Items.Add('Cancel');
 
   SubMenuTitle := 'Choose initial level';
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 destructor TChooseNewLevelMenu.Destroy;

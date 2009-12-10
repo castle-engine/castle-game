@@ -191,8 +191,6 @@ begin
   Items.Add('Edit lights');
   Items.Add('Force thunder now');
   Items.Add('Back to game');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TDebugMenu.CurrentItemSelected;
@@ -267,8 +265,6 @@ begin
   Items.Add('Reload player.xml file');
   Items.Add('Fly');
   Items.Add('Back');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TDebugPlayerMenu.CurrentItemSelected;
@@ -342,8 +338,6 @@ begin
   Items.Add('Reload animations of specific creature');
   Items.AddObject('Time stop for creatures', DebugTimeStopForCreaturesArgument);
   Items.Add('Back');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TDebugCreaturesMenu.CurrentItemSelected;
@@ -477,8 +471,6 @@ begin
   Items.Add('Change to level');
   Items.Add('Restart current level (preserving camera)');
   Items.Add('Back');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TDebugLevelMenu.CurrentItemSelected;
@@ -558,8 +550,6 @@ begin
   Items.Add('Reload items/kinds.xml file');
   Items.Add('Reload animations/models of specific item');
   Items.Add('Back');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TDebugItemsMenu.CurrentItemSelected;
@@ -643,8 +633,6 @@ begin
   Items.Add('Change spot properties');
 
   Items.Add('Back');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TEditHeadlightMenu.CurrentItemSelected;
@@ -779,8 +767,6 @@ begin
   Items.AddObject('Lock main shadows light', LockMainShadowsLightArgument);
 
   Items.Add('Back');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TEditBumpMappingLightMenu.DoLockMainShadowsLight;
@@ -889,8 +875,6 @@ begin
   Items.Add('Edit headlight');
   Items.Add('Edit bump mapping light');
   Items.Add('Back to debug menu');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TEditLevelLightsMenu.CurrentItemSelected;
@@ -994,8 +978,6 @@ begin
   Items.Add('SpotLight: Change beamWidth/dropOffRate');
   Items.Add('SpotLight: Change cutOffAngle');
   Items.Add('Back');
-
-  FixItemsAreas(Glw.Width, Glw.Height);
 end;
 
 procedure TEditOneLightMenu.CurrentItemSelected;
