@@ -113,7 +113,7 @@ begin
 
     Selected := false;
     repeat
-      Glwm.ProcessMessage(true);
+      Application.ProcessMessage(true);
     until Selected;
 
     Result := SelectedIndex;

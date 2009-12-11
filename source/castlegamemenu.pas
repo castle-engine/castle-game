@@ -173,7 +173,7 @@ begin
 
     UserQuit := false;
     repeat
-      Glwm.ProcessMessage(true);
+      Application.ProcessMessage(true);
     until GameEnded or UserQuit;
   finally FreeAndNil(SavedMode); end;
 end;

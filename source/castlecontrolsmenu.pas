@@ -578,7 +578,7 @@ begin
 
     UserQuit := false;
     repeat
-      Glwm.ProcessMessage(true);
+      Application.ProcessMessage(true);
     until UserQuit;
   finally FreeAndNil(SavedMode); end;
 

@@ -848,7 +848,7 @@ begin
 
         UserQuit := false;
         repeat
-          Glwm.ProcessMessage(true);
+          Application.ProcessMessage(true);
         until UserQuit;
       finally FreeAndNil(SavedMode); end;
     finally SoundEngine.MusicPlayer.PlayedSound := stNone; end;

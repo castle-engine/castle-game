@@ -158,26 +158,26 @@ begin
   if WasParam_NoScreenChange or (not AllowScreenChange) then
   begin
     Glw.FullScreen :=
-      (Glwm.ScreenWidth = RequestedScreenWidth) and
-      (Glwm.ScreenHeight = RequestedScreenHeight);
+      (Application.ScreenWidth = RequestedScreenWidth) and
+      (Application.ScreenHeight = RequestedScreenHeight);
   end else
   begin
     Glw.FullScreen := true;
-    if (Glwm.ScreenWidth <> RequestedScreenWidth) or
-       (Glwm.ScreenHeight <> RequestedScreenHeight) or
+    if (Application.ScreenWidth <> RequestedScreenWidth) or
+       (Application.ScreenHeight <> RequestedScreenHeight) or
        (VideoFrequency <> 0) or
        (ColorDepthBits <> 0) then
     begin
-      Glwm.VideoColorBits := ColorDepthBits;
-      Glwm.VideoFrequency := VideoFrequency;
-      Glwm.VideoResize := true;
-      Glwm.VideoResizeWidth := RequestedScreenWidth;
-      Glwm.VideoResizeHeight := RequestedScreenHeight;
+      Application.VideoColorBits := ColorDepthBits;
+      Application.VideoFrequency := VideoFrequency;
+      Application.VideoResize := true;
+      Application.VideoResizeWidth := RequestedScreenWidth;
+      Application.VideoResizeHeight := RequestedScreenHeight;
 
-      if not Glwm.TryVideoChange then
+      if not Application.TryVideoChange then
       begin
         WarningWrite('Can''t change display settings to: ' +nl+
-          Glwm.VideoSettingsDescribe +
+          Application.VideoSettingsDescribe +
           nl+
           'I will set "Allow screen settings change on startup" option to "No". ' +
           'You may want to review settings in "Video options" menu and then ' +
@@ -185,8 +185,8 @@ begin
           nl+
           'Now I will just continue with default system settings. ');
         Glw.FullScreen :=
-          (Glwm.ScreenWidth = RequestedScreenWidth) and
-          (Glwm.ScreenHeight = RequestedScreenHeight);
+          (Application.ScreenWidth = RequestedScreenWidth) and
+          (Application.ScreenHeight = RequestedScreenHeight);
         AllowScreenChange := false;
       end;
     end;

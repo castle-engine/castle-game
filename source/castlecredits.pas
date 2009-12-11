@@ -162,7 +162,7 @@ begin
     glEnable(GL_LIGHTING);
 
     repeat
-      Glwm.ProcessMessage(true);
+      Application.ProcessMessage(true);
     until UserQuit;
 
   finally FreeAndNil(SavedMode); end;
