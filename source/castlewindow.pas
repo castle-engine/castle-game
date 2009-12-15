@@ -18,10 +18,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{ This keeps global Glw variable.
-
-  This is just like GLW_Navigated, but with some specific customizations
-  for this project. }
+{ This keeps global Glw (window) variable. }
 
 unit CastleWindow;
 
