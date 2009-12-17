@@ -128,10 +128,10 @@ clean_private:
 # Comment out line below if you want.
 clean_glwindow:
 	cd ../kambi_vrml_game_engine/ && \
-	rm -f glwindow/glwindow.o \
-	      glwindow/glwindow.ppu \
-	      glwindow/GLWindow.o \
-	      glwindow/GLWindow.ppu
+	rm -f src/glwindow/glwindow.o \
+	      src/glwindow/glwindow.ppu \
+	      src/glwindow/GLWindow.o \
+	      src/glwindow/GLWindow.ppu
 
 # ----------------------------------------
 # Set SVN tag.
