@@ -66,7 +66,7 @@
         <UsageCount Value="10"/>
       </Unit3>
       <Unit4>
-        <Filename Value="../../../../units/kambi_vrml_game_engine/opengl/glwindow.pas"/>
+        <Filename Value="../../../../units/kambi_vrml_game_engine/glwindow/glwindow.pas"/>
         <UnitName Value="GLWindow"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
@@ -101,7 +101,7 @@
         <UsageCount Value="10"/>
       </Unit8>
       <Unit9>
-        <Filename Value="../../kambi_vrml_game_engine/opengl/glwinmessages.pas"/>
+        <Filename Value="../../kambi_vrml_game_engine/glwindow/glwinmessages.pas"/>
         <UnitName Value="GLWinMessages"/>
         <CursorPos X="30" Y="1095"/>
         <TopLine Value="1079"/>
@@ -129,7 +129,7 @@
         <UsageCount Value="10"/>
       </Unit12>
       <Unit13>
-        <Filename Value="../../kambi_vrml_game_engine/opengl/glwindow.pas"/>
+        <Filename Value="../../kambi_vrml_game_engine/glwindow/glwindow.pas"/>
         <UnitName Value="GLWindow"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
@@ -180,7 +180,7 @@
         <UsageCount Value="10"/>
       </Unit19>
       <Unit20>
-        <Filename Value="../../kambi_vrml_game_engine/opengl/glwinmodes.pas"/>
+        <Filename Value="../../kambi_vrml_game_engine/glwindow/glwinmodes.pas"/>
         <UnitName Value="GLWinModes"/>
         <CursorPos X="57" Y="31"/>
         <TopLine Value="17"/>
