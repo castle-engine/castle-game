@@ -66,21 +66,21 @@
         <UsageCount Value="10"/>
       </Unit3>
       <Unit4>
-        <Filename Value="../../../../units/kambi_vrml_game_engine/glwindow/glwindow.pas"/>
+        <Filename Value="../../../kambi_vrml_game_engine/src/glwindow/glwindow.pas"/>
         <UnitName Value="GLWindow"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit4>
       <Unit5>
-        <Filename Value="../../../../units/kambi_vrml_game_engine/packages/components/kambiglcontrol.pas"/>
+        <Filename Value="../../../kambi_vrml_game_engine/src/components/kambiglcontrol.pas"/>
         <UnitName Value="KambiGLControl"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit5>
       <Unit6>
-        <Filename Value="../../../../units/kambi_vrml_game_engine/base/kambistringutils.pas"/>
+        <Filename Value="../../../kambi_vrml_game_engine/src/base/kambistringutils.pas"/>
         <UnitName Value="KambiStringUtils"/>
         <CursorPos X="48" Y="66"/>
         <TopLine Value="54"/>
