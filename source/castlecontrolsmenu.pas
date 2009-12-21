@@ -621,19 +621,15 @@ begin
     glDisable(GL_BLEND);
   finally glEndList end;
 
-  ControlsMenu := TControlsMenu.Create(nil);
-  BasicControlsMenu := TBasicControlsMenu.Create(nil);
-  ItemsControlsMenu := TItemsControlsMenu.Create(nil);
-  OtherControlsMenu := TOtherControlsMenu.Create(nil);
+  ControlsMenu := TControlsMenu.Create(Application);
+  BasicControlsMenu := TBasicControlsMenu.Create(Application);
+  ItemsControlsMenu := TItemsControlsMenu.Create(Application);
+  OtherControlsMenu := TOtherControlsMenu.Create(Application);
   SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
 
 procedure CloseGLW(Glwin: TGLWindow);
 begin
-  FreeAndNil(ControlsMenu);
-  FreeAndNil(BasicControlsMenu);
-  FreeAndNil(ItemsControlsMenu);
-  FreeAndNil(OtherControlsMenu);
   FreeAndNil(SubMenuTitleFont);
 end;
 

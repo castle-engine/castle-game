@@ -217,7 +217,7 @@ procedure TMainMenu.CurrentItemSelected;
     begin
       { Recreate ChooseNewLevelMenu now, to refresh list of levels AvailableForNewGame. }
       FreeAndNil(ChooseNewLevelMenu);
-      ChooseNewLevelMenu := TChooseNewLevelMenu.Create(nil);
+      ChooseNewLevelMenu := TChooseNewLevelMenu.Create(Application);
 
       SetCurrentMenu(CurrentMenu, ChooseNewLevelMenu);
     end;
@@ -861,23 +861,13 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  MainMenu := TMainMenu.Create(nil);
-  VideoMenu := TVideoMenu.Create(nil);
-  SoundMenu := TSoundMenu.Create(nil);
-  ChangeOpenALDeviceMenu := TChangeOpenALDeviceMenu.Create(nil);
-end;
-
-procedure CloseGLW(Glwin: TGLWindow);
-begin
-  FreeAndNil(MainMenu);
-  FreeAndNil(VideoMenu);
-  FreeAndNil(SoundMenu);
-  FreeAndNil(ChangeOpenALDeviceMenu);
-  FreeAndNil(ChooseNewLevelMenu);
+  MainMenu := TMainMenu.Create(Application);
+  VideoMenu := TVideoMenu.Create(Application);
+  SoundMenu := TSoundMenu.Create(Application);
+  ChangeOpenALDeviceMenu := TChangeOpenALDeviceMenu.Create(Application);
 end;
 
 initialization
   Glw.OnInitList.Add(@InitGLW);
-  Glw.OnCloseList.Add(@CloseGLW);
 finalization
 end.

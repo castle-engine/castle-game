@@ -233,7 +233,7 @@ begin
     8: SoundEngine.ReadSoundInfos;
     9: begin
          FreeAndNil(EditLevelLightsMenu);
-         EditLevelLightsMenu := TEditLevelLightsMenu.Create(nil);
+         EditLevelLightsMenu := TEditLevelLightsMenu.Create(Application);
          SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
        end;
     10:ForceThunder;
@@ -905,7 +905,7 @@ begin
          if Level.Scene.Headlight <> nil then
          begin
            FreeAndNil(EditHeadlightMenu);
-           EditHeadlightMenu := TEditHeadlightMenu.Create(nil);
+           EditHeadlightMenu := TEditHeadlightMenu.Create(Application);
            SetCurrentMenu(CurrentMenu, EditHeadlightMenu);
          end else
            MessageOK(Glw, 'No headlight in level ' +
@@ -915,7 +915,7 @@ begin
          { recreate EditBumpMappingLightMenu, since light properties possibly
            changed by outside action (e.g. some TLevel.Idle ?) }
          FreeAndNil(EditBumpMappingLightMenu);
-         EditBumpMappingLightMenu := TEditBumpMappingLightMenu.Create(nil);
+         EditBumpMappingLightMenu := TEditBumpMappingLightMenu.Create(Application);
          SetCurrentMenu(CurrentMenu, EditBumpMappingLightMenu);
        end;
     7: SetCurrentMenu(CurrentMenu, DebugMenu);
@@ -1197,28 +1197,18 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  DebugMenu := TDebugMenu.Create(nil);
-  DebugPlayerMenu := TDebugPlayerMenu.Create(nil);
-  DebugCreaturesMenu := TDebugCreaturesMenu.Create(nil);
-  DebugLevelMenu := TDebugLevelMenu.Create(nil);
-  DebugItemsMenu := TDebugItemsMenu.Create(nil);
-end;
-
-procedure CloseGLW(Glwin: TGLWindow);
-begin
-  FreeAndNil(DebugMenu);
-  FreeAndNil(EditLevelLightsMenu);
-  FreeAndNil(EditOneLightMenu);
-  FreeAndNil(EditHeadlightMenu);
-  FreeAndNil(EditBumpMappingLightMenu);
-  FreeAndNil(DebugItemsMenu);
-  FreeAndNil(DebugCreaturesMenu);
-  FreeAndNil(DebugLevelMenu);
-  FreeAndNil(DebugPlayerMenu);
+  { Although base TGLMenu doesn't require OpenGL context at constructor,
+    our descendants initialize some arguments that require font initialized
+    that requires font display lists created. That's why code below is in
+    OnInit callback, not unit's initialization. }
+  DebugMenu := TDebugMenu.Create(Application);
+  DebugPlayerMenu := TDebugPlayerMenu.Create(Application);
+  DebugCreaturesMenu := TDebugCreaturesMenu.Create(Application);
+  DebugLevelMenu := TDebugLevelMenu.Create(Application);
+  DebugItemsMenu := TDebugItemsMenu.Create(Application);
 end;
 
 initialization
   Glw.OnInitList.Add(@InitGLW);
-  Glw.OnCloseList.Add(@CloseGLW);
 finalization
 end.

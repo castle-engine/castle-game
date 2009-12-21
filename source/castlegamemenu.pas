@@ -182,18 +182,11 @@ end;
 
 procedure InitGLW(Glwin: TGLWindow);
 begin
-  GameMenu := TGameMenu.Create(nil);
-  GameSoundMenu := TGameSoundMenu.Create(nil);
-end;
-
-procedure CloseGLW(Glwin: TGLWindow);
-begin
-  FreeAndNil(GameMenu);
-  FreeAndNil(GameSoundMenu);
+  GameMenu := TGameMenu.Create(Application);
+  GameSoundMenu := TGameSoundMenu.Create(Application);
 end;
 
 initialization
   Glw.OnInitList.Add(@InitGLW);
-  Glw.OnCloseList.Add(@CloseGLW);
 finalization
 end.
