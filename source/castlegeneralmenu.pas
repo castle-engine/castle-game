@@ -41,7 +41,7 @@ type
     property DrawFocused default false;
     procedure CurrentItemChanged; override;
     procedure CurrentItemSelected; override;
-    function PositionInside(const X, Y: Single): boolean; override;
+    function PositionInside(const X, Y: Integer): boolean; override;
   end;
 
 var
@@ -82,7 +82,7 @@ begin
   SoundEngine.Sound(stMenuCurrentItemSelected);
 end;
 
-function TCastleMenu.PositionInside(const X, Y: Single): boolean;
+function TCastleMenu.PositionInside(const X, Y: Integer): boolean;
 begin
   Result := true;
 end;
