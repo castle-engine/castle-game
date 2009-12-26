@@ -28,7 +28,7 @@ uses GLWindow, VRMLOpenGLRenderer, OpenGLTTFonts;
 
 var
   { @noAutoLinkHere }
-  Glw: TGLWindowNavigated;
+  Glw: TGLUIWindow;
 
 var
   GLContextCache: TVRMLOpenGLRendererContextCache;
@@ -67,7 +67,7 @@ begin
 end;
 
 initialization
-  Glw := TGLWindowNavigated.Create(nil);
+  Glw := TGLUIWindow.Create(nil);
   Glw.SetDemoOptions(K_None, #0, false);
 
   GLContextCache := TVRMLOpenGLRendererContextCache.Create;
