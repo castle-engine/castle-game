@@ -134,7 +134,7 @@ type
 
     function PrepareRenderSteps: Cardinal; override;
     procedure FreePrepareRender; override;
-    procedure CloseGL; override;
+    procedure GLContextClose; override;
   end;
 
   TObjectsListItem_3 = TItemKind;
@@ -211,7 +211,7 @@ type
 
     function PrepareRenderSteps: Cardinal; override;
     procedure FreePrepareRender; override;
-    procedure CloseGL; override;
+    procedure GLContextClose; override;
 
     { This is the time point within AttackAnimation
       at which ActualAttack method will be called.
@@ -526,10 +526,10 @@ begin
   inherited;
 end;
 
-procedure TItemKind.CloseGL;
+procedure TItemKind.GLContextClose;
 begin
   if FScene <> nil then
-    FScene.CloseGL;
+    FScene.GLContextClose;
 end;
 
 procedure TItemKind.CreateAnimationIfNeeded(
@@ -668,10 +668,10 @@ begin
   inherited;
 end;
 
-procedure TItemWeaponKind.CloseGL;
+procedure TItemWeaponKind.GLContextClose;
 begin
   inherited;
-  if AttackAnimation <> nil then AttackAnimation.CloseGL;
+  if AttackAnimation <> nil then AttackAnimation.GLContextClose;
 end;
 
 procedure TItemWeaponKind.LoadFromFile(KindsConfig: TKamXMLConfig);
@@ -1023,13 +1023,13 @@ begin
     that will be done after this unit's finalization (DoFinalization).
 
     That's OK --- DoFinalization already freed
-    every item on ItemsKinds, and this implicitly did CloseGL,
+    every item on ItemsKinds, and this implicitly did GLContextClose,
     so everything is OK. }
 
   if ItemsKinds <> nil then
   begin
     for I := 0 to ItemsKinds.Count - 1 do
-      ItemsKinds[I].CloseGL;
+      ItemsKinds[I].GLContextClose;
   end;
 end;
 

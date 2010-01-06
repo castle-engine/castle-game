@@ -119,7 +119,7 @@ type
     procedure FreePrepareRender; virtual;
 
     { Free any association with current OpenGL context. }
-    procedure CloseGL; virtual;
+    procedure GLContextClose; virtual;
 
     { This will be used to refer to this kind from VRML models
       (or some other places too).
@@ -261,7 +261,7 @@ begin
   FPrepareRenderDone := false;
 end;
 
-procedure TObjectKind.CloseGL;
+procedure TObjectKind.GLContextClose;
 begin
   { Nothing to do in this class. }
 end;

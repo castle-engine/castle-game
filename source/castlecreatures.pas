@@ -300,7 +300,7 @@ type
 
     function PrepareRenderSteps: Cardinal; override;
     procedure FreePrepareRender; override;
-    procedure CloseGL; override;
+    procedure GLContextClose; override;
 
     { An animation of standing still.
       Beginning must be on time 0.
@@ -503,7 +503,7 @@ type
   public
     destructor Destroy; override;
 
-    procedure CloseGL; override;
+    procedure GLContextClose; override;
 
     function PrepareRenderSteps: Cardinal; override;
     procedure FreePrepareRender; override;
@@ -577,7 +577,7 @@ type
 
     function PrepareRenderSteps: Cardinal; override;
     procedure FreePrepareRender; override;
-    procedure CloseGL; override;
+    procedure GLContextClose; override;
 
     { Missile uses the same animation all the time.
       In the simplest case, you can just place here a single scene. }
@@ -647,7 +647,7 @@ type
 
     function PrepareRenderSteps: Cardinal; override;
     procedure FreePrepareRender; override;
-    procedure CloseGL; override;
+    procedure GLContextClose; override;
 
     { Missile uses the same animation all the time.
       In the simplest case, you can just place here a single scene. }
@@ -1411,16 +1411,16 @@ begin
   inherited;
 end;
 
-procedure TWalkAttackCreatureKind.CloseGL;
+procedure TWalkAttackCreatureKind.GLContextClose;
 begin
   inherited;
-  if StandAnimation <> nil then StandAnimation.CloseGL;
-  if StandToWalkAnimation <> nil then StandToWalkAnimation.CloseGL;
-  if WalkAnimation <> nil then WalkAnimation.CloseGL;
-  if AttackAnimation <> nil then AttackAnimation.CloseGL;
-  if DyingAnimation <> nil then DyingAnimation.CloseGL;
-  if DyingBackAnimation <> nil then DyingBackAnimation.CloseGL;
-  if HurtAnimation <> nil then HurtAnimation.CloseGL;
+  if StandAnimation <> nil then StandAnimation.GLContextClose;
+  if StandToWalkAnimation <> nil then StandToWalkAnimation.GLContextClose;
+  if WalkAnimation <> nil then WalkAnimation.GLContextClose;
+  if AttackAnimation <> nil then AttackAnimation.GLContextClose;
+  if DyingAnimation <> nil then DyingAnimation.GLContextClose;
+  if DyingBackAnimation <> nil then DyingBackAnimation.GLContextClose;
+  if HurtAnimation <> nil then HurtAnimation.GLContextClose;
 end;
 
 procedure TWalkAttackCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
@@ -1521,10 +1521,10 @@ begin
   inherited;
 end;
 
-procedure TSpiderQueenKind.CloseGL;
+procedure TSpiderQueenKind.GLContextClose;
 begin
   inherited;
-  if ThrowWebAttackAnimation <> nil then ThrowWebAttackAnimation.CloseGL;
+  if ThrowWebAttackAnimation <> nil then ThrowWebAttackAnimation.GLContextClose;
 end;
 
 procedure TSpiderQueenKind.PrepareRenderInternal;
@@ -1644,10 +1644,10 @@ begin
   Result := (inherited PrepareRenderSteps) + 2;
 end;
 
-procedure TMissileCreatureKind.CloseGL;
+procedure TMissileCreatureKind.GLContextClose;
 begin
   inherited;
-  if Animation <> nil then Animation.CloseGL;
+  if Animation <> nil then Animation.GLContextClose;
 end;
 
 function TMissileCreatureKind.CreateDefaultCreature(
@@ -1730,10 +1730,10 @@ begin
   Result := (inherited PrepareRenderSteps) + 2;
 end;
 
-procedure TStillCreatureKind.CloseGL;
+procedure TStillCreatureKind.GLContextClose;
 begin
   inherited;
-  if Animation <> nil then Animation.CloseGL;
+  if Animation <> nil then Animation.GLContextClose;
 end;
 
 function TStillCreatureKind.CreateDefaultCreature(
@@ -3657,13 +3657,13 @@ begin
     that will be done after this unit's finalization (DoFinalization).
 
     That's OK --- DoFinalization already freed
-    every item on CreaturesKinds.Items, and this implicitly did CloseGL,
+    every item on CreaturesKinds.Items, and this implicitly did GLContextClose,
     so everything is OK. }
 
   if CreaturesKinds <> nil then
   begin
     for I := 0 to CreaturesKinds.Count - 1 do
-      TCreatureKind(CreaturesKinds.Items[I]).CloseGL;
+      TCreatureKind(CreaturesKinds.Items[I]).GLContextClose;
   end;
 end;
 

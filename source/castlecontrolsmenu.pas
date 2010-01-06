@@ -524,7 +524,6 @@ end;
 procedure Idle(Glwin: TGLWindow);
 begin
   if Assigned(IdleUnderMenu) then IdleUnderMenu(Glwin);
-  CurrentMenu.Idle(Glwin.Fps.IdleSpeed, nil, []);
   TimeMessagesIdle;
 end;
 
