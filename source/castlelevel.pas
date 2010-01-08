@@ -3393,7 +3393,7 @@ function TLevel.LoadLevelAnimation(
 var
   Options: TPrepareRenderOptions;
 begin
-  Result := TVRMLGLAnimation.Create(GLContextCache);
+  Result := TVRMLGLAnimation.CreateCustomCache(nil, GLContextCache);
   Result.LoadFromFile(FileName);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);

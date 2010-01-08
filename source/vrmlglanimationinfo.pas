@@ -208,7 +208,7 @@ begin
     for I := 1 to RootNodes.High do
       RootNodes[I] := LoadAsVRML(FModelFileNames[I], false);
 
-    Result := TVRMLGLAnimation.Create(FCache);
+    Result := TVRMLGLAnimation.CreateCustomCache(nil, FCache);
     Result.Optimization := FOptimization;
     Result.Load(RootNodes, OwnsFirstRootNode, FTimes,
       FScenesPerTime, FEqualityEpsilon);
