@@ -504,7 +504,8 @@ procedure TItemKind.PrepareRenderInternal;
 begin
   if FScene = nil then
   begin
-    FScene := TVRMLGLScene.Create(ModelFileName, GLContextCache);
+    FScene := TVRMLGLScene.CreateCustomCache(nil, GLContextCache);
+    FScene.Load(ModelFileName);
 
     AttributesSet(Scene.Attributes, BlendingType);
     Scene.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox]);

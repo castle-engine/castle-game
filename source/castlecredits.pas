@@ -181,9 +181,8 @@ begin
   StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', SCastleWWW);
   StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
-  CreditsModel := TVRMLGLScene.Create(
-    ParseVRMLFileFromString(VRMLContents, ''),
-    true, GLContextCache);
+  CreditsModel := TVRMLGLScene.CreateCustomCache(nil, GLContextCache);
+  CreditsModel.Load(ParseVRMLFileFromString(VRMLContents, ''), true);
 
   AttributesSet(CreditsModel.Attributes, btIncrease);
   CreditsModel.Attributes.UseLights := true;
