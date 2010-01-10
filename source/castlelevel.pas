@@ -2573,8 +2573,7 @@ begin
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    FScene := TVRMLGLScene.Create(SceneFileName, roSeparateShapes,
-      GLContextCache);
+    FScene := TVRMLGLScene.Create(SceneFileName, GLContextCache);
 
     { initialize FAnimationTime. Must be initialized before creating creatures. }
     FAnimationTime := 0.0;
@@ -3368,7 +3367,7 @@ function TLevel.LoadLevelScene(const FileName: string;
 var
   Options: TPrepareRenderOptions;
 begin
-  Result := TVRMLGLScene.Create(FileName, roSeparateShapes, GLContextCache);
+  Result := TVRMLGLScene.Create(FileName, GLContextCache);
   AttributesSet(Result.Attributes, btIncrease);
 
   { calculate Options for PrepareRender }

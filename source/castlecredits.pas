@@ -183,7 +183,7 @@ begin
 
   CreditsModel := TVRMLGLScene.Create(
     ParseVRMLFileFromString(VRMLContents, ''),
-    true, roSceneAsAWhole, GLContextCache);
+    true, GLContextCache);
 
   AttributesSet(CreditsModel.Attributes, btIncrease);
   CreditsModel.Attributes.UseLights := true;
