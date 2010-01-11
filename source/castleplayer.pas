@@ -788,19 +788,22 @@ begin
   Camera.InvertVerticalMouseLook := InvertVerticalMouseLook;
   Camera.CameraRadius := LevelCameraRadius;
 
+  { MouseLook is allowed always, even when player is dead.
+    Just like rotation keys.
+
+    Note that when GameWin, rotating will actually
+    be disable by IgnoreAllInputs. But still mouse look will cause mouse
+    to remain hidden, which is good (why pop the mouse cursor on game
+    win animation?). }
+  Camera.MouseLook := UseMouseLook;
+
   if GameWin then
   begin
-    Camera.MouseLook := false;
-    Camera.Input_LeftRot.MakeClear;
-    Camera.Input_RightRot.MakeClear;
-    Camera.Input_UpRotate.MakeClear;
-    Camera.Input_DownRotate.MakeClear;
-    Camera.Input_GravityUp.MakeClear;
+    { When GameWin, we navigate camera by code. }
+    Camera.IgnoreAllInputs := true;
   end else
   begin
-    { MouseLook is turned on always, even when player is dead.
-      Just like rotation keys. }
-    Camera.MouseLook := UseMouseLook;
+    Camera.IgnoreAllInputs := false;
 
     { Rotation keys work always, even when player is dead.
       Initially I disabled them, but after some thought:
@@ -821,15 +824,8 @@ begin
     Camera.PreferGravityUpForMoving := true;
     Camera.PreferGravityUpForRotations := false;
 
-    Camera.Input_Jump.MakeClear;
-    Camera.Input_Crouch.MakeClear;
-    Camera.Input_UpMove.MakeClear;
-    Camera.Input_DownMove.MakeClear;
-
-    Camera.Input_Forward.MakeClear;
-    Camera.Input_Backward.MakeClear;
-    Camera.Input_LeftStrafe.MakeClear;
-    Camera.Input_RightStrafe.MakeClear;
+    { No need to do MakeClear now on any inputs, as we already set
+      IgnoreAllInputs to false. }
 
     Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
