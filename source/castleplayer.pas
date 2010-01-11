@@ -790,11 +790,6 @@ begin
 
   if GameWin then
   begin
-    { Note that the change from MouseLook true to false here
-      will not immediately cause UpdateMouseLook call in CastlePlay,
-      and that's a good thing actually. No need to immediately
-      bother user with mouse cursor displayed over beatiful
-      game ending sequence. }
     Camera.MouseLook := false;
     Camera.Input_LeftRot.MakeClear;
     Camera.Input_RightRot.MakeClear;

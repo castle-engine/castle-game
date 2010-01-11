@@ -845,13 +845,11 @@ begin
 end;
 
 { Call this always when entering the game mode, or when UseMouseLook changes
-  while we're in game mode. This sets mouse visibility and position. }
+  while we're in game mode. }
 procedure UpdateMouseLook;
 begin
-  { Glwin.UpdateMouseLook will read Camera.MouseLook, so we better set
-    it here (even though it's set in Player.Idle). }
+  { Set Camera.MouseLook now, even though it's set in Player.Idle. }
   Player.Camera.MouseLook := UseMouseLook;
-  Glw.UpdateMouseLook;
 end;
 
 procedure EventDown(MouseEvent: boolean; Key: TKey;
@@ -1112,21 +1110,13 @@ begin
 end;
 
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
-
-  procedure DoGameMenu;
-  begin
-    ShowGameMenu(@Draw);
-    { UseMouseLook possibly changed now. }
-    UpdateMouseLook;
-  end;
-
 begin
   EventDown(false, Key, mbLeft);
   if C = CharEscape then
   begin
     if Player.Dead or GameWin then
       GameCancel(false) else
-      DoGameMenu;
+      ShowGameMenu(@Draw);
   end;
 end;
 
@@ -1199,8 +1189,6 @@ begin
       Glw.OnIdle := @Idle;
       Glw.OnKeyDown := @KeyDown;
       Glw.OnMouseDown := @MouseDown;
-
-      UpdateMouseLook;
 
       InitNewLevel;
 
