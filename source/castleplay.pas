@@ -149,8 +149,7 @@ procedure alUpdateListener;
 begin
   if ALActive then
   begin
-    alListenerVector3f(AL_POSITION, Player.Camera.CameraPos);
-    alListenerOrientation(Player.Camera.CameraDir, Player.Camera.CameraUp);
+    alListenerFromCamera(Player.Camera);
   end;
 end;
 
