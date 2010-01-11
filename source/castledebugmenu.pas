@@ -313,10 +313,10 @@ begin
          { After changing ViewAngleDegX, game's OnResize must be called. }
          Glw.EventResize;
        end;
-    3: Player.Navigator.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
-    4: Player.Navigator.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
-    5: Player.Navigator.CameraDir := VectorAdjustToLength(
-         Player.Navigator.CameraDir, PlayerSpeedSlider.Value);
+    3: Player.Camera.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
+    4: Player.Camera.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
+    5: Player.Camera.CameraDir := VectorAdjustToLength(
+         Player.Camera.CameraDir, PlayerSpeedSlider.Value);
   end;
 end;
 
@@ -418,9 +418,9 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
   begin
     if ChooseCreatureKind(Kind) then
     begin
-      Position := VectorAdd(Player.Navigator.CameraPos,
-        VectorAdjustToLength(Player.Navigator.CameraDir, DirectionAttenuation));
-      Direction := Player.Navigator.CameraDir;
+      Position := VectorAdd(Player.Camera.CameraPos,
+        VectorAdjustToLength(Player.Camera.CameraDir, DirectionAttenuation));
+      Direction := Player.Camera.CameraDir;
 
       Level.Creatures.Add(
         Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime,
@@ -511,16 +511,16 @@ procedure TDebugLevelMenu.CurrentItemSelected;
   var
     Pos, Dir, Up: TVector3Single;
   begin
-    Pos := Player.Navigator.CameraPos;
-    Dir := Player.Navigator.CameraDir;
-    Up := Player.Navigator.CameraUp;
+    Pos := Player.Camera.CameraPos;
+    Dir := Player.Camera.CameraDir;
+    Up := Player.Camera.CameraUp;
 
     LevelFinished(Level.Name);
     LevelFinishedFlush;
 
-    Player.Navigator.CameraPos := Pos;
-    Player.Navigator.CameraDir := Dir;
-    Player.Navigator.CameraUp := Up;
+    Player.Camera.CameraPos := Pos;
+    Player.Camera.CameraDir := Dir;
+    Player.Camera.CameraUp := Up;
 
     UserQuit := true;
   end;
@@ -1033,7 +1033,7 @@ begin
            Vector := TVRMLPositionalLightNode(Light).FdLocation.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change location' +nl+
              '(Input "P" to use current player''s location)',
-             Vector, taLeft, Player.Navigator.CameraPos) then
+             Vector, taLeft, Player.Camera.CameraPos) then
            begin
              TVRMLPositionalLightNode(Light).FdLocation.Value := Vector;
              Level.LightSet.CalculateLights;
@@ -1058,7 +1058,7 @@ begin
            Vector := TVRMLDirectionalLightNode(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
-             Vector, taLeft, Player.Navigator.CameraDir) then
+             Vector, taLeft, Player.Camera.CameraDir) then
            begin
              TVRMLDirectionalLightNode(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
@@ -1071,7 +1071,7 @@ begin
            Vector := TNodeSpotLight_1(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
-             Vector, taLeft, Player.Navigator.CameraDir) then
+             Vector, taLeft, Player.Camera.CameraDir) then
            begin
              TNodeSpotLight_1(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
@@ -1082,7 +1082,7 @@ begin
            Vector := TNodeSpotLight_2(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
-             Vector, taLeft, Player.Navigator.CameraDir) then
+             Vector, taLeft, Player.Camera.CameraDir) then
            begin
              TNodeSpotLight_2(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
@@ -1159,11 +1159,11 @@ begin
   DrawUnderMenu := ADrawUnderMenu;
 
   DebugPlayerMenu.RotationHorizontalSpeedSlider.Value :=
-    Player.Navigator.RotationHorizontalSpeed;
+    Player.Camera.RotationHorizontalSpeed;
   DebugPlayerMenu.RotationVerticalSpeedSlider.Value :=
-    Player.Navigator.RotationVerticalSpeed;
+    Player.Camera.RotationVerticalSpeed;
   DebugPlayerMenu.PlayerSpeedSlider.Value :=
-    VectorLen(Player.Navigator.CameraDir);
+    VectorLen(Player.Camera.CameraDir);
 
   SavedMode := TGLMode.Create(Glw, 0, true);
   try

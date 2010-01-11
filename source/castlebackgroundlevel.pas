@@ -65,14 +65,14 @@ procedure BackgroundLevelIdle(Glwin: TGLWindow);
 implementation
 
 uses SysUtils,
-  Navigation, GL, GLU, GLExt, BackgroundGL, KambiGLUtils, GLImages,
+  Cameras, GL, GLU, GLExt, BackgroundGL, KambiGLUtils, GLImages,
   VRMLGLHeadlight, KambiFilesUtils, Images, VectorMath,
   CastleWindow, CastleLevel, CastleLevelAvailable, CastleVideoOptions,
   VRMLGLScene, RenderStateUnit;
 
 var
   BackgroundLevel: TLevel;
-  BackgroundNavigator: TWalkNavigator;
+  BackgroundCamera: TWalkCamera;
 
   GLList_Caption: TGLuint;
   {CaptionWidth, }CaptionHeight: Cardinal;
@@ -83,9 +83,9 @@ begin
   BackgroundLevel := LevelsAvailable.FindName(LevelsAvailable.MenuBackgroundLevelName).
     CreateLevel(true);
 
-  { initialize BackgroundNavigator }
-  BackgroundNavigator := TWalkNavigator.Create(nil);
-  BackgroundNavigator.Init(BackgroundLevel.InitialCameraPos,
+  { initialize BackgroundCamera }
+  BackgroundCamera := TWalkCamera.Create(nil);
+  BackgroundCamera.Init(BackgroundLevel.InitialCameraPos,
     BackgroundLevel.InitialCameraDir,
     BackgroundLevel.InitialCameraUp,
     BackgroundLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
@@ -94,7 +94,7 @@ end;
 procedure BackgroundLevelEnd;
 begin
   FreeAndNil(BackgroundLevel);
-  FreeAndNil(BackgroundNavigator);
+  FreeAndNil(BackgroundCamera);
 end;
 
 function ProjectionFar: Single;
@@ -108,12 +108,12 @@ procedure BackgroundLevelDraw(Glwin: TGLWindow);
 
   procedure ProjectionPushSet;
 
-    procedure UpdateNavigatorProjectionMatrix;
+    procedure UpdateCameraProjectionMatrix;
     var
       ProjectionMatrix: TMatrix4f;
     begin
       glGetFloatv(GL_PROJECTION_MATRIX, @ProjectionMatrix);
-      BackgroundNavigator.ProjectionMatrix := ProjectionMatrix;
+      BackgroundCamera.ProjectionMatrix := ProjectionMatrix;
     end;
 
   begin
@@ -124,7 +124,7 @@ procedure BackgroundLevelDraw(Glwin: TGLWindow);
         ViewAngleDegY, Glwin.Width / Glwin.Height,
         BackgroundLevel.ProjectionNear, ProjectionFar));
     glMatrixMode(GL_MODELVIEW);
-    UpdateNavigatorProjectionMatrix;
+    UpdateCameraProjectionMatrix;
   end;
 
   procedure ProjectionPop;
@@ -148,25 +148,25 @@ begin
 
       if UsedBackground <> nil then
       begin
-        glLoadMatrix(BackgroundNavigator.RotationMatrix);
+        glLoadMatrix(BackgroundCamera.RotationMatrix);
         UsedBackground.Render;
       end else
         ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
 
       glClear(ClearBuffers);
 
-      RenderState.CameraFromNavigator(BackgroundNavigator);
-      glLoadMatrix(BackgroundNavigator.Matrix);
+      RenderState.CameraFromCameraObject(BackgroundCamera);
+      glLoadMatrix(BackgroundCamera.Matrix);
 
       { Set headlight }
       TVRMLGLHeadlight.RenderOrDisable(BackgroundLevel.Scene.Headlight, 0,
-        true, BackgroundNavigator);
+        true, BackgroundCamera);
 
       BackgroundLevel.LightSet.RenderLights;
 
       glPushAttrib(GL_ENABLE_BIT);
         glEnable(GL_LIGHTING);
-        BackgroundLevel.Render(BackgroundNavigator.Frustum, tgAll);
+        BackgroundLevel.Render(BackgroundCamera.Frustum, tgAll);
       glPopAttrib;
 
     finally ProjectionPop end;

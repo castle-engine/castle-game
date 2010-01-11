@@ -372,7 +372,7 @@ type
 
     { Maximum distance between player and creature to allow creature
       to start attack. More precisely, this is measured between
-      Player.Navigator.CameraPos and creature's MiddlePosition. }
+      Player.Camera.CameraPos and creature's MiddlePosition. }
     property MaxAttackDistance: Single
       read FMaxAttackDistance write FMaxAttackDistance
       default DefaultMaxAttackDistance;
@@ -3134,11 +3134,11 @@ begin
     Exit;
   end;
 
-  IdleSeesPlayer := Level.LineOfSight(MiddlePosition, Player.Navigator.CameraPos);
+  IdleSeesPlayer := Level.LineOfSight(MiddlePosition, Player.Camera.CameraPos);
   if IdleSeesPlayer then
   begin
     HasLastSeenPlayer := true;
-    LastSeenPlayer := Player.Navigator.CameraPos;
+    LastSeenPlayer := Player.Camera.CameraPos;
     LastSeenPlayerSector := Player.CameraPosSector;
   end;
 
@@ -3545,7 +3545,7 @@ begin
   if MissileKind.CloseDirectionToPlayer and
      (MissileKind.CloseDirectionToTargetSpeed <> 0) then
   begin
-    TargetDirection := VectorSubtract(Player.Navigator.CameraPos,
+    TargetDirection := VectorSubtract(Player.Camera.CameraPos,
       LegsPosition);
     AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
     AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed * 50;

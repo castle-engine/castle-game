@@ -23,7 +23,7 @@ unit CastlePlayer;
 
 interface
 
-uses Boxes3d, Navigation, CastleItems, VectorMath, GL, GLU, GLExt,
+uses Boxes3d, Cameras, CastleItems, VectorMath, GL, GLU, GLExt,
   VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
   VRMLTriangle, CastleTextures, GameSoundEngine, Classes,
   KambiGLUtils;
@@ -46,7 +46,7 @@ type
 
     Dead player actually behaves (from the point
     of view of this class...) much like alive player. This means that
-    e.g. dead player still has a Navigator, and it's CameraPos may still
+    e.g. dead player still has a Camera, and it's CameraPos may still
     change (e.g. because player was killed when he was flying, or player
     corpse lays on some moving object of the level). It just cannot change
     because of player keys like up/down/rotate etc.
@@ -75,7 +75,7 @@ type
   private
     FLife: Single;
     FMaxLife: Single;
-    FNavigator: TWalkNavigator;
+    FCamera: TWalkCamera;
     FItems: TItemsList;
     FEquippedWeapon: TItem;
     FFlyingModeTimeOut: Single; { > 0 means he's flying. In seconds. }
@@ -86,12 +86,12 @@ type
     BlackOutIntensity: TGLfloat;
     BlackOutColor: TVector3f;
 
-    { This updates Navigator properties.
+    { This updates Camera properties.
       Call this always when FlyingMode or Dead or some key values
       or Swimming or GameWin change. }
-    procedure UpdateNavigator;
+    procedure UpdateCamera;
 
-    procedure FalledDown(Navigator: TWalkNavigator; const FallenHeight: Single);
+    procedure FalledDown(Camera: TWalkCamera; const FallenHeight: Single);
     procedure SetLife(const Value: Single);
 
     { This sets life, just like SetLife.
@@ -207,46 +207,46 @@ type
       @noAutoLinkHere }
     property Items: TItemsList read FItems;
 
-    { Each player object always has related Navigator object.
+    { Each player object always has related Camera object.
 
       Some things are synchronized between player properties and this
-      Navigator object --- e.g. player's FlyingMode is synchronized
-      with Gravity and some Input_Xxx properties of this navigator.
+      Camera object --- e.g. player's FlyingMode is synchronized
+      with Gravity and some Input_Xxx properties of this camera.
       In general, this player object "cooperates" in various ways
-      with it's Navigator object, that's why it was most comfortable
-      to just put Navigator inside TPlayer.
+      with it's Camera object, that's why it was most comfortable
+      to just put Camera inside TPlayer.
 
-      In general you @italic(must not) operate directly on this Navigator
+      In general you @italic(must not) operate directly on this Camera
       properties or call it's methods (TPlayer instance should do this for you),
       with some exceptions.
 
       You are allowed to read and write:
       @unorderedList(
-        @item(Navigator.CameraPos, CameraDir, CameraUp and InitialCameraXxx ---
+        @item(Camera.CameraPos, CameraDir, CameraUp and InitialCameraXxx ---
           these are exactly player's camera settings.)
-        @item(Navigator.CameraPreferredHeight. In fact, it's OK to just call
-          Navigator.Init.)
-        @item(Navigator.RotationHorizontal/VerticalSpeed
+        @item(Camera.CameraPreferredHeight. In fact, it's OK to just call
+          Camera.Init.)
+        @item(Camera.RotationHorizontal/VerticalSpeed
           (you can read and write this --- although it should be
           only for testing/debug purposes, in real game rotation speeds
           should stay constant).)
-        @item(Navigator.ProjectionMatrix, to update it in game's
+        @item(Camera.ProjectionMatrix, to update it in game's
           OnResize or such.)
-        @item(You can call Navigator.KeyDown, MouseDown, Idle.
-          In fact it's OK to just assign Navigator to Glw.Navigator.)
-        @item(You can assign things to Navigator.OnMatrixChanged.)
+        @item(You can call Camera.KeyDown, MouseDown, Idle.
+          In fact it's OK to just assign Camera to Glw.Camera.)
+        @item(You can assign things to Camera.OnMatrixChanged.)
       )
 
       You are allowed to read:
       @unorderedList(
-        @item Navigator.RotationMatrix, Matrix, Frustum.
+        @item Camera.RotationMatrix, Matrix, Frustum.
       )
     }
-    property Navigator: TWalkNavigator read FNavigator;
+    property Camera: TWalkCamera read FCamera;
 
-    { Return the one of Level.Sectors that contains Navigator.CameraPos.
+    { Return the one of Level.Sectors that contains Camera.CameraPos.
       Nil if none. Yes, this is just a shortcut for
-      Level.Sectors.SectorWithPoint(Navigator.CameraPos). }
+      Level.Sectors.SectorWithPoint(Camera.CameraPos). }
     function CameraPosSector: TSceneSector;
 
     { This adds Item to Items, with appropriate GameMessage.
@@ -278,7 +278,7 @@ type
       a message that he's no longer using that weapon. }
     function DeleteItem(ItemIndex: Integer): TItem;
 
-    { Like BoundingBox, but assumes that Navigator.CameraPos is as specified. }
+    { Like BoundingBox, but assumes that Camera.CameraPos is as specified. }
     function BoundingBoxAssuming(const AssumeCameraPos: TVector3Single;
       Tall: boolean = true): TBox3d;
 
@@ -287,7 +287,7 @@ type
       Use for collision detection etc.
 
       If Tall then the returned box uses current camera height
-      (i.e. Navigator.RealCameraPreferredHeight).
+      (i.e. Camera.RealCameraPreferredHeight).
 
       If not Tall, then the box is just CameraRadius around
       CameraPos, so it could be more accurately described
@@ -296,7 +296,7 @@ type
       (you can say that player's "legs" are not included in the box).
       However, not Tall box can still be useful (e.g. when checking for
       collision with creatures, because then the player will "grow"
-      anyway (using GetCameraHeight), so Navigator.RealCameraPreferredHeight
+      anyway (using GetCameraHeight), so Camera.RealCameraPreferredHeight
       will be taken into account but in a different way. }
     function BoundingBox(Tall: boolean = true): TBox3d;
 
@@ -346,7 +346,7 @@ type
     procedure RenderAttack;
 
     { You should set this property as appropriate.
-      This object will just use this property (changing it's Navigator
+      This object will just use this property (changing it's Camera
       properties etc.). }
     property Swimming: TPlayerSwimming read FSwimming write SetSwimming;
 
@@ -435,16 +435,16 @@ begin
   FItems := TItemsList.Create;
   FInventoryCurrentItem := -1;
 
-  FNavigator := TWalkNavigator.Create(nil);
+  FCamera := TWalkCamera.Create(nil);
 
   { turn off keys that are totally unavailable for the player }
-  Navigator.Input_MoveSpeedInc.MakeClear;
-  Navigator.Input_MoveSpeedDec.MakeClear;
-  Navigator.Input_IncreaseCameraPreferredHeight.MakeClear;
-  Navigator.Input_DecreaseCameraPreferredHeight.MakeClear;
+  Camera.Input_MoveSpeedInc.MakeClear;
+  Camera.Input_MoveSpeedDec.MakeClear;
+  Camera.Input_IncreaseCameraPreferredHeight.MakeClear;
+  Camera.Input_DecreaseCameraPreferredHeight.MakeClear;
 
-  Navigator.CheckModsDown := false;
-  Navigator.OnFalledDown := @FalledDown;
+  Camera.CheckModsDown := false;
+  Camera.OnFalledDown := @FalledDown;
 
   HintEscapeKeyShown := false;
 
@@ -458,8 +458,8 @@ begin
 
   { Although it will be called in every OnIdle anyway,
     we also call it here to be sure that right after TPlayer constructor
-    finished, Navigator has already good values. }
-  UpdateNavigator;
+    finished, Camera has already good values. }
+  UpdateCamera;
 end;
 
 destructor TPlayer.Destroy;
@@ -467,7 +467,7 @@ begin
   if OnInputChanged <> nil then
     OnInputChanged.Remove(@InputChanged);
 
-  FreeAndNil(FNavigator);
+  FreeAndNil(FCamera);
   FreeWithContentsAndNil(FItems);
 
   if AllocatedFootstepsSource <> nil then
@@ -611,7 +611,7 @@ begin
   Result[0, 0] -= PlayerSize;
   Result[0, 1] -= PlayerSize;
   if Tall then
-    Result[0, 2] -= Navigator.RealCameraPreferredHeight else
+    Result[0, 2] -= Camera.RealCameraPreferredHeight else
     Result[0, 2] -= Level.CameraRadius;
 
   Result[1, 0] += PlayerSize;
@@ -621,7 +621,7 @@ end;
 
 function TPlayer.BoundingBox(Tall: boolean): TBox3d;
 begin
-  Result := BoundingBoxAssuming(Player.Navigator.CameraPos, Tall);
+  Result := BoundingBoxAssuming(Player.Camera.CameraPos, Tall);
 end;
 
 procedure TPlayer.SetEquippedWeapon(Value: TItem);
@@ -754,7 +754,7 @@ begin
   end;
 end;
 
-procedure TPlayer.UpdateNavigator;
+procedure TPlayer.UpdateCamera;
 var
   LevelMoveHorizontalSpeed: Single;
   LevelMoveVerticalSpeed: Single;
@@ -778,15 +778,15 @@ begin
     LevelCameraPreferredHeight := 0.0;
   end;
 
-  Navigator.Gravity := (not FlyingMode) and (not GameWin);
-  { Note that when not Navigator.Gravity then FallingDownEffect will not
+  Camera.Gravity := (not FlyingMode) and (not GameWin);
+  { Note that when not Camera.Gravity then FallingDownEffect will not
     work anyway. }
-  Navigator.FallingDownEffect := Swimming = psNo;
+  Camera.FallingDownEffect := Swimming = psNo;
 
-  Navigator.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
-  Navigator.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
-  Navigator.InvertVerticalMouseLook := InvertVerticalMouseLook;
-  Navigator.CameraRadius := LevelCameraRadius;
+  Camera.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
+  Camera.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
+  Camera.InvertVerticalMouseLook := InvertVerticalMouseLook;
+  Camera.CameraRadius := LevelCameraRadius;
 
   if GameWin then
   begin
@@ -795,142 +795,142 @@ begin
       and that's a good thing actually. No need to immediately
       bother user with mouse cursor displayed over beatiful
       game ending sequence. }
-    Navigator.MouseLook := false;
-    Navigator.Input_LeftRot.MakeClear;
-    Navigator.Input_RightRot.MakeClear;
-    Navigator.Input_UpRotate.MakeClear;
-    Navigator.Input_DownRotate.MakeClear;
-    Navigator.Input_GravityUp.MakeClear;
+    Camera.MouseLook := false;
+    Camera.Input_LeftRot.MakeClear;
+    Camera.Input_RightRot.MakeClear;
+    Camera.Input_UpRotate.MakeClear;
+    Camera.Input_DownRotate.MakeClear;
+    Camera.Input_GravityUp.MakeClear;
   end else
   begin
     { MouseLook is turned on always, even when player is dead.
       Just like rotation keys. }
-    Navigator.MouseLook := UseMouseLook;
+    Camera.MouseLook := UseMouseLook;
 
     { Rotation keys work always, even when player is dead.
       Initially I disabled them, but after some thought:
       let them work. They work a little strangely (because CameraUp
       is orthogonal to GravityUp), but they still work and player
       can figure it out. }
-    Navigator.Input_LeftRot.Assign(CastleInput_LeftRot.Shortcut, false);
-    Navigator.Input_RightRot.Assign(CastleInput_RightRot.Shortcut, false);
-    Navigator.Input_UpRotate.Assign(CastleInput_UpRotate.Shortcut, false);
-    Navigator.Input_DownRotate.Assign(CastleInput_DownRotate.Shortcut, false);
-    Navigator.Input_GravityUp.Assign(CastleInput_GravityUp.Shortcut, false);
+    Camera.Input_LeftRot.Assign(CastleInput_LeftRot.Shortcut, false);
+    Camera.Input_RightRot.Assign(CastleInput_RightRot.Shortcut, false);
+    Camera.Input_UpRotate.Assign(CastleInput_UpRotate.Shortcut, false);
+    Camera.Input_DownRotate.Assign(CastleInput_DownRotate.Shortcut, false);
+    Camera.Input_GravityUp.Assign(CastleInput_GravityUp.Shortcut, false);
   end;
 
   if GameWin then
   begin
     { PreferGravityUpXxx should be ignored actually, because rotations
       don't work now. }
-    Navigator.PreferGravityUpForMoving := true;
-    Navigator.PreferGravityUpForRotations := false;
+    Camera.PreferGravityUpForMoving := true;
+    Camera.PreferGravityUpForRotations := false;
 
-    Navigator.Input_Jump.MakeClear;
-    Navigator.Input_Crouch.MakeClear;
-    Navigator.Input_UpMove.MakeClear;
-    Navigator.Input_DownMove.MakeClear;
+    Camera.Input_Jump.MakeClear;
+    Camera.Input_Crouch.MakeClear;
+    Camera.Input_UpMove.MakeClear;
+    Camera.Input_DownMove.MakeClear;
 
-    Navigator.Input_Forward.MakeClear;
-    Navigator.Input_Backward.MakeClear;
-    Navigator.Input_LeftStrafe.MakeClear;
-    Navigator.Input_RightStrafe.MakeClear;
+    Camera.Input_Forward.MakeClear;
+    Camera.Input_Backward.MakeClear;
+    Camera.Input_LeftStrafe.MakeClear;
+    Camera.Input_RightStrafe.MakeClear;
 
-    Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
-    Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
-    Navigator.HeadBobbing := 0.0;
-    Navigator.CameraPreferredHeight := LevelCameraRadius * 1.01;
+    Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
+    Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
+    Camera.HeadBobbing := 0.0;
+    Camera.CameraPreferredHeight := LevelCameraRadius * 1.01;
 
-    Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
-    Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+    Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
+    Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
   end else
   if Dead then
   begin
-    Navigator.PreferGravityUpForMoving := true;
+    Camera.PreferGravityUpForMoving := true;
     { This is the only case when PreferGravityUpForRotations := false
       is sensible. }
-    Navigator.PreferGravityUpForRotations := false;
+    Camera.PreferGravityUpForRotations := false;
 
-    Navigator.Input_Jump.MakeClear;
-    Navigator.Input_Crouch.MakeClear;
-    Navigator.Input_UpMove.MakeClear;
-    Navigator.Input_DownMove.MakeClear;
+    Camera.Input_Jump.MakeClear;
+    Camera.Input_Crouch.MakeClear;
+    Camera.Input_UpMove.MakeClear;
+    Camera.Input_DownMove.MakeClear;
 
-    Navigator.Input_Forward.MakeClear;
-    Navigator.Input_Backward.MakeClear;
-    Navigator.Input_LeftStrafe.MakeClear;
-    Navigator.Input_RightStrafe.MakeClear;
+    Camera.Input_Forward.MakeClear;
+    Camera.Input_Backward.MakeClear;
+    Camera.Input_LeftStrafe.MakeClear;
+    Camera.Input_RightStrafe.MakeClear;
 
-    Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
-    Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
-    Navigator.HeadBobbing := 0.0;
-    Navigator.CameraPreferredHeight := LevelCameraRadius * 1.01;
+    Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
+    Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
+    Camera.HeadBobbing := 0.0;
+    Camera.CameraPreferredHeight := LevelCameraRadius * 1.01;
 
-    Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
-    Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+    Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
+    Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
   end else
   begin
     if FlyingMode then
     begin
-      Navigator.PreferGravityUpForMoving := false;
-      Navigator.PreferGravityUpForRotations := true;
+      Camera.PreferGravityUpForMoving := false;
+      Camera.PreferGravityUpForRotations := true;
 
-      Navigator.Input_Jump.MakeClear;
-      Navigator.Input_Crouch.MakeClear;
-      Navigator.Input_UpMove.Assign(CastleInput_UpMove.Shortcut, false);
-      Navigator.Input_DownMove.Assign(CastleInput_DownMove.Shortcut, false);
+      Camera.Input_Jump.MakeClear;
+      Camera.Input_Crouch.MakeClear;
+      Camera.Input_UpMove.Assign(CastleInput_UpMove.Shortcut, false);
+      Camera.Input_DownMove.Assign(CastleInput_DownMove.Shortcut, false);
 
-      { Navigator.HeadBobbing and
-        Navigator.CameraPreferredHeight and
-        Navigator.FallingDownStartSpeed and
-        Navigator.FallingDownSpeedIncrease
+      { Camera.HeadBobbing and
+        Camera.CameraPreferredHeight and
+        Camera.FallingDownStartSpeed and
+        Camera.FallingDownSpeedIncrease
         ... don't matter here, because Gravity is false. }
 
-      Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
-      Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+      Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
+      Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
     end else
     begin
       if Swimming <> psNo then
       begin
-        Navigator.PreferGravityUpForMoving := false;
-        Navigator.PreferGravityUpForRotations := true;
+        Camera.PreferGravityUpForMoving := false;
+        Camera.PreferGravityUpForRotations := true;
 
-        Navigator.Input_Jump.MakeClear;
-        Navigator.Input_Crouch.MakeClear;
-        Navigator.Input_UpMove.Assign(CastleInput_UpMove.Shortcut, false);
-        Navigator.Input_DownMove.Assign(CastleInput_DownMove.Shortcut, false);
+        Camera.Input_Jump.MakeClear;
+        Camera.Input_Crouch.MakeClear;
+        Camera.Input_UpMove.Assign(CastleInput_UpMove.Shortcut, false);
+        Camera.Input_DownMove.Assign(CastleInput_DownMove.Shortcut, false);
 
-        Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
-        Navigator.FallingDownSpeedIncrease := 1.0;
-        Navigator.HeadBobbing := 0.0;
-        Navigator.CameraPreferredHeight := LevelCameraRadius * 1.01;
+        Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
+        Camera.FallingDownSpeedIncrease := 1.0;
+        Camera.HeadBobbing := 0.0;
+        Camera.CameraPreferredHeight := LevelCameraRadius * 1.01;
 
-        Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed / 2;
-        Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed / 2;
+        Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed / 2;
+        Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed / 2;
       end else
       begin
-        Navigator.PreferGravityUpForMoving := true;
-        Navigator.PreferGravityUpForRotations := true;
+        Camera.PreferGravityUpForMoving := true;
+        Camera.PreferGravityUpForRotations := true;
 
-        Navigator.Input_Jump.Assign(CastleInput_UpMove.Shortcut, false);
-        Navigator.Input_Crouch.Assign(CastleInput_DownMove.Shortcut, false);
-        Navigator.Input_UpMove.MakeClear;
-        Navigator.Input_DownMove.MakeClear;
+        Camera.Input_Jump.Assign(CastleInput_UpMove.Shortcut, false);
+        Camera.Input_Crouch.Assign(CastleInput_DownMove.Shortcut, false);
+        Camera.Input_UpMove.MakeClear;
+        Camera.Input_DownMove.MakeClear;
 
-        Navigator.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
-        Navigator.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
-        Navigator.HeadBobbing := DefaultHeadBobbing;
-        Navigator.CameraPreferredHeight := LevelCameraPreferredHeight;
+        Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
+        Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
+        Camera.HeadBobbing := DefaultHeadBobbing;
+        Camera.CameraPreferredHeight := LevelCameraPreferredHeight;
 
-        Navigator.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
-        Navigator.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+        Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
+        Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
       end;
     end;
 
-    Navigator.Input_Forward.Assign(CastleInput_Forward.Shortcut, false);
-    Navigator.Input_Backward.Assign(CastleInput_Backward.Shortcut, false);
-    Navigator.Input_LeftStrafe.Assign(CastleInput_LeftStrafe.Shortcut, false);
-    Navigator.Input_RightStrafe.Assign(CastleInput_RightStrafe.Shortcut, false);
+    Camera.Input_Forward.Assign(CastleInput_Forward.Shortcut, false);
+    Camera.Input_Backward.Assign(CastleInput_Backward.Shortcut, false);
+    Camera.Input_LeftStrafe.Assign(CastleInput_LeftStrafe.Shortcut, false);
+    Camera.Input_RightStrafe.Assign(CastleInput_RightStrafe.Shortcut, false);
   end;
 end;
 
@@ -1019,7 +1019,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       GroundRule := nil;
       IsOnTheGround := false;
     end else
-    if Navigator.IsOnTheGround then
+    if Camera.IsOnTheGround then
     begin
       ReallyIsOnTheGroundTime := Level.AnimationTime;
       IsOnTheGround := true;
@@ -1071,31 +1071,31 @@ procedure TPlayer.Idle(const CompSpeed: Single);
   begin
     { The meaning of ReallyWalkingOnTheGroundTime and
       TimeToChangeFootstepsSoundPlaying:
-      Navigator.IsWalkingOnTheGround can change quite rapidly
+      Camera.IsWalkingOnTheGround can change quite rapidly
       (when player quickly presses and releases up/down keys,
       or when he're walking up the stairs, or when he's walking
-      on un-flat terrain --- then Navigator.IsWalkingOnTheGround
+      on un-flat terrain --- then Camera.IsWalkingOnTheGround
       switches between @true and @false quite often).
       But it is undesirable to change FootstepsSoundPlaying
       so often, as this causes footsteps to suddenly stop, then play,
       then stop again etc. --- this doesn't sound good.
 
       So I use ReallyWalkingOnTheGroundTime to mark myself
-      the time when Navigator.IsWalkingOnTheGround was true.
+      the time when Camera.IsWalkingOnTheGround was true.
       In normal situation I would set NewFootstepsSoundPlaying to stNone
-      when Navigator.IsWalkingOnTheGround = @false.
+      when Camera.IsWalkingOnTheGround = @false.
       But now I set NewFootstepsSoundPlaying to stNone only if
-      Navigator.IsWalkingOnTheGround = @false
+      Camera.IsWalkingOnTheGround = @false
       for at least TimeToChangeFootstepsSoundPlaying seconds. }
 
     { calculate NewFootstepsSoundPlaying }
     if Level = nil then
       NewFootstepsSoundPlaying := stNone else
-    if Navigator.IsWalkingOnTheGround then
+    if Camera.IsWalkingOnTheGround then
     begin
       ReallyWalkingOnTheGroundTime := Level.AnimationTime;
-      { Since Navigator.IsWalkingOnTheGroundm then for sure
-        Navigator.IsOnTheGround, so UpdateIsOnTheGround updated
+      { Since Camera.IsWalkingOnTheGroundm then for sure
+        Camera.IsOnTheGround, so UpdateIsOnTheGround updated
         GroundRule field. }
       if (GroundRule <> nil) and GroundRule.HasFootstepsSound then
         NewFootstepsSoundPlaying := GroundRule.FootstepsSound else
@@ -1178,12 +1178,12 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       MinTo1st(CurrentKnockBackDistance, FKnockbackDistance);
       FKnockbackDistance -= CurrentKnockBackDistance;
 
-      ProposedNewPosition := VectorAdd(Navigator.CameraPos,
+      ProposedNewPosition := VectorAdd(Camera.CameraPos,
         VectorScale(FKnockbackDirection, CurrentKnockBackDistance));
 
-      if Level.PlayerMoveAllowed(Navigator, ProposedNewPosition,
+      if Level.PlayerMoveAllowed(Camera, ProposedNewPosition,
         NewPosition, false) then
-        Navigator.CameraPos := NewPosition;
+        Camera.CameraPos := NewPosition;
     end;
   end;
 
@@ -1197,7 +1197,7 @@ begin
     end;
   end;
 
-  UpdateNavigator;
+  UpdateCamera;
 
   UpdateSwimming;
 
@@ -1235,13 +1235,13 @@ begin
   BlackOut(Red3Single);
 end;
 
-procedure TPlayer.FalledDown(Navigator: TWalkNavigator;
+procedure TPlayer.FalledDown(Camera: TWalkCamera;
   const FallenHeight: Single);
 begin
   if (Swimming = psNo) and (FallenHeight > 4.0) then
   begin
     SoundEngine.Sound(stPlayerFalledDown);
-    if FallenHeight > Navigator.MaxJumpDistance * 1.5 then
+    if FallenHeight > Camera.MaxJumpDistance * 1.5 then
       Life := Life - Max(0, FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
   end;
 end;
@@ -1253,7 +1253,7 @@ begin
   begin
     TimeMessage('You die');
     SoundEngine.Sound(stPlayerDies);
-    Navigator.FallOnTheGround;
+    Camera.FallOnTheGround;
   end else
   if (Life - Value) > 1 then
   begin
@@ -1321,12 +1321,12 @@ end;
 
 function TPlayer.CameraPosSector: TSceneSector;
 begin
-  Result := Level.Sectors.SectorWithPoint(Navigator.CameraPos);
+  Result := Level.Sectors.SectorWithPoint(Camera.CameraPos);
 end;
 
 procedure TPlayer.InputChanged(InputConfiguration: TInputConfiguration);
 begin
-  UpdateNavigator;
+  UpdateCamera;
 end;
 
 procedure TPlayer.SetSwimming(const Value: TPlayerSwimming);
@@ -1358,7 +1358,7 @@ begin
         with the high speed (because in the air FallingDownStartSpeed
         is high and it's increased, but in the water it's much lower
         and not increased at all right now). }
-      Navigator.CancelFallingDown;
+      Camera.CancelFallingDown;
     end;
 
     FSwimming := Value;
@@ -1370,22 +1370,22 @@ begin
       SwimLastSoundTime := 0.0;
     end;
 
-    { Although UpdateNavigator will be called in nearest Player.Idle anyway,
+    { Although UpdateCamera will be called in nearest Player.Idle anyway,
       I want to call it *now*. That's because I want to set
-      Navigator.FallingDownStartSpeed to low speed (suitable for moving
+      Camera.FallingDownStartSpeed to low speed (suitable for moving
       under the water) before next falling down will happen.
-      Why ? See comments about Navigator.CancelFallingDown above.
+      Why ? See comments about Camera.CancelFallingDown above.
 
       And next falling down will happen... actually SetSwimming
       is called from OnMatrixChanged that may be called
       from TryFallingDown ! So next falling down definitely *can*
       happen before next Player.Idle. Actually we may be in the middle
-      of falling down right now. Fortunately Navigator.Idle
-      and Navigator.CancelFallingDown are implemented (or rather fixed :)
+      of falling down right now. Fortunately Camera.Idle
+      and Camera.CancelFallingDown are implemented (or rather fixed :)
       to honour calling CancelFallingDown and setting FallingDownStartSpeed now.
 
       So the safeguard below is needed. }
-    UpdateNavigator;
+    UpdateCamera;
   end;
 end;
 
@@ -1409,16 +1409,16 @@ begin
 
     KnockBackSpeed :=
       PlayerConfig.GetFloat('player/knock_back_speed', 0.3);
-    Navigator.MaxJumpHeight :=
+    Camera.MaxJumpHeight :=
       PlayerConfig.GetFloat('player/jump/max_height',
       DefaultMaxJumpHeight);
-    Navigator.JumpSpeedMultiply :=
+    Camera.JumpSpeedMultiply :=
       PlayerConfig.GetFloat('player/jump/speed_multiply',
       DefaultJumpSpeedMultiply);
-    Navigator.JumpPower :=
+    Camera.JumpPower :=
       PlayerConfig.GetFloat('player/jump/power',
       DefaultJumpPower);
-    Navigator.HeadBobbingDistance :=
+    Camera.HeadBobbingDistance :=
       PlayerConfig.GetFloat('player/head_bobbing_distance',
       DefaultHeadBobbingDistance);
     SickProjectionSpeed := PlayerConfig.GetFloat('player/sick_projection_speed',

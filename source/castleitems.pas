@@ -729,7 +729,7 @@ var
   C: TCreature;
 begin
   WeaponBoundingBox := Box3dTranslate(Player.BoundingBox,
-    VectorAdjustToLength(Player.Navigator.CameraDir, 1.0));
+    VectorAdjustToLength(Player.Camera.CameraDir, 1.0));
   { Tests: Writeln('WeaponBoundingBox is ', Box3dToNiceStr(WeaponBoundingBox)); }
   for I := 0 to Level.Creatures.High do
   begin
@@ -738,7 +738,7 @@ begin
     if Boxes3dCollision(C.BoundingBox, WeaponBoundingBox) then
     begin
       C.Life := C.Life - DamageConst - Random * DamageRandom;
-      C.LastAttackDirection := Player.Navigator.CameraDir;
+      C.LastAttackDirection := Player.Camera.CameraDir;
     end;
   end;
 end;
@@ -765,8 +765,8 @@ begin
       Player.DeleteItem(QuiverIndex).Free;
 
     { shoot the arrow }
-    MissilePosition := Player.Navigator.CameraPos;
-    MissileDirection := Player.Navigator.CameraDir;
+    MissilePosition := Player.Camera.CameraPos;
+    MissileDirection := Player.Camera.CameraDir;
     Missile := Arrow.CreateDefaultCreature(MissilePosition, MissileDirection,
       Level.AnimationTime, Arrow.DefaultMaxLife);
     Level.Creatures.Add(Missile);

@@ -25,7 +25,7 @@ unit CastleLevel;
 interface
 
 uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
-  VRMLNodes, VRMLFields, CastleItems, Navigation,
+  VRMLNodes, VRMLFields, CastleItems, Cameras,
   VRMLTriangle,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
@@ -1114,7 +1114,7 @@ type
 
     { PlayerMoveAllowed and PlayerGetCameraHeightSqr just
       call appropriate non-player methods above.
-      They use Navigator.CameraPos, and they use level's CameraRadius
+      They use Camera.CameraPos, and they use level's CameraRadius
       (i.e. they assume that it's the player who's moving).
       Use these to perform collision detection between player and the level.
 
@@ -1125,11 +1125,11 @@ type
       if player is not IsAboveTheGround).
 
       @groupBegin }
-    function PlayerMoveAllowed(Navigator: TWalkNavigator;
+    function PlayerMoveAllowed(Camera: TWalkCamera;
       const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
 
-    procedure PlayerGetCameraHeightSqr(Navigator: TWalkNavigator;
+    procedure PlayerGetCameraHeightSqr(Camera: TWalkCamera;
       out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
     { Call this to render level things: level scene and level objects
@@ -1974,7 +1974,7 @@ begin
         Box := Player.BoundingBox;
         if Boxes3dCollision(NewBox, Box) or
            Boxes3dCollision(CurrentBox, Box) then
-          Player.Navigator.CameraPos := Player.Navigator.CameraPos + Move;
+          Player.Camera.CameraPos := Player.Camera.CameraPos + Move;
 
         for I := 0 to ParentLevel.Creatures.High do
         begin
@@ -1996,9 +1996,9 @@ begin
       end else
       begin
         if SphereCollisionAssumeTranslation(NewTranslation,
-          Player.Navigator.CameraPos, ParentLevel.CameraRadius,
+          Player.Camera.CameraPos, ParentLevel.CameraRadius,
           @ParentLevel.CollisionIgnoreItem) then
-          Player.Navigator.CameraPos := Player.Navigator.CameraPos + Move;
+          Player.Camera.CameraPos := Player.Camera.CameraPos + Move;
 
         for I := 0 to ParentLevel.Creatures.High do
         begin
@@ -2512,7 +2512,7 @@ procedure TLevelHintArea.Idle;
 var
   ReplaceInteractInput: TPercentReplace;
 begin
-  if (not MessageDone) and PointInside(Player.Navigator.CameraPos) then
+  if (not MessageDone) and PointInside(Player.Camera.CameraPos) then
   begin
     ReplaceInteractInput.C := 'i';
     ReplaceInteractInput.S := InteractInputDescription;
@@ -3154,43 +3154,43 @@ begin
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
 end;
 
-function TLevel.PlayerMoveAllowed(Navigator: TWalkNavigator;
+function TLevel.PlayerMoveAllowed(Camera: TWalkCamera;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result :=
     { Check collision Player <-> level. }
-    MoveAllowed(Navigator.CameraPos, ProposedNewPos, NewPos,
+    MoveAllowed(Camera.CameraPos, ProposedNewPos, NewPos,
       BecauseOfGravity, CameraRadius) and
 
     { Check collision Player <-> Creatures here. }
     (Creatures.MoveAllowedSimple(
       Player.BoundingBox(false),
       Player.BoundingBoxAssuming(NewPos, false),
-      Navigator.CameraPos, NewPos, nil) = nil);
+      Camera.CameraPos, NewPos, nil) = nil);
 end;
 
-procedure TLevel.PlayerGetCameraHeightSqr(Navigator: TWalkNavigator;
+procedure TLevel.PlayerGetCameraHeightSqr(Camera: TWalkCamera;
   out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 var
   HeightAboveTheGround: Single;
   GroundItem: PVRMLTriangle;
 begin
   { Check is player standing over level. }
-  GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
+  GetCameraHeight(Camera.CameraPos, IsAboveTheGround,
     HeightAboveTheGround, GroundItem);
 
   { Check is player standing over one of the creatures. }
-  Creatures.GetCameraHeight(Navigator.CameraPos, IsAboveTheGround,
+  Creatures.GetCameraHeight(Camera.CameraPos, IsAboveTheGround,
     HeightAboveTheGround, GroundItem, nil);
 
   if IsAboveTheGround then
   begin
-    { Below is a waste of time. Because Navigator requires a callback
+    { Below is a waste of time. Because Camera requires a callback
       that passes only SqrHeightAboveTheGround, we Sqr here the
-      HeightAboveTheGround... Inside Navigator will possibly call Sqrt
+      HeightAboveTheGround... Inside Camera will possibly call Sqrt
       on this, thus wasting time on useless Sqrt operation.
-      For now this is not a problem, in the future Navigator should
+      For now this is not a problem, in the future Camera should
       be extended to have callback that returns ready HeightAboveTheGround. }
     SqrHeightAboveTheGround := Sqr(HeightAboveTheGround);
 

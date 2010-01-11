@@ -111,7 +111,7 @@ implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
-  Navigation, VectorMath, Boxes3d, Images,
+  Cameras, VectorMath, Boxes3d, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, CastleCreatures,
   CastleItems, VRMLTriangleOctree, RaysWindow, KambiStringUtils,
@@ -144,13 +144,13 @@ const
   SGameWinMessage = 'Game finished';
 
 { If ALActive then update listener POSITION and ORIENTATION
-  based on Player.Navigator.Camera* }
+  based on Player.Camera.Camera* }
 procedure alUpdateListener;
 begin
   if ALActive then
   begin
-    alListenerVector3f(AL_POSITION, Player.Navigator.CameraPos);
-    alListenerOrientation(Player.Navigator.CameraDir, Player.Navigator.CameraUp);
+    alListenerVector3f(AL_POSITION, Player.Camera.CameraPos);
+    alListenerOrientation(Player.Camera.CameraDir, Player.Camera.CameraUp);
   end;
 end;
 
@@ -163,12 +163,12 @@ end;
 
 procedure Resize(Glwin: TGLWindow);
 
-  procedure UpdateNavigatorProjectionMatrix;
+  procedure UpdateCameraProjectionMatrix;
   var
     ProjectionMatrix: TMatrix4f;
   begin
     glGetFloatv(GL_PROJECTION_MATRIX, @ProjectionMatrix);
-    Player.Navigator.ProjectionMatrix := ProjectionMatrix;
+    Player.Camera.ProjectionMatrix := ProjectionMatrix;
   end;
 
 begin
@@ -177,7 +177,7 @@ begin
   ProjectionGLPerspective(ViewAngleDegY, Glwin.Width / Glwin.Height,
     Level.ProjectionNear, ProjectionFar);
 
-  UpdateNavigatorProjectionMatrix;
+  UpdateCameraProjectionMatrix;
 end;
 
 procedure Draw2D(Draw2DData: Pointer);
@@ -391,9 +391,9 @@ begin
   { When GameWin, don't render creatures (as we don't check
     collisions when MovingPlayerEndSequence). }
   if not GameWin then
-    Level.Creatures.Render(Player.Navigator.Frustum, TransparentGroup);
+    Level.Creatures.Render(Player.Camera.Frustum, TransparentGroup);
   if not DebugRenderForLevelScreenshot then
-    Level.Items.Render(Player.Navigator.Frustum, TransparentGroup);
+    Level.Items.Render(Player.Camera.Frustum, TransparentGroup);
 end;
 
 class procedure TRenderer.RenderShadowVolumes;
@@ -411,7 +411,7 @@ class procedure TRenderer.RenderLevel(InShadow: boolean; TransparentGroup: TTran
 begin
   if InShadow then Level.PushLightsOff;
   try
-    Level.Render(Player.Navigator.Frustum, TransparentGroup);
+    Level.Render(Player.Camera.Frustum, TransparentGroup);
   finally
     if InShadow then Level.PopLightsOff;
   end;
@@ -434,7 +434,7 @@ procedure Draw(Glwin: TGLWindow);
 
   procedure RenderWithShadows(const MainLightPosition: TVector4Single);
   begin
-    SV.InitFrustumAndLight(Player.Navigator.Frustum, MainLightPosition);
+    SV.InitFrustumAndLight(Player.Camera.Frustum, MainLightPosition);
     SV.Count := ShowDebugInfo;
     SV.Render(
       { Creatures and items are never in shadow (this looks bad).
@@ -461,7 +461,7 @@ begin
 
   if UsedBackground <> nil then
   begin
-    glLoadMatrix(Glw.Navigator.RotationMatrix);
+    glLoadMatrix(Glw.Camera.RotationMatrix);
     UsedBackground.Render;
   end else
     ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
@@ -469,8 +469,8 @@ begin
   { Now clear buffers indicated in ClearBuffers. }
   glClear(ClearBuffers);
 
-  RenderState.CameraFromNavigator(Glw.Navigator);
-  glLoadMatrix(Glw.Navigator.Matrix);
+  RenderState.CameraFromCameraObject(Glw.Camera);
+  glLoadMatrix(Glw.Camera.Matrix);
 
   TThunderEffect.RenderOrDisable(Level.ThunderEffect, 1);
   Level.LightSet.RenderLights;
@@ -503,21 +503,21 @@ begin
 
   Player.LevelChanged;
 
-  { Init Player.Navigator properties }
-  Player.Navigator.OnMoveAllowed := @Level.PlayerMoveAllowed;
-  Player.Navigator.OnGetCameraHeight := @Level.PlayerGetCameraHeightSqr;
+  { Init Player.Camera properties }
+  Player.Camera.OnMoveAllowed := @Level.PlayerMoveAllowed;
+  Player.Camera.OnGetCameraHeight := @Level.PlayerGetCameraHeightSqr;
 
   { Init initial camera pos }
-  Player.Navigator.Init(Level.InitialCameraPos, Level.InitialCameraDir,
+  Player.Camera.Init(Level.InitialCameraPos, Level.InitialCameraDir,
     Level.InitialCameraUp, Level.GravityUp, Level.CameraPreferredHeight,
     0.0 { Level.CameraPreferredHeight is already corrected if necessary,
           so I pass here 0.0 instead of CameraRadius } );
 
-  Player.Navigator.CancelFallingDown;
+  Player.Camera.CancelFallingDown;
 
   { Init Level.Scene.Headlight }
   TVRMLGLHeadlight.RenderOrDisable(Level.Scene.Headlight, 0,
-    true, Player.Navigator);
+    true, Player.Camera);
 
   if Level.ThunderEffect <> nil then
     Level.ThunderEffect.InitGLLight(1);
@@ -551,9 +551,9 @@ var
     ToDirectionLength: Single;
     ToUpLength: Single;
   begin
-    ToPosition  := VectorSubtract(TargetPosition , Player.Navigator.CameraPos);
-    ToDirection := VectorSubtract(TargetDirection, Player.Navigator.CameraDir);
-    ToUp        := VectorSubtract(TargetUp       , Player.Navigator.CameraUp);
+    ToPosition  := VectorSubtract(TargetPosition , Player.Camera.CameraPos);
+    ToDirection := VectorSubtract(TargetDirection, Player.Camera.CameraDir);
+    ToUp        := VectorSubtract(TargetUp       , Player.Camera.CameraUp);
 
     ToPositionLength  := VectorLen(ToPosition);
     ToDirectionLength := VectorLen(ToDirection);
@@ -565,21 +565,21 @@ var
       TCagesLevel(Level).DoEndSequence := true else
     begin
       if ToPositionLength < CompSpeed * PositionChangeSpeed then
-        Player.Navigator.CameraPos := TargetPosition else
-        Player.Navigator.CameraPos := VectorAdd(
-          Player.Navigator.CameraPos,
+        Player.Camera.CameraPos := TargetPosition else
+        Player.Camera.CameraPos := VectorAdd(
+          Player.Camera.CameraPos,
           VectorAdjustToLength(ToPosition, CompSpeed * PositionChangeSpeed));
 
       if ToDirectionLength < CompSpeed * DirectionChangeSpeed then
-        Player.Navigator.CameraDir := TargetDirection else
-        Player.Navigator.CameraDir := VectorAdd(
-          Player.Navigator.CameraDir,
+        Player.Camera.CameraDir := TargetDirection else
+        Player.Camera.CameraDir := VectorAdd(
+          Player.Camera.CameraDir,
           VectorAdjustToLength(ToDirection, CompSpeed * DirectionChangeSpeed));
 
       if ToUpLength < CompSpeed * UpChangeSpeed then
-        Player.Navigator.CameraUp := TargetUp else
-        Player.Navigator.CameraUp := VectorAdd(
-          Player.Navigator.CameraUp,
+        Player.Camera.CameraUp := TargetUp else
+        Player.Camera.CameraUp := VectorAdd(
+          Player.Camera.CameraUp,
           VectorAdjustToLength(ToUp, CompSpeed * UpChangeSpeed));
     end;
   end;
@@ -716,7 +716,7 @@ procedure DoInteract;
     LevelCollisionObjectIndex: Integer;
     LevelCollisionInfo: TCollisionInfo;
   begin
-    Ray0 := Player.Navigator.CameraPos;
+    Ray0 := Player.Camera.CameraPos;
 
     { Picking is not an often called procedure, so I can freely normalize
       here to get exact distance to picked object in IntersectionDistance. }
@@ -800,8 +800,8 @@ procedure DoInteract;
       Glw.Width div 2 + XChange,
       Glw.Height div 2 + YChange,
       Glw.Width, Glw.Height,
-      Player.Navigator.CameraPos, Player.Navigator.CameraDir,
-      Player.Navigator.CameraUp,
+      Player.Camera.CameraPos, Player.Camera.CameraDir,
+      Player.Camera.CameraUp,
       ViewAngleDegX, ViewAngleDegY);
     Result := TryInteract(RayVector);
   end;
@@ -828,7 +828,7 @@ begin
 
   { Try to interact with the object in the middle --- if nothing interesting
     there, try to interact with things around the middle. }
-  if not TryInteract(Player.Navigator.CameraDir) then
+  if not TryInteract(Player.Camera.CameraDir) then
     if not TryInteractAroundSquare(25) then
       if not TryInteractAroundSquare(50) then
         if not TryInteractAroundSquare(100) then
@@ -848,9 +848,9 @@ end;
   while we're in game mode. This sets mouse visibility and position. }
 procedure UpdateMouseLook;
 begin
-  { Glwin.UpdateMouseLook will read Navigator.MouseLook, so we better set
+  { Glwin.UpdateMouseLook will read Camera.MouseLook, so we better set
     it here (even though it's set in Player.Idle). }
-  Player.Navigator.MouseLook := UseMouseLook;
+  Player.Camera.MouseLook := UseMouseLook;
   Glw.UpdateMouseLook;
 end;
 
@@ -910,19 +910,19 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
         prevent putting item "inside the ground", but the item
         would be too close to the player --- he could pick it up
         immediately. }
-      PushVector := Player.Navigator.CameraDirInGravityPlane;
+      PushVector := Player.Camera.CameraDirInGravityPlane;
       PushVectorLength := Max(
-        Player.Navigator.RealCameraPreferredHeight,
+        Player.Camera.RealCameraPreferredHeight,
         Box3dSizeX(ItemBox) * 2,
         Box3dSizeY(ItemBox) * 2);
       VectorAdjustToLengthTo1st(PushVector, PushVectorLength);
-      DropPosition := VectorAdd(Player.Navigator.CameraPos,
+      DropPosition := VectorAdd(Player.Camera.CameraPos,
         PushVector);
 
       { Now check is DropPosition actually possible
         (i.e. check collisions item<->level).
         The assumption is that item starts from
-        Player.Navigator.CameraPos and is moved to DropPosition.
+        Player.Camera.CameraPos and is moved to DropPosition.
 
         But actually we must shift both these positions,
         so that we check positions that are ideally in the middle
@@ -931,7 +931,7 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
         look good. }
 
       Result := Level.MoveAllowedSimple(
-        VectorAdd(Player.Navigator.CameraPos, ItemBoxMiddle),
+        VectorAdd(Player.Camera.CameraPos, ItemBoxMiddle),
         VectorAdd(DropPosition, ItemBoxMiddle),
         false, ItemBoxRadius)
     end;
@@ -1074,7 +1074,7 @@ begin
      CastleInput_RightStrafe.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
     MaybeDeadWinMessage else
   if { Note that rotation keys work even when player is dead.
-       See comments in TPlayer.UpdateNavigator. }
+       See comments in TPlayer.UpdateCamera. }
      CastleInput_LeftRot.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
      CastleInput_RightRot.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
      CastleInput_UpRotate.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
@@ -1150,9 +1150,9 @@ begin
   Glw.PostRedisplay;
   alUpdateListener;
 
-  if Box3dPointInside(Player.Navigator.CameraPos, Level.AboveWaterBox) then
+  if Box3dPointInside(Player.Camera.CameraPos, Level.AboveWaterBox) then
     Player.Swimming := psAboveWater else
-  if Box3dPointInside(Player.Navigator.CameraPos, Level.WaterBox) then
+  if Box3dPointInside(Player.Camera.CameraPos, Level.WaterBox) then
     Player.Swimming := psUnderWater else
     Player.Swimming := psNo;
 end;
@@ -1176,17 +1176,17 @@ begin
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
       GL_ENABLE_BIT, true);
     try
-      { Init Player.Navigator properties }
+      { Init Player.Camera properties }
       { No need to actually create TPlayGameHelper class,
         but I must pass here an instance, not a TPlayGameHelper
         only --- at least in objfpc mode, see
         [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
-      Player.Navigator.OnVisibleChange := @TPlayGameHelper(nil).PlayerChange;
+      Player.Camera.OnVisibleChange := @TPlayGameHelper(nil).PlayerChange;
 
       { Note that this sets AutoRedisplay to true. }
       TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, @Resize,
         nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
-        K_None, #0, { FpsShowOnCaption } false, Player.Navigator);
+        K_None, #0, { FpsShowOnCaption } false, Player.Camera);
 
       { OnTimer should be executed quite often, because footsteps sound
         (done in TPlayer.Idle) relies on the fact that OnUsingEnd
@@ -1218,10 +1218,10 @@ begin
         Application.ProcessMessage(true);
       until GameEnded;
     finally
-      { Clear some Player.Navigator callbacks. }
-      Player.Navigator.OnVisibleChange := nil;
-      Player.Navigator.OnMoveAllowed := nil;
-      Player.Navigator.OnGetCameraHeight := nil;
+      { Clear some Player.Camera callbacks. }
+      Player.Camera.OnVisibleChange := nil;
+      Player.Camera.OnMoveAllowed := nil;
+      Player.Camera.OnGetCameraHeight := nil;
 
       FreeAndNil(SavedMode);
     end;
