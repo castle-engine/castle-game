@@ -330,7 +330,7 @@ const
     begin
       WerewolfCreature[I] := Werewolf.CreateDefaultCreature(
         WerewolfAppearPosition[I],
-        VectorSubtract(Player.Camera.CameraPos, WerewolfAppearPosition[I]),
+        VectorSubtract(Player.Camera.Position, WerewolfAppearPosition[I]),
         AnimationTime, Werewolf.DefaultMaxLife) as TWerewolfCreature;
       Creatures.Add(WerewolfCreature[I]);
     end;
@@ -419,7 +419,7 @@ var
 begin
   inherited;
 
-  if Box3dPointInside(Player.Camera.CameraPos, FLevelExitBox) then
+  if Box3dPointInside(Player.Camera.Position, FLevelExitBox) then
   begin
     LevelFinished('cages');
   end;
@@ -594,11 +594,11 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
   var
     NewPosition: TVector3Single;
   begin
-    NewPosition := Player.Camera.CameraPos;
+    NewPosition := Player.Camera.Position;
     { Although I do him knockback, I also change the position
       to make sure that he is thrown outside of FGateExitBox. }
     NewPosition[1] := FGateExitBox[0, 1] - 0.1;
-    Player.Camera.CameraPos := NewPosition;
+    Player.Camera.Position := NewPosition;
 
     Player.Knockback(0, 2, Vector3Single(0, -1, 0));
   end;
@@ -606,9 +606,9 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
   procedure TeleportWork(const TeleportBox: TBox3d;
     const Destination: TVector3Single);
   begin
-    if Box3dPointInside(Player.Camera.CameraPos, TeleportBox) then
+    if Box3dPointInside(Player.Camera.Position, TeleportBox) then
     begin
-      Player.Camera.CameraPos := Destination;
+      Player.Camera.Position := Destination;
       Player.Camera.CancelFallingDown;
 
       Scene.ViewChangedSuddenly;
@@ -627,7 +627,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
     for I := 0 to High(SacrilegeAmbushStartingPosition) do
     begin
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
-      CreatureDirection := VectorSubtract(Player.Camera.CameraPos,
+      CreatureDirection := VectorSubtract(Player.Camera.Position,
         CreaturePosition);
       Creature := Ghost.CreateDefaultCreature(CreaturePosition,
         CreatureDirection, AnimationTime, Ghost.DefaultMaxLife);
@@ -644,7 +644,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
     for I := 0 to High(SwordAmbushStartingPosition) do
     begin
       CreaturePosition := SwordAmbushStartingPosition[I];
-      CreatureDirection := VectorSubtract(Player.Camera.CameraPos,
+      CreatureDirection := VectorSubtract(Player.Camera.Position,
         CreaturePosition);
       Creature := Ghost.CreateDefaultCreature(CreaturePosition,
         CreatureDirection, AnimationTime, Ghost.DefaultMaxLife);
@@ -658,7 +658,7 @@ const
 begin
   inherited;
 
-  if Box3dPointInside(Player.Camera.CameraPos, FGateExitBox) then
+  if Box3dPointInside(Player.Camera.Position, FGateExitBox) then
   begin
     if Player.Items.FindKind(KeyItemKind) = -1 then
     begin
@@ -682,7 +682,7 @@ begin
     TeleportWork(FTeleport2Box, Teleport2Destination);
 
     if (not SacrilegeAmbushDone) and
-      Box3dPointInside(Player.Camera.CameraPos, FSacrilegeBox) then
+      Box3dPointInside(Player.Camera.Position, FSacrilegeBox) then
     begin
       SacrilegeAmbushDone := true;
       SacrilegeAmbush;
@@ -907,10 +907,10 @@ const
   const
     RandomDist = 10.0;
   begin
-    Result[0] := Player.Camera.CameraPos[0] +
+    Result[0] := Player.Camera.Position[0] +
       MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
     Result[0] := Clamped(Result[0], MinSpiderX, MaxSpiderX);
-    Result[1] := Player.Camera.CameraPos[1] +
+    Result[1] := Player.Camera.Position[1] +
       MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
     Result[1] := Clamped(Result[1], MinSpiderY, MaxSpiderY);
     Result[2] := SpiderZ;
@@ -977,7 +977,7 @@ begin
       begin
         SpiderPosition := FSpidersAppearing.Items[I];
         SpiderDirection :=
-          VectorSubtract(Player.Camera.CameraPos, SpiderPosition);
+          VectorSubtract(Player.Camera.Position, SpiderPosition);
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.GravityUp);
         SpiderCreature := Spider.CreateDefaultCreature(
           SpiderPosition, SpiderDirection, AnimationTime, Spider.DefaultMaxLife);
@@ -1270,7 +1270,7 @@ begin
   end else
   if CollisionInfo.Hierarchy.IsLast(Elevator9a9b) and
      MovingElevator9a9b.CompletelyBeginPosition and
-     Box3dPointInside(Player.Camera.CameraPos, Elevator9a9bPickBox) then
+     Box3dPointInside(Player.Camera.Position, Elevator9a9bPickBox) then
   begin
     InteractionOccured := true;
     if Distance > 10 then
@@ -1329,7 +1329,7 @@ begin
   inherited;
 
   if MovingElevator49.CompletelyBeginPosition and
-     Box3dPointInside(Player.Camera.CameraPos, Elevator49DownBox) then
+     Box3dPointInside(Player.Camera.Position, Elevator49DownBox) then
   begin
     MovingElevator49.GoEndPosition;
   end;

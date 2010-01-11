@@ -507,8 +507,8 @@ begin
   Player.Camera.OnGetCameraHeight := @Level.PlayerGetCameraHeightSqr;
 
   { Init initial camera pos }
-  Player.Camera.Init(Level.InitialCameraPos, Level.InitialCameraDir,
-    Level.InitialCameraUp, Level.GravityUp, Level.CameraPreferredHeight,
+  Player.Camera.Init(Level.InitialPosition, Level.InitialDirection,
+    Level.InitialUp, Level.GravityUp, Level.CameraPreferredHeight,
     0.0 { Level.CameraPreferredHeight is already corrected if necessary,
           so I pass here 0.0 instead of CameraRadius } );
 
@@ -550,9 +550,9 @@ var
     ToDirectionLength: Single;
     ToUpLength: Single;
   begin
-    ToPosition  := VectorSubtract(TargetPosition , Player.Camera.CameraPos);
-    ToDirection := VectorSubtract(TargetDirection, Player.Camera.CameraDir);
-    ToUp        := VectorSubtract(TargetUp       , Player.Camera.CameraUp);
+    ToPosition  := VectorSubtract(TargetPosition , Player.Camera.Position);
+    ToDirection := VectorSubtract(TargetDirection, Player.Camera.Direction);
+    ToUp        := VectorSubtract(TargetUp       , Player.Camera.Up);
 
     ToPositionLength  := VectorLen(ToPosition);
     ToDirectionLength := VectorLen(ToDirection);
@@ -564,21 +564,21 @@ var
       TCagesLevel(Level).DoEndSequence := true else
     begin
       if ToPositionLength < CompSpeed * PositionChangeSpeed then
-        Player.Camera.CameraPos := TargetPosition else
-        Player.Camera.CameraPos := VectorAdd(
-          Player.Camera.CameraPos,
+        Player.Camera.Position := TargetPosition else
+        Player.Camera.Position := VectorAdd(
+          Player.Camera.Position,
           VectorAdjustToLength(ToPosition, CompSpeed * PositionChangeSpeed));
 
       if ToDirectionLength < CompSpeed * DirectionChangeSpeed then
-        Player.Camera.CameraDir := TargetDirection else
-        Player.Camera.CameraDir := VectorAdd(
-          Player.Camera.CameraDir,
+        Player.Camera.Direction := TargetDirection else
+        Player.Camera.Direction := VectorAdd(
+          Player.Camera.Direction,
           VectorAdjustToLength(ToDirection, CompSpeed * DirectionChangeSpeed));
 
       if ToUpLength < CompSpeed * UpChangeSpeed then
-        Player.Camera.CameraUp := TargetUp else
-        Player.Camera.CameraUp := VectorAdd(
-          Player.Camera.CameraUp,
+        Player.Camera.Up := TargetUp else
+        Player.Camera.Up := VectorAdd(
+          Player.Camera.Up,
           VectorAdjustToLength(ToUp, CompSpeed * UpChangeSpeed));
     end;
   end;
@@ -715,7 +715,7 @@ procedure DoInteract;
     LevelCollisionObjectIndex: Integer;
     LevelCollisionInfo: TCollisionInfo;
   begin
-    Ray0 := Player.Camera.CameraPos;
+    Ray0 := Player.Camera.Position;
 
     { Picking is not an often called procedure, so I can freely normalize
       here to get exact distance to picked object in IntersectionDistance. }
@@ -799,8 +799,9 @@ procedure DoInteract;
       Glw.Width div 2 + XChange,
       Glw.Height div 2 + YChange,
       Glw.Width, Glw.Height,
-      Player.Camera.CameraPos, Player.Camera.CameraDir,
-      Player.Camera.CameraUp,
+      Player.Camera.Position,
+      Player.Camera.Direction,
+      Player.Camera.Up,
       ViewAngleDegX, ViewAngleDegY);
     Result := TryInteract(RayVector);
   end;
@@ -827,7 +828,7 @@ begin
 
   { Try to interact with the object in the middle --- if nothing interesting
     there, try to interact with things around the middle. }
-  if not TryInteract(Player.Camera.CameraDir) then
+  if not TryInteract(Player.Camera.Direction) then
     if not TryInteractAroundSquare(25) then
       if not TryInteractAroundSquare(50) then
         if not TryInteractAroundSquare(100) then
@@ -900,26 +901,26 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
         1. show visually player that the item was dropped
         2. to avoid automatically picking it again
 
-        Note that I take PushVector from CameraDirInGravityPlane,
-        not from CameraDir, otherwise when player is looking
+        Note that I take PushVector from DirectionInGravityPlane,
+        not from Direction, otherwise when player is looking
         down he could be able to put item "inside the ground".
         Collision detection with the level below would actually
         prevent putting item "inside the ground", but the item
         would be too close to the player --- he could pick it up
         immediately. }
-      PushVector := Player.Camera.CameraDirInGravityPlane;
+      PushVector := Player.Camera.DirectionInGravityPlane;
       PushVectorLength := Max(
         Player.Camera.RealCameraPreferredHeight,
         Box3dSizeX(ItemBox) * 2,
         Box3dSizeY(ItemBox) * 2);
       VectorAdjustToLengthTo1st(PushVector, PushVectorLength);
-      DropPosition := VectorAdd(Player.Camera.CameraPos,
+      DropPosition := VectorAdd(Player.Camera.Position,
         PushVector);
 
       { Now check is DropPosition actually possible
         (i.e. check collisions item<->level).
         The assumption is that item starts from
-        Player.Camera.CameraPos and is moved to DropPosition.
+        Player.Camera.Position and is moved to DropPosition.
 
         But actually we must shift both these positions,
         so that we check positions that are ideally in the middle
@@ -928,7 +929,7 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
         look good. }
 
       Result := Level.MoveAllowedSimple(
-        VectorAdd(Player.Camera.CameraPos, ItemBoxMiddle),
+        VectorAdd(Player.Camera.Position, ItemBoxMiddle),
         VectorAdd(DropPosition, ItemBoxMiddle),
         false, ItemBoxRadius)
     end;
@@ -1139,9 +1140,9 @@ begin
   Glw.PostRedisplay;
   alUpdateListener;
 
-  if Box3dPointInside(Player.Camera.CameraPos, Level.AboveWaterBox) then
+  if Box3dPointInside(Player.Camera.Position, Level.AboveWaterBox) then
     Player.Swimming := psAboveWater else
-  if Box3dPointInside(Player.Camera.CameraPos, Level.WaterBox) then
+  if Box3dPointInside(Player.Camera.Position, Level.WaterBox) then
     Player.Swimming := psUnderWater else
     Player.Swimming := psNo;
 end;

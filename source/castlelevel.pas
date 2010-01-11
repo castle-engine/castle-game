@@ -160,7 +160,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; virtual; abstract;
 
-    procedure GetCameraHeight(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const Position: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
       var GroundItem: PVRMLTriangle); virtual; abstract;
@@ -261,7 +261,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeight(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const Position: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
       var GroundItem: PVRMLTriangle); override;
@@ -331,7 +331,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeight(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const Position: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
       var GroundItem: PVRMLTriangle); override;
@@ -422,7 +422,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeight(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const Position: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
       var GroundItem: PVRMLTriangle); override;
@@ -701,7 +701,7 @@ type
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeight(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const Position: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
       var GroundItem: PVRMLTriangle); override;
@@ -783,7 +783,7 @@ type
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
-    procedure GetCameraHeight(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const Position: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
       var GroundItem: PVRMLTriangle); override;
@@ -856,9 +856,9 @@ type
       Geometry: TVRMLGeometryNode;
       StateStack: TVRMLGraphTraverseStateStack);
   private
-    FInitialCameraPos: TVector3Single;
-    FInitialCameraDir: TVector3Single;
-    FInitialCameraUp: TVector3Single;
+    FInitialPosition: TVector3Single;
+    FInitialDirection: TVector3Single;
+    FInitialUp: TVector3Single;
     FGravityUp: TVector3Single;
 
     FAnimationTime: TKamTime;
@@ -877,7 +877,7 @@ type
       all Objects (not with the base level geometry).
       @groupBegin }
     function ObjectsMoveAllowedSimple(
-      const CameraPos: TVector3Single;
+      const Position: TVector3Single;
       const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean;
@@ -1019,7 +1019,7 @@ type
       is exactly above WaterBox (top of WaterBox is equal to bottom of
       AboveWaterBox) and the height of AboveWaterBox is "rather small".
 
-      The intention of "rather small" is such that when player CameraPos
+      The intention of "rather small" is such that when player Position
       is within AboveWaterBox then the player is floating slightly
       above the water --- not immediately falling down, but also
       not drowning.
@@ -1091,22 +1091,22 @@ type
     function LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
       virtual;
 
-    function MoveAllowed(const CameraPos: TVector3Single;
+    function MoveAllowed(const Position: TVector3Single;
       const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean; virtual;
 
-    function MoveAllowedSimple(const CameraPos: TVector3Single;
+    function MoveAllowedSimple(const Position: TVector3Single;
       const NewPos: TVector3Single;
       const BecauseOfGravity: boolean;
       const MovingObjectCameraRadius: Single): boolean; virtual;
 
     function MoveBoxAllowedSimple(
-      const CameraPos, NewPos: TVector3Single;
+      const Position, NewPos: TVector3Single;
       const NewBox: TBox3d;
       const BecauseOfGravity: boolean): boolean; virtual;
 
-    procedure GetCameraHeight(const CameraPos: TVector3Single;
+    procedure GetCameraHeight(const Position: TVector3Single;
       out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
       out GroundItem: PVRMLTriangle);
       virtual;
@@ -1114,7 +1114,7 @@ type
 
     { PlayerMoveAllowed and PlayerGetCameraHeightSqr just
       call appropriate non-player methods above.
-      They use Camera.CameraPos, and they use level's CameraRadius
+      They use Camera.Position, and they use level's CameraRadius
       (i.e. they assume that it's the player who's moving).
       Use these to perform collision detection between player and the level.
 
@@ -1201,9 +1201,9 @@ type
       LevelObjectIndex: Integer;
       var InteractionOccured: boolean); virtual;
 
-    property InitialCameraPos: TVector3Single read FInitialCameraPos;
-    property InitialCameraDir: TVector3Single read FInitialCameraDir;
-    property InitialCameraUp : TVector3Single read FInitialCameraUp;
+    property InitialPosition : TVector3Single read FInitialPosition;
+    property InitialDirection: TVector3Single read FInitialDirection;
+    property InitialUp       : TVector3Single read FInitialUp;
 
     { Actually, this must be (0, 0, 1) for this game.
       Some things in this game are prepared to handle any
@@ -1470,7 +1470,7 @@ begin
   end;
 end;
 
-procedure TLevelStaticObject.GetCameraHeight(const CameraPos: TVector3Single;
+procedure TLevelStaticObject.GetCameraHeight(const Position: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
   var GroundItem: PVRMLTriangle);
@@ -1482,7 +1482,7 @@ begin
   if Exists and Collides then
   begin
     Scene.OctreeCollisions.GetCameraHeightZ(
-      CameraPos,
+      Position,
       IsAboveThis, HeightAboveThis, GroundItemThis,
       nil, TrianglesToIgnoreFunc);
 
@@ -1645,7 +1645,7 @@ begin
     Result.Hierarchy.Insert(0, Self);
 end;
 
-procedure TLevelObjectSum.GetCameraHeight(const CameraPos: TVector3Single;
+procedure TLevelObjectSum.GetCameraHeight(const Position: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
   var GroundItem: PVRMLTriangle);
@@ -1653,7 +1653,7 @@ var
   I: Integer;
 begin
   for I := 0 to List.High do
-    List.Items[I].GetCameraHeight(CameraPos, TrianglesToIgnoreFunc,
+    List.Items[I].GetCameraHeight(Position, TrianglesToIgnoreFunc,
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
 end;
 
@@ -1827,7 +1827,7 @@ begin
   end;
 end;
 
-procedure TLevelMovingObject.GetCameraHeight(const CameraPos: TVector3Single;
+procedure TLevelMovingObject.GetCameraHeight(const Position: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
   var GroundItem: PVRMLTriangle);
@@ -1839,7 +1839,7 @@ begin
     T := Translation(ParentLevel.AnimationTime);
 
     MovingObject.GetCameraHeight(
-      VectorSubtract(CameraPos, T.Data), TrianglesToIgnoreFunc,
+      VectorSubtract(Position, T.Data), TrianglesToIgnoreFunc,
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
   end;
 end;
@@ -1974,7 +1974,7 @@ begin
         Box := Player.BoundingBox;
         if Boxes3dCollision(NewBox, Box) or
            Boxes3dCollision(CurrentBox, Box) then
-          Player.Camera.CameraPos := Player.Camera.CameraPos + Move;
+          Player.Camera.Position := Player.Camera.Position + Move;
 
         for I := 0 to ParentLevel.Creatures.High do
         begin
@@ -1996,9 +1996,9 @@ begin
       end else
       begin
         if SphereCollisionAssumeTranslation(NewTranslation,
-          Player.Camera.CameraPos, ParentLevel.CameraRadius,
+          Player.Camera.Position, ParentLevel.CameraRadius,
           @ParentLevel.CollisionIgnoreItem) then
-          Player.Camera.CameraPos := Player.Camera.CameraPos + Move;
+          Player.Camera.Position := Player.Camera.Position + Move;
 
         for I := 0 to ParentLevel.Creatures.High do
         begin
@@ -2318,7 +2318,7 @@ begin
   end;
 end;
 
-procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
+procedure TLevelAnimatedObject.GetCameraHeight(const Position: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
   var GroundItem: PVRMLTriangle);
@@ -2330,7 +2330,7 @@ procedure TLevelAnimatedObject.GetCameraHeight(const CameraPos: TVector3Single;
     GroundItemThis: PVRMLTriangle;
   begin
     Scene.OctreeCollisions.GetCameraHeightZ(
-      CameraPos, IsAboveThis, HeightAboveThis, GroundItemThis,
+      Position, IsAboveThis, HeightAboveThis, GroundItemThis,
       nil, TrianglesToIgnoreFunc);
 
     if IsAboveThis and
@@ -2481,7 +2481,7 @@ begin
   Result := nil;
 end;
 
-procedure TLevelArea.GetCameraHeight(const CameraPos: TVector3Single;
+procedure TLevelArea.GetCameraHeight(const Position: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
   var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
   var GroundItem: PVRMLTriangle);
@@ -2512,7 +2512,7 @@ procedure TLevelHintArea.Idle;
 var
   ReplaceInteractInput: TPercentReplace;
 begin
-  if (not MessageDone) and PointInside(Player.Camera.CameraPos) then
+  if (not MessageDone) and PointInside(Player.Camera.Position) then
   begin
     ReplaceInteractInput.C := 'i';
     ReplaceInteractInput.S := InteractInputDescription;
@@ -2585,12 +2585,12 @@ begin
       Scene.Attributes.BumpMappingMaximum := bmNone;
     Scene.Attributes.UseOcclusionQuery := UseOcclusionQuery;
 
-    { Calculate InitialCameraPos, InitialCameraDir, InitialCameraUp.
+    { Calculate InitialPosition, InitialDirection, InitialUp.
       Must be done before initializing creatures, as they right now
-      use InitialCameraPos. FInitialCameraDir, FInitialCameraUp will be
+      use InitialPosition. FInitialDirection, FInitialUp will be
       actually changed later in this procedure. }
-    Scene.GetPerspectiveViewpoint(FInitialCameraPos,
-      FInitialCameraDir, FInitialCameraUp, FGravityUp);
+    Scene.GetPerspectiveViewpoint(FInitialPosition,
+      FInitialDirection, FInitialUp, FGravityUp);
 
     FObjects := TLevelObjectsList.Create;
 
@@ -2657,12 +2657,12 @@ begin
     FProjectionNear := CameraRadius * 0.75;
     FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
 
-    { Fix InitialCameraDir length, and set MoveXxxSpeed.
+    { Fix InitialDirection length, and set MoveXxxSpeed.
 
       We want to have horizontal and vertical speeds controlled independently,
-      so we just normalize InitialCameraDir and set speeds in appropriate
+      so we just normalize InitialDirection and set speeds in appropriate
       MoveXxxSpeed. }
-    NormalizeTo1st(FInitialCameraDir);
+    NormalizeTo1st(FInitialDirection);
     FMoveHorizontalSpeed := NavigationSpeed / 50;
     FMoveVerticalSpeed := 0.4;
 
@@ -3007,7 +3007,7 @@ procedure TLevel.TraverseForCreatures(
     { TODO --- CreatureDirection configurable.
       Right now, it just points to the player start pos --- this is
       more-or-less sensible, usually. }
-    CreatureDirection := VectorSubtract(InitialCameraPos, CreaturePosition);
+    CreatureDirection := VectorSubtract(InitialPosition, CreaturePosition);
     if not CreatureKind.Flying then
       MakeVectorsOrthoOnTheirPlane(CreatureDirection, GravityUp);
 
@@ -3059,7 +3059,7 @@ begin
 end;
 
 function TLevel.ObjectsMoveAllowedSimple(
-  const CameraPos: TVector3Single;
+  const Position: TVector3Single;
   const NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
@@ -3067,7 +3067,7 @@ var
   I: Integer;
 begin
   for I := 0 to Objects.High do
-    if not Objects[I].MoveAllowedSimple(CameraPos, NewPos,
+    if not Objects[I].MoveAllowedSimple(Position, NewPos,
       MovingObjectCameraRadius, @CollisionIgnoreItem) then
     begin
       Result := false;
@@ -3096,21 +3096,21 @@ begin
   Result := true;
 end;
 
-function TLevel.MoveAllowed(const CameraPos: TVector3Single;
+function TLevel.MoveAllowed(const Position: TVector3Single;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
 begin
   Result :=
     Scene.OctreeCollisions.MoveAllowed(
-      CameraPos, ProposedNewPos, NewPos, MovingObjectCameraRadius,
+      Position, ProposedNewPos, NewPos, MovingObjectCameraRadius,
       nil, @CollisionIgnoreItem) and
     Box3dPointInside(NewPos, LevelBox) and
     ObjectsMoveAllowedSimple(
-      CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
+      Position, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
 end;
 
-function TLevel.MoveAllowedSimple(const CameraPos: TVector3Single;
+function TLevel.MoveAllowedSimple(const Position: TVector3Single;
   const NewPos: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
@@ -3118,13 +3118,13 @@ begin
   Result :=
     Box3dPointInside(NewPos, LevelBox) and
     Scene.OctreeCollisions.MoveAllowedSimple(
-      CameraPos, NewPos, MovingObjectCameraRadius,
+      Position, NewPos, MovingObjectCameraRadius,
       nil, @CollisionIgnoreItem) and
     ObjectsMoveAllowedSimple(
-      CameraPos, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
+      Position, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
 end;
 
-function TLevel.MoveBoxAllowedSimple(const CameraPos: TVector3Single;
+function TLevel.MoveBoxAllowedSimple(const Position: TVector3Single;
   const NewPos: TVector3Single;
   const NewBox: TBox3d;
   const BecauseOfGravity: boolean): boolean;
@@ -3132,25 +3132,25 @@ begin
   Result :=
     Box3dPointInside(NewPos, LevelBox) and
     Scene.OctreeCollisions.MoveBoxAllowedSimple(
-      CameraPos, NewPos, NewBox,
+      Position, NewPos, NewBox,
       nil, @CollisionIgnoreItem) and
     ObjectsMoveBoxAllowedSimple(
-      CameraPos, NewPos, NewBox, BecauseOfGravity);
+      Position, NewPos, NewBox, BecauseOfGravity);
 end;
 
-procedure TLevel.GetCameraHeight(const CameraPos: TVector3Single;
+procedure TLevel.GetCameraHeight(const Position: TVector3Single;
   out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
   out GroundItem: PVRMLTriangle);
 var
   I: Integer;
 begin
   Scene.OctreeCollisions.GetCameraHeightZ(
-    CameraPos,
+    Position,
     IsAboveTheGround, HeightAboveTheGround, GroundItem,
     nil, @CollisionIgnoreItem);
 
   for I := 0 to Objects.High do
-    Objects[I].GetCameraHeight(CameraPos, @CollisionIgnoreItem,
+    Objects[I].GetCameraHeight(Position, @CollisionIgnoreItem,
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
 end;
 
@@ -3160,14 +3160,14 @@ function TLevel.PlayerMoveAllowed(Camera: TWalkCamera;
 begin
   Result :=
     { Check collision Player <-> level. }
-    MoveAllowed(Camera.CameraPos, ProposedNewPos, NewPos,
+    MoveAllowed(Camera.Position, ProposedNewPos, NewPos,
       BecauseOfGravity, CameraRadius) and
 
     { Check collision Player <-> Creatures here. }
     (Creatures.MoveAllowedSimple(
       Player.BoundingBox(false),
       Player.BoundingBoxAssuming(NewPos, false),
-      Camera.CameraPos, NewPos, nil) = nil);
+      Camera.Position, NewPos, nil) = nil);
 end;
 
 procedure TLevel.PlayerGetCameraHeightSqr(Camera: TWalkCamera;
@@ -3177,11 +3177,11 @@ var
   GroundItem: PVRMLTriangle;
 begin
   { Check is player standing over level. }
-  GetCameraHeight(Camera.CameraPos, IsAboveTheGround,
+  GetCameraHeight(Camera.Position, IsAboveTheGround,
     HeightAboveTheGround, GroundItem);
 
   { Check is player standing over one of the creatures. }
-  Creatures.GetCameraHeight(Camera.CameraPos, IsAboveTheGround,
+  Creatures.GetCameraHeight(Camera.Position, IsAboveTheGround,
     HeightAboveTheGround, GroundItem, nil);
 
   if IsAboveTheGround then

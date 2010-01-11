@@ -315,8 +315,8 @@ begin
        end;
     3: Player.Camera.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
     4: Player.Camera.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
-    5: Player.Camera.CameraDir := VectorAdjustToLength(
-         Player.Camera.CameraDir, PlayerSpeedSlider.Value);
+    5: Player.Camera.Direction := VectorAdjustToLength(
+         Player.Camera.Direction, PlayerSpeedSlider.Value);
   end;
 end;
 
@@ -418,9 +418,9 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
   begin
     if ChooseCreatureKind(Kind) then
     begin
-      Position := VectorAdd(Player.Camera.CameraPos,
-        VectorAdjustToLength(Player.Camera.CameraDir, DirectionAttenuation));
-      Direction := Player.Camera.CameraDir;
+      Position := VectorAdd(Player.Camera.Position,
+        VectorAdjustToLength(Player.Camera.Direction, DirectionAttenuation));
+      Direction := Player.Camera.Direction;
 
       Level.Creatures.Add(
         Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime,
@@ -511,16 +511,16 @@ procedure TDebugLevelMenu.CurrentItemSelected;
   var
     Pos, Dir, Up: TVector3Single;
   begin
-    Pos := Player.Camera.CameraPos;
-    Dir := Player.Camera.CameraDir;
-    Up := Player.Camera.CameraUp;
+    Pos := Player.Camera.Position;
+    Dir := Player.Camera.Direction;
+    Up := Player.Camera.Up;
 
     LevelFinished(Level.Name);
     LevelFinishedFlush;
 
-    Player.Camera.CameraPos := Pos;
-    Player.Camera.CameraDir := Dir;
-    Player.Camera.CameraUp := Up;
+    Player.Camera.Position := Pos;
+    Player.Camera.Direction := Dir;
+    Player.Camera.Up := Up;
 
     UserQuit := true;
   end;
@@ -1033,7 +1033,7 @@ begin
            Vector := TVRMLPositionalLightNode(Light).FdLocation.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change location' +nl+
              '(Input "P" to use current player''s location)',
-             Vector, taLeft, Player.Camera.CameraPos) then
+             Vector, taLeft, Player.Camera.Position) then
            begin
              TVRMLPositionalLightNode(Light).FdLocation.Value := Vector;
              Level.LightSet.CalculateLights;
@@ -1058,7 +1058,7 @@ begin
            Vector := TVRMLDirectionalLightNode(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
-             Vector, taLeft, Player.Camera.CameraDir) then
+             Vector, taLeft, Player.Camera.Direction) then
            begin
              TVRMLDirectionalLightNode(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
@@ -1071,7 +1071,7 @@ begin
            Vector := TNodeSpotLight_1(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
-             Vector, taLeft, Player.Camera.CameraDir) then
+             Vector, taLeft, Player.Camera.Direction) then
            begin
              TNodeSpotLight_1(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
@@ -1082,7 +1082,7 @@ begin
            Vector := TNodeSpotLight_2(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
-             Vector, taLeft, Player.Camera.CameraDir) then
+             Vector, taLeft, Player.Camera.Direction) then
            begin
              TNodeSpotLight_2(Light).FdDirection.Value := Vector;
              Level.LightSet.CalculateLights;
@@ -1163,7 +1163,7 @@ begin
   DebugPlayerMenu.RotationVerticalSpeedSlider.Value :=
     Player.Camera.RotationVerticalSpeed;
   DebugPlayerMenu.PlayerSpeedSlider.Value :=
-    VectorLen(Player.Camera.CameraDir);
+    VectorLen(Player.Camera.Direction);
 
   SavedMode := TGLMode.Create(Glw, 0, true);
   try

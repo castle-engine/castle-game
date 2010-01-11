@@ -372,7 +372,7 @@ type
 
     { Maximum distance between player and creature to allow creature
       to start attack. More precisely, this is measured between
-      Player.Camera.CameraPos and creature's MiddlePosition. }
+      Player.Camera.Position and creature's MiddlePosition. }
     property MaxAttackDistance: Single
       read FMaxAttackDistance write FMaxAttackDistance
       default DefaultMaxAttackDistance;
@@ -424,7 +424,7 @@ type
 
       More precisely, the attack is allowed to start only when
       the angle between current Direction and the vector
-      from creature's MiddlePosition to the player's CameraPos
+      from creature's MiddlePosition to the player's Position
       is <= MaxAngleToAttack.
 
       This is in radians. }
@@ -1879,23 +1879,23 @@ end;
 function TCreature.SceneTransformAssuming(
   const AssumeLegsPosition, AssumeDirection: TVector3Single): TMatrix4Single;
 var
-  GoodCameraUp: TVector3Single;
+  GoodUp: TVector3Single;
 begin
-  GoodCameraUp := UnitVector3Single[2];
-  { If not Flying, then we know that GoodCameraUp is already
+  GoodUp := UnitVector3Single[2];
+  { If not Flying, then we know that GoodUp is already
     orthogonal to AssumeDirection. }
   if Kind.Flying then
-    MakeVectorsOrthoOnTheirPlane(GoodCameraUp, AssumeDirection);
+    MakeVectorsOrthoOnTheirPlane(GoodUp, AssumeDirection);
 
   { Note that actually I could do here TransformToCoordsNoScaleMatrix,
     as obviously I don't want any scaling. But in this case I know
-    that AssumeDirection length = 1 and GoodCameraUp = 1 (so their product
+    that AssumeDirection length = 1 and GoodUp = 1 (so their product
     length is also = 1), so no need to do
     TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
     on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
 
   Result := TransformToCoordsMatrix(AssumeLegsPosition,
-    AssumeDirection, VectorProduct(GoodCameraUp, AssumeDirection), GoodCameraUp);
+    AssumeDirection, VectorProduct(GoodUp, AssumeDirection), GoodUp);
 end;
 
 function TCreature.SceneTransform: TMatrix4Single;
@@ -3134,12 +3134,12 @@ begin
     Exit;
   end;
 
-  IdleSeesPlayer := Level.LineOfSight(MiddlePosition, Player.Camera.CameraPos);
+  IdleSeesPlayer := Level.LineOfSight(MiddlePosition, Player.Camera.Position);
   if IdleSeesPlayer then
   begin
     HasLastSeenPlayer := true;
-    LastSeenPlayer := Player.Camera.CameraPos;
-    LastSeenPlayerSector := Player.CameraPosSector;
+    LastSeenPlayer := Player.Camera.Position;
+    LastSeenPlayerSector := Player.PositionSector;
   end;
 
   if HasLastSeenPlayer then
@@ -3545,7 +3545,7 @@ begin
   if MissileKind.CloseDirectionToPlayer and
      (MissileKind.CloseDirectionToTargetSpeed <> 0) then
   begin
-    TargetDirection := VectorSubtract(Player.Camera.CameraPos,
+    TargetDirection := VectorSubtract(Player.Camera.Position,
       LegsPosition);
     AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
     AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed * 50;

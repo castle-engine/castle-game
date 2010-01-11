@@ -46,7 +46,7 @@ type
 
     Dead player actually behaves (from the point
     of view of this class...) much like alive player. This means that
-    e.g. dead player still has a Camera, and it's CameraPos may still
+    e.g. dead player still has a Camera, and it's Position may still
     change (e.g. because player was killed when he was flying, or player
     corpse lays on some moving object of the level). It just cannot change
     because of player keys like up/down/rotate etc.
@@ -222,7 +222,7 @@ type
 
       You are allowed to read and write:
       @unorderedList(
-        @item(Camera.CameraPos, CameraDir, CameraUp and InitialCameraXxx ---
+        @item(Camera.Position, Direction, Up and InitialCameraXxx ---
           these are exactly player's camera settings.)
         @item(Camera.CameraPreferredHeight. In fact, it's OK to just call
           Camera.Init.)
@@ -244,10 +244,10 @@ type
     }
     property Camera: TWalkCamera read FCamera;
 
-    { Return the one of Level.Sectors that contains Camera.CameraPos.
+    { Return the one of Level.Sectors that contains Camera.Position.
       Nil if none. Yes, this is just a shortcut for
-      Level.Sectors.SectorWithPoint(Camera.CameraPos). }
-    function CameraPosSector: TSceneSector;
+      Level.Sectors.SectorWithPoint(Camera.Position). }
+    function PositionSector: TSceneSector;
 
     { This adds Item to Items, with appropriate GameMessage.
       Returns index inside Items to this item (note that this
@@ -278,20 +278,20 @@ type
       a message that he's no longer using that weapon. }
     function DeleteItem(ItemIndex: Integer): TItem;
 
-    { Like BoundingBox, but assumes that Camera.CameraPos is as specified. }
-    function BoundingBoxAssuming(const AssumeCameraPos: TVector3Single;
+    { Like BoundingBox, but assumes that Camera.Position is as specified. }
+    function BoundingBoxAssuming(const AssumePosition: TVector3Single;
       Tall: boolean = true): TBox3d;
 
     { Calculates what can be considered "bounding box of the player",
-      taking into account global Level.CameRadius around current CameraPos.
+      taking into account global Level.CameRadius around current Position.
       Use for collision detection etc.
 
       If Tall then the returned box uses current camera height
       (i.e. Camera.RealCameraPreferredHeight).
 
       If not Tall, then the box is just CameraRadius around
-      CameraPos, so it could be more accurately described
-      as a sphere with CameraRadius around CameraPos.
+      Position, so it could be more accurately described
+      as a sphere with CameraRadius around Position.
       In this case, the box doesn't really represent player
       (you can say that player's "legs" are not included in the box).
       However, not Tall box can still be useful (e.g. when checking for
@@ -598,13 +598,13 @@ begin
     EquippedWeapon := nil;
 end;
 
-function TPlayer.BoundingBoxAssuming(const AssumeCameraPos: TVector3Single;
+function TPlayer.BoundingBoxAssuming(const AssumePosition: TVector3Single;
   Tall: boolean): TBox3d;
 var
   PlayerSize: Single;
 begin
-  Result[0] := AssumeCameraPos;
-  Result[1] := AssumeCameraPos;
+  Result[0] := AssumePosition;
+  Result[1] := AssumePosition;
 
   PlayerSize := Level.CameraRadius;
 
@@ -621,7 +621,7 @@ end;
 
 function TPlayer.BoundingBox(Tall: boolean): TBox3d;
 begin
-  Result := BoundingBoxAssuming(Player.Camera.CameraPos, Tall);
+  Result := BoundingBoxAssuming(Player.Camera.Position, Tall);
 end;
 
 procedure TPlayer.SetEquippedWeapon(Value: TItem);
@@ -807,7 +807,7 @@ begin
 
     { Rotation keys work always, even when player is dead.
       Initially I disabled them, but after some thought:
-      let them work. They work a little strangely (because CameraUp
+      let them work. They work a little strangely (because Up
       is orthogonal to GravityUp), but they still work and player
       can figure it out. }
     Camera.Input_LeftRot.Assign(CastleInput_LeftRot.Shortcut, false);
@@ -1169,12 +1169,12 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       MinTo1st(CurrentKnockBackDistance, FKnockbackDistance);
       FKnockbackDistance -= CurrentKnockBackDistance;
 
-      ProposedNewPosition := VectorAdd(Camera.CameraPos,
+      ProposedNewPosition := VectorAdd(Camera.Position,
         VectorScale(FKnockbackDirection, CurrentKnockBackDistance));
 
       if Level.PlayerMoveAllowed(Camera, ProposedNewPosition,
         NewPosition, false) then
-        Camera.CameraPos := NewPosition;
+        Camera.Position := NewPosition;
     end;
   end;
 
@@ -1310,9 +1310,9 @@ begin
   Result := TItemWeaponKind(EquippedWeapon.Kind);
 end;
 
-function TPlayer.CameraPosSector: TSceneSector;
+function TPlayer.PositionSector: TSceneSector;
 begin
-  Result := Level.Sectors.SectorWithPoint(Camera.CameraPos);
+  Result := Level.Sectors.SectorWithPoint(Camera.Position);
 end;
 
 procedure TPlayer.InputChanged(InputConfiguration: TInputConfiguration);

@@ -85,9 +85,9 @@ begin
 
   { initialize BackgroundCamera }
   BackgroundCamera := TWalkCamera.Create(nil);
-  BackgroundCamera.Init(BackgroundLevel.InitialCameraPos,
-    BackgroundLevel.InitialCameraDir,
-    BackgroundLevel.InitialCameraUp,
+  BackgroundCamera.Init(BackgroundLevel.InitialPosition,
+    BackgroundLevel.InitialDirection,
+    BackgroundLevel.InitialUp,
     BackgroundLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
 end;
 
