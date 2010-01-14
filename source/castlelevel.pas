@@ -92,45 +92,17 @@ type
 
     property ParentLevel: TLevel read FParentLevel;
 
-    { This should render given object.
-
-      It can be optimized to not
-      render the object if it's not inside the Frustum.
-
-      It will be called twice for each rendered frame:
-      first time with ATransparent = @false, second time with
-      ATransparent = @true. You should render only fully opaque
-      parts in the first pass and only the transparent parts in the
-      second pass. For the reason see TVRMLGLScene.Render comments. }
+    { See TBase3D.Render. }
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); virtual; abstract;
 
-    { Render shadow quads for all the things rendered by @link(Render).
-      Does nothing if not CastsShadow.
-      It does shadow volumes culling inside  (so ShadowVolumes should
-      have FrustumCullingInit already initialized).
-
-      ParentTransform and ParentTransformIsIdentity describe the transformation
-      of this object set by parent level object.
-      Level objects may be organized in hierarchy when
-      parent transforms it's children. When ParentTransformIsIdentity,
-      ParentTransform must be IdentityMatrix4Single (it's not guaranteed
-      that when ParentTransformIsIdentity = @true, Transform value will be
-      ignored !).
-
-      @italic(Implementation note:) In @link(Render), it was possible
-      to implement this by glPush/PopMatrix and Frustum.Move tricks.
-      But RenderShadowVolume needs actual transformation explicitly:
-      ShadowMaybeVisible needs actual box position in world coordinates,
-      so bounding box has to be transformed by ParentTransform.
-      And TVRMLGLScene.RenderShadowVolume needs explicit ParentTransform
-      to correctly detect front/back sides (for silhouette edges and
-      volume capping). }
+    { See TBase3D.RenderShadowVolume. }
     procedure RenderShadowVolume(
       ShadowVolumes: TShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); virtual; abstract;
 
+    { See TBase3D.CastsShadow. }
     property CastsShadow: boolean read FCastsShadow write FCastsShadow
       default true;
 
@@ -1510,7 +1482,7 @@ procedure TLevelStaticObject.RenderShadowVolume(
 begin
   if Exists and CastsShadow then
   begin
-    Scene.InitAndRenderShadowVolume(ShadowVolumes,
+    Scene.RenderShadowVolume(ShadowVolumes,
       ParentTransformIsIdentity, ParentTransform);
   end;
 end;
@@ -2366,7 +2338,7 @@ begin
   if Exists and CastsShadow then
   begin
     Animation.SceneFromTime(AnimationTime).
-      InitAndRenderShadowVolume(ShadowVolumes,
+      RenderShadowVolume(ShadowVolumes,
         ParentTransformIsIdentity, ParentTransform);
   end;
 end;
@@ -3250,7 +3222,7 @@ begin
     { Useless to optimize this by shadow culling in ShadowVolumes,
       Scene will be visible practically always. }
     ShadowVolumes.InitSceneAlwaysVisible;
-    Scene.RenderShadowVolume(ShadowVolumes, true, IdentityMatrix4Single);
+    Scene.RenderShadowVolumeCore(ShadowVolumes, true, IdentityMatrix4Single);
   end;
 end;
 

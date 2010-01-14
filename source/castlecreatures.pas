@@ -2007,7 +2007,7 @@ begin
   if Kind.CastsShadow then
   begin
     ShadowVolumes.InitScene(BoundingBox);
-    CurrentScene.RenderShadowVolume(ShadowVolumes, false, SceneTransform);
+    CurrentScene.RenderShadowVolumeCore(ShadowVolumes, false, SceneTransform);
   end;
 end;
 
