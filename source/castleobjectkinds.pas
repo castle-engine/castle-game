@@ -331,6 +331,41 @@ procedure TObjectKind.CreateAnimationIfNeeded(
   AnimInfo: TVRMLGLAnimationInfo;
   TransparentGroups: TTransparentGroups;
   Options: TPrepareRenderOptions);
+
+  { Returns FirstScene.ManifoldEdges / BorderEdges.
+
+    Since all scenes in the animation must have exactly the same
+    structure, we know that this ManifoldEdges is actually good
+    for all scenes within this animation. }
+  function Animation_ManifoldEdges(Animation: TVRMLGLAnimation): TDynManifoldEdgeArray;
+  begin
+    Result := Animation.FirstScene.ManifoldEdges;
+  end;
+
+  function Animation_BorderEdges(Animation: TVRMLGLAnimation): TDynBorderEdgeArray;
+  begin
+    Result := Animation.FirstScene.BorderEdges;
+  end;
+
+  { Calls ShareManifoldAndBoderEdges on all scenes within this
+    animation. This is useful if you already have ManifoldEdges and BorderEdges,
+    and you somehow know that it's good also for this scene.
+
+    This is not part of TVRMLGLAnimation, because TVRMLGLAnimation doesn't
+    guarantee now that all scenes are "structurally equal". So you cannot share
+    edges info like this. However, all castle animations satify
+    "structurally equal" condition, so it's Ok for them. }
+  procedure Animation_ShareManifoldAndBorderEdges(
+    Animation: TVRMLGLAnimation;
+    ManifoldShared: TDynManifoldEdgeArray;
+    BorderShared: TDynBorderEdgeArray);
+  var
+    I: Integer;
+  begin
+    for I := 0 to Animation.ScenesCount - 1 do
+      Animation.Scenes[I].ShareManifoldAndBorderEdges(ManifoldShared, BorderShared);
+  end;
+
 var
   FileName: string;
   FileNameIndex: Integer;
@@ -355,10 +390,10 @@ begin
       if FileNameIndex <> -1 then
       begin
         IsSharedManifoldAndBorderEdges := true;
-        SharedManifoldEdges := (ManifoldEdgesPool.Objects[FileNameIndex] as
-          TVRMLGLAnimation).ManifoldEdges;
-        SharedBorderEdges := (ManifoldEdgesPool.Objects[FileNameIndex] as
-          TVRMLGLAnimation).BorderEdges;
+        SharedManifoldEdges := Animation_ManifoldEdges(
+          ManifoldEdgesPool.Objects[FileNameIndex] as TVRMLGLAnimation);
+        SharedBorderEdges := Animation_BorderEdges(
+          ManifoldEdgesPool.Objects[FileNameIndex] as TVRMLGLAnimation);
       end;
     end;
 
@@ -382,7 +417,7 @@ begin
 
     if (prManifoldAndBorderEdges in Options) and
       IsSharedManifoldAndBorderEdges then
-      Anim.ShareManifoldAndBorderEdges(SharedManifoldEdges, SharedBorderEdges);
+      Animation_ShareManifoldAndBorderEdges(Anim, SharedManifoldEdges, SharedBorderEdges);
 
     AnimationsPrepared.Add(Anim);
   end;

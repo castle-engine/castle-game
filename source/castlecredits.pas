@@ -188,7 +188,7 @@ begin
   CreditsModel.Attributes.UseLights := true;
   { We let FirstGLFreeLight to be 0, CreditsModel can use all the lights }
 
-  CreditsModel.PrepareRender([tgAll], [prBoundingBox]);
+  CreditsModel.PrepareRender([tgAll], [prBoundingBox], false);
 
   Info := (CreditsModel.RootNode.FindNodeByName(TNodeWorldInfo,
     'MainInfo', true) as TNodeWorldInfo).FdInfo;

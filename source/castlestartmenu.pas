@@ -114,7 +114,7 @@ type
     destructor Destroy; override;
     procedure CurrentItemSelected; override;
     function SpaceBetweenItems(const NextItemIndex: Cardinal): Cardinal; override;
-    procedure Draw2D(const Focused: boolean); override;
+    procedure Draw(const Focused: boolean); override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -755,7 +755,7 @@ begin
     Result += 10;
 end;
 
-procedure TChooseNewLevelMenu.Draw2D(const Focused: boolean);
+procedure TChooseNewLevelMenu.Draw(const Focused: boolean);
 const
   SubMenuTextColor: TVector3Single = (0.7, 0.7, 0.7);
 begin

@@ -2659,7 +2659,7 @@ begin
     if RenderShadowsPossible then
       TG := TG + [tgOpaque, tgTransparent];
 
-    Scene.PrepareRender(TG, Options);
+    Scene.PrepareRender(TG, Options, false);
 
     Scene.FreeResources([frTextureDataInNodes]);
 
@@ -3351,7 +3351,7 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareRender([tgOpaque, tgTransparent], Options);
+  Result.PrepareRender([tgOpaque, tgTransparent], Options, false);
 
   if CreateOctreeCollisions then
     Result.Spatial := [ssCollisionOctree];

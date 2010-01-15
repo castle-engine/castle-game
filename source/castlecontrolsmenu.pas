@@ -35,7 +35,7 @@ type
       the value of this property. }
     SubMenuAdditionalInfo: string;
     constructor Create(AOwner: TComponent); override;
-    procedure Draw2D(const Focused: boolean); override;
+    procedure Draw(const Focused: boolean); override;
 
     { Sets Position and PositionRelative* parameters.
       Sets position suitable for the StartScreen, and then shifts
@@ -155,7 +155,7 @@ begin
   if DoFixItemsAreas then FixItemsAreas;
 end;
 
-procedure TSubMenu.Draw2D(const Focused: boolean);
+procedure TSubMenu.Draw(const Focused: boolean);
 const
   SubMenuTextColor: TVector3Single = (0.9, 0.9, 0.9);
 begin
