@@ -594,31 +594,6 @@ type
     (that should be created with LoadLevelAnimation) the animation
     instance is owned by this object.
 
-    For now, collision will be checked (only if @link(Collides) and @link(Exists),
-    naturally) by checking always with Animation.FirstScene.OctreeCollisions.
-    So you should create this octree, and make sure that the animation is done
-    such that the first animation frame is always larger than the others.
-    You don't have to make the octree only if you're sure that object will
-    always be not @link(Collides) or not @link(Exists).
-
-    You can also set CollisionUseLastScene, then collision will be done
-    versus the sum of Animation.FirstScene.OctreeCollisions +
-    Animation.LastScene.OctreeCollisions. CollisionUseLastScene
-    is useful is the object is moving, but the move is very slight,
-    so that the sum of first and last scenes geometry is good enough
-    approximation of the whole geometry at any point of the animation.
-
-    Although it seems like a totally stupid way to check for collisions,
-    it's suitable for many purposes (see e.g. uses on "castle hall" level),
-    it's simple and not memory-consuming, and you don't have to take
-    any action when animation frame changes (because AnimationTime changes
-    don't change the colliding geometry, so the animation is static from
-    the point of view of collision checking routines).
-
-    In the future other collision methods may be available.
-    First of all, checking with sum of all bounding boxes, or with particular
-    scene time box, should be available.
-
     You should take care of setting AnimationTime as appropriate if you
     want to really use this animation. }
   TLevelAnimatedObject = class(TLevelObject)
@@ -637,6 +612,7 @@ type
     property Exists: boolean read FExists write FExists default true;
     property Collides: boolean read FCollides write FCollides default true;
 
+    { See TVRMLGLAnimation.CollisionUseLastScene. }
     property CollisionUseLastScene: boolean
       read FCollisionUseLastScene
       write FCollisionUseLastScene default false;
@@ -1513,8 +1489,8 @@ procedure TLevelObjectSum.Render(const Frustum: TFrustum;
 var
   I: Integer;
 begin
-  for I := 0 to List.High do
-    List.Items[I].Render(Frustum, TransparentGroup);
+  for I := 0 to List.Count - 1 do
+    List[I].Render(Frustum, TransparentGroup);
 end;
 
 procedure TLevelObjectSum.RenderShadowVolume(
@@ -1526,8 +1502,8 @@ var
 begin
   if CastsShadow then
   begin
-    for I := 0 to List.High do
-      List.Items[I].RenderShadowVolume(ShadowVolumes,
+    for I := 0 to List.Count - 1 do
+      List[I].RenderShadowVolume(ShadowVolumes,
         ParentTransformIsIdentity, ParentTransform);
   end;
 end;
@@ -1540,9 +1516,9 @@ var
   I: Integer;
 begin
   Result := true;
-  for I := 0 to List.High do
+  for I := 0 to List.Count - 1 do
   begin
-    Result := List.Items[I].MoveAllowedSimple(OldPos, ProposedNewPos,
+    Result := List[I].MoveAllowedSimple(OldPos, ProposedNewPos,
       CameraRadius, TrianglesToIgnoreFunc);
     if not Result then Exit;
   end;
@@ -1556,9 +1532,9 @@ var
   I: Integer;
 begin
   Result := true;
-  for I := 0 to List.High do
+  for I := 0 to List.Count - 1 do
   begin
-    Result := List.Items[I].MoveBoxAllowedSimple(OldPos, ProposedNewPos,
+    Result := List[I].MoveBoxAllowedSimple(OldPos, ProposedNewPos,
       ProposedNewBox, TrianglesToIgnoreFunc);
     if not Result then Exit;
   end;
@@ -1570,9 +1546,9 @@ var
   I: Integer;
 begin
   Result := false;
-  for I := 0 to List.High do
+  for I := 0 to List.Count - 1 do
   begin
-    Result := List.Items[I].SegmentCollision(Pos1, Pos2, TrianglesToIgnoreFunc);
+    Result := List[I].SegmentCollision(Pos1, Pos2, TrianglesToIgnoreFunc);
     if Result then Exit;
   end;
 end;
@@ -1584,9 +1560,9 @@ var
   I: Integer;
 begin
   Result := false;
-  for I := 0 to List.High do
+  for I := 0 to List.Count - 1 do
   begin
-    Result := List.Items[I].SphereCollision(Pos, Radius, TrianglesToIgnoreFunc);
+    Result := List[I].SphereCollision(Pos, Radius, TrianglesToIgnoreFunc);
     if Result then Exit;
   end;
 end;
@@ -1597,9 +1573,9 @@ var
   I: Integer;
 begin
   Result := false;
-  for I := 0 to List.High do
+  for I := 0 to List.Count - 1 do
   begin
-    Result := List.Items[I].BoxCollision(Box, TrianglesToIgnoreFunc);
+    Result := List[I].BoxCollision(Box, TrianglesToIgnoreFunc);
     if Result then Exit;
   end;
 end;
@@ -1624,8 +1600,8 @@ procedure TLevelObjectSum.GetCameraHeight(const Position: TVector3Single;
 var
   I: Integer;
 begin
-  for I := 0 to List.High do
-    List.Items[I].GetCameraHeight(Position, TrianglesToIgnoreFunc,
+  for I := 0 to List.Count - 1 do
+    List[I].GetCameraHeight(Position, TrianglesToIgnoreFunc,
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
 end;
 
@@ -1633,16 +1609,16 @@ procedure TLevelObjectSum.BeforeIdle(const NewAnimationTime: TKamTime);
 var
   I: Integer;
 begin
-  for I := 0 to List.High do
-    List.Items[I].BeforeIdle(NewAnimationTime);
+  for I := 0 to List.Count - 1 do
+    List[I].BeforeIdle(NewAnimationTime);
 end;
 
 procedure TLevelObjectSum.Idle;
 var
   I: Integer;
 begin
-  for I := 0 to List.High do
-    List.Items[I].Idle;
+  for I := 0 to List.Count - 1 do
+    List[I].Idle;
 end;
 
 function TLevelObjectSum.BoundingBox: TBox3d;
@@ -1650,8 +1626,8 @@ var
   I: Integer;
 begin
   Result := EmptyBox3d;
-  for I := 0 to List.High do
-    Box3dSumTo1st(Result, List.Items[I].BoundingBox);
+  for I := 0 to List.Count - 1 do
+    Box3dSumTo1st(Result, List[I].BoundingBox);
 end;
 
 { TLevelMovingObject --------------------------------------------------------- }
