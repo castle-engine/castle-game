@@ -38,7 +38,7 @@ var
 
 implementation
 
-uses SysUtils, VRMLNodes, GLAntiAliasing;
+uses SysUtils, VRMLNodes, GLAntiAliasing, UIControls;
 
 { initialization / finalization ---------------------------------------------- }
 
@@ -69,6 +69,7 @@ end;
 initialization
   Glw := TGLUIWindow.Create(nil);
   Glw.SetDemoOptions(K_None, #0, false);
+  Glw.OnDrawStyle := ds3D;
 
   GLContextCache := TVRMLOpenGLRendererContextCache.Create;
 
