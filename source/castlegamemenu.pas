@@ -30,10 +30,10 @@ procedure ShowGameMenu(ADrawUnderMenu: TDrawFunc);
 implementation
 
 uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
-  GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
+  GL, GLU, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
-  CastleControlsMenu, CastleInputs, CastleCreatures, CastleChooseMenu,
-  CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel,
+  CastleControlsMenu, CastleInputs, CastleChooseMenu,
+  CastleVideoOptions,
   CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
   GLSoundMenu;
 

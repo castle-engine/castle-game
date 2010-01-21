@@ -1253,11 +1253,11 @@ type
 
 implementation
 
-uses SysUtils, GL, GLU, GLExt, Object3dAsVRML,
+uses SysUtils, GL, GLU, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
   CastleInputs, CastleWindow, KambiOpenAL, ALUtils, KambiXMLUtils,
-  CastleRequiredResources, VRMLOpenGLRenderer, VRMLTriangleOctree, VRMLShape;
+  CastleRequiredResources, VRMLOpenGLRenderer, VRMLShape;
 
 {$define read_implementation}
 {$I objectslist_2.inc}

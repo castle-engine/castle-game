@@ -410,8 +410,8 @@ type
 
 implementation
 
-uses Math, SysUtils, KambiClassUtils, KeysMouse, CastlePlay, GLWinMessages,
-  CastleWindow, KambiUtils, OpenGLBmpFonts, OpenGLFonts,
+uses Math, SysUtils, KambiClassUtils, CastlePlay, GLWinMessages,
+  CastleWindow, KambiUtils,
   GLWindow, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, KambiOpenAL, VRMLNodes, CastleControlsMenu,
   CastleTimeMessages, KambiXMLCfg, VRMLGLScene, GLImages,

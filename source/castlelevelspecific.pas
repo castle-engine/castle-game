@@ -23,9 +23,9 @@ unit CastleLevelSpecific;
 
 interface
 
-uses VRMLGLAnimation, VRMLGLScene, Boxes3d, VectorMath,
-  CastlePlayer, CastleLevel, VRMLTriangleOctree, BackgroundGL, VRMLTriangle,
-  ALSourceAllocator, CastleSound, Matrix, VRMLNodes, DOM,
+uses VRMLGLScene, Boxes3d, VectorMath,
+  CastlePlayer, CastleLevel, BackgroundGL, VRMLTriangle,
+  CastleSound, VRMLNodes, DOM,
   CastleCreatures, ShadowVolumes, Classes, KambiTimeUtils, Frustum;
 
 const
@@ -250,10 +250,10 @@ function CastleLevelsPath: string;
 
 implementation
 
-uses KambiFilesUtils, SysUtils, Object3dAsVRML, KambiUtils,
-  GL, GLU, GLExt, KambiGLUtils, KambiStringUtils, GLWinMessages,
+uses KambiFilesUtils, SysUtils, KambiUtils,
+  GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages,
   CastlePlay, CastleTimeMessages, CastleInputs,
-  CastleItems, CastleThunder, CastleLevelAvailable, CastleWindow;
+  CastleItems, CastleThunder, CastleWindow;
 
 function CastleLevelsPath: string;
 begin

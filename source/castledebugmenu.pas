@@ -30,10 +30,10 @@ procedure ShowDebugMenu(ADrawUnderMenu: TDrawFunc);
 implementation
 
 uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
-  GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
-  VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
+  GL, GLU, KambiGLUtils, GLWinMessages, CastleWindow,
+  VectorMath, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleInputs, CastleCreatures, CastleChooseMenu,
-  CastleItems, GLMenu, RaysWindow, CastleVideoOptions, CastleLevel,
+  CastleItems, GLMenu, RaysWindow, CastleVideoOptions,
   CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
   CastleLevelAvailable, Boxes3d;
 

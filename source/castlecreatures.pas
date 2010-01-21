@@ -1189,11 +1189,10 @@ var
 
 implementation
 
-uses SysUtils, DOM, GL, GLU, GLExt, CastleWindow, GLWindow,
+uses SysUtils, DOM, GL, GLU, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
-  CastleLevel, CastleVideoOptions, KambiOpenAL, ALUtils,
-  CastleTimeMessages, CastleItems, Object3dAsVRML, KambiLog, KambiTimeUtils,
-  CastleRequiredResources;
+  CastleVideoOptions, KambiOpenAL, ALUtils,
+  CastleTimeMessages, CastleRequiredResources;
 
 {$define read_implementation}
 {$I objectslist_1.inc}

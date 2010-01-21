@@ -24,7 +24,7 @@ unit CastleSound;
 
 interface
 
-uses Classes, VectorMath, ALSourceAllocator, SysUtils, GameSoundEngine;
+uses Classes, VectorMath, SysUtils, GameSoundEngine;
 
 const
   LevelEventSoundImportance      = 100000;

@@ -54,7 +54,7 @@ type
 
 implementation
 
-uses ALSourceAllocator, GL, GLU, GLExt, KambiGLUtils, CastleSound, CastlePlay;
+uses GL, GLU, KambiGLUtils, CastleSound, CastlePlay;
 
 procedure TThunderEffect.InitGLLight(LightNumber: Cardinal);
 var

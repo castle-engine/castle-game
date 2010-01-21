@@ -32,7 +32,7 @@ procedure DrawInitialBackground;
 
 implementation
 
-uses SysUtils, GL, GLU, GLExt, GLWindow, KambiGLUtils, GLImages,
+uses SysUtils, GL, GLU, GLWindow, KambiGLUtils, GLImages,
   CastleWindow, KambiFilesUtils, Images, CastleTimeMessages;
 
 var

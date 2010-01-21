@@ -34,14 +34,14 @@ procedure ShowStartMenu;
 implementation
 
 uses SysUtils, Classes, KambiUtils, GLWinModes,
-  GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
+  GL, GLU, KambiGLUtils, GLWinMessages, CastleWindow,
   VectorMath, Images, KambiFilesUtils,
-  CastleLevel, CastlePlay, CastleSound, CastlePlayer, CastleHelp,
+  CastleLevel, CastlePlay, CastleSound, CastlePlayer,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, ALUtils, KambiOpenAL, KambiClassUtils,
   CastleTimeMessages, CastleLevelAvailable, CastleBackgroundLevel,
-  GameSoundEngine, GLSoundMenu, KambiLog, KambiTimeUtils,
+  GameSoundEngine, GLSoundMenu,
   CastleRequiredResources, CastleCredits, GLAntiAliasing;
 
 { TCastleMenu descendants interface ------------------------------------------ }

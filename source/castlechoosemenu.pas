@@ -23,7 +23,7 @@ unit CastleChooseMenu;
 
 interface
 
-uses Classes, GLWindow, GL, GLU, GLExt;
+uses Classes, GLWindow, GL, GLU;
 
 { Allows user to choose one item from MenuItems.
   Displays menu using TCastleMenu with ADrawUnderMenu background. }

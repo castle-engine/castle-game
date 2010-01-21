@@ -36,10 +36,10 @@ procedure CredistGLContextRelease;
 
 implementation
 
-uses SysUtils, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleTimeMessages,
+uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages, CastleTimeMessages,
   CastleInputs, CastlePlay, KambiStringUtils, GLWinModes, CastleWindow,
   CastleVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
-  CastleHelp, KambiUtils, VRMLNodes, CastleLevel, VRMLFields, KambiTimeUtils;
+  CastleHelp, KambiUtils, VRMLNodes, VRMLFields, KambiTimeUtils;
 
 var
   DrawUnderCredits: TDrawFunc;
