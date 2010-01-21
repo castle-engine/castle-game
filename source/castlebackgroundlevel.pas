@@ -163,11 +163,7 @@ begin
         true, BackgroundCamera);
 
       BackgroundLevel.LightSet.RenderLights;
-
-      glPushAttrib(GL_ENABLE_BIT);
-        glEnable(GL_LIGHTING);
-        BackgroundLevel.Render(BackgroundCamera.Frustum, tgAll);
-      glPopAttrib;
+      BackgroundLevel.Render(BackgroundCamera.Frustum, tgAll);
 
     finally ProjectionPop end;
 

@@ -69,7 +69,8 @@ var
   TextureMinificationQuality: TTextureMinificationQuality;
 
 { Set Attributes as needed. Right now this means setting
-  current TextureMinificationQuality. }
+  current TextureMinificationQuality, and UseSceneLights = @false
+  (we set own lights by TVRMLLightSetGL). }
 procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes;
   BlendingType: TBlendingType);
 
@@ -185,6 +186,8 @@ begin
     else
       raise EInternalError.Create('20061126-case BlendingType');
   end;
+
+  Attributes.UseSceneLights := false;
 end;
 
 procedure AnimationAttributesSet(Attributes: TVRMLSceneRenderingAttributes;

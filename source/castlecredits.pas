@@ -143,8 +143,7 @@ begin
   IdleUnderCredits := AIdleUnderCredits;
   AnimationTime := 0;
 
-  SavedMode := TGLMode.Create(glw, GL_ENABLE_BIT
-    { for glEnable(GL_LIGHTING) }, false);
+  SavedMode := TGLMode.Create(glw, 0, false);
   try
     TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
       nil,
@@ -157,9 +156,6 @@ begin
     Glw.OnIdle := @Idle;
 
     UserQuit := false;
-
-    { for CreditsModel lighting }
-    glEnable(GL_LIGHTING);
 
     repeat
       Application.ProcessMessage(true);
@@ -185,8 +181,7 @@ begin
   CreditsModel.Load(ParseVRMLFileFromString(VRMLContents, ''), true);
 
   AttributesSet(CreditsModel.Attributes, btIncrease);
-  CreditsModel.Attributes.UseLights := true;
-  { We let FirstGLFreeLight to be 0, CreditsModel can use all the lights }
+  CreditsModel.Attributes.UseSceneLights := true;
 
   CreditsModel.PrepareRender([tgAll], [prBoundingBox], false);
 
