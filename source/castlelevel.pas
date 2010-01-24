@@ -311,28 +311,7 @@ type
     function BoundingBox: TBox3d; override;
   end;
 
-  { This an object that moves on the level.
-
-    It is used to move other TLevelObject --- which can be e.g. a static object
-    (basically just a TVRMLGLScene instance), an animated object,
-    a TLevelObjectSum (allowing you to move a couple of level objects together),
-    or even another TLevelMovingObject.
-
-    It has a Translation function (that must be actually defined
-    in a descendant) that always says how this object is translated from
-    it's original position.
-
-    It can also be told to not participate in collision detection
-    (useful to make "fake" geometric walls, i.e. things that
-    are rendered but are not in fact seen by game mechanics,
-    do not occlude creatures view etc.). See @link(Collides).
-
-    It can also be told that given scene doesn't exist at all for now.
-    This is useful for objects that disappear completely from the level
-    when something happens. See @link(Exists).
-
-    It has methods to render and query it, that take into account
-    the MovingObject translated by Translation.
+  { See TCustomTranslated3D
 
     Note that if Translation actually changes over time then
     you have to think of at least one additional thing yourself:
