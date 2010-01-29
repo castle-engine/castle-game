@@ -381,7 +381,7 @@ end;
 type
   TRenderer = class
     class procedure RenderCreaturesItems(TransparentGroup: TTransparentGroup);
-    class procedure RenderLevel(InShadow: boolean; TransparentGroup: TTransparentGroup);
+    class procedure RenderLevel(TransparentGroup: TTransparentGroup; InShadow: boolean);
     class procedure RenderShadowVolumes;
   end;
 
@@ -406,7 +406,7 @@ begin
   Level.RenderShadowVolume(SV);
 end;
 
-class procedure TRenderer.RenderLevel(InShadow: boolean; TransparentGroup: TTransparentGroup);
+class procedure TRenderer.RenderLevel(TransparentGroup: TTransparentGroup; InShadow: boolean);
 begin
   if InShadow then Level.PushLightsOff;
   try
@@ -421,7 +421,7 @@ procedure Draw(Glwin: TGLWindow);
   procedure RenderNoShadows;
   begin
     TRenderer.RenderCreaturesItems(tgOpaque);
-    TRenderer.RenderLevel(false, tgAll);
+    TRenderer.RenderLevel(tgAll, false);
     { Rendering order of Creatures, Items and Level:
       You know the problem. We must first render all non-transparent objects,
       then all transparent objects. Otherwise transparent objects
