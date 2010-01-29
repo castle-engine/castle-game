@@ -116,7 +116,7 @@ implementation
 
 uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
   CastleLevelSpecific, KambiXMLRead, CastleWindow, GLImages,
-  Images, GLWindow, GLWinModes, KambiTimeUtils,
+  Images, GLWindow, GLWinModes, KambiTimeUtils, UIControls,
   CastleRequiredResources;
 
 {$define read_implementation}
@@ -289,6 +289,8 @@ begin
         Self, false,
         true { FPSActive should not be needed anymore, but I leave it. },
         false, K_None, false, nil);
+
+      Glw.OnDrawStyle := ds3D;
 
       Glw.EventResize;
 

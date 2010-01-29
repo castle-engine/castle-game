@@ -33,6 +33,7 @@ function ChooseByMenu(DrawUnderMenu: TDrawFunc;
 implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, CastleInputs, GLWinMessages, GLMenu,
+  UIControls,
   CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleTimeMessages;
 
 var
@@ -104,6 +105,7 @@ begin
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
     Glw.OnIdle := @Idle;
+    Glw.OnDrawStyle := ds3D;
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }

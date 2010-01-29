@@ -36,8 +36,9 @@ procedure CredistGLContextRelease;
 
 implementation
 
-uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages, CastleTimeMessages,
-  CastleInputs, CastlePlay, KambiStringUtils, GLWinModes, CastleWindow,
+uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages, UIControls,
+  CastleTimeMessages, KambiStringUtils, GLWinModes,
+  CastleInputs, CastlePlay, CastleWindow,
   CastleVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
   CastleHelp, KambiUtils, VRMLNodes, VRMLFields, KambiTimeUtils;
 
@@ -154,6 +155,7 @@ begin
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
     Glw.OnIdle := @Idle;
+    Glw.OnDrawStyle := ds3D;
 
     UserQuit := false;
 

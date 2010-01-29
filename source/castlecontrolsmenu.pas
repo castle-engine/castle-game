@@ -81,7 +81,7 @@ var
 implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
-  GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
+  GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit, UIControls,
   CastleInputs, KeysMouse, VectorMath, KambiUtils, CastlePlay,
   CastleConfig, KambiStringUtils, CastleTimeMessages;
 
@@ -572,6 +572,7 @@ begin
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
     Glw.OnIdle := @Idle;
+    Glw.OnDrawStyle := ds3D;
 
     SetCurrentMenu(CurrentMenu, ControlsMenu);
 

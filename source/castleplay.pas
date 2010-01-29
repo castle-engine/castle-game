@@ -113,7 +113,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
   Cameras, VectorMath, Boxes3d, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
-  BFNT_BitstreamVeraSans_Unit,
+  BFNT_BitstreamVeraSans_Unit, UIControls,
   CastleItems, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, CastleConfig, VRMLGLHeadlight, CastleThunder,
@@ -1189,6 +1189,7 @@ begin
       Glw.OnIdle := @Idle;
       Glw.OnKeyDown := @KeyDown;
       Glw.OnMouseDown := @MouseDown;
+      Glw.OnDrawStyle := ds3D;
 
       InitNewLevel;
 

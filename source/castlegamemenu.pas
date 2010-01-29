@@ -31,7 +31,7 @@ implementation
 
 uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   GL, GLU, KambiGLUtils, GLWinMessages, CastleWindow,
-  VectorMath, CastleHelp, CastlePlay, CastleGeneralMenu,
+  VectorMath, UIControls, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleInputs, CastleChooseMenu,
   CastleVideoOptions,
   CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
@@ -168,6 +168,7 @@ begin
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
     Glw.OnIdle := @Idle;
+    Glw.OnDrawStyle := ds3D;
 
     SetCurrentMenu(CurrentMenu, GameMenu);
 
