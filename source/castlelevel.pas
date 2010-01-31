@@ -312,35 +312,6 @@ type
 
     function PointInside(const Point: TVector3Single): boolean;
 
-    procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup; InShadow: boolean); override;
-    procedure RenderShadowVolume(
-      ShadowVolumes: TBaseShadowVolumes;
-      const ParentTransformIsIdentity: boolean;
-      const ParentTransform: TMatrix4Single); override;
-
-    function MoveAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const CameraRadius: Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-    function MoveBoxAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const ProposedNewBox: TBox3d;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-    function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-    function BoxCollision(const ABox: TBox3d;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-    function RayCollision(
-      out IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision; override;
-    procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single;
-      out GroundItem: PVRMLTriangle); override;
     function BoundingBox: TBox3d; override;
 
     { Called from TLevel constructor. This is the place when you
@@ -1185,78 +1156,6 @@ constructor TLevelArea.Create(AOwner: TComponent);
 begin
   inherited;
   FBox := EmptyBox3d;
-end;
-
-procedure TLevelArea.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup; InShadow: boolean);
-begin
-  { This object is invisible and non-colliding. }
-end;
-
-procedure TLevelArea.RenderShadowVolume(
-  ShadowVolumes: TBaseShadowVolumes;
-  const ParentTransformIsIdentity: boolean;
-  const ParentTransform: TMatrix4Single);
-begin
-  { This object is invisible and non-colliding. }
-end;
-
-function TLevelArea.MoveAllowedSimple(
-  const OldPos, ProposedNewPos: TVector3Single;
-  const CameraRadius: Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  { This object is invisible and non-colliding. }
-  Result := true;
-end;
-
-function TLevelArea.MoveBoxAllowedSimple(
-  const OldPos, ProposedNewPos: TVector3Single;
-  const ProposedNewBox: TBox3d;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  { This object is invisible and non-colliding. }
-  Result := true;
-end;
-
-function TLevelArea.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  { This object is invisible and non-colliding. }
-  Result := false;
-end;
-
-function TLevelArea.SphereCollision(
-  const Pos: TVector3Single; const Radius: Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  { This object is invisible and non-colliding. }
-  Result := false;
-end;
-
-function TLevelArea.BoxCollision(const ABox: TBox3d;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  { This object is invisible and non-colliding. }
-  Result := false;
-end;
-
-function TLevelArea.RayCollision(
-  out IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
-begin
-  { This object is invisible and non-colliding. }
-  Result := nil;
-end;
-
-procedure TLevelArea.GetCameraHeight(const Position, GravityUp: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single;
-  out GroundItem: PVRMLTriangle);
-begin
-  inherited;
-  { This object is invisible and non-colliding. }
 end;
 
 function TLevelArea.BoundingBox: TBox3d;
