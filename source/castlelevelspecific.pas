@@ -37,7 +37,7 @@ type
     Symbol: TLevelSimpleAnimatedObject;
     Button: TLevelSimpleAnimatedObject;
 
-    StairsBlocker: TLevelStaticObject;
+    StairsBlocker: TVRMLGLScene;
 
     FLevelExitBox: TBox3d;
 
@@ -115,7 +115,7 @@ type
   TTowerLevel = class(TLevel)
   private
     MovingElevator: TLevelLinearMovingObject;
-    Elevator: TLevelStaticObject;
+    Elevator: TVRMLGLScene;
     ElevatorButton: TLevelSimpleAnimatedObject;
   public
     constructor Create(
@@ -138,11 +138,11 @@ type
 
     HintOpenDoor: TLevelHintArea;
 
-    FGateExit: TLevelStaticObject;
+    FGateExit: TVRMLGLScene;
 
     FDoEndSequence: boolean;
 
-    FEndSequence: TLevelStaticObject;
+    FEndSequence: TVRMLGLScene;
     procedure SetDoEndSequence(Value: boolean);
   public
     constructor Create(
@@ -197,17 +197,17 @@ type
   private
     procedure RenameCreatures(Node: TVRMLNode);
   private
-    FakeWall: TLevelStaticObject;
+    FakeWall: TVRMLGLScene;
 
     MovingElevator49: TLevelLinearMovingObject;
-    Elevator49: TLevelStaticObject;
+    Elevator49: TVRMLGLScene;
     Elevator49DownBox: TBox3d;
 
     MovingElevator9a9b: TLevelLinearMovingObject;
-    Elevator9a9b: TLevelStaticObject;
+    Elevator9a9b: TVRMLGLScene;
     Elevator9a9bPickBox: TBox3d;
 
-    ExitButton: TLevelStaticObject;
+    ExitButton: TVRMLGLScene;
     ExitMessagePending: boolean;
   protected
     procedure ChangeLevelScene; override;
@@ -276,18 +276,16 @@ begin
 
   CastleHallLevelPath := CastleLevelsPath + 'castle_hall' + PathDelim;
 
-  Symbol := TLevelSimpleAnimatedObject.Create(Self,
-    LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false));
+  Symbol := LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false);
   Symbol.CastsShadow := false; { shadow would not be visible anyway }
   Objects.Add(Symbol);
 
-  Button := TLevelSimpleAnimatedObject.Create(Self,
-    LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false));
+  Button := LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false);
   Button.CastsShadow := false; { strange ghost shadow on symbol would be visible }
   Objects.Add(Button);
 
-  StairsBlocker := TLevelStaticObject.Create(Self,
-    CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl', false);
+  StairsBlocker := LoadLevelScene(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl',
+    true { create octrees }, false);
   StairsBlocker.CastsShadow := false; { shadow would not be visible anyway }
   Objects.Add(StairsBlocker);
 end;
@@ -369,7 +367,7 @@ var
     if StairsBlocker.Exists then
     begin
       StairsBlocker.Exists := false;
-      SoundEngine.Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.Scene.BoundingBox));
+      SoundEngine.Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.BoundingBox));
     end;
   end;
 
@@ -383,7 +381,7 @@ var
       { turn light over stairs to next level }
       LightNode := LightSet.Lights.Items[WerewolfFirstLight].LightNode as
         TVRMLPositionalLightNode;
-      LightNode.FdLocation.Value := Box3dMiddle(StairsBlocker.Scene.BoundingBox);
+      LightNode.FdLocation.Value := Box3dMiddle(StairsBlocker.BoundingBox);
       LightNode.FdOn.Value := true;
 
       for I := 1 to CastleHallWerewolvesCount - 1 do
@@ -425,7 +423,7 @@ begin
   end;
 
   if Button.Started and
-    (AnimationTime - Button.PlayStartTime > Button.Animation.TimeDuration) then
+    (AnimationTime - Button.PlayStartTime > Button.TimeDuration) then
   begin
     if not Symbol.Started then
     begin
@@ -527,13 +525,12 @@ begin
 
   Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false, false);
 
-  Cart := TLevelSimpleAnimatedObject.Create(Self, LoadLevelAnimation(
-    GateLevelPath + 'cart.kanim', true, true));
+  Cart := LoadLevelAnimation(GateLevelPath + 'cart.kanim', true, true);
   Cart.CollisionUseLastScene := true;
   Objects.Add(Cart);
   Cart.Play;
 
-  CartSoundPosition := Box3dMiddle(Cart.Animation.FirstScene.BoundingBox);
+  CartSoundPosition := Box3dMiddle(Cart.FirstScene.BoundingBox);
 
   SacrilegeAmbushDone := false;
   SwordAmbushDone := false;
@@ -772,11 +769,9 @@ begin
 
   TowerLevelPath := CastleLevelsPath + 'tower' + PathDelim;
 
-  Elevator := TLevelStaticObject.Create(
-    Self, TowerLevelPath + 'elevator.wrl', false);
+  Elevator := LoadLevelScene(TowerLevelPath + 'elevator.wrl', true, false);
 
-  ElevatorButton := TLevelSimpleAnimatedObject.Create(Self, LoadLevelAnimation(
-    TowerLevelPath + 'elevator_button.kanim', true, false));
+  ElevatorButton := LoadLevelAnimation(TowerLevelPath + 'elevator_button.kanim', true, false);
 
   ElevatorButtonSum := TBase3DList.Create(nil);
   ElevatorButtonSum.List.Add(Elevator);
@@ -839,8 +834,9 @@ begin
     purposes, and use here Objects.FindName('hint_button_box'). }
   HintOpenDoor := Objects.List[0] as TLevelHintArea;
 
-  FEndSequence := TLevelStaticObject.Create(Self,
+  FEndSequence := LoadLevelScene(
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
+    true { create octrees },
     true { true: load background of EndSequence; we will use it });
   FEndSequence.Exists := false;
   { Even when FEndSequence will exist, we will not check for collisions
@@ -850,8 +846,9 @@ begin
   FEndSequence.CastsShadow := false; { shadow is not visible anyway }
   Objects.Add(FEndSequence);
 
-  FGateExit := TLevelStaticObject.Create(Self,
-    CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl', false);
+  FGateExit := LoadLevelScene(
+    CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
+    true { create octrees }, false);
   FGateExit.CastsShadow := false; { shadow is not visible anyway }
   Objects.Add(FGateExit);
 
@@ -1088,7 +1085,7 @@ end;
 function TCagesLevel.Background: TBackgroundGL;
 begin
   if DoEndSequence then
-    Result := FEndSequence.Scene.Background else
+    Result := FEndSequence.Background else
     Result := inherited;
 end;
 
@@ -1098,7 +1095,7 @@ constructor TDoomLevelDoor.Create(AParentLevel: TLevel;
   const SceneFileName: string);
 begin
   inherited Create(AParentLevel);
-  Child := TLevelStaticObject.Create(AParentLevel, SceneFileName, false);
+  Child := AParentLevel.LoadLevelScene(SceneFileName, true { create octrees }, false);
   MovePushesOthers := false;
   SoundGoEndPosition := stDoorOpen;
   SoundGoBeginPosition := stDoorClose;
@@ -1113,7 +1110,7 @@ procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: TKamTime);
     I: Integer;
   begin
     DoorBox := Box3dTranslate(
-      (Child as TLevelStaticObject).Scene.BoundingBox,
+      Child.BoundingBox,
       GetTranslationFromTime(NewAnimationTime));
 
     Result := Boxes3dCollision(DoorBox, Player.BoundingBox);
@@ -1196,18 +1193,15 @@ begin
   Objects.Add(MakeDoor('door4_7_closed.wrl'));
   Objects.Add(MakeDoor('door5_6_closed.wrl'));
 
-  FakeWall := TLevelStaticObject.Create(Self,
-    DoomDoorsPathPrefix + 'fake_wall_final.wrl', false);
-  { Although TLevelStaticObject will create useless triangle octree
-    for FakeWall, it's not a problem: FakeWall is very small, so it's
-    octree will be generated very fast and will be very small in memory.
-    Not a problem to worry. }
+  FakeWall := LoadLevelScene( DoomDoorsPathPrefix + 'fake_wall_final.wrl',
+    true { create octrees }, false);
+  { TODO: Actually, octree not needed, switch to false. }
   FakeWall.Collides := false;
   FakeWall.CastsShadow := false;
   Objects.Add(FakeWall);
 
-  Elevator49 := TLevelStaticObject.Create(
-    Self, DoomDoorsPathPrefix + 'elevator4_9_final.wrl', false);
+  Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
+    true { create octrees }, false);
 
   MovingElevator49 := TLevelLinearMovingObject.Create(Self);
   MovingElevator49.Child := Elevator49;
@@ -1221,8 +1215,8 @@ begin
   MovingElevator49.CastsShadow := false;
   Objects.Add(MovingElevator49);
 
-  Elevator9a9b := TLevelStaticObject.Create(
-    Self, DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl', false);
+  Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
+    true { create octrees }, false);
 
   MovingElevator9a9b := TLevelLinearMovingObject.Create(Self);
   MovingElevator9a9b.Child := Elevator9a9b;
@@ -1236,8 +1230,8 @@ begin
   MovingElevator9a9b.CastsShadow := false;
   Objects.Add(MovingElevator9a9b);
 
-  ExitButton := TLevelStaticObject.Create(Self,
-    DoomDoorsPathPrefix + 'exit_button_final.wrl', false);
+  ExitButton := LoadLevelScene(DoomDoorsPathPrefix + 'exit_button_final.wrl',
+    true { create octrees }, false);
   ExitButton.CastsShadow := false;
   Objects.Add(ExitButton);
 end;
@@ -1380,9 +1374,8 @@ var
 begin
   inherited;
 
-  Water := TLevelSimpleAnimatedObject.Create(Self,
-    LoadLevelAnimation(CastleLevelsPath + 'gate_background' +
-      PathDelim + 'water.kanim', false, false));
+  Water := LoadLevelAnimation(CastleLevelsPath + 'gate_background' +
+    PathDelim + 'water.kanim', false, false);
   Water.CastsShadow := false; { water shadow would look awkward }
   { No octrees created for water (because in normal usage, player will not
     walk on this level). For safety, Collides set to @false, in case

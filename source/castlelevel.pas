@@ -73,67 +73,6 @@ type
     procedure BeforeIdle(const NewAnimationTime: TKamTime);
   end;
 
-  { This a VRML scene that can appear/disappear from the level.
-
-    It's basically just a TVRMLGLScene instance
-    (loaded with LoadLevelScene, always with a OctreeCollisions).
-    Plus properties @link(Exists) and @link(Collides) which allow you
-    to hide this object from evrything (or only from the collision detection). }
-  TLevelStaticObject = class(TBase3D)
-  private
-    FScene: TVRMLGLScene;
-    FParentLevel: TLevel;
-    function GetParentLevel: TLevel;
-    procedure SetParentLevel(const Value: TLevel);
-  public
-    constructor Create(AParentLevel: TLevel;
-      const SceneFileName: string; PrepareBackground: boolean); reintroduce;
-    destructor Destroy; override;
-
-    property ParentLevel: TLevel read GetParentLevel write SetParentLevel;
-
-    property Scene: TVRMLGLScene read FScene;
-
-    procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup; InShadow: boolean); override;
-
-    procedure RenderShadowVolume(
-      ShadowVolumes: TBaseShadowVolumes;
-      const ParentTransformIsIdentity: boolean;
-      const ParentTransform: TMatrix4Single); override;
-
-    function MoveAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const CameraRadius: Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function MoveBoxAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const ProposedNewBox: TBox3d;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function BoxCollision(const Box: TBox3d;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function RayCollision(
-      out IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision; override;
-
-    procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single;
-      out GroundItem: PVRMLTriangle); override;
-
-    function BoundingBox: TBox3d; override;
-  end;
-
   { See TCustomTranslated3D
 
     Note that if Translation actually changes over time then
@@ -343,87 +282,21 @@ type
     procedure Idle(const CompSpeed: Single); override;
   end;
 
-  { This a VRML scene that can be animated.
-    Basically, a TVRMLGLAnimation wrapper.
-
-    After passing here an animation
-    (that should be created with LoadLevelAnimation) the animation
-    instance is owned by this object.
-
-    You should take care of setting AnimationTime as appropriate if you
-    want to really use this animation. }
-  TLevelAnimatedObject = class(TBase3D)
+  { This is the TVRMLGLAnimation descendant that is easier to use:
+    instead of taking care of AnimationTime, you only call it's Play method.
+    When the animation is stopped, AnimationTime is kept at 0. }
+  TLevelSimpleAnimatedObject = class(TVRMLGLAnimation)
   private
-    FAnimation: TVRMLGLAnimation;
-    FAnimationTime: TKamTime;
-    FCollisionUseLastScene: boolean;
+    FStarted: boolean;
+    FPlayStartTime: Single;
 
     FParentLevel: TLevel;
     function GetParentLevel: TLevel;
     procedure SetParentLevel(const Value: TLevel);
   public
-    constructor Create(AParentLevel: TLevel; AnAnimation: TVRMLGLAnimation); reintroduce;
-    destructor Destroy; override;
+    constructor Create(AOwner: TComponent; AParentLevel: TLevel); reintroduce;
 
     property ParentLevel: TLevel read GetParentLevel write SetParentLevel;
-
-    property Animation: TVRMLGLAnimation read FAnimation;
-    property AnimationTime: TKamTime read FAnimationTime write FAnimationTime;
-
-    { See TVRMLGLAnimation.CollisionUseLastScene. }
-    property CollisionUseLastScene: boolean
-      read FCollisionUseLastScene
-      write FCollisionUseLastScene default false;
-
-    procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup; InShadow: boolean); override;
-
-    procedure RenderShadowVolume(
-      ShadowVolumes: TBaseShadowVolumes;
-      const ParentTransformIsIdentity: boolean;
-      const ParentTransform: TMatrix4Single); override;
-
-    function MoveAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const CameraRadius: Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function MoveBoxAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const ProposedNewBox: TBox3d;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function BoxCollision(const Box: TBox3d;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; override;
-
-    function RayCollision(
-      out IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision; override;
-
-    procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single;
-      out GroundItem: PVRMLTriangle); override;
-
-    function BoundingBox: TBox3d; override;
-  end;
-
-  { This is the TLevelAnimatedObject descendant that is easier to use:
-    instead of taking care of AnimationTime, you only call it's Play method.
-    When the animation is stopped, AnimationTime is kept at 0. }
-  TLevelSimpleAnimatedObject = class(TLevelAnimatedObject)
-  private
-    FStarted: boolean;
-    FPlayStartTime: Single;
-  public
-    constructor Create(AParentLevel: TLevel; AnAnimation: TVRMLGLAnimation);
 
     property Started: boolean read FStarted;
     property PlayStartTime: Single read FPlayStartTime;
@@ -653,18 +526,6 @@ type
       object that has meaningfull ChangeLevelScene method. }
     procedure ChangeLevelScene; virtual;
 
-    { Just load TVRMLGLScene from file, doing some common tasks:
-      @unorderedList(
-        @item sets Attributes according to AttributesSet
-        @item optionally create triangle octree
-        @item(call PrepareRender, with prBoundingBox, prShadowVolume
-          (if shadows enabled by RenderShadowsPossible), optionally
-          with prBackground)
-        @item FreeExternalResources, since they will not be needed anymore
-      ) }
-    function LoadLevelScene(const FileName: string;
-      CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
-
     { Load TVRMLGLAnimation from *.kanim file, doing common tasks.
       @unorderedList(
         @item sets Attributes according to AnimationAttributesSet
@@ -676,7 +537,7 @@ type
     function LoadLevelAnimation(
       const FileName: string;
       CreateFirstOctreeCollisions,
-      CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
+      CreateLastOctreeCollisions: boolean): TLevelSimpleAnimatedObject;
 
     { See @link(SpecialObjectPicked) and @link(Picked), you can call this from
       overriden implementations of these. }
@@ -1013,6 +874,18 @@ type
     { Diffuse color of light used for bump mapping. }
     property BumpMappingLightDiffuseColor: TVector4Single
       read FBumpMappingLightDiffuseColor write SetBumpMappingLightDiffuseColor;
+
+    { Just load TVRMLGLScene from file, doing some common tasks:
+      @unorderedList(
+        @item sets Attributes according to AttributesSet
+        @item optionally create triangle octree
+        @item(call PrepareRender, with prBoundingBox, prShadowVolume
+          (if shadows enabled by RenderShadowsPossible), optionally
+          with prBackground)
+        @item FreeExternalResources, since they will not be needed anymore
+      ) }
+    function LoadLevelScene(const FileName: string;
+      CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
   end;
 
   TLevelClass = class of TLevel;
@@ -1028,144 +901,6 @@ uses SysUtils, GL, GLU, Object3dAsVRML,
   CastleRequiredResources, VRMLOpenGLRenderer, VRMLShape;
 
 {$define read_implementation}
-
-{ TLevelStaticObject --------------------------------------------------------- }
-
-constructor TLevelStaticObject.Create(AParentLevel: TLevel;
-  const SceneFileName: string; PrepareBackground: boolean);
-begin
-  inherited Create(nil);
-  ParentLevel := AParentLevel;
-  FScene := ParentLevel.LoadLevelScene(SceneFileName, true, PrepareBackground);
-end;
-
-destructor TLevelStaticObject.Destroy;
-begin
-  FreeAndNil(FScene);
-  inherited;
-end;
-
-function TLevelStaticObject.GetParentLevel: TLevel;
-begin
-  Result := FParentLevel;
-end;
-
-procedure TLevelStaticObject.SetParentLevel(const Value: TLevel);
-begin
-  FParentLevel := Value;
-end;
-
-function TLevelStaticObject.MoveAllowedSimple(
-  const OldPos, ProposedNewPos: TVector3Single;
-  const CameraRadius: Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := (not Exists) or (not Collides) or
-    Scene.OctreeCollisions.MoveAllowedSimple(
-      OldPos, ProposedNewPos,
-      CameraRadius, nil, TrianglesToIgnoreFunc);
-end;
-
-function TLevelStaticObject.MoveBoxAllowedSimple(
-  const OldPos, ProposedNewPos: TVector3Single;
-  const ProposedNewBox: TBox3d;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := (not Exists) or (not Collides) or
-    Scene.OctreeCollisions.MoveBoxAllowedSimple(
-      OldPos, ProposedNewPos, ProposedNewBox,
-      nil, TrianglesToIgnoreFunc);
-end;
-
-function TLevelStaticObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := Exists and Collides and
-    Scene.OctreeCollisions.IsSegmentCollision(
-      Pos1, Pos2,
-      nil, false, TrianglesToIgnoreFunc);
-end;
-
-function TLevelStaticObject.SphereCollision(
-  const Pos: TVector3Single; const Radius: Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := Exists and Collides and
-    Scene.OctreeCollisions.IsSphereCollision(
-      Pos, Radius,  nil, TrianglesToIgnoreFunc);
-end;
-
-function TLevelStaticObject.BoxCollision(const Box: TBox3d;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := Exists and Collides and
-    Scene.OctreeCollisions.IsBoxCollision(
-      Box,  nil, TrianglesToIgnoreFunc);
-end;
-
-function TLevelStaticObject.RayCollision(
-  out IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
-var
-  Triangle: PVRMLTriangle;
-begin
-  Result := nil;
-  if Exists and Collides then
-  begin
-    Triangle := Scene.OctreeCollisions.RayCollision(
-      IntersectionDistance,
-      Ray0, RayVector,
-      false, nil, false, TrianglesToIgnoreFunc);
-    if Triangle <> nil then
-    begin
-      Result := T3DCollision.Create;
-      Result.Triangle := Triangle;
-      Result.Hierarchy.Add(Self);
-    end;
-  end;
-end;
-
-procedure TLevelStaticObject.GetCameraHeight(const Position, GravityUp: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single;
-  out GroundItem: PVRMLTriangle);
-begin
-  inherited;
-  if Exists and Collides then
-  begin
-    Scene.OctreeCollisions.GetCameraHeight(
-      Position, GravityUp,
-      IsAboveTheGround, SqrHeightAboveTheGround, GroundItem,
-      nil, TrianglesToIgnoreFunc);
-  end;
-end;
-
-procedure TLevelStaticObject.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup; InShadow: boolean);
-begin
-  if Exists then
-    Scene.RenderFrustum(Frustum, TransparentGroup);
-end;
-
-procedure TLevelStaticObject.RenderShadowVolume(
-  ShadowVolumes: TBaseShadowVolumes;
-  const ParentTransformIsIdentity: boolean;
-  const ParentTransform: TMatrix4Single);
-begin
-  if Exists and CastsShadow then
-  begin
-    Scene.RenderShadowVolume(ShadowVolumes,
-      ParentTransformIsIdentity, ParentTransform);
-  end;
-end;
-
-function TLevelStaticObject.BoundingBox: TBox3d;
-begin
-  if Exists and Collides then
-    Result := Scene.BoundingBox else
-    Result := EmptyBox3d;
-end;
 
 { TLevelMovingObject --------------------------------------------------------- }
 
@@ -1481,210 +1216,23 @@ begin
     UsedSound.DoUsingEnd;
 end;
 
-{ TLevelAnimatedObject ------------------------------------------------------- }
+{ TLevelSimpleAnimatedObject ------------------------------------------------- }
 
-constructor TLevelAnimatedObject.Create(AParentLevel: TLevel;
-  AnAnimation: TVRMLGLAnimation);
+constructor TLevelSimpleAnimatedObject.Create(
+  AOwner: TComponent; AParentLevel: TLevel);
 begin
-  inherited Create(nil);
-  ParentLevel := AParentLevel;
-  FAnimation := AnAnimation;
+  inherited Create(AOwner);
+  FStarted := false;
 end;
 
-destructor TLevelAnimatedObject.Destroy;
-begin
-  FreeAndNil(FAnimation);
-  inherited;
-end;
-
-function TLevelAnimatedObject.GetParentLevel: TLevel;
+function TLevelSimpleAnimatedObject.GetParentLevel: TLevel;
 begin
   Result := FParentLevel;
 end;
 
-procedure TLevelAnimatedObject.SetParentLevel(const Value: TLevel);
+procedure TLevelSimpleAnimatedObject.SetParentLevel(const Value: TLevel);
 begin
   FParentLevel := Value;
-end;
-
-function TLevelAnimatedObject.MoveAllowedSimple(
-  const OldPos, ProposedNewPos: TVector3Single;
-  const CameraRadius: Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := (not Exists) or (not Collides) or
-    (Animation.FirstScene.OctreeCollisions.MoveAllowedSimple(
-       OldPos, ProposedNewPos,
-       CameraRadius, nil, TrianglesToIgnoreFunc) and
-       ( (not CollisionUseLastScene) or
-         Animation.LastScene.OctreeCollisions.MoveAllowedSimple(
-           OldPos, ProposedNewPos,
-           CameraRadius, nil, TrianglesToIgnoreFunc) ));
-end;
-
-function TLevelAnimatedObject.MoveBoxAllowedSimple(
-  const OldPos, ProposedNewPos: TVector3Single;
-  const ProposedNewBox: TBox3d;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := (not Exists) or (not Collides) or
-    (Animation.FirstScene.OctreeCollisions.MoveBoxAllowedSimple(
-       OldPos, ProposedNewPos, ProposedNewBox,
-       nil, TrianglesToIgnoreFunc) and
-       ( (not CollisionUseLastScene) or
-         Animation.LastScene.OctreeCollisions.MoveBoxAllowedSimple(
-           OldPos, ProposedNewPos, ProposedNewBox,
-           nil, TrianglesToIgnoreFunc) ));
-end;
-
-function TLevelAnimatedObject.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := Exists and Collides and
-    ( (Animation.FirstScene.OctreeCollisions.IsSegmentCollision(
-         Pos1, Pos2,
-         nil, false, TrianglesToIgnoreFunc) ) or
-      (CollisionUseLastScene and
-        (Animation.LastScene.OctreeCollisions.IsSegmentCollision(
-           Pos1, Pos2,
-           nil, false, TrianglesToIgnoreFunc)))
-    );
-end;
-
-function TLevelAnimatedObject.SphereCollision(
-  const Pos: TVector3Single; const Radius: Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := Exists and Collides and
-    ( (Animation.FirstScene.OctreeCollisions.IsSphereCollision(
-         Pos, Radius, nil, TrianglesToIgnoreFunc) ) or
-      (CollisionUseLastScene and
-        (Animation.LastScene.OctreeCollisions.IsSphereCollision(
-           Pos, Radius, nil, TrianglesToIgnoreFunc)))
-    );
-end;
-
-function TLevelAnimatedObject.BoxCollision(
-  const Box: TBox3d;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
-begin
-  Result := Exists and Collides and
-    ( (Animation.FirstScene.OctreeCollisions.IsBoxCollision(
-         Box, nil, TrianglesToIgnoreFunc) ) or
-      (CollisionUseLastScene and
-        (Animation.LastScene.OctreeCollisions.IsBoxCollision(
-           Box, nil, TrianglesToIgnoreFunc)))
-    );
-end;
-
-function TLevelAnimatedObject.RayCollision(
-  out IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
-var
-  Triangle: PVRMLTriangle;
-  Octree: TVRMLBaseTrianglesOctree;
-begin
-  Result := nil;
-  if Exists and Collides then
-  begin
-    Octree := Animation.FirstScene.OctreeCollisions;
-    Triangle := Octree.RayCollision(IntersectionDistance,
-      Ray0, RayVector, false, nil, false, TrianglesToIgnoreFunc);
-    if Triangle <> nil then
-    begin
-      Result := T3DCollision.Create;
-      Result.Triangle := Triangle;
-      Result.Hierarchy.Add(Self);
-    end else
-    if CollisionUseLastScene then
-    begin
-      { try the same thing on LastScene }
-      Octree := Animation.LastScene.OctreeCollisions;
-      Triangle := Octree.RayCollision(IntersectionDistance,
-        Ray0, RayVector, false, nil, false, TrianglesToIgnoreFunc);
-      if Triangle <> nil then
-      begin
-        Result := T3DCollision.Create;
-        Result.Triangle := Triangle;
-        Result.Hierarchy.Add(Self);
-      end
-    end;
-  end;
-end;
-
-procedure TLevelAnimatedObject.GetCameraHeight(const Position, GravityUp: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-  out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single;
-  out GroundItem: PVRMLTriangle);
-
-  procedure MakeScene(Scene: TVRMLScene);
-  var
-    IsAboveThis: boolean;
-    SqrHeightAboveThis: Single;
-    GroundItemThis: PVRMLTriangle;
-  begin
-    Scene.OctreeCollisions.GetCameraHeight(
-      Position, GravityUp, IsAboveThis, SqrHeightAboveThis, GroundItemThis,
-      nil, TrianglesToIgnoreFunc);
-
-    if IsAboveThis and
-      ((not IsAboveTheGround) or (SqrHeightAboveThis < SqrHeightAboveTheGround)) then
-    begin
-      IsAboveTheGround := true;
-      SqrHeightAboveTheGround := SqrHeightAboveThis;
-      GroundItem := GroundItemThis;
-    end;
-  end;
-
-begin
-  inherited;
-  if Exists and Collides then
-  begin
-    MakeScene(Animation.FirstScene);
-    if CollisionUseLastScene then
-      MakeScene(Animation.LastScene);
-  end;
-end;
-
-procedure TLevelAnimatedObject.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup; InShadow: boolean);
-begin
-  if Exists then
-    Animation.SceneFromTime(AnimationTime).RenderFrustum(Frustum, TransparentGroup);
-end;
-
-procedure TLevelAnimatedObject.RenderShadowVolume(
-  ShadowVolumes: TBaseShadowVolumes;
-  const ParentTransformIsIdentity: boolean;
-  const ParentTransform: TMatrix4Single);
-begin
-  if Exists and CastsShadow then
-  begin
-    Animation.SceneFromTime(AnimationTime).
-      RenderShadowVolume(ShadowVolumes,
-        ParentTransformIsIdentity, ParentTransform);
-  end;
-end;
-
-function TLevelAnimatedObject.BoundingBox: TBox3d;
-begin
-  if Exists and Collides then
-  begin
-    Result := Animation.FirstScene.BoundingBox;
-    if CollisionUseLastScene then
-      Box3dSumTo1st(Result, Animation.LastScene.BoundingBox);
-  end else
-    Result := EmptyBox3d;
-end;
-
-{ TLevelSimpleAnimatedObject ------------------------------------------------- }
-
-constructor TLevelSimpleAnimatedObject.Create(
-  AParentLevel: TLevel; AnAnimation: TVRMLGLAnimation);
-begin
-  inherited;
-  FStarted := false;
 end;
 
 procedure TLevelSimpleAnimatedObject.Play;
@@ -1702,8 +1250,8 @@ procedure TLevelSimpleAnimatedObject.Idle(const CompSpeed: Single);
 begin
   inherited;
   if Started then
-    AnimationTime := ParentLevel.AnimationTime - FPlayStartTime else
-    AnimationTime := 0;
+    ResetWorldTime(ParentLevel.AnimationTime - FPlayStartTime) else
+    ResetWorldTime(0);
 end;
 
 { TLevelArea ----------------------------------------------------------------- }
@@ -2686,11 +2234,11 @@ end;
 function TLevel.LoadLevelAnimation(
   const FileName: string;
   CreateFirstOctreeCollisions,
-  CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
+  CreateLastOctreeCollisions: boolean): TLevelSimpleAnimatedObject;
 var
   Options: TPrepareRenderOptions;
 begin
-  Result := TVRMLGLAnimation.CreateCustomCache(nil, GLContextCache);
+  Result := TLevelSimpleAnimatedObject.CreateCustomCache(nil, GLContextCache);
   Result.LoadFromFile(FileName);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
@@ -2709,6 +2257,8 @@ begin
     Result.LastScene.Spatial := [ssCollisionOctree];
 
   Result.FreeResources([frTextureDataInNodes]);
+
+  Result.ParentLevel := Self;
 end;
 
 function TLevel.Background: TBackgroundGL;
