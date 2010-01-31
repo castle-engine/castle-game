@@ -159,11 +159,6 @@ type
       this is not suitable for render culling --- this is only for detecting
       collisions. }
     function BoundingBox: TBox3d; virtual; abstract;
-
-    { Called from TLevel constructor. This is the place when you
-      can modify ParentLevel.Scene.RootNode, e.g. by calling
-      RemoveBoxNode. }
-    procedure ChangeLevelScene; virtual;
   end;
 
   TObjectsListItem_2 = TLevelObject;
@@ -716,7 +711,10 @@ type
       var GroundItem: PVRMLTriangle); override;
     function BoundingBox: TBox3d; override;
 
-    procedure ChangeLevelScene; override;
+    { Called from TLevel constructor. This is the place when you
+      can modify ParentLevel.Scene.RootNode, e.g. by calling
+      RemoveBoxNode. }
+    procedure ChangeLevelScene(AParentLevel: TLevel);
   end;
 
   { This defines area on the level that causes
@@ -1269,11 +1267,6 @@ begin
 end;
 
 procedure TLevelObject.Idle;
-begin
-  { Nothing to do in this class. }
-end;
-
-procedure TLevelObject.ChangeLevelScene;
 begin
   { Nothing to do in this class. }
 end;
@@ -2422,10 +2415,10 @@ begin
   Result := EmptyBox3d;
 end;
 
-procedure TLevelArea.ChangeLevelScene;
+procedure TLevelArea.ChangeLevelScene(AParentLevel: TLevel);
 begin
   inherited;
-  ParentLevel.RemoveBoxNodeCheck(FBox, VRMLName);
+  AParentLevel.RemoveBoxNodeCheck(FBox, VRMLName);
 end;
 
 function TLevelArea.PointInside(const Point: TVector3Single): boolean;
@@ -2818,7 +2811,10 @@ var
   I: Integer;
 begin
   for I := 0 to Objects.High do
-    Objects[I].ChangeLevelScene;
+  begin
+    if Objects[I] is TLevelArea then
+      TLevelArea(Objects[I]).ChangeLevelScene(Self);
+  end;
 end;
 
 procedure TLevel.TraverseForItems(
