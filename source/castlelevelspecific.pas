@@ -450,12 +450,12 @@ procedure TCastleHallLevel.Picked(const Distance: Single;
 begin
   inherited;
 
-  if CollisionInfo.Hierarchy.IsLast(StairsBlocker) then
+  if CollisionInfo.Hierarchy.IndexOf(StairsBlocker) <> -1 then
   begin
     InteractionOccured := true;
     TimeMessageInteractFailed('You are not able to open it');
   end else
-  if CollisionInfo.Hierarchy.IsLast(Button) then
+  if CollisionInfo.Hierarchy.IndexOf(Button) <> -1 then
   begin
     InteractionOccured := true;
     if Distance < 10.0 then
@@ -798,7 +798,7 @@ procedure TTowerLevel.Picked(const Distance: Single;
 begin
   inherited;
 
-  if CollisionInfo.Hierarchy.IsLast(ElevatorButton) then
+  if CollisionInfo.Hierarchy.IndexOf(ElevatorButton) <> -1 then
   begin
     InteractionOccured := true;
     if Distance > 10 then
@@ -1058,7 +1058,7 @@ procedure TCagesLevel.Picked(const Distance: Single;
 begin
   inherited;
 
-  if CollisionInfo.Hierarchy.IsLast(FGateExit) then
+  if CollisionInfo.Hierarchy.IndexOf(FGateExit) <> -1 then
   begin
     InteractionOccured := true;
     if Distance > 10 then
@@ -1261,7 +1261,7 @@ begin
       TimeMessageInteractFailed('You see a door. It''s already open') else
       Door.GoEndPosition;
   end else
-  if CollisionInfo.Hierarchy.IsLast(Elevator9a9b) and
+  if (CollisionInfo.Hierarchy.IndexOf(Elevator9a9b) <> -1) and
      MovingElevator9a9b.CompletelyBeginPosition and
      Box3dPointInside(Player.Camera.Position, Elevator9a9bPickBox) then
   begin
@@ -1271,7 +1271,7 @@ begin
         'You''re too far to reach it from here') else
       MovingElevator9a9b.GoEndPosition;
   end else
-  if CollisionInfo.Hierarchy.IsLast(ExitButton) then
+  if CollisionInfo.Hierarchy.IndexOf(ExitButton) <> -1 then
   begin
     InteractionOccured := true;
     if Distance > 5 then
