@@ -25,7 +25,7 @@ interface
 
 uses VRMLGLScene, Boxes3d, VectorMath,
   CastlePlayer, CastleLevel, BackgroundGL, VRMLTriangle,
-  CastleSound, VRMLNodes, DOM, Base3D,
+  CastleSound, VRMLNodes, DOM, Base3D, VRMLGLAnimation,
   CastleCreatures, ShadowVolumes, Classes, KambiTimeUtils, Frustum;
 
 const
@@ -34,10 +34,11 @@ const
 type
   TCastleHallLevel = class(TLevel)
   private
-    Symbol: TLevelSimpleAnimatedObject;
-    Button: TLevelSimpleAnimatedObject;
+    Symbol: TVRMLGLAnimation;
+    Button: TVRMLGLAnimation;
 
     StairsBlocker: TVRMLGLScene;
+    StairsBlockerMiddle: TVector3Single;
 
     FLevelExitBox: TBox3d;
 
@@ -116,7 +117,7 @@ type
   private
     MovingElevator: TLevelLinearMovingObject;
     Elevator: TVRMLGLScene;
-    ElevatorButton: TLevelSimpleAnimatedObject;
+    ElevatorButton: TVRMLGLAnimation;
   public
     constructor Create(
       const AName: string;
@@ -288,6 +289,11 @@ begin
     true { create octrees }, false);
   StairsBlocker.CastsShadow := false; { shadow would not be visible anyway }
   Objects.Add(StairsBlocker);
+
+  { get Box3dMiddle(StairsBlocker.BoundingBox) when it Exists.
+    Later StairsBlocker will have Exists = false, so bbox will be empty,
+    but we'll need StairsBlockerMiddle position. }
+  StairsBlockerMiddle := Box3dMiddle(StairsBlocker.BoundingBox);
 end;
 
 procedure TCastleHallLevel.ChangeLevelScene;
@@ -366,8 +372,8 @@ var
   begin
     if StairsBlocker.Exists then
     begin
+      SoundEngine.Sound3d(stStairsBlockerDestroyed, StairsBlockerMiddle);
       StairsBlocker.Exists := false;
-      SoundEngine.Sound3d(stStairsBlockerDestroyed, Box3dMiddle(StairsBlocker.BoundingBox));
     end;
   end;
 
@@ -381,7 +387,7 @@ var
       { turn light over stairs to next level }
       LightNode := LightSet.Lights.Items[WerewolfFirstLight].LightNode as
         TVRMLPositionalLightNode;
-      LightNode.FdLocation.Value := Box3dMiddle(StairsBlocker.BoundingBox);
+      LightNode.FdLocation.Value := StairsBlockerMiddle;
       LightNode.FdOn.Value := true;
 
       for I := 1 to CastleHallWerewolvesCount - 1 do
@@ -422,12 +428,12 @@ begin
     LevelFinished('cages');
   end;
 
-  if Button.Started and
-    (AnimationTime - Button.PlayStartTime > Button.TimeDuration) then
+  if Button.TimePlaying and
+    (Button.WorldTime > Button.TimeDuration) then
   begin
-    if not Symbol.Started then
+    if not Symbol.TimePlaying then
     begin
-      Symbol.Play;
+      Symbol.TimePlaying := true;
       Symbol.Collides := false;
       SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
 
@@ -460,10 +466,10 @@ begin
     InteractionOccured := true;
     if Distance < 10.0 then
     begin
-      if Button.Started then
+      if Button.TimePlaying then
         TimeMessageInteractFailed('Button is already pressed') else
       begin
-        Button.Play;
+        Button.TimePlaying := true;
         TimeMessage('You press the button');
       end;
     end else
@@ -516,7 +522,7 @@ constructor TGateLevel.Create(
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
 var
-  Cart: TLevelSimpleAnimatedObject;
+  Cart: TVRMLGLAnimation;
   GateLevelPath: string;
 begin
   inherited;
@@ -528,7 +534,7 @@ begin
   Cart := LoadLevelAnimation(GateLevelPath + 'cart.kanim', true, true);
   Cart.CollisionUseLastScene := true;
   Objects.Add(Cart);
-  Cart.Play;
+  Cart.TimePlaying := true;
 
   CartSoundPosition := Box3dMiddle(Cart.FirstScene.BoundingBox);
 
@@ -805,7 +811,9 @@ begin
       TimeMessageInteractFailed(
         'You see a button. You''re too far to reach it from here') else
     begin
-      ElevatorButton.Play;
+      { play from the beginning }
+      ElevatorButton.ResetWorldTimeAtLoad;
+      ElevatorButton.TimePlaying := true;
       MovingElevator.GoOtherPosition;
     end;
   end;
@@ -1369,7 +1377,7 @@ constructor TGateBackgroundLevel.Create(
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
 var
-  Water: TLevelSimpleAnimatedObject;
+  Water: TVRMLGLAnimation;
 begin
   inherited;
 
@@ -1382,7 +1390,7 @@ begin
   Water.Collides := false;
   Objects.Add(Water);
 
-  Water.Play;
+  Water.TimePlaying := true;
 end;
 
 { TFountainLevel ------------------------------------------------------------- }

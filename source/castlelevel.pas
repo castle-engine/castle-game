@@ -279,27 +279,6 @@ type
     procedure Idle(const CompSpeed: Single); override;
   end;
 
-  { This is the TVRMLGLAnimation descendant that is easier to use:
-    instead of taking care of AnimationTime, you only call it's Play method.
-    When the animation is stopped, AnimationTime is kept at 0. }
-  TLevelSimpleAnimatedObject = class(TVRMLGLAnimation)
-  private
-    FStarted: boolean;
-    FPlayStartTime: Single;
-  public
-    constructor Create(AOwner: TComponent); override;
-
-    function ParentLevel: TLevel;
-
-    property Started: boolean read FStarted;
-    property PlayStartTime: Single read FPlayStartTime;
-
-    procedure Play;
-    procedure Stop;
-
-    procedure Idle(const CompSpeed: Single); override;
-  end;
-
   { This is an abstract class for a special group of objects:
     they define an invisible and non-colliding areas on the level
     that...well, have @italic(some purpose). What exactly this
@@ -522,11 +501,12 @@ type
         @item(call PrepareRender, with prBoundingBox, prShadowVolume
           (if shadows enabled by RenderShadowsPossible))
         @item FreeExternalResources, since they will not be needed anymore
+        @item TimePlaying is by default @false, so the animation is not playing.
       ) }
     function LoadLevelAnimation(
       const FileName: string;
       CreateFirstOctreeCollisions,
-      CreateLastOctreeCollisions: boolean): TLevelSimpleAnimatedObject;
+      CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
 
     { See @link(SpecialObjectPicked) and @link(Picked), you can call this from
       overriden implementations of these. }
@@ -1197,38 +1177,6 @@ begin
   if (ParentLevel.AnimationTime - EndPositionStateChangeTime > MoveTime) and
     (UsedSound <> nil) then
     UsedSound.DoUsingEnd;
-end;
-
-{ TLevelSimpleAnimatedObject ------------------------------------------------- }
-
-constructor TLevelSimpleAnimatedObject.Create(AOwner: TComponent);
-begin
-  inherited;
-  FStarted := false;
-end;
-
-function TLevelSimpleAnimatedObject.ParentLevel: TLevel;
-begin
-  Result := Owner as TLevel;
-end;
-
-procedure TLevelSimpleAnimatedObject.Play;
-begin
-  FStarted := true;
-  FPlayStartTime := ParentLevel.AnimationTime;
-end;
-
-procedure TLevelSimpleAnimatedObject.Stop;
-begin
-  FStarted := false;
-end;
-
-procedure TLevelSimpleAnimatedObject.Idle(const CompSpeed: Single);
-begin
-  inherited;
-  if Started then
-    ResetWorldTime(ParentLevel.AnimationTime - FPlayStartTime) else
-    ResetWorldTime(0);
 end;
 
 { TLevelArea ----------------------------------------------------------------- }
@@ -2205,11 +2153,11 @@ end;
 function TLevel.LoadLevelAnimation(
   const FileName: string;
   CreateFirstOctreeCollisions,
-  CreateLastOctreeCollisions: boolean): TLevelSimpleAnimatedObject;
+  CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
 var
   Options: TPrepareRenderOptions;
 begin
-  Result := TLevelSimpleAnimatedObject.CreateCustomCache(Self, GLContextCache);
+  Result := TVRMLGLAnimation.CreateCustomCache(Self, GLContextCache);
   Result.LoadFromFile(FileName);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
@@ -2228,6 +2176,8 @@ begin
     Result.LastScene.Spatial := [ssCollisionOctree];
 
   Result.FreeResources([frTextureDataInNodes]);
+
+  Result.TimePlaying := false;
 end;
 
 function TLevel.Background: TBackgroundGL;
