@@ -183,7 +183,7 @@ type
     StayOpenTime: Single;
 
     procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
-    procedure Idle; override;
+    procedure Idle(const CompSpeed: Single); override;
 
     property MovePushesOthers default false;
 
@@ -1151,7 +1151,7 @@ begin
     RevertGoEndPosition;
 end;
 
-procedure TDoomLevelDoor.Idle;
+procedure TDoomLevelDoor.Idle(const CompSpeed: Single);
 begin
   inherited;
 

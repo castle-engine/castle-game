@@ -85,10 +85,6 @@ type
       prevent the collision @italic(before it happens).
       This is the place to do it. }
     procedure BeforeIdle(const NewAnimationTime: TKamTime); virtual;
-
-    { This is called somewhere from TLevel.Idle, @italic(after)
-      ParentLevel.AnimationTime was updated. }
-    procedure Idle; virtual; reintroduce;
   end;
 
   TObjectsListItem_2 = TLevelObject;
@@ -165,7 +161,7 @@ type
 
     procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
 
-    procedure Idle; override;
+    procedure Idle(const CompSpeed: Single); override;
 
     function BoundingBox: TBox3d; override;
   end;
@@ -292,7 +288,7 @@ type
       const ParentTransform: TMatrix4Single); override;
 
     procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
-    procedure Idle; override;
+    procedure Idle(const CompSpeed: Single); override;
 
     { If @true (and Exists and Collides are also @true)
       then moving this object moves everything on it's way.
@@ -468,7 +464,7 @@ type
     function Translation(const AnimationTime: TKamTime):
       TVector3_Single; override;
 
-    procedure Idle; override;
+    procedure Idle(const CompSpeed: Single); override;
   end;
 
   { This a VRML scene that can be animated.
@@ -553,7 +549,7 @@ type
     procedure Play;
     procedure Stop;
 
-    procedure Idle; override;
+    procedure Idle(const CompSpeed: Single); override;
   end;
 
   { This is an abstract class for a special group of objects:
@@ -647,7 +643,7 @@ type
     property MessageDone: boolean read FMessageDone write FMessageDone
       default false;
 
-    procedure Idle; override;
+    procedure Idle(const CompSpeed: Single); override;
   end;
 
   TLevel = class
@@ -1158,11 +1154,6 @@ begin
   { Nothing to do in this class. }
 end;
 
-procedure TLevelObject.Idle;
-begin
-  { Nothing to do in this class. }
-end;
-
 { TLevelObjectsList ---------------------------------------------------------- }
 
 function TLevelObjectsList.RayCollision(
@@ -1477,12 +1468,13 @@ begin
     List[I].BeforeIdle(NewAnimationTime);
 end;
 
-procedure TLevelObjectSum.Idle;
+procedure TLevelObjectSum.Idle(const CompSpeed: Single);
 var
   I: Integer;
 begin
+  inherited;
   for I := 0 to List.Count - 1 do
-    List[I].Idle;
+    List[I].Idle(CompSpeed);
 end;
 
 function TLevelObjectSum.BoundingBox: TBox3d;
@@ -1841,9 +1833,10 @@ begin
   end;
 end;
 
-procedure TLevelMovingObject.Idle;
+procedure TLevelMovingObject.Idle(const CompSpeed: Single);
 begin
-  MovingObject.Idle;
+  inherited;
+  MovingObject.Idle(CompSpeed);
 end;
 
 function TLevelMovingObject.BoundingBox: TBox3d;
@@ -1989,7 +1982,7 @@ begin
     (ParentLevel.AnimationTime - EndPositionStateChangeTime > MoveTime);
 end;
 
-procedure TLevelLinearMovingObject.Idle;
+procedure TLevelLinearMovingObject.Idle(const CompSpeed: Single);
 begin
   inherited;
 
@@ -2210,7 +2203,7 @@ begin
   FStarted := false;
 end;
 
-procedure TLevelSimpleAnimatedObject.Idle;
+procedure TLevelSimpleAnimatedObject.Idle(const CompSpeed: Single);
 begin
   inherited;
   if Started then
@@ -2316,10 +2309,11 @@ end;
 
 { TLevelHintArea ----------------------------------------------------------- }
 
-procedure TLevelHintArea.Idle;
+procedure TLevelHintArea.Idle(const CompSpeed: Single);
 var
   ReplaceInteractInput: TPercentReplace;
 begin
+  inherited;
   if (not MessageDone) and PointInside(Player.Camera.Position) then
   begin
     ReplaceInteractInput.C := 'i';
@@ -3080,7 +3074,7 @@ begin
   FAnimationTime := NewAnimationTime;
 
   for I := 0 to Objects.High do
-    Objects[I].Idle;
+    Objects[I].Idle(CompSpeed);
 
   if ThunderEffect <> nil then
     ThunderEffect.Idle;
