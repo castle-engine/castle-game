@@ -177,8 +177,8 @@ type
 
   TDoomLevelDoor = class(TLevelLinearMovingObject)
   public
-    constructor Create(AParentLevel: TLevel;
-      const SceneFileName: string);
+    constructor Create(AOwner: TComponent;
+      const SceneFileName: string); { TODO } reintroduce;
   public
     StayOpenTime: Single;
 
@@ -773,7 +773,7 @@ begin
 
   ElevatorButton := LoadLevelAnimation(TowerLevelPath + 'elevator_button.kanim', true, false);
 
-  ElevatorButtonSum := TBase3DList.Create(nil);
+  ElevatorButtonSum := TBase3DList.Create(Self);
   ElevatorButtonSum.List.Add(Elevator);
   ElevatorButtonSum.List.Add(ElevatorButton);
 
@@ -1091,11 +1091,10 @@ end;
 
 { TDoomLevelDoor ------------------------------------------------------------- }
 
-constructor TDoomLevelDoor.Create(AParentLevel: TLevel;
-  const SceneFileName: string);
+constructor TDoomLevelDoor.Create(AOwner: TComponent; const SceneFileName: string);
 begin
-  inherited Create(AParentLevel);
-  Child := AParentLevel.LoadLevelScene(SceneFileName, true { create octrees }, false);
+  inherited Create(AOwner);
+  Child := ParentLevel.LoadLevelScene(SceneFileName, true { create octrees }, false);
   MovePushesOthers := false;
   SoundGoEndPosition := stDoorOpen;
   SoundGoBeginPosition := stDoorClose;

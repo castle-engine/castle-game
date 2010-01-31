@@ -25,8 +25,14 @@
   @unorderedList(
     @item(
       T3DCollision.Hierarchy is allowed to be empty.
-      This means that Level.Scene itself collided.
-    )
+      This means that Level.Scene itself collided.)
+
+    @item(
+      Owner of TBase3D must be always set to the containing TLevel.
+      ParentLevel simply returns Owner, typecasted to TLevel.
+      This wasn't really necessary (I could introduce separate ParentLevel)
+      but in practice it's the simplest and Ok for castle for now.)
+
   )
 }
 
@@ -53,13 +59,8 @@ type
 
   ICastle3D = interface
   ['{7B42F707-3510-475D-ACA0-D83B218CF54F}']
-    function GetParentLevel: TLevel;
-    procedure SetParentLevel(const Value: TLevel);
-
-    { Level object that contains this 3D object. You must assign this
-      to something non-nil right after creation, and usually you cannot
-      change it later. }
-    property ParentLevel: TLevel read GetParentLevel write SetParentLevel;
+    { Level object that contains this 3D object. }
+    function ParentLevel: TLevel;
 
     { This will be called at the beginning of TLevel.Idle, @italic(before)
       ParentLevel.AnimationTime changes to NewAnimationTime.
@@ -88,14 +89,10 @@ type
   private
     FMovePushesOthers: boolean;
     FMovePushesOthersUsesBoxes: boolean;
-
-    FParentLevel: TLevel;
-    function GetParentLevel: TLevel;
-    procedure SetParentLevel(const Value: TLevel);
   public
-    constructor Create(AParentLevel: TLevel); reintroduce;
+    constructor Create(AOwner: TComponent); override;
 
-    property ParentLevel: TLevel read GetParentLevel write SetParentLevel;
+    function ParentLevel: TLevel;
 
     { Implements TBase3D.GetTranslation by always calling
       GetTranslationFromTime(ParentLevel.AnimationTime).
@@ -201,7 +198,7 @@ type
     function SoundPosition: TVector3Single;
     procedure PlaySound(SoundType: TSoundType; Looping: boolean);
   public
-    constructor Create(AParentLevel: TLevel); reintroduce;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     { Is this object in @italic(end position), or going to it ?
@@ -289,14 +286,10 @@ type
   private
     FStarted: boolean;
     FPlayStartTime: Single;
-
-    FParentLevel: TLevel;
-    function GetParentLevel: TLevel;
-    procedure SetParentLevel(const Value: TLevel);
   public
-    constructor Create(AOwner: TComponent; AParentLevel: TLevel); reintroduce;
+    constructor Create(AOwner: TComponent); override;
 
-    property ParentLevel: TLevel read GetParentLevel write SetParentLevel;
+    function ParentLevel: TLevel;
 
     property Started: boolean read FStarted;
     property PlayStartTime: Single read FPlayStartTime;
@@ -319,16 +312,12 @@ type
     FVRMLName: string;
     FBox: TBox3d;
 
-    FParentLevel: TLevel;
-    function GetParentLevel: TLevel;
-    procedure SetParentLevel(const Value: TLevel);
-
     { Area. Default value is EmptyBox3d. }
     property Box: TBox3d read FBox write FBox;
   public
-    constructor Create(AParentLevel: TLevel); reintroduce;
+    constructor Create(AOwner: TComponent); override;
 
-    property ParentLevel: TLevel read GetParentLevel write SetParentLevel;
+    function ParentLevel: TLevel;
 
     { Name used to recognize this object's area in level VRML file.
 
@@ -408,7 +397,7 @@ type
     procedure Idle(const CompSpeed: Single); override;
   end;
 
-  TLevel = class
+  TLevel = class(TComponent)
   private
     FScene: TVRMLGLScene;
     FLightSet: TVRMLLightSetGL;
@@ -555,7 +544,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean); virtual;
+      AMenuBackground: boolean); reintroduce; virtual;
 
     destructor Destroy; override;
 
@@ -904,22 +893,16 @@ uses SysUtils, GL, GLU, Object3dAsVRML,
 
 { TLevelMovingObject --------------------------------------------------------- }
 
-constructor TLevelMovingObject.Create(AParentLevel: TLevel);
+constructor TLevelMovingObject.Create(AOwner: TComponent);
 begin
-  inherited Create(nil);
-  ParentLevel := AParentLevel;
+  inherited;
   FMovePushesOthers := true;
   FMovePushesOthersUsesBoxes := true;
 end;
 
-function TLevelMovingObject.GetParentLevel: TLevel;
+function TLevelMovingObject.ParentLevel: TLevel;
 begin
-  Result := FParentLevel;
-end;
-
-procedure TLevelMovingObject.SetParentLevel(const Value: TLevel);
-begin
-  FParentLevel := Value;
+  Result := Owner as TLevel;
 end;
 
 function TLevelMovingObject.GetTranslation: TVector3Single;
@@ -1062,7 +1045,7 @@ end;
 
 { TLevelLinearMovingObject --------------------------------------------------- }
 
-constructor TLevelLinearMovingObject.Create(AParentLevel: TLevel);
+constructor TLevelLinearMovingObject.Create(AOwner: TComponent);
 begin
   inherited;
 
@@ -1218,21 +1201,15 @@ end;
 
 { TLevelSimpleAnimatedObject ------------------------------------------------- }
 
-constructor TLevelSimpleAnimatedObject.Create(
-  AOwner: TComponent; AParentLevel: TLevel);
+constructor TLevelSimpleAnimatedObject.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  inherited;
   FStarted := false;
 end;
 
-function TLevelSimpleAnimatedObject.GetParentLevel: TLevel;
+function TLevelSimpleAnimatedObject.ParentLevel: TLevel;
 begin
-  Result := FParentLevel;
-end;
-
-procedure TLevelSimpleAnimatedObject.SetParentLevel(const Value: TLevel);
-begin
-  FParentLevel := Value;
+  Result := Owner as TLevel;
 end;
 
 procedure TLevelSimpleAnimatedObject.Play;
@@ -1256,10 +1233,9 @@ end;
 
 { TLevelArea ----------------------------------------------------------------- }
 
-constructor TLevelArea.Create(AParentLevel: TLevel);
+constructor TLevelArea.Create(AOwner: TComponent);
 begin
-  inherited Create(nil);
-  FParentLevel := AParentLevel;
+  inherited;
   FBox := EmptyBox3d;
 end;
 
@@ -1352,14 +1328,9 @@ begin
   Result := Box3dPointInside(Point, Box);
 end;
 
-function TLevelArea.GetParentLevel: TLevel;
+function TLevelArea.ParentLevel: TLevel;
 begin
-  Result := FParentLevel;
-end;
-
-procedure TLevelArea.SetParentLevel(const Value: TLevel);
-begin
-  FParentLevel := Value;
+  Result := Owner as TLevel;
 end;
 
 { TLevelHintArea ----------------------------------------------------------- }
@@ -1415,7 +1386,7 @@ var
   Options: TPrepareRenderOptions;
   TG: TTransparentGroups;
 begin
-  inherited Create;
+  inherited Create(nil);
 
   FName := AName;
   FSceneFileName := ASceneFileName;
@@ -2212,7 +2183,7 @@ function TLevel.LoadLevelScene(const FileName: string;
 var
   Options: TPrepareRenderOptions;
 begin
-  Result := TVRMLGLScene.CreateCustomCache(nil, GLContextCache);
+  Result := TVRMLGLScene.CreateCustomCache(Self, GLContextCache);
   Result.Load(FileName);
   AttributesSet(Result.Attributes, btIncrease);
 
@@ -2238,7 +2209,7 @@ function TLevel.LoadLevelAnimation(
 var
   Options: TPrepareRenderOptions;
 begin
-  Result := TLevelSimpleAnimatedObject.CreateCustomCache(nil, GLContextCache);
+  Result := TLevelSimpleAnimatedObject.CreateCustomCache(Self, GLContextCache);
   Result.LoadFromFile(FileName);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
@@ -2257,8 +2228,6 @@ begin
     Result.LastScene.Spatial := [ssCollisionOctree];
 
   Result.FreeResources([frTextureDataInNodes]);
-
-  Result.ParentLevel := Self;
 end;
 
 function TLevel.Background: TBackgroundGL;
