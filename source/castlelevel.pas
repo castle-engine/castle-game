@@ -42,22 +42,6 @@ type
   TLevel = class;
   TLevelObjectsList = class;
 
-  { This represents a collision with level. }
-  TCollisionInfo = class
-  public
-    constructor Create;
-    destructor Destroy; override;
-  public
-    { Hierarchy is a list of TLevelObjects that are hit, from the container
-      to the most detailed one (e.g., if you place an object within
-      TLevelMovingObject.MovingOject, and you hit it --- then Hierarchy
-      will contain first TLevelMovingObject, then TLevelMovingObject.MovingObject).
-      Hierarchy is empty if the level Scene itself was hit. }
-    Hierarchy: TLevelObjectsList;
-    { Triangle is the item that was hit, from appropriate object triangle octree. }
-    Triangle: PVRMLTriangle;
-  end;
-
   { This is a base class for various objects that can be added to the level.
 
     What's an "object on the level" ? Well, theoretically anything.
@@ -91,13 +75,6 @@ type
 
     property ParentLevel: TLevel read FParentLevel;
 
-    { @returns(A collision as TCollisionInfo instance, or @nil if no collision).
-      You're responsible for freeing this TCollisionInfo instance. }
-    function RayCollision(
-      out IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; virtual; abstract;
-
     { This is called at the beginning of TLevel.Idle, @italic(before)
       ParentLevel.AnimationTime changes to NewAnimationTime.
 
@@ -123,7 +100,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single; out Index: Integer;
       const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
   end;
 
   { This is a TLevelObject descendant that is a @italic(sum of any number
@@ -179,7 +156,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision; override;
 
     procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
@@ -239,7 +216,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision; override;
 
     procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
@@ -299,7 +276,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision; override;
 
     procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
@@ -550,7 +527,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision; override;
 
     procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
@@ -633,7 +610,7 @@ type
     function RayCollision(
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
+      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision; override;
     procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
       out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
@@ -1041,7 +1018,7 @@ type
     { This tests for collisions with level base Scene and level @link(Objects). }
     function TryPick(out IntersectionDistance: Single;
       out LevelObjectIndex: Integer;
-      const Ray0, RayVector: TVector3Single): TCollisionInfo;
+      const Ray0, RayVector: TVector3Single): T3DCollision;
 
     { This is called when level was picked --- either the level Scene
       itself, or one of @link(Objects) on the level.
@@ -1051,7 +1028,7 @@ type
         if it was the Scene itself.)
       @param(Distance,InteractionOccured see SpecialObjectPicked)
     }
-    procedure Picked(const Distance: Single; CollisionInfo: TCollisionInfo;
+    procedure Picked(const Distance: Single; CollisionInfo: T3DCollision;
       LevelObjectIndex: Integer;
       var InteractionOccured: boolean); virtual;
 
@@ -1168,19 +1145,6 @@ uses SysUtils, GL, GLU, Object3dAsVRML,
 {$define read_implementation}
 {$I objectslist_2.inc}
 
-{ TCollisionInfo ------------------------------------------------------------- }
-
-constructor TCollisionInfo.Create;
-begin
-  inherited;
-  Hierarchy := TLevelObjectsList.Create;
-end;
-
-destructor TCollisionInfo.Destroy;
-begin
-  FreeAndNil(Hierarchy);
-end;
-
 { TLevelObject --------------------------------------------------------------- }
 
 constructor TLevelObject.Create(AParentLevel: TLevel);
@@ -1204,11 +1168,11 @@ end;
 function TLevelObjectsList.RayCollision(
   out IntersectionDistance: Single; out Index: Integer;
   const Ray0, RayVector: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
 var
   I: Integer;
   ThisIntersectionDistance: Single;
-  ThisCollision: TCollisionInfo;
+  ThisCollision: T3DCollision;
 begin
   Result := nil;
   IntersectionDistance := 0; { Only to silence compiler warning }
@@ -1296,7 +1260,7 @@ end;
 function TLevelStaticObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
 var
   Triangle: PVRMLTriangle;
 begin
@@ -1309,7 +1273,7 @@ begin
       false, nil, false, TrianglesToIgnoreFunc);
     if Triangle <> nil then
     begin
-      Result := TCollisionInfo.Create;
+      Result := T3DCollision.Create;
       Result.Triangle := Triangle;
       Result.Hierarchy.Add(Self);
     end;
@@ -1482,7 +1446,7 @@ end;
 function TLevelObjectSum.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
 var
   Index: Integer;
 begin
@@ -1653,7 +1617,7 @@ end;
 function TLevelMovingObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
 var
   T: TVector3_Single;
 begin
@@ -2129,7 +2093,7 @@ end;
 function TLevelAnimatedObject.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
 var
   Triangle: PVRMLTriangle;
   Octree: TVRMLBaseTrianglesOctree;
@@ -2142,7 +2106,7 @@ begin
       Ray0, RayVector, false, nil, false, TrianglesToIgnoreFunc);
     if Triangle <> nil then
     begin
-      Result := TCollisionInfo.Create;
+      Result := T3DCollision.Create;
       Result.Triangle := Triangle;
       Result.Hierarchy.Add(Self);
     end else
@@ -2154,7 +2118,7 @@ begin
         Ray0, RayVector, false, nil, false, TrianglesToIgnoreFunc);
       if Triangle <> nil then
       begin
-        Result := TCollisionInfo.Create;
+        Result := T3DCollision.Create;
         Result.Triangle := Triangle;
         Result.Hierarchy.Add(Self);
       end
@@ -2319,7 +2283,7 @@ end;
 function TLevelArea.RayCollision(
   out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single;
-  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo;
+  const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): T3DCollision;
 begin
   { This object is invisible and non-colliding. }
   Result := nil;
@@ -3138,11 +3102,11 @@ end;
 
 function TLevel.TryPick(out IntersectionDistance: Single;
   out LevelObjectIndex: Integer;
-  const Ray0, RayVector: TVector3Single): TCollisionInfo;
+  const Ray0, RayVector: TVector3Single): T3DCollision;
 var
   Triangle: PVRMLTriangle;
   ThisIntersectionDistance: Single;
-  ThisCollision: TCollisionInfo;
+  ThisCollision: T3DCollision;
   ThisLevelObjectIndex: Integer;
   {$ifdef DEBUG_PICK}
   S: string;
@@ -3159,7 +3123,7 @@ begin
   begin
     IntersectionDistance := ThisIntersectionDistance;
     LevelObjectIndex := -1;
-    Result := TCollisionInfo.Create;
+    Result := T3DCollision.Create;
     Result.Triangle := Triangle;
   end;
 
@@ -3193,7 +3157,7 @@ begin
 end;
 
 procedure TLevel.Picked(const Distance: Single;
-  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
   var InteractionOccured: boolean);
 begin
   { Nothing to do in this class. }

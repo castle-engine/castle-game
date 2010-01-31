@@ -25,7 +25,7 @@ interface
 
 uses VRMLGLScene, Boxes3d, VectorMath,
   CastlePlayer, CastleLevel, BackgroundGL, VRMLTriangle,
-  CastleSound, VRMLNodes, DOM,
+  CastleSound, VRMLNodes, DOM, Base3D,
   CastleCreatures, ShadowVolumes, Classes, KambiTimeUtils, Frustum;
 
 const
@@ -58,7 +58,7 @@ type
     procedure Idle(const CompSpeed: Single); override;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+      CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
       var InteractionOccured: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
@@ -127,7 +127,7 @@ type
       AMenuBackground: boolean); override;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+      CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
       var InteractionOccured: boolean); override;
   end;
 
@@ -169,7 +169,7 @@ type
       read FDoEndSequence write SetDoEndSequence default false;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+      CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
       var InteractionOccured: boolean); override;
 
     function Background: TBackgroundGL; override;
@@ -222,7 +222,7 @@ type
     destructor Destroy; override;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+      CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
       var InteractionOccured: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
@@ -447,7 +447,7 @@ begin
 end;
 
 procedure TCastleHallLevel.Picked(const Distance: Single;
-  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
   var InteractionOccured: boolean);
 begin
   inherited;
@@ -798,7 +798,7 @@ begin
 end;
 
 procedure TTowerLevel.Picked(const Distance: Single;
-  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
   var InteractionOccured: boolean);
 begin
   inherited;
@@ -1056,7 +1056,7 @@ begin
 end;
 
 procedure TCagesLevel.Picked(const Distance: Single;
-  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
   var InteractionOccured: boolean);
 begin
   inherited;
@@ -1248,7 +1248,7 @@ begin
 end;
 
 procedure TDoomE1M1Level.Picked(const Distance: Single;
-  CollisionInfo: TCollisionInfo; LevelObjectIndex: Integer;
+  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
   var InteractionOccured: boolean);
 var
   Door: TDoomLevelDoor;

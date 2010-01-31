@@ -113,7 +113,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
   Cameras, VectorMath, Boxes3d, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
-  BFNT_BitstreamVeraSans_Unit, UIControls,
+  BFNT_BitstreamVeraSans_Unit, UIControls, Base3D,
   CastleItems, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, CastleConfig, VRMLGLHeadlight, CastleThunder,
@@ -713,7 +713,7 @@ procedure DoInteract;
     IntersectionDistance, ThisIntersectionDistance: Single;
     PickedObjectType: TPickedObjectType;
     LevelCollisionObjectIndex: Integer;
-    LevelCollisionInfo: TCollisionInfo;
+    LevelCollisionInfo: T3DCollision;
   begin
     Ray0 := Player.Camera.Position;
 
