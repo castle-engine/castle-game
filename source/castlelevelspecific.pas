@@ -429,7 +429,7 @@ begin
   end;
 
   if Button.TimePlaying and
-    (Button.WorldTime > Button.TimeDuration) then
+    (Button.Time > Button.TimeDuration) then
   begin
     if not Symbol.TimePlaying then
     begin
@@ -812,7 +812,7 @@ begin
         'You see a button. You''re too far to reach it from here') else
     begin
       { play from the beginning }
-      ElevatorButton.ResetWorldTimeAtLoad;
+      ElevatorButton.ResetTimeAtLoad;
       ElevatorButton.TimePlaying := true;
       MovingElevator.GoOtherPosition;
     end;
