@@ -57,23 +57,6 @@ const
 type
   TLevel = class;
 
-  ICastle3D = interface
-  ['{7B42F707-3510-475D-ACA0-D83B218CF54F}']
-    { Level object that contains this 3D object. }
-    function ParentLevel: TLevel;
-
-    { This will be called at the beginning of TLevel.Idle, @italic(before)
-      ParentLevel.AnimationTime changes to NewAnimationTime.
-
-      This is usefull for taking care of collision detection issues,
-      as our assumption always is that "nothing collides". Which means
-      that if you don't want your TLevelMovingObject to collide
-      with e.g. player or creatures or items, then you should
-      prevent the collision @italic(before it happens).
-      This is the place to do it. }
-    procedure BeforeIdle(const NewAnimationTime: TKamTime);
-  end;
-
   { See TCustomTranslated3D
 
     Note that if Translation actually changes over time then
@@ -83,26 +66,39 @@ type
     like the elevator going up ?
     That's the default behavior, but you can turn it off by setting
     MovePushesOthers to @false.
-    See e.g. the DoomLevelDoor.BeforeIdle method to see how the behavior
+    See e.g. the DoomLevelDoor.BeforeTimeIncrease method to see how the behavior
     "something blocks the move" can be handled. }
-  TLevelMovingObject = class(TCustomTranslated3D, ICastle3D)
+  TLevelMovingObject = class(TCustomTranslated3D)
   private
     FMovePushesOthers: boolean;
     FMovePushesOthersUsesBoxes: boolean;
+    FAnimationTime: TKamTime;
   public
     constructor Create(AOwner: TComponent); override;
+
+    { Local object time, always increasing, used to track animations. }
+    property AnimationTime: TKamTime read FAnimationTime;
 
     function ParentLevel: TLevel;
 
     { Implements TBase3D.GetTranslation by always calling
-      GetTranslationFromTime(ParentLevel.AnimationTime).
+      GetTranslationFromTime(AnimationTime).
       Descendants should override GetTranslationFromTime. }
     function GetTranslation: TVector3Single; override;
 
-    function GetTranslationFromTime(const AnimationTime: TKamTime):
+    function GetTranslationFromTime(const AnAnimationTime: TKamTime):
       TVector3Single; virtual; abstract;
 
-    procedure BeforeIdle(const NewAnimationTime: TKamTime); virtual;
+    { This will be called at the beginning of our @link(Idle),
+      @italic(right before) AnimationTime changes to NewAnimationTime.
+
+      This is usefull for taking care of collision detection issues,
+      as our assumption always is that "nothing collides". Which means
+      that if you don't want your TLevelMovingObject to collide
+      with e.g. player or creatures or items, then you should
+      prevent the collision @italic(before it happens).
+      This is the place to do it. }
+    procedure BeforeTimeIncrease(const NewAnimationTime: TKamTime); virtual;
 
     { If @true (and Exists and Collides are also @true)
       then moving this object moves everything on it's way.
@@ -171,6 +167,8 @@ type
     property MovePushesOthersUsesBoxes: boolean
       read FMovePushesOthersUsesBoxes write FMovePushesOthersUsesBoxes
       default true;
+
+    procedure Idle(const CompSpeed: Single); override;
   end;
 
   { This is a TLevelMovingObject that moves with a constant speed
@@ -273,7 +271,7 @@ type
     MoveTime: Single;
     TranslationEnd: TVector3_Single;
 
-    function GetTranslationFromTime(const AnimationTime: TKamTime):
+    function GetTranslationFromTime(const AnAnimationTime: TKamTime):
       TVector3Single; override;
 
     procedure Idle(const CompSpeed: Single); override;
@@ -849,6 +847,7 @@ begin
   inherited;
   FMovePushesOthers := true;
   FMovePushesOthersUsesBoxes := true;
+  FAnimationTime := 0;
 end;
 
 function TLevelMovingObject.ParentLevel: TLevel;
@@ -858,10 +857,10 @@ end;
 
 function TLevelMovingObject.GetTranslation: TVector3Single;
 begin
-  Result := GetTranslationFromTime(ParentLevel.AnimationTime);
+  Result := GetTranslationFromTime(AnimationTime);
 end;
 
-procedure TLevelMovingObject.BeforeIdle(
+procedure TLevelMovingObject.BeforeTimeIncrease(
   const NewAnimationTime: TKamTime);
 
   function BoundingBoxAssumeTranslation(
@@ -912,12 +911,9 @@ var
   Crea: TCreature;
   Item: TItemOnLevel;
 begin
-  if Supports(Child, ICastle3D) then
-    (Child as ICastle3D).BeforeIdle(NewAnimationTime);
-
   if Exists and Collides and MovePushesOthers then
   begin
-    CurrentTranslation := GetTranslationFromTime(ParentLevel.AnimationTime);
+    CurrentTranslation := GetTranslationFromTime(AnimationTime);
     NewTranslation := GetTranslationFromTime(NewAnimationTime);
 
     { It's an often expected situation that TLevelMovingObject
@@ -994,6 +990,17 @@ begin
   end;
 end;
 
+procedure TLevelMovingObject.Idle(const CompSpeed: Single);
+var
+  NewAnimationTime: TKamTime;
+begin
+  inherited;
+
+  NewAnimationTime := AnimationTime + CompSpeed;
+  BeforeTimeIncrease(NewAnimationTime);
+  FAnimationTime := NewAnimationTime;
+end;
+
 { TLevelLinearMovingObject --------------------------------------------------- }
 
 constructor TLevelLinearMovingObject.Create(AOwner: TComponent);
@@ -1051,34 +1058,34 @@ end;
 procedure TLevelLinearMovingObject.GoEndPosition;
 begin
   FEndPosition := true;
-  FEndPositionStateChangeTime := ParentLevel.AnimationTime;
+  FEndPositionStateChangeTime := AnimationTime;
   PlaySound(SoundGoEndPosition, SoundGoEndPositionLooping);
 end;
 
 procedure TLevelLinearMovingObject.GoBeginPosition;
 begin
   FEndPosition := false;
-  FEndPositionStateChangeTime := ParentLevel.AnimationTime;
+  FEndPositionStateChangeTime := AnimationTime;
   PlaySound(SoundGoBeginPosition, SoundGoBeginPositionLooping);
 end;
 
 procedure TLevelLinearMovingObject.RevertGoEndPosition;
 begin
   FEndPosition := true;
-  FEndPositionStateChangeTime := { ParentLevel.AnimationTime -
-    (MoveTime - (ParentLevel.AnimationTime - EndPositionStateChangeTime)) }
+  FEndPositionStateChangeTime := { AnimationTime -
+    (MoveTime - (AnimationTime - EndPositionStateChangeTime)) }
     { simplified : }
-    2 * ParentLevel.AnimationTime - MoveTime - EndPositionStateChangeTime;
+    2 * AnimationTime - MoveTime - EndPositionStateChangeTime;
   PlaySound(SoundGoEndPosition, SoundGoEndPositionLooping);
 end;
 
 procedure TLevelLinearMovingObject.RevertGoBeginPosition;
 begin
   FEndPosition := false;
-  FEndPositionStateChangeTime := { ParentLevel.AnimationTime -
-    (MoveTime - (ParentLevel.AnimationTime - EndPositionStateChangeTime)) }
+  FEndPositionStateChangeTime := { AnimationTime -
+    (MoveTime - (AnimationTime - EndPositionStateChangeTime)) }
     { simplified : }
-    2 * ParentLevel.AnimationTime - MoveTime - EndPositionStateChangeTime;
+    2 * AnimationTime - MoveTime - EndPositionStateChangeTime;
   PlaySound(SoundGoEndPosition, SoundGoBeginPositionLooping);
 end;
 
@@ -1096,26 +1103,26 @@ begin
 end;
 
 function TLevelLinearMovingObject.GetTranslationFromTime(
-  const AnimationTime: TKamTime): TVector3Single;
+  const AnAnimationTime: TKamTime): TVector3Single;
 var
   R: TVector3_Single;
 begin
   if not EndPosition then
   begin
-    if AnimationTime - EndPositionStateChangeTime > MoveTime then
+    if AnAnimationTime - EndPositionStateChangeTime > MoveTime then
       { Completely closed. }
       R.Init_Zero else
       { During closing. }
       R := TranslationEnd *
-        (1 - (AnimationTime - EndPositionStateChangeTime) / MoveTime);
+        (1 - (AnAnimationTime - EndPositionStateChangeTime) / MoveTime);
   end else
   begin
-    if AnimationTime - EndPositionStateChangeTime > MoveTime then
+    if AnAnimationTime - EndPositionStateChangeTime > MoveTime then
       { Completely open. }
       R := TranslationEnd else
       { During opening. }
       R := TranslationEnd *
-        ((AnimationTime - EndPositionStateChangeTime) / MoveTime);
+        ((AnAnimationTime - EndPositionStateChangeTime) / MoveTime);
   end;
 
   { TODO: This really sucks without overloaded operators for TVector3Single }
@@ -1125,13 +1132,13 @@ end;
 function TLevelLinearMovingObject.CompletelyEndPosition: boolean;
 begin
   Result := EndPosition and
-    (ParentLevel.AnimationTime - EndPositionStateChangeTime > MoveTime);
+    (AnimationTime - EndPositionStateChangeTime > MoveTime);
 end;
 
 function TLevelLinearMovingObject.CompletelyBeginPosition: boolean;
 begin
   Result := (not EndPosition) and
-    (ParentLevel.AnimationTime - EndPositionStateChangeTime > MoveTime);
+    (AnimationTime - EndPositionStateChangeTime > MoveTime);
 end;
 
 procedure TLevelLinearMovingObject.Idle(const CompSpeed: Single);
@@ -1145,7 +1152,7 @@ begin
   { If the SoundGoBegin/EndPosition is longer than the MoveTime
     (or it's looping),
     stop this sound once we're completely in Begin/EndPosition. }
-  if (ParentLevel.AnimationTime - EndPositionStateChangeTime > MoveTime) and
+  if (AnimationTime - EndPositionStateChangeTime > MoveTime) and
     (UsedSound <> nil) then
     UsedSound.DoUsingEnd;
 end;
@@ -1911,19 +1918,8 @@ begin
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single);
-var
-  I: Integer;
-  NewAnimationTime: TKamTime;
 begin
-  NewAnimationTime := AnimationTime + CompSpeed;
-
-  { TODO: lame, if ICastle3D will be within another non-ICastle3D,
-    it's BeforeIdle will not be called. }
-  for I := 0 to Objects.List.Count - 1 do
-    if Supports(Objects.List[I], ICastle3D) then
-      (Objects.List[I] as ICastle3D).BeforeIdle(NewAnimationTime);
-
-  FAnimationTime := NewAnimationTime;
+  FAnimationTime += CompSpeed;
 
   Objects.Idle(CompSpeed);
 

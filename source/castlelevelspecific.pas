@@ -183,7 +183,7 @@ type
   public
     StayOpenTime: Single;
 
-    procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
+    procedure BeforeTimeIncrease(const NewAnimationTime: TKamTime); override;
     procedure Idle(const CompSpeed: Single); override;
 
     property MovePushesOthers default false;
@@ -1109,7 +1109,7 @@ begin
   CastsShadow := false; { looks bad }
 end;
 
-procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: TKamTime);
+procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TKamTime);
 
   function SomethingWillBlockClosingDoor: boolean;
   var
@@ -1150,7 +1150,7 @@ begin
     door move). }
 
   if (not EndPosition) and
-    (ParentLevel.AnimationTime - EndPositionStateChangeTime < MoveTime) and
+    (AnimationTime - EndPositionStateChangeTime < MoveTime) and
     SomethingWillBlockClosingDoor then
     RevertGoEndPosition;
 end;
@@ -1160,7 +1160,7 @@ begin
   inherited;
 
   if EndPosition and
-    (ParentLevel.AnimationTime - EndPositionStateChangeTime >
+    (AnimationTime - EndPositionStateChangeTime >
       MoveTime + StayOpenTime) then
     GoBeginPosition;
 end;
