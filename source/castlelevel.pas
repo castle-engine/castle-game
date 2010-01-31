@@ -30,7 +30,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
-  BackgroundGL, DOM, GameSoundEngine,
+  BackgroundGL, DOM, GameSoundEngine, Base3D,
   ShadowVolumes, Classes, KambiTimeUtils, Frustum;
 
 {$define read_interface}
@@ -83,47 +83,13 @@ type
     override in your TLevel descendats).
     Implementing and using universal (reusable) TLevelObject descendants
     is a better idea. }
-  TLevelObject = class
+  TLevelObject = class(TBase3D)
   private
     FParentLevel: TLevel;
-    FCastsShadow: boolean;
   public
-    constructor Create(AParentLevel: TLevel);
+    constructor Create(AParentLevel: TLevel); reintroduce;
 
     property ParentLevel: TLevel read FParentLevel;
-
-    { See TBase3D.Render. }
-    procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup); virtual; abstract;
-
-    { See TBase3D.RenderShadowVolume. }
-    procedure RenderShadowVolume(
-      ShadowVolumes: TShadowVolumes;
-      const ParentTransformIsIdentity: boolean;
-      const ParentTransform: TMatrix4Single); virtual; abstract;
-
-    { See TBase3D.CastsShadow. }
-    property CastsShadow: boolean read FCastsShadow write FCastsShadow
-      default true;
-
-    function MoveAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const CameraRadius: Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
-
-    function MoveBoxAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const ProposedNewBox: TBox3d;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
-
-    function SegmentCollision(const Pos1, Pos2: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
-
-    function SphereCollision(const Pos: TVector3Single; const Radius: Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
-
-    function BoxCollision(const Box: TBox3d;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean; virtual; abstract;
 
     { @returns(A collision as TCollisionInfo instance, or @nil if no collision).
       You're responsible for freeing this TCollisionInfo instance. }
@@ -131,11 +97,6 @@ type
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; virtual; abstract;
-
-    procedure GetCameraHeight(const Position: TVector3Single;
-      const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-      var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: PVRMLTriangle); virtual; abstract;
 
     { This is called at the beginning of TLevel.Idle, @italic(before)
       ParentLevel.AnimationTime changes to NewAnimationTime.
@@ -150,15 +111,7 @@ type
 
     { This is called somewhere from TLevel.Idle, @italic(after)
       ParentLevel.AnimationTime was updated. }
-    procedure Idle; virtual;
-
-    { Bounding box for collisions.
-
-      Note that for non-colliding objects, this can
-      be empty, even though something is visible on the level. In other words,
-      this is not suitable for render culling --- this is only for detecting
-      collisions. }
-    function BoundingBox: TBox3d; virtual; abstract;
+    procedure Idle; virtual; reintroduce;
   end;
 
   TObjectsListItem_2 = TLevelObject;
@@ -197,10 +150,10 @@ type
     property List: TLevelObjectsList read FList;
 
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup); override;
+      TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumes: TShadowVolumes;
+      ShadowVolumes: TBaseShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -228,10 +181,10 @@ type
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeight(const Position: TVector3Single;
+    procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-      var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: PVRMLTriangle); override;
+      out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+      out GroundItem: PVRMLTriangle); override;
 
     procedure BeforeIdle(const NewAnimationTime: TKamTime); override;
 
@@ -248,8 +201,6 @@ type
     to hide this object from evrything (or only from the collision detection). }
   TLevelStaticObject = class(TLevelObject)
   private
-    FExists: boolean;
-    FCollides: boolean;
     FScene: TVRMLGLScene;
   public
     constructor Create(AParentLevel: TLevel;
@@ -258,19 +209,11 @@ type
 
     property Scene: TVRMLGLScene read FScene;
 
-    { @noAutoLinkHere }
-    property Exists: boolean read FExists write FExists default true;
-
-    { @noAutoLinkHere
-      Note that if not @link(Exists) then this doesn't matter
-      (not existing objects never participate in collision detection). }
-    property Collides: boolean read FCollides write FCollides default true;
-
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup); override;
+      TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumes: TShadowVolumes;
+      ShadowVolumes: TBaseShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -298,10 +241,10 @@ type
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeight(const Position: TVector3Single;
+    procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-      var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: PVRMLTriangle); override;
+      out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+      out GroundItem: PVRMLTriangle); override;
 
     function BoundingBox: TBox3d; override;
   end;
@@ -320,8 +263,6 @@ type
   TLevelMovingObject = class(TLevelObject)
   private
     FMovingObject: TLevelObject;
-    FExists: boolean;
-    FCollides: boolean;
     FMovePushesOthers: boolean;
     FMovePushesOthersUsesBoxes: boolean;
   public
@@ -332,14 +273,6 @@ type
     { Actual moving object. It is owned
       by this object, i.e. it is freed in our destructor. }
     property MovingObject: TLevelObject read FMovingObject write FMovingObject;
-
-    { @noAutoLinkHere }
-    property Exists: boolean read FExists write FExists default true;
-
-    { @noAutoLinkHere
-      Note that if not @link(Exists) then this doesn't matter
-      (not existing objects never participate in collision detection). }
-    property Collides: boolean read FCollides write FCollides default true;
 
     function Translation(const AnimationTime: TKamTime):
       TVector3_Single; virtual; abstract;
@@ -368,16 +301,16 @@ type
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeight(const Position: TVector3Single;
+    procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-      var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: PVRMLTriangle); override;
+      out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+      out GroundItem: PVRMLTriangle); override;
 
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup); override;
+      TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumes: TShadowVolumes;
+      ShadowVolumes: TBaseShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -574,8 +507,6 @@ type
   private
     FAnimation: TVRMLGLAnimation;
     FAnimationTime: TKamTime;
-    FExists: boolean;
-    FCollides: boolean;
     FCollisionUseLastScene: boolean;
   public
     constructor Create(AParentLevel: TLevel; AnAnimation: TVRMLGLAnimation);
@@ -583,8 +514,6 @@ type
 
     property Animation: TVRMLGLAnimation read FAnimation;
     property AnimationTime: TKamTime read FAnimationTime write FAnimationTime;
-    property Exists: boolean read FExists write FExists default true;
-    property Collides: boolean read FCollides write FCollides default true;
 
     { See TVRMLGLAnimation.CollisionUseLastScene. }
     property CollisionUseLastScene: boolean
@@ -592,10 +521,10 @@ type
       write FCollisionUseLastScene default false;
 
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup); override;
+      TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumes: TShadowVolumes;
+      ShadowVolumes: TBaseShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -623,10 +552,10 @@ type
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
 
-    procedure GetCameraHeight(const Position: TVector3Single;
+    procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-      var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: PVRMLTriangle); override;
+      out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+      out GroundItem: PVRMLTriangle); override;
 
     function BoundingBox: TBox3d; override;
   end;
@@ -681,9 +610,9 @@ type
     function PointInside(const Point: TVector3Single): boolean;
 
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup); override;
+      TransparentGroup: TTransparentGroup; InShadow: boolean); override;
     procedure RenderShadowVolume(
-      ShadowVolumes: TShadowVolumes;
+      ShadowVolumes: TBaseShadowVolumes;
       const ParentTransformIsIdentity: boolean;
       const ParentTransform: TMatrix4Single); override;
 
@@ -705,10 +634,10 @@ type
       out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): TCollisionInfo; override;
-    procedure GetCameraHeight(const Position: TVector3Single;
+    procedure GetCameraHeight(const Position, GravityUp: TVector3Single;
       const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-      var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: PVRMLTriangle); override;
+      out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+      out GroundItem: PVRMLTriangle); override;
     function BoundingBox: TBox3d; override;
 
     { Called from TLevel constructor. This is the place when you
@@ -1256,9 +1185,8 @@ end;
 
 constructor TLevelObject.Create(AParentLevel: TLevel);
 begin
-  inherited Create;
+  inherited Create(nil);
   FParentLevel := AParentLevel;
-  FCastsShadow := true;
 end;
 
 procedure TLevelObject.BeforeIdle(const NewAnimationTime: TKamTime);
@@ -1309,8 +1237,6 @@ constructor TLevelStaticObject.Create(AParentLevel: TLevel;
 begin
   inherited Create(AParentLevel);
   FScene := ParentLevel.LoadLevelScene(SceneFileName, true, PrepareBackground);
-  FExists := true;
-  FCollides := true;
 end;
 
 destructor TLevelStaticObject.Destroy;
@@ -1390,15 +1316,16 @@ begin
   end;
 end;
 
-procedure TLevelStaticObject.GetCameraHeight(const Position: TVector3Single;
+procedure TLevelStaticObject.GetCameraHeight(const Position, GravityUp: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-  var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: PVRMLTriangle);
+  out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+  out GroundItem: PVRMLTriangle);
 var
   IsAboveThis: boolean;
   HeightAboveThis: Single;
   GroundItemThis: PVRMLTriangle;
 begin
+  inherited;
   if Exists and Collides then
   begin
     Scene.OctreeCollisions.GetCameraHeightZ(
@@ -1417,14 +1344,14 @@ begin
 end;
 
 procedure TLevelStaticObject.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup);
+  TransparentGroup: TTransparentGroup; InShadow: boolean);
 begin
   if Exists then
     Scene.RenderFrustum(Frustum, TransparentGroup);
 end;
 
 procedure TLevelStaticObject.RenderShadowVolume(
-  ShadowVolumes: TShadowVolumes;
+  ShadowVolumes: TBaseShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 begin
@@ -1457,16 +1384,16 @@ begin
 end;
 
 procedure TLevelObjectSum.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup);
+  TransparentGroup: TTransparentGroup; InShadow: boolean);
 var
   I: Integer;
 begin
   for I := 0 to List.Count - 1 do
-    List[I].Render(Frustum, TransparentGroup);
+    List[I].Render(Frustum, TransparentGroup, InShadow);
 end;
 
 procedure TLevelObjectSum.RenderShadowVolume(
-  ShadowVolumes: TShadowVolumes;
+  ShadowVolumes: TBaseShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 var
@@ -1565,15 +1492,16 @@ begin
     Result.Hierarchy.Insert(0, Self);
 end;
 
-procedure TLevelObjectSum.GetCameraHeight(const Position: TVector3Single;
+procedure TLevelObjectSum.GetCameraHeight(const Position, GravityUp: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-  var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: PVRMLTriangle);
+  out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+  out GroundItem: PVRMLTriangle);
 var
   I: Integer;
 begin
+  inherited; { TODO: bullshit, this should choose min height }
   for I := 0 to List.Count - 1 do
-    List[I].GetCameraHeight(Position, TrianglesToIgnoreFunc,
+    List[I].GetCameraHeight(Position, GravityUp, TrianglesToIgnoreFunc,
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
 end;
 
@@ -1607,8 +1535,6 @@ end;
 constructor TLevelMovingObject.Create(AParentLevel: TLevel);
 begin
   inherited Create(AParentLevel);
-  FExists := true;
-  FCollides := true;
   FMovePushesOthers := true;
   FMovePushesOthersUsesBoxes := true;
 end;
@@ -1747,10 +1673,10 @@ begin
   end;
 end;
 
-procedure TLevelMovingObject.GetCameraHeight(const Position: TVector3Single;
+procedure TLevelMovingObject.GetCameraHeight(const Position, GravityUp: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-  var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: PVRMLTriangle);
+  out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+  out GroundItem: PVRMLTriangle);
 var
   T: TVector3_Single;
 begin
@@ -1759,13 +1685,13 @@ begin
     T := Translation(ParentLevel.AnimationTime);
 
     MovingObject.GetCameraHeight(
-      VectorSubtract(Position, T.Data), TrianglesToIgnoreFunc,
+      VectorSubtract(Position, T.Data), GravityUp, TrianglesToIgnoreFunc,
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
   end;
 end;
 
 procedure TLevelMovingObject.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup);
+  TransparentGroup: TTransparentGroup; InShadow: boolean);
 var
   T: TVector3_Single;
 begin
@@ -1782,20 +1708,20 @@ begin
       about Frustum.Move time so much ?). }
 
     if ZeroVector(T.Data) then
-      MovingObject.Render(Frustum, TransparentGroup) else
+      MovingObject.Render(Frustum, TransparentGroup, InShadow) else
       begin
         glPushMatrix;
           glTranslatev(T.Data);
           { MovingObject.Render expects Frustum in it's local coordinates,
             that's why we subtract Translation here. }
-          MovingObject.Render(Frustum.Move((-T).Data), TransparentGroup);
+          MovingObject.Render(Frustum.Move((-T).Data), TransparentGroup, InShadow);
         glPopMatrix;
       end;
   end;
 end;
 
 procedure TLevelMovingObject.RenderShadowVolume(
-  ShadowVolumes: TShadowVolumes;
+  ShadowVolumes: TBaseShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 var
@@ -2122,8 +2048,6 @@ constructor TLevelAnimatedObject.Create(AParentLevel: TLevel;
 begin
   inherited Create(AParentLevel);
   FAnimation := AnAnimation;
-  FCollides := true;
-  FExists := true;
 end;
 
 destructor TLevelAnimatedObject.Destroy;
@@ -2238,10 +2162,10 @@ begin
   end;
 end;
 
-procedure TLevelAnimatedObject.GetCameraHeight(const Position: TVector3Single;
+procedure TLevelAnimatedObject.GetCameraHeight(const Position, GravityUp: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-  var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: PVRMLTriangle);
+  out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+  out GroundItem: PVRMLTriangle);
 
   procedure MakeScene(Scene: TVRMLScene);
   var
@@ -2272,14 +2196,14 @@ begin
 end;
 
 procedure TLevelAnimatedObject.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup);
+  TransparentGroup: TTransparentGroup; InShadow: boolean);
 begin
   if Exists then
     Animation.SceneFromTime(AnimationTime).RenderFrustum(Frustum, TransparentGroup);
 end;
 
 procedure TLevelAnimatedObject.RenderShadowVolume(
-  ShadowVolumes: TShadowVolumes;
+  ShadowVolumes: TBaseShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 begin
@@ -2339,13 +2263,13 @@ begin
 end;
 
 procedure TLevelArea.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup);
+  TransparentGroup: TTransparentGroup; InShadow: boolean);
 begin
   { This object is invisible and non-colliding. }
 end;
 
 procedure TLevelArea.RenderShadowVolume(
-  ShadowVolumes: TShadowVolumes;
+  ShadowVolumes: TBaseShadowVolumes;
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 begin
@@ -2401,10 +2325,10 @@ begin
   Result := nil;
 end;
 
-procedure TLevelArea.GetCameraHeight(const Position: TVector3Single;
+procedure TLevelArea.GetCameraHeight(const Position, GravityUp: TVector3Single;
   const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc;
-  var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: PVRMLTriangle);
+  out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
+  out GroundItem: PVRMLTriangle);
 begin
   { This object is invisible and non-colliding. }
 end;
@@ -3073,7 +2997,7 @@ begin
     nil, @CollisionIgnoreItem);
 
   for I := 0 to Objects.High do
-    Objects[I].GetCameraHeight(Position, @CollisionIgnoreItem,
+    Objects[I].GetCameraHeight(Position, GravityUp, @CollisionIgnoreItem,
       IsAboveTheGround, HeightAboveTheGround, GroundItem);
 end;
 
@@ -3123,6 +3047,8 @@ begin
 end;
 
 procedure TLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup);
+const
+  InShadow = false; { TODO: doesn't matter for castle objects }
 var
   I: Integer;
 begin
@@ -3131,19 +3057,19 @@ begin
       begin
         { First pass rendering Objects: render non-transparent parts }
         for I := 0 to Objects.High do
-          Objects[I].Render(Frustum, tgOpaque);
+          Objects[I].Render(Frustum, tgOpaque, InShadow);
 
         Scene.RenderFrustum(Frustum, tgAll);
 
         { Second pass rendering Objects: render transparent parts }
         for I := 0 to Objects.High do
-          Objects[I].Render(Frustum, tgTransparent);
+          Objects[I].Render(Frustum, tgTransparent, InShadow);
       end;
     tgOpaque:
       begin
         { First pass rendering Objects: render non-transparent parts }
         for I := 0 to Objects.High do
-          Objects[I].Render(Frustum, tgOpaque);
+          Objects[I].Render(Frustum, tgOpaque, InShadow);
 
         Scene.RenderFrustum(Frustum, tgOpaque);
       end;
@@ -3153,7 +3079,7 @@ begin
 
         { Second pass rendering Objects: render transparent parts }
         for I := 0 to Objects.High do
-          Objects[I].Render(Frustum, tgTransparent);
+          Objects[I].Render(Frustum, tgTransparent, InShadow);
       end;
     else raise EInternalError.Create('castleplay 324hsdf32');
   end;
