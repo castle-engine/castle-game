@@ -18,7 +18,17 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 }
 
-{ TLevel class and some specialized descendants. }
+{ TLevel class and some specialized descendants.
+
+  About usage of TBase3D stuff in castle:
+
+  @unorderedList(
+    @item(
+      T3DCollision.Hierarchy is allowed to be empty.
+      This means that Level.Scene itself collided.
+    )
+  )
+}
 
 unit CastleLevel;
 
