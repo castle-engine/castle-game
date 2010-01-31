@@ -765,7 +765,7 @@ constructor TTowerLevel.Create(
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
 var
-  ElevatorButtonSum: TLevelObjectSum;
+  ElevatorButtonSum: TBase3DList;
   TowerLevelPath: string;
 begin
   inherited;
@@ -778,12 +778,12 @@ begin
   ElevatorButton := TLevelSimpleAnimatedObject.Create(Self, LoadLevelAnimation(
     TowerLevelPath + 'elevator_button.kanim', true, false));
 
-  ElevatorButtonSum := TLevelObjectSum.Create(Self);
+  ElevatorButtonSum := TBase3DList.Create(nil);
   ElevatorButtonSum.List.Add(Elevator);
   ElevatorButtonSum.List.Add(ElevatorButton);
 
   MovingElevator := TLevelLinearMovingObject.Create(Self);
-  MovingElevator.MovingObject := ElevatorButtonSum;
+  MovingElevator.Child := ElevatorButtonSum;
   MovingElevator.MoveTime := 10.0;
   MovingElevator.TranslationEnd.Init(0, 0, 122);
   MovingElevator.SoundGoEndPosition := stElevator;
@@ -837,7 +837,7 @@ begin
 
   { TODO: this is not nice; I should add TLevelObject.Name for such
     purposes, and use here Objects.FindName('hint_button_box'). }
-  HintOpenDoor := Objects.Items[0] as TLevelHintArea;
+  HintOpenDoor := Objects.List[0] as TLevelHintArea;
 
   FEndSequence := TLevelStaticObject.Create(Self,
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
@@ -1098,7 +1098,7 @@ constructor TDoomLevelDoor.Create(AParentLevel: TLevel;
   const SceneFileName: string);
 begin
   inherited Create(AParentLevel);
-  MovingObject := TLevelStaticObject.Create(AParentLevel, SceneFileName, false);
+  Child := TLevelStaticObject.Create(AParentLevel, SceneFileName, false);
   MovePushesOthers := false;
   SoundGoEndPosition := stDoorOpen;
   SoundGoBeginPosition := stDoorClose;
@@ -1113,8 +1113,8 @@ procedure TDoomLevelDoor.BeforeIdle(const NewAnimationTime: TKamTime);
     I: Integer;
   begin
     DoorBox := Box3dTranslate(
-      (MovingObject as TLevelStaticObject).Scene.BoundingBox,
-      Translation(NewAnimationTime));
+      (Child as TLevelStaticObject).Scene.BoundingBox,
+      GetTranslationFromTime(NewAnimationTime));
 
     Result := Boxes3dCollision(DoorBox, Player.BoundingBox);
     if Result then
@@ -1210,7 +1210,7 @@ begin
     Self, DoomDoorsPathPrefix + 'elevator4_9_final.wrl', false);
 
   MovingElevator49 := TLevelLinearMovingObject.Create(Self);
-  MovingElevator49.MovingObject := Elevator49;
+  MovingElevator49.Child := Elevator49;
   MovingElevator49.MoveTime := 3.0;
   MovingElevator49.TranslationEnd.Init(0, 0, -6.7);
   MovingElevator49.SoundGoEndPosition := stElevator;
@@ -1225,7 +1225,7 @@ begin
     Self, DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl', false);
 
   MovingElevator9a9b := TLevelLinearMovingObject.Create(Self);
-  MovingElevator9a9b.MovingObject := Elevator9a9b;
+  MovingElevator9a9b.Child := Elevator9a9b;
   MovingElevator9a9b.MoveTime := 3.0;
   MovingElevator9a9b.TranslationEnd.Init(0, 0, -7.5);
   MovingElevator9a9b.SoundGoEndPosition := stElevator;
