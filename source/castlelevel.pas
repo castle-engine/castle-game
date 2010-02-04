@@ -586,26 +586,6 @@ type
       virtual;
     { @groupEnd }
 
-    { PlayerMoveAllowed and PlayerGetCameraHeightSqr just
-      call appropriate non-player methods above.
-      They use Camera.Position, and they use level's CameraRadius
-      (i.e. they assume that it's the player who's moving).
-      Use these to perform collision detection between player and the level.
-
-      In addition, PlayerMoveAllowed checks collisions with Creatures.
-
-      In addition, PlayerGetCameraHeightSqr sets Player.Ground
-      (to the ground item under the player, or to @nil
-      if player is not IsAboveTheGround).
-
-      @groupBegin }
-    function PlayerMoveAllowed(ACamera: TWalkCamera;
-      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-      const BecauseOfGravity: boolean): boolean;
-
-    procedure PlayerGetCameraHeightSqr(ACamera: TWalkCamera;
-      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
-
     procedure RenderShadowVolume; override;
 
     { Call this to allow level object to update some things,
@@ -753,6 +733,26 @@ type
       CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
 
     procedure BeforeDraw; override;
+
+    { CameraMoveAllowed and CameraGetCameraHeight just
+      call appropriate non-player methods.
+      They use Camera.Position, and they use level's CameraRadius
+      (i.e. they assume that it's the player who's moving).
+      Use these to perform collision detection between player and the level.
+
+      In addition, CameraMoveAllowed checks collisions with Creatures.
+
+      In addition, CameraGetHeight sets Player.Ground
+      (to the ground item under the player, or to @nil
+      if player is not IsAboveTheGround).
+
+      @groupBegin }
+    function CameraMoveAllowed(ACamera: TWalkCamera;
+      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
+      const BecauseOfGravity: boolean): boolean; override;
+    procedure CameraGetHeight(ACamera: TWalkCamera;
+      out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single); override;
+    { @groupEnd }
   end;
 
   TLevelClass = class of TLevel;
@@ -1710,31 +1710,38 @@ begin
     HeightAboveTheGround := Sqrt(HeightAboveTheGround);
 end;
 
-function TLevel.PlayerMoveAllowed(ACamera: TWalkCamera;
+function TLevel.CameraMoveAllowed(ACamera: TWalkCamera;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  Result :=
-    { Check collision Player <-> level. }
-    MoveAllowed(ACamera.Position, ProposedNewPos, NewPos,
-      BecauseOfGravity, CameraRadius) and
+  { Check collision Player <-> level. }
+  Result := inherited CameraMoveAllowed(ACamera,
+    ProposedNewPos, NewPos, BecauseOfGravity);
 
-    { Check collision Player <-> Creatures here. }
-    (Creatures.MoveAllowedSimple(
+  if MenuBackground then Exit;
+
+  { Check collision Player <-> Creatures here. }
+  if Result then
+    Result := Creatures.MoveAllowedSimple(
       Player.BoundingBox(false),
       Player.BoundingBoxAssuming(NewPos, false),
-      ACamera.Position, NewPos, nil) = nil);
+      ACamera.Position, NewPos, nil) = nil;
 end;
 
-procedure TLevel.PlayerGetCameraHeightSqr(ACamera: TWalkCamera;
+procedure TLevel.CameraGetHeight(ACamera: TWalkCamera;
   out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 var
   HeightAboveTheGround: Single;
   GroundItem: PVRMLTriangle;
 begin
   { Check is player standing over level. }
-  GetCameraHeight(ACamera.Position, IsAboveTheGround,
-    HeightAboveTheGround, GroundItem);
+  {TODO:inherited CameraGetHeight(ACamera, IsAboveTheGround,
+    SqrHeightAboveTheGround);}
+
+  { TODO:instead of inherited, use GetCameraHeight, to get GroundItem }
+  GetCameraHeight(ACamera.Position, IsAboveTheGround, HeightAboveTheGround, GroundItem);
+
+  if MenuBackground then Exit;
 
   { Check is player standing over one of the creatures. }
   Creatures.GetCameraHeight(ACamera.Position, IsAboveTheGround,

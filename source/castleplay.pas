@@ -1,5 +1,5 @@
 {
-  Copyright 2006,2007 Michalis Kamburelis.
+  Copyright 2006-2010 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -16,6 +16,8 @@
   You should have received a copy of the GNU General Public License
   along with "castle"; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  ----------------------------------------------------------------------------
 }
 
 { Playing the game. }
@@ -374,11 +376,9 @@ begin
     So we must call EventResize on each Level change. }
   Glw.EventResize;
 
-  Player.LevelChanged;
+  Level.Camera := Player.Camera;
 
-  { Init Player.Camera properties }
-  Player.Camera.OnMoveAllowed := @Level.PlayerMoveAllowed;
-  Player.Camera.OnGetCameraHeight := @Level.PlayerGetCameraHeightSqr;
+  Player.LevelChanged;
 
   { Init initial camera pos }
   Player.Camera.Init(Level.InitialPosition, Level.InitialDirection,
@@ -538,6 +538,11 @@ begin
       Only after NewLevel is initialized, we quickly change Level variable. }
     FreeAndNil(Level);
     Level := NewLevel;
+
+    { Note that InitNewLevel connects Level.Camera with Player.Camera.
+      This occurs *after* previous Level was destroyed (which disconnected
+      Player.Camera from old level), and this is good (other order could
+      leave camera callbacks unassigned). }
 
     InitNewLevel;
   end;
@@ -993,12 +998,11 @@ end;
 
 type
   TPlayGameHelper = class
-    class procedure PlayerChange(Sender: TObject);
+    class procedure PlayerCameraChange(Sender: TObject);
   end;
 
-class procedure TPlayGameHelper.PlayerChange(Sender: TObject);
+class procedure TPlayGameHelper.PlayerCameraChange(Sender: TObject);
 begin
-  Glw.PostRedisplay;
   alUpdateListener;
 
   if Box3dPointInside(Player.Camera.Position, Level.AboveWaterBox) then
@@ -1028,12 +1032,11 @@ begin
       GL_ENABLE_BIT, true,
       @Draw, nil, @CloseQuery, { FPSActive } true);
     try
-      { Init Player.Camera properties }
       { No need to actually create TPlayGameHelper class,
         but I must pass here an instance, not a TPlayGameHelper
         only --- at least in objfpc mode, see
         [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
-      Player.Camera.OnVisibleChange := @TPlayGameHelper(nil).PlayerChange;
+      Level.OnCameraChanged := @TPlayGameHelper(nil).PlayerCameraChange;
 
       Glw.AutoRedisplay := true;
 
@@ -1049,8 +1052,6 @@ begin
       Glw.OnKeyDown := @KeyDown;
       Glw.OnMouseDown := @MouseDown;
       Glw.OnDrawStyle := ds3D;
-
-      Level.Camera := Player.Camera;
 
       { TODO: pass other items? or maybe this look Ok enough for menus? }
       GameControls := TUIControlList.CreateFromArray(false, [Level]);
@@ -1074,9 +1075,7 @@ begin
       until GameEnded;
     finally
       { Clear some Player.Camera callbacks. }
-      Player.Camera.OnVisibleChange := nil;
-      Player.Camera.OnMoveAllowed := nil;
-      Player.Camera.OnGetCameraHeight := nil;
+      Level.OnCameraChanged := nil;
 
       FreeAndNil(GameControls);
       FreeAndNil(SavedMode);

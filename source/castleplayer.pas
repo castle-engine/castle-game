@@ -1172,7 +1172,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
       ProposedNewPosition := VectorAdd(Camera.Position,
         VectorScale(FKnockbackDirection, CurrentKnockBackDistance));
 
-      if Level.PlayerMoveAllowed(Camera, ProposedNewPosition,
+      if Level.CameraMoveAllowed(Camera, ProposedNewPosition,
         NewPosition, false) then
         Camera.Position := NewPosition;
     end;
