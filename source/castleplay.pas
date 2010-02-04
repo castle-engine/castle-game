@@ -706,10 +706,10 @@ procedure DoInteract;
   function TryInteract(RayVector: TVector3Single): boolean;
   type
     { TODO: This will be expanded with at least poEnemy in the future. }
-    TPickedObjectType = (poNone, poLevel, poItem, poSpecialObject);
+    TPickedObjectType = (poNone, poLevel, poItem);
   var
     Ray0: TVector3Single;
-    ItemCollisionIndex, SpecialObjectIndex, I: integer;
+    ItemCollisionIndex, I: integer;
     IntersectionDistance, ThisIntersectionDistance: Single;
     PickedObjectType: TPickedObjectType;
     LevelCollisionInfo: T3DCollision;
@@ -751,18 +751,6 @@ procedure DoInteract;
         IntersectionDistance := ThisIntersectionDistance;
       end;
 
-    { Collision with Level.SpecialObjects }
-    SpecialObjectIndex := Level.SpecialObjectsTryPick(
-      ThisIntersectionDistance, Ray0, RayVector);
-    if (SpecialObjectIndex <> -1) and
-       ( (PickedObjectType = poNone) or
-         (ThisIntersectionDistance < IntersectionDistance)
-       ) then
-    begin
-      PickedObjectType := poSpecialObject;
-      IntersectionDistance := ThisIntersectionDistance;
-    end;
-
     { End. Now call appropriate picked notifier. }
     case PickedObjectType of
       poLevel:
@@ -775,12 +763,6 @@ procedure DoInteract;
         begin
           Level.Items[ItemCollisionIndex].ItemPicked(IntersectionDistance);
           Result := true;
-        end;
-      poSpecialObject:
-        begin
-          Result := false;
-          Level.SpecialObjectPicked(
-            IntersectionDistance, SpecialObjectIndex, Result);
         end;
       else
         Result := false;

@@ -476,7 +476,7 @@ type
       CreateFirstOctreeCollisions,
       CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
 
-    { See @link(SpecialObjectPicked) and @link(Picked), you can call this from
+    { See @link(Picked), you can call this from
       overriden implementations of these. }
     procedure TimeMessageInteractFailed(const S: string);
   public
@@ -665,19 +665,16 @@ type
       This is updated in our Idle. }
     property AnimationTime: TKamTime read FAnimationTime;
 
-    { Override this to allow player to pick some additional objects,
-      not contained in @link(Scene) or @link(Objects).
+    { Tests for collisions with level base Scene and level @link(Objects).
+
       Ray0 and RayVector describe picking
       ray, RayVector is always normalized (i.e. has length 1).
-      If there was a pick: set IntersectionDistance and return
-      something >= 0. Otherwise return -1.
+      If there was a pick: set IntersectionDistance. }
+    function TryPick(out IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single): T3DCollision;
 
-      Returned index will be passed to SpecialObjectPicked. }
-    function SpecialObjectsTryPick(var IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single): Integer; virtual;
-
-    { Override this to take some action when some special object was picked.
-      This will be called only if you overrided also SpecialObjectsTryPick.
+    { Called when level was picked --- either the level Scene
+      itself, or one of @link(Objects) on the level.
 
       Set InteractionOccured to true (it will be false on enter)
       if indeed some interaction occured. Note that "interaction occured"
@@ -694,21 +691,9 @@ type
       TimeMessage and @code(Sound(stPlayerInteractFailed)) at once.
 
       Never call this when Player is Dead. Implementation of this may
-      assume that Player is not Dead. }
-    procedure SpecialObjectPicked(const Distance: Single;
-      SpecialObjectIndex: Integer; var InteractionOccured: boolean); virtual;
+      assume that Player is not Dead.
 
-    { This tests for collisions with level base Scene and level @link(Objects). }
-    function TryPick(out IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single): T3DCollision;
-
-    { This is called when level was picked --- either the level Scene
-      itself, or one of @link(Objects) on the level.
-
-      @param CollisionInfo contains all details.
-      @param(LevelObjectIndex contains index to @link(Objects), or -1
-        if it was the Scene itself.)
-      @param(Distance,InteractionOccured see SpecialObjectPicked)
+      @param(CollisionInfo contains all details.)
     }
     procedure Picked(const Distance: Single; CollisionInfo: T3DCollision;
       var InteractionOccured: boolean); virtual;
@@ -1922,18 +1907,6 @@ begin
 
   if ThunderEffect <> nil then
     ThunderEffect.Idle;
-end;
-
-function TLevel.SpecialObjectsTryPick(var IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single): Integer;
-begin
-  Result := -1;
-end;
-
-procedure TLevel.SpecialObjectPicked(const Distance: Single;
-  SpecialObjectIndex: Integer; var InteractionOccured: boolean);
-begin
-  { Nothing to do in this class. }
 end;
 
 { $define DEBUG_PICK}
