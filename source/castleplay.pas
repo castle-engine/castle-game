@@ -107,10 +107,6 @@ var
   DebugRenderForLevelScreenshot: boolean = false;
   DebugTimeStopForCreatures: boolean = false;
 
-  { TODO: temp public }
-  ShowDebugInfo: boolean;
-
-
 implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
@@ -134,6 +130,8 @@ var
   DisplayFpsUpdateTick: TMilisecTime;
   DisplayFpsFrameTime: Single;
   DisplayFpsRealTime: Single;
+
+  ShowDebugInfo: boolean;
 
   LevelFinishedSchedule: boolean = false;
   { If LevelFinishedSchedule, then this is not-'', and should be the name

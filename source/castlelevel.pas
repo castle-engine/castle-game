@@ -1,5 +1,5 @@
 {
-  Copyright 2006,2007 Michalis Kamburelis.
+  Copyright 2006-2010 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -16,6 +16,8 @@
   You should have received a copy of the GNU General Public License
   along with "castle"; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  ----------------------------------------------------------------------------
 }
 
 { TLevel class and some specialized descendants.
@@ -42,7 +44,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
   BackgroundGL, DOM, GameSoundEngine, Base3D,
-  ShadowVolumes, Classes, KambiTimeUtils, Frustum, KambiSceneManager;
+  GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum, KambiSceneManager;
 
 {$define read_interface}
 
@@ -605,7 +607,7 @@ type
       out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
     procedure RenderShadowVolume(
-      AShadowVolumes: TShadowVolumes); override;
+      ShadowVolumeRenderer: TGLShadowVolumeRenderer); override;
 
     { Call this to allow level object to update some things,
       animate level objects etc. }
@@ -1335,6 +1337,10 @@ begin
     Scene.FreeResources([frTrianglesListNotOverTriangulate]);
     }
   end;
+
+  { Actually, this is needed only when "(not MenuBackground) and ShowDebugInfo".
+    But it's practically free, time use isn't really noticeable. }
+  SV.Count := true;
 end;
 
 destructor TLevel.Destroy;
@@ -1937,12 +1943,12 @@ begin
     ItemsOnLevel.Render(RenderState.CameraFrustum, TransparentGroup);
 end;
 
-procedure TLevel.RenderShadowVolume(AShadowVolumes: TShadowVolumes);
+procedure TLevel.RenderShadowVolume(ShadowVolumeRenderer: TGLShadowVolumeRenderer);
 var
   I: Integer;
 begin
   for I := 0 to Creatures.High do
-    Creatures.Items[I].RenderShadowVolume(AShadowVolumes);
+    Creatures.Items[I].RenderShadowVolume(ShadowVolumeRenderer);
   inherited;
 end;
 
@@ -1974,7 +1980,6 @@ end;
 
 procedure TLevel.RenderFromViewEverything;
 begin
-  SV.Count := ShowDebugInfo;
   ShadowVolumesDraw := DebugRenderShadowVolume;
   ShadowVolumesPossible := RenderShadowsPossible;
   ShadowVolumes := RenderShadows;
