@@ -24,7 +24,7 @@ unit CastlePlay;
 
 interface
 
-uses Classes, CastleLevel, CastlePlayer, Base3D, OpenGLFonts, ShadowVolumes;
+uses Classes, CastleLevel, CastlePlayer, Base3D, OpenGLFonts;
 
 { Play the game.
 
@@ -139,8 +139,6 @@ var
   { If LevelFinishedSchedule, then this is not-'', and should be the name
     of next Level to load. }
   LevelFinishedNextLevelName: string;
-
-  SV: TShadowVolumes;
 
 const
   SDeadMessage = 'You''re dead';
@@ -308,11 +306,11 @@ procedure Draw2D(Draw2DData: Pointer);
       RasterPosLine(LineShadowVolumesCounts);
       Font_BFNT_BitstreamVeraSans.Print(Format(
         'No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
-        [ SV.CountShadowsNotVisible,
-          SV.CountZPass,
-          SV.CountZFailNoLightCap,
-          SV.CountZFailAndLightCap,
-          SV.CountScenes ]));
+        [ Level.SV.CountShadowsNotVisible,
+          Level.SV.CountZPass,
+          Level.SV.CountZFailNoLightCap,
+          Level.SV.CountZFailAndLightCap,
+          Level.SV.CountScenes ]));
     end;
   end;
 
@@ -1158,12 +1156,6 @@ procedure GLWindowInit(Glwin: TGLWindow);
       PlayerControlFileName(BaseName), [TRGBAlphaImage], [], 0, 0);
   end;
 
-  procedure InitializeShadows;
-  begin
-    SV := TShadowVolumes.Create;
-    SV.InitGLContext;
-  end;
-
 const
   { Note: this constant must be synchronized with
     TimeMessagesManager.MaxMessagesCount }
@@ -1198,8 +1190,6 @@ begin
 
   Font_BFNT_BitstreamVeraSans_m10 := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans_m10);
   Font_BFNT_BitstreamVeraSans     := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
-
-  InitializeShadows;
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);
@@ -1209,8 +1199,6 @@ begin
 
   glFreeDisplayList(GLList_TimeMessagesBackground);
   glFreeDisplayList(GLList_InventorySlot);
-
-  FreeAndNil(SV);
 end;
 
 initialization
