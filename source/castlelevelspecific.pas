@@ -934,13 +934,13 @@ const
   SpidersFallingSpeed = 0.5;
   CreaturesCountToAddSpiders = 20;
 var
-  IsAboveTheGround: boolean;
-  HeightAboveTheGround: Single;
+  IsAbove: boolean;
+  AboveHeight: Single;
   I: Integer;
   SpiderCreature: TCreature;
   SpiderPosition, SpiderDirection: TVector3Single;
   SpiderMoveDistance: Single;
-  GroundItem: PVRMLTriangle;
+  AboveGround: PVRMLTriangle;
 begin
   inherited;
 
@@ -979,15 +979,14 @@ begin
 
     { Move spiders down }
     I := 0;
-    { 2 lines below only to get rid of compiler warnings }
-    IsAboveTheGround := false;
-    HeightAboveTheGround := 0;
+    IsAbove := false;
+    AboveHeight := MaxSingle;
+    AboveGround := nil;
     while I < FSpidersAppearing.Count do
     begin
-      GetCameraHeight(FSpidersAppearing.Items[I], IsAboveTheGround,
-        HeightAboveTheGround, GroundItem);
-      if IsAboveTheGround and
-        (HeightAboveTheGround < Spider.CameraRadius * 2) then
+      GetHeightAbove(FSpidersAppearing.Items[I], IsAbove,
+        AboveHeight, AboveGround);
+      if AboveHeight < Spider.CameraRadius * 2 then
       begin
         SpiderPosition := FSpidersAppearing.Items[I];
         SpiderDirection :=
@@ -1002,14 +1001,7 @@ begin
       begin
         { calculate SpiderMoveDistance }
         SpiderMoveDistance := SpidersFallingSpeed * CompSpeed * 50;
-        { Actually IsAboveTheGround should be always @true, the way the
-          "Cages" level is designed. However, I want to be safe here,
-          in case someone will edit cages level, so I check IsAboveTheGround
-          here. }
-        if IsAboveTheGround then
-          MinTo1st(SpiderMoveDistance,
-            HeightAboveTheGround - Spider.CameraRadius);
-
+        MinTo1st(SpiderMoveDistance, AboveHeight - Spider.CameraRadius);
         FSpidersAppearing.Items[I][2] -= SpiderMoveDistance;
         Inc(I);
       end;

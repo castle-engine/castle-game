@@ -887,12 +887,12 @@ const
   PositionRadius = 1.0;
   FallingDownSpeed = 0.2;
 var
-  IsAboveTheGround: boolean;
-  HeightAboveTheGround: Single;
+  IsAbove: boolean;
+  AboveHeight: Single;
   ShiftedPosition: TVector3Single;
   ProposedNewShiftedPosition, NewShiftedPosition: TVector3Single;
   FallingDownLength: Single;
-  GroundItem: PVRMLTriangle;
+  AboveGround: PVRMLTriangle;
 begin
   FRotation += 3 * CompSpeed * 50;
 
@@ -900,25 +900,21 @@ begin
   ShiftedPosition[2] += PositionRadius;
 
   { Note that I'm using ShiftedPosition, not Position,
-    and later I'm comparing "HeightAboveTheGround > PositionRadius",
-    instead of "HeightAboveTheGround > 0".
+    and later I'm comparing "AboveHeight > PositionRadius",
+    instead of "AboveHeight > 0".
     Otherwise, I risk that when item will be placed perfectly on the ground,
     it may "slip through" this ground down.
 
     For the same reason, I use sphere around ShiftedPosition
     when doing Level.MoveAllowed below. }
 
-  Level.GetCameraHeight(ShiftedPosition, IsAboveTheGround,
-    HeightAboveTheGround, GroundItem);
-  if (not IsAboveTheGround) or
-     (HeightAboveTheGround > PositionRadius) then
+  Level.GetHeightAbove(ShiftedPosition, IsAbove, AboveHeight, AboveGround);
+  if AboveHeight > PositionRadius then
   begin
     { Item falls down because of gravity. }
 
     FallingDownLength := CompSpeed * 50 * FallingDownSpeed;
-
-    if IsAboveTheGround then
-      MinTo1st(FallingDownLength, HeightAboveTheGround - PositionRadius);
+    MinTo1st(FallingDownLength, AboveHeight - PositionRadius);
 
     ProposedNewShiftedPosition := ShiftedPosition;
     ProposedNewShiftedPosition[2] -= FallingDownLength;

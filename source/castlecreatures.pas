@@ -25,7 +25,7 @@ interface
 
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3d, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLGLScene, CastleSound, VRMLSceneWaypoints,
-  CastleObjectKinds, ALSourceAllocator, KambiXMLCfg,
+  CastleObjectKinds, ALSourceAllocator, KambiXMLCfg, Base3D,
   GameSoundEngine, GLShadowVolumeRenderer, VRMLTriangle, Frustum;
 
 {$define read_interface}
@@ -690,7 +690,7 @@ type
 
       This is especially noticeable when there are many creatures on the level:
       then a lot of time is wasted in DoGravity, and main time of this
-      is inside TCreaturesList.GetCameraHeight, and main time of this
+      is inside TCreaturesList.GetHeightAbove, and main time of this
       would be spend within BoundingBox calculations. Yes, this is
       checked with profiler. }
     FBoundingBox: TBox3d;
@@ -771,14 +771,14 @@ type
     { Checks AssumeMiddlePosition height above the level and other creatures.
 
       I don't check height above the player, this is not needed
-      (GetCameraHeight is needed only for "growing up" and "falling down";
+      (GetHeightAbove is needed only for "growing up" and "falling down";
       in case of "growing up", creature doesn't have to "grow up"
       when standing on player's head. In case of "falling down" ---
       we don't have to take this into account. Things will work correctly
       anyway.) }
-    procedure GetCameraHeight(
+    procedure GetHeightAbove(
       const AssumeMiddlePosition: TVector3Single;
-      out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
+      out IsAbove: boolean; out AboveHeight: Single);
 
     procedure ShortRangeAttackHurt;
 
@@ -838,7 +838,7 @@ type
       How precisely this is calculated for given creature depends
       on MiddlePositionFromLegs implementation in this class.
 
-      All collision detection (MoveAllowed, GetCameraHeight)
+      All collision detection (MoveAllowed, GetHeightAbove)
       should be done using MiddlePosition, and then appropriately translated
       back to LegsPosition. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
@@ -898,7 +898,7 @@ type
       read FLastAttackDirection write SetLastAttackDirection;
 
     { If @false, then TCreaturesList.MoveAllowedSimple and
-      TCreaturesList.GetCameraHeight will ignore this
+      TCreaturesList.GetHeightAbove will ignore this
       creature, which means that collisions between this creature
       and player/other creatures will not be checked.
       You should set this to @false only in exceptional situations,
@@ -971,18 +971,17 @@ type
 
     { Height of Position over creatures' bounding boxes.
 
-      Assumes IsAboveTheGround is already initialized
-      (and if true, then HeightAboveTheGround is already initialized too).
-      It will update them. Note that GroundItem is updated to @nil if
+      Assumes IsAbove and other Above* parameters are already initialized.
+      It will update them. Note that AboveGround is updated to @nil if
       camera will be found standing over one of the creatures
-      (since creatures are not represented as any PVRMLTriangle).
+      (since creatures are not represented as any P3DTriangle).
 
       You can pass IgnoreCreature <> nil if you want to ignore
       collisions with given creature (this will obviously be useful
       when checking for collisions for this creature). }
-    procedure GetCameraHeight(const Position: TVector3Single;
-      var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-      var GroundItem: PVRMLTriangle;
+    procedure GetHeightAbove(const Position: TVector3Single;
+      var IsAbove: boolean; var AboveHeight: Single;
+      var AboveGround: P3DTriangle;
       IgnoreCreature: TCreature);
 
     { Searches for item of given Kind. Returns index of first found,
@@ -2084,21 +2083,20 @@ begin
         OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
-procedure TCreature.GetCameraHeight(
+procedure TCreature.GetHeightAbove(
   const AssumeMiddlePosition: TVector3Single;
-  out IsAboveTheGround: boolean; out HeightAboveTheGround: Single);
+  out IsAbove: boolean; out AboveHeight: Single);
 var
-  GroundItem: PVRMLTriangle;
+  AboveGround: PVRMLTriangle;
 begin
   { Check creature<->level collision. }
-  Level.GetCameraHeight(AssumeMiddlePosition,
-    IsAboveTheGround, HeightAboveTheGround, GroundItem);
+  Level.GetHeightAbove(AssumeMiddlePosition, IsAbove, AboveHeight, AboveGround);
 
   { Check creature<->other creatures collision. }
-  Level.Creatures.GetCameraHeight(AssumeMiddlePosition,
-    IsAboveTheGround, HeightAboveTheGround, GroundItem, Self);
+  Level.Creatures.GetHeightAbove(AssumeMiddlePosition,
+    IsAbove, AboveHeight, AboveGround, Self);
 
-  { I ignore calculated GroundItem for now.
+  { I ignore calculated AboveGround for now.
     I could return it... but for now, nothing needs it. }
 end;
 
@@ -2166,8 +2164,8 @@ procedure TCreature.Idle(const CompSpeed: Single);
       or "growing up". }
     HeightMargin = 1.01;
   var
-    IsAboveTheGround: boolean;
-    HeightAboveTheGround: Single;
+    IsAbove: boolean;
+    AboveHeight: Single;
     OldIsFallingDown: boolean;
     FallingDownDistance, MaximumFallingDownDistance: Single;
   begin
@@ -2181,10 +2179,9 @@ procedure TCreature.Idle(const CompSpeed: Single);
     OldIsFallingDown := FIsFallingDown;
     OldMiddlePosition := MiddlePosition;
 
-    GetCameraHeight(OldMiddlePosition, IsAboveTheGround, HeightAboveTheGround);
+    GetHeightAbove(OldMiddlePosition, IsAbove, AboveHeight);
 
-    if (not IsAboveTheGround) or
-      (HeightAboveTheGround > HeightBetweenLegsAndMiddle * HeightMargin) then
+    if AboveHeight > HeightBetweenLegsAndMiddle * HeightMargin then
     begin
       { Fall down }
       if not FIsFallingDown then
@@ -2193,13 +2190,13 @@ procedure TCreature.Idle(const CompSpeed: Single);
       FIsFallingDown := true;
 
       FallingDownDistance := FallingDownSpeed * CompSpeed * 50;
-      if IsAboveTheGround then
+      if IsAbove then
       begin
         MaximumFallingDownDistance :=
-          HeightAboveTheGround - HeightBetweenLegsAndMiddle;
+          AboveHeight - HeightBetweenLegsAndMiddle;
 
         { If you will fall down by exactly
-          HeightAboveTheGround - HeightBetweenLegsAndMiddle,
+          AboveHeight - HeightBetweenLegsAndMiddle,
           then you will get exatly into collision with the ground.
           So actually this is too large MaximumFallingDownDistance.
 
@@ -2216,7 +2213,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
           by large distance), this is noticeable: in such case, instead
           of falling down, creature hangs over the ground,
           because MoveAllowedSimple simply doesn't allow it fall
-          exactly by HeightAboveTheGround - HeightBetweenLegsAndMiddle.
+          exactly by AboveHeight - HeightBetweenLegsAndMiddle.
           So MaximumFallingDownDistance has to be a little smaller in this case.
           In particular, this was noticeable for the initially dead alien
           creature on "Doom" level, when shadows were on (when shadows were on,
@@ -2238,12 +2235,11 @@ procedure TCreature.Idle(const CompSpeed: Single);
     begin
       FIsFallingDown := false;
 
-      if IsAboveTheGround and
-        (HeightAboveTheGround < HeightBetweenLegsAndMiddle / HeightMargin) then
+      if AboveHeight < HeightBetweenLegsAndMiddle / HeightMargin then
       begin
         { Growing up }
         MoveVertical(Min(GrowingUpSpeed * CompSpeed * 50,
-          HeightBetweenLegsAndMiddle - HeightAboveTheGround));
+          HeightBetweenLegsAndMiddle - AboveHeight));
       end;
     end;
 
@@ -2418,10 +2414,10 @@ begin
   Result := nil;
 end;
 
-procedure TCreaturesList.GetCameraHeight(
+procedure TCreaturesList.GetHeightAbove(
   const Position: TVector3Single;
-  var IsAboveTheGround: boolean; var HeightAboveTheGround: Single;
-  var GroundItem: PVRMLTriangle;
+  var IsAbove: boolean; var AboveHeight: Single;
+  var AboveGround: P3DTriangle;
   IgnoreCreature: TCreature);
 
   { If the Point is inside the Box then it answers IsAboveTheBox := false. }
@@ -2437,7 +2433,8 @@ procedure TCreaturesList.GetCameraHeight(
       (Point[2] >= Box[1, 2]);
 
     if IsAboveTheBox then
-      HeightAboveTheBox := Point[2] - Box[1, 2];
+      HeightAboveTheBox := Point[2] - Box[1, 2] else
+      HeightAboveTheBox := MaxSingle;
   end;
 
 var
@@ -2452,19 +2449,11 @@ begin
       GetPointHeightAboveBox3d(Position, Items[I].BoundingBox,
         IsAboveTheBox, HeightAboveTheBox);
 
-      if IsAboveTheBox then
+      if HeightAboveTheBox < AboveHeight then
       begin
-        if not IsAboveTheGround then
-        begin
-          IsAboveTheGround := true;
-          HeightAboveTheGround := HeightAboveTheBox;
-          GroundItem := nil;
-        end else
-        if HeightAboveTheBox < HeightAboveTheGround then
-        begin
-          HeightAboveTheGround := HeightAboveTheBox;
-          GroundItem := nil;
-        end;
+        IsAbove := IsAboveTheBox;
+        AboveHeight := HeightAboveTheBox;
+        AboveGround := nil;
       end;
     end;
 end;
@@ -2798,17 +2787,15 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       function TooHighAboveTheGround(const NewMiddlePosition: TVector3Single):
         boolean;
       var
-        IsAboveTheGround: boolean;
-        HeightAboveTheGround: Single;
+        IsAbove: boolean;
+        AboveHeight: Single;
       begin
         Result := false;
         if not Kind.Flying then
         begin
-          GetCameraHeight(NewMiddlePosition, IsAboveTheGround,
-            HeightAboveTheGround);
-          if (not IsAboveTheGround) or
-            (HeightAboveTheGround > WAKind.MaxHeightAcceptableToFall +
-              HeightBetweenLegsAndMiddle) then
+          GetHeightAbove(NewMiddlePosition, IsAbove, AboveHeight);
+          if AboveHeight > WAKind.MaxHeightAcceptableToFall +
+              HeightBetweenLegsAndMiddle then
             Result := true;
         end;
       end;

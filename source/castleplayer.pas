@@ -151,8 +151,6 @@ type
     GroundRule: TTextureRule;
     ReallyIsOnTheGroundTime: Single;
 
-    FGround: PVRMLTriangle;
-
     { There always must be satisfied:
         AllocatedFootstepsSource <> nil
       if and only if
@@ -296,7 +294,7 @@ type
       (you can say that player's "legs" are not included in the box).
       However, not Tall box can still be useful (e.g. when checking for
       collision with creatures, because then the player will "grow"
-      anyway (using GetCameraHeight), so Camera.RealCameraPreferredHeight
+      anyway (using GetHeightAbove), so Camera.RealCameraPreferredHeight
       will be taken into account but in a different way. }
     function BoundingBox(Tall: boolean = true): TBox3d;
 
@@ -367,7 +365,7 @@ type
       later (for debug purposes, if you changed something). }
     procedure LoadFromFile;
 
-    property Ground: PVRMLTriangle read FGround write FGround;
+    function Ground: PVRMLTriangle;
 
     procedure LevelChanged;
 
@@ -1443,6 +1441,11 @@ begin
   IsLava := false;
 
   Attacking := false;
+end;
+
+function TPlayer.Ground: PVRMLTriangle;
+begin
+  Result := PVRMLTriangle(Camera.AboveGround);
 end;
 
 { GLWindow init / close ------------------------------------------------------ }
