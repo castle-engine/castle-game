@@ -154,32 +154,6 @@ begin
   end;
 end;
 
-function ProjectionFar: Single;
-begin
-  if RenderShadowsPossible and RenderShadows then
-    Result := ZFarInfinity else
-    Result := Level.ProjectionFar;
-end;
-
-procedure Resize(Glwin: TGLWindow);
-
-  procedure UpdateCameraProjectionMatrix;
-  var
-    ProjectionMatrix: TMatrix4f;
-  begin
-    glGetFloatv(GL_PROJECTION_MATRIX, @ProjectionMatrix);
-    Player.Camera.ProjectionMatrix := ProjectionMatrix;
-  end;
-
-begin
-  { update glViewport and projection }
-  glViewport(0, 0, Glwin.Width, Glwin.Height);
-  ProjectionGLPerspective(ViewAngleDegY, Glwin.Width / Glwin.Height,
-    Level.ProjectionNear, ProjectionFar);
-
-  UpdateCameraProjectionMatrix;
-end;
-
 procedure Draw2D(Draw2DData: Pointer);
 
   procedure DoDrawInventory;
@@ -495,7 +469,7 @@ var
       ViewAngleDegY + ViewAngleDegY * C * 0.03,
       Glwin.Width / Glwin.Height +
       Glwin.Width / Glwin.Height * S * 0.03,
-      Level.ProjectionNear, ProjectionFar);
+      Level.ProjectionNear, Level.ProjectionFarFinal);
   end;
 
 const
@@ -1061,7 +1035,7 @@ begin
       Player.Camera.OnVisibleChange := @TPlayGameHelper(nil).PlayerChange;
 
       { Note that this sets AutoRedisplay to true. }
-      TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, @Resize,
+      TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, nil,
         nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
         K_None, #0, { FpsShowOnCaption } false, Player.Camera);
 

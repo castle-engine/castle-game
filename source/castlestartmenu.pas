@@ -811,7 +811,6 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  BackgroundLevelIdle(Glwin);
   TimeMessagesIdle;
 end;
 
@@ -831,10 +830,9 @@ begin
     try
       SavedMode := TGLMode.Create(glw, 0, false);
       try
-        { This shouldn't change projection matrix anyway. }
         SavedMode.RestoreProjectionMatrix := false;
 
-        TGLWindowState.SetStandardState(Glw, @BackgroundLevelDraw, @CloseQuery, Glw.OnResize,
+        TGLWindowState.SetStandardState(Glw, nil, @CloseQuery, nil,
           nil, false, true { FPSActive should not be needed anymore, but I leave it. },
           false, K_None, #0,
           { show fps on caption --- useful to test FPS of background level true}false,
@@ -843,9 +841,10 @@ begin
         Glw.OnKeyDown := @KeyDown;
         Glw.OnMouseDown := @MouseDown;
         Glw.OnIdle := @Idle;
-        Glw.OnDrawStyle := ds3D;
 
         SetCurrentMenu(CurrentMenu, MainMenu);
+
+        Glw.Controls.Add(BackgroundLevel);
 
         UserQuit := false;
         repeat

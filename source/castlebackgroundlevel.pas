@@ -41,7 +41,10 @@ unit CastleBackgroundLevel;
 
 interface
 
-uses GLWindow;
+uses GLWindow, CastleLevel;
+
+var
+  BackgroundLevel: TLevel;
 
 procedure BackgroundLevelBegin;
 procedure BackgroundLevelEnd;
@@ -67,11 +70,10 @@ implementation
 uses SysUtils,
   Cameras, GL, GLU, GLExt, BackgroundGL, KambiGLUtils, GLImages,
   VRMLGLHeadlight, KambiFilesUtils, Images, VectorMath,
-  CastleWindow, CastleLevel, CastleLevelAvailable, CastleVideoOptions,
+  CastleWindow, CastleLevelAvailable, CastleVideoOptions,
   VRMLGLScene, RenderStateUnit;
 
 var
-  BackgroundLevel: TLevel;
   BackgroundCamera: TWalkCamera;
 
   GLList_Caption: TGLuint;
@@ -90,6 +92,13 @@ begin
     BackgroundLevel.InitialUp,
     BackgroundLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
 
+  { Do not allow to move the camera in any way.
+    We should also disable any other interaction with the scene,
+    in case in the future TLevel will enable ProcessEvents and some animation
+    through it --- but we can also depend that background level will not
+    have any TouchSensors, KeySensors etc. }
+  BackgroundCamera.IgnoreAllInputs := true;
+
   BackgroundLevel.Camera := BackgroundCamera;
 end;
 
@@ -107,43 +116,11 @@ begin
 end;
 
 procedure BackgroundLevelDraw(Glwin: TGLWindow);
-
-  procedure ProjectionPushSet;
-
-    procedure UpdateCameraProjectionMatrix;
-    var
-      ProjectionMatrix: TMatrix4f;
-    begin
-      glGetFloatv(GL_PROJECTION_MATRIX, @ProjectionMatrix);
-      BackgroundCamera.ProjectionMatrix := ProjectionMatrix;
-    end;
-
-  begin
-    glMatrixMode(GL_PROJECTION);
-      glPushMatrix;
-      glLoadIdentity;
-      glMultMatrix(PerspectiveProjMatrixDeg(
-        ViewAngleDegY, Glwin.Width / Glwin.Height,
-        BackgroundLevel.ProjectionNear, ProjectionFar));
-    glMatrixMode(GL_MODELVIEW);
-    UpdateCameraProjectionMatrix;
-  end;
-
-  procedure ProjectionPop;
-  begin
-    glMatrixMode(GL_PROJECTION);
-      glPopMatrix;
-    glMatrixMode(GL_MODELVIEW);
-  end;
-
 begin
   glPushAttrib(GL_ENABLE_BIT);
 
-    ProjectionPushSet;
-    try
       RenderState.CameraFromCameraObject(BackgroundCamera);
       BackgroundLevel.RenderFromViewEverything;
-    finally ProjectionPop end;
 
     glLoadIdentity;
     glRasterPos2i(0, Glwin.Height - CaptionHeight);

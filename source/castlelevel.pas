@@ -506,6 +506,8 @@ type
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
     property ProjectionNear: Single read FProjectionNear;
     property ProjectionFar: Single read FProjectionFar;
+    { ProjectionFar or infinity (if shadow volumes are used). }
+    function ProjectionFarFinal: Single;
     property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
     property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
 
@@ -750,7 +752,7 @@ type
 
     { TODO: temp public }
     procedure RenderFromViewEverything; override;
-    procedure BeforeDraw; override;    
+    procedure BeforeDraw; override;
   end;
 
   TLevelClass = class of TLevel;
@@ -1994,13 +1996,41 @@ begin
   inherited;
 end;
 
+function TLevel.ProjectionFarFinal: Single;
+begin
+  if RenderShadowsPossible and RenderShadows then
+    Result := ZFarInfinity else
+    Result := ProjectionFar;
+end;
+
 procedure TLevel.ApplyProjection;
+
+  procedure UpdateCameraProjectionMatrix;
+  var
+    ProjectionMatrix: TMatrix4f;
+  begin
+    glGetFloatv(GL_PROJECTION_MATRIX, @ProjectionMatrix);
+    Camera.ProjectionMatrix := ProjectionMatrix;
+  end;
+
 begin
   ShadowVolumesDraw := DebugRenderShadowVolume;
   ShadowVolumesPossible := RenderShadowsPossible;
   ShadowVolumes := RenderShadows;
 
-  inherited;
+  { Below is actually quite similar to what "inherited" would do,
+    with some limitations (e.g. we always want perspective),
+    and we always use our ViewAngleDegY.
+
+    This may be changed one day to just use "inherited", although
+    I'll have to see how default view angles look. }
+
+  { update glViewport and projection }
+  glViewport(0, 0, ContainerWidth, ContainerHeight);
+  ProjectionGLPerspective(ViewAngleDegY, ContainerWidth / ContainerHeight,
+    ProjectionNear, ProjectionFarFinal);
+
+  UpdateCameraProjectionMatrix;
 end;
 
 end.
