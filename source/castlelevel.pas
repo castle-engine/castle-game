@@ -465,6 +465,7 @@ type
     procedure RenderNeverShadowed(TransparentGroup: TTransparentGroup); override;
     procedure RenderHeadLight; override;
     function MainLightForShadows(out AMainLightPosition: TVector4Single): boolean; override;
+    procedure ApplyProjection; override;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -749,6 +750,7 @@ type
 
     { TODO: temp public }
     procedure RenderFromViewEverything; override;
+    procedure BeforeDraw; override;    
   end;
 
   TLevelClass = class of TLevel;
@@ -1976,6 +1978,24 @@ end;
 procedure TLevel.RenderFromViewEverything;
 begin
   SV.Count := ShowDebugInfo;
+  ShadowVolumesDraw := DebugRenderShadowVolume;
+  ShadowVolumesPossible := RenderShadowsPossible;
+  ShadowVolumes := RenderShadows;
+
+  inherited;
+end;
+
+procedure TLevel.BeforeDraw;
+begin
+  ShadowVolumesDraw := DebugRenderShadowVolume;
+  ShadowVolumesPossible := RenderShadowsPossible;
+  ShadowVolumes := RenderShadows;
+
+  inherited;
+end;
+
+procedure TLevel.ApplyProjection;
+begin
   ShadowVolumesDraw := DebugRenderShadowVolume;
   ShadowVolumesPossible := RenderShadowsPossible;
   ShadowVolumes := RenderShadows;
