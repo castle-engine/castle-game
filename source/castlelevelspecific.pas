@@ -182,10 +182,9 @@ type
 
   TDoomLevelDoor = class(TLevelLinearMovingObject)
   public
-    constructor Create(AOwner: TComponent;
-      const SceneFileName: string); { TODO } reintroduce;
-  public
     StayOpenTime: Single;
+
+    constructor Create(AOwner: TComponent); override;
 
     procedure BeforeTimeIncrease(const NewAnimationTime: TKamTime); override;
     procedure Idle(const CompSpeed: Single); override;
@@ -1109,10 +1108,9 @@ end;
 
 { TDoomLevelDoor ------------------------------------------------------------- }
 
-constructor TDoomLevelDoor.Create(AOwner: TComponent; const SceneFileName: string);
+constructor TDoomLevelDoor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Child := ParentLevel.LoadLevelScene(SceneFileName, true { create octrees }, false);
   MovePushesOthers := false;
   SoundGoEndPosition := stDoorOpen;
   SoundGoBeginPosition := stDoorClose;
@@ -1189,7 +1187,9 @@ var
 
   function MakeDoor(const FileName: string): TDoomLevelDoor;
   begin
-    Result := TDoomLevelDoor.Create(Self, DoomDoorsPathPrefix + FileName);
+    Result := TDoomLevelDoor.Create(Self);
+    Result.Child := LoadLevelScene(DoomDoorsPathPrefix + FileName,
+      true { create octrees }, false);
 
     { Although I didn't know it initially, it turns out that all doors
       on Doom E1M1 level (maybe all doors totally ?) have the same
@@ -1211,8 +1211,7 @@ begin
   Items.Add(MakeDoor('door5_6_closed.wrl'));
 
   FakeWall := LoadLevelScene( DoomDoorsPathPrefix + 'fake_wall_final.wrl',
-    true { create octrees }, false);
-  { TODO: Actually, octree not needed, switch to false. }
+    false { no need for octrees, does never collide }, false);
   FakeWall.Collides := false;
   FakeWall.CastsShadow := false;
   Items.Add(FakeWall);
