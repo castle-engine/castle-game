@@ -59,7 +59,7 @@ type
     procedure Idle(const CompSpeed: Single); override;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
+      CollisionInfo: T3DCollision;
       var InteractionOccured: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
@@ -128,7 +128,7 @@ type
       AMenuBackground: boolean); override;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
+      CollisionInfo: T3DCollision;
       var InteractionOccured: boolean); override;
   end;
 
@@ -170,7 +170,7 @@ type
       read FDoEndSequence write SetDoEndSequence default false;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
+      CollisionInfo: T3DCollision;
       var InteractionOccured: boolean); override;
 
     function Background: TBackgroundGL; override;
@@ -223,7 +223,7 @@ type
     destructor Destroy; override;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
+      CollisionInfo: T3DCollision;
       var InteractionOccured: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
@@ -451,7 +451,7 @@ begin
 end;
 
 procedure TCastleHallLevel.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
+  CollisionInfo: T3DCollision;
   var InteractionOccured: boolean);
 begin
   inherited;
@@ -799,7 +799,7 @@ begin
 end;
 
 procedure TTowerLevel.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
+  CollisionInfo: T3DCollision;
   var InteractionOccured: boolean);
 begin
   inherited;
@@ -1061,7 +1061,7 @@ begin
 end;
 
 procedure TCagesLevel.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
+  CollisionInfo: T3DCollision;
   var InteractionOccured: boolean);
 begin
   inherited;
@@ -1249,7 +1249,7 @@ begin
 end;
 
 procedure TDoomE1M1Level.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
+  CollisionInfo: T3DCollision;
   var InteractionOccured: boolean);
 var
   Door: TDoomLevelDoor;

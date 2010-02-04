@@ -712,7 +712,6 @@ procedure DoInteract;
     ItemCollisionIndex, SpecialObjectIndex, I: integer;
     IntersectionDistance, ThisIntersectionDistance: Single;
     PickedObjectType: TPickedObjectType;
-    LevelCollisionObjectIndex: Integer;
     LevelCollisionInfo: T3DCollision;
   begin
     Ray0 := Player.Camera.Position;
@@ -730,7 +729,7 @@ procedure DoInteract;
 
     { Collision with Level (Scene and Objects) }
     LevelCollisionInfo := Level.TryPick(
-      ThisIntersectionDistance, LevelCollisionObjectIndex, Ray0, RayVector);
+      ThisIntersectionDistance, Ray0, RayVector);
     if (LevelCollisionInfo <> nil) and
        ( (PickedObjectType = poNone) or
          (ThisIntersectionDistance < IntersectionDistance) ) then
@@ -770,7 +769,7 @@ procedure DoInteract;
         begin
           Result := false;
           Level.Picked(IntersectionDistance,
-            LevelCollisionInfo, LevelCollisionObjectIndex, Result);
+            LevelCollisionInfo, Result);
         end;
       poItem:
         begin

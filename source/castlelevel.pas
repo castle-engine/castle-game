@@ -700,7 +700,6 @@ type
 
     { This tests for collisions with level base Scene and level @link(Objects). }
     function TryPick(out IntersectionDistance: Single;
-      out LevelObjectIndex: Integer;
       const Ray0, RayVector: TVector3Single): T3DCollision;
 
     { This is called when level was picked --- either the level Scene
@@ -712,7 +711,6 @@ type
       @param(Distance,InteractionOccured see SpecialObjectPicked)
     }
     procedure Picked(const Distance: Single; CollisionInfo: T3DCollision;
-      LevelObjectIndex: Integer;
       var InteractionOccured: boolean); virtual;
 
     property InitialPosition : TVector3Single read FInitialPosition;
@@ -1941,7 +1939,6 @@ end;
 { $define DEBUG_PICK}
 
 function TLevel.TryPick(out IntersectionDistance: Single;
-  out LevelObjectIndex: Integer;
   const Ray0, RayVector: TVector3Single): T3DCollision;
 var
   Triangle: PVRMLTriangle;
@@ -1961,7 +1958,6 @@ begin
   if Triangle <> nil then
   begin
     IntersectionDistance := ThisIntersectionDistance;
-    LevelObjectIndex := -1;
     Result := T3DCollision.Create;
     Result.Triangle := Triangle;
   end;
@@ -1974,13 +1970,6 @@ begin
     if (Result = nil) or (ThisIntersectionDistance < IntersectionDistance) then
     begin
       IntersectionDistance := ThisIntersectionDistance;
-
-      { TODO: remove Objects from Hierarchy }
-      ThisCollision.Hierarchy.Delete(0);
-
-      { TODO: LevelObjectIndex really needed for anything? }
-      LevelObjectIndex := Objects.List.IndexOf(ThisCollision.Hierarchy[0]);
-
       FreeAndNil(Result);
       Result := ThisCollision;
     end else
@@ -1993,16 +1982,15 @@ begin
     S := 'TLevel.TryPick: [';
     for I := 0 to Result.Hierarchy.High do
       S += Result.Hierarchy[I].ClassName + ' ';
-    S += Format('], index %d, distance %f',
-      [LevelObjectIndex, IntersectionDistance]);
+    S += Format('], distance %f',
+      [IntersectionDistance]);
     TimeMessage(S);
   end;
   {$endif DEBUG_PICK}
 end;
 
 procedure TLevel.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision; LevelObjectIndex: Integer;
-  var InteractionOccured: boolean);
+  CollisionInfo: T3DCollision; var InteractionOccured: boolean);
 begin
   { Nothing to do in this class. }
 end;
