@@ -367,6 +367,8 @@ type
       BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
       Geometry: TVRMLGeometryNode;
       StateStack: TVRMLGraphTraverseStateStack);
+
+    procedure RenderCreaturesItems(TransparentGroup: TTransparentGroup);
   private
     FCreatures: TCreaturesList;
     procedure TraverseForCreatures(
@@ -459,6 +461,8 @@ type
     { See @link(Picked), you can call this from
       overriden implementations of these. }
     procedure TimeMessageInteractFailed(const S: string);
+
+    procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -594,16 +598,8 @@ type
     procedure PlayerGetCameraHeightSqr(ACamera: TWalkCamera;
       out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
-    { Call this to render level @link(Items).
-      Frustum is current player's frustum. }
-    procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup); virtual;
-
-    { Render shadow quads for all the things rendered by @link(Render).
-      It does shadow volumes culling inside  (so ShadowVolumes should
-      have FrustumCullingInit already initialized). }
     procedure RenderShadowVolume(
-      AShadowVolumes: TShadowVolumes); virtual;
+      AShadowVolumes: TShadowVolumes); override;
 
     { Call this to allow level object to update some things,
       animate level objects etc. }
@@ -755,6 +751,9 @@ type
       ) }
     function LoadLevelScene(const FileName: string;
       CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
+
+    { TODO: temp public }
+    procedure RenderFromViewEverything; override;
   end;
 
   TLevelClass = class of TLevel;
@@ -767,7 +766,7 @@ uses SysUtils, GL, GLU, Object3dAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
   CastleInputs, CastleWindow, KambiOpenAL, ALUtils, KambiXMLUtils,
-  CastleRequiredResources, VRMLOpenGLRenderer, VRMLShape;
+  CastleRequiredResources, VRMLOpenGLRenderer, VRMLShape, RenderStateUnit;
 
 {$define read_implementation}
 
@@ -1338,10 +1337,14 @@ begin
     Scene.FreeResources([frTrianglesListNotOverTriangulate]);
     }
   end;
+
+  GLContextInit; { TODO }
 end;
 
 destructor TLevel.Destroy;
 begin
+  GLContextClose; { TODO }
+
   FreeAndNil(FThunderEffect);
   FreeWithContentsAndNil(FSectors);
   FreeWithContentsAndNil(FWaypoints);
@@ -1757,19 +1760,6 @@ begin
     Player.Ground := nil;
 end;
 
-procedure TLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup);
-const
-  InShadow = false; { TODO: doesn't matter for castle objects }
-begin
-  Items.Render(Frustum, TransparentGroup, InShadow);
-end;
-
-procedure TLevel.RenderShadowVolume(
-  AShadowVolumes: TShadowVolumes);
-begin
-  Items.RenderShadowVolume(AShadowVolumes, true, IdentityMatrix4Single);
-end;
-
 procedure TLevel.Idle(const CompSpeed: Single;
   const HandleMouseAndKeys: boolean;
   var LetOthersHandleMouseAndKeys: boolean);
@@ -1933,6 +1923,104 @@ procedure TLevel.SetBumpMappingLightDiffuseColor(const Value: TVector4Single);
 begin
   FBumpMappingLightDiffuseColor := Value;
   MainScene.BumpMappingLightDiffuseColor := Value;
+end;
+
+procedure TLevel.RenderCreaturesItems(TransparentGroup: TTransparentGroup);
+begin
+  { for background level view, we do not show creatures / items
+    (their kinds are possibly not loaded yet) }
+  if MenuBackground then Exit;
+
+  { When GameWin, don't render creatures (as we don't check
+    collisions when MovingPlayerEndSequence). }
+  if not GameWin then
+    Creatures.Render(RenderState.CameraFrustum, TransparentGroup);
+  if not DebugRenderForLevelScreenshot then
+    ItemsOnLevel.Render(RenderState.CameraFrustum, TransparentGroup);
+end;
+
+procedure TLevel.RenderShadowVolume(
+  AShadowVolumes: TShadowVolumes);
+var
+  I: Integer;
+begin
+  for I := 0 to Creatures.High do
+    Creatures.Items[I].RenderShadowVolume(AShadowVolumes);
+  inherited;
+end;
+
+procedure TLevel.Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean);
+begin
+  if InShadow then PushLightsOff;
+  try
+    inherited;
+  finally
+    if InShadow then PopLightsOff;
+  end;
+end;
+
+procedure TLevel.RenderFromViewEverything;
+
+  procedure RenderNoShadows;
+  begin
+    RenderCreaturesItems(tgOpaque);
+    Render3D(tgAll, false);
+    { Rendering order of Creatures, Items and Level:
+      You know the problem. We must first render all non-transparent objects,
+      then all transparent objects. Otherwise transparent objects
+      (that must be rendered without updating depth buffer) could get brutally
+      covered by non-transparent objects (that are in fact further away from
+      the camera). }
+    RenderCreaturesItems(tgTransparent);
+  end;
+
+  procedure RenderWithShadows(const MainLightPosition: TVector4Single);
+  begin
+    SV.InitFrustumAndLight(RenderState.CameraFrustum, MainLightPosition);
+    SV.Count := ShowDebugInfo;
+    SV.Render(
+      { Creatures and items are never in shadow (this looks bad).
+        So I render them here, when the lights are turned on
+        and ignoring stencil buffer. They are rendered fully before
+        any Render3D --- since they are always opaque. }
+      @RenderCreaturesItems,
+      @Render3D,
+      @RenderShadowVolume,
+      CastleVideoOptions.DebugRenderShadowVolume);
+  end;
+
+var
+  ClearBuffers: TGLbitfield;
+  UsedBackground: TBackgroundGL;
+  MainLightPosition: TVector4Single;
+begin
+  ClearBuffers := GL_DEPTH_BUFFER_BIT;
+
+  if RenderShadowsPossible and RenderShadows then
+    ClearBuffers := ClearBuffers or GL_STENCIL_BUFFER_BIT;
+
+  UsedBackground := Background;
+
+  if UsedBackground <> nil then
+  begin
+    glLoadMatrix(RenderState.CameraRotationMatrix);
+    UsedBackground.Render;
+  end else
+    ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
+
+  { Now clear buffers indicated in ClearBuffers. }
+  glClear(ClearBuffers);
+
+  glLoadMatrix(RenderState.CameraMatrix);
+
+  TThunderEffect.RenderOrDisable(ThunderEffect, 1);
+  LightSet.RenderLights;
+
+  if RenderShadowsPossible and
+     RenderShadows and
+     LightSet.MainLightForShadows(MainLightPosition) then
+    RenderWithShadows(MainLightPosition) else
+    RenderNoShadows;
 end;
 
 end.

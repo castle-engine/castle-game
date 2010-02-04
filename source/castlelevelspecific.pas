@@ -111,7 +111,7 @@ type
       const HandleMouseAndKeys: boolean;
       var LetOthersHandleMouseAndKeys: boolean); override;
 
-    procedure Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup); override;
+    procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
     procedure RenderShadowVolume(
       AShadowVolumes: TShadowVolumes); override;
@@ -165,7 +165,7 @@ type
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
-    procedure Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup); override;
+    procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
     procedure RenderShadowVolume(
       AShadowVolumes: TShadowVolumes); override;
@@ -260,7 +260,7 @@ function CastleLevelsPath: string;
 implementation
 
 uses KambiFilesUtils, SysUtils, KambiUtils,
-  GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages,
+  GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderStateUnit,
   CastlePlay, CastleTimeMessages, CastleInputs,
   CastleItems, CastleThunder, CastleWindow;
 
@@ -730,14 +730,14 @@ begin
     (Triangle^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
-procedure TGateLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup);
+procedure TGateLevel.Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean);
 
   procedure RenderTeleport(
     const TeleportRotation: Single;
     const TeleportBox: TBox3d;
     TransparentGroup: TTransparentGroup);
   begin
-    if Frustum.Box3dCollisionPossibleSimple(TeleportBox) then
+    if RenderState.CameraFrustum.Box3dCollisionPossibleSimple(TeleportBox) then
     begin
       glPushMatrix;
         glTranslatev(Box3dMiddle(TeleportBox));
@@ -1033,7 +1033,7 @@ begin
   NewPlayer.PickItem(TItem.Create(Bow, 1));
 end;
 
-procedure TCagesLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup);
+procedure TCagesLevel.Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean);
 var
   I: Integer;
 begin

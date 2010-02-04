@@ -24,7 +24,7 @@ unit CastlePlay;
 
 interface
 
-uses Classes, CastleLevel, CastlePlayer, OpenGLFonts;
+uses Classes, CastleLevel, CastlePlayer, Base3D, OpenGLFonts, ShadowVolumes;
 
 { Play the game.
 
@@ -107,26 +107,29 @@ var
   DebugRenderForLevelScreenshot: boolean = false;
   DebugTimeStopForCreatures: boolean = false;
 
+  { TODO: temp public }
+  ShowDebugInfo: boolean;
+
+
 implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
   Cameras, VectorMath, Boxes3d, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
-  BFNT_BitstreamVeraSans_Unit, UIControls, Base3D,
+  BFNT_BitstreamVeraSans_Unit, UIControls,
   CastleItems, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
   CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
-  ShadowVolumes, KambiTimeUtils, GLImages, RenderStateUnit;
+  KambiTimeUtils, GLImages, RenderStateUnit;
 
 var
   GLList_TimeMessagesBackground: TGLuint;
 
   GLList_InventorySlot: TGLuint;
   InventoryVisible: boolean;
-  ShowDebugInfo: boolean;
 
   DisplayFpsUpdateTick: TMilisecTime;
   DisplayFpsFrameTime: Single;
@@ -378,107 +381,10 @@ begin
   Player.Render2D;
 end;
 
-type
-  TRenderer = class
-    class procedure RenderCreaturesItems(TransparentGroup: TTransparentGroup);
-    class procedure RenderLevel(TransparentGroup: TTransparentGroup; InShadow: boolean);
-    class procedure RenderShadowVolumes;
-  end;
-
-class procedure TRenderer.RenderCreaturesItems(TransparentGroup: TTransparentGroup);
-begin
-  { When GameWin, don't render creatures (as we don't check
-    collisions when MovingPlayerEndSequence). }
-  if not GameWin then
-    Level.Creatures.Render(Player.Camera.Frustum, TransparentGroup);
-  if not DebugRenderForLevelScreenshot then
-    Level.ItemsOnLevel.Render(Player.Camera.Frustum, TransparentGroup);
-end;
-
-class procedure TRenderer.RenderShadowVolumes;
-var
-  I: Integer;
-begin
-  for I := 0 to Level.Creatures.High do
-  begin
-    Level.Creatures.Items[I].RenderShadowVolume(SV);
-  end;
-  Level.RenderShadowVolume(SV);
-end;
-
-class procedure TRenderer.RenderLevel(TransparentGroup: TTransparentGroup; InShadow: boolean);
-begin
-  if InShadow then Level.PushLightsOff;
-  try
-    Level.Render(Player.Camera.Frustum, TransparentGroup);
-  finally
-    if InShadow then Level.PopLightsOff;
-  end;
-end;
-
 procedure Draw(Glwin: TGLWindow);
-
-  procedure RenderNoShadows;
-  begin
-    TRenderer.RenderCreaturesItems(tgOpaque);
-    TRenderer.RenderLevel(tgAll, false);
-    { Rendering order of Creatures, Items and Level:
-      You know the problem. We must first render all non-transparent objects,
-      then all transparent objects. Otherwise transparent objects
-      (that must be rendered without updating depth buffer) could get brutally
-      covered by non-transparent objects (that are in fact further away from
-      the camera). }
-    TRenderer.RenderCreaturesItems(tgTransparent);
-  end;
-
-  procedure RenderWithShadows(const MainLightPosition: TVector4Single);
-  begin
-    SV.InitFrustumAndLight(Player.Camera.Frustum, MainLightPosition);
-    SV.Count := ShowDebugInfo;
-    SV.Render(
-      { Creatures and items are never in shadow (this looks bad).
-        So I render them here, when the lights are turned on
-        and ignoring stencil buffer. They are rendered fully before
-        any Level.Render --- since they are always opaque. }
-      @TRenderer(nil).RenderCreaturesItems,
-      @TRenderer(nil).RenderLevel,
-      @TRenderer(nil).RenderShadowVolumes,
-      CastleVideoOptions.DebugRenderShadowVolume);
-  end;
-
-var
-  ClearBuffers: TGLbitfield;
-  UsedBackground: TBackgroundGL;
-  MainLightPosition: TVector4Single;
 begin
-  ClearBuffers := GL_DEPTH_BUFFER_BIT;
-
-  if RenderShadowsPossible and RenderShadows then
-    ClearBuffers := ClearBuffers or GL_STENCIL_BUFFER_BIT;
-
-  UsedBackground := Level.Background;
-
-  if UsedBackground <> nil then
-  begin
-    glLoadMatrix(Glw.Camera.RotationMatrix);
-    UsedBackground.Render;
-  end else
-    ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
-
-  { Now clear buffers indicated in ClearBuffers. }
-  glClear(ClearBuffers);
-
   RenderState.CameraFromCameraObject(Glw.Camera);
-  glLoadMatrix(Glw.Camera.Matrix);
-
-  TThunderEffect.RenderOrDisable(Level.ThunderEffect, 1);
-  Level.LightSet.RenderLights;
-
-  if RenderShadowsPossible and
-     RenderShadows and
-     Level.LightSet.MainLightForShadows(MainLightPosition) then
-    RenderWithShadows(MainLightPosition) else
-    RenderNoShadows;
+  Level.RenderFromViewEverything;
 
   Player.RenderAttack;
 
@@ -486,8 +392,7 @@ begin
   begin
     glPushAttrib(GL_ENABLE_BIT);
       glDisable(GL_LIGHTING);
-      glProjectionPushPopOrtho2D(@Draw2d, nil,
-        0, Glw.Width, 0, Glw.Height);
+      glProjectionPushPopOrtho2D(@Draw2d, nil, 0, Glw.Width, 0, Glw.Height);
     glPopAttrib;
   end;
 end;
@@ -1161,6 +1066,8 @@ begin
       TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, @Resize,
         nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
         K_None, #0, { FpsShowOnCaption } false, Player.Camera);
+
+      {TODO}{Level.Camera := Player.Camera;}
 
       { OnTimer should be executed quite often, because footsteps sound
         (done in TPlayer.Idle) relies on the fact that OnUsingEnd

@@ -89,6 +89,8 @@ begin
     BackgroundLevel.InitialDirection,
     BackgroundLevel.InitialUp,
     BackgroundLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
+
+{TODO}{  BackgroundLevel.Camera := BackgroundCamera;}
 end;
 
 procedure BackgroundLevelEnd;
@@ -163,7 +165,7 @@ begin
         true, BackgroundCamera);
 
       BackgroundLevel.LightSet.RenderLights;
-      BackgroundLevel.Render(BackgroundCamera.Frustum, tgAll);
+      BackgroundLevel.RenderFromViewEverything;
 
     finally ProjectionPop end;
 
