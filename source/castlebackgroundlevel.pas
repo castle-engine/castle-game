@@ -61,10 +61,6 @@ procedure BackgroundCreate;
 procedure BackgroundDestroy;
 { @groupEnd }
 
-{ TODO: to remove }
-procedure BackgroundLevelDraw(Glwin: TGLWindow);
-procedure BackgroundLevelIdle(Glwin: TGLWindow);
-
 implementation
 
 uses SysUtils,
@@ -151,14 +147,6 @@ procedure BackgroundDestroy;
 begin
   FreeAndNil(BackgroundLevel);
   FreeAndNil(BackgroundCaptions);
-end;
-
-procedure BackgroundLevelDraw(Glwin: TGLWindow);
-begin
-end;
-
-procedure BackgroundLevelIdle(Glwin: TGLWindow);
-begin
 end;
 
 end.

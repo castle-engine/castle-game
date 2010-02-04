@@ -257,7 +257,7 @@ begin
 
   case CurrentItem of
     0: ChooseNewGame;
-    1: ShowControlsMenu(@BackgroundLevelDraw, @BackgroundLevelIdle, false, false);
+    1: ShowControlsMenu([BackgroundCaptions, BackgroundLevel], false, false);
     2: SetCurrentMenu(CurrentMenu, VideoMenu);
     3: SetCurrentMenu(CurrentMenu, SoundMenu);
     4: ShowCredits([BackgroundCaptions, BackgroundLevel]);

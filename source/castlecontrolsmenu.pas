@@ -1,5 +1,5 @@
 {
-  Copyright 2006,2007 Michalis Kamburelis.
+  Copyright 2006-2010 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -16,6 +16,8 @@
   You should have received a copy of the GNU General Public License
   along with "castle"; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  ----------------------------------------------------------------------------
 }
 
 { }
@@ -24,7 +26,7 @@ unit CastleControlsMenu;
 interface
 
 uses Classes, GLWindow, GL, GLU, CastleGeneralMenu, Cameras,
-  OpenGLFonts, OpenGLBmpFonts;
+  OpenGLFonts, OpenGLBmpFonts, UIControls;
 
 type
   TSubMenu = class(TCastleMenu)
@@ -48,15 +50,13 @@ type
 
 { Show menu that allows player to configure controls.
   AIdleUnderMenu may be @nil. }
-procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
-  AIdleUnderMenu: TGLWindowFunc;
+procedure ShowControlsMenu(const ControlsUnder: array of TUIControl;
   ADrawFadeRect, ADrawCentered: boolean);
 
 { Like ShowControlsMenu, but user can quit with
   the escape key. AExitWithEscape will be set to @true or @false,
   depending on whether user used escape to exit. }
-procedure ShowControlsMenuEscape(ADrawUnderMenu: TDrawFunc;
-  AIdleUnderMenu: TGLWindowFunc;
+procedure ShowControlsMenuEscape(const ControlsUnder: array of TUIControl;
   ADrawFadeRect, ADrawCentered: boolean;
   out AExitWithEscape: boolean);
 
@@ -81,7 +81,7 @@ var
 implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
-  GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit, UIControls,
+  GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
   CastleInputs, KeysMouse, VectorMath, KambiUtils, CastlePlay,
   CastleConfig, KambiStringUtils, CastleTimeMessages;
 
@@ -461,19 +461,14 @@ const
   WholeAreaY1 = 450;
 
 var
-  DrawUnderMenu: TDrawFunc;
-  IdleUnderMenu: TGLWindowFunc;
   DrawFadeRect: boolean;
   GLList_DrawFadeRect: TGLuint;
   ExitWithEscapeAllowed: boolean;
   ExitWithEscape: boolean;
   MoveX, MoveY: Single;
 
-procedure Draw2d(Draw2DData: Pointer);
+procedure Draw2D(Glwin: TGLWindow);
 begin
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
-
   if DrawFadeRect then
   begin
     glPushMatrix;
@@ -481,18 +476,6 @@ begin
       glCallList(GLList_DrawFadeRect);
     glPopMatrix;
   end;
-end;
-
-procedure Draw(Glwin: TGLWindow);
-begin
-  DrawUnderMenu(Glwin);
-
-  { TODO: push DrawFadeRect inside 2D projection done anyway for TGLMenu }
-  glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glProjectionPushPopOrtho2D(@Draw2d, nil,
-      0, Glwin.Width, 0, Glwin.Height);
-  glPopAttrib;
 end;
 
 procedure EventDown(MouseEvent: boolean; Key: TKey;
@@ -523,7 +506,6 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  if Assigned(IdleUnderMenu) then IdleUnderMenu(Glwin);
   TimeMessagesIdle;
 end;
 
@@ -532,15 +514,13 @@ begin
   MessageOK(Glwin, 'You can''t exit now.');
 end;
 
-procedure ShowControlsMenuCore(ADrawUnderMenu: TDrawFunc;
-  AIdleUnderMenu: TGLWindowFunc;
+procedure ShowControlsMenuCore(const ControlsUnder: array of TUIControl;
   ADrawFadeRect, ADrawCentered, AExitWithEscapeAllowed: boolean;
   out AExitWithEscape: boolean);
 var
   SavedMode: TGLMode;
+  I: Integer;
 begin
-  DrawUnderMenu := ADrawUnderMenu;
-  IdleUnderMenu := AIdleUnderMenu;
   DrawFadeRect := ADrawFadeRect;
   ExitWithEscapeAllowed := AExitWithEscapeAllowed;
   ExitWithEscape := false;
@@ -561,18 +541,20 @@ begin
   OtherControlsMenu.SetPosition(MoveX, MoveY, true);
 
   SavedMode := TGLMode.CreateReset(glw, 0, false,
-    @Draw, Glw.OnResize, @CloseQuery,
+    @Draw2D, Glw.OnResize, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
-    { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
     Glw.OnIdle := @Idle;
-    Glw.OnDrawStyle := ds3D;
+    Glw.OnDrawStyle := ds2D;
 
     SetCurrentMenu(CurrentMenu, ControlsMenu);
+
+    for I := 0 to High(ControlsUnder) do
+      Glw.Controls.Add(ControlsUnder[I]);
 
     UserQuit := false;
     repeat
@@ -583,24 +565,20 @@ begin
   AExitWithEscape := ExitWithEscape;
 end;
 
-procedure ShowControlsMenu(ADrawUnderMenu: TDrawFunc;
-  AIdleUnderMenu: TGLWindowFunc;
+procedure ShowControlsMenu(const ControlsUnder: array of TUIControl;
   ADrawFadeRect, ADrawCentered: boolean);
 var
   Dummy: boolean;
 begin
-  ShowControlsMenuCore(ADrawUnderMenu, AIdleUnderMenu,
-    ADrawFadeRect, ADrawCentered,
+  ShowControlsMenuCore(ControlsUnder, ADrawFadeRect, ADrawCentered,
     false, Dummy);
 end;
 
-procedure ShowControlsMenuEscape(ADrawUnderMenu: TDrawFunc;
-  AIdleUnderMenu: TGLWindowFunc;
+procedure ShowControlsMenuEscape(const ControlsUnder: array of TUIControl;
   ADrawFadeRect, ADrawCentered: boolean;
   out AExitWithEscape: boolean);
 begin
-  ShowControlsMenuCore(ADrawUnderMenu, AIdleUnderMenu,
-    ADrawFadeRect, ADrawCentered,
+  ShowControlsMenuCore(ControlsUnder, ADrawFadeRect, ADrawCentered,
     true, AExitWithEscape);
 end;
 
