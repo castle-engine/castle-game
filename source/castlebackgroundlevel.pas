@@ -52,10 +52,9 @@ interface
 uses GLWindow, UIControls, CastleLevel;
 
 var
-  BackgroundLevel: TLevel;
-  BackgroundCaptions: TUIControl;
+  BackgroundControls: TUIControlList;
 
-{ Create / destroy BackgroundLevel and BackgroundCaptions instances.
+{ Create / destroy BackgroundControls instances.
   @groupBegin }
 procedure BackgroundCreate;
 procedure BackgroundDestroy;
@@ -120,10 +119,16 @@ end;
 { routines ------------------------------------------------------------------- }
 
 procedure BackgroundCreate;
+var
+  BackgroundLevel: TLevel;
+  BackgroundCaptions: TUIControl;
 begin
+  BackgroundControls := TUIControlList.Create(true);
+
   { initialize BackgroundLevel }
   BackgroundLevel := LevelsAvailable.FindName(LevelsAvailable.MenuBackgroundLevelName).
     CreateLevel(true);
+  BackgroundControls.Add(BackgroundLevel);
 
   { initialize BackgroundLevel.Camera }
   BackgroundLevel.Camera := TWalkCamera.Create(BackgroundLevel);
@@ -141,12 +146,12 @@ begin
   BackgroundLevel.Camera.IgnoreAllInputs := true;
 
   BackgroundCaptions := TBackgroundCaptions.Create(nil);
+  BackgroundControls.Add(BackgroundCaptions);
 end;
 
 procedure BackgroundDestroy;
 begin
-  FreeAndNil(BackgroundLevel);
-  FreeAndNil(BackgroundCaptions);
+  FreeAndNil(BackgroundControls);
 end;
 
 end.

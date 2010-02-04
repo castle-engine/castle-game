@@ -962,13 +962,22 @@ begin
 end;
 
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
+var
+  GameControls: TUIControlList;
 begin
   EventDown(false, Key, mbLeft);
   if C = CharEscape then
   begin
     if Player.Dead or GameWin then
       GameCancel(false) else
-      ShowGameMenu([Level { TODO: pass other items? or maybe this look Ok? }]);
+    begin
+{  TODO: pass other items? or maybe this look Ok? }
+      GameControls := TUIControlList.CreateFromArray(false, [Level]);
+      try
+        { TODO: pause the scene }
+        ShowGameMenu(GameControls);
+      finally FreeAndNil(GameControls) end;
+    end;
   end;
 end;
 

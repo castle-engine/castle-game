@@ -50,13 +50,13 @@ type
 
 { Show menu that allows player to configure controls.
   AIdleUnderMenu may be @nil. }
-procedure ShowControlsMenu(const ControlsUnder: array of TUIControl;
+procedure ShowControlsMenu(ControlsUnder: TUIControlList;
   ADrawFadeRect, ADrawCentered: boolean);
 
 { Like ShowControlsMenu, but user can quit with
   the escape key. AExitWithEscape will be set to @true or @false,
   depending on whether user used escape to exit. }
-procedure ShowControlsMenuEscape(const ControlsUnder: array of TUIControl;
+procedure ShowControlsMenuEscape(ControlsUnder: TUIControlList;
   ADrawFadeRect, ADrawCentered: boolean;
   out AExitWithEscape: boolean);
 
@@ -521,7 +521,7 @@ begin
   MessageOK(Glwin, 'You can''t exit now.');
 end;
 
-procedure ShowControlsMenuCore(const ControlsUnder: array of TUIControl;
+procedure ShowControlsMenuCore(ControlsUnder: TUIControlList;
   ADrawFadeRect, ADrawCentered, AExitWithEscapeAllowed: boolean;
   out AExitWithEscape: boolean);
 var
@@ -566,7 +566,7 @@ begin
       Glw.Controls.Add(FadeRect);
     end;
 
-    Glw.Controls.AddArray(ControlsUnder);
+    Glw.Controls.AddList(ControlsUnder);
 
     UserQuit := false;
     repeat
@@ -580,7 +580,7 @@ begin
   AExitWithEscape := ExitWithEscape;
 end;
 
-procedure ShowControlsMenu(const ControlsUnder: array of TUIControl;
+procedure ShowControlsMenu(ControlsUnder: TUIControlList;
   ADrawFadeRect, ADrawCentered: boolean);
 var
   Dummy: boolean;
@@ -589,7 +589,7 @@ begin
     false, Dummy);
 end;
 
-procedure ShowControlsMenuEscape(const ControlsUnder: array of TUIControl;
+procedure ShowControlsMenuEscape(ControlsUnder: TUIControlList;
   ADrawFadeRect, ADrawCentered: boolean;
   out AExitWithEscape: boolean);
 begin

@@ -28,7 +28,7 @@ interface
 uses GLWindow, UIControls;
 
 { Show credits. }
-procedure ShowCredits(const ControlsUnder: array of TUIControl);
+procedure ShowCredits(ControlsUnder: TUIControlList);
 
 { Although this will be called by Glw.Close, it may be too late
   (this must be called before releasing GLContextCache).
@@ -126,10 +126,9 @@ end;
 procedure InitGLW(Glwin: TGLWindow); forward;
 {$endif}
 
-procedure ShowCredits(const ControlsUnder: array of TUIControl);
+procedure ShowCredits(ControlsUnder: TUIControlList);
 var
   SavedMode: TGLMode;
-  I: Integer;
 begin
   {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
   CredistGLContextRelease;
@@ -151,7 +150,7 @@ begin
 
     UserQuit := false;
 
-    Glw.Controls.AddArray(ControlsUnder);
+    Glw.Controls.AddList(ControlsUnder);
 
     repeat
       Application.ProcessMessage(true);

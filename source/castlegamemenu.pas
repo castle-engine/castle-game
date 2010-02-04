@@ -25,7 +25,7 @@ interface
 
 uses UIControls;
 
-procedure ShowGameMenu(const AControlsUnder: array of TUIControl);
+procedure ShowGameMenu(AControlsUnder: TUIControlList);
 
 implementation
 
@@ -64,7 +64,7 @@ var
   CurrentMenu: TCastleMenu;
   GameMenu: TGameMenu;
   GameSoundMenu: TGameSoundMenu;
-  ControlsUnder: array of TUIControl;
+  ControlsUnder: TUIControlList;
 
 { TGameMenu ------------------------------------------------------------ }
 
@@ -141,14 +141,11 @@ end;
 
 {$I castlemenucallbacks.inc}
 
-procedure ShowGameMenu(const AControlsUnder: array of TUIControl);
+procedure ShowGameMenu(AControlsUnder: TUIControlList);
 var
   SavedMode: TGLMode;
-  I: Integer;
 begin
-  SetLength(ControlsUnder, High(AControlsUnder) + 1);
-  for I := 0 to High(AControlsUnder) do
-    ControlsUnder[I] := AControlsUnder[I];
+  ControlsUnder := AControlsUnder;
 
   GameSoundMenu.SoundVolume.RefreshAccessory;
   GameSoundMenu.MusicVolume.RefreshAccessory;
@@ -173,7 +170,7 @@ begin
 
     SetCurrentMenu(CurrentMenu, GameMenu);
 
-    Glw.Controls.AddArray(ControlsUnder);
+    Glw.Controls.AddList(ControlsUnder);
 
     UserQuit := false;
     repeat
