@@ -921,8 +921,9 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
 
   procedure DoDebugMenu;
   begin
-    { TODO: pause the scene }
+    Level.Paused := true;
     ShowDebugMenu(GameControls);
+    Level.Paused := false;
   end;
 
 begin
@@ -981,8 +982,11 @@ begin
   begin
     if Player.Dead or GameWin then
       GameCancel(false) else
-      { TODO: pause the scene }
+    begin
+      Level.Paused := true;
       ShowGameMenu(GameControls);
+      Level.Paused := false;
+    end;
   end;
 end;
 
