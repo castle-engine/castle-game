@@ -1256,10 +1256,10 @@ var
 begin
   inherited;
 
-  if (CollisionInfo.Hierarchy.Count > 0) and
-    (CollisionInfo.Hierarchy.First is TDoomLevelDoor) then
+  if (CollisionInfo.Hierarchy.Count > 1) and
+    (CollisionInfo.Hierarchy[1] is TDoomLevelDoor) then
   begin
-    Door := TDoomLevelDoor(CollisionInfo.Hierarchy.First);
+    Door := TDoomLevelDoor(CollisionInfo.Hierarchy[1]);
     InteractionOccured := true;
     if Distance > 7 then
       TimeMessageInteractFailed('You see a door. You''re too far to open it from here') else
