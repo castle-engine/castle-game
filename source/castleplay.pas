@@ -278,11 +278,11 @@ procedure Draw2D(Draw2DData: Pointer);
       RasterPosLine(LineShadowVolumesCounts);
       Font_BFNT_BitstreamVeraSans.Print(Format(
         'No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
-        [ Level.SV.CountShadowsNotVisible,
-          Level.SV.CountZPass,
-          Level.SV.CountZFailNoLightCap,
-          Level.SV.CountZFailAndLightCap,
-          Level.SV.CountScenes ]));
+        [ Level.ShadowVolumeRenderer.CountShadowsNotVisible,
+          Level.ShadowVolumeRenderer.CountZPass,
+          Level.ShadowVolumeRenderer.CountZFailNoLightCap,
+          Level.ShadowVolumeRenderer.CountZFailAndLightCap,
+          Level.ShadowVolumeRenderer.CountScenes ]));
     end;
   end;
 

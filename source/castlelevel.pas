@@ -606,8 +606,7 @@ type
     procedure PlayerGetCameraHeightSqr(ACamera: TWalkCamera;
       out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
-    procedure RenderShadowVolume(
-      ShadowVolumeRenderer: TGLShadowVolumeRenderer); override;
+    procedure RenderShadowVolume; override;
 
     { Call this to allow level object to update some things,
       animate level objects etc. }
@@ -1340,7 +1339,7 @@ begin
 
   { Actually, this is needed only when "(not MenuBackground) and ShowDebugInfo".
     But it's practically free, time use isn't really noticeable. }
-  SV.Count := true;
+  ShadowVolumeRenderer.Count := true;
 end;
 
 destructor TLevel.Destroy;
@@ -1943,7 +1942,7 @@ begin
     ItemsOnLevel.Render(RenderState.CameraFrustum, TransparentGroup);
 end;
 
-procedure TLevel.RenderShadowVolume(ShadowVolumeRenderer: TGLShadowVolumeRenderer);
+procedure TLevel.RenderShadowVolume;
 var
   I: Integer;
 begin

@@ -113,8 +113,7 @@ type
 
     procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
-    procedure RenderShadowVolume(
-      ShadowVolumeRenderer: TGLShadowVolumeRenderer); override;
+    procedure RenderShadowVolume; override;
   end;
 
   TTowerLevel = class(TLevel)
@@ -167,8 +166,7 @@ type
 
     procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
-    procedure RenderShadowVolume(
-      ShadowVolumeRenderer: TGLShadowVolumeRenderer); override;
+    procedure RenderShadowVolume; override;
 
     { True means that GateExit will not be rendered (or collided)
       and EndSequence will be rendered. }
@@ -763,8 +761,7 @@ begin
   end;
 end;
 
-procedure TGateLevel.RenderShadowVolume(
-  ShadowVolumeRenderer: TGLShadowVolumeRenderer);
+procedure TGateLevel.RenderShadowVolume;
 begin
   { TODO: render teleport shadow quads }
   inherited;
@@ -1067,8 +1064,7 @@ begin
   inherited;
 end;
 
-procedure TCagesLevel.RenderShadowVolume(
-  ShadowVolumeRenderer: TGLShadowVolumeRenderer);
+procedure TCagesLevel.RenderShadowVolume;
 begin
   { TODO: render spiders shadow quads }
   inherited;
