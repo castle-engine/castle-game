@@ -824,7 +824,7 @@ procedure ShowStartMenu;
 var
   SavedMode: TGLMode;
 begin
-  BackgroundLevelBegin;
+  BackgroundCreate;
   try
     SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
     try
@@ -844,6 +844,7 @@ begin
 
         SetCurrentMenu(CurrentMenu, MainMenu);
 
+        Glw.Controls.Add(BackgroundCaptions);
         Glw.Controls.Add(BackgroundLevel);
 
         UserQuit := false;
@@ -853,7 +854,7 @@ begin
       finally FreeAndNil(SavedMode); end;
     finally SoundEngine.MusicPlayer.PlayedSound := stNone; end;
   finally
-    BackgroundLevelEnd;
+    BackgroundDestroy;
   end;
 end;
 

@@ -41,28 +41,20 @@ unit CastleBackgroundLevel;
 
 interface
 
-uses GLWindow, CastleLevel;
+uses GLWindow, UIControls, CastleLevel;
 
 var
   BackgroundLevel: TLevel;
+  BackgroundCaptions: TUIControl;
 
-procedure BackgroundLevelBegin;
-procedure BackgroundLevelEnd;
+{ Create / destroy BackgroundLevel and BackgroundCaptions instances.
+  @groupBegin }
+procedure BackgroundCreate;
+procedure BackgroundDestroy;
+{ @groupEnd }
 
-{ Draw background level.
-
-  @italic(This procedure doesn't require you to set any particular
-  3d projection matrix). This procedure will always set it's own
-  3d projection matrix at the beginning (using matrix push/pop mechanism
-  to keep your original projection unchanged at the end).
-  This makes it possible to just call this proecure when your current
-  projection is set to some 2d projection --- as is the case when
-  we're at game's start menu.
-
-  Actually, this will draw some 2d item: game caption.
-}
+{ TODO: to remove }
 procedure BackgroundLevelDraw(Glwin: TGLWindow);
-
 procedure BackgroundLevelIdle(Glwin: TGLWindow);
 
 implementation
@@ -73,79 +65,37 @@ uses SysUtils,
   CastleWindow, CastleLevelAvailable, CastleVideoOptions,
   VRMLGLScene, RenderStateUnit;
 
-var
-  BackgroundCamera: TWalkCamera;
+{ TBackgroundCaptions -------------------------------------------------------- }
 
-  GLList_Caption: TGLuint;
-  {CaptionWidth, }CaptionHeight: Cardinal;
+type
+  TBackgroundCaptions = class(TUIControl)
+  private
+    GLList_Caption: TGLuint;
+    {CaptionWidth, }CaptionHeight: Cardinal;
+  public
+    function DrawStyle: TUIControlDrawStyle; override;
+    procedure Draw(const Focused: boolean); override;
+    procedure GLContextInit; override;
+    procedure GLContextClose; override;
+  end;
 
-procedure BackgroundLevelBegin;
+function TBackgroundCaptions.DrawStyle: TUIControlDrawStyle;
 begin
-  { initialize BackgroundLevel }
-  BackgroundLevel := LevelsAvailable.FindName(LevelsAvailable.MenuBackgroundLevelName).
-    CreateLevel(true);
-
-  { initialize BackgroundCamera }
-  BackgroundCamera := TWalkCamera.Create(nil);
-  BackgroundCamera.Init(BackgroundLevel.InitialPosition,
-    BackgroundLevel.InitialDirection,
-    BackgroundLevel.InitialUp,
-    BackgroundLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
-
-  { Do not allow to move the camera in any way.
-    We should also disable any other interaction with the scene,
-    in case in the future TLevel will enable ProcessEvents and some animation
-    through it --- but we can also depend that background level will not
-    have any TouchSensors, KeySensors etc. }
-  BackgroundCamera.IgnoreAllInputs := true;
-
-  BackgroundLevel.Camera := BackgroundCamera;
+  Result := ds2D;
 end;
 
-procedure BackgroundLevelEnd;
-begin
-  FreeAndNil(BackgroundLevel);
-  FreeAndNil(BackgroundCamera);
-end;
-
-function ProjectionFar: Single;
-begin
-  if RenderShadowsPossible and RenderShadows then
-    Result := ZFarInfinity else
-    Result := BackgroundLevel.ProjectionFar;
-end;
-
-procedure BackgroundLevelDraw(Glwin: TGLWindow);
+procedure TBackgroundCaptions.Draw(const Focused: boolean);
 begin
   glPushAttrib(GL_ENABLE_BIT);
-
-      RenderState.CameraFromCameraObject(BackgroundCamera);
-      BackgroundLevel.RenderFromViewEverything;
-
-    glLoadIdentity;
-    glRasterPos2i(0, Glwin.Height - CaptionHeight);
+    glRasterPos2i(0, ContainerHeight - CaptionHeight);
 
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.5);
     glCallList(GLList_Caption);
-
   glPopAttrib;
 end;
 
-procedure BackgroundLevelIdle(Glwin: TGLWindow);
-var
-  CompSpeed: Single;
-  LetOthersHandleMouseAndKeys: boolean;
-begin
-  CompSpeed := Glwin.Fps.IdleSpeed;
-
-  LetOthersHandleMouseAndKeys := false;
-  BackgroundLevel.Idle(CompSpeed, true, LetOthersHandleMouseAndKeys);
-end;
-
-{ initialization / finalization ---------------------------------------------- }
-
-procedure InitGLW(Glwin: TGLWindow);
+procedure TBackgroundCaptions.GLContextInit;
 var
   ImageCaption: TImage;
 begin
@@ -158,13 +108,49 @@ begin
   finally FreeAndNil(ImageCaption) end;
 end;
 
-procedure CloseGLW(Glwin: TGLWindow);
+procedure TBackgroundCaptions.GLContextClose;
 begin
   glFreeDisplayList(GLList_Caption);
 end;
 
-initialization
-  Glw.OnInitList.Add(@InitGLW);
-  Glw.OnCloseList.Add(@CloseGLW);
-finalization
+{ routines ------------------------------------------------------------------- }
+
+procedure BackgroundCreate;
+begin
+  { initialize BackgroundLevel }
+  BackgroundLevel := LevelsAvailable.FindName(LevelsAvailable.MenuBackgroundLevelName).
+    CreateLevel(true);
+
+  { initialize BackgroundLevel.Camera }
+  BackgroundLevel.Camera := TWalkCamera.Create(BackgroundLevel);
+  (BackgroundLevel.Camera as TWalkCamera).Init(
+    BackgroundLevel.InitialPosition,
+    BackgroundLevel.InitialDirection,
+    BackgroundLevel.InitialUp,
+    BackgroundLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
+
+  { Do not allow to move the camera in any way.
+    We should also disable any other interaction with the scene,
+    in case in the future TLevel will enable ProcessEvents and some animation
+    through it --- but we can also depend that background level will not
+    have any TouchSensors, KeySensors etc. }
+  BackgroundLevel.Camera.IgnoreAllInputs := true;
+
+  BackgroundCaptions := TBackgroundCaptions.Create(nil);
+end;
+
+procedure BackgroundDestroy;
+begin
+  FreeAndNil(BackgroundLevel);
+  FreeAndNil(BackgroundCaptions);
+end;
+
+procedure BackgroundLevelDraw(Glwin: TGLWindow);
+begin
+end;
+
+procedure BackgroundLevelIdle(Glwin: TGLWindow);
+begin
+end;
+
 end.
