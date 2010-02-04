@@ -1,5 +1,5 @@
 {
-  Copyright 2007 Michalis Kamburelis.
+  Copyright 2007-2010 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -16,26 +16,34 @@
   You should have received a copy of the GNU General Public License
   along with "castle"; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  ----------------------------------------------------------------------------
 }
 
-{ Handling of the background level displayed under the start menu.
+{ Background stuff displayed under the start menu.
 
-  The idea is to reuse here most of our engine, so e.g. we have here
-  a "real" game level --- TLevel instance and other things.
-  Eventually, we will also add here creatures and items from our game,
-  so we can make this background level to really show off some features and tease
-  the player before (s)he clicks "New Game".
+  To allow a wide range of 2D and 3D effects, we simply initialize here
+  a full castle level instance in BackgroundLevel. This level may be animated,
+  it can even have some interactive stuff (like touch sensors etc.,
+  although not used now).
+  So we can make this background level to really show off some features
+  and tease the player before (s)he clicks "New Game".
   At the same time, I have here the ability to insert some special
   things that cannot be really added to the game (e.g. some 2D effect
   that depends that the camera is on particular position --- in actual
   game we can't guarantee this, but in the game we can just set camera
   still).
 
+  We could also place some creatures / items on this level
+  (although not done for now, as we defer loading creatures / items
+  until actual game).
+
   So this unit is somewhat equivalent to CastlePlay unit,
   but different. CastlePlay unit has global Player and Level instances.
   This unit doesn't use them (so it's a design decision that this
   unit @italic(doesn't use CastlePlay unit (even in the implementation))).
-  This unit has internal BackgroundLevel instance and such.
+  This unit has own BackgroundLevel instance (and no player, articial
+  camera is created by BackgroundCreate).
 }
 unit CastleBackgroundLevel;
 
