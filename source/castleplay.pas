@@ -392,7 +392,7 @@ begin
   if not GameWin then
     Level.Creatures.Render(Player.Camera.Frustum, TransparentGroup);
   if not DebugRenderForLevelScreenshot then
-    Level.Items.Render(Player.Camera.Frustum, TransparentGroup);
+    Level.ItemsOnLevel.Render(Player.Camera.Frustum, TransparentGroup);
 end;
 
 class procedure TRenderer.RenderShadowVolumes;
@@ -602,13 +602,16 @@ const
   GameWinUp: TVector3Single = (0, 0, 1);
 var
   PickItemIndex: Integer;
+  LetOthersHandleMouseAndKeys: boolean;
 begin
   CompSpeed := Glw.Fps.IdleSpeed;
 
   TimeMessagesIdle;
 
-  Level.Idle(CompSpeed);
-  Level.Items.Idle(CompSpeed);
+  LetOthersHandleMouseAndKeys := false;
+  Level.Idle(CompSpeed, true, LetOthersHandleMouseAndKeys);
+
+  Level.ItemsOnLevel.Idle(CompSpeed);
 
   if Player.Swimming = psUnderWater then
     SickProjection;
@@ -619,12 +622,12 @@ begin
 
   if (not Player.Dead) and (not GameWin) then
   begin
-    PickItemIndex := Level.Items.PlayerCollision;
+    PickItemIndex := Level.ItemsOnLevel.PlayerCollision;
     if PickItemIndex <> -1 then
     begin
-      Player.PickItem(Level.Items[PickItemIndex].ExtractItem);
-      Level.Items.FreeAndNil(PickItemIndex);
-      Level.Items.Delete(PickItemIndex);
+      Player.PickItem(Level.ItemsOnLevel[PickItemIndex].ExtractItem);
+      Level.ItemsOnLevel.FreeAndNil(PickItemIndex);
+      Level.ItemsOnLevel.Delete(PickItemIndex);
 
       if AutoOpenInventory then
         InventoryVisible := true;
@@ -738,10 +741,10 @@ procedure DoInteract;
       IntersectionDistance := ThisIntersectionDistance;
     end;
 
-    { Collision with Level.Items }
-    for I := 0 to Level.Items.Count - 1 do
+    { Collision with Level.ItemsOnLevel }
+    for I := 0 to Level.ItemsOnLevel.Count - 1 do
       if TryBoxRayClosestIntersection(ThisIntersectionDistance,
-           Level.Items[I].BoundingBox, Ray0, RayVector) and
+           Level.ItemsOnLevel[I].BoundingBox, Ray0, RayVector) and
          ( (PickedObjectType = poNone) or
            (ThisIntersectionDistance < IntersectionDistance)
          ) then
@@ -761,7 +764,7 @@ procedure DoInteract;
         end;
       poItem:
         begin
-          Level.Items[ItemCollisionIndex].ItemPicked(IntersectionDistance);
+          Level.ItemsOnLevel[ItemCollisionIndex].ItemPicked(IntersectionDistance);
           Result := true;
         end;
       else
@@ -940,7 +943,7 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
         if DropppedItem <> nil then
         begin
           UpdateInventoryCurrentItemAfterDelete;
-          Level.Items.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
+          Level.ItemsOnLevel.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
         end;
       end else
         TimeMessage('Not enough room here to drop this item');

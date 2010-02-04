@@ -180,9 +180,12 @@ end;
 procedure BackgroundLevelIdle(Glwin: TGLWindow);
 var
   CompSpeed: Single;
+  LetOthersHandleMouseAndKeys: boolean;
 begin
   CompSpeed := Glwin.Fps.IdleSpeed;
-  BackgroundLevel.Idle(CompSpeed);
+
+  LetOthersHandleMouseAndKeys := false;
+  BackgroundLevel.Idle(CompSpeed, true, LetOthersHandleMouseAndKeys);
 end;
 
 { initialization / finalization ---------------------------------------------- }

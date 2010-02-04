@@ -42,7 +42,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
   BackgroundGL, DOM, GameSoundEngine, Base3D,
-  ShadowVolumes, Classes, KambiTimeUtils, Frustum;
+  ShadowVolumes, Classes, KambiTimeUtils, Frustum, KambiSceneManager;
 
 {$define read_interface}
 
@@ -340,9 +340,8 @@ type
     procedure Idle(const CompSpeed: Single); override;
   end;
 
-  TLevel = class(TComponent)
+  TLevel = class(TKamSceneManager)
   private
-    FMainScene: TVRMLGLScene;
     FLightSet: TVRMLLightSetGL;
     FCameraRadius: Single;
     FCameraPreferredHeight: Single;
@@ -351,8 +350,7 @@ type
     FMoveHorizontalSpeed: Single;
     FMoveVerticalSpeed: Single;
     FLevelBox: TBox3d;
-    FItems: TItemsOnLevelList;
-    FObjects: T3DList;
+    FItemsOnLevel: TItemsOnLevelList;
 
     { Used only within constructor.
       We will process the scene graph, and sometimes it's not comfortable
@@ -440,7 +438,7 @@ type
       Be very cautious what you do here --- remember that this is called
       while TLevel.Create constructor did not finish it's work yet !
 
-      This is your only chance to insert into Objects list some
+      This is your only chance to insert into @link(Items) list some
       object that has meaningfull ChangeLevelScene method. }
     procedure ChangeLevelScene; virtual;
 
@@ -495,7 +493,6 @@ type
     { @groupEnd }
 
     { }
-    property MainScene: TVRMLGLScene read FMainScene;
     property LightSet: TVRMLLightSetGL read FLightSet;
 
     property CameraRadius: Single read FCameraRadius;
@@ -528,45 +525,14 @@ type
     { Items lying on the level.
       These Items are owned by level object, so everything remaining
       on this list when we will destroy level will be freed. }
-    property Items: TItemsOnLevelList read FItems;
+    property ItemsOnLevel: TItemsOnLevelList read FItemsOnLevel;
 
     { Creatures on the level. Note that objects on this list are owned
       by level object. }
     property Creatures: TCreaturesList read FCreatures;
 
-    { Other objects (not items, not creatures) on the level.
-      Objects on this list are owned by level object.
-
-      Note that you @italic(can) modify this property
-      during TLevel lifetime. However, you have to be aware
-      of a couple of limitations:
-      @orderedList(
-        @item(You cannot modify this
-          when something iterates over these Objects.)
-
-        @item(Usually you shouldn't create some TLevelObject
-          instances when the game is running (as creating them sometimes needs
-          some small but noticeable time, e.g. to build TVRMLGLScene octree).
-
-          So even if you modify this property while the game plays,
-          you should have already prepared instances (created in level
-          constructor) to put on this list.)
-
-        @item(Beware that this changes indexes of items, and they may
-          be important for your @link(Picked).)
-      )
-      Usually, this means that it's more comfortable to just not modify
-      Objects list after you added all you need in the constructor.
-      You can instead toggle objects state by properties like
-      @link(TLevelMovingObject.Exists). }
-    property Objects: T3DList read FObjects;
-
-    function CollisionIgnoreItem(
-      const Octree: TVRMLBaseTrianglesOctree;
-      const Triangle: PVRMLTriangle): boolean; virtual;
-
     { LineOfSight, MoveAllowed and GetCameraHeight perform
-      collision detection with the level and level objects.
+      collision detection with the level @link(Items).
 
       Note that MoveAllowed and GetCameraHeight treat transparent
       objects as others --- i.e., they collide. You have to override
@@ -621,15 +587,15 @@ type
       if player is not IsAboveTheGround).
 
       @groupBegin }
-    function PlayerMoveAllowed(Camera: TWalkCamera;
+    function PlayerMoveAllowed(ACamera: TWalkCamera;
       const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
 
-    procedure PlayerGetCameraHeightSqr(Camera: TWalkCamera;
+    procedure PlayerGetCameraHeightSqr(ACamera: TWalkCamera;
       out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 
-    { Call this to render level things: level scene and level objects
-      in @link(Objects). Frustum is current player's frustum. }
+    { Call this to render level @link(Items).
+      Frustum is current player's frustum. }
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup); virtual;
 
@@ -637,17 +603,19 @@ type
       It does shadow volumes culling inside  (so ShadowVolumes should
       have FrustumCullingInit already initialized). }
     procedure RenderShadowVolume(
-      ShadowVolumes: TShadowVolumes); virtual;
+      AShadowVolumes: TShadowVolumes); virtual;
 
     { Call this to allow level object to update some things,
       animate level objects etc. }
-    procedure Idle(const CompSpeed: Single); virtual;
+    procedure Idle(const CompSpeed: Single;
+      const HandleMouseAndKeys: boolean;
+      var LetOthersHandleMouseAndKeys: boolean); override;
 
     { This is the time of the level, in seconds. Time 0 when level is created.
       This is updated in our Idle. }
     property AnimationTime: TKamTime read FAnimationTime;
 
-    { Tests for collisions with level base Scene and level @link(Objects).
+    { Tests for collisions with level @link(Items).
 
       Ray0 and RayVector describe picking
       ray, RayVector is always normalized (i.e. has length 1).
@@ -655,8 +623,7 @@ type
     function TryPick(out IntersectionDistance: Single;
       const Ray0, RayVector: TVector3Single): T3DCollision;
 
-    { Called when level was picked --- either the level Scene
-      itself, or one of @link(Objects) on the level.
+    { Called when level was picked.
 
       Set InteractionOccured to true (it will be false on enter)
       if indeed some interaction occured. Note that "interaction occured"
@@ -908,9 +875,9 @@ begin
             Crea.LegsPosition := Crea.LegsPosition + Move;
         end;
 
-        for I := 0 to ParentLevel.Items.High do
+        for I := 0 to ParentLevel.ItemsOnLevel.High do
         begin
-          Item := ParentLevel.Items[I];
+          Item := ParentLevel.ItemsOnLevel[I];
           Box := Item.BoundingBox;
           if Boxes3dCollision(NewBox, Box) or
              Boxes3dCollision(CurrentBox, Box) then
@@ -941,9 +908,9 @@ begin
           end;
         end;
 
-        for I := 0 to ParentLevel.Items.High do
+        for I := 0 to ParentLevel.ItemsOnLevel.High do
         begin
-          Item := ParentLevel.Items[I];
+          Item := ParentLevel.ItemsOnLevel[I];
           if BoxCollisionAssumeTranslation(NewTranslation,
             Item.BoundingBox,
             @ParentLevel.CollisionIgnoreItem) then
@@ -1219,8 +1186,8 @@ begin
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    FMainScene := TVRMLGLScene.CreateCustomCache(Self, GLContextCache);
-    FMainScene.Load(SceneFileName);
+    MainScene := TVRMLGLScene.CreateCustomCache(Self, GLContextCache);
+    MainScene.Load(SceneFileName);
 
     { initialize FAnimationTime. Must be initialized before creating creatures. }
     FAnimationTime := 0.0;
@@ -1238,11 +1205,9 @@ begin
     MainScene.GetPerspectiveViewpoint(FInitialPosition,
       FInitialDirection, FInitialUp, FGravityUp);
 
-    FObjects := T3DList.Create(Self);
-    { Scene must be the first one on FObjects, this way MoveAllowed will
+    { Scene must be the first one on Items, this way MoveAllowed will
       use Scene for wall-sliding (see T3DList.MoveAllowed implementation). }
-    FObjects.Add(MainScene);
-    {TODO}{SceneManager.MainScene := Scene;}
+    Items.Add(MainScene);
 
     LoadFromDOMElement(DOMElement);
 
@@ -1251,7 +1216,7 @@ begin
     ItemsToRemove := TVRMLNodesList.Create;
     try
       { Initialize Items }
-      FItems := TItemsOnLevelList.Create;
+      FItemsOnLevel := TItemsOnLevelList.Create;
       MainScene.RootNode.TraverseBlenderObjects(@TraverseForItems);
 
       { Initialize Creatures }
@@ -1381,7 +1346,7 @@ begin
   FreeWithContentsAndNil(FSectors);
   FreeWithContentsAndNil(FWaypoints);
   FreeAndNil(FLightSet);
-  FreeWithContentsAndNil(FItems);
+  FreeWithContentsAndNil(FItemsOnLevel);
   FreeWithContentsAndNil(FCreatures);
   if FRequiredCreatures <> nil then
     UnRequireCreatures(FRequiredCreatures);
@@ -1487,7 +1452,7 @@ begin
       begin
         NewObject := LevelObjectFromDOMElement(ObjectNode as TDOMElement);
         if NewObject <> nil then
-          Objects.Add(NewObject);
+          Items.Add(NewObject);
       end;
     end;
   finally FreeChildNodes(ObjectsList) end;
@@ -1540,10 +1505,10 @@ procedure TLevel.ChangeLevelScene;
 var
   I: Integer;
 begin
-  for I := 0 to Objects.List.Count - 1 do
+  for I := 0 to Items.List.Count - 1 do
   begin
-    if Objects.List[I] is TLevelArea then
-      TLevelArea(Objects.List[I]).ChangeLevelScene(Self);
+    if Items.List[I] is TLevelArea then
+      TLevelArea(Items.List[I]).ChangeLevelScene(Self);
   end;
 end;
 
@@ -1590,7 +1555,7 @@ procedure TLevel.TraverseForItems(
     ItemPosition[1] := (ItemStubBoundingBox[0, 1] + ItemStubBoundingBox[1, 1]) / 2;
     ItemPosition[2] := ItemStubBoundingBox[0, 2];
 
-    FItems.Add(TItemOnLevel.Create(TItem.Create(ItemKind, ItemQuantity),
+    FItemsOnLevel.Add(TItemOnLevel.Create(TItem.Create(ItemKind, ItemQuantity),
       ItemPosition));
   end;
 
@@ -1692,7 +1657,7 @@ end;
 
 function TLevel.LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
 begin
-  Result := Objects.SegmentCollision(Pos1, Pos2,
+  Result := Items.SegmentCollision(Pos1, Pos2,
     @MainScene.OctreeCollisions.IgnoreTransparentItem)
 end;
 
@@ -1701,7 +1666,7 @@ function TLevel.MoveAllowed(const Position: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
 begin
-  Result := Objects.MoveAllowed(Position, ProposedNewPos, NewPos,
+  Result := Items.MoveAllowed(Position, ProposedNewPos, NewPos,
     MovingObjectCameraRadius, @CollisionIgnoreItem);
 
   if Result then
@@ -1714,7 +1679,7 @@ function TLevel.MoveAllowedSimple(const Position: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
 begin
-  Result := Objects.MoveAllowedSimple(Position, NewPos,
+  Result := Items.MoveAllowedSimple(Position, NewPos,
     MovingObjectCameraRadius, @CollisionIgnoreItem);
 
   if Result then
@@ -1727,7 +1692,7 @@ function TLevel.MoveBoxAllowedSimple(const Position: TVector3Single;
   const NewBox: TBox3d;
   const BecauseOfGravity: boolean): boolean;
 begin
-  Result := Objects.MoveBoxAllowedSimple(Position, NewPos, NewBox,
+  Result := Items.MoveBoxAllowedSimple(Position, NewPos, NewBox,
     @CollisionIgnoreItem);
 
   if Result then
@@ -1739,42 +1704,42 @@ procedure TLevel.GetCameraHeight(const Position: TVector3Single;
   out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
   out GroundItem: PVRMLTriangle);
 begin
-  Objects.GetCameraHeight(Position, GravityUp, @CollisionIgnoreItem,
+  Items.GetCameraHeight(Position, GravityUp, @CollisionIgnoreItem,
     IsAboveTheGround, HeightAboveTheGround, GroundItem);
 
-  { Objects.GetCameraHeight sets sqr of height, so sqrt it now }
+  { Items.GetCameraHeight sets sqr of height, so sqrt it now }
   if IsAboveTheGround then
     HeightAboveTheGround := Sqrt(HeightAboveTheGround);
 end;
 
-function TLevel.PlayerMoveAllowed(Camera: TWalkCamera;
+function TLevel.PlayerMoveAllowed(ACamera: TWalkCamera;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result :=
     { Check collision Player <-> level. }
-    MoveAllowed(Camera.Position, ProposedNewPos, NewPos,
+    MoveAllowed(ACamera.Position, ProposedNewPos, NewPos,
       BecauseOfGravity, CameraRadius) and
 
     { Check collision Player <-> Creatures here. }
     (Creatures.MoveAllowedSimple(
       Player.BoundingBox(false),
       Player.BoundingBoxAssuming(NewPos, false),
-      Camera.Position, NewPos, nil) = nil);
+      ACamera.Position, NewPos, nil) = nil);
 end;
 
-procedure TLevel.PlayerGetCameraHeightSqr(Camera: TWalkCamera;
+procedure TLevel.PlayerGetCameraHeightSqr(ACamera: TWalkCamera;
   out IsAboveTheGround: boolean; out SqrHeightAboveTheGround: Single);
 var
   HeightAboveTheGround: Single;
   GroundItem: PVRMLTriangle;
 begin
   { Check is player standing over level. }
-  GetCameraHeight(Camera.Position, IsAboveTheGround,
+  GetCameraHeight(ACamera.Position, IsAboveTheGround,
     HeightAboveTheGround, GroundItem);
 
   { Check is player standing over one of the creatures. }
-  Creatures.GetCameraHeight(Camera.Position, IsAboveTheGround,
+  Creatures.GetCameraHeight(ACamera.Position, IsAboveTheGround,
     HeightAboveTheGround, GroundItem, nil);
 
   if IsAboveTheGround then
@@ -1796,20 +1761,22 @@ procedure TLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentG
 const
   InShadow = false; { TODO: doesn't matter for castle objects }
 begin
-  Objects.Render(Frustum, TransparentGroup, InShadow);
+  Items.Render(Frustum, TransparentGroup, InShadow);
 end;
 
 procedure TLevel.RenderShadowVolume(
-  ShadowVolumes: TShadowVolumes);
+  AShadowVolumes: TShadowVolumes);
 begin
-  Objects.RenderShadowVolume(ShadowVolumes, true, IdentityMatrix4Single);
+  Items.RenderShadowVolume(AShadowVolumes, true, IdentityMatrix4Single);
 end;
 
-procedure TLevel.Idle(const CompSpeed: Single);
+procedure TLevel.Idle(const CompSpeed: Single;
+  const HandleMouseAndKeys: boolean;
+  var LetOthersHandleMouseAndKeys: boolean);
 begin
   FAnimationTime += CompSpeed;
 
-  Objects.Idle(CompSpeed);
+  inherited;
 
   if ThunderEffect <> nil then
     ThunderEffect.Idle;
@@ -1825,7 +1792,7 @@ var
   I: Integer;
 {$endif DEBUG_PICK}
 begin
-  Result := Objects.RayCollision(IntersectionDistance, Ray0, RayVector, nil);
+  Result := Items.RayCollision(IntersectionDistance, Ray0, RayVector, nil);
 
   {$ifdef DEBUG_PICK}
   if Result <> nil then
@@ -1844,14 +1811,6 @@ procedure TLevel.Picked(const Distance: Single;
   CollisionInfo: T3DCollision; var InteractionOccured: boolean);
 begin
   { Nothing to do in this class. }
-end;
-
-function TLevel.CollisionIgnoreItem(
-  const Octree: TVRMLBaseTrianglesOctree;
-  const Triangle: PVRMLTriangle): boolean;
-begin
-  { Don't ignore anything in this class. }
-  Result := false;
 end;
 
 procedure TLevel.PrepareNewPlayer(NewPlayer: TPlayer);

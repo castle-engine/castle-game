@@ -56,7 +56,9 @@ type
       ARequiredCreatures: TStringList;
       AMenuBackground: boolean); override;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single;
+      const HandleMouseAndKeys: boolean;
+      var LetOthersHandleMouseAndKeys: boolean); override;
 
     procedure Picked(const Distance: Single;
       CollisionInfo: T3DCollision;
@@ -105,12 +107,14 @@ type
     function CollisionIgnoreItem(
       const Octree: TVRMLBaseTrianglesOctree;
       const Triangle: PVRMLTriangle): boolean; override;
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single;
+      const HandleMouseAndKeys: boolean;
+      var LetOthersHandleMouseAndKeys: boolean); override;
 
     procedure Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumes: TShadowVolumes); override;
+      AShadowVolumes: TShadowVolumes); override;
   end;
 
   TTowerLevel = class(TLevel)
@@ -155,14 +159,16 @@ type
       AMenuBackground: boolean); override;
     destructor Destroy; override;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single;
+      const HandleMouseAndKeys: boolean;
+      var LetOthersHandleMouseAndKeys: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
     procedure Render(const Frustum: TFrustum; TransparentGroup: TTransparentGroup); override;
 
     procedure RenderShadowVolume(
-      ShadowVolumes: TShadowVolumes); override;
+      AShadowVolumes: TShadowVolumes); override;
 
     { True means that GateExit will not be rendered (or collided)
       and EndSequence will be rendered. }
@@ -228,7 +234,9 @@ type
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single;
+      const HandleMouseAndKeys: boolean;
+      var LetOthersHandleMouseAndKeys: boolean); override;
   end;
 
   TGateBackgroundLevel = class(TLevel)
@@ -279,16 +287,16 @@ begin
 
   Symbol := LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false);
   Symbol.CastsShadow := false; { shadow would not be visible anyway }
-  Objects.Add(Symbol);
+  Items.Add(Symbol);
 
   Button := LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false);
   Button.CastsShadow := false; { strange ghost shadow on symbol would be visible }
-  Objects.Add(Button);
+  Items.Add(Button);
 
   StairsBlocker := LoadLevelScene(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl',
     true { create octrees }, false);
   StairsBlocker.CastsShadow := false; { shadow would not be visible anyway }
-  Objects.Add(StairsBlocker);
+  Items.Add(StairsBlocker);
 
   { get Box3dMiddle(StairsBlocker.BoundingBox) when it Exists.
     Later StairsBlocker will have Exists = false, so bbox will be empty,
@@ -319,7 +327,9 @@ begin
   end;
 end;
 
-procedure TCastleHallLevel.Idle(const CompSpeed: Single);
+procedure TCastleHallLevel.Idle(const CompSpeed: Single;
+  const HandleMouseAndKeys: boolean;
+  var LetOthersHandleMouseAndKeys: boolean);
 const
   WerewolfFirstLight = 1;
 
@@ -533,7 +543,7 @@ begin
 
   Cart := LoadLevelAnimation(GateLevelPath + 'cart.kanim', true, true);
   Cart.CollisionUseLastScene := true;
-  Objects.Add(Cart);
+  Items.Add(Cart);
   Cart.TimePlaying := true;
 
   CartSoundPosition := Box3dMiddle(Cart.FirstScene.BoundingBox);
@@ -591,7 +601,9 @@ begin
   end;
 end;
 
-procedure TGateLevel.Idle(const CompSpeed: Single);
+procedure TGateLevel.Idle(const CompSpeed: Single;
+  const HandleMouseAndKeys: boolean;
+  var LetOthersHandleMouseAndKeys: boolean);
 
   procedure RejectGateExitBox;
   var
@@ -752,7 +764,7 @@ begin
 end;
 
 procedure TGateLevel.RenderShadowVolume(
-  ShadowVolumes: TShadowVolumes);
+  AShadowVolumes: TShadowVolumes);
 begin
   { TODO: render teleport shadow quads }
   inherited;
@@ -795,7 +807,7 @@ begin
   { no shadow, because looks bad: tower level has uninteresting light
     and elevator triggers artifacts because of BorderEdges. }
   MovingElevator.CastsShadow := false;
-  Objects.Add(MovingElevator);
+  Items.Add(MovingElevator);
 end;
 
 procedure TTowerLevel.Picked(const Distance: Single;
@@ -839,8 +851,8 @@ begin
   NextSpidersAppearingTime := 0;
 
   { TODO: this is not nice; I should add TLevelObject.Name for such
-    purposes, and use here Objects.FindName('hint_button_box'). }
-  HintOpenDoor := Objects.List[0] as TLevelHintArea;
+    purposes, and use here Items.FindName('hint_button_box'). }
+  HintOpenDoor := Items.List[1] as TLevelHintArea;
 
   FEndSequence := LoadLevelScene(
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
@@ -852,13 +864,13 @@ begin
     as player's move along the EndSequence will be programmed. }
   FEndSequence.Collides := false;
   FEndSequence.CastsShadow := false; { shadow is not visible anyway }
-  Objects.Add(FEndSequence);
+  Items.Add(FEndSequence);
 
   FGateExit := LoadLevelScene(
     CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
     true { create octrees }, false);
   FGateExit.CastsShadow := false; { shadow is not visible anyway }
-  Objects.Add(FGateExit);
+  Items.Add(FGateExit);
 
   BossIndex := Creatures.FindKind(SpiderQueen);
   if BossIndex <> -1 then
@@ -887,7 +899,9 @@ const
     otherwise the spiders will be created on the ceiling of the model... }
   SpiderZ = 69.0;
 
-procedure TCagesLevel.Idle(const CompSpeed: Single);
+procedure TCagesLevel.Idle(const CompSpeed: Single;
+  const HandleMouseAndKeys: boolean;
+  var LetOthersHandleMouseAndKeys: boolean);
 const
   { Some SpiderRadius is used to not put spider inside the wall. }
   SpiderRadius = 2;
@@ -1054,7 +1068,7 @@ begin
 end;
 
 procedure TCagesLevel.RenderShadowVolume(
-  ShadowVolumes: TShadowVolumes);
+  AShadowVolumes: TShadowVolumes);
 begin
   { TODO: render spiders shadow quads }
   inherited;
@@ -1131,9 +1145,9 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TKamTime);
         Exit;
     end;
 
-    for I := 0 to ParentLevel.Items.High do
+    for I := 0 to ParentLevel.ItemsOnLevel.High do
     begin
-      Result := Boxes3dCollision(DoorBox, ParentLevel.Items[I].BoundingBox);
+      Result := Boxes3dCollision(DoorBox, ParentLevel.ItemsOnLevel[I].BoundingBox);
       if Result then
         Exit;
     end;
@@ -1195,17 +1209,17 @@ begin
   DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +
     PathDelim;
 
-  Objects.Add(MakeDoor('door2_3_closed.wrl'));
-  Objects.Add(MakeDoor('door4_5_closed.wrl'));
-  Objects.Add(MakeDoor('door4_7_closed.wrl'));
-  Objects.Add(MakeDoor('door5_6_closed.wrl'));
+  Items.Add(MakeDoor('door2_3_closed.wrl'));
+  Items.Add(MakeDoor('door4_5_closed.wrl'));
+  Items.Add(MakeDoor('door4_7_closed.wrl'));
+  Items.Add(MakeDoor('door5_6_closed.wrl'));
 
   FakeWall := LoadLevelScene( DoomDoorsPathPrefix + 'fake_wall_final.wrl',
     true { create octrees }, false);
   { TODO: Actually, octree not needed, switch to false. }
   FakeWall.Collides := false;
   FakeWall.CastsShadow := false;
-  Objects.Add(FakeWall);
+  Items.Add(FakeWall);
 
   Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
     true { create octrees }, false);
@@ -1220,7 +1234,7 @@ begin
   MovingElevator49.SoundGoBeginPositionLooping := true;
   MovingElevator49.SoundTracksCurrentPosition := true;
   MovingElevator49.CastsShadow := false;
-  Objects.Add(MovingElevator49);
+  Items.Add(MovingElevator49);
 
   Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
     true { create octrees }, false);
@@ -1235,12 +1249,12 @@ begin
   MovingElevator9a9b.SoundGoBeginPositionLooping := true;
   MovingElevator9a9b.SoundTracksCurrentPosition := true;
   MovingElevator9a9b.CastsShadow := false;
-  Objects.Add(MovingElevator9a9b);
+  Items.Add(MovingElevator9a9b);
 
   ExitButton := LoadLevelScene(DoomDoorsPathPrefix + 'exit_button_final.wrl',
     true { create octrees }, false);
   ExitButton.CastsShadow := false;
-  Objects.Add(ExitButton);
+  Items.Add(ExitButton);
 end;
 
 destructor TDoomE1M1Level.Destroy;
@@ -1325,7 +1339,9 @@ begin
   NewPlayer.PickItem(TItem.Create(Quiver, 10));
 end;
 
-procedure TDoomE1M1Level.Idle(const CompSpeed: Single);
+procedure TDoomE1M1Level.Idle(const CompSpeed: Single;
+  const HandleMouseAndKeys: boolean;
+  var LetOthersHandleMouseAndKeys: boolean);
 begin
   inherited;
 
@@ -1388,7 +1404,7 @@ begin
     walk on this level). For safety, Collides set to @false, in case
     user enters this level by debug menu. }
   Water.Collides := false;
-  Objects.Add(Water);
+  Items.Add(Water);
 
   Water.TimePlaying := true;
 end;
