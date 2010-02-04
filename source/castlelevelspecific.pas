@@ -768,7 +768,7 @@ constructor TTowerLevel.Create(
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
 var
-  ElevatorButtonSum: TBase3DList;
+  ElevatorButtonSum: T3DList;
   TowerLevelPath: string;
 begin
   inherited;
@@ -779,7 +779,7 @@ begin
 
   ElevatorButton := LoadLevelAnimation(TowerLevelPath + 'elevator_button.kanim', true, false);
 
-  ElevatorButtonSum := TBase3DList.Create(Self);
+  ElevatorButtonSum := T3DList.Create(Self);
   ElevatorButtonSum.List.Add(Elevator);
   ElevatorButtonSum.List.Add(ElevatorButton);
 

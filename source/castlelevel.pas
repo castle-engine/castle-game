@@ -20,7 +20,7 @@
 
 { TLevel class and some specialized descendants.
 
-  About usage of TBase3D stuff in castle:
+  About usage of T3D stuff in castle:
 
   @unorderedList(
     @item(
@@ -28,7 +28,7 @@
       This means that Level.Scene itself collided.)
 
     @item(
-      Owner of TBase3D must be always set to the containing TLevel.
+      Owner of T3D must be always set to the containing TLevel.
       ParentLevel simply returns Owner, typecasted to TLevel.
       This wasn't really necessary (I could introduce separate ParentLevel)
       but in practice it's the simplest and Ok for castle for now.)
@@ -41,8 +41,7 @@ unit CastleLevel;
 interface
 
 uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
-  VRMLNodes, VRMLFields, CastleItems, Cameras,
-  VRMLTriangle, GLBase3D,
+  VRMLNodes, VRMLFields, CastleItems, Cameras, VRMLTriangle, GL3D,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
@@ -57,7 +56,7 @@ const
 type
   TLevel = class;
 
-  { See TCustomTranslated3D
+  { See T3DCustomTranslated
 
     Note that if Translation actually changes over time then
     you have to think of at least one additional thing yourself:
@@ -68,7 +67,7 @@ type
     MovePushesOthers to @false.
     See e.g. the DoomLevelDoor.BeforeTimeIncrease method to see how the behavior
     "something blocks the move" can be handled. }
-  TLevelMovingObject = class(TCustomTranslated3D)
+  TLevelMovingObject = class(T3DCustomTranslated)
   private
     FMovePushesOthers: boolean;
     FMovePushesOthersUsesBoxes: boolean;
@@ -81,7 +80,7 @@ type
 
     function ParentLevel: TLevel;
 
-    { Implements TBase3D.GetTranslation by always calling
+    { Implements T3D.GetTranslation by always calling
       GetTranslationFromTime(AnimationTime).
       Descendants should override GetTranslationFromTime. }
     function GetTranslation: TVector3Single; override;
@@ -284,7 +283,7 @@ type
 
     This class defines only a properties to define the area.
     For now, each area is just one TBox3d. }
-  TLevelArea = class(TBase3D)
+  TLevelArea = class(T3D)
   private
     FVRMLName: string;
     FBox: TBox3d;
@@ -357,7 +356,7 @@ type
     FMoveVerticalSpeed: Single;
     FLevelBox: TBox3d;
     FItems: TItemsOnLevelList;
-    FObjects: TBase3DList;
+    FObjects: T3DList;
 
     { Used only within constructor.
       We will process the scene graph, and sometimes it's not comfortable
@@ -578,7 +577,7 @@ type
       Objects list after you added all you need in the constructor.
       You can instead toggle objects state by properties like
       @link(TLevelMovingObject.Exists). }
-    property Objects: TBase3DList read FObjects;
+    property Objects: T3DList read FObjects;
 
     function CollisionIgnoreItem(
       const Octree: TVRMLBaseTrianglesOctree;
@@ -1274,7 +1273,7 @@ begin
     Scene.GetPerspectiveViewpoint(FInitialPosition,
       FInitialDirection, FInitialUp, FGravityUp);
 
-    FObjects := TBase3DList.Create(nil);
+    FObjects := T3DList.Create(nil);
 
     LoadFromDOMElement(DOMElement);
 
@@ -1448,14 +1447,14 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
       MissingRequiredAttribute('vrml_name', 'area');
   end;
 
-  function LevelObjectFromDOMElement(Element: TDOMElement): TBase3D;
+  function LevelObjectFromDOMElement(Element: TDOMElement): T3D;
   begin
     if Element.TagName = 'area' then
       Result := LevelAreaFromDOMElement(Element) else
     if (Element.TagName = 'required_resources') or
        (Element.TagName = 'bump_mapping_light') then
     begin
-      { These are handled elsewhere, and don't produce any TBase3D. }
+      { These are handled elsewhere, and don't produce any T3D. }
       Result := nil;
     end else
       raise Exception.CreateFmt('Not allowed children element of <level>: "%s"',
@@ -1506,7 +1505,7 @@ var
   ObjectNode: TDOMNode;
   SoundName: string;
   I: Integer;
-  NewObject: TBase3D;
+  NewObject: T3D;
   BMElement: TDOMElement;
 begin
   { Load Objects }
