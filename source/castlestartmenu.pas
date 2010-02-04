@@ -832,7 +832,7 @@ begin
       try
         SavedMode.RestoreProjectionMatrix := false;
 
-        TGLWindowState.SetStandardState(Glw, nil, @CloseQuery, nil,
+        TGLWindowState.SetStandardState(Glw, nil, nil, @CloseQuery,
           true { FPSActive should not be needed anymore, but I leave it. });
 
         Glw.OnKeyDown := @KeyDown;

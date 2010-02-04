@@ -1035,7 +1035,7 @@ begin
       Player.Camera.OnVisibleChange := @TPlayGameHelper(nil).PlayerChange;
 
       { Note that this sets AutoRedisplay to true. }
-      TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, nil,
+      TGLWindowState.SetStandardState(Glw, @Draw, nil, @CloseQuery,
         { FPSActive } true);
 
       Glw.Camera := Player.Camera;

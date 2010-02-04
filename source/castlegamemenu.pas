@@ -157,7 +157,7 @@ begin
       new projection matrix should stay for the game. }
     SavedMode.RestoreProjectionMatrix := false;
 
-    TGLWindowState.SetStandardState(Glw, DrawUnderMenu, @CloseQuery, Glw.OnResize,
+    TGLWindowState.SetStandardState(Glw, DrawUnderMenu, Glw.OnResize, @CloseQuery,
       true { FPSActive should not be needed anymore, but I leave it. });
 
     { Otherwise messages don't look good, because the text is mixed
