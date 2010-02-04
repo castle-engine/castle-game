@@ -1653,7 +1653,7 @@ end;
 
 function TLevel.LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
 begin
-  Result := Items.SegmentCollision(Pos1, Pos2,
+  Result := not Items.SegmentCollision(Pos1, Pos2,
     @MainScene.OctreeCollisions.IgnoreTransparentItem)
 end;
 
