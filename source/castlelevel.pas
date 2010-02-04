@@ -1336,10 +1336,6 @@ begin
     Scene.FreeResources([frTrianglesListNotOverTriangulate]);
     }
   end;
-
-  { Actually, this is needed only when "(not MenuBackground) and ShowDebugInfo".
-    But it's practically free, time use isn't really noticeable. }
-  ShadowVolumeRenderer.Count := true;
 end;
 
 destructor TLevel.Destroy;
@@ -1982,6 +1978,10 @@ begin
   ShadowVolumesDraw := DebugRenderShadowVolume;
   ShadowVolumesPossible := RenderShadowsPossible;
   ShadowVolumes := RenderShadows;
+
+  { Actually, this is needed only when "(not MenuBackground) and ShowDebugInfo".
+    But it's practically free, time use isn't really noticeable. }
+  ShadowVolumeRenderer.Count := true;
 
   inherited;
 end;
