@@ -260,7 +260,7 @@ begin
     1: ShowControlsMenu(@BackgroundLevelDraw, @BackgroundLevelIdle, false, false);
     2: SetCurrentMenu(CurrentMenu, VideoMenu);
     3: SetCurrentMenu(CurrentMenu, SoundMenu);
-    4: ShowCredits(@BackgroundLevelDraw, @BackgroundLevelIdle);
+    4: ShowCredits([BackgroundCaptions, BackgroundLevel]);
     5: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;

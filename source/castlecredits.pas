@@ -1,5 +1,5 @@
 {
-  Copyright 2007 Michalis Kamburelis.
+  Copyright 2007-2010 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -16,6 +16,8 @@
   You should have received a copy of the GNU General Public License
   along with "castle"; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  ----------------------------------------------------------------------------
 }
 
 { }
@@ -23,11 +25,10 @@ unit CastleCredits;
 
 interface
 
-uses GLWindow;
+uses GLWindow, UIControls;
 
 { Show credits. }
-procedure ShowCredits(ADrawUnderCredits: TDrawFunc;
-  AIdleUnderCredits: TGLWindowFunc);
+procedure ShowCredits(const ControlsUnder: array of TUIControl);
 
 { Although this will be called by Glw.Close, it may be too late
   (this must be called before releasing GLContextCache).
@@ -36,15 +37,13 @@ procedure CredistGLContextRelease;
 
 implementation
 
-uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages, UIControls,
+uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages,
   CastleTimeMessages, KambiStringUtils, GLWinModes,
   CastleInputs, CastlePlay, CastleWindow,
   CastleVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
   CastleHelp, KambiUtils, VRMLNodes, VRMLFields, KambiTimeUtils;
 
 var
-  DrawUnderCredits: TDrawFunc;
-  IdleUnderCredits: TGLWindowFunc;
   UserQuit: boolean;
   CreditsModel: TVRMLGLScene;
   AnimationTime: TKamTime;
@@ -72,8 +71,6 @@ procedure Draw(Glwin: TGLWindow);
   end;
 
 begin
-  DrawUnderCredits(Glwin);
-
   glScissor(25, 20, Glw.Width - 25, Glw.Height - 20 -  160);
   glEnable(GL_SCISSOR_TEST);
 
@@ -99,7 +96,6 @@ begin
   if AnimationTime > AnimationEnd then
     UserQuit := true;
 
-  if Assigned(IdleUnderCredits) then IdleUnderCredits(Glwin);
   TimeMessagesIdle;
 end;
 
@@ -130,23 +126,21 @@ end;
 procedure InitGLW(Glwin: TGLWindow); forward;
 {$endif}
 
-procedure ShowCredits(ADrawUnderCredits: TDrawFunc;
-  AIdleUnderCredits: TGLWindowFunc);
+procedure ShowCredits(const ControlsUnder: array of TUIControl);
 var
   SavedMode: TGLMode;
+  I: Integer;
 begin
   {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
   CredistGLContextRelease;
   InitGLW(Glw);
   {$endif}
 
-  DrawUnderCredits := ADrawUnderCredits;
-  IdleUnderCredits := AIdleUnderCredits;
   AnimationTime := 0;
 
   SavedMode := TGLMode.Create(glw, 0, false);
   try
-    TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, Glw.OnResize,
+    TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, nil,
       nil,
       true { AutoRedisplay for background level updates },
       true { FPSActive should not be needed anymore, but I leave it. },
@@ -158,6 +152,9 @@ begin
     Glw.OnDrawStyle := ds3D;
 
     UserQuit := false;
+
+    for I := 0 to High(ControlsUnder) do
+      Glw.Controls.Add(ControlsUnder[I]);
 
     repeat
       Application.ProcessMessage(true);
