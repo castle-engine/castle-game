@@ -1036,8 +1036,11 @@ begin
 
       { Note that this sets AutoRedisplay to true. }
       TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, nil,
-        nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
-        K_None, #0, { FpsShowOnCaption } false, Player.Camera);
+        { FPSActive } true, { MenuActive } false,
+        K_None, #0, { FpsShowOnCaption } false);
+
+      Glw.Camera := Player.Camera;
+      Glw.AutoRedisplay := true;
 
       Level.Camera := Player.Camera;
 

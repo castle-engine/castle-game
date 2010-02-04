@@ -141,10 +141,10 @@ begin
   SavedMode := TGLMode.Create(glw, 0, false);
   try
     TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, nil,
-      nil,
-      true { AutoRedisplay for background level updates },
       true { FPSActive should not be needed anymore, but I leave it. },
-      false, K_None, #0, false, nil);
+      false, K_None, #0, false);
+
+    Glw.AutoRedisplay := true; { scrolling text animation }
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
