@@ -710,13 +710,6 @@ type
       BossCreature life. }
     function BossCreatureIndicator(out Life, MaxLife: Single): boolean; virtual;
 
-    { Returns the background that you should use before calling Render
-      of this level. @nil if no background should be rendered.
-
-      The default implementation in this class is what
-      is usually most natural: return MainScene.Background. }
-    function Background: TBackgroundGL; virtual;
-
     property MenuBackground: boolean read FMenuBackground write FMenuBackground;
 
     { If @true, we will render dynamic shadows (shadow volumes) for
@@ -1860,11 +1853,6 @@ begin
   Result.FreeResources([frTextureDataInNodes]);
 
   Result.TimePlaying := false;
-end;
-
-function TLevel.Background: TBackgroundGL;
-begin
-  Result := MainScene.Background;
 end;
 
 procedure TLevel.TimeMessageInteractFailed(const S: string);

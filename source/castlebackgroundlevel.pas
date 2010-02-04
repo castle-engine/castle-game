@@ -136,31 +136,15 @@ procedure BackgroundLevelDraw(Glwin: TGLWindow);
     glMatrixMode(GL_MODELVIEW);
   end;
 
-var
-  ClearBuffers: TGLbitfield;
-  UsedBackground: TBackgroundGL;
 begin
   glPushAttrib(GL_ENABLE_BIT);
 
     ProjectionPushSet;
     try
-
-      ClearBuffers := GL_DEPTH_BUFFER_BIT;
-      UsedBackground := BackgroundLevel.Background;
-
-      if UsedBackground <> nil then
-      begin
-        glLoadMatrix(BackgroundCamera.RotationMatrix);
-        UsedBackground.Render;
-      end else
-        ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
-
-      glClear(ClearBuffers);
-
       RenderState.CameraFromCameraObject(BackgroundCamera);
-      glLoadMatrix(BackgroundCamera.Matrix);
 
       { Set headlight }
+      glLoadMatrix(BackgroundCamera.Matrix);
       TVRMLGLHeadlight.RenderOrDisable(BackgroundLevel.MainScene.Headlight, 0,
         true, BackgroundCamera);
 
