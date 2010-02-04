@@ -351,7 +351,6 @@ type
     FProjectionFar: Single;
     FMoveHorizontalSpeed: Single;
     FMoveVerticalSpeed: Single;
-    FLevelBox: TBox3d;
     FItemsOnLevel: TItemsOnLevelList;
 
     { Used only within constructor.
@@ -423,7 +422,7 @@ type
     property BossCreature: TCreature read FBossCreature;
 
     { See [http://vrmlengine.sourceforge.net/castle-development.php]
-      for description of LevelBox and WaterBox trick.
+      for description of CameraBox and WaterBox trick.
       Remember that this may change MainScene.BoundingBox (in case we will
       find and remove the node from Scene). }
     function RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
@@ -513,9 +512,6 @@ type
     function ProjectionFarFinal: Single;
     property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
     property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
-
-    { Player position should always be within this box. }
-    property LevelBox: TBox3d read FLevelBox;
 
     property WaterBox: TBox3d read FWaterBox;
 
@@ -1168,6 +1164,7 @@ var
   NavigationSpeed: Single;
   Options: TPrepareRenderOptions;
   TG: TTransparentGroups;
+  NewCameraBox: TBox3D;
 begin
   inherited Create(nil);
 
@@ -1224,13 +1221,14 @@ begin
       RemoveItemsToRemove;
     finally ItemsToRemove.Free end;
 
-    { Calculate LevelBox. }
-    if not RemoveBoxNode(FLevelBox, 'LevelBox') then
+    { Calculate CameraBox. }
+    if not RemoveBoxNode(NewCameraBox, 'LevelBox') then
     begin
-      { Set LevelBox to MainScene.BoundingBox, and make maximum Z larger. }
-      FLevelBox := MainScene.BoundingBox;
-      FLevelBox[1, 2] += 4 * (LevelBox[1, 2] - LevelBox[0, 2]);
+      { Set CameraBox to MainScene.BoundingBox, and make maximum Z larger. }
+      NewCameraBox := MainScene.BoundingBox;
+      NewCameraBox[1, 2] += 4 * (NewCameraBox[1, 2] - NewCameraBox[0, 2]);
     end;
+    CameraBox := NewCameraBox;
 
     if RemoveBoxNode(FWaterBox, 'WaterBox') then
     begin
@@ -1668,8 +1666,7 @@ begin
     MovingObjectCameraRadius, @CollisionIgnoreItem);
 
   if Result then
-    { TODO: this should be handled by SceneManager.CameraBox }
-    Result := Box3dPointInside(NewPos, LevelBox);
+    Result := Box3dPointInside(NewPos, CameraBox);
 end;
 
 function TLevel.MoveAllowedSimple(const Position: TVector3Single;
@@ -1681,8 +1678,7 @@ begin
     MovingObjectCameraRadius, @CollisionIgnoreItem);
 
   if Result then
-    { TODO: this should be handled by SceneManager.CameraBox }
-    Result := Box3dPointInside(NewPos, LevelBox);
+    Result := Box3dPointInside(NewPos, CameraBox);
 end;
 
 function TLevel.MoveBoxAllowedSimple(const Position: TVector3Single;
@@ -1694,8 +1690,7 @@ begin
     @CollisionIgnoreItem);
 
   if Result then
-    { TODO: this should be handled by SceneManager.CameraBox }
-    Result := Box3dPointInside(NewPos, LevelBox);
+    Result := Box3dPointInside(NewPos, CameraBox);
 end;
 
 procedure TLevel.GetCameraHeight(const Position: TVector3Single;

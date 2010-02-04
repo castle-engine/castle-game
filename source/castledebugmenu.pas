@@ -726,11 +726,11 @@ var
 begin
   inherited;
 
-  LevelBoxSizes := Box3dSizes(Level.LevelBox);
+  LevelBoxSizes := Box3dSizes(Level.CameraBox);
   for I := 0 to 2 do
     PositionSlider[I] := TGLMenuFloatSlider.Create(
-      Level.LevelBox[0, I] - LevelBoxSizes[I],
-      Level.LevelBox[1, I] + LevelBoxSizes[I],
+      Level.CameraBox[0, I] - LevelBoxSizes[I],
+      Level.CameraBox[1, I] + LevelBoxSizes[I],
       Level.MainScene.BumpMappingLightPosition[I]);
 
   for I := 0 to 2 do
