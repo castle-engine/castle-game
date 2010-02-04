@@ -1029,29 +1029,24 @@ end;
 
 function TLevelLinearMovingObject.GetTranslationFromTime(
   const AnAnimationTime: TKamTime): TVector3Single;
-var
-  R: TVector3_Single;
 begin
   if not EndPosition then
   begin
     if AnAnimationTime - EndPositionStateChangeTime > MoveTime then
       { Completely closed. }
-      R.Init_Zero else
+      Result := ZeroVector3Single else
       { During closing. }
-      R := TranslationEnd *
+      Result := TranslationEnd *
         (1 - (AnAnimationTime - EndPositionStateChangeTime) / MoveTime);
   end else
   begin
     if AnAnimationTime - EndPositionStateChangeTime > MoveTime then
       { Completely open. }
-      R := TranslationEnd else
+      Result := TranslationEnd else
       { During opening. }
-      R := TranslationEnd *
+      Result := TranslationEnd *
         ((AnAnimationTime - EndPositionStateChangeTime) / MoveTime);
   end;
-
-  { TODO: This really sucks without overloaded operators for TVector3Single }
-  Result := R;
 end;
 
 function TLevelLinearMovingObject.CompletelyEndPosition: boolean;
