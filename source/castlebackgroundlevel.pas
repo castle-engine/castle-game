@@ -90,7 +90,7 @@ begin
     BackgroundLevel.InitialUp,
     BackgroundLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
 
-{TODO}{  BackgroundLevel.Camera := BackgroundCamera;}
+  BackgroundLevel.Camera := BackgroundCamera;
 end;
 
 procedure BackgroundLevelEnd;
@@ -142,15 +142,7 @@ begin
     ProjectionPushSet;
     try
       RenderState.CameraFromCameraObject(BackgroundCamera);
-
-      { Set headlight }
-      glLoadMatrix(BackgroundCamera.Matrix);
-      TVRMLGLHeadlight.RenderOrDisable(BackgroundLevel.MainScene.Headlight, 0,
-        true, BackgroundCamera);
-
-      BackgroundLevel.LightSet.RenderLights;
       BackgroundLevel.RenderFromViewEverything;
-
     finally ProjectionPop end;
 
     glLoadIdentity;

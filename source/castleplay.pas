@@ -1065,7 +1065,7 @@ begin
         nil, { AutoRedisplay } true, { FPSActive } true, { MenuActive } false,
         K_None, #0, { FpsShowOnCaption } false, Player.Camera);
 
-      {TODO}{Level.Camera := Player.Camera;}
+      Level.Camera := Player.Camera;
 
       { OnTimer should be executed quite often, because footsteps sound
         (done in TPlayer.Idle) relies on the fact that OnUsingEnd

@@ -367,8 +367,6 @@ type
       BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
       Geometry: TVRMLGeometryNode;
       StateStack: TVRMLGraphTraverseStateStack);
-
-    procedure RenderCreaturesItems(TransparentGroup: TTransparentGroup);
   private
     FCreatures: TCreaturesList;
     procedure TraverseForCreatures(
@@ -462,7 +460,11 @@ type
       overriden implementations of these. }
     procedure TimeMessageInteractFailed(const S: string);
 
+    procedure RenderFromView3D; override;
     procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
+    procedure RenderNeverShadowed(TransparentGroup: TTransparentGroup); override;
+    procedure RenderHeadLight; override;
+    function MainLightForShadows(out AMainLightPosition: TVector4Single): boolean; override;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -1913,8 +1915,17 @@ begin
   MainScene.BumpMappingLightDiffuseColor := Value;
 end;
 
-procedure TLevel.RenderCreaturesItems(TransparentGroup: TTransparentGroup);
+function TLevel.MainLightForShadows(out AMainLightPosition: TVector4Single): boolean;
 begin
+  Result := LightSet.MainLightForShadows(AMainLightPosition);
+end;
+
+procedure TLevel.RenderNeverShadowed(TransparentGroup: TTransparentGroup);
+begin
+  inherited;
+
+  { Creatures and items are never in shadow (this looks bad). }
+
   { for background level view, we do not show creatures / items
     (their kinds are possibly not loaded yet) }
   if MenuBackground then Exit;
@@ -1927,8 +1938,7 @@ begin
     ItemsOnLevel.Render(RenderState.CameraFrustum, TransparentGroup);
 end;
 
-procedure TLevel.RenderShadowVolume(
-  AShadowVolumes: TShadowVolumes);
+procedure TLevel.RenderShadowVolume(AShadowVolumes: TShadowVolumes);
 var
   I: Integer;
 begin
@@ -1947,68 +1957,30 @@ begin
   end;
 end;
 
-procedure TLevel.RenderFromViewEverything;
-
-  procedure RenderNoShadows;
-  begin
-    RenderCreaturesItems(tgOpaque);
-    Render3D(tgAll, false);
-    { Rendering order of Creatures, Items and Level:
-      You know the problem. We must first render all non-transparent objects,
-      then all transparent objects. Otherwise transparent objects
-      (that must be rendered without updating depth buffer) could get brutally
-      covered by non-transparent objects (that are in fact further away from
-      the camera). }
-    RenderCreaturesItems(tgTransparent);
-  end;
-
-  procedure RenderWithShadows(const MainLightPosition: TVector4Single);
-  begin
-    SV.InitFrustumAndLight(RenderState.CameraFrustum, MainLightPosition);
-    SV.Count := ShowDebugInfo;
-    SV.Render(
-      { Creatures and items are never in shadow (this looks bad).
-        So I render them here, when the lights are turned on
-        and ignoring stencil buffer. They are rendered fully before
-        any Render3D --- since they are always opaque. }
-      @RenderCreaturesItems,
-      @Render3D,
-      @RenderShadowVolume,
-      CastleVideoOptions.DebugRenderShadowVolume);
-  end;
-
-var
-  ClearBuffers: TGLbitfield;
-  UsedBackground: TBackgroundGL;
-  MainLightPosition: TVector4Single;
+procedure TLevel.RenderFromView3D;
 begin
-  ClearBuffers := GL_DEPTH_BUFFER_BIT;
-
-  if RenderShadowsPossible and RenderShadows then
-    ClearBuffers := ClearBuffers or GL_STENCIL_BUFFER_BIT;
-
-  UsedBackground := Background;
-
-  if UsedBackground <> nil then
-  begin
-    glLoadMatrix(RenderState.CameraRotationMatrix);
-    UsedBackground.Render;
-  end else
-    ClearBuffers := ClearBuffers or GL_COLOR_BUFFER_BIT;
-
-  { Now clear buffers indicated in ClearBuffers. }
-  glClear(ClearBuffers);
-
-  glLoadMatrix(RenderState.CameraMatrix);
-
+  { setup lights from thunder and lightset (headlight is set elsewhere) }
   TThunderEffect.RenderOrDisable(ThunderEffect, 1);
   LightSet.RenderLights;
 
-  if RenderShadowsPossible and
-     RenderShadows and
-     LightSet.MainLightForShadows(MainLightPosition) then
-    RenderWithShadows(MainLightPosition) else
-    RenderNoShadows;
+  inherited;
+end;
+
+procedure TLevel.RenderHeadLight;
+begin
+  if MenuBackground then
+    inherited;
+  { For non-MenuBackground levels we control headlight elsewhere }
+end;
+
+procedure TLevel.RenderFromViewEverything;
+begin
+  SV.Count := ShowDebugInfo;
+  ShadowVolumesDraw := DebugRenderShadowVolume;
+  ShadowVolumesPossible := RenderShadowsPossible;
+  ShadowVolumes := RenderShadows;
+
+  inherited;
 end;
 
 end.
