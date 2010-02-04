@@ -355,9 +355,6 @@ end;
 
 procedure Draw(Glwin: TGLWindow);
 begin
-  RenderState.CameraFromCameraObject(Glw.Camera);
-  Level.RenderFromViewEverything;
-
   Player.RenderAttack;
 
   if not DebugRenderForLevelScreenshot then
@@ -479,14 +476,10 @@ const
   GameWinUp: TVector3Single = (0, 0, 1);
 var
   PickItemIndex: Integer;
-  LetOthersHandleMouseAndKeys: boolean;
 begin
   CompSpeed := Glw.Fps.IdleSpeed;
 
   TimeMessagesIdle;
-
-  LetOthersHandleMouseAndKeys := false;
-  Level.Idle(CompSpeed, true, LetOthersHandleMouseAndKeys);
 
   Level.ItemsOnLevel.Idle(CompSpeed);
 
@@ -1035,10 +1028,7 @@ begin
         [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
       Player.Camera.OnVisibleChange := @TPlayGameHelper(nil).PlayerChange;
 
-      Glw.Camera := Player.Camera;
       Glw.AutoRedisplay := true;
-
-      Level.Camera := Player.Camera;
 
       { OnTimer should be executed quite often, because footsteps sound
         (done in TPlayer.Idle) relies on the fact that OnUsingEnd
@@ -1052,6 +1042,9 @@ begin
       Glw.OnKeyDown := @KeyDown;
       Glw.OnMouseDown := @MouseDown;
       Glw.OnDrawStyle := ds3D;
+
+      Level.Camera := Player.Camera;
+      Glw.Controls.Add(Level);
 
       InitNewLevel;
 

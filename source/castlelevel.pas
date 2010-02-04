@@ -460,6 +460,7 @@ type
       overriden implementations of these. }
     procedure TimeMessageInteractFailed(const S: string);
 
+    procedure RenderFromViewEverything; override;
     procedure RenderFromView3D; override;
     procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
     procedure RenderNeverShadowed(TransparentGroup: TTransparentGroup); override;
@@ -750,8 +751,6 @@ type
     function LoadLevelScene(const FileName: string;
       CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
 
-    { TODO: temp public }
-    procedure RenderFromViewEverything; override;
     procedure BeforeDraw; override;
   end;
 
@@ -1336,14 +1335,10 @@ begin
     Scene.FreeResources([frTrianglesListNotOverTriangulate]);
     }
   end;
-
-  GLContextInit; { TODO }
 end;
 
 destructor TLevel.Destroy;
 begin
-  GLContextClose; { TODO }
-
   FreeAndNil(FThunderEffect);
   FreeWithContentsAndNil(FSectors);
   FreeWithContentsAndNil(FWaypoints);
