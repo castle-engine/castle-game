@@ -23,15 +23,15 @@ unit CastleDebugMenu;
 
 interface
 
-uses GLWindow;
+uses UIControls;
 
-procedure ShowDebugMenu(ADrawUnderMenu: TDrawFunc);
+procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 
 implementation
 
 uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   GL, GLU, KambiGLUtils, GLWinMessages, CastleWindow,
-  VectorMath, UIControls, CastlePlay, CastleGeneralMenu,
+  VectorMath, GLWindow, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleInputs, CastleCreatures, CastleChooseMenu,
   CastleItems, GLMenu, RaysWindow, CastleVideoOptions,
   CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
@@ -153,7 +153,7 @@ end;
 
 var
   UserQuit: boolean;
-  DrawUnderMenu: TDrawFunc;
+  ControlsUnder: TUIControlList;
   CurrentMenu: TCastleMenu;
 
   DebugMenu: TDebugMenu;
@@ -353,7 +353,7 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
         S.Append(Format('Creature %s (%d users)',
           [CreaturesKinds[I].VRMLNodeName, CreaturesKinds[I].RequiredCount]));
       S.Append('Cancel');
-      ResultIndex := ChooseByMenu(DrawUnderMenu, S);
+      ResultIndex := ChooseByMenu(ControlsUnder, S);
       Result := ResultIndex <> CreaturesKinds.High + 1;
       if Result then
         ChooseCreature := CreaturesKinds[ResultIndex];
@@ -491,7 +491,7 @@ procedure TDebugLevelMenu.CurrentItemSelected;
       end;
       S.Append('Cancel');
 
-      Index := ChooseByMenu(DrawUnderMenu, S);
+      Index := ChooseByMenu(ControlsUnder, S);
 
       if Index <> LevelsAvailable.Count then
       begin
@@ -564,7 +564,7 @@ procedure TDebugItemsMenu.CurrentItemSelected;
       for I := 0 to ItemsKinds.High do
         S.Append('Item ' + ItemsKinds[I].VRMLNodeName);
       S.Append('Cancel');
-      ResultIndex := ChooseByMenu(DrawUnderMenu, S);
+      ResultIndex := ChooseByMenu(ControlsUnder, S);
       Result := ResultIndex <> ItemsKinds.High + 1;
       if Result then
         ChooseItem := ItemsKinds[ResultIndex];
@@ -1152,11 +1152,11 @@ end;
 
 {$I castlemenucallbacks.inc}
 
-procedure ShowDebugMenu(ADrawUnderMenu: TDrawFunc);
+procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 var
   SavedMode: TGLMode;
 begin
-  DrawUnderMenu := ADrawUnderMenu;
+  ControlsUnder := AControlsUnder;
 
   DebugPlayerMenu.RotationHorizontalSpeedSlider.Value :=
     Player.Camera.RotationHorizontalSpeed;
@@ -1166,7 +1166,7 @@ begin
     VectorLen(Player.Camera.Direction);
 
   SavedMode := TGLMode.CreateReset(Glw, 0, true,
-    DrawUnderMenu, Glw.OnResize, @CloseQuery,
+    nil, Glw.OnResize, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
     { This is needed, because when changing ViewAngleDegX we will call
@@ -1184,6 +1184,8 @@ begin
     Glw.OnDrawStyle := ds3D;
 
     SetCurrentMenu(CurrentMenu, DebugMenu);
+
+    Glw.Controls.AddList(ControlsUnder);
 
     UserQuit := false;
     repeat

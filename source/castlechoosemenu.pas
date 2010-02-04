@@ -23,17 +23,16 @@ unit CastleChooseMenu;
 
 interface
 
-uses Classes, GLWindow, GL, GLU;
+uses Classes, GLWindow, GL, GLU, UIControls;
 
 { Allows user to choose one item from MenuItems.
-  Displays menu using TCastleMenu with ADrawUnderMenu background. }
-function ChooseByMenu(DrawUnderMenu: TDrawFunc;
+  Displays menu using TCastleMenu with ControlsUnder background. }
+function ChooseByMenu(ControlsUnder: TUIControlList;
   MenuItems: TStringList): Integer;
 
 implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, CastleInputs, GLWinMessages, GLMenu,
-  UIControls,
   CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleTimeMessages;
 
 var
@@ -85,7 +84,7 @@ begin
   MessageOK(Glwin, 'You can''t exit now.');
 end;
 
-function ChooseByMenu(DrawUnderMenu: TDrawFunc;
+function ChooseByMenu(ControlsUnder: TUIControlList;
   MenuItems: TStringList): Integer;
 var
   SavedMode: TGLMode;
@@ -94,7 +93,7 @@ begin
   ChooseMenu.FixItemsAreas;
 
   SavedMode := TGLMode.CreateReset(Glw, 0, true,
-    DrawUnderMenu, Glw.OnResize, @CloseQuery,
+    nil, Glw.OnResize, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
     { This shouldn't change projection matrix anyway. }
@@ -110,6 +109,8 @@ begin
     GLWinMessagesTheme.RectColor[3] := 1.0;
 
     Glw.Controls.MakeSingle(TGLMenu, ChooseMenu);
+
+    Glw.Controls.AddList(ControlsUnder);
 
     Selected := false;
     repeat

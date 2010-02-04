@@ -138,6 +138,8 @@ var
     of next Level to load. }
   LevelFinishedNextLevelName: string;
 
+  GameControls: TUIControlList;
+
 const
   SDeadMessage = 'You''re dead';
   SGameWinMessage = 'Game finished';
@@ -524,6 +526,11 @@ begin
 
     NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel;
 
+    { right before freeing old Level, insert NewLevel at the same place
+      in GameControls and Glw.Controls as Level was. }
+    GameControls.MakeSingle(TLevel, NewLevel);
+    Glw.Controls.MakeSingle(TLevel, NewLevel);
+
     { First TLevel constructor was called.
       This actully loaded the level, displaying some progress bar.
       Background of this progress bar is our old Level --- so Level variable
@@ -909,7 +916,8 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
 
   procedure DoDebugMenu;
   begin
-    ShowDebugMenu(@Draw);
+    { TODO: pause the scene }
+    ShowDebugMenu(GameControls);
   end;
 
 begin
@@ -962,22 +970,14 @@ begin
 end;
 
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
-var
-  GameControls: TUIControlList;
 begin
   EventDown(false, Key, mbLeft);
   if C = CharEscape then
   begin
     if Player.Dead or GameWin then
       GameCancel(false) else
-    begin
-{  TODO: pass other items? or maybe this look Ok? }
-      GameControls := TUIControlList.CreateFromArray(false, [Level]);
-      try
-        { TODO: pause the scene }
-        ShowGameMenu(GameControls);
-      finally FreeAndNil(GameControls) end;
-    end;
+      { TODO: pause the scene }
+      ShowGameMenu(GameControls);
   end;
 end;
 
@@ -1051,7 +1051,11 @@ begin
       Glw.OnDrawStyle := ds3D;
 
       Level.Camera := Player.Camera;
-      Glw.Controls.Add(Level);
+
+      { TODO: pass other items? or maybe this look Ok enough for menus? }
+      GameControls := TUIControlList.CreateFromArray(false, [Level]);
+
+      Glw.Controls.AddList(GameControls);
 
       InitNewLevel;
 
@@ -1074,6 +1078,7 @@ begin
       Player.Camera.OnMoveAllowed := nil;
       Player.Camera.OnGetCameraHeight := nil;
 
+      FreeAndNil(GameControls);
       FreeAndNil(SavedMode);
     end;
   finally

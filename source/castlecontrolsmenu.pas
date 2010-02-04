@@ -48,8 +48,7 @@ type
     procedure SetPosition(const MoveX, MoveY: Single; const DoFixItemsAreas: boolean);
   end;
 
-{ Show menu that allows player to configure controls.
-  AIdleUnderMenu may be @nil. }
+{ Show menu that allows player to configure controls. }
 procedure ShowControlsMenu(ControlsUnder: TUIControlList;
   ADrawFadeRect, ADrawCentered: boolean);
 
