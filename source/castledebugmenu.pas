@@ -1165,15 +1165,14 @@ begin
   DebugPlayerMenu.PlayerSpeedSlider.Value :=
     VectorLen(Player.Camera.Direction);
 
-  SavedMode := TGLMode.Create(Glw, 0, true);
+  SavedMode := TGLMode.CreateReset(Glw, 0, true,
+    DrawUnderMenu, Glw.OnResize, @CloseQuery,
+    true { FPSActive should not be needed anymore, but I leave it. });
   try
     { This is needed, because when changing ViewAngleDegX we will call
       Glw.OnResize to set new projection matrix, and this
       new projection matrix should stay for the game. }
     SavedMode.RestoreProjectionMatrix := false;
-
-    TGLWindowState.SetStandardState(Glw, DrawUnderMenu, Glw.OnResize, @CloseQuery,
-      true { FPSActive should not be needed anymore, but I leave it. });
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }

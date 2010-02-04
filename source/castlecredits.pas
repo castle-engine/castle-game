@@ -138,11 +138,10 @@ begin
 
   AnimationTime := 0;
 
-  SavedMode := TGLMode.Create(glw, 0, false);
+  SavedMode := TGLMode.CreateReset(glw, 0, false,
+    @Draw, nil, @CloseQuery,
+    true { FPSActive should not be needed anymore, but I leave it. });
   try
-    TGLWindowState.SetStandardState(Glw, @Draw, nil, @CloseQuery,
-      true { FPSActive should not be needed anymore, but I leave it. });
-
     Glw.AutoRedisplay := true; { scrolling text animation }
 
     Glw.OnKeyDown := @KeyDown;

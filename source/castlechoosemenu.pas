@@ -93,13 +93,12 @@ begin
   ChooseMenu.Items.Assign(MenuItems);
   ChooseMenu.FixItemsAreas;
 
-  SavedMode := TGLMode.Create(Glw, 0, true);
+  SavedMode := TGLMode.CreateReset(Glw, 0, true,
+    DrawUnderMenu, Glw.OnResize, @CloseQuery,
+    true { FPSActive should not be needed anymore, but I leave it. });
   try
     { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;
-
-    TGLWindowState.SetStandardState(Glw, DrawUnderMenu, Glw.OnResize, @CloseQuery,
-      true { FPSActive should not be needed anymore, but I leave it. });
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;

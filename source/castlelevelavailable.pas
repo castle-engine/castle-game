@@ -283,10 +283,10 @@ var
 begin
   if GLList_LoadingBgImage <> 0 then
   begin
-    SavedMode := TGLMode.Create(Glw, 0, true);
+    SavedMode := TGLMode.CreateReset(Glw, 0, true,
+      @DrawCreateLevel, @Resize2D, @NoClose,
+      true { FPSActive should not be needed anymore, but I leave it. });
     try
-      TGLWindowState.SetStandardState(Glw, @DrawCreateLevel, @Resize2D, @NoClose,
-        true { FPSActive should not be needed anymore, but I leave it. });
       Glw.UserData := Self;
 
       Glw.OnDrawStyle := ds3D;

@@ -560,13 +560,12 @@ begin
   ItemsControlsMenu.SetPosition(MoveX, MoveY, true);
   OtherControlsMenu.SetPosition(MoveX, MoveY, true);
 
-  SavedMode := TGLMode.Create(glw, 0, false);
+  SavedMode := TGLMode.CreateReset(glw, 0, false,
+    @Draw, Glw.OnResize, @CloseQuery,
+    true { FPSActive should not be needed anymore, but I leave it. });
   try
     { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;
-
-    TGLWindowState.SetStandardState(Glw, @Draw, Glw.OnResize, @CloseQuery,
-      true { FPSActive should not be needed anymore, but I leave it. });
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;

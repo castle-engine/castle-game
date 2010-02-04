@@ -1023,9 +1023,10 @@ begin
   LevelFinishedSchedule := false;
   try
 
-    SavedMode := TGLMode.Create(glw,
+    SavedMode := TGLMode.CreateReset(glw,
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
-      GL_ENABLE_BIT, true);
+      GL_ENABLE_BIT, true,
+      @Draw, nil, @CloseQuery, { FPSActive } true);
     try
       { Init Player.Camera properties }
       { No need to actually create TPlayGameHelper class,
@@ -1033,10 +1034,6 @@ begin
         only --- at least in objfpc mode, see
         [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
       Player.Camera.OnVisibleChange := @TPlayGameHelper(nil).PlayerChange;
-
-      { Note that this sets AutoRedisplay to true. }
-      TGLWindowState.SetStandardState(Glw, @Draw, nil, @CloseQuery,
-        { FPSActive } true);
 
       Glw.Camera := Player.Camera;
       Glw.AutoRedisplay := true;

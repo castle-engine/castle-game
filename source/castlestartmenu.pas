@@ -828,12 +828,11 @@ begin
   try
     SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
     try
-      SavedMode := TGLMode.Create(glw, 0, false);
+      SavedMode := TGLMode.CreateReset(glw, 0, false,
+        nil, nil, @CloseQuery,
+        true { FPSActive should not be needed anymore, but I leave it. });
       try
         SavedMode.RestoreProjectionMatrix := false;
-
-        TGLWindowState.SetStandardState(Glw, nil, nil, @CloseQuery,
-          true { FPSActive should not be needed anymore, but I leave it. });
 
         Glw.OnKeyDown := @KeyDown;
         Glw.OnMouseDown := @MouseDown;
