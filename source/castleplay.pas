@@ -947,6 +947,7 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
       only saved in TGLMode state, so it would still contain invalid pointer
       to the old level. So we should instead explicitly push/pop our current
       Glw.Controls, this way using current GameControls value. }
+    Glw.Controls.BeginDisableContextInitClose;
     Glw.Controls.Clear;
 
     Level.Paused := true;
@@ -954,6 +955,7 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
     Level.Paused := false;
 
     Glw.Controls.AddList(GameControls);
+    Glw.Controls.EndDisableContextInitClose;
   end;
 
 begin
