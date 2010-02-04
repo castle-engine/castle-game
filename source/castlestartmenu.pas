@@ -833,9 +833,7 @@ begin
         SavedMode.RestoreProjectionMatrix := false;
 
         TGLWindowState.SetStandardState(Glw, nil, @CloseQuery, nil,
-          true { FPSActive should not be needed anymore, but I leave it. },
-          false, K_None, #0,
-          { show fps on caption --- useful to test FPS of background level true}false);
+          true { FPSActive should not be needed anymore, but I leave it. });
 
         Glw.OnKeyDown := @KeyDown;
         Glw.OnMouseDown := @MouseDown;

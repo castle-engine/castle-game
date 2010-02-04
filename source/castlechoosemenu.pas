@@ -99,8 +99,7 @@ begin
     SavedMode.RestoreProjectionMatrix := false;
 
     TGLWindowState.SetStandardState(Glw, DrawUnderMenu, @CloseQuery, Glw.OnResize,
-      true { FPSActive should not be needed anymore, but I leave it. },
-      false, K_None, #0, false);
+      true { FPSActive should not be needed anymore, but I leave it. });
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;

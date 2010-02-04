@@ -141,8 +141,7 @@ begin
   SavedMode := TGLMode.Create(glw, 0, false);
   try
     TGLWindowState.SetStandardState(Glw, @Draw, @CloseQuery, nil,
-      true { FPSActive should not be needed anymore, but I leave it. },
-      false, K_None, #0, false);
+      true { FPSActive should not be needed anymore, but I leave it. });
 
     Glw.AutoRedisplay := true; { scrolling text animation }
 

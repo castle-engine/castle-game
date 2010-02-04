@@ -286,8 +286,7 @@ begin
     SavedMode := TGLMode.Create(Glw, 0, true);
     try
       TGLWindowState.SetStandardNoCloseState(Glw, @DrawCreateLevel, @Resize2D,
-        true { FPSActive should not be needed anymore, but I leave it. },
-        false, K_None, false);
+        true { FPSActive should not be needed anymore, but I leave it. });
       Glw.UserData := Self;
 
       Glw.OnDrawStyle := ds3D;

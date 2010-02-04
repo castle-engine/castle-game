@@ -1173,8 +1173,7 @@ begin
     SavedMode.RestoreProjectionMatrix := false;
 
     TGLWindowState.SetStandardState(Glw, DrawUnderMenu, @CloseQuery, Glw.OnResize,
-      true { FPSActive should not be needed anymore, but I leave it. },
-      false, K_None, #0, false);
+      true { FPSActive should not be needed anymore, but I leave it. });
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
