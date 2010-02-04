@@ -151,8 +151,7 @@ begin
 
     UserQuit := false;
 
-    for I := 0 to High(ControlsUnder) do
-      Glw.Controls.Add(ControlsUnder[I]);
+    Glw.Controls.AddArray(ControlsUnder);
 
     repeat
       Application.ProcessMessage(true);

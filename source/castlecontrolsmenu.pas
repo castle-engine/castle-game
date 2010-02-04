@@ -461,21 +461,28 @@ const
   WholeAreaY1 = 450;
 
 var
-  DrawFadeRect: boolean;
   GLList_DrawFadeRect: TGLuint;
   ExitWithEscapeAllowed: boolean;
   ExitWithEscape: boolean;
   MoveX, MoveY: Single;
 
-procedure Draw2D(Glwin: TGLWindow);
-begin
-  if DrawFadeRect then
-  begin
-    glPushMatrix;
-      glTranslatef(MoveX, MoveY, 0);
-      glCallList(GLList_DrawFadeRect);
-    glPopMatrix;
+type
+  TFadeRect = class(TUIControl)
+    function DrawStyle: TUIControlDrawStyle; override;
+    procedure Draw(const Focused: boolean); override;
   end;
+
+function TFadeRect.DrawStyle: TUIControlDrawStyle;
+begin
+  Result := ds2D;
+end;
+
+procedure TFadeRect.Draw(const Focused: boolean);
+begin
+  glPushMatrix;
+    glTranslatef(MoveX, MoveY, 0);
+    glCallList(GLList_DrawFadeRect);
+  glPopMatrix;
 end;
 
 procedure EventDown(MouseEvent: boolean; Key: TKey;
@@ -519,9 +526,8 @@ procedure ShowControlsMenuCore(const ControlsUnder: array of TUIControl;
   out AExitWithEscape: boolean);
 var
   SavedMode: TGLMode;
-  I: Integer;
+  FadeRect: TFadeRect;
 begin
-  DrawFadeRect := ADrawFadeRect;
   ExitWithEscapeAllowed := AExitWithEscapeAllowed;
   ExitWithEscape := false;
 
@@ -540,8 +546,10 @@ begin
   ItemsControlsMenu.SetPosition(MoveX, MoveY, true);
   OtherControlsMenu.SetPosition(MoveX, MoveY, true);
 
+  FadeRect := nil;
+
   SavedMode := TGLMode.CreateReset(glw, 0, false,
-    @Draw2D, Glw.OnResize, @CloseQuery,
+    nil, Glw.OnResize, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
     SavedMode.RestoreProjectionMatrix := false;
@@ -549,18 +557,25 @@ begin
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
     Glw.OnIdle := @Idle;
-    Glw.OnDrawStyle := ds2D;
 
     SetCurrentMenu(CurrentMenu, ControlsMenu);
 
-    for I := 0 to High(ControlsUnder) do
-      Glw.Controls.Add(ControlsUnder[I]);
+    if ADrawFadeRect then
+    begin
+      FadeRect := TFadeRect.Create(nil);
+      Glw.Controls.Add(FadeRect);
+    end;
+
+    Glw.Controls.AddArray(ControlsUnder);
 
     UserQuit := false;
     repeat
       Application.ProcessMessage(true);
     until UserQuit;
-  finally FreeAndNil(SavedMode); end;
+  finally
+    FreeAndNil(SavedMode);
+    FreeAndNil(FadeRect);
+  end;
 
   AExitWithEscape := ExitWithEscape;
 end;

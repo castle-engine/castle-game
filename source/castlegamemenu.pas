@@ -23,15 +23,15 @@ unit CastleGameMenu;
 
 interface
 
-uses GLWindow;
+uses UIControls;
 
-procedure ShowGameMenu(ADrawUnderMenu: TDrawFunc);
+procedure ShowGameMenu(const AControlsUnder: array of TUIControl);
 
 implementation
 
 uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   GL, GLU, KambiGLUtils, GLWinMessages, CastleWindow,
-  VectorMath, UIControls, CastleHelp, CastlePlay, CastleGeneralMenu,
+  VectorMath, GLWindow, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleInputs, CastleChooseMenu,
   CastleVideoOptions,
   CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
@@ -61,10 +61,10 @@ type
 
 var
   UserQuit: boolean;
-  DrawUnderMenu: TDrawFunc;
   CurrentMenu: TCastleMenu;
   GameMenu: TGameMenu;
   GameSoundMenu: TGameSoundMenu;
+  ControlsUnder: array of TUIControl;
 
 { TGameMenu ------------------------------------------------------------ }
 
@@ -86,7 +86,7 @@ begin
   case CurrentItem of
     0: UserQuit := true;
     1: ViewGameMessages;
-    2: ShowControlsMenuEscape([ {TODO} ], true, true, UserQuit);
+    2: ShowControlsMenuEscape(ControlsUnder, true, true, UserQuit);
     3: SetCurrentMenu(CurrentMenu, GameSoundMenu);
     4: { At first I did here GameCancel(false), but tests (with Mama)
          show that it's too easy to select this and accidentaly
@@ -141,17 +141,20 @@ end;
 
 {$I castlemenucallbacks.inc}
 
-procedure ShowGameMenu(ADrawUnderMenu: TDrawFunc);
+procedure ShowGameMenu(const AControlsUnder: array of TUIControl);
 var
   SavedMode: TGLMode;
+  I: Integer;
 begin
-  DrawUnderMenu := ADrawUnderMenu;
+  SetLength(ControlsUnder, High(AControlsUnder) + 1);
+  for I := 0 to High(AControlsUnder) do
+    ControlsUnder[I] := AControlsUnder[I];
 
   GameSoundMenu.SoundVolume.RefreshAccessory;
   GameSoundMenu.MusicVolume.RefreshAccessory;
 
   SavedMode := TGLMode.CreateReset(Glw, 0, true,
-    DrawUnderMenu, Glw.OnResize, @CloseQuery,
+    nil, Glw.OnResize, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
     { This is needed, because when changing ViewAngleDegX we will call
@@ -169,6 +172,8 @@ begin
     Glw.OnDrawStyle := ds3D;
 
     SetCurrentMenu(CurrentMenu, GameMenu);
+
+    Glw.Controls.AddArray(ControlsUnder);
 
     UserQuit := false;
     repeat

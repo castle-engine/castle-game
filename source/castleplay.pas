@@ -968,7 +968,7 @@ begin
   begin
     if Player.Dead or GameWin then
       GameCancel(false) else
-      ShowGameMenu(@Draw);
+      ShowGameMenu([Level { TODO: pass other items? or maybe this look Ok? }]);
   end;
 end;
 
