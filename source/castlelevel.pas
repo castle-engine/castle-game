@@ -1761,11 +1761,12 @@ procedure TLevel.Idle(const CompSpeed: Single;
   const HandleMouseAndKeys: boolean;
   var LetOthersHandleMouseAndKeys: boolean);
 begin
-  FAnimationTime += CompSpeed;
+  if not Paused then
+    FAnimationTime += CompSpeed;
 
   inherited;
 
-  if ThunderEffect <> nil then
+  if (not Paused) and (ThunderEffect <> nil) then
     ThunderEffect.Idle;
 end;
 
