@@ -372,9 +372,9 @@ end;
   or because we just started new game). }
 procedure InitNewLevel;
 begin
-  { Resize uses Level.BoundingBox to set good projection min/max depths.
-    So we must call EventResize on each Level change. }
-  Glw.EventResize;
+  { No need to explicitly call any Glw.EventResize or Level.ApplyProjection,
+    newly added to Glw.Controls (and possibly newly created) level will have
+    ApplyProjectionNeeded := true. }
 
   Level.Camera := Player.Camera;
 
