@@ -105,8 +105,8 @@ type
     destructor Destroy; override;
 
     function CollisionIgnoreItem(
-      const Octree: TVRMLBaseTrianglesOctree;
-      const Triangle: PVRMLTriangle): boolean; override;
+      const Sender: TObject;
+      const Triangle: P3DTriangle): boolean; override;
     procedure Idle(const CompSpeed: Single;
       const HandleMouseAndKeys: boolean;
       var LetOthersHandleMouseAndKeys: boolean); override;
@@ -719,12 +719,11 @@ begin
 end;
 
 function TGateLevel.CollisionIgnoreItem(
-  const Octree: TVRMLBaseTrianglesOctree;
-  const Triangle: PVRMLTriangle): boolean;
+  const Sender: TObject; const Triangle: P3DTriangle): boolean;
 begin
   Result :=
-    (inherited CollisionIgnoreItem(Octree, Triangle)) or
-    (Triangle^.State.LastNodes.Material.NodeName = 'MatWater');
+    (inherited CollisionIgnoreItem(Sender, Triangle)) or
+    (PVRMLTriangle(Triangle)^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
 procedure TGateLevel.Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean);

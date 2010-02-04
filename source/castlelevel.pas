@@ -799,7 +799,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
   function SphereCollisionAssumeTranslation(
     const AssumeTranslation: TVector3_Single;
     const Pos: TVector3Single; const Radius: Single;
-    const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
+    const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
   begin
     Result := Exists and Collides;
     if Result then
@@ -815,7 +815,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
   function BoxCollisionAssumeTranslation(
     const AssumeTranslation: TVector3_Single;
     const Box: TBox3d;
-    const TrianglesToIgnoreFunc: TVRMLTriangleIgnoreFunc): boolean;
+    const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
   begin
     Result := Exists and Collides;
     if Result then
