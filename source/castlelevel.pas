@@ -24,10 +24,6 @@
 
   @unorderedList(
     @item(
-      T3DCollision.Hierarchy is allowed to be empty.
-      This means that Level.Scene itself collided.)
-
-    @item(
       Owner of T3D must be always set to the containing TLevel.
       ParentLevel simply returns Owner, typecasted to TLevel.
       This wasn't really necessary (I could introduce separate ParentLevel)
