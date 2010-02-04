@@ -156,7 +156,25 @@ begin
   end;
 end;
 
-procedure Draw2D(Draw2DData: Pointer);
+type
+  TGame2DControls = class(TUIControl)
+  public
+    procedure Draw(const Focused: boolean); override;
+    function DrawStyle: TUIControlDrawStyle; override;
+  end;
+
+  TGame3DControls = class(TUIControl)
+  public
+    procedure Draw(const Focused: boolean); override;
+    function DrawStyle: TUIControlDrawStyle; override;
+  end;
+
+function TGame2DControls.DrawStyle: TUIControlDrawStyle;
+begin
+  Result := ds2D;
+end;
+
+procedure TGame2DControls.Draw(const Focused: boolean);
 
   procedure DoDrawInventory;
   const
@@ -326,6 +344,8 @@ procedure Draw2D(Draw2DData: Pointer);
   end;
 
 begin
+  if DebugRenderForLevelScreenshot then Exit;
+
   Player.RenderWeapon2D;
 
   glLoadIdentity;
@@ -355,17 +375,14 @@ begin
   Player.Render2D;
 end;
 
-procedure Draw(Glwin: TGLWindow);
+function TGame3DControls.DrawStyle: TUIControlDrawStyle;
+begin
+  Result := ds3D;
+end;
+
+procedure TGame3DControls.Draw(const Focused: boolean);
 begin
   Player.RenderAttack;
-
-  if not DebugRenderForLevelScreenshot then
-  begin
-    glPushAttrib(GL_ENABLE_BIT);
-      glDisable(GL_LIGHTING);
-      glProjectionPushPopOrtho2D(@Draw2d, nil, 0, Glw.Width, 0, Glw.Height);
-    glPopAttrib;
-  end;
 end;
 
 { Call this when Level value changed (because of LevelFinished
@@ -1033,6 +1050,8 @@ procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer;
   PrepareNewPlayer: boolean);
 var
   SavedMode: TGLMode;
+  C2D: TGame2DControls;
+  C3D: TGame3DControls;
 begin
   TimeMessagesClear;
 
@@ -1047,7 +1066,7 @@ begin
     SavedMode := TGLMode.CreateReset(glw,
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
       GL_ENABLE_BIT, true,
-      @Draw, nil, @CloseQuery, { FPSActive } true);
+      nil, nil, @CloseQuery, { FPSActive } true);
     try
       { No need to actually create TPlayGameHelper class,
         but I must pass here an instance, not a TPlayGameHelper
@@ -1070,8 +1089,9 @@ begin
       Glw.OnMouseDown := @MouseDown;
       Glw.OnDrawStyle := ds3D;
 
-      { TODO: pass other items? or maybe this look Ok enough for menus? }
-      GameControls := TUIControlList.CreateFromArray(false, [Level]);
+      C2D := TGame2DControls.Create(nil);
+      C3D := TGame3DControls.Create(nil);
+      GameControls := TUIControlList.CreateFromArray(false, [C2D, C3D, Level]);
 
       Glw.Controls.AddList(GameControls);
 
@@ -1095,6 +1115,8 @@ begin
       Level.OnCameraChanged := nil;
 
       FreeAndNil(GameControls);
+      FreeAndNil(C2D);
+      FreeAndNil(C3D);
       FreeAndNil(SavedMode);
     end;
   finally
