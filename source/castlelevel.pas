@@ -312,7 +312,7 @@ type
     function BoundingBox: TBox3d; override;
 
     { Called from TLevel constructor. This is the place when you
-      can modify ParentLevel.Scene.RootNode, e.g. by calling
+      can modify ParentLevel.MainScene.RootNode, e.g. by calling
       RemoveBoxNode. }
     procedure ChangeLevelScene(AParentLevel: TLevel);
   end;
@@ -346,7 +346,7 @@ type
 
   TLevel = class(TComponent)
   private
-    FScene: TVRMLGLScene;
+    FMainScene: TVRMLGLScene;
     FLightSet: TVRMLLightSetGL;
     FCameraRadius: Single;
     FCameraPreferredHeight: Single;
@@ -397,20 +397,6 @@ type
     FPlayedMusicSound: TSoundType;
     FGlobalAmbientLight: TVector4Single;
     FThunderEffect: TThunderEffect;
-
-    { Check collision (following MoveAllowedSimple mechanics) with
-      all Objects (not with the base level geometry).
-      @groupBegin }
-    function ObjectsMoveAllowedSimple(
-      const Position: TVector3Single;
-      const NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean;
-    function ObjectsMoveBoxAllowedSimple(
-      const OldPos, ProposedNewPos: TVector3Single;
-      const ProposedNewBox: TBox3d;
-      const BecauseOfGravity: boolean): boolean;
-    { @groupEnd }
   private
     FName: string;
     FSceneFileName: string;
@@ -442,7 +428,7 @@ type
 
     { See [http://vrmlengine.sourceforge.net/castle-development.php]
       for description of LevelBox and WaterBox trick.
-      Remember that this may change Scene.BoundingBox (in case we will
+      Remember that this may change MainScene.BoundingBox (in case we will
       find and remove the node from Scene). }
     function RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
 
@@ -453,7 +439,7 @@ type
       our octrees. Even before initializing creatures and items.
 
       You can override this to do here some operations
-      that change the Scene.RootNode (e.g. you can do here tricks like
+      that change the MainScene.RootNode (e.g. you can do here tricks like
       extracting some specific objects using RemoveBoxNode).
       Be very cautious what you do here --- remember that this is called
       while TLevel.Create constructor did not finish it's work yet !
@@ -513,7 +499,7 @@ type
     { @groupEnd }
 
     { }
-    property Scene: TVRMLGLScene read FScene;
+    property MainScene: TVRMLGLScene read FMainScene;
     property LightSet: TVRMLLightSetGL read FLightSet;
 
     property CameraRadius: Single read FCameraRadius;
@@ -769,7 +755,7 @@ type
       of this level. @nil if no background should be rendered.
 
       The default implementation in this class is what
-      is usually most natural: return Scene.Background. }
+      is usually most natural: return MainScene.Background. }
     function Background: TBackgroundGL; virtual;
 
     property MenuBackground: boolean read FMenuBackground write FMenuBackground;
@@ -1211,7 +1197,7 @@ constructor TLevel.Create(
   begin
     for I := 0 to ItemsToRemove.Count - 1 do
       ItemsToRemove.Items[I].FreeRemovingFromAllParents;
-    Scene.ChangedAll;
+    MainScene.ChangedAll;
   end;
 
 const
@@ -1237,26 +1223,30 @@ begin
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    FScene := TVRMLGLScene.CreateCustomCache(nil, GLContextCache);
-    FScene.Load(SceneFileName);
+    FMainScene := TVRMLGLScene.CreateCustomCache(Self, GLContextCache);
+    FMainScene.Load(SceneFileName);
 
     { initialize FAnimationTime. Must be initialized before creating creatures. }
     FAnimationTime := 0.0;
 
-    AttributesSet(Scene.Attributes, btIncrease);
+    AttributesSet(MainScene.Attributes, btIncrease);
     if BumpMapping then
-      Scene.Attributes.BumpMappingMaximum := High(TBumpMappingMethod) else
-      Scene.Attributes.BumpMappingMaximum := bmNone;
-    Scene.Attributes.UseOcclusionQuery := UseOcclusionQuery;
+      MainScene.Attributes.BumpMappingMaximum := High(TBumpMappingMethod) else
+      MainScene.Attributes.BumpMappingMaximum := bmNone;
+    MainScene.Attributes.UseOcclusionQuery := UseOcclusionQuery;
 
     { Calculate InitialPosition, InitialDirection, InitialUp.
       Must be done before initializing creatures, as they right now
       use InitialPosition. FInitialDirection, FInitialUp will be
       actually changed later in this procedure. }
-    Scene.GetPerspectiveViewpoint(FInitialPosition,
+    MainScene.GetPerspectiveViewpoint(FInitialPosition,
       FInitialDirection, FInitialUp, FGravityUp);
 
-    FObjects := T3DList.Create(nil);
+    FObjects := T3DList.Create(Self);
+    { Scene must be the first one on FObjects, this way MoveAllowed will
+      use Scene for wall-sliding (see T3DList.MoveAllowed implementation). }
+    FObjects.Add(MainScene);
+    {TODO}{SceneManager.MainScene := Scene;}
 
     LoadFromDOMElement(DOMElement);
 
@@ -1266,11 +1256,11 @@ begin
     try
       { Initialize Items }
       FItems := TItemsOnLevelList.Create;
-      Scene.RootNode.TraverseBlenderObjects(@TraverseForItems);
+      MainScene.RootNode.TraverseBlenderObjects(@TraverseForItems);
 
       { Initialize Creatures }
       FCreatures := TCreaturesList.Create;
-      Scene.RootNode.TraverseBlenderObjects(@TraverseForCreatures);
+      MainScene.RootNode.TraverseBlenderObjects(@TraverseForCreatures);
 
       RemoveItemsToRemove;
     finally ItemsToRemove.Free end;
@@ -1278,8 +1268,8 @@ begin
     { Calculate LevelBox. }
     if not RemoveBoxNode(FLevelBox, 'LevelBox') then
     begin
-      { Set LevelBox to Scene.BoundingBox, and make maximum Z larger. }
-      FLevelBox := Scene.BoundingBox;
+      { Set LevelBox to MainScene.BoundingBox, and make maximum Z larger. }
+      FLevelBox := MainScene.BoundingBox;
       FLevelBox[1, 2] += 4 * (LevelBox[1, 2] - LevelBox[0, 2]);
     end;
 
@@ -1297,16 +1287,16 @@ begin
     { calculate Sectors and Waypoints }
     FSectors := TSceneSectorsList.Create;
     FWaypoints := TSceneWaypointsList.Create;
-    Waypoints.ExtractPositions(Scene.RootNode);
-    Sectors.ExtractBoundingBoxes(Scene.RootNode);
+    Waypoints.ExtractPositions(MainScene.RootNode);
+    Sectors.ExtractBoundingBoxes(MainScene.RootNode);
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
-    Scene.ChangedAll;
+    MainScene.ChangedAll;
 
-    NavigationNode := Scene.NavigationInfoStack.Top as TNodeNavigationInfo;
+    NavigationNode := MainScene.NavigationInfoStack.Top as TNodeNavigationInfo;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
       FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
-      FCameraRadius := Box3dAvgSize(Scene.BoundingBox) * 0.007;
+      FCameraRadius := Box3dAvgSize(MainScene.BoundingBox) * 0.007;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
       FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
@@ -1319,7 +1309,7 @@ begin
       NavigationSpeed := 1.0;
 
     FProjectionNear := CameraRadius * 0.75;
-    FProjectionFar := Box3dMaxSize(Scene.BoundingBox) * 5;
+    FProjectionFar := Box3dMaxSize(MainScene.BoundingBox) * 5;
 
     { Fix InitialDirection length, and set MoveXxxSpeed.
 
@@ -1339,8 +1329,10 @@ begin
       { Make GravityUp = (0, 0, 1) more "precisely" }
       FGravityUp := Vector3Single(0, 0, 1);
 
-    Scene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
+    MainScene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
       (ProjectionNear, ProjectionFar);
+
+    MainScene.CastsShadow := SceneDynamicShadows;
 
     { calcualte Options for PrepareRender }
     Options := [prBackground, prBoundingBox];
@@ -1351,9 +1343,9 @@ begin
     if RenderShadowsPossible then
       TG := TG + [tgOpaque, tgTransparent];
 
-    Scene.PrepareRender(TG, Options, false);
+    MainScene.PrepareRender(TG, Options, false);
 
-    Scene.FreeResources([frTextureDataInNodes]);
+    MainScene.FreeResources([frTextureDataInNodes]);
 
     FLightSet := TVRMLLightSetGL.Create(LoadAsVRML(LightSetFileName),
       true,
@@ -1374,9 +1366,9 @@ begin
 
   if not MenuBackground then
   begin
-    Scene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
-    Scene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
-    Scene.Spatial := [ssRendering, ssCollisionOctree];
+    MainScene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
+    MainScene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
+    MainScene.Spatial := [ssRendering, ssCollisionOctree];
 
     { TrianglesList was created for triangle octree. We don't need it anymore.
 
@@ -1393,10 +1385,8 @@ begin
   FreeWithContentsAndNil(FSectors);
   FreeWithContentsAndNil(FWaypoints);
   FreeAndNil(FLightSet);
-  FreeAndNil(FScene);
   FreeWithContentsAndNil(FItems);
   FreeWithContentsAndNil(FCreatures);
-  FreeAndNil(FObjects);
   if FRequiredCreatures <> nil then
     UnRequireCreatures(FRequiredCreatures);
   inherited;
@@ -1473,7 +1463,7 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
   begin
     { Later: it can be updated during runtime by TLevel subclasses
       if BumpMappingMethod in bmGLSLAll. }
-    Scene.BumpMappingLightPosition := Vector3SingleFromElementData(
+    MainScene.BumpMappingLightPosition := Vector3SingleFromElementData(
       'position', DefaultBumpMappingLightPosition);
     BumpMappingLightAmbientColor[false] := Vector4SingleFromElementData(
       'ambient_color_shadows', DefaultBumpMappingLightAmbientColor);
@@ -1529,7 +1519,7 @@ function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
 var
   BoxShape: TVRMLShape;
 begin
-  BoxShape := Scene.Shapes.FindBlenderMesh(NodeName);
+  BoxShape := MainScene.Shapes.FindBlenderMesh(NodeName);
   Result := BoxShape <> nil;
   if Result then
   begin
@@ -1539,7 +1529,7 @@ begin
       This way we can comfortably set such boxes from Blender. }
     Box := BoxShape.BoundingBox;
     BoxShape.Geometry.FreeRemovingFromAllParents;
-    Scene.ChangedAll;
+    MainScene.ChangedAll;
   end;
 end;
 
@@ -1704,38 +1694,10 @@ begin
   end;
 end;
 
-function TLevel.LineOfSight(
-  const Pos1, Pos2: TVector3Single): boolean;
+function TLevel.LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
 begin
-  Result := not Scene.OctreeCollisions.IsSegmentCollision(
-    Pos1, Pos2, nil, false,
-    @Scene.OctreeCollisions.IgnoreTransparentItem);
-
-  if not Result then
-    Exit;
-
-  if Objects.SegmentCollision(Pos1, Pos2,
-      @Scene.OctreeCollisions.IgnoreTransparentItem) then
-    Result := false;
-end;
-
-function TLevel.ObjectsMoveAllowedSimple(
-  const Position: TVector3Single;
-  const NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
-begin
-  Result := Objects.MoveAllowedSimple(Position, NewPos,
-    MovingObjectCameraRadius, @CollisionIgnoreItem);
-end;
-
-function TLevel.ObjectsMoveBoxAllowedSimple(
-  const OldPos, ProposedNewPos: TVector3Single;
-  const ProposedNewBox: TBox3d;
-  const BecauseOfGravity: boolean): boolean;
-begin
-  Result := Objects.MoveBoxAllowedSimple(OldPos, ProposedNewPos, ProposedNewBox,
-    @CollisionIgnoreItem);
+  Result := Objects.SegmentCollision(Pos1, Pos2,
+    @MainScene.OctreeCollisions.IgnoreTransparentItem)
 end;
 
 function TLevel.MoveAllowed(const Position: TVector3Single;
@@ -1743,13 +1705,12 @@ function TLevel.MoveAllowed(const Position: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
 begin
-  Result :=
-    Scene.OctreeCollisions.MoveAllowed(
-      Position, ProposedNewPos, NewPos, MovingObjectCameraRadius,
-      nil, @CollisionIgnoreItem) and
-    Box3dPointInside(NewPos, LevelBox) and
-    ObjectsMoveAllowedSimple(
-      Position, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
+  Result := Objects.MoveAllowed(Position, ProposedNewPos, NewPos,
+    MovingObjectCameraRadius, @CollisionIgnoreItem);
+
+  if Result then
+    { TODO: this should be handled by SceneManager.CameraBox }
+    Result := Box3dPointInside(NewPos, LevelBox);
 end;
 
 function TLevel.MoveAllowedSimple(const Position: TVector3Single;
@@ -1757,13 +1718,12 @@ function TLevel.MoveAllowedSimple(const Position: TVector3Single;
   const BecauseOfGravity: boolean;
   const MovingObjectCameraRadius: Single): boolean;
 begin
-  Result :=
-    Box3dPointInside(NewPos, LevelBox) and
-    Scene.OctreeCollisions.MoveAllowedSimple(
-      Position, NewPos, MovingObjectCameraRadius,
-      nil, @CollisionIgnoreItem) and
-    ObjectsMoveAllowedSimple(
-      Position, NewPos, BecauseOfGravity, MovingObjectCameraRadius);
+  Result := Objects.MoveAllowedSimple(Position, NewPos,
+    MovingObjectCameraRadius, @CollisionIgnoreItem);
+
+  if Result then
+    { TODO: this should be handled by SceneManager.CameraBox }
+    Result := Box3dPointInside(NewPos, LevelBox);
 end;
 
 function TLevel.MoveBoxAllowedSimple(const Position: TVector3Single;
@@ -1771,40 +1731,24 @@ function TLevel.MoveBoxAllowedSimple(const Position: TVector3Single;
   const NewBox: TBox3d;
   const BecauseOfGravity: boolean): boolean;
 begin
-  Result :=
-    Box3dPointInside(NewPos, LevelBox) and
-    Scene.OctreeCollisions.MoveBoxAllowedSimple(
-      Position, NewPos, NewBox,
-      nil, @CollisionIgnoreItem) and
-    ObjectsMoveBoxAllowedSimple(
-      Position, NewPos, NewBox, BecauseOfGravity);
+  Result := Objects.MoveBoxAllowedSimple(Position, NewPos, NewBox,
+    @CollisionIgnoreItem);
+
+  if Result then
+    { TODO: this should be handled by SceneManager.CameraBox }
+    Result := Box3dPointInside(NewPos, LevelBox);
 end;
 
 procedure TLevel.GetCameraHeight(const Position: TVector3Single;
   out IsAboveTheGround: boolean; out HeightAboveTheGround: Single;
   out GroundItem: PVRMLTriangle);
-var
-  ThisIsAbove: boolean;
-  ThisSqrHeightAbove, ThisHeightAbove: Single;
-  ThisItem: PVRMLTriangle;
 begin
-  Scene.OctreeCollisions.GetCameraHeightZ(
-    Position,
-    IsAboveTheGround, HeightAboveTheGround, GroundItem,
-    nil, @CollisionIgnoreItem);
-
   Objects.GetCameraHeight(Position, GravityUp, @CollisionIgnoreItem,
-    ThisIsAbove, ThisSqrHeightAbove, ThisItem);
-  if ThisIsAbove then
-    ThisHeightAbove := Sqrt(ThisSqrHeightAbove);
+    IsAboveTheGround, HeightAboveTheGround, GroundItem);
 
-  if ThisIsAbove and
-    ((not IsAboveTheGround) or (ThisHeightAbove < HeightAboveTheGround)) then
-  begin
-    IsAboveTheGround := true;
-    HeightAboveTheGround := ThisHeightAbove;
-    GroundItem := ThisItem;
-  end;
+  { Objects.GetCameraHeight sets sqr of height, so sqrt it now }
+  if IsAboveTheGround then
+    HeightAboveTheGround := Sqrt(HeightAboveTheGround);
 end;
 
 function TLevel.PlayerMoveAllowed(Camera: TWalkCamera;
@@ -1856,47 +1800,13 @@ procedure TLevel.Render(const Frustum: TFrustum; TransparentGroup: TTransparentG
 const
   InShadow = false; { TODO: doesn't matter for castle objects }
 begin
-  case TransparentGroup of
-    tgAll:
-      begin
-        { First pass rendering Objects: render non-transparent parts }
-        Objects.Render(Frustum, tgOpaque, InShadow);
-
-        Scene.RenderFrustum(Frustum, tgAll);
-
-        { Second pass rendering Objects: render transparent parts }
-        Objects.Render(Frustum, tgTransparent, InShadow);
-      end;
-    tgOpaque:
-      begin
-        { First pass rendering Objects: render non-transparent parts }
-        Objects.Render(Frustum, tgOpaque, InShadow);
-
-        Scene.RenderFrustum(Frustum, tgOpaque);
-      end;
-    tgTransparent:
-      begin
-        Scene.RenderFrustum(Frustum, tgTransparent);
-
-        { Second pass rendering Objects: render transparent parts }
-        Objects.Render(Frustum, tgTransparent, InShadow);
-      end;
-    else raise EInternalError.Create('castleplay 324hsdf32');
-  end;
+  Objects.Render(Frustum, TransparentGroup, InShadow);
 end;
 
 procedure TLevel.RenderShadowVolume(
   ShadowVolumes: TShadowVolumes);
 begin
   Objects.RenderShadowVolume(ShadowVolumes, true, IdentityMatrix4Single);
-
-  if SceneDynamicShadows then
-  begin
-    { Useless to optimize this by shadow culling in ShadowVolumes,
-      Scene will be visible practically always. }
-    ShadowVolumes.InitSceneAlwaysVisible;
-    Scene.RenderShadowVolumeCore(ShadowVolumes, true, IdentityMatrix4Single);
-  end;
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single);
@@ -1913,41 +1823,13 @@ end;
 
 function TLevel.TryPick(out IntersectionDistance: Single;
   const Ray0, RayVector: TVector3Single): T3DCollision;
+{$ifdef DEBUG_PICK}
 var
-  Triangle: PVRMLTriangle;
-  ThisIntersectionDistance: Single;
-  ThisCollision: T3DCollision;
-  {$ifdef DEBUG_PICK}
   S: string;
   I: Integer;
-  {$endif DEBUG_PICK}
+{$endif DEBUG_PICK}
 begin
-  { First, assume no collision }
-  Result := nil;
-
-  { Collision with Level.Scene }
-  Triangle := Scene.OctreeCollisions.RayCollision(
-    ThisIntersectionDistance, Ray0, RayVector, true, nil, false, nil);
-  if Triangle <> nil then
-  begin
-    IntersectionDistance := ThisIntersectionDistance;
-    Result := T3DCollision.Create;
-    Result.Triangle := Triangle;
-  end;
-
-  { Collisions with Objects[] }
-  ThisCollision := Objects.RayCollision(
-    ThisIntersectionDistance, Ray0, RayVector, nil);
-  if ThisCollision <> nil then
-  begin
-    if (Result = nil) or (ThisIntersectionDistance < IntersectionDistance) then
-    begin
-      IntersectionDistance := ThisIntersectionDistance;
-      FreeAndNil(Result);
-      Result := ThisCollision;
-    end else
-      FreeAndNil(ThisCollision);
-  end;
+  Result := Objects.RayCollision(IntersectionDistance, Ray0, RayVector, nil);
 
   {$ifdef DEBUG_PICK}
   if Result <> nil then
@@ -2037,7 +1919,7 @@ end;
 
 function TLevel.Background: TBackgroundGL;
 begin
-  Result := Scene.Background;
+  Result := MainScene.Background;
 end;
 
 procedure TLevel.TimeMessageInteractFailed(const S: string);
@@ -2063,16 +1945,16 @@ begin
   { Headlight will stay on here, but lights in Level.LightSet are off. }
   LightSet.TurnLightsOffForShadows;
 
-  Scene.BumpMappingLightAmbientColor := FBumpMappingLightAmbientColor[false];
-  Scene.BumpMappingLightDiffuseColor := Black4Single;
+  MainScene.BumpMappingLightAmbientColor := FBumpMappingLightAmbientColor[false];
+  MainScene.BumpMappingLightDiffuseColor := Black4Single;
 end;
 
 procedure TLevel.PopLightsOff;
 begin
   glPopAttrib();
 
-  Scene.BumpMappingLightAmbientColor := FBumpMappingLightAmbientColor[true];
-  Scene.BumpMappingLightDiffuseColor := FBumpMappingLightDiffuseColor;
+  MainScene.BumpMappingLightAmbientColor := FBumpMappingLightAmbientColor[true];
+  MainScene.BumpMappingLightDiffuseColor := FBumpMappingLightDiffuseColor;
 end;
 
 function TLevel.GetBumpMappingLightAmbientColor(const Lighted: boolean):
@@ -2086,16 +1968,16 @@ procedure TLevel.SetBumpMappingLightAmbientColor(const Lighted: boolean;
 begin
   FBumpMappingLightAmbientColor[Lighted] := Value;
 
-  { Scene.BumpMappingLightAmbientColor should normally correspond to
+  { MainScene.BumpMappingLightAmbientColor should normally correspond to
     BumpMappingLightAmbientColor[true], so update it if it changed. }
   if Lighted then
-    Scene.BumpMappingLightAmbientColor := Value;
+    MainScene.BumpMappingLightAmbientColor := Value;
 end;
 
 procedure TLevel.SetBumpMappingLightDiffuseColor(const Value: TVector4Single);
 begin
   FBumpMappingLightDiffuseColor := Value;
-  Scene.BumpMappingLightDiffuseColor := Value;
+  MainScene.BumpMappingLightDiffuseColor := Value;
 end;
 
 end.

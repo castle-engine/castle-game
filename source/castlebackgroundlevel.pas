@@ -159,7 +159,7 @@ begin
       glLoadMatrix(BackgroundCamera.Matrix);
 
       { Set headlight }
-      TVRMLGLHeadlight.RenderOrDisable(BackgroundLevel.Scene.Headlight, 0,
+      TVRMLGLHeadlight.RenderOrDisable(BackgroundLevel.MainScene.Headlight, 0,
         true, BackgroundCamera);
 
       BackgroundLevel.LightSet.RenderLights;

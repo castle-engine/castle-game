@@ -344,10 +344,10 @@ const
     WerewolfCreature[0].Howl(true);
 
     { change the lights }
-    Scene.Headlight.AmbientIntensity := 0.8;
-    Scene.Headlight.Color := Vector3Single(1, 0, 0);
-    Scene.Headlight.Intensity := 0.2;
-    Level.Scene.Headlight.Render(0, false { it should be already enabled },
+    MainScene.Headlight.AmbientIntensity := 0.8;
+    MainScene.Headlight.Color := Vector3Single(1, 0, 0);
+    MainScene.Headlight.Intensity := 0.2;
+    MainScene.Headlight.Render(0, false { it should be already enabled },
       true, ZeroVector3Single, ZeroVector3Single);
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
@@ -614,7 +614,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single);
       Player.Camera.Position := Destination;
       Player.Camera.CancelFallingDown;
 
-      Scene.ViewChangedSuddenly;
+      MainScene.ViewChangedSuddenly;
 
       SoundEngine.Sound(stTeleport);
     end;
@@ -1312,7 +1312,7 @@ procedure TDoomE1M1Level.ChangeLevelScene;
 begin
   inherited;
 
-  Scene.RootNode.EnumerateNodes(@RenameCreatures, true);
+  MainScene.RootNode.EnumerateNodes(@RenameCreatures, true);
   RemoveBoxNodeCheck(Elevator49DownBox, 'Elevator49DownBox');
   RemoveBoxNodeCheck(Elevator9a9bPickBox, 'Elev9a9bPickBox');
 end;

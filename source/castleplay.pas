@@ -514,8 +514,8 @@ begin
 
   Player.Camera.CancelFallingDown;
 
-  { Init Level.Scene.Headlight }
-  TVRMLGLHeadlight.RenderOrDisable(Level.Scene.Headlight, 0,
+  { Init Level.MainScene.Headlight }
+  TVRMLGLHeadlight.RenderOrDisable(Level.MainScene.Headlight, 0,
     true, Player.Camera);
 
   if Level.ThunderEffect <> nil then
@@ -727,7 +727,7 @@ procedure DoInteract;
       (Ray0, RayVector). The pick that has smallest IntersectionDistance
       "wins". }
 
-    { Collision with Level (Scene and Objects) }
+    { Collision with Level }
     LevelCollisionInfo := Level.TryPick(
       ThisIntersectionDistance, Ray0, RayVector);
     if (LevelCollisionInfo <> nil) and

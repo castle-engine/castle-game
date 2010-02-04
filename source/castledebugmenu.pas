@@ -608,15 +608,15 @@ begin
   { To better visualize light changes. }
   DrawBackgroundRectangle := false;
 
-  AmbientIntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.AmbientIntensity);
+  AmbientIntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.AmbientIntensity);
 
-  ColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.Color[0]);
-  ColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.Color[1]);
-  ColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.Color[2]);
+  ColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.Color[0]);
+  ColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.Color[1]);
+  ColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.Color[2]);
 
-  IntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.Scene.Headlight.Intensity);
+  IntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.Intensity);
 
-  SpotArgument := TGLMenuBooleanArgument.Create(Level.Scene.Headlight.Spot);
+  SpotArgument := TGLMenuBooleanArgument.Create(Level.MainScene.Headlight.Spot);
 
   Items.AddObject('Ambient intensity'  , AmbientIntensitySlider);
 
@@ -641,25 +641,25 @@ procedure TEditHeadlightMenu.CurrentItemSelected;
   var
     Vector3: TVector3Single;
   begin
-    Vector3 := Level.Scene.Headlight.Attenuation;
+    Vector3 := Level.MainScene.Headlight.Attenuation;
     if MessageInputQueryVector3Single(Glw, 'Change headlight Attenuation',
       Vector3, taLeft) then
-      Level.Scene.Headlight.Attenuation := Vector3;
+      Level.MainScene.Headlight.Attenuation := Vector3;
   end;
 
   procedure ChangeSpotProperties;
   var
     Value: Single;
   begin
-    Value := Level.Scene.Headlight.SpotCutOffAngle;
+    Value := Level.MainScene.Headlight.SpotCutOffAngle;
     if MessageInputQuery(Glw, 'Change headlight SpotCutOffAngle',
       Value, taLeft) then
-      Level.Scene.Headlight.SpotCutOffAngle := Value;
+      Level.MainScene.Headlight.SpotCutOffAngle := Value;
 
-    Value := Level.Scene.Headlight.SpotDropOffRate;
+    Value := Level.MainScene.Headlight.SpotDropOffRate;
     if MessageInputQuery(Glw, 'Change headlight SpotDropOffRate',
       Value, taLeft) then
-      Level.Scene.Headlight.SpotDropOffRate := Value;
+      Level.MainScene.Headlight.SpotDropOffRate := Value;
   end;
 
 begin
@@ -667,18 +667,18 @@ begin
     0..4: Exit;
     5: begin
          ChangeAttenuation;
-         Level.Scene.Headlight.Render(0, false { it should be already enabled },
+         Level.MainScene.Headlight.Render(0, false { it should be already enabled },
            true, ZeroVector3Single, ZeroVector3Single);
        end;
     6: begin
          SpotArgument.Value := not SpotArgument.Value;
-         Level.Scene.Headlight.Spot := SpotArgument.Value;
-         Level.Scene.Headlight.Render(0, false { it should be already enabled },
+         Level.MainScene.Headlight.Spot := SpotArgument.Value;
+         Level.MainScene.Headlight.Render(0, false { it should be already enabled },
            true, ZeroVector3Single, ZeroVector3Single);
        end;
     7: begin
          ChangeSpotProperties;
-         Level.Scene.Headlight.Render(0, false { it should be already enabled },
+         Level.MainScene.Headlight.Render(0, false { it should be already enabled },
            true, ZeroVector3Single, ZeroVector3Single);
        end;
     8: SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
@@ -691,20 +691,20 @@ begin
   case CurrentItem of
     0:
       begin
-        Level.Scene.Headlight.AmbientIntensity := AmbientIntensitySlider.Value;
-        Level.Scene.Headlight.Render(0, false { it should be already enabled },
+        Level.MainScene.Headlight.AmbientIntensity := AmbientIntensitySlider.Value;
+        Level.MainScene.Headlight.Render(0, false { it should be already enabled },
           true, ZeroVector3Single, ZeroVector3Single);
       end;
     1..3:
       begin
-        Level.Scene.Headlight.Color[CurrentItem-1] := ColorSlider[CurrentItem-1].Value;
-        Level.Scene.Headlight.Render(0, false { it should be already enabled },
+        Level.MainScene.Headlight.Color[CurrentItem-1] := ColorSlider[CurrentItem-1].Value;
+        Level.MainScene.Headlight.Render(0, false { it should be already enabled },
           true, ZeroVector3Single, ZeroVector3Single);
       end;
     4:
       begin
-        Level.Scene.Headlight.Intensity := IntensitySlider.Value;
-        Level.Scene.Headlight.Render(0, false { it should be already enabled },
+        Level.MainScene.Headlight.Intensity := IntensitySlider.Value;
+        Level.MainScene.Headlight.Render(0, false { it should be already enabled },
           true, ZeroVector3Single, ZeroVector3Single);
       end;
     else Exit;
@@ -731,7 +731,7 @@ begin
     PositionSlider[I] := TGLMenuFloatSlider.Create(
       Level.LevelBox[0, I] - LevelBoxSizes[I],
       Level.LevelBox[1, I] + LevelBoxSizes[I],
-      Level.Scene.BumpMappingLightPosition[I]);
+      Level.MainScene.BumpMappingLightPosition[I]);
 
   for I := 0 to 2 do
   begin
@@ -784,7 +784,7 @@ begin
          LightNode.FdKambiShadowsMain.Value then
       begin
         TVRMLPositionalLightNode(LightNode).FdLocation.Value :=
-          Level.Scene.BumpMappingLightPosition;
+          Level.MainScene.BumpMappingLightPosition;
         Level.LightSet.CalculateLights;
         Break;
       end;
@@ -816,9 +816,9 @@ begin
     0..2:
       begin
         Index := CurrentItem;
-        V := Level.Scene.BumpMappingLightPosition;
+        V := Level.MainScene.BumpMappingLightPosition;
         V[Index] := PositionSlider[Index].Value;
-        Level.Scene.BumpMappingLightPosition := V;
+        Level.MainScene.BumpMappingLightPosition := V;
         DoLockMainShadowsLight;
       end;
     3..5:
@@ -902,7 +902,7 @@ begin
        end;
     2, 3, 4: ;
     5: begin
-         if Level.Scene.Headlight <> nil then
+         if Level.MainScene.Headlight <> nil then
          begin
            FreeAndNil(EditHeadlightMenu);
            EditHeadlightMenu := TEditHeadlightMenu.Create(Application);
