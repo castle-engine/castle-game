@@ -1326,6 +1326,8 @@ begin
     Scene.FreeResources([frTrianglesListNotOverTriangulate]);
     }
   end;
+
+  MainScene.ProcessEvents := true;
 end;
 
 destructor TLevel.Destroy;
@@ -1796,6 +1798,8 @@ begin
     Result.Spatial := [ssCollisionOctree];
 
   Result.FreeResources([frTextureDataInNodes]);
+
+  Result.ProcessEvents := true;
 end;
 
 function TLevel.LoadLevelAnimation(
