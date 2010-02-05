@@ -543,6 +543,16 @@ begin
 
     NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel;
 
+    { copy DisableContextInitClose value to new level.
+      This is needed when it's called from inside debug menu,
+      to make Glw.Controls.Begin/EndDisableContextInitClose
+      matching. }
+    NewLevel.DisableContextInitClose := Level.DisableContextInitClose;
+
+    { initialize NewLevel.GLContextInit already, in case this is called
+      from inside debug menu (where explicit GLContextInit may be disabled). }
+    NewLevel.GLContextInit;
+
     { right before freeing old Level, insert NewLevel at the same place
       in GameControls and Glw.Controls as Level was. }
     GameControls.MakeSingle(TLevel, NewLevel);
