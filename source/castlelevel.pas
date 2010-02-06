@@ -1245,7 +1245,7 @@ begin
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
       FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
-      FCameraRadius := Box3dAvgSize(MainScene.BoundingBox) * 0.007;
+      FCameraRadius := Box3dAvgSize(MainScene.BoundingBox, 1) * 0.007;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
       FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
