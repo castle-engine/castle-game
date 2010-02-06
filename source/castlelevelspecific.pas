@@ -1414,9 +1414,7 @@ end;
 procedure TFountainLevel.ChangeLevelScene;
 begin
   inherited;
-  AddNormalMapToTexture(MainScene.RootNode, '_016marbre_jpg', '_016marbre_jpg_normalMap', '../../textures/normal_maps/016marbre.png');
-  AddNormalMapToTexture(MainScene.RootNode, '_012marbre_jpg', '_012marbre_jpg_normalMap', '../../textures/normal_maps/012marbre.png');
-  AddNormalMapToTexture(MainScene.RootNode, 'water2_jpg', 'water2_jpg_normalMap', '../../textures/normal_maps/water2.png');
+  LevelFountainProcess(MainScene.RootNode);
 end;
 
 procedure TFountainLevel.PrepareNewPlayer(NewPlayer: TPlayer);

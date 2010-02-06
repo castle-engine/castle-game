@@ -34,9 +34,13 @@ uses VRMLNodes;
 procedure AddNormalMapToTexture(Node: TVRMLNode;
   const TextureName, NormalMapName, NormalMapUrl: string);
 
+procedure LevelFountainProcess(Node: TVRMLNode);
+
 implementation
 
 uses SysUtils;
+
+{ AddNormalMapToTexture ------------------------------------------------------ }
 
 type
   TEnumerateAddNormalMapToTexture = class
@@ -90,6 +94,15 @@ begin
     if not E.NormalMapUsed then
       FreeAndNil(E.NormalMap);
   finally FreeAndNil(E) end;
+end;
+
+{ level-specific processing -------------------------------------------------- }
+
+procedure LevelFountainProcess(Node: TVRMLNode);
+begin
+  AddNormalMapToTexture(Node, '_016marbre_jpg', '_016marbre_jpg_normalMap', '../../textures/normal_maps/016marbre.png');
+  AddNormalMapToTexture(Node, '_012marbre_jpg', '_012marbre_jpg_normalMap', '../../textures/normal_maps/012marbre.png');
+  AddNormalMapToTexture(Node, 'water2_jpg', 'water2_jpg_normalMap', '../../textures/normal_maps/water2.png');
 end;
 
 end.
