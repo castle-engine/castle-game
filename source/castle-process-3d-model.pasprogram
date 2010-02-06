@@ -120,39 +120,38 @@ class procedure TEnumerateResolveInlines.Enumerate(ParentNode: TVRMLNode; var No
 var
   G2: TNodeGroup_2;
   G1: TNodeGroup_1;
-  I: Integer;
+  Inlined: TVRMLNode;
 begin
   { Replace VRML >= 2.0 inlines with VRML 2.0 / X3D Group node }
   if Node is TNodeInline then
   begin
     TNodeInline(Node).LoadInlined(false);
-    G2 := TNodeGroup_2.Create(Node.NodeName, Node.WWWBasePath);
-    { update PositionInParent,
-      to make the resulting VRML look more similar to original
-      (otherwise resolved inline could move up in the file) }
-    G2.PositionInParent := Node.PositionInParent;
-    for I := 0 to Node.ChildrenCount - 1 do
-      G2.FdChildren.AddItem(Node.Children[I]);
-    Node := G2;
-  end else
-  if Node is TNodeInlineLoadControl then
-  begin
-    TNodeInlineLoadControl(Node).LoadInlined(false);
-    G2 := TNodeGroup_2.Create(Node.NodeName, Node.WWWBasePath);
-    G2.PositionInParent := Node.PositionInParent;
-    for I := 0 to Node.ChildrenCount - 1 do
-      G2.FdChildren.AddItem(Node.Children[I]);
-    Node := G2;
+    Inlined := TNodeInline(Node).Inlined;
+
+    if Inlined <> nil then
+    begin
+      G2 := TNodeGroup_2.Create(Node.NodeName, Node.WWWBasePath);
+      { update PositionInParent,
+        to make the resulting VRML look more similar to original
+        (otherwise resolved inline could move up in the file) }
+      G2.PositionInParent := Node.PositionInParent;
+      G2.FdChildren.AddItem(Inlined);
+      Node := G2;
+    end;
   end else
   { Replace VRML 1.0 inlines with VRML 1.0 Group node }
   if Node is TNodeWWWInline then
   begin
     TNodeWWWInline(Node).LoadInlined(false);
-    G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
-    G1.PositionInParent := Node.PositionInParent;
-    for I := 0 to Node.ChildrenCount - 1 do
-      G1.AddChild(Node.Children[I]);
-    Node := G1;
+    Inlined := TNodeWWWInline(Node).Inlined;
+
+    if Inlined <> nil then
+    begin
+      G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
+      G1.PositionInParent := Node.PositionInParent;
+      G1.AddChild(Inlined);
+      Node := G1;
+    end;
   end;
 end;
 
