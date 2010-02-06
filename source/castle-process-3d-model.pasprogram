@@ -127,6 +127,10 @@ begin
   begin
     TNodeInline(Node).LoadInlined(false);
     G2 := TNodeGroup_2.Create(Node.NodeName, Node.WWWBasePath);
+    { update PositionInParent,
+      to make the resulting VRML look more similar to original
+      (otherwise resolved inline could move up in the file) }
+    G2.PositionInParent := Node.PositionInParent;
     for I := 0 to Node.ChildrenCount - 1 do
       G2.FdChildren.AddItem(Node.Children[I]);
     Node := G2;
@@ -135,6 +139,7 @@ begin
   begin
     TNodeInlineLoadControl(Node).LoadInlined(false);
     G2 := TNodeGroup_2.Create(Node.NodeName, Node.WWWBasePath);
+    G2.PositionInParent := Node.PositionInParent;
     for I := 0 to Node.ChildrenCount - 1 do
       G2.FdChildren.AddItem(Node.Children[I]);
     Node := G2;
@@ -144,6 +149,7 @@ begin
   begin
     TNodeWWWInline(Node).LoadInlined(false);
     G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
+    G1.PositionInParent := Node.PositionInParent;
     for I := 0 to Node.ChildrenCount - 1 do
       G1.AddChild(Node.Children[I]);
     Node := G1;
