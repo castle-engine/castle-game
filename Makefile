@@ -68,19 +68,29 @@ build-unix: clean-glwindow
 	  fpc $(FPC_UNIX_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
 	  @kambi.cfg ../castle/source/castle.pasprogram
 	mv source/castle ./
+	cd ../kambi_vrml_game_engine/ && \
+	  fpc $(FPC_UNIX_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
+	  @kambi.cfg ../castle/source/castle-process-3d-model.pasprogram
+	mv source/castle-process-3d-model ./
 
 build-windows: clean-glwindow
 	cd ../kambi_vrml_game_engine/ && \
 	  fpc $(FPC_WINDOWS_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
 	  @kambi.cfg ../castle/source/castle.pasprogram
 	mv source/castle.exe ./castle.exe
+	cd ../kambi_vrml_game_engine/ && \
+	  fpc $(FPC_WINDOWS_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
+	  @kambi.cfg ../castle/source/castle-process-3d-model.pasprogram
+	mv source/castle-process-3d-model.exe ./castle-process-3d-model.exe
 
 # ------------------------------------------------------------
 # Cleaning targets.
 
 # Clean files which are easily recoverable, or just temporary trash
 # (after compilers or editors).
-# This does not include compiled binaries.
+# This does not include compiled "castle" binaries, but it *does*
+# include "castle-process-3d-model" binaries (as I don't want to pack
+# them in releases).
 clean:
 	find . -type f '(' -iname '*.ow'  -or -iname '*.ppw' -or -iname '*.aw' -or \
 	                   -iname '*.o'   -or -iname '*.ppu' -or -iname '*.a' -or \
@@ -95,6 +105,7 @@ clean:
 # script inside a temporary copy of castle files, where source/
 # subdirectory isn't supposed to exist.
 	if [ -d source/ ]; then $(MAKE) -C source/ clean; fi
+	rm -f castle-process-3d-model castle-process-3d-model.exe
 
 clean_binaries:
 	rm -f castle castle.exe
