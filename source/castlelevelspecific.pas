@@ -248,6 +248,8 @@ type
   end;
 
   TFountainLevel = class(TLevel)
+  protected
+    procedure ChangeLevelScene; override;
   public
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
@@ -259,7 +261,7 @@ implementation
 uses KambiFilesUtils, SysUtils, KambiUtils,
   GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderStateUnit,
   CastlePlay, CastleTimeMessages, CastleInputs,
-  CastleItems, CastleThunder, CastleWindow;
+  CastleItems, CastleThunder, CastleWindow, CastleVRMLProcessing;
 
 function CastleLevelsPath: string;
 begin
@@ -1396,6 +1398,14 @@ begin
 end;
 
 { TFountainLevel ------------------------------------------------------------- }
+
+procedure TFountainLevel.ChangeLevelScene;
+begin
+  inherited;
+  AddNormalMapToTexture(MainScene.RootNode, '_016marbre_jpg', '_016marbre_jpg_normalMap', '../../textures/normal_maps/016marbre.png');
+  AddNormalMapToTexture(MainScene.RootNode, '_012marbre_jpg', '_012marbre_jpg_normalMap', '../../textures/normal_maps/012marbre.png');
+  AddNormalMapToTexture(MainScene.RootNode, 'water2_jpg', 'water2_jpg_normalMap', '../../textures/normal_maps/water2.png');
+end;
 
 procedure TFountainLevel.PrepareNewPlayer(NewPlayer: TPlayer);
 begin

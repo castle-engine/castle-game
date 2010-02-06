@@ -205,42 +205,6 @@ on MESH-NAME to be correctly interpreted."
 							transparency .*
 						}\\)")
 
-(defun kam-add-normalMap-to-texture (texture-name normal-map-name normal-map-url)
-
-  ;; add DEF for normalMap, where texture has DEF
-  (kam-simple-re-replace-buffer
-    (concat
-    "appearance Appearance {
-						material " kam-vrml-material-regexp "
-						texture \\(DEF " (regexp-quote texture-name) " ImageTexture {
-							url \".*\"
-						}\\)
-					}")
-    (concat
-    "appearance KambiAppearance {
-						material \\1
-						texture \\2
-                                                normalMap DEF " (regexp-quote normal-map-name) " ImageTexture {
-                                                	url \"" normal-map-url "\"
-                                                }
-					}"))
-
-  ;; add USE for normalMap, where texture has USE
-  (kam-simple-re-replace-buffer
-    (concat
-    "appearance Appearance {
-						material " kam-vrml-material-regexp "
-						texture USE " (regexp-quote texture-name) "
-					}")
-    (concat
-    "appearance KambiAppearance {
-						material \\1
-						texture USE " (regexp-quote texture-name) "
-                                                normalMap USE " (regexp-quote normal-map-name) "
-					}"))
-
-)
-
 ;; Processing specific VRML files ----------------------------------------------
 
 (defun kam-process-castle-hall ()
@@ -363,12 +327,4 @@ on MESH-NAME to be correctly interpreted."
   (kam-remove-vertex-col-material-one-mesh "Water")
   (kam-add-material-for-mesh "Water" "MatWater")
   (write-file "end_sequence_processed.wrl")
-)
-
-(defun kam-process-fountain ()
-  (interactive)
-  (kam-add-normalMap-to-texture "_016marbre_jpg" "_016marbre_jpg_normalMap" "../../textures/normal_maps/016marbre.png")
-  (kam-add-normalMap-to-texture "_012marbre_jpg" "_012marbre_jpg_normalMap" "../../textures/normal_maps/012marbre.png")
-  (kam-add-normalMap-to-texture "water2_jpg" "water2_jpg_normalMap" "../../textures/normal_maps/water2.png")
-  (write-file "fountain_processed.wrl")
 )
