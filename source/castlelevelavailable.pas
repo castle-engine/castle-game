@@ -66,7 +66,7 @@ type
 
     Demo: boolean;
 
-    function CreateLevel(MenuBackground: boolean = false): TLevel;
+    function CreateLevel(Usage: TLevelUsage = luPlay): TLevel;
   end;
 
   TObjectsListItem_1 = TLevelAvailable;
@@ -250,13 +250,13 @@ begin
   glPopAttrib;
 end;
 
-function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
+function TLevelAvailable.CreateLevel(Usage: TLevelUsage): TLevel;
 
   procedure CreateLevelCore;
   begin
     Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
-      Title, TitleHint, Number, LevelDOMElement, RequiredCreatures, MenuBackground);
-    if not MenuBackground then
+      Title, TitleHint, Number, LevelDOMElement, RequiredCreatures, Usage);
+    if Usage = luPlay then
       AvailableForNewGame := true;
   end;
 
