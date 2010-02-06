@@ -432,6 +432,8 @@ var
 begin
   inherited;
 
+  if Player = nil then Exit;
+
   if Box3dPointInside(Player.Camera.Position, FLevelExitBox) then
   begin
     LevelFinished('cages');
@@ -671,6 +673,8 @@ const
   CartSoundRepeatTime = 10.0;
 begin
   inherited;
+
+  if Player = nil then Exit;
 
   if Box3dPointInside(Player.Camera.Position, FGateExitBox) then
   begin
@@ -946,6 +950,8 @@ var
 begin
   inherited;
 
+  if Player = nil then Exit;
+
   if not GameWin then
   begin
     { Torch light modify, to make an illusion of unstable light }
@@ -1068,6 +1074,8 @@ procedure TCagesLevel.Picked(const Distance: Single;
 begin
   inherited;
 
+  if Player = nil then Exit;
+
   if CollisionInfo.Hierarchy.IndexOf(FGateExit) <> -1 then
   begin
     InteractionOccured := true;
@@ -1121,7 +1129,7 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TKamTime);
       Child.BoundingBox,
       GetTranslationFromTime(NewAnimationTime));
 
-    Result := Boxes3dCollision(DoorBox, Player.BoundingBox);
+    Result := (Player <> nil) and Boxes3dCollision(DoorBox, Player.BoundingBox);
     if Result then
       Exit;
 
@@ -1258,6 +1266,8 @@ var
 begin
   inherited;
 
+  if Player = nil then Exit;
+
   if (CollisionInfo.Hierarchy.Count > 1) and
     (CollisionInfo.Hierarchy[1] is TDoomLevelDoor) then
   begin
@@ -1332,6 +1342,8 @@ procedure TDoomE1M1Level.Idle(const CompSpeed: Single;
   var LetOthersHandleMouseAndKeys: boolean);
 begin
   inherited;
+
+  if Player = nil then Exit;
 
   if MovingElevator49.CompletelyBeginPosition and
      Box3dPointInside(Player.Camera.Position, Elevator49DownBox) then

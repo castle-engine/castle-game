@@ -130,13 +130,8 @@ begin
     CreateLevel(true);
   BackgroundControls.Add(BackgroundLevel);
 
-  { initialize BackgroundLevel.Camera }
-  BackgroundLevel.Camera := TWalkCamera.Create(BackgroundLevel);
-  (BackgroundLevel.Camera as TWalkCamera).Init(
-    BackgroundLevel.InitialPosition,
-    BackgroundLevel.InitialDirection,
-    BackgroundLevel.InitialUp,
-    BackgroundLevel.GravityUp, 0.0, 0.0 { unused, we don't use Gravity here });
+  { create BackgroundLevel.Camera now, for next assignment }
+  BackgroundLevel.Camera := BackgroundLevel.CreateDefaultCamera(BackgroundLevel);
 
   { Do not allow to move the camera in any way.
     We should also disable any other interaction with the scene,

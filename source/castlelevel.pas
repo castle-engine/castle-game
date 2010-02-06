@@ -729,6 +729,7 @@ type
       CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
 
     procedure BeforeDraw; override;
+    function CreateDefaultCamera(AOwner: TComponent): TCamera; override;
 
     { CameraMoveAllowed and CameraGetHeight just
       call appropriate non-player methods.
@@ -852,10 +853,13 @@ begin
 
       if MovePushesOthersUsesBoxes then
       begin
-        Box := Player.BoundingBox;
-        if Boxes3dCollision(NewBox, Box) or
-           Boxes3dCollision(CurrentBox, Box) then
-          Player.Camera.Position := Player.Camera.Position + Move;
+        if Player <> nil then
+        begin
+          Box := Player.BoundingBox;
+          if Boxes3dCollision(NewBox, Box) or
+             Boxes3dCollision(CurrentBox, Box) then
+            Player.Camera.Position := Player.Camera.Position + Move;
+        end;
 
         for I := 0 to ParentLevel.Creatures.High do
         begin
@@ -876,10 +880,13 @@ begin
         end;
       end else
       begin
-        if SphereCollisionAssumeTranslation(NewTranslation,
-          Player.Camera.Position, ParentLevel.CameraRadius,
-          @ParentLevel.CollisionIgnoreItem) then
-          Player.Camera.Position := Player.Camera.Position + Move;
+        if Player <> nil then
+        begin
+          if SphereCollisionAssumeTranslation(NewTranslation,
+            Player.Camera.Position, ParentLevel.CameraRadius,
+            @ParentLevel.CollisionIgnoreItem) then
+            Player.Camera.Position := Player.Camera.Position + Move;
+        end;
 
         for I := 0 to ParentLevel.Creatures.High do
         begin
@@ -1111,7 +1118,9 @@ var
   ReplaceInteractInput: TPercentReplace;
 begin
   inherited;
-  if (not MessageDone) and PointInside(Player.Camera.Position) then
+  if (not MessageDone) and
+     (Player <> nil) and
+     PointInside(Player.Camera.Position) then
   begin
     ReplaceInteractInput.C := 'i';
     ReplaceInteractInput.S := InteractInputDescription;
@@ -1988,6 +1997,9 @@ procedure TLevel.ApplyProjection;
   end;
 
 begin
+  if Camera = nil then
+    Camera := CreateDefaultCamera(Self);
+
   ShadowVolumesDraw := DebugRenderShadowVolume;
   ShadowVolumesPossible := RenderShadowsPossible;
   ShadowVolumes := RenderShadows;
@@ -2005,6 +2017,17 @@ begin
     ProjectionNear, ProjectionFarFinal);
 
   UpdateCameraProjectionMatrix;
+end;
+
+function TLevel.CreateDefaultCamera(AOwner: TComponent): TCamera;
+begin
+  { This camera is suitable for background level and castle-view-level.
+    For actual game, camera will be taken from Player.Camera. }
+
+  Result := TWalkCamera.Create(AOwner);
+  (Result as TWalkCamera).Init(
+    InitialPosition, InitialDirection, InitialUp, GravityUp,
+    0.0, 0.0 { unused, we don't use Gravity here });
 end;
 
 end.
