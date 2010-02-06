@@ -342,18 +342,6 @@ type
     procedure Idle(const CompSpeed: Single); override;
   end;
 
-  { How the created level will be used.
-
-    Setting this to something else than luPlay will disable some features.
-    This is needed for non-standard usage as a menu background
-    (under the castle start menu) and in castle-view-level.
-    Various small features have to be turned off then,
-    and it would be too tiresome to make nice orthogonal properties
-    to turn all these features separately
-    (like TLevel.Collisions, TLevel.UseItemsAndCreatures,
-    TLevel.NormallHeadlight ....). }
-  TLevelUsage = (luMenuBackground, luView, luPlay);
-
   TLevel = class(TKamSceneManager)
   private
     FLightSet: TVRMLLightSetGL;
@@ -414,7 +402,7 @@ type
 
     procedure LoadFromDOMElement(Element: TDOMElement);
   private
-    FUsage: TLevelUsage;
+    FMenuBackground: boolean;
     FSceneDynamicShadows: boolean;
 
     FRequiredCreatures: TStringList;
@@ -493,7 +481,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AUsage: TLevelUsage); reintroduce; virtual;
+      AMenuBackground: boolean); reintroduce; virtual;
 
     destructor Destroy; override;
 
@@ -705,7 +693,7 @@ type
       BossCreature life. }
     function BossCreatureIndicator(out Life, MaxLife: Single): boolean; virtual;
 
-    property Usage: TLevelUsage read FUsage;
+    property MenuBackground: boolean read FMenuBackground write FMenuBackground;
 
     { If @true, we will render dynamic shadows (shadow volumes) for
       all scene geometry. This allows the whole level to use dynamic
@@ -1159,7 +1147,7 @@ constructor TLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AUsage: TLevelUsage);
+  AMenuBackground: boolean);
 
   procedure RemoveItemsToRemove;
   var
@@ -1187,7 +1175,7 @@ begin
   FTitle := ATitle;
   FTitleHint := ATitleHint;
   FNumber := ANumber;
-  FUsage := AUsage;
+  FMenuBackground := AMenuBackground;
   FRequiredCreatures := ARequiredCreatures;
 
   RequireCreatures(FRequiredCreatures);
@@ -1334,7 +1322,7 @@ begin
   { Loading octree have their own Progress, so we load them outside our
     progress. }
 
-  if Usage <> luMenuBackground then
+  if not MenuBackground then
   begin
     MainScene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
     MainScene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
@@ -1724,7 +1712,7 @@ begin
   Result := inherited CameraMoveAllowed(ACamera,
     ProposedNewPos, NewPos, BecauseOfGravity);
 
-  if Usage <> luPlay then Exit;
+  if MenuBackground then Exit;
 
   { Check collision Player <-> Creatures here. }
   if Result then
@@ -1741,7 +1729,7 @@ begin
   { Check is player standing over level. }
   inherited CameraGetHeight(ACamera, IsAbove, AboveHeight, AboveGround);
 
-  if Usage <> luPlay then Exit;
+  if MenuBackground then Exit;
 
   { Check is player standing over one of the creatures. }
   Creatures.GetHeightAbove(ACamera.Position, IsAbove,
@@ -1924,7 +1912,7 @@ begin
 
   { for background level view, we do not show creatures / items
     (their kinds are possibly not loaded yet) }
-  if Usage <> luPlay then Exit;
+  if MenuBackground then Exit;
 
   { When GameWin, don't render creatures (as we don't check
     collisions when MovingPlayerEndSequence). }
@@ -1964,9 +1952,9 @@ end;
 
 procedure TLevel.RenderHeadLight;
 begin
-  if Usage <> luPlay then
+  if MenuBackground then
     inherited;
-  { For luPlay levels we control headlight elsewhere }
+  { For non-MenuBackground levels we control headlight elsewhere }
 end;
 
 procedure TLevel.RenderFromViewEverything;
@@ -1975,7 +1963,7 @@ begin
   ShadowVolumesPossible := RenderShadowsPossible;
   ShadowVolumes := RenderShadows;
 
-  { Actually, this is needed only when "(Usage = luPlay) and ShowDebugInfo".
+  { Actually, this is needed only when "(not MenuBackground) and ShowDebugInfo".
     But it's practically free, time use isn't really noticeable. }
   ShadowVolumeRenderer.Count := true;
 
@@ -2039,7 +2027,7 @@ begin
   Result := TWalkCamera.Create(AOwner);
   (Result as TWalkCamera).Init(
     InitialPosition, InitialDirection, InitialUp, GravityUp,
-    CameraPreferredHeight, CameraRadius);
+    0.0, 0.0 { unused, we don't use Gravity here });
 end;
 
 end.

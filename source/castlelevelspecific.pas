@@ -54,7 +54,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AUsage: TLevelUsage); override;
+      AMenuBackground: boolean); override;
 
     procedure Idle(const CompSpeed: Single;
       const HandleMouseAndKeys: boolean;
@@ -101,7 +101,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AUsage: TLevelUsage); override;
+      AMenuBackground: boolean); override;
     destructor Destroy; override;
 
     function CollisionIgnoreItem(
@@ -128,7 +128,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AUsage: TLevelUsage); override;
+      AMenuBackground: boolean); override;
 
     procedure Picked(const Distance: Single;
       CollisionInfo: T3DCollision;
@@ -155,7 +155,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AUsage: TLevelUsage); override;
+      AMenuBackground: boolean); override;
     destructor Destroy; override;
 
     procedure Idle(const CompSpeed: Single;
@@ -222,7 +222,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AUsage: TLevelUsage); override;
+      AMenuBackground: boolean); override;
     destructor Destroy; override;
 
     procedure Picked(const Distance: Single;
@@ -244,7 +244,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AUsage: TLevelUsage); override;
+      AMenuBackground: boolean); override;
   end;
 
   TFountainLevel = class(TLevel)
@@ -276,7 +276,7 @@ constructor TCastleHallLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AUsage: TLevelUsage);
+  AMenuBackground: boolean);
 var
   CastleHallLevelPath: string;
 begin
@@ -531,7 +531,7 @@ constructor TGateLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AUsage: TLevelUsage);
+  AMenuBackground: boolean);
 var
   Cart: TVRMLGLAnimation;
   GateLevelPath: string;
@@ -779,7 +779,7 @@ constructor TTowerLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AUsage: TLevelUsage);
+  AMenuBackground: boolean);
 var
   ElevatorButtonSum: T3DList;
   TowerLevelPath: string;
@@ -840,7 +840,7 @@ constructor TCagesLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AUsage: TLevelUsage);
+  AMenuBackground: boolean);
 var
   BossIndex: Integer;
 begin
@@ -1182,7 +1182,7 @@ constructor TDoomE1M1Level.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AUsage: TLevelUsage);
+  AMenuBackground: boolean);
 var
   DoomDoorsPathPrefix: string;
 
@@ -1391,7 +1391,7 @@ constructor TGateBackgroundLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AUsage: TLevelUsage);
+  AMenuBackground: boolean);
 var
   Water: TVRMLGLAnimation;
 begin
