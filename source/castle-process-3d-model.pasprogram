@@ -22,12 +22,14 @@
 
 { Apply to 3D model file some castle-specific processing,
   and then output the processed version on stdout.
-  Pass one argument --- source filename. We automatically detect
-  the type of processing to apply based on basename of this file.
+  Call with one command-line parameter: the source filename.
+  We automatically detect the type of processing to apply
+  based on the basename of this file.
 
   Example usage: pipe processed fountain level to view3dscene:
 
-    castle-process-3d-model data/levels/fountain/fountain_final | view3dscene -
+    cd data/levels/fountain/
+    castle-process-3d-model fountain_final.wrl | view3dscene -
 
   What processing is done?
 
@@ -49,7 +51,7 @@
 
   - Also, Inlines are resolved. That is, VRML/X3D "Inline" nodes are replaced
     with their actual files' contents. Without this, processing inside
-    inlines content would not be saved, and e.g. using this program with
+    inlines' content would not be saved, and e.g. using this program with
     data/levels/fountain/fountain_final.wrl would be useless
     (as the actual normal maps would be added inside inline'd fountain.wrl only).
 
