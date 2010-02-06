@@ -1258,7 +1258,7 @@ begin
       NavigationSpeed := 1.0;
 
     FProjectionNear := CameraRadius * 0.75;
-    FProjectionFar := Box3dMaxSize(MainScene.BoundingBox) * 5;
+    FProjectionFar := Box3dMaxSize(MainScene.BoundingBox, 1.0) * 5;
 
     { Fix InitialDirection length, and set MoveXxxSpeed.
 
