@@ -266,7 +266,7 @@ type
       default false;
   public
     MoveTime: Single;
-    TranslationEnd: TVector3_Single;
+    TranslationEnd: TVector3Single;
 
     function GetTranslationFromTime(const AnAnimationTime: TKamTime):
       TVector3Single; override;
@@ -787,7 +787,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
   const NewAnimationTime: TKamTime);
 
   function BoundingBoxAssumeTranslation(
-    const AssumeTranslation: TVector3_Single): TBox3d;
+    const AssumeTranslation: TVector3Single): TBox3d;
   begin
     if Exists and Collides then
       Result := Box3dTranslate(Child.BoundingBox, AssumeTranslation) else
@@ -795,7 +795,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
   end;
 
   function SphereCollisionAssumeTranslation(
-    const AssumeTranslation: TVector3_Single;
+    const AssumeTranslation: TVector3Single;
     const Pos: TVector3Single; const Radius: Single;
     const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
   begin
@@ -806,12 +806,12 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
         use Child.SphereCollsion with Translation. }
 
       Result := Child.SphereCollision(
-        VectorSubtract(Pos, AssumeTranslation.Data), Radius, TrianglesToIgnoreFunc);
+        Pos - AssumeTranslation, Radius, TrianglesToIgnoreFunc);
     end;
   end;
 
   function BoxCollisionAssumeTranslation(
-    const AssumeTranslation: TVector3_Single;
+    const AssumeTranslation: TVector3Single;
     const Box: TBox3d;
     const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
   begin
@@ -822,7 +822,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
         use Child.BoxCollsion with Translation. }
 
       Result := Child.BoxCollision(
-        Box3dAntiTranslate(Box, AssumeTranslation.Data), TrianglesToIgnoreFunc);
+        Box3dAntiTranslate(Box, AssumeTranslation), TrianglesToIgnoreFunc);
     end;
   end;
 
@@ -830,7 +830,7 @@ var
   CurrentBox, NewBox, Box: TBox3d;
   I: Integer;
   Move: TVector3Single;
-  CurrentTranslation, NewTranslation: TVector3_Single;
+  CurrentTranslation, NewTranslation: TVector3Single;
   Crea: TCreature;
   Item: TItemOnLevel;
 begin
@@ -845,7 +845,7 @@ begin
       floats). So the check below is worth the time, because we expect
       that usually is will render the rest if the code unnecessary. }
 
-    if not VectorsPerfectlyEqual(CurrentTranslation.Data, NewTranslation.Data) then
+    if not VectorsPerfectlyEqual(CurrentTranslation, NewTranslation) then
     begin
       CurrentBox := BoundingBox;
       NewBox := BoundingBoxAssumeTranslation(NewTranslation);

@@ -799,7 +799,7 @@ begin
   MovingElevator := TLevelLinearMovingObject.Create(Self);
   MovingElevator.Child := ElevatorButtonSum;
   MovingElevator.MoveTime := 10.0;
-  MovingElevator.TranslationEnd.Init(0, 0, 122);
+  MovingElevator.TranslationEnd := Vector3Single(0, 0, 122);
   MovingElevator.SoundGoEndPosition := stElevator;
   MovingElevator.SoundGoEndPositionLooping := true;
   MovingElevator.SoundGoBeginPosition := stElevator;
@@ -1196,7 +1196,7 @@ var
       on Doom E1M1 level (maybe all doors totally ?) have the same
       values for parameters below. }
     Result.MoveTime := 1.0;
-    Result.TranslationEnd.Init(0, 0, 3.5);
+    Result.TranslationEnd := Vector3Single(0, 0, 3.5);
     Result.StayOpenTime := 5.0;
   end;
 
@@ -1223,7 +1223,7 @@ begin
   MovingElevator49 := TLevelLinearMovingObject.Create(Self);
   MovingElevator49.Child := Elevator49;
   MovingElevator49.MoveTime := 3.0;
-  MovingElevator49.TranslationEnd.Init(0, 0, -6.7);
+  MovingElevator49.TranslationEnd := Vector3Single(0, 0, -6.7);
   MovingElevator49.SoundGoEndPosition := stElevator;
   MovingElevator49.SoundGoEndPositionLooping := true;
   MovingElevator49.SoundGoBeginPosition := stElevator;
@@ -1238,7 +1238,7 @@ begin
   MovingElevator9a9b := TLevelLinearMovingObject.Create(Self);
   MovingElevator9a9b.Child := Elevator9a9b;
   MovingElevator9a9b.MoveTime := 3.0;
-  MovingElevator9a9b.TranslationEnd.Init(0, 0, -7.5);
+  MovingElevator9a9b.TranslationEnd := Vector3Single(0, 0, -7.5);
   MovingElevator9a9b.SoundGoEndPosition := stElevator;
   MovingElevator9a9b.SoundGoEndPositionLooping := true;
   MovingElevator9a9b.SoundGoBeginPosition := stElevator;
