@@ -1,5 +1,5 @@
 {
-  Copyright 2007 Michalis Kamburelis.
+  Copyright 2007-2010 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -16,6 +16,8 @@
   You should have received a copy of the GNU General Public License
   along with "castle"; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  ----------------------------------------------------------------------------
 }
 
 { }
