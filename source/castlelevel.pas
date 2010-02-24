@@ -755,7 +755,7 @@ type
 
 implementation
 
-uses SysUtils, GL, GLU, Object3dAsVRML,
+uses SysUtils, GL, GLU, Object3DAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
   CastleInputs, CastleWindow, KambiOpenAL, ALUtils, KambiXMLUtils,

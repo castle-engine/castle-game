@@ -111,7 +111,7 @@ type
 
 implementation
 
-uses SysUtils, VRMLNodes, Object3dAsVRML;
+uses SysUtils, VRMLNodes, Object3DAsVRML;
 
 constructor TVRMLGLAnimationInfo.Create(
   const AModelFileNames: array of string;
