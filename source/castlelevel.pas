@@ -38,7 +38,7 @@ unit CastleLevel;
 
 interface
 
-uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3d,
+uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3D,
   VRMLNodes, VRMLFields, CastleItems, Cameras, VRMLTriangle, GL3D,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
@@ -280,14 +280,14 @@ type
     "purpose" is, is defined in each TLevelArea descendant.
 
     This class defines only a properties to define the area.
-    For now, each area is just one TBox3d. }
+    For now, each area is just one TBox3D. }
   TLevelArea = class(T3D)
   private
     FVRMLName: string;
-    FBox: TBox3d;
+    FBox: TBox3D;
 
-    { Area. Default value is EmptyBox3d. }
-    property Box: TBox3d read FBox write FBox;
+    { Area. Default value is EmptyBox3D. }
+    property Box: TBox3D read FBox write FBox;
   public
     constructor Create(AOwner: TComponent); override;
 
@@ -298,16 +298,16 @@ type
       If this object is present during ChangeLevelScene call from
       TLevel constructor then the shape with a parent named like VRMLName
       will be removed from VRML file, and it's BoundingBox will be used
-      as Box3d of this object.
+      as Box3D of this object.
 
       This way you can easily configure area of this object in Blender:
       just add a cube, set it's mesh name to match with this VRMLName,
-      and then this cube defines Box3d of this object. }
+      and then this cube defines Box3D of this object. }
     property VRMLName: string read FVRMLName write FVRMLName;
 
     function PointInside(const Point: TVector3Single): boolean;
 
-    function BoundingBox: TBox3d; override;
+    function BoundingBox: TBox3D; override;
 
     { Called from TLevel constructor. This is the place when you
       can modify ParentLevel.MainScene.RootNode, e.g. by calling
@@ -324,7 +324,7 @@ type
     FMessage: string;
     FMessageDone: boolean;
   public
-    { Message to this display when player enters Box3d.
+    { Message to this display when player enters Box3D.
       Some formatting strings are allowed inside:
       @unorderedList(
         @item(%% produces InteractInputDescription in the message.)
@@ -386,8 +386,8 @@ type
     FSectors: TSceneSectorsList;
     FWaypoints: TSceneWaypointsList;
 
-    FWaterBox: TBox3d;
-    FAboveWaterBox: TBox3d;
+    FWaterBox: TBox3D;
+    FAboveWaterBox: TBox3D;
 
     FPlayedMusicSound: TSoundType;
     FGlobalAmbientLight: TVector4Single;
@@ -425,10 +425,10 @@ type
       for description of CameraBox and WaterBox trick.
       Remember that this may change MainScene.BoundingBox (in case we will
       find and remove the node from Scene). }
-    function RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
+    function RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
 
     { Like RemoveBoxNode, but raise EInternalError if not found. }
-    procedure RemoveBoxNodeCheck(out Box: TBox3d; const NodeName: string);
+    procedure RemoveBoxNodeCheck(out Box: TBox3D; const NodeName: string);
 
     { This will be called from our constructor before initializing
       our octrees. Even before initializing creatures and items.
@@ -513,7 +513,7 @@ type
     property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
     property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
 
-    property WaterBox: TBox3d read FWaterBox;
+    property WaterBox: TBox3D read FWaterBox;
 
     { This is always calculated as a box with X, Y borders just like
       the WaterBox and the Z borders placed such that AboveWaterBox
@@ -528,7 +528,7 @@ type
       In other words, this means that player head is above the water surface
       but his feet are in the water. In some sense he/she is swimming,
       in some not. }
-    property AboveWaterBox: TBox3d read FAboveWaterBox;
+    property AboveWaterBox: TBox3D read FAboveWaterBox;
 
     { Items lying on the level.
       These Items are owned by level object, so everything remaining
@@ -573,7 +573,7 @@ type
 
     function MoveBoxAllowedSimple(
       const Position, NewPos: TVector3Single;
-      const NewBox: TBox3d;
+      const NewBox: TBox3D;
       const BecauseOfGravity: boolean): boolean; virtual;
 
     procedure GetHeightAbove(const Position: TVector3Single;
@@ -787,11 +787,11 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
   const NewAnimationTime: TKamTime);
 
   function BoundingBoxAssumeTranslation(
-    const AssumeTranslation: TVector3Single): TBox3d;
+    const AssumeTranslation: TVector3Single): TBox3D;
   begin
     if Exists and Collides then
-      Result := Box3dTranslate(Child.BoundingBox, AssumeTranslation) else
-      Result := EmptyBox3d;
+      Result := Box3DTranslate(Child.BoundingBox, AssumeTranslation) else
+      Result := EmptyBox3D;
   end;
 
   function SphereCollisionAssumeTranslation(
@@ -812,7 +812,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
 
   function BoxCollisionAssumeTranslation(
     const AssumeTranslation: TVector3Single;
-    const Box: TBox3d;
+    const Box: TBox3D;
     const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
   begin
     Result := Exists and Collides;
@@ -822,12 +822,12 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
         use Child.BoxCollsion with Translation. }
 
       Result := Child.BoxCollision(
-        Box3dAntiTranslate(Box, AssumeTranslation), TrianglesToIgnoreFunc);
+        Box3DAntiTranslate(Box, AssumeTranslation), TrianglesToIgnoreFunc);
     end;
   end;
 
 var
-  CurrentBox, NewBox, Box: TBox3d;
+  CurrentBox, NewBox, Box: TBox3D;
   I: Integer;
   Move: TVector3Single;
   CurrentTranslation, NewTranslation: TVector3Single;
@@ -856,8 +856,8 @@ begin
         if Player <> nil then
         begin
           Box := Player.BoundingBox;
-          if Boxes3dCollision(NewBox, Box) or
-             Boxes3dCollision(CurrentBox, Box) then
+          if Boxes3DCollision(NewBox, Box) or
+             Boxes3DCollision(CurrentBox, Box) then
             Player.Camera.Position := Player.Camera.Position + Move;
         end;
 
@@ -865,8 +865,8 @@ begin
         begin
           Crea := ParentLevel.Creatures[I];
           Box := Crea.BoundingBox;
-          if Boxes3dCollision(NewBox, Box) or
-             Boxes3dCollision(CurrentBox, Box) then
+          if Boxes3DCollision(NewBox, Box) or
+             Boxes3DCollision(CurrentBox, Box) then
             Crea.LegsPosition := Crea.LegsPosition + Move;
         end;
 
@@ -874,8 +874,8 @@ begin
         begin
           Item := ParentLevel.ItemsOnLevel[I];
           Box := Item.BoundingBox;
-          if Boxes3dCollision(NewBox, Box) or
-             Boxes3dCollision(CurrentBox, Box) then
+          if Boxes3DCollision(NewBox, Box) or
+             Boxes3DCollision(CurrentBox, Box) then
             Item.Position := Item.Position + Move;
         end;
       end else
@@ -968,7 +968,7 @@ end;
 
 function TLevelLinearMovingObject.SoundPosition: TVector3Single;
 begin
-  Result := Box3dMiddle(BoundingBox);
+  Result := Box3DMiddle(BoundingBox);
 end;
 
 procedure TLevelLinearMovingObject.PlaySound(SoundType: TSoundType;
@@ -1086,13 +1086,13 @@ end;
 constructor TLevelArea.Create(AOwner: TComponent);
 begin
   inherited;
-  FBox := EmptyBox3d;
+  FBox := EmptyBox3D;
 end;
 
-function TLevelArea.BoundingBox: TBox3d;
+function TLevelArea.BoundingBox: TBox3D;
 begin
   { This object is invisible and non-colliding. }
-  Result := EmptyBox3d;
+  Result := EmptyBox3D;
 end;
 
 procedure TLevelArea.ChangeLevelScene(AParentLevel: TLevel);
@@ -1103,7 +1103,7 @@ end;
 
 function TLevelArea.PointInside(const Point: TVector3Single): boolean;
 begin
-  Result := Box3dPointInside(Point, Box);
+  Result := Box3DPointInside(Point, Box);
 end;
 
 function TLevelArea.ParentLevel: TLevel;
@@ -1238,8 +1238,8 @@ begin
       FAboveWaterBox[1, 2] := FAboveWaterBox[0, 2] + 0.4;
     end else
     begin
-      FWaterBox := EmptyBox3d;
-      FAboveWaterBox := EmptyBox3d;
+      FWaterBox := EmptyBox3D;
+      FAboveWaterBox := EmptyBox3D;
     end;
 
     { calculate Sectors and Waypoints }
@@ -1254,7 +1254,7 @@ begin
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
       FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
-      FCameraRadius := Box3dAvgSize(MainScene.BoundingBox, 1) * 0.007;
+      FCameraRadius := Box3DAvgSize(MainScene.BoundingBox, 1) * 0.007;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
       FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
@@ -1267,7 +1267,7 @@ begin
       NavigationSpeed := 1.0;
 
     FProjectionNear := CameraRadius * 0.75;
-    FProjectionFar := Box3dMaxSize(MainScene.BoundingBox, 1.0) * 5;
+    FProjectionFar := Box3DMaxSize(MainScene.BoundingBox, 1.0) * 5;
 
     { Fix InitialDirection length, and set MoveXxxSpeed.
 
@@ -1475,7 +1475,7 @@ begin
     ReadBumpMappingLightProperties(BMElement);
 end;
 
-function TLevel.RemoveBoxNode(out Box: TBox3d; const NodeName: string): boolean;
+function TLevel.RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
 var
   BoxShape: TVRMLShape;
 begin
@@ -1493,7 +1493,7 @@ begin
   end;
 end;
 
-procedure TLevel.RemoveBoxNodeCheck(out Box: TBox3d; const NodeName: string);
+procedure TLevel.RemoveBoxNodeCheck(out Box: TBox3D; const NodeName: string);
 begin
   if not RemoveBoxNode(Box, NodeName) then
     raise EInternalError.CreateFmt('Error in level "%s": no box named "%s" found',
@@ -1523,7 +1523,7 @@ procedure TLevel.TraverseForItems(
     IgnoredBegin, ItemQuantityBegin: Integer;
     ItemKindQuantity, ItemKindVRMLNodeName: string;
     ItemQuantity: Cardinal;
-    ItemStubBoundingBox: TBox3d;
+    ItemStubBoundingBox: TBox3D;
     ItemPosition: TVector3Single;
   begin
     { Calculate ItemKindQuantity }
@@ -1578,7 +1578,7 @@ procedure TLevel.TraverseForCreatures(
 
   procedure CreateNewCreature(const CreatureNodeName: string);
   var
-    StubBoundingBox: TBox3d;
+    StubBoundingBox: TBox3D;
     CreaturePosition, CreatureDirection: TVector3Single;
     CreatureKind: TCreatureKind;
     CreatureKindName: string;
@@ -1669,7 +1669,7 @@ begin
     MovingObjectCameraRadius, @CollisionIgnoreItem);
 
   if Result then
-    Result := Box3dPointInside(NewPos, CameraBox);
+    Result := Box3DPointInside(NewPos, CameraBox);
 end;
 
 function TLevel.MoveAllowedSimple(const Position: TVector3Single;
@@ -1681,19 +1681,19 @@ begin
     MovingObjectCameraRadius, @CollisionIgnoreItem);
 
   if Result then
-    Result := Box3dPointInside(NewPos, CameraBox);
+    Result := Box3DPointInside(NewPos, CameraBox);
 end;
 
 function TLevel.MoveBoxAllowedSimple(const Position: TVector3Single;
   const NewPos: TVector3Single;
-  const NewBox: TBox3d;
+  const NewBox: TBox3D;
   const BecauseOfGravity: boolean): boolean;
 begin
   Result := Items.MoveBoxAllowedSimple(Position, NewPos, NewBox,
     @CollisionIgnoreItem);
 
   if Result then
-    Result := Box3dPointInside(NewPos, CameraBox);
+    Result := Box3DPointInside(NewPos, CameraBox);
 end;
 
 procedure TLevel.GetHeightAbove(const Position: TVector3Single;

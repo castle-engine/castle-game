@@ -23,7 +23,7 @@ unit CastleLevelSpecific;
 
 interface
 
-uses VRMLGLScene, Boxes3d, VectorMath,
+uses VRMLGLScene, Boxes3D, VectorMath,
   CastlePlayer, CastleLevel, BackgroundGL, VRMLTriangle,
   CastleSound, VRMLNodes, DOM, Base3D, VRMLGLAnimation,
   CastleCreatures, GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum;
@@ -40,7 +40,7 @@ type
     StairsBlocker: TVRMLGLScene;
     StairsBlockerMiddle: TVector3Single;
 
-    FLevelExitBox: TBox3d;
+    FLevelExitBox: TBox3D;
 
     WerewolfAppearPosition: array [0..CastleHallWerewolvesCount - 1] of TVector3Single;
     WerewolfAppeared: boolean;
@@ -71,10 +71,10 @@ type
 
   TGateLevel = class(TLevel)
   private
-    FGateExitBox: TBox3d;
+    FGateExitBox: TBox3D;
 
     Teleport: TVRMLGLScene;
-    FTeleport1Box, FTeleport2Box: TBox3d;
+    FTeleport1Box, FTeleport2Box: TBox3D;
 
     Teleport1Rotate: Single;
     Teleport2Rotate: Single;
@@ -88,7 +88,7 @@ type
     SacrilegeAmbushDone: boolean;
     SwordAmbushDone: boolean;
 
-    FSacrilegeBox: TBox3d;
+    FSacrilegeBox: TBox3D;
 
     CartLastSoundTime: Single;
     CartSoundPosition: TVector3Single;
@@ -205,11 +205,11 @@ type
 
     MovingElevator49: TLevelLinearMovingObject;
     Elevator49: TVRMLGLScene;
-    Elevator49DownBox: TBox3d;
+    Elevator49DownBox: TBox3D;
 
     MovingElevator9a9b: TLevelLinearMovingObject;
     Elevator9a9b: TVRMLGLScene;
-    Elevator9a9bPickBox: TBox3d;
+    Elevator9a9bPickBox: TBox3D;
 
     ExitButton: TVRMLGLScene;
     ExitMessagePending: boolean;
@@ -297,15 +297,15 @@ begin
   StairsBlocker.CastsShadow := false; { shadow would not be visible anyway }
   Items.Add(StairsBlocker);
 
-  { get Box3dMiddle(StairsBlocker.BoundingBox) when it Exists.
+  { get Box3DMiddle(StairsBlocker.BoundingBox) when it Exists.
     Later StairsBlocker will have Exists = false, so bbox will be empty,
     but we'll need StairsBlockerMiddle position. }
-  StairsBlockerMiddle := Box3dMiddle(StairsBlocker.BoundingBox);
+  StairsBlockerMiddle := Box3DMiddle(StairsBlocker.BoundingBox);
 end;
 
 procedure TCastleHallLevel.ChangeLevelScene;
 
-  function BoxDownPosition(const Box: TBox3d): TVector3Single;
+  function BoxDownPosition(const Box: TBox3D): TVector3Single;
   begin
     Result[0] := (Box[0, 0] + Box[1, 0]) / 2;
     Result[1] := (Box[0, 1] + Box[1, 1]) / 2;
@@ -313,7 +313,7 @@ procedure TCastleHallLevel.ChangeLevelScene;
   end;
 
 var
-  TempBox: TBox3d;
+  TempBox: TBox3D;
   I: Integer;
 begin
   inherited;
@@ -434,7 +434,7 @@ begin
 
   if Player = nil then Exit;
 
-  if Box3dPointInside(Player.Camera.Position, FLevelExitBox) then
+  if Box3DPointInside(Player.Camera.Position, FLevelExitBox) then
   begin
     LevelFinished('cages');
   end;
@@ -547,7 +547,7 @@ begin
   Items.Add(Cart);
   Cart.TimePlaying := true;
 
-  CartSoundPosition := Box3dMiddle(Cart.FirstScene.BoundingBox);
+  CartSoundPosition := Box3DMiddle(Cart.FirstScene.BoundingBox);
 
   SacrilegeAmbushDone := false;
   SwordAmbushDone := false;
@@ -561,7 +561,7 @@ end;
 
 procedure TGateLevel.ChangeLevelScene;
 
-  function AmbushStartingPos(const Box: TBox3d): TVector3Single;
+  function AmbushStartingPos(const Box: TBox3D): TVector3Single;
   begin
     Result[0] := (Box[0, 0] + Box[1, 0]) / 2;
     Result[1] := (Box[0, 1] + Box[1, 1]) / 2;
@@ -569,7 +569,7 @@ procedure TGateLevel.ChangeLevelScene;
   end;
 
 var
-  TempBox: TBox3d;
+  TempBox: TBox3D;
   I: Integer;
 begin
   inherited;
@@ -581,11 +581,11 @@ begin
 
   RemoveBoxNodeCheck(FSacrilegeBox, 'SacrilegeBox');
 
-  Teleport1Destination := Box3dMiddle(FTeleport2Box);
+  Teleport1Destination := Box3DMiddle(FTeleport2Box);
   Teleport1Destination[0] += 2;
   Teleport1Destination[1] += 2;
 
-  Teleport2Destination := Box3dMiddle(FTeleport1Box);
+  Teleport2Destination := Box3DMiddle(FTeleport1Box);
   Teleport2Destination[0] -= 2;
   Teleport2Destination[1] -= 2;
 
@@ -619,10 +619,10 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
     Player.Knockback(0, 2, Vector3Single(0, -1, 0));
   end;
 
-  procedure TeleportWork(const TeleportBox: TBox3d;
+  procedure TeleportWork(const TeleportBox: TBox3D;
     const Destination: TVector3Single);
   begin
-    if Box3dPointInside(Player.Camera.Position, TeleportBox) then
+    if Box3DPointInside(Player.Camera.Position, TeleportBox) then
     begin
       Player.Camera.Position := Destination;
       Player.Camera.CancelFallingDown;
@@ -676,7 +676,7 @@ begin
 
   if Player = nil then Exit;
 
-  if Box3dPointInside(Player.Camera.Position, FGateExitBox) then
+  if Box3DPointInside(Player.Camera.Position, FGateExitBox) then
   begin
     if Player.Items.FindKind(KeyItemKind) = -1 then
     begin
@@ -700,7 +700,7 @@ begin
     TeleportWork(FTeleport2Box, Teleport2Destination);
 
     if (not SacrilegeAmbushDone) and
-      Box3dPointInside(Player.Camera.Position, FSacrilegeBox) then
+      Box3DPointInside(Player.Camera.Position, FSacrilegeBox) then
     begin
       SacrilegeAmbushDone := true;
       SacrilegeAmbush;
@@ -736,13 +736,13 @@ procedure TGateLevel.Render3D(TransparentGroup: TTransparentGroup; InShadow: boo
 
   procedure RenderTeleport(
     const TeleportRotation: Single;
-    const TeleportBox: TBox3d;
+    const TeleportBox: TBox3D;
     TransparentGroup: TTransparentGroup);
   begin
-    if RenderState.CameraFrustum.Box3dCollisionPossibleSimple(TeleportBox) then
+    if RenderState.CameraFrustum.Box3DCollisionPossibleSimple(TeleportBox) then
     begin
       glPushMatrix;
-        glTranslatev(Box3dMiddle(TeleportBox));
+        glTranslatev(Box3DMiddle(TeleportBox));
         glRotatef(TeleportRotation, 1, 1, 0);
         Teleport.Render(nil, TransparentGroup);
       glPopMatrix;
@@ -1122,27 +1122,27 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TKamTime);
 
   function SomethingWillBlockClosingDoor: boolean;
   var
-    DoorBox: TBox3d;
+    DoorBox: TBox3D;
     I: Integer;
   begin
-    DoorBox := Box3dTranslate(
+    DoorBox := Box3DTranslate(
       Child.BoundingBox,
       GetTranslationFromTime(NewAnimationTime));
 
-    Result := (Player <> nil) and Boxes3dCollision(DoorBox, Player.BoundingBox);
+    Result := (Player <> nil) and Boxes3DCollision(DoorBox, Player.BoundingBox);
     if Result then
       Exit;
 
     for I := 0 to ParentLevel.Creatures.High do
     begin
-      Result := Boxes3dCollision(DoorBox, ParentLevel.Creatures[I].BoundingBox);
+      Result := Boxes3DCollision(DoorBox, ParentLevel.Creatures[I].BoundingBox);
       if Result then
         Exit;
     end;
 
     for I := 0 to ParentLevel.ItemsOnLevel.High do
     begin
-      Result := Boxes3dCollision(DoorBox, ParentLevel.ItemsOnLevel[I].BoundingBox);
+      Result := Boxes3DCollision(DoorBox, ParentLevel.ItemsOnLevel[I].BoundingBox);
       if Result then
         Exit;
     end;
@@ -1283,7 +1283,7 @@ begin
   end else
   if (CollisionInfo.Hierarchy.IndexOf(Elevator9a9b) <> -1) and
      MovingElevator9a9b.CompletelyBeginPosition and
-     Box3dPointInside(Player.Camera.Position, Elevator9a9bPickBox) then
+     Box3DPointInside(Player.Camera.Position, Elevator9a9bPickBox) then
   begin
     InteractionOccured := true;
     if Distance > 10 then
@@ -1346,7 +1346,7 @@ begin
   if Player = nil then Exit;
 
   if MovingElevator49.CompletelyBeginPosition and
-     Box3dPointInside(Player.Camera.Position, Elevator49DownBox) then
+     Box3DPointInside(Player.Camera.Position, Elevator49DownBox) then
   begin
     MovingElevator49.GoEndPosition;
   end;

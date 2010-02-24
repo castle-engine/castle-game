@@ -113,7 +113,7 @@ implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
-  Cameras, VectorMath, Boxes3d, Images,
+  Cameras, VectorMath, Boxes3D, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, UIControls,
   CastleItems, RaysWindow, KambiStringUtils,
@@ -773,18 +773,18 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
       DroppedItemKind: TItemKind;
       out DropPosition: TVector3Single): boolean;
     var
-      ItemBox: TBox3d;
+      ItemBox: TBox3D;
       ItemBoxRadius: Single;
       ItemBoxMiddle: TVector3Single;
       PushVector: TVector3Single;
       PushVectorLength: Single;
     begin
       ItemBox := DroppedItemKind.BoundingBoxRotated;
-      ItemBoxMiddle := Box3dMiddle(ItemBox);
-      { Box3dRadius calculates radius around (0, 0, 0) and we want
+      ItemBoxMiddle := Box3DMiddle(ItemBox);
+      { Box3DRadius calculates radius around (0, 0, 0) and we want
         radius around ItemBoxMiddle }
-      ItemBoxRadius := Box3dRadius(
-        Box3dTranslate(ItemBox, VectorNegate(ItemBoxMiddle)));
+      ItemBoxRadius := Box3DRadius(
+        Box3DTranslate(ItemBox, VectorNegate(ItemBoxMiddle)));
 
       { Calculate DropPosition.
 
@@ -802,8 +802,8 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
       PushVector := Player.Camera.DirectionInGravityPlane;
       PushVectorLength := Max(
         Player.Camera.RealCameraPreferredHeight,
-        Box3dSizeX(ItemBox) * 2,
-        Box3dSizeY(ItemBox) * 2);
+        Box3DSizeX(ItemBox) * 2,
+        Box3DSizeY(ItemBox) * 2);
       VectorAdjustToLengthTo1st(PushVector, PushVectorLength);
       DropPosition := VectorAdd(Player.Camera.Position,
         PushVector);
@@ -1051,9 +1051,9 @@ class procedure TPlayGameHelper.PlayerCameraChange(Sender: TObject);
 begin
   alUpdateListener;
 
-  if Box3dPointInside(Player.Camera.Position, Level.AboveWaterBox) then
+  if Box3DPointInside(Player.Camera.Position, Level.AboveWaterBox) then
     Player.Swimming := psAboveWater else
-  if Box3dPointInside(Player.Camera.Position, Level.WaterBox) then
+  if Box3DPointInside(Player.Camera.Position, Level.WaterBox) then
     Player.Swimming := psUnderWater else
     Player.Swimming := psNo;
 end;

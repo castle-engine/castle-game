@@ -35,7 +35,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   CastleControlsMenu, CastleInputs, CastleCreatures, CastleChooseMenu,
   CastleItems, GLMenu, RaysWindow, CastleVideoOptions,
   CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
-  CastleLevelAvailable, Boxes3d;
+  CastleLevelAvailable, Boxes3D;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -726,7 +726,7 @@ var
 begin
   inherited;
 
-  LevelBoxSizes := Box3dSizes(Level.CameraBox);
+  LevelBoxSizes := Box3DSizes(Level.CameraBox);
   for I := 0 to 2 do
     PositionSlider[I] := TGLMenuFloatSlider.Create(
       Level.CameraBox[0, I] - LevelBoxSizes[I],

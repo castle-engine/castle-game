@@ -23,7 +23,7 @@ unit CastleItems;
 
 interface
 
-uses Boxes3d, VRMLNodes, VRMLGLScene, VectorMath, KambiUtils,
+uses Boxes3D, VRMLNodes, VRMLGLScene, VectorMath, KambiUtils,
   KambiClassUtils, Images, GL, GLU, KambiGLUtils, CastleSound,
   VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds,
   KambiXMLCfg, GameSoundEngine, Frustum;
@@ -68,7 +68,7 @@ type
     FImageFileName: string;
     FImage: TImage;
     FGLList_DrawImage: TGLuint;
-    FBoundingBoxRotated: TBox3d;
+    FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   protected
     procedure PrepareRenderInternal; override;
@@ -130,7 +130,7 @@ type
 
     { This returns Scene.BoundingBox enlarged a little (along X and Y)
       to account the fact that Scene may be rotated around +Z vector. }
-    function BoundingBoxRotated: TBox3d;
+    function BoundingBoxRotated: TBox3D;
 
     function PrepareRenderSteps: Cardinal; override;
     procedure FreePrepareRender; override;
@@ -353,7 +353,7 @@ type
       it's current Position and the fact that items constantly rotate
       (around local +Z). So it's actually Item.Kind.Scene.BoundingBox translated
       and enlarged as appropriate. }
-    function BoundingBox: TBox3d;
+    function BoundingBox: TBox3D;
 
     { Call this when user clicked on the item.
       This will do some GameMessage describing the item
@@ -468,7 +468,7 @@ begin
   TimeMessage('This item cannot be used');
 end;
 
-function TItemKind.BoundingBoxRotated: TBox3d;
+function TItemKind.BoundingBoxRotated: TBox3D;
 var
   HorizontalSize: Single;
 begin
@@ -724,18 +724,18 @@ end;
 
 procedure TItemSwordKind.ActualAttack(Item: TItem);
 var
-  WeaponBoundingBox: TBox3d;
+  WeaponBoundingBox: TBox3D;
   I: Integer;
   C: TCreature;
 begin
-  WeaponBoundingBox := Box3dTranslate(Player.BoundingBox,
+  WeaponBoundingBox := Box3DTranslate(Player.BoundingBox,
     VectorAdjustToLength(Player.Camera.Direction, 1.0));
-  { Tests: Writeln('WeaponBoundingBox is ', Box3dToNiceStr(WeaponBoundingBox)); }
+  { Tests: Writeln('WeaponBoundingBox is ', Box3DToNiceStr(WeaponBoundingBox)); }
   for I := 0 to Level.Creatures.High do
   begin
     C := Level.Creatures[I];
-    { Tests: Writeln('Creature bbox is ', Box3dToNiceStr(C.BoundingBox)); }
-    if Boxes3dCollision(C.BoundingBox, WeaponBoundingBox) then
+    { Tests: Writeln('Creature bbox is ', Box3DToNiceStr(C.BoundingBox)); }
+    if Boxes3DCollision(C.BoundingBox, WeaponBoundingBox) then
     begin
       C.Life := C.Life - DamageConst - Random * DamageRandom;
       C.LastAttackDirection := Player.Camera.Direction;
@@ -855,13 +855,13 @@ begin
     Note: remember to change TItemsOnLevelList.PlayerCollision
     accordingly if I ever change implementation of this. }
 
-  Result := Boxes3dCollision(BoundingBox, Player.BoundingBox);
+  Result := Boxes3DCollision(BoundingBox, Player.BoundingBox);
 end;
 
 procedure TItemOnLevel.Render(const Frustum: TFrustum;
   TransparentGroup: TTransparentGroup);
 begin
-  if Frustum.Box3dCollisionPossibleSimple(BoundingBox) then
+  if Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
   begin
     glPushMatrix;
       glTranslatev(Position);
@@ -876,7 +876,7 @@ begin
         glDisable(GL_LIGHTING);
         glEnable(GL_DEPTH_TEST);
         glColorv(Gray3Single);
-        glDrawBox3dWire(BoundingBox);
+        glDrawBox3DWire(BoundingBox);
       glPopAttrib;
     end;
   end;
@@ -939,9 +939,9 @@ begin
   end;
 end;
 
-function TItemOnLevel.BoundingBox: TBox3d;
+function TItemOnLevel.BoundingBox: TBox3D;
 begin
-  Result := Box3dTranslate(Item.Kind.BoundingBoxRotated, Position);
+  Result := Box3DTranslate(Item.Kind.BoundingBoxRotated, Position);
 end;
 
 procedure TItemOnLevel.ItemPicked(const Distance: Single);
@@ -981,14 +981,14 @@ end;
 
 function TItemsOnLevelList.PlayerCollision: Integer;
 var
-  PlayerBoundingBox: TBox3d;
+  PlayerBoundingBox: TBox3D;
 begin
   { Instead of just calling TItemOnLevel.PlayerCollision,
     this is optimized a little: it calculates Player.BoundingBox
     only once. }
   PlayerBoundingBox := Player.BoundingBox;
   for Result := 0 to High do
-    if Boxes3dCollision(Items[Result].BoundingBox, PlayerBoundingBox) then
+    if Boxes3DCollision(Items[Result].BoundingBox, PlayerBoundingBox) then
       Exit;
   Result := -1;
 end;

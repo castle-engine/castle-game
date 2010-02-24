@@ -23,7 +23,7 @@ unit CastlePlayer;
 
 interface
 
-uses Boxes3d, Cameras, CastleItems, VectorMath, GL, GLU, GLExt,
+uses Boxes3D, Cameras, CastleItems, VectorMath, GL, GLU, GLExt,
   VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
   VRMLTriangle, CastleTextures, GameSoundEngine, Classes,
   KambiGLUtils;
@@ -278,7 +278,7 @@ type
 
     { Like BoundingBox, but assumes that Camera.Position is as specified. }
     function BoundingBoxAssuming(const AssumePosition: TVector3Single;
-      Tall: boolean = true): TBox3d;
+      Tall: boolean = true): TBox3D;
 
     { Calculates what can be considered "bounding box of the player",
       taking into account global Level.CameRadius around current Position.
@@ -296,7 +296,7 @@ type
       collision with creatures, because then the player will "grow"
       anyway (using GetHeightAbove), so Camera.RealCameraPreferredHeight
       will be taken into account but in a different way. }
-    function BoundingBox(Tall: boolean = true): TBox3d;
+    function BoundingBox(Tall: boolean = true): TBox3D;
 
     { Weapon the player is using right now, or nil if none.
 
@@ -597,7 +597,7 @@ begin
 end;
 
 function TPlayer.BoundingBoxAssuming(const AssumePosition: TVector3Single;
-  Tall: boolean): TBox3d;
+  Tall: boolean): TBox3D;
 var
   PlayerSize: Single;
 begin
@@ -617,7 +617,7 @@ begin
   Result[1, 2] += Level.CameraRadius;
 end;
 
-function TPlayer.BoundingBox(Tall: boolean): TBox3d;
+function TPlayer.BoundingBox(Tall: boolean): TBox3D;
 begin
   Result := BoundingBoxAssuming(Player.Camera.Position, Tall);
 end;
