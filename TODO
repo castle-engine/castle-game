@@ -1,3 +1,31 @@
+fountain new level for castle 1.0.0:
+- more space, make it larger, more columns
+- fountain: wider circle, taller fountain base
+- water animated + by shaders
+  splash sound when entering fountain
+- touch sensor to bring down elevator and go up over the columns
+- a path over the columns around the fountain
+- animated light, with shadows and bump mapping, circling the fountain
+- water flowing from the fountain (water flowing sound),
+  baked from fluid sim by blender,
+  with mat transparent to look like water really
+- maybe change the scenery to more sunny and indoors:
+  sunny sky
+  part. transp. dome over the fountain
+- footsteps sound with more echo, to show space
+- maybe small fog (3d tex?) rising from the fountain
+
+------------------------------------------------------------------------------
+castle 2:
+
+- make news item "call for help" for 3d data at some point
+  (maybe freegamer will broadcast it? :)
+
+- make some creature use generatedcubemaptexture, to show it off
+  (needs creatures added to scenemanager, or do generatedcubemap by hand?
+  or maybe just static ImageCubeMapTexture could be cool enough?)
+
+------------------------------------------------------------------------------
 - make real bump mapping demos:
   - add bump maps everywhere ?, make some lights dynamic
 
