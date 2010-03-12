@@ -1819,7 +1819,7 @@ var
   Options: TPrepareRenderOptions;
 begin
   Result := TVRMLGLAnimation.CreateCustomCache(Self, GLContextCache);
-  Result.LoadFromFile(FileName);
+  Result.LoadFromFile(FileName, false, true);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
 
