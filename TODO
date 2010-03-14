@@ -18,6 +18,17 @@ fountain new level for castle 1.0.0:
 ------------------------------------------------------------------------------
 castle 2:
 
+- when our interact key activates pointing device sensor on VRML castle level,
+  our normal interact key handling doesn't know about it --- and still
+  seeks for 3d objects to press, eventually making "beep" to signal
+  it's not found.
+  
+  This isn't much problem now, as there aren't TouchSensors used
+  actually in current levels, but it will become a problem later.
+
+- Make sure this input is always blocked for MenuBackground?
+  Or maybe allow input for MenuBackground, maybe this will be actually useful?
+
 - make news item "call for help" for 3d data at some point
   (maybe freegamer will broadcast it? :)
 
