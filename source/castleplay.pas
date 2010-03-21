@@ -159,13 +159,13 @@ end;
 type
   TGame2DControls = class(TUIControl)
   public
-    procedure Draw(const Focused: boolean); override;
+    procedure Draw; override;
     function DrawStyle: TUIControlDrawStyle; override;
   end;
 
   TGame3DControls = class(TUIControl)
   public
-    procedure Draw(const Focused: boolean); override;
+    procedure Draw; override;
     function DrawStyle: TUIControlDrawStyle; override;
   end;
 
@@ -174,7 +174,7 @@ begin
   Result := ds2D;
 end;
 
-procedure TGame2DControls.Draw(const Focused: boolean);
+procedure TGame2DControls.Draw;
 
   procedure DoDrawInventory;
   const
@@ -380,7 +380,7 @@ begin
   Result := ds3D;
 end;
 
-procedure TGame3DControls.Draw(const Focused: boolean);
+procedure TGame3DControls.Draw;
 begin
   Player.RenderAttack;
 end;

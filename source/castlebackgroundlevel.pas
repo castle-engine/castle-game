@@ -77,7 +77,7 @@ type
     {CaptionWidth, }CaptionHeight: Cardinal;
   public
     function DrawStyle: TUIControlDrawStyle; override;
-    procedure Draw(const Focused: boolean); override;
+    procedure Draw; override;
     procedure GLContextInit; override;
     procedure GLContextClose; override;
   end;
@@ -87,7 +87,7 @@ begin
   Result := ds2D;
 end;
 
-procedure TBackgroundCaptions.Draw(const Focused: boolean);
+procedure TBackgroundCaptions.Draw;
 begin
   glPushAttrib(GL_ENABLE_BIT);
     glRasterPos2i(0, ContainerHeight - CaptionHeight);

@@ -37,7 +37,7 @@ type
       the value of this property. }
     SubMenuAdditionalInfo: string;
     constructor Create(AOwner: TComponent); override;
-    procedure Draw(const Focused: boolean); override;
+    procedure Draw; override;
 
     { Sets Position and PositionRelative* parameters.
       Sets position suitable for the StartScreen, and then shifts
@@ -154,7 +154,7 @@ begin
   if DoFixItemsAreas then FixItemsAreas;
 end;
 
-procedure TSubMenu.Draw(const Focused: boolean);
+procedure TSubMenu.Draw;
 const
   SubMenuTextColor: TVector3Single = (0.9, 0.9, 0.9);
 begin
@@ -468,7 +468,7 @@ var
 type
   TFadeRect = class(TUIControl)
     function DrawStyle: TUIControlDrawStyle; override;
-    procedure Draw(const Focused: boolean); override;
+    procedure Draw; override;
   end;
 
 function TFadeRect.DrawStyle: TUIControlDrawStyle;
@@ -476,7 +476,7 @@ begin
   Result := ds2D;
 end;
 
-procedure TFadeRect.Draw(const Focused: boolean);
+procedure TFadeRect.Draw;
 begin
   glPushMatrix;
     glTranslatef(MoveX, MoveY, 0);
