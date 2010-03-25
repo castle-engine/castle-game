@@ -1153,6 +1153,7 @@ constructor TLevel.Create(
   var
     I: Integer;
   begin
+    MainScene.BeforeNodesFree;
     for I := 0 to ItemsToRemove.Count - 1 do
       ItemsToRemove.Items[I].FreeRemovingFromAllParents;
     MainScene.ChangedAll;
@@ -1243,6 +1244,7 @@ begin
     end;
 
     { calculate Sectors and Waypoints }
+    MainScene.BeforeNodesFree;
     FSectors := TSceneSectorsList.Create;
     FWaypoints := TSceneWaypointsList.Create;
     Waypoints.ExtractPositions(MainScene.RootNode);
@@ -1489,6 +1491,7 @@ begin
       as it should not be visible).
       This way we can comfortably set such boxes from Blender. }
     Box := BoxShape.BoundingBox;
+    MainScene.BeforeNodesFree;
     BoxShape.Geometry.FreeRemovingFromAllParents;
     MainScene.ChangedAll;
   end;
