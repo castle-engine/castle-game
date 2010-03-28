@@ -22,7 +22,7 @@ castle 2:
   our normal interact key handling doesn't know about it --- and still
   seeks for 3d objects to press, eventually making "beep" to signal
   it's not found.
-  
+
   This isn't much problem now, as there aren't TouchSensors used
   actually in current levels, but it will become a problem later.
 
