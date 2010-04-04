@@ -1,6 +1,5 @@
 fountain new level for castle 1.0.0:
-- more space, make it larger, more columns
-- fountain: wider circle, taller fountain base
+- tentacles from fountain
 - water animated + by shaders
   splash sound when entering fountain
 - touch sensor to bring down elevator and go up over the columns
