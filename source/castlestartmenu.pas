@@ -429,7 +429,7 @@ procedure TVideoMenu.CurrentItemSelected;
       Format('Field of view horizontal : %f', [ViewAngleDegX]) +nl+
       Format('Field of view vertical : %f', [ViewAngleDegY]) +nl+
       nl+
-      GLCapsString,
+      GLInformationString,
       taLeft);
   end;
 
