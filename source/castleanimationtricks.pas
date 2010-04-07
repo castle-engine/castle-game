@@ -38,7 +38,7 @@ type
     has to be disabled for this, as this requires full control over blending.
     Also normal materials control must be disabled
     (we have to supply our own alpha value).
-    So Attributes.Blending and TODO Attributes.ControlBlending and
+    So Attributes.Blending and Attributes.ControlBlending and
     Attributes.ControlMaterials must always remain @false.
 
     This also ignores TimeLoop (works like it's always @true) and
@@ -60,6 +60,7 @@ begin
   inherited;
   Attributes.Blending := false;
   Attributes.ControlMaterials := false;
+  Attributes.ControlBlending := false;
 end;
 
 procedure TBlendedLoopingAnimation.Render(const Frustum: TFrustum;
