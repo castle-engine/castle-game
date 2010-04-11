@@ -1307,7 +1307,7 @@ begin
 
     MainScene.FreeResources([frTextureDataInNodes]);
 
-    FLightSet := TVRMLLightSetGL.Create(LoadAsVRML(LightSetFileName),
+    FLightSet := TVRMLLightSetGL.Create(LoadVRML(LightSetFileName),
       true,
       { GL_LIGHT0 is reserved for headlight. }
       { GL_LIGHT1 is reserved for thunder effect in cages level.

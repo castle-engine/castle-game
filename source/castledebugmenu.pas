@@ -891,7 +891,7 @@ begin
   case CurrentItem - Level.LightSet.Lights.Count of
     0: begin
          if StdOutStream <> nil then
-           SaveToVRMLFile(Level.LightSet.RootNode, StdOutStream, LightSetVRMLComment) else
+           SaveVRMLClassic(Level.LightSet.RootNode, StdOutStream, LightSetVRMLComment) else
            MessageOK(Glw, 'No stdout available. On Windows you must run the game ' +
              'from the command-line to get stdout.', taLeft);
        end;
@@ -899,7 +899,7 @@ begin
          if MessageYesNo(Glw, Format('This will permanently overwrite file "%s". ' +
            'Are you sure you want to save the lights ?',
            [Level.LightSetFileName]), taLeft) then
-           SaveToVRMLFile(Level.LightSet.RootNode, Level.LightSetFileName,
+           SaveVRMLClassic(Level.LightSet.RootNode, Level.LightSetFileName,
              LightSetVRMLComment);
        end;
     2, 3, 4: ;
