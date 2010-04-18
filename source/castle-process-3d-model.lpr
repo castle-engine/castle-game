@@ -122,6 +122,22 @@ var
   G1: TNodeGroup_1;
   Inlined: TVRMLNode;
 begin
+  { Replace VRML 1.0 inlines with VRML 1.0 Group node.
+    Note that TNodeWWWInline actually descends from TNodeInline now,
+    so the check for TNodeWWWInline must be 1st. }
+  if Node is TNodeWWWInline then
+  begin
+    TNodeWWWInline(Node).LoadInlined(false);
+    Inlined := TNodeWWWInline(Node).Inlined;
+
+    if Inlined <> nil then
+    begin
+      G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
+      G1.PositionInParent := Node.PositionInParent;
+      G1.AddChild(Inlined);
+      Node := G1;
+    end;
+  end else
   { Replace VRML >= 2.0 inlines with VRML 2.0 / X3D Group node }
   if Node is TNodeInline then
   begin
@@ -137,20 +153,6 @@ begin
       G2.PositionInParent := Node.PositionInParent;
       G2.FdChildren.AddItem(Inlined);
       Node := G2;
-    end;
-  end else
-  { Replace VRML 1.0 inlines with VRML 1.0 Group node }
-  if Node is TNodeWWWInline then
-  begin
-    TNodeWWWInline(Node).LoadInlined(false);
-    Inlined := TNodeWWWInline(Node).Inlined;
-
-    if Inlined <> nil then
-    begin
-      G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
-      G1.PositionInParent := Node.PositionInParent;
-      G1.AddChild(Inlined);
-      Node := G1;
     end;
   end;
 end;
