@@ -1162,7 +1162,7 @@ procedure SaveScreen;
 var
   FileName: string;
 begin
-  FileName := FnameAutoInc(ApplicationName + '_screen_%d.png');
+  FileName := FileNameAutoInc(ApplicationName + '_screen_%d.png');
   Glw.SaveScreen(FileName);
   TimeMessage('Screen saved to ' + FileName);
   SoundEngine.Sound(stSaveScreen);
