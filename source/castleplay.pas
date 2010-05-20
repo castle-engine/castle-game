@@ -684,16 +684,20 @@ procedure DoInteract;
 
   function TryInteractAround(const XChange, YChange: Integer): boolean;
   var
-    RayVector: TVector3Single;
+    Ray0, RayVector: TVector3Single;
   begin
-    RayVector := PrimaryRay(
+    PrimaryRay(
       Glw.Width div 2 + XChange,
       Glw.Height div 2 + YChange,
       Glw.Width, Glw.Height,
       Player.Camera.Position,
       Player.Camera.Direction,
       Player.Camera.Up,
-      ViewAngleDegX, ViewAngleDegY);
+      { Always uses perspective projection }
+      true, Vector2Single(ViewAngleDegX, ViewAngleDegY), ZeroVector4Single,
+      Ray0, RayVector);
+    { Ray0 is ignored, since for perspective projection
+      we know it's from camera position }
     Result := TryInteract(RayVector);
   end;
 
