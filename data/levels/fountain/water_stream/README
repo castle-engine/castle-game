@@ -5,9 +5,8 @@ choosing "selected objects only" (when selected the fluid domain).
 Do
 sed --in-place --separate -e 's|solid FALSE|solid TRUE|' *.wrl
 This makes blending look slightly better (although still not perfect).
-(TODO: make it in Blender)
 
-Note that water_stream.kanim is not structurally equal (fluid simulation
+Note that resulting kanim is not structurally equal (fluid simulation
 doesn't produce such file), so it cannot be converted to a single VRML
 like "kanim_to_interpolators coord_MOD_Cube water_stream.kanim water_stream_done.wrl".
 This actually causes a lot of other troubles:
