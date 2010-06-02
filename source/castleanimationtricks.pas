@@ -108,10 +108,11 @@ begin
     if SceneIndex < 0 then SceneIndex += ScenesCount; { we wanted "unsigned mod" above }
     MiddleIndex := ScenesCount div 2;
 
-    glPushAttrib(GL_COLOR_BUFFER_BIT or GL_LIGHTING_BIT);
+    glPushAttrib(GL_COLOR_BUFFER_BIT or GL_LIGHTING_BIT or GL_DEPTH_BUFFER_BIT);
     try
       glEnable(GL_BLEND); // saved by GL_COLOR_BUFFER_BIT
       glBlendFunc(GL_SRC_ALPHA, GL_ONE); // saved by GL_COLOR_BUFFER_BIT
+      glDepthMask(GL_FALSE); // saved by GL_DEPTH_BUFFER_BIT
 
       { calculate Amount.
 
