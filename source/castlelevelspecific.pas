@@ -253,6 +253,13 @@ type
   protected
     procedure ChangeLevelScene; override;
   public
+    constructor Create(
+      const AName: string;
+      const ASceneFileName, ALightSetFileName: string;
+      const ATitle: string; const ATitleHint: string; const ANumber: Integer;
+      DOMElement: TDOMElement;
+      ARequiredCreatures: TStringList;
+      AMenuBackground: boolean); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
 
@@ -263,7 +270,8 @@ implementation
 uses KambiFilesUtils, SysUtils, KambiUtils,
   GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderStateUnit,
   CastlePlay, CastleTimeMessages, CastleInputs,
-  CastleItems, CastleThunder, CastleWindow, CastleVRMLProcessing;
+  CastleItems, CastleThunder, CastleWindow, CastleVRMLProcessing,
+  CastleAnimationTricks, CastleVideoOptions, VRMLScene;
 
 function CastleLevelsPath: string;
 begin
@@ -1412,6 +1420,36 @@ begin
 end;
 
 { TFountainLevel ------------------------------------------------------------- }
+
+constructor TFountainLevel.Create(
+  const AName: string;
+  const ASceneFileName, ALightSetFileName: string;
+  const ATitle: string; const ATitleHint: string; const ANumber: Integer;
+  DOMElement: TDOMElement;
+  ARequiredCreatures: TStringList;
+  AMenuBackground: boolean);
+var
+  Fountain: TBlendedLoopingAnimation;
+begin
+  inherited;
+
+  { load Fountain animation, following the same code as LoadLevelAnimation }
+  Fountain := TBlendedLoopingAnimation.CreateCustomCache(Self, GLContextCache);
+  Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
+    PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true);
+  AnimationAttributesSet(Fountain.Attributes, btIncrease);
+  Fountain.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox], false);
+  Fountain.FreeResources([frTextureDataInNodes]);
+  Fountain.CastsShadow := false; { not manifold }
+  Fountain.Collides := false;
+
+  Fountain.Diffuse := Vector4Single(0.5, 0.5, 1, 1);
+  Fountain.Ambient := Vector4Single(0, 0, 0, 1);
+
+  Items.Add(Fountain);
+
+  Fountain.TimePlaying := true;
+end;
 
 procedure TFountainLevel.ChangeLevelScene;
 begin

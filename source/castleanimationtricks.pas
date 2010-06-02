@@ -44,8 +44,25 @@ type
     This also ignores TimeLoop (works like it's always @true) and
     TimeBackwards (works like it's always @false). }
   TBlendedLoopingAnimation = class(TVRMLGLAnimation)
+  private
+    FDiffuse: TVector4Single;
+    FSpecular: TVector4Single;
+    FAmbient: TVector4Single;
   public
     constructor Create(AOwner: TComponent); override;
+
+    { Colors of the material.
+      RGB of this will be simply used, and the alpha of this color
+      sets the maximum alpha during the animation.
+      By default Diffuse and Specular are pure white,
+      Ambient is (0.2, 0.2, 0.2, 1).
+
+      @groupBegin }
+    property Diffuse: TVector4Single read FDiffuse write FDiffuse;
+    property Specular: TVector4Single read FSpecular write FSpecular;
+    property Ambient: TVector4Single read FAmbient write FAmbient;
+    { @groupEnd }
+
     procedure Render(const Frustum: TFrustum;
       TransparentGroup: TTransparentGroup;
       InShadow: boolean); override;
@@ -58,6 +75,9 @@ uses Math, KambiUtils, GL, KambiGLUtils;
 constructor TBlendedLoopingAnimation.Create(AOwner: TComponent);
 begin
   inherited;
+  FDiffuse := White4Single;
+  FSpecular := White4Single;
+  FAmbient := Vector4Single(0.2, 0.2, 0.2, 1);
   Attributes.Blending := false;
   Attributes.ControlMaterials := false;
   Attributes.ControlBlending := false;
@@ -65,6 +85,19 @@ end;
 
 procedure TBlendedLoopingAnimation.Render(const Frustum: TFrustum;
   TransparentGroup: TTransparentGroup; InShadow: boolean);
+
+  procedure SetMaterial(const Alpha: Single);
+  var
+    V: TVector4Single;
+  begin
+    V := Ambient; V[3] *= Alpha;
+    glMaterialv(GL_FRONT_AND_BACK, GL_AMBIENT , V); // saved by GL_LIGHTING_BIT
+    V := Diffuse; V[3] *= Alpha;
+    glMaterialv(GL_FRONT_AND_BACK, GL_DIFFUSE , V); // saved by GL_LIGHTING_BIT
+    V := Specular; V[3] *= Alpha;
+    glMaterialv(GL_FRONT_AND_BACK, GL_SPECULAR, V); // saved by GL_LIGHTING_BIT
+  end;
+
 var
   SceneIndex, MiddleIndex, HalfIndex: Integer;
   Amount: Single;
@@ -95,15 +128,22 @@ begin
         This way the seam happens at MiddleIndex, when the shifted animation
         is not visible, so the looping seam is again not visible. }
       if SceneIndex >= MiddleIndex then
-        HalfIndex := MiddleIndex - 1 - (SceneIndex - MiddleIndex) else
+      begin
+        HalfIndex := MiddleIndex - 1 - (SceneIndex - MiddleIndex);
+
+        { Note that when ScenesCount is odd, SceneIndex may be (at max)
+          ScenesCount - 1 = (MiddleIndex * 2 + 1) - 1 = MiddleIndex * 2.
+          Then HalfIndex is calculated as -1 above. Fix it. }
+        MaxTo1st(HalfIndex, 0);
+      end else
         HalfIndex := SceneIndex;
       Assert((0 <= HalfIndex) and (HalfIndex < MiddleIndex));
       Amount := HalfIndex / (MiddleIndex - 1);
 
-      glMaterialv(GL_FRONT_AND_BACK, GL_DIFFUSE, Vector4Single(1, 1, 1, Amount)); // saved by GL_LIGHTING_BIT
+      SetMaterial(Amount);
       Scenes[SceneIndex].Render(Frustum, TransparentGroup, InShadow);
 
-      glMaterialv(GL_FRONT_AND_BACK, GL_DIFFUSE, Vector4Single(1, 1, 1, 1 - Amount)); // saved by GL_LIGHTING_BIT
+      SetMaterial(1 - Amount);
       Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(Frustum, TransparentGroup, InShadow);
     finally glPopAttrib end;
   end;
