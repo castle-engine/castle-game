@@ -102,7 +102,7 @@ var
   SceneIndex, MiddleIndex, HalfIndex: Integer;
   Amount: Single;
 begin
-  if Loaded and Exists then
+  if Loaded and Exists and (TransparentGroup in [tgAll, tgTransparent]) then
   begin
     SceneIndex := Floor(MapRange(Time, TimeBegin, TimeEnd, 0, ScenesCount)) mod ScenesCount;
     if SceneIndex < 0 then SceneIndex += ScenesCount; { we wanted "unsigned mod" above }
@@ -140,11 +140,15 @@ begin
       Assert((0 <= HalfIndex) and (HalfIndex < MiddleIndex));
       Amount := HalfIndex / (MiddleIndex - 1);
 
+      { We pass tgAll to our Scenes[].Render.
+        Since we use alpha < 1 here (and disable material control by scenes),
+        actually the whole scene is always a transparent object. }
+
       SetMaterial(Amount);
-      Scenes[SceneIndex].Render(Frustum, TransparentGroup, InShadow);
+      Scenes[SceneIndex].Render(Frustum, tgAll, InShadow);
 
       SetMaterial(1 - Amount);
-      Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(Frustum, TransparentGroup, InShadow);
+      Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(Frustum, tgAll, InShadow);
     finally glPopAttrib end;
   end;
 end;
