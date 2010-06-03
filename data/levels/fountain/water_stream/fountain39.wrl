@@ -39,7 +39,7 @@ DEF OB_Cube Transform {
 						}
 					}
 					geometry IndexedFaceSet {
-						solid FALSE
+						solid TRUE
 						creaseAngle 4.000000
 						coord DEF coord_MOD_Cube Coordinate {
 							point [
