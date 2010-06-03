@@ -271,7 +271,7 @@ uses KambiFilesUtils, SysUtils, KambiUtils,
   GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderStateUnit,
   CastlePlay, CastleTimeMessages, CastleInputs,
   CastleItems, CastleThunder, CastleWindow, CastleVRMLProcessing,
-  CastleAnimationTricks, CastleVideoOptions, VRMLScene;
+  CastleAnimationTricks, CastleVideoOptions, VRMLScene, ProgressUnit;
 
 function CastleLevelsPath: string;
 begin
@@ -1438,7 +1438,10 @@ begin
   Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
     PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true);
   AnimationAttributesSet(Fountain.Attributes, btIncrease);
-  Fountain.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox], false);
+  Progress.Init(Fountain.PrepareRenderSteps, 'Loading water');
+  try
+    Fountain.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox], true);
+  finally Progress.Fini end;
   Fountain.FreeResources([frTextureDataInNodes]);
   Fountain.CastsShadow := false; { not manifold }
   Fountain.Collides := false;
