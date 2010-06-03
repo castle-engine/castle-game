@@ -41,6 +41,11 @@ type
     So Attributes.Blending and Attributes.ControlBlending and
     Attributes.ControlMaterials must always remain @false.
 
+    Attributes.BlendingSourceFactor and Attributes.BlendingDestinationFactor
+    are used, to control our blending. So you can e.g.
+    set BlendingDestinationFactor to GL_ONE_MINUS_SRC_ALPHA to get (sometimes)
+    better alpha look.
+
     This also ignores TimeLoop (works like it's always @true) and
     TimeBackwards (works like it's always @false). }
   TBlendedLoopingAnimation = class(TVRMLGLAnimation)
@@ -111,7 +116,7 @@ begin
     glPushAttrib(GL_COLOR_BUFFER_BIT or GL_LIGHTING_BIT or GL_DEPTH_BUFFER_BIT);
     try
       glEnable(GL_BLEND); // saved by GL_COLOR_BUFFER_BIT
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE); // saved by GL_COLOR_BUFFER_BIT
+      glBlendFunc(Attributes.BlendingSourceFactor, Attributes.BlendingDestinationFactor); // saved by GL_COLOR_BUFFER_BIT
       glDepthMask(GL_FALSE); // saved by GL_DEPTH_BUFFER_BIT
 
       { calculate Amount.
