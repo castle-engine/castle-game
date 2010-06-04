@@ -6,6 +6,9 @@ Do
 sed --in-place --separate -e 's|solid FALSE|solid TRUE|' *.wrl
 This makes blending look slightly better (although still not perfect).
 
+Then gzip *.wrl and replace in .kanim file ".wrl" to ".wrl.gz"
+(uncompressed files are really large, > 70 MB compared to 25~ MB compressed).
+
 Note that resulting kanim is not structurally equal (fluid simulation
 doesn't produce such file), so it cannot be converted to a single VRML
 like "kanim_to_interpolators coord_MOD_Cube water_stream.kanim water_stream_done.wrl".
