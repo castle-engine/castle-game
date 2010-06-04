@@ -131,7 +131,7 @@ begin
     CM.FdUpdate.Value := 'NEXT_FRAME_ONLY';
     CM.FdSize.Value := 512;}
 
-    CM := TNodeImageCubeMapTexture.Create('', '');
+    CM := TNodeImageCubeMapTexture.Create('', RootNode.WWWBasePath);
     CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
     CM.FdUrl.Items.Add('water_reflections/water_environment_map.dds');
 
