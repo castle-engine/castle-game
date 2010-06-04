@@ -106,6 +106,7 @@ clean:
 # subdirectory isn't supposed to exist.
 	if [ -d source/ ]; then $(MAKE) -C source/ clean; fi
 	rm -f castle-process-3d-model castle-process-3d-model.exe
+	rm -Rf data/levels/fountain/fluidcache/
 
 clean_binaries:
 	rm -f castle castle.exe
