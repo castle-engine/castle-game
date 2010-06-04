@@ -83,10 +83,10 @@ type
 class procedure THelperSpecialCastleNodes.Remove(
   ParentNode: TVRMLNode; var Node: TVRMLNode);
 begin
-  if (Node.NodeName = 'LevelBox') or
+  if (Node.NodeName = 'LevelBox') or (Node.NodeName = 'ME_LevelBox') or
      (Node.NodeName = 'WaterBox') or
-     IsPrefix('Crea', Node.NodeName) or
-     IsPrefix('Item', Node.NodeName) or
+     IsPrefix('Crea', Node.NodeName) or IsPrefix('OB_Crea', Node.NodeName) or
+     IsPrefix('Item', Node.NodeName) or IsPrefix('OB_Item', Node.NodeName) or
      IsPrefix('Waypoint', Node.NodeName) or
      IsPrefix('Sector', Node.NodeName) or
      { Actually below are special only on specific levels }
