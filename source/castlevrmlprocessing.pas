@@ -156,6 +156,10 @@ begin
     V := RootNode.TryFindNode(TNodeViewpoint, true) as TNodeViewpoint;
     if V <> nil then
     begin
+      { Add V.NodeName, to allow saving the route to file.
+        Usable for "castle-process-3d-model fountain_final.wrl | view3dscene -" }
+      if V.NodeName = '' then V.NodeName := 'DefaultViewport';
+
       Route := TVRMLRoute.Create;
       Route.SetSourceDirectly(V.EventCameraRotationInverseMatrix);
       Route.SetDestinationDirectly(ShaderCamMatrix);
