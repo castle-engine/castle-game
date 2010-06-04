@@ -133,11 +133,11 @@ begin
 
     CM := TNodeImageCubeMapTexture.Create('', '');
     CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
-    CM.FdUrl.Items.Add('../../textures/fountain/water_environment_map.dds');
+    CM.FdUrl.Items.Add('water_reflections/water_environment_map.dds');
 
     MT := TNodeMovieTexture.Create('', '');
     CS.AddCustomField(TSFNode.Create(CS, 'normalMap', [], MT));
-    MT.FdUrl.Items.Add('/home/michalis/sources/vrmlengine/trunk/kambi_vrml_test_suite/x3d/water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png');
+    MT.FdUrl.Items.Add('water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png');
     MT.FdLoop.Value := true;
 
     ShaderCamMatrix := TSFMatrix3f.Create(CS, 'cameraRotationInverseMatrix', IdentityMatrix3Single);
@@ -146,12 +146,12 @@ begin
     Part := TNodeShaderPart.Create('', '');
     CS.FdParts.AddItem(Part);
     Part.FdType.Value := 'FRAGMENT';
-    Part.FdUrl.Items.Add('/home/michalis/sources/vrmlengine/trunk/kambi_vrml_test_suite/x3d/water_reflections/water_reflections_normalmap.fs');
+    Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.fs');
 
     Part := TNodeShaderPart.Create('', '');
     CS.FdParts.AddItem(Part);
     Part.FdType.Value := 'VERTEX';
-    Part.FdUrl.Items.Add('/home/michalis/sources/vrmlengine/trunk/kambi_vrml_test_suite/x3d/water_reflections/water_reflections_normalmap.vs');
+    Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.vs');
 
     V := RootNode.TryFindNode(TNodeViewpoint, true) as TNodeViewpoint;
     if V <> nil then
