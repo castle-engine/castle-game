@@ -19,7 +19,7 @@ void main(void)
   float diffuse = dot(normalize(vertex_to_light), normal);
   /* We fake the light has always more intensity.
      This isn't correct, but makes it look better. */
-  diffuse = (diffuse + 1.0) / 2.0;
+  diffuse = (diffuse + 1.0) * 2.0;
   diffuse = max(diffuse, 0.0);
 
   vec3 to_camera = normalize(vertex_to_camera);
