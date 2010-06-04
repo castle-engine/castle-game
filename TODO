@@ -1,3 +1,5 @@
+rem testing absolute links from water shader processing
+
 fountain new level for castle 1.0.0:
 - tentacles from fountain
 - water animated + by shaders
