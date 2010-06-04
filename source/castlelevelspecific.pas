@@ -1439,7 +1439,7 @@ begin
   { When DebugLevel, load only a static 1st animation frame.
     This is fast, and still allows to see the water shape. }
   if DebugLevel then
-    FountainFileName += 'fountain1.wrl' else
+    FountainFileName += 'fountain1.wrl.gz' else
     FountainFileName += 'fountain.kanim';
 
   { load Fountain animation, following the similar code as LoadLevelAnimation }
