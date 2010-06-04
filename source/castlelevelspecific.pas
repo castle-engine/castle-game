@@ -1433,28 +1433,30 @@ var
 begin
   inherited;
 
-  { load Fountain animation, following the same code as LoadLevelAnimation }
-  Fountain := TBlendedLoopingAnimation.CreateCustomCache(Self, GLContextCache);
-  Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
-    PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true);
-  AnimationAttributesSet(Fountain.Attributes, btIncrease);
-  Progress.Init(Fountain.PrepareRenderSteps, 'Loading water');
-  try
-    Fountain.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox], true);
-  finally Progress.Fini end;
-  Fountain.FreeResources([frTextureDataInNodes]);
-  Fountain.CastsShadow := false; { not manifold }
-  Fountain.Collides := false;
+  if not DebugTestLevel then
+  begin
+    { load Fountain animation, following the same code as LoadLevelAnimation }
+    Fountain := TBlendedLoopingAnimation.CreateCustomCache(Self, GLContextCache);
+    Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
+      PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true);
+    AnimationAttributesSet(Fountain.Attributes, btIncrease);
+    Progress.Init(Fountain.PrepareRenderSteps, 'Loading water');
+    try
+      Fountain.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox], true);
+    finally Progress.Fini end;
+    Fountain.FreeResources([frTextureDataInNodes]);
+    Fountain.CastsShadow := false; { not manifold }
+    Fountain.Collides := false;
 
-  Fountain.Diffuse := Vector4Single(0.5, 0.5, 1, 0.75);
-  Fountain.Ambient := Vector4Single(0, 0, 0, 1);
-  Fountain.Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;
-  
-  Fountain.TimePlayingSpeed := 1.5;
+    Fountain.Diffuse := Vector4Single(0.5, 0.5, 1, 0.75);
+    Fountain.Ambient := Vector4Single(0, 0, 0, 1);
+    Fountain.Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;
 
-  Items.Add(Fountain);
+    Fountain.TimePlayingSpeed := 1.5;
+    Fountain.TimePlaying := true;
 
-  Fountain.TimePlaying := true;
+    Items.Add(Fountain);
+  end;
 end;
 
 procedure TFountainLevel.ChangeLevelScene;

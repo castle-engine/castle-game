@@ -59,7 +59,7 @@ var
   WasParam_NoScreenChange: boolean = false;
 
 const
-  Options: array[0..8]of TOption =
+  Options: array[0..9]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short: #0; Long: 'no-sound'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
@@ -68,7 +68,8 @@ const
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
     (Short: #0; Long: 'debug-log'; Argument: oaNone),
     (Short: #0; Long: 'screen-size'; Argument: oaRequired),
-    (Short: #0; Long: 'debug-menu-designer'; Argument: oaNone)
+    (Short: #0; Long: 'debug-menu-designer'; Argument: oaNone),
+    (Short: #0; Long: 'debug-level'; Argument: oaNone)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -102,6 +103,9 @@ begin
            '  --debug-no-creatures  Creatures animations will be loaded' +nl+
            '                        only when you explicitly request them' +nl+
            '                        from debug menu' +nl+
+           '  --debug-level         Test level design: do not load expensive' +nl+
+           '                        animations (like fountain),' +nl+
+           '                        also implies --debug-no-creatures' +nl+
            '  --debug-menu-designer   Run menus is designer mode');
          ProgramBreak;
        end;
@@ -119,6 +123,10 @@ begin
            [@RequestedScreenWidth, @RequestedScreenHeight]);
        end;
     8: DebugMenuDesigner := true;
+    9: begin
+         DebugTestLevel := true;
+         ResourcesStrategy := rsDebugKeepOnlyForExistingItems;
+       end;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
