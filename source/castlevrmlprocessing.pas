@@ -135,7 +135,7 @@ begin
     CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
     CM.FdUrl.Items.Add('water_reflections/water_environment_map.dds');
 
-    MT := TNodeMovieTexture.Create('', '');
+    MT := TNodeMovieTexture.Create('', RootNode.WWWBasePath);
     CS.AddCustomField(TSFNode.Create(CS, 'normalMap', [], MT));
     MT.FdUrl.Items.Add('water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png');
     MT.FdLoop.Value := true;
@@ -143,12 +143,12 @@ begin
     ShaderCamMatrix := TSFMatrix3f.Create(CS, 'cameraRotationInverseMatrix', IdentityMatrix3Single);
     CS.AddCustomField(ShaderCamMatrix, true);
 
-    Part := TNodeShaderPart.Create('', '');
+    Part := TNodeShaderPart.Create('', RootNode.WWWBasePath);
     CS.FdParts.AddItem(Part);
     Part.FdType.Value := 'FRAGMENT';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.fs');
 
-    Part := TNodeShaderPart.Create('', '');
+    Part := TNodeShaderPart.Create('', RootNode.WWWBasePath);
     CS.FdParts.AddItem(Part);
     Part.FdType.Value := 'VERTEX';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.vs');
