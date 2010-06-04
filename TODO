@@ -1,7 +1,6 @@
 fountain new level for castle 1.0.0:
 - tentacles from fountain
-- water animated + by shaders
-  splash sound when entering fountain
+- splash sound when entering fountain
 - touch sensor to bring down elevator and go up over the columns
 - a path over the columns around the fountain
 - animated light, with shadows and bump mapping, circling the fountain
