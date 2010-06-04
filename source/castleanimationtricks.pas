@@ -143,7 +143,7 @@ begin
         MaxTo1st(HalfIndex, 0);
       end else
         HalfIndex := SceneIndex;
-      Assert((0 <= HalfIndex) and (HalfIndex < MiddleIndex));
+      Assert((ScenesCount <= 1) or ((0 <= HalfIndex) and (HalfIndex < MiddleIndex)));
       Amount := HalfIndex / (MiddleIndex - 1);
 
       { We pass tgAll to our Scenes[].Render.

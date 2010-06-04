@@ -124,7 +124,7 @@ begin
        end;
     8: DebugMenuDesigner := true;
     9: begin
-         DebugTestLevel := true;
+         DebugLevel := true;
          ResourcesStrategy := rsDebugKeepOnlyForExistingItems;
        end;
     else raise EInternalError.Create('OptionProc');

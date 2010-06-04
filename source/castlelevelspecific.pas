@@ -1430,33 +1430,38 @@ constructor TFountainLevel.Create(
   AMenuBackground: boolean);
 var
   Fountain: TBlendedLoopingAnimation;
+  FountainFileName: string;
 begin
   inherited;
 
-  if not DebugTestLevel then
-  begin
-    { load Fountain animation, following the same code as LoadLevelAnimation }
-    Fountain := TBlendedLoopingAnimation.CreateCustomCache(Self, GLContextCache);
-    Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
-      PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true);
-    AnimationAttributesSet(Fountain.Attributes, btIncrease);
-    Progress.Init(Fountain.PrepareRenderSteps, 'Loading water');
-    try
-      Fountain.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox], true);
-    finally Progress.Fini end;
-    Fountain.FreeResources([frTextureDataInNodes]);
-    Fountain.CastsShadow := false; { not manifold }
-    Fountain.Collides := false;
+  FountainFileName := CastleLevelsPath + 'fountain' +
+    PathDelim + 'water_stream' + PathDelim;
+  { When DebugLevel, load only a static 1st animation frame.
+    This is fast, and still allows to see the water shape. }
+  if DebugLevel then
+    FountainFileName += 'fountain1.wrl' else
+    FountainFileName += 'fountain.kanim';
 
-    Fountain.Diffuse := Vector4Single(0.5, 0.5, 1, 0.75);
-    Fountain.Ambient := Vector4Single(0, 0, 0, 1);
-    Fountain.Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;
+  { load Fountain animation, following the similar code as LoadLevelAnimation }
+  Fountain := TBlendedLoopingAnimation.CreateCustomCache(Self, GLContextCache);
+  Fountain.LoadFromFile(FountainFileName, false, true);
+  AnimationAttributesSet(Fountain.Attributes, btIncrease);
+  Progress.Init(Fountain.PrepareRenderSteps, 'Loading water');
+  try
+    Fountain.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox], true);
+  finally Progress.Fini end;
+  Fountain.FreeResources([frTextureDataInNodes]);
+  Fountain.CastsShadow := false; { not manifold }
+  Fountain.Collides := false;
 
-    Fountain.TimePlayingSpeed := 1.5;
-    Fountain.TimePlaying := true;
+  Fountain.Diffuse := Vector4Single(0.5, 0.5, 1, 0.75);
+  Fountain.Ambient := Vector4Single(0, 0, 0, 1);
+  Fountain.Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;
 
-    Items.Add(Fountain);
-  end;
+  Fountain.TimePlayingSpeed := 1.5;
+  Fountain.TimePlaying := true;
+
+  Items.Add(Fountain);
 end;
 
 procedure TFountainLevel.ChangeLevelScene;

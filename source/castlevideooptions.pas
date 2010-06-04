@@ -124,7 +124,7 @@ var
     This is meaningull only if RenderShadowsPossible and RenderShadows. }
   DebugRenderShadowVolume: boolean = false;
 
-  DebugTestLevel: boolean = false;
+  DebugLevel: boolean = false;
 
 const
   DefaultColorDepthBits = 0;
