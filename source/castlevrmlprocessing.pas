@@ -125,7 +125,7 @@ begin
     { we could set mat diffuse in Blender and export to VRML,
       but it's easier for now to hardcode it here. }
     Mat := M as TNodeMaterial_2;
-    Mat.FdDiffuse.Value := Vector3Single(0.5, 0.5, 1.0);
+    Mat.FdDiffuseColor.Value := Vector3Single(0.5, 0.5, 1.0);
 
     CS := TNodeComposedShader.Create('', '');
     CS.NodeName := 'WaterShader';
