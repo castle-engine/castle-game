@@ -6,7 +6,10 @@ Do
 sed --in-place --separate -e 's|solid FALSE|solid TRUE|' *.wrl
 This makes blending look slightly better (although still not perfect).
 
-Then gzip *.wrl and replace in .kanim file ".wrl" to ".wrl.gz"
+Then do
+rm -f *.wrl.gz
+gzip *.wrl
+sed --in-place --separate -e 's|.wrl|.wrl.gz|' fountain.kanim
 (uncompressed files are really large, > 70 MB compared to 25~ MB compressed).
 
 Note that resulting kanim is not structurally equal (fluid simulation
