@@ -25,7 +25,7 @@ unit CastleAnimationTricks;
 
 interface
 
-uses VRMLGLScene, Classes, VRMLGLAnimation, Frustum, VectorMath, GLShaders;
+uses VRMLGLScene, Classes, VRMLGLAnimation, Frustum, VectorMath, GLShaders, GL;
 
 type
   { Animation forced to seamlessly loop by blending the beginning frames
@@ -77,6 +77,8 @@ type
   TBlendedLoopingAnimationShader = class(TBlendedLoopingAnimation)
   private
     GLSLProgram: TGLSLProgram;
+    WaterEnvMap: TGLuint;
+    function UseShader: boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure GLContextClose; override;
@@ -87,8 +89,8 @@ type
 
 implementation
 
-uses Math, KambiUtils, GL, KambiGLUtils, KambiStringUtils, SysUtils,
-  KambiFilesUtils;
+uses Math, KambiUtils, KambiGLUtils, KambiStringUtils, SysUtils,
+  KambiFilesUtils, RenderStateUnit, DDS, GLExt, GLImages;
 
 { TBlendedLoopingAnimation --------------------------------------------------- }
 
@@ -182,32 +184,86 @@ begin
   Attributes.GLSLShaders := false;
 end;
 
+function TBlendedLoopingAnimationShader.UseShader: boolean;
+begin
+  Result := GL_ARB_texture_cube_map and (TGLSLProgram.ClassSupport <> gsNone);
+end;
+
 procedure TBlendedLoopingAnimationShader.GLContextClose;
 begin
   if GLSLProgram <> nil then FreeAndNil(GLSLProgram);
+  glFreeTexture(WaterEnvMap);
+  inherited;
 end;
 
 procedure TBlendedLoopingAnimationShader.Render(const Frustum: TFrustum;
   TransparentGroup: TTransparentGroup; InShadow: boolean);
+
+  function LoadWaterEnvMap: TGLuint;
+  var
+    DDS: TDDSImage;
+  begin
+    glGenTextures(1, @Result);
+
+    DDS := TDDSImage.Create;
+    try
+      DDS.LoadFromFile(ProgramDataPath + 'data' + PathDelim + 'levels' +
+        PathDelim + 'fountain' + PathDelim +  'water_reflections' +
+        PathDelim + 'water_environment_map.dds');
+
+      glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, Result);
+
+      glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, Attributes.TextureMagFilter);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, Attributes.TextureMinFilter);
+
+      glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+      glTextureCubeMap(
+        DDS.CubeMapImage(dcsPositiveX),
+        DDS.CubeMapImage(dcsNegativeX),
+        { Swap meaning of positive/negative Y faces from DDS,
+          see TDDSCubeMapSide for explanation. }
+        DDS.CubeMapImage(dcsNegativeY),
+        DDS.CubeMapImage(dcsPositiveY),
+        DDS.CubeMapImage(dcsPositiveZ),
+        DDS.CubeMapImage(dcsNegativeZ),
+        DDS,
+        TextureMinFilterNeedsMipmaps(Attributes.TextureMinFilter));
+    finally FreeAndNil(DDS); end;
+  end;
+
 var
   ShadersPath: string;
 begin
-  if GLSLProgram = nil then
+  if UseShader then
   begin
-    GLSLProgram := TGLSLProgram.Create;
-    ShadersPath := ProgramDataPath + 'data' + PathDelim + 'levels' +
-      PathDelim + 'fountain' + PathDelim +  'water_reflections' +
-      PathDelim + 'glsl_simple.';
-    GLSLProgram.AttachVertexShader(FileToString(ShadersPath + 'vs'));
-    GLSLProgram.AttachFragmentShader(FileToString(ShadersPath + 'fs'));
-    GLSLProgram.Link(true);
+    if WaterEnvMap = 0 then
+      WaterEnvMap := LoadWaterEnvMap;
+
+    if GLSLProgram = nil then
+    begin
+      GLSLProgram := TGLSLProgram.Create;
+      ShadersPath := ProgramDataPath + 'data' + PathDelim + 'levels' +
+        PathDelim + 'fountain' + PathDelim +  'water_reflections' +
+        PathDelim + 'water_reflections.';
+      GLSLProgram.AttachVertexShader(FileToString(ShadersPath + 'vs'));
+      GLSLProgram.AttachFragmentShader(FileToString(ShadersPath + 'fs'));
+      GLSLProgram.Link(true);
+    end;
+
+    glActiveTextureARB(GL_TEXTURE0_ARB);
+    glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, WaterEnvMap);
+
+    GLSLProgram.Enable;
+    GLSLProgram.SetUniform('cameraRotationInverseMatrix', RenderState.CameraRotationInverseMatrix3);
+    GLSLProgram.SetUniform('envMap', 0);
   end;
 
-  GLSLProgram.SetUniform('cameraRotationInverseMatrix', RenderState.CameraRotationInverseMatrix3);
-  GLSLProgram.SetUniform('envMap', 0);
-  GLSLProgram.Enable;
   inherited;
-  GLSLProgram.Disable;
+
+  if UseShader then
+    GLSLProgram.Disable;
 end;
 
 end.
