@@ -1443,7 +1443,7 @@ begin
     FountainFileName += 'fountain.kanim';
 
   { load Fountain animation, following the similar code as LoadLevelAnimation }
-  Fountain := TBlendedLoopingAnimation.CreateCustomCache(Self, GLContextCache);
+  Fountain := TBlendedLoopingAnimationShader.CreateCustomCache(Self, GLContextCache);
   Fountain.LoadFromFile(FountainFileName, false, true);
   AnimationAttributesSet(Fountain.Attributes, btIncrease);
   Progress.Init(Fountain.PrepareRenderSteps, 'Loading water');

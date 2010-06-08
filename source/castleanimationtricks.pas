@@ -25,7 +25,7 @@ unit CastleAnimationTricks;
 
 interface
 
-uses VRMLGLScene, Classes, VRMLGLAnimation, Frustum, VectorMath;
+uses VRMLGLScene, Classes, VRMLGLAnimation, Frustum, VectorMath, GLShaders;
 
 type
   { Animation forced to seamlessly loop by blending the beginning frames
@@ -73,9 +73,24 @@ type
       InShadow: boolean); override;
   end;
 
+  { TBlendedLoopingAnimation with a GLSL shader with a cubemap. }
+  TBlendedLoopingAnimationShader = class(TBlendedLoopingAnimation)
+  private
+    GLSLProgram: TGLSLProgram;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure GLContextClose; override;
+    procedure Render(const Frustum: TFrustum;
+      TransparentGroup: TTransparentGroup;
+      InShadow: boolean); override;
+  end;
+
 implementation
 
-uses Math, KambiUtils, GL, KambiGLUtils;
+uses Math, KambiUtils, GL, KambiGLUtils, KambiStringUtils, SysUtils,
+  KambiFilesUtils;
+
+{ TBlendedLoopingAnimation --------------------------------------------------- }
 
 constructor TBlendedLoopingAnimation.Create(AOwner: TComponent);
 begin
@@ -157,6 +172,42 @@ begin
       Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(Frustum, tgAll, InShadow);
     finally glPopAttrib end;
   end;
+end;
+
+{ TBlendedLoopingAnimationShader --------------------------------------------- }
+
+constructor TBlendedLoopingAnimationShader.Create(AOwner: TComponent);
+begin
+  inherited;
+  Attributes.GLSLShaders := false;
+end;
+
+procedure TBlendedLoopingAnimationShader.GLContextClose;
+begin
+  if GLSLProgram <> nil then FreeAndNil(GLSLProgram);
+end;
+
+procedure TBlendedLoopingAnimationShader.Render(const Frustum: TFrustum;
+  TransparentGroup: TTransparentGroup; InShadow: boolean);
+var
+  ShadersPath: string;
+begin
+  if GLSLProgram = nil then
+  begin
+    GLSLProgram := TGLSLProgram.Create;
+    ShadersPath := ProgramDataPath + 'data' + PathDelim + 'levels' +
+      PathDelim + 'fountain' + PathDelim +  'water_reflections' +
+      PathDelim + 'glsl_simple.';
+    GLSLProgram.AttachVertexShader(FileToString(ShadersPath + 'vs'));
+    GLSLProgram.AttachFragmentShader(FileToString(ShadersPath + 'fs'));
+    GLSLProgram.Link(true);
+  end;
+
+  GLSLProgram.SetUniform('cameraRotationInverseMatrix', RenderState.CameraRotationInverseMatrix3);
+  GLSLProgram.SetUniform('envMap', 0);
+  GLSLProgram.Enable;
+  inherited;
+  GLSLProgram.Disable;
 end;
 
 end.
