@@ -256,6 +256,7 @@ begin
     glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, WaterEnvMap);
 
     GLSLProgram.Enable;
+    RenderState.CameraRotationInverseMatrixNeeded;
     GLSLProgram.SetUniform('cameraRotationInverseMatrix', RenderState.CameraRotationInverseMatrix3);
     GLSLProgram.SetUniform('envMap', 0);
   end;
