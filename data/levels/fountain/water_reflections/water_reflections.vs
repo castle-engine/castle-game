@@ -11,8 +11,6 @@ varying vec3 normal;
 
 void main(void)
 {
-  gl_TexCoord[0] = /* gl_TextureMatrix[0] * (not needed) */ 2.0 * gl_MultiTexCoord0;
-
   gl_Position = ftransform();
 
   vec3 light_position = vec3(0.0, 0.0, 0.0);
@@ -21,5 +19,5 @@ void main(void)
   /* That's easy, since in eye space camera position is always (0, 0, 0). */
   vertex_to_camera = normalize(- vertex);
 
-  normal = gl_NormalMatrix * gl_Normal;
+  normal = normalize(gl_NormalMatrix * gl_Normal);
 }

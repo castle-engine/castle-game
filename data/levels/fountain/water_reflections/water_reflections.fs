@@ -11,7 +11,10 @@ varying vec3 normal;
 
 void main(void)
 {
-  float diffuse = dot(normalize(vertex_to_light), normal);
+  /* although normalized in vs for good interpolation,
+     we should normalize here too (interpolated may be scaled again) */
+  vec3 good_normal = normalize(normal);
+  float diffuse = dot(normalize(vertex_to_light), good_normal);
   /* We fake the light has always more intensity.
      This isn't correct, but makes it look better. */
   diffuse = (diffuse + 1.0) * 2.0;
@@ -19,7 +22,7 @@ void main(void)
 
   vec3 to_camera = normalize(vertex_to_camera);
 
-  vec3 reflected = reflect(to_camera, normal);
+  vec3 reflected = reflect(to_camera, good_normal);
 
   reflected = cameraRotationInverseMatrix * reflected;
 
@@ -28,8 +31,9 @@ void main(void)
   /* fake reflectedColor to be lighter. This just Looks Better. */
   reflectedColor *= 1.5;
 
-  gl_FragColor.rgb = reflectedColor * vec3(gl_FrontMaterial.diffuse) * diffuse;
+  gl_FragColor.rgb = reflectedColor * gl_FrontMaterial.diffuse.rgb * diffuse;
 
-  float refraction_amount = dot(to_camera, normal);
-  gl_FragColor.a = 1.0 - refraction_amount;
+//  float refraction_amount = dot(to_camera, good_normal);
+//  gl_FragColor.a = 1.0 - refraction_amount;
+  gl_FragColor.a = gl_FrontMaterial.diffuse.a;
 }
