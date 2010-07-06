@@ -151,7 +151,7 @@ begin
         to make the resulting VRML look more similar to original
         (otherwise resolved inline could move up in the file) }
       G2.PositionInParent := Node.PositionInParent;
-      G2.FdChildren.AddItem(Inlined);
+      G2.FdChildren.Add(Inlined);
       Node := G2;
     end;
   end;

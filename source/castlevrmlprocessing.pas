@@ -129,7 +129,7 @@ begin
 
     CS := TNodeComposedShader.Create('', '');
     CS.NodeName := 'WaterShader';
-    (Node as TNodeAppearance).FdShaders.AddItem(CS);
+    (Node as TNodeAppearance).FdShaders.Add(CS);
     CS.FdLanguage.Value := 'GLSL';
 
 {    CM := TNodeGeneratedCubeMapTexture.Create('', '');
@@ -150,12 +150,12 @@ begin
     CS.AddCustomField(ShaderCamMatrix, true);
 
     Part := TNodeShaderPart.Create('', RootNode.WWWBasePath);
-    CS.FdParts.AddItem(Part);
+    CS.FdParts.Add(Part);
     Part.FdType.Value := 'FRAGMENT';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.fs');
 
     Part := TNodeShaderPart.Create('', RootNode.WWWBasePath);
-    CS.FdParts.AddItem(Part);
+    CS.FdParts.Add(Part);
     Part.FdType.Value := 'VERTEX';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.vs');
 
