@@ -192,14 +192,14 @@ begin
 
   if Ground <> nil then
   begin
-    if Ground^.State.ParentShape <> nil then
+    if Ground^.State.ShapeNode <> nil then
     begin
       { VRML 2.0 path }
-      if (Ground^.State.ParentShape.Texture <> nil) and
-         (Ground^.State.ParentShape.Texture is TNodeImageTexture) then
+      if (Ground^.State.ShapeNode.Texture <> nil) and
+         (Ground^.State.ShapeNode.Texture is TNodeImageTexture) then
       begin
         TextureUrl := TNodeImageTexture(
-          Ground^.State.ParentShape.Texture).FdUrl.Items[0];
+          Ground^.State.ShapeNode.Texture).FdUrl.Items[0];
         HasTextureUrl := true;
       end;
     end else
