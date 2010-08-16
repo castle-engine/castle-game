@@ -1491,7 +1491,7 @@ begin
       as it should not be visible).
       This way we can comfortably set such boxes from Blender. }
     Box := BoxShape.BoundingBox;
-    MainScene.NodeFreeRemovingFromAllParents(BoxShape.OriginalGeometry);
+    MainScene.RemoveShapeGeometry(BoxShape);
   end;
 end;
 
