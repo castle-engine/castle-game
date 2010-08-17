@@ -43,7 +43,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3D,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
-  BackgroundGL, DOM, GameSoundEngine, Base3D,
+  BackgroundGL, DOM, GameSoundEngine, Base3D, VRMLShape,
   GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum, KambiSceneManager;
 
 {$define read_interface}
@@ -363,18 +363,10 @@ type
       early. }
     ItemsToRemove: TVRMLNodesList;
 
-    procedure TraverseForItems(
-      BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
-      BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
-      Geometry: TVRMLGeometryNode;
-      StateStack: TVRMLGraphTraverseStateStack);
+    procedure TraverseForItems(Shape: TVRMLShape);
   private
     FCreatures: TCreaturesList;
-    procedure TraverseForCreatures(
-      BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
-      BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
-      Geometry: TVRMLGeometryNode;
-      StateStack: TVRMLGraphTraverseStateStack);
+    procedure TraverseForCreatures(Shape: TVRMLShape);
   private
     FInitialPosition: TVector3Single;
     FInitialDirection: TVector3Single;
@@ -759,7 +751,7 @@ uses SysUtils, GL, GLU, Object3DAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
   CastleInputs, CastleWindow, KambiOpenAL, ALUtils, KambiXMLUtils,
-  CastleRequiredResources, VRMLOpenGLRenderer, VRMLShape, RenderStateUnit;
+  CastleRequiredResources, VRMLOpenGLRenderer, RenderStateUnit;
 
 {$define read_implementation}
 
@@ -1167,6 +1159,7 @@ var
   Options: TPrepareRenderOptions;
   TG: TTransparentGroups;
   NewCameraBox: TBox3D;
+  SI: TVRMLShapeTreeIterator;
 begin
   inherited Create(nil);
 
@@ -1214,11 +1207,17 @@ begin
     try
       { Initialize Items }
       FItemsOnLevel := TItemsOnLevelList.Create;
-      MainScene.RootNode.TraverseBlenderObjects(@TraverseForItems);
+      SI := TVRMLShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
+      try
+        while SI.GetNext do TraverseForItems(SI.Current);
+      finally SysUtils.FreeAndNil(SI) end;
 
       { Initialize Creatures }
       FCreatures := TCreaturesList.Create;
-      MainScene.RootNode.TraverseBlenderObjects(@TraverseForCreatures);
+      SI := TVRMLShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
+      try
+        while SI.GetNext do TraverseForCreatures(SI.Current);
+      finally SysUtils.FreeAndNil(SI) end;
 
       RemoveItemsToRemove;
     finally ItemsToRemove.Free end;
@@ -1247,8 +1246,8 @@ begin
     MainScene.BeforeNodesFree;
     FSectors := TSceneSectorsList.Create;
     FWaypoints := TSceneWaypointsList.Create;
-    Waypoints.ExtractPositions(MainScene.RootNode);
-    Sectors.ExtractBoundingBoxes(MainScene.RootNode);
+    Waypoints.ExtractPositions(MainScene);
+    Sectors.ExtractBoundingBoxes(MainScene);
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
     MainScene.ChangedAll;
 
@@ -1513,11 +1512,7 @@ begin
   end;
 end;
 
-procedure TLevel.TraverseForItems(
-  BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
-  BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
-  Geometry: TVRMLGeometryNode;
-  StateStack: TVRMLGraphTraverseStateStack);
+procedure TLevel.TraverseForItems(Shape: TVRMLShape);
 
   procedure CreateNewItem(const ItemNodeName: string);
   var
@@ -1551,7 +1546,7 @@ procedure TLevel.TraverseForItems(
       raise Exception.CreateFmt('Item kind with VRMLNodeName "%s" doesn''t exist',
         [ItemKindVRMLNodeName]);
 
-    ItemStubBoundingBox := Geometry.BoundingBox(StateStack.Top);
+    ItemStubBoundingBox := Shape.BoundingBox;
     ItemPosition[0] := (ItemStubBoundingBox[0, 0] + ItemStubBoundingBox[1, 0]) / 2;
     ItemPosition[1] := (ItemStubBoundingBox[0, 1] + ItemStubBoundingBox[1, 1]) / 2;
     ItemPosition[2] := ItemStubBoundingBox[0, 2];
@@ -1563,20 +1558,16 @@ procedure TLevel.TraverseForItems(
 const
   ItemPrefix = 'Item';
 begin
-  if IsPrefix(ItemPrefix, BlenderMeshName) then
+  if IsPrefix(ItemPrefix, Shape.BlenderMeshName) then
   begin
-    CreateNewItem(SEnding(BlenderMeshName, Length(ItemPrefix) + 1));
+    CreateNewItem(SEnding(Shape.BlenderMeshName, Length(ItemPrefix) + 1));
     { Don't remove BlenderObjectNode now --- will be removed later.
       This avoids problems with removing nodes while traversing. }
-    ItemsToRemove.Add(BlenderObjectNode);
+    ItemsToRemove.Add(Shape.BlenderObjectNode);
   end;
 end;
 
-procedure TLevel.TraverseForCreatures(
-  BlenderObjectNode: TVRMLNode; const BlenderObjectName: string;
-  BlenderMeshNode: TVRMLNode; const BlenderMeshName: string;
-  Geometry: TVRMLGeometryNode;
-  StateStack: TVRMLGraphTraverseStateStack);
+procedure TLevel.TraverseForCreatures(Shape: TVRMLShape);
 
   procedure CreateNewCreature(const CreatureNodeName: string);
   var
@@ -1606,7 +1597,7 @@ procedure TLevel.TraverseForCreatures(
     end;
 
     { calculate CreaturePosition }
-    StubBoundingBox := Geometry.BoundingBox(StateStack.Top);
+    StubBoundingBox := Shape.BoundingBox;
     CreaturePosition[0] := (StubBoundingBox[0, 0] + StubBoundingBox[1, 0]) / 2;
     CreaturePosition[1] := (StubBoundingBox[0, 1] + StubBoundingBox[1, 1]) / 2;
     CreaturePosition[2] := StubBoundingBox[0, 2];
@@ -1647,12 +1638,12 @@ procedure TLevel.TraverseForCreatures(
 const
   CreaturePrefix = 'Crea';
 begin
-  if IsPrefix(CreaturePrefix, BlenderMeshName) then
+  if IsPrefix(CreaturePrefix, Shape.BlenderMeshName) then
   begin
-    CreateNewCreature(SEnding(BlenderMeshName, Length(CreaturePrefix) + 1));
+    CreateNewCreature(SEnding(Shape.BlenderMeshName, Length(CreaturePrefix) + 1));
     { Don't remove BlenderObjectNode now --- will be removed later.
       This avoids problems with removing nodes while traversing. }
-    ItemsToRemove.Add(BlenderObjectNode);
+    ItemsToRemove.Add(Shape.BlenderObjectNode);
   end;
 end;
 
