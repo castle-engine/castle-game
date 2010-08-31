@@ -178,7 +178,7 @@ begin
   AttributesSet(CreditsModel.Attributes, btIncrease);
   CreditsModel.Attributes.UseSceneLights := true;
 
-  CreditsModel.PrepareRender([tgAll], [prBoundingBox], false);
+  CreditsModel.PrepareResources([tgAll], [prRender, prBoundingBox], false);
 
   Info := (CreditsModel.RootNode.FindNodeByName(TNodeWorldInfo,
     'MainInfo', true) as TNodeWorldInfo).FdInfo;

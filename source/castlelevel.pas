@@ -439,7 +439,7 @@ type
       @unorderedList(
         @item sets Attributes according to AnimationAttributesSet
         @item optionally creates triangle octree for the FirstScene and/or LastScene
-        @item(call PrepareRender, with prBoundingBox, prShadowVolume
+        @item(call PrepareResources, with prRender, prBoundingBox, prShadowVolume
           (if shadows enabled by RenderShadowsPossible))
         @item FreeExternalResources, since they will not be needed anymore
         @item TimePlaying is by default @false, so the animation is not playing.
@@ -712,7 +712,7 @@ type
       @unorderedList(
         @item sets Attributes according to AttributesSet
         @item optionally create triangle octree
-        @item(call PrepareRender, with prBoundingBox, prShadowVolume
+        @item(call PrepareResources, with prRender, prBoundingBox, prShadowVolume
           (if shadows enabled by RenderShadowsPossible), optionally
           with prBackground)
         @item FreeExternalResources, since they will not be needed anymore
@@ -1156,7 +1156,7 @@ const
 var
   NavigationNode: TNodeNavigationInfo;
   NavigationSpeed: Single;
-  Options: TPrepareRenderOptions;
+  Options: TPrepareResourcesOptions;
   TG: TTransparentGroups;
   NewCameraBox: TBox3D;
   SI: TVRMLShapeTreeIterator;
@@ -1291,8 +1291,8 @@ begin
 
     MainScene.CastsShadow := SceneDynamicShadows;
 
-    { calcualte Options for PrepareRender }
-    Options := [prBackground, prBoundingBox];
+    { calculate Options for PrepareResources }
+    Options := [prRender, prBackground, prBoundingBox];
     if RenderShadowsPossible and SceneDynamicShadows then
       Options := Options + prShadowVolume;
 
@@ -1300,7 +1300,7 @@ begin
     if RenderShadowsPossible then
       TG := TG + [tgOpaque, tgTransparent];
 
-    MainScene.PrepareRender(TG, Options, false);
+    MainScene.PrepareResources(TG, Options, false);
 
     MainScene.FreeResources([frTextureDataInNodes]);
 
@@ -1326,6 +1326,7 @@ begin
     MainScene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
     MainScene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
     MainScene.Spatial := [ssRendering, ssCollisionOctree];
+    MainScene.PrepareResources([], [prSpatial], false);
 
     { TrianglesList was created for triangle octree. We don't need it anymore.
 
@@ -1779,20 +1780,20 @@ end;
 function TLevel.LoadLevelScene(const FileName: string;
   CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
 var
-  Options: TPrepareRenderOptions;
+  Options: TPrepareResourcesOptions;
 begin
   Result := TVRMLGLScene.CreateCustomCache(Self, GLContextCache);
   Result.Load(FileName);
   AttributesSet(Result.Attributes, btIncrease);
 
-  { calculate Options for PrepareRender }
-  Options := [prBoundingBox { BoundingBox is practically always needed }];
+  { calculate Options for PrepareResources }
+  Options := [prRender, prBoundingBox { always needed }];
   if PrepareBackground then
     Include(Options, prBackground);
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareRender([tgOpaque, tgTransparent], Options, false);
+  Result.PrepareResources([tgOpaque, tgTransparent], Options, false);
 
   if CreateOctreeCollisions then
     Result.Spatial := [ssCollisionOctree];
@@ -1808,19 +1809,19 @@ function TLevel.LoadLevelAnimation(
   CreateFirstOctreeCollisions,
   CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
 var
-  Options: TPrepareRenderOptions;
+  Options: TPrepareResourcesOptions;
 begin
   Result := TVRMLGLAnimation.CreateCustomCache(Self, GLContextCache);
   Result.LoadFromFile(FileName, false, true);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
 
-  { calculate Options for PrepareRender }
-  Options := [prBoundingBox { BoundingBox is practically always needed }];
+  { calculate Options for PrepareResources }
+  Options := [prRender, prBoundingBox { always needed }];
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareRender([tgOpaque, tgTransparent], Options, false);
+  Result.PrepareResources([tgOpaque, tgTransparent], Options, false);
 
   if CreateFirstOctreeCollisions then
     Result.FirstScene.Spatial := [ssCollisionOctree];

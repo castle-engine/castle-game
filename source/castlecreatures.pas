@@ -1268,9 +1268,9 @@ procedure TCreatureKind.CreateAnimationIfNeeded(
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo);
 var
-  Options: TPrepareRenderOptions;
+  Options: TPrepareResourcesOptions;
 begin
-  Options := [prBoundingBox];
+  Options := [prRender, prBoundingBox];
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 

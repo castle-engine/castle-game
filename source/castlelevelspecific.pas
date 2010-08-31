@@ -1448,9 +1448,9 @@ begin
   Fountain := TBlendedLoopingAnimationShader.CreateCustomCache(Self, GLContextCache);
   Fountain.LoadFromFile(FountainFileName, false, true);
   AnimationAttributesSet(Fountain.Attributes, btIncrease);
-  Progress.Init(Fountain.PrepareRenderSteps, 'Loading water');
+  Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
   try
-    Fountain.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox], true);
+    Fountain.PrepareResources([tgOpaque, tgTransparent], [prRender, prBoundingBox], true);
   finally Progress.Fini end;
   Fountain.FreeResources([frTextureDataInNodes]);
   Fountain.CastsShadow := false; { not manifold }

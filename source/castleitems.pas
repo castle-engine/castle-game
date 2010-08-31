@@ -510,7 +510,7 @@ begin
     FScene.Load(ModelFileName);
 
     AttributesSet(Scene.Attributes, BlendingType);
-    Scene.PrepareRender([tgOpaque, tgTransparent], [prBoundingBox], false);
+    Scene.PrepareResources([tgOpaque, tgTransparent], [prRender, prBoundingBox], false);
     Scene.FreeResources([frTextureDataInNodes]);
   end;
 
@@ -541,7 +541,7 @@ procedure TItemKind.CreateAnimationIfNeeded(
   TransparentGroups: TTransparentGroups);
 begin
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
-    TransparentGroups, [prBoundingBox]);
+    TransparentGroups, [prRender, prBoundingBox]);
 end;
 
 { TItemKindsList ------------------------------------------------------------- }

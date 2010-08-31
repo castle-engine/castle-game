@@ -60,7 +60,7 @@ type
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo;
       TransparentGroups: TTransparentGroups;
-      Options: TPrepareRenderOptions);
+      Options: TPrepareResourcesOptions);
 
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool.
       AnimInfo may be @nil, then this is ignored. }
@@ -332,7 +332,7 @@ procedure TObjectKind.CreateAnimationIfNeeded(
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo;
   TransparentGroups: TTransparentGroups;
-  Options: TPrepareRenderOptions);
+  Options: TPrepareResourcesOptions);
 
   { Returns FirstScene.ManifoldEdges / BorderEdges.
 
@@ -374,7 +374,7 @@ var
   IsSharedManifoldAndBorderEdges: boolean;
   SharedManifoldEdges: TDynManifoldEdgeArray;
   SharedBorderEdges: TDynBorderEdgeArray;
-  ActualOptions: TPrepareRenderOptions;
+  ActualOptions: TPrepareResourcesOptions;
 begin
   if (AnimInfo <> nil) and (Anim = nil) then
     Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
@@ -415,7 +415,7 @@ begin
       Exclude(ActualOptions, prManifoldAndBorderEdges);
 
     AnimationAttributesSet(Anim.Attributes, BlendingType);
-    Anim.PrepareRender(TransparentGroups, ActualOptions, false);
+    Anim.PrepareResources(TransparentGroups, ActualOptions, false);
 
     if (prManifoldAndBorderEdges in Options) and
       IsSharedManifoldAndBorderEdges then
