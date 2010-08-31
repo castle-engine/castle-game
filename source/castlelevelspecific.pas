@@ -1437,8 +1437,10 @@ begin
   FountainFileName := CastleLevelsPath + 'fountain' +
     PathDelim + 'water_stream' + PathDelim;
   { When DebugLevel, load only a static 1st animation frame.
-    This is fast, and still allows to see the water shape. }
-  if DebugLevel then
+    This is fast, and still allows to see the water shape.
+    TODO: for now, loading full fountain.kanim is so slow and memory-eating
+    that we don't do it ever. }
+  if DebugLevel or true then
     FountainFileName += 'fountain1.wrl.gz' else
     FountainFileName += 'fountain.kanim';
 
