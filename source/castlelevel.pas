@@ -1243,13 +1243,11 @@ begin
     end;
 
     { calculate Sectors and Waypoints }
-    MainScene.BeforeNodesFree;
     FSectors := TSceneSectorsList.Create;
     FWaypoints := TSceneWaypointsList.Create;
     Waypoints.ExtractPositions(MainScene);
     Sectors.ExtractBoundingBoxes(MainScene);
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
-    MainScene.ChangedAll;
 
     NavigationNode := MainScene.NavigationInfoStack.Top as TNodeNavigationInfo;
 
