@@ -1,3 +1,18 @@
+------------------------------------------------------------------------------
+- castle 1.0.0 blockers:
+  - same plane walls on doom e1m1 level:
+    - at the first door
+    - right when opening the secret (lighter) door
+    (exist also in srcs before TLevelObject - T3D transition, so this isn't any bug from this.)
+
+  - There *must* be a progress for fountain loading now..
+    it eats a lot of time and memory now.
+
+    Hm, for now we always load only 1st anim frame.
+    Speedup?
+    Or remove the whole fountain anim?
+
+------------------------------------------------------------------------------
 fountain new level for castle 1.0.0:
 - tentacles from fountain
 - splash sound when entering fountain
