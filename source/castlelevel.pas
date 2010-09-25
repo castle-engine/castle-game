@@ -2023,7 +2023,8 @@ begin
   Result := TWalkCamera.Create(AOwner);
   (Result as TWalkCamera).Init(
     InitialPosition, InitialDirection, InitialUp, GravityUp,
-    MoveSpeedSecs, 0, 0 { unused, we don't use Gravity here });
+    0, 0 { unused, we don't use Gravity here });
+  (Result as TWalkCamera).MoveSpeedSecs := MoveSpeedSecs;
 end;
 
 end.
