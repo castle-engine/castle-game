@@ -317,8 +317,7 @@ begin
        end;
     3: Player.Camera.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
     4: Player.Camera.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
-    5: Player.Camera.Direction := VectorAdjustToLength(
-         Player.Camera.Direction, PlayerSpeedSlider.Value);
+    5: Player.Camera.MoveSpeed := PlayerSpeedSlider.Value;
   end;
 end;
 
@@ -421,7 +420,7 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
     if ChooseCreatureKind(Kind) then
     begin
       Position := VectorAdd(Player.Camera.Position,
-        VectorAdjustToLength(Player.Camera.Direction, DirectionAttenuation));
+        VectorScale(Player.Camera.Direction, DirectionAttenuation));
       Direction := Player.Camera.Direction;
 
       Level.Creatures.Add(
@@ -1164,8 +1163,7 @@ begin
     Player.Camera.RotationHorizontalSpeed;
   DebugPlayerMenu.RotationVerticalSpeedSlider.Value :=
     Player.Camera.RotationVerticalSpeed;
-  DebugPlayerMenu.PlayerSpeedSlider.Value :=
-    VectorLen(Player.Camera.Direction);
+  DebugPlayerMenu.PlayerSpeedSlider.Value := Player.Camera.MoveSpeed;
 
   SavedMode := TGLMode.CreateReset(Glw, 0, true,
     nil, Glw.OnResize, @CloseQuery,
