@@ -372,7 +372,7 @@ type
     FInitialDirection: TVector3Single;
     FInitialUp: TVector3Single;
     FGravityUp: TVector3Single;
-    FMoveSpeedSecs: Single;
+    FMoveSpeed: Single;
 
     FAnimationTime: TKamTime;
 
@@ -622,7 +622,7 @@ type
     property InitialPosition : TVector3Single read FInitialPosition;
     property InitialDirection: TVector3Single read FInitialDirection;
     property InitialUp       : TVector3Single read FInitialUp;
-    property MoveSpeedSecs: Single read FMoveSpeedSecs;
+    property MoveSpeed: Single read FMoveSpeed;
 
     { Actually, this must be (0, 0, 1) for this game.
       Some things in this game are prepared to handle any
@@ -1276,7 +1276,7 @@ begin
       so we just normalize InitialDirection and set speeds in appropriate
       MoveXxxSpeed. }
     NormalizeTo1st(FInitialDirection);
-    FMoveSpeedSecs := 50;
+    FMoveSpeed := 50;
     FMoveHorizontalSpeed := NavigationSpeed / 50;
     FMoveVerticalSpeed := 0.4;
 
@@ -2024,7 +2024,7 @@ begin
   (Result as TWalkCamera).Init(
     InitialPosition, InitialDirection, InitialUp, GravityUp,
     0, 0 { unused, we don't use Gravity here });
-  (Result as TWalkCamera).MoveSpeedSecs := MoveSpeedSecs;
+  (Result as TWalkCamera).MoveSpeed := MoveSpeed;
 end;
 
 end.

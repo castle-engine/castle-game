@@ -402,7 +402,7 @@ begin
     Level.InitialUp, Level.GravityUp, Level.CameraPreferredHeight,
     0.0 { Level.CameraPreferredHeight is already corrected if necessary,
           so I pass here 0.0 instead of CameraRadius } );
-  Player.Camera.MoveSpeedSecs := Level.MoveSpeedSecs;
+  Player.Camera.MoveSpeed := Level.MoveSpeed;
 
   Player.Camera.CancelFallingDown;
 
