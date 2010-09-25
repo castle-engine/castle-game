@@ -1409,9 +1409,9 @@ begin
     Camera.JumpPower :=
       PlayerConfig.GetFloat('player/jump/power',
       DefaultJumpPower);
-    Camera.HeadBobbingDistance :=
-      PlayerConfig.GetFloat('player/head_bobbing_distance',
-      DefaultHeadBobbingDistance);
+    Camera.HeadBobbingTime :=
+      PlayerConfig.GetFloat('player/head_bobbing_time',
+      DefaultHeadBobbingTime);
     SickProjectionSpeed := PlayerConfig.GetFloat('player/sick_projection_speed',
       10.0);
 
