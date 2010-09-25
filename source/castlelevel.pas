@@ -1276,9 +1276,9 @@ begin
       so we just normalize InitialDirection and set speeds in appropriate
       MoveXxxSpeed. }
     NormalizeTo1st(FInitialDirection);
-    FMoveSpeed := 50;
-    FMoveHorizontalSpeed := NavigationSpeed / 50;
-    FMoveVerticalSpeed := 0.4;
+    FMoveSpeed := 1;
+    FMoveHorizontalSpeed := NavigationSpeed;
+    FMoveVerticalSpeed := 20;
 
     { Check and fix GravityUp. }
     if not VectorsEqual(Normalized(GravityUp),
