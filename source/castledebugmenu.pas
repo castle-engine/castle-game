@@ -254,8 +254,8 @@ begin
 
   { Note that Player is not created at this point.
     We will init Value of these sliders later. }
-  RotationHorizontalSpeedSlider := TGLMenuFloatSlider.Create(0.5, 10, 1);
-  RotationVerticalSpeedSlider := TGLMenuFloatSlider.Create(0.5, 10, 1);
+  RotationHorizontalSpeedSlider := TGLMenuFloatSlider.Create(25, 500, 1);
+  RotationVerticalSpeedSlider := TGLMenuFloatSlider.Create(25, 500, 1);
   PlayerSpeedSlider := TGLMenuFloatSlider.Create(0.1, 5, 1);
 
   Items.Add('Set Player.MaxLife');
