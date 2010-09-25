@@ -399,7 +399,7 @@ begin
 
   { Init initial camera pos }
   Player.Camera.Init(Level.InitialPosition, Level.InitialDirection,
-    Level.InitialUp, Level.GravityUp, Level.CameraPreferredHeight,
+    Level.InitialUp, Level.GravityUp, Level.MoveSpeed, Level.CameraPreferredHeight,
     0.0 { Level.CameraPreferredHeight is already corrected if necessary,
           so I pass here 0.0 instead of CameraRadius } );
 
