@@ -347,8 +347,8 @@ type
     FLightSet: TVRMLLightSetGL;
     FCameraRadius: Single;
     FCameraPreferredHeight: Single;
-    FProjectionNear: Single;
-    FProjectionFar: Single;
+    FLevelProjectionNear: Single;
+    FLevelProjectionFar: Single;
     FMoveHorizontalSpeed: Single;
     FMoveVerticalSpeed: Single;
     FItemsOnLevel: TItemsOnLevelList;
@@ -499,10 +499,10 @@ type
 
     property CameraRadius: Single read FCameraRadius;
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
-    property ProjectionNear: Single read FProjectionNear;
-    property ProjectionFar: Single read FProjectionFar;
-    { ProjectionFar or infinity (if shadow volumes are used). }
-    function ProjectionFarFinal: Single;
+    property LevelProjectionNear: Single read FLevelProjectionNear;
+    property LevelProjectionFar: Single read FLevelProjectionFar;
+    { LevelProjectionFar or infinity (if shadow volumes are used). }
+    function LevelProjectionFarFinal: Single;
     property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
     property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
 
@@ -1267,8 +1267,8 @@ begin
       NavigationSpeed := NavigationNode.FdSpeed.Value else
       NavigationSpeed := 1.0;
 
-    FProjectionNear := CameraRadius * 0.75;
-    FProjectionFar := Box3DMaxSize(MainScene.BoundingBox, false, 1.0) * 5;
+    FLevelProjectionNear := CameraRadius * 0.75;
+    FLevelProjectionFar := Box3DMaxSize(MainScene.BoundingBox, false, 1.0) * 5;
 
     { Fix InitialDirection length, and set MoveXxxSpeed.
 
@@ -1290,7 +1290,7 @@ begin
       FGravityUp := Vector3Single(0, 0, 1);
 
     MainScene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
-      (ProjectionNear, ProjectionFar);
+      (LevelProjectionNear, LevelProjectionFar);
 
     MainScene.CastsShadow := SceneDynamicShadows;
 
@@ -1975,11 +1975,11 @@ begin
   inherited;
 end;
 
-function TLevel.ProjectionFarFinal: Single;
+function TLevel.LevelProjectionFarFinal: Single;
 begin
   if RenderShadowsPossible and RenderShadows then
     Result := ZFarInfinity else
-    Result := ProjectionFar;
+    Result := LevelProjectionFar;
 end;
 
 procedure TLevel.ApplyProjection;
@@ -2010,7 +2010,7 @@ begin
   { update glViewport and projection }
   glViewport(0, 0, ContainerWidth, ContainerHeight);
   ProjectionGLPerspective(ViewAngleDegY, ContainerWidth / ContainerHeight,
-    ProjectionNear, ProjectionFarFinal);
+    LevelProjectionNear, LevelProjectionFarFinal);
 
   UpdateCameraProjectionMatrix;
 end;

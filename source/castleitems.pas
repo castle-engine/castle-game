@@ -26,7 +26,7 @@ unit CastleItems;
 interface
 
 uses Boxes3D, VRMLNodes, VRMLGLScene, VectorMath, KambiUtils,
-  KambiClassUtils, Images, GL, GLU, KambiGLUtils, CastleSound,
+  KambiClassUtils, Classes, Images, GL, GLU, KambiGLUtils, CastleSound,
   VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds,
   KambiXMLCfg, GameSoundEngine, Frustum;
 
@@ -395,7 +395,7 @@ function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 
 implementation
 
-uses SysUtils, Classes, GLWindow, CastleWindow,
+uses SysUtils, GLWindow, CastleWindow,
   CastlePlay, KambiFilesUtils, ProgressUnit,
   CastleCreatures, CastleVideoOptions, CastleTimeMessages,
   VRMLScene, VRMLTriangle, GLImages;

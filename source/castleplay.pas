@@ -484,7 +484,7 @@ var
       ViewAngleDegY + ViewAngleDegY * C * 0.03,
       Glwin.Width / Glwin.Height +
       Glwin.Width / Glwin.Height * S * 0.03,
-      Level.ProjectionNear, Level.ProjectionFarFinal);
+      Level.LevelProjectionNear, Level.LevelProjectionFarFinal);
   end;
 
 const
