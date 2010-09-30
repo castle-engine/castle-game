@@ -352,6 +352,8 @@ type
     FMoveHorizontalSpeed: Single;
     FMoveVerticalSpeed: Single;
     FItemsOnLevel: TItemsOnLevelList;
+    FSickProjection: boolean;
+    FSickProjectionSpeed: TKamTime;
 
     { Used only within constructor.
       We will process the scene graph, and sometimes it's not comfortable
@@ -364,6 +366,8 @@ type
     ItemsToRemove: TVRMLNodesList;
 
     procedure TraverseForItems(Shape: TVRMLShape);
+    procedure SetSickProjection(const Value: boolean);
+    procedure SetSickProjectionSpeed(const Value: TKamTime);
   private
     FCreatures: TCreaturesList;
     procedure TraverseForCreatures(Shape: TVRMLShape);
@@ -741,6 +745,11 @@ type
       out IsAbove: boolean; out AboveHeight: Single;
       out AboveGround: P3DTriangle); override;
     { @groupEnd }
+
+    property SickProjection: boolean
+      read FSickProjection write SetSickProjection;
+    property SickProjectionSpeed: TKamTime
+      read FSickProjectionSpeed write SetSickProjectionSpeed;
   end;
 
   TLevelClass = class of TLevel;
@@ -753,7 +762,7 @@ uses SysUtils, GL, GLU, Object3DAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleTimeMessages,
   CastleInputs, CastleWindow, KambiOpenAL, ALUtils, KambiXMLUtils,
-  CastleRequiredResources, VRMLOpenGLRenderer, RenderStateUnit;
+  CastleRequiredResources, VRMLOpenGLRenderer, RenderStateUnit, Math;
 
 {$define read_implementation}
 
@@ -1992,6 +2001,9 @@ procedure TLevel.ApplyProjection;
     Camera.ProjectionMatrix := ProjectionMatrix;
   end;
 
+var
+  S, C: Extended;
+  Fov, Aspect: Single;
 begin
   if Camera = nil then
     Camera := CreateDefaultCamera(Self);
@@ -2000,17 +2012,23 @@ begin
   ShadowVolumesPossible := RenderShadowsPossible;
   ShadowVolumes := RenderShadows;
 
+  Fov := ViewAngleDegY;
+  Aspect := ContainerWidth / ContainerHeight;
+
+  if SickProjection then
+  begin
+    SinCos(AnimationTime * SickProjectionSpeed, S, C);
+    Fov := Fov + Fov * C * 0.03;
+    Aspect := Aspect + Aspect * S * 0.03;
+  end;
+
   { Below is actually quite similar to what "inherited" would do,
     with some limitations (e.g. we always want perspective),
     and we always use our ViewAngleDegY.
-
-    This may be changed one day to just use "inherited", although
-    I'll have to see how default view angles look. }
-
+    Also, we apply SickProjection. }
   { update glViewport and projection }
   glViewport(0, 0, ContainerWidth, ContainerHeight);
-  ProjectionGLPerspective(ViewAngleDegY, ContainerWidth / ContainerHeight,
-    LevelProjectionNear, LevelProjectionFarFinal);
+  ProjectionGLPerspective(Fov, Aspect, LevelProjectionNear, LevelProjectionFarFinal);
 
   UpdateCameraProjectionMatrix;
 end;
@@ -2025,6 +2043,24 @@ begin
     InitialPosition, InitialDirection, InitialUp, GravityUp,
     0, 0 { unused, we don't use Gravity here });
   (Result as TWalkCamera).MoveSpeed := MoveSpeed;
+end;
+
+procedure TLevel.SetSickProjection(const Value: boolean);
+begin
+  if FSickProjection <> Value then
+  begin
+    FSickProjection := Value;
+    ApplyProjectionNeeded := true;
+  end;
+end;
+
+procedure TLevel.SetSickProjectionSpeed(const Value: TKamTime);
+begin
+  if FSickProjectionSpeed <> Value then
+  begin
+    FSickProjectionSpeed := Value;
+    if SickProjection then ApplyProjectionNeeded := true;
+  end;
 end;
 
 end.
