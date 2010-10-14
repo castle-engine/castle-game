@@ -121,7 +121,7 @@ uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   CastleVideoOptions, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleTimeMessages, BackgroundGL, CastleControlsMenu,
   CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
-  KambiTimeUtils, GLImages, RenderStateUnit;
+  KambiTimeUtils, GLImages, RenderStateUnit, KeysMouse;
 
 var
   GLList_TimeMessagesBackground: TGLuint;
@@ -737,8 +737,9 @@ begin
   Player.Camera.MouseLook := UseMouseLook;
 end;
 
-procedure EventDown(MouseEvent: boolean; Key: TKey;
-  AMouseButton: TMouseButton);
+procedure EventDown(AKey: TKey;
+  AMousePress: boolean; AMouseButton: TMouseButton;
+  AMouseWheel: TMouseWheelDirection);
 
   procedure ChangeInventoryCurrentItem(Change: Integer);
   begin
@@ -964,56 +965,56 @@ procedure EventDown(MouseEvent: boolean; Key: TKey;
 
 begin
   { Basic keys. }
-  if CastleInput_Attack.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_Attack.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoAttack else
-  if CastleInput_UpMove.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
-     CastleInput_DownMove.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
-     CastleInput_Forward.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
-     CastleInput_Backward.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
-     CastleInput_LeftStrafe.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
-     CastleInput_RightStrafe.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_UpMove.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_DownMove.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_Forward.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_Backward.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_LeftStrafe.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_RightStrafe.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     MaybeDeadWinMessage else
   if { Note that rotation keys work even when player is dead.
        See comments in TPlayer.UpdateCamera. }
-     CastleInput_LeftRot.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
-     CastleInput_RightRot.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
-     CastleInput_UpRotate.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
-     CastleInput_DownRotate.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) or
-     CastleInput_GravityUp.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+     CastleInput_LeftRot.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_RightRot.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_UpRotate.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_DownRotate.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_GravityUp.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     MaybeWinMessage else
 
   { Items keys. }
-  if CastleInput_InventoryShow.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_InventoryShow.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     InventoryVisible := not InventoryVisible else
-  if CastleInput_InventoryPrevious.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_InventoryPrevious.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ChangeInventoryCurrentItem(-1) else
-  if CastleInput_InventoryNext.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_InventoryNext.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ChangeInventoryCurrentItem(+1) else
-  if CastleInput_DropItem.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_DropItem.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DropItem else
-  if CastleInput_UseItem.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_UseItem.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     UseItem else
-  if CastleInput_UseLifePotion.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_UseLifePotion.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     UseLifePotion else
 
   { Other keys. }
-  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     SaveScreen else
-  if CastleInput_ViewMessages.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_ViewMessages.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ViewGameMessages else
-  if CastleInput_CancelFlying.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_CancelFlying.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     CancelFlying else
-  if CastleInput_FPSShow.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_FPSShow.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ShowDebugInfo := not ShowDebugInfo else
-  if CastleInput_Interact.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_Interact.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoInteract else
-  if CastleInput_DebugMenu.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_DebugMenu.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoDebugMenu;
 end;
 
 procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
 begin
-  EventDown(false, Key, mbLeft);
+  EventDown(Key, false, mbLeft, mwNone);
   if C = CharEscape then
   begin
     if Player.Dead or GameWin then
@@ -1028,7 +1029,12 @@ end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  EventDown(true, K_None, Button);
+  EventDown(K_None, true, Button, mwNone);
+end;
+
+procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+begin
+  EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);
@@ -1093,6 +1099,7 @@ begin
       Glw.OnIdle := @Idle;
       Glw.OnKeyDown := @KeyDown;
       Glw.OnMouseDown := @MouseDown;
+      Glw.OnMouseWheel := @MouseWheel;
       Glw.OnDrawStyle := ds3D;
 
       C2D := TGame2DControls.Create(nil);

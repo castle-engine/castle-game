@@ -321,20 +321,21 @@ procedure TControlsSubMenu.CurrentItemSelected;
   procedure ChangeKey(InputConfiguration: TInputConfiguration);
   var
     ConflictingKey: TInputConfiguration;
-    NewMouseEvent: boolean;
     NewKey: TKey;
+    NewMousePress: boolean;
     NewMouseButton: TMouseButton;
+    NewMouseWheel: TMouseWheelDirection;
   begin
     MessageKeyMouse(Glw, Format(
-      'Press the new key or mouse button for "%s".', [InputConfiguration.Name]),
+      'Press the new key or mouse button or mouse wheel for "%s".', [InputConfiguration.Name]),
       'Cancel [Escape]' + nl + 'Clear [Backspace]', taLeft,
-      NewMouseEvent, NewKey, NewMouseButton);
+      NewKey, NewMousePress, NewMouseButton, NewMouseWheel);
 
-    if (not NewMouseEvent) and (NewKey = K_Backspace) then
+    if NewKey = K_Backspace then
     begin
       InputConfiguration.Shortcut.MakeClear;
     end else
-    if (not NewMouseEvent) and (NewKey = K_Escape) then
+    if NewKey = K_Escape then
     begin
       { Don't do anything. }
     end else
@@ -342,10 +343,10 @@ procedure TControlsSubMenu.CurrentItemSelected;
          match InputConfiguration.Shortcut. This is meaningless,
          and otherwise could unnecessarily swap Key1 and Key2 in AddShortcut. }
        (not InputConfiguration.Shortcut.IsEvent(
-         NewMouseEvent, NewKey, #0, NewMouseButton)) then
+         NewKey, #0, NewMousePress, NewMouseButton, NewMouseWheel)) then
     begin
-      ConflictingKey := CastleAllInputs.SeekMatchingShortcut(NewMouseEvent,
-        NewKey, NewMouseButton);
+      ConflictingKey := CastleAllInputs.SeekMatchingShortcut(
+        NewKey, NewMousePress, NewMouseButton, NewMouseWheel);
 
       if ConflictingKey <> nil then
       begin
@@ -357,12 +358,19 @@ procedure TControlsSubMenu.CurrentItemSelected;
           Also, one of the rules is to avoid modal dialog boxes...
           So now I just uncoditionally remove conflicting key,
           and make a TimeMessage informing user about it. }
-        if NewMouseEvent then
+        if NewMousePress then
         begin
           TimeMessage(Format('Note: "%s" mouse shortcut cleared for action "%s"',
             [ MouseButtonStr[ConflictingKey.Shortcut.MouseButton],
               ConflictingKey.Name ]));
           ConflictingKey.Shortcut.MouseButtonUse := false;
+        end else
+        if NewMouseWheel <> mwNone then
+        begin
+          TimeMessage(Format('Note: "%s" mouse wheel cleared for action "%s"',
+            [ MouseWheelDirectionStr[ConflictingKey.Shortcut.MouseWheel],
+              ConflictingKey.Name ]));
+          ConflictingKey.Shortcut.MouseWheel := mwNone;
         end else
         if ConflictingKey.Shortcut.Key1 = NewKey then
         begin
@@ -381,7 +389,8 @@ procedure TControlsSubMenu.CurrentItemSelected;
         end;
       end;
 
-      InputConfiguration.AddShortcut(NewMouseEvent, NewKey, NewMouseButton);
+      InputConfiguration.AddShortcut(NewKey,
+        NewMousePress, NewMouseButton, NewMouseWheel);
     end;
   end;
 
@@ -484,16 +493,17 @@ begin
   glPopMatrix;
 end;
 
-procedure EventDown(MouseEvent: boolean; Key: TKey;
-  AMouseButton: TMouseButton);
+procedure EventDown(AKey: TKey;
+  AMousePress: boolean; AMouseButton: TMouseButton;
+  AMouseWheel: TMouseWheelDirection);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     SaveScreen;
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  EventDown(false, Key, mbLeft);
+  EventDown(Key, false, mbLeft, mwNone);
 
   if ExitWithEscapeAllowed then
     case C of
@@ -507,7 +517,12 @@ end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  EventDown(true, K_None, Button);
+  EventDown(K_None, true, Button, mwNone);
+end;
+
+procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+begin
+  EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
 procedure Idle(Glwin: TGLWindow);
@@ -555,6 +570,7 @@ begin
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
+    Glw.OnMouseWheel := @MouseWheel;
     Glw.OnIdle := @Idle;
 
     SetCurrentMenu(CurrentMenu, ControlsMenu);

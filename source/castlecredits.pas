@@ -41,7 +41,7 @@ uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages,
   CastleTimeMessages, KambiStringUtils, GLWinModes,
   CastleInputs, CastlePlay, CastleWindow,
   CastleVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
-  CastleHelp, KambiUtils, VRMLNodes, VRMLFields, KambiTimeUtils;
+  CastleHelp, KambiUtils, VRMLNodes, VRMLFields, KambiTimeUtils, KeysMouse;
 
 var
   UserQuit: boolean;
@@ -106,7 +106,7 @@ end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(false, Key, #0, mbLeft) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(Key, #0, false, mbLeft, mwNone) then
     SaveScreen else
   if C in [CharEscape, CharEnter, ' '] then
     UserQuit := true;
@@ -114,10 +114,16 @@ end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(true, K_None, #0, Button) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(K_None, #0, true, Button, mwNone) then
     SaveScreen else
     { any mouse press ends credits }
     UserQuit := true;
+end;
+
+procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+begin
+  if CastleInput_SaveScreen.Shortcut.IsEvent(K_None, #0, false, mbLeft, MouseWheelDirection(Scroll, Vertical)) then
+    SaveScreen;
 end;
 
 { $define DEBUG_ALWAYS_RELOAD_CREDITS}
@@ -145,6 +151,7 @@ begin
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
+    Glw.OnMouseWheel := @MouseWheel;
     Glw.OnIdle := @Idle;
     Glw.OnDrawStyle := ds3D;
 

@@ -42,7 +42,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   KambiStringUtils, ALUtils, KambiOpenAL, KambiClassUtils,
   CastleTimeMessages, CastleLevelAvailable, CastleBackgroundLevel,
   GameSoundEngine, GLSoundMenu,
-  CastleRequiredResources, CastleCredits, GLAntiAliasing;
+  CastleRequiredResources, CastleCredits, GLAntiAliasing, KeysMouse;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -792,21 +792,28 @@ end;
 
 { global things -------------------------------------------------------------- }
 
-procedure EventDown(MouseEvent: boolean; Key: TKey;
-  AMouseButton: TMouseButton);
+procedure EventDown(AKey: TKey;
+  AMousePress: boolean; AMouseButton: TMouseButton;
+  AMouseWheel: TMouseWheelDirection);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(AKey, #0,
+    AMousePress, AMouseButton, AMouseWheel) then
     SaveScreen;
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  EventDown(false, Key, mbLeft);
+  EventDown(Key, false, mbLeft, mwNone);
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  EventDown(true, K_None, Button);
+  EventDown(K_None, true, Button, mwNone);
+end;
+
+procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+begin
+  EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
 procedure Idle(Glwin: TGLWindow);
@@ -836,6 +843,7 @@ begin
 
         Glw.OnKeyDown := @KeyDown;
         Glw.OnMouseDown := @MouseDown;
+        Glw.OnMouseWheel := @MouseWheel;
         Glw.OnIdle := @Idle;
 
         SetCurrentMenu(CurrentMenu, MainMenu);

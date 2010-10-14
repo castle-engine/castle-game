@@ -35,7 +35,8 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, CastleInputs, GLWinMessages, GLMenu,
-  CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleTimeMessages;
+  CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleTimeMessages,
+  KeysMouse;
 
 var
   Selected: boolean;
@@ -59,21 +60,28 @@ end;
 var
   ChooseMenu: TChooseMenu;
 
-procedure EventDown(MouseEvent: boolean; Key: TKey;
-  AMouseButton: TMouseButton);
+procedure EventDown(AKey: TKey;
+  AMousePress: boolean; AMouseButton: TMouseButton;
+  AMouseWheel: TMouseWheelDirection);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(MouseEvent, Key, #0, AMouseButton) then
+  if CastleInput_SaveScreen.Shortcut.IsEvent(AKey, #0,
+    AMousePress, AMouseButton, AMouseWheel) then
     SaveScreen;
 end;
 
 procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
 begin
-  EventDown(false, Key, mbLeft);
+  EventDown(Key, false, mbLeft, mwNone);
 end;
 
 procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
 begin
-  EventDown(true, K_None, Button);
+  EventDown(K_None, true, Button, mwNone);
+end;
+
+procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+begin
+  EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
 procedure Idle(Glwin: TGLWindow);
@@ -103,6 +111,7 @@ begin
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
+    Glw.OnMouseWheel := @MouseWheel;
     Glw.OnIdle := @Idle;
     Glw.OnDrawStyle := ds3D;
 

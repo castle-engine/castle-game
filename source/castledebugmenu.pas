@@ -37,7 +37,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   CastleControlsMenu, CastleInputs, CastleCreatures, CastleChooseMenu,
   CastleItems, GLMenu, RaysWindow, CastleVideoOptions,
   CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
-  CastleLevelAvailable, Boxes3D;
+  CastleLevelAvailable, Boxes3D, KeysMouse;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -1180,6 +1180,7 @@ begin
 
     Glw.OnKeyDown := @KeyDown;
     Glw.OnMouseDown := @MouseDown;
+    Glw.OnMouseWheel := @MouseWheel;
     Glw.OnIdle := @Idle;
     Glw.OnDrawStyle := ds3D;
 

@@ -68,23 +68,22 @@ type
       it in this class internally. }
     property Shortcut: TInputShortcut read FShortcut;
 
-    { This adds to Shortcut NewKey (if MouseEvent = @false,
-      NewKey must be <> K_None in this case) or
-      NewMouseButton (if MouseEvent = @true). }
-    procedure AddShortcut(const MouseEvent: boolean;
-      const NewKey: TKey; const NewMouseButton: TMouseButton);
+    { Add to Shortcut new key or mouse button or mouse wheel.
+      Only one of them (parameters NewXxx like for TInputShortcut.IsEvent). }
+    procedure AddShortcut(const NewKey: TKey;
+      const NewMousePress: boolean; const NewMouseButton: TMouseButton;
+      const NewMouseWheel: TMouseWheelDirection);
   end;
 
   TObjectsListItem_3 = TInputConfiguration;
   {$I objectslist_3.inc}
   TInputConfigurationsList = class(TObjectsList_3)
   public
-    { Seeks for a Shortcut that has matching Key (if MouseEvent = @false,
-      Key must be <> K_None in this case) or matching MouseButton
-      (if MouseEvent = @true).
+    { Seeks for a Shortcut that has matching key or mouse button or mouse wheel.
       @nil if not found. }
-    function SeekMatchingShortcut(const MouseEvent: boolean;
-      const Key: TKey; const  MouseButton: TMouseButton): TInputConfiguration;
+    function SeekMatchingShortcut(const Key: TKey;
+      const MousePress: boolean; const MouseButton: TMouseButton;
+      const MouseWheel: TMouseWheelDirection): TInputConfiguration;
     procedure RestoreDefaults;
     procedure SaveToConfigFile;
     procedure LoadFromConfigFile;
@@ -163,15 +162,16 @@ end;
 { TInputConfigurationsList ----------------------------------------------------- }
 
 function TInputConfigurationsList.SeekMatchingShortcut(
-  const MouseEvent: boolean;
-  const Key: TKey; const  MouseButton: TMouseButton): TInputConfiguration;
+  const Key: TKey;
+  const MousePress: boolean; const MouseButton: TMouseButton;
+  const MouseWheel: TMouseWheelDirection): TInputConfiguration;
 var
   I: Integer;
 begin
   for I := 0 to High do
   begin
     Result := Items[I];
-    if Result.Shortcut.IsEvent(MouseEvent, Key, #0, MouseButton) then
+    if Result.Shortcut.IsEvent(Key, #0, MousePress, MouseButton, MouseWheel) then
       Exit;
   end;
   Result := nil;
@@ -284,14 +284,17 @@ begin
   OnInputChanged.ExecuteAll(Self);
 end;
 
-procedure TInputConfiguration.AddShortcut(const MouseEvent: boolean;
-  const NewKey: TKey; const NewMouseButton: TMouseButton);
+procedure TInputConfiguration.AddShortcut(const NewKey: TKey;
+  const NewMousePress: boolean; const NewMouseButton: TMouseButton;
+  const NewMouseWheel: TMouseWheelDirection);
 begin
-  if MouseEvent then
+  if NewMousePress then
   begin
-    Shortcut.MouseButtonUse := true;
+    Shortcut.MouseButtonUse := NewMousePress;
     Shortcut.MouseButton := NewMouseButton;
   end else
+  if NewMouseWheel <> mwNone then
+    Shortcut.MouseWheel := NewMouseWheel else
   if Shortcut.Key1 = K_None then
     Shortcut.Key1 := NewKey else
   if Shortcut.Key2 = K_None then
@@ -351,9 +354,9 @@ begin
   CastleInput_InventoryShow := TInputConfiguration.Create('Inventory show / hide', 'inventory_toggle', kgItems,
     TInputShortcut.Create(K_I, K_None, #0, false, mbLeft));
   CastleInput_InventoryPrevious := TInputConfiguration.Create('Select previous inventory item', 'inventory_previous', kgItems,
-    TInputShortcut.Create(K_LeftBracket, K_None, #0, false, mbLeft));
+    TInputShortcut.Create(K_LeftBracket, K_None, #0, false, mbLeft, mwUp));
   CastleInput_InventoryNext := TInputConfiguration.Create('Select next inventory item', 'inventory_next', kgItems,
-    TInputShortcut.Create(K_RightBracket, K_None, #0, false, mbLeft));
+    TInputShortcut.Create(K_RightBracket, K_None, #0, false, mbLeft, mwDown));
   CastleInput_UseItem := TInputConfiguration.Create('Use (or equip) selected inventory item', 'item_use', kgItems,
     TInputShortcut.Create(K_Enter, K_None, #0, false, mbLeft));
   CastleInput_UseLifePotion := TInputConfiguration.Create('Use life potion', 'life_potion_use', kgItems,
