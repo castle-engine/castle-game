@@ -12,6 +12,9 @@
     Speedup?
     Or remove the whole fountain anim?
 
+- entering MessageKeyMouse makes noticeable time delay
+  (probably due to scene manager migration, something is released?)
+
 ------------------------------------------------------------------------------
 fountain new level for castle 1.0.0:
 - tentacles from fountain
@@ -33,7 +36,7 @@ castle 2:
 
 - From kambi_vrml_game_engine/doc/TODO, after 3.8.0:
   - TVRMLGLLightSet - hm, it would be useful to eliminate need to use this
-    e.g. in castle. 
+    e.g. in castle.
     ...
 
 - when our interact key activates pointing device sensor on VRML castle level,
