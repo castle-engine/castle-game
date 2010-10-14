@@ -751,6 +751,9 @@ procedure EventDown(AKey: TKey;
       Player.InventoryCurrentItem := 0 else
       Player.InventoryCurrentItem := ChangeIntCycle(
         Player.InventoryCurrentItem, Change, Player.Items.Count - 1);
+
+    if Player.Items.Count <> 0 then
+      InventoryVisible := true;
   end;
 
   procedure UpdateInventoryCurrentItemAfterDelete;
