@@ -199,6 +199,8 @@ begin
       Items[I].Shortcut.MouseButtonUse, Items[I].Shortcut.DefaultMouseButtonUse);
     ConfigFile.SetDeleteValue('inputs/' + Items[I].ConfigFileName + '/mouse_button',
       Ord(Items[I].Shortcut.MouseButton), Ord(Items[I].Shortcut.DefaultMouseButton));
+    ConfigFile.SetDeleteValue('inputs/' + Items[I].ConfigFileName + '/mouse_wheel',
+      Ord(Items[I].Shortcut.MouseWheel), Ord(Items[I].Shortcut.DefaultMouseWheel));
   end;
 end;
 
@@ -218,6 +220,9 @@ begin
     Items[I].Shortcut.MouseButton := TMouseButton(ConfigFile.GetValue(
       'inputs/' + Items[I].ConfigFileName + '/mouse_button',
       Ord(Items[I].Shortcut.DefaultMouseButton)));
+    Items[I].Shortcut.MouseWheel := TMouseWheelDirection(ConfigFile.GetValue(
+      'inputs/' + Items[I].ConfigFileName + '/mouse_wheel',
+      Ord(Items[I].Shortcut.DefaultMouseWheel)));
   end;
 end;
 
