@@ -755,7 +755,7 @@ type
     { Tries to move from OldMiddlePosition to ProposedNewMiddlePosition.
       Returns true and sets NewMiddlePosition if some move is allowed.
 
-      Note that OldMiddlePosition *must be equal to MiddlePosition*.
+      Note that OldMiddlePosition @italic(must be equal to MiddlePosition).
       It's passed here only for speed.
 
       Check collisions with the level, with player, and with other
