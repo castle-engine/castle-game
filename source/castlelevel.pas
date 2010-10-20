@@ -793,7 +793,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
     const AssumeTranslation: TVector3Single): TBox3D;
   begin
     if Exists and Collides then
-      Result := Box3DTranslate(Child.BoundingBox, AssumeTranslation) else
+      Result := Box3DTranslate(inherited BoundingBox, AssumeTranslation) else
       Result := EmptyBox3D;
   end;
 
@@ -806,9 +806,9 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
     if Result then
     begin
       { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
-        use Child.SphereCollsion with Translation. }
+        use "inherited SphereCollsion" with Translation. }
 
-      Result := Child.SphereCollision(
+      Result := inherited SphereCollision(
         Pos - AssumeTranslation, Radius, TrianglesToIgnoreFunc);
     end;
   end;
@@ -822,9 +822,9 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
     if Result then
     begin
       { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
-        use Child.BoxCollsion with Translation. }
+        use "inherited BoxCollision" with Translation. }
 
-      Result := Child.BoxCollision(
+      Result := inherited BoxCollision(
         Box3DAntiTranslate(Box, AssumeTranslation), TrianglesToIgnoreFunc);
     end;
   end;

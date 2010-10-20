@@ -791,7 +791,6 @@ constructor TTowerLevel.Create(
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
 var
-  ElevatorButtonSum: T3DList;
   TowerLevelPath: string;
 begin
   inherited;
@@ -802,12 +801,9 @@ begin
 
   ElevatorButton := LoadLevelAnimation(TowerLevelPath + 'elevator_button.kanim', true, false);
 
-  ElevatorButtonSum := T3DList.Create(Self);
-  ElevatorButtonSum.List.Add(Elevator);
-  ElevatorButtonSum.List.Add(ElevatorButton);
-
   MovingElevator := TLevelLinearMovingObject.Create(Self);
-  MovingElevator.Child := ElevatorButtonSum;
+  MovingElevator.Add(Elevator);
+  MovingElevator.Add(ElevatorButton);
   MovingElevator.MoveTime := 10.0;
   MovingElevator.TranslationEnd := Vector3Single(0, 0, 122);
   MovingElevator.SoundGoEndPosition := stElevator;
@@ -1136,7 +1132,7 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TKamTime);
     I: Integer;
   begin
     DoorBox := Box3DTranslate(
-      Child.BoundingBox,
+      inherited BoundingBox,
       GetTranslationFromTime(NewAnimationTime));
 
     Result := (Player <> nil) and Boxes3DCollision(DoorBox, Player.BoundingBox);
@@ -1199,8 +1195,8 @@ var
   function MakeDoor(const FileName: string): TDoomLevelDoor;
   begin
     Result := TDoomLevelDoor.Create(Self);
-    Result.Child := LoadLevelScene(DoomDoorsPathPrefix + FileName,
-      true { create octrees }, false);
+    Result.Add(LoadLevelScene(DoomDoorsPathPrefix + FileName,
+      true { create octrees }, false));
 
     { Although I didn't know it initially, it turns out that all doors
       on Doom E1M1 level (maybe all doors totally ?) have the same
@@ -1231,7 +1227,7 @@ begin
     true { create octrees }, false);
 
   MovingElevator49 := TLevelLinearMovingObject.Create(Self);
-  MovingElevator49.Child := Elevator49;
+  MovingElevator49.Add(Elevator49);
   MovingElevator49.MoveTime := 3.0;
   MovingElevator49.TranslationEnd := Vector3Single(0, 0, -6.7);
   MovingElevator49.SoundGoEndPosition := stElevator;
@@ -1246,7 +1242,7 @@ begin
     true { create octrees }, false);
 
   MovingElevator9a9b := TLevelLinearMovingObject.Create(Self);
-  MovingElevator9a9b.Child := Elevator9a9b;
+  MovingElevator9a9b.Add(Elevator9a9b);
   MovingElevator9a9b.MoveTime := 3.0;
   MovingElevator9a9b.TranslationEnd := Vector3Single(0, 0, -7.5);
   MovingElevator9a9b.SoundGoEndPosition := stElevator;
