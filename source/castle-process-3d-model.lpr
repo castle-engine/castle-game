@@ -134,7 +134,7 @@ begin
     begin
       G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
       G1.PositionInParent := Node.PositionInParent;
-      G1.AddChild(Inlined);
+      G1.VRML1ChildAdd(Inlined);
       Node := G1;
     end;
   end else
