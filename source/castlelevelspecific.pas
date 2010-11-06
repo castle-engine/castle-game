@@ -269,7 +269,7 @@ implementation
 
 uses KambiFilesUtils, SysUtils, KambiUtils,
   GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderStateUnit,
-  CastlePlay, CastleTimeMessages, CastleInputs,
+  CastlePlay, CastleNotifications, CastleInputs,
   CastleItems, CastleThunder, CastleWindow, CastleVRMLProcessing,
   CastleAnimationTricks, CastleVideoOptions, VRMLScene, ProgressUnit;
 
@@ -480,7 +480,7 @@ begin
   if CollisionInfo.Hierarchy.IndexOf(StairsBlocker) <> -1 then
   begin
     InteractionOccured := true;
-    TimeMessageInteractFailed('You are not able to open it');
+    NotificationInteractFailed('You are not able to open it');
   end else
   if CollisionInfo.Hierarchy.IndexOf(Button) <> -1 then
   begin
@@ -488,13 +488,13 @@ begin
     if Distance < 10.0 then
     begin
       if Button.TimePlaying then
-        TimeMessageInteractFailed('Button is already pressed') else
+        NotificationInteractFailed('Button is already pressed') else
       begin
         Button.TimePlaying := true;
-        TimeMessage('You press the button');
+        CastleNotifications.Notification('You press the button');
       end;
     end else
-      TimeMessageInteractFailed('You see a button. You cannot reach it from here');
+      NotificationInteractFailed('You see a button. You cannot reach it from here');
   end;
 end;
 
@@ -690,12 +690,12 @@ begin
   begin
     if Player.Items.FindKind(KeyItemKind) = -1 then
     begin
-      TimeMessage('You need a key to open this door');
+      CastleNotifications.Notification('You need a key to open this door');
       RejectGateExitBox;
     end else
     if Player.Items.FindKind(Sword) = -1 then
     begin
-      TimeMessage('Better find a wepon first to protect yourself in the castle');
+      CastleNotifications.Notification('Better find a wepon first to protect yourself in the castle');
       RejectGateExitBox;
     end else
     begin
@@ -827,7 +827,7 @@ begin
   begin
     InteractionOccured := true;
     if Distance > 10 then
-      TimeMessageInteractFailed(
+      NotificationInteractFailed(
         'You see a button. You''re too far to reach it from here') else
     begin
       { play from the beginning }
@@ -1086,7 +1086,7 @@ begin
   begin
     InteractionOccured := true;
     if Distance > 10 then
-      TimeMessageInteractFailed(
+      NotificationInteractFailed(
         'You see a door. You''re too far to open it from here') else
     begin
       if Player.Items.FindKind(RedKeyItemKind) <> -1 then
@@ -1095,13 +1095,13 @@ begin
         begin
           Player.Knockback(2 + Random(5), 2, Vector3Single(0, -1, 0));
           SoundEngine.Sound(stEvilLaugh);
-          TimeMessage('No exit for the one who does not fight');
+          CastleNotifications.Notification('No exit for the one who does not fight');
         end else
         begin
           LevelFinished('');
         end;
       end else
-        TimeMessageInteractFailed('You need an appropriate key to open this door');
+        NotificationInteractFailed('You need an appropriate key to open this door');
     end;
   end;
 end;
@@ -1280,11 +1280,11 @@ begin
     Door := TDoomLevelDoor(CollisionInfo.Hierarchy[1]);
     InteractionOccured := true;
     if Distance > 7 then
-      TimeMessageInteractFailed('You see a door. You''re too far to open it from here') else
+      NotificationInteractFailed('You see a door. You''re too far to open it from here') else
     { Only if the door is completely closed
       (and not during closing right now) we allow player to open it. }
     if not Door.CompletelyBeginPosition then
-      TimeMessageInteractFailed('You see a door. It''s already open') else
+      NotificationInteractFailed('You see a door. It''s already open') else
       Door.GoEndPosition;
   end else
   if (CollisionInfo.Hierarchy.IndexOf(Elevator9a9b) <> -1) and
@@ -1293,7 +1293,7 @@ begin
   begin
     InteractionOccured := true;
     if Distance > 10 then
-      TimeMessageInteractFailed(
+      NotificationInteractFailed(
         'You''re too far to reach it from here') else
       MovingElevator9a9b.GoEndPosition;
   end else
@@ -1301,7 +1301,7 @@ begin
   begin
     InteractionOccured := true;
     if Distance > 5 then
-      TimeMessageInteractFailed(
+      NotificationInteractFailed(
         'You''re too far to reach it from here') else
       begin
         SoundEngine.Sound(stDoomExitButton);

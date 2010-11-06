@@ -82,7 +82,7 @@ implementation
 uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
   GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
   CastleInputs, KeysMouse, VectorMath, KambiUtils, CastlePlay,
-  CastleConfig, KambiStringUtils, CastleTimeMessages;
+  CastleConfig, KambiStringUtils, CastleNotifications;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -357,24 +357,24 @@ procedure TControlsSubMenu.CurrentItemSelected;
           2 key shortcuts and 1 mouse shortcut.
           Also, one of the rules is to avoid modal dialog boxes...
           So now I just uncoditionally remove conflicting key,
-          and make a TimeMessage informing user about it. }
+          and make a Notification informing user about it. }
         if NewMousePress then
         begin
-          TimeMessage(Format('Note: "%s" mouse shortcut cleared for action "%s"',
+          CastleNotifications.Notification(Format('Note: "%s" mouse shortcut cleared for action "%s"',
             [ MouseButtonStr[ConflictingKey.Shortcut.MouseButton],
               ConflictingKey.Name ]));
           ConflictingKey.Shortcut.MouseButtonUse := false;
         end else
         if NewMouseWheel <> mwNone then
         begin
-          TimeMessage(Format('Note: "%s" mouse wheel cleared for action "%s"',
+          CastleNotifications.Notification(Format('Note: "%s" mouse wheel cleared for action "%s"',
             [ MouseWheelDirectionStr[ConflictingKey.Shortcut.MouseWheel],
               ConflictingKey.Name ]));
           ConflictingKey.Shortcut.MouseWheel := mwNone;
         end else
         if ConflictingKey.Shortcut.Key1 = NewKey then
         begin
-          TimeMessage(Format('Note: "%s" key shortcut cleared for action "%s"',
+          CastleNotifications.Notification(Format('Note: "%s" key shortcut cleared for action "%s"',
             [ KeyToStr(ConflictingKey.Shortcut.Key1),
               ConflictingKey.Name ]));
           ConflictingKey.Shortcut.Key1 := K_None;
@@ -382,7 +382,7 @@ procedure TControlsSubMenu.CurrentItemSelected;
         begin
           Assert(ConflictingKey.Shortcut.Key2 = NewKey);
 
-          TimeMessage(Format('Note: "%s" key shortcut cleared for action "%s"',
+          CastleNotifications.Notification(Format('Note: "%s" key shortcut cleared for action "%s"',
             [ KeyToStr(ConflictingKey.Shortcut.Key2),
               ConflictingKey.Name ]));
           ConflictingKey.Shortcut.Key2 := K_None;
@@ -527,7 +527,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  TimeMessagesIdle;
+  NotificationsIdle;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);

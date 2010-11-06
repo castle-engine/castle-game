@@ -28,7 +28,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  TimeMessagesIdle;
+  NotificationsIdle;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);

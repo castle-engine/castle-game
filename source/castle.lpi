@@ -108,8 +108,8 @@
         <UsageCount Value="10"/>
       </Unit9>
       <Unit10>
-        <Filename Value="castletimemessages.pas"/>
-        <UnitName Value="CastleTimeMessages"/>
+        <Filename Value="castlenotifications.pas"/>
+        <UnitName Value="CastleNotifications"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>

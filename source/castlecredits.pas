@@ -38,7 +38,7 @@ procedure CredistGLContextRelease;
 implementation
 
 uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages,
-  CastleTimeMessages, KambiStringUtils, GLWinModes,
+  CastleNotifications, KambiStringUtils, GLWinModes,
   CastleInputs, CastlePlay, CastleWindow,
   CastleVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
   CastleHelp, KambiUtils, VRMLNodes, VRMLFields, KambiTimeUtils, KeysMouse;
@@ -96,7 +96,7 @@ begin
   if AnimationTime > AnimationEnd then
     UserQuit := true;
 
-  TimeMessagesIdle;
+  NotificationsIdle;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);

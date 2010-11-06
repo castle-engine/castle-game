@@ -36,7 +36,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   VectorMath, GLWindow, CastleHelp, CastlePlay, CastleGeneralMenu,
   CastleControlsMenu, CastleInputs, CastleChooseMenu,
   CastleVideoOptions,
-  CastleSound, VRMLNodes, KambiClassUtils, CastleTimeMessages,
+  CastleSound, VRMLNodes, KambiClassUtils, CastleNotifications,
   GLSoundMenu, KeysMouse;
 
 { TCastleMenu descendants interface ------------------------------------------ }

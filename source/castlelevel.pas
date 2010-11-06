@@ -316,7 +316,7 @@ type
   end;
 
   { This defines area on the level that causes
-    a TimeMessage to be displayed when player enters inside.
+    a Notification to be displayed when player enters inside.
     The natural use for it is to display various hint messages when player
     is close to something. }
   TLevelHintArea = class(TLevelArea)
@@ -456,7 +456,7 @@ type
 
     { See @link(Picked), you can call this from
       overriden implementations of these. }
-    procedure TimeMessageInteractFailed(const S: string);
+    procedure NotificationInteractFailed(const S: string);
 
     procedure RenderFromViewEverything; override;
     procedure RenderFromView3D; override;
@@ -612,8 +612,8 @@ type
       The right way to signal to user that interaction occured
       but failed (like the "You cannot open this door" example above)
       is to make a @code(Sound(stPlayerInteractFailed)).
-      In fact, you can call TimeMessageInteractFailed to do
-      TimeMessage and @code(Sound(stPlayerInteractFailed)) at once.
+      In fact, you can call NotificationInteractFailed to do
+      Notification and @code(Sound(stPlayerInteractFailed)) at once.
 
       Never call this when Player is Dead. Implementation of this may
       assume that Player is not Dead.
@@ -760,7 +760,7 @@ implementation
 
 uses SysUtils, GL, GLU, Object3DAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
-  CastleVideoOptions, CastleConfig, CastleTimeMessages,
+  CastleVideoOptions, CastleConfig, CastleNotifications,
   CastleInputs, CastleWindow, KambiOpenAL, ALUtils, KambiXMLUtils,
   CastleRequiredResources, VRMLOpenGLRenderer, RenderStateUnit, Math;
 
@@ -1127,7 +1127,7 @@ begin
   begin
     ReplaceInteractInput.C := 'i';
     ReplaceInteractInput.S := InteractInputDescription;
-    TimeMessage(SPercentReplace(Message, [ReplaceInteractInput], true));
+    CastleNotifications.Notification(SPercentReplace(Message, [ReplaceInteractInput], true));
     MessageDone := true;
   end;
 end;
@@ -1773,7 +1773,7 @@ begin
       S += Result.Hierarchy[I].ClassName + ' ';
     S += Format('], distance %f',
       [IntersectionDistance]);
-    TimeMessage(S);
+    Notification(S);
   end;
   {$endif DEBUG_PICK}
 end;
@@ -1846,9 +1846,9 @@ begin
   Result.TimePlaying := false;
 end;
 
-procedure TLevel.TimeMessageInteractFailed(const S: string);
+procedure TLevel.NotificationInteractFailed(const S: string);
 begin
-  TimeMessage(S);
+  CastleNotifications.Notification(S);
   SoundEngine.Sound(stPlayerInteractFailed);
 end;
 

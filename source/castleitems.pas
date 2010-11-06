@@ -397,7 +397,7 @@ implementation
 
 uses SysUtils, GLWindow, CastleWindow,
   CastlePlay, KambiFilesUtils, ProgressUnit,
-  CastleCreatures, CastleVideoOptions, CastleTimeMessages,
+  CastleCreatures, CastleVideoOptions, CastleNotifications,
   VRMLScene, VRMLTriangle, GLImages;
 
 {$define read_implementation}
@@ -467,7 +467,7 @@ end;
 
 procedure TItemKind.Use(Item: TItem);
 begin
-  TimeMessage('This item cannot be used');
+  Notification('This item cannot be used');
 end;
 
 function TItemKind.BoundingBoxRotated: TBox3D;
@@ -594,11 +594,11 @@ begin
   if Player.Life < Player.MaxLife then
   begin
     Player.Life := Min(Player.Life + 50, Player.MaxLife);
-    TimeMessage(Format('You drink "%s"', [Item.Kind.Name]));
+    Notification(Format('You drink "%s"', [Item.Kind.Name]));
     Item.Quantity := Item.Quantity - 1;
     SoundEngine.Sound(stPlayerPotionDrink);
   end else
-    TimeMessage('You feel quite alright, no need to waste this potion');
+    Notification('You feel quite alright, no need to waste this potion');
 end;
 
 { TItemWeaponKind ------------------------------------------------------------ }
@@ -756,7 +756,7 @@ begin
   QuiverIndex := Player.Items.FindKind(Quiver);
   if QuiverIndex = -1 then
   begin
-    TimeMessage('You have no arrows');
+    Notification('You have no arrows');
     SoundEngine.Sound(stPlayerInteractFailed);
   end else
   begin
@@ -780,7 +780,7 @@ end;
 
 procedure TItemScrollOfFlyingKind.Use(Item: TItem);
 begin
-  TimeMessage(Format('You cast spell from "%s"', [Item.Kind.Name]));
+  Notification(Format('You cast spell from "%s"', [Item.Kind.Name]));
   Player.FlyingModeTimeoutBegin(30.0);
   Item.Quantity := Item.Quantity - 1;
   SoundEngine.Sound(stPlayerCastFlyingSpell);
@@ -957,9 +957,9 @@ begin
     S := Format('You see an item "%s"', [Item.Kind.Name]);
     if Item.Quantity <> 1 then
       S += Format(' (quantity %d)', [Item.Quantity]);
-    TimeMessage(S);
+    Notification(S);
   end else
-    TimeMessage('You see some item, but it''s too far to tell exactly what it is');
+    Notification('You see some item, but it''s too far to tell exactly what it is');
 end;
 
 { TItemsOnLevelList -------------------------------------------------- }

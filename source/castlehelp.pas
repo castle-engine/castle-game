@@ -36,7 +36,7 @@ procedure ViewGameMessages;
 implementation
 
 uses SysUtils, Classes, GLWinMessages, CastleWindow, KambiUtils,
-  CastleTimeMessages;
+  CastleNotifications;
 
 function SCastleVersion: string;
 begin
@@ -54,8 +54,8 @@ var
 begin
   SList := TStringList.Create;
   try
-    SList.Assign(TimeMessagesList);
-    SList.Insert(0, Format('%d messages :', [TimeMessagesList.Count]));
+    SList.Assign(NotificationsList);
+    SList.Insert(0, Format('%d messages :', [NotificationsList.Count]));
     SList.Insert(1, '');
     MessageOK(Glw, SList, taLeft);
   finally SList.Free end;

@@ -414,7 +414,7 @@ uses Math, SysUtils, KambiClassUtils, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils,
   GLWindow, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, KambiOpenAL, VRMLNodes, CastleControlsMenu,
-  CastleTimeMessages, KambiXMLCfg, VRMLGLScene, GLImages,
+  CastleNotifications, KambiXMLCfg, VRMLGLScene, GLImages,
   CastleRequiredResources;
 
 var
@@ -496,7 +496,7 @@ end;
 procedure TPlayer.FlyingModeTimeoutBegin(const TimeOut: Single);
 begin
   if FFlyingModeTimeOut <= 0 then
-    TimeMessage('You start flying');
+    Notification('You start flying');
 
   { It's possible that FlyingModeTimeoutBegin is called when
     FFlyingModeTimeOut is already > 0. In this case, we set
@@ -510,7 +510,7 @@ begin
   if FlyingMode then
   begin
     FFlyingModeTimeOut := 0;
-    TimeMessage('You''re no longer flying');
+    Notification('You''re no longer flying');
   end;
 end;
 
@@ -521,7 +521,7 @@ begin
   S := Format('You pick "%s"', [Item.Kind.Name]);
   if Item.Quantity <> 1 then
     S += Format(' (quantity %d)', [Item.Quantity]);
-  TimeMessage(S);
+  Notification(S);
 
   SoundEngine.Sound(stPlayerPickItem);
 
@@ -567,7 +567,7 @@ begin
 
     if not Between(DropQuantity, 1, SelectedItem.Quantity) then
     begin
-      TimeMessage(Format('You cannot drop %d items', [DropQuantity]));
+      Notification(Format('You cannot drop %d items', [DropQuantity]));
       Exit(nil);
     end;
   end else
@@ -585,7 +585,7 @@ begin
   S := Format('You drop "%s"', [Result.Kind.Name]);
   if Result.Quantity <> 1 then
     S += Format(' (quantity %d)', [Result.Quantity]);
-  TimeMessage(S);
+  Notification(S);
 
   SoundEngine.Sound(stPlayerDropItem);
 end;
@@ -630,9 +630,9 @@ begin
   begin
     FEquippedWeapon := Value;
     if EquippedWeapon = nil then
-      TimeMessage('You''re no longer using your weapon') else
+      Notification('You''re no longer using your weapon') else
     begin
-      TimeMessage(Format('You''re using weapon "%s" now',
+      Notification(Format('You''re using weapon "%s" now',
         [EquippedWeapon.Kind.Name]));
       Assert(EquippedWeapon.Kind is TItemWeaponKind);
       SoundEngine.Sound(EquippedWeaponKind.EquippingSound);
@@ -972,7 +972,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
              (Level.AnimationTime - SwimLastDrownTime > SwimDrownPauseSeconds) then
           begin
             if SwimLastDrownTime = 0.0 then
-              TimeMessage('You''re drowning');
+              Notification('You''re drowning');
             SwimLastDrownTime := Level.AnimationTime;
             Life := Life - (5 + Random(10));
             SoundEngine.Sound(stPlayerDrowning);
@@ -1184,7 +1184,7 @@ begin
     FFlyingModeTimeOut := FFlyingModeTimeOut - CompSpeed;
     if not FlyingMode then
     begin
-      TimeMessage('You''re no longer flying');
+      Notification('You''re no longer flying');
     end;
   end;
 
@@ -1205,7 +1205,7 @@ begin
   if not HintEscapeKeyShown then
   begin
     HintEscapeKeyShown := true;
-    TimeMessage('Hint: press "Escape" for game menu');
+    Notification('Hint: press "Escape" for game menu');
   end;
 
   UpdateIsOnTheGround;
@@ -1242,7 +1242,7 @@ procedure TPlayer.SetLifeCustomBlackOut(const Value: Single;
 begin
   if (Life > 0) and (Value <= 0) then
   begin
-    TimeMessage('You die');
+    Notification('You die');
     SoundEngine.Sound(stPlayerDies);
     Camera.FallOnTheGround;
   end else
@@ -1276,7 +1276,7 @@ begin
       ActualAttackDone := false;
     end else
       { TODO: maybe I should allow him to do some "punch" / "kick" here ? }
-      TimeMessage('No weapon equipped');
+      Notification('No weapon equipped');
   end;
 end;
 

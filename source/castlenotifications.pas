@@ -21,90 +21,89 @@
 }
 
 { }
-unit CastleTimeMessages;
+unit CastleNotifications;
 
 interface
 
-uses TimeMessages, Classes;
+uses GLNotifications, Classes;
 
 var
-  { These are all messages passed to TimeMessage.
+  { These are all messages passed to @link(Notification).
     Created / destroyed in this unit's initialization / finalization.
     They are not broken (to fit into some particular line width).
 
-    You should clear this when new game starts (use TimeMessagesClear).
+    You should clear this when new game starts (use NotificationsClear).
 
     You cannot modify it directly, you can change it
-    only by calling TimeMessage. }
-  TimeMessagesList: TStringList;
+    only by calling @link(Notification). }
+  NotificationsList: TStringList;
 
-{ Add message to TimeMessages and TimeMessagesManager. }
-procedure TimeMessage(const S: string);
+{ Add message to NotificationsList and Notifications. }
+procedure Notification(const S: string);
 
 { This must be called within 2d projection. }
-procedure TimeMessagesDraw;
+procedure NotificationsDraw;
 
-function TimeMessagesDrawNeeded: boolean;
+function NotificationsDrawNeeded: boolean;
 
-procedure TimeMessagesClear;
+procedure NotificationsClear;
 
-procedure TimeMessagesIdle;
+procedure NotificationsIdle;
 
 implementation
 
 uses SysUtils, GLWindow, CastleWindow, KambiClassUtils;
 
 var
-  TimeMessagesManager: TTimeMessagesManager;
+  Notifications: TGLNotifications;
 
-procedure TimeMessage(const S: string);
+procedure Notification(const S: string);
 begin
-  if TimeMessagesManager <> nil then
-    TimeMessagesManager.Show(S);
-  TimeMessagesList.Insert(0, S);
+  if Notifications <> nil then
+    Notifications.Show(S);
+  NotificationsList.Insert(0, S);
 end;
 
-procedure TimeMessagesDraw;
+procedure NotificationsDraw;
 begin
-  TimeMessagesManager.Draw2d(Glw.Width, Glw.Height,
-                             Glw.Width, Glw.Height);
+  Notifications.Draw2D(Glw.Width, Glw.Height,
+                       Glw.Width, Glw.Height);
 end;
 
-function TimeMessagesDrawNeeded: boolean;
+function NotificationsDrawNeeded: boolean;
 begin
-  Result := TimeMessagesManager.DrawNeeded;
+  Result := Notifications.DrawNeeded;
 end;
 
-procedure TimeMessagesClear;
+procedure NotificationsClear;
 begin
-  TimeMessagesList.Clear;
-  TimeMessagesManager.Clear;
+  NotificationsList.Clear;
+  Notifications.Clear;
 end;
 
-procedure TimeMessagesIdle;
+procedure NotificationsIdle;
 begin
-  TimeMessagesManager.Idle;
+  Notifications.Idle;
 end;
 
 { initialization / finalization ---------------------------------------------- }
 
 procedure GLWindowInit(Glwin: TGLWindow);
 begin
-  TimeMessagesManager := TTimeMessagesManager.Create(
-    Glw, hpMiddle, vpDown, Glw.Width);
-  TimeMessagesManager.MaxMessagesCount := 4;
+  Notifications := TGLNotifications.Create(Glw, hpMiddle, vpDown, Glw.Width);
+  Notifications.MaxMessages := 4;
 end;
 
 procedure GLWindowClose(Glwin: TGLWindow);
 begin
-  FreeAndNil(TimeMessagesManager);
+  FreeAndNil(Notifications);
 end;
 
 initialization
-  TimeMessagesList := TStringList.Create;
+  NotificationsList := TStringList.Create;
 
   Glw.OnInitList.Add(@GLWindowInit);
   Glw.OnCloseList.Add(@GLWindowClose);
 finalization
-  FreeAndNil(TimeMessagesList);
+  FreeAndNil(NotificationsList);
 end.

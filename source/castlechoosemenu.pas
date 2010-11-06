@@ -35,7 +35,7 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 implementation
 
 uses SysUtils, GLWinModes, KambiGLUtils, CastleInputs, GLWinMessages, GLMenu,
-  CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleTimeMessages,
+  CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleNotifications,
   KeysMouse;
 
 var
@@ -86,7 +86,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  TimeMessagesIdle;
+  NotificationsIdle;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);

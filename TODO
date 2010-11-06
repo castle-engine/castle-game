@@ -469,7 +469,7 @@ Cages level:
   like "Do you want to save the game before ending ?"
   with answers "Save and end the game", "Don't save and end the game", "Cancel".
 
-  When loading game, load saved TimeMessages for this game.
+  When loading game, load saved Notifications for this game.
 
 - It would be nice to get Mesa3D working with my game. Right now I get
     castle: indirect_vertex_array.c:1359: __indirect_glTexCoordPointer: Assertion `a != ((void *)0)' failed.

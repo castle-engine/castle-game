@@ -72,7 +72,7 @@ procedure LevelFinished(NextLevelName: string);
   destroyed, along with all it's items, creatures etc. references). }
 procedure LevelFinishedFlush;
 
-{ Saves a screen, causing also appropriate TimeMessage. }
+{ Saves a screen, causing also appropriate Notification. }
 procedure SaveScreen;
 
 var
@@ -119,12 +119,12 @@ uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
   CastleItems, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
   CastleVideoOptions, CastleConfig, VRMLGLHeadlight, CastleThunder,
-  CastleTimeMessages, BackgroundGL, CastleControlsMenu,
+  CastleNotifications, BackgroundGL, CastleControlsMenu,
   CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
   KambiTimeUtils, GLImages, RenderStateUnit, KeysMouse;
 
 var
-  GLList_TimeMessagesBackground: TGLuint;
+  GLList_NotificationsBackground: TGLuint;
 
   GLList_InventorySlot: TGLuint;
   InventoryVisible: boolean;
@@ -351,10 +351,10 @@ begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
 
-  if TimeMessagesDrawNeeded then
+  if NotificationsDrawNeeded then
   begin
-    glCallList(GLList_TimeMessagesBackground);
-    TimeMessagesDraw;
+    glCallList(GLList_NotificationsBackground);
+    NotificationsDraw;
   end;
 
   if InventoryVisible then
@@ -417,8 +417,8 @@ begin
 
   SoundEngine.MusicPlayer.PlayedSound := Level.PlayedMusicSound;
 
-  { First TimeMessage for this level. }
-  TimeMessage('Loaded level "' + Level.Title + '"');
+  { First Notification for this level. }
+  Notification('Loaded level "' + Level.Title + '"');
 end;
 
 procedure Idle(Glwin: TGLWindow);
@@ -485,7 +485,7 @@ var
 begin
   CompSpeed := Glw.Fps.IdleSpeed;
 
-  TimeMessagesIdle;
+  NotificationsIdle;
 
   Level.ItemsOnLevel.Idle(CompSpeed);
 
@@ -588,13 +588,13 @@ procedure DoAttack;
 begin
   if GameWin then
   begin
-    TimeMessage(SGameWinMessage);
+    Notification(SGameWinMessage);
     Exit;
   end;
 
   if Player.Dead then
   begin
-    TimeMessage(SDeadMessage);
+    Notification(SDeadMessage);
     Exit;
   end;
 
@@ -724,9 +724,9 @@ end;
 procedure MaybeDeadWinMessage;
 begin
   if GameWin then
-    TimeMessage(SGameWinMessage) else
+    Notification(SGameWinMessage) else
   if Player.Dead then
-    TimeMessage(SDeadMessage);
+    Notification(SDeadMessage);
 end;
 
 { Call this always when entering the game mode, or when UseMouseLook changes
@@ -829,13 +829,13 @@ procedure EventDown(AKey: TKey;
   begin
     if GameWin then
     begin
-      TimeMessage(SGameWinMessage);
+      Notification(SGameWinMessage);
       Exit;
     end;
 
     if Player.Dead then
     begin
-      TimeMessage(SDeadMessage);
+      Notification(SDeadMessage);
       Exit;
     end;
 
@@ -851,9 +851,9 @@ procedure EventDown(AKey: TKey;
           Level.ItemsOnLevel.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
         end;
       end else
-        TimeMessage('Not enough room here to drop this item');
+        Notification('Not enough room here to drop this item');
     end else
-      TimeMessage('Nothing to drop - select some item first');
+      Notification('Nothing to drop - select some item first');
   end;
 
   procedure UseItem;
@@ -863,13 +863,13 @@ procedure EventDown(AKey: TKey;
   begin
     if GameWin then
     begin
-      TimeMessage(SGameWinMessage);
+      Notification(SGameWinMessage);
       Exit;
     end;
 
     if Player.Dead then
     begin
-      TimeMessage(SDeadMessage);
+      Notification(SDeadMessage);
       Exit;
     end;
 
@@ -890,7 +890,7 @@ procedure EventDown(AKey: TKey;
 
       UpdateInventoryCurrentItemAfterDelete;
     end else
-      TimeMessage('Nothing to use - select some item first');
+      Notification('Nothing to use - select some item first');
   end;
 
   procedure UseLifePotion;
@@ -900,13 +900,13 @@ procedure EventDown(AKey: TKey;
   begin
     if GameWin then
     begin
-      TimeMessage(SGameWinMessage);
+      Notification(SGameWinMessage);
       Exit;
     end;
 
     if Player.Dead then
     begin
-      TimeMessage(SDeadMessage);
+      Notification(SDeadMessage);
       Exit;
     end;
 
@@ -926,22 +926,22 @@ procedure EventDown(AKey: TKey;
 
       UpdateInventoryCurrentItemAfterDelete;
     end else
-      TimeMessage('You don''t have any life potion');
+      Notification('You don''t have any life potion');
   end;
 
   procedure CancelFlying;
   begin
     if GameWin then
-      TimeMessage(SGameWinMessage) else
+      Notification(SGameWinMessage) else
     if not Player.Dead then
       Player.CancelFlying else
-      TimeMessage(SDeadMessage);
+      Notification(SDeadMessage);
   end;
 
   procedure MaybeWinMessage;
   begin
     if GameWin then
-      TimeMessage(SGameWinMessage);
+      Notification(SGameWinMessage);
   end;
 
   procedure DoDebugMenu;
@@ -1068,7 +1068,7 @@ var
   C2D: TGame2DControls;
   C3D: TGame3DControls;
 begin
-  TimeMessagesClear;
+  NotificationsClear;
 
   GameWin := false;
 
@@ -1147,7 +1147,7 @@ procedure LevelFinished(NextLevelName: string);
 begin
   if NextLevelName = '' then
   begin
-    TimeMessage('Congratulations, game finished');
+    Notification('Congratulations, game finished');
     GameWin := true;
     SoundEngine.MusicPlayer.PlayedSound := stGameWinMusic;
   end else
@@ -1168,7 +1168,7 @@ var
 begin
   FileName := FileNameAutoInc(ApplicationName + '_screen_%d.png');
   Glw.SaveScreen(FileName);
-  TimeMessage('Screen saved to ' + FileName);
+  Notification('Screen saved to ' + FileName);
   SoundEngine.Sound(stSaveScreen);
 end;
 
@@ -1190,7 +1190,7 @@ procedure GLWindowInit(Glwin: TGLWindow);
 
 const
   { Note: this constant must be synchronized with
-    TimeMessagesManager.MaxMessagesCount }
+    NotificationsManager.MaxMessagesCount }
   DarkAreaHeight = 80;
 
   DarkAreaFadeHeight = 20;
@@ -1198,9 +1198,9 @@ const
 var
   I: Integer;
 begin
-  { Calculate GLList_TimeMessagesBackground }
-  GLList_TimeMessagesBackground := glGenListsCheck(1, 'CastlePlay.GLWindowInit');
-  glNewList(GLList_TimeMessagesBackground, GL_COMPILE);
+  { Calculate GLList_NotificationsBackground }
+  GLList_NotificationsBackground := glGenListsCheck(1, 'CastlePlay.GLWindowInit');
+  glNewList(GLList_NotificationsBackground, GL_COMPILE);
   try
     glLoadIdentity;
     glRasterPos2i(0, 0);
@@ -1229,7 +1229,7 @@ begin
   FreeAndNil(Font_BFNT_BitstreamVeraSans);
   FreeAndNil(Font_BFNT_BitstreamVeraSans_m10);
 
-  glFreeDisplayList(GLList_TimeMessagesBackground);
+  glFreeDisplayList(GLList_NotificationsBackground);
   glFreeDisplayList(GLList_InventorySlot);
 end;
 

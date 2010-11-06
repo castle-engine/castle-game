@@ -40,7 +40,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, ALUtils, KambiOpenAL, KambiClassUtils,
-  CastleTimeMessages, CastleLevelAvailable, CastleBackgroundLevel,
+  CastleNotifications, CastleLevelAvailable, CastleBackgroundLevel,
   GameSoundEngine, GLSoundMenu,
   CastleRequiredResources, CastleCredits, GLAntiAliasing, KeysMouse;
 
@@ -184,7 +184,7 @@ begin
   SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
   SoundMenu.SoundVolume.RefreshAccessory;
   SoundMenu.MusicVolume.RefreshAccessory;
-  TimeMessagesClear;
+  NotificationsClear;
 end;
 
 { TMainMenu ------------------------------------------------------------ }
@@ -818,7 +818,7 @@ end;
 
 procedure Idle(Glwin: TGLWindow);
 begin
-  TimeMessagesIdle;
+  NotificationsIdle;
 end;
 
 procedure CloseQuery(Glwin: TGLWindow);
