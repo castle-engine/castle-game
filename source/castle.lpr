@@ -24,7 +24,7 @@
 
 program castle;
 
-uses GLWindow, SysUtils, KambiUtils, ProgressUnit, ProgressGL, ALUtils,
+uses GLWindow, SysUtils, KambiUtils, ProgressUnit, GLProgress, ALUtils,
   Classes, ParseParametersUnit, GLWinMessages, KambiGLUtils, KambiStringUtils,
   KambiLog, CastleWindow, CastleStartMenu, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
@@ -210,8 +210,8 @@ begin
   InitContext;
 
   { init progress }
-  ProgressGLInterface.Window := Glw;
-  Progress.UserInterface := ProgressGLInterface;
+  GLProgressInterface.Window := Glw;
+  Progress.UserInterface := GLProgressInterface;
   { I'm turning UseDescribePosition to false, because it's usually
     confusing for the user.
     E.g. each creature is counted as PrepareRenderSteps steps,

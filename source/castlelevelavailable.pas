@@ -28,7 +28,7 @@ unit CastleLevelAvailable;
 interface
 
 uses CastleLevel, KambiUtils, Classes, CastlePlay,
-  KambiClassUtils, DOM, GL, GLU, KambiGLUtils, ProgressGL;
+  KambiClassUtils, DOM, GL, GLU, KambiGLUtils, GLProgress;
 
 {$define read_interface}
 
@@ -266,12 +266,12 @@ function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
   var
     SavedBarYPosition: Single;
   begin
-    SavedBarYPosition := ProgressGLInterface.BarYPosition;
-    ProgressGLInterface.BarYPosition := LoadingBarYPosition;
+    SavedBarYPosition := GLProgressInterface.BarYPosition;
+    GLProgressInterface.BarYPosition := LoadingBarYPosition;
     try
       CreateLevelCore;
     finally
-      ProgressGLInterface.BarYPosition := SavedBarYPosition;
+      GLProgressInterface.BarYPosition := SavedBarYPosition;
     end;
   end;
 
