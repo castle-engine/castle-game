@@ -27,7 +27,7 @@ interface
 
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3D, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLGLScene, CastleSound, VRMLSceneWaypoints,
-  CastleObjectKinds, ALSourceAllocator, KambiXMLCfg, Base3D,
+  CastleObjectKinds, ALSourceAllocator, KambiXMLConfig, Base3D,
   GameSoundEngine, GLShadowVolumeRenderer, VRMLTriangle, Frustum;
 
 {$define read_interface}

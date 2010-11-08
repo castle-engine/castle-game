@@ -25,7 +25,7 @@ unit CastleObjectKinds;
 
 interface
 
-uses Classes, KambiXMLCfg, VRMLGLAnimation, VRMLGLAnimationInfo,
+uses Classes, KambiXMLConfig, VRMLGLAnimation, VRMLGLAnimationInfo,
   CastleVideoOptions, VRMLScene, VRMLGLScene;
 
 type

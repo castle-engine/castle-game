@@ -414,7 +414,7 @@ uses Math, SysUtils, KambiClassUtils, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils,
   GLWindow, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, KambiOpenAL, VRMLNodes, CastleControlsMenu,
-  CastleNotifications, KambiXMLCfg, VRMLGLScene, GLImages,
+  CastleNotifications, KambiXMLConfig, VRMLGLScene, GLImages,
   CastleRequiredResources;
 
 var
