@@ -25,7 +25,7 @@ unit VRMLGLAnimationInfo;
 
 interface
 
-uses Classes, VRMLGLScene, VRMLGLAnimation, VRMLOpenGLRenderer,
+uses Classes, VRMLGLScene, VRMLGLAnimation, VRMLGLRenderer,
   KambiUtils, DOM;
 
 type
@@ -39,7 +39,7 @@ type
     FScenesPerTime: Cardinal;
     FOptimization: TGLRendererOptimization;
     FTimeLoop, FTimeBackwards: boolean;
-    FCache: TVRMLOpenGLRendererContextCache;
+    FCache: TVRMLGLRendererContextCache;
     FEqualityEpsilon: Single;
   public
     constructor Create(
@@ -49,12 +49,12 @@ type
       AOptimization: TGLRendererOptimization;
       const AEqualityEpsilon: Single;
       ATimeLoop, ATimeBackwards: boolean;
-      ACache: TVRMLOpenGLRendererContextCache = nil);
+      ACache: TVRMLGLRendererContextCache = nil);
 
     { Constructor that loads animation settings from a *.kanim file.
       File format is described in ../../doc/kanim_format.txt file. }
     constructor CreateFromFile(const FileName: string;
-      ACache: TVRMLOpenGLRendererContextCache = nil);
+      ACache: TVRMLGLRendererContextCache = nil);
 
     { Constructor that loads animation settings from DOM node representing
       *.kanim file.
@@ -62,7 +62,7 @@ type
       @seealso TVRMLGLAnimation.LoadFromDOMElement. }
     constructor CreateFromDOMElement(Element: TDOMElement;
       const BasePath: string;
-      ACache: TVRMLOpenGLRendererContextCache = nil);
+      ACache: TVRMLGLRendererContextCache = nil);
 
     destructor Destroy; override;
 
@@ -83,7 +83,7 @@ type
     property EqualityEpsilon: Single read FEqualityEpsilon write FEqualityEpsilon;
     property TimeLoop: boolean read FTimeLoop write FTimeLoop;
     property TimeBackwards: boolean read FTimeBackwards write FTimeBackwards;
-    property Cache: TVRMLOpenGLRendererContextCache
+    property Cache: TVRMLGLRendererContextCache
       read FCache write FCache;
     { @groupEnd }
 
@@ -122,7 +122,7 @@ constructor TVRMLGLAnimationInfo.Create(
   AOptimization: TGLRendererOptimization;
   const AEqualityEpsilon: Single;
   ATimeLoop, ATimeBackwards: boolean;
-  ACache: TVRMLOpenGLRendererContextCache);
+  ACache: TVRMLGLRendererContextCache);
 begin
   inherited Create;
 
@@ -142,7 +142,7 @@ begin
 end;
 
 constructor TVRMLGLAnimationInfo.CreateFromFile(const FileName: string;
-  ACache: TVRMLOpenGLRendererContextCache);
+  ACache: TVRMLGLRendererContextCache);
 begin
   inherited Create;
 
@@ -158,7 +158,7 @@ end;
 
 constructor TVRMLGLAnimationInfo.CreateFromDOMElement(Element: TDOMElement;
   const BasePath: string;
-  ACache: TVRMLOpenGLRendererContextCache);
+  ACache: TVRMLGLRendererContextCache);
 begin
   inherited Create;
 
