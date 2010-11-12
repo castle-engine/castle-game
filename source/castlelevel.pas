@@ -38,7 +38,7 @@ unit CastleLevel;
 
 interface
 
-uses VectorMath, VRMLScene, VRMLGLScene, VRMLLightSetGL, Boxes3D,
+uses VectorMath, VRMLScene, VRMLGLScene, VRMLGLLightSet, Boxes3D,
   VRMLNodes, VRMLFields, CastleItems, Cameras, VRMLTriangle, GL3D,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
@@ -344,7 +344,7 @@ type
 
   TLevel = class(TKamSceneManager)
   private
-    FLightSet: TVRMLLightSetGL;
+    FLightSet: TVRMLGLLightSet;
     FCameraRadius: Single;
     FCameraPreferredHeight: Single;
     FLevelProjectionNear: Single;
@@ -499,7 +499,7 @@ type
     { @groupEnd }
 
     { }
-    property LightSet: TVRMLLightSetGL read FLightSet;
+    property LightSet: TVRMLGLLightSet read FLightSet;
 
     property CameraRadius: Single read FCameraRadius;
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
@@ -1316,7 +1316,7 @@ begin
 
     MainScene.FreeResources([frTextureDataInNodes]);
 
-    FLightSet := TVRMLLightSetGL.Create(LoadVRML(LightSetFileName),
+    FLightSet := TVRMLGLLightSet.Create(LoadVRML(LightSetFileName),
       true,
       { GL_LIGHT0 is reserved for headlight. }
       { GL_LIGHT1 is reserved for thunder effect in cages level.

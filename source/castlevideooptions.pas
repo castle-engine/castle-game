@@ -72,7 +72,7 @@ var
 
 { Set Attributes as needed. Right now this means setting
   current TextureMinificationQuality, and UseSceneLights = @false
-  (we set own lights by TVRMLLightSetGL). }
+  (we set own lights by TVRMLGLLightSet). }
 procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes;
   BlendingType: TBlendingType);
 
