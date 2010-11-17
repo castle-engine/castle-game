@@ -533,15 +533,15 @@ begin
 
     NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel;
 
-    { copy DisableContextInitClose value to new level.
+    { copy DisableContextOpenClose value to new level.
       This is needed when it's called from inside debug menu,
-      to make Glw.Controls.Begin/EndDisableContextInitClose
+      to make Glw.Controls.Begin/EndDisableContextOpenClose
       matching. }
-    NewLevel.DisableContextInitClose := Level.DisableContextInitClose;
+    NewLevel.DisableContextOpenClose := Level.DisableContextOpenClose;
 
-    { initialize NewLevel.GLContextInit already, in case this is called
-      from inside debug menu (where explicit GLContextInit may be disabled). }
-    NewLevel.GLContextInit;
+    { initialize NewLevel.GLContextOpen already, in case this is called
+      from inside debug menu (where explicit GLContextOpen may be disabled). }
+    NewLevel.GLContextOpen;
 
     { right before freeing old Level, insert NewLevel at the same place
       in GameControls and Glw.Controls as Level was. }
@@ -955,7 +955,7 @@ procedure EventDown(AKey: TKey;
       only saved in TGLMode state, so it would still contain invalid pointer
       to the old level. So we should instead explicitly push/pop our current
       Glw.Controls, this way using current GameControls value. }
-    Glw.Controls.BeginDisableContextInitClose;
+    Glw.Controls.BeginDisableContextOpenClose;
     Glw.Controls.Clear;
 
     Level.Paused := true;
@@ -963,7 +963,7 @@ procedure EventDown(AKey: TKey;
     Level.Paused := false;
 
     Glw.Controls.AddList(GameControls);
-    Glw.Controls.EndDisableContextInitClose;
+    Glw.Controls.EndDisableContextOpenClose;
   end;
 
 begin
@@ -1174,7 +1174,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowInit(Glwin: TGLWindow);
+procedure GLWindowOpen(Glwin: TGLWindow);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -1199,7 +1199,7 @@ var
   I: Integer;
 begin
   { Calculate GLList_NotificationsBackground }
-  GLList_NotificationsBackground := glGenListsCheck(1, 'CastlePlay.GLWindowInit');
+  GLList_NotificationsBackground := glGenListsCheck(1, 'CastlePlay.GLWindowOpen');
   glNewList(GLList_NotificationsBackground, GL_COMPILE);
   try
     glLoadIdentity;
@@ -1235,7 +1235,7 @@ end;
 
 initialization
   ShowDebugInfo := false;
-  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnOpenList.Add(@GLWindowOpen);
   Glw.OnCloseList.Add(@GLWindowClose);
 
   AutoOpenInventory := ConfigFile.GetValue(

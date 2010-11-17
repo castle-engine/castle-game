@@ -64,7 +64,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure InitGLW(Glwin: TGLWindow);
+procedure OpenGLW(Glwin: TGLWindow);
 begin
   GLList_ScreenImage := LoadImageToDisplayList(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'initial_background.png',
@@ -77,7 +77,7 @@ begin
 end;
 
 initialization
-  Glw.OnInitList.Add(@InitGLW);
+  Glw.OnOpenList.Add(@OpenGLW);
   Glw.OnCloseList.Add(@CloseGLW);
 finalization
 end.

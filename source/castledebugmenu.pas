@@ -1197,12 +1197,12 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure InitGLW(Glwin: TGLWindow);
+procedure OpenGLW(Glwin: TGLWindow);
 begin
   { Although base TGLMenu doesn't require OpenGL context at constructor,
     our descendants initialize some arguments that require font initialized
     that requires font display lists created. That's why code below is in
-    OnInit callback, not unit's initialization. }
+    OnOpen callback, not unit's initialization. }
   DebugMenu := TDebugMenu.Create(Application);
   DebugPlayerMenu := TDebugPlayerMenu.Create(Application);
   DebugCreaturesMenu := TDebugCreaturesMenu.Create(Application);
@@ -1211,6 +1211,6 @@ begin
 end;
 
 initialization
-  Glw.OnInitList.Add(@InitGLW);
+  Glw.OnOpenList.Add(@OpenGLW);
 finalization
 end.

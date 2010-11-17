@@ -78,7 +78,7 @@ type
   public
     function DrawStyle: TUIControlDrawStyle; override;
     procedure Draw; override;
-    procedure GLContextInit; override;
+    procedure GLContextOpen; override;
     procedure GLContextClose; override;
   end;
 
@@ -98,7 +98,7 @@ begin
   glPopAttrib;
 end;
 
-procedure TBackgroundCaptions.GLContextInit;
+procedure TBackgroundCaptions.GLContextOpen;
 var
   ImageCaption: TImage;
 begin

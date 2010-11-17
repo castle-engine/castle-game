@@ -145,12 +145,12 @@ begin
   if Log then WritelnLogMultiline('GL context', FailureMessage);
 end;
 
-{ Call Glw.Init, when anti-aliasing (multi-sampling) and shadows (stencil
+{ Call Glw.Open, when anti-aliasing (multi-sampling) and shadows (stencil
   buffer) are possibly allowed. If EGLContextNotPossible, will try to lower
   requirements and initialize worse GL context. }
-procedure InitContext;
+procedure OpenContext;
 begin
-  Glw.InitOptionalMultiSamplingAndStencil(@MultiSamplingOff, @StencilOff);
+  Glw.OpenOptionalMultiSamplingAndStencil(@MultiSamplingOff, @StencilOff);
 end;
 
 { main -------------------------------------------------------------------- }
@@ -203,11 +203,11 @@ begin
 
   { init glwindow }
   Glw.Caption := 'The Castle';
-  Glw.ResizeAllowed := raOnlyAtInit;
+  Glw.ResizeAllowed := raOnlyAtOpen;
   if RenderShadowsPossible then
     Glw.StencilBufferBits := 8;
   Glw.MultiSampling := AntiAliasingGlwMultiSampling;
-  InitContext;
+  OpenContext;
 
   { init progress }
   GLProgressInterface.Window := Glw;
@@ -219,10 +219,10 @@ begin
     when loading levels user would have to know what an "octree" is. }
   Progress.UseDescribePosition := false;
 
-  { init OpenAL (after initing Glw and Progress, because ALContextInit
+  { init OpenAL (after initing Glw and Progress, because ALContextOpen
     wants to display progress of "Loading sounds") }
   DrawInitialBackground;
-  SoundEngine.ALContextInit(WasParam_NoSound);
+  SoundEngine.ALContextOpen(WasParam_NoSound);
   try
     ShowStartMenu;
   finally

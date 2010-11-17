@@ -88,7 +88,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowInit(Glwin: TGLWindow);
+procedure GLWindowOpen(Glwin: TGLWindow);
 begin
   Notifications := TGLNotifications.Create(Glw, hpMiddle, vpDown, Glw.Width);
   Notifications.MaxMessages := 4;
@@ -102,7 +102,7 @@ end;
 initialization
   NotificationsList := TStringList.Create;
 
-  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnOpenList.Add(@GLWindowOpen);
   Glw.OnCloseList.Add(@GLWindowClose);
 finalization
   FreeAndNil(NotificationsList);

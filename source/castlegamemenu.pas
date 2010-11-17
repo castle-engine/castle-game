@@ -184,13 +184,13 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure InitGLW(Glwin: TGLWindow);
+procedure OpenGLW(Glwin: TGLWindow);
 begin
   GameMenu := TGameMenu.Create(Application);
   GameSoundMenu := TGameSoundMenu.Create(Application);
 end;
 
 initialization
-  Glw.OnInitList.Add(@InitGLW);
+  Glw.OnOpenList.Add(@OpenGLW);
 finalization
 end.

@@ -129,7 +129,7 @@ end;
 { $define DEBUG_ALWAYS_RELOAD_CREDITS}
 
 {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
-procedure InitGLW(Glwin: TGLWindow); forward;
+procedure OpenGLW(Glwin: TGLWindow); forward;
 {$endif}
 
 procedure ShowCredits(ControlsUnder: TUIControlList);
@@ -138,7 +138,7 @@ var
 begin
   {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
   CredistGLContextRelease;
-  InitGLW(Glw);
+  OpenGLW(Glw);
   {$endif}
 
   AnimationTime := 0;
@@ -168,7 +168,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure InitGLW(Glwin: TGLWindow);
+procedure OpenGLW(Glwin: TGLWindow);
 var
   VRMLContents: string;
   Info: TMFString;
@@ -204,7 +204,7 @@ begin
 end;
 
 initialization
-  Glw.OnInitList.Add(@InitGLW);
+  Glw.OnOpenList.Add(@OpenGLW);
   Glw.OnCloseList.Add(@CloseGLW);
 finalization
 end.

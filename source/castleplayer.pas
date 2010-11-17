@@ -1450,9 +1450,9 @@ begin
   Result := PVRMLTriangle(Camera.AboveGround);
 end;
 
-{ GLWindow init / close ------------------------------------------------------ }
+{ GLWindow open / close ------------------------------------------------------ }
 
-procedure GLWindowInit(Glwin: TGLWindow);
+procedure GLWindowOpen(Glwin: TGLWindow);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -1474,7 +1474,7 @@ begin
   GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
   GLList_BossIndicatorImage := LoadPlayerControlToDisplayList('boss.png');
 
-  GLList_DrawWaterRect := glGenListsCheck(1, 'CastlePlayer.GLWindowInit');
+  GLList_DrawWaterRect := glGenListsCheck(1, 'CastlePlayer.GLWindowOpen');
   glNewList(GLList_DrawWaterRect, GL_COMPILE);
   try
     glPushAttrib(GL_COLOR_BUFFER_BIT or GL_CURRENT_BIT);
@@ -1496,6 +1496,6 @@ begin
 end;
 
 initialization
-  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnOpenList.Add(@GLWindowOpen);
   Glw.OnCloseList.Add(@GLWindowClose);
 end.

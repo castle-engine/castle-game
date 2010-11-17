@@ -402,7 +402,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowInit(Glwin: TGLWindow);
+procedure GLWindowOpen(Glwin: TGLWindow);
 begin
   { Do this now (not at initialization), because loading available
     levels requires knowledge of Glw window sizes (because LoadingBg
@@ -422,7 +422,7 @@ end;
 
 initialization
   LevelsAvailable := TLevelsAvailableList.Create;
-  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnOpenList.Add(@GLWindowOpen);
   Glw.OnCloseList.Add(@GLWindowClose);
 finalization
   { Call CloseGLW in case OnClose event would happen after finalization

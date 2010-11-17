@@ -74,7 +74,7 @@ var
   InvertVerticalMouseLook: boolean;
 
   { Font used for menu SubMenuTitle.
-    Initialized / finalized in GLWindow Init/Close here. }
+    Initialized / finalized in GLWindow Open/Close here. }
   SubMenuTitleFont: TGLBitmapFont_Abstract;
 
 implementation
@@ -614,10 +614,10 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure InitGLW(Glwin: TGLWindow);
+procedure OpenGLW(Glwin: TGLWindow);
 begin
   if GLList_DrawFadeRect = 0 then
-    GLList_DrawFadeRect := glGenListsCheck(1, 'CastleControlsMenu.InitGLW');
+    GLList_DrawFadeRect := glGenListsCheck(1, 'CastleControlsMenu.OpenGLW');
   glNewList(GLList_DrawFadeRect, GL_COMPILE);
   try
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -640,7 +640,7 @@ begin
 end;
 
 initialization
-  Glw.OnInitList.Add(@InitGLW);
+  Glw.OnOpenList.Add(@OpenGLW);
   Glw.OnCloseList.Add(@CloseGLW);
 
   MouseLookHorizontalSensitivity := ConfigFile.GetFloat(

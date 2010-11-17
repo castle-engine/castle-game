@@ -49,13 +49,13 @@ const
   Font3dBold = false;
   Font3dItalic = false;
 
-procedure GLWindowInit(Glwin: TGLWindow);
+procedure GLWindowOpen(Glwin: TGLWindow);
 begin
   Font3d := GLContextCache.Fonts_IncReference(
     Font3dFamily, Font3dBold, Font3dItalic,
     TNodeFontStyle_2.ClassTTF_Font(Font3dFamily, Font3dBold, Font3dItalic));
 
-  AntiAliasingGLInit;
+  AntiAliasingGLOpen;
   AntiAliasingEnable;
 end;
 
@@ -75,7 +75,7 @@ initialization
 
   GLContextCache := TVRMLGLRendererContextCache.Create;
 
-  Glw.OnInitList.Add(@GLWindowInit);
+  Glw.OnOpenList.Add(@GLWindowOpen);
   Glw.OnCloseList.Add(@GLWindowClose);
 finalization
   { Fonts_DecReference must be called before freeing GLContextCache.
