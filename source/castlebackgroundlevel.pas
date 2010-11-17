@@ -102,6 +102,7 @@ procedure TBackgroundCaptions.GLContextOpen;
 var
   ImageCaption: TImage;
 begin
+  inherited;
   ImageCaption := LoadImage(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'caption.png', [], [], 0, 0);
   try
@@ -114,6 +115,7 @@ end;
 procedure TBackgroundCaptions.GLContextClose;
 begin
   glFreeDisplayList(GLList_Caption);
+  inherited;
 end;
 
 { routines ------------------------------------------------------------------- }
