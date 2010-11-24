@@ -145,9 +145,12 @@ begin
 
   Assert(SoundEngine <> nil);
 
-  ReadXMLFile(TextureConfig, ProgramDataPath + 'data' +
-    PathDelim + 'textures' + PathDelim + 'index.xml');
   try
+    { ReadXMLFile always sets TXMLDocument param (possibly to nil),
+      even in case of exception. So place it inside try..finally. }
+    ReadXMLFile(TextureConfig, ProgramDataPath + 'data' +
+      PathDelim + 'textures' + PathDelim + 'index.xml');
+
     Check(TextureConfig.DocumentElement.TagName = 'textures',
       'Root node of textures/index.xml must be <textures>');
 
