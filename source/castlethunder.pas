@@ -56,7 +56,7 @@ type
 
 implementation
 
-uses GL, GLU, KambiGLUtils, CastleSound, CastlePlay;
+uses GL, GLU, KambiGLUtils, VectorMath, CastleSound, CastlePlay;
 
 procedure TThunderEffect.InitGLLight(LightNumber: Cardinal);
 var
@@ -70,10 +70,10 @@ begin
   glLoadIdentity;
 
   { Prepare "thunder light" }
-  glLightv(GLLight, GL_POSITION, Vector4f(0, 1, -1, 0));
-  glLightv(GLLight, GL_AMBIENT, Vector4f(0.5, 0.5, 1, 1));
-  glLightv(GLLight, GL_DIFFUSE, Vector4f(0.5, 0.5, 1, 1));
-  glLightv(GLLight, GL_SPECULAR, Vector4f(0.5, 0.5, 1, 1));
+  glLightv(GLLight, GL_POSITION, Vector4Single(0, 1, -1, 0));
+  glLightv(GLLight, GL_AMBIENT, Vector4Single(0.5, 0.5, 1, 1));
+  glLightv(GLLight, GL_DIFFUSE, Vector4Single(0.5, 0.5, 1, 1));
+  glLightv(GLLight, GL_SPECULAR, Vector4Single(0.5, 0.5, 1, 1));
   { No spot. }
   glLighti(GLLight, GL_SPOT_CUTOFF, 180);
 end;
