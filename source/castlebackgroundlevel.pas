@@ -63,7 +63,7 @@ procedure BackgroundDestroy;
 implementation
 
 uses SysUtils,
-  Cameras, GL, GLU, GLExt, BackgroundGL, KambiGLUtils, GLImages,
+  Cameras, GL, GLU, GLExt, KambiGLUtils, GLImages,
   VRMLGLHeadlight, KambiFilesUtils, Images, VectorMath,
   CastleWindow, CastleLevelAvailable, CastleVideoOptions,
   VRMLGLScene, RenderStateUnit;

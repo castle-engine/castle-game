@@ -26,7 +26,7 @@ unit CastleLevelSpecific;
 interface
 
 uses VRMLGLScene, Boxes3D, VectorMath,
-  CastlePlayer, CastleLevel, BackgroundGL, VRMLTriangle,
+  CastlePlayer, CastleLevel, VRMLGLBackground, VRMLTriangle,
   CastleSound, VRMLNodes, DOM, Base3D, VRMLGLAnimation,
   CastleCreatures, GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum;
 
@@ -179,7 +179,7 @@ type
       CollisionInfo: T3DCollision;
       var InteractionOccured: boolean); override;
 
-    function Background: TBackgroundGL; override;
+    function Background: TVRMLGLBackground; override;
   end;
 
   TDoomLevelDoor = class(TLevelLinearMovingObject)
@@ -1106,7 +1106,7 @@ begin
   end;
 end;
 
-function TCagesLevel.Background: TBackgroundGL;
+function TCagesLevel.Background: TVRMLGLBackground;
 begin
   if DoEndSequence then
     Result := FEndSequence.Background else

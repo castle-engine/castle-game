@@ -43,7 +43,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLGLLightSet, Boxes3D,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
-  BackgroundGL, DOM, GameSoundEngine, Base3D, VRMLShape,
+  VRMLGLBackground, DOM, GameSoundEngine, Base3D, VRMLShape,
   GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum, KambiSceneManager;
 
 {$define read_interface}
@@ -1298,7 +1298,7 @@ begin
       { Make GravityUp = (0, 0, 1) more "precisely" }
       FGravityUp := Vector3Single(0, 0, 1);
 
-    MainScene.BackgroundSkySphereRadius := TBackgroundGL.NearFarToSkySphereRadius
+    MainScene.BackgroundSkySphereRadius := TVRMLGLBackground.NearFarToSkySphereRadius
       (LevelProjectionNear, LevelProjectionFar);
 
     MainScene.CastsShadow := SceneDynamicShadows;
