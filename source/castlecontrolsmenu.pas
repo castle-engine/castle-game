@@ -45,7 +45,7 @@ type
       like (MoveX, MoveY) = (0, 0).
 
       If DoFixItemsAreas, also FixItemsAreas will be called afterwards. }
-    procedure SetPosition(const MoveX, MoveY: Single; const DoFixItemsAreas: boolean);
+    procedure SetPosition(const MoveX, MoveY: Integer; const DoFixItemsAreas: boolean);
   end;
 
 { Show menu that allows player to configure controls. }
@@ -143,9 +143,9 @@ begin
   DrawBackgroundRectangle := false;
 end;
 
-procedure TSubMenu.SetPosition(const MoveX, MoveY: Single; const DoFixItemsAreas: boolean);
+procedure TSubMenu.SetPosition(const MoveX, MoveY: Integer; const DoFixItemsAreas: boolean);
 begin
-  Position.Init(20 + MoveX, 440 + MoveY);
+  Position := Vector2Integer(20 + MoveX, 440 + MoveY);
   PositionRelativeScreenX := prLowerBorder;
   PositionRelativeScreenY := prLowerBorder;
   PositionRelativeMenuX := prLowerBorder;
@@ -163,7 +163,7 @@ begin
   glColorv(SubMenuTextColor);
 
   glPushMatrix;
-    glTranslatef(Position.Data[0], Position.Data[1] - 20, 0);
+    glTranslatef(Position[0], Position[1] - 20, 0);
     glRasterPos2i(0, 0);
     SubMenuTitleFont.Print(SubMenuTitle + ' :');
   glPopMatrix;
@@ -472,7 +472,7 @@ var
   GLList_DrawFadeRect: TGLuint;
   ExitWithEscapeAllowed: boolean;
   ExitWithEscape: boolean;
-  MoveX, MoveY: Single;
+  MoveX, MoveY: Integer;
 
 type
   TFadeRect = class(TUIControl)
@@ -547,8 +547,8 @@ begin
 
   if ADrawCentered then
   begin
-    MoveX := - WholeAreaX0 + (Glw.Width - (WholeAreaX1 - WholeAreaX0)) / 2;
-    MoveY := - WholeAreaY0 + (Glw.Height - (WholeAreaY1 - WholeAreaY0)) / 2;
+    MoveX := - WholeAreaX0 + (Glw.Width - (WholeAreaX1 - WholeAreaX0)) div 2;
+    MoveY := - WholeAreaY0 + (Glw.Height - (WholeAreaY1 - WholeAreaY0)) div 2;
   end else
   begin
     MoveX := 0;

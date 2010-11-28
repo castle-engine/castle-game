@@ -200,7 +200,7 @@ begin
   Items.Add('Credits');
   Items.Add('Quit');
 
-  Position.Init(20, 480);
+  Position := Vector2Integer(20, 480);
   PositionRelativeScreenX := prLowerBorder;
   PositionRelativeScreenY := prLowerBorder;
   PositionRelativeMenuX := prLowerBorder;
@@ -764,7 +764,7 @@ begin
   glColorv(SubMenuTextColor);
 
   glPushMatrix;
-    glTranslatef(Position.Data[0],
+    glTranslatef(Position[0],
       Areas.Items[FirstDemoLevelIndex].Y0 +
       Areas.Items[FirstDemoLevelIndex].Height + 5 { margin }, 0);
     glRasterPos2i(0, 0);
