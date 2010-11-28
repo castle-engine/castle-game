@@ -100,7 +100,7 @@ var
   SavedMode: TGLMode;
 begin
   ChooseMenu.Items.Assign(MenuItems);
-  ChooseMenu.FixItemsAreas;
+  ChooseMenu.FixItemsRectangles;
 
   SavedMode := TGLMode.CreateReset(Glw, 0, true,
     nil, Glw.OnResize, @CloseQuery,

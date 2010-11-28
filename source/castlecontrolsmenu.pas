@@ -33,7 +33,7 @@ type
   public
     SubMenuTitle: string;
     { Note that you can freely change this at runtime. No need to call
-      things like FixItemsAreas or something like that when you change
+      things like FixItemsRectangles or something like that when you change
       the value of this property. }
     SubMenuAdditionalInfo: string;
     constructor Create(AOwner: TComponent); override;
@@ -44,8 +44,8 @@ type
       it by MoveX / MoveY. By default TSubMenu is positioned
       like (MoveX, MoveY) = (0, 0).
 
-      If DoFixItemsAreas, also FixItemsAreas will be called afterwards. }
-    procedure SetPosition(const MoveX, MoveY: Integer; const DoFixItemsAreas: boolean);
+      If DoFixItemsRectangles, also FixItemsRectangles will be called afterwards. }
+    procedure SetPosition(const MoveX, MoveY: Integer; const DoFixItemsRectangles: boolean);
   end;
 
 { Show menu that allows player to configure controls. }
@@ -143,7 +143,7 @@ begin
   DrawBackgroundRectangle := false;
 end;
 
-procedure TSubMenu.SetPosition(const MoveX, MoveY: Integer; const DoFixItemsAreas: boolean);
+procedure TSubMenu.SetPosition(const MoveX, MoveY: Integer; const DoFixItemsRectangles: boolean);
 begin
   Position := Vector2Integer(20 + MoveX, 440 + MoveY);
   PositionRelativeScreenX := prLowerBorder;
@@ -151,7 +151,7 @@ begin
   PositionRelativeMenuX := prLowerBorder;
   PositionRelativeMenuY := prHigherBorder;
 
-  if DoFixItemsAreas then FixItemsAreas;
+  if DoFixItemsRectangles then FixItemsRectangles;
 end;
 
 procedure TSubMenu.Draw;
@@ -171,10 +171,10 @@ begin
   if SubMenuAdditionalInfo <> '' then
   begin
     glPushMatrix;
-      glTranslatef(AllItemsArea.X0,
-        AllItemsArea.Y0 - SubMenuTitleFont.RowHeight, 0);
+      glTranslatef(AllItemsRectangle.X0,
+        AllItemsRectangle.Y0 - SubMenuTitleFont.RowHeight, 0);
       SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
-        Glw.Width - 2 * Round(AllItemsArea.X0), 0, 0, true, 0);
+        Glw.Width - 2 * Round(AllItemsRectangle.X0), 0, 0, true, 0);
     glPopMatrix;
   end;
 end;
@@ -463,10 +463,10 @@ end;
 { global things -------------------------------------------------------------- }
 
 const
-  WholeAreaX0 = 10;
-  WholeAreaY0 = 50;
-  WholeAreaX1 = 750;
-  WholeAreaY1 = 450;
+  WholeRectangleX0 = 10;
+  WholeRectangleY0 = 50;
+  WholeRectangleX1 = 750;
+  WholeRectangleY1 = 450;
 
 var
   GLList_DrawFadeRect: TGLuint;
@@ -547,8 +547,8 @@ begin
 
   if ADrawCentered then
   begin
-    MoveX := - WholeAreaX0 + (Glw.Width - (WholeAreaX1 - WholeAreaX0)) div 2;
-    MoveY := - WholeAreaY0 + (Glw.Height - (WholeAreaY1 - WholeAreaY0)) div 2;
+    MoveX := - WholeRectangleX0 + (Glw.Width - (WholeRectangleX1 - WholeRectangleX0)) div 2;
+    MoveY := - WholeRectangleY0 + (Glw.Height - (WholeRectangleY1 - WholeRectangleY0)) div 2;
   end else
   begin
     MoveX := 0;
@@ -623,7 +623,7 @@ begin
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
       glColor4f(0, 0, 0, 0.4);
-      glRectf(WholeAreaX0, WholeAreaY0, WholeAreaX1, WholeAreaY1);
+      glRectf(WholeRectangleX0, WholeRectangleY0, WholeRectangleX1, WholeRectangleY1);
     glDisable(GL_BLEND);
   finally glEndList end;
 
