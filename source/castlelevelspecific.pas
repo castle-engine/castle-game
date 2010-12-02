@@ -64,7 +64,7 @@ type
 
     procedure Picked(const Distance: Single;
       CollisionInfo: T3DCollision;
-      var InteractionOccured: boolean); override;
+      var InteractionOccurred: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
@@ -134,7 +134,7 @@ type
 
     procedure Picked(const Distance: Single;
       CollisionInfo: T3DCollision;
-      var InteractionOccured: boolean); override;
+      var InteractionOccurred: boolean); override;
   end;
 
   TCagesLevel = class(TLevel)
@@ -177,7 +177,7 @@ type
 
     procedure Picked(const Distance: Single;
       CollisionInfo: T3DCollision;
-      var InteractionOccured: boolean); override;
+      var InteractionOccurred: boolean); override;
 
     function Background: TVRMLGLBackground; override;
   end;
@@ -229,7 +229,7 @@ type
 
     procedure Picked(const Distance: Single;
       CollisionInfo: T3DCollision;
-      var InteractionOccured: boolean); override;
+      var InteractionOccurred: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
@@ -473,18 +473,18 @@ end;
 
 procedure TCastleHallLevel.Picked(const Distance: Single;
   CollisionInfo: T3DCollision;
-  var InteractionOccured: boolean);
+  var InteractionOccurred: boolean);
 begin
   inherited;
 
   if CollisionInfo.Hierarchy.IndexOf(StairsBlocker) <> -1 then
   begin
-    InteractionOccured := true;
+    InteractionOccurred := true;
     NotificationInteractFailed('You are not able to open it');
   end else
   if CollisionInfo.Hierarchy.IndexOf(Button) <> -1 then
   begin
-    InteractionOccured := true;
+    InteractionOccurred := true;
     if Distance < 10.0 then
     begin
       if Button.TimePlaying then
@@ -819,13 +819,13 @@ end;
 
 procedure TTowerLevel.Picked(const Distance: Single;
   CollisionInfo: T3DCollision;
-  var InteractionOccured: boolean);
+  var InteractionOccurred: boolean);
 begin
   inherited;
 
   if CollisionInfo.Hierarchy.IndexOf(ElevatorButton) <> -1 then
   begin
-    InteractionOccured := true;
+    InteractionOccurred := true;
     if Distance > 10 then
       NotificationInteractFailed(
         'You see a button. You''re too far to reach it from here') else
@@ -1076,7 +1076,7 @@ end;
 
 procedure TCagesLevel.Picked(const Distance: Single;
   CollisionInfo: T3DCollision;
-  var InteractionOccured: boolean);
+  var InteractionOccurred: boolean);
 begin
   inherited;
 
@@ -1084,7 +1084,7 @@ begin
 
   if CollisionInfo.Hierarchy.IndexOf(FGateExit) <> -1 then
   begin
-    InteractionOccured := true;
+    InteractionOccurred := true;
     if Distance > 10 then
       NotificationInteractFailed(
         'You see a door. You''re too far to open it from here') else
@@ -1266,7 +1266,7 @@ end;
 
 procedure TDoomE1M1Level.Picked(const Distance: Single;
   CollisionInfo: T3DCollision;
-  var InteractionOccured: boolean);
+  var InteractionOccurred: boolean);
 var
   Door: TDoomLevelDoor;
 begin
@@ -1278,7 +1278,7 @@ begin
     (CollisionInfo.Hierarchy[1] is TDoomLevelDoor) then
   begin
     Door := TDoomLevelDoor(CollisionInfo.Hierarchy[1]);
-    InteractionOccured := true;
+    InteractionOccurred := true;
     if Distance > 7 then
       NotificationInteractFailed('You see a door. You''re too far to open it from here') else
     { Only if the door is completely closed
@@ -1291,7 +1291,7 @@ begin
      MovingElevator9a9b.CompletelyBeginPosition and
      Box3DPointInside(Player.Camera.Position, Elevator9a9bPickBox) then
   begin
-    InteractionOccured := true;
+    InteractionOccurred := true;
     if Distance > 10 then
       NotificationInteractFailed(
         'You''re too far to reach it from here') else
@@ -1299,7 +1299,7 @@ begin
   end else
   if CollisionInfo.Hierarchy.IndexOf(ExitButton) <> -1 then
   begin
-    InteractionOccured := true;
+    InteractionOccurred := true;
     if Distance > 5 then
       NotificationInteractFailed(
         'You''re too far to reach it from here') else

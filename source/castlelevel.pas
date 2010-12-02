@@ -601,15 +601,15 @@ type
 
     { Called when level was picked.
 
-      Set InteractionOccured to true (it will be false on enter)
-      if indeed some interaction occured. Note that "interaction occured"
+      Set InteractionOccurred to true (it will be false on enter)
+      if indeed some interaction occurred. Note that "interaction occurred"
       is not the same as "interaction succeeded". This means that
       even if you just did a message like "You cannot open this door",
-      you should still set InteractionOccured to @true.
-      When InteractionOccured is @false then picking routine may try
+      you should still set InteractionOccurred to @true.
+      When InteractionOccurred is @false then picking routine may try
       to pick other points around the screen center.
 
-      The right way to signal to user that interaction occured
+      The right way to signal to user that interaction occurred
       but failed (like the "You cannot open this door" example above)
       is to make a @code(Sound(stPlayerInteractFailed)).
       In fact, you can call NotificationInteractFailed to do
@@ -621,7 +621,7 @@ type
       @param(CollisionInfo contains all details.)
     }
     procedure Picked(const Distance: Single; CollisionInfo: T3DCollision;
-      var InteractionOccured: boolean); virtual;
+      var InteractionOccurred: boolean); virtual;
 
     property InitialPosition : TVector3Single read FInitialPosition;
     property InitialDirection: TVector3Single read FInitialDirection;
@@ -1779,7 +1779,7 @@ begin
 end;
 
 procedure TLevel.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision; var InteractionOccured: boolean);
+  CollisionInfo: T3DCollision; var InteractionOccurred: boolean);
 begin
   { Nothing to do in this class. }
 end;
