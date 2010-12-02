@@ -271,7 +271,8 @@ uses KambiFilesUtils, SysUtils, KambiUtils,
   GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderStateUnit,
   CastlePlay, CastleNotifications, CastleInputs,
   CastleItems, CastleThunder, CastleWindow, CastleVRMLProcessing,
-  CastleAnimationTricks, CastleVideoOptions, VRMLScene, ProgressUnit;
+  CastleAnimationTricks, CastleVideoOptions, VRMLScene, ProgressUnit,
+  KambiXMLUtils;
 
 function CastleLevelsPath: string;
 begin
@@ -1426,40 +1427,35 @@ constructor TFountainLevel.Create(
   AMenuBackground: boolean);
 var
   Fountain: TBlendedLoopingAnimation;
-  FountainFileName: string;
+  LoadWaterAnimation: boolean;
 begin
   inherited;
 
-  FountainFileName := CastleLevelsPath + 'fountain' +
-    PathDelim + 'water_stream' + PathDelim;
-  { When DebugLevel, load only a static 1st animation frame.
-    This is fast, and still allows to see the water shape.
-    TODO: for now, loading full fountain.kanim is so slow and memory-eating
-    that we don't do it ever. }
-  if DebugLevel or true then
-    FountainFileName += 'fountain1.wrl.gz' else
-    FountainFileName += 'fountain.kanim';
+  if DOMGetBooleanAttribute(DOMElement, 'load_water_animation', LoadWaterAnimation)
+    and LoadWaterAnimation then
+  begin
+    { load Fountain animation, following the similar code as LoadLevelAnimation }
+    Fountain := TBlendedLoopingAnimationShader.CreateCustomCache(Self, GLContextCache);
+    Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
+      PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true);
+    AnimationAttributesSet(Fountain.Attributes, btIncrease);
+    Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
+    try
+      Fountain.PrepareResources([tgOpaque, tgTransparent], [prRender, prBoundingBox], true);
+    finally Progress.Fini end;
+    Fountain.FreeResources([frTextureDataInNodes]);
+    Fountain.CastsShadow := false; { not manifold }
+    Fountain.Collides := false;
 
-  { load Fountain animation, following the similar code as LoadLevelAnimation }
-  Fountain := TBlendedLoopingAnimationShader.CreateCustomCache(Self, GLContextCache);
-  Fountain.LoadFromFile(FountainFileName, false, true);
-  AnimationAttributesSet(Fountain.Attributes, btIncrease);
-  Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
-  try
-    Fountain.PrepareResources([tgOpaque, tgTransparent], [prRender, prBoundingBox], true);
-  finally Progress.Fini end;
-  Fountain.FreeResources([frTextureDataInNodes]);
-  Fountain.CastsShadow := false; { not manifold }
-  Fountain.Collides := false;
+    Fountain.Diffuse := Vector4Single(0.5, 0.5, 1, 0.75);
+    Fountain.Ambient := Vector4Single(0, 0, 0, 1);
+    Fountain.Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;
 
-  Fountain.Diffuse := Vector4Single(0.5, 0.5, 1, 0.75);
-  Fountain.Ambient := Vector4Single(0, 0, 0, 1);
-  Fountain.Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;
+    Fountain.TimePlayingSpeed := 1.5;
+    Fountain.TimePlaying := true;
 
-  Fountain.TimePlayingSpeed := 1.5;
-  Fountain.TimePlaying := true;
-
-  Items.Add(Fountain);
+    Items.Add(Fountain);
+  end;
 end;
 
 procedure TFountainLevel.ChangeLevelScene;

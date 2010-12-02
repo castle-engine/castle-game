@@ -5,31 +5,8 @@
     - right when opening the secret (lighter) door
     (exist also in srcs before TLevelObject - T3D transition, so this isn't any bug from this.)
 
-  - There *must* be a progress for fountain loading now..
-    it eats a lot of time and memory now.
-
-    Hm, for now we always load only 1st anim frame.
-    Speedup?
-    Or remove the whole fountain anim?
-
 - entering MessageKeyMouse makes noticeable time delay
   (probably due to scene manager migration, something is released?)
-
-------------------------------------------------------------------------------
-fountain new level for castle 1.0.0:
-- tentacles from fountain
-- splash sound when entering fountain
-- touch sensor to bring down elevator and go up over the columns
-- a path over the columns around the fountain
-- animated light, with shadows and bump mapping, circling the fountain
-- water flowing from the fountain (water flowing sound),
-  baked from fluid sim by blender,
-  with mat transparent to look like water really
-- maybe change the scenery to more sunny and indoors:
-  sunny sky
-  part. transp. dome over the fountain
-- footsteps sound with more echo, to show space
-- maybe small fog (3d tex?) rising from the fountain
 
 ------------------------------------------------------------------------------
 castle 2:
@@ -56,6 +33,22 @@ castle 2:
 - make some creature use generatedcubemaptexture, to show it off
   (needs creatures added to scenemanager, or do generatedcubemap by hand?
   or maybe just static ImageCubeMapTexture could be cool enough?)
+
+------------------------------------------------------------------------------
+Resigned: fountain new level for castle 1.0.0:
+- tentacles from fountain
+- splash sound when entering fountain
+- touch sensor to bring down elevator and go up over the columns
+- a path over the columns around the fountain
+- animated light, with shadows and bump mapping, circling the fountain
+- water flowing from the fountain (water flowing sound),
+  baked from fluid sim by blender,
+  with mat transparent to look like water really
+- maybe change the scenery to more sunny and indoors:
+  sunny sky
+  part. transp. dome over the fountain
+- footsteps sound with more echo, to show space
+- maybe small fog (3d tex?) rising from the fountain
 
 ------------------------------------------------------------------------------
 - make real bump mapping demos:
