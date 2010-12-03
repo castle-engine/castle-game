@@ -203,7 +203,7 @@ end;
 function ViewAngleDegY: Single;
 begin
   Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX,
-    Glw.Height / Glw.Width);
+    Window.Height / Window.Width);
 end;
 
 initialization

@@ -66,8 +66,8 @@ end;
 
 procedure NotificationsDraw;
 begin
-  Notifications.Draw2D(Glw.Width, Glw.Height,
-                       Glw.Width, Glw.Height);
+  Notifications.Draw2D(Window.Width, Window.Height,
+                       Window.Width, Window.Height);
 end;
 
 function NotificationsDrawNeeded: boolean;
@@ -88,13 +88,13 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowOpen(Glwin: TGLWindow);
+procedure GLWindowOpen(Window: TGLWindow);
 begin
-  Notifications := TGLNotifications.Create(Glw, hpMiddle, vpDown, Glw.Width);
+  Notifications := TGLNotifications.Create(Window, hpMiddle, vpDown, Window.Width);
   Notifications.MaxMessages := 4;
 end;
 
-procedure GLWindowClose(Glwin: TGLWindow);
+procedure GLWindowClose(Window: TGLWindow);
 begin
   FreeAndNil(Notifications);
 end;
@@ -102,8 +102,8 @@ end;
 initialization
   NotificationsList := TStringList.Create;
 
-  Glw.OnOpenList.Add(@GLWindowOpen);
-  Glw.OnCloseList.Add(@GLWindowClose);
+  Window.OnOpenList.Add(@GLWindowOpen);
+  Window.OnCloseList.Add(@GLWindowClose);
 finalization
   FreeAndNil(NotificationsList);
 end.

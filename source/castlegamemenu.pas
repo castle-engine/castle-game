@@ -104,9 +104,9 @@ constructor TGameSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  SoundInfo := TGLSoundInfoMenuItem.Create(Glw, Self, SoundEngine);
-  SoundVolume := TGLSoundVolumeMenuItem.Create(Glw, Self, SoundEngine);
-  MusicVolume := TGLMusicVolumeMenuItem.Create(Glw, Self, SoundEngine);
+  SoundInfo := TGLSoundInfoMenuItem.Create(Window, Self, SoundEngine);
+  SoundVolume := TGLSoundVolumeMenuItem.Create(Window, Self, SoundEngine);
+  MusicVolume := TGLMusicVolumeMenuItem.Create(Window, Self, SoundEngine);
   Items.Add('Back to game menu');
 end;
 
@@ -152,12 +152,12 @@ begin
   GameSoundMenu.SoundVolume.RefreshAccessory;
   GameSoundMenu.MusicVolume.RefreshAccessory;
 
-  SavedMode := TGLMode.CreateReset(Glw, 0, true,
-    nil, Glw.OnResize, @CloseQuery,
+  SavedMode := TGLMode.CreateReset(Window, 0, true,
+    nil, Window.OnResize, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
     { This is needed, because when changing ViewAngleDegX we will call
-      Glw.OnResize to set new projection matrix, and this
+      Window.OnResize to set new projection matrix, and this
       new projection matrix should stay for the game. }
     SavedMode.RestoreProjectionMatrix := false;
 
@@ -165,15 +165,15 @@ begin
       with the menu text. }
     GLWinMessagesTheme.RectColor[3] := 1.0;
 
-    Glw.OnKeyDown := @KeyDown;
-    Glw.OnMouseDown := @MouseDown;
-    Glw.OnMouseWheel := @MouseWheel;
-    Glw.OnIdle := @Idle;
-    Glw.OnDrawStyle := ds3D;
+    Window.OnKeyDown := @KeyDown;
+    Window.OnMouseDown := @MouseDown;
+    Window.OnMouseWheel := @MouseWheel;
+    Window.OnIdle := @Idle;
+    Window.OnDrawStyle := ds3D;
 
     SetCurrentMenu(CurrentMenu, GameMenu);
 
-    Glw.Controls.AddList(ControlsUnder);
+    Window.Controls.AddList(ControlsUnder);
 
     UserQuit := false;
     repeat
@@ -184,13 +184,13 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenGLW(Glwin: TGLWindow);
+procedure OpenWindow(Window: TGLWindow);
 begin
   GameMenu := TGameMenu.Create(Application);
   GameSoundMenu := TGameSoundMenu.Create(Application);
 end;
 
 initialization
-  Glw.OnOpenList.Add(@OpenGLW);
+  Window.OnOpenList.Add(@OpenWindow);
 finalization
 end.

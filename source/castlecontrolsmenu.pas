@@ -174,7 +174,7 @@ begin
       glTranslatef(AllItemsRectangle.X0,
         AllItemsRectangle.Y0 - SubMenuTitleFont.RowHeight, 0);
       SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
-        Glw.Width - 2 * Round(AllItemsRectangle.X0), 0, 0, true, 0);
+        Window.Width - 2 * Round(AllItemsRectangle.X0), 0, 0, true, 0);
     glPopMatrix;
   end;
 end;
@@ -250,7 +250,7 @@ begin
          AutoOpenInventory := DefaultAutoOpenInventory;
          AutoOpenInventoryArgument.Value := AutoOpenInventory;
 
-         MessageOK(Glw, 'All keys and settings restored to defaults.');
+         MessageOK(Window, 'All keys and settings restored to defaults.');
        end;
     9: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
@@ -326,7 +326,7 @@ procedure TControlsSubMenu.CurrentItemSelected;
     NewMouseButton: TMouseButton;
     NewMouseWheel: TMouseWheelDirection;
   begin
-    MessageKeyMouse(Glw, Format(
+    MessageKeyMouse(Window, Format(
       'Press the new key or mouse button or mouse wheel for "%s".', [InputConfiguration.Name]),
       'Cancel [Escape]' + nl + 'Clear [Backspace]', taLeft,
       NewKey, NewMousePress, NewMouseButton, NewMouseWheel);
@@ -501,7 +501,7 @@ begin
     SaveScreen;
 end;
 
-procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
 
@@ -515,24 +515,24 @@ begin
     end;
 end;
 
-procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure Idle(Glwin: TGLWindow);
+procedure Idle(Window: TGLWindow);
 begin
   NotificationsIdle;
 end;
 
-procedure CloseQuery(Glwin: TGLWindow);
+procedure CloseQuery(Window: TGLWindow);
 begin
-  MessageOK(Glwin, 'You can''t exit now.');
+  MessageOK(Window, 'You can''t exit now.');
 end;
 
 procedure ShowControlsMenuCore(ControlsUnder: TUIControlList;
@@ -547,8 +547,8 @@ begin
 
   if ADrawCentered then
   begin
-    MoveX := - WholeRectangleX0 + (Glw.Width - (WholeRectangleX1 - WholeRectangleX0)) div 2;
-    MoveY := - WholeRectangleY0 + (Glw.Height - (WholeRectangleY1 - WholeRectangleY0)) div 2;
+    MoveX := - WholeRectangleX0 + (Window.Width - (WholeRectangleX1 - WholeRectangleX0)) div 2;
+    MoveY := - WholeRectangleY0 + (Window.Height - (WholeRectangleY1 - WholeRectangleY0)) div 2;
   end else
   begin
     MoveX := 0;
@@ -562,26 +562,26 @@ begin
 
   FadeRect := nil;
 
-  SavedMode := TGLMode.CreateReset(glw, 0, false,
-    nil, Glw.OnResize, @CloseQuery,
+  SavedMode := TGLMode.CreateReset(Window, 0, false,
+    nil, Window.OnResize, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
     SavedMode.RestoreProjectionMatrix := false;
 
-    Glw.OnKeyDown := @KeyDown;
-    Glw.OnMouseDown := @MouseDown;
-    Glw.OnMouseWheel := @MouseWheel;
-    Glw.OnIdle := @Idle;
+    Window.OnKeyDown := @KeyDown;
+    Window.OnMouseDown := @MouseDown;
+    Window.OnMouseWheel := @MouseWheel;
+    Window.OnIdle := @Idle;
 
     SetCurrentMenu(CurrentMenu, ControlsMenu);
 
     if ADrawFadeRect then
     begin
       FadeRect := TFadeRect.Create(nil);
-      Glw.Controls.Add(FadeRect);
+      Window.Controls.Add(FadeRect);
     end;
 
-    Glw.Controls.AddList(ControlsUnder);
+    Window.Controls.AddList(ControlsUnder);
 
     UserQuit := false;
     repeat
@@ -614,7 +614,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenGLW(Glwin: TGLWindow);
+procedure OpenWindow(Window: TGLWindow);
 begin
   if GLList_DrawFadeRect = 0 then
     GLList_DrawFadeRect := glGenListsCheck(1, 'CastleControlsMenu.OpenGLW');
@@ -634,14 +634,14 @@ begin
   SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
 
-procedure CloseGLW(Glwin: TGLWindow);
+procedure CloseWindow(Window: TGLWindow);
 begin
   FreeAndNil(SubMenuTitleFont);
 end;
 
 initialization
-  Glw.OnOpenList.Add(@OpenGLW);
-  Glw.OnCloseList.Add(@CloseGLW);
+  Window.OnOpenList.Add(@OpenWindow);
+  Window.OnCloseList.Add(@CloseWindow);
 
   MouseLookHorizontalSensitivity := ConfigFile.GetFloat(
     'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);

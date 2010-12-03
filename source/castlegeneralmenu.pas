@@ -28,7 +28,7 @@ interface
 uses Classes, GLMenu;
 
 type
-  { Just TGLMenu that calls Glw.PostRedisplay and plays a sound
+  { Just TGLMenu that calls Window.PostRedisplay and plays a sound
     on each CurrentItem change.
 
     Also, it's PositioInside is overridden to always catch all events
@@ -50,8 +50,8 @@ var
   DebugMenuDesigner: boolean = false;
 
 { Sets CurrentValue, taking care of adding this menu / removing existing menu
-  (when new value is @nil) from Glw.Controls.
-  Also, returns previous TGLMenu present in Glw.Controls (there can be
+  (when new value is @nil) from Window.Controls.
+  Also, returns previous TGLMenu present in Window.Controls (there can be
   only one). }
 function SetCurrentMenu(var CurrentValue: TCastleMenu;
   const NewValue: TCastleMenu): TCastleMenu;
@@ -93,17 +93,17 @@ function SetCurrentMenu(var CurrentValue: TCastleMenu;
   const NewValue: TCastleMenu): TCastleMenu;
 begin
   CurrentValue := NewValue;
-  Result := Glw.Controls.MakeSingle(TCastleMenu, NewValue) as TCastleMenu;
+  Result := Window.Controls.MakeSingle(TCastleMenu, NewValue) as TCastleMenu;
 end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure CloseGLW(Glwin: TGLWindow);
+procedure CloseWindow(Window: TGLWindow);
 begin
   GLMenuCloseGL;
 end;
 
 initialization
-  Glw.OnCloseList.Add(@CloseGLW);
+  Window.OnCloseList.Add(@CloseWindow);
 finalization
 end.

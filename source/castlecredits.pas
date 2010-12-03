@@ -30,7 +30,7 @@ uses GLWindow, UIControls;
 { Show credits. }
 procedure ShowCredits(ControlsUnder: TUIControlList);
 
-{ Although this will be called by Glw.Close, it may be too late
+{ Although this will be called by Window.Close, it may be too late
   (this must be called before releasing GLContextCache).
   So you should call this explicitly. }
 procedure CredistGLContextRelease;
@@ -49,7 +49,7 @@ var
   AnimationTime: TKamTime;
   AnimationSpeed, AnimationEnd: TKamTime;
 
-procedure Draw(Glwin: TGLWindow);
+procedure Draw(Window: TGLWindow);
 
   procedure ProjectionPushSet;
   begin
@@ -57,7 +57,7 @@ procedure Draw(Glwin: TGLWindow);
       glPushMatrix;
       glLoadIdentity;
       glMultMatrix(PerspectiveProjMatrixDeg(
-        ViewAngleDegY, Glwin.Width / Glwin.Height,
+        ViewAngleDegY, Window.Width / Window.Height,
         { constant near / far here is Ok, since I render known geometry }
         0.1, 100));
     glMatrixMode(GL_MODELVIEW);
@@ -71,7 +71,7 @@ procedure Draw(Glwin: TGLWindow);
   end;
 
 begin
-  glScissor(25, 20, Glw.Width - 25, Glw.Height - 20 -  160);
+  glScissor(25, 20, Window.Width - 25, Window.Height - 20 -  160);
   glEnable(GL_SCISSOR_TEST);
 
   ProjectionPushSet;
@@ -90,21 +90,21 @@ begin
   glDisable(GL_SCISSOR_TEST);
 end;
 
-procedure Idle(Glwin: TGLWindow);
+procedure Idle(Window: TGLWindow);
 begin
-  AnimationTime := AnimationTime + Glwin.Fps.IdleSpeed;
+  AnimationTime := AnimationTime + Window.Fps.IdleSpeed;
   if AnimationTime > AnimationEnd then
     UserQuit := true;
 
   NotificationsIdle;
 end;
 
-procedure CloseQuery(Glwin: TGLWindow);
+procedure CloseQuery(Window: TGLWindow);
 begin
-  MessageOK(Glwin, 'You can''t exit now.');
+  MessageOK(Window, 'You can''t exit now.');
 end;
 
-procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
 begin
   if CastleInput_SaveScreen.Shortcut.IsEvent(Key, #0, false, mbLeft, mwNone) then
     SaveScreen else
@@ -112,7 +112,7 @@ begin
     UserQuit := true;
 end;
 
-procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
 begin
   if CastleInput_SaveScreen.Shortcut.IsEvent(K_None, #0, true, Button, mwNone) then
     SaveScreen else
@@ -120,7 +120,7 @@ begin
     UserQuit := true;
 end;
 
-procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
 begin
   if CastleInput_SaveScreen.Shortcut.IsEvent(K_None, #0, false, mbLeft, MouseWheelDirection(Scroll, Vertical)) then
     SaveScreen;
@@ -129,7 +129,7 @@ end;
 { $define DEBUG_ALWAYS_RELOAD_CREDITS}
 
 {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
-procedure OpenGLW(Glwin: TGLWindow); forward;
+procedure OpenWindow(Window: TGLWindow); forward;
 {$endif}
 
 procedure ShowCredits(ControlsUnder: TUIControlList);
@@ -138,26 +138,26 @@ var
 begin
   {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
   CredistGLContextRelease;
-  OpenGLW(Glw);
+  OpenWindow(Window);
   {$endif}
 
   AnimationTime := 0;
 
-  SavedMode := TGLMode.CreateReset(glw, 0, false,
+  SavedMode := TGLMode.CreateReset(Window, 0, false,
     @Draw, nil, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
-    Glw.AutoRedisplay := true; { scrolling text animation }
+    Window.AutoRedisplay := true; { scrolling text animation }
 
-    Glw.OnKeyDown := @KeyDown;
-    Glw.OnMouseDown := @MouseDown;
-    Glw.OnMouseWheel := @MouseWheel;
-    Glw.OnIdle := @Idle;
-    Glw.OnDrawStyle := ds3D;
+    Window.OnKeyDown := @KeyDown;
+    Window.OnMouseDown := @MouseDown;
+    Window.OnMouseWheel := @MouseWheel;
+    Window.OnIdle := @Idle;
+    Window.OnDrawStyle := ds3D;
 
     UserQuit := false;
 
-    Glw.Controls.AddList(ControlsUnder);
+    Window.Controls.AddList(ControlsUnder);
 
     repeat
       Application.ProcessMessage(true);
@@ -168,7 +168,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenGLW(Glwin: TGLWindow);
+procedure OpenWindow(Window: TGLWindow);
 var
   VRMLContents: string;
   Info: TMFString;
@@ -198,13 +198,13 @@ begin
   FreeAndNil(CreditsModel);
 end;
 
-procedure CloseGLW(Glwin: TGLWindow);
+procedure CloseWindow(Window: TGLWindow);
 begin
   CredistGLContextRelease;
 end;
 
 initialization
-  Glw.OnOpenList.Add(@OpenGLW);
-  Glw.OnCloseList.Add(@CloseGLW);
+  Window.OnOpenList.Add(@OpenWindow);
+  Window.OnCloseList.Add(@CloseWindow);
 finalization
 end.

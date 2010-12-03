@@ -233,7 +233,7 @@ type
         @item(Camera.ProjectionMatrix, to update it in game's
           OnResize or such.)
         @item(You can call Camera.KeyDown, MouseDown, Idle.
-          In fact it's OK to just assign Camera to Glw.Camera.)
+          In fact it's OK to just assign Camera to Window.Camera.)
         @item(You can assign things to Camera.OnMatrixChanged.)
       )
 
@@ -559,7 +559,7 @@ begin
   begin
     DropQuantity := SelectedItem.Quantity;
 
-    if not MessageInputQueryCardinal(Glw,
+    if not MessageInputQueryCardinal(Window,
       Format('You have %d items "%s". How many of them do you want to drop ?',
         [SelectedItem.Quantity, SelectedItem.Kind.Name]),
       DropQuantity, taLeft) then
@@ -669,10 +669,10 @@ end;
         glCallList(GLList_BlankIndicatorImage) else
       begin
         glEnable(GL_SCISSOR_TEST);
-          glScissor(IndicatorMargin, IndicatorMargin, Glw.Width, LifeMapped);
+          glScissor(IndicatorMargin, IndicatorMargin, Window.Width, LifeMapped);
           glCallList(GLList_FullIndicatorImage);
           glScissor(IndicatorMargin, IndicatorMargin + LifeMapped,
-            Glw.Width, Glw.Height);
+            Window.Width, Window.Height);
           glCallList(GLList_BlankIndicatorImage);
         glDisable(GL_SCISSOR_TEST);
       end;
@@ -706,13 +706,13 @@ begin
     RenderLifeIndicator(
       BossCreatureLife,
       BossCreatureMaxLife,
-      GLList_BossIndicatorImage, Glw.Width - 150, false);
+      GLList_BossIndicatorImage, Window.Width - 150, false);
   end;
 
   if FlyingMode then
   begin
     glColorv(White3Single);
-    glRasterPos2i(0, Glw.Height -
+    glRasterPos2i(0, Window.Height -
       Font_BFNT_BitstreamVeraSans.RowHeight - 5 { margin });
     Font_BFNT_BitstreamVeraSans.Print(Format('Flying (%d more seconds)',
       [Floor(FFlyingModeTimeout)]));
@@ -721,7 +721,7 @@ begin
   glLoadIdentity;
   if Dead then
     DrawGLBlackOutRect(Red3Single, 1.0, 0, 0,
-      Glw.Width, Glw.Height) else
+      Window.Width, Window.Height) else
   begin
     { The problem with drawing such water screen:
       Player eyes may be equal to water level,
@@ -750,7 +750,7 @@ begin
     { Apply black out effect on the possibly watery effect.
       Yes, they both must mix. }
     DrawGLBlackOutRect(BlackOutColor, BlackOutIntensity, 0, 0,
-      Glw.Width, Glw.Height);
+      Window.Width, Window.Height);
   end;
 end;
 
@@ -1452,7 +1452,7 @@ end;
 
 { GLWindow open / close ------------------------------------------------------ }
 
-procedure GLWindowOpen(Glwin: TGLWindow);
+procedure GLWindowOpen(Window: TGLWindow);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -1481,13 +1481,13 @@ begin
       glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_SRC_ALPHA);
         glColorv(Vector4Single(0, 0, 0.1, 0.5));
-        glRectf(0, 0, Glwin.Width, Glwin.Height);
+        glRectf(0, 0, Window.Width, Window.Height);
       glDisable(GL_BLEND);
     glPopAttrib;
   finally glEndList; end;
 end;
 
-procedure GLWindowClose(Glwin: TGLWindow);
+procedure GLWindowClose(Window: TGLWindow);
 begin
   glFreeDisplayList(GLList_BlankIndicatorImage);
   glFreeDisplayList(GLList_RedIndicatorImage);
@@ -1496,6 +1496,6 @@ begin
 end;
 
 initialization
-  Glw.OnOpenList.Add(@GLWindowOpen);
-  Glw.OnCloseList.Add(@GLWindowClose);
+  Window.OnOpenList.Add(@GLWindowOpen);
+  Window.OnCloseList.Add(@GLWindowClose);
 end.

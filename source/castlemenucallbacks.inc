@@ -7,7 +7,7 @@ begin
     SaveScreen;
 end;
 
-procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
 
@@ -16,22 +16,22 @@ begin
   end;
 end;
 
-procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure Idle(Glwin: TGLWindow);
+procedure Idle(Window: TGLWindow);
 begin
   NotificationsIdle;
 end;
 
-procedure CloseQuery(Glwin: TGLWindow);
+procedure CloseQuery(Window: TGLWindow);
 begin
   GameCancel(true);
 end;

@@ -69,29 +69,29 @@ begin
     SaveScreen;
 end;
 
-procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
 end;
 
-procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure Idle(Glwin: TGLWindow);
+procedure Idle(Window: TGLWindow);
 begin
   NotificationsIdle;
 end;
 
-procedure CloseQuery(Glwin: TGLWindow);
+procedure CloseQuery(Window: TGLWindow);
 begin
-  MessageOK(Glwin, 'You can''t exit now.');
+  MessageOK(Window, 'You can''t exit now.');
 end;
 
 function ChooseByMenu(ControlsUnder: TUIControlList;
@@ -102,26 +102,26 @@ begin
   ChooseMenu.Items.Assign(MenuItems);
   ChooseMenu.FixItemsRectangles;
 
-  SavedMode := TGLMode.CreateReset(Glw, 0, true,
-    nil, Glw.OnResize, @CloseQuery,
+  SavedMode := TGLMode.CreateReset(Window, 0, true,
+    nil, Window.OnResize, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
     { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;
 
-    Glw.OnKeyDown := @KeyDown;
-    Glw.OnMouseDown := @MouseDown;
-    Glw.OnMouseWheel := @MouseWheel;
-    Glw.OnIdle := @Idle;
-    Glw.OnDrawStyle := ds3D;
+    Window.OnKeyDown := @KeyDown;
+    Window.OnMouseDown := @MouseDown;
+    Window.OnMouseWheel := @MouseWheel;
+    Window.OnIdle := @Idle;
+    Window.OnDrawStyle := ds3D;
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
     GLWinMessagesTheme.RectColor[3] := 1.0;
 
-    Glw.Controls.MakeSingle(TGLMenu, ChooseMenu);
+    Window.Controls.MakeSingle(TGLMenu, ChooseMenu);
 
-    Glw.Controls.AddList(ControlsUnder);
+    Window.Controls.AddList(ControlsUnder);
 
     Selected := false;
     repeat
@@ -134,18 +134,18 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenGLW(Glwin: TGLWindow);
+procedure OpenWindow(Window: TGLWindow);
 begin
   ChooseMenu := TChooseMenu.Create(nil);
 end;
 
-procedure CloseGLW(Glwin: TGLWindow);
+procedure CloseWindow(Window: TGLWindow);
 begin
   FreeAndNil(ChooseMenu);
 end;
 
 initialization
-  Glw.OnOpenList.Add(@OpenGLW);
-  Glw.OnCloseList.Add(@CloseGLW);
+  Window.OnOpenList.Add(@OpenWindow);
+  Window.OnCloseList.Add(@CloseWindow);
 finalization
 end.

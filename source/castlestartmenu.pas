@@ -423,7 +423,7 @@ procedure TVideoMenu.CurrentItemSelected;
 
   procedure ViewVideoInfo;
   begin
-    MessageOK(Glw,
+    MessageOK(Window,
       'Video information:' +nl+
       nl+
       Format('Field of view horizontal : %f', [ViewAngleDegX]) +nl+
@@ -449,7 +449,7 @@ procedure TVideoMenu.CurrentItemSelected;
     Value: Cardinal;
   begin
     Value := VideoFrequency;
-    if MessageInputQueryCardinal(Glw,
+    if MessageInputQueryCardinal(Window,
       'What display frequency to use ?' +nl+ '("0" means "system default")',
       Value, taLeft) and
       (Value <> VideoFrequency) then
@@ -488,7 +488,7 @@ begin
          begin
            if RenderShadows then
            begin
-             MessageOK(Glw, 'Note that shadows are disabled by --no-shadows ' +
+             MessageOK(Window, 'Note that shadows are disabled by --no-shadows ' +
                'command-line option. So you must restart the game to see the ' +
                'shadows.', taLeft);
              SubMenuAdditionalInfo := SRestartTheGame;
@@ -496,7 +496,7 @@ begin
          end else
          begin
            if RenderShadows then
-             MessageOK(Glw,
+             MessageOK(Window,
                'Warning: this feature requires a good graphic card, otherwise ' +
                'shadows will slow down the game noticeably. ' +
                'That said, with decent graphic card and OpenGL ' +
@@ -574,7 +574,7 @@ begin
 
          VisibleChange;
 
-         MessageOK(Glw, 'All video settings restored to defaults.', taLeft);
+         MessageOK(Window, 'All video settings restored to defaults.', taLeft);
        end;
     11: SetCurrentMenu(CurrentMenu, MainMenu);
     else raise EInternalError.Create('Menu item unknown');
@@ -610,9 +610,9 @@ begin
   OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
   OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
 
-  SoundInfo := TGLSoundInfoMenuItem.Create(Glw, Self, SoundEngine);
-  SoundVolume := TGLSoundVolumeMenuItem.Create(Glw, Self, SoundEngine);
-  MusicVolume := TGLMusicVolumeMenuItem.Create(Glw, Self, SoundEngine);
+  SoundInfo := TGLSoundInfoMenuItem.Create(Window, Self, SoundEngine);
+  SoundVolume := TGLSoundVolumeMenuItem.Create(Window, Self, SoundEngine);
+  MusicVolume := TGLMusicVolumeMenuItem.Create(Window, Self, SoundEngine);
   Items.AddObject('Sound output device', OpenALDeviceArgument);
   Items.Add('Back to main menu');
 
@@ -684,7 +684,7 @@ begin
     { ALCDevice value changed now to new value. }
     SoundMenu.OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
     if not ALActive then
-      MessageOK(Glw, SoundEngine.SoundInitializationReport, taLeft);
+      MessageOK(Window, SoundEngine.SoundInitializationReport, taLeft);
   end;
 
   SetCurrentMenu(CurrentMenu, SoundMenu);
@@ -801,29 +801,29 @@ begin
     SaveScreen;
 end;
 
-procedure KeyDown(glwin: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
 end;
 
-procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure Idle(Glwin: TGLWindow);
+procedure Idle(Window: TGLWindow);
 begin
   NotificationsIdle;
 end;
 
-procedure CloseQuery(Glwin: TGLWindow);
+procedure CloseQuery(Window: TGLWindow);
 begin
-  if MessageYesNo(glwin, 'Are you sure you want to quit ?') then
+  if MessageYesNo(Window, 'Are you sure you want to quit ?') then
     UserQuit := true;
 end;
 
@@ -835,20 +835,20 @@ begin
   try
     SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
     try
-      SavedMode := TGLMode.CreateReset(glw, 0, false,
+      SavedMode := TGLMode.CreateReset(Window, 0, false,
         nil, nil, @CloseQuery,
         true { FPSActive should not be needed anymore, but I leave it. });
       try
         SavedMode.RestoreProjectionMatrix := false;
 
-        Glw.OnKeyDown := @KeyDown;
-        Glw.OnMouseDown := @MouseDown;
-        Glw.OnMouseWheel := @MouseWheel;
-        Glw.OnIdle := @Idle;
+        Window.OnKeyDown := @KeyDown;
+        Window.OnMouseDown := @MouseDown;
+        Window.OnMouseWheel := @MouseWheel;
+        Window.OnIdle := @Idle;
 
         SetCurrentMenu(CurrentMenu, MainMenu);
 
-        Glw.Controls.AddList(BackgroundControls);
+        Window.Controls.AddList(BackgroundControls);
 
         UserQuit := false;
         repeat
@@ -863,7 +863,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenGLW(Glwin: TGLWindow);
+procedure OpenWindow(Window: TGLWindow);
 begin
   MainMenu := TMainMenu.Create(Application);
   VideoMenu := TVideoMenu.Create(Application);
@@ -872,6 +872,6 @@ begin
 end;
 
 initialization
-  Glw.OnOpenList.Add(@OpenGLW);
+  Window.OnOpenList.Add(@OpenWindow);
 finalization
 end.

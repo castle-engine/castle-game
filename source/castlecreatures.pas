@@ -3636,7 +3636,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowClose(Glwin: TGLWindow);
+procedure GLWindowClose(Window: TGLWindow);
 var
   I: Integer;
 begin
@@ -3657,7 +3657,7 @@ end;
 
 procedure DoInitialization;
 begin
-  Glw.OnCloseList.Add(@GLWindowClose);
+  Window.OnCloseList.Add(@GLWindowClose);
 
   CreaturesKinds := TCreaturesKindsList.Create;
 

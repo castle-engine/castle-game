@@ -57,7 +57,7 @@ begin
     SList.Assign(NotificationsList);
     SList.Insert(0, Format('%d messages :', [NotificationsList.Count]));
     SList.Insert(1, '');
-    MessageOK(Glw, SList, taLeft);
+    MessageOK(Window, SList, taLeft);
   finally SList.Free end;
 end;
 

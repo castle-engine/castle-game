@@ -77,7 +77,7 @@ procedure SaveScreen;
 
 var
   { These fonts can be used globally by anything in this game.
-    They are initialized in Glw.OnInit and finalized in Glw.OnClose in this unit. }
+    They are initialized in Window.OnInit and finalized in Window.OnClose in this unit. }
   Font_BFNT_BitstreamVeraSans_m10: TGLBitmapFont_Abstract;
   Font_BFNT_BitstreamVeraSans: TGLBitmapFont_Abstract;
 
@@ -186,7 +186,7 @@ procedure TGame2DControls.Draw;
 
     function ItemSlotX(I: Integer): Integer;
     begin
-      Result := Glw.Width - InventorySlotWidth *
+      Result := Window.Width - InventorySlotWidth *
         ((I div InventorySlotsVisibleInColumn) + 1);
     end;
 
@@ -200,7 +200,7 @@ procedure TGame2DControls.Draw;
     I, X, Y: Integer;
     S: string;
   begin
-    InventorySlotsVisibleInColumn := Glw.Height div InventorySlotHeight;
+    InventorySlotsVisibleInColumn := Window.Height div InventorySlotHeight;
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
@@ -268,7 +268,7 @@ procedure TGame2DControls.Draw;
 
   procedure RasterPosLine(const Line: Cardinal);
   begin
-    glRasterPos2i(0, Glw.Height -
+    glRasterPos2i(0, Window.Height -
       Font_BFNT_BitstreamVeraSans.RowHeight * Line - 10 { margin });
   end;
 
@@ -277,15 +277,15 @@ procedure TGame2DControls.Draw;
     glColorv(Vector3Single(0.7, 0.7, 0.7));
     RasterPosLine(LineFPS);
 
-    { Don't display precise Glw.FpsFrameTime and Glw.FpsRealTime
+    { Don't display precise Window.FpsFrameTime and Window.FpsRealTime
       each time --- this would cause too much move for player.
       Instead, display DisplayFpsXxxTime that are updated each second. }
     if (DisplayFpsUpdateTick = 0) or
        (TimeTickDiff(DisplayFpsUpdateTick, GetTickCount) >= 1000) then
     begin
       DisplayFpsUpdateTick := GetTickCount;
-      DisplayFpsFrameTime := Glw.Fps.FrameTime;
-      DisplayFpsRealTime := Glw.Fps.RealTime;
+      DisplayFpsFrameTime := Window.Fps.FrameTime;
+      DisplayFpsRealTime := Window.Fps.RealTime;
     end;
 
     Font_BFNT_BitstreamVeraSans.Print(
@@ -389,8 +389,8 @@ end;
   or because we just started new game). }
 procedure InitNewLevel;
 begin
-  { No need to explicitly call any Glw.EventResize or Level.ApplyProjection,
-    newly added to Glw.Controls (and possibly newly created) level will have
+  { No need to explicitly call any Window.EventResize or Level.ApplyProjection,
+    newly added to Window.Controls (and possibly newly created) level will have
     ApplyProjectionNeeded := true. }
 
   Level.Camera := Player.Camera;
@@ -421,7 +421,7 @@ begin
   Notification('Loaded level "' + Level.Title + '"');
 end;
 
-procedure Idle(Glwin: TGLWindow);
+procedure Idle(Window: TGLWindow);
 var
   CompSpeed: Single;
 
@@ -483,7 +483,7 @@ const
 var
   PickItemIndex: Integer;
 begin
-  CompSpeed := Glw.Fps.IdleSpeed;
+  CompSpeed := Window.Fps.IdleSpeed;
 
   NotificationsIdle;
 
@@ -535,7 +535,7 @@ begin
 
     { copy DisableContextOpenClose value to new level.
       This is needed when it's called from inside debug menu,
-      to make Glw.Controls.Begin/EndDisableContextOpenClose
+      to make Window.Controls.Begin/EndDisableContextOpenClose
       matching. }
     NewLevel.DisableContextOpenClose := Level.DisableContextOpenClose;
 
@@ -544,9 +544,9 @@ begin
     NewLevel.GLContextOpen;
 
     { right before freeing old Level, insert NewLevel at the same place
-      in GameControls and Glw.Controls as Level was. }
+      in GameControls and Window.Controls as Level was. }
     GameControls.MakeSingle(TLevel, NewLevel);
-    Glw.Controls.MakeSingle(TLevel, NewLevel);
+    Window.Controls.MakeSingle(TLevel, NewLevel);
 
     { First TLevel constructor was called.
       This actully loaded the level, displaying some progress bar.
@@ -565,7 +565,7 @@ begin
   end;
 end;
 
-procedure Timer(Glwin: TGLWindow);
+procedure Timer(Window: TGLWindow);
 begin
   if ALActive then
   begin
@@ -577,7 +577,7 @@ end;
 procedure GameCancel(RequireConfirmation: boolean);
 begin
   if Player.Dead or GameWin or (not RequireConfirmation) or
-    MessageYesNo(Glw, 'Are you sure you want to end the game ?', taLeft) then
+    MessageYesNo(Window, 'Are you sure you want to end the game ?', taLeft) then
   begin
     GameEndedWantsRestart := '';
     GameEnded := true;
@@ -677,9 +677,9 @@ procedure DoInteract;
     Ray0, RayVector: TVector3Single;
   begin
     PrimaryRay(
-      Glw.Width div 2 + XChange,
-      Glw.Height div 2 + YChange,
-      Glw.Width, Glw.Height,
+      Window.Width div 2 + XChange,
+      Window.Height div 2 + YChange,
+      Window.Width, Window.Height,
       Player.Camera.Position,
       Player.Camera.Direction,
       Player.Camera.Up,
@@ -946,24 +946,24 @@ procedure EventDown(AKey: TKey;
 
   procedure DoDebugMenu;
   begin
-    { We explicitly clear, and later readd GameControls to the Glw.Controls.
+    { We explicitly clear, and later readd GameControls to the Window.Controls.
       Reason? During debug menu, current Level instance may change
       (because debug menu may change the level, and even call LevelFinishedFlush).
       During LevelFinishedFlush old Level instance is destroyed,
-      and new TLevel created, and the lists GameControls and Glw.Controls
-      are updated... but our current Glw.Controls list would be, at this time,
+      and new TLevel created, and the lists GameControls and Window.Controls
+      are updated... but our current Window.Controls list would be, at this time,
       only saved in TGLMode state, so it would still contain invalid pointer
       to the old level. So we should instead explicitly push/pop our current
-      Glw.Controls, this way using current GameControls value. }
-    Glw.Controls.BeginDisableContextOpenClose;
-    Glw.Controls.Clear;
+      Window.Controls, this way using current GameControls value. }
+    Window.Controls.BeginDisableContextOpenClose;
+    Window.Controls.Clear;
 
     Level.Paused := true;
     ShowDebugMenu(GameControls);
     Level.Paused := false;
 
-    Glw.Controls.AddList(GameControls);
-    Glw.Controls.EndDisableContextOpenClose;
+    Window.Controls.AddList(GameControls);
+    Window.Controls.EndDisableContextOpenClose;
   end;
 
 begin
@@ -1015,7 +1015,7 @@ begin
     DoDebugMenu;
 end;
 
-procedure KeyDown(Glwin: TGLWindow; Key: TKey; C: char);
+procedure KeyDown(Window: TGLWindow; Key: TKey; C: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
   if C = CharEscape then
@@ -1030,17 +1030,17 @@ begin
   end;
 end;
 
-procedure MouseDown(Glwin: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Glwin: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure CloseQuery(Glwin: TGLWindow);
+procedure CloseQuery(Window: TGLWindow);
 begin
   GameCancel(true);
 end;
@@ -1078,7 +1078,7 @@ begin
   LevelFinishedSchedule := false;
   try
 
-    SavedMode := TGLMode.CreateReset(glw,
+    SavedMode := TGLMode.CreateReset(Window,
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
       GL_ENABLE_BIT, true,
       nil, nil, @CloseQuery, { FPSActive } true);
@@ -1089,7 +1089,7 @@ begin
         [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
       Level.OnCameraChanged := @TPlayGameHelper(nil).PlayerCameraChange;
 
-      Glw.AutoRedisplay := true;
+      Window.AutoRedisplay := true;
 
       { OnTimer should be executed quite often, because footsteps sound
         (done in TPlayer.Idle) relies on the fact that OnUsingEnd
@@ -1097,19 +1097,19 @@ begin
         sound stopped. And our Timer calls RefreshUsed that will
         call OnUsingEnd. }
       Application.TimerMilisec := 100;
-      Glw.OnTimer := @Timer;
+      Window.OnTimer := @Timer;
 
-      Glw.OnIdle := @Idle;
-      Glw.OnKeyDown := @KeyDown;
-      Glw.OnMouseDown := @MouseDown;
-      Glw.OnMouseWheel := @MouseWheel;
-      Glw.OnDrawStyle := ds3D;
+      Window.OnIdle := @Idle;
+      Window.OnKeyDown := @KeyDown;
+      Window.OnMouseDown := @MouseDown;
+      Window.OnMouseWheel := @MouseWheel;
+      Window.OnDrawStyle := ds3D;
 
       C2D := TGame2DControls.Create(nil);
       C3D := TGame3DControls.Create(nil);
       GameControls := TUIControlList.CreateFromArray(false, [C2D, C3D, Level]);
 
-      Glw.Controls.AddList(GameControls);
+      Window.Controls.AddList(GameControls);
 
       InitNewLevel;
 
@@ -1167,14 +1167,14 @@ var
   FileName: string;
 begin
   FileName := FileNameAutoInc(ApplicationName + '_screen_%d.png');
-  Glw.SaveScreen(FileName);
+  Window.SaveScreen(FileName);
   Notification('Screen saved to ' + FileName);
   SoundEngine.Sound(stSaveScreen);
 end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowOpen(Glwin: TGLWindow);
+procedure GLWindowOpen(Window: TGLWindow);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -1208,12 +1208,12 @@ begin
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
       glColor4f(0, 0, 0, DarkAreaAlpha);
-      glRecti(0, 0, Glw.Width, DarkAreaHeight);
+      glRecti(0, 0, Window.Width, DarkAreaHeight);
       for I := 0 to DarkAreaFadeHeight - 1 do
       begin
         glColor4f(0, 0, 0,
           DarkAreaAlpha * (DarkAreaFadeHeight - 1 - I) / DarkAreaFadeHeight);
-        glRecti(0, DarkAreaHeight + I, Glw.Width, DarkAreaHeight + I + 1);
+        glRecti(0, DarkAreaHeight + I, Window.Width, DarkAreaHeight + I + 1);
       end;
     glDisable(GL_BLEND);
   finally glEndList end;
@@ -1224,7 +1224,7 @@ begin
   Font_BFNT_BitstreamVeraSans     := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
 end;
 
-procedure GLWindowClose(Glwin: TGLWindow);
+procedure GLWindowClose(Window: TGLWindow);
 begin
   FreeAndNil(Font_BFNT_BitstreamVeraSans);
   FreeAndNil(Font_BFNT_BitstreamVeraSans_m10);
@@ -1235,8 +1235,8 @@ end;
 
 initialization
   ShowDebugInfo := false;
-  Glw.OnOpenList.Add(@GLWindowOpen);
-  Glw.OnCloseList.Add(@GLWindowClose);
+  Window.OnOpenList.Add(@GLWindowOpen);
+  Window.OnCloseList.Add(@GLWindowClose);
 
   AutoOpenInventory := ConfigFile.GetValue(
     'auto_open_inventory', DefaultAutoOpenInventory);

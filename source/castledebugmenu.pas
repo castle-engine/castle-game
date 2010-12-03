@@ -147,7 +147,7 @@ end;
 function TViewAngleSlider.ValueToStr(const AValue: Single): string;
 begin
   Result := Format('horiz %f, vert %f', [AValue,
-    AdjustViewAngleDegToAspectRatio(AValue, Glw.Height / Glw.Width)]);
+    AdjustViewAngleDegToAspectRatio(AValue, Window.Height / Window.Width)]);
 end;
 
 { ----------------------------------------------------------------------------
@@ -204,7 +204,7 @@ procedure TDebugMenu.CurrentItemSelected;
       Level.ThunderEffect.ForceNow;
       UserQuit := true;
     end else
-      MessageOK(Glw, 'Thunder effect not defined for this level.', taLeft);
+      MessageOK(Window, 'Thunder effect not defined for this level.', taLeft);
   end;
 
 begin
@@ -276,7 +276,7 @@ procedure TDebugPlayerMenu.CurrentItemSelected;
     Value: Single;
   begin
     Value := Player.MaxLife;
-    if MessageInputQuery(Glw, 'Set Player.MaxLife',
+    if MessageInputQuery(Window, 'Set Player.MaxLife',
       Value, taLeft) then
       Player.MaxLife := Value;
   end;
@@ -284,7 +284,7 @@ procedure TDebugPlayerMenu.CurrentItemSelected;
   procedure PlayerMaxLife;
   begin
     if Player.Dead then
-      MessageOK(Glw, 'No can do. You are dead.', taLeft) else
+      MessageOK(Window, 'No can do. You are dead.', taLeft) else
     begin
       Player.Life := Player.MaxLife;
       UserQuit := true;
@@ -313,7 +313,7 @@ begin
     2: begin
          ViewAngleDegX := ViewAngleSlider.Value;
          { After changing ViewAngleDegX, game's OnResize must be called. }
-         Glw.EventResize;
+         Window.EventResize;
        end;
     3: Player.Camera.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
     4: Player.Camera.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
@@ -380,7 +380,7 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
             FloatToNiceStr(Level.Creatures[I].MaxLife),
             FloatToNiceStr(Level.Creatures[I].Kind.CameraRadius) ]));
 
-      MessageOK(Glw, S, taLeft);
+      MessageOK(Window, S, taLeft);
     finally S.Free end;
   end;
 
@@ -438,7 +438,7 @@ procedure TDebugCreaturesMenu.CurrentItemSelected;
     if ChooseCreatureKind(Kind) then
     begin
       if Kind.RequiredCount = 0 then
-        MessageOK(Glw, Format('Creature "%s" is not used by anything, ' +
+        MessageOK(Window, Format('Creature "%s" is not used by anything, ' +
           'cannot reload',  [Kind.VRMLNodeName])) else
         Kind.RedoPrepareRender;
     end;
@@ -643,7 +643,7 @@ procedure TEditHeadlightMenu.CurrentItemSelected;
     Vector3: TVector3Single;
   begin
     Vector3 := Level.MainScene.Headlight.Attenuation;
-    if MessageInputQueryVector3Single(Glw, 'Change headlight Attenuation',
+    if MessageInputQueryVector3Single(Window, 'Change headlight Attenuation',
       Vector3, taLeft) then
       Level.MainScene.Headlight.Attenuation := Vector3;
   end;
@@ -653,12 +653,12 @@ procedure TEditHeadlightMenu.CurrentItemSelected;
     Value: Single;
   begin
     Value := Level.MainScene.Headlight.SpotCutOffAngle;
-    if MessageInputQuery(Glw, 'Change headlight SpotCutOffAngle',
+    if MessageInputQuery(Window, 'Change headlight SpotCutOffAngle',
       Value, taLeft) then
       Level.MainScene.Headlight.SpotCutOffAngle := Value;
 
     Value := Level.MainScene.Headlight.SpotDropOffRate;
-    if MessageInputQuery(Glw, 'Change headlight SpotDropOffRate',
+    if MessageInputQuery(Window, 'Change headlight SpotDropOffRate',
       Value, taLeft) then
       Level.MainScene.Headlight.SpotDropOffRate := Value;
   end;
@@ -891,11 +891,11 @@ begin
     0: begin
          if StdOutStream <> nil then
            SaveVRMLClassic(Level.LightSet.RootNode, StdOutStream, LightSetVRMLComment) else
-           MessageOK(Glw, 'No stdout available. On Windows you must run the game ' +
+           MessageOK(Window, 'No stdout available. On Windows you must run the game ' +
              'from the command-line to get stdout.', taLeft);
        end;
     1: begin
-         if MessageYesNo(Glw, Format('This will permanently overwrite file "%s". ' +
+         if MessageYesNo(Window, Format('This will permanently overwrite file "%s". ' +
            'Are you sure you want to save the lights ?',
            [Level.LightSetFileName]), taLeft) then
            SaveVRMLClassic(Level.LightSet.RootNode, Level.LightSetFileName,
@@ -909,7 +909,7 @@ begin
            EditHeadlightMenu := TEditHeadlightMenu.Create(Application);
            SetCurrentMenu(CurrentMenu, EditHeadlightMenu);
          end else
-           MessageOK(Glw, 'No headlight in level ' +
+           MessageOK(Window, 'No headlight in level ' +
              ' (set NavigationInfo.headlight to TRUE to get headlight)', taLeft);
        end;
     6: begin
@@ -984,14 +984,14 @@ end;
 procedure TEditOneLightMenu.CurrentItemSelected;
 
   function MessageInputQueryVector3SingleP(
-    glwin: TGLWindow; const Title: string;
+    Window: TGLWindow; const Title: string;
     var Value: TVector3Single; TextAlign: TTextAlign;
     const OnP: TVector3Single): boolean;
   var s: string;
   begin
    Result := false;
    s := Format('%g %g %g', [Value[0], Value[1], Value[2]]);
-   if MessageInputQuery(glwin, Title, s, TextAlign) then
+   if MessageInputQuery(Window, Title, s, TextAlign) then
    begin
     try
      if LowerCase(Trim(S)) = 'p' then
@@ -1001,7 +1001,7 @@ procedure TEditOneLightMenu.CurrentItemSelected;
     except
      on E: EConvertError do
      begin
-      MessageOK(glwin, 'Invalid vector 3 value : ' + E.Message, taLeft);
+      MessageOK(Window, 'Invalid vector 3 value : ' + E.Message, taLeft);
      end;
     end;
    end;
@@ -1032,7 +1032,7 @@ begin
          if Light is TVRMLPositionalLightNode then
          begin
            Vector := TVRMLPositionalLightNode(Light).FdLocation.Value;
-           if MessageInputQueryVector3SingleP(Glw, 'Change location' +nl+
+           if MessageInputQueryVector3SingleP(Window, 'Change location' +nl+
              '(Input "P" to use current player''s location)',
              Vector, taLeft, Player.Camera.Position) then
            begin
@@ -1045,7 +1045,7 @@ begin
          if Light is TVRMLPositionalLightNode then
          begin
            Vector := TVRMLPositionalLightNode(Light).FdAttenuation.Value;
-           if MessageInputQueryVector3Single(Glw, 'Change attenuation',
+           if MessageInputQueryVector3Single(Window, 'Change attenuation',
              Vector, taLeft) then
            begin
              TVRMLPositionalLightNode(Light).FdAttenuation.Value := Vector;
@@ -1057,7 +1057,7 @@ begin
          if Light is TVRMLDirectionalLightNode then
          begin
            Vector := TVRMLDirectionalLightNode(Light).FdDirection.Value;
-           if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
+           if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
            begin
@@ -1070,7 +1070,7 @@ begin
          if Light is TNodeSpotLight_1 then
          begin
            Vector := TNodeSpotLight_1(Light).FdDirection.Value;
-           if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
+           if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
            begin
@@ -1081,7 +1081,7 @@ begin
          if Light is TNodeSpotLight_2 then
          begin
            Vector := TNodeSpotLight_2(Light).FdDirection.Value;
-           if MessageInputQueryVector3SingleP(Glw, 'Change direction' +nl+
+           if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
            begin
@@ -1094,7 +1094,7 @@ begin
          if Light is TNodeSpotLight_1 then
          begin
            Value := TNodeSpotLight_1(Light).FdDropOffRate.Value;
-           if MessageInputQuery(Glw, 'Change dropOffRate', Value, taLeft) then
+           if MessageInputQuery(Window, 'Change dropOffRate', Value, taLeft) then
            begin
              TNodeSpotLight_1(Light).FdDropOffRate.Value := Value;
              Level.LightSet.CalculateLights;
@@ -1103,7 +1103,7 @@ begin
          if Light is TNodeSpotLight_2 then
          begin
            Value := TNodeSpotLight_2(Light).FdBeamWidth.Value;
-           if MessageInputQuery(Glw, 'Change beamWidth', Value, taLeft) then
+           if MessageInputQuery(Window, 'Change beamWidth', Value, taLeft) then
            begin
              TNodeSpotLight_2(Light).FdBeamWidth.Value := Value;
              Level.LightSet.CalculateLights;
@@ -1114,7 +1114,7 @@ begin
          if Light is TNodeSpotLight_1 then
          begin
            Value := TNodeSpotLight_1(Light).FdCutOffAngle.Value;
-           if MessageInputQuery(Glw, 'Change cutOffAngle', Value, taLeft) then
+           if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
            begin
              TNodeSpotLight_1(Light).FdCutOffAngle.Value := Value;
              Level.LightSet.CalculateLights;
@@ -1123,7 +1123,7 @@ begin
          if Light is TNodeSpotLight_2 then
          begin
            Value := TNodeSpotLight_2(Light).FdCutOffAngle.Value;
-           if MessageInputQuery(Glw, 'Change cutOffAngle', Value, taLeft) then
+           if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
            begin
              TNodeSpotLight_2(Light).FdCutOffAngle.Value := Value;
              Level.LightSet.CalculateLights;
@@ -1165,12 +1165,12 @@ begin
     Player.Camera.RotationVerticalSpeed;
   DebugPlayerMenu.PlayerSpeedSlider.Value := Player.Camera.MoveSpeed;
 
-  SavedMode := TGLMode.CreateReset(Glw, 0, true,
-    nil, Glw.OnResize, @CloseQuery,
+  SavedMode := TGLMode.CreateReset(Window, 0, true,
+    nil, Window.OnResize, @CloseQuery,
     true { FPSActive should not be needed anymore, but I leave it. });
   try
     { This is needed, because when changing ViewAngleDegX we will call
-      Glw.OnResize to set new projection matrix, and this
+      Window.OnResize to set new projection matrix, and this
       new projection matrix should stay for the game. }
     SavedMode.RestoreProjectionMatrix := false;
 
@@ -1178,15 +1178,15 @@ begin
       with the menu text. }
     GLWinMessagesTheme.RectColor[3] := 1.0;
 
-    Glw.OnKeyDown := @KeyDown;
-    Glw.OnMouseDown := @MouseDown;
-    Glw.OnMouseWheel := @MouseWheel;
-    Glw.OnIdle := @Idle;
-    Glw.OnDrawStyle := ds3D;
+    Window.OnKeyDown := @KeyDown;
+    Window.OnMouseDown := @MouseDown;
+    Window.OnMouseWheel := @MouseWheel;
+    Window.OnIdle := @Idle;
+    Window.OnDrawStyle := ds3D;
 
     SetCurrentMenu(CurrentMenu, DebugMenu);
 
-    Glw.Controls.AddList(ControlsUnder);
+    Window.Controls.AddList(ControlsUnder);
 
     UserQuit := false;
     repeat
@@ -1197,7 +1197,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenGLW(Glwin: TGLWindow);
+procedure OpenWindow(Window: TGLWindow);
 begin
   { Although base TGLMenu doesn't require OpenGL context at constructor,
     our descendants initialize some arguments that require font initialized
@@ -1211,6 +1211,6 @@ begin
 end;
 
 initialization
-  Glw.OnOpenList.Add(@OpenGLW);
+  Window.OnOpenList.Add(@OpenWindow);
 finalization
 end.

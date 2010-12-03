@@ -40,12 +40,12 @@ uses SysUtils, GL, GLU, GLWindow, KambiGLUtils, GLImages,
 var
   GLList_ScreenImage: TGLuint;
 
-procedure Resize(Glwin: TGLWindow);
+procedure Resize(Window: TGLWindow);
 begin
-  ProjectionGLOrtho(0, Glwin.Width, 0, Glwin.Height);
+  ProjectionGLOrtho(0, Window.Width, 0, Window.Height);
 end;
 
-procedure Draw(Glwin: TGLWindow);
+procedure Draw(Window: TGLWindow);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
@@ -55,29 +55,29 @@ end;
 
 procedure DrawInitialBackground;
 begin
-  Glw.OnResize := @Resize;
-  Glw.OnDraw := @Draw;
-  Glw.EventResize;
-  Glw.PostRedisplay;
-  Glw.FlushRedisplay;
+  Window.OnResize := @Resize;
+  Window.OnDraw := @Draw;
+  Window.EventResize;
+  Window.PostRedisplay;
+  Window.FlushRedisplay;
 end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenGLW(Glwin: TGLWindow);
+procedure OpenWindow(Window: TGLWindow);
 begin
   GLList_ScreenImage := LoadImageToDisplayList(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'initial_background.png',
-    [TRGBImage], [], Glw.Width, Glw.Height);
+    [TRGBImage], [], Window.Width, Window.Height);
 end;
 
-procedure CloseGLW(Glwin: TGLWindow);
+procedure CloseWindow(Window: TGLWindow);
 begin
   glFreeDisplayList(GLList_ScreenImage);
 end;
 
 initialization
-  Glw.OnOpenList.Add(@OpenGLW);
-  Glw.OnCloseList.Add(@CloseGLW);
+  Window.OnOpenList.Add(@OpenWindow);
+  Window.OnCloseList.Add(@CloseWindow);
 finalization
 end.

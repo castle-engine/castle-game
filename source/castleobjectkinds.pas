@@ -290,7 +290,7 @@ begin
   try
     { It's important to do FreePrepareRender after Progress.Init.
       Why ? Because Progress.Init does TGLWindow.SaveScreeToDisplayList,
-      and this may call Glw.OnDraw, and this may want to redraw
+      and this may call Window.OnDraw, and this may want to redraw
       the object (e.g. if creature of given kind already exists
       on the screen) and this requires PrepareRender to be already done.
 

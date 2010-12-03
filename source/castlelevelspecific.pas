@@ -1369,7 +1369,7 @@ begin
   begin
     { ExitMessagePending is displayed when player FallOnTheGround effect
       (when dying) ended. }
-    MessageOK(Glw,
+    MessageOK(Window,
       'Congratulations ! You finished the game. ' +
       'Now you can just die and go to hell.' +nl+
       nl+

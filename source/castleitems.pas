@@ -629,10 +629,10 @@ begin
     try
       if ScreenImageAlignLeft then
         X := 0 else
-        X := Cardinal(Glw.Width) - ScreenImage.Width;
+        X := Cardinal(Window.Width) - ScreenImage.Width;
       if ScreenImageAlignBottom then
         Y := 0 else
-        Y := Cardinal(Glw.Height) - ScreenImage.Height;
+        Y := Cardinal(Window.Height) - ScreenImage.Height;
 
       glLoadIdentity;
       glRasterPos2i(X, Y);
@@ -1012,7 +1012,7 @@ end;
 
 { initialization / finalization ---------------------------------------- }
 
-procedure GLWindowClose(Glwin: TGLWindow);
+procedure GLWindowClose(Window: TGLWindow);
 var
   I: Integer;
 begin
@@ -1033,7 +1033,7 @@ end;
 
 procedure DoInitialization;
 begin
-  Glw.OnCloseList.Add(@GLWindowClose);
+  Window.OnCloseList.Add(@GLWindowClose);
 
   ItemsKinds := TItemKindsList.Create;
 

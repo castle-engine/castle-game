@@ -95,7 +95,7 @@ begin
            '                        Change the screen size (default is ' +
              DefaultRequestedScreenSize + ').' +nl+
            nl+
-           Glw.ParseParametersHelp([poDisplay], true) +nl+
+           Window.ParseParametersHelp([poDisplay], true) +nl+
            nl+
            'Debug options (don''t use unless you know what you''re doing):' +nl+
            '  --debug-log           Write various log info on stdout' +nl+
@@ -125,24 +125,24 @@ end;
 
 { initializing GL context --------------------------------------------------- }
 
-procedure MultiSamplingOff(Glwin: TGLWindow; const FailureMessage: string);
+procedure MultiSamplingOff(Window: TGLWindow; const FailureMessage: string);
 begin
   AntiAliasing := 0;
   if Log then WritelnLogMultiline('GL context', FailureMessage);
 end;
 
-procedure StencilOff(Glwin: TGLWindow; const FailureMessage: string);
+procedure StencilOff(Window: TGLWindow; const FailureMessage: string);
 begin
   RenderShadowsPossible := false;
   if Log then WritelnLogMultiline('GL context', FailureMessage);
 end;
 
-{ Call Glw.Open, when anti-aliasing (multi-sampling) and shadows (stencil
+{ Call Window.Open, when anti-aliasing (multi-sampling) and shadows (stencil
   buffer) are possibly allowed. If EGLContextNotPossible, will try to lower
   requirements and initialize worse GL context. }
 procedure OpenContext;
 begin
-  Glw.OpenOptionalMultiSamplingAndStencil(@MultiSamplingOff, @StencilOff);
+  Window.OpenOptionalMultiSamplingAndStencil(@MultiSamplingOff, @StencilOff);
 end;
 
 { main -------------------------------------------------------------------- }
@@ -150,20 +150,20 @@ end;
 begin
   { parse parameters }
   OpenALOptionsParse;
-  Glw.ParseParameters([poDisplay]);
+  Window.ParseParameters([poDisplay]);
   ParseParameters(Options, @OptionProc, nil);
 
-  Glw.Width := RequestedScreenWidth;
-  Glw.Height := RequestedScreenHeight;
-  Glw.ColorBits := ColorDepthBits;
+  Window.Width := RequestedScreenWidth;
+  Window.Height := RequestedScreenHeight;
+  Window.ColorBits := ColorDepthBits;
   if WasParam_NoScreenChange or (not AllowScreenChange) then
   begin
-    Glw.FullScreen :=
+    Window.FullScreen :=
       (Application.ScreenWidth = RequestedScreenWidth) and
       (Application.ScreenHeight = RequestedScreenHeight);
   end else
   begin
-    Glw.FullScreen := true;
+    Window.FullScreen := true;
     if (Application.ScreenWidth <> RequestedScreenWidth) or
        (Application.ScreenHeight <> RequestedScreenHeight) or
        (VideoFrequency <> 0) or
@@ -185,7 +185,7 @@ begin
           'set "Allow screen settings change on startup" back to "Yes".' +nl+
           nl+
           'Now I will just continue with default system settings. ');
-        Glw.FullScreen :=
+        Window.FullScreen :=
           (Application.ScreenWidth = RequestedScreenWidth) and
           (Application.ScreenHeight = RequestedScreenHeight);
         AllowScreenChange := false;
@@ -194,15 +194,15 @@ begin
   end;
 
   { init glwindow }
-  Glw.Caption := 'The Castle';
-  Glw.ResizeAllowed := raOnlyAtOpen;
+  Window.Caption := 'The Castle';
+  Window.ResizeAllowed := raOnlyAtOpen;
   if RenderShadowsPossible then
-    Glw.StencilBufferBits := 8;
-  Glw.MultiSampling := AntiAliasingGlwMultiSampling;
+    Window.StencilBufferBits := 8;
+  Window.MultiSampling := AntiAliasingGlwMultiSampling;
   OpenContext;
 
   { init progress }
-  GLProgressInterface.Window := Glw;
+  GLProgressInterface.Window := Window;
   Progress.UserInterface := GLProgressInterface;
   { I'm turning UseDescribePosition to false, because it's usually
     confusing for the user.
@@ -220,11 +220,11 @@ begin
   finally
     CredistGLContextRelease;
 
-    { Usually Glw.Closed = false here.
+    { Usually Window.Closed = false here.
       But this is finally...end clause so we try hard to avoid raising
       another exception here --- so we safeguard and eventually change
       Progress.UserInterface here. }
-    if Glw.Closed then
+    if Window.Closed then
       Progress.UserInterface := ProgressNullInterface;
 
     SoundEngine.ALContextClose;

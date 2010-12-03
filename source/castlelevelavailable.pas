@@ -230,7 +230,7 @@ begin
   begin
     LoadingBgFileName := CombinePaths(BasePath, LoadingBgFileName);
     GLList_LoadingBgImage := LoadImageToDisplayList(LoadingBgFileName,
-      [TRGBImage], [], Glw.Width, Glw.Height);
+      [TRGBImage], [], Window.Width, Window.Height);
   end else
     glFreeDisplayList(GLList_LoadingBgImage);
 
@@ -241,14 +241,14 @@ begin
   LoadRequiredResources(Element, RequiredCreatures);
 end;
 
-procedure DrawCreateLevel(Glwin: TGLWindow);
+procedure DrawCreateLevel(Window: TGLWindow);
 begin
   glClear(GL_COLOR_BUFFER_BIT);
   glLoadIdentity;
   glRasterPos2i(0, 0);
   glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
-    glCallList(TLevelAvailable(Glwin.UserData).GLList_LoadingBgImage);
+    glCallList(TLevelAvailable(Window.UserData).GLList_LoadingBgImage);
   glPopAttrib;
 end;
 
@@ -285,15 +285,15 @@ var
 begin
   if GLList_LoadingBgImage <> 0 then
   begin
-    SavedMode := TGLMode.CreateReset(Glw, 0, true,
+    SavedMode := TGLMode.CreateReset(Window, 0, true,
       @DrawCreateLevel, @Resize2D, @NoClose,
       true { FPSActive should not be needed anymore, but I leave it. });
     try
-      Glw.UserData := Self;
+      Window.UserData := Self;
 
-      Glw.OnDrawStyle := ds3D;
+      Window.OnDrawStyle := ds3D;
 
-      Glw.EventResize;
+      Window.EventResize;
 
       CreateLevelNoBackground;
 
@@ -402,7 +402,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowOpen(Glwin: TGLWindow);
+procedure GLWindowOpen(Window: TGLWindow);
 begin
   { Do this now (not at initialization), because loading available
     levels requires knowledge of Glw window sizes (because LoadingBg
@@ -411,7 +411,7 @@ begin
   LevelsAvailable.LoadFromConfig;
 end;
 
-procedure GLWindowClose(Glwin: TGLWindow);
+procedure GLWindowClose(Window: TGLWindow);
 begin
   if LevelsAvailable <> nil then
   begin
@@ -422,10 +422,10 @@ end;
 
 initialization
   LevelsAvailable := TLevelsAvailableList.Create;
-  Glw.OnOpenList.Add(@GLWindowOpen);
-  Glw.OnCloseList.Add(@GLWindowClose);
+  Window.OnOpenList.Add(@GLWindowOpen);
+  Window.OnCloseList.Add(@GLWindowClose);
 finalization
   { Call CloseGLW in case OnClose event would happen after finalization
     of this unit. }
-  GLWindowClose(Glw);
+  GLWindowClose(Window);
 end.

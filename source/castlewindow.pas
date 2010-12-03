@@ -30,7 +30,7 @@ uses GLWindow, VRMLGLRenderer, OpenGLTTFonts;
 
 var
   { @noAutoLinkHere }
-  Glw: TGLUIWindow;
+  Window: TGLUIWindow;
 
 var
   GLContextCache: TVRMLGLRendererContextCache;
@@ -49,7 +49,7 @@ const
   Font3dBold = false;
   Font3dItalic = false;
 
-procedure GLWindowOpen(Glwin: TGLWindow);
+procedure GLWindowOpen(Window: TGLWindow);
 begin
   Font3d := GLContextCache.Fonts_IncReference(
     Font3dFamily, Font3dBold, Font3dItalic,
@@ -59,7 +59,7 @@ begin
   AntiAliasingEnable;
 end;
 
-procedure GLWindowClose(Glwin: TGLWindow);
+procedure GLWindowClose(Window: TGLWindow);
 begin
   if (GLContextCache <> nil) and (Font3d <> nil) then
   begin
@@ -69,21 +69,21 @@ begin
 end;
 
 initialization
-  Glw := TGLUIWindow.Create(nil);
-  Glw.SetDemoOptions(K_None, #0, false);
-  Glw.OnDrawStyle := ds3D;
+  Window := TGLUIWindow.Create(nil);
+  Window.SetDemoOptions(K_None, #0, false);
+  Window.OnDrawStyle := ds3D;
 
   GLContextCache := TVRMLGLRendererContextCache.Create;
 
-  Glw.OnOpenList.Add(@GLWindowOpen);
-  Glw.OnCloseList.Add(@GLWindowClose);
+  Window.OnOpenList.Add(@GLWindowOpen);
+  Window.OnCloseList.Add(@GLWindowClose);
 finalization
   { Fonts_DecReference must be called before freeing GLContextCache.
-    It's called from Glw.Close. But Glw.Close may be called when
-    FreeAndNil(Glw) below, so to make sure we call Fonts_DecReference
+    It's called from Window.Close. But Window.Close may be called when
+    FreeAndNil(Window) below, so to make sure we call Fonts_DecReference
     (by our GLWindowClose) right now. }
-  GLWindowClose(Glw);
+  GLWindowClose(Window);
 
   FreeAndNil(GLContextCache);
-  FreeAndNil(Glw);
+  FreeAndNil(Window);
 end.
