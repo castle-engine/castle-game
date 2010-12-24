@@ -136,23 +136,11 @@ type
     destructor Destroy; override;
   end;
 
-var
-  SoundEngine: TCastleSoundEngine;
-
-{ This initializes SoundEngine (makes it non-nil, if it's currently @nil).
-
-  While this is called from initialization of this unit, there may
-  happen circumstances when you want to call this explicitly.
-  Namely, if you want to use SoundEngine from initialization of some
-  other unit, and it happens that this initialization is before
-  initialization of CastleSound. We have some non-trivial unit
-  dependencies and loops here, so it happens. }
-{ Not needed temporarily. }
-{ procedure InitializeSoundEngine; }
+function SoundEngine: TCastleSoundEngine;
 
 implementation
 
-uses CastleConfig, ALUtils;
+uses CastleConfig, ALUtils, ALSoundEngine;
 
 constructor TCastleSoundEngine.Create;
 
@@ -252,16 +240,21 @@ begin
   inherited;
 end;
 
+function SoundEngine: TCastleSoundEngine;
+begin
+  Result := ALSoundEngine.SoundEngine as TCastleSoundEngine
+end;
+
 { initialization ------------------------------------------------------------- }
 
 procedure InitializeSoundEngine;
 begin
-  if SoundEngine = nil then
-    SoundEngine := TCastleSoundEngine.Create;
+  if ALSoundEngine.SoundEngine = nil then
+    ALSoundEngine.SoundEngine := TCastleSoundEngine.Create;
 end;
 
 initialization
   InitializeSoundEngine;
 finalization
-  FreeAndNil(SoundEngine);
+  FreeAndNil(ALSoundEngine.SoundEngine);
 end.

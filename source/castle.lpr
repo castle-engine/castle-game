@@ -29,7 +29,7 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, GLProgress, ALUtils,
   KambiLog, CastleWindow, CastleStartMenu, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
   CastleCreatures, CastlePlay, CastleGeneralMenu,
-  CastleRequiredResources, CastleCredits, GLAntiAliasing;
+  CastleRequiredResources, CastleCredits, GLAntiAliasing, ALSoundEngine;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -55,7 +55,6 @@ end;
 { parsing parameters --------------------------------------------------------- }
 
 var
-  WasParam_NoSound: boolean = false;
   WasParam_NoScreenChange: boolean = false;
 
 const
