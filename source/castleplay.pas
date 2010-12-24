@@ -570,7 +570,7 @@ begin
   if ALActive then
   begin
     CheckAL('game loop (check in OnTimer)');
-    SoundEngine.ALRefreshUsedSources;
+    SoundEngine.RefreshUsedSources;
   end;
 end;
 
