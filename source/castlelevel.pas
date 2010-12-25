@@ -1074,7 +1074,7 @@ begin
 
   { Update sound position when object is moving }
   if (UsedSound <> nil) and SoundTracksCurrentPosition then
-    alSourceVector3f(UsedSound.ALSource, AL_POSITION, SoundPosition);
+    UsedSound.Position := SoundPosition;
 
   { If the SoundGoBegin/EndPosition is longer than the MoveTime
     (or it's looping),

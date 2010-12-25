@@ -2113,7 +2113,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     begin
       SoundPosition := LerpLegsMiddlePosition(
         TCreatureSoundSourceData(UsedSounds[I].UserData).SoundHeight);
-      alSourceVector3f(UsedSounds[I].ALSource, AL_POSITION, SoundPosition);
+      UsedSounds[I].Position := SoundPosition;
     end;
   end;
 

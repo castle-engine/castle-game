@@ -1124,8 +1124,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
         if AllocatedFootstepsSource <> nil then
         begin
           { Lower the position, to be on our feet. }
-          alSourceVector3f(AllocatedFootstepsSource.ALSource,
-            AL_POSITION, Vector3Single(0, 0, -1.0));
+          AllocatedFootstepsSource.Position := Vector3Single(0, 0, -1.0);
           AllocatedFootstepsSource.OnUsingEnd :=
             @AllocatedFootstepsSourceUsingEnd;
         end else
