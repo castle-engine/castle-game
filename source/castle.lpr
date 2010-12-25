@@ -58,9 +58,8 @@ var
   WasParam_NoScreenChange: boolean = false;
 
 const
-  Options: array[0..8]of TOption =
+  Options: array[0..7]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
-    (Short: #0; Long: 'no-sound'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
     (Short:'n'; Long: 'no-screen-change'; Argument: oaNone),
     (Short: #0; Long: 'no-shadows'; Argument: oaNone),
@@ -83,7 +82,6 @@ begin
            HelpOptionHelp +nl+
            VersionOptionHelp +nl+
            SoundEngine.ParseParametersHelp(true) +nl+
-           '  --no-sound            Turn off sound' +nl+
            '  -n / --no-screen-resize' +nl+
            '                        Do not try to resize the screen.' +nl+
            '                        If your screen size is not the required' +nl+
@@ -104,20 +102,19 @@ begin
            '  --debug-menu-designer   Run menus is designer mode');
          ProgramBreak;
        end;
-    1: WasParam_NoSound := true;
-    2: begin
+    1: begin
          WritelnStr(Version);
          ProgramBreak;
        end;
-    3: WasParam_NoScreenChange := true;
-    4: RenderShadowsPossible := false;
-    5: ResourcesStrategy := rsDebugKeepOnlyForExistingItems;
-    6: InitializeLog(Version);
-    7: begin
+    2: WasParam_NoScreenChange := true;
+    3: RenderShadowsPossible := false;
+    4: ResourcesStrategy := rsDebugKeepOnlyForExistingItems;
+    5: InitializeLog(Version);
+    6: begin
          DeFormat(Argument, '%dx%d',
            [@RequestedScreenWidth, @RequestedScreenHeight]);
        end;
-    8: DebugMenuDesigner := true;
+    7: DebugMenuDesigner := true;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
@@ -213,7 +210,7 @@ begin
   { init OpenAL (after initing Glw and Progress, because ALContextOpen
     wants to display progress of "Loading sounds") }
   DrawInitialBackground;
-  SoundEngine.ALContextOpen(WasParam_NoSound);
+  SoundEngine.ALContextOpen;
   try
     ShowStartMenu;
   finally
