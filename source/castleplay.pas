@@ -150,10 +150,7 @@ const
   based on Player.Camera.Camera* }
 procedure alUpdateListener;
 begin
-  if SoundEngine.ALActive then
-  begin
-    alListenerFromCamera(Player.Camera);
-  end;
+  SoundEngine.UpdateListener(Player.Camera);
 end;
 
 type
