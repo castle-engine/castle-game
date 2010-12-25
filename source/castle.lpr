@@ -82,7 +82,7 @@ begin
            'Options:' +nl+
            HelpOptionHelp +nl+
            VersionOptionHelp +nl+
-           OpenALOptionsHelp(true) +nl+
+           SoundEngine.ParseParametersHelp(true) +nl+
            '  --no-sound            Turn off sound' +nl+
            '  -n / --no-screen-resize' +nl+
            '                        Do not try to resize the screen.' +nl+
@@ -148,7 +148,7 @@ end;
 
 begin
   { parse parameters }
-  OpenALOptionsParse;
+  SoundEngine.ParseParameters;
   Window.ParseParameters([poDisplay]);
   ParseParameters(Options, @OptionProc, nil);
 

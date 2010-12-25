@@ -150,7 +150,7 @@ const
   based on Player.Camera.Camera* }
 procedure alUpdateListener;
 begin
-  if ALActive then
+  if SoundEngine.ALActive then
   begin
     alListenerFromCamera(Player.Camera);
   end;
@@ -567,7 +567,7 @@ end;
 
 procedure Timer(Window: TGLWindow);
 begin
-  if ALActive then
+  if SoundEngine.ALActive then
   begin
     CheckAL('game loop (check in OnTimer)');
     SoundEngine.RefreshUsedSources;

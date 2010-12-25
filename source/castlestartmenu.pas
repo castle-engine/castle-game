@@ -608,7 +608,7 @@ begin
   inherited;
 
   OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
-  OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
+  OpenALDeviceArgument.Value := ALCDeviceToNiceStr(SoundEngine.Device);
 
   SoundInfo := TGLSoundInfoMenuItem.Create(Window, Self, SoundEngine);
   SoundVolume := TGLSoundVolumeMenuItem.Create(Window, Self, SoundEngine);
@@ -682,8 +682,8 @@ begin
   begin
     SoundEngine.ALChangeDevice(OpenALDevices[CurrentItem]);
     { ALCDevice value changed now to new value. }
-    SoundMenu.OpenALDeviceArgument.Value := ALCDeviceToNiceStr(ALCDevice);
-    if not ALActive then
+    SoundMenu.OpenALDeviceArgument.Value := ALCDeviceToNiceStr(SoundEngine.Device);
+    if not SoundEngine.ALActive then
       MessageOK(Window, SoundEngine.SoundInitializationReport, taLeft);
   end;
 
