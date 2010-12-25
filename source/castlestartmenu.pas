@@ -41,7 +41,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, ALUtils, KambiOpenAL, KambiClassUtils,
   CastleNotifications, CastleLevelAvailable, CastleBackgroundLevel,
-  GameSoundEngine, GLSoundMenu,
+  XmlSoundEngine, GLSoundMenu,
   CastleRequiredResources, CastleCredits, GLAntiAliasing, KeysMouse;
 
 { TCastleMenu descendants interface ------------------------------------------ }

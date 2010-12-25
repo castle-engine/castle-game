@@ -21,12 +21,12 @@
 }
 
 { Everything related to playing sound in "The Castle".
-  In particular, TCastleSoundEngine descendant from TGameSoundEngine. }
+  In particular, TCastleSoundEngine descendant from TXmlSoundEngine. }
 unit CastleSound;
 
 interface
 
-uses Classes, VectorMath, SysUtils, GameSoundEngine;
+uses Classes, VectorMath, SysUtils, XmlSoundEngine;
 
 const
   LevelEventSoundImportance      = 100000;
@@ -130,7 +130,7 @@ var
     :TSoundType;
 
 type
-  TCastleSoundEngine = class(TGameSoundEngine)
+  TCastleSoundEngine = class(TXmlSoundEngine)
   public
     constructor Create;
     destructor Destroy; override;

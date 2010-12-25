@@ -28,7 +28,7 @@ unit CastleTextures;
 interface
 
 uses KambiUtils, KambiClassUtils, Classes, CastleSound, VRMLTriangle, DOM,
-  GameSoundEngine;
+  XmlSoundEngine;
 
 {$define read_interface}
 

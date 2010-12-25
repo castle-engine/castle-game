@@ -43,7 +43,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLGLLightSet, Boxes3D,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSoundAllocator, Matrix,
-  VRMLGLBackground, DOM, GameSoundEngine, Base3D, VRMLShape,
+  VRMLGLBackground, DOM, XmlSoundEngine, Base3D, VRMLShape,
   GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum, KambiSceneManager;
 
 {$define read_interface}
