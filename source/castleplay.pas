@@ -146,13 +146,6 @@ const
   SDeadMessage = 'You''re dead';
   SGameWinMessage = 'Game finished';
 
-{ If ALActive then update listener POSITION and ORIENTATION
-  based on Player.Camera.Camera* }
-procedure alUpdateListener;
-begin
-  SoundEngine.UpdateListener(Player.Camera);
-end;
-
 type
   TGame2DControls = class(TUIControl)
   public
@@ -1049,8 +1042,6 @@ type
 
 class procedure TPlayGameHelper.PlayerCameraChange(Sender: TObject);
 begin
-  alUpdateListener;
-
   if Box3DPointInside(Player.Camera.Position, Level.AboveWaterBox) then
     Player.Swimming := psAboveWater else
   if Box3DPointInside(Player.Camera.Position, Level.WaterBox) then

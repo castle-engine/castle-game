@@ -242,19 +242,11 @@ end;
 
 function SoundEngine: TCastleSoundEngine;
 begin
-  Result := ALSoundEngine.SoundEngine as TCastleSoundEngine
+  Result := ALSoundEngine.SoundEngine as TCastleSoundEngine;
 end;
 
 { initialization ------------------------------------------------------------- }
 
-procedure InitializeSoundEngine;
-begin
-  if ALSoundEngine.SoundEngine = nil then
-    ALSoundEngine.SoundEngine := TCastleSoundEngine.Create;
-end;
-
 initialization
-  InitializeSoundEngine;
-finalization
-  FreeAndNil(ALSoundEngine.SoundEngine);
+  ALSoundEngine.SoundEngine := TCastleSoundEngine.Create;
 end.
