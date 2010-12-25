@@ -27,7 +27,7 @@ interface
 
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3D, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLGLScene, CastleSound, VRMLSceneWaypoints,
-  CastleObjectKinds, ALSourceAllocator, KambiXMLConfig, Base3D,
+  CastleObjectKinds, ALSoundAllocator, KambiXMLConfig, Base3D,
   GameSoundEngine, GLShadowVolumeRenderer, VRMLTriangle, Frustum;
 
 {$define read_interface}
@@ -678,9 +678,9 @@ type
     FallingDownStartHeight: Single;
     FIsFallingDown: boolean;
 
-    UsedSounds: TALAllocatedSourcesList;
+    UsedSounds: TALSoundsList;
 
-    procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
+    procedure SoundSourceUsingEnd(Sender: TALSound);
 
     procedure SetLegsPosition(const Value: TVector3Single);
     procedure SetDirection(const Value: TVector3Single);
@@ -1784,7 +1784,7 @@ begin
 
   FSoundDyingEnabled := true;
 
-  UsedSounds := TALAllocatedSourcesList.Create;
+  UsedSounds := TALSoundsList.Create;
 
   { FLegsPosition and FDirection changed, so RecalculateBoundingBox must be
     called. At this point CurrentScene is needed (by RecalculateBoundingBox),
@@ -1822,7 +1822,7 @@ begin
   inherited;
 end;
 
-procedure TCreature.SoundSourceUsingEnd(Sender: TALAllocatedSource);
+procedure TCreature.SoundSourceUsingEnd(Sender: TALSound);
 begin
   Sender.UserData.Free;
   Sender.UserData := nil;
@@ -1833,7 +1833,7 @@ end;
 procedure TCreature.Sound3d(const SoundType: TSoundType; const SoundHeight: Single;
   TiedToCreature: boolean);
 var
-  NewSource: TALAllocatedSource;
+  NewSource: TALSound;
   SoundPosition: TVector3Single;
 begin
   SoundPosition := LerpLegsMiddlePosition(SoundHeight);

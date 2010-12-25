@@ -26,7 +26,7 @@ unit CastlePlayer;
 interface
 
 uses Boxes3D, Cameras, CastleItems, VectorMath, GL, GLU, GLExt,
-  VRMLSceneWaypoints, CastleInputs, ALSourceAllocator, CastleSound,
+  VRMLSceneWaypoints, CastleInputs, ALSoundAllocator, CastleSound,
   VRMLTriangle, CastleTextures, GameSoundEngine, Classes,
   KambiGLUtils;
 
@@ -138,11 +138,11 @@ type
       always valid when IsLava. }
     LavaLastDamageTime: Single;
 
-    AllocatedSwimmingChangeSource: TALAllocatedSource;
-    procedure AllocatedSwimmingChangeSourceUsingEnd(Sender: TALAllocatedSource);
+    AllocatedSwimmingChangeSource: TALSound;
+    procedure AllocatedSwimmingChangeSourceUsingEnd(Sender: TALSound);
   private
-    AllocatedSwimmingSource: TALAllocatedSource;
-    procedure AllocatedSwimmingSourceUsingEnd(Sender: TALAllocatedSource);
+    AllocatedSwimmingSource: TALSound;
+    procedure AllocatedSwimmingSourceUsingEnd(Sender: TALSound);
   private
     FSwimming: TPlayerSwimming;
     procedure SetSwimming(const Value: TPlayerSwimming);
@@ -157,10 +157,10 @@ type
         AllocatedFootstepsSource <> nil
       if and only if
         FootstepsSoundPlaying <> stNone. }
-    AllocatedFootstepsSource: TALAllocatedSource;
+    AllocatedFootstepsSource: TALSound;
     FootstepsSoundPlaying: TSoundType;
     ReallyWalkingOnTheGroundTime: Single;
-    procedure AllocatedFootstepsSourceUsingEnd(Sender: TALAllocatedSource);
+    procedure AllocatedFootstepsSourceUsingEnd(Sender: TALSound);
   private
     { FKnockbackDistance <= 0 means "no knockback currently" }
     FKnockbackDistance: Single;
@@ -925,7 +925,7 @@ begin
   end;
 end;
 
-procedure TPlayer.AllocatedFootstepsSourceUsingEnd(Sender: TALAllocatedSource);
+procedure TPlayer.AllocatedFootstepsSourceUsingEnd(Sender: TALSound);
 begin
   Assert(Sender = AllocatedFootstepsSource);
   AllocatedFootstepsSource.OnUsingEnd := nil;
@@ -933,14 +933,14 @@ begin
   FootstepsSoundPlaying := stNone;
 end;
 
-procedure TPlayer.AllocatedSwimmingChangeSourceUsingEnd(Sender: TALAllocatedSource);
+procedure TPlayer.AllocatedSwimmingChangeSourceUsingEnd(Sender: TALSound);
 begin
   Assert(Sender = AllocatedSwimmingChangeSource);
   AllocatedSwimmingChangeSource.OnUsingEnd := nil;
   AllocatedSwimmingChangeSource := nil;
 end;
 
-procedure TPlayer.AllocatedSwimmingSourceUsingEnd(Sender: TALAllocatedSource);
+procedure TPlayer.AllocatedSwimmingSourceUsingEnd(Sender: TALSound);
 begin
   Assert(Sender = AllocatedSwimmingSource);
   AllocatedSwimmingSource.OnUsingEnd := nil;

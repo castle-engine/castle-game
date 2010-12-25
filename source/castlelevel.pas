@@ -42,7 +42,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLGLLightSet, Boxes3D,
   VRMLNodes, VRMLFields, CastleItems, Cameras, VRMLTriangle, GL3D,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
-  ProgressUnit, VRMLGLAnimation, ALSourceAllocator, Matrix,
+  ProgressUnit, VRMLGLAnimation, ALSoundAllocator, Matrix,
   VRMLGLBackground, DOM, GameSoundEngine, Base3D, VRMLShape,
   GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum, KambiSceneManager;
 
@@ -188,8 +188,8 @@ type
     FSoundGoEndPositionLooping: boolean;
     FSoundTracksCurrentPosition: boolean;
 
-    UsedSound: TALAllocatedSource;
-    procedure SoundSourceUsingEnd(Sender: TALAllocatedSource);
+    UsedSound: TALSound;
+    procedure SoundSourceUsingEnd(Sender: TALSound);
     function SoundPosition: TVector3Single;
     procedure PlaySound(SoundType: TSoundType; Looping: boolean);
   public
@@ -962,7 +962,7 @@ begin
   inherited;
 end;
 
-procedure TLevelLinearMovingObject.SoundSourceUsingEnd(Sender: TALAllocatedSource);
+procedure TLevelLinearMovingObject.SoundSourceUsingEnd(Sender: TALSound);
 begin
   Assert(Sender = UsedSound);
   UsedSound.OnUsingEnd := nil;
