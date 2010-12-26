@@ -249,4 +249,7 @@ end;
 
 initialization
   ALSoundEngine.SoundEngine := TCastleSoundEngine.Create;
+  { These were chosen experimentally for castle }
+  SoundEngine.DefaultRolloffFactor := 0.1;
+  SoundEngine.DefaultReferenceDistance := 2.0;
 end.
