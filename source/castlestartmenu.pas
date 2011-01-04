@@ -100,7 +100,6 @@ type
 
   TChangeOpenALDeviceMenu = class(TSubMenu)
   public
-    OpenALDevices: TStringList;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure CurrentItemSelected; override;
@@ -608,7 +607,7 @@ begin
   inherited;
 
   OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
-  OpenALDeviceArgument.Value := ALCDeviceToNiceStr(SoundEngine.Device);
+  OpenALDeviceArgument.Value := SoundEngine.DeviceNiceName;
 
   SoundInfo := TGLSoundInfoMenuItem.Create(Window, Self, SoundEngine);
   SoundVolume := TGLSoundVolumeMenuItem.Create(Window, Self, SoundEngine);
@@ -657,12 +656,8 @@ var
 begin
   inherited;
 
-  OpenALDevices := TStringList.Create;
-  OpenALDevices.Append(''); { Default OpenAL device }
-  GetOpenALDevices(OpenALDevices);
-
-  for I := 0 to OpenALDevices.Count - 1 do
-    Items.Add(ALCDeviceToNiceStr(OpenALDevices[I]));
+  for I := 0 to SoundEngine.Devices.Count - 1 do
+    Items.Add(SoundEngine.Devices[I].NiceName);
   Items.Add('Cancel');
 
   SubMenuTitle := 'Change sound output device';
@@ -670,7 +665,6 @@ end;
 
 destructor TChangeOpenALDeviceMenu.Destroy;
 begin
-  FreeAndNil(OpenALDevices);
   inherited;
 end;
 
@@ -678,11 +672,11 @@ procedure TChangeOpenALDeviceMenu.CurrentItemSelected;
 begin
   inherited;
 
-  if CurrentItem < OpenALDevices.Count then
+  if CurrentItem < SoundEngine.Devices.Count then
   begin
-    SoundEngine.Device := OpenALDevices[CurrentItem];
+    SoundEngine.Device := SoundEngine.Devices[CurrentItem].Name;
     { ALCDevice value changed now to new value. }
-    SoundMenu.OpenALDeviceArgument.Value := ALCDeviceToNiceStr(SoundEngine.Device);
+    SoundMenu.OpenALDeviceArgument.Value := SoundEngine.Devices[CurrentItem].NiceName;
     if not SoundEngine.ALActive then
       MessageOK(Window, SoundEngine.SoundInitializationReport, taLeft);
   end;
