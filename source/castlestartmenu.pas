@@ -680,7 +680,7 @@ begin
 
   if CurrentItem < OpenALDevices.Count then
   begin
-    SoundEngine.ALChangeDevice(OpenALDevices[CurrentItem]);
+    SoundEngine.Device := OpenALDevices[CurrentItem];
     { ALCDevice value changed now to new value. }
     SoundMenu.OpenALDeviceArgument.Value := ALCDeviceToNiceStr(SoundEngine.Device);
     if not SoundEngine.ALActive then
