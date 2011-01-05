@@ -81,7 +81,7 @@ begin
            'Options:' +nl+
            HelpOptionHelp +nl+
            VersionOptionHelp +nl+
-           SoundEngine.ParseParametersHelp(true) +nl+
+           SoundEngine.ParseParametersHelp +nl+
            '  -n / --no-screen-resize' +nl+
            '                        Do not try to resize the screen.' +nl+
            '                        If your screen size is not the required' +nl+
