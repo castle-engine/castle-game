@@ -111,7 +111,7 @@ var
 
 implementation
 
-uses Math, SysUtils, KambiUtils, GLWindow, KambiOpenAL, ALUtils,
+uses Math, SysUtils, KambiUtils, GLWindow,
   GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
   Cameras, VectorMath, Boxes3D, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
@@ -558,10 +558,7 @@ end;
 procedure Timer(Window: TGLWindow);
 begin
   if SoundEngine.ALActive then
-  begin
-    CheckAL('game loop (check in OnTimer)');
     SoundEngine.RefreshUsedSources;
-  end;
 end;
 
 procedure GameCancel(RequireConfirmation: boolean);

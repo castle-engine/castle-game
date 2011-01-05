@@ -761,7 +761,7 @@ implementation
 uses SysUtils, GL, GLU, Object3DAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleNotifications,
-  CastleInputs, CastleWindow, KambiOpenAL, ALUtils, KambiXMLUtils,
+  CastleInputs, CastleWindow, KambiXMLUtils,
   CastleRequiredResources, VRMLGLRenderer, RenderStateUnit, Math;
 
 {$define read_implementation}

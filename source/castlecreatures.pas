@@ -1192,7 +1192,7 @@ implementation
 
 uses SysUtils, DOM, GL, GLU, CastleWindow, GLWindow,
   VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
-  CastleVideoOptions, KambiOpenAL, ALUtils,
+  CastleVideoOptions,
   CastleNotifications, CastleRequiredResources;
 
 {$define read_implementation}
