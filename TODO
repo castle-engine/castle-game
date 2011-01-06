@@ -1,14 +1,3 @@
-------------------------------------------------------------------------------
-- castle 1.0.0 blockers:
-  - same plane walls on doom e1m1 level:
-    - at the first door
-    - right when opening the secret (lighter) door
-    (exist also in srcs before TLevelObject - T3D transition, so this isn't any bug from this.)
-
-- entering MessageKeyMouse makes noticeable time delay
-  (probably due to scene manager migration, something is released?)
-
-------------------------------------------------------------------------------
 castle 2:
 
 - From kambi_vrml_game_engine/doc/TODO, after 3.8.0:
@@ -51,6 +40,11 @@ Resigned: fountain new level for castle 1.0.0:
 - maybe small fog (3d tex?) rising from the fountain
 
 ------------------------------------------------------------------------------
+- same plane walls on doom e1m1 level:
+  - at the first door
+  - right when opening the secret (lighter) door
+  (exist also in srcs before TLevelObject - T3D transition, so this isn't any bug from this.)
+
 - make real bump mapping demos:
   - add bump maps everywhere ?, make some lights dynamic
 
