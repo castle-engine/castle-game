@@ -1434,8 +1434,7 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
   const
     DefaultBumpMappingLightPosition: TVector3Single = (0, 0, 0);
   begin
-    { Later: it can be updated during runtime by TLevel subclasses
-      if BumpMappingMethod in bmGLSLAll. }
+    { We may update these later during runtime by TLevel subclasses. }
     MainScene.BumpMappingLightPosition := Vector3SingleFromElementData(
       'position', DefaultBumpMappingLightPosition);
     BumpMappingLightAmbientColor[false] := Vector4SingleFromElementData(
