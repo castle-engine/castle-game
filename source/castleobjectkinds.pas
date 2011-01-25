@@ -415,7 +415,7 @@ begin
       Exclude(ActualOptions, prManifoldAndBorderEdges);
 
     AnimationAttributesSet(Anim.Attributes, BlendingType);
-    Anim.PrepareResources(TransparentGroups, ActualOptions, false);
+    Anim.PrepareResources(ActualOptions, false);
 
     if (prManifoldAndBorderEdges in Options) and
       IsSharedManifoldAndBorderEdges then

@@ -1168,7 +1168,6 @@ var
   NavigationNode: TNodeNavigationInfo;
   NavigationSpeed: Single;
   Options: TPrepareResourcesOptions;
-  TG: TTransparentGroups;
   NewCameraBox: TBox3D;
   SI: TVRMLShapeTreeIterator;
 begin
@@ -1308,11 +1307,7 @@ begin
     if RenderShadowsPossible and SceneDynamicShadows then
       Options := Options + prShadowVolume;
 
-    TG := [tgAll];
-    if RenderShadowsPossible then
-      TG := TG + [tgOpaque, tgTransparent];
-
-    MainScene.PrepareResources(TG, Options, false);
+    MainScene.PrepareResources(Options, false);
 
     MainScene.FreeResources([frTextureDataInNodes]);
 
@@ -1338,7 +1333,7 @@ begin
     MainScene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
     MainScene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
     MainScene.Spatial := [ssRendering, ssCollisionOctree];
-    MainScene.PrepareResources([], [prSpatial], false);
+    MainScene.PrepareResources([prSpatial], false);
 
     { TrianglesList was created for triangle octree. We don't need it anymore.
 
@@ -1804,7 +1799,7 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareResources([tgOpaque, tgTransparent], Options, false);
+  Result.PrepareResources(Options, false);
 
   if CreateOctreeCollisions then
     Result.Spatial := [ssCollisionOctree];
@@ -1832,7 +1827,7 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareResources([tgOpaque, tgTransparent], Options, false);
+  Result.PrepareResources(Options, false);
 
   if CreateFirstOctreeCollisions then
     Result.FirstScene.Spatial := [ssCollisionOctree];

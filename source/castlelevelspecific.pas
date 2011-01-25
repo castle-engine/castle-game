@@ -1441,7 +1441,7 @@ begin
     AnimationAttributesSet(Fountain.Attributes, btIncrease);
     Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
     try
-      Fountain.PrepareResources([tgOpaque, tgTransparent], [prRender, prBoundingBox], true);
+      Fountain.PrepareResources([prRender, prBoundingBox], true);
     finally Progress.Fini end;
     Fountain.FreeResources([frTextureDataInNodes]);
     Fountain.CastsShadow := false; { not manifold }

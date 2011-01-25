@@ -510,7 +510,7 @@ begin
     FScene.Load(ModelFileName);
 
     AttributesSet(Scene.Attributes, BlendingType);
-    Scene.PrepareResources([tgOpaque, tgTransparent], [prRender, prBoundingBox], false);
+    Scene.PrepareResources([prRender, prBoundingBox], false);
     Scene.FreeResources([frTextureDataInNodes]);
   end;
 
