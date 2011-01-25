@@ -37,7 +37,6 @@ type
     FModelFileNames: TDynStringArray;
     FTimes: TDynSingleArray;
     FScenesPerTime: Cardinal;
-    FOptimization: TGLRendererOptimization;
     FTimeLoop, FTimeBackwards: boolean;
     FCache: TVRMLGLRendererContextCache;
     FEqualityEpsilon: Single;
@@ -46,7 +45,6 @@ type
       const AModelFileNames: array of string;
       const ATimes: array of Single;
       AScenesPerTime: Cardinal;
-      AOptimization: TGLRendererOptimization;
       const AEqualityEpsilon: Single;
       ATimeLoop, ATimeBackwards: boolean;
       ACache: TVRMLGLRendererContextCache = nil);
@@ -78,8 +76,6 @@ type
     property Times: TDynSingleArray read FTimes;
 
     property ScenesPerTime: Cardinal read FScenesPerTime write FScenesPerTime;
-    property Optimization: TGLRendererOptimization
-      read FOptimization write FOptimization;
     property EqualityEpsilon: Single read FEqualityEpsilon write FEqualityEpsilon;
     property TimeLoop: boolean read FTimeLoop write FTimeLoop;
     property TimeBackwards: boolean read FTimeBackwards write FTimeBackwards;
@@ -119,7 +115,6 @@ constructor TVRMLGLAnimationInfo.Create(
   const AModelFileNames: array of string;
   const ATimes: array of Single;
   AScenesPerTime: Cardinal;
-  AOptimization: TGLRendererOptimization;
   const AEqualityEpsilon: Single;
   ATimeLoop, ATimeBackwards: boolean;
   ACache: TVRMLGLRendererContextCache);
@@ -133,7 +128,6 @@ begin
   FTimes.AppendArray(ATimes);
 
   FScenesPerTime := AScenesPerTime;
-  FOptimization := AOptimization;
   FEqualityEpsilon := AEqualityEpsilon;
   FTimeLoop := ATimeLoop;
   FTimeBackwards := ATimeBackwards;
@@ -150,7 +144,7 @@ begin
   FTimes := TDynSingleArray.Create;
 
   TVRMLGLAnimation.LoadFromFileToVars(FileName,
-    FModelFileNames, FTimes, FScenesPerTime, FOptimization,
+    FModelFileNames, FTimes, FScenesPerTime,
     FEqualityEpsilon, FTimeLoop, FTimeBackwards);
 
   FCache := ACache;
@@ -166,7 +160,7 @@ begin
   FTimes := TDynSingleArray.Create;
 
   TVRMLGLAnimation.LoadFromDOMElementToVars(Element, BasePath,
-    FModelFileNames, FTimes, FScenesPerTime, FOptimization,
+    FModelFileNames, FTimes, FScenesPerTime,
     FEqualityEpsilon, FTimeLoop, FTimeBackwards);
 
   FCache := ACache;
@@ -211,7 +205,6 @@ begin
       RootNodes[I] := LoadVRML(FModelFileNames[I], false);
 
     Result := TVRMLGLAnimation.CreateCustomCache(nil, FCache);
-    Result.Optimization := FOptimization;
     Result.Load(RootNodes, OwnsFirstRootNode, FTimes,
       FScenesPerTime, FEqualityEpsilon);
     Result.TimeLoop := FTimeLoop;
