@@ -8,7 +8,6 @@ Separator {
 Switch {
 	DEF MatWater
 	Material {
-          fogImmune TRUE
 		diffuseColor 0.000000 0.000000 1.000000
 		specularColor 0.000000 0.000000 0.000000
 		shininess 0.500000 
@@ -3182,6 +3181,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			106.199570 -235.443024 -9.223026 1.000000
 		}
+		LocalFog { } # don't use fog for water
 		USE MeshWater
 	}
 }

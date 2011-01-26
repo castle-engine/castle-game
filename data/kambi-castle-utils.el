@@ -254,10 +254,8 @@ on MESH-NAME to be correctly interpreted."
   (kam-fix-vertex-col-material "MeshRocks")
   (kam-remove-vertex-col-material-one-mesh "MeshWater")
   (kam-add-material-for-mesh "MeshWater" "MatWater")
-  (kam-simple-replace-buffer "DEF MatWater
-	Material {" "DEF MatWater
-	Material {
-          fogImmune TRUE")
+  (kam-simple-replace "USE MeshWater" "LocalFog { } # don't use fog for water
+\t\tUSE MeshWater" (point-min) nil t)
   (kam-fix-vertex-col-material "MeshGate")
 
   ;; I don't know why blender refuses to write these as relative paths...
@@ -273,10 +271,8 @@ on MESH-NAME to be correctly interpreted."
   (interactive)
   (kam-remove-vertex-col-material-one-mesh "MeshWater")
   (kam-add-material-for-mesh "MeshWater" "MatWater")
-  (kam-simple-replace-buffer "DEF MatWater
-	Material {" "DEF MatWater
-	Material {
-          fogImmune TRUE")
+  (kam-simple-replace "USE MeshWater" "LocalFog { } # don't use fog for water
+\t\tUSE MeshWater" (point-min) nil t)
 )
 
 (defun kam-process-gate-water-1 ()
