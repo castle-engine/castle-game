@@ -29,7 +29,8 @@ uses GLWindow, SysUtils, KambiUtils, ProgressUnit, GLProgress, ALUtils,
   KambiLog, CastleWindow, CastleStartMenu, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
   CastleCreatures, CastlePlay, CastleGeneralMenu,
-  CastleRequiredResources, CastleCredits, GLAntiAliasing, ALSoundEngine;
+  CastleRequiredResources, CastleCredits, GLAntiAliasing, ALSoundEngine,
+  VRMLGLRenderer;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -58,13 +59,14 @@ var
   WasParam_NoScreenChange: boolean = false;
 
 const
-  Options: array[0..7]of TOption =
+  Options: array[0..8]of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
     (Short:'n'; Long: 'no-screen-change'; Argument: oaNone),
     (Short: #0; Long: 'no-shadows'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
     (Short: #0; Long: 'debug-log'; Argument: oaNone),
+    (Short: #0; Long: 'debug-log-cache'; Argument: oaNone),
     (Short: #0; Long: 'screen-size'; Argument: oaRequired),
     (Short: #0; Long: 'debug-menu-designer'; Argument: oaNone)
   );
@@ -86,7 +88,7 @@ begin
            '                        Do not try to resize the screen.' +nl+
            '                        If your screen size is not the required' +nl+
            '                        size (set by --screen-size)' +nl+
-           '                        then will run in windowed mode.' +nl+
+           '                        then run in windowed mode.' +nl+
            '  --no-shadows          Disable initializing and using shadows.' +nl+
            '  --screen-size WIDTHxHEIGHT' +nl+
            '                        Change the screen size (default is ' +
@@ -96,6 +98,7 @@ begin
            nl+
            'Debug options (don''t use unless you know what you''re doing):' +nl+
            '  --debug-log           Write various log info on stdout' +nl+
+           '  --debug-log-cache     Write log info, including cache, on stdout' +nl+
            '  --debug-no-creatures  Creatures animations will be loaded' +nl+
            '                        only when you explicitly request them' +nl+
            '                        from debug menu' +nl+
@@ -111,10 +114,14 @@ begin
     4: ResourcesStrategy := rsDebugKeepOnlyForExistingItems;
     5: InitializeLog(Version);
     6: begin
+         InitializeLog(Version);
+         LogRendererCache := true;
+       end;
+    7: begin
          DeFormat(Argument, '%dx%d',
            [@RequestedScreenWidth, @RequestedScreenHeight]);
        end;
-    7: DebugMenuDesigner := true;
+    8: DebugMenuDesigner := true;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
