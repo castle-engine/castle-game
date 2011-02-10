@@ -459,10 +459,12 @@ type
     procedure NotificationInteractFailed(const S: string);
 
     procedure RenderFromViewEverything; override;
-    procedure RenderFromView3D; override;
-    procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
-    procedure RenderNeverShadowed(TransparentGroup: TTransparentGroup); override;
-    procedure RenderHeadLight; override;
+    procedure RenderFromView3D(const LightsEnabled: Cardinal); override;
+    procedure Render3D(const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup; InShadow: boolean); override;
+    procedure RenderNeverShadowed(const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup); override;
+    procedure RenderHeadLight(var LightsEnabled: Cardinal); override;
     function MainLightForShadows(out AMainLightPosition: TVector4Single): boolean; override;
     procedure ApplyProjection; override;
   public
@@ -1903,7 +1905,8 @@ begin
   Result := LightSet.MainLightForShadows(AMainLightPosition);
 end;
 
-procedure TLevel.RenderNeverShadowed(TransparentGroup: TTransparentGroup);
+procedure TLevel.RenderNeverShadowed(const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup);
 begin
   inherited;
 
@@ -1916,9 +1919,9 @@ begin
   { When GameWin, don't render creatures (as we don't check
     collisions when MovingPlayerEndSequence). }
   if not GameWin then
-    Creatures.Render(RenderState.CameraFrustum, TransparentGroup);
+    Creatures.Render(RenderState.CameraFrustum, LightsEnabled, TransparentGroup);
   if not DebugRenderForLevelScreenshot then
-    ItemsOnLevel.Render(RenderState.CameraFrustum, TransparentGroup);
+    ItemsOnLevel.Render(RenderState.CameraFrustum, LightsEnabled, TransparentGroup);
 end;
 
 procedure TLevel.RenderShadowVolume;
@@ -1930,7 +1933,8 @@ begin
   inherited;
 end;
 
-procedure TLevel.Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean);
+procedure TLevel.Render3D(const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup; InShadow: boolean);
 begin
   if InShadow then PushLightsOff;
   try
@@ -1940,16 +1944,33 @@ begin
   end;
 end;
 
-procedure TLevel.RenderFromView3D;
+procedure TLevel.RenderFromView3D(const LightsEnabled: Cardinal);
+var
+  NewLightsEnabled: Cardinal;
 begin
-  { setup lights from thunder and lightset (headlight is set elsewhere) }
-  TThunderEffect.RenderOrDisable(ThunderEffect, 1);
+  NewLightsEnabled := LightsEnabled;
+
+  { Init MainScene.Headlight }
+  if MainScene.Headlight <> nil then
+  begin
+    MainScene.Headlight.Render(NewLightsEnabled, true, true, Player.Camera);
+    Inc(NewLightsEnabled);
+  end;
+
+  if (ThunderEffect <> nil) and
+      ThunderEffect.Visible then
+  begin
+    ThunderEffect.RenderLight(NewLightsEnabled);
+    Inc(NewLightsEnabled);
+  end;
+
+  (*TODO: LightSet.RenderLights should also increase LightsEnabled *)
   LightSet.RenderLights;
 
-  inherited;
+  inherited RenderFromView3D(NewLightsEnabled);
 end;
 
-procedure TLevel.RenderHeadLight;
+procedure TLevel.RenderHeadLight(var LightsEnabled: Cardinal);
 begin
   if MenuBackground then
     inherited;

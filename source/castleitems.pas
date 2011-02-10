@@ -347,7 +347,8 @@ type
       (when item for sure is not within Frustum, we don't have
       to push it to OpenGL). }
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup);
+      const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup);
 
     procedure Idle(const CompSpeed: Single);
 
@@ -369,7 +370,8 @@ type
   TItemsOnLevelList = class(TObjectsList_1)
     { Call Render for all items. }
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup);
+      const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup);
     { Call Idle for all items. }
     procedure Idle(const CompSpeed: Single);
     { Check collision with all items, returns index of first collider
@@ -861,14 +863,15 @@ begin
 end;
 
 procedure TItemOnLevel.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup);
+  const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup);
 begin
   if Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
   begin
     glPushMatrix;
       glTranslatev(Position);
       glRotatev(FRotation, UnitVector3Single[2]);
-      Item.Kind.Scene.Render(nil, TransparentGroup);
+      Item.Kind.Scene.Render(nil, LightsEnabled, TransparentGroup);
     glPopMatrix;
 
     if RenderBoundingBoxes and
@@ -965,12 +968,13 @@ end;
 { TItemsOnLevelList -------------------------------------------------- }
 
 procedure TItemsOnLevelList.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup);
+  const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    Items[I].Render(Frustum, TransparentGroup);
+    Items[I].Render(Frustum, LightsEnabled, TransparentGroup);
 end;
 
 procedure TItemsOnLevelList.Idle(const CompSpeed: Single);

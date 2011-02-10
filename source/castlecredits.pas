@@ -84,7 +84,7 @@ begin
     glLoadIdentity;
     glTranslatef(0, AnimationSpeed * AnimationTime, 0);
 
-    CreditsModel.Render(nil, tgAll);
+    CreditsModel.Render(nil, 0, tgAll);
   finally ProjectionPop end;
 
   glDisable(GL_SCISSOR_TEST);

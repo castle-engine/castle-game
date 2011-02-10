@@ -396,13 +396,6 @@ begin
 
   Player.Camera.CancelFallingDown;
 
-  { Init Level.MainScene.Headlight }
-  TVRMLGLHeadlight.RenderOrDisable(Level.MainScene.Headlight, 0,
-    true, Player.Camera);
-
-  if Level.ThunderEffect <> nil then
-    Level.ThunderEffect.InitGLLight(1);
-
   glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
 
   SoundEngine.MusicPlayer.PlayedSound := Level.PlayedMusicSound;

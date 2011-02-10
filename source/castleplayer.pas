@@ -1298,7 +1298,7 @@ begin
     begin
       glClear(GL_DEPTH_BUFFER_BIT);
       glLoadIdentity;
-      Anim.SceneFromTime(AttackTime).Render(nil, tgAll);
+      Anim.SceneFromTime(AttackTime).Render(nil, 0(*TODO*), tgAll);
     end else
       Attacking := false;
   end;

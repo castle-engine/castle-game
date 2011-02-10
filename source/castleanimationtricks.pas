@@ -69,7 +69,8 @@ type
     { @groupEnd }
 
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup;
+      const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup;
       InShadow: boolean); override;
   end;
 
@@ -83,7 +84,8 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure GLContextClose; override;
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup;
+      const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup;
       InShadow: boolean); override;
   end;
 
@@ -106,7 +108,8 @@ begin
 end;
 
 procedure TBlendedLoopingAnimation.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup; InShadow: boolean);
+  const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup; InShadow: boolean);
 
   procedure SetMaterial(const Alpha: Single);
   var
@@ -168,10 +171,11 @@ begin
         actually the whole scene is always a transparent object. }
 
       SetMaterial(Amount);
-      Scenes[SceneIndex].Render(Frustum, tgAll, InShadow);
+      Scenes[SceneIndex].Render(Frustum, LightsEnabled, tgAll, InShadow);
 
       SetMaterial(1 - Amount);
-      Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(Frustum, tgAll, InShadow);
+      Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(
+        Frustum, LightsEnabled, tgAll, InShadow);
     finally glPopAttrib end;
   end;
 end;
@@ -197,7 +201,8 @@ begin
 end;
 
 procedure TBlendedLoopingAnimationShader.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup; InShadow: boolean);
+  const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup; InShadow: boolean);
 
   function LoadWaterEnvMap: TGLuint;
   var

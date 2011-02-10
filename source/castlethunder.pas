@@ -29,25 +29,18 @@ interface
 type
   { Rendering and making sound of thunder effect.
 
-    Note that many methods (but not InitGLLight)
+    Note that many methods (but not RenderLight)
     use Level.AnimationTime for timing. }
   TThunderEffect = class
   private
     LastBeginTime, NextBeginTime: Single;
   public
-    { This will init GL_LIGHT_LightNumber properties.
-
+    { Init and enable GL_LIGHT_LightNumber properties.
       Note that this requires that current matrix is modelview.
       Matrix @italic(may) be reset to identity by this procedure. }
-    procedure InitGLLight(LightNumber: Cardinal);
-    procedure Render(LightNumber: Cardinal);
+    procedure RenderLight(const LightNumber: Cardinal);
 
-    { If ThunderEffect <> nil, this just calls ThunderEffect.Render(LightNumber).
-      If no, this disables OpenGL light number LightNumber.
-      In effect, this *always* enables or disables
-      OpenGL light number LightNumber. }
-    class procedure RenderOrDisable(
-      ThunderEffect: TThunderEffect; LightNumber: Cardinal);
+    function Visible: boolean;
 
     procedure Idle;
     { Force thunder happening in next Idle call. }
@@ -58,7 +51,7 @@ implementation
 
 uses GL, GLU, KambiGLUtils, VectorMath, CastleSound, CastlePlay;
 
-procedure TThunderEffect.InitGLLight(LightNumber: Cardinal);
+procedure TThunderEffect.RenderLight(const LightNumber: Cardinal);
 var
   GLLight: TGLenum;
 begin
@@ -76,38 +69,22 @@ begin
   glLightv(GLLight, GL_SPECULAR, Vector4Single(0.5, 0.5, 1, 1));
   { No spot. }
   glLighti(GLLight, GL_SPOT_CUTOFF, 180);
+
+  glEnable(GLLight);
 end;
 
-procedure TThunderEffect.Render(LightNumber: Cardinal);
+function TThunderEffect.Visible: boolean;
 var
-  GLLight: TGLenum;
   ThunderTime: Single;
-  ThunderVisible: boolean;
 begin
-  { calculate GLLight }
-  GLLight := GL_LIGHT0 + LightNumber;
-
-  { calculate ThunderVisible }
-  ThunderVisible := false;
+  Result := false;
   if LastBeginTime <> 0 then
   begin
     ThunderTime := Level.AnimationTime - LastBeginTime;
     if (ThunderTime < 1.0) or
        ((1.5 < ThunderTime) and (ThunderTime < 2.5)) then
-      ThunderVisible := true;
+      Result := true;
   end;
-
-  if ThunderVisible then
-    glEnable(GLLight) else
-    glDisable(GLLight);
-end;
-
-class procedure TThunderEffect.RenderOrDisable(
-  ThunderEffect: TThunderEffect; LightNumber: Cardinal);
-begin
-  if ThunderEffect <> nil then
-    ThunderEffect.Render(LightNumber) else
-    glDisable(GL_LIGHT0 + LightNumber);
 end;
 
 procedure TThunderEffect.Idle;

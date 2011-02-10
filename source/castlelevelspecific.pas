@@ -113,7 +113,8 @@ type
       const HandleMouseAndKeys: boolean;
       var LetOthersHandleMouseAndKeys: boolean); override;
 
-    procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
+    procedure Render3D(const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
     procedure RenderShadowVolume; override;
   end;
@@ -166,7 +167,8 @@ type
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
-    procedure Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean); override;
+    procedure Render3D(const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup; InShadow: boolean); override;
 
     procedure RenderShadowVolume; override;
 
@@ -743,7 +745,8 @@ begin
     (PVRMLTriangle(Triangle)^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
-procedure TGateLevel.Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean);
+procedure TGateLevel.Render3D(const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup; InShadow: boolean);
 
   procedure RenderTeleport(
     const TeleportRotation: Single;
@@ -755,7 +758,7 @@ procedure TGateLevel.Render3D(TransparentGroup: TTransparentGroup; InShadow: boo
       glPushMatrix;
         glTranslatev(Box3DMiddle(TeleportBox));
         glRotatef(TeleportRotation, 1, 1, 0);
-        Teleport.Render(nil, TransparentGroup);
+        Teleport.Render(nil, LightsEnabled, TransparentGroup);
       glPopMatrix;
     end;
   end;
@@ -1035,7 +1038,8 @@ begin
   NewPlayer.PickItem(TItem.Create(Bow, 1));
 end;
 
-procedure TCagesLevel.Render3D(TransparentGroup: TTransparentGroup; InShadow: boolean);
+procedure TCagesLevel.Render3D(const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup; InShadow: boolean);
 var
   I: Integer;
 begin
@@ -1061,7 +1065,7 @@ begin
     begin
       glPushMatrix;
         glTranslatev(FSpidersAppearing.Items[I]);
-        Spider.StandAnimation.Scenes[0].Render(nil, tgAll);
+        Spider.StandAnimation.Scenes[0].Render(nil, LightsEnabled, tgAll);
       glPopMatrix;
     end;
   end;

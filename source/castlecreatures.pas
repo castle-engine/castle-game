@@ -807,7 +807,8 @@ type
     property BoundingBox: TBox3D read FBoundingBox;
 
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup); virtual;
+      const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup); virtual;
 
     { Render shadow volumes for all the thinds rendered by @link(Render).
       It renders shadow volume only if Kind.CastsShadow and
@@ -948,7 +949,8 @@ type
   {$I objectslist_1.inc}
   TCreaturesList = class(TObjectsList_1)
     procedure Render(const Frustum: TFrustum;
-      TransparentGroup: TTransparentGroup);
+      const LightsEnabled: Cardinal;
+      const TransparentGroup: TTransparentGroup);
     procedure Idle(const CompSpeed: Single);
 
     { Remove from this list all creatures that return
@@ -1937,7 +1939,8 @@ begin
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup);
+  const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup);
 
   procedure RenderBoundingGeometry;
   var
@@ -1984,7 +1987,7 @@ begin
   begin
     glPushMatrix;
       glMultMatrix(SceneTransform);
-      CurrentScene.Render(nil, TransparentGroup);
+      CurrentScene.Render(nil, LightsEnabled, TransparentGroup);
       if RenderDebugCaptions then
         DoRenderDebugCaptions;
     glPopMatrix;
@@ -2332,12 +2335,13 @@ end;
 { TCreatures ----------------------------------------------------------------- }
 
 procedure TCreaturesList.Render(const Frustum: TFrustum;
-  TransparentGroup: TTransparentGroup);
+  const LightsEnabled: Cardinal;
+  const TransparentGroup: TTransparentGroup);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    Items[I].Render(Frustum, TransparentGroup);
+    Items[I].Render(Frustum, LightsEnabled, TransparentGroup);
 end;
 
 procedure TCreaturesList.Idle(const CompSpeed: Single);
