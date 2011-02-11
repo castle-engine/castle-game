@@ -403,13 +403,6 @@ type
     FSceneDynamicShadows: boolean;
 
     FRequiredCreatures: TStringList;
-
-    FBumpMappingLightAmbientColor: array [boolean] of TVector4Single;
-    function GetBumpMappingLightAmbientColor(const Lighted: boolean): TVector4Single;
-    procedure SetBumpMappingLightAmbientColor(const Lighted: boolean; const Value: TVector4Single);
-  private
-    FBumpMappingLightDiffuseColor: TVector4Single;
-    procedure SetBumpMappingLightDiffuseColor(const Value: TVector4Single);
   protected
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
@@ -705,16 +698,6 @@ type
     { Turn off lights not supposed to light in the shadow. }
     procedure PushLightsOff;
     procedure PopLightsOff;
-
-    { Ambient color of light used for bump mapping,
-      for shadowed (@false) and lighted (@true) versions. }
-    property BumpMappingLightAmbientColor[Lighted: boolean]: TVector4Single
-      read GetBumpMappingLightAmbientColor
-      write SetBumpMappingLightAmbientColor;
-
-    { Diffuse color of light used for bump mapping. }
-    property BumpMappingLightDiffuseColor: TVector4Single
-      read FBumpMappingLightDiffuseColor write SetBumpMappingLightDiffuseColor;
 
     { Just load TVRMLGLScene from file, doing some common tasks:
       @unorderedList(
@@ -1195,9 +1178,9 @@ begin
     FAnimationTime := 0.0;
 
     AttributesSet(MainScene.Attributes, btIncrease);
-    if BumpMapping then
-      MainScene.Attributes.BumpMappingMaximum := High(TBumpMappingMethod) else
-      MainScene.Attributes.BumpMappingMaximum := bmNone;
+    MainScene.Attributes.BumpMapping := BumpMapping;
+//TODO: for now, needed to actually see BumpMapping:
+    MainScene.Attributes.ForceShaderRendering := true;
     MainScene.Attributes.UseOcclusionQuery := UseOcclusionQuery;
 
     { Calculate InitialPosition, InitialDirection, InitialUp.
@@ -1313,12 +1296,7 @@ begin
 
     MainScene.FreeResources([frTextureDataInNodes]);
 
-    FLightSet := TVRMLGLLightSet.Create(LoadVRML(LightSetFileName),
-      true,
-      { GL_LIGHT0 is reserved for headlight. }
-      { GL_LIGHT1 is reserved for thunder effect in cages level.
-        So first light is GL_LIGHT2. }
-      2, -1);
+    FLightSet := TVRMLGLLightSet.Create(LoadVRML(LightSetFileName), true);
 
     FGlobalAmbientLight := DefaultGlobalAmbientLight;
 
@@ -1404,51 +1382,12 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
         [Element.TagName]);
   end;
 
-  procedure ReadBumpMappingLightProperties(BMElement: TDOMElement);
-
-    function Vector3SingleFromElementData(const ChildName: string;
-      const DefaultValue: TVector3Single): TVector3Single;
-    var
-      E: TDOMElement;
-    begin
-      E := DOMGetChildElement(BMElement, ChildName, false);
-      if E <> nil then
-        Result := Vector3SingleFromStr(DOMGetTextData(E)) else
-        Result := DefaultValue;
-    end;
-
-    function Vector4SingleFromElementData(const ChildName: string;
-      const DefaultValue: TVector4Single): TVector4Single;
-    var
-      E: TDOMElement;
-    begin
-      E := DOMGetChildElement(BMElement, ChildName, false);
-      if E <> nil then
-        Result := Vector4Single(Vector3SingleFromStr(DOMGetTextData(E)), 1) else
-        Result := DefaultValue;
-    end;
-
-  const
-    DefaultBumpMappingLightPosition: TVector3Single = (0, 0, 0);
-  begin
-    { We may update these later during runtime by TLevel subclasses. }
-    MainScene.BumpMappingLightPosition := Vector3SingleFromElementData(
-      'position', DefaultBumpMappingLightPosition);
-    BumpMappingLightAmbientColor[false] := Vector4SingleFromElementData(
-      'ambient_color_shadows', DefaultBumpMappingLightAmbientColor);
-    BumpMappingLightAmbientColor[true] := Vector4SingleFromElementData(
-      'ambient_color_lighted', DefaultBumpMappingLightAmbientColor);
-    BumpMappingLightDiffuseColor := Vector4SingleFromElementData(
-      'diffuse_color', DefaultBumpMappingLightDiffuseColor);
-  end;
-
 var
   ObjectsList: TDOMNodeList;
   ObjectNode: TDOMNode;
   SoundName: string;
   I: Integer;
   NewObject: T3D;
-  BMElement: TDOMElement;
 begin
   { Load Objects }
   ObjectsList := Element.ChildNodes;
@@ -1478,10 +1417,6 @@ begin
 
   FSceneDynamicShadows := false; { default value }
   DOMGetBooleanAttribute(Element, 'scene_dynamic_shadows', FSceneDynamicShadows);
-
-  BMElement := DOMGetChildElement(Element, 'bump_mapping_light', false);
-  if BMElement <> nil then
-    ReadBumpMappingLightProperties(BMElement);
 end;
 
 function TLevel.RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
@@ -1860,44 +1795,15 @@ end;
 
 procedure TLevel.PushLightsOff;
 begin
-  glPushAttrib(GL_LIGHTING_BIT);
+//TODO:  glPushAttrib(GL_LIGHTING_BIT);
 
   { Headlight will stay on here, but lights in Level.LightSet are off. }
-  LightSet.TurnLightsOffForShadows;
-
-  MainScene.BumpMappingLightAmbientColor := FBumpMappingLightAmbientColor[false];
-  MainScene.BumpMappingLightDiffuseColor := Black4Single;
+//TODO:  LightSet.TurnLightsOffForShadows;
 end;
 
 procedure TLevel.PopLightsOff;
 begin
-  glPopAttrib();
-
-  MainScene.BumpMappingLightAmbientColor := FBumpMappingLightAmbientColor[true];
-  MainScene.BumpMappingLightDiffuseColor := FBumpMappingLightDiffuseColor;
-end;
-
-function TLevel.GetBumpMappingLightAmbientColor(const Lighted: boolean):
-  TVector4Single;
-begin
-  Result := FBumpMappingLightAmbientColor[Lighted];
-end;
-
-procedure TLevel.SetBumpMappingLightAmbientColor(const Lighted: boolean;
-  const Value: TVector4Single);
-begin
-  FBumpMappingLightAmbientColor[Lighted] := Value;
-
-  { MainScene.BumpMappingLightAmbientColor should normally correspond to
-    BumpMappingLightAmbientColor[true], so update it if it changed. }
-  if Lighted then
-    MainScene.BumpMappingLightAmbientColor := Value;
-end;
-
-procedure TLevel.SetBumpMappingLightDiffuseColor(const Value: TVector4Single);
-begin
-  FBumpMappingLightDiffuseColor := Value;
-  MainScene.BumpMappingLightDiffuseColor := Value;
+//TODO:  glPopAttrib();
 end;
 
 function TLevel.MainLightForShadows(out AMainLightPosition: TVector4Single): boolean;
@@ -1964,8 +1870,7 @@ begin
     Inc(NewLightsEnabled);
   end;
 
-  (*TODO: LightSet.RenderLights should also increase LightsEnabled *)
-  LightSet.RenderLights;
+  LightSet.RenderLights(NewLightsEnabled);
 
   inherited RenderFromView3D(NewLightsEnabled);
 end;

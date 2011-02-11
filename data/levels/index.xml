@@ -221,13 +221,6 @@
       <creature name="Alien" />
       <creature name="BallMissile" />
     </required_resources>
-
-    <bump_mapping_light>
-      <ambient_color_shadows>0.24 0.24 0.24</ambient_color_shadows>
-      <ambient_color_lighted>0.24 0.24 0.24</ambient_color_lighted>
-      <diffuse_color>1 1 1</diffuse_color>
-      <position>3 23 5</position>
-    </bump_mapping_light>
   </level>
 
   <!-- Another entry for fountain level, to load it with water animation -->
@@ -252,13 +245,6 @@
       <creature name="Alien" />
       <creature name="BallMissile" />
     </required_resources>
-
-    <bump_mapping_light>
-      <ambient_color_shadows>0.24 0.24 0.24</ambient_color_shadows>
-      <ambient_color_lighted>0.24 0.24 0.24</ambient_color_lighted>
-      <diffuse_color>1 1 1</diffuse_color>
-      <position>3 23 5</position>
-    </bump_mapping_light>
   </level>
 
 <!--

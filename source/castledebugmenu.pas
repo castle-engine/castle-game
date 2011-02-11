@@ -108,9 +108,15 @@ type
     OnArgument: TGLMenuBooleanArgument;
     ShadowsArgument: TGLMenuBooleanArgument;
     ShadowsMainArgument: TGLMenuBooleanArgument;
+    PositionSlider: array [0..2] of TGLMenuFloatSlider;
     constructor Create(AOwner: TComponent; ALight: TVRMLLightNode); reintroduce;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
+
+    function GetLightLocation: TVector3Single;
+    procedure SetLightLocation(const Value: TVector3Single);
+    property LightLocation: TVector3Single
+      read GetLightLocation write SetLightLocation;
   end;
 
   TEditHeadlightMenu = class(TCastleMenu)
@@ -123,18 +129,6 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
-  end;
-
-  TEditBumpMappingLightMenu = class(TCastleMenu)
-  public
-    PositionSlider: array [0..2] of TGLMenuFloatSlider;
-    AmbientColorSlider: array [boolean, 0..2] of TGLMenuFloatSlider;
-    DiffuseColorSlider: array [0..2] of TGLMenuFloatSlider;
-    LockMainShadowsLightArgument: TGLMenuBooleanArgument;
-    constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
-    procedure DoLockMainShadowsLight;
   end;
 
 { TViewAngleSlider ----------------------------------------------------------- }
@@ -166,7 +160,6 @@ var
   EditLevelLightsMenu: TEditLevelLightsMenu;
   EditOneLightMenu: TEditOneLightMenu;
   EditHeadlightMenu: TEditHeadlightMenu;
-  EditBumpMappingLightMenu: TEditBumpMappingLightMenu;
 
 { TDebugMenu ------------------------------------------------------------ }
 
@@ -712,140 +705,6 @@ begin
   end;
 end;
 
-{ TEditBumpMappingLightMenu -------------------------------------------------- }
-
-var
-  { Static var, so that it's preserved between TEditBumpMappingLightMenu
-    creation/destruction. Not saved to any config file, this is only
-    for testing after all. }
-  LockMainShadowsLight: boolean = false;
-
-constructor TEditBumpMappingLightMenu.Create(AOwner: TComponent);
-var
-  I: Integer;
-  LevelBoxSizes: TVector3Single;
-begin
-  inherited;
-
-  LevelBoxSizes := Box3DSizes(Level.CameraBox);
-  for I := 0 to 2 do
-    PositionSlider[I] := TGLMenuFloatSlider.Create(
-      Level.CameraBox[0, I] - LevelBoxSizes[I],
-      Level.CameraBox[1, I] + LevelBoxSizes[I],
-      Level.MainScene.BumpMappingLightPosition[I]);
-
-  for I := 0 to 2 do
-  begin
-    AmbientColorSlider[false, I] := TGLMenuFloatSlider.Create(0, 1,
-      Level.BumpMappingLightAmbientColor[false][I]);
-    AmbientColorSlider[true, I] := TGLMenuFloatSlider.Create(0, 1,
-      Level.BumpMappingLightAmbientColor[true][I]);
-  end;
-
-  for I := 0 to 2 do
-    DiffuseColorSlider[I] := TGLMenuFloatSlider.Create(0, 1,
-      Level.BumpMappingLightDiffuseColor[I]);
-
-  LockMainShadowsLightArgument :=
-    TGLMenuBooleanArgument.Create(LockMainShadowsLight);
-
-  Items.AddObject('Position X', PositionSlider[0]);
-  Items.AddObject('Position Y', PositionSlider[1]);
-  Items.AddObject('Position Z', PositionSlider[2]);
-
-  Items.AddObject('Ambient shadowed red'  , AmbientColorSlider[false, 0]);
-  Items.AddObject('Ambient shadowed green', AmbientColorSlider[false, 1]);
-  Items.AddObject('Ambient shadowed blue' , AmbientColorSlider[false, 2]);
-
-  Items.AddObject('Ambient lighted red'  , AmbientColorSlider[true, 0]);
-  Items.AddObject('Ambient lighted green', AmbientColorSlider[true, 1]);
-  Items.AddObject('Ambient lighted blue' , AmbientColorSlider[true, 2]);
-
-  Items.AddObject('Diffuse red'  , DiffuseColorSlider[0]);
-  Items.AddObject('Diffuse green', DiffuseColorSlider[1]);
-  Items.AddObject('Diffuse blue' , DiffuseColorSlider[2]);
-
-  Items.AddObject('Lock main shadows light', LockMainShadowsLightArgument);
-
-  Items.Add('Back');
-end;
-
-procedure TEditBumpMappingLightMenu.DoLockMainShadowsLight;
-var
-  I: Integer;
-  LightNode: TVRMLLightNode;
-begin
-  if LockMainShadowsLight then
-  begin
-    for I := 0 to Level.LightSet.Lights.High do
-    begin
-      LightNode := Level.LightSet.Lights.Items[I].LightNode;
-      if (LightNode is TVRMLPositionalLightNode) and
-         LightNode.FdKambiShadows.Value and
-         LightNode.FdKambiShadowsMain.Value then
-      begin
-        TVRMLPositionalLightNode(LightNode).FdLocation.Value :=
-          Level.MainScene.BumpMappingLightPosition;
-        Level.LightSet.CalculateLights;
-        Break;
-      end;
-    end;
-  end;
-end;
-
-procedure TEditBumpMappingLightMenu.CurrentItemSelected;
-begin
-  case CurrentItem of
-    0..11: ;
-    12: begin
-          LockMainShadowsLightArgument.Value := not LockMainShadowsLightArgument.Value;
-          LockMainShadowsLight := LockMainShadowsLightArgument.Value;
-          DoLockMainShadowsLight;
-        end;
-    13: SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
-    else raise EInternalError.Create('Menu item unknown');
-  end;
-end;
-
-procedure TEditBumpMappingLightMenu.CurrentItemAccessoryValueChanged;
-var
-  Index: Integer;
-  V: TVector3Single;
-  C: TVector4Single;
-begin
-  case CurrentItem of
-    0..2:
-      begin
-        Index := CurrentItem;
-        V := Level.MainScene.BumpMappingLightPosition;
-        V[Index] := PositionSlider[Index].Value;
-        Level.MainScene.BumpMappingLightPosition := V;
-        DoLockMainShadowsLight;
-      end;
-    3..5:
-      begin
-        Index := CurrentItem - 3;
-        C := Level.BumpMappingLightAmbientColor[false];
-        C[Index] := AmbientColorSlider[false, Index].Value;
-        Level.BumpMappingLightAmbientColor[false] := C;
-      end;
-    6..8:
-      begin
-        Index := CurrentItem - 6;
-        C := Level.BumpMappingLightAmbientColor[true];
-        C[Index] := AmbientColorSlider[true, Index].Value;
-        Level.BumpMappingLightAmbientColor[true] := C;
-      end;
-    9..11:
-      begin
-        Index := CurrentItem - 9;
-        C := Level.BumpMappingLightDiffuseColor;
-        C[Index] := DiffuseColorSlider[Index].Value;
-        Level.BumpMappingLightDiffuseColor := C;
-      end;
-  end;
-end;
-
 { TEditLevelLightsMenu ------------------------------------------------------- }
 
 constructor TEditLevelLightsMenu.Create(AOwner: TComponent);
@@ -874,7 +733,6 @@ begin
   Items.AddObject('Global ambient light green', AmbientColorSlider[1]);
   Items.AddObject('Global ambient light blue' , AmbientColorSlider[2]);
   Items.Add('Edit headlight');
-  Items.Add('Edit bump mapping light');
   Items.Add('Back to debug menu');
 end;
 
@@ -912,14 +770,7 @@ begin
            MessageOK(Window, 'No headlight in level ' +
              ' (set NavigationInfo.headlight to TRUE to get headlight)', taLeft);
        end;
-    6: begin
-         { recreate EditBumpMappingLightMenu, since light properties possibly
-           changed by outside action (e.g. some TLevel.Idle ?) }
-         FreeAndNil(EditBumpMappingLightMenu);
-         EditBumpMappingLightMenu := TEditBumpMappingLightMenu.Create(Application);
-         SetCurrentMenu(CurrentMenu, EditBumpMappingLightMenu);
-       end;
-    7: SetCurrentMenu(CurrentMenu, DebugMenu);
+    6: SetCurrentMenu(CurrentMenu, DebugMenu);
     else
        begin
          FreeAndNil(EditOneLightMenu);
@@ -945,6 +796,9 @@ end;
 { TEditOneLightMenu ---------------------------------------------------------- }
 
 constructor TEditOneLightMenu.Create(AOwner: TComponent; ALight: TVRMLLightNode);
+var
+  I: Integer;
+  LevelBoxSizes: TVector3Single;
 begin
   inherited Create(AOwner);
 
@@ -952,6 +806,13 @@ begin
   DrawBackgroundRectangle := false;
 
   Light := ALight;
+
+  LevelBoxSizes := Box3DSizes(Level.CameraBox);
+  for I := 0 to 2 do
+    PositionSlider[I] := TGLMenuFloatSlider.Create(
+      Level.CameraBox[0, I] - LevelBoxSizes[I],
+      Level.CameraBox[1, I] + LevelBoxSizes[I],
+      LightLocation[I]);
 
   RedColorSlider := TGLMenuFloatSlider.Create(0, 1, Light.FdColor.Value[0]);
   GreenColorSlider := TGLMenuFloatSlider.Create(0, 1, Light.FdColor.Value[1]);
@@ -964,6 +825,9 @@ begin
   ShadowsMainArgument := TGLMenuBooleanArgument.Create(
     Light.FdKambiShadowsMain.Value);
 
+  Items.AddObject('Position X', PositionSlider[0]);
+  Items.AddObject('Position Y', PositionSlider[1]);
+  Items.AddObject('Position Z', PositionSlider[2]);
   Items.AddObject('Red color', RedColorSlider);
   Items.AddObject('Green color', GreenColorSlider);
   Items.AddObject('Blue color', BlueColorSlider);
@@ -972,13 +836,25 @@ begin
   Items.AddObject('On', OnArgument);
   Items.AddObject('Shadows', ShadowsArgument);
   Items.AddObject('Shadows main light', ShadowsMainArgument);
-  Items.Add('Point/SpotLight: Change location');
   Items.Add('Point/SpotLight: Change attenuation');
   Items.Add('DirectionalLight: Change direction');
   Items.Add('SpotLight: Change direction');
   Items.Add('SpotLight: Change beamWidth/dropOffRate');
   Items.Add('SpotLight: Change cutOffAngle');
   Items.Add('Back');
+end;
+
+function TEditOneLightMenu.GetLightLocation: TVector3Single;
+begin
+  if Light is TVRMLPositionalLightNode then
+    Result := TVRMLPositionalLightNode(Light).FdLocation.Value else
+    Result := ZeroVector3Single;
+end;
+
+procedure TEditOneLightMenu.SetLightLocation(const Value: TVector3Single);
+begin
+  if Light is TVRMLPositionalLightNode then
+    TVRMLPositionalLightNode(Light).FdLocation.Value := Value;
 end;
 
 procedure TEditOneLightMenu.CurrentItemSelected;
@@ -1012,36 +888,23 @@ var
   Value: Single;
 begin
   case CurrentItem of
-    0, 1, 2, 3, 4: ;
-    5: begin
+    0..7: ;
+    8: begin
          OnArgument.Value := not OnArgument.Value;
          Light.FdOn.Value := OnArgument.Value;
          Level.LightSet.CalculateLights;
        end;
-    6: begin
+    9: begin
          ShadowsArgument.Value := not ShadowsArgument.Value;
          Light.FdKambiShadows.Value := ShadowsArgument.Value;
          Level.LightSet.CalculateLights;
        end;
-    7: begin
+    10:begin
          ShadowsMainArgument.Value := not ShadowsMainArgument.Value;
          Light.FdKambiShadowsMain.Value := ShadowsMainArgument.Value;
          Level.LightSet.CalculateLights;
        end;
-    8: begin
-         if Light is TVRMLPositionalLightNode then
-         begin
-           Vector := TVRMLPositionalLightNode(Light).FdLocation.Value;
-           if MessageInputQueryVector3SingleP(Window, 'Change location' +nl+
-             '(Input "P" to use current player''s location)',
-             Vector, taLeft, Player.Camera.Position) then
-           begin
-             TVRMLPositionalLightNode(Light).FdLocation.Value := Vector;
-             Level.LightSet.CalculateLights;
-           end;
-         end;
-       end;
-    9: begin
+    11:begin
          if Light is TVRMLPositionalLightNode then
          begin
            Vector := TVRMLPositionalLightNode(Light).FdAttenuation.Value;
@@ -1053,7 +916,7 @@ begin
            end;
          end;
        end;
-    10:begin
+    12:begin
          if Light is TVRMLDirectionalLightNode then
          begin
            Vector := TVRMLDirectionalLightNode(Light).FdDirection.Value;
@@ -1066,7 +929,7 @@ begin
            end;
          end;
        end;
-    11:begin
+    13:begin
          if Light is TNodeSpotLight_1 then
          begin
            Vector := TNodeSpotLight_1(Light).FdDirection.Value;
@@ -1090,7 +953,7 @@ begin
            end;
          end;
        end;
-    12:begin
+    14:begin
          if Light is TNodeSpotLight_1 then
          begin
            Value := TNodeSpotLight_1(Light).FdDropOffRate.Value;
@@ -1110,7 +973,7 @@ begin
            end;
          end;
        end;
-    13:begin
+    15:begin
          if Light is TNodeSpotLight_1 then
          begin
            Value := TNodeSpotLight_1(Light).FdCutOffAngle.Value;
@@ -1130,19 +993,30 @@ begin
            end;
          end;
        end;
-    14:SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
+    16:SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
 
 procedure TEditOneLightMenu.CurrentItemAccessoryValueChanged;
+var
+  Index: Integer;
+  V: TVector3Single;
 begin
   case CurrentItem of
-    0: Light.FdColor.Value[0] := RedColorSlider.Value;
-    1: Light.FdColor.Value[1] := GreenColorSlider.Value;
-    2: Light.FdColor.Value[2] := BlueColorSlider.Value;
-    3: Light.FdIntensity.Value := IntensitySlider.Value;
-    4: Light.FdAmbientIntensity.Value := AmbientIntensitySlider.Value;
+    0..2:
+      if Light is TVRMLPositionalLightNode then
+      begin
+        Index := CurrentItem;
+        V := TVRMLPositionalLightNode(Light).FdLocation.Value;
+        V[Index] := PositionSlider[Index].Value;
+        TVRMLPositionalLightNode(Light).FdLocation.Value := V;
+      end;
+    3: Light.FdColor.Value[0] := RedColorSlider.Value;
+    4: Light.FdColor.Value[1] := GreenColorSlider.Value;
+    5: Light.FdColor.Value[2] := BlueColorSlider.Value;
+    6: Light.FdIntensity.Value := IntensitySlider.Value;
+    7: Light.FdAmbientIntensity.Value := AmbientIntensitySlider.Value;
     else Exit;
   end;
 
