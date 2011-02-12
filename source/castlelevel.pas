@@ -1870,7 +1870,7 @@ begin
     Inc(NewLightsEnabled);
   end;
 
-  LightSet.RenderLights(NewLightsEnabled);
+  LightSet.Render(NewLightsEnabled);
 
   inherited RenderFromView3D(NewLightsEnabled);
 end;
