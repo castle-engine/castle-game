@@ -1795,15 +1795,13 @@ end;
 
 procedure TLevel.PushLightsOff;
 begin
-//TODO:  glPushAttrib(GL_LIGHTING_BIT);
-
   { Headlight will stay on here, but lights in Level.LightSet are off. }
-//TODO:  LightSet.TurnLightsOffForShadows;
+  //TODO: here we were disabling every light with LightNode.FdKambiShadows.Value
 end;
 
 procedure TLevel.PopLightsOff;
 begin
-//TODO:  glPopAttrib();
+  //TODO: here we were enabling back what PushLightsOff did
 end;
 
 function TLevel.MainLightForShadows(out AMainLightPosition: TVector4Single): boolean;
