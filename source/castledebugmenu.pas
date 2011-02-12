@@ -99,7 +99,7 @@ type
 
   TEditOneLightMenu = class(TCastleMenu)
   public
-    Light: TVRMLLightNode;
+    Light: TNodeX3DLightNode;
     RedColorSlider: TGLMenuFloatSlider;
     GreenColorSlider: TGLMenuFloatSlider;
     BlueColorSlider: TGLMenuFloatSlider;
@@ -109,7 +109,7 @@ type
     ShadowsArgument: TGLMenuBooleanArgument;
     ShadowsMainArgument: TGLMenuBooleanArgument;
     PositionSlider: array [0..2] of TGLMenuFloatSlider;
-    constructor Create(AOwner: TComponent; ALight: TVRMLLightNode); reintroduce;
+    constructor Create(AOwner: TComponent; ALight: TNodeX3DLightNode); reintroduce;
     procedure CurrentItemSelected; override;
     procedure CurrentItemAccessoryValueChanged; override;
 
@@ -710,7 +710,7 @@ end;
 constructor TEditLevelLightsMenu.Create(AOwner: TComponent);
 var
   I: Integer;
-  LightNode: TVRMLLightNode;
+  LightNode: TNodeX3DLightNode;
 begin
   inherited;
 
@@ -795,7 +795,7 @@ end;
 
 { TEditOneLightMenu ---------------------------------------------------------- }
 
-constructor TEditOneLightMenu.Create(AOwner: TComponent; ALight: TVRMLLightNode);
+constructor TEditOneLightMenu.Create(AOwner: TComponent; ALight: TNodeX3DLightNode);
 var
   I: Integer;
   LevelBoxSizes: TVector3Single;
