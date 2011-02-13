@@ -54,7 +54,6 @@ type
 procedure TEnumerateAddNormalMapToTexture.Enumerate(ParentNode: TVRMLNode; var Node: TVRMLNode);
 var
   A: TNodeAppearance;
-  KA: TNodeKambiAppearance;
 begin
   if Node is TNodeAppearance then
   begin
@@ -62,20 +61,9 @@ begin
     if (A.FdTexture.Value <> nil) and
        (A.FdTexture.Value.NodeName = TextureName) then
     begin
-      { create KambiApperance, with all props copied from A }
-      KA := TNodeKambiAppearance.Create(A.NodeName, A.WWWBasePath);
-      KA.FdfillProperties.Assign(A.FdfillProperties);
-      KA.FdlineProperties.Assign(A.FdlineProperties);
-      KA.Fdmaterial.Assign(A.Fdmaterial);
-      KA.Fdshaders.Assign(A.Fdshaders);
-      KA.Fdtexture.Assign(A.Fdtexture);
-      KA.FdtextureTransform.Assign(A.FdtextureTransform);
-
       { add NormalMap }
-      KA.FdNormalMap.Value := NormalMap;
+      A.FdNormalMap.Value := NormalMap;
       NormalMapUsed := true;
-
-      Node := KA;
     end;
   end;
 end;
