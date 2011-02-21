@@ -1179,8 +1179,6 @@ begin
 
     AttributesSet(MainScene.Attributes, btIncrease);
     MainScene.Attributes.BumpMapping := BumpMapping;
-//TODO: for now, needed to actually see BumpMapping:
-    MainScene.Attributes.ForceShaderRendering := true;
     MainScene.Attributes.UseOcclusionQuery := UseOcclusionQuery;
 
     { Calculate InitialPosition, InitialDirection, InitialUp.

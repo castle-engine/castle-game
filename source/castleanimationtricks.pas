@@ -92,7 +92,7 @@ type
 implementation
 
 uses Math, KambiUtils, KambiGLUtils, KambiStringUtils, SysUtils,
-  KambiFilesUtils, RenderStateUnit, DDS, GLExt, GLImages;
+  KambiFilesUtils, RenderStateUnit, DDS, GLExt, GLImages, VRMLGLRenderer;
 
 { TBlendedLoopingAnimation --------------------------------------------------- }
 
@@ -185,7 +185,7 @@ end;
 constructor TBlendedLoopingAnimationShader.Create(AOwner: TComponent);
 begin
   inherited;
-  Attributes.GLSLShaders := false;
+  Attributes.Shaders := srDisable;
 end;
 
 function TBlendedLoopingAnimationShader.UseShader: boolean;
