@@ -1,5 +1,5 @@
 /* For some more comments, see water_reflections_normalmap.fs
-   in kambi_vrml_test_suite. This is adjusted to work nicely with
+   in demo_models. This is adjusted to work nicely with
    water on fountain level. */
 
 uniform samplerCube envMap;

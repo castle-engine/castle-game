@@ -1,5 +1,5 @@
 /* For some more comments, see water_reflections_normalmap.vs
-   in kambi_vrml_test_suite. This is adjusted to work nicely with
+   in demo_models. This is adjusted to work nicely with
    water on fountain level. */
 
 /* Varying vectors below are given in in eye-space.
