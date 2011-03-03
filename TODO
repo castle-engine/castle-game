@@ -65,6 +65,11 @@ Resigned: fountain new level for castle 1.0.0:
 
 - make gamma correction.
     Windows: http://www.delphi3d.net/articles/viewarticle.php?article=gamma.htm
+    
+- Circular (Laz forum), others:
+  move speed too fast
+  visual hint when monster is hit
+    
 
 - rudy usability test:
   - again, mouse over yes/no message boxes should work
@@ -75,6 +80,7 @@ Resigned: fountain new level for castle 1.0.0:
 
 - Kasia usability test:
   - mouse over yes/no message boxes should work (confirmed Eric)
+    confirmed Circular (laz forum)
   - spider on the gate level is not really interesting. Make spider ambush ? On the cart --- suddenly a group of spiders crawls from an egg ? Or on the sword pit --- suddenly group of spiders crawls from underneath ?
   - enter/exit on levels should be more black, to suggest more that these are enter/exit, not a normal wall
   - items should automatically hide if they were uncovered by automatic show ?
