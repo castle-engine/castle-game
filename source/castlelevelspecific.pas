@@ -1451,8 +1451,6 @@ begin
     Fountain.CastsShadow := false; { not manifold }
     Fountain.Collides := false;
 
-    Fountain.Diffuse := Vector4Single(0.5, 0.5, 1, 0.75);
-    Fountain.Ambient := Vector4Single(0, 0, 0, 1);
     Fountain.Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;
 
     Fountain.TimePlayingSpeed := 1.5;

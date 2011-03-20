@@ -36,10 +36,9 @@ type
 
     Note that the normal blending control (for rendering transparent materials)
     has to be disabled for this, as this requires full control over blending.
-    Also normal materials control must be disabled
-    (we have to supply our own alpha value).
-    So Attributes.Blending and Attributes.ControlBlending and
-    Attributes.ControlMaterials must always remain @false.
+    So Attributes.Blending and Attributes.ControlBlending must always remain
+    @false. We also have to modify the alpha value, using
+    Attributes.Opacity.
 
     Attributes.BlendingSourceFactor and Attributes.BlendingDestinationFactor
     are used, to control our blending. So you can e.g.
@@ -49,25 +48,8 @@ type
     This also ignores TimeLoop (works like it's always @true) and
     TimeBackwards (works like it's always @false). }
   TBlendedLoopingAnimation = class(TVRMLGLAnimation)
-  private
-    FDiffuse: TVector4Single;
-    FSpecular: TVector4Single;
-    FAmbient: TVector4Single;
   public
     constructor Create(AOwner: TComponent); override;
-
-    { Colors of the material.
-      RGB of this will be simply used, and the alpha of this color
-      sets the maximum alpha during the animation.
-      By default Diffuse and Specular are pure white,
-      Ambient is (0.2, 0.2, 0.2, 1).
-
-      @groupBegin }
-    property Diffuse: TVector4Single read FDiffuse write FDiffuse;
-    property Specular: TVector4Single read FSpecular write FSpecular;
-    property Ambient: TVector4Single read FAmbient write FAmbient;
-    { @groupEnd }
-
     procedure Render(const Frustum: TFrustum;
       const LightsEnabled: Cardinal;
       const TransparentGroup: TTransparentGroup;
@@ -99,30 +81,13 @@ uses Math, KambiUtils, KambiGLUtils, KambiStringUtils, SysUtils,
 constructor TBlendedLoopingAnimation.Create(AOwner: TComponent);
 begin
   inherited;
-  FDiffuse := White4Single;
-  FSpecular := White4Single;
-  FAmbient := Vector4Single(0.2, 0.2, 0.2, 1);
   Attributes.Blending := false;
-  Attributes.ControlMaterials := false;
   Attributes.ControlBlending := false;
 end;
 
 procedure TBlendedLoopingAnimation.Render(const Frustum: TFrustum;
   const LightsEnabled: Cardinal;
   const TransparentGroup: TTransparentGroup; InShadow: boolean);
-
-  procedure SetMaterial(const Alpha: Single);
-  var
-    V: TVector4Single;
-  begin
-    V := Ambient; V[3] *= Alpha;
-    glMaterialv(GL_FRONT_AND_BACK, GL_AMBIENT , V); // saved by GL_LIGHTING_BIT
-    V := Diffuse; V[3] *= Alpha;
-    glMaterialv(GL_FRONT_AND_BACK, GL_DIFFUSE , V); // saved by GL_LIGHTING_BIT
-    V := Specular; V[3] *= Alpha;
-    glMaterialv(GL_FRONT_AND_BACK, GL_SPECULAR, V); // saved by GL_LIGHTING_BIT
-  end;
-
 var
   SceneIndex, MiddleIndex, HalfIndex: Integer;
   Amount: Single;
@@ -170,10 +135,10 @@ begin
         Since we use alpha < 1 here (and disable material control by scenes),
         actually the whole scene is always a transparent object. }
 
-      SetMaterial(Amount);
+      Attributes.Opacity := Amount;
       Scenes[SceneIndex].Render(Frustum, LightsEnabled, tgAll, InShadow);
 
-      SetMaterial(1 - Amount);
+      Attributes.Opacity := 1 - Amount;
       Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(
         Frustum, LightsEnabled, tgAll, InShadow);
     finally glPopAttrib end;
