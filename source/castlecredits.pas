@@ -180,7 +180,7 @@ begin
   StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
   CreditsModel := TVRMLGLScene.CreateCustomCache(nil, GLContextCache);
-  CreditsModel.Load(LoadVRMLClassicFromString(VRMLContents, ''), true);
+  CreditsModel.Load(LoadVRMLClassicFromString(VRMLContents, '', GLContextCache), true);
 
   AttributesSet(CreditsModel.Attributes, btIncrease);
   CreditsModel.Attributes.UseSceneLights := true;

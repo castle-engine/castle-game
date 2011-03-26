@@ -132,7 +132,7 @@ begin
 
     if Inlined <> nil then
     begin
-      G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
+      G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath, Node.Cache);
       G1.PositionInParent := Node.PositionInParent;
       G1.VRML1ChildAdd(Inlined);
       Node := G1;
@@ -146,7 +146,7 @@ begin
 
     if Inlined <> nil then
     begin
-      G2 := TNodeGroup_2.Create(Node.NodeName, Node.WWWBasePath);
+      G2 := TNodeGroup_2.Create(Node.NodeName, Node.WWWBasePath, Node.Cache);
       { update PositionInParent,
         to make the resulting VRML look more similar to original
         (otherwise resolved inline could move up in the file) }
@@ -171,7 +171,7 @@ begin
   Parameters.CheckHigh(1);
   FileName := Parameters[1];
 
-  Model := LoadVRML(FileName);
+  Model := LoadVRML(FileName, DefaultCache);
   try
     BaseName := DeleteFileExt(ExtractFileName(FileName));
 
