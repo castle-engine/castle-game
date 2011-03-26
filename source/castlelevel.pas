@@ -1294,7 +1294,7 @@ begin
 
     MainScene.FreeResources([frTextureDataInNodes]);
 
-    FLightSet := TVRMLGLLightSet.Create(LoadVRML(LightSetFileName, GLContextCache), true);
+    FLightSet := TVRMLGLLightSet.Create(LoadVRML(LightSetFileName), true);
 
     FGlobalAmbientLight := DefaultGlobalAmbientLight;
 

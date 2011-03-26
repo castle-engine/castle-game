@@ -199,10 +199,10 @@ begin
     OwnsFirstRootNode := FirstRootNodeIndex = -1;
     if not OwnsFirstRootNode then
       RootNodes[0] := FirstRootNodesPool.Objects[FirstRootNodeIndex] as TVRMLNode else
-      RootNodes[0] := LoadVRML(FModelFileNames[0], Cache, false);
+      RootNodes[0] := LoadVRML(FModelFileNames[0], false);
 
     for I := 1 to RootNodes.High do
-      RootNodes[I] := LoadVRML(FModelFileNames[I], Cache, false);
+      RootNodes[I] := LoadVRML(FModelFileNames[I], false);
 
     Result := TVRMLGLAnimation.CreateCustomCache(nil, FCache);
     Result.Load(RootNodes, OwnsFirstRootNode, FTimes,

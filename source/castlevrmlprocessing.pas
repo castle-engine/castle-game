@@ -76,7 +76,7 @@ begin
   E := TEnumerateAddNormalMapToTexture.Create;
   try
     E.TextureName := TextureName;
-    E.NormalMap := TNodeImageTexture.Create(NormalMapName, Node.WWWBasePath, Node.Cache);
+    E.NormalMap := TNodeImageTexture.Create(NormalMapName, Node.WWWBasePath);
     E.NormalMap.FdUrl.Items.Add(NormalMapUrl);
     Node.EnumerateReplaceChildren(@E.Enumerate);
     if not E.NormalMapUsed then
@@ -115,7 +115,7 @@ begin
     Mat := M as TNodeMaterial_2;
     Mat.FdDiffuseColor.Value := Vector3Single(0.5, 0.5, 1.0);
 
-    CS := TNodeComposedShader.Create('', '', RootNode.Cache);
+    CS := TNodeComposedShader.Create('', '');
     CS.NodeName := 'WaterShader';
     (Node as TNodeAppearance).FdShaders.Add(CS);
     CS.FdLanguage.Value := 'GLSL';
@@ -125,11 +125,11 @@ begin
     CM.FdUpdate.Value := 'NEXT_FRAME_ONLY';
     CM.FdSize.Value := 512;}
 
-    CM := TNodeImageCubeMapTexture.Create('', RootNode.WWWBasePath, RootNode.Cache);
+    CM := TNodeImageCubeMapTexture.Create('', RootNode.WWWBasePath);
     CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
     CM.FdUrl.Items.Add('water_reflections/water_environment_map.dds');
 
-    MT := TNodeMovieTexture.Create('', RootNode.WWWBasePath, RootNode.Cache);
+    MT := TNodeMovieTexture.Create('', RootNode.WWWBasePath);
     CS.AddCustomField(TSFNode.Create(CS, 'normalMap', [], MT));
     MT.FdUrl.Items.Add('water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png');
     MT.FdLoop.Value := true;
@@ -137,12 +137,12 @@ begin
     ShaderCamMatrix := TSFMatrix3f.Create(CS, 'cameraRotationInverseMatrix', IdentityMatrix3Single);
     CS.AddCustomField(ShaderCamMatrix, true);
 
-    Part := TNodeShaderPart.Create('', RootNode.WWWBasePath, RootNode.Cache);
+    Part := TNodeShaderPart.Create('', RootNode.WWWBasePath);
     CS.FdParts.Add(Part);
     Part.FdType.Value := 'FRAGMENT';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.fs');
 
-    Part := TNodeShaderPart.Create('', RootNode.WWWBasePath, RootNode.Cache);
+    Part := TNodeShaderPart.Create('', RootNode.WWWBasePath);
     CS.FdParts.Add(Part);
     Part.FdType.Value := 'VERTEX';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.vs');
