@@ -44,7 +44,8 @@ uses VectorMath, VRMLScene, VRMLGLScene, VRMLGLLightSet, Boxes3D,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSoundAllocator, Matrix,
   VRMLGLBackground, DOM, XmlSoundEngine, Base3D, VRMLShape,
-  GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum, KambiSceneManager;
+  GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum, KambiSceneManager,
+  VRMLShader;
 
 {$define read_interface}
 
@@ -1178,7 +1179,9 @@ begin
     FAnimationTime := 0.0;
 
     AttributesSet(MainScene.Attributes, btIncrease);
-    MainScene.Attributes.BumpMapping := BumpMapping;
+    if BumpMapping then
+      MainScene.Attributes.BumpMapping := bmBasic else
+      MainScene.Attributes.BumpMapping := bmNone;
     MainScene.Attributes.UseOcclusionQuery := UseOcclusionQuery;
 
     { Calculate InitialPosition, InitialDirection, InitialUp.
