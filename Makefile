@@ -13,7 +13,9 @@ default: info
 	$(MAKE) -C data/items/sword/
 	$(MAKE) -C data/levels/
 
-VERSION := $(shell castle --version)
+# This is deliberately a "=" variable, not ":=", so it's expanded only
+# when needed (not for any compilation)
+VERSION = $(shell castle --version)
 
 info:
 	@echo 'Version is '$(VERSION)
