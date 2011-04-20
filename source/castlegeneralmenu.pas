@@ -42,7 +42,7 @@ type
     property ExclusiveEvents default false;
     property DrawFocused default false;
     procedure CurrentItemChanged; override;
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
     function PositionInside(const X, Y: Integer): boolean; override;
   end;
 
@@ -78,10 +78,10 @@ begin
   SoundEngine.Sound(stMenuCurrentItemChanged);
 end;
 
-procedure TCastleMenu.CurrentItemSelected;
+procedure TCastleMenu.Click;
 begin
   inherited;
-  SoundEngine.Sound(stMenuCurrentItemSelected);
+  SoundEngine.Sound(stMenuClick);
 end;
 
 function TCastleMenu.PositionInside(const X, Y: Integer): boolean;

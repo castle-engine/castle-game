@@ -123,7 +123,7 @@ var
     @groupBegin }
   stIntroMusic,
   stMenuCurrentItemChanged,
-  stMenuCurrentItemSelected,
+  stMenuClick,
   stSaveScreen,
   stGameWinMusic
   { @groupEnd }
@@ -220,7 +220,7 @@ begin
   SoundNameType('thrown_web_idle',                stThrownWebIdle);
   SoundNameType('intro_music',                    stIntroMusic);
   SoundNameType('menu_current_item_changed',      stMenuCurrentItemChanged);
-  SoundNameType('menu_current_item_selected',     stMenuCurrentItemSelected);
+  SoundNameType('menu_current_item_selected',     stMenuClick);
   SoundNameType('save_screen',                    stSaveScreen);
   SoundNameType('game_win_music',                 stGameWinMusic);
 

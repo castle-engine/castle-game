@@ -44,10 +44,10 @@ var
 
 type
   TChooseMenu = class(TCastleMenu)
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
   end;
 
-procedure TChooseMenu.CurrentItemSelected;
+procedure TChooseMenu.Click;
 begin
   inherited;
 

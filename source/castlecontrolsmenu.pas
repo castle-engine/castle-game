@@ -95,8 +95,8 @@ type
     UseMouseLookArgument: TGLMenuBooleanArgument;
     InvertVerticalMouseLookArgument: TGLMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
+    procedure Click; override;
+    procedure AccessoryValueChanged; override;
   end;
 
   TControlsSubMenu = class(TSubMenu)
@@ -108,7 +108,7 @@ type
     destructor Destroy; override;
 
     property Group: TInputGroup read FGroup;
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
   end;
 
   TBasicControlsMenu = class(TControlsSubMenu)
@@ -211,7 +211,7 @@ begin
   SubMenuTitle := 'Configure controls';
 end;
 
-procedure TControlsMenu.CurrentItemSelected;
+procedure TControlsMenu.Click;
 begin
   inherited;
 
@@ -257,7 +257,7 @@ begin
   end;
 end;
 
-procedure TControlsMenu.CurrentItemAccessoryValueChanged;
+procedure TControlsMenu.AccessoryValueChanged;
 begin
   inherited;
 
@@ -316,7 +316,7 @@ begin
   inherited;
 end;
 
-procedure TControlsSubMenu.CurrentItemSelected;
+procedure TControlsSubMenu.Click;
 
   procedure ChangeKey(InputConfiguration: TInputConfiguration);
   var

@@ -44,7 +44,7 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
 type
   TGameMenu = class(TCastleMenu)
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
   end;
 
   TGameSoundMenu = class(TCastleMenu)
@@ -54,8 +54,8 @@ type
     MusicVolume: TGLMusicVolumeMenuItem;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
+    procedure Click; override;
+    procedure AccessoryValueChanged; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ begin
   Items.Add('End game');
 end;
 
-procedure TGameMenu.CurrentItemSelected;
+procedure TGameMenu.Click;
 begin
   inherited;
 
@@ -118,7 +118,7 @@ begin
   inherited;
 end;
 
-procedure TGameSoundMenu.CurrentItemSelected;
+procedure TGameSoundMenu.Click;
 begin
   inherited;
 
@@ -131,7 +131,7 @@ begin
   end;
 end;
 
-procedure TGameSoundMenu.CurrentItemAccessoryValueChanged;
+procedure TGameSoundMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
     1: SoundVolume.AccessoryValueChanged;

@@ -50,7 +50,7 @@ type
   TMainMenu = class(TCastleMenu)
   public
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
   end;
 
   TTextureMinificationQualitySlider = class(TGLMenuIntegerSlider)
@@ -81,8 +81,8 @@ type
     procedure SetAntiAliasing(
       Value: TAntiAliasing;
       UpdateSlider: boolean);
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
+    procedure Click; override;
+    procedure AccessoryValueChanged; override;
   end;
 
   TSoundMenu = class(TSubMenu)
@@ -94,15 +94,15 @@ type
     OpenALDeviceArgument: TGLMenuItemArgument;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
+    procedure Click; override;
+    procedure AccessoryValueChanged; override;
   end;
 
   TChangeOpenALDeviceMenu = class(TSubMenu)
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
   end;
 
   TChooseNewLevelMenu = class(TSubMenu)
@@ -111,7 +111,7 @@ type
     FirstDemoLevelIndex: Cardinal;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
     function SpaceBetweenItems(const NextItemIndex: Cardinal): Cardinal; override;
     procedure Draw; override;
   end;
@@ -208,7 +208,7 @@ begin
   DrawBackgroundRectangle := false;
 end;
 
-procedure TMainMenu.CurrentItemSelected;
+procedure TMainMenu.Click;
 
   procedure ChooseNewGame;
 
@@ -418,7 +418,7 @@ begin
   end;
 end;
 
-procedure TVideoMenu.CurrentItemSelected;
+procedure TVideoMenu.Click;
 
   procedure ViewVideoInfo;
   begin
@@ -580,7 +580,7 @@ begin
   end;
 end;
 
-procedure TVideoMenu.CurrentItemAccessoryValueChanged;
+procedure TVideoMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
     1: begin
@@ -626,7 +626,7 @@ begin
   inherited;
 end;
 
-procedure TSoundMenu.CurrentItemSelected;
+procedure TSoundMenu.Click;
 begin
   inherited;
 
@@ -640,7 +640,7 @@ begin
   end;
 end;
 
-procedure TSoundMenu.CurrentItemAccessoryValueChanged;
+procedure TSoundMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
     1: SoundVolume.AccessoryValueChanged;
@@ -668,7 +668,7 @@ begin
   inherited;
 end;
 
-procedure TChangeOpenALDeviceMenu.CurrentItemSelected;
+procedure TChangeOpenALDeviceMenu.Click;
 begin
   inherited;
 
@@ -766,7 +766,7 @@ begin
   glPopMatrix;
 end;
 
-procedure TChooseNewLevelMenu.CurrentItemSelected;
+procedure TChooseNewLevelMenu.Click;
 begin
   inherited;
 

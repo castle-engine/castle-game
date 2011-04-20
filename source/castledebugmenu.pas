@@ -55,7 +55,7 @@ type
     DebugRenderShadowVolumeArgument: TGLMenuBooleanArgument;
     DebugRenderForLevelScreenshotArgument: TGLMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
   end;
 
   TDebugPlayerMenu = class(TCastleMenu)
@@ -65,36 +65,36 @@ type
     RotationVerticalSpeedSlider: TGLMenuFloatSlider;
     PlayerSpeedSlider: TGLMenuFloatSlider;
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
+    procedure Click; override;
+    procedure AccessoryValueChanged; override;
   end;
 
   TDebugItemsMenu = class(TCastleMenu)
   public
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
   end;
 
   TDebugCreaturesMenu = class(TCastleMenu)
   public
     DebugTimeStopForCreaturesArgument: TGLMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
+    procedure Click; override;
   end;
 
   TDebugLevelMenu = class(TCastleMenu)
   public
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
+    procedure Click; override;
+    procedure AccessoryValueChanged; override;
   end;
 
   TEditLevelLightsMenu = class(TCastleMenu)
   public
     AmbientColorSlider: array[0..2] of TGLMenuFloatSlider;
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
+    procedure Click; override;
+    procedure AccessoryValueChanged; override;
   end;
 
   TEditOneLightMenu = class(TCastleMenu)
@@ -110,8 +110,8 @@ type
     ShadowsMainArgument: TGLMenuBooleanArgument;
     PositionSlider: array [0..2] of TGLMenuFloatSlider;
     constructor Create(AOwner: TComponent; ALight: TNodeX3DLightNode); reintroduce;
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
+    procedure Click; override;
+    procedure AccessoryValueChanged; override;
 
     function GetLightLocation: TVector3Single;
     procedure SetLightLocation(const Value: TVector3Single);
@@ -127,8 +127,8 @@ type
     SpotArgument: TGLMenuBooleanArgument;
     { Create this only when Level.Headlight <> nil. }
     constructor Create(AOwner: TComponent); override;
-    procedure CurrentItemSelected; override;
-    procedure CurrentItemAccessoryValueChanged; override;
+    procedure Click; override;
+    procedure AccessoryValueChanged; override;
   end;
 
 { TViewAngleSlider ----------------------------------------------------------- }
@@ -188,7 +188,7 @@ begin
   Items.Add('Back to game');
 end;
 
-procedure TDebugMenu.CurrentItemSelected;
+procedure TDebugMenu.Click;
 
   procedure ForceThunder;
   begin
@@ -262,7 +262,7 @@ begin
   Items.Add('Back');
 end;
 
-procedure TDebugPlayerMenu.CurrentItemSelected;
+procedure TDebugPlayerMenu.Click;
 
   procedure PlayerSetMaxLife;
   var
@@ -300,7 +300,7 @@ begin
   end;
 end;
 
-procedure TDebugPlayerMenu.CurrentItemAccessoryValueChanged;
+procedure TDebugPlayerMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
     2: begin
@@ -334,7 +334,7 @@ begin
   Items.Add('Back');
 end;
 
-procedure TDebugCreaturesMenu.CurrentItemSelected;
+procedure TDebugCreaturesMenu.Click;
 
   function ChooseCreatureKind(out ChooseCreature: TCreatureKind): boolean;
   var
@@ -467,7 +467,7 @@ begin
   Items.Add('Back');
 end;
 
-procedure TDebugLevelMenu.CurrentItemSelected;
+procedure TDebugLevelMenu.Click;
 
   procedure ChangeToLevel;
   var
@@ -529,7 +529,7 @@ begin
   end;
 end;
 
-procedure TDebugLevelMenu.CurrentItemAccessoryValueChanged;
+procedure TDebugLevelMenu.AccessoryValueChanged;
 begin
   inherited;
 end;
@@ -546,7 +546,7 @@ begin
   Items.Add('Back');
 end;
 
-procedure TDebugItemsMenu.CurrentItemSelected;
+procedure TDebugItemsMenu.Click;
 
   function ChooseItemKind(out ChooseItem: TItemKind): boolean;
   var
@@ -629,7 +629,7 @@ begin
   Items.Add('Back');
 end;
 
-procedure TEditHeadlightMenu.CurrentItemSelected;
+procedure TEditHeadlightMenu.Click;
 
   procedure ChangeAttenuation;
   var
@@ -680,7 +680,7 @@ begin
   end;
 end;
 
-procedure TEditHeadlightMenu.CurrentItemAccessoryValueChanged;
+procedure TEditHeadlightMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
     0:
@@ -736,7 +736,7 @@ begin
   Items.Add('Back to debug menu');
 end;
 
-procedure TEditLevelLightsMenu.CurrentItemSelected;
+procedure TEditLevelLightsMenu.Click;
 
   function LightSetVRMLComment: string;
   begin
@@ -781,7 +781,7 @@ begin
   end;
 end;
 
-procedure TEditLevelLightsMenu.CurrentItemAccessoryValueChanged;
+procedure TEditLevelLightsMenu.AccessoryValueChanged;
 begin
   case CurrentItem - Level.LightSet.Lights.Count of
     2: Level.GlobalAmbientLight[0] := AmbientColorSlider[0].Value;
@@ -857,7 +857,7 @@ begin
     TVRMLPositionalLightNode(Light).FdLocation.Value := Value;
 end;
 
-procedure TEditOneLightMenu.CurrentItemSelected;
+procedure TEditOneLightMenu.Click;
 
   function MessageInputQueryVector3SingleP(
     Window: TGLWindow; const Title: string;
@@ -998,7 +998,7 @@ begin
   end;
 end;
 
-procedure TEditOneLightMenu.CurrentItemAccessoryValueChanged;
+procedure TEditOneLightMenu.AccessoryValueChanged;
 var
   Index: Integer;
   V: TVector3Single;
