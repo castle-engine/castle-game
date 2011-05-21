@@ -374,15 +374,15 @@ const
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
     begin
-      LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].LightNode as
+      LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].Node as
         TVRMLPositionalLightNode;
       LightNode.FdColor.Value := Vector3Single(1, 0, 0);
       LightNode.FdAttenuation.Value := Vector3Single(1, 0.1, 0);
       LightNode.FdKambiShadows.Value := true;
     end;
 
-    LightSet.Lights.Items[0].LightNode.FdKambiShadows.Value := true;
-    LightSet.Lights.Items[0].LightNode.FdKambiShadowsMain.Value := true;
+    LightSet.Lights.Items[0].Node.FdKambiShadows.Value := true;
+    LightSet.Lights.Items[0].Node.FdKambiShadowsMain.Value := true;
 
     LightSet.CalculateLights;
   end;
@@ -407,14 +407,14 @@ var
     if WerewolfAliveCount = 0 then
     begin
       { turn light over stairs to next level }
-      LightNode := LightSet.Lights.Items[WerewolfFirstLight].LightNode as
+      LightNode := LightSet.Lights.Items[WerewolfFirstLight].Node as
         TVRMLPositionalLightNode;
       LightNode.FdLocation.Value := StairsBlockerMiddle;
       LightNode.FdOn.Value := true;
 
       for I := 1 to CastleHallWerewolvesCount - 1 do
       begin
-        LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].LightNode as
+        LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].Node as
           TVRMLPositionalLightNode;
         LightNode.FdOn.Value := false;
       end;
@@ -423,7 +423,7 @@ var
       { turn light for each alive werewolf }
       for I := 0 to CastleHallWerewolvesCount - 1 do
       begin
-        LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].LightNode as
+        LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].Node as
           TVRMLPositionalLightNode;
         LightNode.FdOn.Value := not WerewolfCreature[I].Dead;
         LightNode.FdLocation.Value := WerewolfCreature[I].MiddlePosition;
@@ -965,8 +965,8 @@ begin
   if not GameWin then
   begin
     { Torch light modify, to make an illusion of unstable light }
-    LightSet.Lights.Items[0].LightNode.FdIntensity.Value := Clamped(
-        LightSet.Lights.Items[0].LightNode.FdIntensity.Value +
+    LightSet.Lights.Items[0].Node.FdIntensity.Value := Clamped(
+        LightSet.Lights.Items[0].Node.FdIntensity.Value +
           MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed  * 50,
         0.5, 1);
     LightSet.CalculateLights;

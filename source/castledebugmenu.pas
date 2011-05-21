@@ -723,7 +723,7 @@ begin
 
   for I := 0 to Level.LightSet.Lights.High do
   begin
-    LightNode := Level.LightSet.Lights.Items[I].LightNode;
+    LightNode := Level.LightSet.Lights.Items[I].Node;
     Items.Add(Format('Edit %d: %s "%s"',
       [I, LightNode.NodeTypeName, LightNode.NodeName]));
   end;
@@ -775,7 +775,7 @@ begin
        begin
          FreeAndNil(EditOneLightMenu);
          EditOneLightMenu := TEditOneLightMenu.Create(nil,
-           Level.LightSet.Lights.Items[CurrentItem].LightNode);
+           Level.LightSet.Lights.Items[CurrentItem].Node);
          SetCurrentMenu(CurrentMenu, EditOneLightMenu);
        end;
   end;
