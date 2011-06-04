@@ -372,7 +372,7 @@ end;
 
 procedure TGame3DControls.Draw;
 begin
-  Player.RenderAttack;
+  Player.RenderAttack(Level.MainScene.GlobalLights { TODO: check that is actually does what it should });
 end;
 
 { Call this when Level value changed (because of LevelFinished

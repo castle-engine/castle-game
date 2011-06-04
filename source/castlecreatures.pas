@@ -807,8 +807,7 @@ type
     property BoundingBox: TBox3D read FBoundingBox;
 
     procedure Render(const Frustum: TFrustum;
-      const LightsEnabled: Cardinal;
-      const TransparentGroup: TTransparentGroup); virtual;
+      const Params: TRenderParams); virtual;
 
     { Render shadow volumes for all the thinds rendered by @link(Render).
       It renders shadow volume only if Kind.CastsShadow and
@@ -949,8 +948,7 @@ type
   {$I objectslist_1.inc}
   TCreaturesList = class(TObjectsList_1)
     procedure Render(const Frustum: TFrustum;
-      const LightsEnabled: Cardinal;
-      const TransparentGroup: TTransparentGroup);
+      const Params: TRenderParams);
     procedure Idle(const CompSpeed: Single);
 
     { Remove from this list all creatures that return
@@ -1939,8 +1937,7 @@ begin
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum;
-  const LightsEnabled: Cardinal;
-  const TransparentGroup: TTransparentGroup);
+  const Params: TRenderParams);
 
   procedure RenderBoundingGeometry;
   var
@@ -1987,13 +1984,13 @@ begin
   begin
     glPushMatrix;
       glMultMatrix(SceneTransform);
-      CurrentScene.Render(nil, LightsEnabled, TransparentGroup);
+      CurrentScene.Render(nil, (Params as TVRMLRenderParams).BaseLights, Params.TransparentGroup);
       if RenderDebugCaptions then
         DoRenderDebugCaptions;
     glPopMatrix;
 
     if RenderBoundingBoxes and
-       (TransparentGroup in [tgAll, tgOpaque]) then
+       (Params.TransparentGroup in [tgAll, tgOpaque]) then
       RenderBoundingGeometry;
   end;
 end;
@@ -2335,13 +2332,12 @@ end;
 { TCreatures ----------------------------------------------------------------- }
 
 procedure TCreaturesList.Render(const Frustum: TFrustum;
-  const LightsEnabled: Cardinal;
-  const TransparentGroup: TTransparentGroup);
+  const Params: TRenderParams);
 var
   I: Integer;
 begin
   for I := 0 to High do
-    Items[I].Render(Frustum, LightsEnabled, TransparentGroup);
+    Items[I].Render(Frustum, Params);
 end;
 
 procedure TCreaturesList.Idle(const CompSpeed: Single);

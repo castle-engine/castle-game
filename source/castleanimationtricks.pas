@@ -25,7 +25,8 @@ unit CastleAnimationTricks;
 
 interface
 
-uses VRMLGLScene, Classes, VRMLGLAnimation, Frustum, VectorMath, GLShaders, GL;
+uses VRMLGLScene, Classes, VRMLGLAnimation, Frustum, VectorMath, GLShaders, GL,
+  Base3D;
 
 type
   { Animation forced to seamlessly loop by blending the beginning frames
@@ -51,9 +52,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure Render(const Frustum: TFrustum;
-      const LightsEnabled: Cardinal;
-      const TransparentGroup: TTransparentGroup;
-      InShadow: boolean); override;
+      const Params: TRenderParams); override;
   end;
 
   { TBlendedLoopingAnimation with a GLSL shader with a cubemap. }
@@ -66,9 +65,7 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure GLContextClose; override;
     procedure Render(const Frustum: TFrustum;
-      const LightsEnabled: Cardinal;
-      const TransparentGroup: TTransparentGroup;
-      InShadow: boolean); override;
+      const Params: TRenderParams); override;
   end;
 
 implementation
@@ -86,13 +83,14 @@ begin
 end;
 
 procedure TBlendedLoopingAnimation.Render(const Frustum: TFrustum;
-  const LightsEnabled: Cardinal;
-  const TransparentGroup: TTransparentGroup; InShadow: boolean);
+  const Params: TRenderParams);
 var
   SceneIndex, MiddleIndex, HalfIndex: Integer;
   Amount: Single;
+  OldTransparentGroup: TTransparentGroup;
 begin
-  if Loaded and Exists and (TransparentGroup in [tgAll, tgTransparent]) then
+  OldTransparentGroup := Params.TransparentGroup;
+  if Loaded and Exists and (OldTransparentGroup in [tgAll, tgTransparent]) then
   begin
     SceneIndex := Floor(MapRange(Time, TimeBegin, TimeEnd, 0, ScenesCount)) mod ScenesCount;
     if SceneIndex < 0 then SceneIndex += ScenesCount; { we wanted "unsigned mod" above }
@@ -134,13 +132,16 @@ begin
       { We pass tgAll to our Scenes[].Render.
         Since we use alpha < 1 here (and disable material control by scenes),
         actually the whole scene is always a transparent object. }
+      Params.TransparentGroup := tgAll;
 
       Attributes.Opacity := Amount;
-      Scenes[SceneIndex].Render(Frustum, LightsEnabled, tgAll, InShadow);
+      Scenes[SceneIndex].Render(Frustum, Params);
 
       Attributes.Opacity := 1 - Amount;
       Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(
-        Frustum, LightsEnabled, tgAll, InShadow);
+        Frustum, Params);
+
+      Params.TransparentGroup := OldTransparentGroup;
     finally glPopAttrib end;
   end;
 end;
@@ -166,8 +167,7 @@ begin
 end;
 
 procedure TBlendedLoopingAnimationShader.Render(const Frustum: TFrustum;
-  const LightsEnabled: Cardinal;
-  const TransparentGroup: TTransparentGroup; InShadow: boolean);
+  const Params: TRenderParams);
 
   function LoadWaterEnvMap: TGLuint;
   var

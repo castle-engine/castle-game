@@ -113,8 +113,7 @@ type
       const HandleMouseAndKeys: boolean;
       var LetOthersHandleMouseAndKeys: boolean); override;
 
-    procedure Render3D(const LightsEnabled: Cardinal;
-      const TransparentGroup: TTransparentGroup; InShadow: boolean); override;
+    procedure Render3D(const Params: TRenderParams); override;
 
     procedure RenderShadowVolume; override;
   end;
@@ -167,8 +166,7 @@ type
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
-    procedure Render3D(const LightsEnabled: Cardinal;
-      const TransparentGroup: TTransparentGroup; InShadow: boolean); override;
+    procedure Render3D(const Params: TRenderParams); override;
 
     procedure RenderShadowVolume; override;
 
@@ -745,26 +743,31 @@ begin
     (PVRMLTriangle(Triangle)^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
-procedure TGateLevel.Render3D(const LightsEnabled: Cardinal;
-  const TransparentGroup: TTransparentGroup; InShadow: boolean);
+procedure TGateLevel.Render3D(const Params: TRenderParams);
+
+{ TODO: remake teleport as simply additional object on level, not collidable.
+  This will remove the need for below.
+  Required: T3DTransform (see draft tutorial for planned name),
+  like T3DTranslated. Maybe special T3DTranslateRotate ?
+}
 
   procedure RenderTeleport(
     const TeleportRotation: Single;
     const TeleportBox: TBox3D;
-    TransparentGroup: TTransparentGroup);
+    const TransparentGroup: TTransparentGroup);
   begin
     if RenderState.CameraFrustum.Box3DCollisionPossibleSimple(TeleportBox) then
     begin
       glPushMatrix;
         glTranslatev(Box3DMiddle(TeleportBox));
         glRotatef(TeleportRotation, 1, 1, 0);
-        Teleport.Render(nil, LightsEnabled, TransparentGroup);
+        Teleport.Render(nil, (Params as TVRMLRenderParams).BaseLights, TransparentGroup);
       glPopMatrix;
     end;
   end;
 
 begin
-  if TransparentGroup in [tgOpaque, tgAll] then
+  if Params.TransparentGroup in [tgOpaque, tgAll] then
   begin
     RenderTeleport(Teleport1Rotate, FTeleport1Box, tgOpaque);
     RenderTeleport(Teleport2Rotate, FTeleport2Box, tgOpaque);
@@ -772,7 +775,7 @@ begin
 
   inherited;
 
-  if TransparentGroup in [tgTransparent, tgAll] then
+  if Params.TransparentGroup in [tgTransparent, tgAll] then
   begin
     RenderTeleport(Teleport1Rotate, FTeleport1Box, tgTransparent);
     RenderTeleport(Teleport2Rotate, FTeleport2Box, tgTransparent);
@@ -1038,12 +1041,11 @@ begin
   NewPlayer.PickItem(TItem.Create(Bow, 1));
 end;
 
-procedure TCagesLevel.Render3D(const LightsEnabled: Cardinal;
-  const TransparentGroup: TTransparentGroup; InShadow: boolean);
+procedure TCagesLevel.Render3D(const Params: TRenderParams);
 var
   I: Integer;
 begin
-  if TransparentGroup in [tgOpaque, tgAll] then
+  if Params.TransparentGroup in [tgOpaque, tgAll] then
   begin
     { Render spiders before rendering inherited,
       because spiders are not transparent. }
@@ -1065,7 +1067,7 @@ begin
     begin
       glPushMatrix;
         glTranslatev(FSpidersAppearing.Items[I]);
-        Spider.StandAnimation.Scenes[0].Render(nil, LightsEnabled, tgAll);
+        Spider.StandAnimation.Scenes[0].Render(nil, (Params as TVRMLRenderParams).BaseLights, tgAll);
       glPopMatrix;
     end;
   end;

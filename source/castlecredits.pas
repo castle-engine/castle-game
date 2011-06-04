@@ -70,6 +70,8 @@ procedure Draw(Window: TGLWindow);
     glMatrixMode(GL_MODELVIEW);
   end;
 
+var
+  BaseLights: TDynLightInstanceArray;
 begin
   glScissor(25, 20, Window.Width - 25, Window.Height - 20 -  160);
   glEnable(GL_SCISSOR_TEST);
@@ -84,7 +86,11 @@ begin
     glLoadIdentity;
     glTranslatef(0, AnimationSpeed * AnimationTime, 0);
 
-    CreditsModel.Render(nil, 0, tgAll);
+    { TODO: remove need for BaseLights, render CreditsModel as part of scene manager }
+    BaseLights := TDynLightInstanceArray.Create;
+    try
+      CreditsModel.Render(nil, BaseLights, tgAll);
+    finally FreeAndNil(BaseLights) end;
   finally ProjectionPop end;
 
   glDisable(GL_SCISSOR_TEST);

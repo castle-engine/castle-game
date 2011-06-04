@@ -28,7 +28,7 @@ interface
 uses Boxes3D, Cameras, CastleItems, VectorMath, GL, GLU, GLExt,
   VRMLSceneWaypoints, CastleInputs, ALSoundAllocator, CastleSound,
   VRMLTriangle, CastleTextures, XmlSoundEngine, Classes,
-  KambiGLUtils;
+  KambiGLUtils, VRMLNodes;
 
 const
   DefaultMaxLife = 100;
@@ -343,7 +343,7 @@ type
     { This will render player's weapon attacking.
       This is a 3D rendering. Note that this may clear depth buffer
       and set matrix to identity. }
-    procedure RenderAttack;
+    procedure RenderAttack(BaseLights: TDynLightInstanceArray);
 
     { You should set this property as appropriate.
       This object will just use this property (changing it's Camera
@@ -413,7 +413,7 @@ implementation
 uses Math, SysUtils, KambiClassUtils, CastlePlay, GLWinMessages,
   CastleWindow, KambiUtils,
   GLWindow, Images, KambiFilesUtils,
-  VRMLGLAnimation, ALUtils, KambiOpenAL, VRMLNodes, CastleControlsMenu,
+  VRMLGLAnimation, ALUtils, KambiOpenAL, CastleControlsMenu,
   CastleNotifications, KambiXMLConfig, VRMLGLScene, GLImages,
   CastleRequiredResources;
 
@@ -1285,7 +1285,7 @@ begin
     glCallList(EquippedWeaponKind.GLList_DrawScreenImage);
 end;
 
-procedure TPlayer.RenderAttack;
+procedure TPlayer.RenderAttack(BaseLights: TDynLightInstanceArray);
 var
   AttackTime: Single;
   Anim: TVRMLGLAnimation;
@@ -1298,7 +1298,7 @@ begin
     begin
       glClear(GL_DEPTH_BUFFER_BIT);
       glLoadIdentity;
-      Anim.SceneFromTime(AttackTime).Render(nil, 0(*TODO*), tgAll);
+      Anim.SceneFromTime(AttackTime).Render(nil, BaseLights, tgAll);
     end else
       Attacking := false;
   end;
