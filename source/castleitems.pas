@@ -868,7 +868,7 @@ begin
     glPushMatrix;
       glTranslatev(Position);
       glRotatev(FRotation, UnitVector3Single[2]);
-      Item.Kind.Scene.Render(nil, (Params as TVRMLRenderParams).BaseLights, Params.TransparentGroup);
+      Item.Kind.Scene.Render(nil, Params);
     glPopMatrix;
 
     if RenderBoundingBoxes and

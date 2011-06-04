@@ -371,8 +371,18 @@ begin
 end;
 
 procedure TGame3DControls.Draw;
+var
+  Params: TVRMLRenderParams;
 begin
-  Player.RenderAttack(Level.MainScene.GlobalLights { TODO: check that is actually does what it should });
+  { TODO: avoid creating this. In fact, just place this within scene manager,
+    instead of drawing in ds3D. }
+  Params := TVRMLRenderParams.Create;
+  try
+    Params.TransparentGroup := tgAll;
+    Params.InShadow := false;
+    Params.BaseLights.Assign(Level.MainScene.GlobalLights); { TODO: check GlobalLights do what they should }
+    Player.RenderAttack(Params);
+  finally FreeAndNil(Params) end;
 end;
 
 { Call this when Level value changed (because of LevelFinished

@@ -1984,7 +1984,7 @@ begin
   begin
     glPushMatrix;
       glMultMatrix(SceneTransform);
-      CurrentScene.Render(nil, (Params as TVRMLRenderParams).BaseLights, Params.TransparentGroup);
+      CurrentScene.Render(nil, Params);
       if RenderDebugCaptions then
         DoRenderDebugCaptions;
     glPopMatrix;

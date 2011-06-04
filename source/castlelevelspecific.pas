@@ -749,6 +749,9 @@ procedure TGateLevel.Render3D(const Params: TRenderParams);
   This will remove the need for below.
   Required: T3DTransform (see draft tutorial for planned name),
   like T3DTranslated. Maybe special T3DTranslateRotate ?
+
+  This will also fix: for now, we ignore TransparentGroup below,
+  and render teleports transparent/opaque invalid.
 }
 
   procedure RenderTeleport(
@@ -761,7 +764,7 @@ procedure TGateLevel.Render3D(const Params: TRenderParams);
       glPushMatrix;
         glTranslatev(Box3DMiddle(TeleportBox));
         glRotatef(TeleportRotation, 1, 1, 0);
-        Teleport.Render(nil, (Params as TVRMLRenderParams).BaseLights, TransparentGroup);
+        Teleport.Render(nil, Params);
       glPopMatrix;
     end;
   end;
@@ -1062,14 +1065,14 @@ begin
         end;
       glEnd;
     glPopAttrib;
+  end;
 
-    for I := 0 to FSpidersAppearing.High do
-    begin
-      glPushMatrix;
-        glTranslatev(FSpidersAppearing.Items[I]);
-        Spider.StandAnimation.Scenes[0].Render(nil, (Params as TVRMLRenderParams).BaseLights, tgAll);
-      glPopMatrix;
-    end;
+  for I := 0 to FSpidersAppearing.High do
+  begin
+    glPushMatrix;
+      glTranslatev(FSpidersAppearing.Items[I]);
+      Spider.StandAnimation.Scenes[0].Render(nil, Params);
+    glPopMatrix;
   end;
 
   inherited;

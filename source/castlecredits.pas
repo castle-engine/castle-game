@@ -71,7 +71,7 @@ procedure Draw(Window: TGLWindow);
   end;
 
 var
-  BaseLights: TDynLightInstanceArray;
+  Params: TVRMLRenderParams;
 begin
   glScissor(25, 20, Window.Width - 25, Window.Height - 20 -  160);
   glEnable(GL_SCISSOR_TEST);
@@ -86,11 +86,13 @@ begin
     glLoadIdentity;
     glTranslatef(0, AnimationSpeed * AnimationTime, 0);
 
-    { TODO: remove need for BaseLights, render CreditsModel as part of scene manager }
-    BaseLights := TDynLightInstanceArray.Create;
+    { TODO: remove need for Params, render CreditsModel as part of scene manager }
+    Params := TVRMLRenderParams.Create;
     try
-      CreditsModel.Render(nil, BaseLights, tgAll);
-    finally FreeAndNil(BaseLights) end;
+      Params.InShadow := false;
+      Params.TransparentGroup := tgAll;
+      CreditsModel.Render(nil, Params);
+    finally FreeAndNil(Params) end;
   finally ProjectionPop end;
 
   glDisable(GL_SCISSOR_TEST);
