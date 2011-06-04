@@ -1855,10 +1855,7 @@ begin
 
   { Init MainScene.Headlight }
   if MainScene.Headlight <> nil then
-  begin
-    MainScene.Headlight.Render(NewLightsEnabled, true, true, Player.Camera);
     Params.BaseLights.Add(MainScene.Headlight.LightInstance(Player.Camera));
-  end;
 
   if (ThunderEffect <> nil) and
       ThunderEffect.Visible then

@@ -659,22 +659,12 @@ procedure TEditHeadlightMenu.Click;
 begin
   case CurrentItem of
     0..4: Exit;
-    5: begin
-         ChangeAttenuation;
-         Level.MainScene.Headlight.Render(0, false { it should be already enabled },
-           true, ZeroVector3Single, ZeroVector3Single);
-       end;
+    5: ChangeAttenuation;
     6: begin
          SpotArgument.Value := not SpotArgument.Value;
          Level.MainScene.Headlight.Spot := SpotArgument.Value;
-         Level.MainScene.Headlight.Render(0, false { it should be already enabled },
-           true, ZeroVector3Single, ZeroVector3Single);
        end;
-    7: begin
-         ChangeSpotProperties;
-         Level.MainScene.Headlight.Render(0, false { it should be already enabled },
-           true, ZeroVector3Single, ZeroVector3Single);
-       end;
+    7: ChangeSpotProperties;
     8: SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
@@ -683,24 +673,9 @@ end;
 procedure TEditHeadlightMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
-    0:
-      begin
-        Level.MainScene.Headlight.AmbientIntensity := AmbientIntensitySlider.Value;
-        Level.MainScene.Headlight.Render(0, false { it should be already enabled },
-          true, ZeroVector3Single, ZeroVector3Single);
-      end;
-    1..3:
-      begin
-        Level.MainScene.Headlight.Color[CurrentItem-1] := ColorSlider[CurrentItem-1].Value;
-        Level.MainScene.Headlight.Render(0, false { it should be already enabled },
-          true, ZeroVector3Single, ZeroVector3Single);
-      end;
-    4:
-      begin
-        Level.MainScene.Headlight.Intensity := IntensitySlider.Value;
-        Level.MainScene.Headlight.Render(0, false { it should be already enabled },
-          true, ZeroVector3Single, ZeroVector3Single);
-      end;
+    0:    Level.MainScene.Headlight.AmbientIntensity := AmbientIntensitySlider.Value;
+    1..3: Level.MainScene.Headlight.Color[CurrentItem-1] := ColorSlider[CurrentItem-1].Value;
+    4:    Level.MainScene.Headlight.Intensity := IntensitySlider.Value;
     else Exit;
   end;
 end;

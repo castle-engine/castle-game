@@ -118,7 +118,7 @@ uses Math, SysUtils, KambiUtils, GLWindow,
   BFNT_BitstreamVeraSans_Unit, UIControls,
   CastleItems, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
-  CastleVideoOptions, CastleConfig, VRMLGLHeadlight, CastleThunder,
+  CastleVideoOptions, CastleConfig, CastleThunder,
   CastleNotifications, CastleControlsMenu,
   CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
   KambiTimeUtils, GLImages, KeysMouse;

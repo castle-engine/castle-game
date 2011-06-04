@@ -367,8 +367,6 @@ const
     MainScene.Headlight.AmbientIntensity := 0.8;
     MainScene.Headlight.Color := Vector3Single(1, 0, 0);
     MainScene.Headlight.Intensity := 0.2;
-    MainScene.Headlight.Render(0, false { it should be already enabled },
-      true, ZeroVector3Single, ZeroVector3Single);
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
     begin
