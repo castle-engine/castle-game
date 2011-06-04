@@ -268,7 +268,7 @@ function CastleLevelsPath: string;
 implementation
 
 uses KambiFilesUtils, SysUtils, KambiUtils,
-  GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderStateUnit,
+  GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderingCameraUnit,
   CastlePlay, CastleNotifications, CastleInputs,
   CastleItems, CastleThunder, CastleWindow, CastleVRMLProcessing,
   CastleAnimationTricks, CastleVideoOptions, VRMLScene, ProgressUnit,
@@ -759,7 +759,7 @@ procedure TGateLevel.Render3D(const Params: TRenderParams);
     const TeleportBox: TBox3D;
     const TransparentGroup: TTransparentGroup);
   begin
-    if RenderState.CameraFrustum.Box3DCollisionPossibleSimple(TeleportBox) then
+    if RenderingCamera.Frustum.Box3DCollisionPossibleSimple(TeleportBox) then
     begin
       glPushMatrix;
         glTranslatev(Box3DMiddle(TeleportBox));

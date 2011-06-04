@@ -746,7 +746,7 @@ uses SysUtils, GL, GLU, Object3DAsVRML,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleNotifications,
   CastleInputs, CastleWindow, KambiXMLUtils,
-  CastleRequiredResources, VRMLGLRenderer, RenderStateUnit, Math;
+  CastleRequiredResources, VRMLGLRenderer, RenderingCameraUnit, Math;
 
 {$define read_implementation}
 
@@ -1821,9 +1821,9 @@ begin
   { When GameWin, don't render creatures (as we don't check
     collisions when MovingPlayerEndSequence). }
   if not GameWin then
-    Creatures.Render(RenderState.CameraFrustum, Params);
+    Creatures.Render(RenderingCamera.Frustum, Params);
   if not DebugRenderForLevelScreenshot then
-    ItemsOnLevel.Render(RenderState.CameraFrustum, Params);
+    ItemsOnLevel.Render(RenderingCamera.Frustum, Params);
 end;
 
 procedure TLevel.RenderShadowVolume;

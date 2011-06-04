@@ -71,7 +71,7 @@ type
 implementation
 
 uses Math, KambiUtils, KambiGLUtils, KambiStringUtils, SysUtils,
-  KambiFilesUtils, RenderStateUnit, DDS, GLExt, GLImages, VRMLGLRenderer;
+  KambiFilesUtils, RenderingCameraUnit, DDS, GLExt, GLImages, VRMLGLRenderer;
 
 { TBlendedLoopingAnimation --------------------------------------------------- }
 
@@ -226,8 +226,8 @@ begin
     glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, WaterEnvMap);
 
     GLSLProgram.Enable;
-    RenderState.CameraRotationInverseMatrixNeeded;
-    GLSLProgram.SetUniform('cameraRotationInverseMatrix', RenderState.CameraRotationInverseMatrix3);
+    RenderingCamera.RotationInverseMatrixNeeded;
+    GLSLProgram.SetUniform('cameraRotationInverseMatrix', RenderingCamera.RotationInverseMatrix3);
     GLSLProgram.SetUniform('envMap', 0);
   end;
 

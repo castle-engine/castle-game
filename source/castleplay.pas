@@ -121,7 +121,7 @@ uses Math, SysUtils, KambiUtils, GLWindow,
   CastleVideoOptions, CastleConfig, VRMLGLHeadlight, CastleThunder,
   CastleNotifications, CastleControlsMenu,
   CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
-  KambiTimeUtils, GLImages, RenderStateUnit, KeysMouse;
+  KambiTimeUtils, GLImages, KeysMouse;
 
 var
   GLList_NotificationsBackground: TGLuint;
