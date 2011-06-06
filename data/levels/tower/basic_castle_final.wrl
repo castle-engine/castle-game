@@ -1,6 +1,31 @@
 #VRML V1.0 ascii
 
-Group{
+Group {
+
+  # lights ---------------------------------------------------------------------
+
+  PointLight {
+          color 0.800000011920929 0.400000005960464 0.400000005960464
+          kambiShadows TRUE
+          location -0.484244674444199 2.030553579330444 5.987204074859619
+          global TRUE
+  }
+  PointLight {
+          intensity 0.512820541858673
+          color 0.400000005960464 0.400000005960464 0.400000005960464
+          kambiShadows TRUE
+          location -11.109210014343262 -36.451499938964844 88.175689697265625
+          global TRUE
+  }
+  DEF FakeShadowPosition PointLight {
+          on FALSE
+          kambiShadows TRUE
+          kambiShadowsMain TRUE
+          location 0 0 1000
+          global TRUE
+  }
+
+  # end lights -----------------------------------------------------------------
 
 # commented out things below were used for making menu_bg.png image
 # from this level (but actually this level changed so much since

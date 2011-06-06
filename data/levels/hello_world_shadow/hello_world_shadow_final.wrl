@@ -1,8 +1,12 @@
 #VRML V1.0 ascii
 
 Group {
-  # Just for testing lights from view3dscene
-  # WWWInline { name "hello_world_shadow_lights.wrl" separate FALSE }
+  PointLight {
+          kambiShadows TRUE
+          kambiShadowsMain TRUE
+          location 0 0 10
+          global TRUE
+  }
 
   # Camera settings "encoded" in the VRML declaration below :
   # direction 0.042524755001068 0.19542683660984 -0.000000005639484

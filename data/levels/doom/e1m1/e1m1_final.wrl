@@ -12,6 +12,37 @@ Group {
 #     WWWInline { name "elevator_9a_9b_final.wrl" }
 #   }
 
+  # lights -------------------------------------------------------------------
+
+  DirectionalLight {
+          on FALSE
+          direction -1 -1 -1
+          global TRUE
+  }
+  DirectionalLight {
+          on FALSE
+          direction 1 1 1
+          global TRUE
+  }
+  DirectionalLight {
+          kambiShadows TRUE
+          direction 1 -1 -1
+          global TRUE
+  }
+  DirectionalLight {
+          direction -1 1 1
+          global TRUE
+  }
+  DEF FakeShadowPosition PointLight {
+          on FALSE
+          kambiShadows TRUE
+          kambiShadowsMain TRUE
+          location 0 0 1000
+          global TRUE
+  }
+
+  # end lights ---------------------------------------------------------------
+
   NavigationInfo {
     avatarSize [ 0.5, 2 ]
     speed 20

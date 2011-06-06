@@ -1,9 +1,6 @@
 #VRML V1.0 ascii
 
 Group {
-  # Just for testing lights from view3dscene
-  WWWInline { name "gate_lights.wrl" separate FALSE }
-
   # Camera settings "encoded" in the VRML declaration below :
   # direction -0.190682768821716 0.057995583862066 0.016631152480841
   # up 0.079557605087757 -0.024196594953537 0.996536552906036
@@ -18,6 +15,24 @@ Group {
       orientation 0.056064303964376 0.99756246805191 -0.041548863053322 1.277875304222107
     }
   }
+  
+  # lights -------------------------------------------------------------------
+  
+  PointLight {
+          color 0.899999976158142 0.899999976158142 1
+          location 10 10 100
+          kambiShadows TRUE
+          global TRUE
+  }
+  DEF FakeShadowPosition PointLight {
+      on FALSE
+      kambiShadows TRUE
+      kambiShadowsMain TRUE
+      location 0 0 1000
+      global TRUE
+  }
+
+  # end lights ---------------------------------------------------------------
 
   NavigationInfo {
     avatarSize [ 0.5, 2 ]

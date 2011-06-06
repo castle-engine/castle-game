@@ -36,7 +36,6 @@
 <levels
   background_level_name="gate_background">
 
-<!-- TODO: add     light_set_file_name="gate/gate_lights.wrl" -->
   <level
     name="gate"
     scene_file_name="gate/gate_final.wrl"
@@ -54,7 +53,6 @@
     </required_resources>
   </level>
 
-<!-- TODO: add     light_set_file_name="gate_background/gate_lights.wrl" -->
   <level
     name="gate_background"
     scene_file_name="gate_background/gate_final.wrl"
@@ -65,7 +63,6 @@
     <required_resources />
   </level>
 
-<!-- TODO: add light_set_file_name="castle_hall/castle_hall_lights.wrl"-->
   <level
     name="castle_hall"
     scene_file_name="castle_hall/castle_hall_final.wrl"
@@ -88,7 +85,6 @@
 
   </level>
 
-<!-- TODO: add light_set_file_name="cages/cages_lights.wrl" -->
   <level
     name="cages"
     scene_file_name="cages/cages_final.wrl"
@@ -112,7 +108,6 @@
 
   </level>
 
-<!-- TODO: add light_set_file_name="tower/basic_castle_lights.wrl"-->
   <level
     name="tower"
     scene_file_name="tower/basic_castle_final.wrl"
@@ -138,7 +133,6 @@
 
   </level>
 
-<!-- TODO: add light_set_file_name="doom/e1m1/e1m1_lights.wrl" -->
   <level
     name="doom_e1m1"
     scene_file_name="doom/e1m1/e1m1_final.wrl"
@@ -170,7 +164,6 @@
 
   </level>
 
-<!-- TODO: add light_set_file_name="hello_world/hello_world_lights.wrl" -->
   <level
     name="hello_world"
     scene_file_name="hello_world/hello_world_final.wrl"
@@ -187,7 +180,6 @@
     </required_resources>
   </level>
 
-<!-- TODO: add light_set_file_name="hello_world_shadow/hello_world_shadow_lights.wrl" -->
   <level
     name="hello_world_shadow"
     scene_file_name="hello_world_shadow/hello_world_shadow_final.wrl"
@@ -204,7 +196,6 @@
     </required_resources>
   </level>
 
-<!-- TODO: add light_set_file_name="fountain/fountain_lights.wrl" -->
   <level
     name="fountain"
     scene_file_name="fountain/fountain_final.wrl"
@@ -226,7 +217,6 @@
   </level>
 
   <!-- Another entry for fountain level, to load it with water animation -->
-<!-- TODO: add light_set_file_name="fountain/fountain_lights.wrl" -->
   <level
     name="fountain-with-water"
     scene_file_name="fountain/fountain_final.wrl"

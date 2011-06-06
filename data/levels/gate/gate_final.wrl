@@ -18,6 +18,32 @@ Group {
       orientation 1.62031710715382E-006 -0.999999701976776 0.000751008978114 0.463883370161057
     }
   }
+  
+  # lights -------------------------------------------------------------------
+  
+  PointLight {
+          color 0.899999976158142 0.899999976158142 1
+          location 10 10 100
+          kambiShadows TRUE
+          global TRUE
+  }
+  PointLight {
+          on FALSE
+          intensity 0.300000011920929
+          color 1 0 0
+          ambientIntensity 0.020000416785479
+          location -215.25466918945312 -28.800104141235352 -29.862327575683594
+          global TRUE
+  }
+  DEF FakeShadowPosition PointLight {
+      on FALSE
+      kambiShadows TRUE
+      kambiShadowsMain TRUE
+      location 0 0 1000
+      global TRUE
+  }
+
+  # end lights ---------------------------------------------------------------
 
   NavigationInfo {
     avatarSize [ 0.5, 2 ]
