@@ -430,7 +430,7 @@ var
         LightNode.FdLocation.Value := WerewolfCreature[I].MiddlePosition;
       end;
     end;
-    //TODO: LightSet.CalculateLights; 
+    //TODO: LightSet.CalculateLights;
   end;
 
   function GetWerewolfAliveCount: Cardinal;
@@ -966,6 +966,8 @@ var
   SpiderPosition, SpiderDirection: TVector3Single;
   SpiderMoveDistance: Single;
   AboveGround: PVRMLTriangle;
+var
+  TorchLight: PLightInstance;
 begin
   inherited;
 
@@ -974,8 +976,10 @@ begin
   if not GameWin then
   begin
     { Torch light modify, to make an illusion of unstable light }
-    MainScene.GlobalLights.Items[0].Node.FdIntensity.Value := Clamped(
-        MainScene.GlobalLights.Items[0].Node.FdIntensity.Value +
+    TorchLight := MainScene.GlobalLights.FindName('MainHallTorchLight');
+    Assert(TorchLight <> nil, 'Torch light not found on cages level');
+    TorchLight^.Node.FdIntensity.Value := Clamped(
+        TorchLight^.Node.FdIntensity.Value +
           MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed  * 50,
         0.5, 1);
 //TODO:    LightSet.CalculateLights;
