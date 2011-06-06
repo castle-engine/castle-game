@@ -454,7 +454,6 @@ type
     procedure RenderFromView3D(const Params: TVRMLRenderParams); override;
     procedure Render3D(const Params: TRenderParams); override;
     procedure RenderNeverShadowed(const Params: TRenderParams); override;
-    procedure RenderHeadLight(const BaseLights: TDynLightInstanceArray); override;
     function MainLightForShadows(out AMainLightPosition: TVector4Single): boolean; override;
     procedure ApplyProjection; override;
   public
@@ -1845,14 +1844,6 @@ begin
     ThunderEffect and LightSet should add lights to Params.BaseLights }
   NewLightsEnabled := 0;
 
-  { Init MainScene.Headlight }
-  // TODO: convoluted, should be simpler
-  if Player <> nil then
-    H := MainScene.Headlight(Player.Camera) else
-    H := MainScene.HeadlightDefault;
-  if H <> nil then
-    Params.BaseLights.Add(H^);
-
   if (ThunderEffect <> nil) and
       ThunderEffect.Visible then
   begin
@@ -1863,13 +1854,6 @@ begin
 //  LightSet.Render(NewLightsEnabled);
 
   inherited RenderFromView3D(Params);
-end;
-
-procedure TLevel.RenderHeadLight(const BaseLights: TDynLightInstanceArray);
-begin
-  if MenuBackground then
-    inherited;
-  { For non-MenuBackground levels we control headlight elsewhere }
 end;
 
 procedure TLevel.RenderFromViewEverything;
