@@ -188,8 +188,6 @@ begin
     else
       raise EInternalError.Create('20061126-case BlendingType');
   end;
-
-  Attributes.UseSceneLights := false;
 end;
 
 procedure AnimationAttributesSet(Attributes: TVRMLSceneRenderingAttributes;

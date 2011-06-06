@@ -16,17 +16,65 @@ Group {
     }
   }
 
-  NavigationInfo {
+  # lights -------------------------------------------------------------------
+
+#   PointLight {
+#     location -0.48424467735151117 2.030553575594324 5.9872039198498008
+#     color 0.4 0.2 0.2
+#     global TRUE
+#   }
+
+#   PointLight {
+#     location -11.109210014343262 -36.451499938964844 88.175689697265625
+#     color 0.4 0.4 0.4
+#     global TRUE
+#   }
+
+#   PointLight {
+#     # direction 0 0 1
+#     location 0 0 0
+#     color 0.8 0.8 0.8
+#     global TRUE
+#   }
+
+  # This will be used as fake light to determine shadow placement
+  # when werewolves will appear. It will always stay with on = FALSE.
+  # The position of this is crucial: it makes the cool effect of
+  # long shadow legs on the ground when werewolves appear on the level.
+  DEF FakeShadowPosition PointLight { location 0 0 1 on FALSE global TRUE }
+
+  PointLight {
+    location  10  10 100
+    color 0.3 0.3 0.3
+    kambiShadows TRUE
+    kambiShadowsMain TRUE
+    global TRUE
+  }
+  PointLight {
+    location -10 -10 100
+    color 0.3 0.3 0.3
+    kambiShadows TRUE
+    global TRUE
+  }
+
+  # Add some lights initially turned off, so that the total number
+  # of lights equals number of werewolves appearing.
+  PointLight { on FALSE global TRUE }
+  PointLight { on FALSE global TRUE }
+  PointLight { on FALSE global TRUE }
+
+  # end lights ---------------------------------------------------------------
+
+  KambiNavigationInfo {
     avatarSize [ 0.5, 2 ]
     speed 20
     headlight TRUE
     type "WALK"
-  }
-
-  KambiHeadLight {
-    ambientIntensity 0.5
-    intensity 0.5
-    color 1 1 1
+    headlightNode DirectionalLight {
+      ambientIntensity 0.5
+      intensity 0.5
+      color 1 1 1
+    }
   }
 
   Separator {
