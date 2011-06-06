@@ -25,7 +25,7 @@ unit CastleVideoOptions;
 
 interface
 
-uses GL, GLU, KambiGLUtils, VRMLGLScene;
+uses GL, GLU, KambiGLUtils, VRMLGLScene, VRMLNodes, Base3D;
 
 type
   { This determines OpenGL blending factors used when rendering given model. }
@@ -158,9 +158,19 @@ var
     (like for creatures or items)). }
   UseOcclusionQuery: boolean;
 
+type
+  TSimpleRenderParams = class(TVRMLRenderParams)
+  public
+    FBaseLights: TDynLightInstanceArray;
+    constructor Create;
+    destructor Destroy; override;
+    function BaseLights(Scene: T3D): TDynLightInstanceArray; override;
+  end;
+
 implementation
 
-uses KambiUtils, CastleConfig, CastleWindow, RaysWindow, GLAntiAliasing;
+uses SysUtils, KambiUtils, CastleConfig, CastleWindow, RaysWindow,
+  GLAntiAliasing;
 
 procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes;
   BlendingType: TBlendingType);
@@ -188,6 +198,8 @@ begin
     else
       raise EInternalError.Create('20061126-case BlendingType');
   end;
+
+  Attributes.UseSceneLights := false;
 end;
 
 procedure AnimationAttributesSet(Attributes: TVRMLSceneRenderingAttributes;
@@ -202,6 +214,23 @@ function ViewAngleDegY: Single;
 begin
   Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX,
     Window.Height / Window.Width);
+end;
+
+constructor TSimpleRenderParams.Create;
+begin
+  inherited;
+  FBaseLights := TDynLightInstanceArray.Create;
+end;
+
+destructor TSimpleRenderParams.Destroy;
+begin
+  FreeAndNil(FBaseLights);
+  inherited;
+end;
+
+function TSimpleRenderParams.BaseLights(Scene: T3D): TDynLightInstanceArray;
+begin
+  Result := FBaseLights;
 end;
 
 initialization

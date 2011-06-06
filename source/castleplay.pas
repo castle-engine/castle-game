@@ -372,15 +372,15 @@ end;
 
 procedure TGame3DControls.Draw;
 var
-  Params: TVRMLRenderParams;
+  Params: TSimpleRenderParams;
 begin
   { TODO: avoid creating this. In fact, just place this within scene manager,
     instead of drawing in ds3D. }
-  Params := TVRMLRenderParams.Create;
+  Params := TSimpleRenderParams.Create;
   try
     Params.TransparentGroup := tgAll;
     Params.InShadow := false;
-    Params.BaseLights.Assign(Level.MainScene.GlobalLights); { TODO: check GlobalLights do what they should }
+    Params.FBaseLights.Assign(Level.MainScene.GlobalLights);
     Player.RenderAttack(Params);
   finally FreeAndNil(Params) end;
 end;

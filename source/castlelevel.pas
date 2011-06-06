@@ -452,9 +452,7 @@ type
 
     procedure RenderFromViewEverything; override;
     procedure RenderFromView3D(const Params: TVRMLRenderParams); override;
-    procedure Render3D(const Params: TRenderParams); override;
     procedure RenderNeverShadowed(const Params: TRenderParams); override;
-    function MainLightForShadows(out AMainLightPosition: TVector4Single): boolean; override;
     procedure ApplyProjection; override;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
@@ -687,10 +685,6 @@ type
       attribute scene_dynamic_shadows. }
     property SceneDynamicShadows: boolean
       read FSceneDynamicShadows write FSceneDynamicShadows default false;
-
-    { Turn off lights not supposed to light in the shadow. }
-    procedure PushLightsOff;
-    procedure PopLightsOff;
 
     { Just load TVRMLGLScene from file, doing some common tasks:
       @unorderedList(
@@ -1151,6 +1145,8 @@ var
 begin
   inherited Create(nil);
 
+  UseGlobalLights := true;
+
   FName := AName;
   FSceneFileName := ASceneFileName;
   FTitle := ATitle;
@@ -1170,6 +1166,7 @@ begin
     FAnimationTime := 0.0;
 
     AttributesSet(MainScene.Attributes, btIncrease);
+    MainScene.Attributes.UseSceneLights := true;
     if BumpMapping then
       MainScene.Attributes.BumpMapping := bmBasic else
       MainScene.Attributes.BumpMapping := bmNone;
@@ -1782,22 +1779,6 @@ begin
   end;
 end;
 
-procedure TLevel.PushLightsOff;
-begin
-  { Headlight will stay on here, but lights in Level.LightSet are off. }
-  //TODO: here we were disabling every light with LightNode.FdKambiShadows.Value
-end;
-
-procedure TLevel.PopLightsOff;
-begin
-  //TODO: here we were enabling back what PushLightsOff did
-end;
-
-function TLevel.MainLightForShadows(out AMainLightPosition: TVector4Single): boolean;
-begin
-  // TODO Result := LightSet.MainLightForShadows(AMainLightPosition);
-end;
-
 procedure TLevel.RenderNeverShadowed(const Params: TRenderParams);
 begin
   inherited;
@@ -1825,20 +1806,9 @@ begin
   inherited;
 end;
 
-procedure TLevel.Render3D(const Params: TRenderParams);
-begin
-  if Params.InShadow then PushLightsOff;
-  try
-    inherited;
-  finally
-    if Params.InShadow then PopLightsOff;
-  end;
-end;
-
 procedure TLevel.RenderFromView3D(const Params: TVRMLRenderParams);
 var
   NewLightsEnabled: Cardinal;
-  H: PLightInstance;
 begin
   { TODO: NewLightsEnabled should be removed.
     ThunderEffect and LightSet should add lights to Params.BaseLights }
