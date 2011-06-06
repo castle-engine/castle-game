@@ -26,6 +26,8 @@ unit CastleThunder;
 
 interface
 
+uses VRMLNodes;
+
 type
   { Rendering and making sound of thunder effect.
 
@@ -34,13 +36,14 @@ type
   TThunderEffect = class
   private
     LastBeginTime, NextBeginTime: Single;
+    ThunderLightNode: TNodeDirectionalLight_2;
+    ThunderLight: TLightInstance;
   public
-    { Init and enable GL_LIGHT_LightNumber properties.
-      Note that this requires that current matrix is modelview.
-      Matrix @italic(may) be reset to identity by this procedure. }
-    procedure RenderLight(const LightNumber: Cardinal);
+    constructor Create;
+    destructor Destroy; override;
 
-    function Visible: boolean;
+    { Add thunder light, if visible. }
+    procedure AddLight(const BaseLights: TDynLightInstanceArray);
 
     procedure Idle;
     { Force thunder happening in next Idle call. }
@@ -49,42 +52,49 @@ type
 
 implementation
 
-uses GL, GLU, KambiGLUtils, VectorMath, CastleSound, CastlePlay;
+uses SysUtils, GL, GLU, KambiGLUtils, VectorMath, CastleSound, CastlePlay, Math;
 
-procedure TThunderEffect.RenderLight(const LightNumber: Cardinal);
-var
-  GLLight: TGLenum;
+constructor TThunderEffect.Create;
 begin
-  GLLight := GL_LIGHT0 + LightNumber;
+  inherited;
+  ThunderLightNode := TNodeDirectionalLight_2.Create('', '');
+  ThunderLightNode.FdDirection.Value := Vector3Single(0, -1, 1);
+  ThunderLightNode.FdAmbientIntensity.Value := 0.5;
+  ThunderLightNode.FdColor.Value := Vector3Single(0.5, 0.5, 1);
 
-  { GL_POSITION of the light is affected by current matrix
-    (i.e. current at the time of glLightv(GLLight, GL_POSITION, ...) call).
-    So it's safest to set here matrix. }
-  glLoadIdentity;
-
-  { Prepare "thunder light" }
-  glLightv(GLLight, GL_POSITION, Vector4Single(0, 1, -1, 0));
-  glLightv(GLLight, GL_AMBIENT, Vector4Single(0.5, 0.5, 1, 1));
-  glLightv(GLLight, GL_DIFFUSE, Vector4Single(0.5, 0.5, 1, 1));
-  glLightv(GLLight, GL_SPECULAR, Vector4Single(0.5, 0.5, 1, 1));
-  { No spot. }
-  glLighti(GLLight, GL_SPOT_CUTOFF, 180);
-
-  glEnable(GLLight);
+  ThunderLight.Node := ThunderLightNode;
+  ThunderLight.Transform := IdentityMatrix4Single;
+  ThunderLight.TransformScale := 1;
+  ThunderLight.Location := ZeroVector3Single;
+  ThunderLight.Direction := ThunderLightNode.FdDirection.Value;
+  ThunderLight.Radius := MaxSingle;
 end;
 
-function TThunderEffect.Visible: boolean;
-var
-  ThunderTime: Single;
+destructor TThunderEffect.Destroy;
 begin
-  Result := false;
-  if LastBeginTime <> 0 then
+  FreeAndNil(ThunderLightNode);
+  inherited;
+end;
+
+procedure TThunderEffect.AddLight(const BaseLights: TDynLightInstanceArray);
+
+  function Visible: boolean;
+  var
+    ThunderTime: Single;
   begin
-    ThunderTime := Level.AnimationTime - LastBeginTime;
-    if (ThunderTime < 1.0) or
-       ((1.5 < ThunderTime) and (ThunderTime < 2.5)) then
-      Result := true;
+    Result := false;
+    if LastBeginTime <> 0 then
+    begin
+      ThunderTime := Level.AnimationTime - LastBeginTime;
+      if (ThunderTime < 1.0) or
+         ((1.5 < ThunderTime) and (ThunderTime < 2.5)) then
+        Result := true;
+    end;
   end;
+
+begin
+  if Visible then
+    BaseLights.Add(ThunderLight);
 end;
 
 procedure TThunderEffect.Idle;

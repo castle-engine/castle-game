@@ -451,7 +451,7 @@ type
     procedure NotificationInteractFailed(const S: string);
 
     procedure RenderFromViewEverything; override;
-    procedure RenderFromView3D(const Params: TVRMLRenderParams); override;
+    procedure InitializeLights(const BaseLights: TDynLightInstanceArray); override;
     procedure RenderNeverShadowed(const Params: TRenderParams); override;
     procedure ApplyProjection; override;
   public
@@ -1806,24 +1806,12 @@ begin
   inherited;
 end;
 
-procedure TLevel.RenderFromView3D(const Params: TVRMLRenderParams);
-var
-  NewLightsEnabled: Cardinal;
+procedure TLevel.InitializeLights(const BaseLights: TDynLightInstanceArray);
 begin
-  { TODO: NewLightsEnabled should be removed.
-    ThunderEffect and LightSet should add lights to Params.BaseLights }
-  NewLightsEnabled := 0;
+  inherited;
 
-  if (ThunderEffect <> nil) and
-      ThunderEffect.Visible then
-  begin
-    ThunderEffect.RenderLight(NewLightsEnabled);
-    Inc(NewLightsEnabled);
-  end;
-
-//  LightSet.Render(NewLightsEnabled);
-
-  inherited RenderFromView3D(Params);
+  if ThunderEffect <> nil then
+    ThunderEffect.AddLight(BaseLights);
 end;
 
 procedure TLevel.RenderFromViewEverything;
