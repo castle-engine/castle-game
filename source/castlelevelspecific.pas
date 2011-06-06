@@ -52,7 +52,7 @@ type
   public
     constructor Create(
       const AName: string;
-      const ASceneFileName, ALightSetFileName: string;
+      const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
@@ -99,7 +99,7 @@ type
   public
     constructor Create(
       const AName: string;
-      const ASceneFileName, ALightSetFileName: string;
+      const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
@@ -126,7 +126,7 @@ type
   public
     constructor Create(
       const AName: string;
-      const ASceneFileName, ALightSetFileName: string;
+      const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
@@ -153,7 +153,7 @@ type
   public
     constructor Create(
       const AName: string;
-      const ASceneFileName, ALightSetFileName: string;
+      const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
@@ -220,7 +220,7 @@ type
   public
     constructor Create(
       const AName: string;
-      const ASceneFileName, ALightSetFileName: string;
+      const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
@@ -242,7 +242,7 @@ type
   public
     constructor Create(
       const AName: string;
-      const ASceneFileName, ALightSetFileName: string;
+      const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
@@ -255,7 +255,7 @@ type
   public
     constructor Create(
       const AName: string;
-      const ASceneFileName, ALightSetFileName: string;
+      const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
@@ -283,7 +283,7 @@ end;
 
 constructor TCastleHallLevel.Create(
   const AName: string;
-  const ASceneFileName, ALightSetFileName: string;
+  const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
@@ -347,6 +347,7 @@ const
   var
     I: Integer;
     LightNode: TVRMLPositionalLightNode;
+    Headlight: PLightInstance;
   begin
     Assert(not WerewolfAppeared);
 
@@ -364,23 +365,27 @@ const
     WerewolfCreature[0].Howl(true);
 
     { change the lights }
-    MainScene.Headlight.AmbientIntensity := 0.8;
-    MainScene.Headlight.Color := Vector3Single(1, 0, 0);
-    MainScene.Headlight.Intensity := 0.2;
+    Headlight := MainScene.HeadlightDefault;
+    if Headlight <> nil then
+    begin
+      Headlight^.Node.FdAmbientIntensity.Send(0.8);
+      Headlight^.Node.FdColor.Send(Vector3Single(1, 0, 0));
+      Headlight^.Node.FdIntensity.Send(0.2);
+    end;
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
     begin
-      LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].Node as
+      LightNode := MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
         TVRMLPositionalLightNode;
       LightNode.FdColor.Value := Vector3Single(1, 0, 0);
       LightNode.FdAttenuation.Value := Vector3Single(1, 0.1, 0);
       LightNode.FdKambiShadows.Value := true;
     end;
 
-    LightSet.Lights.Items[0].Node.FdKambiShadows.Value := true;
-    LightSet.Lights.Items[0].Node.FdKambiShadowsMain.Value := true;
+    MainScene.GlobalLights.Items[0].Node.FdKambiShadows.Value := true;
+    MainScene.GlobalLights.Items[0].Node.FdKambiShadowsMain.Value := true;
 
-    LightSet.CalculateLights;
+//TODO:    LightSet.CalculateLights;
   end;
 
 var
@@ -403,14 +408,14 @@ var
     if WerewolfAliveCount = 0 then
     begin
       { turn light over stairs to next level }
-      LightNode := LightSet.Lights.Items[WerewolfFirstLight].Node as
+      LightNode := MainScene.GlobalLights.Items[WerewolfFirstLight].Node as
         TVRMLPositionalLightNode;
       LightNode.FdLocation.Value := StairsBlockerMiddle;
       LightNode.FdOn.Value := true;
 
       for I := 1 to CastleHallWerewolvesCount - 1 do
       begin
-        LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].Node as
+        LightNode := MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
           TVRMLPositionalLightNode;
         LightNode.FdOn.Value := false;
       end;
@@ -419,13 +424,13 @@ var
       { turn light for each alive werewolf }
       for I := 0 to CastleHallWerewolvesCount - 1 do
       begin
-        LightNode := LightSet.Lights.Items[I + WerewolfFirstLight].Node as
+        LightNode := MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
           TVRMLPositionalLightNode;
         LightNode.FdOn.Value := not WerewolfCreature[I].Dead;
         LightNode.FdLocation.Value := WerewolfCreature[I].MiddlePosition;
       end;
     end;
-    LightSet.CalculateLights;
+    //TODO: LightSet.CalculateLights; 
   end;
 
   function GetWerewolfAliveCount: Cardinal;
@@ -536,7 +541,7 @@ end;
 
 constructor TGateLevel.Create(
   const AName: string;
-  const ASceneFileName, ALightSetFileName: string;
+  const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
@@ -793,7 +798,7 @@ end;
 
 constructor TTowerLevel.Create(
   const AName: string;
-  const ASceneFileName, ALightSetFileName: string;
+  const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
@@ -850,7 +855,7 @@ end;
 
 constructor TCagesLevel.Create(
   const AName: string;
-  const ASceneFileName, ALightSetFileName: string;
+  const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
@@ -969,11 +974,11 @@ begin
   if not GameWin then
   begin
     { Torch light modify, to make an illusion of unstable light }
-    LightSet.Lights.Items[0].Node.FdIntensity.Value := Clamped(
-        LightSet.Lights.Items[0].Node.FdIntensity.Value +
+    MainScene.GlobalLights.Items[0].Node.FdIntensity.Value := Clamped(
+        MainScene.GlobalLights.Items[0].Node.FdIntensity.Value +
           MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed  * 50,
         0.5, 1);
-    LightSet.CalculateLights;
+//TODO:    LightSet.CalculateLights;
 
     { Maybe appear new spiders }
     if (Level.Creatures.Count < CreaturesCountToAddSpiders) and
@@ -1192,7 +1197,7 @@ end;
 
 constructor TDoomE1M1Level.Create(
   const AName: string;
-  const ASceneFileName, ALightSetFileName: string;
+  const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
@@ -1401,7 +1406,7 @@ end;
 
 constructor TGateBackgroundLevel.Create(
   const AName: string;
-  const ASceneFileName, ALightSetFileName: string;
+  const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
@@ -1427,7 +1432,7 @@ end;
 
 constructor TFountainLevel.Create(
   const AName: string;
-  const ASceneFileName, ALightSetFileName: string;
+  const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;

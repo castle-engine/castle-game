@@ -36,10 +36,10 @@
 <levels
   background_level_name="gate_background">
 
+<!-- TODO: add     light_set_file_name="gate/gate_lights.wrl" -->
   <level
     name="gate"
     scene_file_name="gate/gate_final.wrl"
-    light_set_file_name="gate/gate_lights.wrl"
     title="The Gate"
     number="1"
     default_available_for_new_game="true"
@@ -54,10 +54,10 @@
     </required_resources>
   </level>
 
+<!-- TODO: add     light_set_file_name="gate_background/gate_lights.wrl" -->
   <level
     name="gate_background"
     scene_file_name="gate_background/gate_final.wrl"
-    light_set_file_name="gate_background/gate_lights.wrl"
     title="Background"
     number="101"
     implementation_class="TGateBackgroundLevel"
@@ -65,10 +65,10 @@
     <required_resources />
   </level>
 
+<!-- TODO: add light_set_file_name="castle_hall/castle_hall_lights.wrl"-->
   <level
     name="castle_hall"
     scene_file_name="castle_hall/castle_hall_final.wrl"
-    light_set_file_name="castle_hall/castle_hall_lights.wrl"
     title="Castle Hall"
     number="2"
     implementation_class="TCastleHallLevel"
@@ -88,10 +88,11 @@
 
   </level>
 
+<!-- TODO: add light_set_file_name="cages/cages_lights.wrl" -->
   <level
     name="cages"
     scene_file_name="cages/cages_final.wrl"
-    light_set_file_name="cages/cages_lights.wrl"
+
     title="Cages"
     number="3"
     implementation_class="TCagesLevel"
@@ -111,10 +112,11 @@
 
   </level>
 
+<!-- TODO: add light_set_file_name="tower/basic_castle_lights.wrl"-->
   <level
     name="tower"
     scene_file_name="tower/basic_castle_final.wrl"
-    light_set_file_name="tower/basic_castle_lights.wrl"
+
     title="Tower"
     number="99"
     implementation_class="TTowerLevel"
@@ -136,10 +138,11 @@
 
   </level>
 
+<!-- TODO: add light_set_file_name="doom/e1m1/e1m1_lights.wrl" -->
   <level
     name="doom_e1m1"
     scene_file_name="doom/e1m1/e1m1_final.wrl"
-    light_set_file_name="doom/e1m1/e1m1_lights.wrl"
+
     title="Doom E1M1"
     title_hint="shadows OFF adviced"
     number="666"
@@ -167,10 +170,10 @@
 
   </level>
 
+<!-- TODO: add light_set_file_name="hello_world/hello_world_lights.wrl" -->
   <level
     name="hello_world"
     scene_file_name="hello_world/hello_world_final.wrl"
-    light_set_file_name="hello_world/hello_world_lights.wrl"
     title="Hello world"
     number="95"
     implementation_class="TLevel"
@@ -184,11 +187,10 @@
     </required_resources>
   </level>
 
-
+<!-- TODO: add light_set_file_name="hello_world_shadow/hello_world_shadow_lights.wrl" -->
   <level
     name="hello_world_shadow"
     scene_file_name="hello_world_shadow/hello_world_shadow_final.wrl"
-    light_set_file_name="hello_world_shadow/hello_world_shadow_lights.wrl"
     title="Hello world (static shadow)"
     number="96"
     implementation_class="TLevel"
@@ -202,10 +204,10 @@
     </required_resources>
   </level>
 
+<!-- TODO: add light_set_file_name="fountain/fountain_lights.wrl" -->
   <level
     name="fountain"
     scene_file_name="fountain/fountain_final.wrl"
-    light_set_file_name="fountain/fountain_lights.wrl"
     title="Fountain"
     title_hint="shadows and bump mapping ON adviced"
     number="15"
@@ -224,10 +226,10 @@
   </level>
 
   <!-- Another entry for fountain level, to load it with water animation -->
+<!-- TODO: add light_set_file_name="fountain/fountain_lights.wrl" -->
   <level
     name="fountain-with-water"
     scene_file_name="fountain/fountain_final.wrl"
-    light_set_file_name="fountain/fountain_lights.wrl"
     title="Fountain"
     title_hint="with costly water animation"
     number="16"
@@ -251,7 +253,6 @@
   <level
     name="althana"
     scene_file_name="/win/mojepasy/openGL/castle/althana/althana_final.wrl"
-    light_set_file_name="/win/mojepasy/openGL/castle/althana/althana_lights.wrl"
     title="Althana"
     number="96"
     implementation_class="TLevel"
@@ -262,7 +263,6 @@
   <level
     name="chojnowice"
     scene_file_name="/win/mojepasy/openGL/castle/grzegorz/chojnowice/chojnowice_final.wrl"
-    light_set_file_name="/win/mojepasy/openGL/castle/grzegorz/chojnowice/chojnowice_lights.wrl"
     title="Chojnowice"
     number="201"
     implementation_class="TLevel"

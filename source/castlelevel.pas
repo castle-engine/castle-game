@@ -38,7 +38,7 @@ unit CastleLevel;
 
 interface
 
-uses VectorMath, VRMLScene, VRMLGLScene, VRMLGLLightSet, Boxes3D,
+uses VectorMath, VRMLScene, VRMLGLScene, Boxes3D,
   VRMLNodes, VRMLFields, CastleItems, Cameras, VRMLTriangle, GL3D,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
@@ -345,7 +345,6 @@ type
 
   TLevel = class(TKamSceneManager)
   private
-    FLightSet: TVRMLGLLightSet;
     FCameraRadius: Single;
     FCameraPreferredHeight: Single;
     FLevelProjectionNear: Single;
@@ -396,7 +395,6 @@ type
     FTitle: string;
     FTitleHint: string;
     FNumber: Integer;
-    FLightSetFileName: string;
 
     procedure LoadFromDOMElement(Element: TDOMElement);
   private
@@ -468,7 +466,7 @@ type
       require anywhere to modify it). }
     constructor Create(
       const AName: string;
-      const ASceneFileName, ALightSetFileName: string;
+      const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
@@ -489,12 +487,9 @@ type
     { These will be used in constructor to load level.
       @groupBegin }
     property SceneFileName: string read FSceneFileName;
-    property LightSetFileName: string read FLightSetFileName;
     { @groupEnd }
 
     { }
-    property LightSet: TVRMLGLLightSet read FLightSet;
-
     property CameraRadius: Single read FCameraRadius;
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
     property LevelProjectionNear: Single read FLevelProjectionNear;
@@ -1130,7 +1125,7 @@ const
 
 constructor TLevel.Create(
   const AName: string;
-  const ASceneFileName, ALightSetFileName: string;
+  const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
@@ -1159,7 +1154,6 @@ begin
 
   FName := AName;
   FSceneFileName := ASceneFileName;
-  FLightSetFileName := ALightSetFileName;
   FTitle := ATitle;
   FTitleHint := ATitleHint;
   FNumber := ANumber;
@@ -1295,8 +1289,6 @@ begin
 
     MainScene.FreeResources([frTextureDataInNodes]);
 
-    FLightSet := TVRMLGLLightSet.Create(LoadVRML(LightSetFileName), true);
-
     FGlobalAmbientLight := DefaultGlobalAmbientLight;
 
     Progress.Step;
@@ -1331,7 +1323,6 @@ begin
   FreeAndNil(FThunderEffect);
   FreeWithContentsAndNil(FSectors);
   FreeWithContentsAndNil(FWaypoints);
-  FreeAndNil(FLightSet);
   FreeWithContentsAndNil(FItemsOnLevel);
   FreeWithContentsAndNil(FCreatures);
   if FRequiredCreatures <> nil then
@@ -1805,7 +1796,7 @@ end;
 
 function TLevel.MainLightForShadows(out AMainLightPosition: TVector4Single): boolean;
 begin
-  Result := LightSet.MainLightForShadows(AMainLightPosition);
+  // TODO Result := LightSet.MainLightForShadows(AMainLightPosition);
 end;
 
 procedure TLevel.RenderNeverShadowed(const Params: TRenderParams);
@@ -1848,14 +1839,19 @@ end;
 procedure TLevel.RenderFromView3D(const Params: TVRMLRenderParams);
 var
   NewLightsEnabled: Cardinal;
+  H: PLightInstance;
 begin
   { TODO: NewLightsEnabled should be removed.
     ThunderEffect and LightSet should add lights to Params.BaseLights }
   NewLightsEnabled := 0;
 
   { Init MainScene.Headlight }
-  if MainScene.Headlight <> nil then
-    Params.BaseLights.Add(MainScene.Headlight.LightInstance(Player.Camera));
+  // TODO: convoluted, should be simpler
+  if Player <> nil then
+    H := MainScene.Headlight(Player.Camera) else
+    H := MainScene.HeadlightDefault;
+  if H <> nil then
+    Params.BaseLights.Add(H^);
 
   if (ThunderEffect <> nil) and
       ThunderEffect.Visible then
@@ -1864,7 +1860,7 @@ begin
     Inc(NewLightsEnabled);
   end;
 
-  LightSet.Render(NewLightsEnabled);
+//  LightSet.Render(NewLightsEnabled);
 
   inherited RenderFromView3D(Params);
 end;

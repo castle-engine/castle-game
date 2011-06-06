@@ -121,12 +121,12 @@ type
 
   TEditHeadlightMenu = class(TCastleMenu)
   public
+    Headlight: TNodeX3DLightNode;
     AmbientIntensitySlider: TGLMenuFloatSlider;
     ColorSlider: array[0..2] of TGLMenuFloatSlider;
     IntensitySlider: TGLMenuFloatSlider;
     SpotArgument: TGLMenuBooleanArgument;
-    { Create this only when Level.Headlight <> nil. }
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; AHeadlight: TNodeX3DLightNode); reintroduce;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
   end;
@@ -595,22 +595,22 @@ end;
 
 { TEditHeadlightMenu --------------------------------------------------------- }
 
-constructor TEditHeadlightMenu.Create(AOwner: TComponent);
+constructor TEditHeadlightMenu.Create(AOwner: TComponent; AHeadlight: TNodeX3DLightNode);
 begin
-  inherited;
+  inherited Create(AOwner);
+
+  Headlight := AHeadlight;
 
   { To better visualize light changes. }
   DrawBackgroundRectangle := false;
 
-  AmbientIntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.AmbientIntensity);
+  AmbientIntensitySlider := TGLMenuFloatSlider.Create(0, 1, Headlight.FdAmbientIntensity.Value);
 
-  ColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.Color[0]);
-  ColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.Color[1]);
-  ColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.Color[2]);
+  ColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Headlight.FdColor.Value[0]);
+  ColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Headlight.FdColor.Value[1]);
+  ColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Headlight.FdColor.Value[2]);
 
-  IntensitySlider := TGLMenuFloatSlider.Create(0, 1, Level.MainScene.Headlight.Intensity);
-
-  SpotArgument := TGLMenuBooleanArgument.Create(Level.MainScene.Headlight.Spot);
+  IntensitySlider := TGLMenuFloatSlider.Create(0, 1, Headlight.FdIntensity.Value);
 
   Items.AddObject('Ambient intensity'  , AmbientIntensitySlider);
 
@@ -622,10 +622,6 @@ begin
 
   Items.Add('Change attenuation');
 
-  Items.AddObject('Spot', SpotArgument);
-
-  Items.Add('Change spot properties');
-
   Items.Add('Back');
 end;
 
@@ -635,37 +631,21 @@ procedure TEditHeadlightMenu.Click;
   var
     Vector3: TVector3Single;
   begin
-    Vector3 := Level.MainScene.Headlight.Attenuation;
-    if MessageInputQueryVector3Single(Window, 'Change headlight Attenuation',
-      Vector3, taLeft) then
-      Level.MainScene.Headlight.Attenuation := Vector3;
-  end;
-
-  procedure ChangeSpotProperties;
-  var
-    Value: Single;
-  begin
-    Value := Level.MainScene.Headlight.SpotCutOffAngle;
-    if MessageInputQuery(Window, 'Change headlight SpotCutOffAngle',
-      Value, taLeft) then
-      Level.MainScene.Headlight.SpotCutOffAngle := Value;
-
-    Value := Level.MainScene.Headlight.SpotDropOffRate;
-    if MessageInputQuery(Window, 'Change headlight SpotDropOffRate',
-      Value, taLeft) then
-      Level.MainScene.Headlight.SpotDropOffRate := Value;
+    if Headlight is TVRMLPositionalLightNode then
+    begin
+      Vector3 := TVRMLPositionalLightNode(Headlight).FdAttenuation.Value;
+      if MessageInputQueryVector3Single(Window, 'Change headlight Attenuation',
+        Vector3, taLeft) then
+        TVRMLPositionalLightNode(Headlight).FdAttenuation.Value := Vector3;
+    end else
+      MessageOk(Window, 'Light is not positional, no attenuation');
   end;
 
 begin
   case CurrentItem of
     0..4: Exit;
     5: ChangeAttenuation;
-    6: begin
-         SpotArgument.Value := not SpotArgument.Value;
-         Level.MainScene.Headlight.Spot := SpotArgument.Value;
-       end;
-    7: ChangeSpotProperties;
-    8: SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
+    6: SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -673,9 +653,9 @@ end;
 procedure TEditHeadlightMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
-    0:    Level.MainScene.Headlight.AmbientIntensity := AmbientIntensitySlider.Value;
-    1..3: Level.MainScene.Headlight.Color[CurrentItem-1] := ColorSlider[CurrentItem-1].Value;
-    4:    Level.MainScene.Headlight.Intensity := IntensitySlider.Value;
+    0:    Headlight.FdAmbientIntensity.Value := AmbientIntensitySlider.Value;
+    1..3: Headlight.FdColor.Value[CurrentItem-1] := ColorSlider[CurrentItem-1].Value;
+    4:    Headlight.FdIntensity.Value := IntensitySlider.Value;
     else Exit;
   end;
 end;
@@ -696,14 +676,14 @@ begin
   AmbientColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[1]);
   AmbientColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[2]);
 
-  for I := 0 to Level.LightSet.Lights.High do
+  for I := 0 to Level.MainScene.GlobalLights.High do
   begin
-    LightNode := Level.LightSet.Lights.Items[I].Node;
+    LightNode := Level.MainScene.GlobalLights.Items[I].Node;
     Items.Add(Format('Edit %d: %s "%s"',
       [I, LightNode.NodeTypeName, LightNode.NodeName]));
   end;
-  Items.Add('Output level lights on console');
-  Items.Add('Save level lights to level xxx_lights.wrl file');
+  Items.Add('Output level main file (with lights) on console');
+  Items.Add('Save level main file (with lights)');
   Items.AddObject('Global ambient light red'  , AmbientColorSlider[0]);
   Items.AddObject('Global ambient light green', AmbientColorSlider[1]);
   Items.AddObject('Global ambient light blue' , AmbientColorSlider[2]);
@@ -720,26 +700,27 @@ procedure TEditLevelLightsMenu.Click;
   end;
 
 begin
-  case CurrentItem - Level.LightSet.Lights.Count of
+  case CurrentItem - Level.MainScene.GlobalLights.Count of
     0: begin
          if StdOutStream <> nil then
-           SaveVRMLClassic(Level.LightSet.RootNode, StdOutStream, LightSetVRMLComment) else
+           SaveVRMLClassic(Level.MainScene.RootNode, StdOutStream, LightSetVRMLComment) else
            MessageOK(Window, 'No stdout available. On Windows you must run the game ' +
              'from the command-line to get stdout.', taLeft);
        end;
     1: begin
          if MessageYesNo(Window, Format('This will permanently overwrite file "%s". ' +
-           'Are you sure you want to save the lights ?',
-           [Level.LightSetFileName]), taLeft) then
-           SaveVRMLClassic(Level.LightSet.RootNode, Level.LightSetFileName,
+           'Are you sure you want to save the level file ?',
+           [Level.SceneFileName]), taLeft) then
+           SaveVRMLClassic(Level.MainScene.RootNode, Level.SceneFileName,
              LightSetVRMLComment);
        end;
     2, 3, 4: ;
     5: begin
-         if Level.MainScene.Headlight <> nil then
+         if Level.MainScene.HeadlightDefault <> nil then
          begin
            FreeAndNil(EditHeadlightMenu);
-           EditHeadlightMenu := TEditHeadlightMenu.Create(Application);
+           EditHeadlightMenu := TEditHeadlightMenu.Create(Application,
+             Level.MainScene.HeadlightDefault^.Node);
            SetCurrentMenu(CurrentMenu, EditHeadlightMenu);
          end else
            MessageOK(Window, 'No headlight in level ' +
@@ -750,7 +731,7 @@ begin
        begin
          FreeAndNil(EditOneLightMenu);
          EditOneLightMenu := TEditOneLightMenu.Create(nil,
-           Level.LightSet.Lights.Items[CurrentItem].Node);
+           Level.MainScene.GlobalLights.Items[CurrentItem].Node);
          SetCurrentMenu(CurrentMenu, EditOneLightMenu);
        end;
   end;
@@ -758,7 +739,7 @@ end;
 
 procedure TEditLevelLightsMenu.AccessoryValueChanged;
 begin
-  case CurrentItem - Level.LightSet.Lights.Count of
+  case CurrentItem - Level.MainScene.GlobalLights.Count of
     2: Level.GlobalAmbientLight[0] := AmbientColorSlider[0].Value;
     3: Level.GlobalAmbientLight[1] := AmbientColorSlider[1].Value;
     4: Level.GlobalAmbientLight[2] := AmbientColorSlider[2].Value;
@@ -867,17 +848,17 @@ begin
     8: begin
          OnArgument.Value := not OnArgument.Value;
          Light.FdOn.Value := OnArgument.Value;
-         Level.LightSet.CalculateLights;
+         //TODO:Level.LightSet.CalculateLights;
        end;
     9: begin
          ShadowsArgument.Value := not ShadowsArgument.Value;
          Light.FdKambiShadows.Value := ShadowsArgument.Value;
-         Level.LightSet.CalculateLights;
+         //TODO:Level.LightSet.CalculateLights;
        end;
     10:begin
          ShadowsMainArgument.Value := not ShadowsMainArgument.Value;
          Light.FdKambiShadowsMain.Value := ShadowsMainArgument.Value;
-         Level.LightSet.CalculateLights;
+         //TODO:Level.LightSet.CalculateLights;
        end;
     11:begin
          if Light is TVRMLPositionalLightNode then
@@ -887,7 +868,7 @@ begin
              Vector, taLeft) then
            begin
              TVRMLPositionalLightNode(Light).FdAttenuation.Value := Vector;
-             Level.LightSet.CalculateLights;
+             //TODO:Level.LightSet.CalculateLights;
            end;
          end;
        end;
@@ -900,7 +881,7 @@ begin
              Vector, taLeft, Player.Camera.Direction) then
            begin
              TVRMLDirectionalLightNode(Light).FdDirection.Value := Vector;
-             Level.LightSet.CalculateLights;
+             //TODO:Level.LightSet.CalculateLights;
            end;
          end;
        end;
@@ -913,7 +894,7 @@ begin
              Vector, taLeft, Player.Camera.Direction) then
            begin
              TNodeSpotLight_1(Light).FdDirection.Value := Vector;
-             Level.LightSet.CalculateLights;
+             //TODO:Level.LightSet.CalculateLights;
            end;
          end else
          if Light is TNodeSpotLight_2 then
@@ -924,7 +905,7 @@ begin
              Vector, taLeft, Player.Camera.Direction) then
            begin
              TNodeSpotLight_2(Light).FdDirection.Value := Vector;
-             Level.LightSet.CalculateLights;
+             //TODO:Level.LightSet.CalculateLights;
            end;
          end;
        end;
@@ -935,7 +916,7 @@ begin
            if MessageInputQuery(Window, 'Change dropOffRate', Value, taLeft) then
            begin
              TNodeSpotLight_1(Light).FdDropOffRate.Value := Value;
-             Level.LightSet.CalculateLights;
+             //TODO:Level.LightSet.CalculateLights;
            end;
          end else
          if Light is TNodeSpotLight_2 then
@@ -944,7 +925,7 @@ begin
            if MessageInputQuery(Window, 'Change beamWidth', Value, taLeft) then
            begin
              TNodeSpotLight_2(Light).FdBeamWidth.Value := Value;
-             Level.LightSet.CalculateLights;
+             //TODO:Level.LightSet.CalculateLights;
            end;
          end;
        end;
@@ -955,7 +936,7 @@ begin
            if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
            begin
              TNodeSpotLight_1(Light).FdCutOffAngle.Value := Value;
-             Level.LightSet.CalculateLights;
+             //TODO:Level.LightSet.CalculateLights;
            end;
          end else
          if Light is TNodeSpotLight_2 then
@@ -964,7 +945,7 @@ begin
            if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
            begin
              TNodeSpotLight_2(Light).FdCutOffAngle.Value := Value;
-             Level.LightSet.CalculateLights;
+             //TODO:Level.LightSet.CalculateLights;
            end;
          end;
        end;
@@ -995,7 +976,7 @@ begin
     else Exit;
   end;
 
-  Level.LightSet.CalculateLights;
+  //TODO:Level.LightSet.CalculateLights;
 end;
 
 { global things -------------------------------------------------------------- }

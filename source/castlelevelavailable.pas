@@ -52,7 +52,6 @@ type
       properties for description. }
     Name: string;
     SceneFileName: string;
-    LightSetFileName: string;
     Title: string;
     TitleHint: string;
     Number: Integer;
@@ -200,10 +199,6 @@ begin
     MissingRequiredAttribute('scene_file_name');
   SceneFileName := CombinePaths(BasePath, SceneFileName);
 
-  if not DOMGetAttribute(Element, 'light_set_file_name', LightSetFileName) then
-    MissingRequiredAttribute('light_set_file_name');
-  LightSetFileName := CombinePaths(BasePath, LightSetFileName);
-
   if not DOMGetAttribute(Element, 'title', Title) then
     MissingRequiredAttribute('title');
 
@@ -256,7 +251,7 @@ function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
 
   procedure CreateLevelCore;
   begin
-    Result := LevelClass.Create(Name, SceneFileName, LightSetFileName,
+    Result := LevelClass.Create(Name, SceneFileName,
       Title, TitleHint, Number, LevelDOMElement, RequiredCreatures, MenuBackground);
     if not MenuBackground then
       AvailableForNewGame := true;
