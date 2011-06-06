@@ -67,7 +67,7 @@ Group {
     type "WALK"
     headlightNode SpotLight {
       color 1 1 0.29
-      cutOffAngle 0.6981317008 # 40 degree
+      cutOffAngle 0.3
       dropOffRate 0.001
     }
   }
