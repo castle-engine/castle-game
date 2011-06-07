@@ -119,10 +119,10 @@ type
 class procedure TEnumerateResolveInlines.Enumerate(ParentNode: TVRMLNode; var Node: TVRMLNode);
 var
   G2: TNodeGroup_2;
-  G1: TNodeGroup_1;
+  G1: TVRMLNode;
   Inlined: TVRMLNode;
 begin
-  { Replace VRML 1.0 inlines with VRML 1.0 Group node.
+  { Replace VRML 1.0 inlines with VRML 1.0 Group or Separator node.
     Note that TNodeWWWInline actually descends from TNodeInline now,
     so the check for TNodeWWWInline must be 1st. }
   if Node is TNodeWWWInline then
@@ -132,7 +132,9 @@ begin
 
     if Inlined <> nil then
     begin
-      G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
+      if TNodeWWWInline(Node).FdSeparate.Value then
+        G1 := TNodeSeparator.Create(Node.NodeName, Node.WWWBasePath) else
+        G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
       G1.PositionInParent := Node.PositionInParent;
       G1.VRML1ChildAdd(Inlined);
       Node := G1;
