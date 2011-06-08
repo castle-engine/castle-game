@@ -158,15 +158,6 @@ var
     (like for creatures or items)). }
   UseOcclusionQuery: boolean;
 
-type
-  TSimpleRenderParams = class(TVRMLRenderParams)
-  public
-    FBaseLights: TDynLightInstanceArray;
-    constructor Create;
-    destructor Destroy; override;
-    function BaseLights(Scene: T3D): TDynLightInstanceArray; override;
-  end;
-
 implementation
 
 uses SysUtils, KambiUtils, CastleConfig, CastleWindow, RaysWindow,
@@ -214,23 +205,6 @@ function ViewAngleDegY: Single;
 begin
   Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX,
     Window.Height / Window.Width);
-end;
-
-constructor TSimpleRenderParams.Create;
-begin
-  inherited;
-  FBaseLights := TDynLightInstanceArray.Create;
-end;
-
-destructor TSimpleRenderParams.Destroy;
-begin
-  FreeAndNil(FBaseLights);
-  inherited;
-end;
-
-function TSimpleRenderParams.BaseLights(Scene: T3D): TDynLightInstanceArray;
-begin
-  Result := FBaseLights;
 end;
 
 initialization

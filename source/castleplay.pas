@@ -372,14 +372,12 @@ end;
 
 procedure TGame3DControls.Draw;
 var
-  Params: TSimpleRenderParams;
+  Params: TBasicRenderParams;
 begin
   { TODO: avoid creating this. In fact, just place this within scene manager,
     instead of drawing in ds3D. }
-  Params := TSimpleRenderParams.Create;
+  Params := TBasicRenderParams.Create;
   try
-    Params.TransparentGroup := tgAll;
-    Params.InShadow := false;
     Params.FBaseLights.Assign(Level.MainScene.GlobalLights);
     Player.RenderAttack(Params);
   finally FreeAndNil(Params) end;

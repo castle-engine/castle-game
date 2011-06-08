@@ -87,10 +87,8 @@ begin
     glTranslatef(0, AnimationSpeed * AnimationTime, 0);
 
     { TODO: remove need for Params, render CreditsModel as part of scene manager }
-    Params := TSimpleRenderParams.Create;
+    Params := TBasicRenderParams.Create;
     try
-      Params.InShadow := false;
-      Params.TransparentGroup := tgAll;
       CreditsModel.Render(nil, Params);
     finally FreeAndNil(Params) end;
   finally ProjectionPop end;
