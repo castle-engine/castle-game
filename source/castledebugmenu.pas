@@ -412,15 +412,20 @@ procedure TDebugCreaturesMenu.Click;
   begin
     if ChooseCreatureKind(Kind) then
     begin
-      Position := VectorAdd(Player.Camera.Position,
-        VectorScale(Player.Camera.Direction, DirectionAttenuation));
-      Direction := Player.Camera.Direction;
+      if Kind.RequiredCount > 0 then
+      begin
+        Position := VectorAdd(Player.Camera.Position,
+          VectorScale(Player.Camera.Direction, DirectionAttenuation));
+        Direction := Player.Camera.Direction;
 
-      Level.Creatures.Add(
-        Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime,
-          Kind.DefaultMaxLife));
+        Level.Creatures.Add(
+          Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime,
+            Kind.DefaultMaxLife));
 
-      UserQuit := true;
+        UserQuit := true;
+      end else
+        MessageOK(Window, Format('Creature kind %s is not loaded. You have to add it to <required_resources> inside levels/index.xml for this level, and do not run with --debug-no-creatures.',
+          [Kind.VRMLNodeName]));
     end;
   end;
 

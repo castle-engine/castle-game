@@ -111,7 +111,7 @@ begin
        end;
     2: WasParam_NoScreenChange := true;
     3: RenderShadowsPossible := false;
-    4: ResourcesStrategy := rsDebugKeepOnlyForExistingItems;
+    4: DebugNoCreatures := true;
     5: InitializeLog(Version);
     6: begin
          InitializeLog(Version);

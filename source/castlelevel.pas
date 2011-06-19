@@ -1537,7 +1537,7 @@ procedure TLevel.TraverseForCreatures(Shape: TVRMLShape);
       creature kind unprepared and don't add this creature. }
     if not CreatureKind.PrepareRenderDone then
     begin
-      Assert(ResourcesStrategy = rsDebugKeepOnlyForExistingItems);
+      Assert(DebugNoCreatures);
       Exit;
     end;
 

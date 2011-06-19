@@ -1776,10 +1776,6 @@ begin
 
   FKind := AKind;
 
-{TODO: not needed? clean other resources usage?
-  RequireCreature(Kind);
-  }
-
   FLegsPosition := ALegsPosition;
   FDirection := Normalized(ADirection);
 
@@ -1819,10 +1815,6 @@ begin
     end;
     FreeAndNil(UsedSounds);
   end;
-
-{TODO: removed, like RequireCreature above:
-  if Kind <> nil then
-    UnRequireCreature(Kind);}
 
   inherited;
 end;

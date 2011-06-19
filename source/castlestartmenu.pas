@@ -150,7 +150,6 @@ begin
     TObjectKind constructors are allowed to depend on this.
     So we must prepare everything before creating the level
     (since TLevel constructor creates some creatures and items on the level). }
-{TODO: should be removed  RequireAllCreatures;}
   BaseLights := TDynLightInstanceArray.Create; {TODO:dirty to create BaseLights here}
   try
     ItemsKinds.PrepareRender(BaseLights);
@@ -341,8 +340,6 @@ begin
     TGLMenuItemArgument.TextWidth(SSystemDefault));
   VideoFrequencyArgument.Value := VideoFrequencyToStr(VideoFrequency);
 
-  ConserveResourcesArgument := TGLMenuBooleanArgument.Create(ConserveResources);
-
   BumpMappingArgument := TGLMenuBooleanArgument.Create(BumpMapping);
 
   AntiAliasingSlider := TAntiAliasingSlider.Create;
@@ -354,7 +351,6 @@ begin
   Items.AddObject('Creature animation smoothness', CreatureAnimationSlider);
   Items.AddObject('Color depth', ColorDepthArgument);
   Items.AddObject('Display frequency', VideoFrequencyArgument);
-  Items.AddObject('Conserve memory', ConserveResourcesArgument);
   Items.AddObject('Bump mapping', BumpMappingArgument);
   Items.AddObject('Anti-aliasing', AntiAliasingSlider);
   Items.Add('Restore to defaults');
@@ -403,9 +399,9 @@ begin
       TextureMinificationQualitySlider.Value := Ord(TextureMinificationQuality);
 
     { All items and creatures must be reloaded after
-      texture minification filter changed. }
+      texture minification filter changed.
+      Actually, creatures are not loaded now, so only free items. }
     ItemsKinds.FreePrepareRender;
-    UnRequireAllCreatures;
   end;
 end;
 
@@ -463,17 +459,6 @@ procedure TVideoMenu.Click;
     end;
   end;
 
-  procedure SetConserveResources(Value: boolean);
-  begin
-    if ConserveResources <> Value then
-    begin
-      ConserveResources := Value;
-      ConserveResourcesArgument.Value := ConserveResources;
-      SubMenuAdditionalInfo := SRestartTheGame;
-    end;
-  end;
-
-
 begin
   inherited;
 
@@ -515,13 +500,12 @@ begin
     4: ;
     5: ChangeColorDepthBits;
     6: ChangeVideoFrequency;
-    7: SetConserveResources(not ConserveResources);
-    8: begin
+    7: begin
          BumpMapping := not BumpMapping;
          BumpMappingArgument.Value := BumpMapping;
        end;
-    9: ;
-    10:begin
+    8: ;
+    9: begin
          AllowScreenChange := DefaultAllowScreenChange;
          AllowScreenChangeArgument.Value := AllowScreenChange;
 
@@ -568,8 +552,6 @@ begin
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
-         SetConserveResources(DefaultConserveResources);
-
          BumpMapping := DefaultBumpMapping;
          BumpMappingArgument.Value := BumpMapping;
 
@@ -579,7 +561,7 @@ begin
 
          MessageOK(Window, 'All video settings restored to defaults.', taLeft);
        end;
-    11: SetCurrentMenu(CurrentMenu, MainMenu);
+    10: SetCurrentMenu(CurrentMenu, MainMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -600,7 +582,7 @@ begin
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
        end;
-    9: SetAntiAliasing(AntiAliasingSlider.Value, false);
+    8: SetAntiAliasing(AntiAliasingSlider.Value, false);
   end;
 end;
 
