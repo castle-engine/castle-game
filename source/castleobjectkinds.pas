@@ -61,7 +61,7 @@ type
       AnimInfo: TVRMLGLAnimationInfo;
       TransparentGroups: TTransparentGroups;
       Options: TPrepareResourcesOptions;
-      const BaseLights: TDynLightInstanceArray);
+      const BaseLights: TLightInstancesList);
 
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool.
       AnimInfo may be @nil, then this is ignored. }
@@ -92,12 +92,12 @@ type
       It must call Progress.Step PrepareRenderSteps times.
       It has a funny name to differentiate from PrepareRender,
       that should be called outside. }
-    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); virtual;
+    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); virtual;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
 
-    procedure PrepareRender(const BaseLights: TDynLightInstanceArray);
+    procedure PrepareRender(const BaseLights: TLightInstancesList);
 
     { How many times Progress.Step will be called during PrepareRender
       of this object.
@@ -143,7 +143,7 @@ type
       and then (wrapped within Progress.Init...Fini) will
       call PrepareRender. This should reload / regenerate all
       things prepared in PrepareRender. }
-    procedure RedoPrepareRender(const BaseLights: TDynLightInstanceArray);
+    procedure RedoPrepareRender(const BaseLights: TLightInstancesList);
   end;
 
 implementation
@@ -181,7 +181,7 @@ begin
   inherited;
 end;
 
-procedure TObjectKind.PrepareRender(const BaseLights: TDynLightInstanceArray);
+procedure TObjectKind.PrepareRender(const BaseLights: TLightInstancesList);
 var
   I: Integer;
 begin
@@ -238,7 +238,7 @@ begin
   end;
 end;
 
-procedure TObjectKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
+procedure TObjectKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 begin
   { Nothing to do here in this class. }
 end;
@@ -285,7 +285,7 @@ begin
     raise Exception.CreateFmt('Wrong blending_type value "%s"', [SBlendingType]);
 end;
 
-procedure TObjectKind.RedoPrepareRender(const BaseLights: TDynLightInstanceArray);
+procedure TObjectKind.RedoPrepareRender(const BaseLights: TLightInstancesList);
 begin
   Progress.Init(PrepareRenderSteps, 'Loading object ' + VRMLNodeName);
   try
@@ -334,7 +334,7 @@ procedure TObjectKind.CreateAnimationIfNeeded(
   AnimInfo: TVRMLGLAnimationInfo;
   TransparentGroups: TTransparentGroups;
   Options: TPrepareResourcesOptions;
-  const BaseLights: TDynLightInstanceArray);
+  const BaseLights: TLightInstancesList);
 
   { Returns FirstScene.ManifoldEdges / BorderEdges.
 

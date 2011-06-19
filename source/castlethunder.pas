@@ -43,7 +43,7 @@ type
     destructor Destroy; override;
 
     { Add thunder light, if visible. }
-    procedure AddLight(const BaseLights: TDynLightInstanceArray);
+    procedure AddLight(const BaseLights: TLightInstancesList);
 
     procedure Idle;
     { Force thunder happening in next Idle call. }
@@ -76,7 +76,7 @@ begin
   inherited;
 end;
 
-procedure TThunderEffect.AddLight(const BaseLights: TDynLightInstanceArray);
+procedure TThunderEffect.AddLight(const BaseLights: TLightInstancesList);
 
   function Visible: boolean;
   var

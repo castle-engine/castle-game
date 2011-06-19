@@ -451,7 +451,7 @@ type
     procedure NotificationInteractFailed(const S: string);
 
     procedure RenderFromViewEverything; override;
-    procedure InitializeLights(const Lights: TDynLightInstanceArray); override;
+    procedure InitializeLights(const Lights: TLightInstancesList); override;
     procedure RenderNeverShadowed(const Params: TRenderParams); override;
     procedure ApplyProjection; override;
   public
@@ -1807,7 +1807,7 @@ begin
   inherited;
 end;
 
-procedure TLevel.InitializeLights(const Lights: TDynLightInstanceArray);
+procedure TLevel.InitializeLights(const Lights: TLightInstancesList);
 begin
   inherited;
 

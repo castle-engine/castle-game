@@ -110,7 +110,7 @@ type
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo;
-      const BaseLights: TDynLightInstanceArray);
+      const BaseLights: TLightInstancesList);
 
     procedure AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
       KindsConfig: TKamXMLConfig; const AnimationName: string;
@@ -295,7 +295,7 @@ type
 
       Also calculates CameraRadiusFromPrepareRender
       from StandAnimation.Scenes[0]. }
-    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
+    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -502,7 +502,7 @@ type
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
   protected
-    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
+    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
     destructor Destroy; override;
 
@@ -541,7 +541,7 @@ type
 
   TGhostKind = class(TWalkAttackCreatureKind)
   protected
-    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
+    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
@@ -573,7 +573,7 @@ type
     FFallsDown: boolean;
     FFallsDownSpeed: Single;
   protected
-    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
+    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
@@ -643,7 +643,7 @@ type
     FAnimation: TVRMLGLAnimation;
     FAnimationInfo: TVRMLGLAnimationInfo;
   protected
-    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
+    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
@@ -1268,7 +1268,7 @@ procedure TCreatureKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo;
-  const BaseLights: TDynLightInstanceArray);
+  const BaseLights: TLightInstancesList);
 var
   Options: TPrepareResourcesOptions;
 begin
@@ -1369,7 +1369,7 @@ begin
   inherited;
 end;
 
-procedure TWalkAttackCreatureKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
+procedure TWalkAttackCreatureKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
 
@@ -1529,7 +1529,7 @@ begin
   if ThrowWebAttackAnimation <> nil then ThrowWebAttackAnimation.GLContextClose;
 end;
 
-procedure TSpiderQueenKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
+procedure TSpiderQueenKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('ThrowWebAttack',
@@ -1575,7 +1575,7 @@ end;
 
 { TGhostKind ------------------------------------------------------------- }
 
-procedure TGhostKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
+procedure TGhostKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 var
   ReferenceScene: TVRMLGLScene;
 begin
@@ -1632,7 +1632,7 @@ begin
   inherited;
 end;
 
-procedure TMissileCreatureKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
+procedure TMissileCreatureKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('Move', FAnimation, FAnimationInfo, BaseLights);
@@ -1718,7 +1718,7 @@ begin
   inherited;
 end;
 
-procedure TStillCreatureKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
+procedure TStillCreatureKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('Stand', FAnimation, FAnimationInfo, BaseLights);

@@ -39,7 +39,7 @@ uses Classes, DOM, CastleCreatures, VRMLNodes;
   have to load each time.
 
   @groupBegin }
-procedure RequireCreatures(const BaseLights: TDynLightInstanceArray; Names: TStringList);
+procedure RequireCreatures(const BaseLights: TLightInstancesList; Names: TStringList);
 procedure UnRequireCreatures(Names: TStringList);
 { @groupEnd }
 
@@ -62,7 +62,7 @@ uses SysUtils, KambiLog, ProgressUnit, KambiTimeUtils, CastleConfig,
 
 { [Un]RequireCreatures ------------------------------------------------------- }
 
-procedure RequireCreatures(const BaseLights: TDynLightInstanceArray; Names: TStringList);
+procedure RequireCreatures(const BaseLights: TLightInstancesList; Names: TStringList);
 var
   I: Integer;
   Kind: TCreatureKind;

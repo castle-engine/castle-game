@@ -428,7 +428,7 @@ var
 
 constructor TPlayer.Create;
 var
-  BaseLights: TDynLightInstanceArray;
+  BaseLights: TLightInstancesList;
 begin
   inherited Create;
   FLife := DefaultMaxLife;
@@ -458,7 +458,7 @@ begin
 
   { TODO: not nice to initialize BaseLights here?
     player creatures should be required/released at each level start probably. }
-  BaseLights := TDynLightInstanceArray.Create;
+  BaseLights := TLightInstancesList.Create;
   try
     RequireCreatures(BaseLights, RequiredCreatures);
   finally FreeAndNil(BaseLights) end;

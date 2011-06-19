@@ -178,7 +178,7 @@ procedure OpenWindow(Window: TGLWindow);
 var
   VRMLContents: string;
   Info: TMFString;
-  BaseLights: TDynLightInstanceArray;
+  BaseLights: TLightInstancesList;
 begin
   VRMLContents := FileToString(ProgramDataPath + 'data' + PathDelim +
     'menu_bg' + PathDelim + 'credits.wrl');
@@ -192,7 +192,7 @@ begin
   AttributesSet(CreditsModel.Attributes, btIncrease);
   CreditsModel.Attributes.UseSceneLights := true;
 
-  BaseLights := TDynLightInstanceArray.Create; {TODO:dirty to create BaseLights here}
+  BaseLights := TLightInstancesList.Create; {TODO:dirty to create BaseLights here}
   try
     CreditsModel.PrepareResources([prRender, prBoundingBox], false, BaseLights);
   finally FreeAndNil(BaseLights) end;

@@ -144,13 +144,13 @@ var
   LocalPlayer: TPlayer;
   LocalLevel, NewLocalLevel: TLevel;
   WantsStart: boolean;
-  BaseLights: TDynLightInstanceArray;
+  BaseLights: TLightInstancesList;
 begin
   { All kinds must be prepared before instances are created.
     TObjectKind constructors are allowed to depend on this.
     So we must prepare everything before creating the level
     (since TLevel constructor creates some creatures and items on the level). }
-  BaseLights := TDynLightInstanceArray.Create; {TODO:dirty to create BaseLights here}
+  BaseLights := TLightInstancesList.Create; {TODO:dirty to create BaseLights here}
   try
     ItemsKinds.PrepareRender(BaseLights);
   finally FreeAndNil(BaseLights) end;
