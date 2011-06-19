@@ -1,10 +1,5 @@
 castle 2:
 
-- From kambi_vrml_game_engine/doc/TODO, after 3.8.0:
-  - TVRMLGLLightSet - hm, it would be useful to eliminate need to use this
-    e.g. in castle.
-    ...
-
 - when our interact key activates pointing device sensor on VRML castle level,
   our normal interact key handling doesn't know about it --- and still
   seeks for 3d objects to press, eventually making "beep" to signal
