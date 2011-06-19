@@ -73,7 +73,7 @@ type
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   protected
-    procedure PrepareRenderInternal; override;
+    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
 
     { This is like @inherited, but it passes proper values for boolean parameters
       specifying what to prepare. }
@@ -81,7 +81,8 @@ type
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo;
-      TransparentGroups: TTransparentGroups);
+      TransparentGroups: TTransparentGroups;
+      const BaseLights: TDynLightInstanceArray);
 
     function GetStringCheckNonEmpty(KindsConfig: TKamXMLConfig;
       const AttrName: string): string;
@@ -145,7 +146,7 @@ type
   public
     { Calls PrepareRender for all items.
       This does Progress.Init, Step, Fini. }
-    procedure PrepareRender;
+    procedure PrepareRender(const BaseLights: TDynLightInstanceArray);
 
     { Call FreePrepareRender for all items. }
     procedure FreePrepareRender;
@@ -172,7 +173,7 @@ type
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
-    procedure PrepareRenderInternal; override;
+    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
   public
     destructor Destroy; override;
 
@@ -502,7 +503,7 @@ begin
   Result := FBoundingBoxRotated;
 end;
 
-procedure TItemKind.PrepareRenderInternal;
+procedure TItemKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
 begin
   if FScene = nil then
   begin
@@ -510,7 +511,7 @@ begin
     FScene.Load(ModelFileName);
 
     AttributesSet(Scene.Attributes, BlendingType);
-    Scene.PrepareResources([prRender, prBoundingBox], false);
+    Scene.PrepareResources([prRender, prBoundingBox], false, BaseLights);
     Scene.FreeResources([frTextureDataInNodes]);
   end;
 
@@ -538,15 +539,16 @@ procedure TItemKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo;
-  TransparentGroups: TTransparentGroups);
+  TransparentGroups: TTransparentGroups;
+  const BaseLights: TDynLightInstanceArray);
 begin
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
-    TransparentGroups, [prRender, prBoundingBox]);
+    TransparentGroups, [prRender, prBoundingBox], BaseLights);
 end;
 
 { TItemKindsList ------------------------------------------------------------- }
 
-procedure TItemKindsList.PrepareRender;
+procedure TItemKindsList.PrepareRender(const BaseLights: TDynLightInstanceArray);
 var
   I: Integer;
   PrepareRenderSteps: Cardinal;
@@ -558,7 +560,7 @@ begin
   Progress.Init(PrepareRenderSteps, 'Loading items');
   try
     for I := 0 to High do
-      Items[I].PrepareRender;
+      Items[I].PrepareRender(BaseLights);
   finally Progress.Fini; end;
 end;
 
@@ -652,11 +654,11 @@ begin
   Player.EquippedWeapon := Item;
 end;
 
-procedure TItemWeaponKind.PrepareRenderInternal;
+procedure TItemWeaponKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
 begin
   inherited;
   CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationInfo,
-    [tgAll]);
+    [tgAll], BaseLights);
 end;
 
 function TItemWeaponKind.PrepareRenderSteps: Cardinal;

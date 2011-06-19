@@ -451,7 +451,7 @@ type
     procedure NotificationInteractFailed(const S: string);
 
     procedure RenderFromViewEverything; override;
-    procedure InitializeLights(const BaseLights: TDynLightInstanceArray); override;
+    procedure InitializeLights(const Lights: TDynLightInstanceArray); override;
     procedure RenderNeverShadowed(const Params: TRenderParams); override;
     procedure ApplyProjection; override;
   public
@@ -1155,7 +1155,7 @@ begin
   FMenuBackground := AMenuBackground;
   FRequiredCreatures := ARequiredCreatures;
 
-  RequireCreatures(FRequiredCreatures);
+  RequireCreatures(BaseLights, FRequiredCreatures);
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -1281,7 +1281,7 @@ begin
     if RenderShadowsPossible and SceneDynamicShadows then
       Options := Options + prShadowVolume;
 
-    MainScene.PrepareResources(Options, false);
+    MainScene.PrepareResources(Options, false, BaseLights);
 
     MainScene.FreeResources([frTextureDataInNodes]);
 
@@ -1300,7 +1300,7 @@ begin
     MainScene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
     MainScene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
     MainScene.Spatial := [ssRendering, ssCollisionOctree];
-    MainScene.PrepareResources([prSpatial], false);
+    MainScene.PrepareResources([prSpatial], false, BaseLights);
 
     { TrianglesList was created for triangle octree. We don't need it anymore.
 
@@ -1722,7 +1722,7 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareResources(Options, false);
+  Result.PrepareResources(Options, false, BaseLights);
 
   if CreateOctreeCollisions then
     Result.Spatial := [ssCollisionOctree];
@@ -1750,7 +1750,7 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareResources(Options, false);
+  Result.PrepareResources(Options, false, BaseLights);
 
   if CreateFirstOctreeCollisions then
     Result.FirstScene.Spatial := [ssCollisionOctree];
@@ -1806,12 +1806,12 @@ begin
   inherited;
 end;
 
-procedure TLevel.InitializeLights(const BaseLights: TDynLightInstanceArray);
+procedure TLevel.InitializeLights(const Lights: TDynLightInstanceArray);
 begin
   inherited;
 
   if ThunderEffect <> nil then
-    ThunderEffect.AddLight(BaseLights);
+    ThunderEffect.AddLight(Lights);
 end;
 
 procedure TLevel.RenderFromViewEverything;

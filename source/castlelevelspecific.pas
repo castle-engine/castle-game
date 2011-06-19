@@ -347,7 +347,7 @@ const
   var
     I: Integer;
     LightNode: TVRMLPositionalLightNode;
-    Headlight: PLightInstance;
+    Headlight: TLightInstance;
   begin
     Assert(not WerewolfAppeared);
 
@@ -365,12 +365,11 @@ const
     WerewolfCreature[0].Howl(true);
 
     { change the lights }
-    Headlight := MainScene.HeadlightDefault;
-    if Headlight <> nil then
+    if HeadlightInstance(Headlight) then
     begin
-      Headlight^.Node.FdAmbientIntensity.Send(0.8);
-      Headlight^.Node.FdColor.Send(Vector3Single(1, 0, 0));
-      Headlight^.Node.FdIntensity.Send(0.2);
+      Headlight.Node.FdAmbientIntensity.Send(0.8);
+      Headlight.Node.FdColor.Send(Vector3Single(1, 0, 0));
+      Headlight.Node.FdIntensity.Send(0.2);
     end;
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
@@ -1457,7 +1456,7 @@ begin
     AnimationAttributesSet(Fountain.Attributes, btIncrease);
     Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
     try
-      Fountain.PrepareResources([prRender, prBoundingBox], true);
+      Fountain.PrepareResources([prRender, prBoundingBox], true, BaseLights);
     finally Progress.Fini end;
     Fountain.FreeResources([frTextureDataInNodes]);
     Fountain.CastsShadow := false; { not manifold }

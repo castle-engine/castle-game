@@ -41,7 +41,7 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, KambiClassUtils,
   CastleNotifications, CastleLevelAvailable, CastleBackgroundLevel,
-  XmlSoundEngine, GLSoundMenu,
+  XmlSoundEngine, GLSoundMenu, VRMLNodes,
   CastleRequiredResources, CastleCredits, GLAntiAliasing, KeysMouse;
 
 { TCastleMenu descendants interface ------------------------------------------ }
@@ -144,13 +144,17 @@ var
   LocalPlayer: TPlayer;
   LocalLevel, NewLocalLevel: TLevel;
   WantsStart: boolean;
+  BaseLights: TDynLightInstanceArray;
 begin
   { All kinds must be prepared before instances are created.
     TObjectKind constructors are allowed to depend on this.
     So we must prepare everything before creating the level
     (since TLevel constructor creates some creatures and items on the level). }
-  RequireAllCreatures;
-  ItemsKinds.PrepareRender;
+{TODO: should be removed  RequireAllCreatures;}
+  BaseLights := TDynLightInstanceArray.Create; {TODO:dirty to create BaseLights here}
+  try
+    ItemsKinds.PrepareRender(BaseLights);
+  finally FreeAndNil(BaseLights) end;
 
   LocalLevel := NewGameLevelAvailable.CreateLevel;
   try

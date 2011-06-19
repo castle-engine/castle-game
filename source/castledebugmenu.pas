@@ -433,7 +433,7 @@ procedure TDebugCreaturesMenu.Click;
       if Kind.RequiredCount = 0 then
         MessageOK(Window, Format('Creature "%s" is not used by anything, ' +
           'cannot reload',  [Kind.VRMLNodeName])) else
-        Kind.RedoPrepareRender;
+        Kind.RedoPrepareRender(Level.BaseLights);
     end;
   end;
 
@@ -579,7 +579,7 @@ procedure TDebugItemsMenu.Click;
     Kind: TItemKind;
   begin
     if ChooseItemKind(Kind) then
-      Kind.RedoPrepareRender;
+      Kind.RedoPrepareRender(Level.BaseLights);
   end;
 
 begin
@@ -699,6 +699,8 @@ procedure TEditLevelLightsMenu.Click;
       [Level.Title]);
   end;
 
+var
+  H: TLightInstance;
 begin
   case CurrentItem - Level.MainScene.GlobalLights.Count of
     0: begin
@@ -716,11 +718,10 @@ begin
        end;
     2, 3, 4: ;
     5: begin
-         if Level.MainScene.HeadlightDefault <> nil then
+         if Level.HeadlightInstance(H) then
          begin
            FreeAndNil(EditHeadlightMenu);
-           EditHeadlightMenu := TEditHeadlightMenu.Create(Application,
-             Level.MainScene.HeadlightDefault^.Node);
+           EditHeadlightMenu := TEditHeadlightMenu.Create(Application, H.Node);
            SetCurrentMenu(CurrentMenu, EditHeadlightMenu);
          end else
            MessageOK(Window, 'No headlight in level ' +

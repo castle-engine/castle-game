@@ -26,7 +26,7 @@ unit CastleObjectKinds;
 interface
 
 uses Classes, KambiXMLConfig, VRMLGLAnimation, VRMLGLAnimationInfo,
-  CastleVideoOptions, VRMLScene, VRMLGLScene;
+  CastleVideoOptions, VRMLScene, VRMLGLScene, VRMLNodes;
 
 type
   { This is a common class for item kind and creature kind. }
@@ -60,7 +60,8 @@ type
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo;
       TransparentGroups: TTransparentGroups;
-      Options: TPrepareResourcesOptions);
+      Options: TPrepareResourcesOptions;
+      const BaseLights: TDynLightInstanceArray);
 
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool.
       AnimInfo may be @nil, then this is ignored. }
@@ -91,12 +92,12 @@ type
       It must call Progress.Step PrepareRenderSteps times.
       It has a funny name to differentiate from PrepareRender,
       that should be called outside. }
-    procedure PrepareRenderInternal; virtual;
+    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); virtual;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
 
-    procedure PrepareRender;
+    procedure PrepareRender(const BaseLights: TDynLightInstanceArray);
 
     { How many times Progress.Step will be called during PrepareRender
       of this object.
@@ -142,7 +143,7 @@ type
       and then (wrapped within Progress.Init...Fini) will
       call PrepareRender. This should reload / regenerate all
       things prepared in PrepareRender. }
-    procedure RedoPrepareRender;
+    procedure RedoPrepareRender(const BaseLights: TDynLightInstanceArray);
   end;
 
 implementation
@@ -180,7 +181,7 @@ begin
   inherited;
 end;
 
-procedure TObjectKind.PrepareRender;
+procedure TObjectKind.PrepareRender(const BaseLights: TDynLightInstanceArray);
 var
   I: Integer;
 begin
@@ -192,7 +193,7 @@ begin
   Assert(AnimationsPrepared.Count = 0);
 
   try
-    PrepareRenderInternal;
+    PrepareRenderInternal(BaseLights);
 
     { During AnimationsPrepared we collect prepared animations,
       to now handle them in general.
@@ -237,7 +238,7 @@ begin
   end;
 end;
 
-procedure TObjectKind.PrepareRenderInternal;
+procedure TObjectKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
 begin
   { Nothing to do here in this class. }
 end;
@@ -284,7 +285,7 @@ begin
     raise Exception.CreateFmt('Wrong blending_type value "%s"', [SBlendingType]);
 end;
 
-procedure TObjectKind.RedoPrepareRender;
+procedure TObjectKind.RedoPrepareRender(const BaseLights: TDynLightInstanceArray);
 begin
   Progress.Init(PrepareRenderSteps, 'Loading object ' + VRMLNodeName);
   try
@@ -298,7 +299,7 @@ begin
       work. }
     FreePrepareRender;
 
-    PrepareRender;
+    PrepareRender(BaseLights);
   finally Progress.Fini; end;
 end;
 
@@ -332,7 +333,8 @@ procedure TObjectKind.CreateAnimationIfNeeded(
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo;
   TransparentGroups: TTransparentGroups;
-  Options: TPrepareResourcesOptions);
+  Options: TPrepareResourcesOptions;
+  const BaseLights: TDynLightInstanceArray);
 
   { Returns FirstScene.ManifoldEdges / BorderEdges.
 
@@ -415,7 +417,7 @@ begin
       Exclude(ActualOptions, prManifoldAndBorderEdges);
 
     AnimationAttributesSet(Anim.Attributes, BlendingType);
-    Anim.PrepareResources(ActualOptions, false);
+    Anim.PrepareResources(ActualOptions, false, BaseLights);
 
     if (prManifoldAndBorderEdges in Options) and
       IsSharedManifoldAndBorderEdges then

@@ -28,7 +28,7 @@ interface
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3D, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLGLScene, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSoundAllocator, KambiXMLConfig, Base3D,
-  XmlSoundEngine, GLShadowVolumeRenderer, VRMLTriangle, Frustum;
+  XmlSoundEngine, GLShadowVolumeRenderer, VRMLTriangle, Frustum, VRMLNodes;
 
 {$define read_interface}
 
@@ -109,7 +109,8 @@ type
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
-      AnimInfo: TVRMLGLAnimationInfo);
+      AnimInfo: TVRMLGLAnimationInfo;
+      const BaseLights: TDynLightInstanceArray);
 
     procedure AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
       KindsConfig: TKamXMLConfig; const AnimationName: string;
@@ -294,7 +295,7 @@ type
 
       Also calculates CameraRadiusFromPrepareRender
       from StandAnimation.Scenes[0]. }
-    procedure PrepareRenderInternal; override;
+    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
   public
     constructor Create(const AVRMLNodeName: string);
 
@@ -501,7 +502,7 @@ type
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
   protected
-    procedure PrepareRenderInternal; override;
+    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
   public
     destructor Destroy; override;
 
@@ -540,7 +541,7 @@ type
 
   TGhostKind = class(TWalkAttackCreatureKind)
   protected
-    procedure PrepareRenderInternal; override;
+    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
   public
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
@@ -572,7 +573,7 @@ type
     FFallsDown: boolean;
     FFallsDownSpeed: Single;
   protected
-    procedure PrepareRenderInternal; override;
+    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
@@ -642,7 +643,7 @@ type
     FAnimation: TVRMLGLAnimation;
     FAnimationInfo: TVRMLGLAnimationInfo;
   protected
-    procedure PrepareRenderInternal; override;
+    procedure PrepareRenderInternal(const BaseLights: TDynLightInstanceArray); override;
   public
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
@@ -1191,7 +1192,7 @@ var
 implementation
 
 uses SysUtils, DOM, GL, GLU, CastleWindow, GLWindow,
-  VRMLNodes, KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
+  KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleVideoOptions,
   CastleNotifications, CastleRequiredResources;
 
@@ -1266,7 +1267,8 @@ end;
 procedure TCreatureKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TVRMLGLAnimation;
-  AnimInfo: TVRMLGLAnimationInfo);
+  AnimInfo: TVRMLGLAnimationInfo;
+  const BaseLights: TDynLightInstanceArray);
 var
   Options: TPrepareResourcesOptions;
 begin
@@ -1278,7 +1280,7 @@ begin
     { all creature animations are displayed in 3D screen along
       with other objects, so they must use separate tgOpaque, tgTransparent
       rendering }
-    [tgOpaque, tgTransparent], Options);
+    [tgOpaque, tgTransparent], Options, BaseLights);
 end;
 
 procedure TCreatureKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
@@ -1367,7 +1369,7 @@ begin
   inherited;
 end;
 
-procedure TWalkAttackCreatureKind.PrepareRenderInternal;
+procedure TWalkAttackCreatureKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
 begin
   inherited;
 
@@ -1379,14 +1381,14 @@ begin
   AddFirstRootNodesPool(FDyingBackAnimationInfo  );
   AddFirstRootNodesPool(FHurtAnimationInfo       );
 
-  CreateAnimationIfNeeded('Stand'      , FStandAnimation      , FStandAnimationInfo      );
+  CreateAnimationIfNeeded('Stand'      , FStandAnimation      , FStandAnimationInfo      , BaseLights);
   AddManifoldEdgesPool(FStandAnimationInfo, FStandAnimation);
-  CreateAnimationIfNeeded('StandToWalk', FStandToWalkAnimation, FStandToWalkAnimationInfo);
-  CreateAnimationIfNeeded('Walk'       , FWalkAnimation       , FWalkAnimationInfo       );
-  CreateAnimationIfNeeded('Attack'     , FAttackAnimation     , FAttackAnimationInfo     );
-  CreateAnimationIfNeeded('Dying'      , FDyingAnimation      , FDyingAnimationInfo      );
-  CreateAnimationIfNeeded('DyingBack'  , FDyingBackAnimation  , FDyingBackAnimationInfo  );
-  CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationInfo       );
+  CreateAnimationIfNeeded('StandToWalk', FStandToWalkAnimation, FStandToWalkAnimationInfo, BaseLights);
+  CreateAnimationIfNeeded('Walk'       , FWalkAnimation       , FWalkAnimationInfo       , BaseLights);
+  CreateAnimationIfNeeded('Attack'     , FAttackAnimation     , FAttackAnimationInfo     , BaseLights);
+  CreateAnimationIfNeeded('Dying'      , FDyingAnimation      , FDyingAnimationInfo      , BaseLights);
+  CreateAnimationIfNeeded('DyingBack'  , FDyingBackAnimation  , FDyingBackAnimationInfo  , BaseLights);
+  CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationInfo       , BaseLights);
 
   CameraRadiusFromPrepareRender :=
     Min(Box3DXYRadius(StandAnimation.Scenes[0].BoundingBox),
@@ -1527,11 +1529,11 @@ begin
   if ThrowWebAttackAnimation <> nil then ThrowWebAttackAnimation.GLContextClose;
 end;
 
-procedure TSpiderQueenKind.PrepareRenderInternal;
+procedure TSpiderQueenKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
 begin
   inherited;
   CreateAnimationIfNeeded('ThrowWebAttack',
-    FThrowWebAttackAnimation, FThrowWebAttackAnimationInfo);
+    FThrowWebAttackAnimation, FThrowWebAttackAnimationInfo, BaseLights);
 end;
 
 function TSpiderQueenKind.PrepareRenderSteps: Cardinal;
@@ -1573,7 +1575,7 @@ end;
 
 { TGhostKind ------------------------------------------------------------- }
 
-procedure TGhostKind.PrepareRenderInternal;
+procedure TGhostKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
 var
   ReferenceScene: TVRMLGLScene;
 begin
@@ -1630,10 +1632,10 @@ begin
   inherited;
 end;
 
-procedure TMissileCreatureKind.PrepareRenderInternal;
+procedure TMissileCreatureKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
 begin
   inherited;
-  CreateAnimationIfNeeded('Move', FAnimation, FAnimationInfo);
+  CreateAnimationIfNeeded('Move', FAnimation, FAnimationInfo, BaseLights);
 
   CameraRadiusFromPrepareRender :=
     Box3DXYRadius(Animation.Scenes[0].BoundingBox);
@@ -1716,10 +1718,10 @@ begin
   inherited;
 end;
 
-procedure TStillCreatureKind.PrepareRenderInternal;
+procedure TStillCreatureKind.PrepareRenderInternal(const BaseLights: TDynLightInstanceArray);
 begin
   inherited;
-  CreateAnimationIfNeeded('Stand', FAnimation, FAnimationInfo);
+  CreateAnimationIfNeeded('Stand', FAnimation, FAnimationInfo, BaseLights);
 
   CameraRadiusFromPrepareRender :=
     Box3DXYRadius(Animation.Scenes[0].BoundingBox);
@@ -1774,7 +1776,9 @@ begin
 
   FKind := AKind;
 
+{TODO: not needed? clean other resources usage?
   RequireCreature(Kind);
+  }
 
   FLegsPosition := ALegsPosition;
   FDirection := Normalized(ADirection);
@@ -1816,8 +1820,9 @@ begin
     FreeAndNil(UsedSounds);
   end;
 
+{TODO: removed, like RequireCreature above:
   if Kind <> nil then
-    UnRequireCreature(Kind);
+    UnRequireCreature(Kind);}
 
   inherited;
 end;

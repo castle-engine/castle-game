@@ -25,7 +25,7 @@ unit CastleRequiredResources;
 
 interface
 
-uses Classes, DOM, CastleCreatures;
+uses Classes, DOM, CastleCreatures, VRMLNodes;
 
 type
   { We have three different memory behaviors. }
@@ -40,7 +40,7 @@ type
       resources no longer needed are freed.
 
       Advantage: you have to wait
-      only at loading level time, and memory use moderate.
+      only at loading level time, and memory use is moderate.
       Disadvantage: every level load needs to initialize it's creatures.
       If you frequently change between game levels, this means that you
       have to load each time. }
@@ -79,7 +79,7 @@ var
   in this case.)
 
   @groupBegin }
-procedure RequireCreatures(Names: TStringList);
+procedure RequireCreatures(const BaseLights: TDynLightInstanceArray; Names: TStringList);
 procedure UnRequireCreatures(Names: TStringList);
 { @groupEnd }
 
@@ -101,7 +101,7 @@ procedure UnRequireCreatures(Names: TStringList);
   to be "paired" like normal RequireCreatures, UnRequireCreatures.
 
   @groupBegin }
-procedure RequireAllCreatures;
+procedure RequireAllCreatures(const BaseLights: TDynLightInstanceArray);
 procedure UnRequireAllCreatures;
 { @groupEnd }
 
@@ -114,7 +114,7 @@ procedure UnRequireAllCreatures;
   So these calls are honoured for all ResourcesStrategy values.
 
   @groupBegin }
-procedure RequireCreature(Kind: TCreatureKind);
+procedure RequireCreature(const BaseLights: TDynLightInstanceArray; Kind: TCreatureKind);
 procedure UnRequireCreature(Kind: TCreatureKind);
 { @groupEnd }
 
@@ -162,7 +162,7 @@ end;
 { ----------------------------------------------------------------------------
   [Un]RequireCreaturesCore using TCreatureKindFunc }
 
-procedure RequireCreaturesCore(Func: TCreatureKindFunc);
+procedure RequireCreaturesCore(const BaseLights: TDynLightInstanceArray; Func: TCreatureKindFunc);
 var
   I: Integer;
   Kind: TCreatureKind;
@@ -204,7 +204,7 @@ begin
           if Log then
             WritelnLog('Resources', Format(
               'Creature "%s" becomes required, loading', [Kind.VRMLNodeName]));
-          Kind.PrepareRender;
+          Kind.PrepareRender(BaseLights);
         end;
       end;
     finally Progress.Fini end;
@@ -255,12 +255,12 @@ end;
 { ----------------------------------------------------------------------------
   Public comfortable [Un]RequireCreatures }
 
-procedure RequireCreatures(Names: TStringList);
+procedure RequireCreatures(const BaseLights: TDynLightInstanceArray; Names: TStringList);
 begin
   if ResourcesStrategy = rsKeepOnlyForCurrentLevel then
   begin
     KindNames := Names;
-    RequireCreaturesCore(@CreatureKind_Names);
+    RequireCreaturesCore(BaseLights, @CreatureKind_Names);
   end;
 end;
 
@@ -276,12 +276,12 @@ end;
 var
   RequireAllMode: boolean = false;
 
-procedure RequireAllCreatures;
+procedure RequireAllCreatures(const BaseLights: TDynLightInstanceArray);
 begin
   if (ResourcesStrategy = rsKeepAllLoaded) and (not RequireAllMode) then
   begin
     RequireAllMode := true;
-    RequireCreaturesCore(@CreatureKind_Always);
+    RequireCreaturesCore(BaseLights, @CreatureKind_Always);
   end;
 end;
 
@@ -294,10 +294,10 @@ begin
   end;
 end;
 
-procedure RequireCreature(Kind: TCreatureKind);
+procedure RequireCreature(const BaseLights: TDynLightInstanceArray; Kind: TCreatureKind);
 begin
   SpecificKind := Kind;
-  RequireCreaturesCore(@CreatureKind_Specific);
+  RequireCreaturesCore(BaseLights, @CreatureKind_Specific);
 end;
 
 procedure UnRequireCreature(Kind: TCreatureKind);

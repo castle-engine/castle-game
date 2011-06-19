@@ -389,7 +389,7 @@ type
       @unorderedList(
         @item(If InventoryCurrentItem between 0 and Items.Count - 1
           then InventoryCurrentItem is selected)
-        @item( Else no item is selected (possibly Items.Count = 0,
+        @item(Else no item is selected (possibly Items.Count = 0,
           possibly not)))
     }
     property InventoryCurrentItem: Integer
@@ -411,7 +411,7 @@ type
 implementation
 
 uses Math, SysUtils, KambiClassUtils, CastlePlay, GLWinMessages,
-  CastleWindow, KambiUtils,
+  CastleWindow, KambiUtils, VRMLNodes,
   GLWindow, Images, KambiFilesUtils,
   VRMLGLAnimation, ALUtils, KambiOpenAL, CastleControlsMenu,
   CastleNotifications, KambiXMLConfig, GLImages,
@@ -427,6 +427,8 @@ var
 { TPlayer -------------------------------------------------------------------- }
 
 constructor TPlayer.Create;
+var
+  BaseLights: TDynLightInstanceArray;
 begin
   inherited Create;
   FLife := DefaultMaxLife;
@@ -454,7 +456,12 @@ begin
 
   LoadFromFile;
 
-  RequireCreatures(RequiredCreatures);
+  { TODO: not nice to initialize BaseLights here?
+    player creatures should be required/released at each level start probably. }
+  BaseLights := TDynLightInstanceArray.Create;
+  try
+    RequireCreatures(BaseLights, RequiredCreatures);
+  finally FreeAndNil(BaseLights) end;
 
   { Although it will be called in every OnIdle anyway,
     we also call it here to be sure that right after TPlayer constructor
