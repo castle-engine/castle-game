@@ -25,10 +25,11 @@ unit CastleCredits;
 
 interface
 
-uses GLWindow, UIControls;
+uses GLWindow, UIControls, VRMLNodes;
 
 { Show credits. }
-procedure ShowCredits(ControlsUnder: TUIControlList);
+procedure ShowCredits(ControlsUnder: TUIControlList;
+  const BaseLights: TLightInstancesList);
 
 { Although this will be called by Window.Close, it may be too late
   (this must be called before releasing GLContextCache).
@@ -41,13 +42,14 @@ uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages,
   CastleNotifications, KambiStringUtils, GLWinModes,
   CastleInputs, CastlePlay, CastleWindow,
   CastleVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
-  CastleHelp, KambiUtils, VRMLNodes, VRMLFields, KambiTimeUtils, KeysMouse;
+  CastleHelp, KambiUtils, VRMLFields, KambiTimeUtils, KeysMouse;
 
 var
   UserQuit: boolean;
   CreditsModel: TVRMLGLScene;
   AnimationTime: TKamTime;
   AnimationSpeed, AnimationEnd: TKamTime;
+  CreditsBaseLights: TLightInstancesList;
 
 procedure Draw(Window: TGLWindow);
 
@@ -71,7 +73,7 @@ procedure Draw(Window: TGLWindow);
   end;
 
 var
-  Params: TVRMLRenderParams;
+  Params: TBasicRenderParams;
 begin
   glScissor(25, 20, Window.Width - 25, Window.Height - 20 -  160);
   glEnable(GL_SCISSOR_TEST);
@@ -89,6 +91,7 @@ begin
     { TODO: remove need for Params, render CreditsModel as part of scene manager }
     Params := TBasicRenderParams.Create;
     try
+      Params.FBaseLights.Assign(CreditsBaseLights);
       CreditsModel.Render(nil, Params);
     finally FreeAndNil(Params) end;
   finally ProjectionPop end;
@@ -138,7 +141,8 @@ end;
 procedure OpenWindow(Window: TGLWindow); forward;
 {$endif}
 
-procedure ShowCredits(ControlsUnder: TUIControlList);
+procedure ShowCredits(ControlsUnder: TUIControlList;
+  const BaseLights: TLightInstancesList);
 var
   SavedMode: TGLMode;
 begin
@@ -148,6 +152,9 @@ begin
   {$endif}
 
   AnimationTime := 0;
+
+  CreditsBaseLights := BaseLights;
+  CreditsModel.PrepareResources([prRender, prBoundingBox], false, CreditsBaseLights);
 
   SavedMode := TGLMode.CreateReset(Window, 0, false,
     @Draw, nil, @CloseQuery,
@@ -178,7 +185,6 @@ procedure OpenWindow(Window: TGLWindow);
 var
   VRMLContents: string;
   Info: TMFString;
-  BaseLights: TLightInstancesList;
 begin
   VRMLContents := FileToString(ProgramDataPath + 'data' + PathDelim +
     'menu_bg' + PathDelim + 'credits.wrl');
@@ -191,11 +197,6 @@ begin
 
   AttributesSet(CreditsModel.Attributes, btIncrease);
   CreditsModel.Attributes.UseSceneLights := true;
-
-  BaseLights := TLightInstancesList.Create; {TODO:dirty to create BaseLights here}
-  try
-    CreditsModel.PrepareResources([prRender, prBoundingBox], false, BaseLights);
-  finally FreeAndNil(BaseLights) end;
 
   Info := (CreditsModel.RootNode.FindNodeByName(TNodeWorldInfo,
     'MainInfo', true) as TNodeWorldInfo).FdInfo;
