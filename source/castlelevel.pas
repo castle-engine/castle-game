@@ -1155,7 +1155,8 @@ begin
   FMenuBackground := AMenuBackground;
   FRequiredCreatures := ARequiredCreatures;
 
-  RequireCreatures(BaseLights, FRequiredCreatures);
+  if not DebugNoCreatures then
+    RequireCreatures(BaseLights, FRequiredCreatures);
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -1321,7 +1322,7 @@ begin
   FreeWithContentsAndNil(FWaypoints);
   FreeWithContentsAndNil(FItemsOnLevel);
   FreeWithContentsAndNil(FCreatures);
-  if FRequiredCreatures <> nil then
+  if (FRequiredCreatures <> nil) and not DebugNoCreatures then
     UnRequireCreatures(FRequiredCreatures);
   inherited;
 end;
