@@ -853,18 +853,15 @@ begin
     0..7: ;
     8: begin
          OnArgument.Value := not OnArgument.Value;
-         Light.FdOn.Value := OnArgument.Value;
-         //TODO:Level.LightSet.CalculateLights;
+         Light.FdOn.Send(OnArgument.Value);
        end;
     9: begin
          ShadowsArgument.Value := not ShadowsArgument.Value;
-         Light.FdKambiShadows.Value := ShadowsArgument.Value;
-         //TODO:Level.LightSet.CalculateLights;
+         Light.FdKambiShadows.Send(ShadowsArgument.Value);
        end;
     10:begin
          ShadowsMainArgument.Value := not ShadowsMainArgument.Value;
-         Light.FdKambiShadowsMain.Value := ShadowsMainArgument.Value;
-         //TODO:Level.LightSet.CalculateLights;
+         Light.FdKambiShadowsMain.Send(ShadowsMainArgument.Value);
        end;
     11:begin
          if Light is TVRMLPositionalLightNode then
@@ -872,10 +869,7 @@ begin
            Vector := TVRMLPositionalLightNode(Light).FdAttenuation.Value;
            if MessageInputQueryVector3Single(Window, 'Change attenuation',
              Vector, taLeft) then
-           begin
-             TVRMLPositionalLightNode(Light).FdAttenuation.Value := Vector;
-             //TODO:Level.LightSet.CalculateLights;
-           end;
+             TVRMLPositionalLightNode(Light).FdAttenuation.Send(Vector);
          end;
        end;
     12:begin
@@ -885,10 +879,7 @@ begin
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
-           begin
-             TVRMLDirectionalLightNode(Light).FdDirection.Value := Vector;
-             //TODO:Level.LightSet.CalculateLights;
-           end;
+             TVRMLDirectionalLightNode(Light).FdDirection.Send(Vector);
          end;
        end;
     13:begin
@@ -898,10 +889,7 @@ begin
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
-           begin
-             TNodeSpotLight_1(Light).FdDirection.Value := Vector;
-             //TODO:Level.LightSet.CalculateLights;
-           end;
+             TNodeSpotLight_1(Light).FdDirection.Send(Vector);
          end else
          if Light is TNodeSpotLight_2 then
          begin
@@ -909,10 +897,7 @@ begin
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
-           begin
-             TNodeSpotLight_2(Light).FdDirection.Value := Vector;
-             //TODO:Level.LightSet.CalculateLights;
-           end;
+             TNodeSpotLight_2(Light).FdDirection.Send(Vector);
          end;
        end;
     14:begin
@@ -920,19 +905,13 @@ begin
          begin
            Value := TNodeSpotLight_1(Light).FdDropOffRate.Value;
            if MessageInputQuery(Window, 'Change dropOffRate', Value, taLeft) then
-           begin
-             TNodeSpotLight_1(Light).FdDropOffRate.Value := Value;
-             //TODO:Level.LightSet.CalculateLights;
-           end;
+             TNodeSpotLight_1(Light).FdDropOffRate.Send(Value);
          end else
          if Light is TNodeSpotLight_2 then
          begin
            Value := TNodeSpotLight_2(Light).FdBeamWidth.Value;
            if MessageInputQuery(Window, 'Change beamWidth', Value, taLeft) then
-           begin
-             TNodeSpotLight_2(Light).FdBeamWidth.Value := Value;
-             //TODO:Level.LightSet.CalculateLights;
-           end;
+             TNodeSpotLight_2(Light).FdBeamWidth.Send(Value);
          end;
        end;
     15:begin
@@ -940,19 +919,13 @@ begin
          begin
            Value := TNodeSpotLight_1(Light).FdCutOffAngle.Value;
            if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
-           begin
-             TNodeSpotLight_1(Light).FdCutOffAngle.Value := Value;
-             //TODO:Level.LightSet.CalculateLights;
-           end;
+             TNodeSpotLight_1(Light).FdCutOffAngle.Send(Value);
          end else
          if Light is TNodeSpotLight_2 then
          begin
            Value := TNodeSpotLight_2(Light).FdCutOffAngle.Value;
            if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
-           begin
-             TNodeSpotLight_2(Light).FdCutOffAngle.Value := Value;
-             //TODO:Level.LightSet.CalculateLights;
-           end;
+             TNodeSpotLight_2(Light).FdCutOffAngle.Send(Value);
          end;
        end;
     16:SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
@@ -972,17 +945,15 @@ begin
         Index := CurrentItem;
         V := TVRMLPositionalLightNode(Light).FdLocation.Value;
         V[Index] := PositionSlider[Index].Value;
-        TVRMLPositionalLightNode(Light).FdLocation.Value := V;
+        TVRMLPositionalLightNode(Light).FdLocation.Send(V);
       end;
-    3: Light.FdColor.Value[0] := RedColorSlider.Value;
-    4: Light.FdColor.Value[1] := GreenColorSlider.Value;
-    5: Light.FdColor.Value[2] := BlueColorSlider.Value;
-    6: Light.FdIntensity.Value := IntensitySlider.Value;
-    7: Light.FdAmbientIntensity.Value := AmbientIntensitySlider.Value;
+    3: begin Light.FdColor.Value[0] := RedColorSlider.Value  ; Light.FdColor.Changed; end;
+    4: begin Light.FdColor.Value[1] := GreenColorSlider.Value; Light.FdColor.Changed; end;
+    5: begin Light.FdColor.Value[2] := BlueColorSlider.Value ; Light.FdColor.Changed; end;
+    6: Light.FdIntensity.Send(IntensitySlider.Value);
+    7: Light.FdAmbientIntensity.Send(AmbientIntensitySlider.Value);
     else Exit;
   end;
-
-  //TODO:Level.LightSet.CalculateLights;
 end;
 
 { global things -------------------------------------------------------------- }

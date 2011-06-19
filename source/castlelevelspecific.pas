@@ -348,6 +348,7 @@ const
     I: Integer;
     LightNode: TVRMLPositionalLightNode;
     Headlight: TLightInstance;
+    ShadowLight: PLightInstance;
   begin
     Assert(not WerewolfAppeared);
 
@@ -376,15 +377,15 @@ const
     begin
       LightNode := MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
         TVRMLPositionalLightNode;
-      LightNode.FdColor.Value := Vector3Single(1, 0, 0);
-      LightNode.FdAttenuation.Value := Vector3Single(1, 0.1, 0);
-      LightNode.FdKambiShadows.Value := true;
+      LightNode.FdColor.Send(Vector3Single(1, 0, 0));
+      LightNode.FdAttenuation.Send(Vector3Single(1, 0.1, 0));
+      LightNode.FdKambiShadows.Send(true);
     end;
 
-    MainScene.GlobalLights.Items[0].Node.FdKambiShadows.Value := true;
-    MainScene.GlobalLights.Items[0].Node.FdKambiShadowsMain.Value := true;
-
-//TODO:    LightSet.CalculateLights;
+    ShadowLight := MainScene.GlobalLights.FindName('FakeShadowPosition');
+    Check(ShadowLight <> nil, 'FakeShadowPosition light not found on castle_hall level');
+    ShadowLight^.Node.FdKambiShadows.Send(true);
+    ShadowLight^.Node.FdKambiShadowsMain.Send(true);
   end;
 
 var
@@ -425,11 +426,10 @@ var
       begin
         LightNode := MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
           TVRMLPositionalLightNode;
-        LightNode.FdOn.Value := not WerewolfCreature[I].Dead;
-        LightNode.FdLocation.Value := WerewolfCreature[I].MiddlePosition;
+        LightNode.FdOn.Send(not WerewolfCreature[I].Dead);
+        LightNode.FdLocation.Send(WerewolfCreature[I].MiddlePosition);
       end;
     end;
-    //TODO: LightSet.CalculateLights;
   end;
 
   function GetWerewolfAliveCount: Cardinal;
@@ -976,12 +976,11 @@ begin
   begin
     { Torch light modify, to make an illusion of unstable light }
     TorchLight := MainScene.GlobalLights.FindName('MainHallTorchLight');
-    Assert(TorchLight <> nil, 'Torch light not found on cages level');
-    TorchLight^.Node.FdIntensity.Value := Clamped(
+    Check(TorchLight <> nil, 'Torch light not found on cages level');
+    TorchLight^.Node.FdIntensity.Send(Clamped(
         TorchLight^.Node.FdIntensity.Value +
           MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed  * 50,
-        0.5, 1);
-//TODO:    LightSet.CalculateLights;
+        0.5, 1));
 
     { Maybe appear new spiders }
     if (Level.Creatures.Count < CreaturesCountToAddSpiders) and
