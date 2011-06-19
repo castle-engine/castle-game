@@ -182,7 +182,7 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature; virtual; abstract;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
@@ -470,7 +470,7 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature; override;
   end;
 
@@ -479,7 +479,7 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature; override;
   end;
 
@@ -488,7 +488,7 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature; override;
   end;
 
@@ -514,7 +514,7 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature; override;
 
     property MinDelayBetweenThrowWebAttacks: Single
@@ -546,7 +546,7 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature; override;
   end;
 
@@ -597,7 +597,7 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature; override;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
@@ -659,7 +659,7 @@ type
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature; override;
 
     procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
@@ -794,7 +794,7 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
-      const AnimationTime: Single);
+      const AnimationTime: Single; const BaseLights: TLightInstancesList);
 
     destructor Destroy; override;
 
@@ -1048,7 +1048,7 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
-      const AnimationTime: Single);
+      const AnimationTime: Single; const BaseLights: TLightInstancesList);
 
     destructor Destroy; override;
 
@@ -1097,7 +1097,7 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
-      const AnimationTime: Single);
+      const AnimationTime: Single; const BaseLights: TLightInstancesList);
 
     procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single); override;
@@ -1483,11 +1483,11 @@ end;
 function TBallThrowerCreatureKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single;
+  const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
   Result := TBallThrowerCreature.Create(Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime);
+    MaxLife, AnimationTime, BaseLights);
 end;
 
 { TWerewolfKind -------------------------------------------------------------- }
@@ -1495,11 +1495,11 @@ end;
 function TWerewolfKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single;
+  const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
   Result := TWerewolfCreature.Create(Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime);
+    MaxLife, AnimationTime, BaseLights);
 end;
 
 { TSpiderKind -------------------------------------------------------------- }
@@ -1507,11 +1507,11 @@ end;
 function TSpiderKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single;
+  const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
   Result := TSpiderCreature.Create(Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime);
+    MaxLife, AnimationTime, BaseLights);
 end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
@@ -1550,11 +1550,11 @@ end;
 function TSpiderQueenKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single;
+  const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
   Result := TSpiderQueenCreature.Create(Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime);
+    MaxLife, AnimationTime, BaseLights);
 end;
 
 procedure TSpiderQueenKind.LoadFromFile(KindsConfig: TKamXMLConfig);
@@ -1596,11 +1596,11 @@ end;
 function TGhostKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single;
+  const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
   Result := TGhostCreature.Create(Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime);
+    MaxLife, AnimationTime, BaseLights);
 end;
 
 { TMissileCreatureKind ---------------------------------------------------- }
@@ -1655,11 +1655,11 @@ end;
 function TMissileCreatureKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single;
+  const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
   Result := TMissileCreature.Create(Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime);
+    MaxLife, AnimationTime, BaseLights);
 end;
 
 procedure TMissileCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
@@ -1741,11 +1741,11 @@ end;
 function TStillCreatureKind.CreateDefaultCreature(
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single;
+  const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
   Result := TStillCreature.Create(Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime);
+    MaxLife, AnimationTime, BaseLights);
 end;
 
 procedure TStillCreatureKind.LoadFromFile(KindsConfig: TKamXMLConfig);
@@ -1770,11 +1770,15 @@ constructor TCreature.Create(AKind: TCreatureKind;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AMaxLife: Single;
-  const AnimationTime: Single);
+  const AnimationTime: Single; const BaseLights: TLightInstancesList);
 begin
   inherited Create;
 
   FKind := AKind;
+
+  { This is only needed if you used --debug-no-creatures or forgot
+    to add creature to <required_resources> }
+  RequireCreature(BaseLights, Kind);
 
   FLegsPosition := ALegsPosition;
   FDirection := Normalized(ADirection);
@@ -1815,6 +1819,9 @@ begin
     end;
     FreeAndNil(UsedSounds);
   end;
+
+  if Kind <> nil then
+    UnRequireCreature(Kind);
 
   inherited;
 end;
@@ -2471,9 +2478,9 @@ constructor TWalkAttackCreature.Create(AKind: TCreatureKind;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AMaxLife: Single;
-  const AnimationTime: Single);
+  const AnimationTime: Single; const BaseLights: TLightInstancesList);
 begin
-  inherited Create(AKind, ALegsPosition, ADirection, AMaxLife, AnimationTime);
+  inherited Create(AKind, ALegsPosition, ADirection, AMaxLife, AnimationTime, BaseLights);
 
   if AMaxLife > 0 then
   begin
@@ -3243,7 +3250,7 @@ begin
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
     Missile := BallMissile.CreateDefaultCreature(
       MissilePosition, MissileDirection,
-      Level.AnimationTime, BallMissile.DefaultMaxLife);
+      Level.AnimationTime, Level.BaseLights, BallMissile.DefaultMaxLife);
 
     Level.Creatures.Add(Missile);
 
@@ -3257,7 +3264,7 @@ constructor TWerewolfCreature.Create(AKind: TCreatureKind;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AMaxLife: Single;
-  const AnimationTime: Single);
+  const AnimationTime: Single; const BaseLights: TLightInstancesList);
 begin
   inherited;
   NextHowlTime := AnimationTime + Random * 60.0;
@@ -3423,7 +3430,7 @@ begin
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
     Missile := ThrownWeb.CreateDefaultCreature(
       MissilePosition, MissileDirection,
-      Level.AnimationTime, ThrownWeb.DefaultMaxLife);
+      Level.AnimationTime, Level.BaseLights, ThrownWeb.DefaultMaxLife);
 
     Level.Creatures.Add(Missile);
 

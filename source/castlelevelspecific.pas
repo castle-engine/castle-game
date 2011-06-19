@@ -357,7 +357,7 @@ const
       WerewolfCreature[I] := Werewolf.CreateDefaultCreature(
         WerewolfAppearPosition[I],
         VectorSubtract(Player.Camera.Position, WerewolfAppearPosition[I]),
-        AnimationTime, Werewolf.DefaultMaxLife) as TWerewolfCreature;
+        AnimationTime, BaseLights, Werewolf.DefaultMaxLife) as TWerewolfCreature;
       Creatures.Add(WerewolfCreature[I]);
     end;
 
@@ -659,7 +659,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
       CreatureDirection := VectorSubtract(Player.Camera.Position,
         CreaturePosition);
       Creature := Ghost.CreateDefaultCreature(CreaturePosition,
-        CreatureDirection, AnimationTime, Ghost.DefaultMaxLife);
+        CreatureDirection, AnimationTime, BaseLights, Ghost.DefaultMaxLife);
       Creatures.Add(Creature);
     end;
   end;
@@ -676,7 +676,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
       CreatureDirection := VectorSubtract(Player.Camera.Position,
         CreaturePosition);
       Creature := Ghost.CreateDefaultCreature(CreaturePosition,
-        CreatureDirection, AnimationTime, Ghost.DefaultMaxLife);
+        CreatureDirection, AnimationTime, BaseLights, Ghost.DefaultMaxLife);
       Creatures.Add(Creature);
     end;
   end;
@@ -720,10 +720,7 @@ begin
     end;
 
     if (not SwordAmbushDone) and
-      (Player.Items.FindKind(Sword) <> -1) and
-      { not Ghost.PrepareRenderDone may happen only when run with
-        --debug-no-creatures }
-      Ghost.PrepareRenderDone then
+      (Player.Items.FindKind(Sword) <> -1) then
     begin
       SwordAmbushDone := true;
       SwordAmbush;
@@ -1022,7 +1019,7 @@ begin
           VectorSubtract(Player.Camera.Position, SpiderPosition);
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.GravityUp);
         SpiderCreature := Spider.CreateDefaultCreature(
-          SpiderPosition, SpiderDirection, AnimationTime, Spider.DefaultMaxLife);
+          SpiderPosition, SpiderDirection, AnimationTime, BaseLights, Spider.DefaultMaxLife);
         Creatures.Add(SpiderCreature);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
         FSpidersAppearing.Delete(I, 1);

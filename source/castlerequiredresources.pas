@@ -43,6 +43,9 @@ procedure RequireCreatures(const BaseLights: TLightInstancesList; Names: TString
 procedure UnRequireCreatures(Names: TStringList);
 { @groupEnd }
 
+procedure RequireCreature(const BaseLights: TLightInstancesList; Kind: TCreatureKind);
+procedure UnRequireCreature(Kind: TCreatureKind);
+
 { Loads a <resources_required> XML element (required child of given
   ParentElement) into a RequiredCreatures list.
 
@@ -151,6 +154,28 @@ begin
       end;
     end;
   end;
+end;
+
+procedure RequireCreature(const BaseLights: TLightInstancesList; Kind: TCreatureKind);
+var
+  Names: TStringList;
+begin
+  Names := TStringList.Create;
+  try
+    Names.Append(Kind.VRMLNodeName);
+    RequireCreatures(BaseLights, Names);
+  finally FreeAndNil(Names) end;
+end;
+
+procedure UnRequireCreature(Kind: TCreatureKind);
+var
+  Names: TStringList;
+begin
+  Names := TStringList.Create;
+  try
+    Names.Append(Kind.VRMLNodeName);
+    UnRequireCreatures(Names);
+  finally FreeAndNil(Names) end;
 end;
 
 { XML stuff ------------------------------------------------------------------ }

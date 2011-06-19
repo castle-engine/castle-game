@@ -1559,7 +1559,7 @@ procedure TLevel.TraverseForCreatures(Shape: TVRMLShape);
 
     { calculate Creature }
     Creature := CreatureKind.CreateDefaultCreature(CreaturePosition,
-      CreatureDirection, AnimationTime, MaxLife);
+      CreatureDirection, AnimationTime, BaseLights, MaxLife);
 
     FCreatures.Add(Creature);
   end;
