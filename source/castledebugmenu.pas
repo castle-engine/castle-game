@@ -1020,4 +1020,6 @@ end;
 initialization
   Window.OnOpenList.Add(@OpenWindow);
 finalization
+  { This may be left created }
+  FreeAndNil(EditOneLightMenu);
 end.
