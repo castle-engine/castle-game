@@ -27,7 +27,7 @@ interface
 
 uses Boxes3D, Cameras, CastleItems, VectorMath, GL, GLU, GLExt,
   VRMLSceneWaypoints, CastleInputs, ALSoundAllocator, CastleSound,
-  VRMLTriangle, CastleTextures, XmlSoundEngine, Classes,
+  VRMLTriangle, CastleTextures, XmlSoundEngine, Classes, Base3D,
   KambiGLUtils, VRMLGLScene;
 
 const
@@ -343,7 +343,7 @@ type
     { This will render player's weapon attacking.
       This is a 3D rendering. Note that this may clear depth buffer
       and set matrix to identity. }
-    procedure RenderAttack(Params: TVRMLRenderParams);
+    procedure RenderAttack(Params: TRenderParams);
 
     { You should set this property as appropriate.
       This object will just use this property (changing it's Camera
@@ -1292,7 +1292,7 @@ begin
     glCallList(EquippedWeaponKind.GLList_DrawScreenImage);
 end;
 
-procedure TPlayer.RenderAttack(Params: TVRMLRenderParams);
+procedure TPlayer.RenderAttack(Params: TRenderParams);
 var
   AttackTime: Single;
   Anim: TVRMLGLAnimation;
