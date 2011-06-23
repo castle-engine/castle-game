@@ -44,8 +44,7 @@ uses VectorMath, VRMLScene, VRMLGLScene, Boxes3D,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSoundAllocator, Matrix,
   VRMLGLBackground, DOM, XmlSoundEngine, Base3D, VRMLShape,
-  GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum, KambiSceneManager,
-  VRMLShader;
+  Classes, KambiTimeUtils, Frustum, KambiSceneManager, VRMLShader;
 
 {$define read_interface}
 

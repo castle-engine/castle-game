@@ -28,7 +28,7 @@ interface
 uses VRMLGLScene, Boxes3D, VectorMath,
   CastlePlayer, CastleLevel, VRMLGLBackground, VRMLTriangle,
   CastleSound, VRMLNodes, DOM, Base3D, VRMLGLAnimation,
-  CastleCreatures, GLShadowVolumeRenderer, Classes, KambiTimeUtils, Frustum;
+  CastleCreatures, Classes, KambiTimeUtils, Frustum;
 
 const
   CastleHallWerewolvesCount = 4;
