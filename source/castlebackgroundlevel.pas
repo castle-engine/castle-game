@@ -53,7 +53,6 @@ uses GLWindow, UIControls, CastleLevel;
 
 var
   BackgroundControls: TUIControlList;
-  BackgroundLevel: TLevel; //< Also part of BackgroundControls.
 
 { Create / destroy BackgroundControls instances.
   @groupBegin }
@@ -123,6 +122,7 @@ end;
 procedure BackgroundCreate;
 var
   BackgroundCaptions: TUIControl;
+  BackgroundLevel: TLevel;
 begin
   BackgroundControls := TUIControlList.Create(true);
 

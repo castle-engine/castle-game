@@ -28,8 +28,7 @@ interface
 uses GLWindow, UIControls, VRMLNodes;
 
 { Show credits. }
-procedure ShowCredits(ControlsUnder: TUIControlList;
-  const BaseLights: TLightInstancesList);
+procedure ShowCredits(ControlsUnder: TUIControlList);
 
 { Although this will be called by Window.Close, it may be too late
   (this must be called before releasing GLContextCache).
@@ -49,7 +48,6 @@ var
   CreditsModel: TVRMLGLScene;
   AnimationTime: TKamTime;
   AnimationSpeed, AnimationEnd: TKamTime;
-  CreditsBaseLights: TLightInstancesList;
 
 procedure Draw(Window: TGLWindow);
 
@@ -91,7 +89,6 @@ begin
     { TODO: remove need for Params, render CreditsModel as part of scene manager }
     Params := TBasicRenderParams.Create;
     try
-      Params.FBaseLights.AppendInWorldCoordinates(CreditsBaseLights);
       CreditsModel.Render(nil, Params);
     finally FreeAndNil(Params) end;
   finally ProjectionPop end;
@@ -141,8 +138,7 @@ end;
 procedure OpenWindow(Window: TGLWindow); forward;
 {$endif}
 
-procedure ShowCredits(ControlsUnder: TUIControlList;
-  const BaseLights: TLightInstancesList);
+procedure ShowCredits(ControlsUnder: TUIControlList);
 var
   SavedMode: TGLMode;
 begin
@@ -152,9 +148,6 @@ begin
   {$endif}
 
   AnimationTime := 0;
-
-  CreditsBaseLights := BaseLights;
-  CreditsModel.PrepareResources([prRender, prBoundingBox], false, CreditsBaseLights);
 
   SavedMode := TGLMode.CreateReset(Window, 0, false,
     @Draw, nil, @CloseQuery,
