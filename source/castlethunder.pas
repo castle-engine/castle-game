@@ -68,6 +68,7 @@ begin
   ThunderLight.Location := ZeroVector3Single;
   ThunderLight.Direction := ThunderLightNode.FdDirection.Value;
   ThunderLight.Radius := MaxSingle;
+  ThunderLight.WorldCoordinates := true;
 end;
 
 destructor TThunderEffect.Destroy;
