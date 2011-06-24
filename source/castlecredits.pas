@@ -91,7 +91,7 @@ begin
     { TODO: remove need for Params, render CreditsModel as part of scene manager }
     Params := TBasicRenderParams.Create;
     try
-      Params.FBaseLights.Assign(CreditsBaseLights);
+      Params.FBaseLights.AppendInWorldCoordinates(CreditsBaseLights);
       CreditsModel.Render(nil, Params);
     finally FreeAndNil(Params) end;
   finally ProjectionPop end;

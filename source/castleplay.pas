@@ -378,7 +378,7 @@ begin
     instead of drawing in ds3D. }
   Params := TBasicRenderParams.Create;
   try
-    Params.FBaseLights.Assign(Level.MainScene.GlobalLights);
+    Params.FBaseLights.AppendInWorldCoordinates(Level.MainScene.GlobalLights);
     Player.RenderAttack(Params);
   finally FreeAndNil(Params) end;
 end;
