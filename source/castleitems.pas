@@ -894,7 +894,7 @@ var
   IsAbove: boolean;
   AboveHeight: Single;
   ShiftedPosition: TVector3Single;
-  ProposedNewShiftedPosition, NewShiftedPosition: TVector3Single;
+  ProposedNewShiftedPosition{, NewShiftedPosition}: TVector3Single;
   FallingDownLength: Single;
   AboveGround: PVRMLTriangle;
 begin
