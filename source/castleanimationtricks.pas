@@ -25,8 +25,7 @@ unit CastleAnimationTricks;
 
 interface
 
-uses VRMLGLScene, Classes, VRMLGLAnimation, Frustum, VectorMath, GLShaders, GL,
-  Base3D;
+uses Classes, VRMLGLAnimation, Frustum, VectorMath, GLShaders, GL, Base3D;
 
 type
   { Animation forced to seamlessly loop by blending the beginning frames

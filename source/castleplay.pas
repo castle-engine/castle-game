@@ -113,12 +113,12 @@ implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow,
   GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
-  Cameras, VectorMath, Boxes3D, Images,
+  VectorMath, Boxes3D, Images,
   CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, UIControls,
   CastleItems, RaysWindow, KambiStringUtils,
   KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
-  CastleVideoOptions, CastleConfig, CastleThunder,
+  CastleVideoOptions, CastleConfig,
   CastleNotifications, CastleControlsMenu,
   CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
   KambiTimeUtils, GLImages, KeysMouse;

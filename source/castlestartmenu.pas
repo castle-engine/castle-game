@@ -35,14 +35,14 @@ implementation
 
 uses SysUtils, Classes, KambiUtils, GLWinModes,
   GL, GLU, KambiGLUtils, GLWinMessages, CastleWindow,
-  VectorMath, Images, KambiFilesUtils, UIControls,
+  VectorMath, Images, KambiFilesUtils,
   CastleLevel, CastlePlay, CastleSound, CastlePlayer,
   CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
   CastleControlsMenu, CastleInputs, CastleVideoOptions,
   KambiStringUtils, KambiClassUtils,
   CastleNotifications, CastleLevelAvailable, CastleBackgroundLevel,
   XmlSoundEngine, GLSoundMenu, VRMLNodes,
-  CastleRequiredResources, CastleCredits, GLAntiAliasing, KeysMouse;
+  CastleCredits, GLAntiAliasing, KeysMouse;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 

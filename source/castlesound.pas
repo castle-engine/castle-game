@@ -140,7 +140,7 @@ function SoundEngine: TCastleSoundEngine;
 
 implementation
 
-uses CastleConfig, ALUtils, ALSoundEngine;
+uses CastleConfig, ALSoundEngine;
 
 constructor TCastleSoundEngine.Create;
 

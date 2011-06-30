@@ -42,9 +42,9 @@ uses VectorMath, VRMLScene, VRMLGLScene, Boxes3D,
   VRMLNodes, VRMLFields, CastleItems, Cameras, VRMLTriangle, GL3D,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
-  ProgressUnit, VRMLGLAnimation, ALSoundAllocator, Matrix,
+  ProgressUnit, VRMLGLAnimation, ALSoundAllocator,
   VRMLGLBackground, DOM, XmlSoundEngine, Base3D, VRMLShape,
-  Classes, KambiTimeUtils, Frustum, KambiSceneManager, VRMLShader;
+  Classes, KambiTimeUtils, KambiSceneManager, VRMLShader;
 
 {$define read_interface}
 
@@ -729,7 +729,7 @@ type
 
 implementation
 
-uses SysUtils, GL, GLU, Object3DAsVRML,
+uses SysUtils, GL,
   CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
   CastleVideoOptions, CastleConfig, CastleNotifications,
   CastleInputs, CastleWindow, KambiXMLUtils,

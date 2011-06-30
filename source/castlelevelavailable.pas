@@ -27,7 +27,7 @@ unit CastleLevelAvailable;
 
 interface
 
-uses CastleLevel, KambiUtils, Classes, CastlePlay,
+uses CastleLevel, KambiUtils, Classes,
   KambiClassUtils, DOM, GL, GLU, KambiGLUtils, GLProgress;
 
 {$define read_interface}

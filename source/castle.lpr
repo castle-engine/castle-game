@@ -24,7 +24,7 @@
 
 program castle;
 
-uses GLWindow, SysUtils, KambiUtils, ProgressUnit, GLProgress, ALUtils,
+uses GLWindow, SysUtils, KambiUtils, ProgressUnit, GLProgress,
   Classes, ParseParametersUnit, GLWinMessages, KambiGLUtils, KambiStringUtils,
   KambiLog, CastleWindow, CastleStartMenu, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
