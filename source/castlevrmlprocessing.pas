@@ -96,7 +96,7 @@ type
 procedure TEnumerateAddShaderToWater.Handle(Node: TVRMLNode);
 var
   M: TVRMLNode;
-  Mat: TNodeMaterial_2;
+  Mat: TNodeMaterial;
   CS: TNodeComposedShader;
   CM: TNodeImageCubeMapTexture;
   MT: TNodeMovieTexture;
@@ -107,12 +107,12 @@ var
 begin
   M := (Node as TNodeAppearance).FdMaterial.Value;
   if (M <> nil) and
-     (M is TNodeMaterial_2) and
-     (TNodeMaterial_2(M).NodeName = MatName) then
+     (M is TNodeMaterial) and
+     (TNodeMaterial(M).NodeName = MatName) then
   begin
     { we could set mat diffuse in Blender and export to VRML,
       but it's easier for now to hardcode it here. }
-    Mat := M as TNodeMaterial_2;
+    Mat := M as TNodeMaterial;
     Mat.FdDiffuseColor.Value := Vector3Single(0.5, 0.5, 1.0);
 
     CS := TNodeComposedShader.Create('', '');

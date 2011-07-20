@@ -118,7 +118,7 @@ type
 
 class procedure TEnumerateResolveInlines.Enumerate(ParentNode: TVRMLNode; var Node: TVRMLNode);
 var
-  G2: TNodeGroup_2;
+  G2: TNodeGroup;
   G1: TVRMLNode;
   Inlined: TVRMLNode;
 begin
@@ -148,7 +148,7 @@ begin
 
     if Inlined <> nil then
     begin
-      G2 := TNodeGroup_2.Create(Node.NodeName, Node.WWWBasePath);
+      G2 := TNodeGroup.Create(Node.NodeName, Node.WWWBasePath);
       { update PositionInParent,
         to make the resulting VRML look more similar to original
         (otherwise resolved inline could move up in the file) }

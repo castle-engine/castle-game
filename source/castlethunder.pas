@@ -36,7 +36,7 @@ type
   TThunderEffect = class
   private
     LastBeginTime, NextBeginTime: Single;
-    ThunderLightNode: TNodeDirectionalLight_2;
+    ThunderLightNode: TNodeDirectionalLight;
     ThunderLight: TLightInstance;
   public
     constructor Create;
@@ -57,7 +57,7 @@ uses SysUtils, GL, GLU, KambiGLUtils, VectorMath, CastleSound, CastlePlay, Math;
 constructor TThunderEffect.Create;
 begin
   inherited;
-  ThunderLightNode := TNodeDirectionalLight_2.Create('', '');
+  ThunderLightNode := TNodeDirectionalLight.Create('', '');
   ThunderLightNode.FdDirection.Value := Vector3Single(0, -1, 1);
   ThunderLightNode.FdAmbientIntensity.Value := 0.5;
   ThunderLightNode.FdColor.Value := Vector3Single(0.5, 0.5, 1);

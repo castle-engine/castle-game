@@ -53,7 +53,7 @@ procedure GLWindowOpen(Window: TGLWindow);
 begin
   Font3d := GLContextCache.Fonts_IncReference(
     Font3dFamily, Font3dBold, Font3dItalic,
-    TNodeFontStyle_2.ClassTTF_Font(Font3dFamily, Font3dBold, Font3dItalic));
+    TNodeFontStyle.ClassTTF_Font(Font3dFamily, Font3dBold, Font3dItalic));
 
   AntiAliasingGLOpen;
   AntiAliasingEnable;

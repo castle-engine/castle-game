@@ -882,13 +882,13 @@ begin
              Vector, taLeft, Player.Camera.Direction) then
              TNodeSpotLight_1(Light).FdDirection.Send(Vector);
          end else
-         if Light is TNodeSpotLight_2 then
+         if Light is TNodeSpotLight then
          begin
-           Vector := TNodeSpotLight_2(Light).FdDirection.Value;
+           Vector := TNodeSpotLight(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
-             TNodeSpotLight_2(Light).FdDirection.Send(Vector);
+             TNodeSpotLight(Light).FdDirection.Send(Vector);
          end;
        end;
     14:begin
@@ -898,11 +898,11 @@ begin
            if MessageInputQuery(Window, 'Change dropOffRate', Value, taLeft) then
              TNodeSpotLight_1(Light).FdDropOffRate.Send(Value);
          end else
-         if Light is TNodeSpotLight_2 then
+         if Light is TNodeSpotLight then
          begin
-           Value := TNodeSpotLight_2(Light).FdBeamWidth.Value;
+           Value := TNodeSpotLight(Light).FdBeamWidth.Value;
            if MessageInputQuery(Window, 'Change beamWidth', Value, taLeft) then
-             TNodeSpotLight_2(Light).FdBeamWidth.Send(Value);
+             TNodeSpotLight(Light).FdBeamWidth.Send(Value);
          end;
        end;
     15:begin
@@ -912,11 +912,11 @@ begin
            if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
              TNodeSpotLight_1(Light).FdCutOffAngle.Send(Value);
          end else
-         if Light is TNodeSpotLight_2 then
+         if Light is TNodeSpotLight then
          begin
-           Value := TNodeSpotLight_2(Light).FdCutOffAngle.Value;
+           Value := TNodeSpotLight(Light).FdCutOffAngle.Value;
            if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
-             TNodeSpotLight_2(Light).FdCutOffAngle.Send(Value);
+             TNodeSpotLight(Light).FdCutOffAngle.Send(Value);
          end;
        end;
     16:SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
