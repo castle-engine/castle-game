@@ -200,7 +200,7 @@ begin
       RootNodes[0] := FirstRootNodesPool.Objects[FirstRootNodeIndex] as TVRMLNode else
       RootNodes[0] := LoadVRML(FModelFileNames[0], false);
 
-    for I := 1 to RootNodes.High do
+    for I := 1 to RootNodes.Count - 1 do
       RootNodes[I] := LoadVRML(FModelFileNames[I], false);
 
     Result := TVRMLGLAnimation.CreateCustomCache(nil, FCache);

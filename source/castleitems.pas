@@ -554,12 +554,12 @@ var
   PrepareRenderSteps: Cardinal;
 begin
   PrepareRenderSteps := 0;
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     PrepareRenderSteps += Items[I].PrepareRenderSteps;
 
   Progress.Init(PrepareRenderSteps, 'Loading items');
   try
-    for I := 0 to High do
+    for I := 0 to Count - 1 do
       Items[I].PrepareRender(BaseLights);
   finally Progress.Fini; end;
 end;
@@ -568,7 +568,7 @@ procedure TItemKindsList.FreePrepareRender;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     Items[I].FreePrepareRender;
 end;
 
@@ -582,7 +582,7 @@ begin
     KindsConfig.FileName := ProgramDataPath + 'data' + PathDelim +
       'items' + PathDelim + 'kinds.xml';
 
-    for I := 0 to High do
+    for I := 0 to Count - 1 do
     begin
       Items[I].LoadFromFile(KindsConfig);
     end;
@@ -735,7 +735,7 @@ begin
   WeaponBoundingBox := Box3DTranslate(Player.BoundingBox,
     VectorAdjustToLength(Player.Camera.Direction, 1.0));
   { Tests: Writeln('WeaponBoundingBox is ', Box3DToNiceStr(WeaponBoundingBox)); }
-  for I := 0 to Level.Creatures.High do
+  for I := 0 to Level.Creatures.Count - 1 do
   begin
     C := Level.Creatures[I];
     { Tests: Writeln('Creature bbox is ', Box3DToNiceStr(C.BoundingBox)); }
@@ -971,7 +971,7 @@ procedure TItemsOnLevelList.Render(const Frustum: TFrustum;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     Items[I].Render(Frustum, Params);
 end;
 
@@ -979,7 +979,7 @@ procedure TItemsOnLevelList.Idle(const CompSpeed: Single);
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     Items[I].Idle(CompSpeed);
 end;
 
@@ -991,7 +991,7 @@ begin
     this is optimized a little: it calculates Player.BoundingBox
     only once. }
   PlayerBoundingBox := Player.BoundingBox;
-  for Result := 0 to High do
+  for Result := 0 to Count - 1 do
     if Boxes3DCollision(Items[Result].BoundingBox, PlayerBoundingBox) then
       Exit;
   Result := -1;

@@ -168,7 +168,7 @@ function TInputConfigurationsList.SeekMatchingShortcut(
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
   begin
     Result := Items[I];
     if Result.Shortcut.IsEvent(Key, #0, MousePress, MouseButton, MouseWheel) then
@@ -181,7 +181,7 @@ procedure TInputConfigurationsList.RestoreDefaults;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     Items[I].Shortcut.MakeDefault;
 end;
 
@@ -189,7 +189,7 @@ procedure TInputConfigurationsList.SaveToConfigFile;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
   begin
     ConfigFile.SetDeleteValue('inputs/' + Items[I].ConfigFileName + '/key1',
       Items[I].Shortcut.Key1, Items[I].Shortcut.DefaultKey1);
@@ -208,7 +208,7 @@ procedure TInputConfigurationsList.LoadFromConfigFile;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
   begin
     Items[I].Shortcut.Key1 := ConfigFile.GetValue(
       'inputs/' + Items[I].ConfigFileName + '/key1', Items[I].Shortcut.DefaultKey1);
@@ -231,8 +231,8 @@ function TInputConfigurationsList.SeekConflict(
 var
   I, J: Integer;
 begin
-  for I := 0 to High do
-    for J := I + 1 to High do
+  for I := 0 to Count - 1 do
+    for J := I + 1 to Count - 1 do
     begin
       if Items[J].Shortcut.IsKey(Items[I].Shortcut.Key1, #0) or
          Items[J].Shortcut.IsKey(Items[I].Shortcut.Key2, #0) or
@@ -254,7 +254,7 @@ procedure TDynInputChangedEventArray.ExecuteAll(
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     Items[I](InputConfiguration);
 end;
 

@@ -1300,7 +1300,7 @@ function TCreaturesKindsList.FindByVRMLNodeName(
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
   begin
     Result := Items[I];
     if Result.VRMLNodeName = AVRMLNodeName then
@@ -1321,7 +1321,7 @@ begin
     KindsConfig.FileName := ProgramDataPath + 'data' + PathDelim +
       'creatures' + PathDelim + 'kinds.xml';
 
-    for I := 0 to High do
+    for I := 0 to Count - 1 do
     begin
       Items[I].LoadFromFile(KindsConfig);
     end;
@@ -1806,7 +1806,7 @@ var
 begin
   if UsedSounds <> nil then
   begin
-    for I := 0 to UsedSounds.High do
+    for I := 0 to UsedSounds.Count - 1 do
     begin
       UsedSounds[I].UserData.Free;
       UsedSounds[I].UserData := nil;
@@ -2113,7 +2113,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     I: Integer;
     SoundPosition: TVector3Single;
   begin
-    for I := 0 to UsedSounds.High do
+    for I := 0 to UsedSounds.Count - 1 do
     begin
       SoundPosition := LerpLegsMiddlePosition(
         TCreatureSoundSourceData(UsedSounds[I].UserData).SoundHeight);
@@ -2340,7 +2340,7 @@ procedure TCreaturesList.Render(const Frustum: TFrustum;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     Items[I].Render(Frustum, Params);
 end;
 
@@ -2348,7 +2348,7 @@ procedure TCreaturesList.Idle(const CompSpeed: Single);
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     Items[I].Idle(CompSpeed);
 end;
 
@@ -2356,7 +2356,7 @@ procedure TCreaturesList.RemoveFromLevel;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     if Items[I].RemoveMeFromLevel then
       FreeAndNil(I);
   RemoveAll(nil);
@@ -2369,7 +2369,7 @@ function TCreaturesList.MoveAllowedSimple(
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
   begin
     Result := Items[I];
     if (Result <> IgnoreCreature) and
@@ -2448,7 +2448,7 @@ var
   IsAboveTheBox: boolean;
   HeightAboveTheBox: Single;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     if (Items[I] <> IgnoreCreature) and
        (Items[I].CollisionsWithCreaturesAndPlayer) then
     begin

@@ -343,12 +343,12 @@ procedure TDebugCreaturesMenu.Click;
   begin
     S := TStringList.Create;
     try
-      for I := 0 to CreaturesKinds.High do
+      for I := 0 to CreaturesKinds.Count - 1 do
         S.Append(Format('Creature %s (%d users)',
           [CreaturesKinds[I].VRMLNodeName, CreaturesKinds[I].RequiredCount]));
       S.Append('Cancel');
       ResultIndex := ChooseByMenu(ControlsUnder, S);
-      Result := ResultIndex <> CreaturesKinds.High + 1;
+      Result := ResultIndex <> CreaturesKinds.Count;
       if Result then
         ChooseCreature := CreaturesKinds[ResultIndex];
     finally S.Free end;
@@ -365,7 +365,7 @@ procedure TDebugCreaturesMenu.Click;
       S.Append('Index: Kind, Position, Life / MaxLife, CameraRadius');
       S.Append('');
 
-      for I := 0 to Level.Creatures.High do
+      for I := 0 to Level.Creatures.Count - 1 do
         S.Append(Format('%d: %s, %s, %s / %s, %s',
           [ I, Level.Creatures[I].Kind.VRMLNodeName,
             VectorToNiceStr(Level.Creatures[I].LegsPosition),
@@ -381,7 +381,7 @@ procedure TDebugCreaturesMenu.Click;
   var
     I: Integer;
   begin
-    for I := 0 to Level.Creatures.High do
+    for I := 0 to Level.Creatures.Count - 1 do
       if Level.Creatures[I].Life > 0 then
       begin
         Level.Creatures[I].SoundDyingEnabled := false;
@@ -394,7 +394,7 @@ procedure TDebugCreaturesMenu.Click;
   var
     I: Integer;
   begin
-    for I := 0 to Level.Creatures.High do
+    for I := 0 to Level.Creatures.Count - 1 do
       if (not (Level.Creatures[I] is TStillCreature)) and
         (Level.Creatures[I].Life > 0) then
       begin
@@ -478,7 +478,7 @@ procedure TDebugLevelMenu.Click;
     try
       LevelsAvailable.SortByNumber;
 
-      for I := 0 to LevelsAvailable.High do
+      for I := 0 to LevelsAvailable.Count - 1 do
       begin
         S.Append(Format('Level %d "%s"',
           [ LevelsAvailable[I].Number, LevelsAvailable[I].Title ]));
@@ -555,11 +555,11 @@ procedure TDebugItemsMenu.Click;
   begin
     S := TStringList.Create;
     try
-      for I := 0 to ItemsKinds.High do
+      for I := 0 to ItemsKinds.Count - 1 do
         S.Append('Item ' + ItemsKinds[I].VRMLNodeName);
       S.Append('Cancel');
       ResultIndex := ChooseByMenu(ControlsUnder, S);
-      Result := ResultIndex <> ItemsKinds.High + 1;
+      Result := ResultIndex <> ItemsKinds.Count;
       if Result then
         ChooseItem := ItemsKinds[ResultIndex];
     finally S.Free end;
@@ -569,7 +569,7 @@ procedure TDebugItemsMenu.Click;
   var
     I: Integer;
   begin
-    for I := 0 to ItemsKinds.High do
+    for I := 0 to ItemsKinds.Count - 1 do
       Player.PickItem(TItem.Create(ItemsKinds[I], 20));
     UserQuit := true;
   end;
@@ -676,7 +676,7 @@ begin
   AmbientColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[1]);
   AmbientColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[2]);
 
-  for I := 0 to Level.MainScene.GlobalLights.High do
+  for I := 0 to Level.MainScene.GlobalLights.Count - 1 do
   begin
     LightNode := Level.MainScene.GlobalLights.Items[I].Node;
     Items.Add(Format('Edit %d: %s "%s"',

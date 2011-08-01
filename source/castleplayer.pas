@@ -542,7 +542,7 @@ begin
   end else
   begin
     Items.Add(Item);
-    Result := Items.High;
+    Result := Items.Count - 1;
   end;
 
   { Automatically equip the weapon. }

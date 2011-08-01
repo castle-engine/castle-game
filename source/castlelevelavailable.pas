@@ -319,7 +319,7 @@ function TLevelsAvailableList.FindName(const AName: string): TLevelAvailable;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     if Items[I].Name = AName then
       Exit(Items[I]);
 
@@ -342,7 +342,7 @@ procedure TLevelsAvailableList.LoadFromConfig;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     Items[I].AvailableForNewGame := ConfigFile.GetValue(
       'levels_available/' + Items[I].Name,
       Items[I].DefaultAvailableForNewGame);
@@ -352,7 +352,7 @@ procedure TLevelsAvailableList.SaveToConfig;
 var
   I: Integer;
 begin
-  for I := 0 to High do
+  for I := 0 to Count - 1 do
     ConfigFile.SetDeleteValue(
       'levels_available/' + Items[I].Name,
       Items[I].AvailableForNewGame,

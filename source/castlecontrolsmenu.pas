@@ -296,7 +296,7 @@ begin
 
   FGroup := AGroup;
 
-  for I := 0 to CastleGroupInputs[Group].High do
+  for I := 0 to CastleGroupInputs[Group].Count - 1 do
     Items.AddObject(
       CastleGroupInputs[Group].Items[I].Name,
       InputArgument(CastleGroupInputs[Group].Items[I].Shortcut.
@@ -397,9 +397,9 @@ procedure TControlsSubMenu.Click;
 begin
   inherited;
 
-  if Between(CurrentItem, 0, CastleGroupInputs[Group].High) then
+  if Between(CurrentItem, 0, CastleGroupInputs[Group].Count - 1) then
     ChangeKey(CastleGroupInputs[Group].Items[CurrentItem]) else
-  if CurrentItem = CastleGroupInputs[Group].High + 1 then
+  if CurrentItem = CastleGroupInputs[Group].Count then
   begin
     SetCurrentMenu(CurrentMenu, ControlsMenu);
   end else
@@ -412,7 +412,7 @@ var
 begin
   { Refresh key names displayed in the menu. }
 
-  for I := 0 to CastleGroupInputs[Group].High do
+  for I := 0 to CastleGroupInputs[Group].Count - 1 do
     TGLMenuItemArgument(Items.Objects[I]).Value :=
       CastleGroupInputs[Group].Items[I].Shortcut.Description(SNoneInput);
 end;

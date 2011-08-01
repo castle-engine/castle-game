@@ -1059,7 +1059,7 @@ begin
       glEnable(GL_DEPTH_TEST);
       glColorv(Black3Single);
       glBegin(GL_LINES);
-        for I := 0 to FSpidersAppearing.High do
+        for I := 0 to FSpidersAppearing.Count - 1 do
         begin
           glVertex3f(FSpidersAppearing.Items[I][0],
                      FSpidersAppearing.Items[I][1], SpiderZ);
@@ -1069,7 +1069,7 @@ begin
     glPopAttrib;
   end;
 
-  for I := 0 to FSpidersAppearing.High do
+  for I := 0 to FSpidersAppearing.Count - 1 do
   begin
     glPushMatrix;
       glTranslatev(FSpidersAppearing.Items[I]);
@@ -1151,14 +1151,14 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TKamTime);
     if Result then
       Exit;
 
-    for I := 0 to ParentLevel.Creatures.High do
+    for I := 0 to ParentLevel.Creatures.Count - 1 do
     begin
       Result := Boxes3DCollision(DoorBox, ParentLevel.Creatures[I].BoundingBox);
       if Result then
         Exit;
     end;
 
-    for I := 0 to ParentLevel.ItemsOnLevel.High do
+    for I := 0 to ParentLevel.ItemsOnLevel.Count - 1 do
     begin
       Result := Boxes3DCollision(DoorBox, ParentLevel.ItemsOnLevel[I].BoundingBox);
       if Result then

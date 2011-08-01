@@ -835,7 +835,7 @@ begin
             Player.Camera.Position := Player.Camera.Position + Move;
         end;
 
-        for I := 0 to ParentLevel.Creatures.High do
+        for I := 0 to ParentLevel.Creatures.Count - 1 do
         begin
           Crea := ParentLevel.Creatures[I];
           Box := Crea.BoundingBox;
@@ -844,7 +844,7 @@ begin
             Crea.LegsPosition := Crea.LegsPosition + Move;
         end;
 
-        for I := 0 to ParentLevel.ItemsOnLevel.High do
+        for I := 0 to ParentLevel.ItemsOnLevel.Count - 1 do
         begin
           Item := ParentLevel.ItemsOnLevel[I];
           Box := Item.BoundingBox;
@@ -862,7 +862,7 @@ begin
             Player.Camera.Position := Player.Camera.Position + Move;
         end;
 
-        for I := 0 to ParentLevel.Creatures.High do
+        for I := 0 to ParentLevel.Creatures.Count - 1 do
         begin
           Crea := ParentLevel.Creatures[I];
           if Crea.UseBoundingSphere then
@@ -880,7 +880,7 @@ begin
           end;
         end;
 
-        for I := 0 to ParentLevel.ItemsOnLevel.High do
+        for I := 0 to ParentLevel.ItemsOnLevel.Count - 1 do
         begin
           Item := ParentLevel.ItemsOnLevel[I];
           if BoxCollisionAssumeTranslation(NewTranslation,
@@ -1686,7 +1686,7 @@ begin
   if Result <> nil then
   begin
     S := 'TLevel.TryPick: [';
-    for I := 0 to Result.Hierarchy.High do
+    for I := 0 to Result.Hierarchy.Count - 1 do
       S += Result.Hierarchy[I].ClassName + ' ';
     S += Format('], distance %f',
       [IntersectionDistance]);
@@ -1801,7 +1801,7 @@ procedure TLevel.RenderShadowVolume;
 var
   I: Integer;
 begin
-  for I := 0 to Creatures.High do
+  for I := 0 to Creatures.Count - 1 do
     Creatures.Items[I].RenderShadowVolume(ShadowVolumeRenderer);
   inherited;
 end;
