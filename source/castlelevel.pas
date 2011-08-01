@@ -1197,7 +1197,7 @@ begin
       finally SysUtils.FreeAndNil(SI) end;
 
       { Initialize Creatures }
-      FCreatures := TCreaturesList.Create;
+      FCreatures := TCreaturesList.Create(true);
       SI := TVRMLShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
       try
         while SI.GetNext do TraverseForCreatures(SI.Current);
@@ -1320,7 +1320,7 @@ begin
   FreeWithContentsAndNil(FSectors);
   FreeWithContentsAndNil(FWaypoints);
   FreeWithContentsAndNil(FItemsOnLevel);
-  FreeWithContentsAndNil(FCreatures);
+  FreeAndNil(FCreatures);
   if (FRequiredCreatures <> nil) and not DebugNoCreatures then
     UnRequireCreatures(FRequiredCreatures);
   inherited;

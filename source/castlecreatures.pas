@@ -28,7 +28,8 @@ interface
 uses Classes, VectorMath, VRMLGLAnimation, Boxes3D, KambiClassUtils, KambiUtils,
   VRMLGLAnimationInfo, VRMLGLScene, CastleSound, VRMLSceneWaypoints,
   CastleObjectKinds, ALSoundAllocator, KambiXMLConfig, Base3D,
-  XmlSoundEngine, GLShadowVolumeRenderer, VRMLTriangle, Frustum, VRMLNodes;
+  XmlSoundEngine, GLShadowVolumeRenderer, VRMLTriangle, Frustum, VRMLNodes,
+  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 {$define read_interface}
 
@@ -945,9 +946,7 @@ type
     function UseBoundingSphere: boolean; virtual;
   end;
 
-  TObjectsListItem_1 = TCreature;
-  {$I objectslist_1.inc}
-  TCreaturesList = class(TObjectsList_1)
+  TCreaturesList = class(specialize TFPGObjectList<TCreature>)
     procedure Render(const Frustum: TFrustum;
       const Params: TRenderParams);
     procedure Idle(const CompSpeed: Single);
@@ -1197,7 +1196,6 @@ uses SysUtils, DOM, GL, GLU, CastleWindow, GLWindow,
   CastleNotifications, CastleRequiredResources;
 
 {$define read_implementation}
-{$I objectslist_1.inc}
 {$I objectslist_2.inc}
 
 { TCreatureKind -------------------------------------------------------------- }
@@ -2358,8 +2356,8 @@ var
 begin
   for I := 0 to Count - 1 do
     if Items[I].RemoveMeFromLevel then
-      FreeAndNil(I);
-  RemoveAll(nil);
+      FPGObjectList_FreeAndNilItem(Self, I);
+  FPGObjectList_RemoveNils(Self);
 end;
 
 function TCreaturesList.MoveAllowedSimple(
