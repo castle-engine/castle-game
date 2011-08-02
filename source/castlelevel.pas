@@ -1369,26 +1369,20 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
   end;
 
 var
-  ObjectsList: TDOMNodeList;
-  ObjectNode: TDOMNode;
   SoundName: string;
-  I: Integer;
+  I: TXMLElementIterator;
   NewObject: T3D;
 begin
   { Load Objects }
-  ObjectsList := Element.ChildNodes;
+  I := TXMLElementIterator.Create(Element);
   try
-    for I := 0 to Integer(ObjectsList.Count) - 1 do
+    while I.GetNext do
     begin
-      ObjectNode := ObjectsList.Item[I];
-      if ObjectNode.NodeType = ELEMENT_NODE then
-      begin
-        NewObject := LevelObjectFromDOMElement(ObjectNode as TDOMElement);
-        if NewObject <> nil then
-          Items.Add(NewObject);
-      end;
+      NewObject := LevelObjectFromDOMElement(I.Current);
+      if NewObject <> nil then
+        Items.Add(NewObject);
     end;
-  finally FreeChildNodes(ObjectsList) end;
+  finally FreeAndNil(I) end;
 
   { Load other level properties (that are not read in
     TLevelAvailable.LoadFromDOMElement) }
