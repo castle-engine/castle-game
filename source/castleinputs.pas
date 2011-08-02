@@ -76,9 +76,7 @@ type
       const NewMouseWheel: TMouseWheelDirection);
   end;
 
-  TObjectsListItem_3 = TInputConfiguration;
-  {$I objectslist_3.inc}
-  TInputConfigurationsList = class(TObjectsList_3)
+  TInputConfigurationsList = class(specialize TFPGObjectList<TInputConfiguration>)
   public
     { Seeks for a Shortcut that has matching key or mouse button or mouse wheel.
       @nil if not found. }
@@ -153,7 +151,6 @@ uses SysUtils, CastleConfig;
 
 {$define read_implementation}
 {$I dynarray_1.inc}
-{$I objectslist_3.inc}
 
 function InteractInputDescription: string;
 begin
@@ -322,7 +319,7 @@ var
   ConflictDescription: string;
 begin
   OnInputChanged := TDynInputChangedEventArray.Create;
-  CastleAllInputs := TInputConfigurationsList.Create(false);
+  CastleAllInputs := TInputConfigurationsList.Create(true);
 
   for InputGroup := Low(InputGroup) to High(InputGroup) do
     CastleGroupInputs[InputGroup] := TInputConfigurationsList.Create(false);
@@ -413,7 +410,7 @@ begin
   for InputGroup := Low(InputGroup) to High(InputGroup) do
     FreeAndNil(CastleGroupInputs[InputGroup]);
 
-  FreeWithContentsAndNil(CastleAllInputs);
+  FreeAndNil(CastleAllInputs);
   FreeAndNil(OnInputChanged);
 end;
 

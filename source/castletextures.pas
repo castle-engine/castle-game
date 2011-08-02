@@ -30,8 +30,6 @@ interface
 uses KambiUtils, KambiClassUtils, Classes, CastleSound, VRMLTriangle, DOM,
   XmlSoundEngine, FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
-{$define read_interface}
-
 type
   { }
   TTextureRule = class
@@ -51,9 +49,7 @@ type
     LavaDamageTime: Single;
   end;
 
-  TObjectsListItem_1 = TTextureRule;
-  {$I objectslist_1.inc}
-  TTextureRulesList = class(TObjectsList_1)
+  TTextureRulesList = class(specialize TFPGObjectList<TTextureRule>)
   private
     GroundRule_Cache: boolean;
     GroundRule_LastGround: PVRMLTriangle;
@@ -78,23 +74,17 @@ type
 var
   TextureRulesList: TTextureRulesList;
 
-{$undef read_interface}
-
 implementation
 
 uses SysUtils, KambiXMLRead, KambiXMLUtils, KambiFilesUtils, VRMLNodes;
-
-{$define read_implementation}
-{$I objectslist_1.inc}
 
 { TTextureRule --------------------------------------------------------------- }
 
 procedure TTextureRule.LoadFromDOMElement(Element: TDOMElement);
 var
   FootstepsSoundName: string;
-  SubElement, LavaDamage: TDOMElement;
-  SubElements: TDOMNodeList;
-  I: Integer;
+  LavaDamage: TDOMElement;
+  I: TXMLElementIterator;
 begin
   if not DOMGetAttribute(Element, 'base_name', BaseName) then
     raise Exception.Create('<texture> element must have "base_name" attribute');
@@ -105,30 +95,25 @@ begin
   if HasFootstepsSound then
     FootstepsSound := SoundEngine.SoundFromName(FootstepsSoundName);
 
-  SubElements := Element.ChildNodes;
+  I := TXMLElementIterator.Create(Element);
   try
-    for I := 0 to Integer(SubElements.Count) - 1 do
-      if SubElements.Item[I].NodeType = ELEMENT_NODE then
+    while I.GetNext do
+      if I.Current.TagName = 'lava' then
       begin
-        SubElement := SubElements.Item[I] as TDOMElement;
-
-        if SubElement.TagName = 'lava' then
-        begin
-          Lava := true;
-          LavaDamage := DOMGetOneChildElement(SubElement);
-          if (LavaDamage = nil) or (LavaDamage.TagName <> 'damage') then
-            raise Exception.Create('Missing <damage> inside <lava> element');
-          if not DOMGetSingleAttribute(LavaDamage, 'const', LavaDamageConst) then
-            LavaDamageConst := 0;
-          if not DOMGetSingleAttribute(LavaDamage, 'random', LavaDamageRandom) then
-            LavaDamageRandom := 0;
-          if not DOMGetSingleAttribute(LavaDamage, 'time', LavaDamageTime) then
-            LavaDamageTime := 0;
-        end else
-          raise Exception.CreateFmt('Unknown element inside <texture>: "%s"',
-            [SubElement.TagName]);
-      end;
-  finally FreeChildNodes(SubElements); end;
+        Lava := true;
+        LavaDamage := DOMGetOneChildElement(I.Current);
+        if (LavaDamage = nil) or (LavaDamage.TagName <> 'damage') then
+          raise Exception.Create('Missing <damage> inside <lava> element');
+        if not DOMGetSingleAttribute(LavaDamage, 'const', LavaDamageConst) then
+          LavaDamageConst := 0;
+        if not DOMGetSingleAttribute(LavaDamage, 'random', LavaDamageRandom) then
+          LavaDamageRandom := 0;
+        if not DOMGetSingleAttribute(LavaDamage, 'time', LavaDamageTime) then
+          LavaDamageTime := 0;
+      end else
+        raise Exception.CreateFmt('Unknown element inside <texture>: "%s"',
+          [I.Current.TagName]);
+  finally FreeAndNil(I) end;
 end;
 
 { TTextureRulesList ---------------------------------------------------------- }
@@ -141,7 +126,7 @@ var
   TextureRule: TTextureRule;
   I: Integer;
 begin
-  FreeContents;
+  Clear;
 
   Assert(SoundEngine <> nil);
 
@@ -233,8 +218,8 @@ begin
 end;
 
 initialization
-  TextureRulesList := TTextureRulesList.Create(false);
+  TextureRulesList := TTextureRulesList.Create(true);
   TextureRulesList.LoadFromFile;
 finalization
-  FreeWithContentsAndNil(TextureRulesList);
+  FreeAndNil(TextureRulesList);
 end.

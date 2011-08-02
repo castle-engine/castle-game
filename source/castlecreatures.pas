@@ -31,8 +31,6 @@ uses Classes, VectorMath, VRMLGLAnimation, Boxes3D, KambiClassUtils, KambiUtils,
   XmlSoundEngine, GLShadowVolumeRenderer, VRMLTriangle, Frustum, VRMLNodes,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
-{$define read_interface}
-
 const
   { Default value for TCreatureKind.DefaultMaxLife.
     Yes, it's not a typo, this identifier starts with "DefaultDefault". }
@@ -241,9 +239,7 @@ type
       read FRequiredCount write FRequiredCount default 0;
   end;
 
-  TObjectsListItem_2 = TCreatureKind;
-  {$I objectslist_2.inc}
-  TCreaturesKindsList = class(TObjectsList_2)
+  TCreaturesKindsList = class(specialize TFPGObjectList<TCreatureKind>)
   public
     { Find item with given VRMLNodeName.
       @raises Exception if not found. }
@@ -1186,17 +1182,12 @@ var
   Arrow: TMissileCreatureKind;
   Barrel: TStillCreatureKind;
 
-{$undef read_interface}
-
 implementation
 
 uses SysUtils, DOM, GL, GLU, CastleWindow, GLWindow,
   KambiFilesUtils, KambiGLUtils, ProgressUnit, CastlePlay,
   CastleVideoOptions,
   CastleNotifications, CastleRequiredResources;
-
-{$define read_implementation}
-{$I objectslist_2.inc}
 
 { TCreatureKind -------------------------------------------------------------- }
 
@@ -3661,7 +3652,7 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@GLWindowClose);
 
-  CreaturesKinds := TCreaturesKindsList.Create(false);
+  CreaturesKinds := TCreaturesKindsList.Create(true);
 
   Alien := TBallThrowerCreatureKind.Create('Alien');
   Werewolf := TWerewolfKind.Create('Werewolf');
@@ -3677,11 +3668,7 @@ begin
 end;
 
 procedure DoFinalization;
-var
-  I: Integer;
 begin
-  for I := 0 to CreaturesKinds.Count - 1 do
-    TCreatureKind(CreaturesKinds.Items[I]).Free;
   FreeAndNil(CreaturesKinds);
 end;
 

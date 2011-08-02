@@ -31,8 +31,6 @@ uses CastleLevel, KambiUtils, Classes,
   KambiClassUtils, DOM, GL, GLU, KambiGLUtils, GLProgress,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
-{$define read_interface}
-
 type
   { }
   TLevelAvailable = class
@@ -71,16 +69,13 @@ type
     function CreateLevel(MenuBackground: boolean = false): TLevel;
   end;
 
-  TObjectsListItem_1 = TLevelAvailable;
-  {$I objectslist_1.inc}
-  TLevelsAvailableList = class(TObjectsList_1)
+  TLevelsAvailableList = class(specialize TFPGObjectList<TLevelAvailable>)
   private
     { We keep Document reference through lifetime of this object,
       because each TLevelAvailable instance needs a reference to
       LevelDOMElement (this is parsed during TLevel.Create). }
     Document: TXMLDocument;
     FMenuBackgroundLevelName: string;
-    function IsSmallerByNumber(const A, B: TLevelAvailable): boolean;
   public
     destructor Destroy; override;
 
@@ -105,14 +100,11 @@ type
   end;
 
 var
-  { This lists all available TLevel classes, along with information
+  { List of all available TLevel classes, along with information
     whether they are allowed to be placed in "New Game" levels.
-
     Created in initialization of this unit, destroyed in finalization.
     Owns it's Items. }
   LevelsAvailable: TLevelsAvailableList;
-
-{$undef read_interface}
 
 implementation
 
@@ -120,9 +112,6 @@ uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
   CastleLevelSpecific, KambiXMLRead, CastleWindow, GLImages,
   Images, GLWindow, GLWinModes, KambiTimeUtils, UIControls,
   CastleRequiredResources;
-
-{$define read_implementation}
-{$I objectslist_1.inc}
 
 { TLevelAvailable ------------------------------------------------------------ }
 
@@ -328,10 +317,9 @@ begin
     'Level "%s" not found on LevelsAvailable list', [AName]);
 end;
 
-function TLevelsAvailableList.IsSmallerByNumber(
-  const A, B: TLevelAvailable): boolean;
+function IsSmallerByNumber(const A, B: TLevelAvailable): Integer;
 begin
-  Result := A.Number < B.Number;
+  Result := A.Number - B.Number;
 end;
 
 procedure TLevelsAvailableList.SortByNumber;
@@ -412,12 +400,12 @@ begin
   if LevelsAvailable <> nil then
   begin
     LevelsAvailable.SaveToConfig;
-    FreeWithContentsAndNil(LevelsAvailable);
+    FreeAndNil(LevelsAvailable);
   end;
 end;
 
 initialization
-  LevelsAvailable := TLevelsAvailableList.Create(false);
+  LevelsAvailable := TLevelsAvailableList.Create(true);
   Window.OnOpenList.Add(@GLWindowOpen);
   Window.OnCloseList.Add(@GLWindowClose);
 finalization
