@@ -36,8 +36,6 @@ const
   DefaultItemDamageRandom = 5.0;
   DefaultItemActualAttackTime = 0.0;
 
-{$define read_interface}
-
 type
   TItem = class;
 
@@ -141,9 +139,7 @@ type
     procedure GLContextClose; override;
   end;
 
-  TObjectsListItem_3 = TItemKind;
-  {$I objectslist_3.inc}
-  TItemKindsList = class(TObjectsList_3)
+  TItemKindsList = class(specialize TFPGObjectList<TItemKind>)
   public
     { Calls PrepareRender for all items.
       This does Progress.Init, Step, Fini. }
@@ -295,9 +291,7 @@ type
     function Split(QuantitySplit: Cardinal): TItem;
   end;
 
-  TObjectsListItem_2 = TItem;
-  {$I objectslist_2.inc}
-  TItemsList = class(TObjectsList_2)
+  TItemsList = class(specialize TFPGObjectList<TItem>)
   public
     { This checks is Item "stackable" with any item on the list.
       Returns index of item on the list that is stackable with given Item,
@@ -366,9 +360,7 @@ type
     procedure ItemPicked(const Distance: Single);
   end;
 
-  TObjectsListItem_1 = TItemOnLevel;
-  {$I objectslist_1.inc}
-  TItemsOnLevelList = class(TObjectsList_1)
+  TItemsOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
     { Call Render for all items. }
     procedure Render(const Frustum: TFrustum;
       const Params: TRenderParams);
@@ -393,19 +385,12 @@ var
 { Returns nil if not found. }
 function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 
-{$undef read_interface}
-
 implementation
 
 uses SysUtils, GLWindow, CastleWindow,
   CastlePlay, KambiFilesUtils, ProgressUnit,
   CastleCreatures, CastleVideoOptions, CastleNotifications,
   VRMLScene, VRMLTriangle, GLImages;
-
-{$define read_implementation}
-{$I objectslist_1.inc}
-{$I objectslist_2.inc}
-{$I objectslist_3.inc}
 
 { TItemKind ------------------------------------------------------------ }
 
@@ -1038,7 +1023,7 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@GLWindowClose);
 
-  ItemsKinds := TItemKindsList.Create(false);
+  ItemsKinds := TItemKindsList.Create(true);
 
   Sword := TItemSwordKind.Create('Sword');
   Bow := TItemBowKind.Create('Bow');
@@ -1053,7 +1038,7 @@ end;
 
 procedure DoFinalization;
 begin
-  FreeWithContentsAndNil(ItemsKinds);
+  FreeAndNil(ItemsKinds);
 end;
 
 initialization

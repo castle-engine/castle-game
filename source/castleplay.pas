@@ -494,7 +494,6 @@ begin
     if PickItemIndex <> -1 then
     begin
       Player.PickItem(Level.ItemsOnLevel[PickItemIndex].ExtractItem);
-      Level.ItemsOnLevel.FreeAndNil(PickItemIndex);
       Level.ItemsOnLevel.Delete(PickItemIndex);
 
       if AutoOpenInventory then

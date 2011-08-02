@@ -1190,7 +1190,7 @@ begin
     ItemsToRemove := TVRMLNodesList.Create(false);
     try
       { Initialize Items }
-      FItemsOnLevel := TItemsOnLevelList.Create(false);
+      FItemsOnLevel := TItemsOnLevelList.Create(true);
       SI := TVRMLShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
       try
         while SI.GetNext do TraverseForItems(SI.Current);
@@ -1319,7 +1319,7 @@ begin
   FreeAndNil(FThunderEffect);
   FreeAndNil(FSectors);
   FreeAndNil(FWaypoints);
-  FreeWithContentsAndNil(FItemsOnLevel);
+  FreeAndNil(FItemsOnLevel);
   FreeAndNil(FCreatures);
   if (FRequiredCreatures <> nil) and not DebugNoCreatures then
     UnRequireCreatures(FRequiredCreatures);
