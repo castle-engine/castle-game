@@ -321,10 +321,10 @@ var
   ConflictDescription: string;
 begin
   OnInputChanged := TDynInputChangedEventArray.Create;
-  CastleAllInputs := TInputConfigurationsList.Create;
+  CastleAllInputs := TInputConfigurationsList.Create(false);
 
   for InputGroup := Low(InputGroup) to High(InputGroup) do
-    CastleGroupInputs[InputGroup] := TInputConfigurationsList.Create;
+    CastleGroupInputs[InputGroup] := TInputConfigurationsList.Create(false);
 
   { Order of creation below is significant: it determines the order
     of menu entries in "Configure controls". }

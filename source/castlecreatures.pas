@@ -1786,7 +1786,7 @@ begin
 
   FSoundDyingEnabled := true;
 
-  UsedSounds := TALSoundsList.Create;
+  UsedSounds := TALSoundsList.Create(false);
 
   { FLegsPosition and FDirection changed, so RecalculateBoundingBox must be
     called. At this point CurrentScene is needed (by RecalculateBoundingBox),
@@ -2496,7 +2496,7 @@ begin
     FStateChangeTime := AnimationTime - 1000;
   end;
 
-  WaypointsSaved := TSceneWaypointsList.Create;
+  WaypointsSaved := TSceneWaypointsList.Create(false);
 end;
 
 destructor TWalkAttackCreature.Destroy;
@@ -3661,7 +3661,7 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@GLWindowClose);
 
-  CreaturesKinds := TCreaturesKindsList.Create;
+  CreaturesKinds := TCreaturesKindsList.Create(false);
 
   Alien := TBallThrowerCreatureKind.Create('Alien');
   Werewolf := TWerewolfKind.Create('Werewolf');

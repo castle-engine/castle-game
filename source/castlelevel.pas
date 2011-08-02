@@ -1187,10 +1187,10 @@ begin
 
     ChangeLevelScene;
 
-    ItemsToRemove := TVRMLNodesList.Create;
+    ItemsToRemove := TVRMLNodesList.Create(false);
     try
       { Initialize Items }
-      FItemsOnLevel := TItemsOnLevelList.Create;
+      FItemsOnLevel := TItemsOnLevelList.Create(false);
       SI := TVRMLShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
       try
         while SI.GetNext do TraverseForItems(SI.Current);
@@ -1227,8 +1227,8 @@ begin
     end;
 
     { calculate Sectors and Waypoints }
-    FSectors := TSceneSectorsList.Create;
-    FWaypoints := TSceneWaypointsList.Create;
+    FSectors := TSceneSectorsList.Create(false);
+    FWaypoints := TSceneWaypointsList.Create(false);
     Waypoints.ExtractPositions(MainScene);
     Sectors.ExtractBoundingBoxes(MainScene);
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);

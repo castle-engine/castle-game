@@ -180,7 +180,7 @@ var
   FirstRootNodeIndex: Integer;
   OwnsFirstRootNode: boolean;
 begin
-  RootNodes := TVRMLNodesList.Create;
+  RootNodes := TVRMLNodesList.Create(false);
   try
     RootNodes.Count := FModelFileNames.Count;
 

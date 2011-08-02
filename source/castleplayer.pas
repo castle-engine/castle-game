@@ -434,7 +434,7 @@ begin
   FLife := DefaultMaxLife;
   FMaxLife := DefaultMaxLife;
 
-  FItems := TItemsList.Create;
+  FItems := TItemsList.Create(false);
   FInventoryCurrentItem := -1;
 
   FCamera := TWalkCamera.Create(nil);

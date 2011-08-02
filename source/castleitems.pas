@@ -1037,7 +1037,7 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@GLWindowClose);
 
-  ItemsKinds := TItemKindsList.Create;
+  ItemsKinds := TItemKindsList.Create(false);
 
   Sword := TItemSwordKind.Create('Sword');
   Bow := TItemBowKind.Create('Bow');

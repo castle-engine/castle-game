@@ -158,7 +158,7 @@ begin
   FBlendingType := DefaultBlendingType;
   FirstRootNodesPool := TStringList.Create;
   ManifoldEdgesPool := TStringList.Create;
-  AnimationsPrepared := TVRMLGLAnimationsList.Create;
+  AnimationsPrepared := TVRMLGLAnimationsList.Create(false);
 end;
 
 destructor TObjectKind.Destroy;

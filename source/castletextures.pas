@@ -233,7 +233,7 @@ begin
 end;
 
 initialization
-  TextureRulesList := TTextureRulesList.Create;
+  TextureRulesList := TTextureRulesList.Create(false);
   TextureRulesList.LoadFromFile;
 finalization
   FreeWithContentsAndNil(TextureRulesList);

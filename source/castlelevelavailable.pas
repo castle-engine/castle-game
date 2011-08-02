@@ -416,7 +416,7 @@ begin
 end;
 
 initialization
-  LevelsAvailable := TLevelsAvailableList.Create;
+  LevelsAvailable := TLevelsAvailableList.Create(false);
   Window.OnOpenList.Add(@GLWindowOpen);
   Window.OnCloseList.Add(@GLWindowClose);
 finalization

@@ -694,7 +694,7 @@ var
 begin
   inherited;
 
-  LevelsAvailableForNewGame := TLevelsAvailableList.Create;
+  LevelsAvailableForNewGame := TLevelsAvailableList.Create(false);
 
   LevelsAvailable.SortByNumber;
 
