@@ -28,7 +28,8 @@ unit CastleLevelAvailable;
 interface
 
 uses CastleLevel, KambiUtils, Classes,
-  KambiClassUtils, DOM, GL, GLU, KambiGLUtils, GLProgress;
+  KambiClassUtils, DOM, GL, GLU, KambiGLUtils, GLProgress,
+  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 {$define read_interface}
 

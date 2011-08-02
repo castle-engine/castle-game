@@ -25,7 +25,8 @@ unit CastleInputs;
 
 interface
 
-uses KeysMouse, Cameras, KambiUtils, KambiClassUtils, Classes;
+uses KeysMouse, Cameras, KambiUtils, KambiClassUtils, Classes,
+  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 {$define read_interface}
 

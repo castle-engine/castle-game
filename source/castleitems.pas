@@ -28,7 +28,8 @@ interface
 uses Boxes3D, VRMLNodes, VRMLGLScene, VectorMath, KambiUtils,
   KambiClassUtils, Classes, Images, GL, GLU, KambiGLUtils, CastleSound,
   VRMLGLAnimation, VRMLGLAnimationInfo, CastleObjectKinds,
-  KambiXMLConfig, XmlSoundEngine, Frustum, Base3D;
+  KambiXMLConfig, XmlSoundEngine, Frustum, Base3D,
+  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 const
   DefaultItemDamageConst = 5.0;
