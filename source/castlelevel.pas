@@ -1227,8 +1227,8 @@ begin
     end;
 
     { calculate Sectors and Waypoints }
-    FSectors := TSceneSectorsList.Create(false);
-    FWaypoints := TSceneWaypointsList.Create(false);
+    FSectors := TSceneSectorsList.Create(true);
+    FWaypoints := TSceneWaypointsList.Create(true);
     Waypoints.ExtractPositions(MainScene);
     Sectors.ExtractBoundingBoxes(MainScene);
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
@@ -1317,8 +1317,8 @@ end;
 destructor TLevel.Destroy;
 begin
   FreeAndNil(FThunderEffect);
-  FreeWithContentsAndNil(FSectors);
-  FreeWithContentsAndNil(FWaypoints);
+  FreeAndNil(FSectors);
+  FreeAndNil(FWaypoints);
   FreeWithContentsAndNil(FItemsOnLevel);
   FreeAndNil(FCreatures);
   if (FRequiredCreatures <> nil) and not DebugNoCreatures then
