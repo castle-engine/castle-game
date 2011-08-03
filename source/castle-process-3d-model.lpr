@@ -60,7 +60,7 @@
     programs better, as these stub boxes usually only get in the way.
 }
 
-uses SysUtils, KambiUtils, KambiClassUtils, VRMLNodes, Object3DAsVRML,
+uses SysUtils, KambiUtils, KambiClassUtils, VRMLNodes, X3DLoad,
   KambiStringUtils, CastleVRMLProcessing;
 
 { Remove special "stub" nodes, for castle creatures, items etc.

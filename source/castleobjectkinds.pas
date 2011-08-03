@@ -148,7 +148,7 @@ type
 
 implementation
 
-uses SysUtils, ProgressUnit, Object3DAsVRML, DOM, CastleWindow,
+uses SysUtils, ProgressUnit, X3DLoad, DOM, CastleWindow,
   KambiStringUtils, KambiLog;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
