@@ -475,7 +475,11 @@ begin
     OnInputChanged.Remove(@InputChanged);
 
   FreeAndNil(FCamera);
-  FreeWithContentsAndNil(FItems);
+  if FItems <> nil then
+  begin
+    FItems.FreeObjects := true;
+    FreeAndNil(FItems);
+  end;
 
   if AllocatedFootstepsSource <> nil then
     AllocatedFootstepsSource.DoUsingEnd;
