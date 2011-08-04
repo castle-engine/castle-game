@@ -139,7 +139,7 @@ type
     procedure GLContextClose; override;
   end;
 
-  TItemKindsList = class(specialize TFPGObjectList<TItemKind>)
+  TItemKindList = class(specialize TFPGObjectList<TItemKind>)
   public
     { Calls PrepareRender for all items.
       This does Progress.Init, Step, Fini. }
@@ -291,7 +291,7 @@ type
     function Split(QuantitySplit: Cardinal): TItem;
   end;
 
-  TItemsList = class(specialize TFPGObjectList<TItem>)
+  TItemList = class(specialize TFPGObjectList<TItem>)
   public
     { This checks is Item "stackable" with any item on the list.
       Returns index of item on the list that is stackable with given Item,
@@ -360,7 +360,7 @@ type
     procedure ItemPicked(const Distance: Single);
   end;
 
-  TItemsOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
+  TItemOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
     { Call Render for all items. }
     procedure Render(const Frustum: TFrustum;
       const Params: TRenderParams);
@@ -372,7 +372,7 @@ type
   end;
 
 var
-  ItemsKinds: TItemKindsList;
+  ItemsKinds: TItemKindList;
 
   Sword: TItemSwordKind;
   Bow: TItemBowKind;
@@ -532,9 +532,9 @@ begin
     TransparentGroups, [prRender, prBoundingBox], BaseLights);
 end;
 
-{ TItemKindsList ------------------------------------------------------------- }
+{ TItemKindList ------------------------------------------------------------- }
 
-procedure TItemKindsList.PrepareRender(const BaseLights: TLightInstancesList);
+procedure TItemKindList.PrepareRender(const BaseLights: TLightInstancesList);
 var
   I: Integer;
   PrepareRenderSteps: Cardinal;
@@ -550,7 +550,7 @@ begin
   finally Progress.Fini; end;
 end;
 
-procedure TItemKindsList.FreePrepareRender;
+procedure TItemKindList.FreePrepareRender;
 var
   I: Integer;
 begin
@@ -558,7 +558,7 @@ begin
     Items[I].FreePrepareRender;
 end;
 
-procedure TItemKindsList.LoadFromFile;
+procedure TItemKindList.LoadFromFile;
 var
   I: Integer;
   KindsConfig: TKamXMLConfig;
@@ -799,9 +799,9 @@ begin
   FQuantity -= QuantitySplit;
 end;
 
-{ TItemsList ------------------------------------------------------------ }
+{ TItemList ------------------------------------------------------------ }
 
-function TItemsList.Stackable(Item: TItem): Integer;
+function TItemList.Stackable(Item: TItem): Integer;
 begin
   for Result := 0 to Count - 1 do
     if Items[Result].Stackable(Item) then
@@ -809,7 +809,7 @@ begin
   Result := -1;
 end;
 
-function TItemsList.FindKind(Kind: TItemKind): Integer;
+function TItemList.FindKind(Kind: TItemKind): Integer;
 begin
   for Result := 0 to Count - 1 do
     if Items[Result].Kind = Kind then
@@ -842,7 +842,7 @@ function TItemOnLevel.PlayerCollision: boolean;
 begin
   { I approximate both player and item as a bounding boxes.
     This works quite good, and is "precise enough" :)
-    Note: remember to change TItemsOnLevelList.PlayerCollision
+    Note: remember to change TItemOnLevelList.PlayerCollision
     accordingly if I ever change implementation of this. }
 
   Result := Boxes3DCollision(BoundingBox, Player.BoundingBox);
@@ -950,9 +950,9 @@ begin
     Notification('You see some item, but it''s too far to tell exactly what it is');
 end;
 
-{ TItemsOnLevelList -------------------------------------------------- }
+{ TItemOnLevelList -------------------------------------------------- }
 
-procedure TItemsOnLevelList.Render(const Frustum: TFrustum;
+procedure TItemOnLevelList.Render(const Frustum: TFrustum;
   const Params: TRenderParams);
 var
   I: Integer;
@@ -961,7 +961,7 @@ begin
     Items[I].Render(Frustum, Params);
 end;
 
-procedure TItemsOnLevelList.Idle(const CompSpeed: Single);
+procedure TItemOnLevelList.Idle(const CompSpeed: Single);
 var
   I: Integer;
 begin
@@ -969,7 +969,7 @@ begin
     Items[I].Idle(CompSpeed);
 end;
 
-function TItemsOnLevelList.PlayerCollision: Integer;
+function TItemOnLevelList.PlayerCollision: Integer;
 var
   PlayerBoundingBox: TBox3D;
 begin
@@ -1023,7 +1023,7 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@GLWindowClose);
 
-  ItemsKinds := TItemKindsList.Create(true);
+  ItemsKinds := TItemKindList.Create(true);
 
   Sword := TItemSwordKind.Create('Sword');
   Bow := TItemBowKind.Create('Bow');

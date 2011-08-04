@@ -350,7 +350,7 @@ type
     FLevelProjectionFar: Single;
     FMoveHorizontalSpeed: Single;
     FMoveVerticalSpeed: Single;
-    FItemsOnLevel: TItemsOnLevelList;
+    FItemsOnLevel: TItemOnLevelList;
     FSickProjection: boolean;
     FSickProjectionSpeed: TKamTime;
 
@@ -362,13 +362,13 @@ type
       Be careful: never add here two nodes such that one may be parent
       of another, otherwise freeing one could free the other one too
       early. }
-    ItemsToRemove: TVRMLNodesList;
+    ItemsToRemove: TVRMLNodeList;
 
     procedure TraverseForItems(Shape: TVRMLShape);
     procedure SetSickProjection(const Value: boolean);
     procedure SetSickProjectionSpeed(const Value: TKamTime);
   private
-    FCreatures: TCreaturesList;
+    FCreatures: TCreatureList;
     procedure TraverseForCreatures(Shape: TVRMLShape);
   private
     FInitialPosition: TVector3Single;
@@ -379,8 +379,8 @@ type
 
     FAnimationTime: TKamTime;
 
-    FSectors: TSceneSectorsList;
-    FWaypoints: TSceneWaypointsList;
+    FSectors: TSceneSectorList;
+    FWaypoints: TSceneWaypointList;
 
     FWaterBox: TBox3D;
     FAboveWaterBox: TBox3D;
@@ -515,11 +515,11 @@ type
     { Items lying on the level.
       These Items are owned by level object, so everything remaining
       on this list when we will destroy level will be freed. }
-    property ItemsOnLevel: TItemsOnLevelList read FItemsOnLevel;
+    property ItemsOnLevel: TItemOnLevelList read FItemsOnLevel;
 
     { Creatures on the level. Note that objects on this list are owned
       by level object. }
-    property Creatures: TCreaturesList read FCreatures;
+    property Creatures: TCreatureList read FCreatures;
 
     { LineOfSight, MoveAllowed and GetHeightAbove perform
       collision detection with the level @link(Items).
@@ -619,8 +619,8 @@ type
       code efficiency). }
     property GravityUp: TVector3Single read FGravityUp;
 
-    property Sectors: TSceneSectorsList read FSectors;
-    property Waypoints: TSceneWaypointsList read FWaypoints;
+    property Sectors: TSceneSectorList read FSectors;
+    property Waypoints: TSceneWaypointList read FWaypoints;
 
     property PlayedMusicSound: TSoundType
       read FPlayedMusicSound write FPlayedMusicSound default stNone;
@@ -1187,17 +1187,17 @@ begin
 
     ChangeLevelScene;
 
-    ItemsToRemove := TVRMLNodesList.Create(false);
+    ItemsToRemove := TVRMLNodeList.Create(false);
     try
       { Initialize Items }
-      FItemsOnLevel := TItemsOnLevelList.Create(true);
+      FItemsOnLevel := TItemOnLevelList.Create(true);
       SI := TVRMLShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
       try
         while SI.GetNext do TraverseForItems(SI.Current);
       finally SysUtils.FreeAndNil(SI) end;
 
       { Initialize Creatures }
-      FCreatures := TCreaturesList.Create(true);
+      FCreatures := TCreatureList.Create(true);
       SI := TVRMLShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
       try
         while SI.GetNext do TraverseForCreatures(SI.Current);
@@ -1227,8 +1227,8 @@ begin
     end;
 
     { calculate Sectors and Waypoints }
-    FSectors := TSceneSectorsList.Create(true);
-    FWaypoints := TSceneWaypointsList.Create(true);
+    FSectors := TSceneSectorList.Create(true);
+    FWaypoints := TSceneWaypointList.Create(true);
     Waypoints.ExtractPositions(MainScene);
     Sectors.ExtractBoundingBoxes(MainScene);
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);

@@ -49,7 +49,7 @@ type
     LavaDamageTime: Single;
   end;
 
-  TTextureRulesList = class(specialize TFPGObjectList<TTextureRule>)
+  TTextureRuleList = class(specialize TFPGObjectList<TTextureRule>)
   private
     GroundRule_Cache: boolean;
     GroundRule_LastGround: PVRMLTriangle;
@@ -72,7 +72,7 @@ type
   end;
 
 var
-  TextureRulesList: TTextureRulesList;
+  TextureRules: TTextureRuleList;
 
 implementation
 
@@ -116,9 +116,9 @@ begin
   finally FreeAndNil(I) end;
 end;
 
-{ TTextureRulesList ---------------------------------------------------------- }
+{ TTextureRuleList ---------------------------------------------------------- }
 
-procedure TTextureRulesList.LoadFromFile;
+procedure TTextureRuleList.LoadFromFile;
 var
   TextureConfig: TXMLDocument;
   TextureElement: TDOMElement;
@@ -159,7 +159,7 @@ begin
   end;
 end;
 
-function TTextureRulesList.GroundRule(Ground: PVRMLTriangle): TTextureRule;
+function TTextureRuleList.GroundRule(Ground: PVRMLTriangle): TTextureRule;
 var
   HasTextureUrl: boolean;
   TextureUrl: string;
@@ -218,8 +218,8 @@ begin
 end;
 
 initialization
-  TextureRulesList := TTextureRulesList.Create(true);
-  TextureRulesList.LoadFromFile;
+  TextureRules := TTextureRuleList.Create(true);
+  TextureRules.LoadFromFile;
 finalization
-  FreeAndNil(TextureRulesList);
+  FreeAndNil(TextureRules);
 end.

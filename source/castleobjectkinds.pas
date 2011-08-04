@@ -36,7 +36,7 @@ type
     FPrepareRenderDone: boolean;
     FBlendingType: TBlendingType;
     { This is internal for PrepareRender. }
-    AnimationsPrepared: TVRMLGLAnimationsList;
+    AnimationsPrepared: TVRMLGLAnimationList;
   protected
     { Use this in PrepareRender to share RootNodes[0]
       of your animations in subclasses. In our destructor and FreePrepareRender
@@ -158,7 +158,7 @@ begin
   FBlendingType := DefaultBlendingType;
   FirstRootNodesPool := TStringList.Create;
   ManifoldEdgesPool := TStringList.Create;
-  AnimationsPrepared := TVRMLGLAnimationsList.Create(false);
+  AnimationsPrepared := TVRMLGLAnimationList.Create(false);
 end;
 
 destructor TObjectKind.Destroy;

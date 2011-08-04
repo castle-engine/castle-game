@@ -175,12 +175,12 @@ end;
 function TVRMLGLAnimationInfo.CreateAnimation(
   FirstRootNodesPool: TStringList): TVRMLGLAnimation;
 var
-  RootNodes: TVRMLNodesList;
+  RootNodes: TVRMLNodeList;
   I: Integer;
   FirstRootNodeIndex: Integer;
   OwnsFirstRootNode: boolean;
 begin
-  RootNodes := TVRMLNodesList.Create(false);
+  RootNodes := TVRMLNodeList.Create(false);
   try
     RootNodes.Count := FModelFileNames.Count;
 

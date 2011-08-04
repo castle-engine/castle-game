@@ -239,7 +239,7 @@ type
       read FRequiredCount write FRequiredCount default 0;
   end;
 
-  TCreaturesKindsList = class(specialize TFPGObjectList<TCreatureKind>)
+  TCreatureKindList = class(specialize TFPGObjectList<TCreatureKind>)
   public
     { Find item with given VRMLNodeName.
       @raises Exception if not found. }
@@ -676,7 +676,7 @@ type
     FallingDownStartHeight: Single;
     FIsFallingDown: boolean;
 
-    UsedSounds: TALSoundsList;
+    UsedSounds: TALSoundList;
 
     procedure SoundSourceUsingEnd(Sender: TALSound);
 
@@ -690,7 +690,7 @@ type
 
       This is especially noticeable when there are many creatures on the level:
       then a lot of time is wasted in DoGravity, and main time of this
-      is inside TCreaturesList.GetHeightAbove, and main time of this
+      is inside TCreatureList.GetHeightAbove, and main time of this
       would be spend within BoundingBox calculations. Yes, this is
       checked with profiler. }
     FBoundingBox: TBox3D;
@@ -897,8 +897,8 @@ type
     property LastAttackDirection: TVector3Single
       read FLastAttackDirection write SetLastAttackDirection;
 
-    { If @false, then TCreaturesList.MoveAllowedSimple and
-      TCreaturesList.GetHeightAbove will ignore this
+    { If @false, then TCreatureList.MoveAllowedSimple and
+      TCreatureList.GetHeightAbove will ignore this
       creature, which means that collisions between this creature
       and player/other creatures will not be checked.
       You should set this to @false only in exceptional situations,
@@ -942,7 +942,7 @@ type
     function UseBoundingSphere: boolean; virtual;
   end;
 
-  TCreaturesList = class(specialize TFPGObjectList<TCreature>)
+  TCreatureList = class(specialize TFPGObjectList<TCreature>)
     procedure Render(const Frustum: TFrustum;
       const Params: TRenderParams);
     procedure Idle(const CompSpeed: Single);
@@ -1023,7 +1023,7 @@ type
 
     WaypointsSaved_Begin: TSceneSector;
     WaypointsSaved_End: TSceneSector;
-    WaypointsSaved: TSceneWaypointsList;
+    WaypointsSaved: TSceneWaypointList;
   protected
     procedure SetState(Value: TWalkAttackCreatureState); virtual;
 
@@ -1170,7 +1170,7 @@ type
   end;
 
 var
-  CreaturesKinds: TCreaturesKindsList;
+  CreaturesKinds: TCreatureKindList;
 
   Alien: TBallThrowerCreatureKind;
   Werewolf: TWerewolfKind;
@@ -1282,9 +1282,9 @@ begin
       AnimInfo.ScenesPerTime * CreatureAnimationScenesPerTime;
 end;
 
-{ TCreaturesKindsList -------------------------------------------------------- }
+{ TCreatureKindList -------------------------------------------------------- }
 
-function TCreaturesKindsList.FindByVRMLNodeName(
+function TCreatureKindList.FindByVRMLNodeName(
   const AVRMLNodeName: string): TCreatureKind;
 var
   I: Integer;
@@ -1300,7 +1300,7 @@ begin
     [AVRMLNodeName]);
 end;
 
-procedure TCreaturesKindsList.LoadFromFile;
+procedure TCreatureKindList.LoadFromFile;
 var
   I: Integer;
   KindsConfig: TKamXMLConfig;
@@ -1777,7 +1777,7 @@ begin
 
   FSoundDyingEnabled := true;
 
-  UsedSounds := TALSoundsList.Create(false);
+  UsedSounds := TALSoundList.Create(false);
 
   { FLegsPosition and FDirection changed, so RecalculateBoundingBox must be
     called. At this point CurrentScene is needed (by RecalculateBoundingBox),
@@ -2322,9 +2322,9 @@ begin
   Result := not Dead;
 end;
 
-{ TCreatures ----------------------------------------------------------------- }
+{ TCreatureList -------------------------------------------------------------- }
 
-procedure TCreaturesList.Render(const Frustum: TFrustum;
+procedure TCreatureList.Render(const Frustum: TFrustum;
   const Params: TRenderParams);
 var
   I: Integer;
@@ -2333,7 +2333,7 @@ begin
     Items[I].Render(Frustum, Params);
 end;
 
-procedure TCreaturesList.Idle(const CompSpeed: Single);
+procedure TCreatureList.Idle(const CompSpeed: Single);
 var
   I: Integer;
 begin
@@ -2341,7 +2341,7 @@ begin
     Items[I].Idle(CompSpeed);
 end;
 
-procedure TCreaturesList.RemoveFromLevel;
+procedure TCreatureList.RemoveFromLevel;
 var
   I: Integer;
 begin
@@ -2351,7 +2351,7 @@ begin
   FPGObjectList_RemoveNils(Self);
 end;
 
-function TCreaturesList.MoveAllowedSimple(
+function TCreatureList.MoveAllowedSimple(
   const OldBoundingBox, NewBoundingBox: TBox3D;
   const OldPosition, NewPosition: TVector3Single;
   IgnoreCreature: TCreature): TCreature;
@@ -2409,7 +2409,7 @@ begin
   Result := nil;
 end;
 
-procedure TCreaturesList.GetHeightAbove(
+procedure TCreatureList.GetHeightAbove(
   const Position: TVector3Single;
   var IsAbove: boolean; var AboveHeight: Single;
   var AboveGround: P3DTriangle;
@@ -2453,7 +2453,7 @@ begin
     end;
 end;
 
-function TCreaturesList.FindKind(Kind: TCreatureKind): Integer;
+function TCreatureList.FindKind(Kind: TCreatureKind): Integer;
 begin
   for Result := 0 to Count - 1 do
     if Items[Result].Kind = Kind then
@@ -2487,7 +2487,7 @@ begin
     FStateChangeTime := AnimationTime - 1000;
   end;
 
-  WaypointsSaved := TSceneWaypointsList.Create(false);
+  WaypointsSaved := TSceneWaypointList.Create(false);
 end;
 
 destructor TWalkAttackCreature.Destroy;
@@ -2999,7 +2999,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         begin
           WaypointsSaved_Begin := MiddlePositionSectorNow;
           WaypointsSaved_End := LastSeenPlayerSector;
-          TSceneSectorsList.FindWay(WaypointsSaved_Begin, WaypointsSaved_End,
+          TSceneSectorList.FindWay(WaypointsSaved_Begin, WaypointsSaved_End,
             WaypointsSaved);
         end;
 
@@ -3652,7 +3652,7 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@GLWindowClose);
 
-  CreaturesKinds := TCreaturesKindsList.Create(true);
+  CreaturesKinds := TCreatureKindList.Create(true);
 
   Alien := TBallThrowerCreatureKind.Create('Alien');
   Werewolf := TWerewolfKind.Create('Werewolf');

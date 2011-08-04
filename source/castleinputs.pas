@@ -76,7 +76,7 @@ type
       const NewMouseWheel: TMouseWheelDirection);
   end;
 
-  TInputConfigurationsList = class(specialize TFPGObjectList<TInputConfiguration>)
+  TInputConfigurationList = class(specialize TFPGObjectList<TInputConfiguration>)
   public
     { Seeks for a Shortcut that has matching key or mouse button or mouse wheel.
       @nil if not found. }
@@ -136,8 +136,8 @@ var
   { List of all configurable shortcuts.
     Will be created in initialization and freed in finalization of this unit.
     All TInputConfiguration instances will automatically add to this. }
-  CastleAllInputs: TInputConfigurationsList;
-  CastleGroupInputs: array[TInputGroup] of TInputConfigurationsList;
+  CastleAllInputs: TInputConfigurationList;
+  CastleGroupInputs: array[TInputGroup] of TInputConfigurationList;
 
   OnInputChanged: TDynInputChangedEventArray;
 
@@ -157,9 +157,9 @@ begin
   Result := CastleInput_Interact.Shortcut.Description('"Interact" key');
 end;
 
-{ TInputConfigurationsList ----------------------------------------------------- }
+{ TInputConfigurationList ----------------------------------------------------- }
 
-function TInputConfigurationsList.SeekMatchingShortcut(
+function TInputConfigurationList.SeekMatchingShortcut(
   const Key: TKey;
   const MousePress: boolean; const MouseButton: TMouseButton;
   const MouseWheel: TMouseWheelDirection): TInputConfiguration;
@@ -175,7 +175,7 @@ begin
   Result := nil;
 end;
 
-procedure TInputConfigurationsList.RestoreDefaults;
+procedure TInputConfigurationList.RestoreDefaults;
 var
   I: Integer;
 begin
@@ -183,7 +183,7 @@ begin
     Items[I].Shortcut.MakeDefault;
 end;
 
-procedure TInputConfigurationsList.SaveToConfigFile;
+procedure TInputConfigurationList.SaveToConfigFile;
 var
   I: Integer;
 begin
@@ -202,7 +202,7 @@ begin
   end;
 end;
 
-procedure TInputConfigurationsList.LoadFromConfigFile;
+procedure TInputConfigurationList.LoadFromConfigFile;
 var
   I: Integer;
 begin
@@ -224,7 +224,7 @@ begin
   end;
 end;
 
-function TInputConfigurationsList.SeekConflict(
+function TInputConfigurationList.SeekConflict(
   out ConflictDescription: string): boolean;
 var
   I, J: Integer;
@@ -319,10 +319,10 @@ var
   ConflictDescription: string;
 begin
   OnInputChanged := TDynInputChangedEventArray.Create;
-  CastleAllInputs := TInputConfigurationsList.Create(true);
+  CastleAllInputs := TInputConfigurationList.Create(true);
 
   for InputGroup := Low(InputGroup) to High(InputGroup) do
-    CastleGroupInputs[InputGroup] := TInputConfigurationsList.Create(false);
+    CastleGroupInputs[InputGroup] := TInputConfigurationList.Create(false);
 
   { Order of creation below is significant: it determines the order
     of menu entries in "Configure controls". }

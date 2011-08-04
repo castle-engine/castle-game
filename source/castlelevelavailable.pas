@@ -69,7 +69,7 @@ type
     function CreateLevel(MenuBackground: boolean = false): TLevel;
   end;
 
-  TLevelsAvailableList = class(specialize TFPGObjectList<TLevelAvailable>)
+  TLevelAvailableList = class(specialize TFPGObjectList<TLevelAvailable>)
   private
     { We keep Document reference through lifetime of this object,
       because each TLevelAvailable instance needs a reference to
@@ -104,7 +104,7 @@ var
     whether they are allowed to be placed in "New Game" levels.
     Created in initialization of this unit, destroyed in finalization.
     Owns it's Items. }
-  LevelsAvailable: TLevelsAvailableList;
+  LevelsAvailable: TLevelAvailableList;
 
 implementation
 
@@ -297,15 +297,15 @@ begin
     CreateLevelNoBackground;
 end;
 
-{ TLevelsAvailableList ------------------------------------------------------- }
+{ TLevelAvailableList ------------------------------------------------------- }
 
-destructor TLevelsAvailableList.Destroy;
+destructor TLevelAvailableList.Destroy;
 begin
   SysUtils.FreeAndNil(Document);
   inherited;
 end;
 
-function TLevelsAvailableList.FindName(const AName: string): TLevelAvailable;
+function TLevelAvailableList.FindName(const AName: string): TLevelAvailable;
 var
   I: Integer;
 begin
@@ -322,12 +322,12 @@ begin
   Result := A.Number - B.Number;
 end;
 
-procedure TLevelsAvailableList.SortByNumber;
+procedure TLevelAvailableList.SortByNumber;
 begin
   Sort(@IsSmallerByNumber);
 end;
 
-procedure TLevelsAvailableList.LoadFromConfig;
+procedure TLevelAvailableList.LoadFromConfig;
 var
   I: Integer;
 begin
@@ -337,7 +337,7 @@ begin
       Items[I].DefaultAvailableForNewGame);
 end;
 
-procedure TLevelsAvailableList.SaveToConfig;
+procedure TLevelAvailableList.SaveToConfig;
 var
   I: Integer;
 begin
@@ -348,7 +348,7 @@ begin
       Items[I].DefaultAvailableForNewGame);
 end;
 
-procedure TLevelsAvailableList.LoadFromFile;
+procedure TLevelAvailableList.LoadFromFile;
 var
   LevelsList: TDOMNodeList;
   LevelNode: TDOMNode;
@@ -405,7 +405,7 @@ begin
 end;
 
 initialization
-  LevelsAvailable := TLevelsAvailableList.Create(true);
+  LevelsAvailable := TLevelAvailableList.Create(true);
   Window.OnOpenList.Add(@GLWindowOpen);
   Window.OnCloseList.Add(@GLWindowClose);
 finalization

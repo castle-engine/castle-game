@@ -78,7 +78,7 @@ type
     FLife: Single;
     FMaxLife: Single;
     FCamera: TWalkCamera;
-    FItems: TItemsList;
+    FItems: TItemList;
     FEquippedWeapon: TItem;
     FFlyingModeTimeOut: Single; { > 0 means he's flying. In seconds. }
     function GetFlyingMode: boolean;
@@ -205,7 +205,7 @@ type
       DropItem or DeleteItem.
 
       @noAutoLinkHere }
-    property Items: TItemsList read FItems;
+    property Items: TItemList read FItems;
 
     { Each player object always has related Camera object.
 
@@ -434,7 +434,7 @@ begin
   FLife := DefaultMaxLife;
   FMaxLife := DefaultMaxLife;
 
-  FItems := TItemsList.Create(false);
+  FItems := TItemList.Create(false);
   FInventoryCurrentItem := -1;
 
   FCamera := TWalkCamera.Create(nil);
@@ -1025,7 +1025,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
     begin
       ReallyIsOnTheGroundTime := Level.AnimationTime;
       IsOnTheGround := true;
-      GroundRule := TextureRulesList.GroundRule(Ground);
+      GroundRule := TextureRules.GroundRule(Ground);
     end else
     if Level.AnimationTime - ReallyIsOnTheGroundTime >
       TimeToChangeIsOnTheGround then

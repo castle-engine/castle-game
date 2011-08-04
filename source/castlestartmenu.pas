@@ -107,7 +107,7 @@ type
 
   TChooseNewLevelMenu = class(TSubMenu)
   public
-    LevelsAvailableForNewGame: TLevelsAvailableList;
+    LevelsAvailableForNewGame: TLevelAvailableList;
     FirstDemoLevelIndex: Cardinal;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -694,7 +694,7 @@ var
 begin
   inherited;
 
-  LevelsAvailableForNewGame := TLevelsAvailableList.Create(false);
+  LevelsAvailableForNewGame := TLevelAvailableList.Create(false);
 
   LevelsAvailable.SortByNumber;
 
