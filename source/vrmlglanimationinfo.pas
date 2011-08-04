@@ -33,7 +33,7 @@ type
     Why ? Because loading all these files can be quite time-consuming. }
   TVRMLGLAnimationInfo = class
   private
-    FModelFileNames: TDynStringArray;
+    FModelFileNames: TKamStringList;
     FTimes: TDynSingleArray;
     FScenesPerTime: Cardinal;
     FTimeLoop, FTimeBackwards: boolean;
@@ -71,7 +71,7 @@ type
       from *.kanim file if you used CreateFromFile.
 
       @groupBegin }
-    property ModelFileNames: TDynStringArray read FModelFileNames;
+    property ModelFileNames: TKamStringList read FModelFileNames;
     property Times: TDynSingleArray read FTimes;
 
     property ScenesPerTime: Cardinal read FScenesPerTime write FScenesPerTime;
@@ -120,11 +120,11 @@ constructor TVRMLGLAnimationInfo.Create(
 begin
   inherited Create;
 
-  FModelFileNames := TDynStringArray.Create;
+  FModelFileNames := TKamStringList.Create;
   FTimes := TDynSingleArray.Create;
 
-  FModelFileNames.AppendArray(AModelFileNames);
-  FTimes.AppendArray(ATimes);
+  FModelFileNames.AddArray(AModelFileNames);
+  FTimes.AddArray(ATimes);
 
   FScenesPerTime := AScenesPerTime;
   FEqualityEpsilon := AEqualityEpsilon;
@@ -139,7 +139,7 @@ constructor TVRMLGLAnimationInfo.CreateFromFile(const FileName: string;
 begin
   inherited Create;
 
-  FModelFileNames := TDynStringArray.Create;
+  FModelFileNames := TKamStringList.Create;
   FTimes := TDynSingleArray.Create;
 
   TVRMLGLAnimation.LoadFromFileToVars(FileName,
@@ -155,7 +155,7 @@ constructor TVRMLGLAnimationInfo.CreateFromDOMElement(Element: TDOMElement;
 begin
   inherited Create;
 
-  FModelFileNames := TDynStringArray.Create;
+  FModelFileNames := TKamStringList.Create;
   FTimes := TDynSingleArray.Create;
 
   TVRMLGLAnimation.LoadFromDOMElementToVars(Element, BasePath,
