@@ -1022,7 +1022,7 @@ begin
           SpiderPosition, SpiderDirection, AnimationTime, BaseLights, Spider.DefaultMaxLife);
         Creatures.Add(SpiderCreature);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
-        FSpidersAppearing.Delete(I, 1);
+        FSpidersAppearing.Delete(I);
       end else
       begin
         { calculate SpiderMoveDistance }
