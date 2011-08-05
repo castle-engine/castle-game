@@ -25,7 +25,7 @@
 program castle;
 
 uses GLWindow, SysUtils, KambiUtils, ProgressUnit, GLProgress,
-  Classes, ParseParametersUnit, GLWinMessages, KambiGLUtils, KambiStringUtils,
+  Classes, KambiParameters, GLWinMessages, KambiGLUtils, KambiStringUtils,
   KambiLog, CastleWindow, CastleStartMenu, CastleHelp, CastleSound,
   KambiClassUtils, CastleVideoOptions, CastleInitialBackground,
   CastleCreatures, CastlePlay, CastleGeneralMenu,
@@ -154,7 +154,7 @@ begin
   { parse parameters }
   SoundEngine.ParseParameters;
   Window.ParseParameters([poDisplay]);
-  ParseParameters(Options, @OptionProc, nil);
+  Parameters.Parse(Options, @OptionProc, nil);
 
   Window.Width := RequestedScreenWidth;
   Window.Height := RequestedScreenHeight;
