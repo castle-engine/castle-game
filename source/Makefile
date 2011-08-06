@@ -22,7 +22,6 @@ apidoc:
 	  --title 'The Castle units' \
 	  --auto-abstract \
 	  --auto-link \
-	  --include $(UNITS_BASE_PATH)base/templates/ \
 	  --graphviz-classes --graphviz-uses \
 	  --link-gv-classes jpg --link-gv-uses jpg \
 	  *.pas
