@@ -109,7 +109,7 @@ var
 implementation
 
 uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
-  CastleLevelSpecific, KambiXMLRead, CastleWindow, GLImages,
+  CastleLevelSpecific, XMLRead, CastleWindow, GLImages,
   Images, GLWindow, GLWinModes, KambiTimeUtils, UIControls,
   CastleRequiredResources;
 

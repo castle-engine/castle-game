@@ -76,7 +76,7 @@ var
 
 implementation
 
-uses SysUtils, KambiXMLRead, KambiXMLUtils, KambiFilesUtils, VRMLNodes;
+uses SysUtils, XMLRead, KambiXMLUtils, KambiFilesUtils, VRMLNodes;
 
 { TTextureRule --------------------------------------------------------------- }
 
