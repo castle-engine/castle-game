@@ -26,9 +26,7 @@ unit CastleInputs;
 interface
 
 uses KeysMouse, Cameras, KambiUtils, KambiClassUtils, Classes,
-  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
-
-{$define read_interface}
+  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, GenericStructList;
 
 type
   TInputGroup = (kgBasic, kgItems, kgOther);
@@ -93,11 +91,7 @@ type
   TInputChangedEvent = procedure (InputConfiguration: TInputConfiguration) of object;
   PInputChangedEvent = ^TInputChangedEvent;
 
-  TDynArrayItem_1 = TInputChangedEvent;
-  PDynArrayItem_1 = PInputChangedEvent;
-  {$define DYNARRAY_1_IS_FUNCTION}
-  {$I dynarray_1.inc}
-  TDynInputChangedEventArray = class(TDynArray_1)
+  TDynInputChangedEventArray = class(specialize TGenericStructList<TInputChangedEvent>)
   public
     procedure ExecuteAll(InputConfiguration: TInputConfiguration);
   end;
@@ -143,14 +137,9 @@ var
 
 function InteractInputDescription: string;
 
-{$undef read_interface}
-
 implementation
 
 uses SysUtils, CastleConfig;
-
-{$define read_implementation}
-{$I dynarray_1.inc}
 
 function InteractInputDescription: string;
 begin
