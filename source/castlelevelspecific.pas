@@ -1028,7 +1028,7 @@ begin
         { calculate SpiderMoveDistance }
         SpiderMoveDistance := SpidersFallingSpeed * CompSpeed * 50;
         MinTo1st(SpiderMoveDistance, AboveHeight - Spider.CameraRadius);
-        FSpidersAppearing.Items[I][2] -= SpiderMoveDistance;
+        FSpidersAppearing.List^[I][2] -= SpiderMoveDistance;
         Inc(I);
       end;
     end;
