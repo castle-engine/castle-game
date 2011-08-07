@@ -34,7 +34,7 @@ type
   TVRMLGLAnimationInfo = class
   private
     FModelFileNames: TKamStringList;
-    FTimes: TDynSingleArray;
+    FTimes: TSingleList;
     FScenesPerTime: Cardinal;
     FTimeLoop, FTimeBackwards: boolean;
     FCache: TVRMLGLRendererContextCache;
@@ -72,7 +72,7 @@ type
 
       @groupBegin }
     property ModelFileNames: TKamStringList read FModelFileNames;
-    property Times: TDynSingleArray read FTimes;
+    property Times: TSingleList read FTimes;
 
     property ScenesPerTime: Cardinal read FScenesPerTime write FScenesPerTime;
     property EqualityEpsilon: Single read FEqualityEpsilon write FEqualityEpsilon;
@@ -121,7 +121,7 @@ begin
   inherited Create;
 
   FModelFileNames := TKamStringList.Create;
-  FTimes := TDynSingleArray.Create;
+  FTimes := TSingleList.Create;
 
   FModelFileNames.AddArray(AModelFileNames);
   FTimes.AddArray(ATimes);
@@ -140,7 +140,7 @@ begin
   inherited Create;
 
   FModelFileNames := TKamStringList.Create;
-  FTimes := TDynSingleArray.Create;
+  FTimes := TSingleList.Create;
 
   TVRMLGLAnimation.LoadFromFileToVars(FileName,
     FModelFileNames, FTimes, FScenesPerTime,
@@ -156,7 +156,7 @@ begin
   inherited Create;
 
   FModelFileNames := TKamStringList.Create;
-  FTimes := TDynSingleArray.Create;
+  FTimes := TSingleList.Create;
 
   TVRMLGLAnimation.LoadFromDOMElementToVars(Element, BasePath,
     FModelFileNames, FTimes, FScenesPerTime,

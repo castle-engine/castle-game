@@ -91,7 +91,7 @@ type
   TInputChangedEvent = procedure (InputConfiguration: TInputConfiguration) of object;
   PInputChangedEvent = ^TInputChangedEvent;
 
-  TDynInputChangedEventArray = class(specialize TGenericStructList<TInputChangedEvent>)
+  TInputChangedEventList = class(specialize TGenericStructList<TInputChangedEvent>)
   public
     procedure ExecuteAll(InputConfiguration: TInputConfiguration);
   end;
@@ -133,7 +133,7 @@ var
   CastleAllInputs: TInputConfigurationList;
   CastleGroupInputs: array[TInputGroup] of TInputConfigurationList;
 
-  OnInputChanged: TDynInputChangedEventArray;
+  OnInputChanged: TInputChangedEventList;
 
 function InteractInputDescription: string;
 
@@ -234,9 +234,9 @@ begin
   Result := false;
 end;
 
-{ TDynInputChangedEventArray -------------------------------------------------- }
+{ TInputChangedEventList -------------------------------------------------- }
 
-procedure TDynInputChangedEventArray.ExecuteAll(
+procedure TInputChangedEventList.ExecuteAll(
   InputConfiguration: TInputConfiguration);
 var
   I: Integer;
@@ -307,7 +307,7 @@ var
   InputGroup: TInputGroup;
   ConflictDescription: string;
 begin
-  OnInputChanged := TDynInputChangedEventArray.Create;
+  OnInputChanged := TInputChangedEventList.Create;
   CastleAllInputs := TInputConfigurationList.Create(true);
 
   for InputGroup := Low(InputGroup) to High(InputGroup) do

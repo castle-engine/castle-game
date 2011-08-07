@@ -139,7 +139,7 @@ type
 
   TCagesLevel = class(TLevel)
   private
-    FSpidersAppearing: TDynVector3SingleArray;
+    FSpidersAppearing: TVector3SingleList;
     NextSpidersAppearingTime: Single;
 
     HintOpenDoor: TLevelHintArea;
@@ -863,7 +863,7 @@ begin
 
   ThunderEffect := TThunderEffect.Create;
 
-  FSpidersAppearing := TDynVector3SingleArray.Create;
+  FSpidersAppearing := TVector3SingleList.Create;
   NextSpidersAppearingTime := 0;
 
   { TODO: this is not nice; I should add TLevelObject.Name for such

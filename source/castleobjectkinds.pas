@@ -341,12 +341,12 @@ procedure TObjectKind.CreateAnimationIfNeeded(
     Since all scenes in the animation must have exactly the same
     structure, we know that this ManifoldEdges is actually good
     for all scenes within this animation. }
-  function Animation_ManifoldEdges(Animation: TVRMLGLAnimation): TDynManifoldEdgeArray;
+  function Animation_ManifoldEdges(Animation: TVRMLGLAnimation): TManifoldEdgeList;
   begin
     Result := Animation.FirstScene.ManifoldEdges;
   end;
 
-  function Animation_BorderEdges(Animation: TVRMLGLAnimation): TDynBorderEdgeArray;
+  function Animation_BorderEdges(Animation: TVRMLGLAnimation): TBorderEdgeList;
   begin
     Result := Animation.FirstScene.BorderEdges;
   end;
@@ -361,8 +361,8 @@ procedure TObjectKind.CreateAnimationIfNeeded(
     "structurally equal" condition, so it's Ok for them. }
   procedure Animation_ShareManifoldAndBorderEdges(
     Animation: TVRMLGLAnimation;
-    ManifoldShared: TDynManifoldEdgeArray;
-    BorderShared: TDynBorderEdgeArray);
+    ManifoldShared: TManifoldEdgeList;
+    BorderShared: TBorderEdgeList);
   var
     I: Integer;
   begin
@@ -374,8 +374,8 @@ var
   FileName: string;
   FileNameIndex: Integer;
   IsSharedManifoldAndBorderEdges: boolean;
-  SharedManifoldEdges: TDynManifoldEdgeArray;
-  SharedBorderEdges: TDynBorderEdgeArray;
+  SharedManifoldEdges: TManifoldEdgeList;
+  SharedBorderEdges: TBorderEdgeList;
   ActualOptions: TPrepareResourcesOptions;
 begin
   if (AnimInfo <> nil) and (Anim = nil) then
