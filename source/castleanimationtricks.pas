@@ -221,7 +221,7 @@ begin
       GLSLProgram.Link(true);
     end;
 
-    glActiveTextureARB(GL_TEXTURE0_ARB);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, WaterEnvMap);
 
     GLSLProgram.Enable;
