@@ -764,7 +764,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
     const AssumeTranslation: TVector3Single): TBox3D;
   begin
     if Exists and Collides then
-      Result := Box3DTranslate(inherited BoundingBox, AssumeTranslation) else
+      Result := (inherited BoundingBox).Translate(AssumeTranslation) else
       Result := EmptyBox3D;
   end;
 
@@ -796,7 +796,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
         use "inherited BoxCollision" with Translation. }
 
       Result := inherited BoxCollision(
-        Box3DAntiTranslate(Box, AssumeTranslation), TrianglesToIgnoreFunc);
+        Box.AntiTranslate(AssumeTranslation), TrianglesToIgnoreFunc);
     end;
   end;
 
@@ -830,8 +830,8 @@ begin
         if Player <> nil then
         begin
           Box := Player.BoundingBox;
-          if Boxes3DCollision(NewBox, Box) or
-             Boxes3DCollision(CurrentBox, Box) then
+          if Box.Collision(NewBox) or
+             Box.Collision(CurrentBox) then
             Player.Camera.Position := Player.Camera.Position + Move;
         end;
 
@@ -839,8 +839,8 @@ begin
         begin
           Crea := ParentLevel.Creatures[I];
           Box := Crea.BoundingBox;
-          if Boxes3DCollision(NewBox, Box) or
-             Boxes3DCollision(CurrentBox, Box) then
+          if Box.Collision(NewBox) or
+             Box.Collision(CurrentBox) then
             Crea.LegsPosition := Crea.LegsPosition + Move;
         end;
 
@@ -848,8 +848,8 @@ begin
         begin
           Item := ParentLevel.ItemsOnLevel[I];
           Box := Item.BoundingBox;
-          if Boxes3DCollision(NewBox, Box) or
-             Boxes3DCollision(CurrentBox, Box) then
+          if Box.Collision(NewBox) or
+             Box.Collision(CurrentBox) then
             Item.Position := Item.Position + Move;
         end;
       end else
@@ -942,7 +942,7 @@ end;
 
 function TLevelLinearMovingObject.SoundPosition: TVector3Single;
 begin
-  Result := Box3DMiddle(BoundingBox);
+  Result := BoundingBox.Middle;
 end;
 
 procedure TLevelLinearMovingObject.PlaySound(SoundType: TSoundType;
@@ -1077,7 +1077,7 @@ end;
 
 function TLevelArea.PointInside(const Point: TVector3Single): boolean;
 begin
-  Result := Box3DPointInside(Point, Box);
+  Result := Box.PointInside(Point);
 end;
 
 function TLevelArea.ParentLevel: TLevel;
@@ -1211,15 +1211,15 @@ begin
     begin
       { Set CameraBox to MainScene.BoundingBox, and make maximum Z larger. }
       NewCameraBox := MainScene.BoundingBox;
-      NewCameraBox[1, 2] += 4 * (NewCameraBox[1, 2] - NewCameraBox[0, 2]);
+      NewCameraBox.Data[1, 2] += 4 * (NewCameraBox.Data[1, 2] - NewCameraBox.Data[0, 2]);
     end;
     CameraBox := NewCameraBox;
 
     if RemoveBoxNode(FWaterBox, 'WaterBox') then
     begin
       FAboveWaterBox := FWaterBox;
-      FAboveWaterBox[0, 2] := FWaterBox[1, 2];
-      FAboveWaterBox[1, 2] := FAboveWaterBox[0, 2] + 0.4;
+      FAboveWaterBox.Data[0, 2] := FWaterBox.Data[1, 2];
+      FAboveWaterBox.Data[1, 2] := FAboveWaterBox.Data[0, 2] + 0.4;
     end else
     begin
       FWaterBox := EmptyBox3D;
@@ -1237,7 +1237,7 @@ begin
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
       FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
-      FCameraRadius := Box3DAvgSize(MainScene.BoundingBox, false, 1) * 0.007;
+      FCameraRadius := MainScene.BoundingBox.AverageSize(false, 1) * 0.007;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
       FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
@@ -1250,7 +1250,7 @@ begin
       NavigationSpeed := 1.0;
 
     FLevelProjectionNear := CameraRadius * 0.75;
-    FLevelProjectionFar := Box3DMaxSize(MainScene.BoundingBox, false, 1.0) * 5;
+    FLevelProjectionFar := MainScene.BoundingBox.MaxSize(false, 1.0) * 5;
 
     { Fix InitialDirection length, and set MoveXxxSpeed.
 
@@ -1469,9 +1469,9 @@ procedure TLevel.TraverseForItems(Shape: TVRMLShape);
         [ItemKindVRMLNodeName]);
 
     ItemStubBoundingBox := Shape.BoundingBox;
-    ItemPosition[0] := (ItemStubBoundingBox[0, 0] + ItemStubBoundingBox[1, 0]) / 2;
-    ItemPosition[1] := (ItemStubBoundingBox[0, 1] + ItemStubBoundingBox[1, 1]) / 2;
-    ItemPosition[2] := ItemStubBoundingBox[0, 2];
+    ItemPosition[0] := (ItemStubBoundingBox.Data[0, 0] + ItemStubBoundingBox.Data[1, 0]) / 2;
+    ItemPosition[1] := (ItemStubBoundingBox.Data[0, 1] + ItemStubBoundingBox.Data[1, 1]) / 2;
+    ItemPosition[2] := ItemStubBoundingBox.Data[0, 2];
 
     FItemsOnLevel.Add(TItemOnLevel.Create(TItem.Create(ItemKind, ItemQuantity),
       ItemPosition));
@@ -1520,9 +1520,9 @@ procedure TLevel.TraverseForCreatures(Shape: TVRMLShape);
 
     { calculate CreaturePosition }
     StubBoundingBox := Shape.BoundingBox;
-    CreaturePosition[0] := (StubBoundingBox[0, 0] + StubBoundingBox[1, 0]) / 2;
-    CreaturePosition[1] := (StubBoundingBox[0, 1] + StubBoundingBox[1, 1]) / 2;
-    CreaturePosition[2] := StubBoundingBox[0, 2];
+    CreaturePosition[0] := (StubBoundingBox.Data[0, 0] + StubBoundingBox.Data[1, 0]) / 2;
+    CreaturePosition[1] := (StubBoundingBox.Data[0, 1] + StubBoundingBox.Data[1, 1]) / 2;
+    CreaturePosition[2] := StubBoundingBox.Data[0, 2];
 
     { calculate CreatureKind }
     CreatureKind := CreaturesKinds.FindByVRMLNodeName(CreatureKindName);
@@ -1584,7 +1584,7 @@ begin
     MovingObjectCameraRadius, @CollisionIgnoreItem);
 
   if Result then
-    Result := Box3DPointInside(NewPos, CameraBox);
+    Result := CameraBox.PointInside(NewPos);
 end;
 
 function TLevel.MoveAllowedSimple(const Position: TVector3Single;
@@ -1596,7 +1596,7 @@ begin
     MovingObjectCameraRadius, @CollisionIgnoreItem);
 
   if Result then
-    Result := Box3DPointInside(NewPos, CameraBox);
+    Result := CameraBox.PointInside(NewPos);
 end;
 
 function TLevel.MoveBoxAllowedSimple(const Position: TVector3Single;
@@ -1608,7 +1608,7 @@ begin
     @CollisionIgnoreItem);
 
   if Result then
-    Result := Box3DPointInside(NewPos, CameraBox);
+    Result := CameraBox.PointInside(NewPos);
 end;
 
 procedure TLevel.GetHeightAbove(const Position: TVector3Single;

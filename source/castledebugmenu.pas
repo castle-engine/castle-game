@@ -760,11 +760,11 @@ begin
 
   Light := ALight;
 
-  LevelBoxSizes := Box3DSizes(Level.CameraBox);
+  LevelBoxSizes := Level.CameraBox.Sizes;
   for I := 0 to 2 do
     PositionSlider[I] := TGLMenuFloatSlider.Create(
-      Level.CameraBox[0, I] - LevelBoxSizes[I],
-      Level.CameraBox[1, I] + LevelBoxSizes[I],
+      Level.CameraBox.Data[0, I] - LevelBoxSizes[I],
+      Level.CameraBox.Data[1, I] + LevelBoxSizes[I],
       LightLocation[I]);
 
   RedColorSlider := TGLMenuFloatSlider.Create(0, 1, Light.FdColor.Value[0]);

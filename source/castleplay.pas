@@ -627,8 +627,8 @@ procedure DoInteract;
 
     { Collision with Level.ItemsOnLevel }
     for I := 0 to Level.ItemsOnLevel.Count - 1 do
-      if TryBoxRayClosestIntersection(ThisIntersectionDistance,
-           Level.ItemsOnLevel[I].BoundingBox, Ray0, RayVector) and
+      if Level.ItemsOnLevel[I].BoundingBox.TryRayClosestIntersection(
+        ThisIntersectionDistance, Ray0, RayVector) and
          ( (PickedObjectType = poNone) or
            (ThisIntersectionDistance < IntersectionDistance)
          ) then
@@ -765,11 +765,10 @@ procedure EventDown(AKey: TKey;
       PushVectorLength: Single;
     begin
       ItemBox := DroppedItemKind.BoundingBoxRotated;
-      ItemBoxMiddle := Box3DMiddle(ItemBox);
+      ItemBoxMiddle := ItemBox.Middle;
       { Box3DRadius calculates radius around (0, 0, 0) and we want
         radius around ItemBoxMiddle }
-      ItemBoxRadius := Box3DRadius(
-        Box3DTranslate(ItemBox, VectorNegate(ItemBoxMiddle)));
+      ItemBoxRadius := ItemBox.Translate(VectorNegate(ItemBoxMiddle)).Radius;
 
       { Calculate DropPosition.
 
@@ -787,8 +786,8 @@ procedure EventDown(AKey: TKey;
       PushVector := Player.Camera.DirectionInGravityPlane;
       PushVectorLength := Max(
         Player.Camera.RealCameraPreferredHeight,
-        Box3DSizeX(ItemBox) * 2,
-        Box3DSizeY(ItemBox) * 2);
+        ItemBox.SizeX * 2,
+        ItemBox.SizeY * 2);
       VectorAdjustToLengthTo1st(PushVector, PushVectorLength);
       DropPosition := VectorAdd(Player.Camera.Position,
         PushVector);
@@ -1039,9 +1038,9 @@ type
 
 class procedure TPlayGameHelper.PlayerCameraChange(Sender: TObject);
 begin
-  if Box3DPointInside(Player.Camera.Position, Level.AboveWaterBox) then
+  if Level.AboveWaterBox.PointInside(Player.Camera.Position) then
     Player.Swimming := psAboveWater else
-  if Box3DPointInside(Player.Camera.Position, Level.WaterBox) then
+  if Level.WaterBox.PointInside(Player.Camera.Position) then
     Player.Swimming := psUnderWater else
     Player.Swimming := psNo;
 end;

@@ -474,15 +474,15 @@ begin
       This hurts a little (because of 1 call to Sqrt),
       that's why results of this function are cached if FBoundingBoxRotated. }
     HorizontalSize := Max(Max(
-      VectorLenSqr(Vector2Single(FBoundingBoxRotated[0, 0], FBoundingBoxRotated[0, 1])),
-      VectorLenSqr(Vector2Single(FBoundingBoxRotated[1, 0], FBoundingBoxRotated[0, 1])),
-      VectorLenSqr(Vector2Single(FBoundingBoxRotated[1, 0], FBoundingBoxRotated[1, 1]))),
-      VectorLenSqr(Vector2Single(FBoundingBoxRotated[0, 0], FBoundingBoxRotated[1, 1])));
+      VectorLenSqr(Vector2Single(FBoundingBoxRotated.Data[0, 0], FBoundingBoxRotated.Data[0, 1])),
+      VectorLenSqr(Vector2Single(FBoundingBoxRotated.Data[1, 0], FBoundingBoxRotated.Data[0, 1])),
+      VectorLenSqr(Vector2Single(FBoundingBoxRotated.Data[1, 0], FBoundingBoxRotated.Data[1, 1]))),
+      VectorLenSqr(Vector2Single(FBoundingBoxRotated.Data[0, 0], FBoundingBoxRotated.Data[1, 1])));
     HorizontalSize := Sqrt(HorizontalSize);
-    FBoundingBoxRotated[0, 0] := -HorizontalSize;
-    FBoundingBoxRotated[0, 1] := -HorizontalSize;
-    FBoundingBoxRotated[1, 0] := +HorizontalSize;
-    FBoundingBoxRotated[1, 1] := +HorizontalSize;
+    FBoundingBoxRotated.Data[0, 0] := -HorizontalSize;
+    FBoundingBoxRotated.Data[0, 1] := -HorizontalSize;
+    FBoundingBoxRotated.Data[1, 0] := +HorizontalSize;
+    FBoundingBoxRotated.Data[1, 1] := +HorizontalSize;
 
     FBoundingBoxRotatedCalculated := true;
   end;
@@ -718,14 +718,14 @@ var
   I: Integer;
   C: TCreature;
 begin
-  WeaponBoundingBox := Box3DTranslate(Player.BoundingBox,
+  WeaponBoundingBox := Player.BoundingBox.Translate(
     VectorAdjustToLength(Player.Camera.Direction, 1.0));
-  { Tests: Writeln('WeaponBoundingBox is ', Box3DToNiceStr(WeaponBoundingBox)); }
+  { Tests: Writeln('WeaponBoundingBox is ', WeaponBoundingBox.ToNiceStr); }
   for I := 0 to Level.Creatures.Count - 1 do
   begin
     C := Level.Creatures[I];
-    { Tests: Writeln('Creature bbox is ', Box3DToNiceStr(C.BoundingBox)); }
-    if Boxes3DCollision(C.BoundingBox, WeaponBoundingBox) then
+    { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
+    if C.BoundingBox.Collision(WeaponBoundingBox) then
     begin
       C.Life := C.Life - DamageConst - Random * DamageRandom;
       C.LastAttackDirection := Player.Camera.Direction;
@@ -845,7 +845,7 @@ begin
     Note: remember to change TItemOnLevelList.PlayerCollision
     accordingly if I ever change implementation of this. }
 
-  Result := Boxes3DCollision(BoundingBox, Player.BoundingBox);
+  Result := BoundingBox.Collision(Player.BoundingBox);
 end;
 
 procedure TItemOnLevel.Render(const Frustum: TFrustum;
@@ -931,7 +931,7 @@ end;
 
 function TItemOnLevel.BoundingBox: TBox3D;
 begin
-  Result := Box3DTranslate(Item.Kind.BoundingBoxRotated, Position);
+  Result := Item.Kind.BoundingBoxRotated.Translate(Position);
 end;
 
 procedure TItemOnLevel.ItemPicked(const Distance: Single);
@@ -978,7 +978,7 @@ begin
     only once. }
   PlayerBoundingBox := Player.BoundingBox;
   for Result := 0 to Count - 1 do
-    if Boxes3DCollision(Items[Result].BoundingBox, PlayerBoundingBox) then
+    if Items[Result].BoundingBox.Collision(PlayerBoundingBox) then
       Exit;
   Result := -1;
 end;

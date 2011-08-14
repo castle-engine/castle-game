@@ -828,7 +828,7 @@ type
       write SetLegsPosition;
 
     { The height of MiddlePosition above LegsPosition.
-      Calculated in this class using CurrentScene.BoundingBox[1, 2]
+      Calculated in this class using CurrentScene.BoundingBox.Data[1, 2]
       and Kind.MiddlePositionHeight.
       Note that while CurrentScene may change, this also may change. }
     function HeightBetweenLegsAndMiddle: Single; virtual;
@@ -1380,8 +1380,8 @@ begin
   CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationInfo       , BaseLights);
 
   CameraRadiusFromPrepareRender :=
-    Min(Box3DXYRadius(StandAnimation.Scenes[0].BoundingBox),
-        StandAnimation.Scenes[0].BoundingBox[1, 2] * 0.75);
+    Min(StandAnimation.Scenes[0].BoundingBox.XYRadius,
+        StandAnimation.Scenes[0].BoundingBox.Data[1, 2] * 0.75);
 end;
 
 function TWalkAttackCreatureKind.PrepareRenderSteps: Cardinal;
@@ -1575,11 +1575,11 @@ begin
   ReferenceScene := StandAnimation.Scenes[0];
 
   CameraRadiusFromPrepareRender :=
-    Max(Box3DXYRadius(ReferenceScene.BoundingBox),
+    Max(ReferenceScene.BoundingBox.XYRadius,
     { I can do here "/ 2" thanks to the fact that middle_position_height
-      of ghost is 0.5 (so I have room for another "BoundingBox[1, 2] / 2"
+      of ghost is 0.5 (so I have room for another "BoundingBox.Data[1, 2] / 2"
       for radius). }
-    ReferenceScene.BoundingBox[1, 2] / 2);
+    ReferenceScene.BoundingBox.Data[1, 2] / 2);
 end;
 
 function TGhostKind.CreateDefaultCreature(
@@ -1626,8 +1626,7 @@ begin
   inherited;
   CreateAnimationIfNeeded('Move', FAnimation, FAnimationInfo, BaseLights);
 
-  CameraRadiusFromPrepareRender :=
-    Box3DXYRadius(Animation.Scenes[0].BoundingBox);
+  CameraRadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
 
 function TMissileCreatureKind.PrepareRenderSteps: Cardinal;
@@ -1712,8 +1711,7 @@ begin
   inherited;
   CreateAnimationIfNeeded('Stand', FAnimation, FAnimationInfo, BaseLights);
 
-  CameraRadiusFromPrepareRender :=
-    Box3DXYRadius(Animation.Scenes[0].BoundingBox);
+  CameraRadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
 
 function TStillCreatureKind.PrepareRenderSteps: Cardinal;
@@ -1841,7 +1839,7 @@ end;
 
 function TCreature.HeightBetweenLegsAndMiddle: Single;
 begin
-  Result := CurrentScene.BoundingBox[1, 2] * Kind.MiddlePositionHeight;
+  Result := CurrentScene.BoundingBox.Data[1, 2] * Kind.MiddlePositionHeight;
 end;
 
 function TCreature.MiddlePositionFromLegs(
@@ -1899,7 +1897,7 @@ end;
 function TCreature.BoundingBoxAssumingLegs(
   const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3D;
 begin
-  Result := Box3DTransform(CurrentScene.BoundingBox,
+  Result := CurrentScene.BoundingBox.Transform(
     SceneTransformAssuming(AssumeLegsPosition, AssumeDirection));
 end;
 
@@ -1958,7 +1956,7 @@ procedure TCreature.Render(const Frustum: TFrustum;
     FontSize = 0.5;
   begin
     glPushMatrix;
-      glTranslatef(0, 0, CurrentScene.BoundingBox[1, 2]);
+      glTranslatef(0, 0, CurrentScene.BoundingBox.Data[1, 2]);
       glRotatef(90, 0, 0, 1);
       glRotatef(90, 1, 0, 0);
       glScalef(FontSize / Font3d.RowHeight, FontSize / Font3d.RowHeight, 1);
@@ -2007,15 +2005,15 @@ end;
 function TCreature.MiddleCollisionWithPlayer(
   const AssumeMiddlePosition: TVector3Single): boolean;
 begin
-  Result := Boxes3DCollision(
-    BoundingBoxAssumingMiddle(AssumeMiddlePosition, Direction), Player.BoundingBox);
+  Result := BoundingBoxAssumingMiddle(AssumeMiddlePosition, Direction).Collision(
+    Player.BoundingBox);
 end;
 
 function TCreature.LegsCollisionWithPlayer(
   const AssumeLegsPosition: TVector3Single): boolean;
 begin
-  Result := Boxes3DCollision(
-    BoundingBoxAssumingLegs(AssumeLegsPosition, Direction), Player.BoundingBox);
+  Result := BoundingBoxAssumingLegs(AssumeLegsPosition, Direction).Collision(
+    Player.BoundingBox);
 end;
 
 function TCreature.MoveAllowed(
@@ -2364,7 +2362,7 @@ begin
     if (Result <> IgnoreCreature) and
       Result.CollisionsWithCreaturesAndPlayer then
     begin
-      if Boxes3DCollision(NewBoundingBox, Result.BoundingBox) then
+      if NewBoundingBox.Collision(Result.BoundingBox) then
       begin
         { Strictly thinking, now I know that I have a collision with creature
           and I should exit with false. But it's not that simple.
@@ -2387,7 +2385,7 @@ begin
           tries to get closer to the creature (so if the pathologic situation
           occurs, someone can't make it worse, and can't "abuse" this
           by entering into creature's bounding box). }
-        if (not Boxes3DCollision(OldBoundingBox, Result.BoundingBox)) or
+        if (not OldBoundingBox.Collision(Result.BoundingBox)) or
            ( PointsDistanceSqr(NewPosition, Result.MiddlePosition) <
              PointsDistanceSqr(OldPosition, Result.MiddlePosition) ) then
           Exit;
@@ -2400,8 +2398,8 @@ begin
         Without this check, player could get on the other side
         of the creature if the creature is slim (e.g. Alien) and player
         tries very hard, and he has large speed. }
-      if (not Boxes3DCollision(OldBoundingBox, Result.BoundingBox)) and
-         IsBox3DSegmentCollision(Result.BoundingBox, OldPosition, NewPosition) then
+      if (not OldBoundingBox.Collision(Result.BoundingBox)) and
+         Result.BoundingBox.IsSegmentCollision(OldPosition, NewPosition) then
         Exit;
     end;
   end;
@@ -2422,13 +2420,13 @@ procedure TCreatureList.GetHeightAbove(
   begin
     { We use here the assumption that GravityUp is (0, 0, 1). }
 
-    IsAboveTheBox := (not IsEmptyBox3D(Box)) and
-      (Box[0, 0] <= Point[0]) and (Point[0] <= Box[1, 0]) and
-      (Box[0, 1] <= Point[1]) and (Point[1] <= Box[1, 1]) and
-      (Point[2] >= Box[1, 2]);
+    IsAboveTheBox := (not Box.IsEmpty) and
+      (Box.Data[0, 0] <= Point[0]) and (Point[0] <= Box.Data[1, 0]) and
+      (Box.Data[0, 1] <= Point[1]) and (Point[1] <= Box.Data[1, 1]) and
+      (Point[2] >= Box.Data[1, 2]);
 
     if IsAboveTheBox then
-      HeightAboveTheBox := Point[2] - Box[1, 2] else
+      HeightAboveTheBox := Point[2] - Box.Data[1, 2] else
       HeightAboveTheBox := MaxSingle;
   end;
 
@@ -2740,10 +2738,10 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         SetState(wasWalk) else
       if (not Kind.Flying) and
          (AngleRadBetweenDirectionToPlayer < 0.01) and
-         (BoundingBox[0][0] <= LastSeenPlayer[0]) and
-         (BoundingBox[1][0] >= LastSeenPlayer[0]) and
-         (BoundingBox[0][1] <= LastSeenPlayer[1]) and
-         (BoundingBox[1][1] >= LastSeenPlayer[1]) then
+         (BoundingBox.Data[0][0] <= LastSeenPlayer[0]) and
+         (BoundingBox.Data[1][0] >= LastSeenPlayer[0]) and
+         (BoundingBox.Data[0][1] <= LastSeenPlayer[1]) and
+         (BoundingBox.Data[1][1] >= LastSeenPlayer[1]) then
       begin
         { Then the player (or it's LastSeenPlayer) is right above or below us.
           Since we can't fly, we can't get there. Standing in place
@@ -3199,21 +3197,20 @@ begin
     If we move our boxes by Box3DMinSize(B), we're sure that
     each box will stick to the previous and next. But maybe
     there will be some areas around the sticking points ?
-    So Box3DMinSize(B) / 2 seems safe. }
-  DistanceIncrease := Box3DMinSize(B) / 2;
+    So B.MinSize / 2 seems safe. }
+  DistanceIncrease := B.MinSize / 2;
 
   DistanceLength := DistanceIncrease;
   while DistanceLength < WAKind.MaxAttackDistance do
   begin
-    if Boxes3DCollision(Box3DTranslate(B,
-       VectorScale(Direction, DistanceLength)), PB) then
+    if B.Translate(VectorScale(Direction, DistanceLength)).Collision(PB) then
       Exit(true);
     DistanceLength += DistanceIncrease;
   end;
 
   { Check one last time for WAKind.MaxAttackDistance }
-  Result := Boxes3DCollision(Box3DTranslate(B,
-    VectorScale(Direction, WAKind.MaxAttackDistance)), PB);
+  Result := B.Translate(
+    VectorScale(Direction, WAKind.MaxAttackDistance)).Collision(PB);
 end;
 
 function TWalkAttackCreature.DebugCaption: string;
@@ -3498,7 +3495,7 @@ begin
     for I := 0 to Level.Creatures.Count - 1 do
       if (Level.Creatures[I] <> Self) and
          (Level.Creatures[I].CollisionsWithCreaturesAndPlayer) and
-         (Box3DSphereSimpleCollision(Level.Creatures[I].BoundingBox,
+         (Level.Creatures[I].BoundingBox.SphereSimpleCollision(
            MiddlePosition, Kind.CameraRadius)) then
       begin
         ExplodeWithCreature(Level.Creatures[I]);

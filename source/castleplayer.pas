@@ -614,20 +614,20 @@ function TPlayer.BoundingBoxAssuming(const AssumePosition: TVector3Single;
 var
   PlayerSize: Single;
 begin
-  Result[0] := AssumePosition;
-  Result[1] := AssumePosition;
+  Result.Data[0] := AssumePosition;
+  Result.Data[1] := AssumePosition;
 
   PlayerSize := Level.CameraRadius;
 
-  Result[0, 0] -= PlayerSize;
-  Result[0, 1] -= PlayerSize;
+  Result.Data[0, 0] -= PlayerSize;
+  Result.Data[0, 1] -= PlayerSize;
   if Tall then
-    Result[0, 2] -= Camera.RealCameraPreferredHeight else
-    Result[0, 2] -= Level.CameraRadius;
+    Result.Data[0, 2] -= Camera.RealCameraPreferredHeight else
+    Result.Data[0, 2] -= Level.CameraRadius;
 
-  Result[1, 0] += PlayerSize;
-  Result[1, 1] += PlayerSize;
-  Result[1, 2] += Level.CameraRadius;
+  Result.Data[1, 0] += PlayerSize;
+  Result.Data[1, 1] += PlayerSize;
+  Result.Data[1, 2] += Level.CameraRadius;
 end;
 
 function TPlayer.BoundingBox(Tall: boolean): TBox3D;
