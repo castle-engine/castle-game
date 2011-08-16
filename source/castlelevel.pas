@@ -39,7 +39,7 @@ unit CastleLevel;
 interface
 
 uses VectorMath, VRMLScene, VRMLGLScene, Boxes3D,
-  VRMLNodes, VRMLFields, CastleItems, Cameras, VRMLTriangle, GL3D,
+  VRMLNodes, VRMLFields, CastleItems, Cameras, VRMLTriangle,
   CastleCreatures, VRMLSceneWaypoints, CastleSound,
   KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
   ProgressUnit, VRMLGLAnimation, ALSoundAllocator,
