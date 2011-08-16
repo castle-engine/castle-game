@@ -138,7 +138,7 @@
     scene_file_name="doom/e1m1/e1m1_final.wrl"
 
     title="Doom E1M1"
-    title_hint="shadows OFF adviced"
+    title_hint="shadows OFF advised"
     number="666"
     implementation_class="TDoomE1M1Level"
     loading_bg="doom/logo/doom_title.png"
@@ -200,7 +200,7 @@
     name="fountain"
     scene_file_name="fountain/fountain_final.wrl"
     title="Fountain"
-    title_hint="shadows and bump mapping ON adviced"
+    title_hint="shadows and bump mapping ON advised"
     number="15"
     implementation_class="TFountainLevel"
     footsteps_sound="player_footsteps_concrete"
