@@ -57,14 +57,10 @@ type
   { TBlendedLoopingAnimation with a GLSL shader with a cubemap. }
   TBlendedLoopingAnimationShader = class(TBlendedLoopingAnimation)
   private
-    GLSLProgram: TGLSLProgram;
-    WaterEnvMap: TGLuint;
-    function UseShader: boolean;
+    CustomShader: TGLSLProgram;
   public
-    constructor Create(AOwner: TComponent); override;
     procedure GLContextClose; override;
-    procedure Render(const Frustum: TFrustum;
-      const Params: TRenderParams); override;
+    procedure Render(const Frustum: TFrustum; const Params: TRenderParams); override;
   end;
 
 implementation
@@ -146,28 +142,19 @@ begin
   end;
 end;
 
-{ TBlendedLoopingAnimationShader --------------------------------------------- }
+{ TWaterShader --------------------------------------------------------------- }
 
-constructor TBlendedLoopingAnimationShader.Create(AOwner: TComponent);
-begin
-  inherited;
-  Attributes.Shaders := srDisable;
-end;
+type
+  TWaterShader = class(TGLSLProgram)
+  private
+    WaterEnvMap: TGLuint;
+  public
+    constructor Create(Attributes: TVRMLRenderingAttributes);
+    destructor Destroy; override;
+    function SetupUniforms(var BoundTextureUnits: Cardinal): boolean; override;
+  end;
 
-function TBlendedLoopingAnimationShader.UseShader: boolean;
-begin
-  Result := GL_ARB_texture_cube_map and (TGLSLProgram.ClassSupport <> gsNone);
-end;
-
-procedure TBlendedLoopingAnimationShader.GLContextClose;
-begin
-  if GLSLProgram <> nil then FreeAndNil(GLSLProgram);
-  glFreeTexture(WaterEnvMap);
-  inherited;
-end;
-
-procedure TBlendedLoopingAnimationShader.Render(const Frustum: TFrustum;
-  const Params: TRenderParams);
+constructor TWaterShader.Create(Attributes: TVRMLRenderingAttributes);
 
   function LoadWaterEnvMap: TGLuint;
   var
@@ -206,35 +193,57 @@ procedure TBlendedLoopingAnimationShader.Render(const Frustum: TFrustum;
 var
   ShadersPath: string;
 begin
-  if UseShader then
+  inherited Create;
+  if GL_ARB_texture_cube_map and (Support <> gsNone) then
   begin
-    if WaterEnvMap = 0 then
-      WaterEnvMap := LoadWaterEnvMap;
+    WaterEnvMap := LoadWaterEnvMap;
 
-    if GLSLProgram = nil then
-    begin
-      GLSLProgram := TGLSLProgram.Create;
-      ShadersPath := ProgramDataPath + 'data' + PathDelim + 'levels' +
-        PathDelim + 'fountain' + PathDelim +  'water_reflections' +
-        PathDelim + 'water_reflections.';
-      GLSLProgram.AttachVertexShader(FileToString(ShadersPath + 'vs'));
-      GLSLProgram.AttachFragmentShader(FileToString(ShadersPath + 'fs'));
-      GLSLProgram.Link(true);
-    end;
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, WaterEnvMap);
-
-    GLSLProgram.Enable;
-    RenderingCamera.RotationInverseMatrixNeeded;
-    GLSLProgram.SetUniform('cameraRotationInverseMatrix', RenderingCamera.RotationInverseMatrix3);
-    GLSLProgram.SetUniform('envMap', 0);
+    ShadersPath := ProgramDataPath + 'data' + PathDelim + 'levels' +
+      PathDelim + 'fountain' + PathDelim +  'water_reflections' +
+      PathDelim + 'water_reflections.';
+    AttachVertexShader(FileToString(ShadersPath + 'vs'));
+    AttachFragmentShader(FileToString(ShadersPath + 'fs'));
+    Link(true);
   end;
+end;
 
+destructor TWaterShader.Destroy;
+begin
+  glFreeTexture(WaterEnvMap);
   inherited;
+end;
 
-  if UseShader then
-    GLSLProgram.Disable;
+function TWaterShader.SetupUniforms(var BoundTextureUnits: Cardinal): boolean;
+begin
+  Result := inherited SetupUniforms(BoundTextureUnits);
+
+  glActiveTexture(GL_TEXTURE0 + BoundTextureUnits);
+  glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, WaterEnvMap);
+  SetUniform('envMap', BoundTextureUnits);
+  Inc(BoundTextureUnits);
+
+  RenderingCamera.RotationInverseMatrixNeeded;
+  SetUniform('cameraRotationInverseMatrix', RenderingCamera.RotationInverseMatrix3);
+end;
+
+{ TBlendedLoopingAnimationShader --------------------------------------------- }
+
+procedure TBlendedLoopingAnimationShader.GLContextClose;
+begin
+  if CustomShader <> nil then
+    FreeAndNil(CustomShader);
+  inherited;
+end;
+
+procedure TBlendedLoopingAnimationShader.Render(const Frustum: TFrustum;
+  const Params: TRenderParams);
+begin
+  if Attributes.CustomShader = nil then
+  begin
+    CustomShader := TWaterShader.Create(Attributes);
+    Attributes.CustomShader := CustomShader;
+  end;
+  inherited;
 end;
 
 end.
