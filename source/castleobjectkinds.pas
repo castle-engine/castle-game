@@ -59,7 +59,6 @@ type
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo;
-      TransparentGroups: TTransparentGroups;
       Options: TPrepareResourcesOptions;
       const BaseLights: TLightInstancesList);
 
@@ -332,7 +331,6 @@ procedure TObjectKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo;
-  TransparentGroups: TTransparentGroups;
   Options: TPrepareResourcesOptions;
   const BaseLights: TLightInstancesList);
 

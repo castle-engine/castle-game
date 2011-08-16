@@ -80,7 +80,6 @@ type
       const AnimationName: string;
       var Anim: TVRMLGLAnimation;
       AnimInfo: TVRMLGLAnimationInfo;
-      TransparentGroups: TTransparentGroups;
       const BaseLights: TLightInstancesList);
 
     function GetStringCheckNonEmpty(KindsConfig: TKamXMLConfig;
@@ -525,11 +524,10 @@ procedure TItemKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TVRMLGLAnimation;
   AnimInfo: TVRMLGLAnimationInfo;
-  TransparentGroups: TTransparentGroups;
   const BaseLights: TLightInstancesList);
 begin
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
-    TransparentGroups, [prRender, prBoundingBox], BaseLights);
+    [prRender, prBoundingBox], BaseLights);
 end;
 
 { TItemKindList ------------------------------------------------------------- }
@@ -644,7 +642,7 @@ procedure TItemWeaponKind.PrepareRenderInternal(const BaseLights: TLightInstance
 begin
   inherited;
   CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationInfo,
-    [tgAll], BaseLights);
+    BaseLights);
 end;
 
 function TItemWeaponKind.PrepareRenderSteps: Cardinal;
@@ -859,8 +857,7 @@ begin
       Item.Kind.Scene.Render(nil, Params);
     glPopMatrix;
 
-    if RenderBoundingBoxes and
-       (Params.TransparentGroup in [tgAll, tgOpaque]) then
+    if RenderBoundingBoxes and (not Params.Transparent) then
     begin
       glPushAttrib(GL_ENABLE_BIT);
         glDisable(GL_LIGHTING);

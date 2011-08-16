@@ -749,14 +749,14 @@ procedure TGateLevel.Render3D(const Params: TRenderParams);
   Required: T3DTransform (see draft tutorial for planned name),
   like T3DTranslated. Maybe special T3DTranslateRotate ?
 
-  This will also fix: for now, we ignore TransparentGroup below,
+  This will also fix: for now, we ignore Params.Transparent below,
   and render teleports transparent/opaque invalid.
 }
 
   procedure RenderTeleport(
     const TeleportRotation: Single;
     const TeleportBox: TBox3D;
-    const TransparentGroup: TTransparentGroup);
+    const Transparent: boolean);
   begin
     if RenderingCamera.Frustum.Box3DCollisionPossibleSimple(TeleportBox) then
     begin
@@ -769,19 +769,13 @@ procedure TGateLevel.Render3D(const Params: TRenderParams);
   end;
 
 begin
-  if Params.TransparentGroup in [tgOpaque, tgAll] then
-  begin
-    RenderTeleport(Teleport1Rotate, FTeleport1Box, tgOpaque);
-    RenderTeleport(Teleport2Rotate, FTeleport2Box, tgOpaque);
-  end;
+  RenderTeleport(Teleport1Rotate, FTeleport1Box, Params.Transparent);
+  RenderTeleport(Teleport2Rotate, FTeleport2Box, Params.Transparent);
 
   inherited;
 
-  if Params.TransparentGroup in [tgTransparent, tgAll] then
-  begin
-    RenderTeleport(Teleport1Rotate, FTeleport1Box, tgTransparent);
-    RenderTeleport(Teleport2Rotate, FTeleport2Box, tgTransparent);
-  end;
+  RenderTeleport(Teleport1Rotate, FTeleport1Box, Params.Transparent);
+  RenderTeleport(Teleport2Rotate, FTeleport2Box, Params.Transparent);
 end;
 
 procedure TGateLevel.RenderShadowVolume;
@@ -1050,7 +1044,7 @@ procedure TCagesLevel.Render3D(const Params: TRenderParams);
 var
   I: Integer;
 begin
-  if Params.TransparentGroup in [tgOpaque, tgAll] then
+  if not Params.Transparent then
   begin
     { Render spiders before rendering inherited,
       because spiders are not transparent. }

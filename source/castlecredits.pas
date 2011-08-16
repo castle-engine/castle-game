@@ -90,6 +90,8 @@ begin
     Params := TBasicRenderParams.Create;
     try
       CreditsModel.Render(nil, Params);
+      Params.Transparent := true;
+      CreditsModel.Render(nil, Params);
     finally FreeAndNil(Params) end;
   finally ProjectionPop end;
 

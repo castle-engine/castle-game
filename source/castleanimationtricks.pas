@@ -86,10 +86,8 @@ procedure TBlendedLoopingAnimation.Render(const Frustum: TFrustum;
 var
   SceneIndex, MiddleIndex, HalfIndex: Integer;
   Amount: Single;
-  OldTransparentGroup: TTransparentGroup;
 begin
-  OldTransparentGroup := Params.TransparentGroup;
-  if Loaded and Exists and (OldTransparentGroup in [tgAll, tgTransparent]) then
+  if Loaded and Exists and Params.Transparent then
   begin
     SceneIndex := Floor(MapRange(Time, TimeBegin, TimeEnd, 0, ScenesCount)) mod ScenesCount;
     if SceneIndex < 0 then SceneIndex += ScenesCount; { we wanted "unsigned mod" above }
@@ -128,19 +126,22 @@ begin
       Assert((ScenesCount <= 1) or ((0 <= HalfIndex) and (HalfIndex < MiddleIndex)));
       Amount := HalfIndex / (MiddleIndex - 1);
 
-      { We pass tgAll to our Scenes[].Render.
-        Since we use alpha < 1 here (and disable material control by scenes),
-        actually the whole scene is always a transparent object. }
-      Params.TransparentGroup := tgAll;
+      { Since we use alpha < 1 here (and disable material control by scenes),
+        actually everything renderer here is a transparent object
+        (that's why we check Params.Transparent above).
 
-      Attributes.Opacity := Amount;
-      Scenes[SceneIndex].Render(Frustum, Params);
+        However, with Blending := false, TVRMLGLScene will assume that
+        everything is opaque and should be rendered only when Transparent = false.
+        So temporarily switch Transparent. }
+      Params.Transparent := false;
 
-      Attributes.Opacity := 1 - Amount;
-      Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(
-        Frustum, Params);
+        Attributes.Opacity := Amount;
+        Scenes[SceneIndex].Render(Frustum, Params);
 
-      Params.TransparentGroup := OldTransparentGroup;
+        Attributes.Opacity := 1 - Amount;
+        Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(Frustum, Params);
+
+      Params.Transparent := true;
     finally glPopAttrib end;
   end;
 end;

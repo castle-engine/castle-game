@@ -1266,10 +1266,7 @@ begin
     Options := Options + prShadowVolume;
 
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
-    { all creature animations are displayed in 3D screen along
-      with other objects, so they must use separate tgOpaque, tgTransparent
-      rendering }
-    [tgOpaque, tgTransparent], Options, BaseLights);
+    Options, BaseLights);
 end;
 
 procedure TCreatureKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
@@ -1980,8 +1977,7 @@ begin
         DoRenderDebugCaptions;
     glPopMatrix;
 
-    if RenderBoundingBoxes and
-       (Params.TransparentGroup in [tgAll, tgOpaque]) then
+    if RenderBoundingBoxes and (not Params.Transparent) then
       RenderBoundingGeometry;
   end;
 end;

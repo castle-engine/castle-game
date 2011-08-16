@@ -380,6 +380,8 @@ begin
   try
     Params.FBaseLights.AppendInWorldCoordinates(Level.MainScene.GlobalLights);
     Player.RenderAttack(Params);
+    Params.Transparent := true;
+    Player.RenderAttack(Params);
   finally FreeAndNil(Params) end;
 end;
 
