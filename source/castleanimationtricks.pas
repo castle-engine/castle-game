@@ -219,7 +219,7 @@ begin
 
   glActiveTexture(GL_TEXTURE0 + BoundTextureUnits);
   glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, WaterEnvMap);
-  SetUniform('envMap', BoundTextureUnits);
+  SetUniform('envMap', TGLint(BoundTextureUnits));
   Inc(BoundTextureUnits);
 
   RenderingCamera.RotationInverseMatrixNeeded;
