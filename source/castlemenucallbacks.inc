@@ -26,11 +26,6 @@ begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure Idle(Window: TGLWindow);
-begin
-  NotificationsIdle;
-end;
-
 procedure CloseQuery(Window: TGLWindow);
 begin
   GameCancel(true);

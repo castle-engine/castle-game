@@ -25,85 +25,19 @@ unit CastleNotifications;
 
 interface
 
-uses GLNotifications, Classes;
-
-var
-  { These are all messages passed to @link(Notification).
-    Created / destroyed in this unit's initialization / finalization.
-    They are not broken (to fit into some particular line width).
-
-    You should clear this when new game starts (use NotificationsClear).
-
-    You cannot modify it directly, you can change it
-    only by calling @link(Notification). }
-  NotificationsList: TStringList;
-
-{ Add message to NotificationsList and Notifications. }
-procedure Notification(const S: string);
-
-{ This must be called within 2d projection. }
-procedure NotificationsDraw;
-
-function NotificationsDrawNeeded: boolean;
-
-procedure NotificationsClear;
-
-procedure NotificationsIdle;
-
-implementation
-
-uses SysUtils, GLWindow, CastleWindow, KambiClassUtils;
+uses GLNotifications;
 
 var
   Notifications: TGLNotifications;
 
-procedure Notification(const S: string);
-begin
-  if Notifications <> nil then
-    Notifications.Show(S);
-  NotificationsList.Insert(0, S);
-end;
+implementation
 
-procedure NotificationsDraw;
-begin
-  Notifications.Draw2D(Window.Width, Window.Height,
-                       Window.Width, Window.Height);
-end;
-
-function NotificationsDrawNeeded: boolean;
-begin
-  Result := Notifications.DrawNeeded;
-end;
-
-procedure NotificationsClear;
-begin
-  NotificationsList.Clear;
-  Notifications.Clear;
-end;
-
-procedure NotificationsIdle;
-begin
-  Notifications.Idle;
-end;
-
-{ initialization / finalization ---------------------------------------------- }
-
-procedure GLWindowOpen(Window: TGLWindow);
-begin
-  Notifications := TGLNotifications.Create(Window, hpMiddle, vpDown, Window.Width);
-  Notifications.MaxMessages := 4;
-end;
-
-procedure GLWindowClose(Window: TGLWindow);
-begin
-  FreeAndNil(Notifications);
-end;
+uses SysUtils;
 
 initialization
-  NotificationsList := TStringList.Create;
-
-  Window.OnOpenList.Add(@GLWindowOpen);
-  Window.OnCloseList.Add(@GLWindowClose);
+  Notifications := TGLNotifications.Create(nil);
+  Notifications.CollectHistory := true;
+  Notifications.MaxMessages := 4;
 finalization
-  FreeAndNil(NotificationsList);
+  FreeAndNil(Notifications);
 end.

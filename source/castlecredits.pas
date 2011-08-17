@@ -103,8 +103,6 @@ begin
   AnimationTime := AnimationTime + Window.Fps.IdleSpeed;
   if AnimationTime > AnimationEnd then
     UserQuit := true;
-
-  NotificationsIdle;
 end;
 
 procedure CloseQuery(Window: TGLWindow);
@@ -165,6 +163,7 @@ begin
 
     UserQuit := false;
 
+    Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 
     repeat

@@ -341,11 +341,8 @@ begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
 
-  if NotificationsDrawNeeded then
-  begin
+  if Notifications.DrawStyle <> dsNone then
     glCallList(GLList_NotificationsBackground);
-    NotificationsDraw;
-  end;
 
   if InventoryVisible then
     DoDrawInventory;
@@ -411,7 +408,7 @@ begin
   SoundEngine.MusicPlayer.PlayedSound := Level.PlayedMusicSound;
 
   { First Notification for this level. }
-  Notification('Loaded level "' + Level.Title + '"');
+  Notifications.Show('Loaded level "' + Level.Title + '"');
 end;
 
 procedure Idle(Window: TGLWindow);
@@ -477,8 +474,6 @@ var
   PickItemIndex: Integer;
 begin
   CompSpeed := Window.Fps.IdleSpeed;
-
-  NotificationsIdle;
 
   Level.ItemsOnLevel.Idle(CompSpeed);
 
@@ -577,13 +572,13 @@ procedure DoAttack;
 begin
   if GameWin then
   begin
-    Notification(SGameWinMessage);
+    Notifications.Show(SGameWinMessage);
     Exit;
   end;
 
   if Player.Dead then
   begin
-    Notification(SDeadMessage);
+    Notifications.Show(SDeadMessage);
     Exit;
   end;
 
@@ -713,9 +708,9 @@ end;
 procedure MaybeDeadWinMessage;
 begin
   if GameWin then
-    Notification(SGameWinMessage) else
+    Notifications.Show(SGameWinMessage) else
   if Player.Dead then
-    Notification(SDeadMessage);
+    Notifications.Show(SDeadMessage);
 end;
 
 { Call this always when entering the game mode, or when UseMouseLook changes
@@ -817,13 +812,13 @@ procedure EventDown(AKey: TKey;
   begin
     if GameWin then
     begin
-      Notification(SGameWinMessage);
+      Notifications.Show(SGameWinMessage);
       Exit;
     end;
 
     if Player.Dead then
     begin
-      Notification(SDeadMessage);
+      Notifications.Show(SDeadMessage);
       Exit;
     end;
 
@@ -839,9 +834,9 @@ procedure EventDown(AKey: TKey;
           Level.ItemsOnLevel.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
         end;
       end else
-        Notification('Not enough room here to drop this item');
+        Notifications.Show('Not enough room here to drop this item');
     end else
-      Notification('Nothing to drop - select some item first');
+      Notifications.Show('Nothing to drop - select some item first');
   end;
 
   procedure UseItem;
@@ -851,13 +846,13 @@ procedure EventDown(AKey: TKey;
   begin
     if GameWin then
     begin
-      Notification(SGameWinMessage);
+      Notifications.Show(SGameWinMessage);
       Exit;
     end;
 
     if Player.Dead then
     begin
-      Notification(SDeadMessage);
+      Notifications.Show(SDeadMessage);
       Exit;
     end;
 
@@ -878,7 +873,7 @@ procedure EventDown(AKey: TKey;
 
       UpdateInventoryCurrentItemAfterDelete;
     end else
-      Notification('Nothing to use - select some item first');
+      Notifications.Show('Nothing to use - select some item first');
   end;
 
   procedure UseLifePotion;
@@ -888,13 +883,13 @@ procedure EventDown(AKey: TKey;
   begin
     if GameWin then
     begin
-      Notification(SGameWinMessage);
+      Notifications.Show(SGameWinMessage);
       Exit;
     end;
 
     if Player.Dead then
     begin
-      Notification(SDeadMessage);
+      Notifications.Show(SDeadMessage);
       Exit;
     end;
 
@@ -914,22 +909,22 @@ procedure EventDown(AKey: TKey;
 
       UpdateInventoryCurrentItemAfterDelete;
     end else
-      Notification('You don''t have any life potion');
+      Notifications.Show('You don''t have any life potion');
   end;
 
   procedure CancelFlying;
   begin
     if GameWin then
-      Notification(SGameWinMessage) else
+      Notifications.Show(SGameWinMessage) else
     if not Player.Dead then
       Player.CancelFlying else
-      Notification(SDeadMessage);
+      Notifications.Show(SDeadMessage);
   end;
 
   procedure MaybeWinMessage;
   begin
     if GameWin then
-      Notification(SGameWinMessage);
+      Notifications.Show(SGameWinMessage);
   end;
 
   procedure DoDebugMenu;
@@ -1054,7 +1049,7 @@ var
   C2D: TGame2DControls;
   C3D: TGame3DControls;
 begin
-  NotificationsClear;
+  Notifications.Clear;
 
   GameWin := false;
 
@@ -1093,7 +1088,7 @@ begin
 
       C2D := TGame2DControls.Create(nil);
       C3D := TGame3DControls.Create(nil);
-      GameControls := TUIControlList.CreateFromArray(false, [C2D, C3D, Level]);
+      GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, C3D, Level]);
 
       Window.Controls.AddList(GameControls);
 
@@ -1133,7 +1128,7 @@ procedure LevelFinished(NextLevelName: string);
 begin
   if NextLevelName = '' then
   begin
-    Notification('Congratulations, game finished');
+    Notifications.Show('Congratulations, game finished');
     GameWin := true;
     SoundEngine.MusicPlayer.PlayedSound := stGameWinMusic;
   end else
@@ -1154,7 +1149,7 @@ var
 begin
   FileName := FileNameAutoInc(ApplicationName + '_screen_%d.png');
   Window.SaveScreen(FileName);
-  Notification('Screen saved to ' + FileName);
+  Notifications.Show('Screen saved to ' + FileName);
   SoundEngine.Sound(stSaveScreen);
 end;
 

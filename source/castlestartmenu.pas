@@ -186,7 +186,7 @@ begin
   SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
   SoundMenu.SoundVolume.RefreshAccessory;
   SoundMenu.MusicVolume.RefreshAccessory;
-  NotificationsClear;
+  Notifications.Clear;
 end;
 
 { TMainMenu ------------------------------------------------------------ }
@@ -796,11 +796,6 @@ begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure Idle(Window: TGLWindow);
-begin
-  NotificationsIdle;
-end;
-
 procedure CloseQuery(Window: TGLWindow);
 begin
   if MessageYesNo(Window, 'Are you sure you want to quit ?') then
@@ -824,10 +819,10 @@ begin
         Window.OnKeyDown := @KeyDown;
         Window.OnMouseDown := @MouseDown;
         Window.OnMouseWheel := @MouseWheel;
-        Window.OnIdle := @Idle;
 
         SetCurrentMenu(CurrentMenu, MainMenu);
 
+        Window.Controls.Add(Notifications);
         Window.Controls.AddList(BackgroundControls);
 
         UserQuit := false;

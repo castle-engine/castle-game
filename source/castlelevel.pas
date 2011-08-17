@@ -1098,7 +1098,7 @@ begin
   begin
     ReplaceInteractInput.C := 'i';
     ReplaceInteractInput.S := InteractInputDescription;
-    CastleNotifications.Notification(SPercentReplace(Message, [ReplaceInteractInput], true));
+    Notifications.Show(SPercentReplace(Message, [ReplaceInteractInput], true));
     MessageDone := true;
   end;
 end;
@@ -1759,7 +1759,7 @@ end;
 
 procedure TLevel.NotificationInteractFailed(const S: string);
 begin
-  CastleNotifications.Notification(S);
+  Notifications.Show(S);
   SoundEngine.Sound(stPlayerInteractFailed);
 end;
 

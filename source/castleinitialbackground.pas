@@ -25,11 +25,7 @@ unit CastleInitialBackground;
 
 interface
 
-{ Sets initial OnResize and OnDraw and draws intro.
-
-  OnDraw already does NotificationsDraw.
-  You should remember to call NotificationsIdle if you will inherit
-  our OnDraw (and e.g. draw start menu over it). }
+{ Sets initial OnResize and OnDraw and draws intro. }
 procedure DrawInitialBackground;
 
 implementation
@@ -50,7 +46,6 @@ begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
   glCallList(GLList_ScreenImage);
-  NotificationsDraw;
 end;
 
 procedure DrawInitialBackground;

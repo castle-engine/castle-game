@@ -168,11 +168,11 @@ begin
     Window.OnKeyDown := @KeyDown;
     Window.OnMouseDown := @MouseDown;
     Window.OnMouseWheel := @MouseWheel;
-    Window.OnIdle := @Idle;
     Window.OnDrawStyle := ds3D;
 
     SetCurrentMenu(CurrentMenu, GameMenu);
 
+    Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 
     UserQuit := false;

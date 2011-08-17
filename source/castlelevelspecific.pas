@@ -494,7 +494,7 @@ begin
         NotificationInteractFailed('Button is already pressed') else
       begin
         Button.TimePlaying := true;
-        CastleNotifications.Notification('You press the button');
+        Notifications.Show('You press the button');
       end;
     end else
       NotificationInteractFailed('You see a button. You cannot reach it from here');
@@ -693,12 +693,12 @@ begin
   begin
     if Player.Items.FindKind(KeyItemKind) = -1 then
     begin
-      CastleNotifications.Notification('You need a key to open this door');
+      Notifications.Show('You need a key to open this door');
       RejectGateExitBox;
     end else
     if Player.Items.FindKind(Sword) = -1 then
     begin
-      CastleNotifications.Notification('Better find a wepon first to protect yourself in the castle');
+      Notifications.Show('Better find a wepon first to protect yourself in the castle');
       RejectGateExitBox;
     end else
     begin
@@ -1101,7 +1101,7 @@ begin
         begin
           Player.Knockback(2 + Random(5), 2, Vector3Single(0, -1, 0));
           SoundEngine.Sound(stEvilLaugh);
-          CastleNotifications.Notification('No exit for the one who does not fight');
+          Notifications.Show('No exit for the one who does not fight');
         end else
         begin
           LevelFinished('');

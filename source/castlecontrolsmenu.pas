@@ -360,21 +360,21 @@ procedure TControlsSubMenu.Click;
           and make a Notification informing user about it. }
         if NewMousePress then
         begin
-          CastleNotifications.Notification(Format('Note: "%s" mouse shortcut cleared for action "%s"',
+          Notifications.Show(Format('Note: "%s" mouse shortcut cleared for action "%s"',
             [ MouseButtonStr[ConflictingKey.Shortcut.MouseButton],
               ConflictingKey.Name ]));
           ConflictingKey.Shortcut.MouseButtonUse := false;
         end else
         if NewMouseWheel <> mwNone then
         begin
-          CastleNotifications.Notification(Format('Note: "%s" mouse wheel cleared for action "%s"',
+          Notifications.Show(Format('Note: "%s" mouse wheel cleared for action "%s"',
             [ MouseWheelDirectionStr[ConflictingKey.Shortcut.MouseWheel],
               ConflictingKey.Name ]));
           ConflictingKey.Shortcut.MouseWheel := mwNone;
         end else
         if ConflictingKey.Shortcut.Key1 = NewKey then
         begin
-          CastleNotifications.Notification(Format('Note: "%s" key shortcut cleared for action "%s"',
+          Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
             [ KeyToStr(ConflictingKey.Shortcut.Key1),
               ConflictingKey.Name ]));
           ConflictingKey.Shortcut.Key1 := K_None;
@@ -382,7 +382,7 @@ procedure TControlsSubMenu.Click;
         begin
           Assert(ConflictingKey.Shortcut.Key2 = NewKey);
 
-          CastleNotifications.Notification(Format('Note: "%s" key shortcut cleared for action "%s"',
+          Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
             [ KeyToStr(ConflictingKey.Shortcut.Key2),
               ConflictingKey.Name ]));
           ConflictingKey.Shortcut.Key2 := K_None;
@@ -525,11 +525,6 @@ begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure Idle(Window: TGLWindow);
-begin
-  NotificationsIdle;
-end;
-
 procedure CloseQuery(Window: TGLWindow);
 begin
   MessageOK(Window, 'You can''t exit now.');
@@ -571,7 +566,6 @@ begin
     Window.OnKeyDown := @KeyDown;
     Window.OnMouseDown := @MouseDown;
     Window.OnMouseWheel := @MouseWheel;
-    Window.OnIdle := @Idle;
 
     SetCurrentMenu(CurrentMenu, ControlsMenu);
 
@@ -581,6 +575,7 @@ begin
       Window.Controls.Add(FadeRect);
     end;
 
+    Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 
     UserQuit := false;

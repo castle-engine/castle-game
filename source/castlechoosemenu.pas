@@ -84,11 +84,6 @@ begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure Idle(Window: TGLWindow);
-begin
-  NotificationsIdle;
-end;
-
 procedure CloseQuery(Window: TGLWindow);
 begin
   MessageOK(Window, 'You can''t exit now.');
@@ -112,7 +107,6 @@ begin
     Window.OnKeyDown := @KeyDown;
     Window.OnMouseDown := @MouseDown;
     Window.OnMouseWheel := @MouseWheel;
-    Window.OnIdle := @Idle;
     Window.OnDrawStyle := ds3D;
 
     { Otherwise messages don't look good, because the text is mixed
@@ -121,6 +115,7 @@ begin
 
     Window.Controls.MakeSingle(TGLMenu, ChooseMenu);
 
+    Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 
     Selected := false;

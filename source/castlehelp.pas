@@ -54,8 +54,8 @@ var
 begin
   SList := TStringList.Create;
   try
-    SList.Assign(NotificationsList);
-    SList.Insert(0, Format('%d messages :', [NotificationsList.Count]));
+    SList.Assign(Notifications.History);
+    SList.Insert(0, Format('%d messages :', [Notifications.History.Count]));
     SList.Insert(1, '');
     MessageOK(Window, SList, taLeft);
   finally SList.Free end;
