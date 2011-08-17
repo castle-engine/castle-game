@@ -195,8 +195,8 @@ begin
 
   Info := (CreditsModel.RootNode.FindNodeByName(TNodeWorldInfo,
     'MainInfo', true) as TNodeWorldInfo).FdInfo;
-  AnimationSpeed := StrToFloat(Info.Items.Items[1]);
-  AnimationEnd := StrToFloat(Info.Items.Items[2]);
+  AnimationSpeed := StrToFloat(Info.Items[1]);
+  AnimationEnd := StrToFloat(Info.Items[2]);
 end;
 
 procedure CredistGLContextRelease;
