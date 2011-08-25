@@ -99,7 +99,7 @@ type
 
   TEditOneLightMenu = class(TCastleMenu)
   public
-    Light: TAbstractX3DLightNode;
+    Light: TAbstractLightNode;
     RedColorSlider: TGLMenuFloatSlider;
     GreenColorSlider: TGLMenuFloatSlider;
     BlueColorSlider: TGLMenuFloatSlider;
@@ -109,7 +109,7 @@ type
     ShadowsArgument: TGLMenuBooleanArgument;
     ShadowsMainArgument: TGLMenuBooleanArgument;
     PositionSlider: array [0..2] of TGLMenuFloatSlider;
-    constructor Create(AOwner: TComponent; ALight: TAbstractX3DLightNode); reintroduce;
+    constructor Create(AOwner: TComponent; ALight: TAbstractLightNode); reintroduce;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
 
@@ -121,12 +121,12 @@ type
 
   TEditHeadlightMenu = class(TCastleMenu)
   public
-    Headlight: TAbstractX3DLightNode;
+    Headlight: TAbstractLightNode;
     AmbientIntensitySlider: TGLMenuFloatSlider;
     ColorSlider: array[0..2] of TGLMenuFloatSlider;
     IntensitySlider: TGLMenuFloatSlider;
     SpotArgument: TGLMenuBooleanArgument;
-    constructor Create(AOwner: TComponent; AHeadlight: TAbstractX3DLightNode); reintroduce;
+    constructor Create(AOwner: TComponent; AHeadlight: TAbstractLightNode); reintroduce;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
   end;
@@ -595,7 +595,7 @@ end;
 
 { TEditHeadlightMenu --------------------------------------------------------- }
 
-constructor TEditHeadlightMenu.Create(AOwner: TComponent; AHeadlight: TAbstractX3DLightNode);
+constructor TEditHeadlightMenu.Create(AOwner: TComponent; AHeadlight: TAbstractLightNode);
 begin
   inherited Create(AOwner);
 
@@ -665,7 +665,7 @@ end;
 constructor TEditLevelLightsMenu.Create(AOwner: TComponent);
 var
   I: Integer;
-  LightNode: TAbstractX3DLightNode;
+  LightNode: TAbstractLightNode;
 begin
   inherited;
 
@@ -748,7 +748,7 @@ end;
 
 { TEditOneLightMenu ---------------------------------------------------------- }
 
-constructor TEditOneLightMenu.Create(AOwner: TComponent; ALight: TAbstractX3DLightNode);
+constructor TEditOneLightMenu.Create(AOwner: TComponent; ALight: TAbstractLightNode);
 var
   I: Integer;
   LevelBoxSizes: TVector3Single;
