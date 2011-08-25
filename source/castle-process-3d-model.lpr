@@ -67,21 +67,21 @@ uses SysUtils, KambiUtils, KambiClassUtils, VRMLNodes, X3DLoad,
   This is purely for testing purposes (e.g. to view castle levels
   in view3dscene), in actual game you want to remove them more intelligently
   (actually adding creatures, items, etc. at designated places). }
-procedure RemoveSpecialCastleNodes(Node: TVRMLNode); forward;
+procedure RemoveSpecialCastleNodes(Node: TX3DNode); forward;
 
 { Resolve inlines, that is replace all Inline nodes with Group nodes containing
   their contents. }
-procedure ResolveInlines(Node: TVRMLNode); forward;
+procedure ResolveInlines(Node: TX3DNode); forward;
 
 { RemoveSpecialCastleNodes --------------------------------------------------- }
 
 type
   THelperSpecialCastleNodes = class
-    class procedure Remove(ParentNode: TVRMLNode; var Node: TVRMLNode);
+    class procedure Remove(ParentNode: TX3DNode; var Node: TX3DNode);
   end;
 
 class procedure THelperSpecialCastleNodes.Remove(
-  ParentNode: TVRMLNode; var Node: TVRMLNode);
+  ParentNode: TX3DNode; var Node: TX3DNode);
 begin
   if (Node.NodeName = 'LevelBox') or (Node.NodeName = 'ME_LevelBox') or
      (Node.NodeName = 'WaterBox') or
@@ -103,7 +103,7 @@ begin
     Node := nil;
 end;
 
-procedure RemoveSpecialCastleNodes(Node: TVRMLNode);
+procedure RemoveSpecialCastleNodes(Node: TX3DNode);
 begin
   Node.EnumerateReplaceChildren(@THelperSpecialCastleNodes(nil).Remove);
 end;
@@ -113,42 +113,42 @@ end;
 type
   TEnumerateResolveInlines = class
   public
-    class procedure Enumerate(ParentNode: TVRMLNode; var Node: TVRMLNode);
+    class procedure Enumerate(ParentNode: TX3DNode; var Node: TX3DNode);
   end;
 
-class procedure TEnumerateResolveInlines.Enumerate(ParentNode: TVRMLNode; var Node: TVRMLNode);
+class procedure TEnumerateResolveInlines.Enumerate(ParentNode: TX3DNode; var Node: TX3DNode);
 var
-  G2: TNodeGroup;
-  G1: TVRMLNode;
-  Inlined: TVRMLNode;
+  G2: TGroupNode;
+  G1: TX3DNode;
+  Inlined: TX3DNode;
 begin
   { Replace VRML 1.0 inlines with VRML 1.0 Group or Separator node.
-    Note that TNodeWWWInline actually descends from TNodeInline now,
-    so the check for TNodeWWWInline must be 1st. }
-  if Node is TNodeWWWInline then
+    Note that TWWWInlineNode actually descends from TInlineNode now,
+    so the check for TWWWInlineNode must be 1st. }
+  if Node is TWWWInlineNode then
   begin
-    TNodeWWWInline(Node).LoadInlined(false);
-    Inlined := TNodeWWWInline(Node).Inlined;
+    TWWWInlineNode(Node).LoadInlined(false);
+    Inlined := TWWWInlineNode(Node).Inlined;
 
     if Inlined <> nil then
     begin
-      if TNodeWWWInline(Node).FdSeparate.Value then
-        G1 := TNodeSeparator.Create(Node.NodeName, Node.WWWBasePath) else
-        G1 := TNodeGroup_1.Create(Node.NodeName, Node.WWWBasePath);
+      if TWWWInlineNode(Node).FdSeparate.Value then
+        G1 := TSeparatorNode.Create(Node.NodeName, Node.WWWBasePath) else
+        G1 := TGroupNode_1.Create(Node.NodeName, Node.WWWBasePath);
       G1.PositionInParent := Node.PositionInParent;
       G1.VRML1ChildAdd(Inlined);
       Node := G1;
     end;
   end else
   { Replace VRML >= 2.0 inlines with VRML 2.0 / X3D Group node }
-  if Node is TNodeInline then
+  if Node is TInlineNode then
   begin
-    TNodeInline(Node).LoadInlined(false);
-    Inlined := TNodeInline(Node).Inlined;
+    TInlineNode(Node).LoadInlined(false);
+    Inlined := TInlineNode(Node).Inlined;
 
     if Inlined <> nil then
     begin
-      G2 := TNodeGroup.Create(Node.NodeName, Node.WWWBasePath);
+      G2 := TGroupNode.Create(Node.NodeName, Node.WWWBasePath);
       { update PositionInParent,
         to make the resulting VRML look more similar to original
         (otherwise resolved inline could move up in the file) }
@@ -159,7 +159,7 @@ begin
   end;
 end;
 
-procedure ResolveInlines(Node: TVRMLNode);
+procedure ResolveInlines(Node: TX3DNode);
 begin
   Node.EnumerateReplaceChildren(@TEnumerateResolveInlines(nil).Enumerate);
 end;
@@ -168,7 +168,7 @@ end;
 
 var
   BaseName, FileName: string;
-  Model: TVRMLNode;
+  Model: TX3DNode;
 begin
   Parameters.CheckHigh(1);
   FileName := Parameters[1];

@@ -362,7 +362,7 @@ type
       Be careful: never add here two nodes such that one may be parent
       of another, otherwise freeing one could free the other one too
       early. }
-    ItemsToRemove: TVRMLNodeList;
+    ItemsToRemove: TX3DNodeList;
 
     procedure TraverseForItems(Shape: TVRMLShape);
     procedure SetSickProjection(const Value: boolean);
@@ -1136,7 +1136,7 @@ constructor TLevel.Create(
 const
   SectorsMargin = 0.5;
 var
-  NavigationNode: TNodeNavigationInfo;
+  NavigationNode: TNavigationInfoNode;
   NavigationSpeed: Single;
   Options: TPrepareResourcesOptions;
   NewCameraBox: TBox3D;
@@ -1187,7 +1187,7 @@ begin
 
     ChangeLevelScene;
 
-    ItemsToRemove := TVRMLNodeList.Create(false);
+    ItemsToRemove := TX3DNodeList.Create(false);
     try
       { Initialize Items }
       FItemsOnLevel := TItemOnLevelList.Create(true);
@@ -1233,7 +1233,7 @@ begin
     Sectors.ExtractBoundingBoxes(MainScene);
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
 
-    NavigationNode := MainScene.NavigationInfoStack.Top as TNodeNavigationInfo;
+    NavigationNode := MainScene.NavigationInfoStack.Top as TNavigationInfoNode;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
       FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else

@@ -175,12 +175,12 @@ end;
 function TVRMLGLAnimationInfo.CreateAnimation(
   FirstRootNodesPool: TStringList): TVRMLGLAnimation;
 var
-  RootNodes: TVRMLNodeList;
+  RootNodes: TX3DNodeList;
   I: Integer;
   FirstRootNodeIndex: Integer;
   OwnsFirstRootNode: boolean;
 begin
-  RootNodes := TVRMLNodeList.Create(false);
+  RootNodes := TX3DNodeList.Create(false);
   try
     RootNodes.Count := FModelFileNames.Count;
 
@@ -197,7 +197,7 @@ begin
       FirstRootNodeIndex := -1;
     OwnsFirstRootNode := FirstRootNodeIndex = -1;
     if not OwnsFirstRootNode then
-      RootNodes[0] := FirstRootNodesPool.Objects[FirstRootNodeIndex] as TVRMLNode else
+      RootNodes[0] := FirstRootNodesPool.Objects[FirstRootNodeIndex] as TX3DNode else
       RootNodes[0] := LoadVRML(FModelFileNames[0], false);
 
     for I := 1 to RootNodes.Count - 1 do

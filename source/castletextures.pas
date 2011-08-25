@@ -184,9 +184,9 @@ begin
     begin
       { VRML 2.0 path }
       if (Ground^.State.ShapeNode.Texture <> nil) and
-         (Ground^.State.ShapeNode.Texture is TNodeImageTexture) then
+         (Ground^.State.ShapeNode.Texture is TImageTextureNode) then
       begin
-        TextureUrl := TNodeImageTexture(
+        TextureUrl := TImageTextureNode(
           Ground^.State.ShapeNode.Texture).FdUrl.Items[0];
         HasTextureUrl := true;
       end;

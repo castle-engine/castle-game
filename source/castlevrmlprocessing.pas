@@ -31,10 +31,10 @@ uses VRMLNodes;
 
 { Find all Appearance nodes using texture with given name,
   and replace then with KambiApperance nodes, adding normalMap field. }
-procedure AddNormalMapToTexture(Node: TVRMLNode;
+procedure AddNormalMapToTexture(Node: TX3DNode;
   const TextureName, NormalMapName, NormalMapUrl: string);
 
-procedure LevelFountainProcess(Node: TVRMLNode);
+procedure LevelFountainProcess(Node: TX3DNode);
 
 implementation
 
@@ -46,18 +46,18 @@ type
   TEnumerateAddNormalMapToTexture = class
   public
     TextureName: string;
-    NormalMap: TNodeImageTexture;
+    NormalMap: TImageTextureNode;
     NormalMapUsed: boolean;
-    procedure Enumerate(ParentNode: TVRMLNode; var Node: TVRMLNode);
+    procedure Enumerate(ParentNode: TX3DNode; var Node: TX3DNode);
   end;
 
-procedure TEnumerateAddNormalMapToTexture.Enumerate(ParentNode: TVRMLNode; var Node: TVRMLNode);
+procedure TEnumerateAddNormalMapToTexture.Enumerate(ParentNode: TX3DNode; var Node: TX3DNode);
 var
-  A: TNodeAppearance;
+  A: TAppearanceNode;
 begin
-  if Node is TNodeAppearance then
+  if Node is TAppearanceNode then
   begin
-    A := TNodeAppearance(Node);
+    A := TAppearanceNode(Node);
     if (A.FdTexture.Value <> nil) and
        (A.FdTexture.Value.NodeName = TextureName) then
     begin
@@ -68,7 +68,7 @@ begin
   end;
 end;
 
-procedure AddNormalMapToTexture(Node: TVRMLNode;
+procedure AddNormalMapToTexture(Node: TX3DNode;
   const TextureName, NormalMapName, NormalMapUrl: string);
 var
   E: TEnumerateAddNormalMapToTexture;
@@ -76,7 +76,7 @@ begin
   E := TEnumerateAddNormalMapToTexture.Create;
   try
     E.TextureName := TextureName;
-    E.NormalMap := TNodeImageTexture.Create(NormalMapName, Node.WWWBasePath);
+    E.NormalMap := TImageTextureNode.Create(NormalMapName, Node.WWWBasePath);
     E.NormalMap.FdUrl.Items.Add(NormalMapUrl);
     Node.EnumerateReplaceChildren(@E.Enumerate);
     if not E.NormalMapUsed then
@@ -89,47 +89,47 @@ end;
 type
   TEnumerateAddShaderToWater = class
     MatName: string;
-    RootNode: TVRMLNode;
-    procedure Handle(Node: TVRMLNode);
+    RootNode: TX3DNode;
+    procedure Handle(Node: TX3DNode);
   end;
 
-procedure TEnumerateAddShaderToWater.Handle(Node: TVRMLNode);
+procedure TEnumerateAddShaderToWater.Handle(Node: TX3DNode);
 var
-  M: TVRMLNode;
-  Mat: TNodeMaterial;
-  CS: TNodeComposedShader;
-  CM: TNodeImageCubeMapTexture;
-  MT: TNodeMovieTexture;
-  Part: TNodeShaderPart;
+  M: TX3DNode;
+  Mat: TMaterialNode;
+  CS: TComposedShaderNode;
+  CM: TImageCubeMapTextureNode;
+  MT: TMovieTextureNode;
+  Part: TShaderPartNode;
   ShaderCamMatrix: TSFMatrix3f;
-  V: TNodeViewpoint;
+  V: TViewpointNode;
   Route: TVRMLRoute;
 begin
-  M := (Node as TNodeAppearance).FdMaterial.Value;
+  M := (Node as TAppearanceNode).FdMaterial.Value;
   if (M <> nil) and
-     (M is TNodeMaterial) and
-     (TNodeMaterial(M).NodeName = MatName) then
+     (M is TMaterialNode) and
+     (TMaterialNode(M).NodeName = MatName) then
   begin
     { we could set mat diffuse in Blender and export to VRML,
       but it's easier for now to hardcode it here. }
-    Mat := M as TNodeMaterial;
+    Mat := M as TMaterialNode;
     Mat.FdDiffuseColor.Value := Vector3Single(0.5, 0.5, 1.0);
 
-    CS := TNodeComposedShader.Create('', '');
+    CS := TComposedShaderNode.Create('', '');
     CS.NodeName := 'WaterShader';
-    (Node as TNodeAppearance).FdShaders.Add(CS);
+    (Node as TAppearanceNode).FdShaders.Add(CS);
     CS.FdLanguage.Value := 'GLSL';
 
-{    CM := TNodeGeneratedCubeMapTexture.Create('', '');
+{    CM := TGeneratedCubeMapTextureNode.Create('', '');
     CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
     CM.FdUpdate.Value := 'NEXT_FRAME_ONLY';
     CM.FdSize.Value := 512;}
 
-    CM := TNodeImageCubeMapTexture.Create('', RootNode.WWWBasePath);
+    CM := TImageCubeMapTextureNode.Create('', RootNode.WWWBasePath);
     CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
     CM.FdUrl.Items.Add('water_reflections/water_environment_map.dds');
 
-    MT := TNodeMovieTexture.Create('', RootNode.WWWBasePath);
+    MT := TMovieTextureNode.Create('', RootNode.WWWBasePath);
     CS.AddCustomField(TSFNode.Create(CS, 'normalMap', [], MT));
     MT.FdUrl.Items.Add('water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png');
     MT.FdLoop.Value := true;
@@ -137,17 +137,17 @@ begin
     ShaderCamMatrix := TSFMatrix3f.Create(CS, 'cameraRotationInverseMatrix', IdentityMatrix3Single);
     CS.AddCustomField(ShaderCamMatrix, true);
 
-    Part := TNodeShaderPart.Create('', RootNode.WWWBasePath);
+    Part := TShaderPartNode.Create('', RootNode.WWWBasePath);
     CS.FdParts.Add(Part);
     Part.FdType.Value := 'FRAGMENT';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.fs');
 
-    Part := TNodeShaderPart.Create('', RootNode.WWWBasePath);
+    Part := TShaderPartNode.Create('', RootNode.WWWBasePath);
     CS.FdParts.Add(Part);
     Part.FdType.Value := 'VERTEX';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.vs');
 
-    V := RootNode.TryFindNode(TNodeViewpoint, true) as TNodeViewpoint;
+    V := RootNode.TryFindNode(TViewpointNode, true) as TViewpointNode;
     if V <> nil then
     begin
       { Add V.NodeName, to allow saving the route to file.
@@ -166,7 +166,7 @@ end;
 
 { Find Appearance with given material name, fill there "shaders" field
   to make nice water. }
-procedure AddShaderToWater(Node: TVRMLNode; const MatName: string);
+procedure AddShaderToWater(Node: TX3DNode; const MatName: string);
 var
   E: TEnumerateAddShaderToWater;
 begin
@@ -174,13 +174,13 @@ begin
   try
     E.MatName := MatName;
     E.RootNode := Node;
-    Node.EnumerateNodes(TNodeAppearance, @E.Handle, false);
+    Node.EnumerateNodes(TAppearanceNode, @E.Handle, false);
   finally FreeAndNil(E) end;
 end;
 
 { level-specific processing -------------------------------------------------- }
 
-procedure LevelFountainProcess(Node: TVRMLNode);
+procedure LevelFountainProcess(Node: TX3DNode);
 begin
   AddNormalMapToTexture(Node, '_016marbre_jpg', '_016marbre_jpg_normalMap', '../../textures/normal_maps/016marbre.png');
   AddNormalMapToTexture(Node, '_012marbre_jpg', '_012marbre_jpg_normalMap', '../../textures/normal_maps/012marbre.png');

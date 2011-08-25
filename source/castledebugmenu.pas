@@ -99,7 +99,7 @@ type
 
   TEditOneLightMenu = class(TCastleMenu)
   public
-    Light: TNodeX3DLightNode;
+    Light: TAbstractX3DLightNode;
     RedColorSlider: TGLMenuFloatSlider;
     GreenColorSlider: TGLMenuFloatSlider;
     BlueColorSlider: TGLMenuFloatSlider;
@@ -109,7 +109,7 @@ type
     ShadowsArgument: TGLMenuBooleanArgument;
     ShadowsMainArgument: TGLMenuBooleanArgument;
     PositionSlider: array [0..2] of TGLMenuFloatSlider;
-    constructor Create(AOwner: TComponent; ALight: TNodeX3DLightNode); reintroduce;
+    constructor Create(AOwner: TComponent; ALight: TAbstractX3DLightNode); reintroduce;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
 
@@ -121,12 +121,12 @@ type
 
   TEditHeadlightMenu = class(TCastleMenu)
   public
-    Headlight: TNodeX3DLightNode;
+    Headlight: TAbstractX3DLightNode;
     AmbientIntensitySlider: TGLMenuFloatSlider;
     ColorSlider: array[0..2] of TGLMenuFloatSlider;
     IntensitySlider: TGLMenuFloatSlider;
     SpotArgument: TGLMenuBooleanArgument;
-    constructor Create(AOwner: TComponent; AHeadlight: TNodeX3DLightNode); reintroduce;
+    constructor Create(AOwner: TComponent; AHeadlight: TAbstractX3DLightNode); reintroduce;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
   end;
@@ -595,7 +595,7 @@ end;
 
 { TEditHeadlightMenu --------------------------------------------------------- }
 
-constructor TEditHeadlightMenu.Create(AOwner: TComponent; AHeadlight: TNodeX3DLightNode);
+constructor TEditHeadlightMenu.Create(AOwner: TComponent; AHeadlight: TAbstractX3DLightNode);
 begin
   inherited Create(AOwner);
 
@@ -631,12 +631,12 @@ procedure TEditHeadlightMenu.Click;
   var
     Vector3: TVector3Single;
   begin
-    if Headlight is TVRMLPositionalLightNode then
+    if Headlight is TAbstractPositionalLightNode then
     begin
-      Vector3 := TVRMLPositionalLightNode(Headlight).FdAttenuation.Value;
+      Vector3 := TAbstractPositionalLightNode(Headlight).FdAttenuation.Value;
       if MessageInputQueryVector3Single(Window, 'Change headlight Attenuation',
         Vector3, taLeft) then
-        TVRMLPositionalLightNode(Headlight).FdAttenuation.Value := Vector3;
+        TAbstractPositionalLightNode(Headlight).FdAttenuation.Value := Vector3;
     end else
       MessageOk(Window, 'Light is not positional, no attenuation');
   end;
@@ -665,7 +665,7 @@ end;
 constructor TEditLevelLightsMenu.Create(AOwner: TComponent);
 var
   I: Integer;
-  LightNode: TNodeX3DLightNode;
+  LightNode: TAbstractX3DLightNode;
 begin
   inherited;
 
@@ -748,7 +748,7 @@ end;
 
 { TEditOneLightMenu ---------------------------------------------------------- }
 
-constructor TEditOneLightMenu.Create(AOwner: TComponent; ALight: TNodeX3DLightNode);
+constructor TEditOneLightMenu.Create(AOwner: TComponent; ALight: TAbstractX3DLightNode);
 var
   I: Integer;
   LevelBoxSizes: TVector3Single;
@@ -799,15 +799,15 @@ end;
 
 function TEditOneLightMenu.GetLightLocation: TVector3Single;
 begin
-  if Light is TVRMLPositionalLightNode then
-    Result := TVRMLPositionalLightNode(Light).FdLocation.Value else
+  if Light is TAbstractPositionalLightNode then
+    Result := TAbstractPositionalLightNode(Light).FdLocation.Value else
     Result := ZeroVector3Single;
 end;
 
 procedure TEditOneLightMenu.SetLightLocation(const Value: TVector3Single);
 begin
-  if Light is TVRMLPositionalLightNode then
-    TVRMLPositionalLightNode(Light).FdLocation.Value := Value;
+  if Light is TAbstractPositionalLightNode then
+    TAbstractPositionalLightNode(Light).FdLocation.Value := Value;
 end;
 
 procedure TEditOneLightMenu.Click;
@@ -855,68 +855,68 @@ begin
          Light.FdKambiShadowsMain.Send(ShadowsMainArgument.Value);
        end;
     11:begin
-         if Light is TVRMLPositionalLightNode then
+         if Light is TAbstractPositionalLightNode then
          begin
-           Vector := TVRMLPositionalLightNode(Light).FdAttenuation.Value;
+           Vector := TAbstractPositionalLightNode(Light).FdAttenuation.Value;
            if MessageInputQueryVector3Single(Window, 'Change attenuation',
              Vector, taLeft) then
-             TVRMLPositionalLightNode(Light).FdAttenuation.Send(Vector);
+             TAbstractPositionalLightNode(Light).FdAttenuation.Send(Vector);
          end;
        end;
     12:begin
-         if Light is TVRMLDirectionalLightNode then
+         if Light is TAbstractDirectionalLightNode then
          begin
-           Vector := TVRMLDirectionalLightNode(Light).FdDirection.Value;
+           Vector := TAbstractDirectionalLightNode(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
-             TVRMLDirectionalLightNode(Light).FdDirection.Send(Vector);
+             TAbstractDirectionalLightNode(Light).FdDirection.Send(Vector);
          end;
        end;
     13:begin
-         if Light is TNodeSpotLight_1 then
+         if Light is TSpotLightNode_1 then
          begin
-           Vector := TNodeSpotLight_1(Light).FdDirection.Value;
+           Vector := TSpotLightNode_1(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
-             TNodeSpotLight_1(Light).FdDirection.Send(Vector);
+             TSpotLightNode_1(Light).FdDirection.Send(Vector);
          end else
-         if Light is TNodeSpotLight then
+         if Light is TSpotLightNode then
          begin
-           Vector := TNodeSpotLight(Light).FdDirection.Value;
+           Vector := TSpotLightNode(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
              Vector, taLeft, Player.Camera.Direction) then
-             TNodeSpotLight(Light).FdDirection.Send(Vector);
+             TSpotLightNode(Light).FdDirection.Send(Vector);
          end;
        end;
     14:begin
-         if Light is TNodeSpotLight_1 then
+         if Light is TSpotLightNode_1 then
          begin
-           Value := TNodeSpotLight_1(Light).FdDropOffRate.Value;
+           Value := TSpotLightNode_1(Light).FdDropOffRate.Value;
            if MessageInputQuery(Window, 'Change dropOffRate', Value, taLeft) then
-             TNodeSpotLight_1(Light).FdDropOffRate.Send(Value);
+             TSpotLightNode_1(Light).FdDropOffRate.Send(Value);
          end else
-         if Light is TNodeSpotLight then
+         if Light is TSpotLightNode then
          begin
-           Value := TNodeSpotLight(Light).FdBeamWidth.Value;
+           Value := TSpotLightNode(Light).FdBeamWidth.Value;
            if MessageInputQuery(Window, 'Change beamWidth', Value, taLeft) then
-             TNodeSpotLight(Light).FdBeamWidth.Send(Value);
+             TSpotLightNode(Light).FdBeamWidth.Send(Value);
          end;
        end;
     15:begin
-         if Light is TNodeSpotLight_1 then
+         if Light is TSpotLightNode_1 then
          begin
-           Value := TNodeSpotLight_1(Light).FdCutOffAngle.Value;
+           Value := TSpotLightNode_1(Light).FdCutOffAngle.Value;
            if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
-             TNodeSpotLight_1(Light).FdCutOffAngle.Send(Value);
+             TSpotLightNode_1(Light).FdCutOffAngle.Send(Value);
          end else
-         if Light is TNodeSpotLight then
+         if Light is TSpotLightNode then
          begin
-           Value := TNodeSpotLight(Light).FdCutOffAngle.Value;
+           Value := TSpotLightNode(Light).FdCutOffAngle.Value;
            if MessageInputQuery(Window, 'Change cutOffAngle', Value, taLeft) then
-             TNodeSpotLight(Light).FdCutOffAngle.Send(Value);
+             TSpotLightNode(Light).FdCutOffAngle.Send(Value);
          end;
        end;
     16:SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
@@ -931,12 +931,12 @@ var
 begin
   case CurrentItem of
     0..2:
-      if Light is TVRMLPositionalLightNode then
+      if Light is TAbstractPositionalLightNode then
       begin
         Index := CurrentItem;
-        V := TVRMLPositionalLightNode(Light).FdLocation.Value;
+        V := TAbstractPositionalLightNode(Light).FdLocation.Value;
         V[Index] := PositionSlider[Index].Value;
-        TVRMLPositionalLightNode(Light).FdLocation.Send(V);
+        TAbstractPositionalLightNode(Light).FdLocation.Send(V);
       end;
     3: begin Light.FdColor.Value[0] := RedColorSlider.Value  ; Light.FdColor.Changed; end;
     4: begin Light.FdColor.Value[1] := GreenColorSlider.Value; Light.FdColor.Changed; end;

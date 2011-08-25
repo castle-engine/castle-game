@@ -192,8 +192,8 @@ begin
   AttributesSet(CreditsModel.Attributes, btIncrease);
   CreditsModel.Attributes.UseSceneLights := true;
 
-  Info := (CreditsModel.RootNode.FindNodeByName(TNodeWorldInfo,
-    'MainInfo', true) as TNodeWorldInfo).FdInfo;
+  Info := (CreditsModel.RootNode.FindNodeByName(TWorldInfoNode,
+    'MainInfo', true) as TWorldInfoNode).FdInfo;
   AnimationSpeed := StrToFloat(Info.Items[1]);
   AnimationEnd := StrToFloat(Info.Items[2]);
 end;

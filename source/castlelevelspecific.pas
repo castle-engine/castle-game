@@ -201,7 +201,7 @@ type
 
   TDoomE1M1Level = class(TLevel)
   private
-    procedure RenameCreatures(Node: TVRMLNode);
+    procedure RenameCreatures(Node: TX3DNode);
   private
     FakeWall: TVRMLGLScene;
 
@@ -346,7 +346,7 @@ const
   procedure WerewolfAppear;
   var
     I: Integer;
-    LightNode: TVRMLPositionalLightNode;
+    LightNode: TAbstractPositionalLightNode;
     Headlight: TLightInstance;
     ShadowLight: PLightInstance;
   begin
@@ -376,7 +376,7 @@ const
     for I := 0 to CastleHallWerewolvesCount - 1 do
     begin
       LightNode := MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
-        TVRMLPositionalLightNode;
+        TAbstractPositionalLightNode;
       LightNode.FdColor.Send(Vector3Single(1, 0, 0));
       LightNode.FdAttenuation.Send(Vector3Single(1, 0.1, 0));
       LightNode.FdKambiShadows.Send(true);
@@ -403,20 +403,20 @@ var
   procedure WerewolfShowLights;
   var
     I: Integer;
-    LightNode: TVRMLPositionalLightNode;
+    LightNode: TAbstractPositionalLightNode;
   begin
     if WerewolfAliveCount = 0 then
     begin
       { turn light over stairs to next level }
       LightNode := MainScene.GlobalLights.Items[WerewolfFirstLight].Node as
-        TVRMLPositionalLightNode;
+        TAbstractPositionalLightNode;
       LightNode.FdLocation.Value := StairsBlockerMiddle;
       LightNode.FdOn.Value := true;
 
       for I := 1 to CastleHallWerewolvesCount - 1 do
       begin
         LightNode := MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
-          TVRMLPositionalLightNode;
+          TAbstractPositionalLightNode;
         LightNode.FdOn.Value := false;
       end;
     end else
@@ -425,7 +425,7 @@ var
       for I := 0 to CastleHallWerewolvesCount - 1 do
       begin
         LightNode := MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
-          TVRMLPositionalLightNode;
+          TAbstractPositionalLightNode;
         LightNode.FdOn.Send(not WerewolfCreature[I].Dead);
         LightNode.FdLocation.Send(WerewolfCreature[I].MiddlePosition);
       end;
@@ -1316,7 +1316,7 @@ begin
   end;
 end;
 
-procedure TDoomE1M1Level.RenameCreatures(Node: TVRMLNode);
+procedure TDoomE1M1Level.RenameCreatures(Node: TX3DNode);
 const
   SCreaDoomZomb = 'CreaDoomZomb_';
   SCreaDoomSerg = 'CreaDoomSerg_';
