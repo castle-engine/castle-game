@@ -21,7 +21,7 @@
 }
 
 { }
-unit CastleInitialBackground;
+unit GameInitialBackground;
 
 interface
 
@@ -31,7 +31,7 @@ procedure DrawInitialBackground;
 implementation
 
 uses SysUtils, GL, GLU, GLWindow, KambiGLUtils, GLImages,
-  CastleWindow, KambiFilesUtils, Images, CastleNotifications;
+  GameWindow, KambiFilesUtils, Images, GameNotifications;
 
 var
   GLList_ScreenImage: TGLuint;

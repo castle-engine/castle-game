@@ -34,14 +34,14 @@
   )
 }
 
-unit CastleLevel;
+unit GameLevel;
 
 interface
 
 uses VectorMath, VRMLScene, VRMLGLScene, Boxes3D,
-  VRMLNodes, VRMLFields, CastleItems, Cameras, VRMLTriangle,
-  CastleCreatures, VRMLSceneWaypoints, CastleSound,
-  KambiUtils, KambiClassUtils, CastlePlayer, CastleThunder,
+  VRMLNodes, VRMLFields, GameItems, Cameras, VRMLTriangle,
+  GameCreatures, VRMLSceneWaypoints, GameSound,
+  KambiUtils, KambiClassUtils, GamePlayer, GameThunder,
   ProgressUnit, VRMLGLAnimation, ALSoundAllocator,
   VRMLGLBackground, DOM, XmlSoundEngine, Base3D, VRMLShape,
   Classes, KambiTimeUtils, KambiSceneManager, VRMLShader;
@@ -665,7 +665,7 @@ type
     { For thunder effect. nil if no thunder effect should be done for this level.
 
       Descendants can set this in their constructor.
-      We will call it's Idle, CastlePlay will call it's InitGLLight and Render,
+      We will call it's Idle, GamePlay will call it's InitGLLight and Render,
       our destructor will free it. }
     property ThunderEffect: TThunderEffect
       read FThunderEffect write FThunderEffect;
@@ -730,10 +730,10 @@ type
 implementation
 
 uses SysUtils, GL,
-  CastlePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
-  CastleVideoOptions, CastleConfig, CastleNotifications,
-  CastleInputs, CastleWindow, KambiXMLUtils,
-  CastleRequiredResources, VRMLGLRenderer, RenderingCameraUnit, Math;
+  GamePlay, KambiGLUtils, KambiFilesUtils, KambiStringUtils,
+  GameVideoOptions, GameConfig, GameNotifications,
+  GameInputs, GameWindow, KambiXMLUtils,
+  GameRequiredResources, VRMLGLRenderer, RenderingCameraUnit, Math;
 
 {$define read_implementation}
 

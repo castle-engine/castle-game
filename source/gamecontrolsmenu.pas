@@ -21,11 +21,11 @@
 }
 
 { }
-unit CastleControlsMenu;
+unit GameControlsMenu;
 
 interface
 
-uses Classes, GLWindow, GL, GLU, CastleGeneralMenu, Cameras,
+uses Classes, GLWindow, GL, GLU, GameGeneralMenu, Cameras,
   OpenGLFonts, OpenGLBmpFonts, UIControls;
 
 type
@@ -79,10 +79,10 @@ var
 
 implementation
 
-uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, CastleWindow,
+uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, GameWindow,
   GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
-  CastleInputs, KeysMouse, VectorMath, KambiUtils, CastlePlay,
-  CastleConfig, KambiStringUtils, CastleNotifications;
+  GameInputs, KeysMouse, VectorMath, KambiUtils, GamePlay,
+  GameConfig, KambiStringUtils, GameNotifications;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 

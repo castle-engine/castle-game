@@ -21,13 +21,13 @@
 }
 
 { }
-unit CastlePlayer;
+unit GamePlayer;
 
 interface
 
-uses Boxes3D, Cameras, CastleItems, VectorMath, GL, GLU, GLExt,
-  VRMLSceneWaypoints, CastleInputs, ALSoundAllocator, CastleSound,
-  VRMLTriangle, CastleTextures, XmlSoundEngine, Classes, Base3D,
+uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
+  VRMLSceneWaypoints, GameInputs, ALSoundAllocator, GameSound,
+  VRMLTriangle, GameTextures, XmlSoundEngine, Classes, Base3D,
   KambiGLUtils;
 
 const
@@ -410,12 +410,12 @@ type
 
 implementation
 
-uses Math, SysUtils, KambiClassUtils, CastlePlay, GLWinMessages,
-  CastleWindow, KambiUtils, VRMLNodes,
+uses Math, SysUtils, KambiClassUtils, GamePlay, GLWinMessages,
+  GameWindow, KambiUtils, VRMLNodes,
   GLWindow, Images, KambiFilesUtils,
-  VRMLGLAnimation, ALUtils, KambiOpenAL, CastleControlsMenu,
-  CastleNotifications, KambiXMLConfig, GLImages,
-  CastleRequiredResources;
+  VRMLGLAnimation, ALUtils, KambiOpenAL, GameControlsMenu,
+  GameNotifications, KambiXMLConfig, GLImages,
+  GameRequiredResources;
 
 var
   GLList_BlankIndicatorImage: TGLuint;

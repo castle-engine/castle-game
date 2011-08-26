@@ -21,7 +21,7 @@
 }
 
 { }
-unit CastleStartMenu;
+unit GameStartMenu;
 
 interface
 
@@ -34,15 +34,15 @@ procedure ShowStartMenu;
 implementation
 
 uses SysUtils, Classes, KambiUtils, GLWinModes,
-  GL, GLU, KambiGLUtils, GLWinMessages, CastleWindow,
+  GL, GLU, KambiGLUtils, GLWinMessages, GameWindow,
   VectorMath, Images, KambiFilesUtils,
-  CastleLevel, CastlePlay, CastleSound, CastlePlayer,
-  CastleCreatures, CastleItems, CastleGeneralMenu, GLMenu,
-  CastleControlsMenu, CastleInputs, CastleVideoOptions,
+  GameLevel, GamePlay, GameSound, GamePlayer,
+  GameCreatures, GameItems, GameGeneralMenu, GLMenu,
+  GameControlsMenu, GameInputs, GameVideoOptions,
   KambiStringUtils, KambiClassUtils,
-  CastleNotifications, CastleLevelAvailable, CastleBackgroundLevel,
+  GameNotifications, GameLevelAvailable, GameBackgroundLevel,
   XmlSoundEngine, GLSoundMenu, VRMLNodes,
-  CastleCredits, GLAntiAliasing, KeysMouse;
+  GameCredits, GLAntiAliasing, KeysMouse;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 

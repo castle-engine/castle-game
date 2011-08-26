@@ -21,12 +21,12 @@
 }
 
 { }
-unit CastleObjectKinds;
+unit GameObjectKinds;
 
 interface
 
 uses Classes, KambiXMLConfig, VRMLGLAnimation, VRMLGLAnimationInfo,
-  CastleVideoOptions, VRMLScene, VRMLGLScene, VRMLNodes;
+  GameVideoOptions, VRMLScene, VRMLGLScene, VRMLNodes;
 
 type
   { This is a common class for item kind and creature kind. }
@@ -147,7 +147,7 @@ type
 
 implementation
 
-uses SysUtils, ProgressUnit, X3DLoad, DOM, CastleWindow,
+uses SysUtils, ProgressUnit, X3DLoad, DOM, GameWindow,
   KambiStringUtils, KambiLog;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);

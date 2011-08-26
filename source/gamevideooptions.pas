@@ -21,7 +21,7 @@
 }
 
 { Variables and utilities for things in "Video options" menu. }
-unit CastleVideoOptions;
+unit GameVideoOptions;
 
 interface
 
@@ -162,7 +162,7 @@ var
 
 implementation
 
-uses SysUtils, KambiUtils, CastleConfig, CastleWindow, RaysWindow,
+uses SysUtils, KambiUtils, GameConfig, GameWindow, RaysWindow,
   GLAntiAliasing;
 
 procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes;

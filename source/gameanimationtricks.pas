@@ -21,7 +21,7 @@
 }
 
 { Tricks with precalculated animation for "The Castle". }
-unit CastleAnimationTricks;
+unit GameAnimationTricks;
 
 interface
 

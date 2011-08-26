@@ -21,7 +21,7 @@
 }
 
 { Key/mouse shortcuts of the game. }
-unit CastleInputs;
+unit GameInputs;
 
 interface
 
@@ -139,7 +139,7 @@ function InteractInputDescription: string;
 
 implementation
 
-uses SysUtils, CastleConfig;
+uses SysUtils, GameConfig;
 
 function InteractInputDescription: string;
 begin

@@ -21,7 +21,7 @@
 }
 
 { }
-unit CastleDebugMenu;
+unit GameDebugMenu;
 
 interface
 
@@ -32,12 +32,12 @@ procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 implementation
 
 uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
-  GL, GLU, KambiGLUtils, GLWinMessages, CastleWindow,
-  VectorMath, GLWindow, CastlePlay, CastleGeneralMenu,
-  CastleControlsMenu, CastleInputs, CastleCreatures, CastleChooseMenu,
-  CastleItems, GLMenu, RaysWindow, CastleVideoOptions,
-  CastleSound, VRMLNodes, KambiClassUtils, CastleNotifications,
-  CastleLevelAvailable, Boxes3D, KeysMouse;
+  GL, GLU, KambiGLUtils, GLWinMessages, GameWindow,
+  VectorMath, GLWindow, GamePlay, GameGeneralMenu,
+  GameControlsMenu, GameInputs, GameCreatures, GameChooseMenu,
+  GameItems, GLMenu, RaysWindow, GameVideoOptions,
+  GameSound, VRMLNodes, KambiClassUtils, GameNotifications,
+  GameLevelAvailable, Boxes3D, KeysMouse;
 
 { TCastleMenu descendants interface ------------------------------------------ }
 
@@ -949,7 +949,7 @@ end;
 
 { global things -------------------------------------------------------------- }
 
-{$I castlemenucallbacks.inc}
+{$I gamemenucallbacks.inc}
 
 procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 var

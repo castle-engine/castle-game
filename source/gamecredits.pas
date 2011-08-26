@@ -21,7 +21,7 @@
 }
 
 { }
-unit CastleCredits;
+unit GameCredits;
 
 interface
 
@@ -38,10 +38,10 @@ procedure CredistGLContextRelease;
 implementation
 
 uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages,
-  CastleNotifications, KambiStringUtils, GLWinModes,
-  CastleInputs, CastlePlay, CastleWindow,
-  CastleVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
-  CastleHelp, KambiUtils, VRMLFields, KambiTimeUtils, KeysMouse;
+  GameNotifications, KambiStringUtils, GLWinModes,
+  GameInputs, GamePlay, GameWindow,
+  GameVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
+  GameHelp, KambiUtils, VRMLFields, KambiTimeUtils, KeysMouse;
 
 var
   UserQuit: boolean;

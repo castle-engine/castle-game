@@ -22,7 +22,7 @@
 
 { Everything related to playing sound in "The Castle".
   In particular, TCastleSoundEngine descendant from TXmlSoundEngine. }
-unit CastleSound;
+unit GameSound;
 
 interface
 
@@ -140,7 +140,7 @@ function SoundEngine: TCastleSoundEngine;
 
 implementation
 
-uses CastleConfig, ALSoundEngine;
+uses GameConfig, ALSoundEngine;
 
 constructor TCastleSoundEngine.Create;
 

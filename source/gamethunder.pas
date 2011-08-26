@@ -22,7 +22,7 @@
 
 { Small unit to do "thunder" effect as seen in "cages" level.
   Based on my "lets_take_a_walk" unit thunder.pas. }
-unit CastleThunder;
+unit GameThunder;
 
 interface
 
@@ -52,7 +52,7 @@ type
 
 implementation
 
-uses SysUtils, GL, GLU, KambiGLUtils, VectorMath, CastleSound, CastlePlay, Math;
+uses SysUtils, GL, GLU, KambiGLUtils, VectorMath, GameSound, GamePlay, Math;
 
 constructor TThunderEffect.Create;
 begin

@@ -38,18 +38,18 @@
   (although not done for now, as we defer loading creatures / items
   until actual game).
 
-  So this unit is somewhat equivalent to CastlePlay unit,
-  but different. CastlePlay unit has global Player and Level instances.
+  So this unit is somewhat equivalent to GamePlay unit,
+  but different. GamePlay unit has global Player and Level instances.
   This unit doesn't use them (so it's a design decision that this
-  unit @italic(doesn't use CastlePlay unit (even in the implementation))).
+  unit @italic(doesn't use GamePlay unit (even in the implementation))).
   This unit has own BackgroundLevel instance (and no player, articial
   camera is created by BackgroundCreate).
 }
-unit CastleBackgroundLevel;
+unit GameBackgroundLevel;
 
 interface
 
-uses GLWindow, UIControls, CastleLevel;
+uses GLWindow, UIControls, GameLevel;
 
 var
   BackgroundControls: TUIControlList;
@@ -64,7 +64,7 @@ implementation
 
 uses SysUtils, GL, GLU, GLExt, KambiGLUtils, GLImages,
   KambiFilesUtils, Images, VectorMath,
-  CastleWindow, CastleLevelAvailable, CastleVideoOptions;
+  GameWindow, GameLevelAvailable, GameVideoOptions;
 
 { TBackgroundCaptions -------------------------------------------------------- }
 

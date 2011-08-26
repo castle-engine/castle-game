@@ -21,7 +21,7 @@
 }
 
 { }
-unit CastleChooseMenu;
+unit GameChooseMenu;
 
 interface
 
@@ -34,8 +34,8 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 
 implementation
 
-uses SysUtils, GLWinModes, KambiGLUtils, CastleInputs, GLWinMessages, GLMenu,
-  CastleWindow, CastleGeneralMenu, CastlePlay, VectorMath, CastleNotifications,
+uses SysUtils, GLWinModes, KambiGLUtils, GameInputs, GLWinMessages, GLMenu,
+  GameWindow, GameGeneralMenu, GamePlay, VectorMath, GameNotifications,
   KeysMouse;
 
 var

@@ -21,7 +21,7 @@
 }
 
 { }
-unit CastleGeneralMenu;
+unit GameGeneralMenu;
 
 interface
 
@@ -58,7 +58,7 @@ function SetCurrentMenu(var CurrentValue: TCastleMenu;
 
 implementation
 
-uses SysUtils, GLWindow, CastleWindow, CastleSound;
+uses SysUtils, GLWindow, GameWindow, GameSound;
 
 { TCastleMenu ---------------------------------------------------------------- }
 

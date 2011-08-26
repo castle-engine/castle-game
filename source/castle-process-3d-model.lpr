@@ -61,7 +61,7 @@
 }
 
 uses SysUtils, KambiUtils, KambiClassUtils, VRMLNodes, X3DLoad,
-  KambiStringUtils, CastleVRMLProcessing, KambiParameters;
+  KambiStringUtils, GameVRMLProcessing, KambiParameters;
 
 { Remove special "stub" nodes, for castle creatures, items etc.
   This is purely for testing purposes (e.g. to view castle levels

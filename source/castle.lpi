@@ -44,22 +44,22 @@
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
-        <Filename Value="castleconfig.pas"/>
-        <UnitName Value="CastleConfig"/>
+        <Filename Value="gameconfig.pas"/>
+        <UnitName Value="GameConfig"/>
         <CursorPos X="47" Y="52"/>
         <TopLine Value="34"/>
         <UsageCount Value="10"/>
       </Unit1>
       <Unit2>
-        <Filename Value="castleitems.pas"/>
-        <UnitName Value="CastleItems"/>
+        <Filename Value="gameitems.pas"/>
+        <UnitName Value="GameItems"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit2>
       <Unit3>
-        <Filename Value="castlecreatures.pas"/>
-        <UnitName Value="CastleCreatures"/>
+        <Filename Value="gamecreatures.pas"/>
+        <UnitName Value="GameCreatures"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
@@ -86,15 +86,15 @@
         <UsageCount Value="10"/>
       </Unit6>
       <Unit7>
-        <Filename Value="castlesound.pas"/>
-        <UnitName Value="CastleSound"/>
+        <Filename Value="gamesound.pas"/>
+        <UnitName Value="GameSound"/>
         <CursorPos X="56" Y="27"/>
         <TopLine Value="11"/>
         <UsageCount Value="10"/>
       </Unit7>
       <Unit8>
-        <Filename Value="castlelevelspecific.pas"/>
-        <UnitName Value="CastleLevelSpecific"/>
+        <Filename Value="gamelevelspecific.pas"/>
+        <UnitName Value="GameLevelSpecific"/>
         <CursorPos X="58" Y="30"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
@@ -107,22 +107,22 @@
         <UsageCount Value="10"/>
       </Unit9>
       <Unit10>
-        <Filename Value="castlenotifications.pas"/>
-        <UnitName Value="CastleNotifications"/>
+        <Filename Value="gamenotifications.pas"/>
+        <UnitName Value="GameNotifications"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit10>
       <Unit11>
-        <Filename Value="castlegeneralmenu.pas"/>
-        <UnitName Value="CastleGeneralMenu"/>
+        <Filename Value="gamegeneralmenu.pas"/>
+        <UnitName Value="GameGeneralMenu"/>
         <CursorPos X="6" Y="26"/>
         <TopLine Value="10"/>
         <UsageCount Value="10"/>
       </Unit11>
       <Unit12>
-        <Filename Value="castlechoosemenu.pas"/>
-        <UnitName Value="CastleChooseMenu"/>
+        <Filename Value="gamechoosemenu.pas"/>
+        <UnitName Value="GameChooseMenu"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>
@@ -135,8 +135,8 @@
         <UsageCount Value="10"/>
       </Unit13>
       <Unit14>
-        <Filename Value="castlewindow.pas"/>
-        <UnitName Value="CastleWindow"/>
+        <Filename Value="gamewindow.pas"/>
+        <UnitName Value="GameWindow"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
         <UsageCount Value="10"/>

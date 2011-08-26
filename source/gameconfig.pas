@@ -22,7 +22,7 @@
 
 { User config file.
   Note that this unit initializes OnGetApplicationName in initialization. }
-unit CastleConfig;
+unit GameConfig;
 
 interface
 
@@ -36,7 +36,7 @@ var
 
 implementation
 
-uses SysUtils, KambiFilesUtils, CastleSound;
+uses SysUtils, KambiFilesUtils, GameSound;
 
 { initialization / finalization --------------------------------------------- }
 

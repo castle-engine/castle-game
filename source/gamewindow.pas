@@ -22,7 +22,7 @@
 
 { This keeps global Glw (window) variable. }
 
-unit CastleWindow;
+unit GameWindow;
 
 interface
 

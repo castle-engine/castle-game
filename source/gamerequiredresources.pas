@@ -21,11 +21,11 @@
 }
 
 { }
-unit CastleRequiredResources;
+unit GameRequiredResources;
 
 interface
 
-uses Classes, DOM, CastleCreatures, VRMLNodes;
+uses Classes, DOM, GameCreatures, VRMLNodes;
 
 { These increment/decrement RequiredCount for creatures on given list.
 
@@ -60,7 +60,7 @@ var
 
 implementation
 
-uses SysUtils, KambiLog, ProgressUnit, KambiTimeUtils, CastleConfig,
+uses SysUtils, KambiLog, ProgressUnit, KambiTimeUtils, GameConfig,
   KambiXMLUtils;
 
 { [Un]RequireCreatures ------------------------------------------------------- }

@@ -21,14 +21,14 @@
 }
 
 { TLevel specialized descendants. }
-unit CastleLevelSpecific;
+unit GameLevelSpecific;
 
 interface
 
 uses VRMLGLScene, Boxes3D, VectorMath,
-  CastlePlayer, CastleLevel, VRMLGLBackground, VRMLTriangle,
-  CastleSound, VRMLNodes, DOM, Base3D, VRMLGLAnimation,
-  CastleCreatures, Classes, KambiTimeUtils;
+  GamePlayer, GameLevel, VRMLGLBackground, VRMLTriangle,
+  GameSound, VRMLNodes, DOM, Base3D, VRMLGLAnimation,
+  GameCreatures, Classes, KambiTimeUtils;
 
 const
   CastleHallWerewolvesCount = 4;
@@ -269,9 +269,9 @@ implementation
 
 uses KambiFilesUtils, SysUtils, KambiUtils,
   GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderingCameraUnit,
-  CastlePlay, CastleNotifications, CastleInputs,
-  CastleItems, CastleThunder, CastleWindow, CastleVRMLProcessing,
-  CastleAnimationTricks, CastleVideoOptions, VRMLScene, ProgressUnit,
+  GamePlay, GameNotifications, GameInputs,
+  GameItems, GameThunder, GameWindow, GameVRMLProcessing,
+  GameAnimationTricks, GameVideoOptions, VRMLScene, ProgressUnit,
   KambiXMLUtils;
 
 function CastleLevelsPath: string;

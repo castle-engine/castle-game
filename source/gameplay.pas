@@ -22,11 +22,11 @@
 
 { Playing the game. }
 
-unit CastlePlay;
+unit GamePlay;
 
 interface
 
-uses Classes, CastleLevel, CastlePlayer, Base3D, OpenGLFonts;
+uses Classes, GameLevel, GamePlayer, Base3D, OpenGLFonts;
 
 { Play the game.
 
@@ -112,15 +112,15 @@ var
 implementation
 
 uses Math, SysUtils, KambiUtils, GLWindow,
-  GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, CastleWindow,
+  GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, GameWindow,
   VectorMath, Boxes3D, Images,
-  CastleHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
+  GameHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, UIControls,
-  CastleItems, RaysWindow, KambiStringUtils,
-  KambiFilesUtils, CastleInputs, CastleGameMenu, CastleDebugMenu, CastleSound,
-  CastleVideoOptions, CastleConfig,
-  CastleNotifications, CastleControlsMenu,
-  CastleLevelSpecific, VRMLGLScene, CastleLevelAvailable,
+  GameItems, RaysWindow, KambiStringUtils,
+  KambiFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
+  GameVideoOptions, GameConfig,
+  GameNotifications, GameControlsMenu,
+  GameLevelSpecific, VRMLGLScene, GameLevelAvailable,
   KambiTimeUtils, GLImages, KeysMouse;
 
 var

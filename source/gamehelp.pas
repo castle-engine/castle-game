@@ -21,23 +21,44 @@
 }
 
 { }
-unit CastleNotifications;
+unit GameHelp;
 
 interface
 
-uses GLNotifications;
+const
+  Version = '0.9.3';
 
-var
-  Notifications: TGLNotifications;
+function SCastleVersion: string;
+function SCastleWWW: string;
+
+procedure ViewGameMessages;
 
 implementation
 
-uses SysUtils;
+uses SysUtils, Classes, GLWinMessages, GameWindow, KambiUtils,
+  GameNotifications;
 
-initialization
-  Notifications := TGLNotifications.Create(nil);
-  Notifications.CollectHistory := true;
-  Notifications.MaxMessages := 4;
-finalization
-  FreeAndNil(Notifications);
+function SCastleVersion: string;
+begin
+  Result := ApplicationName + ' version ' + Version + '.';
+end;
+
+function SCastleWWW: string;
+begin
+  Result := 'WWW: http://vrmlengine.sourceforge.net/castle.php';
+end;
+
+procedure ViewGameMessages;
+var
+  SList: TStringList;
+begin
+  SList := TStringList.Create;
+  try
+    SList.Assign(Notifications.History);
+    SList.Insert(0, Format('%d messages :', [Notifications.History.Count]));
+    SList.Insert(1, '');
+    MessageOK(Window, SList, taLeft);
+  finally SList.Free end;
+end;
+
 end.

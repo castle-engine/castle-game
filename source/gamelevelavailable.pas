@@ -21,13 +21,13 @@
 }
 
 { TLevelAvailable class and related things. }
-unit CastleLevelAvailable;
+unit GameLevelAvailable;
 
 {$I kambiconf.inc}
 
 interface
 
-uses CastleLevel, KambiUtils, Classes,
+uses GameLevel, KambiUtils, Classes,
   KambiClassUtils, DOM, GL, GLU, KambiGLUtils, GLProgress,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
@@ -108,10 +108,10 @@ var
 
 implementation
 
-uses SysUtils, CastleConfig, KambiXMLUtils, KambiFilesUtils,
-  CastleLevelSpecific, XMLRead, CastleWindow, GLImages,
+uses SysUtils, GameConfig, KambiXMLUtils, KambiFilesUtils,
+  GameLevelSpecific, XMLRead, GameWindow, GLImages,
   Images, GLWindow, GLWinModes, KambiTimeUtils, UIControls,
-  CastleRequiredResources;
+  GameRequiredResources;
 
 { TLevelAvailable ------------------------------------------------------------ }
 
@@ -151,7 +151,7 @@ procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
     if Result then
     begin
       { TODO: I would like to use RTTI here.
-        Also CastleLevelSpecific will be removed from uses clause then. }
+        Also GameLevelSpecific will be removed from uses clause then. }
       if ValueStr = 'TLevel' then
         Value := TLevel else
       if ValueStr = 'TCagesLevel' then

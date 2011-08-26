@@ -21,13 +21,13 @@
 }
 
 { }
-unit CastleTextures;
+unit GameTextures;
 
 {$I kambiconf.inc}
 
 interface
 
-uses KambiUtils, KambiClassUtils, Classes, CastleSound, VRMLTriangle, DOM,
+uses KambiUtils, KambiClassUtils, Classes, GameSound, VRMLTriangle, DOM,
   XmlSoundEngine, FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type
