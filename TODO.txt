@@ -60,11 +60,11 @@ Resigned: fountain new level for castle 1.0.0:
 
 - make gamma correction.
     Windows: http://www.delphi3d.net/articles/viewarticle.php?article=gamma.htm
-    
+
 - Circular (Laz forum), others:
   move speed too fast
   visual hint when monster is hit
-    
+
 
 - rudy usability test:
   - again, mouse over yes/no message boxes should work
@@ -472,8 +472,7 @@ Cages level:
 dist-making to-dos:
 
 - Makefile to pack distro of my game: add at some point svn log:
-  svn log -v file:///home/michal/svn/kambi-svn-repos/ \
-    castle/trunk kambi_vrml_game_engine/trunk > ChangeLog
+  svn log -v REPO-URL castle/trunk castle_game_engine/trunk > ChangeLog
 
 - real exe installer for Windows,
   include OpenAL installer

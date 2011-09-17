@@ -66,21 +66,21 @@ endif
 endif
 
 build-unix: clean-glwindow
-	cd ../kambi_vrml_game_engine/ && \
+	cd ../castle_game_engine/ && \
 	  fpc $(FPC_UNIX_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
 	  @kambi.cfg ../castle/source/castle.lpr
 	mv source/castle ./
-	cd ../kambi_vrml_game_engine/ && \
+	cd ../castle_game_engine/ && \
 	  fpc $(FPC_UNIX_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
 	  @kambi.cfg ../castle/source/castle-process-3d-model.lpr
 	mv source/castle-process-3d-model ./
 
 build-windows: clean-glwindow
-	cd ../kambi_vrml_game_engine/ && \
+	cd ../castle_game_engine/ && \
 	  fpc $(FPC_WINDOWS_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
 	  @kambi.cfg ../castle/source/castle.lpr
 	mv source/castle.exe ./castle.exe
-	cd ../kambi_vrml_game_engine/ && \
+	cd ../castle_game_engine/ && \
 	  fpc $(FPC_WINDOWS_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
 	  @kambi.cfg ../castle/source/castle-process-3d-model.lpr
 	mv source/castle-process-3d-model.exe ./castle-process-3d-model.exe
@@ -132,7 +132,7 @@ clean_private:
 
 # Force rebuilding GLWindow unit with proper backend.
 clean-glwindow:
-	$(MAKE) -C ../kambi_vrml_game_engine/ clean-glwindow
+	$(MAKE) -C ../castle_game_engine/ clean-glwindow
 
 # ----------------------------------------
 # Set SVN tag.
