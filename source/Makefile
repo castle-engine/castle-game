@@ -3,7 +3,7 @@
 default:
 	@echo 'Nothing to do by default in this Makefile right now'
 
-UNITS_BASE_PATH := /home/michalis/sources/vrmlengine/trunk/castle_game_engine/
+UNITS_BASE_PATH := /home/michalis/sources/castle-engine/trunk/castle_game_engine/
 
 # Generate docs.
 # This is just for fun (I'm a pasdoc developer after all...),

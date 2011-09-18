@@ -138,8 +138,8 @@ clean-glwindow:
 # Set SVN tag.
 
 svntag:
-	svn copy https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/trunk/castle \
-	         https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/tags/castle/$(VERSION) \
+	svn copy http://svn.code.sf.net/p/castle-engine/code/trunk/castle \
+	         http://svn.code.sf.net/p/castle-engine/code/tags/castle/$(VERSION) \
 	  -m "Tagging the $(VERSION) version of 'The Castle'."
 
 # eof ------------------------------------------------------------

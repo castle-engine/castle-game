@@ -1,5 +1,5 @@
 Export from Blender using kanim exporter
-(http://vrmlengine.sourceforge.net/kanim_format.php)
+(http://castle-engine.sourceforge.net/kanim_format.php)
 choosing "selected objects only" (when selected the fluid domain).
 
 Run ./process_after_export.sh then.

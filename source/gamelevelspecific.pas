@@ -1387,7 +1387,7 @@ begin
       '--- you know, with real storyline, and just everything much ' +
       'much better. ' +
       'So check out for updates on our WWW page ' +
-      '[http://vrmlengine.sourceforge.net/castle.php]. ' +
+      '[http://castle-engine.sourceforge.net/castle.php]. ' +
       'Oh, and this is open-source game, so if you can, ' +
       'you''re most welcome to contribute!', taLeft);
     ExitMessagePending := false;

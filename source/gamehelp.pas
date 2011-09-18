@@ -45,7 +45,7 @@ end;
 
 function SCastleWWW: string;
 begin
-  Result := 'WWW: http://vrmlengine.sourceforge.net/castle.php';
+  Result := 'WWW: http://castle-engine.sourceforge.net/castle.php';
 end;
 
 procedure ViewGameMessages;

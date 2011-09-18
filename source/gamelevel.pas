@@ -409,7 +409,7 @@ type
       exists on this level. }
     property BossCreature: TCreature read FBossCreature;
 
-    { See [http://vrmlengine.sourceforge.net/castle-development.php]
+    { See [http://castle-engine.sourceforge.net/castle-development.php]
       for description of CameraBox and WaterBox trick.
       Remember that this may change MainScene.BoundingBox (in case we will
       find and remove the node from Scene). }

@@ -693,7 +693,7 @@ end;
 
 procedure TEditLevelLightsMenu.Click;
 const
-  SaveGenerator = '"The Castle" lights editor, http://vrmlengine.sourceforge.net/castle.php';
+  SaveGenerator = '"The Castle" lights editor, http://castle-engine.sourceforge.net/castle.php';
 var
   H: TLightInstance;
 begin

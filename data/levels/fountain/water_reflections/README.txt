@@ -5,7 +5,7 @@ About making water_environment_map.dds:
   #    view-dependent light in universal env map).
 
   # 2. Open fountain_final.wrl level removing level box, item/creature stub objects:
-  cd ~/sources/vrmlengine/trunk/castle/data/levels/fountain/
+  cd ~/sources/castle-engine/trunk/castle/data/levels/fountain/
   castle-process-3d-model fountain_final.wrl | view3dscene -
 
   # 3. Use view3dscene Edit->Remove Geometry Node to remove first (at the ground)
