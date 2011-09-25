@@ -123,17 +123,17 @@ var
   Inlined: TX3DNode;
 begin
   { Replace VRML 1.0 inlines with VRML 1.0 Group or Separator node.
-    Note that TWWWInlineNode actually descends from TInlineNode now,
-    so the check for TWWWInlineNode must be 1st. }
-  if Node is TWWWInlineNode then
+    Note that TWWWInlineNode_1 actually descends from TInlineNode now,
+    so the check for TWWWInlineNode_1 must be 1st. }
+  if Node is TWWWInlineNode_1 then
   begin
-    TWWWInlineNode(Node).LoadInlined(false);
-    Inlined := TWWWInlineNode(Node).Inlined;
+    TWWWInlineNode_1(Node).LoadInlined(false);
+    Inlined := TWWWInlineNode_1(Node).Inlined;
 
     if Inlined <> nil then
     begin
-      if TWWWInlineNode(Node).FdSeparate.Value then
-        G1 := TSeparatorNode.Create(Node.NodeName, Node.WWWBasePath) else
+      if TWWWInlineNode_1(Node).FdSeparate.Value then
+        G1 := TSeparatorNode_1.Create(Node.NodeName, Node.WWWBasePath) else
         G1 := TGroupNode_1.Create(Node.NodeName, Node.WWWBasePath);
       G1.PositionInParent := Node.PositionInParent;
       G1.VRML1ChildAdd(Inlined);
