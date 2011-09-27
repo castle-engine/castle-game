@@ -70,7 +70,6 @@ end;
 
 initialization
   Window := TGLUIWindow.Create(nil);
-  Window.SetDemoOptions(K_None, #0, false);
   Window.OnDrawStyle := ds3D;
 
   GLContextCache := TVRMLGLRendererContextCache.Create;
