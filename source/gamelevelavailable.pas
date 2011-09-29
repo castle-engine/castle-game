@@ -27,8 +27,8 @@ unit GameLevelAvailable;
 
 interface
 
-uses GameLevel, KambiUtils, Classes,
-  KambiClassUtils, DOM, GL, GLU, KambiGLUtils, GLProgress,
+uses GameLevel, CastleUtils, Classes,
+  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, GLProgress,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type
@@ -108,9 +108,9 @@ var
 
 implementation
 
-uses SysUtils, GameConfig, KambiXMLUtils, KambiFilesUtils,
+uses SysUtils, GameConfig, CastleXMLUtils, CastleFilesUtils,
   GameLevelSpecific, XMLRead, GameWindow, GLImages,
-  Images, GLWindow, GLWinModes, KambiTimeUtils, UIControls,
+  Images, GLWindow, GLWinModes, CastleTimeUtils, UIControls,
   GameRequiredResources;
 
 { TLevelAvailable ------------------------------------------------------------ }

@@ -25,10 +25,10 @@ unit GameItems;
 
 interface
 
-uses Boxes3D, VRMLNodes, VRMLGLScene, VectorMath, KambiUtils,
-  KambiClassUtils, Classes, Images, GL, GLU, KambiGLUtils, GameSound,
+uses Boxes3D, VRMLNodes, VRMLGLScene, VectorMath, CastleUtils,
+  CastleClassUtils, Classes, Images, GL, GLU, CastleGLUtils, GameSound,
   VRMLGLAnimation, VRMLGLAnimationInfo, GameObjectKinds,
-  KambiXMLConfig, XmlSoundEngine, Frustum, Base3D,
+  CastleXMLConfig, XmlSoundEngine, Frustum, Base3D,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 const
@@ -387,7 +387,7 @@ function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 implementation
 
 uses SysUtils, GLWindow, GameWindow,
-  GamePlay, KambiFilesUtils, ProgressUnit,
+  GamePlay, CastleFilesUtils, ProgressUnit,
   GameCreatures, GameVideoOptions, GameNotifications,
   VRMLScene, VRMLTriangle, GLImages;
 

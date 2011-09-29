@@ -24,10 +24,10 @@
 
 program castle;
 
-uses GLWindow, SysUtils, KambiUtils, ProgressUnit, GLProgress,
-  Classes, KambiParameters, GLWinMessages, KambiGLUtils, KambiStringUtils,
-  KambiLog, GameWindow, GameStartMenu, GameHelp, GameSound,
-  KambiClassUtils, GameVideoOptions, GameInitialBackground,
+uses GLWindow, SysUtils, CastleUtils, ProgressUnit, GLProgress,
+  Classes, CastleParameters, GLWinMessages, CastleGLUtils, CastleStringUtils,
+  CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound,
+  CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu,
   GameRequiredResources, GameCredits, GLAntiAliasing, ALSoundEngine,
   VRMLGLRenderer;

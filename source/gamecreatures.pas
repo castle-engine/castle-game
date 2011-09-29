@@ -25,9 +25,9 @@ unit GameCreatures;
 
 interface
 
-uses Classes, VectorMath, VRMLGLAnimation, Boxes3D, KambiClassUtils, KambiUtils,
+uses Classes, VectorMath, VRMLGLAnimation, Boxes3D, CastleClassUtils, CastleUtils,
   VRMLGLAnimationInfo, VRMLGLScene, GameSound, VRMLSceneWaypoints,
-  GameObjectKinds, ALSoundAllocator, KambiXMLConfig, Base3D,
+  GameObjectKinds, ALSoundAllocator, CastleXMLConfig, Base3D,
   XmlSoundEngine, GLShadowVolumeRenderer, VRMLTriangle, Frustum, VRMLNodes,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
@@ -1185,7 +1185,7 @@ var
 implementation
 
 uses SysUtils, DOM, GL, GLU, GameWindow, GLWindow,
-  KambiFilesUtils, KambiGLUtils, ProgressUnit, GamePlay,
+  CastleFilesUtils, CastleGLUtils, ProgressUnit, GamePlay,
   GameVideoOptions, GameNotifications, GameRequiredResources;
 
 { TCreatureKind -------------------------------------------------------------- }

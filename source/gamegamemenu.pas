@@ -31,11 +31,11 @@ procedure ShowGameMenu(AControlsUnder: TUIControlList);
 
 implementation
 
-uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
-  GL, GLU, KambiGLUtils, GLWinMessages, GameWindow,
+uses SysUtils, Classes, CastleUtils, CastleStringUtils, GLWinModes,
+  GL, GLU, CastleGLUtils, GLWinMessages, GameWindow,
   VectorMath, GLWindow, GameHelp, GamePlay, GameGeneralMenu,
   GameControlsMenu, GameInputs, GameChooseMenu,
-  GameVideoOptions, GameSound, VRMLNodes, KambiClassUtils, GameNotifications,
+  GameVideoOptions, GameSound, VRMLNodes, CastleClassUtils, GameNotifications,
   GLSoundMenu, KeysMouse;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }

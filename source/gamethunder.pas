@@ -52,7 +52,7 @@ type
 
 implementation
 
-uses SysUtils, GL, GLU, KambiGLUtils, VectorMath, GameSound, GamePlay, Math;
+uses SysUtils, GL, GLU, CastleGLUtils, VectorMath, GameSound, GamePlay, Math;
 
 constructor TThunderEffect.Create;
 begin

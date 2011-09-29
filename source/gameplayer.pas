@@ -28,7 +28,7 @@ interface
 uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
   VRMLSceneWaypoints, GameInputs, ALSoundAllocator, GameSound,
   VRMLTriangle, GameTextures, XmlSoundEngine, Classes, Base3D,
-  KambiGLUtils;
+  CastleGLUtils;
 
 const
   DefaultMaxLife = 100;
@@ -410,11 +410,11 @@ type
 
 implementation
 
-uses Math, SysUtils, KambiClassUtils, GamePlay, GLWinMessages,
-  GameWindow, KambiUtils, VRMLNodes,
-  GLWindow, Images, KambiFilesUtils,
-  VRMLGLAnimation, ALUtils, KambiOpenAL, GameControlsMenu,
-  GameNotifications, KambiXMLConfig, GLImages,
+uses Math, SysUtils, CastleClassUtils, GamePlay, GLWinMessages,
+  GameWindow, CastleUtils, VRMLNodes,
+  GLWindow, Images, CastleFilesUtils,
+  VRMLGLAnimation, ALUtils, CastleOpenAL, GameControlsMenu,
+  GameNotifications, CastleXMLConfig, GLImages,
   GameRequiredResources;
 
 var

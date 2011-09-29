@@ -79,10 +79,10 @@ var
 
 implementation
 
-uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, GameWindow,
+uses SysUtils, GLWinModes, CastleGLUtils, GLWinMessages, GameWindow,
   GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
-  GameInputs, KeysMouse, VectorMath, KambiUtils, GamePlay,
-  GameConfig, KambiStringUtils, GameNotifications;
+  GameInputs, KeysMouse, VectorMath, CastleUtils, GamePlay,
+  GameConfig, CastleStringUtils, GameNotifications;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 

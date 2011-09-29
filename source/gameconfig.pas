@@ -26,7 +26,7 @@ unit GameConfig;
 
 interface
 
-uses KambiUtils, KambiXMLConfig;
+uses CastleUtils, CastleXMLConfig;
 
 var
   { User config file for this game.
@@ -36,7 +36,7 @@ var
 
 implementation
 
-uses SysUtils, KambiFilesUtils, GameSound;
+uses SysUtils, CastleFilesUtils, GameSound;
 
 { initialization / finalization --------------------------------------------- }
 

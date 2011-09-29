@@ -65,8 +65,8 @@ type
 
 implementation
 
-uses Math, KambiUtils, KambiGLUtils, KambiStringUtils, SysUtils,
-  KambiFilesUtils, RenderingCameraUnit, DDS, GLExt, GLImages, VRMLGLRenderer;
+uses Math, CastleUtils, CastleGLUtils, CastleStringUtils, SysUtils,
+  CastleFilesUtils, RenderingCameraUnit, DDS, GLExt, GLImages, VRMLGLRenderer;
 
 { TBlendedLoopingAnimation --------------------------------------------------- }
 

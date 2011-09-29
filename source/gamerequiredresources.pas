@@ -60,8 +60,8 @@ var
 
 implementation
 
-uses SysUtils, KambiLog, ProgressUnit, KambiTimeUtils, GameConfig,
-  KambiXMLUtils;
+uses SysUtils, CastleLog, ProgressUnit, CastleTimeUtils, GameConfig,
+  CastleXMLUtils;
 
 { [Un]RequireCreatures ------------------------------------------------------- }
 

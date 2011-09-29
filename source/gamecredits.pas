@@ -37,11 +37,11 @@ procedure CredistGLContextRelease;
 
 implementation
 
-uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages,
-  GameNotifications, KambiStringUtils, GLWinModes,
+uses SysUtils, GL, GLU, CastleGLUtils, GLWinMessages,
+  GameNotifications, CastleStringUtils, GLWinModes,
   GameInputs, GamePlay, GameWindow,
-  GameVideoOptions, VectorMath, VRMLGLScene, KambiFilesUtils,
-  GameHelp, KambiUtils, VRMLFields, KambiTimeUtils, KeysMouse;
+  GameVideoOptions, VectorMath, VRMLGLScene, CastleFilesUtils,
+  GameHelp, CastleUtils, VRMLFields, CastleTimeUtils, KeysMouse;
 
 var
   UserQuit: boolean;

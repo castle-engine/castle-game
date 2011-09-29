@@ -28,7 +28,7 @@ interface
 uses VRMLGLScene, Boxes3D, VectorMath,
   GamePlayer, GameLevel, VRMLGLBackground, VRMLTriangle,
   GameSound, VRMLNodes, DOM, Base3D, VRMLGLAnimation,
-  GameCreatures, Classes, KambiTimeUtils;
+  GameCreatures, Classes, CastleTimeUtils;
 
 const
   CastleHallWerewolvesCount = 4;
@@ -267,12 +267,12 @@ function CastleLevelsPath: string;
 
 implementation
 
-uses KambiFilesUtils, SysUtils, KambiUtils,
-  GL, GLU, KambiGLUtils, KambiStringUtils, GLWinMessages, RenderingCameraUnit,
+uses CastleFilesUtils, SysUtils, CastleUtils,
+  GL, GLU, CastleGLUtils, CastleStringUtils, GLWinMessages, RenderingCameraUnit,
   GamePlay, GameNotifications, GameInputs,
   GameItems, GameThunder, GameWindow, GameVRMLProcessing,
   GameAnimationTricks, GameVideoOptions, VRMLScene, ProgressUnit,
-  KambiXMLUtils;
+  CastleXMLUtils;
 
 function CastleLevelsPath: string;
 begin

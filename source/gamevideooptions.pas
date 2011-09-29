@@ -25,7 +25,7 @@ unit GameVideoOptions;
 
 interface
 
-uses GL, KambiGLUtils, VRMLGLScene, VRMLNodes;
+uses GL, CastleGLUtils, VRMLGLScene, VRMLNodes;
 
 type
   { This determines OpenGL blending factors used when rendering given model. }
@@ -162,7 +162,7 @@ var
 
 implementation
 
-uses SysUtils, KambiUtils, GameConfig, GameWindow, RaysWindow,
+uses SysUtils, CastleUtils, GameConfig, GameWindow, RaysWindow,
   GLAntiAliasing;
 
 procedure AttributesSet(Attributes: TSceneRenderingAttributes;

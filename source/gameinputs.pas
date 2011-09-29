@@ -25,7 +25,7 @@ unit GameInputs;
 
 interface
 
-uses KeysMouse, Cameras, KambiUtils, KambiClassUtils, Classes,
+uses KeysMouse, Cameras, CastleUtils, CastleClassUtils, Classes,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, GenericStructList;
 
 type

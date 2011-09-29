@@ -25,7 +25,7 @@ unit GameObjectKinds;
 
 interface
 
-uses Classes, KambiXMLConfig, VRMLGLAnimation, VRMLGLAnimationInfo,
+uses Classes, CastleXMLConfig, VRMLGLAnimation, VRMLGLAnimationInfo,
   GameVideoOptions, VRMLScene, VRMLGLScene, VRMLNodes;
 
 type
@@ -148,7 +148,7 @@ type
 implementation
 
 uses SysUtils, ProgressUnit, X3DLoad, DOM, GameWindow,
-  KambiStringUtils, KambiLog;
+  CastleStringUtils, CastleLog;
 
 constructor TObjectKind.Create(const AVRMLNodeName: string);
 begin

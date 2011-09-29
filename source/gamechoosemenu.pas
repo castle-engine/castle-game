@@ -34,7 +34,7 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 
 implementation
 
-uses SysUtils, GLWinModes, KambiGLUtils, GameInputs, GLWinMessages, GLMenu,
+uses SysUtils, GLWinModes, CastleGLUtils, GameInputs, GLWinMessages, GLMenu,
   GameWindow, GameGeneralMenu, GamePlay, VectorMath, GameNotifications,
   KeysMouse;
 

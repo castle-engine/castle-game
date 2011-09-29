@@ -35,7 +35,7 @@ procedure ViewGameMessages;
 
 implementation
 
-uses SysUtils, Classes, GLWinMessages, GameWindow, KambiUtils,
+uses SysUtils, Classes, GLWinMessages, GameWindow, CastleUtils,
   GameNotifications;
 
 function SCastleVersion: string;

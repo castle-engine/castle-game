@@ -27,7 +27,7 @@ unit GameTextures;
 
 interface
 
-uses KambiUtils, KambiClassUtils, Classes, GameSound, VRMLTriangle, DOM,
+uses CastleUtils, CastleClassUtils, Classes, GameSound, VRMLTriangle, DOM,
   XmlSoundEngine, FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type
@@ -76,7 +76,7 @@ var
 
 implementation
 
-uses SysUtils, XMLRead, KambiXMLUtils, KambiFilesUtils, VRMLNodes;
+uses SysUtils, XMLRead, CastleXMLUtils, CastleFilesUtils, VRMLNodes;
 
 { TTextureRule --------------------------------------------------------------- }
 

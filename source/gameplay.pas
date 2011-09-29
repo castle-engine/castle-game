@@ -111,17 +111,17 @@ var
 
 implementation
 
-uses Math, SysUtils, KambiUtils, GLWindow,
-  GLWinModes, GL, GLU, GLExt, KambiGLUtils, GLWinMessages, GameWindow,
+uses Math, SysUtils, CastleUtils, GLWindow,
+  GLWinModes, GL, GLU, GLExt, CastleGLUtils, GLWinMessages, GameWindow,
   VectorMath, Boxes3D, Images,
   GameHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, UIControls,
-  GameItems, RaysWindow, KambiStringUtils,
-  KambiFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
+  GameItems, RaysWindow, CastleStringUtils,
+  CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, GameConfig,
   GameNotifications, GameControlsMenu,
   GameLevelSpecific, VRMLGLScene, GameLevelAvailable,
-  KambiTimeUtils, GLImages, KeysMouse;
+  CastleTimeUtils, GLImages, KeysMouse;
 
 var
   GLList_NotificationsBackground: TGLuint;

@@ -33,13 +33,13 @@ procedure ShowStartMenu;
 
 implementation
 
-uses SysUtils, Classes, KambiUtils, GLWinModes,
-  GL, GLU, KambiGLUtils, GLWinMessages, GameWindow,
-  VectorMath, Images, KambiFilesUtils,
+uses SysUtils, Classes, CastleUtils, GLWinModes,
+  GL, GLU, CastleGLUtils, GLWinMessages, GameWindow,
+  VectorMath, Images, CastleFilesUtils,
   GameLevel, GamePlay, GameSound, GamePlayer,
   GameCreatures, GameItems, GameGeneralMenu, GLMenu,
   GameControlsMenu, GameInputs, GameVideoOptions,
-  KambiStringUtils, KambiClassUtils,
+  CastleStringUtils, CastleClassUtils,
   GameNotifications, GameLevelAvailable, GameBackgroundLevel,
   XmlSoundEngine, GLSoundMenu, VRMLNodes,
   GameCredits, GLAntiAliasing, KeysMouse;

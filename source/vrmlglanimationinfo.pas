@@ -25,7 +25,7 @@ unit VRMLGLAnimationInfo;
 
 interface
 
-uses Classes, VRMLGLAnimation, VRMLGLRenderer, KambiUtils, KambiStringUtils, DOM;
+uses Classes, VRMLGLAnimation, VRMLGLRenderer, CastleUtils, CastleStringUtils, DOM;
 
 type
   { Simple class to postpone loading vrml files that will be used

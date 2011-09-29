@@ -31,12 +31,12 @@ procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 
 implementation
 
-uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
-  GL, GLU, KambiGLUtils, GLWinMessages, GameWindow,
+uses SysUtils, Classes, CastleUtils, CastleStringUtils, GLWinModes,
+  GL, GLU, CastleGLUtils, GLWinMessages, GameWindow,
   VectorMath, GLWindow, GamePlay, GameGeneralMenu,
   GameControlsMenu, GameInputs, GameCreatures, GameChooseMenu,
   GameItems, GLMenu, RaysWindow, GameVideoOptions,
-  GameSound, VRMLNodes, KambiClassUtils, GameNotifications,
+  GameSound, VRMLNodes, CastleClassUtils, GameNotifications,
   GameLevelAvailable, Boxes3D, KeysMouse;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
