@@ -26,7 +26,7 @@ unit GameWindow;
 
 interface
 
-uses GLWindow, VRMLGLRenderer, OpenGLTTFonts;
+uses CastleWindow, VRMLGLRenderer, OpenGLTTFonts;
 
 var
   { @noAutoLinkHere }
@@ -49,7 +49,7 @@ const
   Font3dBold = false;
   Font3dItalic = false;
 
-procedure GLWindowOpen(Window: TCastleWindowBase);
+procedure WindowOpen(Window: TCastleWindowBase);
 begin
   Font3d := GLContextCache.Fonts_IncReference(
     Font3dFamily, Font3dBold, Font3dItalic,
@@ -59,7 +59,7 @@ begin
   AntiAliasingEnable;
 end;
 
-procedure GLWindowClose(Window: TCastleWindowBase);
+procedure WindowClose(Window: TCastleWindowBase);
 begin
   if (GLContextCache <> nil) and (Font3d <> nil) then
   begin
@@ -74,14 +74,14 @@ initialization
 
   GLContextCache := TVRMLGLRendererContextCache.Create;
 
-  Window.OnOpenList.Add(@GLWindowOpen);
-  Window.OnCloseList.Add(@GLWindowClose);
+  Window.OnOpenList.Add(@WindowOpen);
+  Window.OnCloseList.Add(@WindowClose);
 finalization
   { Fonts_DecReference must be called before freeing GLContextCache.
     It's called from Window.Close. But Window.Close may be called when
     FreeAndNil(Window) below, so to make sure we call Fonts_DecReference
-    (by our GLWindowClose) right now. }
-  GLWindowClose(Window);
+    (by our WindowClose) right now. }
+  WindowClose(Window);
 
   FreeAndNil(GLContextCache);
   FreeAndNil(Window);

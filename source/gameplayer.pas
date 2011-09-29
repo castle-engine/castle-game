@@ -410,9 +410,9 @@ type
 
 implementation
 
-uses Math, SysUtils, CastleClassUtils, GamePlay, GLWinMessages,
+uses Math, SysUtils, CastleClassUtils, GamePlay, CastleMessages,
   GameWindow, CastleUtils, VRMLNodes,
-  GLWindow, Images, CastleFilesUtils,
+  CastleWindow, Images, CastleFilesUtils,
   VRMLGLAnimation, ALUtils, CastleOpenAL, GameControlsMenu,
   GameNotifications, CastleXMLConfig, GLImages,
   GameRequiredResources;
@@ -1460,9 +1460,9 @@ begin
   Result := PTriangle(Camera.AboveGround);
 end;
 
-{ GLWindow open / close ------------------------------------------------------ }
+{ CastleWindow open / close ------------------------------------------------------ }
 
-procedure GLWindowOpen(Window: TCastleWindowBase);
+procedure WindowOpen(Window: TCastleWindowBase);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -1484,7 +1484,7 @@ begin
   GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
   GLList_BossIndicatorImage := LoadPlayerControlToDisplayList('boss.png');
 
-  GLList_DrawWaterRect := glGenListsCheck(1, 'CastlePlayer.GLWindowOpen');
+  GLList_DrawWaterRect := glGenListsCheck(1, 'CastlePlayer.WindowOpen');
   glNewList(GLList_DrawWaterRect, GL_COMPILE);
   try
     glPushAttrib(GL_COLOR_BUFFER_BIT or GL_CURRENT_BIT);
@@ -1497,7 +1497,7 @@ begin
   finally glEndList; end;
 end;
 
-procedure GLWindowClose(Window: TCastleWindowBase);
+procedure WindowClose(Window: TCastleWindowBase);
 begin
   glFreeDisplayList(GLList_BlankIndicatorImage);
   glFreeDisplayList(GLList_RedIndicatorImage);
@@ -1506,6 +1506,6 @@ begin
 end;
 
 initialization
-  Window.OnOpenList.Add(@GLWindowOpen);
-  Window.OnCloseList.Add(@GLWindowClose);
+  Window.OnOpenList.Add(@WindowOpen);
+  Window.OnCloseList.Add(@WindowClose);
 end.

@@ -386,7 +386,7 @@ function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
 
 implementation
 
-uses SysUtils, GLWindow, GameWindow,
+uses SysUtils, CastleWindow, GameWindow,
   GamePlay, CastleFilesUtils, ProgressUnit,
   GameCreatures, GameVideoOptions, GameNotifications,
   VRMLScene, VRMLTriangle, GLImages;
@@ -997,12 +997,12 @@ end;
 
 { initialization / finalization ---------------------------------------- }
 
-procedure GLWindowClose(Window: TCastleWindowBase);
+procedure WindowClose(Window: TCastleWindowBase);
 var
   I: Integer;
 begin
   { In fact, ItemsKinds will always be nil here, because
-    GLWindowClose will be called from CastleWindow unit finalization
+    WindowClose will be called from CastleWindow unit finalization
     that will be done after this unit's finalization (DoFinalization).
 
     That's OK --- DoFinalization already freed
@@ -1018,7 +1018,7 @@ end;
 
 procedure DoInitialization;
 begin
-  Window.OnCloseList.Add(@GLWindowClose);
+  Window.OnCloseList.Add(@WindowClose);
 
   ItemsKinds := TItemKindList.Create(true);
 

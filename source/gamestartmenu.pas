@@ -25,7 +25,7 @@ unit GameStartMenu;
 
 interface
 
-uses GLWindow;
+uses CastleWindow;
 
 { Show menu, ask user what to do, do what the user wants
   (e.g. load level and call PlayGame), when user wants to quit --- return. }
@@ -33,15 +33,15 @@ procedure ShowStartMenu;
 
 implementation
 
-uses SysUtils, Classes, CastleUtils, GLWinModes,
-  GL, GLU, CastleGLUtils, GLWinMessages, GameWindow,
+uses SysUtils, Classes, CastleUtils, CastleWindowModes,
+  GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
   VectorMath, Images, CastleFilesUtils,
   GameLevel, GamePlay, GameSound, GamePlayer,
   GameCreatures, GameItems, GameGeneralMenu, GLMenu,
   GameControlsMenu, GameInputs, GameVideoOptions,
   CastleStringUtils, CastleClassUtils,
   GameNotifications, GameLevelAvailable, GameBackgroundLevel,
-  XmlSoundEngine, GLSoundMenu, VRMLNodes,
+  XmlSoundEngine, CastleSoundMenu, VRMLNodes,
   GameCredits, GLAntiAliasing, KeysMouse;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
@@ -87,9 +87,9 @@ type
 
   TSoundMenu = class(TSubMenu)
   public
-    SoundInfo: TGLSoundInfoMenuItem;
-    SoundVolume: TGLSoundVolumeMenuItem;
-    MusicVolume: TGLMusicVolumeMenuItem;
+    SoundInfo: TSoundInfoMenuItem;
+    SoundVolume: TSoundVolumeMenuItem;
+    MusicVolume: TMusicVolumeMenuItem;
 
     OpenALDeviceArgument: TMenuArgument;
     constructor Create(AOwner: TComponent); override;
@@ -595,9 +595,9 @@ begin
   OpenALDeviceArgument := TMenuArgument.Create(450);
   OpenALDeviceArgument.Value := SoundEngine.DeviceNiceName;
 
-  SoundInfo := TGLSoundInfoMenuItem.Create(Window, Self, SoundEngine);
-  SoundVolume := TGLSoundVolumeMenuItem.Create(Window, Self, SoundEngine);
-  MusicVolume := TGLMusicVolumeMenuItem.Create(Window, Self, SoundEngine);
+  SoundInfo := TSoundInfoMenuItem.Create(Window, Self, SoundEngine);
+  SoundVolume := TSoundVolumeMenuItem.Create(Window, Self, SoundEngine);
+  MusicVolume := TMusicVolumeMenuItem.Create(Window, Self, SoundEngine);
   Items.AddObject('Sound output device', OpenALDeviceArgument);
   Items.Add('Back to main menu');
 

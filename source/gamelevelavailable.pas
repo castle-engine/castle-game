@@ -23,12 +23,12 @@
 { TLevelAvailable class and related things. }
 unit GameLevelAvailable;
 
-{$I kambiconf.inc}
+{$I castleconf.inc}
 
 interface
 
 uses GameLevel, CastleUtils, Classes,
-  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, GLProgress,
+  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, CastleProgress,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type
@@ -110,7 +110,7 @@ implementation
 
 uses SysUtils, GameConfig, CastleXMLUtils, CastleFilesUtils,
   GameLevelSpecific, XMLRead, GameWindow, GLImages,
-  Images, GLWindow, GLWinModes, CastleTimeUtils, UIControls,
+  Images, CastleWindow, CastleWindowModes, CastleTimeUtils, UIControls,
   GameRequiredResources;
 
 { TLevelAvailable ------------------------------------------------------------ }
@@ -125,7 +125,7 @@ destructor TLevelAvailable.Destroy;
 begin
   FreeAndNil(RequiredCreatures);
 
-  { Thanks to GLWindowClose implementation, we can be sure that gl context
+  { Thanks to WindowClose implementation, we can be sure that gl context
     is active now, so it's not a problem to call glFreeDisplayList now. }
 
   glFreeDisplayList(GLList_LoadingBgImage);
@@ -251,12 +251,12 @@ function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
   var
     SavedBarYPosition: Single;
   begin
-    SavedBarYPosition := GLProgressInterface.BarYPosition;
-    GLProgressInterface.BarYPosition := LoadingBarYPosition;
+    SavedBarYPosition := WindowProgressInterface.BarYPosition;
+    WindowProgressInterface.BarYPosition := LoadingBarYPosition;
     try
       CreateLevelCore;
     finally
-      GLProgressInterface.BarYPosition := SavedBarYPosition;
+      WindowProgressInterface.BarYPosition := SavedBarYPosition;
     end;
   end;
 
@@ -386,7 +386,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowOpen(Window: TCastleWindowBase);
+procedure WindowOpen(Window: TCastleWindowBase);
 begin
   { Do this now (not at initialization), because loading available
     levels requires knowledge of Glw window sizes (because LoadingBg
@@ -395,7 +395,7 @@ begin
   LevelsAvailable.LoadFromConfig;
 end;
 
-procedure GLWindowClose(Window: TCastleWindowBase);
+procedure WindowClose(Window: TCastleWindowBase);
 begin
   if LevelsAvailable <> nil then
   begin
@@ -406,10 +406,10 @@ end;
 
 initialization
   LevelsAvailable := TLevelAvailableList.Create(true);
-  Window.OnOpenList.Add(@GLWindowOpen);
-  Window.OnCloseList.Add(@GLWindowClose);
+  Window.OnOpenList.Add(@WindowOpen);
+  Window.OnCloseList.Add(@WindowClose);
 finalization
   { Call CloseGLW in case OnClose event would happen after finalization
     of this unit. }
-  GLWindowClose(Window);
+  WindowClose(Window);
 end.

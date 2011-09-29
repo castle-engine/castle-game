@@ -31,9 +31,9 @@ procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 
 implementation
 
-uses SysUtils, Classes, CastleUtils, CastleStringUtils, GLWinModes,
-  GL, GLU, CastleGLUtils, GLWinMessages, GameWindow,
-  VectorMath, GLWindow, GamePlay, GameGeneralMenu,
+uses SysUtils, Classes, CastleUtils, CastleStringUtils, CastleWindowModes,
+  GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
+  VectorMath, CastleWindow, GamePlay, GameGeneralMenu,
   GameControlsMenu, GameInputs, GameCreatures, GameChooseMenu,
   GameItems, GLMenu, RaysWindow, GameVideoOptions,
   GameSound, VRMLNodes, CastleClassUtils, GameNotifications,
@@ -974,7 +974,7 @@ begin
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
-    GLWinMessagesTheme.RectColor[3] := 1.0;
+    MessagesTheme.RectColor[3] := 1.0;
 
     Window.OnKeyDown := @KeyDown;
     Window.OnMouseDown := @MouseDown;

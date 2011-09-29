@@ -111,8 +111,8 @@ var
 
 implementation
 
-uses Math, SysUtils, CastleUtils, GLWindow,
-  GLWinModes, GL, GLU, GLExt, CastleGLUtils, GLWinMessages, GameWindow,
+uses Math, SysUtils, CastleUtils, CastleWindow,
+  CastleWindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
   VectorMath, Boxes3D, Images,
   GameHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, UIControls,
@@ -1099,7 +1099,7 @@ begin
 
       glEnable(GL_LIGHTING);
 
-      GLWinMessagesTheme.RectColor[3] := 0.4;
+      MessagesTheme.RectColor[3] := 0.4;
 
       if PrepareNewPlayer then
         Level.PrepareNewPlayer(Player);
@@ -1155,7 +1155,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowOpen(Window: TCastleWindowBase);
+procedure WindowOpen(Window: TCastleWindowBase);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -1180,7 +1180,7 @@ var
   I: Integer;
 begin
   { Calculate GLList_NotificationsBackground }
-  GLList_NotificationsBackground := glGenListsCheck(1, 'CastlePlay.GLWindowOpen');
+  GLList_NotificationsBackground := glGenListsCheck(1, 'CastlePlay.WindowOpen');
   glNewList(GLList_NotificationsBackground, GL_COMPILE);
   try
     glLoadIdentity;
@@ -1205,7 +1205,7 @@ begin
   Font_BFNT_BitstreamVeraSans     := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
 end;
 
-procedure GLWindowClose(Window: TCastleWindowBase);
+procedure WindowClose(Window: TCastleWindowBase);
 begin
   FreeAndNil(Font_BFNT_BitstreamVeraSans);
   FreeAndNil(Font_BFNT_BitstreamVeraSans_m10);
@@ -1216,8 +1216,8 @@ end;
 
 initialization
   ShowDebugInfo := false;
-  Window.OnOpenList.Add(@GLWindowOpen);
-  Window.OnCloseList.Add(@GLWindowClose);
+  Window.OnOpenList.Add(@WindowOpen);
+  Window.OnCloseList.Add(@WindowClose);
 
   AutoOpenInventory := ConfigFile.GetValue(
     'auto_open_inventory', DefaultAutoOpenInventory);

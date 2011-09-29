@@ -31,12 +31,12 @@ procedure ShowGameMenu(AControlsUnder: TUIControlList);
 
 implementation
 
-uses SysUtils, Classes, CastleUtils, CastleStringUtils, GLWinModes,
-  GL, GLU, CastleGLUtils, GLWinMessages, GameWindow,
-  VectorMath, GLWindow, GameHelp, GamePlay, GameGeneralMenu,
+uses SysUtils, Classes, CastleUtils, CastleStringUtils, CastleWindowModes,
+  GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
+  VectorMath, CastleWindow, GameHelp, GamePlay, GameGeneralMenu,
   GameControlsMenu, GameInputs, GameChooseMenu,
   GameVideoOptions, GameSound, VRMLNodes, CastleClassUtils, GameNotifications,
-  GLSoundMenu, KeysMouse;
+  CastleSoundMenu, KeysMouse;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -48,9 +48,9 @@ type
 
   TGameSoundMenu = class(TCastleGameMenu)
   public
-    SoundInfo: TGLSoundInfoMenuItem;
-    SoundVolume: TGLSoundVolumeMenuItem;
-    MusicVolume: TGLMusicVolumeMenuItem;
+    SoundInfo: TSoundInfoMenuItem;
+    SoundVolume: TSoundVolumeMenuItem;
+    MusicVolume: TMusicVolumeMenuItem;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Click; override;
@@ -103,9 +103,9 @@ constructor TGameSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  SoundInfo := TGLSoundInfoMenuItem.Create(Window, Self, SoundEngine);
-  SoundVolume := TGLSoundVolumeMenuItem.Create(Window, Self, SoundEngine);
-  MusicVolume := TGLMusicVolumeMenuItem.Create(Window, Self, SoundEngine);
+  SoundInfo := TSoundInfoMenuItem.Create(Window, Self, SoundEngine);
+  SoundVolume := TSoundVolumeMenuItem.Create(Window, Self, SoundEngine);
+  MusicVolume := TMusicVolumeMenuItem.Create(Window, Self, SoundEngine);
   Items.Add('Back to game menu');
 end;
 
@@ -162,7 +162,7 @@ begin
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
-    GLWinMessagesTheme.RectColor[3] := 1.0;
+    MessagesTheme.RectColor[3] := 1.0;
 
     Window.OnKeyDown := @KeyDown;
     Window.OnMouseDown := @MouseDown;

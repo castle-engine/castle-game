@@ -24,8 +24,8 @@
 
 program castle;
 
-uses GLWindow, SysUtils, CastleUtils, ProgressUnit, GLProgress,
-  Classes, CastleParameters, GLWinMessages, CastleGLUtils, CastleStringUtils,
+uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
+  Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
   CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu,
@@ -196,7 +196,7 @@ begin
     end;
   end;
 
-  { init glwindow }
+  { init window }
   Window.Caption := 'The Castle';
   Window.ResizeAllowed := raOnlyAtOpen;
   if RenderShadowsPossible then
@@ -205,8 +205,8 @@ begin
   OpenContext;
 
   { init progress }
-  GLProgressInterface.Window := Window;
-  Progress.UserInterface := GLProgressInterface;
+  WindowProgressInterface.Window := Window;
+  Progress.UserInterface := WindowProgressInterface;
   { I'm turning UseDescribePosition to false, because it's usually
     confusing for the user.
     E.g. each creature is counted as PrepareRenderSteps steps,

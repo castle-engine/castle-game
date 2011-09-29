@@ -25,7 +25,7 @@ unit GameChooseMenu;
 
 interface
 
-uses Classes, GLWindow, GL, GLU, UIControls;
+uses Classes, CastleWindow, GL, GLU, UIControls;
 
 { Allows user to choose one item from MenuItems.
   Displays menu using TCastleGameMenu with ControlsUnder background. }
@@ -34,7 +34,7 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 
 implementation
 
-uses SysUtils, GLWinModes, CastleGLUtils, GameInputs, GLWinMessages, GLMenu,
+uses SysUtils, CastleWindowModes, CastleGLUtils, GameInputs, CastleMessages, GLMenu,
   GameWindow, GameGeneralMenu, GamePlay, VectorMath, GameNotifications,
   KeysMouse;
 
@@ -111,7 +111,7 @@ begin
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
-    GLWinMessagesTheme.RectColor[3] := 1.0;
+    MessagesTheme.RectColor[3] := 1.0;
 
     Window.Controls.MakeSingle(TCastleMenu, ChooseMenu);
 

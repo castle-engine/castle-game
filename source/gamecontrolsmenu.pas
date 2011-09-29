@@ -25,7 +25,7 @@ unit GameControlsMenu;
 
 interface
 
-uses Classes, GLWindow, GL, GLU, GameGeneralMenu, Cameras,
+uses Classes, CastleWindow, GL, GLU, GameGeneralMenu, Cameras,
   OpenGLFonts, OpenGLBmpFonts, UIControls;
 
 type
@@ -74,12 +74,12 @@ var
   InvertVerticalMouseLook: boolean;
 
   { Font used for menu SubMenuTitle.
-    Initialized / finalized in GLWindow Open/Close here. }
+    Initialized / finalized in CastleWindow Open/Close here. }
   SubMenuTitleFont: TGLBitmapFont_Abstract;
 
 implementation
 
-uses SysUtils, GLWinModes, CastleGLUtils, GLWinMessages, GameWindow,
+uses SysUtils, CastleWindowModes, CastleGLUtils, CastleMessages, GameWindow,
   GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
   GameInputs, KeysMouse, VectorMath, CastleUtils, GamePlay,
   GameConfig, CastleStringUtils, GameNotifications;

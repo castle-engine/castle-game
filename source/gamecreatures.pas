@@ -1184,7 +1184,7 @@ var
 
 implementation
 
-uses SysUtils, DOM, GL, GLU, GameWindow, GLWindow,
+uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow,
   CastleFilesUtils, CastleGLUtils, ProgressUnit, GamePlay,
   GameVideoOptions, GameNotifications, GameRequiredResources;
 
@@ -3621,12 +3621,12 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowClose(Window: TCastleWindowBase);
+procedure WindowClose(Window: TCastleWindowBase);
 var
   I: Integer;
 begin
   { In fact, CreaturesKinds will always be nil here, because
-    GLWindowClose will be called from GameWindow unit finalization
+    WindowClose will be called from GameWindow unit finalization
     that will be done after this unit's finalization (DoFinalization).
 
     That's OK --- DoFinalization already freed
@@ -3642,7 +3642,7 @@ end;
 
 procedure DoInitialization;
 begin
-  Window.OnCloseList.Add(@GLWindowClose);
+  Window.OnCloseList.Add(@WindowClose);
 
   CreaturesKinds := TCreatureKindList.Create(true);
 

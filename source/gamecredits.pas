@@ -25,7 +25,7 @@ unit GameCredits;
 
 interface
 
-uses GLWindow, UIControls, VRMLNodes;
+uses CastleWindow, UIControls, VRMLNodes;
 
 { Show credits. }
 procedure ShowCredits(ControlsUnder: TUIControlList);
@@ -37,8 +37,8 @@ procedure CredistGLContextRelease;
 
 implementation
 
-uses SysUtils, GL, GLU, CastleGLUtils, GLWinMessages,
-  GameNotifications, CastleStringUtils, GLWinModes,
+uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
+  GameNotifications, CastleStringUtils, CastleWindowModes,
   GameInputs, GamePlay, GameWindow,
   GameVideoOptions, VectorMath, VRMLGLScene, CastleFilesUtils,
   GameHelp, CastleUtils, VRMLFields, CastleTimeUtils, KeysMouse;
