@@ -44,35 +44,35 @@ uses SysUtils, Classes, KambiUtils, GLWinModes,
   XmlSoundEngine, GLSoundMenu, VRMLNodes,
   GameCredits, GLAntiAliasing, KeysMouse;
 
-{ TCastleMenu descendants interface ------------------------------------------ }
+{ TCastleGameMenu descendants interface ------------------------------------------ }
 
 type
-  TMainMenu = class(TCastleMenu)
+  TMainMenu = class(TCastleGameMenu)
   public
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
   end;
 
-  TTextureMinificationQualitySlider = class(TGLMenuIntegerSlider)
+  TTextureMinificationQualitySlider = class(TCastleMenuIntegerSlider)
     constructor Create;
     function ValueToStr(const AValue: Integer): string; override;
   end;
 
-  TAntiAliasingSlider = class(TGLMenuIntegerSlider)
+  TAntiAliasingSlider = class(TCastleMenuIntegerSlider)
     constructor Create;
     function ValueToStr(const AValue: Integer): string; override;
   end;
 
   TVideoMenu = class(TSubMenu)
   public
-    TextureMinificationQualitySlider: TGLMenuIntegerSlider;
-    AllowScreenChangeArgument: TGLMenuBooleanArgument;
-    RenderShadowsArgument: TGLMenuBooleanArgument;
-    CreatureAnimationSlider: TGLMenuIntegerSlider;
-    ColorDepthArgument: TGLMenuItemArgument;
-    VideoFrequencyArgument: TGLMenuItemArgument;
-    ConserveResourcesArgument: TGLMenuBooleanArgument;
-    BumpMappingArgument: TGLMenuBooleanArgument;
+    TextureMinificationQualitySlider: TCastleMenuIntegerSlider;
+    AllowScreenChangeArgument: TCastleMenuBooleanArgument;
+    RenderShadowsArgument: TCastleMenuBooleanArgument;
+    CreatureAnimationSlider: TCastleMenuIntegerSlider;
+    ColorDepthArgument: TCastleMenuItemArgument;
+    VideoFrequencyArgument: TCastleMenuItemArgument;
+    ConserveResourcesArgument: TCastleMenuBooleanArgument;
+    BumpMappingArgument: TCastleMenuBooleanArgument;
     AntiAliasingSlider: TAntiAliasingSlider;
     constructor Create(AOwner: TComponent); override;
     procedure SetTextureMinificationQuality(
@@ -91,7 +91,7 @@ type
     SoundVolume: TGLSoundVolumeMenuItem;
     MusicVolume: TGLMusicVolumeMenuItem;
 
-    OpenALDeviceArgument: TGLMenuItemArgument;
+    OpenALDeviceArgument: TCastleMenuItemArgument;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Click; override;
@@ -117,11 +117,11 @@ type
   end;
 
 { ----------------------------------------------------------------------------
-  global vars (used by TCastleMenu descendants implementation) }
+  global vars (used by TCastleGameMenu descendants implementation) }
 
 var
   UserQuit: boolean;
-  CurrentMenu: TCastleMenu;
+  CurrentMenu: TCastleGameMenu;
   MainMenu: TMainMenu;
   VideoMenu: TVideoMenu;
   SoundMenu: TSoundMenu;
@@ -325,22 +325,22 @@ begin
   inherited;
 
   TextureMinificationQualitySlider := TTextureMinificationQualitySlider.Create;
-  AllowScreenChangeArgument := TGLMenuBooleanArgument.Create(AllowScreenChange);
-  RenderShadowsArgument := TGLMenuBooleanArgument.Create(RenderShadows);
-  CreatureAnimationSlider := TGLMenuIntegerSlider.Create(
+  AllowScreenChangeArgument := TCastleMenuBooleanArgument.Create(AllowScreenChange);
+  RenderShadowsArgument := TCastleMenuBooleanArgument.Create(RenderShadows);
+  CreatureAnimationSlider := TCastleMenuIntegerSlider.Create(
     MinCreatureAnimationScenesPerTime,
     MaxCreatureAnimationScenesPerTime,
     CreatureAnimationScenesPerTime);
 
-  ColorDepthArgument := TGLMenuItemArgument.Create(
-    TGLMenuItemArgument.TextWidth(SSystemDefault));
+  ColorDepthArgument := TCastleMenuItemArgument.Create(
+    TCastleMenuItemArgument.TextWidth(SSystemDefault));
   ColorDepthArgument.Value := ColorDepthBitsToStr(ColorDepthBits);
 
-  VideoFrequencyArgument := TGLMenuItemArgument.Create(
-    TGLMenuItemArgument.TextWidth(SSystemDefault));
+  VideoFrequencyArgument := TCastleMenuItemArgument.Create(
+    TCastleMenuItemArgument.TextWidth(SSystemDefault));
   VideoFrequencyArgument.Value := VideoFrequencyToStr(VideoFrequency);
 
-  BumpMappingArgument := TGLMenuBooleanArgument.Create(BumpMapping);
+  BumpMappingArgument := TCastleMenuBooleanArgument.Create(BumpMapping);
 
   AntiAliasingSlider := TAntiAliasingSlider.Create;
 
@@ -592,7 +592,7 @@ constructor TSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  OpenALDeviceArgument := TGLMenuItemArgument.Create(450);
+  OpenALDeviceArgument := TCastleMenuItemArgument.Create(450);
   OpenALDeviceArgument.Value := SoundEngine.DeviceNiceName;
 
   SoundInfo := TGLSoundInfoMenuItem.Create(Window, Self, SoundEngine);
@@ -781,22 +781,22 @@ begin
     SaveScreen;
 end;
 
-procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TCastleWindowBase; key: TKey; c: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
 end;
 
-procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TCastleWindowBase; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TCastleWindowBase; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure CloseQuery(Window: TGLWindow);
+procedure CloseQuery(Window: TCastleWindowBase);
 begin
   if MessageYesNo(Window, 'Are you sure you want to quit ?') then
     UserQuit := true;
@@ -838,7 +838,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TGLWindow);
+procedure OpenWindow(Window: TCastleWindowBase);
 begin
   MainMenu := TMainMenu.Create(Application);
   VideoMenu := TVideoMenu.Create(Application);

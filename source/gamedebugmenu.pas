@@ -39,76 +39,76 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   GameSound, VRMLNodes, KambiClassUtils, GameNotifications,
   GameLevelAvailable, Boxes3D, KeysMouse;
 
-{ TCastleMenu descendants interface ------------------------------------------ }
+{ TCastleGameMenu descendants interface ------------------------------------------ }
 
 type
-  TViewAngleSlider = class(TGLMenuFloatSlider)
+  TViewAngleSlider = class(TCastleMenuFloatSlider)
   public
     constructor Create;
     function ValueToStr(const AValue: Single): string; override;
   end;
 
-  TDebugMenu = class(TCastleMenu)
+  TDebugMenu = class(TCastleGameMenu)
   public
-    RenderBoundingBoxesArgument: TGLMenuBooleanArgument;
-    RenderDebugCaptionsArgument: TGLMenuBooleanArgument;
-    DebugRenderShadowVolumeArgument: TGLMenuBooleanArgument;
-    DebugRenderForLevelScreenshotArgument: TGLMenuBooleanArgument;
+    RenderBoundingBoxesArgument: TCastleMenuBooleanArgument;
+    RenderDebugCaptionsArgument: TCastleMenuBooleanArgument;
+    DebugRenderShadowVolumeArgument: TCastleMenuBooleanArgument;
+    DebugRenderForLevelScreenshotArgument: TCastleMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
   end;
 
-  TDebugPlayerMenu = class(TCastleMenu)
+  TDebugPlayerMenu = class(TCastleGameMenu)
   public
     ViewAngleSlider: TViewAngleSlider;
-    RotationHorizontalSpeedSlider: TGLMenuFloatSlider;
-    RotationVerticalSpeedSlider: TGLMenuFloatSlider;
-    PlayerSpeedSlider: TGLMenuFloatSlider;
+    RotationHorizontalSpeedSlider: TCastleMenuFloatSlider;
+    RotationVerticalSpeedSlider: TCastleMenuFloatSlider;
+    PlayerSpeedSlider: TCastleMenuFloatSlider;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
   end;
 
-  TDebugItemsMenu = class(TCastleMenu)
+  TDebugItemsMenu = class(TCastleGameMenu)
   public
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
   end;
 
-  TDebugCreaturesMenu = class(TCastleMenu)
+  TDebugCreaturesMenu = class(TCastleGameMenu)
   public
-    DebugTimeStopForCreaturesArgument: TGLMenuBooleanArgument;
+    DebugTimeStopForCreaturesArgument: TCastleMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
   end;
 
-  TDebugLevelMenu = class(TCastleMenu)
+  TDebugLevelMenu = class(TCastleGameMenu)
   public
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
   end;
 
-  TEditLevelLightsMenu = class(TCastleMenu)
+  TEditLevelLightsMenu = class(TCastleGameMenu)
   public
-    AmbientColorSlider: array[0..2] of TGLMenuFloatSlider;
+    AmbientColorSlider: array[0..2] of TCastleMenuFloatSlider;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
   end;
 
-  TEditOneLightMenu = class(TCastleMenu)
+  TEditOneLightMenu = class(TCastleGameMenu)
   public
     Light: TAbstractLightNode;
-    RedColorSlider: TGLMenuFloatSlider;
-    GreenColorSlider: TGLMenuFloatSlider;
-    BlueColorSlider: TGLMenuFloatSlider;
-    IntensitySlider: TGLMenuFloatSlider;
-    AmbientIntensitySlider: TGLMenuFloatSlider;
-    OnArgument: TGLMenuBooleanArgument;
-    ShadowsArgument: TGLMenuBooleanArgument;
-    ShadowsMainArgument: TGLMenuBooleanArgument;
-    PositionSlider: array [0..2] of TGLMenuFloatSlider;
+    RedColorSlider: TCastleMenuFloatSlider;
+    GreenColorSlider: TCastleMenuFloatSlider;
+    BlueColorSlider: TCastleMenuFloatSlider;
+    IntensitySlider: TCastleMenuFloatSlider;
+    AmbientIntensitySlider: TCastleMenuFloatSlider;
+    OnArgument: TCastleMenuBooleanArgument;
+    ShadowsArgument: TCastleMenuBooleanArgument;
+    ShadowsMainArgument: TCastleMenuBooleanArgument;
+    PositionSlider: array [0..2] of TCastleMenuFloatSlider;
     constructor Create(AOwner: TComponent; ALight: TAbstractLightNode); reintroduce;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
@@ -119,13 +119,13 @@ type
       read GetLightLocation write SetLightLocation;
   end;
 
-  TEditHeadlightMenu = class(TCastleMenu)
+  TEditHeadlightMenu = class(TCastleGameMenu)
   public
     Headlight: TAbstractLightNode;
-    AmbientIntensitySlider: TGLMenuFloatSlider;
-    ColorSlider: array[0..2] of TGLMenuFloatSlider;
-    IntensitySlider: TGLMenuFloatSlider;
-    SpotArgument: TGLMenuBooleanArgument;
+    AmbientIntensitySlider: TCastleMenuFloatSlider;
+    ColorSlider: array[0..2] of TCastleMenuFloatSlider;
+    IntensitySlider: TCastleMenuFloatSlider;
+    SpotArgument: TCastleMenuBooleanArgument;
     constructor Create(AOwner: TComponent; AHeadlight: TAbstractLightNode); reintroduce;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
@@ -145,12 +145,12 @@ begin
 end;
 
 { ----------------------------------------------------------------------------
-  global vars (used by TCastleMenu descendants implementation) }
+  global vars (used by TCastleGameMenu descendants implementation) }
 
 var
   UserQuit: boolean;
   ControlsUnder: TUIControlList;
-  CurrentMenu: TCastleMenu;
+  CurrentMenu: TCastleGameMenu;
 
   DebugMenu: TDebugMenu;
   DebugPlayerMenu: TDebugPlayerMenu;
@@ -167,10 +167,10 @@ constructor TDebugMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  RenderBoundingBoxesArgument := TGLMenuBooleanArgument.Create(RenderBoundingBoxes);
-  RenderDebugCaptionsArgument := TGLMenuBooleanArgument.Create(RenderDebugCaptions);
-  DebugRenderShadowVolumeArgument := TGLMenuBooleanArgument.Create(DebugRenderShadowVolume);
-  DebugRenderForLevelScreenshotArgument := TGLMenuBooleanArgument.Create(
+  RenderBoundingBoxesArgument := TCastleMenuBooleanArgument.Create(RenderBoundingBoxes);
+  RenderDebugCaptionsArgument := TCastleMenuBooleanArgument.Create(RenderDebugCaptions);
+  DebugRenderShadowVolumeArgument := TCastleMenuBooleanArgument.Create(DebugRenderShadowVolume);
+  DebugRenderForLevelScreenshotArgument := TCastleMenuBooleanArgument.Create(
     DebugRenderForLevelScreenshot);
 
   Items.Add('Player debug menu');
@@ -247,9 +247,9 @@ begin
 
   { Note that Player is not created at this point.
     We will init Value of these sliders later. }
-  RotationHorizontalSpeedSlider := TGLMenuFloatSlider.Create(25, 500, 1);
-  RotationVerticalSpeedSlider := TGLMenuFloatSlider.Create(25, 500, 1);
-  PlayerSpeedSlider := TGLMenuFloatSlider.Create(0.1, 5, 1);
+  RotationHorizontalSpeedSlider := TCastleMenuFloatSlider.Create(25, 500, 1);
+  RotationVerticalSpeedSlider := TCastleMenuFloatSlider.Create(25, 500, 1);
+  PlayerSpeedSlider := TCastleMenuFloatSlider.Create(0.1, 5, 1);
 
   Items.Add('Set Player.MaxLife');
   Items.Add('Player.Life := Player.MaxLife');
@@ -320,7 +320,7 @@ constructor TDebugCreaturesMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  DebugTimeStopForCreaturesArgument := TGLMenuBooleanArgument.Create(
+  DebugTimeStopForCreaturesArgument := TCastleMenuBooleanArgument.Create(
     DebugTimeStopForCreatures);
 
   Items.Add('Show info about creatures on level');
@@ -604,13 +604,13 @@ begin
   { To better visualize light changes. }
   DrawBackgroundRectangle := false;
 
-  AmbientIntensitySlider := TGLMenuFloatSlider.Create(0, 1, Headlight.FdAmbientIntensity.Value);
+  AmbientIntensitySlider := TCastleMenuFloatSlider.Create(0, 1, Headlight.FdAmbientIntensity.Value);
 
-  ColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Headlight.FdColor.Value[0]);
-  ColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Headlight.FdColor.Value[1]);
-  ColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Headlight.FdColor.Value[2]);
+  ColorSlider[0] := TCastleMenuFloatSlider.Create(0, 1, Headlight.FdColor.Value[0]);
+  ColorSlider[1] := TCastleMenuFloatSlider.Create(0, 1, Headlight.FdColor.Value[1]);
+  ColorSlider[2] := TCastleMenuFloatSlider.Create(0, 1, Headlight.FdColor.Value[2]);
 
-  IntensitySlider := TGLMenuFloatSlider.Create(0, 1, Headlight.FdIntensity.Value);
+  IntensitySlider := TCastleMenuFloatSlider.Create(0, 1, Headlight.FdIntensity.Value);
 
   Items.AddObject('Ambient intensity'  , AmbientIntensitySlider);
 
@@ -672,9 +672,9 @@ begin
   { To better visualize changes to Level.GlobalAmbientLight }
   DrawBackgroundRectangle := false;
 
-  AmbientColorSlider[0] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[0]);
-  AmbientColorSlider[1] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[1]);
-  AmbientColorSlider[2] := TGLMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[2]);
+  AmbientColorSlider[0] := TCastleMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[0]);
+  AmbientColorSlider[1] := TCastleMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[1]);
+  AmbientColorSlider[2] := TCastleMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[2]);
 
   for I := 0 to Level.MainScene.GlobalLights.Count - 1 do
   begin
@@ -762,20 +762,20 @@ begin
 
   LevelBoxSizes := Level.CameraBox.Sizes;
   for I := 0 to 2 do
-    PositionSlider[I] := TGLMenuFloatSlider.Create(
+    PositionSlider[I] := TCastleMenuFloatSlider.Create(
       Level.CameraBox.Data[0, I] - LevelBoxSizes[I],
       Level.CameraBox.Data[1, I] + LevelBoxSizes[I],
       LightLocation[I]);
 
-  RedColorSlider := TGLMenuFloatSlider.Create(0, 1, Light.FdColor.Value[0]);
-  GreenColorSlider := TGLMenuFloatSlider.Create(0, 1, Light.FdColor.Value[1]);
-  BlueColorSlider := TGLMenuFloatSlider.Create(0, 1, Light.FdColor.Value[2]);
-  IntensitySlider := TGLMenuFloatSlider.Create(0, 1, Light.FdIntensity.Value);
-  AmbientIntensitySlider := TGLMenuFloatSlider.Create(
+  RedColorSlider := TCastleMenuFloatSlider.Create(0, 1, Light.FdColor.Value[0]);
+  GreenColorSlider := TCastleMenuFloatSlider.Create(0, 1, Light.FdColor.Value[1]);
+  BlueColorSlider := TCastleMenuFloatSlider.Create(0, 1, Light.FdColor.Value[2]);
+  IntensitySlider := TCastleMenuFloatSlider.Create(0, 1, Light.FdIntensity.Value);
+  AmbientIntensitySlider := TCastleMenuFloatSlider.Create(
     -1, 1, Light.FdAmbientIntensity.Value);
-  OnArgument := TGLMenuBooleanArgument.Create(Light.FdOn.Value);
-  ShadowsArgument := TGLMenuBooleanArgument.Create(Light.FdKambiShadows.Value);
-  ShadowsMainArgument := TGLMenuBooleanArgument.Create(
+  OnArgument := TCastleMenuBooleanArgument.Create(Light.FdOn.Value);
+  ShadowsArgument := TCastleMenuBooleanArgument.Create(Light.FdKambiShadows.Value);
+  ShadowsMainArgument := TCastleMenuBooleanArgument.Create(
     Light.FdKambiShadowsMain.Value);
 
   Items.AddObject('Position X', PositionSlider[0]);
@@ -813,7 +813,7 @@ end;
 procedure TEditOneLightMenu.Click;
 
   function MessageInputQueryVector3SingleP(
-    Window: TGLWindow; const Title: string;
+    Window: TCastleWindowBase; const Title: string;
     var Value: TVector3Single; TextAlign: TTextAlign;
     const OnP: TVector3Single): boolean;
   var s: string;
@@ -994,9 +994,9 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TGLWindow);
+procedure OpenWindow(Window: TCastleWindowBase);
 begin
-  { Although base TGLMenu doesn't require OpenGL context at constructor,
+  { Although base TCastleMenu doesn't require OpenGL context at constructor,
     our descendants initialize some arguments that require font initialized
     that requires font display lists created. That's why code below is in
     OnOpen callback, not unit's initialization. }

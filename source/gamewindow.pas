@@ -30,7 +30,7 @@ uses GLWindow, VRMLGLRenderer, OpenGLTTFonts;
 
 var
   { @noAutoLinkHere }
-  Window: TGLUIWindow;
+  Window: TCastleWindowCustom;
 
 var
   GLContextCache: TVRMLGLRendererContextCache;
@@ -49,7 +49,7 @@ const
   Font3dBold = false;
   Font3dItalic = false;
 
-procedure GLWindowOpen(Window: TGLWindow);
+procedure GLWindowOpen(Window: TCastleWindowBase);
 begin
   Font3d := GLContextCache.Fonts_IncReference(
     Font3dFamily, Font3dBold, Font3dItalic,
@@ -59,7 +59,7 @@ begin
   AntiAliasingEnable;
 end;
 
-procedure GLWindowClose(Window: TGLWindow);
+procedure GLWindowClose(Window: TCastleWindowBase);
 begin
   if (GLContextCache <> nil) and (Font3d <> nil) then
   begin
@@ -69,7 +69,7 @@ begin
 end;
 
 initialization
-  Window := TGLUIWindow.Create(nil);
+  Window := TCastleWindowCustom.Create(nil);
   Window.OnDrawStyle := ds3D;
 
   GLContextCache := TVRMLGLRendererContextCache.Create;

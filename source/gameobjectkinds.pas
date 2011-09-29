@@ -36,7 +36,7 @@ type
     FPrepareRenderDone: boolean;
     FBlendingType: TBlendingType;
     { This is internal for PrepareRender. }
-    AnimationsPrepared: TVRMLGLAnimationList;
+    AnimationsPrepared: T3DPrecalculatedAnimationList;
   protected
     { Use this in PrepareRender to share RootNodes[0]
       of your animations in subclasses. In our destructor and FreePrepareRender
@@ -57,20 +57,20 @@ type
       by some debug messages etc.)) }
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
-      var Anim: TVRMLGLAnimation;
-      AnimInfo: TVRMLGLAnimationInfo;
+      var Anim: T3DPrecalculatedAnimation;
+      AnimInfo: T3DPrecalculatedAnimationInfo;
       Options: TPrepareResourcesOptions;
       const BaseLights: TLightInstancesList);
 
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool.
       AnimInfo may be @nil, then this is ignored. }
-    procedure AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
+    procedure AddFirstRootNodesPool(AnimInfo: T3DPrecalculatedAnimationInfo);
 
     { Similar to AddFirstRootNodesPool, this allows us to share
       ManifoldEdges / BorderEdges instances between different animations,
       if they start from the same VRML scene. }
-    procedure AddManifoldEdgesPool(AnimInfo: TVRMLGLAnimationInfo;
-      AnimationToShareEdges: TVRMLGLAnimation);
+    procedure AddManifoldEdgesPool(AnimInfo: T3DPrecalculatedAnimationInfo;
+      AnimationToShareEdges: T3DPrecalculatedAnimation);
 
     { Create AnimInfo instance, reading animation properties from
       XML file KindsConfig. The path of responsible XML element
@@ -83,8 +83,8 @@ type
 
       @param(AnimationName determines the XML element name, so it must
         be a valid part of XML name) }
-    procedure AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
-      KindsConfig: TKamXMLConfig; const AnimationName: string;
+    procedure AnimationFromConfig(var AnimInfo: T3DPrecalculatedAnimationInfo;
+      KindsConfig: TCastleConfig; const AnimationName: string;
       NilIfNoElement: boolean = false); virtual;
 
     { Prepare anything needed when starting new game.
@@ -136,7 +136,7 @@ type
     property BlendingType: TBlendingType
       read FBlendingType write FBlendingType default DefaultBlendingType;
 
-    procedure LoadFromFile(KindsConfig: TKamXMLConfig); virtual;
+    procedure LoadFromFile(KindsConfig: TCastleConfig); virtual;
 
     { This is a debug command, will cause FreePrepareRender
       and then (wrapped within Progress.Init...Fini) will
@@ -157,7 +157,7 @@ begin
   FBlendingType := DefaultBlendingType;
   FirstRootNodesPool := TStringList.Create;
   ManifoldEdgesPool := TStringList.Create;
-  AnimationsPrepared := TVRMLGLAnimationList.Create(false);
+  AnimationsPrepared := T3DPrecalculatedAnimationList.Create(false);
 end;
 
 destructor TObjectKind.Destroy;
@@ -268,7 +268,7 @@ begin
   { Nothing to do in this class. }
 end;
 
-procedure TObjectKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+procedure TObjectKind.LoadFromFile(KindsConfig: TCastleConfig);
 const
   SBlendingTypeIncrease = 'increase';
   SBlendingTypeScale = 'scale';
@@ -289,7 +289,7 @@ begin
   Progress.Init(PrepareRenderSteps, 'Loading object ' + VRMLNodeName);
   try
     { It's important to do FreePrepareRender after Progress.Init.
-      Why ? Because Progress.Init does TGLWindow.SaveScreeToDisplayList,
+      Why ? Because Progress.Init does TCastleWindowBase.SaveScreeToDisplayList,
       and this may call Window.OnDraw, and this may want to redraw
       the object (e.g. if creature of given kind already exists
       on the screen) and this requires PrepareRender to be already done.
@@ -302,7 +302,7 @@ begin
   finally Progress.Fini; end;
 end;
 
-procedure TObjectKind.AddFirstRootNodesPool(AnimInfo: TVRMLGLAnimationInfo);
+procedure TObjectKind.AddFirstRootNodesPool(AnimInfo: T3DPrecalculatedAnimationInfo);
 var
   FileName: string;
 begin
@@ -314,8 +314,8 @@ begin
   end;
 end;
 
-procedure TObjectKind.AddManifoldEdgesPool(AnimInfo: TVRMLGLAnimationInfo;
-  AnimationToShareEdges: TVRMLGLAnimation);
+procedure TObjectKind.AddManifoldEdgesPool(AnimInfo: T3DPrecalculatedAnimationInfo;
+  AnimationToShareEdges: T3DPrecalculatedAnimation);
 var
   FileName: string;
   Index: Integer;
@@ -329,8 +329,8 @@ end;
 
 procedure TObjectKind.CreateAnimationIfNeeded(
   const AnimationName: string;
-  var Anim: TVRMLGLAnimation;
-  AnimInfo: TVRMLGLAnimationInfo;
+  var Anim: T3DPrecalculatedAnimation;
+  AnimInfo: T3DPrecalculatedAnimationInfo;
   Options: TPrepareResourcesOptions;
   const BaseLights: TLightInstancesList);
 
@@ -339,12 +339,12 @@ procedure TObjectKind.CreateAnimationIfNeeded(
     Since all scenes in the animation must have exactly the same
     structure, we know that this ManifoldEdges is actually good
     for all scenes within this animation. }
-  function Animation_ManifoldEdges(Animation: TVRMLGLAnimation): TManifoldEdgeList;
+  function Animation_ManifoldEdges(Animation: T3DPrecalculatedAnimation): TManifoldEdgeList;
   begin
     Result := Animation.FirstScene.ManifoldEdges;
   end;
 
-  function Animation_BorderEdges(Animation: TVRMLGLAnimation): TBorderEdgeList;
+  function Animation_BorderEdges(Animation: T3DPrecalculatedAnimation): TBorderEdgeList;
   begin
     Result := Animation.FirstScene.BorderEdges;
   end;
@@ -353,12 +353,12 @@ procedure TObjectKind.CreateAnimationIfNeeded(
     animation. This is useful if you already have ManifoldEdges and BorderEdges,
     and you somehow know that it's good also for this scene.
 
-    This is not part of TVRMLGLAnimation, because TVRMLGLAnimation doesn't
+    This is not part of T3DPrecalculatedAnimation, because T3DPrecalculatedAnimation doesn't
     guarantee now that all scenes are "structurally equal". So you cannot share
     edges info like this. However, all castle animations satify
     "structurally equal" condition, so it's Ok for them. }
   procedure Animation_ShareManifoldAndBorderEdges(
-    Animation: TVRMLGLAnimation;
+    Animation: T3DPrecalculatedAnimation;
     ManifoldShared: TManifoldEdgeList;
     BorderShared: TBorderEdgeList);
   var
@@ -393,9 +393,9 @@ begin
       begin
         IsSharedManifoldAndBorderEdges := true;
         SharedManifoldEdges := Animation_ManifoldEdges(
-          ManifoldEdgesPool.Objects[FileNameIndex] as TVRMLGLAnimation);
+          ManifoldEdgesPool.Objects[FileNameIndex] as T3DPrecalculatedAnimation);
         SharedBorderEdges := Animation_BorderEdges(
-          ManifoldEdgesPool.Objects[FileNameIndex] as TVRMLGLAnimation);
+          ManifoldEdgesPool.Objects[FileNameIndex] as T3DPrecalculatedAnimation);
       end;
     end;
 
@@ -426,8 +426,8 @@ begin
   Progress.Step;
 end;
 
-procedure TObjectKind.AnimationFromConfig(var AnimInfo: TVRMLGLAnimationInfo;
-  KindsConfig: TKamXMLConfig; const AnimationName: string;
+procedure TObjectKind.AnimationFromConfig(var AnimInfo: T3DPrecalculatedAnimationInfo;
+  KindsConfig: TCastleConfig; const AnimationName: string;
   NilIfNoElement: boolean);
 var
   Element: TDOMElement;
@@ -444,7 +444,7 @@ begin
         [AnimationName, VRMLNodeName]);
   end else
   begin
-    AnimInfo := TVRMLGLAnimationInfo.CreateFromDOMElement(
+    AnimInfo := T3DPrecalculatedAnimationInfo.CreateFromDOMElement(
       Element, ExtractFilePath(KindsConfig.FileName),
       GLContextCache);
   end;

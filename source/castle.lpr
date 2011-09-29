@@ -128,13 +128,13 @@ end;
 
 { initializing GL context --------------------------------------------------- }
 
-procedure MultiSamplingOff(Window: TGLWindow; const FailureMessage: string);
+procedure MultiSamplingOff(Window: TCastleWindowBase; const FailureMessage: string);
 begin
   AntiAliasing := 0;
   if Log then WritelnLogMultiline('GL context', FailureMessage);
 end;
 
-procedure StencilOff(Window: TGLWindow; const FailureMessage: string);
+procedure StencilOff(Window: TCastleWindowBase; const FailureMessage: string);
 begin
   RenderShadowsPossible := false;
   if Log then WritelnLogMultiline('GL context', FailureMessage);

@@ -411,7 +411,7 @@ begin
   Notifications.Show('Loaded level "' + Level.Title + '"');
 end;
 
-procedure Idle(Window: TGLWindow);
+procedure Idle(Window: TCastleWindowBase);
 var
   CompSpeed: Single;
 
@@ -552,7 +552,7 @@ begin
   end;
 end;
 
-procedure Timer(Window: TGLWindow);
+procedure Timer(Window: TCastleWindowBase);
 begin
   if SoundEngine.ALActive then
     SoundEngine.RefreshUsedSources;
@@ -998,7 +998,7 @@ begin
     DoDebugMenu;
 end;
 
-procedure KeyDown(Window: TGLWindow; Key: TKey; C: char);
+procedure KeyDown(Window: TCastleWindowBase; Key: TKey; C: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
   if C = CharEscape then
@@ -1013,17 +1013,17 @@ begin
   end;
 end;
 
-procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TCastleWindowBase; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TCastleWindowBase; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure CloseQuery(Window: TGLWindow);
+procedure CloseQuery(Window: TCastleWindowBase);
 begin
   GameCancel(true);
 end;
@@ -1155,7 +1155,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowOpen(Window: TGLWindow);
+procedure GLWindowOpen(Window: TCastleWindowBase);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -1205,7 +1205,7 @@ begin
   Font_BFNT_BitstreamVeraSans     := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
 end;
 
-procedure GLWindowClose(Window: TGLWindow);
+procedure GLWindowClose(Window: TCastleWindowBase);
 begin
   FreeAndNil(Font_BFNT_BitstreamVeraSans);
   FreeAndNil(Font_BFNT_BitstreamVeraSans_m10);

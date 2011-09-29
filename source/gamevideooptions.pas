@@ -75,14 +75,14 @@ var
   (main scene will override UseSceneLights back to @true,
   for other scenes we ignore lights --- for historic reasons,
   we couldn't support them well in the past.) }
-procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes;
+procedure AttributesSet(Attributes: TSceneRenderingAttributes;
   BlendingType: TBlendingType);
 
 { Set Attributes of animation as needed. In theory you should
   call AttributesSet here, but in practice animation's attributes
   must be a little different, otherwise animations can
   take too much memory to load. }
-procedure AnimationAttributesSet(Attributes: TVRMLSceneRenderingAttributes;
+procedure AnimationAttributesSet(Attributes: TSceneRenderingAttributes;
   BlendingType: TBlendingType);
 
 const
@@ -165,7 +165,7 @@ implementation
 uses SysUtils, KambiUtils, GameConfig, GameWindow, RaysWindow,
   GLAntiAliasing;
 
-procedure AttributesSet(Attributes: TVRMLSceneRenderingAttributes;
+procedure AttributesSet(Attributes: TSceneRenderingAttributes;
   BlendingType: TBlendingType);
 const
   TextureMinificationQualityToGL:
@@ -195,7 +195,7 @@ begin
   Attributes.UseSceneLights := false;
 end;
 
-procedure AnimationAttributesSet(Attributes: TVRMLSceneRenderingAttributes;
+procedure AnimationAttributesSet(Attributes: TSceneRenderingAttributes;
   BlendingType: TBlendingType);
 begin
   { Despite the comments in the interface, this is the same thing

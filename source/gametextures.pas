@@ -52,7 +52,7 @@ type
   TTextureRuleList = class(specialize TFPGObjectList<TTextureRule>)
   private
     GroundRule_Cache: boolean;
-    GroundRule_LastGround: PVRMLTriangle;
+    GroundRule_LastGround: PTriangle;
     GroundRule_LastResult: TTextureRule;
   public
     { Load contents of this object from textures/index.xml file. }
@@ -68,7 +68,7 @@ type
 
       Ground = @nil is allowed here (and will always result in @nil
       returned). }
-    function GroundRule(Ground: PVRMLTriangle): TTextureRule;
+    function GroundRule(Ground: PTriangle): TTextureRule;
   end;
 
 var
@@ -159,7 +159,7 @@ begin
   end;
 end;
 
-function TTextureRuleList.GroundRule(Ground: PVRMLTriangle): TTextureRule;
+function TTextureRuleList.GroundRule(Ground: PTriangle): TTextureRule;
 var
   HasTextureUrl: boolean;
   TextureUrl: string;

@@ -45,11 +45,11 @@ uses SysUtils, GL, GLU, KambiGLUtils, GLWinMessages,
 
 var
   UserQuit: boolean;
-  CreditsModel: TVRMLGLScene;
+  CreditsModel: T3DScene;
   AnimationTime: TKamTime;
   AnimationSpeed, AnimationEnd: TKamTime;
 
-procedure Draw(Window: TGLWindow);
+procedure Draw(Window: TCastleWindowBase);
 
   procedure ProjectionPushSet;
   begin
@@ -98,19 +98,19 @@ begin
   glDisable(GL_SCISSOR_TEST);
 end;
 
-procedure Idle(Window: TGLWindow);
+procedure Idle(Window: TCastleWindowBase);
 begin
   AnimationTime := AnimationTime + Window.Fps.IdleSpeed;
   if AnimationTime > AnimationEnd then
     UserQuit := true;
 end;
 
-procedure CloseQuery(Window: TGLWindow);
+procedure CloseQuery(Window: TCastleWindowBase);
 begin
   MessageOK(Window, 'You can''t exit now.');
 end;
 
-procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TCastleWindowBase; key: TKey; c: char);
 begin
   if CastleInput_SaveScreen.Shortcut.IsEvent(Key, #0, false, mbLeft, mwNone) then
     SaveScreen else
@@ -118,7 +118,7 @@ begin
     UserQuit := true;
 end;
 
-procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TCastleWindowBase; Button: TMouseButton);
 begin
   if CastleInput_SaveScreen.Shortcut.IsEvent(K_None, #0, true, Button, mwNone) then
     SaveScreen else
@@ -126,7 +126,7 @@ begin
     UserQuit := true;
 end;
 
-procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TCastleWindowBase; const Scroll: Single; const Vertical: boolean);
 begin
   if CastleInput_SaveScreen.Shortcut.IsEvent(K_None, #0, false, mbLeft, MouseWheelDirection(Scroll, Vertical)) then
     SaveScreen;
@@ -135,7 +135,7 @@ end;
 { $define DEBUG_ALWAYS_RELOAD_CREDITS}
 
 {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
-procedure OpenWindow(Window: TGLWindow); forward;
+procedure OpenWindow(Window: TCastleWindowBase); forward;
 {$endif}
 
 procedure ShowCredits(ControlsUnder: TUIControlList);
@@ -175,7 +175,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TGLWindow);
+procedure OpenWindow(Window: TCastleWindowBase);
 var
   VRMLContents: string;
   Info: TMFString;
@@ -186,7 +186,7 @@ begin
   StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', SCastleWWW);
   StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
-  CreditsModel := TVRMLGLScene.CreateCustomCache(nil, GLContextCache);
+  CreditsModel := T3DScene.CreateCustomCache(nil, GLContextCache);
   CreditsModel.Load(LoadVRMLClassicFromString(VRMLContents, ''), true);
 
   AttributesSet(CreditsModel.Attributes, btIncrease);
@@ -203,7 +203,7 @@ begin
   FreeAndNil(CreditsModel);
 end;
 
-procedure CloseWindow(Window: TGLWindow);
+procedure CloseWindow(Window: TCastleWindowBase);
 begin
   CredistGLContextRelease;
 end;

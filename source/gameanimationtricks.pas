@@ -47,7 +47,7 @@ type
 
     This also ignores TimeLoop (works like it's always @true) and
     TimeBackwards (works like it's always @false). }
-  TBlendedLoopingAnimation = class(TVRMLGLAnimation)
+  TBlendedLoopingAnimation = class(T3DPrecalculatedAnimation)
   public
     constructor Create(AOwner: TComponent); override;
     procedure Render(const Frustum: TFrustum;
@@ -126,7 +126,7 @@ begin
         actually everything renderer here is a transparent object
         (that's why we check Params.Transparent above).
 
-        However, with Blending := false, TVRMLGLScene will assume that
+        However, with Blending := false, T3DScene will assume that
         everything is opaque and should be rendered only when Transparent = false.
         So temporarily switch Transparent. }
       Params.Transparent := false;

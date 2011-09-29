@@ -38,15 +38,15 @@ uses SysUtils, Classes, KambiUtils, KambiStringUtils, GLWinModes,
   GameVideoOptions, GameSound, VRMLNodes, KambiClassUtils, GameNotifications,
   GLSoundMenu, KeysMouse;
 
-{ TCastleMenu descendants interface ------------------------------------------ }
+{ TCastleGameMenu descendants interface ------------------------------------------ }
 
 type
-  TGameMenu = class(TCastleMenu)
+  TGameMenu = class(TCastleGameMenu)
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
   end;
 
-  TGameSoundMenu = class(TCastleMenu)
+  TGameSoundMenu = class(TCastleGameMenu)
   public
     SoundInfo: TGLSoundInfoMenuItem;
     SoundVolume: TGLSoundVolumeMenuItem;
@@ -58,11 +58,11 @@ type
   end;
 
 { ----------------------------------------------------------------------------
-  global vars (used by TCastleMenu descendants implementation) }
+  global vars (used by TCastleGameMenu descendants implementation) }
 
 var
   UserQuit: boolean;
-  CurrentMenu: TCastleMenu;
+  CurrentMenu: TCastleGameMenu;
   GameMenu: TGameMenu;
   GameSoundMenu: TGameSoundMenu;
   ControlsUnder: TUIControlList;
@@ -183,7 +183,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TGLWindow);
+procedure OpenWindow(Window: TCastleWindowBase);
 begin
   GameMenu := TGameMenu.Create(Application);
   GameSoundMenu := TGameSoundMenu.Create(Application);

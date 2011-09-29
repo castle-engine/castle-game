@@ -367,7 +367,7 @@ type
       later (for debug purposes, if you changed something). }
     procedure LoadFromFile;
 
-    function Ground: PVRMLTriangle;
+    function Ground: PTriangle;
 
     procedure LevelChanged;
 
@@ -1299,7 +1299,7 @@ end;
 procedure TPlayer.RenderAttack(Params: TRenderParams);
 var
   AttackTime: Single;
-  Anim: TVRMLGLAnimation;
+  Anim: T3DPrecalculatedAnimation;
 begin
   if Attacking then
   begin
@@ -1401,9 +1401,9 @@ end;
 
 procedure TPlayer.LoadFromFile;
 var
-  PlayerConfig: TKamXMLConfig;
+  PlayerConfig: TCastleConfig;
 begin
-  PlayerConfig := TKamXMLConfig.Create(nil);
+  PlayerConfig := TCastleConfig.Create(nil);
   try
     PlayerConfig.FileName := ProgramDataPath + 'data' + PathDelim +
       'player.xml';
@@ -1455,14 +1455,14 @@ begin
   Attacking := false;
 end;
 
-function TPlayer.Ground: PVRMLTriangle;
+function TPlayer.Ground: PTriangle;
 begin
-  Result := PVRMLTriangle(Camera.AboveGround);
+  Result := PTriangle(Camera.AboveGround);
 end;
 
 { GLWindow open / close ------------------------------------------------------ }
 
-procedure GLWindowOpen(Window: TGLWindow);
+procedure GLWindowOpen(Window: TCastleWindowBase);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -1497,7 +1497,7 @@ begin
   finally glEndList; end;
 end;
 
-procedure GLWindowClose(Window: TGLWindow);
+procedure GLWindowClose(Window: TCastleWindowBase);
 begin
   glFreeDisplayList(GLList_BlankIndicatorImage);
   glFreeDisplayList(GLList_RedIndicatorImage);

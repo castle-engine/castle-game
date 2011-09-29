@@ -226,7 +226,7 @@ begin
   LoadRequiredResources(Element, RequiredCreatures);
 end;
 
-procedure DrawCreateLevel(Window: TGLWindow);
+procedure DrawCreateLevel(Window: TCastleWindowBase);
 begin
   glClear(GL_COLOR_BUFFER_BIT);
   glLoadIdentity;
@@ -386,7 +386,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure GLWindowOpen(Window: TGLWindow);
+procedure GLWindowOpen(Window: TCastleWindowBase);
 begin
   { Do this now (not at initialization), because loading available
     levels requires knowledge of Glw window sizes (because LoadingBg
@@ -395,7 +395,7 @@ begin
   LevelsAvailable.LoadFromConfig;
 end;
 
-procedure GLWindowClose(Window: TGLWindow);
+procedure GLWindowClose(Window: TCastleWindowBase);
 begin
   if LevelsAvailable <> nil then
   begin

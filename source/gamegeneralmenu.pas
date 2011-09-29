@@ -28,7 +28,7 @@ interface
 uses Classes, GLMenu;
 
 type
-  { Just TGLMenu that calls Window.PostRedisplay and plays a sound
+  { Just TCastleMenu that calls Window.PostRedisplay and plays a sound
     on each CurrentItem change.
 
     Also, it's PositioInside is overridden to always catch all events
@@ -36,7 +36,7 @@ type
     menu is the only control used here.
     Also, it let's events further down to our callbacks, thanks
     to ExclusiveEvents being @false. }
-  TCastleMenu = class(TGLMenu)
+  TCastleGameMenu = class(TCastleMenu)
   public
     constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
@@ -51,54 +51,54 @@ var
 
 { Sets CurrentValue, taking care of adding this menu / removing existing menu
   (when new value is @nil) from Window.Controls.
-  Also, returns previous TGLMenu present in Window.Controls (there can be
+  Also, returns previous TCastleMenu present in Window.Controls (there can be
   only one). }
-function SetCurrentMenu(var CurrentValue: TCastleMenu;
-  const NewValue: TCastleMenu): TCastleMenu;
+function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
+  const NewValue: TCastleGameMenu): TCastleGameMenu;
 
 implementation
 
 uses SysUtils, GLWindow, GameWindow, GameSound;
 
-{ TCastleMenu ---------------------------------------------------------------- }
+{ TCastleGameMenu ---------------------------------------------------------------- }
 
-constructor TCastleMenu.Create(AOwner: TComponent);
+constructor TCastleGameMenu.Create(AOwner: TComponent);
 begin
   inherited;
   { Don't set DesignerModeWindow, we do tricks that make setting mouse
-    position in GLMenu not working. See TGLMenu.DesignerMode comments. }
+    position in GLMenu not working. See TCastleMenu.DesignerMode comments. }
   DesignerMode := DebugMenuDesigner;
   ExclusiveEvents := false;
   DrawFocused := false;
 end;
 
-procedure TCastleMenu.CurrentItemChanged;
+procedure TCastleGameMenu.CurrentItemChanged;
 begin
   inherited;
   SoundEngine.Sound(stMenuCurrentItemChanged);
 end;
 
-procedure TCastleMenu.Click;
+procedure TCastleGameMenu.Click;
 begin
   inherited;
   SoundEngine.Sound(stMenuClick);
 end;
 
-function TCastleMenu.PositionInside(const X, Y: Integer): boolean;
+function TCastleGameMenu.PositionInside(const X, Y: Integer): boolean;
 begin
   Result := true;
 end;
 
-function SetCurrentMenu(var CurrentValue: TCastleMenu;
-  const NewValue: TCastleMenu): TCastleMenu;
+function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
+  const NewValue: TCastleGameMenu): TCastleGameMenu;
 begin
   CurrentValue := NewValue;
-  Result := Window.Controls.MakeSingle(TCastleMenu, NewValue) as TCastleMenu;
+  Result := Window.Controls.MakeSingle(TCastleGameMenu, NewValue) as TCastleGameMenu;
 end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure CloseWindow(Window: TGLWindow);
+procedure CloseWindow(Window: TCastleWindowBase);
 begin
   GLMenuCloseGL;
 end;

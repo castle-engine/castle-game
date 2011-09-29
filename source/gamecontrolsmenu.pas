@@ -29,7 +29,7 @@ uses Classes, GLWindow, GL, GLU, GameGeneralMenu, Cameras,
   OpenGLFonts, OpenGLBmpFonts, UIControls;
 
 type
-  TSubMenu = class(TCastleMenu)
+  TSubMenu = class(TCastleGameMenu)
   public
     SubMenuTitle: string;
     { Note that you can freely change this at runtime. No need to call
@@ -84,16 +84,16 @@ uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, GameWindow,
   GameInputs, KeysMouse, VectorMath, KambiUtils, GamePlay,
   GameConfig, KambiStringUtils, GameNotifications;
 
-{ TCastleMenu descendants interface ------------------------------------------ }
+{ TCastleGameMenu descendants interface ------------------------------------------ }
 
 type
   TControlsMenu = class(TSubMenu)
   public
-    MouseLookHorizontalSensitivitySlider: TGLMenuFloatSlider;
-    MouseLookVerticalSensitivitySlider: TGLMenuFloatSlider;
-    AutoOpenInventoryArgument: TGLMenuBooleanArgument;
-    UseMouseLookArgument: TGLMenuBooleanArgument;
-    InvertVerticalMouseLookArgument: TGLMenuBooleanArgument;
+    MouseLookHorizontalSensitivitySlider: TCastleMenuFloatSlider;
+    MouseLookVerticalSensitivitySlider: TCastleMenuFloatSlider;
+    AutoOpenInventoryArgument: TCastleMenuBooleanArgument;
+    UseMouseLookArgument: TCastleMenuBooleanArgument;
+    InvertVerticalMouseLookArgument: TCastleMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
@@ -124,11 +124,11 @@ type
   end;
 
 { ----------------------------------------------------------------------------
-  global vars (used by TCastleMenu descendants implementation) }
+  global vars (used by TCastleGameMenu descendants implementation) }
 
 var
   UserQuit: boolean;
-  CurrentMenu: TCastleMenu;
+  CurrentMenu: TCastleGameMenu;
   ControlsMenu: TControlsMenu;
   BasicControlsMenu: TBasicControlsMenu;
   ItemsControlsMenu: TItemsControlsMenu;
@@ -185,14 +185,14 @@ constructor TControlsMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  MouseLookHorizontalSensitivitySlider := TGLMenuFloatSlider.Create(
+  MouseLookHorizontalSensitivitySlider := TCastleMenuFloatSlider.Create(
     0.01, 0.3, MouseLookHorizontalSensitivity);
-  MouseLookVerticalSensitivitySlider := TGLMenuFloatSlider.Create(
+  MouseLookVerticalSensitivitySlider := TCastleMenuFloatSlider.Create(
     0.01, 0.3, MouseLookVerticalSensitivity);
-  AutoOpenInventoryArgument := TGLMenuBooleanArgument.Create(AutoOpenInventory);
-  UseMouseLookArgument := TGLMenuBooleanArgument.Create(UseMouseLook);
+  AutoOpenInventoryArgument := TCastleMenuBooleanArgument.Create(AutoOpenInventory);
+  UseMouseLookArgument := TCastleMenuBooleanArgument.Create(UseMouseLook);
   InvertVerticalMouseLookArgument :=
-    TGLMenuBooleanArgument.Create(InvertVerticalMouseLook);
+    TCastleMenuBooleanArgument.Create(InvertVerticalMouseLook);
 
   Items.Add('Configure basic controls');
   Items.Add('Configure items controls');
@@ -277,12 +277,12 @@ const
 constructor TControlsSubMenu.CreateControlsSubMenu(AOwner: TComponent;
   AGroup: TInputGroup);
 
-  function InputArgument(const S: string): TGLMenuItemArgument;
+  function InputArgument(const S: string): TCastleMenuItemArgument;
   begin
-    Result := TGLMenuItemArgument.Create(
+    Result := TCastleMenuItemArgument.Create(
       400
       { This used to be
-        TGLMenuItemArgument.TextWidth(
+        TCastleMenuItemArgument.TextWidth(
           'key "Page Down" or "Page Up" or mouse "medium"')
         But this is too long... Unfortunately, it seems that some
         key configurations just will not fit on screen. });
@@ -413,7 +413,7 @@ begin
   { Refresh key names displayed in the menu. }
 
   for I := 0 to CastleGroupInputs[Group].Count - 1 do
-    TGLMenuItemArgument(Items.Objects[I]).Value :=
+    TCastleMenuItemArgument(Items.Objects[I]).Value :=
       CastleGroupInputs[Group].Items[I].Shortcut.Description(SNoneInput);
 end;
 
@@ -501,7 +501,7 @@ begin
     SaveScreen;
 end;
 
-procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TCastleWindowBase; key: TKey; c: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
 
@@ -515,17 +515,17 @@ begin
     end;
 end;
 
-procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TCastleWindowBase; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TCastleWindowBase; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure CloseQuery(Window: TGLWindow);
+procedure CloseQuery(Window: TCastleWindowBase);
 begin
   MessageOK(Window, 'You can''t exit now.');
 end;
@@ -609,7 +609,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TGLWindow);
+procedure OpenWindow(Window: TCastleWindowBase);
 begin
   if GLList_DrawFadeRect = 0 then
     GLList_DrawFadeRect := glGenListsCheck(1, 'CastleControlsMenu.OpenGLW');
@@ -629,7 +629,7 @@ begin
   SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
 
-procedure CloseWindow(Window: TGLWindow);
+procedure CloseWindow(Window: TCastleWindowBase);
 begin
   FreeAndNil(SubMenuTitleFont);
 end;

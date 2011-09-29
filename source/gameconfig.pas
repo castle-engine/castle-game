@@ -32,7 +32,7 @@ var
   { User config file for this game.
     Will be created (and FileName set) in initialization,
     will be flushed and freed in finalization. }
-  ConfigFile: TKamXMLConfig;
+  ConfigFile: TCastleConfig;
 
 implementation
 
@@ -53,7 +53,7 @@ initialization
     - ParamStr(0) is useless for upx executables. }
   OnGetApplicationName := {$ifdef FPC_OBJFPC} @ {$endif} MyGetApplicationName;
 
-  ConfigFile := TKamXMLConfig.Create(nil);
+  ConfigFile := TCastleConfig.Create(nil);
   ConfigFile.FileName := UserConfigFile('.conf');
 finalization
   if ConfigFile <> nil then

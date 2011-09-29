@@ -28,14 +28,14 @@ interface
 uses GLNotifications;
 
 var
-  Notifications: TGLNotifications;
+  Notifications: TCastleNotifications;
 
 implementation
 
 uses SysUtils;
 
 initialization
-  Notifications := TGLNotifications.Create(nil);
+  Notifications := TCastleNotifications.Create(nil);
   Notifications.CollectHistory := true;
   Notifications.MaxMessages := 4;
 finalization

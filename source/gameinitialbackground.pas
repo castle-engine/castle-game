@@ -36,12 +36,12 @@ uses SysUtils, GL, GLU, GLWindow, KambiGLUtils, GLImages,
 var
   GLList_ScreenImage: TGLuint;
 
-procedure Resize(Window: TGLWindow);
+procedure Resize(Window: TCastleWindowBase);
 begin
   ProjectionGLOrtho(0, Window.Width, 0, Window.Height);
 end;
 
-procedure Draw(Window: TGLWindow);
+procedure Draw(Window: TCastleWindowBase);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
@@ -59,14 +59,14 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TGLWindow);
+procedure OpenWindow(Window: TCastleWindowBase);
 begin
   GLList_ScreenImage := LoadImageToDisplayList(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'initial_background.png',
     [TRGBImage], [], Window.Width, Window.Height);
 end;
 
-procedure CloseWindow(Window: TGLWindow);
+procedure CloseWindow(Window: TCastleWindowBase);
 begin
   glFreeDisplayList(GLList_ScreenImage);
 end;

@@ -64,7 +64,7 @@ type
   TItemKind = class(TObjectKind)
   private
     FModelFileName: string;
-    FScene: TVRMLGLScene;
+    FScene: T3DScene;
     FName: string;
     FImageFileName: string;
     FImage: TImage;
@@ -78,18 +78,18 @@ type
       specifying what to prepare. }
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
-      var Anim: TVRMLGLAnimation;
-      AnimInfo: TVRMLGLAnimationInfo;
+      var Anim: T3DPrecalculatedAnimation;
+      AnimInfo: T3DPrecalculatedAnimationInfo;
       const BaseLights: TLightInstancesList);
 
-    function GetStringCheckNonEmpty(KindsConfig: TKamXMLConfig;
+    function GetStringCheckNonEmpty(KindsConfig: TCastleConfig;
       const AttrName: string): string;
   public
     { The constructor. }
     constructor Create(const AVRMLNodeName: string);
     destructor Destroy; override;
 
-    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
+    procedure LoadFromFile(KindsConfig: TCastleConfig); override;
 
     property ModelFileName: string read FModelFileName;
 
@@ -97,7 +97,7 @@ type
     property Name: string read FName;
 
     { Note that the Scene is nil if not PrepareRenderDone. }
-    function Scene: TVRMLGLScene;
+    function Scene: T3DScene;
 
     { This is a 2d image, to be used for inventory slots etc.
       When you call this for the 1st time, the image will be loaded
@@ -164,8 +164,8 @@ type
     FScreenImageAlignLeft: boolean;
     FScreenImageAlignBottom : boolean;
     FEquippingSound: TSoundType;
-    FAttackAnimation: TVRMLGLAnimation;
-    FAttackAnimationInfo: TVRMLGLAnimationInfo;
+    FAttackAnimation: T3DPrecalculatedAnimation;
+    FAttackAnimationInfo: T3DPrecalculatedAnimationInfo;
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
@@ -203,7 +203,7 @@ type
 
     { This is an animation of attack with this weapon.
       TimeBegin must be 0. }
-    property AttackAnimation: TVRMLGLAnimation
+    property AttackAnimation: T3DPrecalculatedAnimation
       read FAttackAnimation;
 
     procedure Use(Item: TItem); override;
@@ -228,7 +228,7 @@ type
     property SoundAttackStart: TSoundType
       read FSoundAttackStart write FSoundAttackStart default stNone;
 
-    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
+    procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
 
   TItemShortRangeWeaponKind = class(TItemWeaponKind)
@@ -243,7 +243,7 @@ type
     property DamageRandom: Single read FDamageRandom write FDamageRandom
       default DefaultItemDamageRandom;
 
-    procedure LoadFromFile(KindsConfig: TKamXMLConfig); override;
+    procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
 
   TItemSwordKind = class(TItemShortRangeWeaponKind)
@@ -407,7 +407,7 @@ begin
 end;
 
 function TItemKind.GetStringCheckNonEmpty(
-  KindsConfig: TKamXMLConfig; const AttrName: string): string;
+  KindsConfig: TCastleConfig; const AttrName: string): string;
 begin
   Result := KindsConfig.GetValue(VRMLNodeName + '/' + AttrName, '');
   if Result = '' then
@@ -415,7 +415,7 @@ begin
       [AttrName, VRMLNodeName]);
 end;
 
-procedure TItemKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+procedure TItemKind.LoadFromFile(KindsConfig: TCastleConfig);
 var
   BasePath: string;
 begin
@@ -432,7 +432,7 @@ begin
   FImageFileName := CombinePaths(BasePath, FImageFileName);
 end;
 
-function TItemKind.Scene: TVRMLGLScene;
+function TItemKind.Scene: T3DScene;
 begin
   Result := FScene;
 end;
@@ -492,7 +492,7 @@ procedure TItemKind.PrepareRenderInternal(const BaseLights: TLightInstancesList)
 begin
   if FScene = nil then
   begin
-    FScene := TVRMLGLScene.CreateCustomCache(nil, GLContextCache);
+    FScene := T3DScene.CreateCustomCache(nil, GLContextCache);
     FScene.Load(ModelFileName);
 
     AttributesSet(Scene.Attributes, BlendingType);
@@ -522,8 +522,8 @@ end;
 
 procedure TItemKind.CreateAnimationIfNeeded(
   const AnimationName: string;
-  var Anim: TVRMLGLAnimation;
-  AnimInfo: TVRMLGLAnimationInfo;
+  var Anim: T3DPrecalculatedAnimation;
+  AnimInfo: T3DPrecalculatedAnimationInfo;
   const BaseLights: TLightInstancesList);
 begin
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
@@ -559,9 +559,9 @@ end;
 procedure TItemKindList.LoadFromFile;
 var
   I: Integer;
-  KindsConfig: TKamXMLConfig;
+  KindsConfig: TCastleConfig;
 begin
-  KindsConfig := TKamXMLConfig.Create(nil);
+  KindsConfig := TCastleConfig.Create(nil);
   try
     KindsConfig.FileName := ProgramDataPath + 'data' + PathDelim +
       'items' + PathDelim + 'kinds.xml';
@@ -662,7 +662,7 @@ begin
   if AttackAnimation <> nil then AttackAnimation.GLContextClose;
 end;
 
-procedure TItemWeaponKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+procedure TItemWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
 var
   BasePath: string;
 begin
@@ -698,7 +698,7 @@ begin
   FDamageRandom := DefaultItemDamageRandom;
 end;
 
-procedure TItemShortRangeWeaponKind.LoadFromFile(KindsConfig: TKamXMLConfig);
+procedure TItemShortRangeWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
@@ -879,7 +879,7 @@ var
   ShiftedPosition: TVector3Single;
   ProposedNewShiftedPosition{, NewShiftedPosition}: TVector3Single;
   FallingDownLength: Single;
-  AboveGround: PVRMLTriangle;
+  AboveGround: PTriangle;
 begin
   FRotation += 3 * CompSpeed * 50;
 
@@ -997,7 +997,7 @@ end;
 
 { initialization / finalization ---------------------------------------- }
 
-procedure GLWindowClose(Window: TGLWindow);
+procedure GLWindowClose(Window: TCastleWindowBase);
 var
   I: Integer;
 begin

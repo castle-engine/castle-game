@@ -7,7 +7,7 @@ begin
     SaveScreen;
 end;
 
-procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TCastleWindowBase; key: TKey; c: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
 
@@ -16,17 +16,17 @@ begin
   end;
 end;
 
-procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TCastleWindowBase; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TCastleWindowBase; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure CloseQuery(Window: TGLWindow);
+procedure CloseQuery(Window: TCastleWindowBase);
 begin
   GameCancel(true);
 end;

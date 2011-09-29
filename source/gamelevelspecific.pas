@@ -36,10 +36,10 @@ const
 type
   TCastleHallLevel = class(TLevel)
   private
-    Symbol: TVRMLGLAnimation;
-    Button: TVRMLGLAnimation;
+    Symbol: T3DPrecalculatedAnimation;
+    Button: T3DPrecalculatedAnimation;
 
-    StairsBlocker: TVRMLGLScene;
+    StairsBlocker: T3DScene;
     StairsBlockerMiddle: TVector3Single;
 
     FLevelExitBox: TBox3D;
@@ -75,7 +75,7 @@ type
   private
     FGateExitBox: TBox3D;
 
-    Teleport: TVRMLGLScene;
+    Teleport: T3DScene;
     FTeleport1Box, FTeleport2Box: TBox3D;
 
     Teleport1Rotate: Single;
@@ -121,8 +121,8 @@ type
   TTowerLevel = class(TLevel)
   private
     MovingElevator: TLevelLinearMovingObject;
-    Elevator: TVRMLGLScene;
-    ElevatorButton: TVRMLGLAnimation;
+    Elevator: T3DScene;
+    ElevatorButton: T3DPrecalculatedAnimation;
   public
     constructor Create(
       const AName: string;
@@ -144,11 +144,11 @@ type
 
     HintOpenDoor: TLevelHintArea;
 
-    FGateExit: TVRMLGLScene;
+    FGateExit: T3DScene;
 
     FDoEndSequence: boolean;
 
-    FEndSequence: TVRMLGLScene;
+    FEndSequence: T3DScene;
     procedure SetDoEndSequence(Value: boolean);
   public
     constructor Create(
@@ -203,17 +203,17 @@ type
   private
     procedure RenameCreatures(Node: TX3DNode);
   private
-    FakeWall: TVRMLGLScene;
+    FakeWall: T3DScene;
 
     MovingElevator49: TLevelLinearMovingObject;
-    Elevator49: TVRMLGLScene;
+    Elevator49: T3DScene;
     Elevator49DownBox: TBox3D;
 
     MovingElevator9a9b: TLevelLinearMovingObject;
-    Elevator9a9b: TVRMLGLScene;
+    Elevator9a9b: T3DScene;
     Elevator9a9bPickBox: TBox3D;
 
-    ExitButton: TVRMLGLScene;
+    ExitButton: T3DScene;
     ExitMessagePending: boolean;
   protected
     procedure ChangeLevelScene; override;
@@ -546,7 +546,7 @@ constructor TGateLevel.Create(
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
 var
-  Cart: TVRMLGLAnimation;
+  Cart: T3DPrecalculatedAnimation;
   GateLevelPath: string;
 begin
   inherited;
@@ -739,7 +739,7 @@ function TGateLevel.CollisionIgnoreItem(
 begin
   Result :=
     (inherited CollisionIgnoreItem(Sender, Triangle)) or
-    (PVRMLTriangle(Triangle)^.State.LastNodes.Material.NodeName = 'MatWater');
+    (PTriangle(Triangle)^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
 procedure TGateLevel.Render3D(const Params: TRenderParams);
@@ -955,7 +955,7 @@ var
   SpiderCreature: TCreature;
   SpiderPosition, SpiderDirection: TVector3Single;
   SpiderMoveDistance: Single;
-  AboveGround: PVRMLTriangle;
+  AboveGround: PTriangle;
 var
   TorchLight: PLightInstance;
 begin
@@ -1404,7 +1404,7 @@ constructor TGateBackgroundLevel.Create(
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
 var
-  Water: TVRMLGLAnimation;
+  Water: T3DPrecalculatedAnimation;
 begin
   inherited;
 

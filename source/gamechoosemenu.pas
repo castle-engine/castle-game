@@ -28,7 +28,7 @@ interface
 uses Classes, GLWindow, GL, GLU, UIControls;
 
 { Allows user to choose one item from MenuItems.
-  Displays menu using TCastleMenu with ControlsUnder background. }
+  Displays menu using TCastleGameMenu with ControlsUnder background. }
 function ChooseByMenu(ControlsUnder: TUIControlList;
   MenuItems: TStringList): Integer;
 
@@ -43,7 +43,7 @@ var
   SelectedIndex: Integer;
 
 type
-  TChooseMenu = class(TCastleMenu)
+  TChooseMenu = class(TCastleGameMenu)
     procedure Click; override;
   end;
 
@@ -69,22 +69,22 @@ begin
     SaveScreen;
 end;
 
-procedure KeyDown(Window: TGLWindow; key: TKey; c: char);
+procedure KeyDown(Window: TCastleWindowBase; key: TKey; c: char);
 begin
   EventDown(Key, false, mbLeft, mwNone);
 end;
 
-procedure MouseDown(Window: TGLWindow; Button: TMouseButton);
+procedure MouseDown(Window: TCastleWindowBase; Button: TMouseButton);
 begin
   EventDown(K_None, true, Button, mwNone);
 end;
 
-procedure MouseWheel(Window: TGLWindow; const Scroll: Single; const Vertical: boolean);
+procedure MouseWheel(Window: TCastleWindowBase; const Scroll: Single; const Vertical: boolean);
 begin
   EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
-procedure CloseQuery(Window: TGLWindow);
+procedure CloseQuery(Window: TCastleWindowBase);
 begin
   MessageOK(Window, 'You can''t exit now.');
 end;
@@ -113,7 +113,7 @@ begin
       with the menu text. }
     GLWinMessagesTheme.RectColor[3] := 1.0;
 
-    Window.Controls.MakeSingle(TGLMenu, ChooseMenu);
+    Window.Controls.MakeSingle(TCastleMenu, ChooseMenu);
 
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
@@ -129,12 +129,12 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TGLWindow);
+procedure OpenWindow(Window: TCastleWindowBase);
 begin
   ChooseMenu := TChooseMenu.Create(nil);
 end;
 
-procedure CloseWindow(Window: TGLWindow);
+procedure CloseWindow(Window: TCastleWindowBase);
 begin
   FreeAndNil(ChooseMenu);
 end;

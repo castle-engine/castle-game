@@ -342,7 +342,7 @@ type
     procedure Idle(const CompSpeed: Single); override;
   end;
 
-  TLevel = class(TKamSceneManager)
+  TLevel = class(TCastleSceneManager)
   private
     FCameraRadius: Single;
     FCameraPreferredHeight: Single;
@@ -364,12 +364,12 @@ type
       early. }
     ItemsToRemove: TX3DNodeList;
 
-    procedure TraverseForItems(Shape: TVRMLShape);
+    procedure TraverseForItems(Shape: TShape);
     procedure SetSickProjection(const Value: boolean);
     procedure SetSickProjectionSpeed(const Value: TKamTime);
   private
     FCreatures: TCreatureList;
-    procedure TraverseForCreatures(Shape: TVRMLShape);
+    procedure TraverseForCreatures(Shape: TShape);
   private
     FInitialPosition: TVector3Single;
     FInitialDirection: TVector3Single;
@@ -431,7 +431,7 @@ type
       object that has meaningfull ChangeLevelScene method. }
     procedure ChangeLevelScene; virtual;
 
-    { Load TVRMLGLAnimation from *.kanim file, doing common tasks.
+    { Load T3DPrecalculatedAnimation from *.kanim file, doing common tasks.
       @unorderedList(
         @item sets Attributes according to AnimationAttributesSet
         @item optionally creates triangle octree for the FirstScene and/or LastScene
@@ -443,7 +443,7 @@ type
     function LoadLevelAnimation(
       const FileName: string;
       CreateFirstOctreeCollisions,
-      CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
+      CreateLastOctreeCollisions: boolean): T3DPrecalculatedAnimation;
 
     { See @link(Picked), you can call this from
       overriden implementations of these. }
@@ -560,7 +560,7 @@ type
 
     procedure GetHeightAbove(const Position: TVector3Single;
       out IsAbove: boolean; out AboveHeight: Single;
-      out AboveGround: PVRMLTriangle);
+      out AboveGround: PTriangle);
       virtual;
     { @groupEnd }
 
@@ -685,7 +685,7 @@ type
     property SceneDynamicShadows: boolean
       read FSceneDynamicShadows write FSceneDynamicShadows default false;
 
-    { Just load TVRMLGLScene from file, doing some common tasks:
+    { Just load T3DScene from file, doing some common tasks:
       @unorderedList(
         @item sets Attributes according to AttributesSet
         @item optionally create triangle octree
@@ -695,7 +695,7 @@ type
         @item FreeExternalResources, since they will not be needed anymore
       ) }
     function LoadLevelScene(const FileName: string;
-      CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
+      CreateOctreeCollisions, PrepareBackground: boolean): T3DScene;
 
     procedure BeforeDraw; override;
     function CreateDefaultCamera(AOwner: TComponent): TCamera; override;
@@ -1140,7 +1140,7 @@ var
   NavigationSpeed: Single;
   Options: TPrepareResourcesOptions;
   NewCameraBox: TBox3D;
-  SI: TVRMLShapeTreeIterator;
+  SI: TShapeTreeIterator;
 begin
   inherited Create(nil);
 
@@ -1159,7 +1159,7 @@ begin
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    MainScene := TVRMLGLScene.CreateCustomCache(Self, GLContextCache);
+    MainScene := T3DScene.CreateCustomCache(Self, GLContextCache);
     MainScene.Load(SceneFileName);
 
     { initialize FAnimationTime. Must be initialized before creating creatures. }
@@ -1191,14 +1191,14 @@ begin
     try
       { Initialize Items }
       FItemsOnLevel := TItemOnLevelList.Create(true);
-      SI := TVRMLShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
+      SI := TShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
       try
         while SI.GetNext do TraverseForItems(SI.Current);
       finally SysUtils.FreeAndNil(SI) end;
 
       { Initialize Creatures }
       FCreatures := TCreatureList.Create(true);
-      SI := TVRMLShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
+      SI := TShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
       try
         while SI.GetNext do TraverseForCreatures(SI.Current);
       finally SysUtils.FreeAndNil(SI) end;
@@ -1401,7 +1401,7 @@ end;
 
 function TLevel.RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
 var
-  BoxShape: TVRMLShape;
+  BoxShape: TShape;
 begin
   BoxShape := MainScene.Shapes.FindBlenderMesh(NodeName);
   Result := BoxShape <> nil;
@@ -1434,7 +1434,7 @@ begin
   end;
 end;
 
-procedure TLevel.TraverseForItems(Shape: TVRMLShape);
+procedure TLevel.TraverseForItems(Shape: TShape);
 
   procedure CreateNewItem(const ItemNodeName: string);
   var
@@ -1489,7 +1489,7 @@ begin
   end;
 end;
 
-procedure TLevel.TraverseForCreatures(Shape: TVRMLShape);
+procedure TLevel.TraverseForCreatures(Shape: TShape);
 
   procedure CreateNewCreature(const CreatureNodeName: string);
   var
@@ -1613,7 +1613,7 @@ end;
 
 procedure TLevel.GetHeightAbove(const Position: TVector3Single;
   out IsAbove: boolean; out AboveHeight: Single;
-  out AboveGround: PVRMLTriangle);
+  out AboveGround: PTriangle);
 begin
   Items.GetHeightAbove(Position, GravityUp, @CollisionIgnoreItem,
     IsAbove, AboveHeight, AboveGround);
@@ -1701,11 +1701,11 @@ begin
 end;
 
 function TLevel.LoadLevelScene(const FileName: string;
-  CreateOctreeCollisions, PrepareBackground: boolean): TVRMLGLScene;
+  CreateOctreeCollisions, PrepareBackground: boolean): T3DScene;
 var
   Options: TPrepareResourcesOptions;
 begin
-  Result := TVRMLGLScene.CreateCustomCache(Self, GLContextCache);
+  Result := T3DScene.CreateCustomCache(Self, GLContextCache);
   Result.Load(FileName);
   AttributesSet(Result.Attributes, btIncrease);
 
@@ -1730,11 +1730,11 @@ end;
 function TLevel.LoadLevelAnimation(
   const FileName: string;
   CreateFirstOctreeCollisions,
-  CreateLastOctreeCollisions: boolean): TVRMLGLAnimation;
+  CreateLastOctreeCollisions: boolean): T3DPrecalculatedAnimation;
 var
   Options: TPrepareResourcesOptions;
 begin
-  Result := TVRMLGLAnimation.CreateCustomCache(Self, GLContextCache);
+  Result := T3DPrecalculatedAnimation.CreateCustomCache(Self, GLContextCache);
   Result.LoadFromFile(FileName, false, true);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);

@@ -29,9 +29,9 @@ uses Classes, VRMLGLAnimation, VRMLGLRenderer, KambiUtils, KambiStringUtils, DOM
 
 type
   { Simple class to postpone loading vrml files that will be used
-    for TVRMLGLAnimation, and actually creating TVRMLGLAnimation instances.
+    for T3DPrecalculatedAnimation, and actually creating T3DPrecalculatedAnimation instances.
     Why ? Because loading all these files can be quite time-consuming. }
-  TVRMLGLAnimationInfo = class
+  T3DPrecalculatedAnimationInfo = class
   private
     FModelFileNames: TKamStringList;
     FTimes: TSingleList;
@@ -56,7 +56,7 @@ type
     { Constructor that loads animation settings from DOM node representing
       *.kanim file.
       File format is described in ../../doc/kanim_format.txt file.
-      @seealso TVRMLGLAnimation.LoadFromDOMElement. }
+      @seealso T3DPrecalculatedAnimation.LoadFromDOMElement. }
     constructor CreateFromDOMElement(Element: TDOMElement;
       const BasePath: string;
       ACache: TVRMLGLRendererContextCache = nil);
@@ -82,7 +82,7 @@ type
       read FCache write FCache;
     { @groupEnd }
 
-    { Remember that you're responsible for returned TVRMLGLAnimation
+    { Remember that you're responsible for returned T3DPrecalculatedAnimation
       instance after calling this function.
 
       @param(FirstRootNodesPool
@@ -95,22 +95,22 @@ type
 
         This allows you to prepare some commonly used root nodes and put
         them in FirstRootNodesPool before calling
-        TVRMLGLAnimationInfo.CreateAnimation. This way loading time
+        T3DPrecalculatedAnimationInfo.CreateAnimation. This way loading time
         will be faster, and also display lists sharing may be greater,
-        as the same RootNode may be shared by a couple of TVRMLGLAnimation
+        as the same RootNode may be shared by a couple of T3DPrecalculatedAnimation
         instances.
 
         Be sure to remove these nodes (free them and remove them from
         FirstRootNodesPool) after you're sure that all animations that
         used them were destroyed.) }
-    function CreateAnimation(FirstRootNodesPool: TStringList): TVRMLGLAnimation;
+    function CreateAnimation(FirstRootNodesPool: TStringList): T3DPrecalculatedAnimation;
   end;
 
 implementation
 
 uses SysUtils, VRMLNodes, X3DLoad;
 
-constructor TVRMLGLAnimationInfo.Create(
+constructor T3DPrecalculatedAnimationInfo.Create(
   const AModelFileNames: array of string;
   const ATimes: array of Single;
   AScenesPerTime: Cardinal;
@@ -134,7 +134,7 @@ begin
   FCache := ACache;
 end;
 
-constructor TVRMLGLAnimationInfo.CreateFromFile(const FileName: string;
+constructor T3DPrecalculatedAnimationInfo.CreateFromFile(const FileName: string;
   ACache: TVRMLGLRendererContextCache);
 begin
   inherited Create;
@@ -142,14 +142,14 @@ begin
   FModelFileNames := TKamStringList.Create;
   FTimes := TSingleList.Create;
 
-  TVRMLGLAnimation.LoadFromFileToVars(FileName,
+  T3DPrecalculatedAnimation.LoadFromFileToVars(FileName,
     FModelFileNames, FTimes, FScenesPerTime,
     FEqualityEpsilon, FTimeLoop, FTimeBackwards);
 
   FCache := ACache;
 end;
 
-constructor TVRMLGLAnimationInfo.CreateFromDOMElement(Element: TDOMElement;
+constructor T3DPrecalculatedAnimationInfo.CreateFromDOMElement(Element: TDOMElement;
   const BasePath: string;
   ACache: TVRMLGLRendererContextCache);
 begin
@@ -158,22 +158,22 @@ begin
   FModelFileNames := TKamStringList.Create;
   FTimes := TSingleList.Create;
 
-  TVRMLGLAnimation.LoadFromDOMElementToVars(Element, BasePath,
+  T3DPrecalculatedAnimation.LoadFromDOMElementToVars(Element, BasePath,
     FModelFileNames, FTimes, FScenesPerTime,
     FEqualityEpsilon, FTimeLoop, FTimeBackwards);
 
   FCache := ACache;
 end;
 
-destructor TVRMLGLAnimationInfo.Destroy;
+destructor T3DPrecalculatedAnimationInfo.Destroy;
 begin
   FreeAndNil(FModelFileNames);
   FreeAndNil(FTimes);
   inherited;
 end;
 
-function TVRMLGLAnimationInfo.CreateAnimation(
-  FirstRootNodesPool: TStringList): TVRMLGLAnimation;
+function T3DPrecalculatedAnimationInfo.CreateAnimation(
+  FirstRootNodesPool: TStringList): T3DPrecalculatedAnimation;
 var
   RootNodes: TX3DNodeList;
   I: Integer;
@@ -203,7 +203,7 @@ begin
     for I := 1 to RootNodes.Count - 1 do
       RootNodes[I] := LoadVRML(FModelFileNames[I], false);
 
-    Result := TVRMLGLAnimation.CreateCustomCache(nil, FCache);
+    Result := T3DPrecalculatedAnimation.CreateCustomCache(nil, FCache);
     Result.Load(RootNodes, OwnsFirstRootNode, FTimes,
       FScenesPerTime, FEqualityEpsilon);
     Result.TimeLoop := FTimeLoop;
