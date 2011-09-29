@@ -50,22 +50,22 @@ FPC_WINDOWS_OPTIONS := -dDEBUG
 else
 
 ifeq ($(DEBUG),valgrind)
-FPC_UNIX_OPTIONS := -gl -gv -dRELEASE -dGLWINDOW_XLIB
+FPC_UNIX_OPTIONS := -gl -gv -dRELEASE -dCASTLE_WINDOW_XLIB
 FPC_WINDOWS_OPTIONS := -gl -gv -dRELEASE
 else
 
 ifeq ($(DEBUG),gprof)
-FPC_UNIX_OPTIONS := -pg -dRELEASE -dGLWINDOW_XLIB
+FPC_UNIX_OPTIONS := -pg -dRELEASE -dCASTLE_WINDOW_XLIB
 FPC_WINDOWS_OPTIONS := -pg -dRELEASE
 else
 
-FPC_UNIX_OPTIONS := -dRELEASE -dGLWINDOW_XLIB
+FPC_UNIX_OPTIONS := -dRELEASE -dCASTLE_WINDOW_XLIB
 FPC_WINDOWS_OPTIONS := -dRELEASE
 endif
 endif
 endif
 
-build-unix: clean-glwindow
+build-unix: clean-window
 	cd ../castle_game_engine/ && \
 	  fpc $(FPC_UNIX_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
 	  @kambi.cfg ../castle/source/castle.lpr
@@ -75,7 +75,7 @@ build-unix: clean-glwindow
 	  @kambi.cfg ../castle/source/castle-process-3d-model.lpr
 	mv source/castle-process-3d-model ./
 
-build-windows: clean-glwindow
+build-windows: clean-window
 	cd ../castle_game_engine/ && \
 	  fpc $(FPC_WINDOWS_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
 	  @kambi.cfg ../castle/source/castle.lpr
@@ -130,9 +130,9 @@ clean_private:
 	     | xargs rm -Rf
 	rm -Rf data/sounds/intermediate/
 
-# Force rebuilding GLWindow unit with proper backend.
-clean-glwindow:
-	$(MAKE) -C ../castle_game_engine/ clean-glwindow
+# Force rebuilding CastleWindow unit with proper backend.
+clean-window:
+	$(MAKE) -C ../castle_game_engine/ clean-window
 
 # ----------------------------------------
 # Set SVN tag.
