@@ -89,11 +89,11 @@ uses SysUtils, GLWinModes, KambiGLUtils, GLWinMessages, GameWindow,
 type
   TControlsMenu = class(TSubMenu)
   public
-    MouseLookHorizontalSensitivitySlider: TCastleMenuFloatSlider;
-    MouseLookVerticalSensitivitySlider: TCastleMenuFloatSlider;
-    AutoOpenInventoryArgument: TCastleMenuBooleanArgument;
-    UseMouseLookArgument: TCastleMenuBooleanArgument;
-    InvertVerticalMouseLookArgument: TCastleMenuBooleanArgument;
+    MouseLookHorizontalSensitivitySlider: TMenuFloatSlider;
+    MouseLookVerticalSensitivitySlider: TMenuFloatSlider;
+    AutoOpenInventoryArgument: TMenuBooleanArgument;
+    UseMouseLookArgument: TMenuBooleanArgument;
+    InvertVerticalMouseLookArgument: TMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
     procedure AccessoryValueChanged; override;
@@ -185,14 +185,14 @@ constructor TControlsMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  MouseLookHorizontalSensitivitySlider := TCastleMenuFloatSlider.Create(
+  MouseLookHorizontalSensitivitySlider := TMenuFloatSlider.Create(
     0.01, 0.3, MouseLookHorizontalSensitivity);
-  MouseLookVerticalSensitivitySlider := TCastleMenuFloatSlider.Create(
+  MouseLookVerticalSensitivitySlider := TMenuFloatSlider.Create(
     0.01, 0.3, MouseLookVerticalSensitivity);
-  AutoOpenInventoryArgument := TCastleMenuBooleanArgument.Create(AutoOpenInventory);
-  UseMouseLookArgument := TCastleMenuBooleanArgument.Create(UseMouseLook);
+  AutoOpenInventoryArgument := TMenuBooleanArgument.Create(AutoOpenInventory);
+  UseMouseLookArgument := TMenuBooleanArgument.Create(UseMouseLook);
   InvertVerticalMouseLookArgument :=
-    TCastleMenuBooleanArgument.Create(InvertVerticalMouseLook);
+    TMenuBooleanArgument.Create(InvertVerticalMouseLook);
 
   Items.Add('Configure basic controls');
   Items.Add('Configure items controls');
@@ -277,12 +277,12 @@ const
 constructor TControlsSubMenu.CreateControlsSubMenu(AOwner: TComponent;
   AGroup: TInputGroup);
 
-  function InputArgument(const S: string): TCastleMenuItemArgument;
+  function InputArgument(const S: string): TMenuArgument;
   begin
-    Result := TCastleMenuItemArgument.Create(
+    Result := TMenuArgument.Create(
       400
       { This used to be
-        TCastleMenuItemArgument.TextWidth(
+        TMenuArgument.TextWidth(
           'key "Page Down" or "Page Up" or mouse "medium"')
         But this is too long... Unfortunately, it seems that some
         key configurations just will not fit on screen. });
@@ -413,7 +413,7 @@ begin
   { Refresh key names displayed in the menu. }
 
   for I := 0 to CastleGroupInputs[Group].Count - 1 do
-    TCastleMenuItemArgument(Items.Objects[I]).Value :=
+    TMenuArgument(Items.Objects[I]).Value :=
       CastleGroupInputs[Group].Items[I].Shortcut.Description(SNoneInput);
 end;
 

@@ -53,26 +53,26 @@ type
     procedure Click; override;
   end;
 
-  TTextureMinificationQualitySlider = class(TCastleMenuIntegerSlider)
+  TTextureMinificationQualitySlider = class(TMenuIntegerSlider)
     constructor Create;
     function ValueToStr(const AValue: Integer): string; override;
   end;
 
-  TAntiAliasingSlider = class(TCastleMenuIntegerSlider)
+  TAntiAliasingSlider = class(TMenuIntegerSlider)
     constructor Create;
     function ValueToStr(const AValue: Integer): string; override;
   end;
 
   TVideoMenu = class(TSubMenu)
   public
-    TextureMinificationQualitySlider: TCastleMenuIntegerSlider;
-    AllowScreenChangeArgument: TCastleMenuBooleanArgument;
-    RenderShadowsArgument: TCastleMenuBooleanArgument;
-    CreatureAnimationSlider: TCastleMenuIntegerSlider;
-    ColorDepthArgument: TCastleMenuItemArgument;
-    VideoFrequencyArgument: TCastleMenuItemArgument;
-    ConserveResourcesArgument: TCastleMenuBooleanArgument;
-    BumpMappingArgument: TCastleMenuBooleanArgument;
+    TextureMinificationQualitySlider: TMenuIntegerSlider;
+    AllowScreenChangeArgument: TMenuBooleanArgument;
+    RenderShadowsArgument: TMenuBooleanArgument;
+    CreatureAnimationSlider: TMenuIntegerSlider;
+    ColorDepthArgument: TMenuArgument;
+    VideoFrequencyArgument: TMenuArgument;
+    ConserveResourcesArgument: TMenuBooleanArgument;
+    BumpMappingArgument: TMenuBooleanArgument;
     AntiAliasingSlider: TAntiAliasingSlider;
     constructor Create(AOwner: TComponent); override;
     procedure SetTextureMinificationQuality(
@@ -91,7 +91,7 @@ type
     SoundVolume: TGLSoundVolumeMenuItem;
     MusicVolume: TGLMusicVolumeMenuItem;
 
-    OpenALDeviceArgument: TCastleMenuItemArgument;
+    OpenALDeviceArgument: TMenuArgument;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Click; override;
@@ -325,22 +325,22 @@ begin
   inherited;
 
   TextureMinificationQualitySlider := TTextureMinificationQualitySlider.Create;
-  AllowScreenChangeArgument := TCastleMenuBooleanArgument.Create(AllowScreenChange);
-  RenderShadowsArgument := TCastleMenuBooleanArgument.Create(RenderShadows);
-  CreatureAnimationSlider := TCastleMenuIntegerSlider.Create(
+  AllowScreenChangeArgument := TMenuBooleanArgument.Create(AllowScreenChange);
+  RenderShadowsArgument := TMenuBooleanArgument.Create(RenderShadows);
+  CreatureAnimationSlider := TMenuIntegerSlider.Create(
     MinCreatureAnimationScenesPerTime,
     MaxCreatureAnimationScenesPerTime,
     CreatureAnimationScenesPerTime);
 
-  ColorDepthArgument := TCastleMenuItemArgument.Create(
-    TCastleMenuItemArgument.TextWidth(SSystemDefault));
+  ColorDepthArgument := TMenuArgument.Create(
+    TMenuArgument.TextWidth(SSystemDefault));
   ColorDepthArgument.Value := ColorDepthBitsToStr(ColorDepthBits);
 
-  VideoFrequencyArgument := TCastleMenuItemArgument.Create(
-    TCastleMenuItemArgument.TextWidth(SSystemDefault));
+  VideoFrequencyArgument := TMenuArgument.Create(
+    TMenuArgument.TextWidth(SSystemDefault));
   VideoFrequencyArgument.Value := VideoFrequencyToStr(VideoFrequency);
 
-  BumpMappingArgument := TCastleMenuBooleanArgument.Create(BumpMapping);
+  BumpMappingArgument := TMenuBooleanArgument.Create(BumpMapping);
 
   AntiAliasingSlider := TAntiAliasingSlider.Create;
 
@@ -592,7 +592,7 @@ constructor TSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  OpenALDeviceArgument := TCastleMenuItemArgument.Create(450);
+  OpenALDeviceArgument := TMenuArgument.Create(450);
   OpenALDeviceArgument.Value := SoundEngine.DeviceNiceName;
 
   SoundInfo := TGLSoundInfoMenuItem.Create(Window, Self, SoundEngine);
