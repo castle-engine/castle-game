@@ -268,7 +268,7 @@ function CastleLevelsPath: string;
 implementation
 
 uses CastleFilesUtils, SysUtils, CastleUtils,
-  GL, GLU, CastleGLUtils, CastleStringUtils, GLWinMessages, RenderingCameraUnit,
+  GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
   GamePlay, GameNotifications, GameInputs,
   GameItems, GameThunder, GameWindow, GameVRMLProcessing,
   GameAnimationTricks, GameVideoOptions, VRMLScene, ProgressUnit,
