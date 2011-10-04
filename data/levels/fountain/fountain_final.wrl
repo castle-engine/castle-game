@@ -97,6 +97,6 @@ Inline { url "fountain.wrl" }
 #   scale 0.5 0.5 0.5
 #   children [
 #     Inline { url "../../../../demo_models/x3d/touch_sensor_tests.x3dv" }
-#     Inline { url "../../../../demo_models/kambi_script/particles.x3dv" }
+#     Inline { url "../../../../demo_models/castle_script/particles.x3dv" }
 #   ]
 # }
