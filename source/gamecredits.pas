@@ -46,8 +46,8 @@ uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
 var
   UserQuit: boolean;
   CreditsModel: T3DScene;
-  AnimationTime: TKamTime;
-  AnimationSpeed, AnimationEnd: TKamTime;
+  AnimationTime: TFloatTime;
+  AnimationSpeed, AnimationEnd: TFloatTime;
 
 procedure Draw(Window: TCastleWindowBase);
 

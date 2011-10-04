@@ -188,7 +188,7 @@ type
 
     constructor Create(AOwner: TComponent); override;
 
-    procedure BeforeTimeIncrease(const NewAnimationTime: TKamTime); override;
+    procedure BeforeTimeIncrease(const NewAnimationTime: TFloatTime); override;
     procedure Idle(const CompSpeed: Single); override;
 
     property MovePushesOthers default false;
@@ -1130,7 +1130,7 @@ begin
   CastsShadow := false; { looks bad }
 end;
 
-procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TKamTime);
+procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
 
   function SomethingWillBlockClosingDoor: boolean;
   var

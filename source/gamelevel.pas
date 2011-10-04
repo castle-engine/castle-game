@@ -69,12 +69,12 @@ type
   private
     FMovePushesOthers: boolean;
     FMovePushesOthersUsesBoxes: boolean;
-    FAnimationTime: TKamTime;
+    FAnimationTime: TFloatTime;
   public
     constructor Create(AOwner: TComponent); override;
 
     { Local object time, always increasing, used to track animations. }
-    property AnimationTime: TKamTime read FAnimationTime;
+    property AnimationTime: TFloatTime read FAnimationTime;
 
     function ParentLevel: TLevel;
 
@@ -83,7 +83,7 @@ type
       Descendants should override GetTranslationFromTime. }
     function GetTranslation: TVector3Single; override;
 
-    function GetTranslationFromTime(const AnAnimationTime: TKamTime):
+    function GetTranslationFromTime(const AnAnimationTime: TFloatTime):
       TVector3Single; virtual; abstract;
 
     { This will be called at the beginning of our @link(Idle),
@@ -95,7 +95,7 @@ type
       with e.g. player or creatures or items, then you should
       prevent the collision @italic(before it happens).
       This is the place to do it. }
-    procedure BeforeTimeIncrease(const NewAnimationTime: TKamTime); virtual;
+    procedure BeforeTimeIncrease(const NewAnimationTime: TFloatTime); virtual;
 
     { If @true (and Exists and Collides are also @true)
       then moving this object moves everything on it's way.
@@ -268,7 +268,7 @@ type
     MoveTime: Single;
     TranslationEnd: TVector3Single;
 
-    function GetTranslationFromTime(const AnAnimationTime: TKamTime):
+    function GetTranslationFromTime(const AnAnimationTime: TFloatTime):
       TVector3Single; override;
 
     procedure Idle(const CompSpeed: Single); override;
@@ -352,7 +352,7 @@ type
     FMoveVerticalSpeed: Single;
     FItemsOnLevel: TItemOnLevelList;
     FSickProjection: boolean;
-    FSickProjectionSpeed: TKamTime;
+    FSickProjectionSpeed: TFloatTime;
 
     { Used only within constructor.
       We will process the scene graph, and sometimes it's not comfortable
@@ -366,7 +366,7 @@ type
 
     procedure TraverseForItems(Shape: TShape);
     procedure SetSickProjection(const Value: boolean);
-    procedure SetSickProjectionSpeed(const Value: TKamTime);
+    procedure SetSickProjectionSpeed(const Value: TFloatTime);
   private
     FCreatures: TCreatureList;
     procedure TraverseForCreatures(Shape: TShape);
@@ -377,7 +377,7 @@ type
     FGravityUp: TVector3Single;
     FMoveSpeed: Single;
 
-    FAnimationTime: TKamTime;
+    FAnimationTime: TFloatTime;
 
     FSectors: TSceneSectorList;
     FWaypoints: TSceneWaypointList;
@@ -574,7 +574,7 @@ type
 
     { This is the time of the level, in seconds. Time 0 when level is created.
       This is updated in our Idle. }
-    property AnimationTime: TKamTime read FAnimationTime;
+    property AnimationTime: TFloatTime read FAnimationTime;
 
     { Tests for collisions with level @link(Items).
 
@@ -719,7 +719,7 @@ type
 
     property SickProjection: boolean
       read FSickProjection write SetSickProjection;
-    property SickProjectionSpeed: TKamTime
+    property SickProjectionSpeed: TFloatTime
       read FSickProjectionSpeed write SetSickProjectionSpeed;
   end;
 
@@ -758,7 +758,7 @@ begin
 end;
 
 procedure TLevelMovingObject.BeforeTimeIncrease(
-  const NewAnimationTime: TKamTime);
+  const NewAnimationTime: TFloatTime);
 
   function BoundingBoxAssumeTranslation(
     const AssumeTranslation: TVector3Single): TBox3D;
@@ -895,7 +895,7 @@ end;
 
 procedure TLevelMovingObject.Idle(const CompSpeed: Single);
 var
-  NewAnimationTime: TKamTime;
+  NewAnimationTime: TFloatTime;
 begin
   inherited;
 
@@ -1006,7 +1006,7 @@ begin
 end;
 
 function TLevelLinearMovingObject.GetTranslationFromTime(
-  const AnAnimationTime: TKamTime): TVector3Single;
+  const AnAnimationTime: TFloatTime): TVector3Single;
 begin
   if not EndPosition then
   begin
@@ -1900,7 +1900,7 @@ begin
   end;
 end;
 
-procedure TLevel.SetSickProjectionSpeed(const Value: TKamTime);
+procedure TLevel.SetSickProjectionSpeed(const Value: TFloatTime);
 begin
   if FSickProjectionSpeed <> Value then
   begin
