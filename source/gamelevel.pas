@@ -38,13 +38,13 @@ unit GameLevel;
 
 interface
 
-uses VectorMath, VRMLScene, Scene, Boxes3D,
-  VRMLNodes, VRMLFields, GameItems, Cameras, Triangle,
-  GameCreatures, VRMLSceneWaypoints, GameSound,
+uses VectorMath, SceneCore, Scene, Boxes3D,
+  X3DNodes, X3DFields, GameItems, Cameras, Triangle,
+  GameCreatures, SceneWaypoints, GameSound,
   CastleUtils, CastleClassUtils, GamePlayer, GameThunder,
-  ProgressUnit, VRMLGLAnimation, ALSoundAllocator,
-  VRMLGLBackground, DOM, XmlSoundEngine, Base3D, Shape,
-  Classes, CastleTimeUtils, CastleSceneManager, VRMLShader;
+  ProgressUnit, PrecalculatedAnimation, ALSoundAllocator,
+  Background, DOM, XmlSoundEngine, Base3D, Shape,
+  Classes, CastleTimeUtils, CastleSceneManager, GLRendererShader;
 
 {$define read_interface}
 
@@ -733,7 +733,7 @@ uses SysUtils, GL,
   GamePlay, CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   GameVideoOptions, GameConfig, GameNotifications,
   GameInputs, GameWindow, CastleXMLUtils,
-  GameRequiredResources, VRMLGLRenderer, RenderingCameraUnit, Math;
+  GameRequiredResources, GLRenderer, RenderingCameraUnit, Math;
 
 {$define read_implementation}
 
@@ -1271,7 +1271,7 @@ begin
       { Make GravityUp = (0, 0, 1) more "precisely" }
       FGravityUp := Vector3Single(0, 0, 1);
 
-    MainScene.BackgroundSkySphereRadius := TVRMLGLBackground.NearFarToSkySphereRadius
+    MainScene.BackgroundSkySphereRadius := TBackground.NearFarToSkySphereRadius
       (LevelProjectionNear, LevelProjectionFar);
 
     MainScene.CastsShadow := SceneDynamicShadows;

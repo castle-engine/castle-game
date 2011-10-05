@@ -25,7 +25,7 @@ unit GameRequiredResources;
 
 interface
 
-uses Classes, DOM, GameCreatures, VRMLNodes;
+uses Classes, DOM, GameCreatures, X3DNodes;
 
 { These increment/decrement RequiredCount for creatures on given list.
 

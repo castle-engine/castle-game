@@ -26,7 +26,7 @@ unit GameThunder;
 
 interface
 
-uses VRMLNodes;
+uses X3DNodes;
 
 type
   { Rendering and making sound of thunder effect.

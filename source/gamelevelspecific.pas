@@ -26,8 +26,8 @@ unit GameLevelSpecific;
 interface
 
 uses Scene, Boxes3D, VectorMath,
-  GamePlayer, GameLevel, VRMLGLBackground, Triangle,
-  GameSound, VRMLNodes, DOM, Base3D, VRMLGLAnimation,
+  GamePlayer, GameLevel, Background, Triangle,
+  GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation,
   GameCreatures, Classes, CastleTimeUtils;
 
 const
@@ -179,7 +179,7 @@ type
       CollisionInfo: T3DCollision;
       var InteractionOccurred: boolean); override;
 
-    function Background: TVRMLGLBackground; override;
+    function Background: TBackground; override;
   end;
 
   TDoomLevelDoor = class(TLevelLinearMovingObject)
@@ -271,7 +271,7 @@ uses CastleFilesUtils, SysUtils, CastleUtils,
   GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
   GamePlay, GameNotifications, GameInputs,
   GameItems, GameThunder, GameWindow, GameVRMLProcessing,
-  GameAnimationTricks, GameVideoOptions, VRMLScene, ProgressUnit,
+  GameAnimationTricks, GameVideoOptions, SceneCore, ProgressUnit,
   CastleXMLUtils;
 
 function CastleLevelsPath: string;
@@ -1112,7 +1112,7 @@ begin
   end;
 end;
 
-function TCagesLevel.Background: TVRMLGLBackground;
+function TCagesLevel.Background: TBackground;
 begin
   if DoEndSequence then
     Result := FEndSequence.Background else

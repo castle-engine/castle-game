@@ -26,21 +26,21 @@ unit GameWindow;
 
 interface
 
-uses CastleWindow, VRMLGLRenderer, OpenGLTTFonts;
+uses CastleWindow, GLRenderer, OpenGLTTFonts;
 
 var
   { @noAutoLinkHere }
   Window: TCastleWindowCustom;
 
 var
-  GLContextCache: TVRMLGLRendererContextCache;
+  GLContextCache: TGLRendererContextCache;
 
   { Just a generally usable OpenGL outline (3D) font. }
   Font3d: TGLOutlineFont;
 
 implementation
 
-uses SysUtils, VRMLNodes, GLAntiAliasing, UIControls;
+uses SysUtils, X3DNodes, GLAntiAliasing, UIControls;
 
 { initialization / finalization ---------------------------------------------- }
 
@@ -72,7 +72,7 @@ initialization
   Window := TCastleWindowCustom.Create(nil);
   Window.OnDrawStyle := ds3D;
 
-  GLContextCache := TVRMLGLRendererContextCache.Create;
+  GLContextCache := TGLRendererContextCache.Create;
 
   Window.OnOpenList.Add(@WindowOpen);
   Window.OnCloseList.Add(@WindowClose);

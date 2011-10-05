@@ -27,7 +27,7 @@ unit GameVRMLProcessing;
 
 interface
 
-uses VRMLNodes;
+uses X3DNodes;
 
 { Find all Appearance nodes using texture with given name,
   and replace then with KambiApperance nodes, adding normalMap field. }
@@ -38,7 +38,7 @@ procedure LevelFountainProcess(Node: TX3DNode);
 
 implementation
 
-uses SysUtils, VRMLFields, VectorMath;
+uses SysUtils, X3DFields, VectorMath;
 
 { AddNormalMapToTexture ------------------------------------------------------ }
 

@@ -30,7 +30,7 @@ uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu,
   GameRequiredResources, GameCredits, GLAntiAliasing, ALSoundEngine,
-  VRMLGLRenderer;
+  GLRenderer;
 
 { requested screen size ------------------------------------------------------ }
 

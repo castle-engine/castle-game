@@ -35,7 +35,7 @@ uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
   VectorMath, CastleWindow, GameHelp, GamePlay, GameGeneralMenu,
   GameControlsMenu, GameInputs, GameChooseMenu,
-  GameVideoOptions, GameSound, VRMLNodes, CastleClassUtils, GameNotifications,
+  GameVideoOptions, GameSound, X3DNodes, CastleClassUtils, GameNotifications,
   CastleSoundMenu, KeysMouse;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }

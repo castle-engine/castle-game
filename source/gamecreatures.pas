@@ -25,10 +25,10 @@ unit GameCreatures;
 
 interface
 
-uses Classes, VectorMath, VRMLGLAnimation, Boxes3D, CastleClassUtils, CastleUtils,
-  VRMLGLAnimationInfo, Scene, GameSound, VRMLSceneWaypoints,
+uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, CastleUtils,
+  PrecalculatedAnimationInfo, Scene, GameSound, SceneWaypoints,
   GameObjectKinds, ALSoundAllocator, CastleXMLConfig, Base3D,
-  XmlSoundEngine, GLShadowVolumeRenderer, Triangle, Frustum, VRMLNodes,
+  XmlSoundEngine, GLShadowVolumeRenderer, Triangle, Frustum, X3DNodes,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 const

@@ -25,9 +25,9 @@ unit GameItems;
 
 interface
 
-uses Boxes3D, VRMLNodes, Scene, VectorMath, CastleUtils,
+uses Boxes3D, X3DNodes, Scene, VectorMath, CastleUtils,
   CastleClassUtils, Classes, Images, GL, GLU, CastleGLUtils, GameSound,
-  VRMLGLAnimation, VRMLGLAnimationInfo, GameObjectKinds,
+  PrecalculatedAnimation, PrecalculatedAnimationInfo, GameObjectKinds,
   CastleXMLConfig, XmlSoundEngine, Frustum, Base3D,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
@@ -389,7 +389,7 @@ implementation
 uses SysUtils, CastleWindow, GameWindow,
   GamePlay, CastleFilesUtils, ProgressUnit,
   GameCreatures, GameVideoOptions, GameNotifications,
-  VRMLScene, Triangle, GLImages;
+  SceneCore, Triangle, GLImages;
 
 { TItemKind ------------------------------------------------------------ }
 

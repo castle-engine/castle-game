@@ -21,11 +21,11 @@
 }
 
 { }
-unit VRMLGLAnimationInfo;
+unit PrecalculatedAnimationInfo;
 
 interface
 
-uses Classes, VRMLGLAnimation, VRMLGLRenderer, CastleUtils, CastleStringUtils, DOM;
+uses Classes, PrecalculatedAnimation, GLRenderer, CastleUtils, CastleStringUtils, DOM;
 
 type
   { Simple class to postpone loading vrml files that will be used
@@ -37,7 +37,7 @@ type
     FTimes: TSingleList;
     FScenesPerTime: Cardinal;
     FTimeLoop, FTimeBackwards: boolean;
-    FCache: TVRMLGLRendererContextCache;
+    FCache: TGLRendererContextCache;
     FEqualityEpsilon: Single;
   public
     constructor Create(
@@ -46,12 +46,12 @@ type
       AScenesPerTime: Cardinal;
       const AEqualityEpsilon: Single;
       ATimeLoop, ATimeBackwards: boolean;
-      ACache: TVRMLGLRendererContextCache);
+      ACache: TGLRendererContextCache);
 
     { Constructor that loads animation settings from a *.kanim file.
       File format is described in ../../doc/kanim_format.txt file. }
     constructor CreateFromFile(const FileName: string;
-      ACache: TVRMLGLRendererContextCache);
+      ACache: TGLRendererContextCache);
 
     { Constructor that loads animation settings from DOM node representing
       *.kanim file.
@@ -59,7 +59,7 @@ type
       @seealso T3DPrecalculatedAnimation.LoadFromDOMElement. }
     constructor CreateFromDOMElement(Element: TDOMElement;
       const BasePath: string;
-      ACache: TVRMLGLRendererContextCache = nil);
+      ACache: TGLRendererContextCache = nil);
 
     destructor Destroy; override;
 
@@ -78,7 +78,7 @@ type
     property EqualityEpsilon: Single read FEqualityEpsilon write FEqualityEpsilon;
     property TimeLoop: boolean read FTimeLoop write FTimeLoop;
     property TimeBackwards: boolean read FTimeBackwards write FTimeBackwards;
-    property Cache: TVRMLGLRendererContextCache
+    property Cache: TGLRendererContextCache
       read FCache write FCache;
     { @groupEnd }
 
@@ -108,7 +108,7 @@ type
 
 implementation
 
-uses SysUtils, VRMLNodes, X3DLoad;
+uses SysUtils, X3DNodes, X3DLoad;
 
 constructor T3DPrecalculatedAnimationInfo.Create(
   const AModelFileNames: array of string;
@@ -116,7 +116,7 @@ constructor T3DPrecalculatedAnimationInfo.Create(
   AScenesPerTime: Cardinal;
   const AEqualityEpsilon: Single;
   ATimeLoop, ATimeBackwards: boolean;
-  ACache: TVRMLGLRendererContextCache);
+  ACache: TGLRendererContextCache);
 begin
   inherited Create;
 
@@ -135,7 +135,7 @@ begin
 end;
 
 constructor T3DPrecalculatedAnimationInfo.CreateFromFile(const FileName: string;
-  ACache: TVRMLGLRendererContextCache);
+  ACache: TGLRendererContextCache);
 begin
   inherited Create;
 
@@ -151,7 +151,7 @@ end;
 
 constructor T3DPrecalculatedAnimationInfo.CreateFromDOMElement(Element: TDOMElement;
   const BasePath: string;
-  ACache: TVRMLGLRendererContextCache);
+  ACache: TGLRendererContextCache);
 begin
   inherited Create;
 

@@ -41,7 +41,7 @@ uses SysUtils, Classes, CastleUtils, WindowModes,
   GameControlsMenu, GameInputs, GameVideoOptions,
   CastleStringUtils, CastleClassUtils,
   GameNotifications, GameLevelAvailable, GameBackgroundLevel,
-  XmlSoundEngine, CastleSoundMenu, VRMLNodes,
+  XmlSoundEngine, CastleSoundMenu, X3DNodes,
   GameCredits, GLAntiAliasing, KeysMouse;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }

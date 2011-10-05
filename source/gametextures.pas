@@ -76,7 +76,7 @@ var
 
 implementation
 
-uses SysUtils, XMLRead, CastleXMLUtils, CastleFilesUtils, VRMLNodes;
+uses SysUtils, XMLRead, CastleXMLUtils, CastleFilesUtils, X3DNodes;
 
 { TTextureRule --------------------------------------------------------------- }
 
