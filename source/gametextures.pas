@@ -27,7 +27,7 @@ unit GameTextures;
 
 interface
 
-uses CastleUtils, CastleClassUtils, Classes, GameSound, VRMLTriangle, DOM,
+uses CastleUtils, CastleClassUtils, Classes, GameSound, Triangle, DOM,
   XmlSoundEngine, FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type

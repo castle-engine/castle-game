@@ -26,7 +26,7 @@ unit GameObjectKinds;
 interface
 
 uses Classes, CastleXMLConfig, VRMLGLAnimation, VRMLGLAnimationInfo,
-  GameVideoOptions, VRMLScene, VRMLGLScene, VRMLNodes;
+  GameVideoOptions, VRMLScene, Scene, VRMLNodes;
 
 type
   { This is a common class for item kind and creature kind. }

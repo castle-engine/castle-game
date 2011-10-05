@@ -40,7 +40,7 @@ implementation
 uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
   GameNotifications, CastleStringUtils, WindowModes,
   GameInputs, GamePlay, GameWindow,
-  GameVideoOptions, VectorMath, VRMLGLScene, CastleFilesUtils,
+  GameVideoOptions, VectorMath, Scene, CastleFilesUtils,
   GameHelp, CastleUtils, VRMLFields, CastleTimeUtils, KeysMouse;
 
 var

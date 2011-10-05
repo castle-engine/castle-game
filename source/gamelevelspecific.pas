@@ -25,8 +25,8 @@ unit GameLevelSpecific;
 
 interface
 
-uses VRMLGLScene, Boxes3D, VectorMath,
-  GamePlayer, GameLevel, VRMLGLBackground, VRMLTriangle,
+uses Scene, Boxes3D, VectorMath,
+  GamePlayer, GameLevel, VRMLGLBackground, Triangle,
   GameSound, VRMLNodes, DOM, Base3D, VRMLGLAnimation,
   GameCreatures, Classes, CastleTimeUtils;
 

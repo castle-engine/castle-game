@@ -38,12 +38,12 @@ unit GameLevel;
 
 interface
 
-uses VectorMath, VRMLScene, VRMLGLScene, Boxes3D,
-  VRMLNodes, VRMLFields, GameItems, Cameras, VRMLTriangle,
+uses VectorMath, VRMLScene, Scene, Boxes3D,
+  VRMLNodes, VRMLFields, GameItems, Cameras, Triangle,
   GameCreatures, VRMLSceneWaypoints, GameSound,
   CastleUtils, CastleClassUtils, GamePlayer, GameThunder,
   ProgressUnit, VRMLGLAnimation, ALSoundAllocator,
-  VRMLGLBackground, DOM, XmlSoundEngine, Base3D, VRMLShape,
+  VRMLGLBackground, DOM, XmlSoundEngine, Base3D, Shape,
   Classes, CastleTimeUtils, CastleSceneManager, VRMLShader;
 
 {$define read_interface}
