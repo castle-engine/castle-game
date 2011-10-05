@@ -120,7 +120,7 @@ uses Math, SysUtils, CastleUtils, CastleWindow,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, GameConfig,
   GameNotifications, GameControlsMenu,
-  GameLevelSpecific, Scene, GameLevelAvailable,
+  GameLevelSpecific, CastleScene, GameLevelAvailable,
   CastleTimeUtils, GLImages, KeysMouse;
 
 var

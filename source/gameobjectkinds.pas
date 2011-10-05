@@ -26,7 +26,7 @@ unit GameObjectKinds;
 interface
 
 uses Classes, CastleXMLConfig, PrecalculatedAnimation, PrecalculatedAnimationInfo,
-  GameVideoOptions, SceneCore, Scene, X3DNodes;
+  GameVideoOptions, CastleSceneCore, CastleScene, X3DNodes;
 
 type
   { This is a common class for item kind and creature kind. }

@@ -60,7 +60,7 @@
     programs better, as these stub boxes usually only get in the way.
 }
 
-uses SysUtils, CastleUtils, CastleClassUtils, VRMLNodes, X3DLoad,
+uses SysUtils, CastleUtils, CastleClassUtils, X3DNodes, X3DLoad,
   CastleStringUtils, GameVRMLProcessing, CastleParameters;
 
 { Remove special "stub" nodes, for castle creatures, items etc.

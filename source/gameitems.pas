@@ -25,7 +25,7 @@ unit GameItems;
 
 interface
 
-uses Boxes3D, X3DNodes, Scene, VectorMath, CastleUtils,
+uses Boxes3D, X3DNodes, CastleScene, VectorMath, CastleUtils,
   CastleClassUtils, Classes, Images, GL, GLU, CastleGLUtils, GameSound,
   PrecalculatedAnimation, PrecalculatedAnimationInfo, GameObjectKinds,
   CastleXMLConfig, XmlSoundEngine, Frustum, Base3D,
@@ -389,7 +389,7 @@ implementation
 uses SysUtils, CastleWindow, GameWindow,
   GamePlay, CastleFilesUtils, ProgressUnit,
   GameCreatures, GameVideoOptions, GameNotifications,
-  SceneCore, Triangle, GLImages;
+  CastleSceneCore, Triangle, GLImages;
 
 { TItemKind ------------------------------------------------------------ }
 

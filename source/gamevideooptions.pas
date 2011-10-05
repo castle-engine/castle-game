@@ -25,7 +25,7 @@ unit GameVideoOptions;
 
 interface
 
-uses GL, CastleGLUtils, Scene, X3DNodes;
+uses GL, CastleGLUtils, CastleScene, X3DNodes;
 
 type
   { This determines OpenGL blending factors used when rendering given model. }

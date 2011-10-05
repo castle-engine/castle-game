@@ -38,7 +38,7 @@ unit GameLevel;
 
 interface
 
-uses VectorMath, SceneCore, Scene, Boxes3D,
+uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
   X3DNodes, X3DFields, GameItems, Cameras, Triangle,
   GameCreatures, SceneWaypoints, GameSound,
   CastleUtils, CastleClassUtils, GamePlayer, GameThunder,

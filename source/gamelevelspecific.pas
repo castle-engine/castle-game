@@ -25,7 +25,7 @@ unit GameLevelSpecific;
 
 interface
 
-uses Scene, Boxes3D, VectorMath,
+uses CastleScene, Boxes3D, VectorMath,
   GamePlayer, GameLevel, Background, Triangle,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation,
   GameCreatures, Classes, CastleTimeUtils;
@@ -271,7 +271,7 @@ uses CastleFilesUtils, SysUtils, CastleUtils,
   GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
   GamePlay, GameNotifications, GameInputs,
   GameItems, GameThunder, GameWindow, GameVRMLProcessing,
-  GameAnimationTricks, GameVideoOptions, SceneCore, ProgressUnit,
+  GameAnimationTricks, GameVideoOptions, CastleSceneCore, ProgressUnit,
   CastleXMLUtils;
 
 function CastleLevelsPath: string;
