@@ -67,22 +67,22 @@ endif
 
 build-unix: clean-window
 	cd ../castle_game_engine/ && \
-	  fpc $(FPC_UNIX_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
-	  @kambi.cfg ../castle/source/castle.lpr
+	  fpc $(FPC_UNIX_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" \
+	  @castle-fpc.cfg ../castle/source/castle.lpr
 	mv source/castle ./
 	cd ../castle_game_engine/ && \
-	  fpc $(FPC_UNIX_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
-	  @kambi.cfg ../castle/source/castle-process-3d-model.lpr
+	  fpc $(FPC_UNIX_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" \
+	  @castle-fpc.cfg ../castle/source/castle-process-3d-model.lpr
 	mv source/castle-process-3d-model ./
 
 build-windows: clean-window
 	cd ../castle_game_engine/ && \
-	  fpc $(FPC_WINDOWS_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
-	  @kambi.cfg ../castle/source/castle.lpr
+	  fpc $(FPC_WINDOWS_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" \
+	  @castle-fpc.cfg ../castle/source/castle.lpr
 	mv source/castle.exe ./castle.exe
 	cd ../castle_game_engine/ && \
-	  fpc $(FPC_WINDOWS_OPTIONS) "$${KAMBI_FPC_OPTIONS:-}" \
-	  @kambi.cfg ../castle/source/castle-process-3d-model.lpr
+	  fpc $(FPC_WINDOWS_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" \
+	  @castle-fpc.cfg ../castle/source/castle-process-3d-model.lpr
 	mv source/castle-process-3d-model.exe ./castle-process-3d-model.exe
 
 # ------------------------------------------------------------
