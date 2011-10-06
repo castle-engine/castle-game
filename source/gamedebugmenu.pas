@@ -35,7 +35,7 @@ uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
   VectorMath, CastleWindow, GamePlay, GameGeneralMenu,
   GameControlsMenu, GameInputs, GameCreatures, GameChooseMenu,
-  GameItems, GLMenu, RaysWindow, GameVideoOptions,
+  GameItems, OnScreenMenu, RaysWindow, GameVideoOptions,
   GameSound, X3DNodes, CastleClassUtils, GameNotifications,
   GameLevelAvailable, Boxes3D, KeysMouse;
 
@@ -996,7 +996,7 @@ end;
 
 procedure OpenWindow(Window: TCastleWindowBase);
 begin
-  { Although base TCastleMenu doesn't require OpenGL context at constructor,
+  { Although base TCastleOnScreenMenu doesn't require OpenGL context at constructor,
     our descendants initialize some arguments that require font initialized
     that requires font display lists created. That's why code below is in
     OnOpen callback, not unit's initialization. }

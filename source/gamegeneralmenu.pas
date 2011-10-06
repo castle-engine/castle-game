@@ -25,10 +25,10 @@ unit GameGeneralMenu;
 
 interface
 
-uses Classes, GLMenu;
+uses Classes, OnScreenMenu;
 
 type
-  { Just TCastleMenu that calls Window.PostRedisplay and plays a sound
+  { Just TCastleOnScreenMenu that calls Window.PostRedisplay and plays a sound
     on each CurrentItem change.
 
     Also, it's PositioInside is overridden to always catch all events
@@ -36,7 +36,7 @@ type
     menu is the only control used here.
     Also, it let's events further down to our callbacks, thanks
     to ExclusiveEvents being @false. }
-  TCastleGameMenu = class(TCastleMenu)
+  TCastleGameMenu = class(TCastleOnScreenMenu)
   public
     constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
@@ -51,7 +51,7 @@ var
 
 { Sets CurrentValue, taking care of adding this menu / removing existing menu
   (when new value is @nil) from Window.Controls.
-  Also, returns previous TCastleMenu present in Window.Controls (there can be
+  Also, returns previous TCastleOnScreenMenu present in Window.Controls (there can be
   only one). }
 function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
   const NewValue: TCastleGameMenu): TCastleGameMenu;
@@ -66,7 +66,7 @@ constructor TCastleGameMenu.Create(AOwner: TComponent);
 begin
   inherited;
   { Don't set DesignerModeWindow, we do tricks that make setting mouse
-    position in GLMenu not working. See TCastleMenu.DesignerMode comments. }
+    position in OnScreenMenu not working. See TCastleOnScreenMenu.DesignerMode comments. }
   DesignerMode := DebugMenuDesigner;
   ExclusiveEvents := false;
   DrawFocused := false;
@@ -100,7 +100,7 @@ end;
 
 procedure CloseWindow(Window: TCastleWindowBase);
 begin
-  GLMenuCloseGL;
+  OnScreenMenuCloseGL;
 end;
 
 initialization

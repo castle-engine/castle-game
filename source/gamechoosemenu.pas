@@ -34,7 +34,7 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 
 implementation
 
-uses SysUtils, WindowModes, CastleGLUtils, GameInputs, CastleMessages, GLMenu,
+uses SysUtils, WindowModes, CastleGLUtils, GameInputs, CastleMessages, OnScreenMenu,
   GameWindow, GameGeneralMenu, GamePlay, VectorMath, GameNotifications,
   KeysMouse;
 
@@ -113,7 +113,7 @@ begin
       with the menu text. }
     MessagesTheme.RectColor[3] := 1.0;
 
-    Window.Controls.MakeSingle(TCastleMenu, ChooseMenu);
+    Window.Controls.MakeSingle(TCastleOnScreenMenu, ChooseMenu);
 
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);

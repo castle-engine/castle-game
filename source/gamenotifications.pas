@@ -25,7 +25,7 @@ unit GameNotifications;
 
 interface
 
-uses GLNotifications;
+uses CastleNotifications;
 
 var
   Notifications: TCastleNotifications;

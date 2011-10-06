@@ -80,7 +80,7 @@ var
 implementation
 
 uses SysUtils, WindowModes, CastleGLUtils, CastleMessages, GameWindow,
-  GLMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
+  OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
   GameInputs, KeysMouse, VectorMath, CastleUtils, GamePlay,
   GameConfig, CastleStringUtils, GameNotifications;
 
