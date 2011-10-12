@@ -512,9 +512,6 @@ Each time before uploading release:
 - upload to WWW:
   release on SourceForge as usual (verify that file uploaded ok)
 
-- TODO: this needs update for SF SVN
-  make svntag
-  check by
-    svn list file:///home/michal/svn/kambi-svn-repos/castle/tags/
+- make svntag, check it's done in repo
 
 ----------------------------------------
