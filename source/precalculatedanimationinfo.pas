@@ -33,7 +33,7 @@ type
     Why ? Because loading all these files can be quite time-consuming. }
   T3DPrecalculatedAnimationInfo = class
   private
-    FModelFileNames: TKamStringList;
+    FModelFileNames: TCastleStringList;
     FTimes: TSingleList;
     FScenesPerTime: Cardinal;
     FTimeLoop, FTimeBackwards: boolean;
@@ -71,7 +71,7 @@ type
       from *.kanim file if you used CreateFromFile.
 
       @groupBegin }
-    property ModelFileNames: TKamStringList read FModelFileNames;
+    property ModelFileNames: TCastleStringList read FModelFileNames;
     property Times: TSingleList read FTimes;
 
     property ScenesPerTime: Cardinal read FScenesPerTime write FScenesPerTime;
@@ -120,7 +120,7 @@ constructor T3DPrecalculatedAnimationInfo.Create(
 begin
   inherited Create;
 
-  FModelFileNames := TKamStringList.Create;
+  FModelFileNames := TCastleStringList.Create;
   FTimes := TSingleList.Create;
 
   FModelFileNames.AddArray(AModelFileNames);
@@ -139,7 +139,7 @@ constructor T3DPrecalculatedAnimationInfo.CreateFromFile(const FileName: string;
 begin
   inherited Create;
 
-  FModelFileNames := TKamStringList.Create;
+  FModelFileNames := TCastleStringList.Create;
   FTimes := TSingleList.Create;
 
   T3DPrecalculatedAnimation.LoadFromFileToVars(FileName,
@@ -155,7 +155,7 @@ constructor T3DPrecalculatedAnimationInfo.CreateFromDOMElement(Element: TDOMElem
 begin
   inherited Create;
 
-  FModelFileNames := TKamStringList.Create;
+  FModelFileNames := TCastleStringList.Create;
   FTimes := TSingleList.Create;
 
   T3DPrecalculatedAnimation.LoadFromDOMElementToVars(Element, BasePath,

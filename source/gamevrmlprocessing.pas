@@ -103,7 +103,7 @@ var
   Part: TShaderPartNode;
   ShaderCamMatrix: TSFMatrix3f;
   V: TViewpointNode;
-  Route: TVRMLRoute;
+  Route: TX3DRoute;
 begin
   M := (Node as TAppearanceNode).FdMaterial.Value;
   if (M <> nil) and
@@ -154,7 +154,7 @@ begin
         Usable for "castle-process-3d-model fountain_final.wrl | view3dscene -" }
       if V.NodeName = '' then V.NodeName := 'DefaultViewport';
 
-      Route := TVRMLRoute.Create;
+      Route := TX3DRoute.Create;
       Route.SetSourceDirectly(V.EventCameraRotationInverseMatrix);
       Route.SetDestinationDirectly(ShaderCamMatrix);
       Route.PositionInParent := 100000; { at the end of the file }
