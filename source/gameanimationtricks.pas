@@ -149,12 +149,12 @@ type
   private
     WaterEnvMap: TGLuint;
   public
-    constructor Create(Attributes: TX3DRenderingAttributes);
+    constructor Create(Attributes: TRenderingAttributes);
     destructor Destroy; override;
     function SetupUniforms(var BoundTextureUnits: Cardinal): boolean; override;
   end;
 
-constructor TWaterShader.Create(Attributes: TX3DRenderingAttributes);
+constructor TWaterShader.Create(Attributes: TRenderingAttributes);
 
   function LoadWaterEnvMap: TGLuint;
   var
