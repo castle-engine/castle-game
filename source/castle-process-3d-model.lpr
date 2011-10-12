@@ -61,7 +61,7 @@
 }
 
 uses SysUtils, CastleUtils, CastleClassUtils, X3DNodes, X3DLoad,
-  CastleStringUtils, GameVRMLProcessing, CastleParameters;
+  CastleStringUtils, GameX3DProcessing, CastleParameters;
 
 { Remove special "stub" nodes, for castle creatures, items etc.
   This is purely for testing purposes (e.g. to view castle levels

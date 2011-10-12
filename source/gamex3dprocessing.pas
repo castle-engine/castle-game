@@ -23,7 +23,7 @@
 { Process 3D castle models, to add to them VRML/X3D features that couldn't
   be produced by normal 3D modelling programs (like Blender) exporters. }
 
-unit GameVRMLProcessing;
+unit GameX3DProcessing;
 
 interface
 

@@ -270,7 +270,7 @@ implementation
 uses CastleFilesUtils, SysUtils, CastleUtils,
   GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
   GamePlay, GameNotifications, GameInputs,
-  GameItems, GameThunder, GameWindow, GameVRMLProcessing,
+  GameItems, GameThunder, GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, ProgressUnit,
   CastleXMLUtils;
 
