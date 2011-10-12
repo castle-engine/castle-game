@@ -36,7 +36,7 @@ type
     FPrepareRenderDone: boolean;
     FBlendingType: TBlendingType;
     { This is internal for PrepareRender. }
-    AnimationsPrepared: T3DPrecalculatedAnimationList;
+    AnimationsPrepared: TCastlePrecalculatedAnimationList;
   protected
     { Use this in PrepareRender to share RootNodes[0]
       of your animations in subclasses. In our destructor and FreePrepareRender
@@ -57,20 +57,20 @@ type
       by some debug messages etc.)) }
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
-      var Anim: T3DPrecalculatedAnimation;
-      AnimInfo: T3DPrecalculatedAnimationInfo;
+      var Anim: TCastlePrecalculatedAnimation;
+      AnimInfo: TCastlePrecalculatedAnimationInfo;
       Options: TPrepareResourcesOptions;
       const BaseLights: TLightInstancesList);
 
     { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool.
       AnimInfo may be @nil, then this is ignored. }
-    procedure AddFirstRootNodesPool(AnimInfo: T3DPrecalculatedAnimationInfo);
+    procedure AddFirstRootNodesPool(AnimInfo: TCastlePrecalculatedAnimationInfo);
 
     { Similar to AddFirstRootNodesPool, this allows us to share
       ManifoldEdges / BorderEdges instances between different animations,
       if they start from the same VRML scene. }
-    procedure AddManifoldEdgesPool(AnimInfo: T3DPrecalculatedAnimationInfo;
-      AnimationToShareEdges: T3DPrecalculatedAnimation);
+    procedure AddManifoldEdgesPool(AnimInfo: TCastlePrecalculatedAnimationInfo;
+      AnimationToShareEdges: TCastlePrecalculatedAnimation);
 
     { Create AnimInfo instance, reading animation properties from
       XML file KindsConfig. The path of responsible XML element
@@ -83,7 +83,7 @@ type
 
       @param(AnimationName determines the XML element name, so it must
         be a valid part of XML name) }
-    procedure AnimationFromConfig(var AnimInfo: T3DPrecalculatedAnimationInfo;
+    procedure AnimationFromConfig(var AnimInfo: TCastlePrecalculatedAnimationInfo;
       KindsConfig: TCastleConfig; const AnimationName: string;
       NilIfNoElement: boolean = false); virtual;
 
@@ -157,7 +157,7 @@ begin
   FBlendingType := DefaultBlendingType;
   FirstRootNodesPool := TStringList.Create;
   ManifoldEdgesPool := TStringList.Create;
-  AnimationsPrepared := T3DPrecalculatedAnimationList.Create(false);
+  AnimationsPrepared := TCastlePrecalculatedAnimationList.Create(false);
 end;
 
 destructor TObjectKind.Destroy;
@@ -302,7 +302,7 @@ begin
   finally Progress.Fini; end;
 end;
 
-procedure TObjectKind.AddFirstRootNodesPool(AnimInfo: T3DPrecalculatedAnimationInfo);
+procedure TObjectKind.AddFirstRootNodesPool(AnimInfo: TCastlePrecalculatedAnimationInfo);
 var
   FileName: string;
 begin
@@ -314,8 +314,8 @@ begin
   end;
 end;
 
-procedure TObjectKind.AddManifoldEdgesPool(AnimInfo: T3DPrecalculatedAnimationInfo;
-  AnimationToShareEdges: T3DPrecalculatedAnimation);
+procedure TObjectKind.AddManifoldEdgesPool(AnimInfo: TCastlePrecalculatedAnimationInfo;
+  AnimationToShareEdges: TCastlePrecalculatedAnimation);
 var
   FileName: string;
   Index: Integer;
@@ -329,8 +329,8 @@ end;
 
 procedure TObjectKind.CreateAnimationIfNeeded(
   const AnimationName: string;
-  var Anim: T3DPrecalculatedAnimation;
-  AnimInfo: T3DPrecalculatedAnimationInfo;
+  var Anim: TCastlePrecalculatedAnimation;
+  AnimInfo: TCastlePrecalculatedAnimationInfo;
   Options: TPrepareResourcesOptions;
   const BaseLights: TLightInstancesList);
 
@@ -339,12 +339,12 @@ procedure TObjectKind.CreateAnimationIfNeeded(
     Since all scenes in the animation must have exactly the same
     structure, we know that this ManifoldEdges is actually good
     for all scenes within this animation. }
-  function Animation_ManifoldEdges(Animation: T3DPrecalculatedAnimation): TManifoldEdgeList;
+  function Animation_ManifoldEdges(Animation: TCastlePrecalculatedAnimation): TManifoldEdgeList;
   begin
     Result := Animation.FirstScene.ManifoldEdges;
   end;
 
-  function Animation_BorderEdges(Animation: T3DPrecalculatedAnimation): TBorderEdgeList;
+  function Animation_BorderEdges(Animation: TCastlePrecalculatedAnimation): TBorderEdgeList;
   begin
     Result := Animation.FirstScene.BorderEdges;
   end;
@@ -353,12 +353,12 @@ procedure TObjectKind.CreateAnimationIfNeeded(
     animation. This is useful if you already have ManifoldEdges and BorderEdges,
     and you somehow know that it's good also for this scene.
 
-    This is not part of T3DPrecalculatedAnimation, because T3DPrecalculatedAnimation doesn't
+    This is not part of TCastlePrecalculatedAnimation, because TCastlePrecalculatedAnimation doesn't
     guarantee now that all scenes are "structurally equal". So you cannot share
     edges info like this. However, all castle animations satify
     "structurally equal" condition, so it's Ok for them. }
   procedure Animation_ShareManifoldAndBorderEdges(
-    Animation: T3DPrecalculatedAnimation;
+    Animation: TCastlePrecalculatedAnimation;
     ManifoldShared: TManifoldEdgeList;
     BorderShared: TBorderEdgeList);
   var
@@ -393,9 +393,9 @@ begin
       begin
         IsSharedManifoldAndBorderEdges := true;
         SharedManifoldEdges := Animation_ManifoldEdges(
-          ManifoldEdgesPool.Objects[FileNameIndex] as T3DPrecalculatedAnimation);
+          ManifoldEdgesPool.Objects[FileNameIndex] as TCastlePrecalculatedAnimation);
         SharedBorderEdges := Animation_BorderEdges(
-          ManifoldEdgesPool.Objects[FileNameIndex] as T3DPrecalculatedAnimation);
+          ManifoldEdgesPool.Objects[FileNameIndex] as TCastlePrecalculatedAnimation);
       end;
     end;
 
@@ -426,7 +426,7 @@ begin
   Progress.Step;
 end;
 
-procedure TObjectKind.AnimationFromConfig(var AnimInfo: T3DPrecalculatedAnimationInfo;
+procedure TObjectKind.AnimationFromConfig(var AnimInfo: TCastlePrecalculatedAnimationInfo;
   KindsConfig: TCastleConfig; const AnimationName: string;
   NilIfNoElement: boolean);
 var
@@ -444,7 +444,7 @@ begin
         [AnimationName, VRMLNodeName]);
   end else
   begin
-    AnimInfo := T3DPrecalculatedAnimationInfo.CreateFromDOMElement(
+    AnimInfo := TCastlePrecalculatedAnimationInfo.CreateFromDOMElement(
       Element, ExtractFilePath(KindsConfig.FileName),
       GLContextCache);
   end;

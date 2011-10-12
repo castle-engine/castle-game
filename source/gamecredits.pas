@@ -45,7 +45,7 @@ uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
 
 var
   UserQuit: boolean;
-  CreditsModel: T3DScene;
+  CreditsModel: TCastleScene;
   AnimationTime: TFloatTime;
   AnimationSpeed, AnimationEnd: TFloatTime;
 
@@ -186,7 +186,7 @@ begin
   StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', SCastleWWW);
   StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
-  CreditsModel := T3DScene.CreateCustomCache(nil, GLContextCache);
+  CreditsModel := TCastleScene.CreateCustomCache(nil, GLContextCache);
   CreditsModel.Load(LoadVRMLClassicFromString(VRMLContents, ''), true);
 
   AttributesSet(CreditsModel.Attributes, btIncrease);

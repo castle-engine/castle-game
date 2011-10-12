@@ -64,7 +64,7 @@ type
   TItemKind = class(TObjectKind)
   private
     FModelFileName: string;
-    FScene: T3DScene;
+    FScene: TCastleScene;
     FName: string;
     FImageFileName: string;
     FImage: TImage;
@@ -78,8 +78,8 @@ type
       specifying what to prepare. }
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
-      var Anim: T3DPrecalculatedAnimation;
-      AnimInfo: T3DPrecalculatedAnimationInfo;
+      var Anim: TCastlePrecalculatedAnimation;
+      AnimInfo: TCastlePrecalculatedAnimationInfo;
       const BaseLights: TLightInstancesList);
 
     function GetStringCheckNonEmpty(KindsConfig: TCastleConfig;
@@ -97,7 +97,7 @@ type
     property Name: string read FName;
 
     { Note that the Scene is nil if not PrepareRenderDone. }
-    function Scene: T3DScene;
+    function Scene: TCastleScene;
 
     { This is a 2d image, to be used for inventory slots etc.
       When you call this for the 1st time, the image will be loaded
@@ -164,8 +164,8 @@ type
     FScreenImageAlignLeft: boolean;
     FScreenImageAlignBottom : boolean;
     FEquippingSound: TSoundType;
-    FAttackAnimation: T3DPrecalculatedAnimation;
-    FAttackAnimationInfo: T3DPrecalculatedAnimationInfo;
+    FAttackAnimation: TCastlePrecalculatedAnimation;
+    FAttackAnimationInfo: TCastlePrecalculatedAnimationInfo;
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
@@ -203,7 +203,7 @@ type
 
     { This is an animation of attack with this weapon.
       TimeBegin must be 0. }
-    property AttackAnimation: T3DPrecalculatedAnimation
+    property AttackAnimation: TCastlePrecalculatedAnimation
       read FAttackAnimation;
 
     procedure Use(Item: TItem); override;
@@ -432,7 +432,7 @@ begin
   FImageFileName := CombinePaths(BasePath, FImageFileName);
 end;
 
-function TItemKind.Scene: T3DScene;
+function TItemKind.Scene: TCastleScene;
 begin
   Result := FScene;
 end;
@@ -492,7 +492,7 @@ procedure TItemKind.PrepareRenderInternal(const BaseLights: TLightInstancesList)
 begin
   if FScene = nil then
   begin
-    FScene := T3DScene.CreateCustomCache(nil, GLContextCache);
+    FScene := TCastleScene.CreateCustomCache(nil, GLContextCache);
     FScene.Load(ModelFileName);
 
     AttributesSet(Scene.Attributes, BlendingType);
@@ -522,8 +522,8 @@ end;
 
 procedure TItemKind.CreateAnimationIfNeeded(
   const AnimationName: string;
-  var Anim: T3DPrecalculatedAnimation;
-  AnimInfo: T3DPrecalculatedAnimationInfo;
+  var Anim: TCastlePrecalculatedAnimation;
+  AnimInfo: TCastlePrecalculatedAnimationInfo;
   const BaseLights: TLightInstancesList);
 begin
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,

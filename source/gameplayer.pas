@@ -1299,7 +1299,7 @@ end;
 procedure TPlayer.RenderAttack(Params: TRenderParams);
 var
   AttackTime: Single;
-  Anim: T3DPrecalculatedAnimation;
+  Anim: TCastlePrecalculatedAnimation;
 begin
   if Attacking then
   begin

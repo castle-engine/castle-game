@@ -431,7 +431,7 @@ type
       object that has meaningfull ChangeLevelScene method. }
     procedure ChangeLevelScene; virtual;
 
-    { Load T3DPrecalculatedAnimation from *.kanim file, doing common tasks.
+    { Load TCastlePrecalculatedAnimation from *.kanim file, doing common tasks.
       @unorderedList(
         @item sets Attributes according to AnimationAttributesSet
         @item optionally creates triangle octree for the FirstScene and/or LastScene
@@ -443,7 +443,7 @@ type
     function LoadLevelAnimation(
       const FileName: string;
       CreateFirstOctreeCollisions,
-      CreateLastOctreeCollisions: boolean): T3DPrecalculatedAnimation;
+      CreateLastOctreeCollisions: boolean): TCastlePrecalculatedAnimation;
 
     { See @link(Picked), you can call this from
       overriden implementations of these. }
@@ -685,7 +685,7 @@ type
     property SceneDynamicShadows: boolean
       read FSceneDynamicShadows write FSceneDynamicShadows default false;
 
-    { Just load T3DScene from file, doing some common tasks:
+    { Just load TCastleScene from file, doing some common tasks:
       @unorderedList(
         @item sets Attributes according to AttributesSet
         @item optionally create triangle octree
@@ -695,7 +695,7 @@ type
         @item FreeExternalResources, since they will not be needed anymore
       ) }
     function LoadLevelScene(const FileName: string;
-      CreateOctreeCollisions, PrepareBackground: boolean): T3DScene;
+      CreateOctreeCollisions, PrepareBackground: boolean): TCastleScene;
 
     procedure BeforeDraw; override;
     function CreateDefaultCamera(AOwner: TComponent): TCamera; override;
@@ -1159,7 +1159,7 @@ begin
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    MainScene := T3DScene.CreateCustomCache(Self, GLContextCache);
+    MainScene := TCastleScene.CreateCustomCache(Self, GLContextCache);
     MainScene.Load(SceneFileName);
 
     { initialize FAnimationTime. Must be initialized before creating creatures. }
@@ -1701,11 +1701,11 @@ begin
 end;
 
 function TLevel.LoadLevelScene(const FileName: string;
-  CreateOctreeCollisions, PrepareBackground: boolean): T3DScene;
+  CreateOctreeCollisions, PrepareBackground: boolean): TCastleScene;
 var
   Options: TPrepareResourcesOptions;
 begin
-  Result := T3DScene.CreateCustomCache(Self, GLContextCache);
+  Result := TCastleScene.CreateCustomCache(Self, GLContextCache);
   Result.Load(FileName);
   AttributesSet(Result.Attributes, btIncrease);
 
@@ -1730,11 +1730,11 @@ end;
 function TLevel.LoadLevelAnimation(
   const FileName: string;
   CreateFirstOctreeCollisions,
-  CreateLastOctreeCollisions: boolean): T3DPrecalculatedAnimation;
+  CreateLastOctreeCollisions: boolean): TCastlePrecalculatedAnimation;
 var
   Options: TPrepareResourcesOptions;
 begin
-  Result := T3DPrecalculatedAnimation.CreateCustomCache(Self, GLContextCache);
+  Result := TCastlePrecalculatedAnimation.CreateCustomCache(Self, GLContextCache);
   Result.LoadFromFile(FileName, false, true);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);

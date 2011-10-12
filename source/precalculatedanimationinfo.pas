@@ -29,9 +29,9 @@ uses Classes, PrecalculatedAnimation, GLRenderer, CastleUtils, CastleStringUtils
 
 type
   { Simple class to postpone loading vrml files that will be used
-    for T3DPrecalculatedAnimation, and actually creating T3DPrecalculatedAnimation instances.
-    Why ? Because loading all these files can be quite time-consuming. }
-  T3DPrecalculatedAnimationInfo = class
+    for TCastlePrecalculatedAnimation, and actually creating TCastlePrecalculatedAnimation instances.
+    Why? Because loading all these files can be quite time-consuming. }
+  TCastlePrecalculatedAnimationInfo = class
   private
     FModelFileNames: TCastleStringList;
     FTimes: TSingleList;
@@ -56,7 +56,7 @@ type
     { Constructor that loads animation settings from DOM node representing
       *.kanim file.
       File format is described in ../../doc/kanim_format.txt file.
-      @seealso T3DPrecalculatedAnimation.LoadFromDOMElement. }
+      @seealso TCastlePrecalculatedAnimation.LoadFromDOMElement. }
     constructor CreateFromDOMElement(Element: TDOMElement;
       const BasePath: string;
       ACache: TGLRendererContextCache = nil);
@@ -82,7 +82,7 @@ type
       read FCache write FCache;
     { @groupEnd }
 
-    { Remember that you're responsible for returned T3DPrecalculatedAnimation
+    { Remember that you're responsible for returned TCastlePrecalculatedAnimation
       instance after calling this function.
 
       @param(FirstRootNodesPool
@@ -95,22 +95,22 @@ type
 
         This allows you to prepare some commonly used root nodes and put
         them in FirstRootNodesPool before calling
-        T3DPrecalculatedAnimationInfo.CreateAnimation. This way loading time
+        TCastlePrecalculatedAnimationInfo.CreateAnimation. This way loading time
         will be faster, and also display lists sharing may be greater,
-        as the same RootNode may be shared by a couple of T3DPrecalculatedAnimation
+        as the same RootNode may be shared by a couple of TCastlePrecalculatedAnimation
         instances.
 
         Be sure to remove these nodes (free them and remove them from
         FirstRootNodesPool) after you're sure that all animations that
         used them were destroyed.) }
-    function CreateAnimation(FirstRootNodesPool: TStringList): T3DPrecalculatedAnimation;
+    function CreateAnimation(FirstRootNodesPool: TStringList): TCastlePrecalculatedAnimation;
   end;
 
 implementation
 
 uses SysUtils, X3DNodes, X3DLoad;
 
-constructor T3DPrecalculatedAnimationInfo.Create(
+constructor TCastlePrecalculatedAnimationInfo.Create(
   const AModelFileNames: array of string;
   const ATimes: array of Single;
   AScenesPerTime: Cardinal;
@@ -134,7 +134,7 @@ begin
   FCache := ACache;
 end;
 
-constructor T3DPrecalculatedAnimationInfo.CreateFromFile(const FileName: string;
+constructor TCastlePrecalculatedAnimationInfo.CreateFromFile(const FileName: string;
   ACache: TGLRendererContextCache);
 begin
   inherited Create;
@@ -142,14 +142,14 @@ begin
   FModelFileNames := TCastleStringList.Create;
   FTimes := TSingleList.Create;
 
-  T3DPrecalculatedAnimation.LoadFromFileToVars(FileName,
+  TCastlePrecalculatedAnimation.LoadFromFileToVars(FileName,
     FModelFileNames, FTimes, FScenesPerTime,
     FEqualityEpsilon, FTimeLoop, FTimeBackwards);
 
   FCache := ACache;
 end;
 
-constructor T3DPrecalculatedAnimationInfo.CreateFromDOMElement(Element: TDOMElement;
+constructor TCastlePrecalculatedAnimationInfo.CreateFromDOMElement(Element: TDOMElement;
   const BasePath: string;
   ACache: TGLRendererContextCache);
 begin
@@ -158,22 +158,22 @@ begin
   FModelFileNames := TCastleStringList.Create;
   FTimes := TSingleList.Create;
 
-  T3DPrecalculatedAnimation.LoadFromDOMElementToVars(Element, BasePath,
+  TCastlePrecalculatedAnimation.LoadFromDOMElementToVars(Element, BasePath,
     FModelFileNames, FTimes, FScenesPerTime,
     FEqualityEpsilon, FTimeLoop, FTimeBackwards);
 
   FCache := ACache;
 end;
 
-destructor T3DPrecalculatedAnimationInfo.Destroy;
+destructor TCastlePrecalculatedAnimationInfo.Destroy;
 begin
   FreeAndNil(FModelFileNames);
   FreeAndNil(FTimes);
   inherited;
 end;
 
-function T3DPrecalculatedAnimationInfo.CreateAnimation(
-  FirstRootNodesPool: TStringList): T3DPrecalculatedAnimation;
+function TCastlePrecalculatedAnimationInfo.CreateAnimation(
+  FirstRootNodesPool: TStringList): TCastlePrecalculatedAnimation;
 var
   RootNodes: TX3DNodeList;
   I: Integer;
@@ -203,7 +203,7 @@ begin
     for I := 1 to RootNodes.Count - 1 do
       RootNodes[I] := LoadVRML(FModelFileNames[I], false);
 
-    Result := T3DPrecalculatedAnimation.CreateCustomCache(nil, FCache);
+    Result := TCastlePrecalculatedAnimation.CreateCustomCache(nil, FCache);
     Result.Load(RootNodes, OwnsFirstRootNode, FTimes,
       FScenesPerTime, FEqualityEpsilon);
     Result.TimeLoop := FTimeLoop;

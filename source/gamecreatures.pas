@@ -107,11 +107,11 @@ type
       specifying what to prepare. }
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
-      var Anim: T3DPrecalculatedAnimation;
-      AnimInfo: T3DPrecalculatedAnimationInfo;
+      var Anim: TCastlePrecalculatedAnimation;
+      AnimInfo: TCastlePrecalculatedAnimationInfo;
       const BaseLights: TLightInstancesList);
 
-    procedure AnimationFromConfig(var AnimInfo: T3DPrecalculatedAnimationInfo;
+    procedure AnimationFromConfig(var AnimInfo: TCastlePrecalculatedAnimationInfo;
       KindsConfig: TCastleConfig; const AnimationName: string;
       NilIfNoElement: boolean = false); override;
   public
@@ -256,21 +256,21 @@ type
     (just like Level.AnimationTime). }
   TWalkAttackCreatureKind = class(TCreatureKind)
   private
-    FStandAnimation: T3DPrecalculatedAnimation;
-    FStandToWalkAnimation: T3DPrecalculatedAnimation;
-    FWalkAnimation: T3DPrecalculatedAnimation;
-    FAttackAnimation: T3DPrecalculatedAnimation;
-    FDyingAnimation: T3DPrecalculatedAnimation;
-    FDyingBackAnimation: T3DPrecalculatedAnimation;
-    FHurtAnimation: T3DPrecalculatedAnimation;
+    FStandAnimation: TCastlePrecalculatedAnimation;
+    FStandToWalkAnimation: TCastlePrecalculatedAnimation;
+    FWalkAnimation: TCastlePrecalculatedAnimation;
+    FAttackAnimation: TCastlePrecalculatedAnimation;
+    FDyingAnimation: TCastlePrecalculatedAnimation;
+    FDyingBackAnimation: TCastlePrecalculatedAnimation;
+    FHurtAnimation: TCastlePrecalculatedAnimation;
 
-    FStandAnimationInfo: T3DPrecalculatedAnimationInfo;
-    FStandToWalkAnimationInfo: T3DPrecalculatedAnimationInfo;
-    FWalkAnimationInfo: T3DPrecalculatedAnimationInfo;
-    FAttackAnimationInfo: T3DPrecalculatedAnimationInfo;
-    FDyingAnimationInfo: T3DPrecalculatedAnimationInfo;
-    FDyingBackAnimationInfo: T3DPrecalculatedAnimationInfo;
-    FHurtAnimationInfo: T3DPrecalculatedAnimationInfo;
+    FStandAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FStandToWalkAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FWalkAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FAttackAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FDyingAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FDyingBackAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FHurtAnimationInfo: TCastlePrecalculatedAnimationInfo;
 
     FMoveSpeed: Single;
     FMinDelayBetweenAttacks: Single;
@@ -287,7 +287,7 @@ type
     FMaxHeightAcceptableToFall: Single;
     FRandomWalkDistance: Single;
   protected
-    { Make all T3DPrecalculatedAnimation properties non-nil. I.e. load them from their
+    { Make all TCastlePrecalculatedAnimation properties non-nil. I.e. load them from their
       XxxInfo counterparts.
 
       Also calculates CameraRadiusFromPrepareRender
@@ -305,18 +305,18 @@ type
     { An animation of standing still.
       Beginning must be on time 0.
       Beginning and end of it must glue together. }
-    property StandAnimation: T3DPrecalculatedAnimation read FStandAnimation;
+    property StandAnimation: TCastlePrecalculatedAnimation read FStandAnimation;
 
     { An animation when creature changes from standing still to walking.
       Beginning must be on time 0.
       It's beginnig must glue with beginning of StandAnimation,
       it's ending must glue with beginning of WalkAnimation. }
-    property StandToWalkAnimation: T3DPrecalculatedAnimation read FStandToWalkAnimation;
+    property StandToWalkAnimation: TCastlePrecalculatedAnimation read FStandToWalkAnimation;
 
     { An animation of walking.
       Beginning must be on time 0.
       Beginning and end of it must glue together. }
-    property WalkAnimation: T3DPrecalculatedAnimation read FWalkAnimation;
+    property WalkAnimation: TCastlePrecalculatedAnimation read FWalkAnimation;
 
     { An animation of attacking.
       Beginning must be on time 0.
@@ -332,14 +332,14 @@ type
       (when the distance was already close enough). And after performing
       the attack, the creature doesn't need to go back to state
       before the attack. }
-    property AttackAnimation: T3DPrecalculatedAnimation read FAttackAnimation;
+    property AttackAnimation: TCastlePrecalculatedAnimation read FAttackAnimation;
 
     { An animation of dying.
       Beginning must be on time 0.
       Beginning should *more-or-less* look like any point of the stand/attack/walk
       animations. Note that we can display this animation infinitely,
       so it must work good after Time > it's TimeEnd. }
-    property DyingAnimation: T3DPrecalculatedAnimation read FDyingAnimation;
+    property DyingAnimation: TCastlePrecalculatedAnimation read FDyingAnimation;
 
     { An optional dying animation. May be @nil, and corresponding
       DyingBackAnimationInfo may be @nil. If not @nil, this will be used
@@ -347,7 +347,7 @@ type
       DyingAnimation is used only when it's killed by hitting from the front).
 
       The direction of last hit is taken from LastAttackDirection. }
-    property DyingBackAnimation: T3DPrecalculatedAnimation read FDyingBackAnimation;
+    property DyingBackAnimation: TCastlePrecalculatedAnimation read FDyingBackAnimation;
 
     { Animation when the creature will be hurt.
       Beginning must be on time 0.
@@ -355,7 +355,7 @@ type
       any point of the stand/attack/walk animations.
       Note that this animation will not loop, it will be played
       for TimeDurationWithBack time. }
-    property HurtAnimation: T3DPrecalculatedAnimation read FHurtAnimation;
+    property HurtAnimation: TCastlePrecalculatedAnimation read FHurtAnimation;
 
     { The moving speed: how much Direction vector will be scaled
       when moving in wasWalk. }
@@ -491,8 +491,8 @@ type
 
   TSpiderQueenKind = class(TWalkAttackCreatureKind)
   private
-    FThrowWebAttackAnimation: T3DPrecalculatedAnimation;
-    FThrowWebAttackAnimationInfo: T3DPrecalculatedAnimationInfo;
+    FThrowWebAttackAnimation: TCastlePrecalculatedAnimation;
+    FThrowWebAttackAnimationInfo: TCastlePrecalculatedAnimationInfo;
 
     FMinDelayBetweenThrowWebAttacks: Single;
     FMaxThrowWebAttackDistance: Single;
@@ -530,7 +530,7 @@ type
       read FActualThrowWebAttackTime
       write FActualThrowWebAttackTime default 0;
 
-    property ThrowWebAttackAnimation: T3DPrecalculatedAnimation
+    property ThrowWebAttackAnimation: TCastlePrecalculatedAnimation
       read FThrowWebAttackAnimation;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
@@ -557,8 +557,8 @@ type
     cares to keep Direction horizontal). }
   TMissileCreatureKind = class(TCreatureKind)
   private
-    FAnimation: T3DPrecalculatedAnimation;
-    FAnimationInfo: T3DPrecalculatedAnimationInfo;
+    FAnimation: TCastlePrecalculatedAnimation;
+    FAnimationInfo: TCastlePrecalculatedAnimationInfo;
     FMoveSpeed: Single;
     FSoundExplosion: TSoundType;
     FCloseDirectionToPlayer: boolean;
@@ -581,7 +581,7 @@ type
 
     { Missile uses the same animation all the time.
       In the simplest case, you can just place here a single scene. }
-    property Animation: T3DPrecalculatedAnimation read FAnimation;
+    property Animation: TCastlePrecalculatedAnimation read FAnimation;
 
     { The moving speed: how much Direction vector will be scaled
       when moving. }
@@ -633,12 +633,12 @@ type
   end;
 
   { A really dumb creature that just stays still during the whole
-    game. Basically this is just T3DPrecalculatedAnimation that is displayed as
+    game. Basically this is just TCastlePrecalculatedAnimation that is displayed as
     a creature. }
   TStillCreatureKind = class(TCreatureKind)
   private
-    FAnimation: T3DPrecalculatedAnimation;
-    FAnimationInfo: T3DPrecalculatedAnimationInfo;
+    FAnimation: TCastlePrecalculatedAnimation;
+    FAnimationInfo: TCastlePrecalculatedAnimationInfo;
   protected
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
@@ -651,7 +651,7 @@ type
 
     { Missile uses the same animation all the time.
       In the simplest case, you can just place here a single scene. }
-    property Animation: T3DPrecalculatedAnimation read FAnimation;
+    property Animation: TCastlePrecalculatedAnimation read FAnimation;
 
     function CreateDefaultCreature(
       const ALegsPosition: TVector3Single;
@@ -820,7 +820,7 @@ type
       Note that this is called at the end of our constructor
       (through RecalculateBoundingBox),
       so it must be implemented to work even when Level is not assigned yet. }
-    function CurrentScene: T3DScene; virtual; abstract;
+    function CurrentScene: TCastleScene; virtual; abstract;
 
     { The position of the (0, 0, 0) point of creature model
       (or rather, currently used model! Creatures are animated after all). }
@@ -1058,7 +1058,7 @@ type
 
     procedure Idle(const CompSpeed: Single); override;
 
-    function CurrentScene: T3DScene; override;
+    function CurrentScene: TCastleScene; override;
 
     { The method where you must actually do your attack
       --- fire a missile, lower player's life etc.
@@ -1119,7 +1119,7 @@ type
   public
     procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single); override;
-    function CurrentScene: T3DScene; override;
+    function CurrentScene: TCastleScene; override;
   end;
 
   TGhostCreature = class(TWalkAttackCreature)
@@ -1150,7 +1150,7 @@ type
 
     procedure Idle(const CompSpeed: Single); override;
 
-    function CurrentScene: T3DScene; override;
+    function CurrentScene: TCastleScene; override;
 
     { Missiles return @false here.
       We will check for collisions when missile moves. }
@@ -1164,7 +1164,7 @@ type
     { Shortcut for TStillCreatureKind(Kind). }
     function StillKind: TStillCreatureKind;
 
-    function CurrentScene: T3DScene; override;
+    function CurrentScene: TCastleScene; override;
 
     function RemoveMeFromLevel: boolean; override;
   end;
@@ -1254,8 +1254,8 @@ end;
 
 procedure TCreatureKind.CreateAnimationIfNeeded(
   const AnimationName: string;
-  var Anim: T3DPrecalculatedAnimation;
-  AnimInfo: T3DPrecalculatedAnimationInfo;
+  var Anim: TCastlePrecalculatedAnimation;
+  AnimInfo: TCastlePrecalculatedAnimationInfo;
   const BaseLights: TLightInstancesList);
 var
   Options: TPrepareResourcesOptions;
@@ -1268,7 +1268,7 @@ begin
     Options, BaseLights);
 end;
 
-procedure TCreatureKind.AnimationFromConfig(var AnimInfo: T3DPrecalculatedAnimationInfo;
+procedure TCreatureKind.AnimationFromConfig(var AnimInfo: TCastlePrecalculatedAnimationInfo;
   KindsConfig: TCastleConfig; const AnimationName: string;
   NilIfNoElement: boolean);
 begin
@@ -1562,7 +1562,7 @@ end;
 
 procedure TGhostKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 var
-  ReferenceScene: T3DScene;
+  ReferenceScene: TCastleScene;
 begin
   inherited;
 
@@ -3133,7 +3133,7 @@ begin
   end;
 end;
 
-function TWalkAttackCreature.CurrentScene: T3DScene;
+function TWalkAttackCreature.CurrentScene: TCastleScene;
 var
   StateTime: Single;
 begin
@@ -3382,7 +3382,7 @@ begin
     end;
 end;
 
-function TSpiderQueenCreature.CurrentScene: T3DScene;
+function TSpiderQueenCreature.CurrentScene: TCastleScene;
 var
   StateTime: Single;
 begin
@@ -3541,7 +3541,7 @@ begin
   end;
 end;
 
-function TMissileCreature.CurrentScene: T3DScene;
+function TMissileCreature.CurrentScene: TCastleScene;
 begin
   if Level <> nil then
     Result := MissileKind.Animation.SceneFromTime(Level.AnimationTime) else
@@ -3606,7 +3606,7 @@ begin
   Result := TStillCreatureKind(Kind);
 end;
 
-function TStillCreature.CurrentScene: T3DScene;
+function TStillCreature.CurrentScene: TCastleScene;
 begin
   if Level <> nil then
     Result := StillKind.Animation.SceneFromTime(Level.AnimationTime) else

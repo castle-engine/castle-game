@@ -36,10 +36,10 @@ const
 type
   TCastleHallLevel = class(TLevel)
   private
-    Symbol: T3DPrecalculatedAnimation;
-    Button: T3DPrecalculatedAnimation;
+    Symbol: TCastlePrecalculatedAnimation;
+    Button: TCastlePrecalculatedAnimation;
 
-    StairsBlocker: T3DScene;
+    StairsBlocker: TCastleScene;
     StairsBlockerMiddle: TVector3Single;
 
     FLevelExitBox: TBox3D;
@@ -75,7 +75,7 @@ type
   private
     FGateExitBox: TBox3D;
 
-    Teleport: T3DScene;
+    Teleport: TCastleScene;
     FTeleport1Box, FTeleport2Box: TBox3D;
 
     Teleport1Rotate: Single;
@@ -121,8 +121,8 @@ type
   TTowerLevel = class(TLevel)
   private
     MovingElevator: TLevelLinearMovingObject;
-    Elevator: T3DScene;
-    ElevatorButton: T3DPrecalculatedAnimation;
+    Elevator: TCastleScene;
+    ElevatorButton: TCastlePrecalculatedAnimation;
   public
     constructor Create(
       const AName: string;
@@ -144,11 +144,11 @@ type
 
     HintOpenDoor: TLevelHintArea;
 
-    FGateExit: T3DScene;
+    FGateExit: TCastleScene;
 
     FDoEndSequence: boolean;
 
-    FEndSequence: T3DScene;
+    FEndSequence: TCastleScene;
     procedure SetDoEndSequence(Value: boolean);
   public
     constructor Create(
@@ -203,17 +203,17 @@ type
   private
     procedure RenameCreatures(Node: TX3DNode);
   private
-    FakeWall: T3DScene;
+    FakeWall: TCastleScene;
 
     MovingElevator49: TLevelLinearMovingObject;
-    Elevator49: T3DScene;
+    Elevator49: TCastleScene;
     Elevator49DownBox: TBox3D;
 
     MovingElevator9a9b: TLevelLinearMovingObject;
-    Elevator9a9b: T3DScene;
+    Elevator9a9b: TCastleScene;
     Elevator9a9bPickBox: TBox3D;
 
-    ExitButton: T3DScene;
+    ExitButton: TCastleScene;
     ExitMessagePending: boolean;
   protected
     procedure ChangeLevelScene; override;
@@ -546,7 +546,7 @@ constructor TGateLevel.Create(
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
 var
-  Cart: T3DPrecalculatedAnimation;
+  Cart: TCastlePrecalculatedAnimation;
   GateLevelPath: string;
 begin
   inherited;
@@ -1404,7 +1404,7 @@ constructor TGateBackgroundLevel.Create(
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
 var
-  Water: T3DPrecalculatedAnimation;
+  Water: TCastlePrecalculatedAnimation;
 begin
   inherited;
 
