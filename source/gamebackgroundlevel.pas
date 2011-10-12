@@ -131,7 +131,7 @@ begin
   BackgroundControls.Add(BackgroundLevel);
 
   { create BackgroundLevel.Camera now, for next assignment }
-  BackgroundLevel.Camera := BackgroundLevel.CreateDefaultCamera(BackgroundLevel);
+  BackgroundLevel.Camera := BackgroundLevel.CreateDefaultCamera;
 
   { Do not allow to move the camera in any way.
     We should also disable any other interaction with the scene,

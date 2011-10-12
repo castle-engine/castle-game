@@ -1852,7 +1852,7 @@ var
   Fov, Aspect: Single;
 begin
   if Camera = nil then
-    Camera := CreateDefaultCamera(Self);
+    Camera := CreateDefaultCamera;
 
   ShadowVolumesDraw := DebugRenderShadowVolume;
   ShadowVolumesPossible := RenderShadowsPossible;
