@@ -198,10 +198,10 @@ begin
     OwnsFirstRootNode := FirstRootNodeIndex = -1;
     if not OwnsFirstRootNode then
       RootNodes[0] := FirstRootNodesPool.Objects[FirstRootNodeIndex] as TX3DNode else
-      RootNodes[0] := LoadVRML(FModelFileNames[0], false);
+      RootNodes[0] := Load3D(FModelFileNames[0], false);
 
     for I := 1 to RootNodes.Count - 1 do
-      RootNodes[I] := LoadVRML(FModelFileNames[I], false);
+      RootNodes[I] := Load3D(FModelFileNames[I], false);
 
     Result := TCastlePrecalculatedAnimation.CreateCustomCache(nil, FCache);
     Result.Load(RootNodes, OwnsFirstRootNode, FTimes,

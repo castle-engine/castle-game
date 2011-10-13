@@ -700,7 +700,7 @@ begin
   case CurrentItem - Level.MainScene.GlobalLights.Count of
     0: begin
          if StdOutStream <> nil then
-           SaveVRML(Level.MainScene.RootNode, StdOutStream,
+           Save3D(Level.MainScene.RootNode, StdOutStream,
              SaveGenerator, '', xeClassic) else
            MessageOK(Window, 'No stdout available. On Windows you must run the game ' +
              'from the command-line to get stdout.', taLeft);
@@ -709,7 +709,7 @@ begin
          if MessageYesNo(Window, Format('This will permanently overwrite file "%s". ' +
            'Are you sure you want to save the level file ?',
            [Level.SceneFileName]), taLeft) then
-           SaveVRML(Level.MainScene.RootNode, Level.SceneFileName,
+           Save3D(Level.MainScene.RootNode, Level.SceneFileName,
              SaveGenerator, '', xeClassic);
        end;
     2, 3, 4: ;

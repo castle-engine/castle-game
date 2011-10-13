@@ -173,7 +173,7 @@ begin
   Parameters.CheckHigh(1);
   FileName := Parameters[1];
 
-  Model := LoadVRML(FileName);
+  Model := Load3D(FileName);
   try
     BaseName := DeleteFileExt(ExtractFileName(FileName));
 
@@ -185,6 +185,6 @@ begin
 
     RemoveSpecialCastleNodes(Model);
 
-    SaveVRML(Model, StdOutStream, 'castle-process-3d-model', '', xeClassic);
+    Save3D(Model, StdOutStream, 'castle-process-3d-model', '', xeClassic);
   finally FreeAndNil(Model) end;
 end.

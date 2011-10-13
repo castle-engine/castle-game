@@ -310,7 +310,7 @@ begin
   begin
     FileName := AnimInfo.ModelFileNames[0];
     if FirstRootNodesPool.IndexOf(FileName) = -1 then
-      FirstRootNodesPool.AddObject(FileName, LoadVRML(FileName, false));
+      FirstRootNodesPool.AddObject(FileName, Load3D(FileName, false));
   end;
 end;
 

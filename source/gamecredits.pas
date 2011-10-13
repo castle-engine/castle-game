@@ -187,7 +187,7 @@ begin
   StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
   CreditsModel := TCastleScene.CreateCustomCache(nil, GLContextCache);
-  CreditsModel.Load(LoadVRMLClassicFromString(VRMLContents, ''), true);
+  CreditsModel.Load(LoadX3DClassicFromString(VRMLContents, ''), true);
 
   AttributesSet(CreditsModel.Attributes, btIncrease);
   CreditsModel.Attributes.UseSceneLights := true;
