@@ -28,7 +28,7 @@ interface
 uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
   SceneWaypoints, GameInputs, ALSoundAllocator, GameSound,
   Triangle, GameTextures, XmlSoundEngine, Classes, Base3D,
-  CastleGLUtils;
+  CastleGLUtils, CastleColors;
 
 const
   DefaultMaxLife = 100;

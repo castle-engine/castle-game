@@ -29,7 +29,7 @@ uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, Cas
   PrecalculatedAnimationInfo, CastleScene, GameSound, SceneWaypoints,
   GameObjectKinds, ALSoundAllocator, CastleXMLConfig, Base3D,
   XmlSoundEngine, GLShadowVolumeRenderer, Triangle, Frustum, X3DNodes,
-  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
+  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, CastleColors;
 
 const
   { Default value for TCreatureKind.DefaultMaxLife.

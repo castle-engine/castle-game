@@ -28,7 +28,7 @@ interface
 uses CastleScene, Boxes3D, VectorMath,
   GamePlayer, GameLevel, Background, Triangle,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation,
-  GameCreatures, Classes, CastleTimeUtils;
+  GameCreatures, Classes, CastleTimeUtils, CastleColors;
 
 const
   CastleHallWerewolvesCount = 4;
