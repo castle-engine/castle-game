@@ -260,9 +260,9 @@ function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
     end;
   end;
 
-  procedure DelayIfNeeded;
+  procedure SleepIfNeeded;
   begin
-    Delay(2000);
+    Sleep(2000);
   end;
 
 var
@@ -289,8 +289,8 @@ begin
         will be slow enough to actually make time for user to see
         background image), or make this hack more intelligent
         (like checking how much time was spent inside CreateLevelNoBackground
-        and doing Delay() only if necessary). }
-      DelayIfNeeded;
+        and doing Sleep() only if necessary). }
+      SleepIfNeeded;
 
     finally FreeAndNil(SavedMode) end;
   end else
