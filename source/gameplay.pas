@@ -1104,7 +1104,7 @@ begin
         Level.PrepareNewPlayer(Player);
 
       repeat
-        Application.ProcessMessage(true);
+        Application.ProcessMessage(true, true);
       until GameEnded;
     finally
       { Clear some Player.Camera callbacks. }

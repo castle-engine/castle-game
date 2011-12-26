@@ -119,7 +119,7 @@ begin
 
     Selected := false;
     repeat
-      Application.ProcessMessage(true);
+      Application.ProcessMessage(true, true);
     until Selected;
 
     Result := SelectedIndex;
