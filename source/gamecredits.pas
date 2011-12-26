@@ -149,9 +149,7 @@ begin
 
   AnimationTime := 0;
 
-  SavedMode := TGLMode.CreateReset(Window, 0, false,
-    @Draw, nil, @CloseQuery,
-    true { FPSActive should not be needed anymore, but I leave it. });
+  SavedMode := TGLMode.CreateReset(Window, 0, false, @Draw, nil, @CloseQuery);
   try
     Window.AutoRedisplay := true; { scrolling text animation }
 

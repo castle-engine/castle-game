@@ -964,8 +964,7 @@ begin
   DebugPlayerMenu.PlayerSpeedSlider.Value := Player.Camera.MoveSpeed;
 
   SavedMode := TGLMode.CreateReset(Window, 0, true,
-    nil, Window.OnResize, @CloseQuery,
-    true { FPSActive should not be needed anymore, but I leave it. });
+    nil, Window.OnResize, @CloseQuery);
   try
     { This is needed, because when changing ViewAngleDegX we will call
       Window.OnResize to set new projection matrix, and this

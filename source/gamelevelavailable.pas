@@ -271,8 +271,7 @@ begin
   if GLList_LoadingBgImage <> 0 then
   begin
     SavedMode := TGLMode.CreateReset(Window, 0, true,
-      @DrawCreateLevel, @Resize2D, @NoClose,
-      true { FPSActive should not be needed anymore, but I leave it. });
+      @DrawCreateLevel, @Resize2D, @NoClose);
     try
       Window.UserData := Self;
 

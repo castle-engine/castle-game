@@ -98,8 +98,7 @@ begin
   ChooseMenu.FixItemsRectangles;
 
   SavedMode := TGLMode.CreateReset(Window, 0, true,
-    nil, Window.OnResize, @CloseQuery,
-    true { FPSActive should not be needed anymore, but I leave it. });
+    nil, Window.OnResize, @CloseQuery);
   try
     { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;

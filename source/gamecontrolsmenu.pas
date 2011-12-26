@@ -558,8 +558,7 @@ begin
   FadeRect := nil;
 
   SavedMode := TGLMode.CreateReset(Window, 0, false,
-    nil, Window.OnResize, @CloseQuery,
-    true { FPSActive should not be needed anymore, but I leave it. });
+    nil, Window.OnResize, @CloseQuery);
   try
     SavedMode.RestoreProjectionMatrix := false;
 

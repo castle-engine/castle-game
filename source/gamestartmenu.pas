@@ -811,8 +811,7 @@ begin
     SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
     try
       SavedMode := TGLMode.CreateReset(Window, 0, false,
-        nil, nil, @CloseQuery,
-        true { FPSActive should not be needed anymore, but I leave it. });
+        nil, nil, @CloseQuery);
       try
         SavedMode.RestoreProjectionMatrix := false;
 

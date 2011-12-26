@@ -1061,8 +1061,7 @@ begin
 
     SavedMode := TGLMode.CreateReset(Window,
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
-      GL_ENABLE_BIT, true,
-      nil, nil, @CloseQuery, { FPSActive } true);
+      GL_ENABLE_BIT, true, nil, nil, @CloseQuery);
     try
       { No need to actually create TPlayGameHelper class,
         but I must pass here an instance, not a TPlayGameHelper
