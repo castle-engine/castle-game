@@ -26,7 +26,7 @@ unit GameHelp;
 interface
 
 const
-  Version = '0.9.3';
+  Version = '0.9.4';
 
 function SCastleVersion: string;
 function SCastleWWW: string;
