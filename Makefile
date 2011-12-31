@@ -103,7 +103,7 @@ clean:
 			   -iname '*.blend1' ')' -print \
 	     | xargs rm -f
 # I recurse into source/ subdir only if it exists ---
-# this is useful because this may be called by update_archives.sh
+# this is useful because this may be called by pack_binary.sh
 # script inside a temporary copy of castle files, where source/
 # subdirectory isn't supposed to exist.
 	if [ -d source/ ]; then $(MAKE) -C source/ clean; fi
@@ -118,7 +118,7 @@ clean_binaries:
 #
 # These things are *not* automatically generated (automatically generated
 # stuff is removed always by `clean'). So this target is supposed to be
-# used only by update_archives.sh and update_pascal_src.sh scripts,
+# used only by pack_*.sh scripts,
 # it does it inside temporary copy of castle/trunk/.
 #
 # Notes: I remove here data/sounds/intermediate/, because it's large

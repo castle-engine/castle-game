@@ -497,8 +497,7 @@ Each time before uploading release:
 - make sure Version (in castlehelp.pas) is good
 - Remember to test whether FPC version used was correct
   (to avoid accidentaly compiling with some SVN intermediate version etc.)
-- make release like for all other programs, see
-  /win/mojewww/camelot/private/update_archives/README.
+- make release like for all other programs, see ../www/pack/README.txt
 
 - extract created dist
   - test running from extracted created dist
