@@ -6,19 +6,14 @@
 # ------------------------------------------------------------
 # Various targets.
 
-# default: make sure that various files are up-to-date, and show info
-default: info
+default: build
+
+# make sure that various files are up-to-date
+update:
 	$(MAKE) -C source/
 	$(MAKE) -C data/items/life_potion/
 	$(MAKE) -C data/items/sword/
 	$(MAKE) -C data/levels/
-
-# This is deliberately a "=" variable, not ":=", so it's expanded only
-# when needed (not for any compilation)
-VERSION = $(shell castle --version)
-
-info:
-	@echo 'Version is '$(VERSION)
 
 # Simple install.
 # You may as well symlink to /usr/local/share/castle, for system-wide install.
@@ -45,45 +40,39 @@ install:
 # Otherwise normal optimized release build will be done.
 
 ifeq ($(DEBUG),t)
-FPC_UNIX_OPTIONS := -dDEBUG
-FPC_WINDOWS_OPTIONS := -dDEBUG
+FPC_OPTIONS := -dDEBUG
 else
-
 ifeq ($(DEBUG),valgrind)
-FPC_UNIX_OPTIONS := -gl -gv -dRELEASE -dCASTLE_WINDOW_XLIB
-FPC_WINDOWS_OPTIONS := -gl -gv -dRELEASE
+FPC_OPTIONS := -gl -gv -dRELEASE
 else
-
 ifeq ($(DEBUG),gprof)
-FPC_UNIX_OPTIONS := -pg -dRELEASE -dCASTLE_WINDOW_XLIB
-FPC_WINDOWS_OPTIONS := -pg -dRELEASE
+FPC_OPTIONS := -pg -dRELEASE
 else
-
-FPC_UNIX_OPTIONS := -dRELEASE -dCASTLE_WINDOW_XLIB
-FPC_WINDOWS_OPTIONS := -dRELEASE
+FPC_OPTIONS := -dRELEASE
 endif
 endif
 endif
 
-build-unix: clean-window
-	cd ../castle_game_engine/ && \
-	  fpc $(FPC_UNIX_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" \
-	  @castle-fpc.cfg ../castle/source/castle.lpr
-	mv source/castle ./
-	cd ../castle_game_engine/ && \
-	  fpc $(FPC_UNIX_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" \
-	  @castle-fpc.cfg ../castle/source/castle-process-3d-model.lpr
-	mv source/castle-process-3d-model ./
+FPC_OPTIONS := $(FPC_OPTIONS) -dCASTLE_WINDOW_BEST_NOGUI @castle-fpc.cfg
 
-build-windows: clean-window
+# Extension of executable is determined by target operating system,
+# that in turn depends on 1. -T options in CASTLE_FPC_OPTIONS and
+# 2. current OS, if no -T inside CASTLE_FPC_OPTIONS. It's easiest to just
+# use "fpc -iTO", to avoid having to detect OS (or parse CASTLE_FPC_OPTIONS)
+# in the Makefile.
+TARGET_OS = $(shell fpc -iTO "$${CASTLE_FPC_OPTIONS:-}")
+EXE_EXTENSION = $(shell if '[' $(TARGET_OS) '=' 'win32' ']'; then echo '.exe'; else echo ''; fi)
+
+build:
+# clean-window to force rebuilding CastleWindow unit with proper backend.
+	$(MAKE) -C ../castle_game_engine/ clean-window
+	@echo 'Target OS exe extension detected: "'$(EXE_EXTENSION)'"'
 	cd ../castle_game_engine/ && \
-	  fpc $(FPC_WINDOWS_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" \
-	  @castle-fpc.cfg ../castle/source/castle.lpr
-	mv source/castle.exe ./castle.exe
+	  fpc $(FPC_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" ../castle/source/castle.lpr
+	mv source/castle$(EXE_EXTENSION) ./
 	cd ../castle_game_engine/ && \
-	  fpc $(FPC_WINDOWS_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" \
-	  @castle-fpc.cfg ../castle/source/castle-process-3d-model.lpr
-	mv source/castle-process-3d-model.exe ./castle-process-3d-model.exe
+	  fpc $(FPC_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" ../castle/source/castle-process-3d-model.lpr
+	mv source/castle-process-3d-model$(EXE_EXTENSION) ./
 
 # ------------------------------------------------------------
 # Cleaning targets.
@@ -129,17 +118,5 @@ clean_private:
 	find . -type d '(' -iname '.svn' ')' -print \
 	     | xargs rm -Rf
 	rm -Rf data/sounds/intermediate/
-
-# Force rebuilding CastleWindow unit with proper backend.
-clean-window:
-	$(MAKE) -C ../castle_game_engine/ clean-window
-
-# ----------------------------------------
-# Set SVN tag.
-
-svntag:
-	svn copy http://svn.code.sf.net/p/castle-engine/code/trunk/castle \
-	         http://svn.code.sf.net/p/castle-engine/code/tags/castle/$(VERSION) \
-	  -m "Tagging the $(VERSION) version of 'The Castle'."
 
 # eof ------------------------------------------------------------
