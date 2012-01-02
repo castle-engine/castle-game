@@ -60,7 +60,7 @@ FPC_OPTIONS := $(FPC_OPTIONS) -dCASTLE_WINDOW_BEST_NOGUI @castle-fpc.cfg
 # 2. current OS, if no -T inside CASTLE_FPC_OPTIONS. It's easiest to just
 # use "fpc -iTO", to avoid having to detect OS (or parse CASTLE_FPC_OPTIONS)
 # in the Makefile.
-TARGET_OS = $(shell fpc -iTO "$${CASTLE_FPC_OPTIONS:-}")
+TARGET_OS = $(shell fpc -iTO $${CASTLE_FPC_OPTIONS:-})
 EXE_EXTENSION = $(shell if '[' $(TARGET_OS) '=' 'win32' ']'; then echo '.exe'; else echo ''; fi)
 
 build:
@@ -68,10 +68,10 @@ build:
 	$(MAKE) -C ../castle_game_engine/ clean-window
 	@echo 'Target OS exe extension detected: "'$(EXE_EXTENSION)'"'
 	cd ../castle_game_engine/ && \
-	  fpc $(FPC_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" ../castle/source/castle.lpr
+	  fpc $(FPC_OPTIONS) $${CASTLE_FPC_OPTIONS:-} ../castle/source/castle.lpr
 	mv source/castle$(EXE_EXTENSION) ./
 	cd ../castle_game_engine/ && \
-	  fpc $(FPC_OPTIONS) "$${CASTLE_FPC_OPTIONS:-}" ../castle/source/castle-process-3d-model.lpr
+	  fpc $(FPC_OPTIONS) $${CASTLE_FPC_OPTIONS:-} ../castle/source/castle-process-3d-model.lpr
 	mv source/castle-process-3d-model$(EXE_EXTENSION) ./
 
 # ------------------------------------------------------------
