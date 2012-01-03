@@ -61,11 +61,12 @@ FPC_OPTIONS := $(FPC_OPTIONS) -dCASTLE_WINDOW_BEST_NOGUI @castle-fpc.cfg
 # use "fpc -iTO", to avoid having to detect OS (or parse CASTLE_FPC_OPTIONS)
 # in the Makefile.
 TARGET_OS = $(shell fpc -iTO $${CASTLE_FPC_OPTIONS:-})
-EXE_EXTENSION = $(shell if '[' $(TARGET_OS) '=' 'win32' ']'; then echo '.exe'; else echo ''; fi)
+EXE_EXTENSION = $(shell if '[' '(' $(TARGET_OS) '=' 'win32' ')' -o '(' $(TARGET_OS) '=' 'win64' ')' ']'; then echo '.exe'; else echo ''; fi)
 
 build:
 # clean-window to force rebuilding CastleWindow unit with proper backend.
 	$(MAKE) -C ../castle_game_engine/ clean-window
+	@echo 'Target OS detected: "'$(TARGET_OS)'"'
 	@echo 'Target OS exe extension detected: "'$(EXE_EXTENSION)'"'
 	cd ../castle_game_engine/ && \
 	  fpc $(FPC_OPTIONS) $${CASTLE_FPC_OPTIONS:-} ../castle/source/castle.lpr
