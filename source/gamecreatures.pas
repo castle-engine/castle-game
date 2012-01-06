@@ -1999,21 +1999,8 @@ procedure TCreature.RenderShadowVolume(
   const ParentTransform: TMatrix4Single);
 begin
   if Kind.CastsShadow then
-  begin
-    { TODO: should be simplified.
-      Our BoundingBox is just CurrentScene.BoundingBox,
-      transformed by SceneTransform.
-      Calling CurrentScene.RenderShadowVolume should have the same effect.
-
-    we do it directly, as our bounding box and
-      CurrentScene.RenderShadowVolumeCore mismatch:
-      - our bounding box has SceneTransform transformation already applied
-      - CurrentScene.RenderShadowVolumeCore works like no transformation }
-    (ShadowVolumeRenderer as TGLShadowVolumeRenderer).InitScene(BoundingBox);
-    CurrentScene.RenderShadowVolumeCore(
-      (ShadowVolumeRenderer as TGLShadowVolumeRenderer),
+    CurrentScene.RenderShadowVolume(ShadowVolumeRenderer,
       false, SceneTransform * ParentTransform);
-  end;
 end;
 
 function TCreature.MiddleCollisionWithPlayer(
