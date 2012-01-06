@@ -74,7 +74,7 @@ const
 
   DefaultMiddlePositionHeight = 1.0;
 
-  DefaultCastsShadow = true;
+  DefaultCastsShadowVolumes = true;
 
 type
   TCreature = class;
@@ -97,7 +97,7 @@ type
 
     FMiddlePositionHeight: Single;
 
-    FCastsShadow: boolean;
+    FCastsShadowVolumes: boolean;
     FRequiredCount: Cardinal;
   protected
     { In descendants only PrepareRender can (and should!) set this. }
@@ -229,8 +229,9 @@ type
       write FMiddlePositionHeight
       default DefaultMiddlePositionHeight;
 
-    property CastsShadow: boolean read FCastsShadow write FCastsShadow
-      default DefaultCastsShadow;
+    property CastsShadowVolumes: boolean
+      read FCastsShadowVolumes write FCastsShadowVolumes
+      default DefaultCastsShadowVolumes;
 
     { Used by RequireCreatures, UnRequireCreatures to count
       how many times this kind is required. Idea is that when this drops
@@ -801,6 +802,8 @@ type
 
     property Kind: TCreatureKind read FKind;
 
+    property Collides default false;
+
     function BoundingBox: TBox3D; override;
 
     procedure Render(const Frustum: TFrustum;
@@ -1202,7 +1205,7 @@ begin
   FShortRangeAttackKnockbackDistance := DefaultShortRangeAttackKnockbackDistance;
   FFallDownLifeLossScale := DefaultFallDownLifeLossScale;
   FMiddlePositionHeight := DefaultMiddlePositionHeight;
-  FCastsShadow := DefaultCastsShadow;
+  FCastsShadowVolumes := DefaultCastsShadowVolumes;
   CreaturesKinds.Add(Self);
 end;
 
@@ -1237,8 +1240,8 @@ begin
     KindsConfig.GetFloat(VRMLNodeName + '/middle_position_height',
     DefaultMiddlePositionHeight);
 
-  CastsShadow :=
-    KindsConfig.GetValue(VRMLNodeName + '/casts_shadow', DefaultCastsShadow);
+  CastsShadowVolumes :=
+    KindsConfig.GetValue(VRMLNodeName + '/casts_shadow', DefaultCastsShadowVolumes);
 
   SoundSuddenPain := SoundEngine.SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_sudden_pain', ''));
@@ -1760,6 +1763,11 @@ begin
 
   FKind := AKind;
 
+  { TODO: we resolve collisions ourselves, without the help of T3D and scene
+    manager methods. For them, we're not collidable, for now.
+    In the future, we should just switch to use T3D and scene manager methods. }
+  Collides := false;
+
   { This is only needed if you used --debug-no-creatures or forgot
     to add creature to <required_resources> }
   RequireCreature(BaseLights, Kind);
@@ -1998,7 +2006,7 @@ procedure TCreature.RenderShadowVolume(
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 begin
-  if Kind.CastsShadow then
+  if Kind.CastsShadowVolumes then
     CurrentScene.RenderShadowVolume(ShadowVolumeRenderer,
       false, SceneTransform * ParentTransform);
 end;
@@ -2346,7 +2354,10 @@ var
 begin
   for I := 0 to Count - 1 do
     if Items[I].RemoveMeFromLevel then
+    begin
+      Level.Items.Remove(Items[I]);
       FPGObjectList_FreeAndNilItem(Self, I);
+    end;
   FPGObjectList_RemoveNils(Self);
 end;
 
@@ -3239,7 +3250,7 @@ begin
       MissilePosition, MissileDirection,
       Level.AnimationTime, Level.BaseLights, BallMissile.DefaultMaxLife);
 
-    Level.Creatures.Add(Missile);
+    Level.AddCreature(Missile);
 
     Missile.Sound3d(stBallMissileFired, 0.0);
   end;
@@ -3419,7 +3430,7 @@ begin
       MissilePosition, MissileDirection,
       Level.AnimationTime, Level.BaseLights, ThrownWeb.DefaultMaxLife);
 
-    Level.Creatures.Add(Missile);
+    Level.AddCreature(Missile);
 
     Missile.Sound3d(stThrownWebFired, 0.0);
   end;

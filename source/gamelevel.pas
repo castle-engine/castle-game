@@ -518,8 +518,10 @@ type
     property ItemsOnLevel: TItemOnLevelList read FItemsOnLevel;
 
     { Creatures on the level. Note that objects on this list are owned
-      by level object. }
+      by level object. Add by AddCreature, remove by setting
+      RemoveMeFromLevel to @true. }
     property Creatures: TCreatureList read FCreatures;
+    procedure AddCreature(C: TCreature);
 
     { LineOfSight, MoveAllowed and GetHeightAbove perform
       collision detection with the level @link(Items).
@@ -1274,7 +1276,7 @@ begin
     MainScene.BackgroundSkySphereRadius := TBackground.NearFarToSkySphereRadius
       (LevelProjectionNear, LevelProjectionFar);
 
-    MainScene.CastsShadow := SceneDynamicShadows;
+    MainScene.CastsShadowVolumes := SceneDynamicShadows;
 
     { calculate Options for PrepareResources }
     Options := [prRender, prBackground, prBoundingBox];
@@ -1554,7 +1556,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     Creature := CreatureKind.CreateDefaultCreature(CreaturePosition,
       CreatureDirection, AnimationTime, BaseLights, MaxLife);
 
-    FCreatures.Add(Creature);
+    AddCreature(Creature);
   end;
 
 const
@@ -1567,6 +1569,12 @@ begin
       This avoids problems with removing nodes while traversing. }
     ItemsToRemove.Add(Shape.BlenderObjectNode);
   end;
+end;
+
+procedure TLevel.AddCreature(C: TCreature);
+begin
+  Creatures.Add(C);
+  Items.Add(C);
 end;
 
 function TLevel.LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
@@ -1783,10 +1791,6 @@ begin
     (their kinds are possibly not loaded yet) }
   if MenuBackground then Exit;
 
-  { When GameWin, don't render creatures (as we don't check
-    collisions when MovingPlayerEndSequence). }
-  if not GameWin then
-    Creatures.Render(RenderingCamera.Frustum, Params);
   if not DebugRenderForLevelScreenshot then
     ItemsOnLevel.Render(RenderingCamera.Frustum, Params);
 end;
