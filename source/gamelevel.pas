@@ -1796,7 +1796,7 @@ var
   I: Integer;
 begin
   for I := 0 to Creatures.Count - 1 do
-    Creatures.Items[I].RenderShadowVolume(ShadowVolumeRenderer);
+    Creatures.Items[I].RenderShadowVolume(ShadowVolumeRenderer, true, IdentityMatrix4Single);
   inherited;
 end;
 

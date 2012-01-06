@@ -662,7 +662,7 @@ type
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
 
-  TCreature = class
+  TCreature = class(T3D)
   private
     FKind: TCreatureKind;
     FLegsPosition: TVector3Single;
@@ -683,10 +683,9 @@ type
     procedure SetLegsPosition(const Value: TVector3Single);
     procedure SetDirection(const Value: TVector3Single);
   private
-    { It turns out that it's more speed-optimal to keep BoundingBox
-      precalculated (and waste time on updating it each time we change
-      Direction or LegsPosition) instead of making BoundingBox
-      a function that always calculates it's result.
+    { It's faster to keep FBoundingBox precalculated (and only update
+      it each time we change Direction or LegsPosition)
+      instead of completely recalculating it in each BoundingBox call.
 
       This is especially noticeable when there are many creatures on the level:
       then a lot of time is wasted in DoGravity, and main time of this
@@ -791,7 +790,7 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList);
+      const AnimationTime: Single; const BaseLights: TLightInstancesList); reintroduce;
 
     destructor Destroy; override;
 
@@ -802,19 +801,21 @@ type
 
     property Kind: TCreatureKind read FKind;
 
-    property BoundingBox: TBox3D read FBoundingBox;
+    function BoundingBox: TBox3D; override;
 
     procedure Render(const Frustum: TFrustum;
-      const Params: TRenderParams); virtual;
+      const Params: TRenderParams); override;
 
     { Render shadow volumes for all the thinds rendered by @link(Render).
       It renders shadow volume only if Kind.CastsShadow and
       shadow volume is not culled (so ShadowVolumeRenderer should
       have FrustumCullingInit already initialized). }
     procedure RenderShadowVolume(
-      ShadowVolumeRenderer: TGLShadowVolumeRenderer); virtual;
+      ShadowVolumeRenderer: TBaseShadowVolumeRenderer;
+      const ParentTransformIsIdentity: boolean;
+      const ParentTransform: TMatrix4Single); override;
 
-    procedure Idle(const CompSpeed: Single); virtual;
+    procedure Idle(const CompSpeed: Single); override;
 
     { Return current scene to be rendered.
       Note that this is called at the end of our constructor
@@ -1755,7 +1756,7 @@ constructor TCreature.Create(AKind: TCreatureKind;
   const AMaxLife: Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList);
 begin
-  inherited Create;
+  inherited Create(nil);
 
   FKind := AKind;
 
@@ -1807,6 +1808,11 @@ begin
     UnRequireCreature(Kind);
 
   inherited;
+end;
+
+function TCreature.BoundingBox: TBox3D;
+begin
+  Result := FBoundingBox;
 end;
 
 procedure TCreature.SoundSourceUsingEnd(Sender: TALSound);
@@ -1967,7 +1973,7 @@ procedure TCreature.Render(const Frustum: TFrustum;
   end;
 
 begin
-  if Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
+  if Exists and Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
   begin
     glPushMatrix;
       glMultMatrix(SceneTransform);
@@ -1988,12 +1994,25 @@ begin
 end;
 
 procedure TCreature.RenderShadowVolume(
-  ShadowVolumeRenderer: TGLShadowVolumeRenderer);
+  ShadowVolumeRenderer: TBaseShadowVolumeRenderer;
+  const ParentTransformIsIdentity: boolean;
+  const ParentTransform: TMatrix4Single);
 begin
   if Kind.CastsShadow then
   begin
-    ShadowVolumeRenderer.InitScene(BoundingBox);
-    CurrentScene.RenderShadowVolumeCore(ShadowVolumeRenderer, false, SceneTransform);
+    { TODO: should be simplified.
+      Our BoundingBox is just CurrentScene.BoundingBox,
+      transformed by SceneTransform.
+      Calling CurrentScene.RenderShadowVolume should have the same effect.
+
+    we do it directly, as our bounding box and
+      CurrentScene.RenderShadowVolumeCore mismatch:
+      - our bounding box has SceneTransform transformation already applied
+      - CurrentScene.RenderShadowVolumeCore works like no transformation }
+    (ShadowVolumeRenderer as TGLShadowVolumeRenderer).InitScene(BoundingBox);
+    CurrentScene.RenderShadowVolumeCore(
+      (ShadowVolumeRenderer as TGLShadowVolumeRenderer),
+      false, SceneTransform * ParentTransform);
   end;
 end;
 
