@@ -758,13 +758,13 @@ type
 
       Check collisions with the level, with player, and with other
       creatures. }
-    function MoveAllowed(
+    function Move(
       const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
       out NewMiddlePosition: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
 
-    { Like MoveAllowed, but this is only a "yes/no" collision check. }
-    function MoveAllowedSimple(
+    { Like @link(Move), but this is only a "yes/no" collision check. }
+    function MoveSimple(
       const OldMiddlePosition, NewMiddlePosition: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
 
@@ -776,7 +776,7 @@ type
       when standing on player's head. In case of "falling down" ---
       we don't have to take this into account. Things will work correctly
       anyway.) }
-    procedure GetHeightAbove(
+    procedure GetHeightAboveOthers(
       const AssumeMiddlePosition: TVector3Single;
       out IsAbove: boolean; out AboveHeight: Single);
 
@@ -2011,7 +2011,7 @@ begin
     Player.BoundingBox);
 end;
 
-function TCreature.MoveAllowed(
+function TCreature.Move(
   const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
   out NewMiddlePosition: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
@@ -2042,7 +2042,7 @@ begin
         OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
-function TCreature.MoveAllowedSimple(
+function TCreature.MoveSimple(
   const OldMiddlePosition, NewMiddlePosition: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
@@ -2071,7 +2071,7 @@ begin
         OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
-procedure TCreature.GetHeightAbove(
+procedure TCreature.GetHeightAboveOthers(
   const AssumeMiddlePosition: TVector3Single;
   out IsAbove: boolean; out AboveHeight: Single);
 var
@@ -2134,7 +2134,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
       ProposedNewMiddlePosition := OldMiddlePosition;
       ProposedNewMiddlePosition[2] += Distance;
 
-      Result := MoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
+      Result := Move(OldMiddlePosition, ProposedNewMiddlePosition,
         NewMiddlePosition, true);
 
       if Result then
@@ -2167,7 +2167,7 @@ procedure TCreature.Idle(const CompSpeed: Single);
     OldIsFallingDown := FIsFallingDown;
     OldMiddlePosition := MiddlePosition;
 
-    GetHeightAbove(OldMiddlePosition, IsAbove, AboveHeight);
+    GetHeightAboveOthers(OldMiddlePosition, IsAbove, AboveHeight);
 
     if AboveHeight > HeightBetweenLegsAndMiddle * HeightMargin then
     begin
@@ -2781,7 +2781,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
         Result := false;
         if not Kind.Flying then
         begin
-          GetHeightAbove(NewMiddlePosition, IsAbove, AboveHeight);
+          GetHeightAboveOthers(NewMiddlePosition, IsAbove, AboveHeight);
           if AboveHeight > WAKind.MaxHeightAcceptableToFall +
               HeightBetweenLegsAndMiddle then
             Result := true;
@@ -2817,7 +2817,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
           Our trick with "AlternativeTarget" should handle
           eventual problems with the track of creature, so MoveAllowed
           should not be needed. }
-        MoveAllowedSimple(OldMiddlePosition, NewMiddlePosition, false);
+        MoveSimple(OldMiddlePosition, NewMiddlePosition, false);
 
       if Result then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
@@ -3079,7 +3079,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
       ProposedNewMiddlePosition := VectorAdd(OldMiddlePosition,
         VectorScale(LastAttackDirection, CurrentKnockBackDistance));
 
-      if MoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
+      if Move(OldMiddlePosition, ProposedNewMiddlePosition,
         NewMiddlePosition, false) then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
