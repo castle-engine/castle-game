@@ -106,7 +106,7 @@ var
   RenderDebugCaptions: boolean = false;
 
 const
-  DefaultRenderShadows = false;
+  DefaultRenderShadows = true;
 
 var
   { If false then you should do *nothing* related to the shadows,
@@ -120,7 +120,7 @@ var
 
   { Should we actually render shadows ?
     This is meaningfull only if RenderShadowsPossible. }
-  RenderShadows: boolean;
+  RenderShadows: boolean = DefaultRenderShadows;
 
   { You can set this to true for debug purposes.
     This is meaningull only if RenderShadowsPossible and RenderShadows. }

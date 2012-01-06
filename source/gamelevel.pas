@@ -436,7 +436,7 @@ type
         @item sets Attributes according to AnimationAttributesSet
         @item optionally creates triangle octree for the FirstScene and/or LastScene
         @item(call PrepareResources, with prRender, prBoundingBox, prShadowVolume
-          (if shadows enabled by RenderShadowsPossible))
+          (if shadow volumes enabled by RenderShadowsPossible))
         @item FreeExternalResources, since they will not be needed anymore
         @item TimePlaying is by default @false, so the animation is not playing.
       ) }
@@ -690,7 +690,7 @@ type
         @item sets Attributes according to AttributesSet
         @item optionally create triangle octree
         @item(call PrepareResources, with prRender, prBoundingBox, prShadowVolume
-          (if shadows enabled by RenderShadowsPossible), optionally
+          (if shadow volumes enabled by RenderShadowsPossible), optionally
           with prBackground)
         @item FreeExternalResources, since they will not be needed anymore
       ) }

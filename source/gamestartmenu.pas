@@ -347,7 +347,7 @@ begin
   Items.Add('View video information');
   Items.AddObject('Texture quality', TextureMinificationQualitySlider);
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
-  Items.AddObject('Shadows', RenderShadowsArgument);
+  Items.AddObject('Shadow volumes', RenderShadowsArgument);
   Items.AddObject('Creature animation smoothness', CreatureAnimationSlider);
   Items.AddObject('Color depth', ColorDepthArgument);
   Items.AddObject('Display frequency', VideoFrequencyArgument);
@@ -472,29 +472,12 @@ begin
     3: begin
          RenderShadows := not RenderShadows;
          RenderShadowsArgument.Value := RenderShadows;
-         if not RenderShadowsPossible then
+         if (not RenderShadowsPossible) and RenderShadows then
          begin
-           if RenderShadows then
-           begin
-             MessageOK(Window, 'Note that shadows are disabled by --no-shadows ' +
-               'command-line option. So you must restart the game to see the ' +
-               'shadows.', taLeft);
-             SubMenuAdditionalInfo := SRestartTheGame;
-           end;
-         end else
-         begin
-           if RenderShadows then
-             MessageOK(Window,
-               'Warning: this feature requires a good graphic card, otherwise ' +
-               'shadows will slow down the game noticeably. ' +
-               'That said, with decent graphic card and OpenGL ' +
-               'drivers, the main game levels are definitely playable ' +
-               'with shadows. So enjoy !' +nl+
-               nl+
-               'Since 0.8.0 release, both z-fail and z-pass are implemented, ' +
-               'so shadows should work 100% OK always. I would like to turn ' +
-               'shadows on by default in the future, so please report any ' +
-               'problems.', taLeft);
+           MessageOK(Window, 'Note that shadows are disabled by --no-shadows ' +
+             'command-line option. So you must restart the game to see the ' +
+             'shadows.', taLeft);
+           SubMenuAdditionalInfo := SRestartTheGame;
          end;
        end;
     4: ;
