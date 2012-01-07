@@ -296,16 +296,16 @@ begin
   CastleHallLevelPath := CastleLevelsPath + 'castle_hall' + PathDelim;
 
   Symbol := LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false);
-  Symbol.CastsShadowVolumes := false; { shadow would not be visible anyway }
+  Symbol.CastShadowVolumes := false; { shadow would not be visible anyway }
   Items.Add(Symbol);
 
   Button := LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false);
-  Button.CastsShadowVolumes := false; { strange ghost shadow on symbol would be visible }
+  Button.CastShadowVolumes := false; { strange ghost shadow on symbol would be visible }
   Items.Add(Button);
 
   StairsBlocker := LoadLevelScene(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl',
     true { create octrees }, false);
-  StairsBlocker.CastsShadowVolumes := false; { shadow would not be visible anyway }
+  StairsBlocker.CastShadowVolumes := false; { shadow would not be visible anyway }
   Items.Add(StairsBlocker);
 
   { get StairsBlocker.BoundingBox.Middle when it Exists.
@@ -816,7 +816,7 @@ begin
   MovingElevator.SoundTracksCurrentPosition := true;
   { no shadow, because looks bad: tower level has uninteresting light
     and elevator triggers artifacts because of BorderEdges. }
-  MovingElevator.CastsShadowVolumes := false;
+  MovingElevator.CastShadowVolumes := false;
   Items.Add(MovingElevator);
 end;
 
@@ -873,13 +873,13 @@ begin
     with it --- no reason to waste time, no collisions will be possible
     as player's move along the EndSequence will be programmed. }
   FEndSequence.Collides := false;
-  FEndSequence.CastsShadowVolumes := false; { shadow is not visible anyway }
+  FEndSequence.CastShadowVolumes := false; { shadow is not visible anyway }
   Items.Add(FEndSequence);
 
   FGateExit := LoadLevelScene(
     CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
     true { create octrees }, false);
-  FGateExit.CastsShadowVolumes := false; { shadow is not visible anyway }
+  FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
   Items.Add(FGateExit);
 
   BossIndex := Creatures.FindKind(SpiderQueen);
@@ -1127,7 +1127,7 @@ begin
   MovePushesOthers := false;
   SoundGoEndPosition := stDoorOpen;
   SoundGoBeginPosition := stDoorClose;
-  CastsShadowVolumes := false; { looks bad }
+  CastShadowVolumes := false; { looks bad }
 end;
 
 procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
@@ -1225,7 +1225,7 @@ begin
   FakeWall := LoadLevelScene( DoomDoorsPathPrefix + 'fake_wall_final.wrl',
     false { no need for octrees, does never collide }, false);
   FakeWall.Collides := false;
-  FakeWall.CastsShadowVolumes := false;
+  FakeWall.CastShadowVolumes := false;
   Items.Add(FakeWall);
 
   Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
@@ -1240,7 +1240,7 @@ begin
   MovingElevator49.SoundGoBeginPosition := stElevator;
   MovingElevator49.SoundGoBeginPositionLooping := true;
   MovingElevator49.SoundTracksCurrentPosition := true;
-  MovingElevator49.CastsShadowVolumes := false;
+  MovingElevator49.CastShadowVolumes := false;
   Items.Add(MovingElevator49);
 
   Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
@@ -1255,12 +1255,12 @@ begin
   MovingElevator9a9b.SoundGoBeginPosition := stElevator;
   MovingElevator9a9b.SoundGoBeginPositionLooping := true;
   MovingElevator9a9b.SoundTracksCurrentPosition := true;
-  MovingElevator9a9b.CastsShadowVolumes := false;
+  MovingElevator9a9b.CastShadowVolumes := false;
   Items.Add(MovingElevator9a9b);
 
   ExitButton := LoadLevelScene(DoomDoorsPathPrefix + 'exit_button_final.wrl',
     true { create octrees }, false);
-  ExitButton.CastsShadowVolumes := false;
+  ExitButton.CastShadowVolumes := false;
   Items.Add(ExitButton);
 end;
 
@@ -1410,7 +1410,7 @@ begin
 
   Water := LoadLevelAnimation(CastleLevelsPath + 'gate_background' +
     PathDelim + 'water.kanim', false, false);
-  Water.CastsShadowVolumes := false; { water shadow would look awkward }
+  Water.CastShadowVolumes := false; { water shadow would look awkward }
   { No octrees created for water (because in normal usage, player will not
     walk on this level). For safety, Collides set to @false, in case
     user enters this level by debug menu. }
@@ -1448,7 +1448,7 @@ begin
       Fountain.PrepareResources([prRender, prBoundingBox], true, BaseLights);
     finally Progress.Fini end;
     Fountain.FreeResources([frTextureDataInNodes]);
-    Fountain.CastsShadowVolumes := false; { not manifold }
+    Fountain.CastShadowVolumes := false; { not manifold }
     Fountain.Collides := false;
 
     Fountain.Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;

@@ -1276,7 +1276,7 @@ begin
     MainScene.BackgroundSkySphereRadius := TBackground.NearFarToSkySphereRadius
       (LevelProjectionNear, LevelProjectionFar);
 
-    MainScene.CastsShadowVolumes := SceneDynamicShadows;
+    MainScene.CastShadowVolumes := SceneDynamicShadows;
 
     { calculate Options for PrepareResources }
     Options := [prRender, prBackground, prBoundingBox];

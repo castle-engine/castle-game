@@ -74,7 +74,7 @@ const
 
   DefaultMiddlePositionHeight = 1.0;
 
-  DefaultCastsShadowVolumes = true;
+  DefaultCastShadowVolumes = true;
 
 type
   TCreature = class;
@@ -97,7 +97,7 @@ type
 
     FMiddlePositionHeight: Single;
 
-    FCastsShadowVolumes: boolean;
+    FCastShadowVolumes: boolean;
     FRequiredCount: Cardinal;
   protected
     { In descendants only PrepareRender can (and should!) set this. }
@@ -229,9 +229,9 @@ type
       write FMiddlePositionHeight
       default DefaultMiddlePositionHeight;
 
-    property CastsShadowVolumes: boolean
-      read FCastsShadowVolumes write FCastsShadowVolumes
-      default DefaultCastsShadowVolumes;
+    property CastShadowVolumes: boolean
+      read FCastShadowVolumes write FCastShadowVolumes
+      default DefaultCastShadowVolumes;
 
     { Used by RequireCreatures, UnRequireCreatures to count
       how many times this kind is required. Idea is that when this drops
@@ -1205,7 +1205,7 @@ begin
   FShortRangeAttackKnockbackDistance := DefaultShortRangeAttackKnockbackDistance;
   FFallDownLifeLossScale := DefaultFallDownLifeLossScale;
   FMiddlePositionHeight := DefaultMiddlePositionHeight;
-  FCastsShadowVolumes := DefaultCastsShadowVolumes;
+  FCastShadowVolumes := DefaultCastShadowVolumes;
   CreaturesKinds.Add(Self);
 end;
 
@@ -1240,8 +1240,8 @@ begin
     KindsConfig.GetFloat(VRMLNodeName + '/middle_position_height',
     DefaultMiddlePositionHeight);
 
-  CastsShadowVolumes :=
-    KindsConfig.GetValue(VRMLNodeName + '/casts_shadow', DefaultCastsShadowVolumes);
+  CastShadowVolumes :=
+    KindsConfig.GetValue(VRMLNodeName + '/casts_shadow', DefaultCastShadowVolumes);
 
   SoundSuddenPain := SoundEngine.SoundFromName(
     KindsConfig.GetValue(VRMLNodeName + '/sound_sudden_pain', ''));
@@ -2006,7 +2006,7 @@ procedure TCreature.RenderShadowVolume(
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 begin
-  if Kind.CastsShadowVolumes then
+  if Kind.CastShadowVolumes then
     CurrentScene.RenderShadowVolume(ShadowVolumeRenderer,
       false, SceneTransform * ParentTransform);
 end;
