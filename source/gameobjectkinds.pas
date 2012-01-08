@@ -123,14 +123,13 @@ type
     { Free any association with current OpenGL context. }
     procedure GLContextClose; virtual;
 
-    { This will be used to refer to this kind from VRML models
-      (or some other places too).
+    { Unique identifier of this creature kind.
+      Used to refer to this kind from VRML/X3D models, XML files and other data.
 
-      This should be a valid VRML node name.
-      Also, this mustn't contain '_' or '0' ... '9' chars (we may use them
-      internally to encode other info in the same VRML node name)
-      --- so actually this should only contain letters, 'a'..'z' and 'A'..'Z'.
-      Make this in 'CamelCase' to be consistent. }
+      This must be composed of only letters, use CamelCase.
+      (Reason: This must be a valid identifier in all possible languages.
+      Also digits and underscore are reserved, as we may use them internally
+      to other other info in VRML/X3D and XML node names.) }
     property VRMLNodeName: string read FVRMLNodeName;
 
     property BlendingType: TBlendingType
