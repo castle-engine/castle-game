@@ -1829,7 +1829,9 @@ end;
 
 function TCreature.BoundingBox: TBox3D;
 begin
-  Result := FBoundingBox;
+  if GetExists then
+    Result := FBoundingBox else
+    Result := EmptyBox3D;
 end;
 
 procedure TCreature.SoundSourceUsingEnd(Sender: TALSound);

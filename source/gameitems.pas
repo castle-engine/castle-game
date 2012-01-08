@@ -891,6 +891,7 @@ var
   FallingDownLength: Single;
   AboveGround: PTriangle;
 begin
+  inherited;
   if not GetExists then Exit;
 
   FRotation += 3 * CompSpeed * 50;
