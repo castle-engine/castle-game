@@ -451,7 +451,6 @@ type
 
     procedure RenderFromViewEverything; override;
     procedure InitializeLights(const Lights: TLightInstancesList); override;
-    procedure Render3D(const Params: TRenderParams); override;
     procedure ApplyProjection; override;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
@@ -514,8 +513,11 @@ type
 
     { Items lying on the level.
       These Items are owned by level object, so everything remaining
-      on this list when we will destroy level will be freed. }
+      on this list when we will destroy level will be freed.
+      Add by AddItemOnLevel, remove by removing simultaneously from Items
+      and ItemsOnLevel lists. }
     property ItemsOnLevel: TItemOnLevelList read FItemsOnLevel;
+    procedure AddItemOnLevel(const I: TItemOnLevel);
 
     { Creatures on the level. Note that objects on this list are owned
       by level object. Add by AddCreature, remove by setting
@@ -1475,7 +1477,7 @@ procedure TLevel.TraverseForItems(Shape: TShape);
     ItemPosition[1] := (ItemStubBoundingBox.Data[0, 1] + ItemStubBoundingBox.Data[1, 1]) / 2;
     ItemPosition[2] := ItemStubBoundingBox.Data[0, 2];
 
-    FItemsOnLevel.Add(TItemOnLevel.Create(TItem.Create(ItemKind, ItemQuantity),
+    AddItemOnLevel(TItemOnLevel.Create(TItem.Create(ItemKind, ItemQuantity),
       ItemPosition));
   end;
 
@@ -1569,6 +1571,12 @@ begin
       This avoids problems with removing nodes while traversing. }
     ItemsToRemove.Add(Shape.BlenderObjectNode);
   end;
+end;
+
+procedure TLevel.AddItemOnLevel(const I: TItemOnLevel);
+begin
+  ItemsOnLevel.Add(I);
+  Items.Add(I);
 end;
 
 procedure TLevel.AddCreature(C: TCreature);
@@ -1779,12 +1787,6 @@ begin
     Life := BossCreature.Life;
     MaxLife := BossCreature.MaxLife;
   end;
-end;
-
-procedure TLevel.Render3D(const Params: TRenderParams);
-begin
-  inherited;
-  ItemsOnLevel.Render(RenderingCamera.Frustum, Params);
 end;
 
 procedure TLevel.RenderShadowVolume;

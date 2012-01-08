@@ -2265,7 +2265,8 @@ procedure TCreature.Idle(const CompSpeed: Single);
   end;
 
 begin
-  if not GetExists then Exit;
+  inherited;
+  if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
   { CurrentScene (possibly) changed, since Level.AnimationTime changed now.
     So recalculate bounding box.
@@ -3132,6 +3133,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
 
 begin
   inherited;
+  if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
   if Dead and not (State in [wasDying, wasDyingBack]) then
   begin
@@ -3297,6 +3299,7 @@ end;
 procedure TWerewolfCreature.Idle(const CompSpeed: Single);
 begin
   inherited;
+  if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
   if (not Dead) and (Level.AnimationTime > NextHowlTime) then
     Howl(false);
@@ -3408,6 +3411,7 @@ procedure TSpiderQueenCreature.Idle(const CompSpeed: Single);
 
 begin
   inherited;
+  if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
   if not Dead then
     case State of
@@ -3494,6 +3498,7 @@ var
   I: Integer;
 begin
   inherited;
+  if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
   { Note that for now missiles are removed from level as soon as they are dead,
     so I don't bother with checking here Dead. Or UseBoundingSphere

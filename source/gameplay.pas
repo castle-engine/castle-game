@@ -477,14 +477,10 @@ var
 begin
   CompSpeed := Window.Fps.IdleSpeed;
 
-  Level.ItemsOnLevel.Idle(CompSpeed);
-
   Level.SickProjection := Player.Swimming = psUnderWater;
   if Level.SickProjection then
     Level.SickProjectionSpeed := Player.SickProjectionSpeed;
 
-  if (not GameWin) and (not DebugTimeStopForCreatures) then
-    Level.Creatures.Idle(CompSpeed);
   Level.Creatures.RemoveFromLevel;
 
   if (not Player.Dead) and (not GameWin) then
@@ -493,6 +489,7 @@ begin
     if PickItemIndex <> -1 then
     begin
       Player.PickItem(Level.ItemsOnLevel[PickItemIndex].ExtractItem);
+      Level.Items.Remove(Level.ItemsOnLevel[PickItemIndex]);
       Level.ItemsOnLevel.Delete(PickItemIndex);
 
       if AutoOpenInventory then
@@ -833,7 +830,7 @@ procedure EventDown(AKey: TKey;
         if DropppedItem <> nil then
         begin
           UpdateInventoryCurrentItemAfterDelete;
-          Level.ItemsOnLevel.Add(TItemOnLevel.Create(DropppedItem, DropPosition));
+          Level.AddItemOnLevel(TItemOnLevel.Create(DropppedItem, DropPosition));
         end;
       end else
         Notifications.Show('Not enough room here to drop this item');
