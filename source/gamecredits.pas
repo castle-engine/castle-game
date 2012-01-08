@@ -89,9 +89,10 @@ begin
     { TODO: remove need for Params, render CreditsModel as part of scene manager }
     Params := TBasicRenderParams.Create;
     try
-      CreditsModel.Render(nil, Params);
-      Params.Transparent := true;
-      CreditsModel.Render(nil, Params);
+      Params.Transparent := false; Params.ShadowVolumesReceivers := false; CreditsModel.Render(nil, Params);
+      Params.Transparent := false; Params.ShadowVolumesReceivers := true ; CreditsModel.Render(nil, Params);
+      Params.Transparent := true ; Params.ShadowVolumesReceivers := false; CreditsModel.Render(nil, Params);
+      Params.Transparent := true ; Params.ShadowVolumesReceivers := true ; CreditsModel.Render(nil, Params);
     finally FreeAndNil(Params) end;
   finally ProjectionPop end;
 

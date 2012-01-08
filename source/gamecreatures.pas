@@ -1986,11 +1986,13 @@ begin
     glPushMatrix;
       glMultMatrix(SceneTransform);
       CurrentScene.Render(nil, Params);
-      if RenderDebugCaptions then
+      if RenderDebugCaptions and
+         (not Params.Transparent) and Params.ShadowVolumesReceivers then
         DoRenderDebugCaptions;
     glPopMatrix;
 
-    if RenderBoundingBoxes and (not Params.Transparent) then
+    if RenderBoundingBoxes and
+       (not Params.Transparent) and Params.ShadowVolumesReceivers then
       RenderBoundingGeometry;
   end;
 end;

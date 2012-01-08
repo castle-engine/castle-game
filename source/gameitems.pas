@@ -838,7 +838,7 @@ end;
 
 function TItemOnLevel.PlayerCollision: boolean;
 begin
-  { I approximate both player and item as a bounding boxes.
+  { I approximate both player and item as bounding boxes.
     This works quite good, and is "precise enough" :)
     Note: remember to change TItemOnLevelList.PlayerCollision
     accordingly if I ever change implementation of this. }
@@ -857,7 +857,8 @@ begin
       Item.Kind.Scene.Render(nil, Params);
     glPopMatrix;
 
-    if RenderBoundingBoxes and (not Params.Transparent) then
+    if RenderBoundingBoxes and
+      (not Params.Transparent) and Params.ShadowVolumesReceivers then
     begin
       glPushAttrib(GL_ENABLE_BIT);
         glDisable(GL_LIGHTING);

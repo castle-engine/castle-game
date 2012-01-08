@@ -747,16 +747,11 @@ procedure TGateLevel.Render3D(const Params: TRenderParams);
 { TODO: remake teleport as simply additional object on level, not collidable.
   This will remove the need for below.
   Required: T3DTransform (see draft tutorial for planned name),
-  like T3DTranslated. Maybe special T3DTranslateRotate ?
-
-  This will also fix: for now, we ignore Params.Transparent below,
-  and render teleports transparent/opaque invalid.
-}
+  like T3DTranslated. Maybe special T3DTranslateRotate ? }
 
   procedure RenderTeleport(
     const TeleportRotation: Single;
-    const TeleportBox: TBox3D;
-    const Transparent: boolean);
+    const TeleportBox: TBox3D);
   begin
     if RenderingCamera.Frustum.Box3DCollisionPossibleSimple(TeleportBox) then
     begin
@@ -769,13 +764,9 @@ procedure TGateLevel.Render3D(const Params: TRenderParams);
   end;
 
 begin
-  RenderTeleport(Teleport1Rotate, FTeleport1Box, Params.Transparent);
-  RenderTeleport(Teleport2Rotate, FTeleport2Box, Params.Transparent);
-
   inherited;
-
-  RenderTeleport(Teleport1Rotate, FTeleport1Box, Params.Transparent);
-  RenderTeleport(Teleport2Rotate, FTeleport2Box, Params.Transparent);
+  RenderTeleport(Teleport1Rotate, FTeleport1Box);
+  RenderTeleport(Teleport2Rotate, FTeleport2Box);
 end;
 
 procedure TGateLevel.RenderShadowVolume;
@@ -1044,10 +1035,10 @@ procedure TCagesLevel.Render3D(const Params: TRenderParams);
 var
   I: Integer;
 begin
-  if not Params.Transparent then
+  inherited;
+
+  if (not Params.Transparent) and Params.ShadowVolumesReceivers then
   begin
-    { Render spiders before rendering inherited,
-      because spiders are not transparent. }
     glPushAttrib(GL_ENABLE_BIT);
       glDisable(GL_LIGHTING);
       glEnable(GL_DEPTH_TEST);
@@ -1070,8 +1061,6 @@ begin
       Spider.StandAnimation.Scenes[0].Render(nil, Params);
     glPopMatrix;
   end;
-
-  inherited;
 end;
 
 procedure TCagesLevel.RenderShadowVolume;

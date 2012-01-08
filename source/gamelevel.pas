@@ -451,7 +451,7 @@ type
 
     procedure RenderFromViewEverything; override;
     procedure InitializeLights(const Lights: TLightInstancesList); override;
-    procedure RenderNeverShadowed(const Params: TRenderParams); override;
+    procedure Render3D(const Params: TRenderParams); override;
     procedure ApplyProjection; override;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
@@ -1781,11 +1781,9 @@ begin
   end;
 end;
 
-procedure TLevel.RenderNeverShadowed(const Params: TRenderParams);
+procedure TLevel.Render3D(const Params: TRenderParams);
 begin
   inherited;
-
-  { Creatures and items are never in shadow (this looks bad). }
 
   { for background level view, we do not show creatures / items
     (their kinds are possibly not loaded yet) }

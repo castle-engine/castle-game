@@ -376,9 +376,11 @@ begin
   Params := TBasicRenderParams.Create;
   try
     Params.FBaseLights.AppendInWorldCoordinates(Level.MainScene.GlobalLights);
-    Player.RenderAttack(Params);
-    Params.Transparent := true;
-    Player.RenderAttack(Params);
+
+    Params.Transparent := false; Params.ShadowVolumesReceivers := false; Player.RenderAttack(Params);
+    Params.Transparent := false; Params.ShadowVolumesReceivers := true ; Player.RenderAttack(Params);
+    Params.Transparent := true ; Params.ShadowVolumesReceivers := false; Player.RenderAttack(Params);
+    Params.Transparent := true ; Params.ShadowVolumesReceivers := true ; Player.RenderAttack(Params);
   finally FreeAndNil(Params) end;
 end;
 
