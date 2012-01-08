@@ -97,7 +97,7 @@ type
       This is the place to do it. }
     procedure BeforeTimeIncrease(const NewAnimationTime: TFloatTime); virtual;
 
-    { If @true (and Exists and Collides are also @true)
+    { If @true (and GetExists and Collides are also @true)
       then moving this object moves everything on it's way.
       I mean, if you put a creature/player/item on it's way of move,
       the creature/player/item will be pushed by this object.
@@ -765,7 +765,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
   function BoundingBoxAssumeTranslation(
     const AssumeTranslation: TVector3Single): TBox3D;
   begin
-    if Exists and Collides then
+    if GetExists and Collides then
       Result := (inherited BoundingBox).Translate(AssumeTranslation) else
       Result := EmptyBox3D;
   end;
@@ -775,7 +775,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
     const Pos: TVector3Single; const Radius: Single;
     const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
   begin
-    Result := Exists and Collides;
+    Result := GetExists and Collides;
     if Result then
     begin
       { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
@@ -791,7 +791,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
     const Box: TBox3D;
     const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
   begin
-    Result := Exists and Collides;
+    Result := GetExists and Collides;
     if Result then
     begin
       { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
@@ -810,7 +810,7 @@ var
   Crea: TCreature;
   Item: TItemOnLevel;
 begin
-  if Exists and Collides and MovePushesOthers then
+  if GetExists and Collides and MovePushesOthers then
   begin
     CurrentTranslation := GetTranslationFromTime(AnimationTime);
     NewTranslation := GetTranslationFromTime(NewAnimationTime);

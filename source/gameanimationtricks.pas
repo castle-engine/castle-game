@@ -83,7 +83,7 @@ var
   SceneIndex, MiddleIndex, HalfIndex: Integer;
   Amount: Single;
 begin
-  if Loaded and Exists and
+  if Loaded and GetExists and
     Params.Transparent and Params.ShadowVolumesReceivers then
   begin
     SceneIndex := Floor(MapRange(Time, TimeBegin, TimeEnd, 0, ScenesCount)) mod ScenesCount;

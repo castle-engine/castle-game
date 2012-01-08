@@ -698,6 +698,8 @@ type
   private
     FSoundDyingEnabled: boolean;
   protected
+    function GetExists: boolean; override;
+
     { Return matrix that takes into account current LegsPosition and Direction.
       Multiply CurrentScene geometry by this matrix to get current geometry. }
     function SceneTransform: TMatrix4Single;
@@ -1792,6 +1794,13 @@ begin
   RecalculateBoundingBox;
 end;
 
+function TCreature.GetExists: boolean;
+begin
+  Result := (inherited GetExists) and
+    ( (Level <> nil) and (not Level.MenuBackground) ) and
+    (not GameWin);
+end;
+
 destructor TCreature.Destroy;
 var
   I: Integer;
@@ -1981,7 +1990,7 @@ procedure TCreature.Render(const Frustum: TFrustum;
   end;
 
 begin
-  if Exists and Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
+  if GetExists and Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
   begin
     glPushMatrix;
       glMultMatrix(SceneTransform);
@@ -2252,6 +2261,8 @@ procedure TCreature.Idle(const CompSpeed: Single);
   end;
 
 begin
+  if not GetExists then Exit;
+
   { CurrentScene (possibly) changed, since Level.AnimationTime changed now.
     So recalculate bounding box.
 

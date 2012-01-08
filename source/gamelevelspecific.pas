@@ -308,7 +308,7 @@ begin
   StairsBlocker.CastShadowVolumes := false; { shadow would not be visible anyway }
   Items.Add(StairsBlocker);
 
-  { get StairsBlocker.BoundingBox.Middle when it Exists.
+  { get StairsBlocker.BoundingBox.Middle when it GetExists.
     Later StairsBlocker will have Exists = false, so bbox will be empty,
     but we'll need StairsBlockerMiddle position. }
   StairsBlockerMiddle := StairsBlocker.BoundingBox.Middle;
