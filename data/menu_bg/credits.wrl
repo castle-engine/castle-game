@@ -22,7 +22,7 @@ DirectionalLight {
 }
 
 Transform {
-  translation 0 -8 -17
+  translation 0 -8 -17.5
   scale 1.1 1 1
   children Shape {
     appearance Appearance { material Material {
@@ -42,23 +42,16 @@ Transform {
                "Szymon Stoma and Kaska Zaremba"
                "designed and modelled the scenario"
                "on \"The Gate\" level,"
-               "provided models for many objects"
+               "provided many models"
                "(keys, bow, quiver, arrows, ball_missile),"
-               "provided some sounds"
-               "and a large amount of feedback."
-               "And probably some more stuff"
-               " that I don't remember right now :)"
-               "Thanks!"
+               "sounds and a lot of good feedback."
+               "Many thanks!"
                ""
                ""
                "Grzegorz Hermanowicz (herrmannek)"
                "implemented underwater \"sick\""
                "projection effect and started gravity"
-               "for arrows implementation,"
-               "thanks !"
-               "Finally we have a 2nd guy with"
-               "SVN write access, so if something"
-               "gets broken --- that's totally not me :)"
+               "for arrows implementation, thanks!"
                ""
                ""
                "Compiled with $SCompilerDescription." ]
@@ -77,6 +70,6 @@ DEF MainInfo WorldInfo {
    title "credits for \"The Castle\""
    info [ "the following two lines mean animation speed and animation time end",
           "2"
-          "22"
+          "18"
         ]
 }
