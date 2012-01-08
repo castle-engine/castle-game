@@ -359,6 +359,8 @@ type
       (may depend on Distance --- when it's too far, player may not
       be able to exactly tell what the item is). }
     procedure ItemPicked(const Distance: Single);
+
+    property Collides default false;
   end;
 
   TItemOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
@@ -824,6 +826,11 @@ begin
   inherited Create(nil);
   FItem := AItem;
   FPosition := APosition;
+
+  { TODO: we resolve collisions ourselves, without the help of T3D and scene
+    manager methods. For them, we're not collidable, for now.
+    In the future, we should just switch to use T3D and scene manager methods. }
+  Collides := false;
 end;
 
 destructor TItemOnLevel.Destroy;
