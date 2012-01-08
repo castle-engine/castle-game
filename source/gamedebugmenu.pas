@@ -345,7 +345,7 @@ procedure TDebugCreaturesMenu.Click;
     try
       for I := 0 to CreaturesKinds.Count - 1 do
         S.Append(Format('Creature %s (%d users)',
-          [CreaturesKinds[I].VRMLNodeName, CreaturesKinds[I].RequiredCount]));
+          [CreaturesKinds[I].ShortName, CreaturesKinds[I].RequiredCount]));
       S.Append('Cancel');
       ResultIndex := ChooseByMenu(ControlsUnder, S);
       Result := ResultIndex <> CreaturesKinds.Count;
@@ -367,7 +367,7 @@ procedure TDebugCreaturesMenu.Click;
 
       for I := 0 to Level.Creatures.Count - 1 do
         S.Append(Format('%d: %s, %s, %s / %s, %s',
-          [ I, Level.Creatures[I].Kind.VRMLNodeName,
+          [ I, Level.Creatures[I].Kind.ShortName,
             VectorToNiceStr(Level.Creatures[I].LegsPosition),
             FloatToNiceStr(Level.Creatures[I].Life),
             FloatToNiceStr(Level.Creatures[I].MaxLife),
@@ -432,7 +432,7 @@ procedure TDebugCreaturesMenu.Click;
     begin
       if Kind.RequiredCount = 0 then
         MessageOK(Window, Format('Creature "%s" is not used by anything, ' +
-          'cannot reload',  [Kind.VRMLNodeName])) else
+          'cannot reload',  [Kind.ShortName])) else
         Kind.RedoPrepareRender(Level.BaseLights);
     end;
   end;
@@ -556,7 +556,7 @@ procedure TDebugItemsMenu.Click;
     S := TStringList.Create;
     try
       for I := 0 to ItemsKinds.Count - 1 do
-        S.Append('Item ' + ItemsKinds[I].VRMLNodeName);
+        S.Append('Item ' + ItemsKinds[I].ShortName);
       S.Append('Cancel');
       ResultIndex := ChooseByMenu(ControlsUnder, S);
       Result := ResultIndex <> ItemsKinds.Count;

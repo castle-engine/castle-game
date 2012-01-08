@@ -1442,7 +1442,7 @@ procedure TLevel.TraverseForItems(Shape: TShape);
   var
     ItemKind: TItemKind;
     IgnoredBegin, ItemQuantityBegin: Integer;
-    ItemKindQuantity, ItemKindVRMLNodeName: string;
+    ItemKindQuantity, ItemKindShortName: string;
     ItemQuantity: Cardinal;
     ItemStubBoundingBox: TBox3D;
     ItemPosition: TVector3Single;
@@ -1453,22 +1453,22 @@ procedure TLevel.TraverseForItems(Shape: TShape);
       ItemKindQuantity := ItemNodeName else
       ItemKindQuantity := Copy(ItemNodeName, 1, IgnoredBegin - 1);
 
-    { Calculate ItemKindVRMLNodeName, ItemQuantity }
+    { Calculate ItemKindShortName, ItemQuantity }
     ItemQuantityBegin := CharsPos(['0'..'9'], ItemKindQuantity);
     if ItemQuantityBegin = 0 then
     begin
-      ItemKindVRMLNodeName := ItemKindQuantity;
+      ItemKindShortName := ItemKindQuantity;
       ItemQuantity := 1;
     end else
     begin
-      ItemKindVRMLNodeName := Copy(ItemKindQuantity, 1, ItemQuantityBegin - 1);
+      ItemKindShortName := Copy(ItemKindQuantity, 1, ItemQuantityBegin - 1);
       ItemQuantity := StrToInt(SEnding(ItemKindQuantity, ItemQuantityBegin));
     end;
 
-    ItemKind := ItemKindWithVRMLNodeName(ItemKindVRMLNodeName);
+    ItemKind := ItemKindWithShortName(ItemKindShortName);
     if ItemKind = nil then
-      raise Exception.CreateFmt('Item kind with VRMLNodeName "%s" doesn''t exist',
-        [ItemKindVRMLNodeName]);
+      raise Exception.CreateFmt('Item kind with ShortName "%s" doesn''t exist',
+        [ItemKindShortName]);
 
     ItemStubBoundingBox := Shape.BoundingBox;
     ItemPosition[0] := (ItemStubBoundingBox.Data[0, 0] + ItemStubBoundingBox.Data[1, 0]) / 2;
@@ -1527,7 +1527,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     CreaturePosition[2] := StubBoundingBox.Data[0, 2];
 
     { calculate CreatureKind }
-    CreatureKind := CreaturesKinds.FindByVRMLNodeName(CreatureKindName);
+    CreatureKind := CreaturesKinds.FindByShortName(CreatureKindName);
     { The creature kind may be unprepared here only because
       --debug-no-creatures was specified. In this case, leave this
       creature kind unprepared and don't add this creature. }

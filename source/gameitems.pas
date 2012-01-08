@@ -86,7 +86,7 @@ type
       const AttrName: string): string;
   public
     { The constructor. }
-    constructor Create(const AVRMLNodeName: string);
+    constructor Create(const AShortName: string);
     destructor Destroy; override;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
@@ -236,7 +236,7 @@ type
     FDamageConst: Single;
     FDamageRandom: Single;
   public
-    constructor Create(const AVRMLNodeName: string);
+    constructor Create(const AShortName: string);
 
     property DamageConst: Single read FDamageConst write FDamageConst
       default DefaultItemDamageConst;
@@ -386,7 +386,7 @@ var
   Quiver: TItemKind;
 
 { Returns nil if not found. }
-function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
+function ItemKindWithShortName(const ShortName: string): TItemKind;
 
 implementation
 
@@ -397,9 +397,9 @@ uses SysUtils, CastleWindow, GameWindow,
 
 { TItemKind ------------------------------------------------------------ }
 
-constructor TItemKind.Create(const AVRMLNodeName: string);
+constructor TItemKind.Create(const AShortName: string);
 begin
-  inherited Create(AVRMLNodeName);
+  inherited Create(AShortName);
   ItemsKinds.Add(Self);
 end;
 
@@ -413,10 +413,10 @@ end;
 function TItemKind.GetStringCheckNonEmpty(
   KindsConfig: TCastleConfig; const AttrName: string): string;
 begin
-  Result := KindsConfig.GetValue(VRMLNodeName + '/' + AttrName, '');
+  Result := KindsConfig.GetValue(ShortName + '/' + AttrName, '');
   if Result = '' then
     raise Exception.CreateFmt('Empty "%s" attribute for item "%s"',
-      [AttrName, VRMLNodeName]);
+      [AttrName, ShortName]);
 end;
 
 procedure TItemKind.LoadFromFile(KindsConfig: TCastleConfig);
@@ -672,7 +672,7 @@ var
 begin
   inherited;
 
-  ActualAttackTime := KindsConfig.GetFloat(VRMLNodeName + '/actual_attack_time',
+  ActualAttackTime := KindsConfig.GetFloat(ShortName + '/actual_attack_time',
     DefaultItemActualAttackTime);
 
   BasePath := ExtractFilePath(KindsConfig.FileName);
@@ -680,13 +680,13 @@ begin
   FScreenImageFileName := GetStringCheckNonEmpty(KindsConfig, 'screen_image/file_name');
   FScreenImageFileName := CombinePaths(BasePath, FScreenImageFileName);
 
-  FScreenImageAlignLeft := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_left', false);
-  FScreenImageAlignBottom := KindsConfig.GetValue(VRMLNodeName + 'screen_image/align_bottom', true);
+  FScreenImageAlignLeft := KindsConfig.GetValue(ShortName + 'screen_image/align_left', false);
+  FScreenImageAlignBottom := KindsConfig.GetValue(ShortName + 'screen_image/align_bottom', true);
 
   EquippingSound := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(VRMLNodeName + '/equipping_sound', ''));
+    KindsConfig.GetValue(ShortName + '/equipping_sound', ''));
   SoundAttackStart := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(VRMLNodeName + '/sound_attack_start', ''));
+    KindsConfig.GetValue(ShortName + '/sound_attack_start', ''));
 
   { TODO: TItemWeaponKind impl allows to have FAttackAnimationInfo = nil
     if you don't want attack animation, but line below doesn't allow it. }
@@ -695,7 +695,7 @@ end;
 
 { TItemShortRangeWeaponKind -------------------------------------------------- }
 
-constructor TItemShortRangeWeaponKind.Create(const AVRMLNodeName: string);
+constructor TItemShortRangeWeaponKind.Create(const AShortName: string);
 begin
   inherited;
   FDamageConst := DefaultItemDamageConst;
@@ -706,9 +706,9 @@ procedure TItemShortRangeWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  DamageConst := KindsConfig.GetFloat(VRMLNodeName + '/damage/const',
+  DamageConst := KindsConfig.GetFloat(ShortName + '/damage/const',
     DefaultItemDamageConst);
-  DamageRandom :=KindsConfig.GetFloat(VRMLNodeName + '/damage/random',
+  DamageRandom :=KindsConfig.GetFloat(ShortName + '/damage/random',
     DefaultItemDamageRandom);
 end;
 
@@ -1004,14 +1004,14 @@ end;
 
 { other global stuff --------------------------------------------------- }
 
-function ItemKindWithVRMLNodeName(const VRMLNodeName: string): TItemKind;
+function ItemKindWithShortName(const ShortName: string): TItemKind;
 var
   I: Integer;
 begin
   for I := 0 to ItemsKinds.Count - 1 do
   begin
     Result := ItemsKinds.Items[I];
-    if Result.VRMLNodeName = VRMLNodeName then
+    if Result.ShortName = ShortName then
       Exit;
   end;
   Result := nil;

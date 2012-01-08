@@ -115,7 +115,7 @@ type
       KindsConfig: TCastleConfig; const AnimationName: string;
       NilIfNoElement: boolean = false); override;
   public
-    constructor Create(const AVRMLNodeName: string);
+    constructor Create(const AShortName: string);
 
     { If @true, then the creature flies. Otherwise it always tries to move only
       horizontally (which means that Direction is always orthogonal
@@ -242,9 +242,9 @@ type
 
   TCreatureKindList = class(specialize TFPGObjectList<TCreatureKind>)
   public
-    { Find item with given VRMLNodeName.
+    { Find item with given ShortName.
       @raises Exception if not found. }
-    function FindByVRMLNodeName(const AVRMLNodeName: string): TCreatureKind;
+    function FindByShortName(const AShortName: string): TCreatureKind;
 
     { This opens creatures/kinds.xml file and calls LoadFromFile for
       all existing TCreatureKind instances. }
@@ -295,7 +295,7 @@ type
       from StandAnimation.Scenes[0]. }
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
-    constructor Create(const AVRMLNodeName: string);
+    constructor Create(const AShortName: string);
 
     destructor Destroy; override;
 
@@ -573,7 +573,7 @@ type
   protected
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
-    constructor Create(const AVRMLNodeName: string);
+    constructor Create(const AShortName: string);
     destructor Destroy; override;
 
     function PrepareRenderSteps: Cardinal; override;
@@ -643,7 +643,7 @@ type
   protected
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
-    constructor Create(const AVRMLNodeName: string);
+    constructor Create(const AShortName: string);
     destructor Destroy; override;
 
     function PrepareRenderSteps: Cardinal; override;
@@ -1196,9 +1196,9 @@ uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow,
 
 { TCreatureKind -------------------------------------------------------------- }
 
-constructor TCreatureKind.Create(const AVRMLNodeName: string);
+constructor TCreatureKind.Create(const AShortName: string);
 begin
-  inherited Create(AVRMLNodeName);
+  inherited Create(AShortName);
   FFlying := DefaultFlying;
   FDefaultMaxLife := DefaultDefaultMaxLife;
   FSoundDyingTiedToCreature := DefaultSoundDyingTiedToCreature;
@@ -1215,40 +1215,40 @@ procedure TCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  Flying := KindsConfig.GetValue(VRMLNodeName + '/flying',
+  Flying := KindsConfig.GetValue(ShortName + '/flying',
     DefaultFlying);
   SoundDyingTiedToCreature :=
-    KindsConfig.GetValue(VRMLNodeName + '/sound_dying_tied_to_creature',
+    KindsConfig.GetValue(ShortName + '/sound_dying_tied_to_creature',
     DefaultSoundDyingTiedToCreature);
-  DefaultMaxLife := KindsConfig.GetFloat(VRMLNodeName + '/default_max_life',
+  DefaultMaxLife := KindsConfig.GetFloat(ShortName + '/default_max_life',
     DefaultDefaultMaxLife);
-  CameraRadiusFromFile := KindsConfig.GetFloat(VRMLNodeName + '/camera_radius',
+  CameraRadiusFromFile := KindsConfig.GetFloat(ShortName + '/camera_radius',
     0.0);
   ShortRangeAttackDamageConst :=
-    KindsConfig.GetFloat(VRMLNodeName + '/short_range_attack/damage/const',
+    KindsConfig.GetFloat(ShortName + '/short_range_attack/damage/const',
     DefaultShortRangeAttackDamageConst);
   ShortRangeAttackDamageRandom :=
-    KindsConfig.GetFloat(VRMLNodeName + '/short_range_attack/damage/random',
+    KindsConfig.GetFloat(ShortName + '/short_range_attack/damage/random',
     DefaultShortRangeAttackDamageRandom);
   ShortRangeAttackKnockbackDistance :=
-    KindsConfig.GetFloat(VRMLNodeName + '/short_range_attack/knockback_distance',
+    KindsConfig.GetFloat(ShortName + '/short_range_attack/knockback_distance',
     DefaultShortRangeAttackKnockbackDistance);
 
   FallDownLifeLossScale :=
-    KindsConfig.GetFloat(VRMLNodeName + '/fall_down_life_loss_scale',
+    KindsConfig.GetFloat(ShortName + '/fall_down_life_loss_scale',
     DefaultFallDownLifeLossScale);
 
   MiddlePositionHeight :=
-    KindsConfig.GetFloat(VRMLNodeName + '/middle_position_height',
+    KindsConfig.GetFloat(ShortName + '/middle_position_height',
     DefaultMiddlePositionHeight);
 
   CastShadowVolumes :=
-    KindsConfig.GetValue(VRMLNodeName + '/casts_shadow', DefaultCastShadowVolumes);
+    KindsConfig.GetValue(ShortName + '/casts_shadow', DefaultCastShadowVolumes);
 
   SoundSuddenPain := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(VRMLNodeName + '/sound_sudden_pain', ''));
+    KindsConfig.GetValue(ShortName + '/sound_sudden_pain', ''));
   SoundDying := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(VRMLNodeName + '/sound_dying', ''));
+    KindsConfig.GetValue(ShortName + '/sound_dying', ''));
 end;
 
 function TCreatureKind.CameraRadius: Single;
@@ -1286,20 +1286,20 @@ end;
 
 { TCreatureKindList -------------------------------------------------------- }
 
-function TCreatureKindList.FindByVRMLNodeName(
-  const AVRMLNodeName: string): TCreatureKind;
+function TCreatureKindList.FindByShortName(
+  const AShortName: string): TCreatureKind;
 var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
   begin
     Result := Items[I];
-    if Result.VRMLNodeName = AVRMLNodeName then
+    if Result.ShortName = AShortName then
       Exit;
   end;
 
   raise Exception.CreateFmt('Not existing creature kind name "%s"',
-    [AVRMLNodeName]);
+    [AShortName]);
 end;
 
 procedure TCreatureKindList.LoadFromFile;
@@ -1321,9 +1321,9 @@ end;
 
 { TWalkAttackCreatureKind ---------------------------------------------------- }
 
-constructor TWalkAttackCreatureKind.Create(const AVRMLNodeName: string);
+constructor TWalkAttackCreatureKind.Create(const AShortName: string);
 begin
-  inherited Create(AVRMLNodeName);
+  inherited Create(AShortName);
 
   MoveSpeed := DefaultMoveSpeed;
   FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
@@ -1421,44 +1421,44 @@ begin
   inherited;
 
   ActualAttackTime :=
-    KindsConfig.GetFloat(VRMLNodeName + '/actual_attack_time',
+    KindsConfig.GetFloat(ShortName + '/actual_attack_time',
     DefaultActualAttackTime);
   MoveSpeed :=
-    KindsConfig.GetFloat(VRMLNodeName + '/move_speed',
+    KindsConfig.GetFloat(ShortName + '/move_speed',
     DefaultMoveSpeed);
   MaxAttackDistance :=
-    KindsConfig.GetFloat(VRMLNodeName + '/max_attack_distance',
+    KindsConfig.GetFloat(ShortName + '/max_attack_distance',
     DefaultMaxAttackDistance);
   PreferredAttackDistance :=
-    KindsConfig.GetFloat(VRMLNodeName + '/preferred_attack_distance',
+    KindsConfig.GetFloat(ShortName + '/preferred_attack_distance',
     DefaultPreferredAttackDistance);
   MinDelayBetweenAttacks :=
-    KindsConfig.GetFloat(VRMLNodeName + '/min_delay_between_attacks',
+    KindsConfig.GetFloat(ShortName + '/min_delay_between_attacks',
     DefaultMinDelayBetweenAttacks);
   LifeToRunAway :=
-    KindsConfig.GetFloat(VRMLNodeName + '/life_to_run_away',
+    KindsConfig.GetFloat(ShortName + '/life_to_run_away',
     DefaultLifeToRunAway);
   MaxKnockedBackDistance :=
-    KindsConfig.GetFloat(VRMLNodeName + '/max_knocked_back_distance',
+    KindsConfig.GetFloat(ShortName + '/max_knocked_back_distance',
     DefaultMaxKnockedBackDistance);
   MaxAngleToAttack :=
-    KindsConfig.GetFloat(VRMLNodeName + '/max_angle_to_attack',
+    KindsConfig.GetFloat(ShortName + '/max_angle_to_attack',
     DefaultMaxAngleToAttack);
   MinLifeLossToHurt :=
-    KindsConfig.GetFloat(VRMLNodeName + '/min_life_loss_to_hurt',
+    KindsConfig.GetFloat(ShortName + '/min_life_loss_to_hurt',
     DefaultMinLifeLossToHurt);
   ChanceToHurt :=
-    KindsConfig.GetFloat(VRMLNodeName + '/chance_to_hurt',
+    KindsConfig.GetFloat(ShortName + '/chance_to_hurt',
     DefaultChanceToHurt);
   MaxHeightAcceptableToFall :=
-    KindsConfig.GetFloat(VRMLNodeName + '/max_height_acceptable_to_fall',
+    KindsConfig.GetFloat(ShortName + '/max_height_acceptable_to_fall',
     DefaultMaxHeightAcceptableToFall);
   RandomWalkDistance :=
-    KindsConfig.GetFloat(VRMLNodeName + '/random_walk_distance',
+    KindsConfig.GetFloat(ShortName + '/random_walk_distance',
     DefaultCreatureRandomWalkDistance);
 
   SoundAttackStart := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(VRMLNodeName + '/sound_attack_start', ''));
+    KindsConfig.GetValue(ShortName + '/sound_attack_start', ''));
 
   AnimationFromConfig(FStandAnimationInfo, KindsConfig, 'stand');
   AnimationFromConfig(FStandToWalkAnimationInfo, KindsConfig, 'stand_to_walk');
@@ -1553,13 +1553,13 @@ begin
   inherited;
 
   MinDelayBetweenThrowWebAttacks :=
-    KindsConfig.GetFloat(VRMLNodeName + '/throw_web/min_delay_between_attacks', 0.0);
+    KindsConfig.GetFloat(ShortName + '/throw_web/min_delay_between_attacks', 0.0);
   MaxThrowWebAttackDistance :=
-    KindsConfig.GetFloat(VRMLNodeName + '/throw_web/max_attack_distance', 0.0);
+    KindsConfig.GetFloat(ShortName + '/throw_web/max_attack_distance', 0.0);
   MaxAngleToThrowWebAttack :=
-    KindsConfig.GetFloat(VRMLNodeName + '/throw_web/max_angle_to_attack', 0.0);
+    KindsConfig.GetFloat(ShortName + '/throw_web/max_angle_to_attack', 0.0);
   ActualThrowWebAttackTime :=
-    KindsConfig.GetFloat(VRMLNodeName + '/throw_web/actual_attack_time', 0.0);
+    KindsConfig.GetFloat(ShortName + '/throw_web/actual_attack_time', 0.0);
 
   AnimationFromConfig(FThrowWebAttackAnimationInfo, KindsConfig, 'throw_web_attack');
 end;
@@ -1596,9 +1596,9 @@ end;
 
 { TMissileCreatureKind ---------------------------------------------------- }
 
-constructor TMissileCreatureKind.Create(const AVRMLNodeName: string);
+constructor TMissileCreatureKind.Create(const AShortName: string);
 begin
-  inherited Create(AVRMLNodeName);
+  inherited Create(AShortName);
   Flying := true;
   FMoveSpeed := DefaultMissileMoveSpeed;
   FCloseDirectionToPlayer := DefaultCloseDirectionToPlayer;
@@ -1657,42 +1657,42 @@ begin
   inherited;
 
   MoveSpeed :=
-    KindsConfig.GetFloat(VRMLNodeName + '/move_speed',
+    KindsConfig.GetFloat(ShortName + '/move_speed',
     DefaultMissileMoveSpeed);
   CloseDirectionToPlayer :=
-    KindsConfig.GetValue(VRMLNodeName + '/close_direction_to_player',
+    KindsConfig.GetValue(ShortName + '/close_direction_to_player',
     DefaultCloseDirectionToPlayer);
   CloseDirectionToTargetSpeed :=
-    KindsConfig.GetFloat(VRMLNodeName + '/close_direction_to_target_speed',
+    KindsConfig.GetFloat(ShortName + '/close_direction_to_target_speed',
     DefaultCloseDirectionToTargetSpeed);
   PauseBetweenSoundIdle :=
-    KindsConfig.GetFloat(VRMLNodeName + '/pause_between_sound_idle',
+    KindsConfig.GetFloat(ShortName + '/pause_between_sound_idle',
     DefaultPauseBetweenSoundIdle);
   HitsPlayer :=
-    KindsConfig.GetValue(VRMLNodeName + '/hits_player',
+    KindsConfig.GetValue(ShortName + '/hits_player',
     DefaultHitsPlayer);
   HitsCreatures :=
-    KindsConfig.GetValue(VRMLNodeName + '/hits_creatures',
+    KindsConfig.GetValue(ShortName + '/hits_creatures',
     DefaultHitsCreatures);
   FFallsDown :=
-    KindsConfig.GetValue(VRMLNodeName + '/falls_down', DefaultFallsDown);
+    KindsConfig.GetValue(ShortName + '/falls_down', DefaultFallsDown);
   FFallsDownSpeed :=
-    KindsConfig.GetFloat(VRMLNodeName + '/falls_down_speed',
+    KindsConfig.GetFloat(ShortName + '/falls_down_speed',
     DefaultFallsDownSpeed);
 
   SoundExplosion := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(VRMLNodeName + '/sound_explosion', ''));
+    KindsConfig.GetValue(ShortName + '/sound_explosion', ''));
   SoundIdle := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(VRMLNodeName + '/sound_idle', ''));
+    KindsConfig.GetValue(ShortName + '/sound_idle', ''));
 
   AnimationFromConfig(FAnimationInfo, KindsConfig, 'fly');
 end;
 
 { TStillCreatureKind ---------------------------------------------------- }
 
-constructor TStillCreatureKind.Create(const AVRMLNodeName: string);
+constructor TStillCreatureKind.Create(const AShortName: string);
 begin
-  inherited Create(AVRMLNodeName);
+  inherited Create(AShortName);
 end;
 
 destructor TStillCreatureKind.Destroy;
@@ -1790,7 +1790,7 @@ begin
     PrepareRenderDone. }
   if not Kind.PrepareRenderDone then
     raise EInternalError.CreateFmt('PrepareRender of creature kind "%s" not done',
-      [Kind.VRMLNodeName]);
+      [Kind.ShortName]);
   RecalculateBoundingBox;
 end;
 
@@ -2015,7 +2015,7 @@ end;
 function TCreature.DebugCaption: string;
 begin
   Result := Format('%s [%s / %s]',
-    [Kind.VRMLNodeName, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
+    [Kind.ShortName, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
 end;
 
 procedure TCreature.RenderShadowVolume(

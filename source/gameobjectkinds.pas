@@ -32,7 +32,7 @@ type
   { This is a common class for item kind and creature kind. }
   TObjectKind = class
   private
-    FVRMLNodeName: string;
+    FShortName: string;
     FPrepareRenderDone: boolean;
     FBlendingType: TBlendingType;
     { This is internal for PrepareRender. }
@@ -74,7 +74,7 @@ type
 
     { Create AnimInfo instance, reading animation properties from
       XML file KindsConfig. The path of responsible XML element
-      depends on VRMLNodeName and given AnimationName.
+      depends on ShortName and given AnimationName.
 
       If NilIfNoElement, then this will just set AnimInfo to @nil
       if appropriate XML element file not found. Otherwise
@@ -93,7 +93,7 @@ type
       that should be called outside. }
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); virtual;
   public
-    constructor Create(const AVRMLNodeName: string);
+    constructor Create(const AShortName: string);
     destructor Destroy; override;
 
     procedure PrepareRender(const BaseLights: TLightInstancesList);
@@ -130,7 +130,7 @@ type
       (Reason: This must be a valid identifier in all possible languages.
       Also digits and underscore are reserved, as we may use them internally
       to other other info in VRML/X3D and XML node names.) }
-    property VRMLNodeName: string read FVRMLNodeName;
+    property ShortName: string read FShortName;
 
     property BlendingType: TBlendingType
       read FBlendingType write FBlendingType default DefaultBlendingType;
@@ -149,10 +149,10 @@ implementation
 uses SysUtils, ProgressUnit, X3DLoad, DOM, GameWindow,
   CastleStringUtils, CastleLog;
 
-constructor TObjectKind.Create(const AVRMLNodeName: string);
+constructor TObjectKind.Create(const AShortName: string);
 begin
   inherited Create;
-  FVRMLNodeName := AVRMLNodeName;
+  FShortName := AShortName;
   FBlendingType := DefaultBlendingType;
   FirstRootNodesPool := TStringList.Create;
   ManifoldEdgesPool := TStringList.Create;
@@ -274,7 +274,7 @@ const
 var
   SBlendingType: string;
 begin
-  SBlendingType := KindsConfig.GetValue(VRMLNodeName + '/blending_type',
+  SBlendingType := KindsConfig.GetValue(ShortName + '/blending_type',
     SBlendingTypeIncrease);
   if SBlendingType = SBlendingTypeIncrease then
     BlendingType := btIncrease else
@@ -285,7 +285,7 @@ end;
 
 procedure TObjectKind.RedoPrepareRender(const BaseLights: TLightInstancesList);
 begin
-  Progress.Init(PrepareRenderSteps, 'Loading object ' + VRMLNodeName);
+  Progress.Init(PrepareRenderSteps, 'Loading object ' + ShortName);
   try
     { It's important to do FreePrepareRender after Progress.Init.
       Why ? Because Progress.Init does TCastleWindowBase.SaveScreeToDisplayList,
@@ -403,7 +403,7 @@ begin
     if Log then
       WritelnLog('Animation info',
         Format('%40s %3d scenes * %8d triangles',
-        [ VRMLNodeName + '.' + AnimationName + ' animation: ',
+        [ ShortName + '.' + AnimationName + ' animation: ',
           Anim.ScenesCount,
           Anim.Scenes[0].TrianglesCount(true) ]));
 
@@ -434,13 +434,13 @@ begin
   FreeAndNil(AnimInfo);
 
   Element := KindsConfig.PathElement(
-    VRMLNodeName + '/' + AnimationName + '_animation/animation');
+    ShortName + '/' + AnimationName + '_animation/animation');
   if Element = nil then
   begin
     if not NilIfNoElement then
       raise Exception.CreateFmt(
         'No <%s_animation>/<animation> elements for object "%s"',
-        [AnimationName, VRMLNodeName]);
+        [AnimationName, ShortName]);
   end else
   begin
     AnimInfo := TCastlePrecalculatedAnimationInfo.CreateFromDOMElement(
