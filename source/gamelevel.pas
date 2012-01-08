@@ -568,8 +568,6 @@ type
       virtual;
     { @groupEnd }
 
-    procedure RenderShadowVolume; override;
-
     { Call this to allow level object to update some things,
       animate level objects etc. }
     procedure Idle(const CompSpeed: Single;
@@ -1787,15 +1785,6 @@ begin
     Life := BossCreature.Life;
     MaxLife := BossCreature.MaxLife;
   end;
-end;
-
-procedure TLevel.RenderShadowVolume;
-var
-  I: Integer;
-begin
-  for I := 0 to Creatures.Count - 1 do
-    Creatures.Items[I].RenderShadowVolume(ShadowVolumeRenderer, true, IdentityMatrix4Single);
-  inherited;
 end;
 
 procedure TLevel.InitializeLights(const Lights: TLightInstancesList);

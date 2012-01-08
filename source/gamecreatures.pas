@@ -2021,7 +2021,7 @@ procedure TCreature.RenderShadowVolume(
   const ParentTransformIsIdentity: boolean;
   const ParentTransform: TMatrix4Single);
 begin
-  if Kind.CastShadowVolumes then
+  if GetExists and Kind.CastShadowVolumes then
     CurrentScene.RenderShadowVolume(ShadowVolumeRenderer,
       false, SceneTransform * ParentTransform);
 end;
