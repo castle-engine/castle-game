@@ -1797,7 +1797,7 @@ end;
 function TCreature.GetExists: boolean;
 begin
   Result := (inherited GetExists) and
-    ( (Level <> nil) and (not Level.MenuBackground) ) and
+    (Level <> nil) and (not Level.MenuBackground) and
     (not GameWin);
 end;
 

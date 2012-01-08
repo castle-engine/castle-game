@@ -302,14 +302,16 @@ type
     function FindKind(Kind: TItemKind): Integer;
   end;
 
-  TItemOnLevel = class
+  TItemOnLevel = class(T3D)
   private
     FItem: TItem;
     FPosition: TVector3Single;
     { Rotation around Z }
     FRotation: Single;
+  protected
+    function GetExists: boolean; override;
   public
-    constructor Create(AItem: TItem; const APosition: TVector3Single);
+    constructor Create(AItem: TItem; const APosition: TVector3Single); reintroduce;
     destructor Destroy; override;
 
     { Note that this Item is owned by TItemOnLevel instance,
@@ -342,15 +344,15 @@ type
       (when item for sure is not within Frustum, we don't have
       to push it to OpenGL). }
     procedure Render(const Frustum: TFrustum;
-      const Params: TRenderParams);
+      const Params: TRenderParams); override;
 
-    procedure Idle(const CompSpeed: Single);
+    procedure Idle(const CompSpeed: Single); override;
 
     { This returns BoundingBox of this item, taking into account
       it's current Position and the fact that items constantly rotate
       (around local +Z). So it's actually Item.Kind.Scene.BoundingBox translated
       and enlarged as appropriate. }
-    function BoundingBox: TBox3D;
+    function BoundingBox: TBox3D; override;
 
     { Call this when user clicked on the item.
       This will do some GameMessage describing the item
@@ -819,7 +821,7 @@ end;
 
 constructor TItemOnLevel.Create(AItem: TItem; const APosition: TVector3Single);
 begin
-  inherited Create;
+  inherited Create(nil);
   FItem := AItem;
   FPosition := APosition;
 end;
@@ -849,7 +851,7 @@ end;
 procedure TItemOnLevel.Render(const Frustum: TFrustum;
   const Params: TRenderParams);
 begin
-  if Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
+  if GetExists and Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
   begin
     glPushMatrix;
       glTranslatev(Position);
@@ -882,6 +884,8 @@ var
   FallingDownLength: Single;
   AboveGround: PTriangle;
 begin
+  if not GetExists then Exit;
+
   FRotation += 3 * CompSpeed * 50;
 
   ShiftedPosition := Position;
@@ -929,7 +933,9 @@ end;
 
 function TItemOnLevel.BoundingBox: TBox3D;
 begin
-  Result := Item.Kind.BoundingBoxRotated.Translate(Position);
+  if GetExists then
+    Result := Item.Kind.BoundingBoxRotated.Translate(Position) else
+    Result := EmptyBox3D;
 end;
 
 procedure TItemOnLevel.ItemPicked(const Distance: Single);
@@ -946,6 +952,13 @@ begin
     Notifications.Show(S);
   end else
     Notifications.Show('You see some item, but it''s too far to tell exactly what it is');
+end;
+
+function TItemOnLevel.GetExists: boolean;
+begin
+  Result := (inherited GetExists) and
+    (Level <> nil) and (not Level.MenuBackground) and
+    (not DebugRenderForLevelScreenshot);
 end;
 
 { TItemOnLevelList -------------------------------------------------- }

@@ -1784,13 +1784,7 @@ end;
 procedure TLevel.Render3D(const Params: TRenderParams);
 begin
   inherited;
-
-  { for background level view, we do not show creatures / items
-    (their kinds are possibly not loaded yet) }
-  if MenuBackground then Exit;
-
-  if not DebugRenderForLevelScreenshot then
-    ItemsOnLevel.Render(RenderingCamera.Frustum, Params);
+  ItemsOnLevel.Render(RenderingCamera.Frustum, Params);
 end;
 
 procedure TLevel.RenderShadowVolume;
