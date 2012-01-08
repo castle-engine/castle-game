@@ -1994,6 +1994,10 @@ begin
   begin
     glPushMatrix;
       glMultMatrix(SceneTransform);
+      { self-shadows on creatures look bad, esp. see werewolves at the end
+        of "castle hall" level. Changing ReceiveShadowVolumes to false
+        here is a little hacky (would be cleaner to do it at loading), but easy. }
+      CurrentScene.ReceiveShadowVolumes := false;
       CurrentScene.Render(nil, Params);
       if RenderDebugCaptions and
          (not Params.Transparent) and Params.ShadowVolumesReceivers then
