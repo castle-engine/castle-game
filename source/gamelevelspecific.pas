@@ -747,7 +747,7 @@ procedure TGateLevel.Render3D(const Params: TRenderParams);
 { TODO: remake teleport as simply additional object on level, not collidable.
   This will remove the need for below.
   Required: T3DTransform (see draft tutorial for planned name),
-  like T3DTranslated. Maybe special T3DTranslateRotate ? }
+  like T3DTransform. Maybe special T3DTranslateRotate ? }
 
   procedure RenderTeleport(
     const TeleportRotation: Single;

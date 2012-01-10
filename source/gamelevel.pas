@@ -54,7 +54,7 @@ const
 type
   TLevel = class;
 
-  { See T3DCustomTranslated
+  { See T3DCustomTransform.
 
     Note that if Translation actually changes over time then
     you have to think of at least one additional thing yourself:
@@ -65,7 +65,7 @@ type
     MovePushesOthers to @false.
     See e.g. the DoomLevelDoor.BeforeTimeIncrease method to see how the behavior
     "something blocks the move" can be handled. }
-  TLevelMovingObject = class(T3DCustomTranslated)
+  TLevelMovingObject = class(T3DCustomTransform)
   private
     FMovePushesOthers: boolean;
     FMovePushesOthersUsesBoxes: boolean;
