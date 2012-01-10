@@ -82,6 +82,7 @@ type
       GetTranslationFromTime(AnimationTime).
       Descendants should override GetTranslationFromTime. }
     function GetTranslation: TVector3Single; override;
+    function OnlyTranslation: boolean; override;
 
     function GetTranslationFromTime(const AnAnimationTime: TFloatTime):
       TVector3Single; virtual; abstract;
@@ -757,6 +758,11 @@ end;
 function TLevelMovingObject.GetTranslation: TVector3Single;
 begin
   Result := GetTranslationFromTime(AnimationTime);
+end;
+
+function TLevelMovingObject.OnlyTranslation: boolean;
+begin
+  Result := true; { TLevelMovingObject always uses only translation }
 end;
 
 procedure TLevelMovingObject.BeforeTimeIncrease(
