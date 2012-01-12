@@ -76,11 +76,8 @@ type
     FGateExitBox: TBox3D;
 
     Teleport: TCastleScene;
-    FTeleport1Box, FTeleport2Box: TBox3D;
-
-    Teleport1Rotate: Single;
-    Teleport2Rotate: Single;
-
+    Teleport1, Teleport2: T3DTransform;
+    Teleport1Box, Teleport2Box: TBox3D;
     Teleport1Destination: TVector3Single;
     Teleport2Destination: TVector3Single;
 
@@ -112,10 +109,6 @@ type
     procedure Idle(const CompSpeed: Single;
       const HandleMouseAndKeys: boolean;
       var LetOthersHandleMouseAndKeys: boolean); override;
-
-    procedure Render3D(const Params: TRenderParams); override;
-
-    procedure RenderShadowVolume; override;
   end;
 
   TTowerLevel = class(TLevel)
@@ -554,6 +547,21 @@ begin
   GateLevelPath := CastleLevelsPath + 'gate' + PathDelim;
 
   Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false, false);
+  Teleport.Collides := false;
+  Teleport.CastShadowVolumes := false; { not manifold }
+
+  Teleport1 := T3DTransform.Create(Self);
+  { set rotation axis. Rotation angle will be increased in each Idle }
+  Teleport1.Rotation :=  Vector4Single(1, 1, 0, 0);
+  Teleport1.Translation := Teleport1Box.Middle;
+  Teleport1.Add(Teleport);
+  Items.Add(Teleport1);
+
+  Teleport2 := T3DTransform.Create(Self);
+  Teleport2.Rotation :=  Vector4Single(1, 1, 0, 0);
+  Teleport2.Translation := Teleport2Box.Middle;
+  Teleport2.Add(Teleport);
+  Items.Add(Teleport2);
 
   Cart := LoadLevelAnimation(GateLevelPath + 'cart.kanim', true, true);
   Cart.CollisionUseLastScene := true;
@@ -568,7 +576,6 @@ end;
 
 destructor TGateLevel.Destroy;
 begin
-  FreeAndNil(Teleport);
   inherited;
 end;
 
@@ -589,16 +596,16 @@ begin
 
   RemoveBoxNodeCheck(FGateExitBox, 'GateExitBox');
 
-  RemoveBoxNodeCheck(FTeleport1Box, 'Teleport1Box');
-  RemoveBoxNodeCheck(FTeleport2Box, 'Teleport2Box');
+  RemoveBoxNodeCheck(Teleport1Box, 'Teleport1Box');
+  RemoveBoxNodeCheck(Teleport2Box, 'Teleport2Box');
 
   RemoveBoxNodeCheck(FSacrilegeBox, 'SacrilegeBox');
 
-  Teleport1Destination := FTeleport2Box.Middle;
+  Teleport1Destination := Teleport2Box.Middle;
   Teleport1Destination[0] += 2;
   Teleport1Destination[1] += 2;
 
-  Teleport2Destination := FTeleport1Box.Middle;
+  Teleport2Destination := Teleport1Box.Middle;
   Teleport2Destination[0] -= 2;
   Teleport2Destination[1] -= 2;
 
@@ -632,9 +639,15 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
     Player.Knockback(0, 2, Vector3Single(0, -1, 0));
   end;
 
-  procedure TeleportWork(const TeleportBox: TBox3D;
+  procedure TeleportWork(Teleport: T3DTransform; const TeleportBox: TBox3D;
     const Destination: TVector3Single);
+  var
+    Rot: TVector4Single;
   begin
+    Rot := Teleport.Rotation;
+    Rot[3] += 0.175 * CompSpeed;
+    Teleport.Rotation := Rot;
+
     if TeleportBox.PointInside(Player.Camera.Position) then
     begin
       Player.Camera.Position := Destination;
@@ -707,10 +720,8 @@ begin
     end;
   end else
   begin
-    Teleport1Rotate += 0.2 * CompSpeed * 50;
-    Teleport2Rotate += 0.2 * CompSpeed * 50;
-    TeleportWork(FTeleport1Box, Teleport1Destination);
-    TeleportWork(FTeleport2Box, Teleport2Destination);
+    TeleportWork(Teleport1, Teleport1Box, Teleport1Destination);
+    TeleportWork(Teleport2, Teleport2Box, Teleport2Destination);
 
     if (not SacrilegeAmbushDone) and
       FSacrilegeBox.PointInside(Player.Camera.Position) then
@@ -740,39 +751,6 @@ begin
   Result :=
     (inherited CollisionIgnoreItem(Sender, Triangle)) or
     (PTriangle(Triangle)^.State.LastNodes.Material.NodeName = 'MatWater');
-end;
-
-procedure TGateLevel.Render3D(const Params: TRenderParams);
-
-{ TODO: remake teleport as simply additional object on level, not collidable.
-  This will remove the need for below.
-  Required: T3DTransform (see draft tutorial for planned name),
-  like T3DTransform. Maybe special T3DTranslateRotate ? }
-
-  procedure RenderTeleport(
-    const TeleportRotation: Single;
-    const TeleportBox: TBox3D);
-  begin
-    if RenderingCamera.Frustum.Box3DCollisionPossibleSimple(TeleportBox) then
-    begin
-      glPushMatrix;
-        glTranslatev(TeleportBox.Middle);
-        glRotatef(TeleportRotation, 1, 1, 0);
-        Teleport.Render(nil, Params);
-      glPopMatrix;
-    end;
-  end;
-
-begin
-  inherited;
-  RenderTeleport(Teleport1Rotate, FTeleport1Box);
-  RenderTeleport(Teleport2Rotate, FTeleport2Box);
-end;
-
-procedure TGateLevel.RenderShadowVolume;
-begin
-  { TODO: render teleport shadow quads }
-  inherited;
 end;
 
 { TTowerLevel ---------------------------------------------------------------- }
