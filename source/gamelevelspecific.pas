@@ -28,7 +28,7 @@ interface
 uses CastleScene, Boxes3D, VectorMath,
   GamePlayer, GameLevel, Background, Triangle,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation,
-  GameCreatures, Classes, CastleTimeUtils, CastleColors;
+  GameCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
 
 const
   CastleHallWerewolvesCount = 4;
@@ -101,7 +101,6 @@ type
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
       AMenuBackground: boolean); override;
-    destructor Destroy; override;
 
     function CollisionIgnoreItem(
       const Sender: TObject;
@@ -130,9 +129,14 @@ type
       var InteractionOccurred: boolean); override;
   end;
 
+  TSpiderAppearing = class(T3DTransform)
+    procedure Render(const Frustum: TFrustum; const Params: TRenderParams); override;
+  end;
+
   TCagesLevel = class(TLevel)
   private
-    FSpidersAppearing: TVector3SingleList;
+    { List of TSpiderAppearing instances }
+    SpidersAppearing: T3DList;
     NextSpidersAppearingTime: Single;
 
     HintOpenDoor: TLevelHintArea;
@@ -151,17 +155,12 @@ type
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
       AMenuBackground: boolean); override;
-    destructor Destroy; override;
 
     procedure Idle(const CompSpeed: Single;
       const HandleMouseAndKeys: boolean;
       var LetOthersHandleMouseAndKeys: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
-
-    procedure Render3D(const Params: TRenderParams); override;
-
-    procedure RenderShadowVolume; override;
 
     { True means that GateExit will not be rendered (or collided)
       and EndSequence will be rendered. }
@@ -218,7 +217,6 @@ type
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
       AMenuBackground: boolean); override;
-    destructor Destroy; override;
 
     procedure Picked(const Distance: Single;
       CollisionInfo: T3DCollision;
@@ -574,11 +572,6 @@ begin
   SwordAmbushDone := false;
 end;
 
-destructor TGateLevel.Destroy;
-begin
-  inherited;
-end;
-
 procedure TGateLevel.ChangeLevelScene;
 
   function AmbushStartingPos(const Box: TBox3D): TVector3Single;
@@ -810,6 +803,31 @@ begin
   end;
 end;
 
+{ TSpiderAppearing ----------------------------------------------------------- }
+
+const
+  { Remember to make it -1 lower than actual ceiling geometry,
+    otherwise the spiders will be created on the ceiling of the model... }
+  SpiderZ = 69.0;
+
+procedure TSpiderAppearing.Render(const Frustum: TFrustum; const Params: TRenderParams);
+begin
+  if (not Params.Transparent) and Params.ShadowVolumesReceivers then
+  begin
+    glPushAttrib(GL_ENABLE_BIT);
+      glDisable(GL_LIGHTING);
+      glEnable(GL_DEPTH_TEST);
+      glColorv(Black3Single);
+      glBegin(GL_LINES);
+        glVertex3f(Translation[0], Translation[1], SpiderZ);
+        glVertexv(Translation);
+      glEnd;
+    glPopAttrib;
+  end;
+
+  inherited;
+end;
+
 { TCagesLevel ---------------------------------------------------------------- }
 
 constructor TCagesLevel.Create(
@@ -826,9 +844,10 @@ begin
 
   ThunderEffect := TThunderEffect.Create;
 
-  FSpidersAppearing := TVector3SingleList.Create;
+  SpidersAppearing := T3DList.Create(Self);
+  Items.Add(SpidersAppearing);
   NextSpidersAppearingTime := 0;
-
+  
   { TODO: this is not nice; I should add TLevelObject.Name for such
     purposes, and use here Items.FindName('hint_button_box'). }
   HintOpenDoor := Items.List[1] as TLevelHintArea;
@@ -856,12 +875,6 @@ begin
     FBossCreature := Creatures[BossIndex];
 end;
 
-destructor TCagesLevel.Destroy;
-begin
-  FreeAndNil(FSpidersAppearing);
-  inherited;
-end;
-
 procedure TCagesLevel.SetDoEndSequence(Value: boolean);
 begin
   { Changing from false to true ? Make sound. }
@@ -872,11 +885,6 @@ begin
   FEndSequence.Exists := DoEndSequence;
   FGateExit.Exists := not DoEndSequence;
 end;
-
-const
-  { Remember to make it -1 lower than actual ceiling geometry,
-    otherwise the spiders will be created on the ceiling of the model... }
-  SpiderZ = 69.0;
 
 procedure TCagesLevel.Idle(const CompSpeed: Single;
   const HandleMouseAndKeys: boolean;
@@ -890,8 +898,14 @@ const
   MaxSpiderY = 162.0  - SpiderRadius;
 
   procedure AppearSpider(const Position: TVector3Single);
+  var
+    SA: TSpiderAppearing;
   begin
-    FSpidersAppearing.Add(Position);
+    SA := TSpiderAppearing.Create(Self);
+    SA.Add(Spider.StandAnimation.Scenes[0]);
+    SA.Collides := false;
+    SA.Translation := Position;
+    SpidersAppearing.Add(SA);
   end;
 
   function RandomSpiderXY: TVector3Single;
@@ -925,7 +939,7 @@ var
   SpiderPosition, SpiderDirection: TVector3Single;
   SpiderMoveDistance: Single;
   AboveGround: PTriangle;
-var
+  SA: TSpiderAppearing;
   TorchLight: PLightInstance;
 begin
   inherited;
@@ -971,13 +985,13 @@ begin
     IsAbove := false;
     AboveHeight := MaxSingle;
     AboveGround := nil;
-    while I < FSpidersAppearing.Count do
+    while I < SpidersAppearing.List.Count do
     begin
-      GetHeightAbove(FSpidersAppearing.Items[I], IsAbove,
-        AboveHeight, AboveGround);
+      SA := SpidersAppearing.List[I] as TSpiderAppearing;
+      SpiderPosition := SA.Translation;
+      GetHeightAbove(SpiderPosition, IsAbove, AboveHeight, AboveGround);
       if AboveHeight < Spider.CameraRadius * 2 then
       begin
-        SpiderPosition := FSpidersAppearing.Items[I];
         SpiderDirection :=
           VectorSubtract(Player.Camera.Position, SpiderPosition);
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.GravityUp);
@@ -985,13 +999,14 @@ begin
           SpiderPosition, SpiderDirection, AnimationTime, BaseLights, Spider.DefaultMaxLife);
         AddCreature(SpiderCreature);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
-        FSpidersAppearing.Delete(I);
+        FreeAndNil(SA); { it will be automatically removed from SpidersAppearing list }
       end else
       begin
         { calculate SpiderMoveDistance }
         SpiderMoveDistance := SpidersFallingSpeed * CompSpeed * 50;
         MinTo1st(SpiderMoveDistance, AboveHeight - Spider.CameraRadius);
-        FSpidersAppearing.L[I][2] -= SpiderMoveDistance;
+        SpiderPosition[2] -= SpiderMoveDistance;
+        SA.Translation := SpiderPosition;
         Inc(I);
       end;
     end;
@@ -1007,44 +1022,6 @@ begin
   { Give player 1 sword and 1 bow, to have weapons. }
   NewPlayer.PickItem(TItem.Create(Sword, 1));
   NewPlayer.PickItem(TItem.Create(Bow, 1));
-end;
-
-procedure TCagesLevel.Render3D(const Params: TRenderParams);
-var
-  I: Integer;
-begin
-  inherited;
-
-  if (not Params.Transparent) and Params.ShadowVolumesReceivers then
-  begin
-    glPushAttrib(GL_ENABLE_BIT);
-      glDisable(GL_LIGHTING);
-      glEnable(GL_DEPTH_TEST);
-      glColorv(Black3Single);
-      glBegin(GL_LINES);
-        for I := 0 to FSpidersAppearing.Count - 1 do
-        begin
-          glVertex3f(FSpidersAppearing.Items[I][0],
-                     FSpidersAppearing.Items[I][1], SpiderZ);
-          glVertexv(FSpidersAppearing.Items[I]);
-        end;
-      glEnd;
-    glPopAttrib;
-  end;
-
-  for I := 0 to FSpidersAppearing.Count - 1 do
-  begin
-    glPushMatrix;
-      glTranslatev(FSpidersAppearing.Items[I]);
-      Spider.StandAnimation.Scenes[0].Render(nil, Params);
-    glPopMatrix;
-  end;
-end;
-
-procedure TCagesLevel.RenderShadowVolume;
-begin
-  { TODO: render spiders shadow quads }
-  inherited;
 end;
 
 procedure TCagesLevel.Picked(const Distance: Single;
@@ -1229,11 +1206,6 @@ begin
     true { create octrees }, false);
   ExitButton.CastShadowVolumes := false;
   Items.Add(ExitButton);
-end;
-
-destructor TDoomE1M1Level.Destroy;
-begin
-  inherited;
 end;
 
 procedure TDoomE1M1Level.Picked(const Distance: Single;
