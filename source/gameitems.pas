@@ -302,16 +302,13 @@ type
     function FindKind(Kind: TItemKind): Integer;
   end;
 
-  TItemOnLevel = class(T3D)
+  TItemOnLevel = class(T3DTransform)
   private
     FItem: TItem;
-    FPosition: TVector3Single;
-    { Rotation around Z }
-    FRotation: Single;
   protected
     function GetExists: boolean; override;
   public
-    constructor Create(AItem: TItem; const APosition: TVector3Single); reintroduce;
+    constructor Create(AItem: TItem; const ATranslation: TVector3Single); reintroduce;
     destructor Destroy; override;
 
     { Note that this Item is owned by TItemOnLevel instance,
@@ -329,9 +326,6 @@ type
       TItemOnLevel instance is to free it ! }
     function ExtractItem: TItem;
 
-    { This is the position of the (0, 0, 0) point of item model. }
-    property Position: TVector3Single read FPosition write FPosition;
-
     { Tests collision of this item with Player (in @link(Player) variable). }
     function PlayerCollision: boolean;
 
@@ -347,12 +341,6 @@ type
       const Params: TRenderParams); override;
 
     procedure Idle(const CompSpeed: Single); override;
-
-    { This returns BoundingBox of this item, taking into account
-      it's current Position and the fact that items constantly rotate
-      (around local +Z). So it's actually Item.Kind.Scene.BoundingBox translated
-      and enlarged as appropriate. }
-    function BoundingBox: TBox3D; override;
 
     { Call this when user clicked on the item.
       This will do some GameMessage describing the item
@@ -821,11 +809,17 @@ end;
 
 { TItemOnLevel ------------------------------------------------------------ }
 
-constructor TItemOnLevel.Create(AItem: TItem; const APosition: TVector3Single);
+constructor TItemOnLevel.Create(AItem: TItem; const ATranslation: TVector3Single);
 begin
   inherited Create(nil);
   FItem := AItem;
-  FPosition := APosition;
+  Translation := ATranslation;
+  Rotation := Vector4Single(UnitVector3Single[2], 0); { angle will animate later }
+
+  { most item models are not 2-manifold }
+  CastShadowVolumes := false;
+
+  Add(Item.Kind.Scene);
 
   { TODO: we resolve collisions ourselves, without the help of T3D and scene
     manager methods. For them, we're not collidable, for now.
@@ -858,92 +852,76 @@ end;
 procedure TItemOnLevel.Render(const Frustum: TFrustum;
   const Params: TRenderParams);
 begin
-  if GetExists and Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
+  inherited;
+  if GetExists and RenderBoundingBoxes and
+    (not Params.Transparent) and Params.ShadowVolumesReceivers and
+    Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
   begin
-    glPushMatrix;
-      glTranslatev(Position);
-      glRotatev(FRotation, UnitVector3Single[2]);
-      Item.Kind.Scene.Render(nil, Params);
-    glPopMatrix;
-
-    if RenderBoundingBoxes and
-      (not Params.Transparent) and Params.ShadowVolumesReceivers then
-    begin
-      glPushAttrib(GL_ENABLE_BIT);
-        glDisable(GL_LIGHTING);
-        glEnable(GL_DEPTH_TEST);
-        glColorv(Gray3Single);
-        glDrawBox3DWire(BoundingBox);
-      glPopAttrib;
-    end;
+    glPushAttrib(GL_ENABLE_BIT);
+      glDisable(GL_LIGHTING);
+      glEnable(GL_DEPTH_TEST);
+      glColorv(Gray3Single);
+      glDrawBox3DWire(BoundingBox);
+    glPopAttrib;
   end;
 end;
 
 procedure TItemOnLevel.Idle(const CompSpeed: Single);
 const
-  PositionRadius = 1.0;
+  Radius = 1.0;
   FallingDownSpeed = 0.2;
 var
   IsAbove: boolean;
   AboveHeight: Single;
-  ShiftedPosition: TVector3Single;
-  ProposedNewShiftedPosition{, NewShiftedPosition}: TVector3Single;
+  ShiftedTranslation: TVector3Single;
+  NewTranslation: TVector3Single;
   FallingDownLength: Single;
   AboveGround: PTriangle;
+  Rot: TVector4Single;
 begin
   inherited;
   if not GetExists then Exit;
 
-  FRotation += 3 * CompSpeed * 50;
+  Rot := Rotation;
+  Rot[3] += 2.61 * CompSpeed;
+  Rotation := Rot;
 
-  ShiftedPosition := Position;
-  ShiftedPosition[2] += PositionRadius;
+  ShiftedTranslation := Translation;
+  ShiftedTranslation[2] += Radius;
 
-  { Note that I'm using ShiftedPosition, not Position,
-    and later I'm comparing "AboveHeight > PositionRadius",
+  { Note that I'm using ShiftedTranslation, not Translation,
+    and later I'm comparing "AboveHeight > Radius",
     instead of "AboveHeight > 0".
     Otherwise, I risk that when item will be placed perfectly on the ground,
     it may "slip through" this ground down.
 
-    For the same reason, I use sphere around ShiftedPosition
+    For the same reason, I use sphere around ShiftedTranslation
     when doing Level.MoveAllowed below. }
 
-  Level.GetHeightAbove(ShiftedPosition, IsAbove, AboveHeight, AboveGround);
-  if AboveHeight > PositionRadius then
+  Level.GetHeightAbove(ShiftedTranslation, IsAbove, AboveHeight, AboveGround);
+  if AboveHeight > Radius then
   begin
     { Item falls down because of gravity. }
 
     FallingDownLength := CompSpeed * 50 * FallingDownSpeed;
-    MinTo1st(FallingDownLength, AboveHeight - PositionRadius);
+    MinTo1st(FallingDownLength, AboveHeight - Radius);
 
-    ProposedNewShiftedPosition := ShiftedPosition;
-    ProposedNewShiftedPosition[2] -= FallingDownLength;
+    NewTranslation := ShiftedTranslation;
+    NewTranslation[2] -= FallingDownLength;
 
-    if Level.MoveAllowedSimple(ShiftedPosition, ProposedNewShiftedPosition,
-      true, PositionRadius) then
-    begin
-      FPosition := ProposedNewShiftedPosition;
-      FPosition[2] -= PositionRadius;
-    end;
-
-    { TODO: I should use Level.MoveAllowed here, not
+    { TODO: I could use Level.MoveAllowed here, not
       Level.MoveAllowedSimple. But then left life potion on gate
       level must be corrected (possibly by correcting the large sword mesh)
       to not "slip down" from the sword. }
-    {if Level.MoveAllowed(ShiftedPosition, ProposedNewShiftedPosition,
-      NewShiftedPosition, true, PositionRadius) then
+    {if Level.MoveAllowed(ShiftedTranslation, NewTranslation,
+      RealNewTranslation, true, Radius) then}
+    if Level.MoveAllowedSimple(ShiftedTranslation, NewTranslation,
+      true, Radius) then
     begin
-      FPosition := NewShiftedPosition;
-      FPosition[2] -= PositionRadius;
-    end;}
+      NewTranslation[2] -= Radius;
+      Translation := NewTranslation;
+    end;
   end;
-end;
-
-function TItemOnLevel.BoundingBox: TBox3D;
-begin
-  if GetExists then
-    Result := Item.Kind.BoundingBoxRotated.Translate(Position) else
-    Result := EmptyBox3D;
 end;
 
 procedure TItemOnLevel.ItemPicked(const Distance: Single);
@@ -964,9 +942,7 @@ end;
 
 function TItemOnLevel.GetExists: boolean;
 begin
-  Result := (inherited GetExists) and
-    (Level <> nil) and (not Level.MenuBackground) and
-    (not DebugRenderForLevelScreenshot);
+  Result := (inherited GetExists) and (not DebugRenderForLevelScreenshot);
 end;
 
 { TItemOnLevelList -------------------------------------------------- }

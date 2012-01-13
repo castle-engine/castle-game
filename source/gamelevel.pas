@@ -858,7 +858,7 @@ begin
           Box := Item.BoundingBox;
           if Box.Collision(NewBox) or
              Box.Collision(CurrentBox) then
-            Item.Position := Item.Position + Move;
+            Item.Translation := Item.Translation + Move;
         end;
       end else
       begin
@@ -894,7 +894,7 @@ begin
           if BoxCollisionAssumeTranslation(NewTranslation,
             Item.BoundingBox,
             @ParentLevel.CollisionIgnoreItem) then
-            Item.Position := Item.Position + Move;
+            Item.Translation := Item.Translation + Move;
         end;
       end;
     end;
@@ -1490,7 +1490,9 @@ const
 begin
   if IsPrefix(ItemPrefix, Shape.BlenderMeshName) then
   begin
-    CreateNewItem(SEnding(Shape.BlenderMeshName, Length(ItemPrefix) + 1));
+    { For MenuBackground, item models may be not loaded yet }
+    if not MenuBackground then
+      CreateNewItem(SEnding(Shape.BlenderMeshName, Length(ItemPrefix) + 1));
     { Don't remove BlenderObjectNode now --- will be removed later.
       This avoids problems with removing nodes while traversing. }
     ItemsToRemove.Add(Shape.BlenderObjectNode);
@@ -1570,7 +1572,9 @@ const
 begin
   if IsPrefix(CreaturePrefix, Shape.BlenderMeshName) then
   begin
-    CreateNewCreature(SEnding(Shape.BlenderMeshName, Length(CreaturePrefix) + 1));
+    { For MenuBackground, creature models may be not loaded yet }
+    if not MenuBackground then
+      CreateNewCreature(SEnding(Shape.BlenderMeshName, Length(CreaturePrefix) + 1));
     { Don't remove BlenderObjectNode now --- will be removed later.
       This avoids problems with removing nodes while traversing. }
     ItemsToRemove.Add(Shape.BlenderObjectNode);
