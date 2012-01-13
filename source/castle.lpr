@@ -78,7 +78,7 @@ begin
     0: begin
          InfoWrite(
            SCastleVersion +nl+
-           SCastleWWW +nl+
+           'Website: ' + CastleURL +nl+
            nl+
            'Options:' +nl+
            HelpOptionHelp +nl+

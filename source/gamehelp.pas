@@ -30,7 +30,6 @@ const
   CastleURL = 'http://castle-engine.sourceforge.net/castle.php';
 
 function SCastleVersion: string;
-function SCastleWWW: string;
 
 procedure ViewGameMessages;
 
@@ -42,11 +41,6 @@ uses SysUtils, Classes, CastleMessages, GameWindow, CastleUtils,
 function SCastleVersion: string;
 begin
   Result := ApplicationName + ' version ' + Version + '.';
-end;
-
-function SCastleWWW: string;
-begin
-  Result := 'WWW: ' + CastleURL;
 end;
 
 procedure ViewGameMessages;

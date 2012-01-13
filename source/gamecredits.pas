@@ -182,7 +182,7 @@ begin
   VRMLContents := FileToString(ProgramDataPath + 'data' + PathDelim +
     'menu_bg' + PathDelim + 'credits.wrl');
   StringReplaceAllTo1st(VRMLContents, '$SCastleVersion', SCastleVersion);
-  StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', SCastleWWW);
+  StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', 'WWW: ' + CastleURL);
   StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
   CreditsModel := TCastleScene.CreateCustomCache(nil, GLContextCache);
