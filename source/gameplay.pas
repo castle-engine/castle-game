@@ -279,7 +279,9 @@ procedure TGame2DControls.Draw;
     end;
 
     Font_BFNT_BitstreamVeraSans.Print(
-      Format('FPS : %f (real : %f)', [DisplayFpsFrameTime, DisplayFpsRealTime]));
+      Format('FPS : %f (real : %f). Shapes : %d / %d',
+        [DisplayFpsFrameTime, DisplayFpsRealTime,
+         Level.Statistics.ShapesRendered, Level.Statistics.ShapesVisible]));
   end;
 
   procedure DoShowShadowVolumesCounts;
