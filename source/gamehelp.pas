@@ -27,6 +27,7 @@ interface
 
 const
   Version = '0.9.4';
+  CastleURL = 'http://castle-engine.sourceforge.net/castle.php';
 
 function SCastleVersion: string;
 function SCastleWWW: string;
@@ -45,7 +46,7 @@ end;
 
 function SCastleWWW: string;
 begin
-  Result := 'WWW: http://castle-engine.sourceforge.net/castle.php';
+  Result := 'WWW: ' + CastleURL;
 end;
 
 procedure ViewGameMessages;

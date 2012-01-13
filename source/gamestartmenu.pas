@@ -38,11 +38,11 @@ uses SysUtils, Classes, CastleUtils, WindowModes,
   VectorMath, Images, CastleFilesUtils,
   GameLevel, GamePlay, GameSound, GamePlayer,
   GameCreatures, GameItems, GameGeneralMenu, OnScreenMenu,
-  GameControlsMenu, GameInputs, GameVideoOptions,
+  GameControlsMenu, GameInputs, GameVideoOptions, GameHelp,
   CastleStringUtils, CastleClassUtils,
   GameNotifications, GameLevelAvailable, GameBackgroundLevel,
   XmlSoundEngine, CastleSoundMenu, X3DNodes,
-  GameCredits, GLAntiAliasing, KeysMouse;
+  GameCredits, GLAntiAliasing, KeysMouse, CastleOpenDocument;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -200,6 +200,7 @@ begin
   Items.Add('Video options');
   Items.Add('Sound options');
   Items.Add('Credits');
+  Items.Add('Visit our website');
   Items.Add('Quit');
 
   Position := Vector2Integer(20, 480);
@@ -263,7 +264,8 @@ begin
     2: SetCurrentMenu(CurrentMenu, VideoMenu);
     3: SetCurrentMenu(CurrentMenu, SoundMenu);
     4: ShowCredits(BackgroundControls);
-    5: UserQuit := true;
+    5: if not OpenURL(CastleURL) then MessageOK(Window, SCannotOpenURL, taMiddle);
+    6: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
