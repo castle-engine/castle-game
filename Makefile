@@ -70,10 +70,10 @@ build:
 	@echo 'Target OS exe extension detected: "'$(EXE_EXTENSION)'"'
 	cd ../castle_game_engine/ && \
 	  fpc $(FPC_OPTIONS) $${CASTLE_FPC_OPTIONS:-} ../castle/source/castle.lpr
-	mv source/castle$(EXE_EXTENSION) ./
+	mv source/castle$(EXE_EXTENSION) .
 	cd ../castle_game_engine/ && \
 	  fpc $(FPC_OPTIONS) $${CASTLE_FPC_OPTIONS:-} ../castle/source/castle-process-3d-model.lpr
-	mv source/castle-process-3d-model$(EXE_EXTENSION) ./
+	mv source/castle-process-3d-model$(EXE_EXTENSION) .
 
 # ------------------------------------------------------------
 # Cleaning targets.
