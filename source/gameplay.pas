@@ -97,14 +97,6 @@ var
   confirmation will never be required anyway. }
 procedure GameCancel(RequireConfirmation: boolean);
 
-const
-  DefaultAutoOpenInventory = true;
-
-var
-  { Automatically open inventory on pickup ?
-    Saved/loaded to config file in this unit. }
-  AutoOpenInventory: boolean;
-
 var
   DebugRenderForLevelScreenshot: boolean = false;
   DebugTimeStopForCreatures: boolean = false;
@@ -127,7 +119,6 @@ var
   GLList_NotificationsBackground: TGLuint;
 
   GLList_InventorySlot: TGLuint;
-  InventoryVisible: boolean;
 
   DisplayFpsUpdateTick: TMilisecTime;
   DisplayFpsFrameTime: Single;
@@ -474,8 +465,6 @@ const
   GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
   GameWinDirection: TVector3Single = (0, 1, 0);
   GameWinUp: TVector3Single = (0, 0, 1);
-var
-  PickItemIndex: Integer;
 begin
   CompSpeed := Window.Fps.IdleSpeed;
 
@@ -486,18 +475,7 @@ begin
   Level.Creatures.RemoveFromLevel;
 
   if (not Player.Dead) and (not GameWin) then
-  begin
-    PickItemIndex := Level.ItemsOnLevel.PlayerCollision;
-    if PickItemIndex <> -1 then
-    begin
-      Player.PickItem(Level.ItemsOnLevel[PickItemIndex].ExtractItem);
-      Level.Items.Remove(Level.ItemsOnLevel[PickItemIndex]);
-      Level.ItemsOnLevel.Delete(PickItemIndex);
-
-      if AutoOpenInventory then
-        InventoryVisible := true;
-    end;
-  end;
+    Level.PlayerCollisions;
 
   Player.Idle(CompSpeed);
 
@@ -1218,10 +1196,4 @@ initialization
   ShowDebugInfo := false;
   Window.OnOpenList.Add(@WindowOpen);
   Window.OnCloseList.Add(@WindowClose);
-
-  AutoOpenInventory := ConfigFile.GetValue(
-    'auto_open_inventory', DefaultAutoOpenInventory);
-finalization
-  ConfigFile.SetDeleteValue('auto_open_inventory',
-    AutoOpenInventory, DefaultAutoOpenInventory);
 end.

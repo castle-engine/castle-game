@@ -81,7 +81,7 @@ implementation
 
 uses SysUtils, WindowModes, CastleGLUtils, CastleMessages, GameWindow,
   OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
-  GameInputs, KeysMouse, VectorMath, CastleUtils, GamePlay,
+  GameInputs, KeysMouse, VectorMath, CastleUtils, GamePlay, GameItems,
   GameConfig, CastleStringUtils, GameNotifications;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }

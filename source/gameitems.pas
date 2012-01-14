@@ -326,9 +326,6 @@ type
       TItemOnLevel instance is to free it ! }
     function ExtractItem: TItem;
 
-    { Tests collision of this item with Player (in @link(Player) variable). }
-    function PlayerCollision: boolean;
-
     { Render the item, on current Position with current rotation etc.
       Current matrix should be modelview, this pushes/pops matrix state
       (so it 1. needs one place on matrix stack,
@@ -349,12 +346,11 @@ type
     procedure ItemPicked(const Distance: Single);
 
     property Collides default false;
+
+    procedure PlayerCollision(var RemoveMe: TRemoveType); override;
   end;
 
   TItemOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
-    { Check collision with all items, returns index of first collider
-      (or -1 if no collision). }
-    function PlayerCollision: Integer;
   end;
 
 var
@@ -368,6 +364,16 @@ var
   RedKeyItemKind: TItemKind;
   Quiver: TItemKind;
 
+const
+  DefaultAutoOpenInventory = true;
+
+var
+  { Automatically open inventory on pickup ?
+    Saved/loaded to config file in this unit. }
+  AutoOpenInventory: boolean;
+
+  InventoryVisible: boolean;
+
 { Returns nil if not found. }
 function ItemKindWithShortName(const ShortName: string): TItemKind;
 
@@ -375,7 +381,7 @@ implementation
 
 uses SysUtils, CastleWindow, GameWindow,
   GamePlay, CastleFilesUtils, ProgressUnit,
-  GameCreatures, GameVideoOptions, GameNotifications,
+  GameCreatures, GameVideoOptions, GameNotifications, GameConfig,
   CastleSceneCore, Triangle, GLImages;
 
 { TItemKind ------------------------------------------------------------ }
@@ -813,7 +819,7 @@ begin
 
   { most item models are not 2-manifold }
   CastShadowVolumes := false;
-  
+
   Collision := ctItem;
 
   Add(Item.Kind.Scene);
@@ -834,16 +840,6 @@ function TItemOnLevel.ExtractItem: TItem;
 begin
   Result := Item;
   FItem := nil;
-end;
-
-function TItemOnLevel.PlayerCollision: boolean;
-begin
-  { I approximate both player and item as bounding boxes.
-    This works quite good, and is "precise enough" :)
-    Note: remember to change TItemOnLevelList.PlayerCollision
-    accordingly if I ever change implementation of this. }
-
-  Result := BoundingBox.Collision(Player.BoundingBox);
 end;
 
 procedure TItemOnLevel.Render(const Frustum: TFrustum;
@@ -937,25 +933,21 @@ begin
     Notifications.Show('You see some item, but it''s too far to tell exactly what it is');
 end;
 
+procedure TItemOnLevel.PlayerCollision(var RemoveMe: TRemoveType);
+begin
+  inherited;
+  Player.PickItem(ExtractItem);
+
+  Level.ItemsOnLevel.Extract(Self);
+  RemoveMe := rtRemoveAndFree;
+
+  if AutoOpenInventory then
+    InventoryVisible := true;
+end;
+
 function TItemOnLevel.GetExists: boolean;
 begin
   Result := (inherited GetExists) and (not DebugRenderForLevelScreenshot);
-end;
-
-{ TItemOnLevelList -------------------------------------------------- }
-
-function TItemOnLevelList.PlayerCollision: Integer;
-var
-  PlayerBoundingBox: TBox3D;
-begin
-  { Instead of just calling TItemOnLevel.PlayerCollision,
-    this is optimized a little: it calculates Player.BoundingBox
-    only once. }
-  PlayerBoundingBox := Player.BoundingBox;
-  for Result := 0 to Count - 1 do
-    if Items[Result].BoundingBox.Collision(PlayerBoundingBox) then
-      Exit;
-  Result := -1;
 end;
 
 { other global stuff --------------------------------------------------- }
@@ -1018,6 +1010,10 @@ end;
 
 initialization
   DoInitialization;
+  AutoOpenInventory := ConfigFile.GetValue(
+    'auto_open_inventory', DefaultAutoOpenInventory);
 finalization
   DoFinalization;
+  ConfigFile.SetDeleteValue('auto_open_inventory',
+    AutoOpenInventory, DefaultAutoOpenInventory);
 end.
