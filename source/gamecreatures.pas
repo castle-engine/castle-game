@@ -949,10 +949,6 @@ type
   end;
 
   TCreatureList = class(specialize TFPGObjectList<TCreature>)
-    procedure Render(const Frustum: TFrustum;
-      const Params: TRenderParams);
-    procedure Idle(const CompSpeed: Single);
-
     { Remove from this list all creatures that return
       RemoveMeFromLevel = @true. }
     procedure RemoveFromLevel;
@@ -2348,23 +2344,6 @@ begin
 end;
 
 { TCreatureList -------------------------------------------------------------- }
-
-procedure TCreatureList.Render(const Frustum: TFrustum;
-  const Params: TRenderParams);
-var
-  I: Integer;
-begin
-  for I := 0 to Count - 1 do
-    Items[I].Render(Frustum, Params);
-end;
-
-procedure TCreatureList.Idle(const CompSpeed: Single);
-var
-  I: Integer;
-begin
-  for I := 0 to Count - 1 do
-    Items[I].Idle(CompSpeed);
-end;
 
 procedure TCreatureList.RemoveFromLevel;
 var

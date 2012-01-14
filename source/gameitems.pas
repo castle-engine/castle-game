@@ -352,11 +352,6 @@ type
   end;
 
   TItemOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
-    { Call Render for all items. }
-    procedure Render(const Frustum: TFrustum;
-      const Params: TRenderParams);
-    { Call Idle for all items. }
-    procedure Idle(const CompSpeed: Single);
     { Check collision with all items, returns index of first collider
       (or -1 if no collision). }
     function PlayerCollision: Integer;
@@ -946,23 +941,6 @@ begin
 end;
 
 { TItemOnLevelList -------------------------------------------------- }
-
-procedure TItemOnLevelList.Render(const Frustum: TFrustum;
-  const Params: TRenderParams);
-var
-  I: Integer;
-begin
-  for I := 0 to Count - 1 do
-    Items[I].Render(Frustum, Params);
-end;
-
-procedure TItemOnLevelList.Idle(const CompSpeed: Single);
-var
-  I: Integer;
-begin
-  for I := 0 to Count - 1 do
-    Items[I].Idle(CompSpeed);
-end;
 
 function TItemOnLevelList.PlayerCollision: Integer;
 var
