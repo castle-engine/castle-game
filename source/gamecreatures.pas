@@ -1756,6 +1756,8 @@ begin
     In the future, we should just switch to use T3D and scene manager methods. }
   Collides := false;
 
+  Collision := ctCreature;
+
   { This is only needed if you used --debug-no-creatures or forgot
     to add creature to <required_resources> }
   RequireCreature(BaseLights, Kind);

@@ -847,7 +847,7 @@ begin
   SpidersAppearing := T3DList.Create(Self);
   Items.Add(SpidersAppearing);
   NextSpidersAppearingTime := 0;
-  
+
   { TODO: this is not nice; I should add TLevelObject.Name for such
     purposes, and use here Items.FindName('hint_button_box'). }
   HintOpenDoor := Items.List[1] as TLevelHintArea;
@@ -1088,19 +1088,13 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
     if Result then
       Exit;
 
-    for I := 0 to ParentLevel.Creatures.Count - 1 do
-    begin
-      Result := DoorBox.Collision(ParentLevel.Creatures[I].BoundingBox);
-      if Result then
-        Exit;
-    end;
-
-    for I := 0 to ParentLevel.ItemsOnLevel.Count - 1 do
-    begin
-      Result := DoorBox.Collision(ParentLevel.ItemsOnLevel[I].BoundingBox);
-      if Result then
-        Exit;
-    end;
+    for I := 0 to ParentLevel.Items.List.Count - 1 do
+      if ParentLevel.Items.List[I].Collision in [ctItem, ctCreature] then
+      begin
+        Result := DoorBox.Collision(ParentLevel.Items.List[I].BoundingBox);
+        if Result then
+          Exit;
+      end;
   end;
 
 begin
