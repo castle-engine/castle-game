@@ -663,7 +663,7 @@ type
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
 
-  TCreature = class(T3D)
+  TCreature = class(T3DCustomTransform)
   private
     FKind: TCreatureKind;
     FLegsPosition: TVector3Single;
@@ -700,14 +700,13 @@ type
   protected
     function GetExists: boolean; override;
 
-    { Return matrix that takes into account current LegsPosition and Direction.
-      Multiply CurrentScene geometry by this matrix to get current geometry. }
-    function SceneTransform: TMatrix4Single;
-
-    { Like SceneTransform, but assumes that LegsPosition and Direction
+    { Like TransformMatricesMult, but assumes that LegsPosition and Direction
       is as specified. }
-    function SceneTransformAssuming(
-      const AssumeLegsPosition, AssumeDirection: TVector3Single): TMatrix4Single;
+    procedure TransformAssuming(
+      const AssumeLegsPosition, AssumeDirection: TVector3Single;
+      out M, MInverse: TMatrix4Single);
+    procedure TransformMatricesMult(var M, MInverse: TMatrix4Single); override;
+    function OnlyTranslation: boolean; override;
 
     { These define exactly what "MiddlePosition" means for this creature.
 
@@ -810,15 +809,6 @@ type
 
     procedure Render(const Frustum: TFrustum;
       const Params: TRenderParams); override;
-
-    { Render shadow volumes for all the thinds rendered by @link(Render).
-      It renders shadow volume only if Kind.CastsShadow and
-      shadow volume is not culled (so ShadowVolumeRenderer should
-      have FrustumCullingInit already initialized). }
-    procedure RenderShadowVolume(
-      ShadowVolumeRenderer: TBaseShadowVolumeRenderer;
-      const ParentTransformIsIdentity: boolean;
-      const ParentTransform: TMatrix4Single); override;
 
     procedure Idle(const CompSpeed: Single); override;
 
@@ -1882,16 +1872,19 @@ begin
   Result := MiddlePositionFromLegs(LegsPosition);
 end;
 
-function TCreature.SceneTransformAssuming(
-  const AssumeLegsPosition, AssumeDirection: TVector3Single): TMatrix4Single;
+procedure TCreature.TransformAssuming(
+  const AssumeLegsPosition, AssumeDirection: TVector3Single;
+  out M, MInverse: TMatrix4Single);
 var
-  GoodUp: TVector3Single;
+  GoodUp, Side: TVector3Single;
 begin
   GoodUp := UnitVector3Single[2];
   { If not Flying, then we know that GoodUp is already
     orthogonal to AssumeDirection. }
   if Kind.Flying then
     MakeVectorsOrthoOnTheirPlane(GoodUp, AssumeDirection);
+
+  Side := VectorProduct(GoodUp, AssumeDirection);
 
   { Note that actually I could do here TransformToCoordsNoScaleMatrix,
     as obviously I don't want any scaling. But in this case I know
@@ -1900,20 +1893,33 @@ begin
     TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
     on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
 
-  Result := TransformToCoordsMatrix(AssumeLegsPosition,
-    AssumeDirection, VectorProduct(GoodUp, AssumeDirection), GoodUp);
+  M := TransformToCoordsMatrix(AssumeLegsPosition,
+    AssumeDirection, Side, GoodUp);
+  MInverse := TransformFromCoordsMatrix(AssumeLegsPosition,
+    AssumeDirection, Side, GoodUp);
 end;
 
-function TCreature.SceneTransform: TMatrix4Single;
+procedure TCreature.TransformMatricesMult(var M, MInverse: TMatrix4Single);
+var
+  NewM, NewMInverse: TMatrix4Single;
 begin
-  Result := SceneTransformAssuming(LegsPosition, Direction);
+  TransformAssuming(LegsPosition, Direction, NewM, NewMInverse);
+  M := M * NewM;
+  MInverse := NewMInverse * MInverse;
+end;
+
+function TCreature.OnlyTranslation: boolean;
+begin
+  Result := false;
 end;
 
 function TCreature.BoundingBoxAssumingLegs(
   const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3D;
+var
+  M, MInverse: TMatrix4Single;
 begin
-  Result := CurrentScene.BoundingBox.Transform(
-    SceneTransformAssuming(AssumeLegsPosition, AssumeDirection));
+  TransformAssuming(AssumeLegsPosition, AssumeDirection, M, MInverse);
+  Result := CurrentScene.BoundingBox.Transform(M);
 end;
 
 function TCreature.BoundingBoxAssumingMiddle(
@@ -1986,15 +1992,23 @@ procedure TCreature.Render(const Frustum: TFrustum;
   end;
 
 begin
+  { self-shadows on creatures look bad, esp. see werewolves at the end
+    of "castle hall" level. Changing XxxShadowVolumes here
+    is a little hacky (would be cleaner to do it at loading), but easy. }
+  CurrentScene.ReceiveShadowVolumes := false;
+  CurrentScene.CastShadowVolumes := Kind.CastShadowVolumes;
+
+  { Make sure our List contains exactly CurrentScene }
+  if List.Count = 1 then
+    List[0] := CurrentScene else
+    Add(CurrentScene);
+
+  inherited;
+
   if GetExists and Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
   begin
     glPushMatrix;
-      glMultMatrix(SceneTransform);
-      { self-shadows on creatures look bad, esp. see werewolves at the end
-        of "castle hall" level. Changing ReceiveShadowVolumes to false
-        here is a little hacky (would be cleaner to do it at loading), but easy. }
-      CurrentScene.ReceiveShadowVolumes := false;
-      CurrentScene.Render(nil, Params);
+      glMultMatrix(Transform);
       if RenderDebugCaptions and
          (not Params.Transparent) and Params.ShadowVolumesReceivers then
         DoRenderDebugCaptions;
@@ -2010,16 +2024,6 @@ function TCreature.DebugCaption: string;
 begin
   Result := Format('%s [%s / %s]',
     [Kind.ShortName, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
-end;
-
-procedure TCreature.RenderShadowVolume(
-  ShadowVolumeRenderer: TBaseShadowVolumeRenderer;
-  const ParentTransformIsIdentity: boolean;
-  const ParentTransform: TMatrix4Single);
-begin
-  if GetExists and Kind.CastShadowVolumes then
-    CurrentScene.RenderShadowVolume(ShadowVolumeRenderer,
-      false, SceneTransform * ParentTransform);
 end;
 
 function TCreature.MiddleCollisionWithPlayer(
