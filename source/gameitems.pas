@@ -343,7 +343,7 @@ type
       This will do some GameMessage describing the item
       (may depend on Distance --- when it's too far, player may not
       be able to exactly tell what the item is). }
-    procedure ItemPicked(const Distance: Single);
+    procedure Picked(const Distance: Single);
 
     property Collides default false;
 
@@ -921,7 +921,7 @@ begin
   end;
 end;
 
-procedure TItemOnLevel.ItemPicked(const Distance: Single);
+procedure TItemOnLevel.Picked(const Distance: Single);
 const
   VisibleItemDistance = 60.0;
 var

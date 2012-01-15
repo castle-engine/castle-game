@@ -110,7 +110,7 @@ uses Math, SysUtils, CastleUtils, CastleWindow,
   BFNT_BitstreamVeraSans_Unit, UIControls,
   GameItems, RaysWindow, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
-  GameVideoOptions, GameConfig,
+  GameVideoOptions, GameConfig, GameCreatures,
   GameNotifications, GameControlsMenu,
   GameLevelSpecific, CastleScene, GameLevelAvailable,
   CastleTimeUtils, GLImages, KeysMouse;
@@ -584,7 +584,12 @@ procedure DoInteract;
     begin
       if CollisionInfo.Hierarchy.Last is TItemOnLevel then
       begin
-        TItemOnLevel(CollisionInfo.Hierarchy.Last).ItemPicked(IntersectionDistance);
+        TItemOnLevel(CollisionInfo.Hierarchy.Last).Picked(IntersectionDistance);
+        Result := true;
+      end else
+      if CollisionInfo.Hierarchy.Last is TCreature then
+      begin
+        TCreature(CollisionInfo.Hierarchy.Last).Picked(IntersectionDistance);
         Result := true;
       end else
         Level.Picked(IntersectionDistance, CollisionInfo, Result);

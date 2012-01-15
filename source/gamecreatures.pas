@@ -936,6 +936,13 @@ type
       creatures would unnecessarily force the sphere radius to be small
       and MiddlePosition to be high. }
     function UseBoundingSphere: boolean; virtual;
+
+    function RayCollision(
+      out IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single;
+      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision; override;
+
+    procedure Picked(const Distance: Single);
   end;
 
   TCreatureList = class(specialize TFPGObjectList<TCreature>)
@@ -2347,6 +2354,53 @@ end;
 function TCreature.UseBoundingSphere: boolean;
 begin
   Result := not Dead;
+end;
+
+function TCreature.RayCollision(
+  out IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single;
+  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision;
+var
+  Intersection: TVector3Single;
+begin
+  { Overridden, for two reasons:
+    - Ignore T3D.Collides value (items right now have Collides=false,
+      but we want them to be pickable). TODO: unclean.
+    - Resolve collision by looking at bounding box.
+      No need to look at actual scene geometry, no need for octree inside scene. }
+
+  if GetExists and BoundingBox.TryRayClosestIntersection(
+    Intersection, IntersectionDistance, Ray0, RayVector) then
+  begin
+    Result := T3DCollision.Create;
+    Result.Triangle := nil;
+    Result.Point := Intersection;
+    Result.Hierarchy.Add(Self);
+  end else
+    Result := nil;
+end;
+
+procedure TCreature.Picked(const Distance: Single);
+const
+  VisibleItemDistance = 60.0;
+var
+  S: string;
+begin
+  if Distance <= VisibleItemDistance then
+  begin
+    S := Format('You see a creature "%s"', [Kind.ShortName]);
+
+    if Life >= MaxLife then
+      S += ' (not wounded)' else
+    if Life >= MaxLife / 3 then
+      S += ' (wounded)' else
+    if Life > 0 then
+      S += ' (very wounded)' else
+      S += ' (dead)';
+
+    Notifications.Show(S);
+  end else
+    Notifications.Show('You see some creature, but it''s too far to tell exactly what it is');
 end;
 
 { TCreatureList -------------------------------------------------------------- }
