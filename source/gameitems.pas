@@ -961,11 +961,8 @@ function TItemOnLevel.RayCollision(
 var
   Intersection: TVector3Single;
 begin
-  { Overridden, for two reasons:
-    - Ignore T3D.Collides value (items right now have Collides=false,
-      but we want them to be pickable). TODO: unclean.
-    - Resolve collision by looking at bounding box.
-      No need to look at actual scene geometry, no need for octree inside scene. }
+  { Overridden, to resolve collision by looking at bounding box.
+    No need to look at actual scene geometry, no need for octree inside scene. }
 
   if GetExists and BoundingBox.TryRayClosestIntersection(
     Intersection, IntersectionDistance, Ray0, RayVector) then
