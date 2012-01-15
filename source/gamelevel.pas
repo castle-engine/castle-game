@@ -579,14 +579,6 @@ type
       This is updated in our Idle. }
     property AnimationTime: TFloatTime read FAnimationTime;
 
-    { Tests for collisions with level @link(Items).
-
-      Ray0 and RayVector describe picking
-      ray, RayVector is always normalized (i.e. has length 1).
-      If there was a pick: set IntersectionDistance. }
-    function TryPick(out IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single): T3DCollision;
-
     { Called when level was picked.
 
       Set InteractionOccurred to true (it will be false on enter)
@@ -1694,31 +1686,6 @@ begin
 
   if (not Paused) and (ThunderEffect <> nil) then
     ThunderEffect.Idle;
-end;
-
-{ $define DEBUG_PICK}
-
-function TLevel.TryPick(out IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single): T3DCollision;
-{$ifdef DEBUG_PICK}
-var
-  S: string;
-  I: Integer;
-{$endif DEBUG_PICK}
-begin
-  Result := Items.RayCollision(IntersectionDistance, Ray0, RayVector, nil);
-
-  {$ifdef DEBUG_PICK}
-  if Result <> nil then
-  begin
-    S := 'TLevel.TryPick: [';
-    for I := 0 to Result.Hierarchy.Count - 1 do
-      S += Result.Hierarchy[I].ClassName + ' ';
-    S += Format('], distance %f',
-      [IntersectionDistance]);
-    Notification(S);
-  end;
-  {$endif DEBUG_PICK}
 end;
 
 procedure TLevel.Picked(const Distance: Single;

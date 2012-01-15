@@ -348,6 +348,10 @@ type
     property Collides default false;
 
     procedure PlayerCollision(var RemoveMe: TRemoveType); override;
+
+    function RayCollision(out IntersectionDistance: Single;
+      const Ray0, RayVector: TVector3Single;
+      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision; override;
   end;
 
   TItemOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
@@ -948,6 +952,30 @@ end;
 function TItemOnLevel.GetExists: boolean;
 begin
   Result := (inherited GetExists) and (not DebugRenderForLevelScreenshot);
+end;
+
+function TItemOnLevel.RayCollision(
+  out IntersectionDistance: Single;
+  const Ray0, RayVector: TVector3Single;
+  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision;
+var
+  Intersection: TVector3Single;
+begin
+  { Overridden, for two reasons:
+    - Ignore T3D.Collides value (items right now have Collides=false,
+      but we want them to be pickable). TODO: unclean.
+    - Resolve collision by looking at bounding box.
+      No need to look at actual scene geometry, no need for octree inside scene. }
+
+  if GetExists and BoundingBox.TryRayClosestIntersection(
+    Intersection, IntersectionDistance, Ray0, RayVector) then
+  begin
+    Result := T3DCollision.Create;
+    Result.Triangle := nil;
+    Result.Point := Intersection;
+    Result.Hierarchy.Add(Self);
+  end else
+    Result := nil;
 end;
 
 { other global stuff --------------------------------------------------- }

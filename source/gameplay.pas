@@ -567,72 +567,29 @@ end;
 procedure DoInteract;
 
   function TryInteract(RayVector: TVector3Single): boolean;
-  type
-    { TODO: This will be expanded with at least poEnemy in the future. }
-    TPickedObjectType = (poNone, poLevel, poItem);
   var
-    Ray0: TVector3Single;
-    ItemCollisionIndex, I: integer;
-    IntersectionDistance, ThisIntersectionDistance: Single;
-    PickedObjectType: TPickedObjectType;
-    LevelCollisionInfo: T3DCollision;
+    IntersectionDistance: Single;
+    CollisionInfo: T3DCollision;
   begin
-    Ray0 := Player.Camera.Position;
-
     { Picking is not an often called procedure, so I can freely normalize
       here to get exact distance to picked object in IntersectionDistance. }
     NormalizeTo1st(RayVector);
 
-    IntersectionDistance := MaxSingle;
-    PickedObjectType := poNone;
+    CollisionInfo := Level.Items.RayCollision(
+      IntersectionDistance, Player.Camera.Position, RayVector, nil);
 
-    { Now start picking, by doing various tests for collisions with ray
-      (Ray0, RayVector). The pick that has smallest IntersectionDistance
-      "wins". }
+    Result := false;
 
-    { Collision with Level }
-    LevelCollisionInfo := Level.TryPick(
-      ThisIntersectionDistance, Ray0, RayVector);
-    if (LevelCollisionInfo <> nil) and
-       ( (PickedObjectType = poNone) or
-         (ThisIntersectionDistance < IntersectionDistance) ) then
+    if CollisionInfo <> nil then
     begin
-      PickedObjectType := poLevel;
-      IntersectionDistance := ThisIntersectionDistance;
-    end;
-
-    { Collision with Level.ItemsOnLevel }
-    for I := 0 to Level.ItemsOnLevel.Count - 1 do
-      if Level.ItemsOnLevel[I].BoundingBox.TryRayClosestIntersection(
-        ThisIntersectionDistance, Ray0, RayVector) and
-         ( (PickedObjectType = poNone) or
-           (ThisIntersectionDistance < IntersectionDistance)
-         ) then
+      if CollisionInfo.Hierarchy.Last is TItemOnLevel then
       begin
-        ItemCollisionIndex := I;
-        PickedObjectType := poItem;
-        IntersectionDistance := ThisIntersectionDistance;
-      end;
-
-    { End. Now call appropriate picked notifier. }
-    case PickedObjectType of
-      poLevel:
-        begin
-          Result := false;
-          Level.Picked(IntersectionDistance,
-            LevelCollisionInfo, Result);
-        end;
-      poItem:
-        begin
-          Level.ItemsOnLevel[ItemCollisionIndex].ItemPicked(IntersectionDistance);
-          Result := true;
-        end;
-      else
-        Result := false;
+        TItemOnLevel(CollisionInfo.Hierarchy.Last).ItemPicked(IntersectionDistance);
+        Result := true;
+      end else
+        Level.Picked(IntersectionDistance, CollisionInfo, Result);
+      FreeAndNil(CollisionInfo);
     end;
-
-    { No matter what happened, remember to always free LevelCollisionInfo }
-    FreeAndNil(LevelCollisionInfo);
   end;
 
   function TryInteractAround(const XChange, YChange: Integer): boolean;
