@@ -1318,7 +1318,7 @@ begin
     }
   end;
 
-  MainScene.Input_PointingDeviceActivate := CastleInput_Interact.Shortcut;
+  Input_PointingDeviceActivate := CastleInput_Interact.Shortcut;
   MainScene.ProcessEvents := true;
 end;
 
@@ -1722,7 +1722,6 @@ begin
 
   Result.FreeResources([frTextureDataInNodes]);
 
-  Result.Input_PointingDeviceActivate := CastleInput_Interact.Shortcut;
   Result.ProcessEvents := true;
 end;
 
