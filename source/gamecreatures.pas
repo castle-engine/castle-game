@@ -2001,7 +2001,7 @@ begin
   CurrentScene.CastShadowVolumes := Kind.CastShadowVolumes;
 
   { Make sure our List contains exactly CurrentScene }
-  if List.Count = 1 then
+  if Count = 1 then
     List[0] := CurrentScene else
     Add(CurrentScene);
 

@@ -1443,10 +1443,10 @@ procedure TLevel.ChangeLevelScene;
 var
   I: Integer;
 begin
-  for I := 0 to Items.List.Count - 1 do
+  for I := 0 to Items.Count - 1 do
   begin
-    if Items.List[I] is TLevelArea then
-      TLevelArea(Items.List[I]).ChangeLevelScene(Self);
+    if Items[I] is TLevelArea then
+      TLevelArea(Items[I]).ChangeLevelScene(Self);
   end;
 end;
 
@@ -1924,9 +1924,9 @@ begin
   PlayerBoundingBox := Player.BoundingBox;
 
   I := 0;
-  while I < Items.List.Count do
+  while I < Items.Count do
   begin
-    Item := Items.List[I];
+    Item := Items[I];
     if (Item.Collision = ctItem) and
         Item.BoundingBox.Collision(PlayerBoundingBox) then
     begin

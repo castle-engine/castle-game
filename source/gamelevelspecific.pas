@@ -850,7 +850,7 @@ begin
 
   { TODO: this is not nice; I should add TLevelObject.Name for such
     purposes, and use here Items.FindName('hint_button_box'). }
-  HintOpenDoor := Items.List[1] as TLevelHintArea;
+  HintOpenDoor := Items[1] as TLevelHintArea;
 
   FEndSequence := LoadLevelScene(
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
@@ -985,9 +985,9 @@ begin
     IsAbove := false;
     AboveHeight := MaxSingle;
     AboveGround := nil;
-    while I < SpidersAppearing.List.Count do
+    while I < SpidersAppearing.Count do
     begin
-      SA := SpidersAppearing.List[I] as TSpiderAppearing;
+      SA := SpidersAppearing[I] as TSpiderAppearing;
       SpiderPosition := SA.Translation;
       GetHeightAbove(SpiderPosition, IsAbove, AboveHeight, AboveGround);
       if AboveHeight < Spider.CameraRadius * 2 then
@@ -1088,10 +1088,10 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
     if Result then
       Exit;
 
-    for I := 0 to ParentLevel.Items.List.Count - 1 do
-      if ParentLevel.Items.List[I].Collision in [ctItem, ctCreature] then
+    for I := 0 to ParentLevel.Items.Count - 1 do
+      if ParentLevel.Items[I].Collision in [ctItem, ctCreature] then
       begin
-        Result := DoorBox.Collision(ParentLevel.Items.List[I].BoundingBox);
+        Result := DoorBox.Collision(ParentLevel.Items[I].BoundingBox);
         if Result then
           Exit;
       end;
