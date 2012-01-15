@@ -89,14 +89,14 @@ Transform {
 
 Inline { url "fountain.wrl" }
 
-# This is just to test that VRML events, touch sensors, KambiScript work
+# This is just to test that VRML/X3D events, touch sensors, CastleScript work
 # fine now inside castle level.
 # Transform {
 #   rotation 1 0 0 1.5707963705062866
 #   translation -3 0 10
 #   scale 0.5 0.5 0.5
 #   children [
-#     Inline { url "../../../../demo_models/x3d/touch_sensor_tests.x3dv" }
+#     Inline { url "../../../../demo_models/sensors_pointing_device/touch_sensor_tests.x3dv" }
 #     Inline { url "../../../../demo_models/castle_script/particles.x3dv" }
 #   ]
 # }
