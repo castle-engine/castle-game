@@ -303,7 +303,9 @@ Cages level:
 
 - chooseNewLevel menu: display thumbnails of levels
 
-- when player walks, his weapon should slowly move
+- when player walks, his weapon should slowly move.
+  Careful of motion sickness: it seems, we should either to head bobbing,
+  or weapon swaying, never both!
 
 - mouse smoothing for mouse look ?
   Seems not needed, at least with my mouse ?
