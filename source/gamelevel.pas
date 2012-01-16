@@ -54,6 +54,9 @@ const
 type
   TLevel = class;
 
+  TCastleSceneClass = class of TCastleScene;
+  TCastlePrecalculatedAnimationClass = class of TCastlePrecalculatedAnimation;
+
   { See T3DCustomTransform.
 
     Note that if Translation actually changes over time then
@@ -406,10 +409,6 @@ type
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
 
-    { Instance of boss creature, if any, on the level. @nil if no boss creature
-      exists on this level. }
-    property BossCreature: TCreature read FBossCreature;
-
     { See [http://castle-engine.sourceforge.net/castle-development.php]
       for description of CameraBox and WaterBox trick.
       Remember that this may change MainScene.BoundingBox (in case we will
@@ -444,11 +443,12 @@ type
     function LoadLevelAnimation(
       const FileName: string;
       CreateFirstOctreeCollisions,
+      CreateLastOctreeCollisions: boolean;
+      const AnimationClass: TCastlePrecalculatedAnimationClass): TCastlePrecalculatedAnimation;
+    function LoadLevelAnimation(
+      const FileName: string;
+      CreateFirstOctreeCollisions,
       CreateLastOctreeCollisions: boolean): TCastlePrecalculatedAnimation;
-
-    { See @link(Picked), you can call this from
-      overriden implementations of these. }
-    procedure NotificationInteractFailed(const S: string);
 
     procedure RenderFromViewEverything; override;
     procedure InitializeLights(const Lights: TLightInstancesList); override;
@@ -690,6 +690,9 @@ type
         @item FreeExternalResources, since they will not be needed anymore
       ) }
     function LoadLevelScene(const FileName: string;
+      CreateOctreeCollisions, PrepareBackground: boolean;
+      const SceneClass: TCastleSceneClass): TCastleScene;
+    function LoadLevelScene(const FileName: string;
       CreateOctreeCollisions, PrepareBackground: boolean): TCastleScene;
 
     procedure BeforeDraw; override;
@@ -724,6 +727,10 @@ type
       It happens only for alive players moving in normal mode (not in preprogrammed
       mode, like when GameWin sequence is happening).  }
     procedure PlayerCollisions;
+
+    { Instance of boss creature, if any, on the level. @nil if no boss creature
+      exists on this level. }
+    property BossCreature: TCreature read FBossCreature;
   end;
 
   TLevelClass = class of TLevel;
@@ -1700,11 +1707,12 @@ begin
 end;
 
 function TLevel.LoadLevelScene(const FileName: string;
-  CreateOctreeCollisions, PrepareBackground: boolean): TCastleScene;
+  CreateOctreeCollisions, PrepareBackground: boolean;
+  const SceneClass: TCastleSceneClass): TCastleScene;
 var
   Options: TPrepareResourcesOptions;
 begin
-  Result := TCastleScene.CreateCustomCache(Self, GLContextCache);
+  Result := SceneClass.CreateCustomCache(Self, GLContextCache);
   Result.Load(FileName);
   AttributesSet(Result.Attributes, btIncrease);
 
@@ -1725,14 +1733,22 @@ begin
   Result.ProcessEvents := true;
 end;
 
+function TLevel.LoadLevelScene(const FileName: string;
+  CreateOctreeCollisions, PrepareBackground: boolean): TCastleScene;
+begin
+  Result := LoadLevelScene(FileName, CreateOctreeCollisions, PrepareBackground,
+    TCastleScene);
+end;
+
 function TLevel.LoadLevelAnimation(
   const FileName: string;
   CreateFirstOctreeCollisions,
-  CreateLastOctreeCollisions: boolean): TCastlePrecalculatedAnimation;
+  CreateLastOctreeCollisions: boolean;
+  const AnimationClass: TCastlePrecalculatedAnimationClass): TCastlePrecalculatedAnimation;
 var
   Options: TPrepareResourcesOptions;
 begin
-  Result := TCastlePrecalculatedAnimation.CreateCustomCache(Self, GLContextCache);
+  Result := AnimationClass.CreateCustomCache(Self, GLContextCache);
   Result.LoadFromFile(FileName, false, true);
 
   AnimationAttributesSet(Result.Attributes, btIncrease);
@@ -1755,10 +1771,14 @@ begin
   Result.TimePlaying := false;
 end;
 
-procedure TLevel.NotificationInteractFailed(const S: string);
+function TLevel.LoadLevelAnimation(
+  const FileName: string;
+  CreateFirstOctreeCollisions,
+  CreateLastOctreeCollisions: boolean): TCastlePrecalculatedAnimation;
 begin
-  Notifications.Show(S);
-  SoundEngine.Sound(stPlayerInteractFailed);
+  Result := LoadLevelAnimation(FileName,
+    CreateFirstOctreeCollisions, CreateLastOctreeCollisions,
+    TCastlePrecalculatedAnimation);
 end;
 
 function TLevel.BossCreatureIndicator(out Life, MaxLife: Single): boolean;

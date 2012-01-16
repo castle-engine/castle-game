@@ -62,10 +62,6 @@ type
       const HandleMouseAndKeys: boolean;
       var LetOthersHandleMouseAndKeys: boolean); override;
 
-    procedure Picked(const Distance: Single;
-      CollisionInfo: TRayCollision;
-      var InteractionOccurred: boolean); override;
-
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
     function BossCreatureIndicator(out Life, MaxLife: Single): boolean; override;
@@ -123,10 +119,6 @@ type
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
       AMenuBackground: boolean); override;
-
-    procedure Picked(const Distance: Single;
-      CollisionInfo: TRayCollision;
-      var InteractionOccurred: boolean); override;
   end;
 
   TSpiderAppearing = class(T3DTransform)
@@ -166,10 +158,6 @@ type
       and EndSequence will be rendered. }
     property DoEndSequence: boolean
       read FDoEndSequence write SetDoEndSequence default false;
-
-    procedure Picked(const Distance: Single;
-      CollisionInfo: TRayCollision;
-      var InteractionOccurred: boolean); override;
 
     function Background: TBackground; override;
   end;
@@ -270,6 +258,55 @@ begin
   Result := ProgramDataPath + 'data' + PathDelim + 'levels' + PathDelim;
 end;
 
+procedure NotificationInteractFailed(const S: string);
+begin
+  Notifications.Show(S);
+  SoundEngine.Sound(stPlayerInteractFailed);
+end;
+
+{ TStairsBlocker ------------------------------------------------------------- }
+
+type
+  TStairsBlocker = class(TCastleScene)
+    function PointingDeviceActivate(const Active: boolean;
+      const Distance: Single): boolean; override;
+  end;
+
+function TStairsBlocker.PointingDeviceActivate(const Active: boolean;
+  const Distance: Single): boolean;
+begin
+  Result := Active;
+  if not Result then Exit;
+
+  NotificationInteractFailed('You are not able to open it');
+end;
+
+{ TCastleHallButton ---------------------------------------------------------- }
+
+type
+  TCastleHallButton = class(TCastlePrecalculatedAnimation)
+    function PointingDeviceActivate(const Active: boolean;
+      const Distance: Single): boolean; override;
+  end;
+
+function TCastleHallButton.PointingDeviceActivate(const Active: boolean;
+  const Distance: Single): boolean;
+begin
+  Result := Active;
+  if not Result then Exit;
+
+  if Distance < 10.0 then
+  begin
+    if TimePlaying then
+      NotificationInteractFailed('Button is already pressed') else
+    begin
+      TimePlaying := true;
+      Notifications.Show('You press the button');
+    end;
+  end else
+    NotificationInteractFailed('You see a button. You cannot reach it from here');
+end;
+
 { TCastleHallLevel ----------------------------------------------------------- }
 
 constructor TCastleHallLevel.Create(
@@ -290,12 +327,13 @@ begin
   Symbol.CastShadowVolumes := false; { shadow would not be visible anyway }
   Items.Add(Symbol);
 
-  Button := LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false);
+  Button := LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false,
+    TCastleHallButton);
   Button.CastShadowVolumes := false; { strange ghost shadow on symbol would be visible }
   Items.Add(Button);
 
   StairsBlocker := LoadLevelScene(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl',
-    true { create octrees }, false);
+    true { create octrees }, false, TStairsBlocker);
   StairsBlocker.CastShadowVolumes := false; { shadow would not be visible anyway }
   Items.Add(StairsBlocker);
 
@@ -462,33 +500,6 @@ begin
     WerewolfShowLights;
     if WerewolfAliveCount = 0 then
       DestroyStairsBlocker;
-  end;
-end;
-
-procedure TCastleHallLevel.Picked(const Distance: Single;
-  CollisionInfo: TRayCollision;
-  var InteractionOccurred: boolean);
-begin
-  inherited;
-
-  if CollisionInfo.IndexOfItem(StairsBlocker) <> -1 then
-  begin
-    InteractionOccurred := true;
-    NotificationInteractFailed('You are not able to open it');
-  end else
-  if CollisionInfo.IndexOfItem(Button) <> -1 then
-  begin
-    InteractionOccurred := true;
-    if Distance < 10.0 then
-    begin
-      if Button.TimePlaying then
-        NotificationInteractFailed('Button is already pressed') else
-      begin
-        Button.TimePlaying := true;
-        Notifications.Show('You press the button');
-      end;
-    end else
-      NotificationInteractFailed('You see a button. You cannot reach it from here');
   end;
 end;
 
@@ -746,6 +757,31 @@ begin
     (PTriangle(Triangle)^.State.LastNodes.Material.NodeName = 'MatWater');
 end;
 
+{ TTowerElevatorButton ------------------------------------------------------- }
+
+type
+  TTowerElevatorButton = class(TCastlePrecalculatedAnimation)
+    function PointingDeviceActivate(const Active: boolean;
+      const Distance: Single): boolean; override;
+  end;
+
+function TTowerElevatorButton.PointingDeviceActivate(const Active: boolean;
+  const Distance: Single): boolean;
+begin
+  Result := Active;
+  if not Result then Exit;
+
+  if Distance > 10 then
+    NotificationInteractFailed(
+      'You see a button. You''re too far to reach it from here') else
+  begin
+    { play from the beginning }
+    ResetTimeAtLoad;
+    TimePlaying := true;
+    TTowerLevel(Level).MovingElevator.GoOtherPosition;
+  end;
+end;
+
 { TTowerLevel ---------------------------------------------------------------- }
 
 constructor TTowerLevel.Create(
@@ -764,7 +800,8 @@ begin
 
   Elevator := LoadLevelScene(TowerLevelPath + 'elevator.wrl', true, false);
 
-  ElevatorButton := LoadLevelAnimation(TowerLevelPath + 'elevator_button.kanim', true, false);
+  ElevatorButton := LoadLevelAnimation(TowerLevelPath + 'elevator_button.kanim', true, false,
+    TTowerElevatorButton);
 
   MovingElevator := TLevelLinearMovingObject.Create(Self);
   MovingElevator.Add(Elevator);
@@ -780,27 +817,6 @@ begin
     and elevator triggers artifacts because of BorderEdges. }
   MovingElevator.CastShadowVolumes := false;
   Items.Add(MovingElevator);
-end;
-
-procedure TTowerLevel.Picked(const Distance: Single;
-  CollisionInfo: TRayCollision;
-  var InteractionOccurred: boolean);
-begin
-  inherited;
-
-  if CollisionInfo.IndexOfItem(ElevatorButton) <> -1 then
-  begin
-    InteractionOccurred := true;
-    if Distance > 10 then
-      NotificationInteractFailed(
-        'You see a button. You''re too far to reach it from here') else
-    begin
-      { play from the beginning }
-      ElevatorButton.ResetTimeAtLoad;
-      ElevatorButton.TimePlaying := true;
-      MovingElevator.GoOtherPosition;
-    end;
-  end;
 end;
 
 { TSpiderAppearing ----------------------------------------------------------- }
@@ -826,6 +842,40 @@ begin
   end;
 
   inherited;
+end;
+
+{ TGateExit ------------------------------------------------------------------ }
+
+type
+  TGateExit = class(TCastleScene)
+    function PointingDeviceActivate(const Active: boolean;
+      const Distance: Single): boolean; override;
+  end;
+
+function TGateExit.PointingDeviceActivate(const Active: boolean;
+  const Distance: Single): boolean;
+begin
+  Result := Active;
+  if not Result then Exit;
+
+  if Distance > 10 then
+    NotificationInteractFailed(
+      'You see a door. You''re too far to open it from here') else
+  begin
+    if Player.Items.FindKind(RedKeyItemKind) <> -1 then
+    begin
+      if (Level.BossCreature <> nil) and (not Level.BossCreature.Dead) then
+      begin
+        Player.Knockback(2 + Random(5), 2, Vector3Single(0, -1, 0));
+        SoundEngine.Sound(stEvilLaugh);
+        Notifications.Show('No exit for the one who does not fight');
+      end else
+      begin
+        LevelFinished('');
+      end;
+    end else
+      NotificationInteractFailed('You need an appropriate key to open this door');
+  end;
 end;
 
 { TCagesLevel ---------------------------------------------------------------- }
@@ -866,7 +916,7 @@ begin
 
   FGateExit := LoadLevelScene(
     CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
-    true { create octrees }, false);
+    true { create octrees }, false, TGateExit);
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
   Items.Add(FGateExit);
 
@@ -1022,38 +1072,6 @@ begin
   { Give player 1 sword and 1 bow, to have weapons. }
   NewPlayer.PickItem(TItem.Create(Sword, 1));
   NewPlayer.PickItem(TItem.Create(Bow, 1));
-end;
-
-procedure TCagesLevel.Picked(const Distance: Single;
-  CollisionInfo: TRayCollision;
-  var InteractionOccurred: boolean);
-begin
-  inherited;
-
-  if Player = nil then Exit;
-
-  if CollisionInfo.IndexOfItem(FGateExit) <> -1 then
-  begin
-    InteractionOccurred := true;
-    if Distance > 10 then
-      NotificationInteractFailed(
-        'You see a door. You''re too far to open it from here') else
-    begin
-      if Player.Items.FindKind(RedKeyItemKind) <> -1 then
-      begin
-        if (BossCreature <> nil) and (not BossCreature.Dead) then
-        begin
-          Player.Knockback(2 + Random(5), 2, Vector3Single(0, -1, 0));
-          SoundEngine.Sound(stEvilLaugh);
-          Notifications.Show('No exit for the one who does not fight');
-        end else
-        begin
-          LevelFinished('');
-        end;
-      end else
-        NotificationInteractFailed('You need an appropriate key to open this door');
-    end;
-  end;
 end;
 
 function TCagesLevel.Background: TBackground;
