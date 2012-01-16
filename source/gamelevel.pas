@@ -600,7 +600,7 @@ type
 
       @param(CollisionInfo contains all details.)
     }
-    procedure Picked(const Distance: Single; CollisionInfo: T3DCollision;
+    procedure Picked(const Distance: Single; CollisionInfo: TRayCollision;
       var InteractionOccurred: boolean); virtual;
 
     property InitialPosition : TVector3Single read FInitialPosition;
@@ -1689,7 +1689,7 @@ begin
 end;
 
 procedure TLevel.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision; var InteractionOccurred: boolean);
+  CollisionInfo: TRayCollision; var InteractionOccurred: boolean);
 begin
   { Nothing to do in this class. }
 end;

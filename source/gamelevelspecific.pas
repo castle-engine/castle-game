@@ -63,7 +63,7 @@ type
       var LetOthersHandleMouseAndKeys: boolean); override;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: T3DCollision;
+      CollisionInfo: TRayCollision;
       var InteractionOccurred: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
@@ -125,7 +125,7 @@ type
       AMenuBackground: boolean); override;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: T3DCollision;
+      CollisionInfo: TRayCollision;
       var InteractionOccurred: boolean); override;
   end;
 
@@ -168,7 +168,7 @@ type
       read FDoEndSequence write SetDoEndSequence default false;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: T3DCollision;
+      CollisionInfo: TRayCollision;
       var InteractionOccurred: boolean); override;
 
     function Background: TBackground; override;
@@ -219,7 +219,7 @@ type
       AMenuBackground: boolean); override;
 
     procedure Picked(const Distance: Single;
-      CollisionInfo: T3DCollision;
+      CollisionInfo: TRayCollision;
       var InteractionOccurred: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
@@ -466,7 +466,7 @@ begin
 end;
 
 procedure TCastleHallLevel.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision;
+  CollisionInfo: TRayCollision;
   var InteractionOccurred: boolean);
 begin
   inherited;
@@ -783,7 +783,7 @@ begin
 end;
 
 procedure TTowerLevel.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision;
+  CollisionInfo: TRayCollision;
   var InteractionOccurred: boolean);
 begin
   inherited;
@@ -1025,7 +1025,7 @@ begin
 end;
 
 procedure TCagesLevel.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision;
+  CollisionInfo: TRayCollision;
   var InteractionOccurred: boolean);
 begin
   inherited;
@@ -1203,7 +1203,7 @@ begin
 end;
 
 procedure TDoomE1M1Level.Picked(const Distance: Single;
-  CollisionInfo: T3DCollision;
+  CollisionInfo: TRayCollision;
   var InteractionOccurred: boolean);
 var
   Door: TDoomLevelDoor;

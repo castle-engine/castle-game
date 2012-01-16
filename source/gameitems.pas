@@ -350,7 +350,7 @@ type
     procedure PlayerCollision(var RemoveMe: TRemoveType); override;
 
     function RayCollision(const RayOrigin, RayDirection: TVector3Single;
-      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision; override;
+      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): TRayCollision; override;
   end;
 
   TItemOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
@@ -954,11 +954,11 @@ begin
 end;
 
 function TItemOnLevel.RayCollision(const RayOrigin, RayDirection: TVector3Single;
-  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision;
+  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): TRayCollision;
 var
   Intersection: TVector3Single;
   IntersectionDistance: Single;
-  NewNode: P3DCollisionNode;
+  NewNode: PRayCollisionNode;
 begin
   { Overridden, to resolve collision by looking at bounding box.
     No need to look at actual scene geometry, no need for octree inside scene. }
@@ -966,7 +966,7 @@ begin
   if GetExists and BoundingBox.TryRayClosestIntersection(
     Intersection, IntersectionDistance, RayOrigin, RayDirection) then
   begin
-    Result := T3DCollision.Create;
+    Result := TRayCollision.Create;
     Result.Distance := IntersectionDistance;
     NewNode := Result.Add;
     NewNode^.Item := Self;

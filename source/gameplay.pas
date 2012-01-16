@@ -568,7 +568,7 @@ procedure DoInteract;
 
   function TryInteract(RayDirection: TVector3Single): boolean;
   var
-    CollisionInfo: T3DCollision;
+    CollisionInfo: TRayCollision;
   begin
     { Picking is not an often called procedure, so I can freely normalize
       here to get exact distance to picked object in IntersectionDistance. }
