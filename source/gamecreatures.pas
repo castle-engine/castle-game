@@ -2359,6 +2359,7 @@ function TCreature.RayCollision(const Ray0, RayVector: TVector3Single;
 var
   Intersection: TVector3Single;
   IntersectionDistance: Single;
+  NewNode: P3DCollisionNode;
 begin
   { Overridden, to resolve collision by looking at bounding box.
     No need to look at actual scene geometry, no need for octree inside scene. }
@@ -2367,10 +2368,13 @@ begin
     Intersection, IntersectionDistance, Ray0, RayVector) then
   begin
     Result := T3DCollision.Create;
-    Result.Triangle := nil;
-    Result.Point := Intersection;
     Result.Distance := IntersectionDistance;
-    Result.Hierarchy.Add(Self);
+    NewNode := Result.Add;
+    NewNode^.Item := Self;
+    NewNode^.Point := Intersection;
+    NewNode^.RayOrigin := Ray0;
+    NewNode^.RayDirection := RayVector;
+    NewNode^.Triangle := nil;
   end else
     Result := nil;
 end;

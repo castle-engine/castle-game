@@ -580,14 +580,14 @@ procedure DoInteract;
 
     if CollisionInfo <> nil then
     begin
-      if CollisionInfo.Hierarchy.Last is TItemOnLevel then
+      if CollisionInfo.First.Item is TItemOnLevel then
       begin
-        TItemOnLevel(CollisionInfo.Hierarchy.Last).Picked(CollisionInfo.Distance);
+        TItemOnLevel(CollisionInfo.First.Item).Picked(CollisionInfo.Distance);
         Result := true;
       end else
-      if CollisionInfo.Hierarchy.Last is TCreature then
+      if CollisionInfo.First.Item is TCreature then
       begin
-        TCreature(CollisionInfo.Hierarchy.Last).Picked(CollisionInfo.Distance);
+        TCreature(CollisionInfo.First.Item).Picked(CollisionInfo.Distance);
         Result := true;
       end else
         Level.Picked(CollisionInfo.Distance, CollisionInfo, Result);

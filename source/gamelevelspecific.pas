@@ -471,12 +471,12 @@ procedure TCastleHallLevel.Picked(const Distance: Single;
 begin
   inherited;
 
-  if CollisionInfo.Hierarchy.IndexOf(StairsBlocker) <> -1 then
+  if CollisionInfo.IndexOfItem(StairsBlocker) <> -1 then
   begin
     InteractionOccurred := true;
     NotificationInteractFailed('You are not able to open it');
   end else
-  if CollisionInfo.Hierarchy.IndexOf(Button) <> -1 then
+  if CollisionInfo.IndexOfItem(Button) <> -1 then
   begin
     InteractionOccurred := true;
     if Distance < 10.0 then
@@ -788,7 +788,7 @@ procedure TTowerLevel.Picked(const Distance: Single;
 begin
   inherited;
 
-  if CollisionInfo.Hierarchy.IndexOf(ElevatorButton) <> -1 then
+  if CollisionInfo.IndexOfItem(ElevatorButton) <> -1 then
   begin
     InteractionOccurred := true;
     if Distance > 10 then
@@ -1032,7 +1032,7 @@ begin
 
   if Player = nil then Exit;
 
-  if CollisionInfo.Hierarchy.IndexOf(FGateExit) <> -1 then
+  if CollisionInfo.IndexOfItem(FGateExit) <> -1 then
   begin
     InteractionOccurred := true;
     if Distance > 10 then
@@ -1212,10 +1212,10 @@ begin
 
   if Player = nil then Exit;
 
-  if (CollisionInfo.Hierarchy.Count > 1) and
-    (CollisionInfo.Hierarchy[1] is TDoomLevelDoor) then
+  if (CollisionInfo.Count > 1) and
+    (CollisionInfo.L[1].Item is TDoomLevelDoor) then
   begin
-    Door := TDoomLevelDoor(CollisionInfo.Hierarchy[1]);
+    Door := TDoomLevelDoor(CollisionInfo.L[1].Item);
     InteractionOccurred := true;
     if Distance > 7 then
       NotificationInteractFailed('You see a door. You''re too far to open it from here') else
@@ -1225,7 +1225,7 @@ begin
       NotificationInteractFailed('You see a door. It''s already open') else
       Door.GoEndPosition;
   end else
-  if (CollisionInfo.Hierarchy.IndexOf(Elevator9a9b) <> -1) and
+  if (CollisionInfo.IndexOfItem(Elevator9a9b) <> -1) and
      MovingElevator9a9b.CompletelyBeginPosition and
      Elevator9a9bPickBox.PointInside(Player.Camera.Position) then
   begin
@@ -1235,7 +1235,7 @@ begin
         'You''re too far to reach it from here') else
       MovingElevator9a9b.GoEndPosition;
   end else
-  if CollisionInfo.Hierarchy.IndexOf(ExitButton) <> -1 then
+  if CollisionInfo.IndexOfItem(ExitButton) <> -1 then
   begin
     InteractionOccurred := true;
     if Distance > 5 then
