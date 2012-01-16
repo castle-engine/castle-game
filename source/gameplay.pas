@@ -566,15 +566,15 @@ end;
 
 procedure DoInteract;
 
-  function TryInteract(RayVector: TVector3Single): boolean;
+  function TryInteract(RayDirection: TVector3Single): boolean;
   var
     CollisionInfo: T3DCollision;
   begin
     { Picking is not an often called procedure, so I can freely normalize
       here to get exact distance to picked object in IntersectionDistance. }
-    NormalizeTo1st(RayVector);
+    NormalizeTo1st(RayDirection);
 
-    CollisionInfo := Level.Items.RayCollision(Player.Camera.Position, RayVector, nil);
+    CollisionInfo := Level.Items.RayCollision(Player.Camera.Position, RayDirection, nil);
 
     Result := false;
 
@@ -597,7 +597,7 @@ procedure DoInteract;
 
   function TryInteractAround(const XChange, YChange: Integer): boolean;
   var
-    Ray0, RayVector: TVector3Single;
+    RayOrigin, RayDirection: TVector3Single;
   begin
     PrimaryRay(
       Window.Width div 2 + XChange,
@@ -608,10 +608,10 @@ procedure DoInteract;
       Player.Camera.Up,
       { Always uses perspective projection }
       true, Vector2Single(ViewAngleDegX, ViewAngleDegY), ZeroVector4Single,
-      Ray0, RayVector);
-    { Ray0 is ignored, since for perspective projection
+      RayOrigin, RayDirection);
+    { RayOrigin is ignored, since for perspective projection
       we know it's from camera position }
-    Result := TryInteract(RayVector);
+    Result := TryInteract(RayDirection);
   end;
 
   function TryInteractAroundSquare(const Change: Integer): boolean;
