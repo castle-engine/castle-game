@@ -568,15 +568,13 @@ procedure DoInteract;
 
   function TryInteract(RayVector: TVector3Single): boolean;
   var
-    IntersectionDistance: Single;
     CollisionInfo: T3DCollision;
   begin
     { Picking is not an often called procedure, so I can freely normalize
       here to get exact distance to picked object in IntersectionDistance. }
     NormalizeTo1st(RayVector);
 
-    CollisionInfo := Level.Items.RayCollision(
-      IntersectionDistance, Player.Camera.Position, RayVector, nil);
+    CollisionInfo := Level.Items.RayCollision(Player.Camera.Position, RayVector, nil);
 
     Result := false;
 
@@ -584,15 +582,15 @@ procedure DoInteract;
     begin
       if CollisionInfo.Hierarchy.Last is TItemOnLevel then
       begin
-        TItemOnLevel(CollisionInfo.Hierarchy.Last).Picked(IntersectionDistance);
+        TItemOnLevel(CollisionInfo.Hierarchy.Last).Picked(CollisionInfo.Distance);
         Result := true;
       end else
       if CollisionInfo.Hierarchy.Last is TCreature then
       begin
-        TCreature(CollisionInfo.Hierarchy.Last).Picked(IntersectionDistance);
+        TCreature(CollisionInfo.Hierarchy.Last).Picked(CollisionInfo.Distance);
         Result := true;
       end else
-        Level.Picked(IntersectionDistance, CollisionInfo, Result);
+        Level.Picked(CollisionInfo.Distance, CollisionInfo, Result);
       FreeAndNil(CollisionInfo);
     end;
   end;

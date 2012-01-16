@@ -937,9 +937,7 @@ type
       and MiddlePosition to be high. }
     function UseBoundingSphere: boolean; virtual;
 
-    function RayCollision(
-      out IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single;
+    function RayCollision(const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision; override;
 
     procedure Picked(const Distance: Single);
@@ -2356,12 +2354,11 @@ begin
   Result := not Dead;
 end;
 
-function TCreature.RayCollision(
-  out IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single;
+function TCreature.RayCollision(const Ray0, RayVector: TVector3Single;
   const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision;
 var
   Intersection: TVector3Single;
+  IntersectionDistance: Single;
 begin
   { Overridden, to resolve collision by looking at bounding box.
     No need to look at actual scene geometry, no need for octree inside scene. }
@@ -2372,6 +2369,7 @@ begin
     Result := T3DCollision.Create;
     Result.Triangle := nil;
     Result.Point := Intersection;
+    Result.Distance := IntersectionDistance;
     Result.Hierarchy.Add(Self);
   end else
     Result := nil;

@@ -349,8 +349,7 @@ type
 
     procedure PlayerCollision(var RemoveMe: TRemoveType); override;
 
-    function RayCollision(out IntersectionDistance: Single;
-      const Ray0, RayVector: TVector3Single;
+    function RayCollision(const Ray0, RayVector: TVector3Single;
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision; override;
   end;
 
@@ -954,12 +953,11 @@ begin
   Result := (inherited GetExists) and (not DebugRenderForLevelScreenshot);
 end;
 
-function TItemOnLevel.RayCollision(
-  out IntersectionDistance: Single;
-  const Ray0, RayVector: TVector3Single;
+function TItemOnLevel.RayCollision(const Ray0, RayVector: TVector3Single;
   const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): T3DCollision;
 var
   Intersection: TVector3Single;
+  IntersectionDistance: Single;
 begin
   { Overridden, to resolve collision by looking at bounding box.
     No need to look at actual scene geometry, no need for octree inside scene. }
@@ -970,6 +968,7 @@ begin
     Result := T3DCollision.Create;
     Result.Triangle := nil;
     Result.Point := Intersection;
+    Result.Distance := IntersectionDistance;
     Result.Hierarchy.Add(Self);
   end else
     Result := nil;
