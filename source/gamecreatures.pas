@@ -2372,9 +2372,9 @@ begin
     NewNode := Result.Add;
     NewNode^.Item := Self;
     NewNode^.Point := Intersection;
+    NewNode^.Triangle := nil;
     NewNode^.RayOrigin := RayOrigin;
     NewNode^.RayDirection := RayDirection;
-    NewNode^.Triangle := nil;
   end else
     Result := nil;
 end;
