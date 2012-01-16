@@ -580,17 +580,7 @@ procedure DoInteract;
 
     if CollisionInfo <> nil then
     begin
-      if CollisionInfo.First.Item is TItemOnLevel then
-      begin
-        TItemOnLevel(CollisionInfo.First.Item).Picked(CollisionInfo.Distance);
-        Result := true;
-      end else
-      if CollisionInfo.First.Item is TCreature then
-      begin
-        TCreature(CollisionInfo.First.Item).Picked(CollisionInfo.Distance);
-        Result := true;
-      end else
-        Level.Picked(CollisionInfo.Distance, CollisionInfo, Result);
+      Level.Picked(CollisionInfo.Distance, CollisionInfo, Result);
       FreeAndNil(CollisionInfo);
     end;
   end;

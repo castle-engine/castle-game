@@ -940,7 +940,8 @@ type
     function RayCollision(const RayOrigin, RayDirection: TVector3Single;
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): TRayCollision; override;
 
-    procedure Picked(const Distance: Single);
+    function PointingDeviceActivate(const Active: boolean;
+      const Distance: Single): boolean; override;
   end;
 
   TCreatureList = class(specialize TFPGObjectList<TCreature>)
@@ -2379,12 +2380,16 @@ begin
     Result := nil;
 end;
 
-procedure TCreature.Picked(const Distance: Single);
+function TCreature.PointingDeviceActivate(const Active: boolean;
+  const Distance: Single): boolean;
 const
   VisibleItemDistance = 60.0;
 var
   S: string;
 begin
+  Result := Active;
+  if not Result then Exit;
+
   if Distance <= VisibleItemDistance then
   begin
     S := Format('You see a creature "%s"', [Kind.ShortName]);

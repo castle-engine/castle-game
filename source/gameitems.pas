@@ -339,11 +339,8 @@ type
 
     procedure Idle(const CompSpeed: Single); override;
 
-    { Call this when user clicked on the item.
-      This will do some GameMessage describing the item
-      (may depend on Distance --- when it's too far, player may not
-      be able to exactly tell what the item is). }
-    procedure Picked(const Distance: Single);
+    function PointingDeviceActivate(const Active: boolean;
+      const Distance: Single): boolean; override;
 
     property Collides default false;
 
@@ -920,12 +917,16 @@ begin
   end;
 end;
 
-procedure TItemOnLevel.Picked(const Distance: Single);
+function TItemOnLevel.PointingDeviceActivate(const Active: boolean;
+  const Distance: Single): boolean;
 const
   VisibleItemDistance = 60.0;
 var
   S: string;
 begin
+  Result := Active;
+  if not Result then Exit;
+
   if Distance <= VisibleItemDistance then
   begin
     S := Format('You see an item "%s"', [Item.Kind.Name]);
