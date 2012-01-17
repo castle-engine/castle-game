@@ -564,58 +564,6 @@ begin
   Player.Attack;
 end;
 
-procedure DoInteract;
-
-  function TryInteractAround(const XChange, YChange: Integer): boolean;
-  var
-    RayOrigin, RayDirection: TVector3Single;
-  begin
-    PrimaryRay(
-      Window.Width div 2 + XChange,
-      Window.Height div 2 + YChange,
-      Window.Width, Window.Height,
-      Player.Camera.Position,
-      Player.Camera.Direction,
-      Player.Camera.Up,
-      { Always uses perspective projection }
-      true, Vector2Single(ViewAngleDegX, ViewAngleDegY), ZeroVector4Single,
-      RayOrigin, RayDirection);
-    { RayOrigin is ignored, since for perspective projection
-      we know it's from camera position }
-    { TODO: move this to scene manager }
-    Result := false; //TryInteract(RayDirection);
-  end;
-
-  function TryInteractAroundSquare(const Change: Integer): boolean;
-  begin
-    Result := TryInteractAround(-Change, -Change) or
-              TryInteractAround(-Change, +Change) or
-              TryInteractAround(+Change, +Change) or
-              TryInteractAround(+Change, -Change) or
-              TryInteractAround(      0, -Change) or
-              TryInteractAround(      0, +Change) or
-              TryInteractAround(-Change,       0) or
-              TryInteractAround(+Change,       0);
-  end;
-
-begin
-  if GameWin or Player.Dead then
-  begin
-    GameEndedWantsRestart := Level.Name;
-    GameEnded := true;
-    Exit;
-  end;
-
-  { Try to interact with the object in the middle --- if nothing interesting
-    there, try to interact with things around the middle. }
-// TODO:  if not TryInteract(Player.Camera.Direction) then
-    if not TryInteractAroundSquare(25) then
-      if not TryInteractAroundSquare(50) then
-        if not TryInteractAroundSquare(100) then
-          if not TryInteractAroundSquare(200) then
-            SoundEngine.Sound(stPlayerInteractFailed);
-end;
-
 procedure MaybeDeadWinMessage;
 begin
   if GameWin then
