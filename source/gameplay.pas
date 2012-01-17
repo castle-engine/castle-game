@@ -808,6 +808,17 @@ procedure EventDown(AKey: TKey;
     Window.Controls.EndDisableContextOpenClose;
   end;
 
+  procedure DoInteract;
+  begin
+    { normal interaction is already handled because
+      TCastleSceneManager.Input_PointingDeviceActivate is equal to interact key. }
+    if GameWin or Player.Dead then
+    begin
+      GameEndedWantsRestart := Level.Name;
+      GameEnded := true;
+    end;
+  end;
+
 begin
   { Basic keys. }
   if CastleInput_Attack.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
