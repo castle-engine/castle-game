@@ -177,6 +177,9 @@ type
     property SoundGoBeginPosition default stDoorClose;
     property SoundGoEndPosition default stDoorOpen;
     }
+
+    function PointingDeviceActivate(const Active: boolean;
+      const Distance: Single): boolean; override;
   end;
 
   TDoomE1M1Level = class(TLevel)
@@ -205,10 +208,6 @@ type
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
       AMenuBackground: boolean); override;
-
-    procedure Picked(const Distance: Single;
-      CollisionInfo: TRayCollision;
-      var InteractionOccurred: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
@@ -1141,6 +1140,77 @@ begin
     GoBeginPosition;
 end;
 
+function TDoomLevelDoor.PointingDeviceActivate(const Active: boolean;
+  const Distance: Single): boolean;
+begin
+  Result := Active;
+  if not Result then Exit;
+
+  if Distance > 7 then
+    NotificationInteractFailed('You see a door. You''re too far to open it from here') else
+  { Only if the door is completely closed
+    (and not during closing right now) we allow player to open it. }
+  if not CompletelyBeginPosition then
+    NotificationInteractFailed('You see a door. It''s already open') else
+    GoEndPosition;
+end;
+
+{ TElevator9a9b ------------------------------------------------------------------ }
+
+type
+  TElevator9a9b = class(TCastleScene)
+    function PointingDeviceActivate(const Active: boolean;
+      const Distance: Single): boolean; override;
+  end;
+
+function TElevator9a9b.PointingDeviceActivate(const Active: boolean;
+  const Distance: Single): boolean;
+var
+  MovingElevator9a9b: TLevelLinearMovingObject;
+  Elevator9a9bPickBox: TBox3D;
+begin
+  Result := Active;
+  if not Result then Exit;
+
+  MovingElevator9a9b := (Level as TDoomE1M1Level).MovingElevator9a9b;
+  Elevator9a9bPickBox := (Level as TDoomE1M1Level).Elevator9a9bPickBox;
+
+  Result := MovingElevator9a9b.CompletelyBeginPosition and
+    Elevator9a9bPickBox.PointInside(Player.Camera.Position);
+
+  if Result then
+  begin
+    if Distance > 10 then
+      NotificationInteractFailed(
+        'You''re too far to reach it from here') else
+      MovingElevator9a9b.GoEndPosition;
+  end;
+end;
+
+{ TExitButton ------------------------------------------------------------------ }
+
+type
+  TExitButton = class(TCastleScene)
+    function PointingDeviceActivate(const Active: boolean;
+      const Distance: Single): boolean; override;
+  end;
+
+function TExitButton.PointingDeviceActivate(const Active: boolean;
+  const Distance: Single): boolean;
+begin
+  Result := Active;
+  if not Result then Exit;
+
+  if Distance > 5 then
+    NotificationInteractFailed(
+      'You''re too far to reach it from here') else
+    begin
+      SoundEngine.Sound(stDoomExitButton);
+      Player.Life := 0;
+      (Level as TDoomE1M1Level).ExitMessagePending := true;
+    end;
+end;
+
 { TDoomE1M1Level ------------------------------------------------------------- }
 
 constructor TDoomE1M1Level.Create(
@@ -1200,7 +1270,7 @@ begin
   Items.Add(MovingElevator49);
 
   Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
-    true { create octrees }, false);
+    true { create octrees }, false, TElevator9a9b);
 
   MovingElevator9a9b := TLevelLinearMovingObject.Create(Self);
   MovingElevator9a9b.Add(Elevator9a9b);
@@ -1215,56 +1285,9 @@ begin
   Items.Add(MovingElevator9a9b);
 
   ExitButton := LoadLevelScene(DoomDoorsPathPrefix + 'exit_button_final.wrl',
-    true { create octrees }, false);
+    true { create octrees }, false, TExitButton);
   ExitButton.CastShadowVolumes := false;
   Items.Add(ExitButton);
-end;
-
-procedure TDoomE1M1Level.Picked(const Distance: Single;
-  CollisionInfo: TRayCollision;
-  var InteractionOccurred: boolean);
-var
-  Door: TDoomLevelDoor;
-begin
-  inherited;
-
-  if Player = nil then Exit;
-
-  if (CollisionInfo.Count > 1) and
-    (CollisionInfo.L[1].Item is TDoomLevelDoor) then
-  begin
-    Door := TDoomLevelDoor(CollisionInfo.L[1].Item);
-    InteractionOccurred := true;
-    if Distance > 7 then
-      NotificationInteractFailed('You see a door. You''re too far to open it from here') else
-    { Only if the door is completely closed
-      (and not during closing right now) we allow player to open it. }
-    if not Door.CompletelyBeginPosition then
-      NotificationInteractFailed('You see a door. It''s already open') else
-      Door.GoEndPosition;
-  end else
-  if (CollisionInfo.IndexOfItem(Elevator9a9b) <> -1) and
-     MovingElevator9a9b.CompletelyBeginPosition and
-     Elevator9a9bPickBox.PointInside(Player.Camera.Position) then
-  begin
-    InteractionOccurred := true;
-    if Distance > 10 then
-      NotificationInteractFailed(
-        'You''re too far to reach it from here') else
-      MovingElevator9a9b.GoEndPosition;
-  end else
-  if CollisionInfo.IndexOfItem(ExitButton) <> -1 then
-  begin
-    InteractionOccurred := true;
-    if Distance > 5 then
-      NotificationInteractFailed(
-        'You''re too far to reach it from here') else
-      begin
-        SoundEngine.Sound(stDoomExitButton);
-        Player.Life := 0;
-        ExitMessagePending := true;
-      end;
-  end;
 end;
 
 procedure TDoomE1M1Level.RenameCreatures(Node: TX3DNode);

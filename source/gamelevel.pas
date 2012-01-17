@@ -579,30 +579,6 @@ type
       This is updated in our Idle. }
     property AnimationTime: TFloatTime read FAnimationTime;
 
-    { Called when level was picked.
-
-      Set InteractionOccurred to true (it will be false on enter)
-      if indeed some interaction occurred. Note that "interaction occurred"
-      is not the same as "interaction succeeded". This means that
-      even if you just did a message like "You cannot open this door",
-      you should still set InteractionOccurred to @true.
-      When InteractionOccurred is @false then picking routine may try
-      to pick other points around the screen center.
-
-      The right way to signal to user that interaction occurred
-      but failed (like the "You cannot open this door" example above)
-      is to make a @code(Sound(stPlayerInteractFailed)).
-      In fact, you can call NotificationInteractFailed to do
-      Notification and @code(Sound(stPlayerInteractFailed)) at once.
-
-      Never call this when Player is Dead. Implementation of this may
-      assume that Player is not Dead.
-
-      @param(CollisionInfo contains all details.)
-    }
-    procedure Picked(const Distance: Single; CollisionInfo: TRayCollision;
-      var InteractionOccurred: boolean); virtual;
-
     property InitialPosition : TVector3Single read FInitialPosition;
     property InitialDirection: TVector3Single read FInitialDirection;
     property InitialUp       : TVector3Single read FInitialUp;
@@ -1693,12 +1669,6 @@ begin
 
   if (not Paused) and (ThunderEffect <> nil) then
     ThunderEffect.Idle;
-end;
-
-procedure TLevel.Picked(const Distance: Single;
-  CollisionInfo: TRayCollision; var InteractionOccurred: boolean);
-begin
-  { Nothing to do in this class. }
 end;
 
 procedure TLevel.PrepareNewPlayer(NewPlayer: TPlayer);
