@@ -453,7 +453,7 @@ type
     procedure RenderFromViewEverything; override;
     procedure InitializeLights(const Lights: TLightInstancesList); override;
     procedure ApplyProjection; override;
-    procedure PointingDeviceActivateFailed; override;
+    procedure PointingDeviceActivateFailed(const Active: boolean); override;
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -1137,6 +1137,7 @@ begin
   inherited Create(nil);
 
   UseGlobalLights := true;
+  ApproximateActivation := true;
 
   FName := AName;
   FSceneFileName := ASceneFileName;
@@ -1901,9 +1902,11 @@ begin
   end;
 end;
 
-procedure TLevel.PointingDeviceActivateFailed;
+procedure TLevel.PointingDeviceActivateFailed(const Active: boolean);
 begin
-  SoundEngine.Sound(stPlayerInteractFailed);
+  inherited;
+  if Active then
+    SoundEngine.Sound(stPlayerInteractFailed);
 end;
 
 end.
