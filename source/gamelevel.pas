@@ -1138,6 +1138,7 @@ begin
 
   UseGlobalLights := true;
   ApproximateActivation := true;
+  Input_PointingDeviceActivate.Assign(CastleInput_Interact.Shortcut, false);
 
   FName := AName;
   FSceneFileName := ASceneFileName;
@@ -1303,7 +1304,6 @@ begin
     }
   end;
 
-  Input_PointingDeviceActivate := CastleInput_Interact.Shortcut;
   MainScene.ProcessEvents := true;
 end;
 

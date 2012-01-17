@@ -88,7 +88,8 @@ type
     BlackOutIntensity: TGLfloat;
     BlackOutColor: TVector3f;
 
-    { This updates Camera properties.
+    { Update Camera properties, including inputs.
+      Also updates Level.Input_PointingDeviceActivate, it's suitable to do it here.
       Call this always when FlyingMode or Dead or some key values
       or Swimming or GameWin change. }
     procedure UpdateCamera;
@@ -845,6 +846,9 @@ begin
 
     Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
     Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+
+    if Level <> nil then
+      Level.Input_PointingDeviceActivate.MakeClear;
   end else
   if Dead then
   begin
@@ -870,6 +874,9 @@ begin
 
     Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
     Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+
+    if Level <> nil then
+      Level.Input_PointingDeviceActivate.MakeClear;
   end else
   begin
     if FlyingMode then
@@ -891,48 +898,49 @@ begin
       Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
       Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
     end else
+    if Swimming <> psNo then
     begin
-      if Swimming <> psNo then
-      begin
-        Camera.PreferGravityUpForMoving := false;
-        Camera.PreferGravityUpForRotations := true;
+      Camera.PreferGravityUpForMoving := false;
+      Camera.PreferGravityUpForRotations := true;
 
-        Camera.Input_Jump.MakeClear;
-        Camera.Input_Crouch.MakeClear;
-        Camera.Input_UpMove.Assign(CastleInput_UpMove.Shortcut, false);
-        Camera.Input_DownMove.Assign(CastleInput_DownMove.Shortcut, false);
+      Camera.Input_Jump.MakeClear;
+      Camera.Input_Crouch.MakeClear;
+      Camera.Input_UpMove.Assign(CastleInput_UpMove.Shortcut, false);
+      Camera.Input_DownMove.Assign(CastleInput_DownMove.Shortcut, false);
 
-        Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
-        Camera.FallingDownSpeedIncrease := 1.0;
-        Camera.HeadBobbing := 0.0;
-        Camera.CameraPreferredHeight := LevelCameraRadius * 1.01;
+      Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
+      Camera.FallingDownSpeedIncrease := 1.0;
+      Camera.HeadBobbing := 0.0;
+      Camera.CameraPreferredHeight := LevelCameraRadius * 1.01;
 
-        Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed / 2;
-        Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed / 2;
-      end else
-      begin
-        Camera.PreferGravityUpForMoving := true;
-        Camera.PreferGravityUpForRotations := true;
+      Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed / 2;
+      Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed / 2;
+    end else
+    begin
+      Camera.PreferGravityUpForMoving := true;
+      Camera.PreferGravityUpForRotations := true;
 
-        Camera.Input_Jump.Assign(CastleInput_UpMove.Shortcut, false);
-        Camera.Input_Crouch.Assign(CastleInput_DownMove.Shortcut, false);
-        Camera.Input_UpMove.MakeClear;
-        Camera.Input_DownMove.MakeClear;
+      Camera.Input_Jump.Assign(CastleInput_UpMove.Shortcut, false);
+      Camera.Input_Crouch.Assign(CastleInput_DownMove.Shortcut, false);
+      Camera.Input_UpMove.MakeClear;
+      Camera.Input_DownMove.MakeClear;
 
-        Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
-        Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
-        Camera.HeadBobbing := DefaultHeadBobbing;
-        Camera.CameraPreferredHeight := LevelCameraPreferredHeight;
+      Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
+      Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
+      Camera.HeadBobbing := DefaultHeadBobbing;
+      Camera.CameraPreferredHeight := LevelCameraPreferredHeight;
 
-        Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
-        Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
-      end;
+      Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
+      Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
     end;
 
     Camera.Input_Forward.Assign(CastleInput_Forward.Shortcut, false);
     Camera.Input_Backward.Assign(CastleInput_Backward.Shortcut, false);
     Camera.Input_LeftStrafe.Assign(CastleInput_LeftStrafe.Shortcut, false);
     Camera.Input_RightStrafe.Assign(CastleInput_RightStrafe.Shortcut, false);
+
+    if Level <> nil then
+      Level.Input_PointingDeviceActivate.Assign(CastleInput_Interact.Shortcut, false);
   end;
 end;
 
