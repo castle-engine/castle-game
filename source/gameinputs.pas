@@ -54,7 +54,12 @@ type
     constructor Create(const AName: string;
       const AConfigFileName: string;
       const AGroup: TInputGroup;
-      AShortcut: TInputShortcut);
+      const AKey1: TKey;
+      const AKey2: TKey = K_None;
+      const ACharacter: Char = #0;
+      const AMouseButtonUse: boolean = false;
+      const AMouseButton: TMouseButton = mbLeft;
+      const AMouseWheel: TMouseWheelDirection = mwNone);
     destructor Destroy; override;
 
     property Name: string read FName;
@@ -250,14 +255,20 @@ end;
 constructor TInputConfiguration.Create(const AName: string;
   const AConfigFileName: string;
   const AGroup: TInputGroup;
-  AShortcut: TInputShortcut);
+  const AKey1: TKey;
+  const AKey2: TKey;
+  const ACharacter: Char;
+  const AMouseButtonUse: boolean;
+  const AMouseButton: TMouseButton;
+  const AMouseWheel: TMouseWheelDirection);
 begin
   inherited Create;
   FName := AName;
   FConfigFileName := AConfigFileName;
   FGroup := AGroup;
 
-  FShortcut := AShortcut;
+  FShortcut := TInputShortcut.Create(nil);
+  FShortcut.Assign(AKey1, AKey2, ACharacter, AMouseButtonUse, AMouseButton, AMouseWheel);
   FShortcut.OnChanged := @ShortcutChanged;
 
   CastleAllInputs.Add(Self);
@@ -318,57 +329,57 @@ begin
 
   { Basic shortcuts. }
   CastleInput_Attack := TInputConfiguration.Create('Attack', 'attack', kgBasic,
-    TInputShortcut.Create(K_Ctrl, K_None, #0, true, mbLeft));
+    K_Ctrl, K_None, #0, true, mbLeft);
   CastleInput_Forward := TInputConfiguration.Create('Move forward', 'move_forward', kgBasic,
-    TInputShortcut.Create(K_W, K_Up, #0, false, mbLeft));
+    K_W, K_Up, #0, false, mbLeft);
   CastleInput_Backward := TInputConfiguration.Create('Move backward', 'move_backward', kgBasic,
-    TInputShortcut.Create(K_S, K_Down, #0, false, mbLeft));
+    K_S, K_Down, #0, false, mbLeft);
   CastleInput_LeftStrafe := TInputConfiguration.Create('Move left', 'move_left', kgBasic,
-    TInputShortcut.Create(K_A, K_None, #0, false, mbLeft));
+    K_A, K_None, #0, false, mbLeft);
   CastleInput_RightStrafe := TInputConfiguration.Create('Move right', 'move_right', kgBasic,
-    TInputShortcut.Create(K_D, K_None, #0, false, mbLeft));
+    K_D, K_None, #0, false, mbLeft);
   CastleInput_LeftRot := TInputConfiguration.Create('Turn left', 'turn_left', kgBasic,
-    TInputShortcut.Create(K_Left, K_None, #0, false, mbLeft));
+    K_Left, K_None, #0, false, mbLeft);
   CastleInput_RightRot := TInputConfiguration.Create('Turn right', 'turn_right', kgBasic,
-    TInputShortcut.Create(K_Right, K_None, #0, false, mbLeft));
+    K_Right, K_None, #0, false, mbLeft);
   CastleInput_UpRotate := TInputConfiguration.Create('Look up', 'look_up', kgBasic,
-    TInputShortcut.Create(K_PageDown, K_None, #0, false, mbLeft));
+    K_PageDown, K_None, #0, false, mbLeft);
   CastleInput_DownRotate := TInputConfiguration.Create('Look down', 'look_down', kgBasic,
-    TInputShortcut.Create(K_Delete, K_None, #0, false, mbLeft));
+    K_Delete, K_None, #0, false, mbLeft);
   CastleInput_GravityUp := TInputConfiguration.Create('Look straight', 'look_straight', kgBasic,
-    TInputShortcut.Create(K_End, K_None, #0, false, mbLeft));
+    K_End, K_None, #0, false, mbLeft);
   CastleInput_UpMove := TInputConfiguration.Create('Jump (or fly/swim up)', 'move_up', kgBasic,
-    TInputShortcut.Create(K_Space, K_None, #0, true, mbRight));
+    K_Space, K_None, #0, true, mbRight);
   CastleInput_DownMove := TInputConfiguration.Create('Crouch (or fly/swim down)', 'move_down', kgBasic,
-    TInputShortcut.Create(K_C, K_None, #0, false, mbLeft));
+    K_C, K_None, #0, false, mbLeft);
 
   { Items shortcuts. }
   CastleInput_InventoryShow := TInputConfiguration.Create('Inventory show / hide', 'inventory_toggle', kgItems,
-    TInputShortcut.Create(K_I, K_None, #0, false, mbLeft));
+    K_I, K_None, #0, false, mbLeft);
   CastleInput_InventoryPrevious := TInputConfiguration.Create('Select previous inventory item', 'inventory_previous', kgItems,
-    TInputShortcut.Create(K_LeftBracket, K_None, #0, false, mbLeft, mwUp));
+    K_LeftBracket, K_None, #0, false, mbLeft, mwUp);
   CastleInput_InventoryNext := TInputConfiguration.Create('Select next inventory item', 'inventory_next', kgItems,
-    TInputShortcut.Create(K_RightBracket, K_None, #0, false, mbLeft, mwDown));
+    K_RightBracket, K_None, #0, false, mbLeft, mwDown);
   CastleInput_UseItem := TInputConfiguration.Create('Use (or equip) selected inventory item', 'item_use', kgItems,
-    TInputShortcut.Create(K_Enter, K_None, #0, false, mbLeft));
+    K_Enter, K_None, #0, false, mbLeft);
   CastleInput_UseLifePotion := TInputConfiguration.Create('Use life potion', 'life_potion_use', kgItems,
-    TInputShortcut.Create(K_L, K_None, #0, false, mbLeft));
+    K_L, K_None, #0, false, mbLeft);
   CastleInput_DropItem := TInputConfiguration.Create('Drop selected inventory item', 'item_drop', kgItems,
-    TInputShortcut.Create(K_R, K_None, #0, false, mbLeft));
+    K_R, K_None, #0, false, mbLeft);
 
   { Other shortcuts. }
   CastleInput_ViewMessages := TInputConfiguration.Create('View all messages', 'view_messages', kgOther,
-    TInputShortcut.Create(K_M, K_None, #0, false, mbLeft));
+    K_M, K_None, #0, false, mbLeft);
   CastleInput_SaveScreen := TInputConfiguration.Create('Save screen', 'save_screen', kgOther,
-    TInputShortcut.Create(K_F5, K_None, #0, false, mbLeft));
+    K_F5, K_None, #0, false, mbLeft);
   CastleInput_CancelFlying := TInputConfiguration.Create('Cancel flying spell', 'cancel_flying', kgOther,
-    TInputShortcut.Create(K_Q, K_None, #0, false, mbLeft));
+    K_Q, K_None, #0, false, mbLeft);
   CastleInput_FPSShow := TInputConfiguration.Create('FPS show / hide', 'fps_toggle', kgOther,
-    TInputShortcut.Create(K_Tab, K_None, #0, false, mbLeft));
+    K_Tab, K_None, #0, false, mbLeft);
   CastleInput_Interact := TInputConfiguration.Create('Interact (press button / open door etc.)', 'interact', kgOther,
-    TInputShortcut.Create(K_E, K_None, #0, false, mbLeft));
+    K_E, K_None, #0, false, mbLeft);
   CastleInput_DebugMenu := TInputConfiguration.Create('Debug menu', 'debug_menu', kgOther,
-    TInputShortcut.Create(K_BackQuote, K_None, #0, false, mbLeft));
+    K_BackQuote, K_None, #0, false, mbLeft);
 
   if CastleAllInputs.SeekConflict(ConflictDescription) then
     raise EInternalError.Create(
