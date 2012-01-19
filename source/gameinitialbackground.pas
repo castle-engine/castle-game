@@ -38,7 +38,7 @@ var
 
 procedure Resize(Window: TCastleWindowBase);
 begin
-  ProjectionGLOrtho(0, Window.Width, 0, Window.Height);
+  OrthoProjection(0, Window.Width, 0, Window.Height);
 end;
 
 procedure Draw(Window: TCastleWindowBase);

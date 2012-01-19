@@ -1801,15 +1801,6 @@ begin
 end;
 
 procedure TLevel.ApplyProjection;
-
-  procedure UpdateCameraProjectionMatrix;
-  var
-    ProjectionMatrix: TMatrix4f;
-  begin
-    glGetFloatv(GL_PROJECTION_MATRIX, @ProjectionMatrix);
-    Camera.ProjectionMatrix := ProjectionMatrix;
-  end;
-
 var
   S, C: Extended;
   Fov, Aspect: Single;
@@ -1837,9 +1828,8 @@ begin
     Also, we apply SickProjection. }
   { update glViewport and projection }
   glViewport(0, 0, ContainerWidth, ContainerHeight);
-  ProjectionGLPerspective(Fov, Aspect, LevelProjectionNear, LevelProjectionFarFinal);
-
-  UpdateCameraProjectionMatrix;
+  Camera.ProjectionMatrix := PerspectiveProjection(
+    Fov, Aspect, LevelProjectionNear, LevelProjectionFarFinal);
 end;
 
 function TLevel.CreateDefaultCamera(AOwner: TComponent): TCamera;
