@@ -797,10 +797,9 @@ var
   I: Integer;
   Move: TVector3Single;
   CurrentTranslation, NewTranslation: TVector3Single;
-  Crea: TCreature;
-  Item: TItemOnLevel;
   SphereC: TVector3Single;
   SphereR: Single;
+  Item: T3D;
 begin
   if GetExists and Collides and MovePushesOthers then
   begin
@@ -829,22 +828,16 @@ begin
             Player.Camera.Position := Player.Camera.Position + Move;
         end;
 
-        for I := 0 to ParentLevel.Creatures.Count - 1 do
+        for I := 0 to ParentLevel.Items.Count - 1 do
         begin
-          Crea := ParentLevel.Creatures[I];
-          Box := Crea.BoundingBox;
-          if Box.Collision(NewBox) or
-             Box.Collision(CurrentBox) then
-            Crea.Translate(Move);
-        end;
-
-        for I := 0 to ParentLevel.ItemsOnLevel.Count - 1 do
-        begin
-          Item := ParentLevel.ItemsOnLevel[I];
-          Box := Item.BoundingBox;
-          if Box.Collision(NewBox) or
-             Box.Collision(CurrentBox) then
-            Item.Translate(Move);
+          Item := ParentLevel.Items[I];
+          if Item.Collision in [ctItem, ctCreature] then
+          begin
+            Box := Item.BoundingBox;
+            if Box.Collision(NewBox) or
+               Box.Collision(CurrentBox) then
+              Item.Translate(Move);
+          end;
         end;
       end else
       begin
@@ -856,31 +849,23 @@ begin
             Player.Camera.Position := Player.Camera.Position + Move;
         end;
 
-        for I := 0 to ParentLevel.Creatures.Count - 1 do
+        for I := 0 to ParentLevel.Items.Count - 1 do
         begin
-          Crea := ParentLevel.Creatures[I];
-          if Crea.UseSphere then
-          begin
-            Crea.Sphere(SphereC, SphereR);
-            if SphereCollisionAssumeTranslation(NewTranslation, SphereC, SphereR,
-              @ParentLevel.CollisionIgnoreItem) then
-              Crea.Translate(Move);
-          end else
-          begin
-            if BoxCollisionAssumeTranslation(NewTranslation,
-              Crea.BoundingBox,
-              @ParentLevel.CollisionIgnoreItem) then
-              Crea.Translate(Move);
-          end;
-        end;
-
-        for I := 0 to ParentLevel.ItemsOnLevel.Count - 1 do
-        begin
-          Item := ParentLevel.ItemsOnLevel[I];
-          if BoxCollisionAssumeTranslation(NewTranslation,
-            Item.BoundingBox,
-            @ParentLevel.CollisionIgnoreItem) then
-            Item.Translate(Move);
+          Item := ParentLevel.Items[I];
+          if Item.Collision in [ctItem, ctCreature] then
+            if Item.UseSphere then
+            begin
+              Item.Sphere(SphereC, SphereR);
+              if SphereCollisionAssumeTranslation(NewTranslation, SphereC, SphereR,
+                @ParentLevel.CollisionIgnoreItem) then
+                Item.Translate(Move);
+            end else
+            begin
+              if BoxCollisionAssumeTranslation(NewTranslation,
+                Item.BoundingBox,
+                @ParentLevel.CollisionIgnoreItem) then
+                Item.Translate(Move);
+            end;
         end;
       end;
     end;
