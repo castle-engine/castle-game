@@ -2353,7 +2353,7 @@ end;
 
 function TCreature.UseSphere: boolean;
 begin
-  Result := not Dead;
+  Result := GetExists and (not Dead);
 end;
 
 procedure TCreature.Sphere(out Center: TVector3Single; out Radius: Single);
