@@ -354,7 +354,6 @@ type
     FLevelProjectionFar: Single;
     FMoveHorizontalSpeed: Single;
     FMoveVerticalSpeed: Single;
-    FItemsOnLevel: TItemOnLevelList;
     FSickProjection: boolean;
     FSickProjectionSpeed: TFloatTime;
 
@@ -512,14 +511,6 @@ type
       but his feet are in the water. In some sense he/she is swimming,
       in some not. }
     property AboveWaterBox: TBox3D read FAboveWaterBox;
-
-    { Items lying on the level.
-      These Items are owned by level object, so everything remaining
-      on this list when we will destroy level will be freed.
-      Add by AddItemOnLevel, remove by removing simultaneously from Items
-      and ItemsOnLevel lists. }
-    property ItemsOnLevel: TItemOnLevelList read FItemsOnLevel;
-    procedure AddItemOnLevel(const I: TItemOnLevel);
 
     { Creatures on the level. Note that objects on this list are owned
       by level object. Add by AddCreature, remove by setting
@@ -1171,7 +1162,6 @@ begin
     ItemsToRemove := TX3DNodeList.Create(false);
     try
       { Initialize Items }
-      FItemsOnLevel := TItemOnLevelList.Create(true);
       SI := TShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
       try
         while SI.GetNext do TraverseForItems(SI.Current);
@@ -1299,7 +1289,6 @@ begin
   FreeAndNil(FThunderEffect);
   FreeAndNil(FSectors);
   FreeAndNil(FWaypoints);
-  FreeAndNil(FItemsOnLevel);
   FreeAndNil(FCreatures);
   if (FRequiredCreatures <> nil) and not DebugNoCreatures then
     UnRequireCreatures(FRequiredCreatures);
@@ -1453,7 +1442,7 @@ procedure TLevel.TraverseForItems(Shape: TShape);
     ItemPosition[1] := (ItemStubBoundingBox.Data[0, 1] + ItemStubBoundingBox.Data[1, 1]) / 2;
     ItemPosition[2] := ItemStubBoundingBox.Data[0, 2];
 
-    AddItemOnLevel(TItemOnLevel.Create(TItem.Create(ItemKind, ItemQuantity),
+    Items.Add(TItemOnLevel.Create(Self, TItem.Create(ItemKind, ItemQuantity),
       ItemPosition));
   end;
 
@@ -1551,12 +1540,6 @@ begin
       This avoids problems with removing nodes while traversing. }
     ItemsToRemove.Add(Shape.BlenderObjectNode);
   end;
-end;
-
-procedure TLevel.AddItemOnLevel(const I: TItemOnLevel);
-begin
-  ItemsOnLevel.Add(I);
-  Items.Add(I);
 end;
 
 procedure TLevel.AddCreature(C: TCreature);

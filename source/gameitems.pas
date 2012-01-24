@@ -308,7 +308,8 @@ type
   protected
     function GetExists: boolean; override;
   public
-    constructor Create(AItem: TItem; const ATranslation: TVector3Single); reintroduce;
+    constructor Create(AOwner: TComponent;
+      AItem: TItem; const ATranslation: TVector3Single); reintroduce;
     destructor Destroy; override;
 
     { Note that this Item is owned by TItemOnLevel instance,
@@ -810,9 +811,10 @@ end;
 
 { TItemOnLevel ------------------------------------------------------------ }
 
-constructor TItemOnLevel.Create(AItem: TItem; const ATranslation: TVector3Single);
+constructor TItemOnLevel.Create(AOwner: TComponent;
+  AItem: TItem; const ATranslation: TVector3Single);
 begin
-  inherited Create(nil);
+  inherited Create(AOwner);
   FItem := AItem;
   Translation := ATranslation;
   Rotation := Vector4Single(UnitVector3Single[2], 0); { angle will animate later }
@@ -942,7 +944,6 @@ begin
   inherited;
   Player.PickItem(ExtractItem);
 
-  Level.ItemsOnLevel.Extract(Self);
   RemoveMe := rtRemoveAndFree;
 
   if AutoOpenInventory then
