@@ -942,6 +942,8 @@ type
 
     function PointingDeviceActivate(const Active: boolean;
       const Distance: Single): boolean; override;
+
+    procedure Translate(const T: TVector3Single); override;
   end;
 
   TCreatureList = class(specialize TFPGObjectList<TCreature>)
@@ -2405,6 +2407,11 @@ begin
     Notifications.Show(S);
   end else
     Notifications.Show('You see some creature, but it''s too far to tell exactly what it is');
+end;
+
+procedure TCreature.Translate(const T: TVector3Single);
+begin
+  LegsPosition := LegsPosition + T;
 end;
 
 { TCreatureList -------------------------------------------------------------- }

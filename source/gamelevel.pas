@@ -833,7 +833,7 @@ begin
           Box := Crea.BoundingBox;
           if Box.Collision(NewBox) or
              Box.Collision(CurrentBox) then
-            Crea.LegsPosition := Crea.LegsPosition + Move;
+            Crea.Translate(Move);
         end;
 
         for I := 0 to ParentLevel.ItemsOnLevel.Count - 1 do
@@ -842,7 +842,7 @@ begin
           Box := Item.BoundingBox;
           if Box.Collision(NewBox) or
              Box.Collision(CurrentBox) then
-            Item.Translation := Item.Translation + Move;
+            Item.Translate(Move);
         end;
       end else
       begin
@@ -862,13 +862,13 @@ begin
             if SphereCollisionAssumeTranslation(NewTranslation,
               Crea.MiddlePosition, Crea.Kind.CameraRadius,
               @ParentLevel.CollisionIgnoreItem) then
-              Crea.LegsPosition := Crea.LegsPosition + Move;
+              Crea.Translate(Move);
           end else
           begin
             if BoxCollisionAssumeTranslation(NewTranslation,
               Crea.BoundingBox,
               @ParentLevel.CollisionIgnoreItem) then
-              Crea.LegsPosition := Crea.LegsPosition + Move;
+              Crea.Translate(Move);
           end;
         end;
 
@@ -878,7 +878,7 @@ begin
           if BoxCollisionAssumeTranslation(NewTranslation,
             Item.BoundingBox,
             @ParentLevel.CollisionIgnoreItem) then
-            Item.Translation := Item.Translation + Move;
+            Item.Translate(Move);
         end;
       end;
     end;
