@@ -184,22 +184,10 @@ begin
     DebugRenderForLevelScreenshotArgument);
   Items.Add('Reload sounds/index.xml');
   Items.Add('Edit lights');
-  Items.Add('Force thunder now');
   Items.Add('Back to game');
 end;
 
 procedure TDebugMenu.Click;
-
-  procedure ForceThunder;
-  begin
-    if Level.ThunderEffect <> nil then
-    begin
-      Level.ThunderEffect.ForceNow;
-      UserQuit := true;
-    end else
-      MessageOK(Window, 'Thunder effect not defined for this level.', taLeft);
-  end;
-
 begin
   inherited;
 
@@ -231,8 +219,7 @@ begin
          EditLevelLightsMenu := TEditLevelLightsMenu.Create(Application);
          SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
        end;
-    10:ForceThunder;
-    11:UserQuit := true;
+    10:UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -251,34 +238,24 @@ begin
   RotationVerticalSpeedSlider := TMenuFloatSlider.Create(25, 500, 1);
   PlayerSpeedSlider := TMenuFloatSlider.Create(0.1, 5, 1);
 
-  Items.Add('Set Player.MaxLife');
-  Items.Add('Player.Life := Player.MaxLife');
+  Items.Add('Infinite Life');
+  Items.Add('Fly');
   Items.AddObject('Set view angle', ViewAngleSlider);
   Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
   Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
   Items.AddObject('Set player speed', PlayerSpeedSlider);
   Items.Add('Reload player.xml file');
-  Items.Add('Fly');
   Items.Add('Back');
 end;
 
 procedure TDebugPlayerMenu.Click;
 
   procedure PlayerSetMaxLife;
-  var
-    Value: Single;
-  begin
-    Value := Player.MaxLife;
-    if MessageInputQuery(Window, 'Set Player.MaxLife',
-      Value, taLeft) then
-      Player.MaxLife := Value;
-  end;
-
-  procedure PlayerMaxLife;
   begin
     if Player.Dead then
       MessageOK(Window, 'No can do. You are dead.', taLeft) else
     begin
+      Player.MaxLife := 10000;
       Player.Life := Player.MaxLife;
       UserQuit := true;
     end;
@@ -289,14 +266,13 @@ begin
 
   case CurrentItem of
     0: PlayerSetMaxLife;
-    1: PlayerMaxLife;
+    1: Player.FlyingModeTimeoutBegin(60 * 60);
     2: ;
     3: ;
     4: ;
     5: ;
     6: Player.LoadFromFile;
-    7: Player.FlyingModeTimeoutBegin(60 * 60);
-    8: SetCurrentMenu(CurrentMenu, DebugMenu);
+    7: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
 end;
 
@@ -323,11 +299,9 @@ begin
   DebugTimeStopForCreaturesArgument := TMenuBooleanArgument.Create(
     DebugTimeStopForCreatures);
 
-  Items.Add('Show info about creatures on level');
   Items.Add('Kill all creatures');
   Items.Add('Kill all non-still creatures');
   Items.Add('Add creature to level before player');
-  Items.Add('Add creature to level exactly on player');
   Items.Add('Reload creatures/kinds.xml file');
   Items.Add('Reload animations of specific creature');
   Items.AddObject('Time stop for creatures', DebugTimeStopForCreaturesArgument);
@@ -351,29 +325,6 @@ procedure TDebugCreaturesMenu.Click;
       Result := ResultIndex <> CreaturesKinds.Count;
       if Result then
         ChooseCreature := CreaturesKinds[ResultIndex];
-    finally S.Free end;
-  end;
-
-  procedure ShowLevelCreaturesInfo;
-  var
-    S: TStringList;
-    I: Integer;
-  begin
-    S := TStringList.Create;
-    try
-      S.Append(Format('%d creatures on level:', [Level.Creatures.Count]));
-      S.Append('Index: Kind, Position, Life / MaxLife, CameraRadius');
-      S.Append('');
-
-      for I := 0 to Level.Creatures.Count - 1 do
-        S.Append(Format('%d: %s, %s, %s / %s, %s',
-          [ I, Level.Creatures[I].Kind.ShortName,
-            VectorToNiceStr(Level.Creatures[I].LegsPosition),
-            FloatToNiceStr(Level.Creatures[I].Life),
-            FloatToNiceStr(Level.Creatures[I].MaxLife),
-            FloatToNiceStr(Level.Creatures[I].Kind.CameraRadius) ]));
-
-      MessageOK(Window, S, taLeft);
     finally S.Free end;
   end;
 
@@ -441,18 +392,16 @@ begin
   inherited;
 
   case CurrentItem of
-    0: ShowLevelCreaturesInfo;
-    1: KillAll;
-    2: KillAllNonStill;
-    3: AddLevelCreature(10);
-    4: AddLevelCreature(0);
-    5: CreaturesKinds.LoadFromFile;
-    6: ReloadCreatureAnimation;
-    7: begin
+    0: KillAll;
+    1: KillAllNonStill;
+    2: AddLevelCreature(10);
+    3: CreaturesKinds.LoadFromFile;
+    4: ReloadCreatureAnimation;
+    5: begin
          DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
          DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
        end;
-    8: SetCurrentMenu(CurrentMenu, DebugMenu);
+    6: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
 end;
 
@@ -787,8 +736,8 @@ begin
   Items.AddObject('Intensity', IntensitySlider);
   Items.AddObject('Ambient intensity', AmbientIntensitySlider);
   Items.AddObject('On', OnArgument);
-  Items.AddObject('Shadows', ShadowsArgument);
-  Items.AddObject('Shadows main light', ShadowsMainArgument);
+  Items.AddObject('Shadow Vols', ShadowsArgument);
+  Items.AddObject('Shadows Vols Main', ShadowsMainArgument);
   Items.Add('Point/SpotLight: Change attenuation');
   Items.Add('DirectionalLight: Change direction');
   Items.Add('SpotLight: Change direction');
