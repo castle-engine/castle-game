@@ -150,7 +150,7 @@ type
         @item(When not MovePushesOthersUsesBoxes, then we try to check
           using precise octree of level objects (assuming they are
           used in SphereCollision/BoxCollision overrides).
-          And for player and creatures with UseBoundingSphere = @true,
+          And for player and creatures with UseSphere = @true,
           we use their spheres instead of their bounding boxes.
           This is the way of checking that more resembles reality
           (as we use the actual geometry within the octrees instead of
@@ -799,6 +799,8 @@ var
   CurrentTranslation, NewTranslation: TVector3Single;
   Crea: TCreature;
   Item: TItemOnLevel;
+  SphereC: TVector3Single;
+  SphereR: Single;
 begin
   if GetExists and Collides and MovePushesOthers then
   begin
@@ -857,10 +859,10 @@ begin
         for I := 0 to ParentLevel.Creatures.Count - 1 do
         begin
           Crea := ParentLevel.Creatures[I];
-          if Crea.UseBoundingSphere then
+          if Crea.UseSphere then
           begin
-            if SphereCollisionAssumeTranslation(NewTranslation,
-              Crea.MiddlePosition, Crea.Kind.CameraRadius,
+            Crea.Sphere(SphereC, SphereR);
+            if SphereCollisionAssumeTranslation(NewTranslation, SphereC, SphereR,
               @ParentLevel.CollisionIgnoreItem) then
               Crea.Translate(Move);
           end else

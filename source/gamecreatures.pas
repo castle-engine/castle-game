@@ -922,20 +922,19 @@ type
     procedure Sound3d(const SoundType: TSoundType; const SoundHeight: Single;
       TiedToCreature: boolean = true);
 
-    { Is using bounding sphere (sphere centered at MiddlePosition with
-      radius Kind.CameraRadius) allowed ?
+    { Can the approximate sphere be used for some collision-detection
+      tasks.
 
-      If @false, then all collision
-      detection routines @italic(must) use bounding box instead of the
-      sphere. Since UseBoundingSphere = @false usually means that
-      Kind.CameraRadius is not appropriate for this creature state.
+      Set to @false in descendants if Kind.CameraRadius
+      is not appropriate for this creature state.
 
       In this class, this is implemented to return @code(not Dead).
       This is usually sensible, since only alive creatures need bounding
       sphere advantages (stairs climbing), and using sphere with dead
       creatures would unnecessarily force the sphere radius to be small
       and MiddlePosition to be high. }
-    function UseBoundingSphere: boolean; virtual;
+    function UseSphere: boolean; override;
+    procedure Sphere(out Center: TVector3Single; out Radius: Single); override;
 
     function RayCollision(const RayOrigin, RayDirection: TVector3Single;
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): TRayCollision; override;
@@ -2056,7 +2055,7 @@ function TCreature.Move(
   const BecauseOfGravity: boolean): boolean;
 begin
   { Check creature<->level collision. }
-  if UseBoundingSphere then
+  if UseSphere then
   begin
     Result := Level.MoveAllowed(
       OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
@@ -2086,7 +2085,7 @@ function TCreature.MoveSimple(
   const BecauseOfGravity: boolean): boolean;
 begin
   { Check creature<->level collision. }
-  if UseBoundingSphere then
+  if UseSphere then
   begin
     Result := Level.MoveAllowedSimple(
       OldMiddlePosition, NewMiddlePosition,
@@ -2227,12 +2226,12 @@ procedure TCreature.Idle(const CompSpeed: Single);
           then you will get exatly into collision with the ground.
           So actually this is too large MaximumFallingDownDistance.
 
-          But actually it's OK when UseBoundingSphere, because then
+          But actually it's OK when UseSphere, because then
           MoveVertical (actually MoveAllowed) can correct new position,
           so actually it will be slightly above the ground. So falling
           down will work.
 
-          But when not UseBoundingSphere, the situation is worse,
+          But when not UseSphere, the situation is worse,
           because then MoveAllowed actually calls MoveAllowedSimple.
           And MoveAllowedSimple will always simply reject such move
           with MaximumFallingDownDistance.
@@ -2247,11 +2246,11 @@ procedure TCreature.Idle(const CompSpeed: Single);
           FPS is low, that's why the bug was noticeable only with shadows = on).
 
           TODO: the better version would be to improve
-          MoveAllowed for not UseBoundingSphere case, instead of
+          MoveAllowed for not UseSphere case, instead of
           workarounding it here with this epsilon,
           but this requires implementing "wall-sliding" for the whole box3d
           in our octree. }
-        if not UseBoundingSphere then
+        if not UseSphere then
           MaximumFallingDownDistance -= 0.01;
         MinTo1st(FallingDownDistance, MaximumFallingDownDistance);
       end;
@@ -2352,9 +2351,15 @@ begin
     Player.Life := Player.Life - Damage;
 end;
 
-function TCreature.UseBoundingSphere: boolean;
+function TCreature.UseSphere: boolean;
 begin
   Result := not Dead;
+end;
+
+procedure TCreature.Sphere(out Center: TVector3Single; out Radius: Single);
+begin
+  Center := MiddlePosition;
+  Radius := Kind.CameraRadius;
 end;
 
 function TCreature.RayCollision(const RayOrigin, RayDirection: TVector3Single;
@@ -3551,8 +3556,8 @@ begin
   if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
   { Note that for now missiles are removed from level as soon as they are dead,
-    so I don't bother with checking here Dead. Or UseBoundingSphere
-    --- you can safely assume that UseBoundingSphere is @true here,
+    so I don't bother with checking here Dead. Or UseSphere
+    --- you can safely assume that UseSphere is @true here,
     and use Level.MoveAllowedSimple instead of Level.MoveBoxAllowedSimple. }
 
   NewMiddlePosition := VectorAdd(MiddlePosition,
