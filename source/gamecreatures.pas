@@ -1353,16 +1353,7 @@ procedure TWalkAttackCreatureKind.PrepareRenderInternal(const BaseLights: TLight
 begin
   inherited;
 
-  AddFirstRootNodesPool(FStandAnimationInfo      );
-  AddFirstRootNodesPool(FStandToWalkAnimationInfo);
-  AddFirstRootNodesPool(FWalkAnimationInfo       );
-  AddFirstRootNodesPool(FAttackAnimationInfo     );
-  AddFirstRootNodesPool(FDyingAnimationInfo      );
-  AddFirstRootNodesPool(FDyingBackAnimationInfo  );
-  AddFirstRootNodesPool(FHurtAnimationInfo       );
-
   CreateAnimationIfNeeded('Stand'      , FStandAnimation      , FStandAnimationInfo      , BaseLights);
-  AddManifoldEdgesPool(FStandAnimationInfo, FStandAnimation);
   CreateAnimationIfNeeded('StandToWalk', FStandToWalkAnimation, FStandToWalkAnimationInfo, BaseLights);
   CreateAnimationIfNeeded('Walk'       , FWalkAnimation       , FWalkAnimationInfo       , BaseLights);
   CreateAnimationIfNeeded('Attack'     , FAttackAnimation     , FAttackAnimationInfo     , BaseLights);

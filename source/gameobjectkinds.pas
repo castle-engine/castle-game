@@ -38,20 +38,13 @@ type
     { This is internal for PrepareRender. }
     AnimationsPrepared: TCastlePrecalculatedAnimationList;
   protected
-    { Use this in PrepareRender to share RootNodes[0]
-      of your animations in subclasses. In our destructor and FreePrepareRender
-      we will free and clear objects on this list. }
-    FirstRootNodesPool: TStringList;
-
-    ManifoldEdgesPool: TStringList;
-
     { This creates Anim from given AnimInfo, only if Anim = nil.
       Then it sets attributes for the animation and then prepares
       the animation by calling animation's @noAutoLink(PrepareRender).
 
       So this may be helpful to use in PrepareRenderInside implementations.
 
-      It uses FirstRootNodesPool. It calls Progress.Step 2 times.
+      It calls Progress.Step 2 times.
 
       @param(AnimationName is here only for debug purposes (it may be used
       by some debug messages etc.)) }
@@ -61,16 +54,6 @@ type
       AnimInfo: TCastlePrecalculatedAnimationInfo;
       Options: TPrepareResourcesOptions;
       const BaseLights: TLightInstancesList);
-
-    { Add AnimInfo.ModelFileNames[0] to FirstRootNodesPool.
-      AnimInfo may be @nil, then this is ignored. }
-    procedure AddFirstRootNodesPool(AnimInfo: TCastlePrecalculatedAnimationInfo);
-
-    { Similar to AddFirstRootNodesPool, this allows us to share
-      ManifoldEdges / BorderEdges instances between different animations,
-      if they start from the same VRML scene. }
-    procedure AddManifoldEdgesPool(AnimInfo: TCastlePrecalculatedAnimationInfo;
-      AnimationToShareEdges: TCastlePrecalculatedAnimation);
 
     { Create AnimInfo instance, reading animation properties from
       XML file KindsConfig. The path of responsible XML element
@@ -116,8 +99,7 @@ type
       must be done once again, because some attributes (e.g. things
       set by AnimationAttributesSet) changed.
 
-      In this class this just sets PrepareRenderDone to @false,
-      and takes care of clearing FirstRootNodesPool. }
+      In this class this just sets PrepareRenderDone to @false. }
     procedure FreePrepareRender; virtual;
 
     { Free any association with current OpenGL context. }
@@ -154,28 +136,12 @@ begin
   inherited Create;
   FShortName := AShortName;
   FBlendingType := DefaultBlendingType;
-  FirstRootNodesPool := TStringList.Create;
-  ManifoldEdgesPool := TStringList.Create;
   AnimationsPrepared := TCastlePrecalculatedAnimationList.Create(false);
 end;
 
 destructor TObjectKind.Destroy;
-var
-  I: Integer;
 begin
-  for I := 0 to FirstRootNodesPool.Count - 1 do
-  begin
-    FirstRootNodesPool.Objects[I].Free;
-    FirstRootNodesPool.Objects[I] := nil;
-  end;
-  FreeAndNil(FirstRootNodesPool);
-
-  { No need to free ManifoldEdgesPool objects --- they are animations,
-    will be freed from other places (usually from FreePrepareRender). }
-  FreeAndNil(ManifoldEdgesPool);
-
   FreeAndNil(AnimationsPrepared);
-
   inherited;
 end;
 
@@ -247,18 +213,7 @@ begin
 end;
 
 procedure TObjectKind.FreePrepareRender;
-var
-  I: Integer;
 begin
-  for I := 0 to FirstRootNodesPool.Count - 1 do
-  begin
-    FirstRootNodesPool.Objects[I].Free;
-    FirstRootNodesPool.Objects[I] := nil;
-  end;
-  FirstRootNodesPool.Clear;
-
-  ManifoldEdgesPool.Clear;
-
   FPrepareRenderDone := false;
 end;
 
@@ -301,103 +256,19 @@ begin
   finally Progress.Fini; end;
 end;
 
-procedure TObjectKind.AddFirstRootNodesPool(AnimInfo: TCastlePrecalculatedAnimationInfo);
-var
-  FileName: string;
-begin
-  if AnimInfo <> nil then
-  begin
-    FileName := AnimInfo.ModelFileNames[0];
-    if FirstRootNodesPool.IndexOf(FileName) = -1 then
-      FirstRootNodesPool.AddObject(FileName, Load3D(FileName, false));
-  end;
-end;
-
-procedure TObjectKind.AddManifoldEdgesPool(AnimInfo: TCastlePrecalculatedAnimationInfo;
-  AnimationToShareEdges: TCastlePrecalculatedAnimation);
-var
-  FileName: string;
-  Index: Integer;
-begin
-  FileName := AnimInfo.ModelFileNames[0];
-  Index := ManifoldEdgesPool.IndexOf(FileName);
-  if Index = -1 then
-    ManifoldEdgesPool.AddObject(FileName, AnimationToShareEdges) else
-    ManifoldEdgesPool.Objects[Index] := AnimationToShareEdges;
-end;
-
 procedure TObjectKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TCastlePrecalculatedAnimation;
   AnimInfo: TCastlePrecalculatedAnimationInfo;
   Options: TPrepareResourcesOptions;
   const BaseLights: TLightInstancesList);
-
-  { Returns FirstScene.ManifoldEdges / BorderEdges.
-
-    Since all scenes in the animation must have exactly the same
-    structure, we know that this ManifoldEdges is actually good
-    for all scenes within this animation. }
-  function Animation_ManifoldEdges(Animation: TCastlePrecalculatedAnimation): TManifoldEdgeList;
-  begin
-    Result := Animation.FirstScene.ManifoldEdges;
-  end;
-
-  function Animation_BorderEdges(Animation: TCastlePrecalculatedAnimation): TBorderEdgeList;
-  begin
-    Result := Animation.FirstScene.BorderEdges;
-  end;
-
-  { Calls ShareManifoldAndBoderEdges on all scenes within this
-    animation. This is useful if you already have ManifoldEdges and BorderEdges,
-    and you somehow know that it's good also for this scene.
-
-    This is not part of TCastlePrecalculatedAnimation, because TCastlePrecalculatedAnimation doesn't
-    guarantee now that all scenes are "structurally equal". So you cannot share
-    edges info like this. However, all castle animations satify
-    "structurally equal" condition, so it's Ok for them. }
-  procedure Animation_ShareManifoldAndBorderEdges(
-    Animation: TCastlePrecalculatedAnimation;
-    ManifoldShared: TManifoldEdgeList;
-    BorderShared: TBorderEdgeList);
-  var
-    I: Integer;
-  begin
-    for I := 0 to Animation.ScenesCount - 1 do
-      Animation.Scenes[I].ShareManifoldAndBorderEdges(ManifoldShared, BorderShared);
-  end;
-
-var
-  FileName: string;
-  FileNameIndex: Integer;
-  IsSharedManifoldAndBorderEdges: boolean;
-  SharedManifoldEdges: TManifoldEdgeList;
-  SharedBorderEdges: TBorderEdgeList;
-  ActualOptions: TPrepareResourcesOptions;
 begin
   if (AnimInfo <> nil) and (Anim = nil) then
-    Anim := AnimInfo.CreateAnimation(FirstRootNodesPool);
+    Anim := AnimInfo.CreateAnimation;
   Progress.Step;
 
   if Anim <> nil then
   begin
-    { calculate IsSharedManifoldAndBorderEdges, SharedManifoldEdges,
-      SharedBorderEdges }
-    IsSharedManifoldAndBorderEdges := false;
-    if (AnimInfo <> nil) then
-    begin
-      FileName := AnimInfo.ModelFileNames[0];
-      FileNameIndex := ManifoldEdgesPool.IndexOf(FileName);
-      if FileNameIndex <> -1 then
-      begin
-        IsSharedManifoldAndBorderEdges := true;
-        SharedManifoldEdges := Animation_ManifoldEdges(
-          ManifoldEdgesPool.Objects[FileNameIndex] as TCastlePrecalculatedAnimation);
-        SharedBorderEdges := Animation_BorderEdges(
-          ManifoldEdgesPool.Objects[FileNameIndex] as TCastlePrecalculatedAnimation);
-      end;
-    end;
-
     { Write info before PrepareRender, otherwise it could not
       be available after freeing scene RootNodes in Anim.PrepareRender. }
     if Log then
@@ -407,18 +278,8 @@ begin
           Anim.ScenesCount,
           Anim.Scenes[0].TrianglesCount(true) ]));
 
-    { calculate ActualOptions: Options, but possibly without
-      prManifoldAndBorderEdges }
-    ActualOptions := Options;
-    if IsSharedManifoldAndBorderEdges then
-      Exclude(ActualOptions, prManifoldAndBorderEdges);
-
     AnimationAttributesSet(Anim.Attributes, BlendingType);
-    Anim.PrepareResources(ActualOptions, false, BaseLights);
-
-    if (prManifoldAndBorderEdges in Options) and
-      IsSharedManifoldAndBorderEdges then
-      Animation_ShareManifoldAndBorderEdges(Anim, SharedManifoldEdges, SharedBorderEdges);
+    Anim.PrepareResources(Options, false, BaseLights);
 
     AnimationsPrepared.Add(Anim);
   end;
