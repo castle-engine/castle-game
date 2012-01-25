@@ -1,22 +1,7 @@
-castle 2:
-
-- when our interact key activates pointing device sensor on VRML castle level,
-  our normal interact key handling doesn't know about it --- and still
-  seeks for 3d objects to press, eventually making "beep" to signal
-  it's not found.
-
-  This isn't much problem now, as there aren't TouchSensors used
-  actually in current levels, but it will become a problem later.
-
-- Make sure this input is always blocked for MenuBackground?
-  Or maybe allow input for MenuBackground, maybe this will be actually useful?
-
-- make news item "call for help" for 3d data at some point
-  (maybe freegamer will broadcast it? :)
-
-- make some creature use generatedcubemaptexture, to show it off
-  (needs creatures added to scenemanager, or do generatedcubemap by hand?
-  or maybe just static ImageCubeMapTexture could be cool enough?)
+Most of this file is obsolete now.
+We have here some ideas for new data, new levels, new creatures
+--- some of them will be used for castle 2.
+The "Castle 1" data files are no longed extended, I treat them as "finished".
 
 ------------------------------------------------------------------------------
 Resigned: fountain new level for castle 1.0.0:
@@ -35,6 +20,29 @@ Resigned: fountain new level for castle 1.0.0:
 - maybe small fog (3d tex?) rising from the fountain
 
 ------------------------------------------------------------------------------
+- Input_PointingDeviceActivate polish (if needed for castle 2):
+  - Input_PointingDeviceActivate interacts (badly?) with key repeat.
+    Keeping "e" pressed with activate/deactivate TouchSensor repeatedly.
+
+    Can we avoid it? CastleScene already does check
+    "FPointingDeviceActive <> Active". So we already check it, to avoid
+    reacting to repeated PointingDeviceActivate(true,...).
+    The problem is, GTK and Xlib send us keyup + keydown automatically?
+    So no way to avoid it (unless some hacks with timeouts to counteract
+    key repeat)? Or use some special flag in GTK and Xlib to detect when
+    KeyUp is "bogus", and should be ignored (right inside CastleWindow
+    implementation; outside code can then handle/or not repeated KetDown).
+
+    Do it, if will be problematic for castle 2.
+
+  - Make sure interact key input (PointingDeviceActivate)
+    is always blocked for MenuBackground?
+    Or maybe allow input for MenuBackground, maybe this will be actually useful?
+
+- make some creature use generatedcubemaptexture, to show it off
+  (needs creatures added to scenemanager, or do generatedcubemap by hand?
+  or maybe just static ImageCubeMapTexture could be cool enough?)
+
 - same plane walls on doom e1m1 level:
   - at the first door
   - right when opening the secret (lighter) door
@@ -64,7 +72,6 @@ Resigned: fountain new level for castle 1.0.0:
 - Circular (Laz forum), others:
   move speed too fast
   visual hint when monster is hit
-
 
 - rudy usability test:
   - again, mouse over yes/no message boxes should work
@@ -165,34 +172,6 @@ Resigned: fountain new level for castle 1.0.0:
 
 - knockback for player sword (or for some other short-range weapon ?)
 
-- Radeon problems
-
-  IIUni tests (retest this after "converse memory" feature) :
-  - test "9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game."
-    When run with --debug-no-creatures, music is OK.
-    Didn't manage to run without --debug-no-creatures.
-    Retest now with "conserve memory" feature.
-
-  Reported on PGD
-  (Retest now with "conserve memory" feature) :
-  6.FPS is awfully low.
-    Note: FPS seems much better with "render for level screenshot" = yes.
-    I'm probably doing something un-optimal on Radeon when drawing
-    2d controls. Make sure exactly what it is.
-    Later: this is somewhat difficult to reproduce on IIUni...
-    Ignore for 0.7.0 ?
-
-  7.Switching task (Alt+Tab) and going back to game causes "can't change display settings" warning.
-    Confirmed on on IIUni. Ignore for 0.7.0.
-
-  8.Using ctrl+alt+del to bring taskmgr -> taskmgr.exe fails. Well, this is definitely Radeon's problem. But maybe I'm just overloading the system too much ?
-    Confirmed on on IIUni. Ignore for 0.7.0.
-
-  9.No music on "The Gate" level. Oh, and the menu music also doesn't play when going back from the game.
-
-  - Check changing ColorsBits and VideoFrequency on Radeon, maybe will help for some problems ?
-    Check disabling lockArrays in renderer.
-
 - Paul: going up the steps could do with a smoother animation
 
 - Eric stage 6 comment:
@@ -215,12 +194,6 @@ Resigned: fountain new level for castle 1.0.0:
     is lower.
   - crosshair for bow
   - showing arrow in shooting anim for bow
-
-- intro moving when the game starts (either movie from the game --- or just some
-  nice anim, moving camera around the level.)
-
-Stage 6:
-Goal #5 (2.5 Points) - Have a minimum of 2 mini-bosses you must fight in the game.
 
 - gate:
   - use S&K red light with maxed intensity to shine on the top of the sword.
@@ -311,35 +284,15 @@ Cages level:
   Seems not needed, at least with my mouse ?
   Players with poor mouses can always just use keys ?
 
-- fix GTK backend to resize screen (surprisingly, it seems that I should
-  just use XFV86VidMode from Xlib ? GTK does not wrap this ?)
-  and then compile release versions of "The Castle" with GTK backend,
-  avoiding override_redirect.
-
-- Mama reports:
-  Po uruchomieniu castle.exe mam taki komunikat:
-    Error
-    castle: Exception EAccessViolation:
-    Access violation
-  pod windows'98
-
 - creature's footsteps sound ?
 
 - sound when creature sees player for the 1st time
-
-- music volume is affected by sound volume now. That's because listener gain affects everything...
-
-- Add names of guys that did the loops, maybe send them mails ? Some of the loops are plainly great!
-
-- choosing Min/MaxALAllocatedSounds from menu.
 
 - why with wide angle the corner geometry is sometimes clipped ?
 
 - sometimes spider_queen may get stuck in the ground ---
   that's because camera sphere
   middle changes with anim. Maybe make it non-changing ?
-
-- "Restore defaults" in Sound options.
 
 - Enemies:
   - More enemies attacks.
@@ -418,13 +371,6 @@ Cages level:
   "throw back" (throws all enemies slightly backward --- this is also useful
      for player to actually see that monsters get hurt when falling from high)
 
-- change the name --- there already exists game named "castle"!
-  And there is "Castle Adventure" !
-
-  "Castle in the rock"
-  "High castle"
-  "Castle above the mist" ?
-
 - idea from quake: water surface slowly moving (change/move the texture?
   some deformation of the texture ? I'm not sure how to do this trick,
   but it looks very nice!)
@@ -440,17 +386,6 @@ Cages level:
 - apply nice "strips" texture to handle of the sword,
   see http://mediawiki.blender.org/index.php/Manual/PartII/Basic_Mesh_Modelling
 
-- some alpha rect around the item's model ?
-  test, although it seems that rotating is enough.
-
-- Not bad creature models from www.3dcafe.com:
-
-  horror/abom
-  anatomy_people/creature
-  anatomy_people/vampire
-
-  /win/3dmodels/www.katorlegaz.com/animals/horse
-
 - Load / save game ability.
 
   Place load in the start menu.
@@ -461,20 +396,8 @@ Cages level:
 
   When loading game, load saved Notifications for this game.
 
-- It would be nice to get Mesa3D working with my game. Right now I get
-    castle: indirect_vertex_array.c:1359: __indirect_glTexCoordPointer: Assertion `a != ((void *)0)' failed.
-  when loading level, which seems to be a
-  <a href="http://forum.linspire.com/viewtopic.php?t=423672&">common
-  problem with Mesa</a>
-
-  Update: on kocury, GL_VERSION 1.2 (1.5 Mesa 6.4.1) works OK now.
-  Test on ii.uni in 137 room.
-
 ----------------------------------------
 dist-making to-dos:
-
-- Makefile to pack distro of my game: add at some point svn log:
-  svn log -v REPO-URL castle/trunk castle_game_engine/trunk > ChangeLog
 
 - real exe installer for Windows,
   include OpenAL installer
@@ -488,7 +411,7 @@ dist-making to-dos:
 Each time before uploading release:
 
 - test data/ things easy to forget:
-  - All textures in VRML files must have relative filenames
+  - All textures in VRML/X3D files must have relative filenames
       find data/ -type f -iname '*.wrl' | \
         xargs grep filename | \
         grep --invert-match "filename ../" | \
@@ -496,9 +419,6 @@ Each time before uploading release:
   - All sounds that are intended to be spatialized must be mono:
       wavidentify data/sounds/*.wav | grep stereo
 
-- make sure Version (in castlehelp.pas) is good
-- Remember to test whether FPC version used was correct
-  (to avoid accidentaly compiling with some SVN intermediate version etc.)
 - make release like for all other programs, see ../www/pack/README.txt
 
 - extract created dist
@@ -508,11 +428,9 @@ Each time before uploading release:
       ./castle
       rm -f ~/.castle.data
       ln -s /win/mojepasy/openGL/castle/trunk/ ~/.castle.data
-  - test building from extracted created dist (using `make build-xxx')
+  - test building from extracted created dist ("make")
 
 - upload to WWW:
-  release on SourceForge as usual (verify that file uploaded ok)
-
-- make svntag, check it's done in repo
+  release on SourceForge as usual, see ../www/NOTES.txt
 
 ----------------------------------------
