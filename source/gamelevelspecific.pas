@@ -886,8 +886,21 @@ constructor TCagesLevel.Create(
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
   AMenuBackground: boolean);
-var
-  BossIndex: Integer;
+
+  function FindCreatureKind(Kind: TCreatureKind): TCreature;
+  var
+    I: Integer;
+  begin
+    for I := 0 to Items.Count - 1 do
+      if Items[I] is TCreature then
+      begin
+        Result := TCreature(Items[I]);
+        if Result.Kind = Kind then
+          Exit;
+      end;
+    Result := nil;
+  end;
+
 begin
   inherited;
 
@@ -919,9 +932,7 @@ begin
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
   Items.Add(FGateExit);
 
-  BossIndex := Creatures.FindKind(SpiderQueen);
-  if BossIndex <> -1 then
-    FBossCreature := Creatures[BossIndex];
+  FBossCreature := FindCreatureKind(SpiderQueen);
 end;
 
 procedure TCagesLevel.SetDoEndSequence(Value: boolean);

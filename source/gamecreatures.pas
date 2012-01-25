@@ -980,10 +980,6 @@ type
       var IsAbove: boolean; var AboveHeight: Single;
       var AboveGround: P3DTriangle;
       IgnoreCreature: TCreature);
-
-    { Searches for item of given Kind. Returns index of first found,
-      or -1 if not found. }
-    function FindKind(Kind: TCreatureKind): Integer;
   end;
 
   TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack,
@@ -2534,14 +2530,6 @@ begin
         AboveGround := nil;
       end;
     end;
-end;
-
-function TCreatureList.FindKind(Kind: TCreatureKind): Integer;
-begin
-  for Result := 0 to Count - 1 do
-    if Items[Result].Kind = Kind then
-      Exit;
-  Result := -1;
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
