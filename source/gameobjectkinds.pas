@@ -25,7 +25,7 @@ unit GameObjectKinds;
 
 interface
 
-uses Classes, CastleXMLConfig, PrecalculatedAnimation, PrecalculatedAnimationInfo,
+uses Classes, CastleXMLConfig, PrecalculatedAnimation,
   GameVideoOptions, CastleSceneCore, CastleScene, X3DNodes;
 
 type
@@ -38,7 +38,7 @@ type
     { This is internal for PrepareRender. }
     AnimationsPrepared: TCastlePrecalculatedAnimationList;
   protected
-    { This creates Anim from given AnimInfo, only if Anim = nil.
+    { Create Anim from given AnimationFile, only if Anim = nil.
       Then it sets attributes for the animation and then prepares
       the animation by calling animation's @noAutoLink(PrepareRender).
 
@@ -51,24 +51,24 @@ type
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
       var Anim: TCastlePrecalculatedAnimation;
-      AnimInfo: TCastlePrecalculatedAnimationInfo;
+      AnimationFile: string;
       Options: TPrepareResourcesOptions;
       const BaseLights: TLightInstancesList);
 
-    { Create AnimInfo instance, reading animation properties from
-      XML file KindsConfig. The path of responsible XML element
+    { Read animation filename, reading from XML file KindsConfig.
+      The path of responsible XML attribute
       depends on ShortName and given AnimationName.
 
-      If NilIfNoElement, then this will just set AnimInfo to @nil
-      if appropriate XML element file not found. Otherwise
-      (when NilIfNoElement = @false, this is default),
+      If EmptyIfNoAttribute, then this will just set AnimationFile to ''
+      if appropriate XML attribute not found. Otherwise
+      (when EmptyIfNoAttribute = @false, this is default),
       error will be raised.
 
-      @param(AnimationName determines the XML element name, so it must
+      @param(AnimationName determines the XML attribute name, so it must
         be a valid part of XML name) }
-    procedure AnimationFromConfig(var AnimInfo: TCastlePrecalculatedAnimationInfo;
+    procedure AnimationFromConfig(var AnimationFile: string;
       KindsConfig: TCastleConfig; const AnimationName: string;
-      NilIfNoElement: boolean = false); virtual;
+      EmptyIfNoAttribute: boolean = false); virtual;
 
     { Prepare anything needed when starting new game.
       It must call Progress.Step PrepareRenderSteps times.
@@ -129,7 +129,7 @@ type
 implementation
 
 uses SysUtils, ProgressUnit, X3DLoad, DOM, GameWindow,
-  CastleStringUtils, CastleLog;
+  CastleStringUtils, CastleLog, CastleFilesUtils;
 
 constructor TObjectKind.Create(const AShortName: string);
 begin
@@ -259,12 +259,16 @@ end;
 procedure TObjectKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TCastlePrecalculatedAnimation;
-  AnimInfo: TCastlePrecalculatedAnimationInfo;
+  AnimationFile: string;
   Options: TPrepareResourcesOptions;
   const BaseLights: TLightInstancesList);
 begin
-  if (AnimInfo <> nil) and (Anim = nil) then
-    Anim := AnimInfo.CreateAnimation;
+  if (AnimationFile <> '') and (Anim = nil) then
+  begin
+    Anim := TCastlePrecalculatedAnimation.CreateCustomCache(nil, GLContextCache);
+    Anim.LoadFromFile(AnimationFile, { AllowStdIn } false,
+      { LoadTime } true, CreatureAnimationScenesPerTime);
+  end;
   Progress.Step;
 
   if Anim <> nil then
@@ -286,27 +290,23 @@ begin
   Progress.Step;
 end;
 
-procedure TObjectKind.AnimationFromConfig(var AnimInfo: TCastlePrecalculatedAnimationInfo;
+procedure TObjectKind.AnimationFromConfig(var AnimationFile: string;
   KindsConfig: TCastleConfig; const AnimationName: string;
-  NilIfNoElement: boolean);
+  EmptyIfNoAttribute: boolean);
 var
-  Element: TDOMElement;
+  FileName: string;
 begin
-  FreeAndNil(AnimInfo);
+  AnimationFile := '';
 
-  Element := KindsConfig.PathElement(
-    ShortName + '/' + AnimationName + '_animation/animation');
-  if Element = nil then
+  FileName := KindsConfig.GetValue(ShortName + '/' + AnimationName + '_animation', '');
+  if FileName = '' then
   begin
-    if not NilIfNoElement then
-      raise Exception.CreateFmt(
-        'No <%s_animation>/<animation> elements for object "%s"',
+    if not EmptyIfNoAttribute then
+      raise Exception.CreateFmt('Missing "%s_animation" for object "%s"',
         [AnimationName, ShortName]);
   end else
   begin
-    AnimInfo := TCastlePrecalculatedAnimationInfo.CreateFromDOMElement(
-      Element, ExtractFilePath(KindsConfig.FileName),
-      GLContextCache);
+    AnimationFile := CombinePaths(ExtractFilePath(KindsConfig.FileName), FileName);
   end;
 end;
 

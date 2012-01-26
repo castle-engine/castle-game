@@ -26,7 +26,7 @@ unit GameCreatures;
 interface
 
 uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, CastleUtils,
-  PrecalculatedAnimationInfo, CastleScene, GameSound, SceneWaypoints,
+  CastleScene, GameSound, SceneWaypoints,
   GameObjectKinds, ALSoundAllocator, CastleXMLConfig, Base3D,
   XmlSoundEngine, GLShadowVolumeRenderer, Triangle, Frustum, X3DNodes,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, CastleColors;
@@ -108,12 +108,8 @@ type
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
       var Anim: TCastlePrecalculatedAnimation;
-      AnimInfo: TCastlePrecalculatedAnimationInfo;
+      AnimationFile: string;
       const BaseLights: TLightInstancesList);
-
-    procedure AnimationFromConfig(var AnimInfo: TCastlePrecalculatedAnimationInfo;
-      KindsConfig: TCastleConfig; const AnimationName: string;
-      NilIfNoElement: boolean = false); override;
   public
     constructor Create(const AShortName: string);
 
@@ -265,13 +261,13 @@ type
     FDyingBackAnimation: TCastlePrecalculatedAnimation;
     FHurtAnimation: TCastlePrecalculatedAnimation;
 
-    FStandAnimationInfo: TCastlePrecalculatedAnimationInfo;
-    FStandToWalkAnimationInfo: TCastlePrecalculatedAnimationInfo;
-    FWalkAnimationInfo: TCastlePrecalculatedAnimationInfo;
-    FAttackAnimationInfo: TCastlePrecalculatedAnimationInfo;
-    FDyingAnimationInfo: TCastlePrecalculatedAnimationInfo;
-    FDyingBackAnimationInfo: TCastlePrecalculatedAnimationInfo;
-    FHurtAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FStandAnimationFile: string;
+    FStandToWalkAnimationFile: string;
+    FWalkAnimationFile: string;
+    FAttackAnimationFile: string;
+    FDyingAnimationFile: string;
+    FDyingBackAnimationFile: string;
+    FHurtAnimationFile: string;
 
     FMoveSpeed: Single;
     FMinDelayBetweenAttacks: Single;
@@ -343,7 +339,7 @@ type
     property DyingAnimation: TCastlePrecalculatedAnimation read FDyingAnimation;
 
     { An optional dying animation. May be @nil, and corresponding
-      DyingBackAnimationInfo may be @nil. If not @nil, this will be used
+      DyingBackAnimationFile may be ''. If not @nil, this will be used
       if creature is killed by hitting it in the back (and normal
       DyingAnimation is used only when it's killed by hitting from the front).
 
@@ -493,7 +489,7 @@ type
   TSpiderQueenKind = class(TWalkAttackCreatureKind)
   private
     FThrowWebAttackAnimation: TCastlePrecalculatedAnimation;
-    FThrowWebAttackAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FThrowWebAttackAnimationFile: string;
 
     FMinDelayBetweenThrowWebAttacks: Single;
     FMaxThrowWebAttackDistance: Single;
@@ -559,7 +555,7 @@ type
   TMissileCreatureKind = class(TCreatureKind)
   private
     FAnimation: TCastlePrecalculatedAnimation;
-    FAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FAnimationFile: string;
     FMoveSpeed: Single;
     FSoundExplosion: TSoundType;
     FCloseDirectionToPlayer: boolean;
@@ -639,7 +635,7 @@ type
   TStillCreatureKind = class(TCreatureKind)
   private
     FAnimation: TCastlePrecalculatedAnimation;
-    FAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FAnimationFile: string;
   protected
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
@@ -1250,7 +1246,7 @@ end;
 procedure TCreatureKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TCastlePrecalculatedAnimation;
-  AnimInfo: TCastlePrecalculatedAnimationInfo;
+  AnimationFile: string;
   const BaseLights: TLightInstancesList);
 var
   Options: TPrepareResourcesOptions;
@@ -1259,18 +1255,8 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
+  inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimationFile,
     Options, BaseLights);
-end;
-
-procedure TCreatureKind.AnimationFromConfig(var AnimInfo: TCastlePrecalculatedAnimationInfo;
-  KindsConfig: TCastleConfig; const AnimationName: string;
-  NilIfNoElement: boolean);
-begin
-  inherited;
-  if AnimInfo <> nil then
-    AnimInfo.ScenesPerTime :=
-      AnimInfo.ScenesPerTime * CreatureAnimationScenesPerTime;
 end;
 
 { TCreatureKindList -------------------------------------------------------- }
@@ -1338,13 +1324,13 @@ begin
   FreeAndNil(FDyingBackAnimation);
   FreeAndNil(FHurtAnimation);
 
-  FreeAndNil(FStandAnimationInfo);
-  FreeAndNil(FStandToWalkAnimationInfo);
-  FreeAndNil(FWalkAnimationInfo);
-  FreeAndNil(FAttackAnimationInfo);
-  FreeAndNil(FDyingAnimationInfo);
-  FreeAndNil(FDyingBackAnimationInfo);
-  FreeAndNil(FHurtAnimationInfo);
+  FStandAnimationFile := '';
+  FStandToWalkAnimationFile := '';
+  FWalkAnimationFile := '';
+  FAttackAnimationFile := '';
+  FDyingAnimationFile := '';
+  FDyingBackAnimationFile := '';
+  FHurtAnimationFile := '';
 
   inherited;
 end;
@@ -1353,13 +1339,13 @@ procedure TWalkAttackCreatureKind.PrepareRenderInternal(const BaseLights: TLight
 begin
   inherited;
 
-  CreateAnimationIfNeeded('Stand'      , FStandAnimation      , FStandAnimationInfo      , BaseLights);
-  CreateAnimationIfNeeded('StandToWalk', FStandToWalkAnimation, FStandToWalkAnimationInfo, BaseLights);
-  CreateAnimationIfNeeded('Walk'       , FWalkAnimation       , FWalkAnimationInfo       , BaseLights);
-  CreateAnimationIfNeeded('Attack'     , FAttackAnimation     , FAttackAnimationInfo     , BaseLights);
-  CreateAnimationIfNeeded('Dying'      , FDyingAnimation      , FDyingAnimationInfo      , BaseLights);
-  CreateAnimationIfNeeded('DyingBack'  , FDyingBackAnimation  , FDyingBackAnimationInfo  , BaseLights);
-  CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationInfo       , BaseLights);
+  CreateAnimationIfNeeded('Stand'      , FStandAnimation      , FStandAnimationFile      , BaseLights);
+  CreateAnimationIfNeeded('StandToWalk', FStandToWalkAnimation, FStandToWalkAnimationFile, BaseLights);
+  CreateAnimationIfNeeded('Walk'       , FWalkAnimation       , FWalkAnimationFile       , BaseLights);
+  CreateAnimationIfNeeded('Attack'     , FAttackAnimation     , FAttackAnimationFile     , BaseLights);
+  CreateAnimationIfNeeded('Dying'      , FDyingAnimation      , FDyingAnimationFile      , BaseLights);
+  CreateAnimationIfNeeded('DyingBack'  , FDyingBackAnimation  , FDyingBackAnimationFile  , BaseLights);
+  CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationFile       , BaseLights);
 
   CameraRadiusFromPrepareRender :=
     Min(StandAnimation.Scenes[0].BoundingBox.XYRadius,
@@ -1440,13 +1426,13 @@ begin
   SoundAttackStart := SoundEngine.SoundFromName(
     KindsConfig.GetValue(ShortName + '/sound_attack_start', ''));
 
-  AnimationFromConfig(FStandAnimationInfo, KindsConfig, 'stand');
-  AnimationFromConfig(FStandToWalkAnimationInfo, KindsConfig, 'stand_to_walk');
-  AnimationFromConfig(FWalkAnimationInfo, KindsConfig, 'walk');
-  AnimationFromConfig(FAttackAnimationInfo, KindsConfig, 'attack');
-  AnimationFromConfig(FDyingAnimationInfo, KindsConfig, 'dying');
-  AnimationFromConfig(FDyingBackAnimationInfo, KindsConfig, 'dying_back', true);
-  AnimationFromConfig(FHurtAnimationInfo, KindsConfig, 'hurt');
+  AnimationFromConfig(FStandAnimationFile, KindsConfig, 'stand');
+  AnimationFromConfig(FStandToWalkAnimationFile, KindsConfig, 'stand_to_walk');
+  AnimationFromConfig(FWalkAnimationFile, KindsConfig, 'walk');
+  AnimationFromConfig(FAttackAnimationFile, KindsConfig, 'attack');
+  AnimationFromConfig(FDyingAnimationFile, KindsConfig, 'dying');
+  AnimationFromConfig(FDyingBackAnimationFile, KindsConfig, 'dying_back', true);
+  AnimationFromConfig(FHurtAnimationFile, KindsConfig, 'hurt');
 end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
@@ -1490,7 +1476,7 @@ end;
 destructor TSpiderQueenKind.Destroy;
 begin
   FreeAndNil(FThrowWebAttackAnimation);
-  FreeAndNil(FThrowWebAttackAnimationInfo);
+  FThrowWebAttackAnimationFile := '';
   inherited;
 end;
 
@@ -1504,7 +1490,7 @@ procedure TSpiderQueenKind.PrepareRenderInternal(const BaseLights: TLightInstanc
 begin
   inherited;
   CreateAnimationIfNeeded('ThrowWebAttack',
-    FThrowWebAttackAnimation, FThrowWebAttackAnimationInfo, BaseLights);
+    FThrowWebAttackAnimation, FThrowWebAttackAnimationFile, BaseLights);
 end;
 
 function TSpiderQueenKind.PrepareRenderSteps: Cardinal;
@@ -1541,7 +1527,7 @@ begin
   ActualThrowWebAttackTime :=
     KindsConfig.GetFloat(ShortName + '/throw_web/actual_attack_time', 0.0);
 
-  AnimationFromConfig(FThrowWebAttackAnimationInfo, KindsConfig, 'throw_web_attack');
+  AnimationFromConfig(FThrowWebAttackAnimationFile, KindsConfig, 'throw_web_attack');
 end;
 
 { TGhostKind ------------------------------------------------------------- }
@@ -1593,7 +1579,7 @@ end;
 destructor TMissileCreatureKind.Destroy;
 begin
   FreeAndNil(FAnimation);
-  FreeAndNil(FAnimationInfo);
+  FAnimationFile := '';
   inherited;
 end;
 
@@ -1606,7 +1592,7 @@ end;
 procedure TMissileCreatureKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
-  CreateAnimationIfNeeded('Move', FAnimation, FAnimationInfo, BaseLights);
+  CreateAnimationIfNeeded('Move', FAnimation, FAnimationFile, BaseLights);
 
   CameraRadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
@@ -1665,7 +1651,7 @@ begin
   SoundIdle := SoundEngine.SoundFromName(
     KindsConfig.GetValue(ShortName + '/sound_idle', ''));
 
-  AnimationFromConfig(FAnimationInfo, KindsConfig, 'fly');
+  AnimationFromConfig(FAnimationFile, KindsConfig, 'fly');
 end;
 
 { TStillCreatureKind ---------------------------------------------------- }
@@ -1678,7 +1664,7 @@ end;
 destructor TStillCreatureKind.Destroy;
 begin
   FreeAndNil(FAnimation);
-  FreeAndNil(FAnimationInfo);
+  FAnimationFile := '';
   inherited;
 end;
 
@@ -1691,7 +1677,7 @@ end;
 procedure TStillCreatureKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
-  CreateAnimationIfNeeded('Stand', FAnimation, FAnimationInfo, BaseLights);
+  CreateAnimationIfNeeded('Stand', FAnimation, FAnimationFile, BaseLights);
 
   CameraRadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
@@ -1721,7 +1707,7 @@ procedure TStillCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  AnimationFromConfig(FAnimationInfo, KindsConfig, 'stand');
+  AnimationFromConfig(FAnimationFile, KindsConfig, 'stand');
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }

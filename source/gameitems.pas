@@ -27,7 +27,7 @@ interface
 
 uses Boxes3D, X3DNodes, CastleScene, VectorMath, CastleUtils,
   CastleClassUtils, Classes, Images, GL, GLU, CastleGLUtils, GameSound,
-  PrecalculatedAnimation, PrecalculatedAnimationInfo, GameObjectKinds,
+  PrecalculatedAnimation, GameObjectKinds,
   CastleXMLConfig, XmlSoundEngine, Frustum, Base3D,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, CastleColors;
 
@@ -79,7 +79,7 @@ type
     procedure CreateAnimationIfNeeded(
       const AnimationName: string;
       var Anim: TCastlePrecalculatedAnimation;
-      AnimInfo: TCastlePrecalculatedAnimationInfo;
+      AnimInfo: string;
       const BaseLights: TLightInstancesList);
 
     function GetStringCheckNonEmpty(KindsConfig: TCastleConfig;
@@ -165,7 +165,7 @@ type
     FScreenImageAlignBottom : boolean;
     FEquippingSound: TSoundType;
     FAttackAnimation: TCastlePrecalculatedAnimation;
-    FAttackAnimationInfo: TCastlePrecalculatedAnimationInfo;
+    FAttackAnimationFile: string;
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
@@ -517,7 +517,7 @@ end;
 procedure TItemKind.CreateAnimationIfNeeded(
   const AnimationName: string;
   var Anim: TCastlePrecalculatedAnimation;
-  AnimInfo: TCastlePrecalculatedAnimationInfo;
+  AnimInfo: string;
   const BaseLights: TLightInstancesList);
 begin
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
@@ -586,7 +586,7 @@ end;
 destructor TItemWeaponKind.Destroy;
 begin
   FreeAndNil(FAttackAnimation);
-  FreeAndNil(FAttackAnimationInfo);
+  FAttackAnimationFile := '';
   FreeAndNil(FScreenImage);
   inherited;
 end;
@@ -635,7 +635,7 @@ end;
 procedure TItemWeaponKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
-  CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationInfo,
+  CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationFile,
     BaseLights);
 end;
 
@@ -678,9 +678,9 @@ begin
   SoundAttackStart := SoundEngine.SoundFromName(
     KindsConfig.GetValue(ShortName + '/sound_attack_start', ''));
 
-  { TODO: TItemWeaponKind impl allows to have FAttackAnimationInfo = nil
+  { TODO: TItemWeaponKind impl allows to have FAttackAnimationFile = ''
     if you don't want attack animation, but line below doesn't allow it. }
-  AnimationFromConfig(FAttackAnimationInfo, KindsConfig, 'attack');
+  AnimationFromConfig(FAttackAnimationFile, KindsConfig, 'attack');
 end;
 
 { TItemShortRangeWeaponKind -------------------------------------------------- }

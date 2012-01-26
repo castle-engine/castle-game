@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<animation scenes_per_time="1" loop="false" backwards="false">
+  <frame file_name="alien_still_final.wrl" time="0.00" />
+  <frame file_name="alien_attack_2_final.wrl" time="0.30" />
+  <frame file_name="alien_attack_1_final.wrl" time="0.60" />
+  <frame file_name="alien_still_final.wrl" time="1.00" />
+</animation>

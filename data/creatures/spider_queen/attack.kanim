@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<animation scenes_per_time="1" loop="false" backwards="false">
+  <frame file_name="spider_queen_stand.wrl" time="0.00" />
+  <frame file_name="spider_queen_attack_2.wrl" time="0.20" />
+  <frame file_name="spider_queen_attack_3.wrl" time="0.40" />
+  <frame file_name="spider_queen_stand.wrl" time="0.60" />
+</animation>

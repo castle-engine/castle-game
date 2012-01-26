@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<animation scenes_per_time="1" loop="false" backwards="false">
+  <frame file_name="werewolf_still_final.wrl" time="0.00" />
+  <frame file_name="werewolf_hurt_final.wrl" time="0.30" />
+  <frame file_name="werewolf_dead_final.wrl" time="0.80" />
+</animation>

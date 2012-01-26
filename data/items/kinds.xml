@@ -37,17 +37,11 @@
 
     equipping_sound="sword_equipping"
     sound_attack_start="sword_attack_start"
+
+    attack_animation="sword/attack.kanim"
   >
     <screen_image file_name="sword/equipped.png" align_left="false" align_bottom="true" />
     <damage const="20.0" random="20.0" />
-
-    <attack_animation>
-      <animation scenes_per_time="30" equality_epsilon="0"
-        loop="false" backwards="false">
-        <frame file_name="sword/attack_1.wrl" time="0" />
-        <frame file_name="sword/attack_2.wrl" time="0.5" />
-      </animation>
-    </attack_animation>
   </Sword>
 
   <Bow
@@ -58,16 +52,10 @@
 
     equipping_sound="bow_equipping"
     sound_attack_start="bow_attack_start"
+
+    attack_animation="bow/attack.kanim"
   >
     <screen_image file_name="bow/equipped.png" align_left="false" align_bottom="true" />
-
-    <attack_animation>
-      <animation scenes_per_time="30" equality_epsilon="0"
-        loop="false" backwards="false">
-        <frame file_name="bow/attack_2.wrl" time="0" />
-        <frame file_name="bow/attack_1.wrl" time="0.5" />
-      </animation>
-    </attack_animation>
   </Bow>
 
   <ScrFlying
