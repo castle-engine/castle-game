@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 
 <animation
-  scenes_per_time="30"
   equality_epsilon="0.01"
   loop="true"
   backwards="true">

@@ -379,8 +379,7 @@ begin
 
       2. Contrary to my expectations, setting it to
          MinCreatureAnimationScenesPerTime does *not* drastically
-         reduce "Loading creatures" time. So the setting is not so
-         meaningfull for the user.
+         reduce "Loading creatures" time. Although it does reduce memory usage.
   }
 
   SubMenuTitle := 'Video options';

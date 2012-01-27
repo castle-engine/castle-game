@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<animation scenes_per_time="1" loop="false" backwards="true">
+<animation loop="false" backwards="true">
   <frame file_name="alien_still_final.wrl" time="0.00" />
   <frame file_name="alien_dying_1_final.wrl" time="0.10" />
 </animation>

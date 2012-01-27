@@ -25,7 +25,8 @@ unit GameVideoOptions;
 
 interface
 
-uses GL, CastleGLUtils, CastleScene, X3DNodes;
+uses GL, CastleGLUtils, CastleScene, X3DNodes,
+  PrecalculatedAnimationCore;
 
 type
   { This determines OpenGL blending factors used when rendering given model. }
@@ -92,7 +93,7 @@ var
   AllowScreenChange: boolean;
 
 const
-  DefaultCreatureAnimationScenesPerTime = 30;
+  DefaultCreatureAnimationScenesPerTime = DefaultKAnimScenesPerTime;
   MinCreatureAnimationScenesPerTime = 5;
   MaxCreatureAnimationScenesPerTime = 40;
 

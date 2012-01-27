@@ -13,13 +13,6 @@
 
   For available sound names see ../sounds/index.xml. Empty (or not specified)
   sound name always means "no sound for this event".
-
-  Notes about animation specification:
-  - scenes_per_time is here used only as the multiplier for the
-    default value set in the program (currently 30).
-    This means that usually you want to pass scenes_per_time="1".
-  - equality_epsilon set here *is honoured*. (Although default value (see
-    http://castle-engine.sourceforge.net/kanim_format.php) is usually OK.)
 -->
 
 <CONFIG>

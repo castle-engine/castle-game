@@ -129,7 +129,7 @@ type
 implementation
 
 uses SysUtils, ProgressUnit, X3DLoad, DOM, GameWindow,
-  CastleStringUtils, CastleLog, CastleFilesUtils;
+  CastleStringUtils, CastleLog, CastleFilesUtils, PrecalculatedAnimationCore;
 
 constructor TObjectKind.Create(const AShortName: string);
 begin
@@ -267,7 +267,9 @@ begin
   begin
     Anim := TCastlePrecalculatedAnimation.CreateCustomCache(nil, GLContextCache);
     Anim.LoadFromFile(AnimationFile, { AllowStdIn } false,
-      { LoadTime } true, CreatureAnimationScenesPerTime);
+      { LoadTime } true,
+      { rescale scenes_per_time }
+      CreatureAnimationScenesPerTime / DefaultKAnimScenesPerTime);
   end;
   Progress.Step;
 

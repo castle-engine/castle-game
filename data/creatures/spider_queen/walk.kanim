@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<!-- This animation really needs more frames to look smoothly. -->
-<animation scenes_per_time="5" loop="true" backwards="false">
+<!-- This animation really needs more frames (scenes_per_time) to look smoothly. -->
+<animation scenes_per_time="150" loop="true" backwards="false">
   <frame file_name="spider_queen_stand.wrl" time="0.00" />
   <frame file_name="spider_queen_walk_2.wrl" time="0.04" />
   <frame file_name="spider_queen_walk_3.wrl" time="0.08" />

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<animation scenes_per_time="25" optimization="separate-shapes-no-transform" equality_epsilon="0.001" loop="false" backwards="false" >
+<animation scenes_per_time="25" equality_epsilon="0.001" loop="false" backwards="false" >
 <frame file_name="fountain1.wrl.gz" time="0.0" />
 <frame file_name="fountain2.wrl.gz" time="0.04" />
 <frame file_name="fountain3.wrl.gz" time="0.08" />

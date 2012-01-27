@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<animation scenes_per_time="1" loop="true" backwards="true">
+<animation loop="false" backwards="false">
   <frame file_name="werewolf_still_final.wrl" time="0.00" />
-  <frame file_name="werewolf_walk_2_final.wrl" time="0.2" />
+  <frame file_name="werewolf_attack_1_final.wrl" time="0.15" />
+  <frame file_name="werewolf_attack_2_final.wrl" time="0.30" />
+  <frame file_name="werewolf_still_final.wrl" time="0.50" />
 </animation>
