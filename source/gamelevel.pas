@@ -456,10 +456,7 @@ type
   public
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
-      be sure to initialize Progress.UserInterface before calling this.
-
-      Note that ARequiredCreatures reference is simply copied (as we don't
-      require anywhere to modify it). }
+      be sure to initialize Progress.UserInterface before calling this. }
     constructor Create(
       const AName: string;
       const ASceneFileName: string;
@@ -1124,7 +1121,8 @@ begin
   FTitleHint := ATitleHint;
   FNumber := ANumber;
   FMenuBackground := AMenuBackground;
-  FRequiredCreatures := ARequiredCreatures;
+  FRequiredCreatures := TStringList.Create;
+  FRequiredCreatures.Assign(ARequiredCreatures);
 
   if not DebugNoCreatures then
     RequireCreatures(BaseLights, FRequiredCreatures);
@@ -1292,6 +1290,7 @@ begin
   FreeAndNil(FCreatures);
   if (FRequiredCreatures <> nil) and not DebugNoCreatures then
     UnRequireCreatures(FRequiredCreatures);
+  FreeAndNil(FRequiredCreatures);
   inherited;
 end;
 
