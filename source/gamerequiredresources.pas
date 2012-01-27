@@ -130,17 +130,7 @@ begin
 
     if Names.IndexOf(Kind.ShortName) <> -1 then
     begin
-      { If everything went OK, I could place here an assertion
-        Assert(Kind.RequiredCount > 0);
-        However, if creature loading inside RequireCreatures will fail,
-        then TLevel destructor is forced to call UnRequireCreatures
-        possibly "unrequiring" more than was actually initialized.
-        So we have to silently ignore cases when creature is unrequired
-        even though it already has "Kind.RequiredCount = 0".
-        Still, a correct run of the program (when creature loading goes 100% OK)
-        should always have Kind.RequiredCount > 0 here. }
-
-      if Kind.RequiredCount = 0 then Exit;
+      Assert(Kind.RequiredCount > 0);
 
       Kind.RequiredCount := Kind.RequiredCount - 1;
       if Kind.RequiredCount = 0 then
@@ -148,9 +138,20 @@ begin
         if Log then
           WritelnLog('Resources', Format(
             'Creature "%s" is no longer required, freeing', [Kind.ShortName]));
-        Assert(Kind.PrepareRenderDone);
 
-        Kind.FreePrepareRender;
+        { If everything went OK, I could place here an assertion
+
+            Assert(Kind.PrepareRenderDone);
+
+          However, if creature loading inside RequireCreatures will fail,
+          then TLevel destructor is forced to call UnRequireCreatures
+          on creatures that, although had RequiredCount
+          increased, didn't have actually PrepareRender call.
+          Still, a correct run of the program (when creature loading goes 100% OK)
+          should always have Kind.RequiredCount > 0 here. }
+
+        if Kind.PrepareRenderDone then
+          Kind.FreePrepareRender;
       end;
     end;
   end;
