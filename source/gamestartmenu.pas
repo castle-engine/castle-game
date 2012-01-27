@@ -330,9 +330,9 @@ begin
   AllowScreenChangeArgument := TMenuBooleanArgument.Create(AllowScreenChange);
   RenderShadowsArgument := TMenuBooleanArgument.Create(RenderShadows);
   CreatureAnimationSlider := TMenuIntegerSlider.Create(
-    MinCreatureAnimationScenesPerTime,
-    MaxCreatureAnimationScenesPerTime,
-    CreatureAnimationScenesPerTime);
+    MinAnimationScenesPerTime,
+    MaxAnimationScenesPerTime,
+    AnimationScenesPerTime);
 
   ColorDepthArgument := TMenuArgument.Create(
     TMenuArgument.TextWidth(SSystemDefault));
@@ -350,7 +350,7 @@ begin
   Items.AddObject('Texture quality', TextureMinificationQualitySlider);
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
   Items.AddObject('Shadow volumes', RenderShadowsArgument);
-  Items.AddObject('Creature animation smoothness', CreatureAnimationSlider);
+  Items.AddObject('Animation smoothness', CreatureAnimationSlider);
   Items.AddObject('Color depth', ColorDepthArgument);
   Items.AddObject('Display frequency', VideoFrequencyArgument);
   Items.AddObject('Bump mapping', BumpMappingArgument);
@@ -374,11 +374,11 @@ begin
       But I don't like this implementation. Why ?
 
       1. CastleCreatures implementation requires that the
-         program must be restarted for new CreatureAnimationScenesPerTime
+         program must be restarted for new AnimationScenesPerTime
          value to take effect.
 
       2. Contrary to my expectations, setting it to
-         MinCreatureAnimationScenesPerTime does *not* drastically
+         MinAnimationScenesPerTime does *not* drastically
          reduce "Loading creatures" time. Although it does reduce memory usage.
   }
 
@@ -498,15 +498,15 @@ begin
 
          SetTextureMinificationQuality(DefaultTextureMinificationQuality, true);
 
-         if CreatureAnimationScenesPerTime <> DefaultCreatureAnimationScenesPerTime then
+         if AnimationScenesPerTime <> DefaultAnimationScenesPerTime then
          begin
-           CreatureAnimationScenesPerTime := DefaultCreatureAnimationScenesPerTime;
+           AnimationScenesPerTime := DefaultAnimationScenesPerTime;
 
            { TODO: FPC bug below ?
-             When I change below DefaultCreatureAnimationScenesPerTime
-             to CreatureAnimationScenesPerTime, the assignment below doesn't
+             When I change below DefaultAnimationScenesPerTime
+             to AnimationScenesPerTime, the assignment below doesn't
              work anymore. Doing
-               Writeln('Should be ', CreatureAnimationScenesPerTime);
+               Writeln('Should be ', AnimationScenesPerTime);
              suddenly makes the assigment working.
 
              Steps to reproduce : run the game, change the slider value
@@ -518,7 +518,7 @@ begin
              With -dDEBUG doesn't happen.
              On Win32 with -dRELEASE doesn't happen. }
 
-           CreatureAnimationSlider.Value := DefaultCreatureAnimationScenesPerTime;
+           CreatureAnimationSlider.Value := DefaultAnimationScenesPerTime;
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
@@ -559,10 +559,10 @@ begin
            false);
        end;
     4: begin
-         if CreatureAnimationScenesPerTime <>
+         if AnimationScenesPerTime <>
            Cardinal(CreatureAnimationSlider.Value) then
          begin
-           CreatureAnimationScenesPerTime := CreatureAnimationSlider.Value;
+           AnimationScenesPerTime := CreatureAnimationSlider.Value;
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
        end;

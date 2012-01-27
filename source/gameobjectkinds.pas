@@ -266,10 +266,9 @@ begin
   if (AnimationFile <> '') and (Anim = nil) then
   begin
     Anim := TCastlePrecalculatedAnimation.CreateCustomCache(nil, GLContextCache);
-    Anim.LoadFromFile(AnimationFile, { AllowStdIn } false,
-      { LoadTime } true,
+    Anim.LoadFromFile(AnimationFile, { AllowStdIn } false, { LoadTime } true,
       { rescale scenes_per_time }
-      CreatureAnimationScenesPerTime / DefaultKAnimScenesPerTime);
+      AnimationScenesPerTime / DefaultKAnimScenesPerTime);
   end;
   Progress.Step;
 

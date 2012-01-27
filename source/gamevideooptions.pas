@@ -93,12 +93,12 @@ var
   AllowScreenChange: boolean;
 
 const
-  DefaultCreatureAnimationScenesPerTime = DefaultKAnimScenesPerTime;
-  MinCreatureAnimationScenesPerTime = 5;
-  MaxCreatureAnimationScenesPerTime = 40;
+  DefaultAnimationScenesPerTime = DefaultKAnimScenesPerTime;
+  MinAnimationScenesPerTime = 5;
+  MaxAnimationScenesPerTime = 40;
 
 var
-  CreatureAnimationScenesPerTime: Cardinal;
+  AnimationScenesPerTime: Cardinal;
 
 var
   { You can set this to true for testing purposes. }
@@ -217,9 +217,9 @@ initialization
     Ord(DefaultTextureMinificationQuality)));
   AllowScreenChange := ConfigFile.GetValue(
     'video_options/allow_screen_change', DefaultAllowScreenChange);
-  CreatureAnimationScenesPerTime := ConfigFile.GetValue(
-    'video_options/creature_animation_smoothness',
-    DefaultCreatureAnimationScenesPerTime);
+  AnimationScenesPerTime := ConfigFile.GetValue(
+    'video_options/animation_smoothness',
+    DefaultAnimationScenesPerTime);
   RenderShadows := ConfigFile.GetValue(
     'video_options/shadows', DefaultRenderShadows);
   ColorDepthBits := ConfigFile.GetValue(
@@ -240,8 +240,8 @@ finalization
     'video_options/allow_screen_change',
     AllowScreenChange, DefaultAllowScreenChange);
   ConfigFile.SetDeleteValue(
-    'video_options/creature_animation_smoothness',
-    CreatureAnimationScenesPerTime, DefaultCreatureAnimationScenesPerTime);
+    'video_options/animation_smoothness',
+    AnimationScenesPerTime, DefaultAnimationScenesPerTime);
   ConfigFile.SetDeleteValue(
     'video_options/shadows',
     RenderShadows, DefaultRenderShadows);
