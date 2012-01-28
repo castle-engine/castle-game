@@ -328,30 +328,21 @@ procedure TDebugCreaturesMenu.Click;
     finally S.Free end;
   end;
 
-  procedure KillAll;
+  procedure KillAll(const IncludeStill: boolean);
   var
     I: Integer;
+    C: TCreature;
   begin
-    for I := 0 to Level.Creatures.Count - 1 do
-      if Level.Creatures[I].Life > 0 then
+    for I := 0 to Level.Items.Count - 1 do
+      if Level.Items[I] is TCreature then
       begin
-        Level.Creatures[I].SoundDyingEnabled := false;
-        Level.Creatures[I].Life := 0;
-        Level.Creatures[I].LastAttackDirection := ZeroVector3Single;
-      end;
-  end;
-
-  procedure KillAllNonStill;
-  var
-    I: Integer;
-  begin
-    for I := 0 to Level.Creatures.Count - 1 do
-      if (not (Level.Creatures[I] is TStillCreature)) and
-        (Level.Creatures[I].Life > 0) then
-      begin
-        Level.Creatures[I].SoundDyingEnabled := false;
-        Level.Creatures[I].Life := 0;
-        Level.Creatures[I].LastAttackDirection := ZeroVector3Single;
+        C := TCreature(Level.Items[I]);
+        if (C.Life > 0) and (IncludeStill or (not (C is TStillCreature))) then
+        begin
+          C.SoundDyingEnabled := false;
+          C.Life := 0;
+          C.LastAttackDirection := ZeroVector3Single;
+        end;
       end;
   end;
 
@@ -392,8 +383,8 @@ begin
   inherited;
 
   case CurrentItem of
-    0: KillAll;
-    1: KillAllNonStill;
+    0: KillAll(true);
+    1: KillAll(false);
     2: AddLevelCreature(10);
     3: CreaturesKinds.LoadFromFile;
     4: ReloadCreatureAnimation;

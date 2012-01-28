@@ -338,7 +338,7 @@ type
     procedure Render(const Frustum: TFrustum;
       const Params: TRenderParams); override;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     function PointingDeviceActivate(const Active: boolean;
       const Distance: Single): boolean; override;
@@ -861,7 +861,7 @@ begin
   end;
 end;
 
-procedure TItemOnLevel.Idle(const CompSpeed: Single);
+procedure TItemOnLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 const
   Radius = 1.0;
   FallingDownSpeed = 0.2;

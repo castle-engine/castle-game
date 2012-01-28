@@ -806,7 +806,7 @@ type
     procedure Render(const Frustum: TFrustum;
       const Params: TRenderParams); override;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     { Return current scene to be rendered.
       Note that this is called at the end of our constructor
@@ -860,15 +860,6 @@ type
 
       In constructor, when setting this from ADirection, we normalize it. }
     property Direction: TVector3Single read FDirection write SetDirection;
-
-    { When this function returns true, the creature will be removed
-      from Level.Creatures list (this will be done in game's OnIdle,
-      right before calling Idle of all the creatures).
-
-      In this class this returns always false. Yes, this means that
-      even dead creatures *may* still exist on level (e.g. to
-      show DyingAnimation, or missile's explosion animation etc.) }
-    function RemoveMeFromLevel: boolean; virtual;
 
     { Shortcut for Life <= 0. }
     function Dead: boolean;
@@ -942,10 +933,6 @@ type
   end;
 
   TCreatureList = class(specialize TFPGObjectList<TCreature>)
-    { Remove from this list all creatures that return
-      RemoveMeFromLevel = @true. }
-    procedure RemoveFromLevel;
-
     { This checks whether someone (player or creature) moving from
       OldBoundingBox to NewBoundingBox(and OldPosition to NewPosition
       --- appropriate positions should be within their bounding boxes)
@@ -1047,7 +1034,7 @@ type
     { Last State change time, taken from Level.AnimationTime. }
     property StateChangeTime: Single read FStateChangeTime;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     function CurrentScene: TCastleScene; override;
 
@@ -1086,7 +1073,7 @@ type
       const AnimationTime: Single; const BaseLights: TLightInstancesList);
 
     procedure ActualAttack; override;
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     procedure Howl(ForceHowl: boolean);
   end;
@@ -1094,8 +1081,7 @@ type
   TSpiderCreature = class(TWalkAttackCreature)
   public
     procedure ActualAttack; override;
-
-    function RemoveMeFromLevel: boolean; override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   TSpiderQueenCreature = class(TWalkAttackCreature)
@@ -1109,7 +1095,7 @@ type
     procedure SetLife(const Value: Single); override;
   public
     procedure ActualAttack; override;
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
     function CurrentScene: TCastleScene; override;
   end;
 
@@ -1122,8 +1108,7 @@ type
       Ghost is blended anyway, so checking for collisions with him
       is not really necessary anyway. }
     function CollisionsWithCreaturesAndPlayer: boolean; override;
-
-    function RemoveMeFromLevel: boolean; override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   { A TCreature that has a kind always of TMissileCreatureKind. }
@@ -1139,15 +1124,13 @@ type
     { Shortcut for TMissileCreatureKind(Kind). }
     function MissileKind: TMissileCreatureKind;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     function CurrentScene: TCastleScene; override;
 
     { Missiles return @false here.
       We will check for collisions when missile moves. }
     function CollisionsWithCreaturesAndPlayer: boolean; override;
-
-    function RemoveMeFromLevel: boolean; override;
   end;
 
   TStillCreature = class(TCreature)
@@ -1157,7 +1140,7 @@ type
 
     function CurrentScene: TCastleScene; override;
 
-    function RemoveMeFromLevel: boolean; override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
 var
@@ -1771,6 +1754,10 @@ destructor TCreature.Destroy;
 var
   I: Integer;
 begin
+  { TODO: dirty, temporary solution, Level.Creatures will be removed soon }
+  if (Level <> nil) and (Level.Creatures <> nil) then
+    Level.Creatures.Extract(Self);
+
   if UsedSounds <> nil then
   begin
     for I := 0 to UsedSounds.Count - 1 do
@@ -2099,7 +2086,7 @@ begin
     I could return it... but for now, nothing needs it. }
 end;
 
-procedure TCreature.Idle(const CompSpeed: Single);
+procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
   procedure UpdateUsedSounds;
   var
@@ -2270,11 +2257,6 @@ begin
     DoGravity;
 end;
 
-function TCreature.RemoveMeFromLevel: boolean;
-begin
-  Result := false;
-end;
-
 procedure TCreature.SetLife(const Value: Single);
 begin
   if (Life > 0) and (Value <= 0) then
@@ -2393,19 +2375,6 @@ begin
 end;
 
 { TCreatureList -------------------------------------------------------------- }
-
-procedure TCreatureList.RemoveFromLevel;
-var
-  I: Integer;
-begin
-  for I := 0 to Count - 1 do
-    if Items[I].RemoveMeFromLevel then
-    begin
-      Level.Items.Remove(Items[I]);
-      FPGObjectList_FreeAndNilItem(Self, I);
-    end;
-  FPGObjectList_RemoveNils(Self);
-end;
 
 function TCreatureList.MoveAllowedSimple(
   const OldBoundingBox, NewBoundingBox: TBox3D;
@@ -2569,7 +2538,7 @@ begin
   end;
 end;
 
-procedure TWalkAttackCreature.Idle(const CompSpeed: Single);
+procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
   { Is attack allowed ? }
   function AttackAllowed: boolean;
@@ -3316,7 +3285,7 @@ begin
   end;
 end;
 
-procedure TWerewolfCreature.Idle(const CompSpeed: Single);
+procedure TWerewolfCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 begin
   inherited;
   if (not GetExists) or DebugTimeStopForCreatures then Exit;
@@ -3347,13 +3316,15 @@ begin
   end;
 end;
 
-function TSpiderCreature.RemoveMeFromLevel: boolean;
+procedure TSpiderCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 begin
+  inherited;
   { Spiders must be removed from level, otherwise too many of them
     stay on Cages level and slow down the rendering.
-    dying animation is adjusted to scale the model down. }
-  Result := (State = wasDying) and
-    (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd);
+    Dying animation scales the model down, to make it gradually disappear. }
+  if (State = wasDying) and
+    (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd) then
+    RemoveMe := rtRemoveAndFree;
 end;
 
 { TSpiderQueenCreature ---------------------------------------------------- }
@@ -3383,7 +3354,7 @@ begin
   inherited;
 end;
 
-procedure TSpiderQueenCreature.Idle(const CompSpeed: Single);
+procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
   procedure DoMaybeSwitchToThrowWebAttack;
   var
@@ -3497,10 +3468,12 @@ begin
   Result := State <> wasDying;
 end;
 
-function TGhostCreature.RemoveMeFromLevel: boolean;
+procedure TGhostCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 begin
-  Result := (State = wasDying) and
-    (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd);
+  inherited;
+  if (State = wasDying) and
+    (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd) then
+    RemoveMe := rtRemoveAndFree;
 end;
 
 { TMissileCreature ----------------------------------------------------------- }
@@ -3510,7 +3483,7 @@ begin
   Result := TMissileCreatureKind(Kind);
 end;
 
-procedure TMissileCreature.Idle(const CompSpeed: Single);
+procedure TMissileCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 var
   NewMiddlePosition: TVector3Single;
   AngleBetween, AngleChange: Single;
@@ -3518,6 +3491,11 @@ var
   I: Integer;
 begin
   inherited;
+
+  { TODO: do some missile explosion animation for some missiles. }
+  if Life <= 0.0 then
+    RemoveMe := rtRemoveAndFree;
+
   if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
   { Note that for now missiles are removed from level as soon as they are dead,
@@ -3607,12 +3585,6 @@ begin
     Result := MissileKind.Animation.SceneFromTime(0);
 end;
 
-function TMissileCreature.RemoveMeFromLevel: boolean;
-begin
-  { TODO: do some missile explosion animation for some missiles. }
-  Result := Life <= 0.0;
-end;
-
 procedure TMissileCreature.ExplodeCore;
 begin
   { TODO: for some missiles, their explosion may hurt everyone around.
@@ -3672,10 +3644,12 @@ begin
     Result := StillKind.Animation.SceneFromTime(0);
 end;
 
-function TStillCreature.RemoveMeFromLevel: boolean;
+procedure TStillCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 begin
-  { TODO: do explosion anim. }
-  Result := Life <= 0.0;
+  inherited;
+  { TODO: do explosion anim for barrel. }
+  if Life <= 0.0 then
+    RemoveMe := rtRemoveAndFree;
 end;
 
 { initialization / finalization ---------------------------------------------- }

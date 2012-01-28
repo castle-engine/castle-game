@@ -169,7 +169,7 @@ type
     constructor Create(AOwner: TComponent); override;
 
     procedure BeforeTimeIncrease(const NewAnimationTime: TFloatTime); override;
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     property MovePushesOthers default false;
 
@@ -988,6 +988,16 @@ const
     Result[2] := SpiderZ;
   end;
 
+  function CreaturesCount: Cardinal;
+  var
+    I: Integer;
+  begin
+    Result := 0;
+    for I := 0 to Items.Count - 1 do
+      if Items[I].Collision = ctCreature then
+        Inc(Result);
+  end;
+
 const
   SpidersFallingSpeed = 0.5;
   CreaturesCountToAddSpiders = 20;
@@ -1017,8 +1027,7 @@ begin
         0.5, 1));
 
     { Maybe appear new spiders }
-    if (Level.Creatures.Count < CreaturesCountToAddSpiders) and
-       { Spider.PrepareRenderDone may be false here only if
+    if { Spider.PrepareRenderDone may be false here only if
          --debug-no-creatures was specified. In this case,
          leave Spider unprepared and don't use spider's on this level. }
        Spider.PrepareRenderDone then
@@ -1035,8 +1044,9 @@ begin
       if AnimationTime >= NextSpidersAppearingTime then
       begin
         NextSpidersAppearingTime := AnimationTime + 2 + Random(10);
-        for I := 1 to 1 + Random(3) do
-          AppearSpider(RandomSpiderXYAroundPlayer);
+        if CreaturesCount < CreaturesCountToAddSpiders then
+          for I := 1 to 1 + Random(3) do
+            AppearSpider(RandomSpiderXYAroundPlayer);
       end;
     end;
 
@@ -1141,7 +1151,7 @@ begin
     RevertGoEndPosition;
 end;
 
-procedure TDoomLevelDoor.Idle(const CompSpeed: Single);
+procedure TDoomLevelDoor.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 begin
   inherited;
 

@@ -472,8 +472,6 @@ begin
   if Level.SickProjection then
     Level.SickProjectionSpeed := Player.SickProjectionSpeed;
 
-  Level.Creatures.RemoveFromLevel;
-
   if (not Player.Dead) and (not GameWin) then
     Level.PlayerCollisions;
 

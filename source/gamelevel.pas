@@ -169,7 +169,7 @@ type
       read FMovePushesOthersUsesBoxes write FMovePushesOthersUsesBoxes
       default true;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   { This is a TLevelMovingObject that moves with a constant speed
@@ -275,7 +275,7 @@ type
     function GetTranslationFromTime(const AnAnimationTime: TFloatTime):
       TVector3Single; override;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   { This is an abstract class for a special group of objects:
@@ -343,7 +343,7 @@ type
     property MessageDone: boolean read FMessageDone write FMessageDone
       default false;
 
-    procedure Idle(const CompSpeed: Single); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   TLevel = class(TCastleSceneManager)
@@ -453,7 +453,10 @@ type
     procedure InitializeLights(const Lights: TLightInstancesList); override;
     procedure ApplyProjection; override;
     procedure PointingDeviceActivateFailed(const Active: boolean); override;
+
   public
+    property Creatures: TCreatureList read FCreatures;
+
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
       be sure to initialize Progress.UserInterface before calling this. }
@@ -512,7 +515,6 @@ type
     { Creatures on the level. Note that objects on this list are owned
       by level object. Add by AddCreature, remove by setting
       RemoveMeFromLevel to @true. }
-    property Creatures: TCreatureList read FCreatures;
     procedure AddCreature(C: TCreature);
 
     { LineOfSight, MoveAllowed and GetHeightAbove perform
@@ -860,7 +862,7 @@ begin
   end;
 end;
 
-procedure TLevelMovingObject.Idle(const CompSpeed: Single);
+procedure TLevelMovingObject.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 var
   NewAnimationTime: TFloatTime;
 begin
@@ -1006,7 +1008,7 @@ begin
     (AnimationTime - EndPositionStateChangeTime > MoveTime);
 end;
 
-procedure TLevelLinearMovingObject.Idle(const CompSpeed: Single);
+procedure TLevelLinearMovingObject.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 begin
   inherited;
 
@@ -1054,7 +1056,7 @@ end;
 
 { TLevelHintArea ----------------------------------------------------------- }
 
-procedure TLevelHintArea.Idle(const CompSpeed: Single);
+procedure TLevelHintArea.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 var
   ReplaceInteractInput: TPercentReplace;
 begin
