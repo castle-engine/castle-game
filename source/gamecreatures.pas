@@ -2005,7 +2005,7 @@ begin
     NewMiddlePosition := ProposedNewMiddlePosition;
     Result := Level.MoveBoxAllowedSimple(
       OldMiddlePosition, NewMiddlePosition,
-      BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
+      BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
       BecauseOfGravity);
   end;
 
@@ -2015,8 +2015,7 @@ begin
       (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
       { Check creature<->other creatures collision. }
       (Level.Creatures.MoveAllowedSimple(
-        BoundingBox,
-        BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
+        BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
         OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
@@ -2034,7 +2033,7 @@ begin
   begin
     Result := Level.MoveBoxAllowedSimple(
       OldMiddlePosition, NewMiddlePosition,
-      BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
+      BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
       BecauseOfGravity);
   end;
 
@@ -2044,8 +2043,7 @@ begin
       (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
       { Check creature<->other creatures collision. }
       (Level.Creatures.MoveAllowedSimple(
-        BoundingBox,
-        BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
+        BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
         OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 

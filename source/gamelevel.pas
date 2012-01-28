@@ -551,7 +551,7 @@ type
 
     function MoveBoxAllowedSimple(
       const Position, NewPos: TVector3Single;
-      const NewBox: TBox3D;
+      const OldBox, NewBox: TBox3D;
       const BecauseOfGravity: boolean): boolean; virtual;
 
     procedure GetHeightAbove(const Position: TVector3Single;
@@ -1570,10 +1570,10 @@ end;
 
 function TLevel.MoveBoxAllowedSimple(const Position: TVector3Single;
   const NewPos: TVector3Single;
-  const NewBox: TBox3D;
+  const OldBox, NewBox: TBox3D;
   const BecauseOfGravity: boolean): boolean;
 begin
-  Result := Items.MoveBoxAllowedSimple(Position, NewPos, NewBox,
+  Result := Items.MoveBoxAllowedSimple(Position, NewPos, OldBox, NewBox,
     @CollisionIgnoreItem);
 
   if Result then
