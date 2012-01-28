@@ -92,28 +92,14 @@ var
   { Creatures sounds.
     @groupBegin }
   stCreatureFalledDown,
-  stAlienSuddenPain,
-  stAlienDying,
-  stWerewolfSuddenPain,
-  stWerewolfAttackStart,
   stWerewolfActualAttackHit,
   stWerewolfHowling,
-  stWerewolfDying,
   stBallMissileFired,
   stBallMissileExplode,
   stBallMissileIdle,
-  stGhostSuddenPain,
-  stGhostAttackStart,
-  stGhostDying,
   stSpiderActualAttackHit,
-  stSpiderSuddenPain,
-  stSpiderAttackStart,
-  stSpiderDying,
   stSpiderAppears,
   stSpiderQueenActualAttackHit,
-  stSpiderQueenSuddenPain,
-  stSpiderQueenAttackStart,
-  stSpiderQueenDying,
   stThrownWebFired,
   stThrownWebHit,
   stThrownWebIdle,
@@ -194,28 +180,14 @@ begin
   stDoomExitButton             := SoundFromName('doom_exit_button');
   stCreak                      := SoundFromName('creak');
   stCreatureFalledDown         := SoundFromName('creature_falled_down');
-  stAlienSuddenPain            := SoundFromName('alien_sudden_pain');
-  stAlienDying                 := SoundFromName('alien_dying');
-  stWerewolfSuddenPain         := SoundFromName('werewolf_sudden_pain');
-  stWerewolfAttackStart        := SoundFromName('werewolf_attack_start');
   stWerewolfActualAttackHit    := SoundFromName('werewolf_actual_attack_hit');
   stWerewolfHowling            := SoundFromName('werewolf_howling');
-  stWerewolfDying              := SoundFromName('werewolf_dying');
   stBallMissileFired           := SoundFromName('ball_missile_fired');
   stBallMissileExplode         := SoundFromName('ball_missile_explode');
   stBallMissileIdle            := SoundFromName('ball_missile_idle');
-  stGhostSuddenPain            := SoundFromName('ghost_sudden_pain');
-  stGhostAttackStart           := SoundFromName('ghost_attack_start');
-  stGhostDying                 := SoundFromName('ghost_dying');
   stSpiderActualAttackHit      := SoundFromName('spider_actual_attack_hit');
-  stSpiderSuddenPain           := SoundFromName('spider_sudden_pain');
-  stSpiderAttackStart          := SoundFromName('spider_attack_start');
-  stSpiderDying                := SoundFromName('spider_dying');
   stSpiderAppears              := SoundFromName('spider_appears');
   stSpiderQueenActualAttackHit := SoundFromName('spider_queen_actual_attack_hit');
-  stSpiderQueenSuddenPain      := SoundFromName('spider_queen_sudden_pain');
-  stSpiderQueenAttackStart     := SoundFromName('spider_queen_attack_start');
-  stSpiderQueenDying           := SoundFromName('spider_queen_dying');
   stThrownWebFired             := SoundFromName('thrown_web_fired');
   stThrownWebHit               := SoundFromName('thrown_web_hit');
   stThrownWebIdle              := SoundFromName('thrown_web_idle');
