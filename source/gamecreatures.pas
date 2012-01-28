@@ -686,7 +686,8 @@ type
 
       This is especially noticeable when there are many creatures on the level:
       then a lot of time is wasted in DoGravity, and main time of this
-      is inside TCreatureList.GetHeightAbove, and main time of this
+      is iterating over creatures checking their GetHeightAbove,
+      and main time of this
       would be spend within BoundingBox calculations. Yes, this is
       checked with profiler. }
     FBoundingBox: TBox3D;
@@ -764,18 +765,6 @@ type
     function MoveSimple(
       const OldMiddlePosition, NewMiddlePosition: TVector3Single;
       const BecauseOfGravity: boolean): boolean;
-
-    { Checks AssumeMiddlePosition height above the level and other creatures.
-
-      I don't check height above the player, this is not needed
-      (GetHeightAbove is needed only for "growing up" and "falling down";
-      in case of "growing up", creature doesn't have to "grow up"
-      when standing on player's head. In case of "falling down" ---
-      we don't have to take this into account. Things will work correctly
-      anyway.) }
-    procedure GetHeightAboveOthers(
-      const AssumeMiddlePosition: TVector3Single;
-      out IsAbove: boolean; out AboveHeight: Single);
 
     procedure ShortRangeAttackHurt;
 
@@ -881,7 +870,7 @@ type
       read FLastAttackDirection write SetLastAttackDirection;
 
     { If @false, then TCreatureList.MoveAllowedSimple and
-      TCreatureList.GetHeightAbove will ignore this
+      TCreature.GetHeightAbove will ignore this
       creature, which means that collisions between this creature
       and player/other creatures will not be checked.
       You should set this to @false only in exceptional situations,
@@ -930,6 +919,12 @@ type
       const Distance: Single): boolean; override;
 
     procedure Translate(const T: TVector3Single); override;
+
+    { Height above this creature. }
+    procedure GetHeightAbove(const Position, GravityUp: TVector3Single;
+      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
+      out IsAbove: boolean; out AboveHeight: Single;
+      out AboveGround: P3DTriangle); override;
   end;
 
   TCreatureList = class(specialize TFPGObjectList<TCreature>)
@@ -948,21 +943,6 @@ type
       const OldBoundingBox, NewBoundingBox: TBox3D;
       const OldPosition, NewPosition: TVector3Single;
       IgnoreCreature: TCreature): TCreature;
-
-    { Height of Position over creatures' bounding boxes.
-
-      Assumes IsAbove and other Above* parameters are already initialized.
-      It will update them. Note that AboveGround is updated to @nil if
-      camera will be found standing over one of the creatures
-      (since creatures are not represented as any P3DTriangle).
-
-      You can pass IgnoreCreature <> nil if you want to ignore
-      collisions with given creature (this will obviously be useful
-      when checking for collisions for this creature). }
-    procedure GetHeightAbove(const Position: TVector3Single;
-      var IsAbove: boolean; var AboveHeight: Single;
-      var AboveGround: P3DTriangle;
-      IgnoreCreature: TCreature);
   end;
 
   TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack,
@@ -2069,23 +2049,6 @@ begin
         OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
-procedure TCreature.GetHeightAboveOthers(
-  const AssumeMiddlePosition: TVector3Single;
-  out IsAbove: boolean; out AboveHeight: Single);
-var
-  AboveGround: PTriangle;
-begin
-  { Check creature<->level collision. }
-  Level.GetHeightAbove(AssumeMiddlePosition, IsAbove, AboveHeight, AboveGround);
-
-  { Check creature<->other creatures collision. }
-  Level.Creatures.GetHeightAbove(AssumeMiddlePosition,
-    IsAbove, AboveHeight, AboveGround, Self);
-
-  { I ignore calculated AboveGround for now.
-    I could return it... but for now, nothing needs it. }
-end;
-
 procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
   procedure UpdateUsedSounds;
@@ -2152,6 +2115,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
   var
     IsAbove: boolean;
     AboveHeight: Single;
+    AboveGround: PTriangle;
     OldIsFallingDown: boolean;
     FallingDownDistance, MaximumFallingDownDistance: Single;
   begin
@@ -2165,7 +2129,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     OldIsFallingDown := FIsFallingDown;
     OldMiddlePosition := MiddlePosition;
 
-    GetHeightAboveOthers(OldMiddlePosition, IsAbove, AboveHeight);
+    Level.GetHeightAbove(OldMiddlePosition, IsAbove, AboveHeight, AboveGround);
 
     if AboveHeight > HeightBetweenLegsAndMiddle * HeightMargin then
     begin
@@ -2374,6 +2338,42 @@ begin
   LegsPosition := LegsPosition + T;
 end;
 
+procedure TCreature.GetHeightAbove(const Position, GravityUp: TVector3Single;
+  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
+  out IsAbove: boolean; out AboveHeight: Single;
+  out AboveGround: P3DTriangle);
+var
+  Box: TBox3D;
+begin
+  { we check collision with creature's bounding box }
+  { inherited already initializes all out parameters,
+    so code lower only updates what's necessary }
+  inherited;
+  { TODO: this *should* check Collides, for consistency with other stuff.
+    Also, this should have Collides = true.
+    CollisionsWithCreaturesAndPlayer should disappear (all it's uses
+    should change to just Collides?) }
+  if GetExists and CollisionsWithCreaturesAndPlayer then
+  begin
+    Box := BoundingBox;
+    { TODO: this assumes GravityUp is +Z }
+    IsAbove := (not Box.IsEmpty) and
+      (Box.Data[0, 0] <= Position[0]) and (Position[0] <= Box.Data[1, 0]) and
+      (Box.Data[0, 1] <= Position[1]) and (Position[1] <= Box.Data[1, 1]) and
+      { Actually, we look only at the top rectangle of bounding box.
+        That's why self-collision is not a problem here: even if Position
+        equals this creature's own MiddlePosition or LegsPosition,
+        it's still below Box.Data[1, 2].
+        If you replace the check below with ">= Box.Data[0, 2]",
+        then creature will always be considered standing on it's own head,
+        and will fly up into infinity :) }
+      (Position[2] >= Box.Data[1, 2]);
+
+    if IsAbove then
+      AboveHeight := Position[2] - Box.Data[1, 2];
+  end;
+end;
+
 { TCreatureList -------------------------------------------------------------- }
 
 function TCreatureList.MoveAllowedSimple(
@@ -2432,50 +2432,6 @@ begin
   end;
 
   Result := nil;
-end;
-
-procedure TCreatureList.GetHeightAbove(
-  const Position: TVector3Single;
-  var IsAbove: boolean; var AboveHeight: Single;
-  var AboveGround: P3DTriangle;
-  IgnoreCreature: TCreature);
-
-  { If the Point is inside the Box then it answers IsAboveTheBox := false. }
-  procedure GetPointHeightAboveBox3D(const Point: TVector3Single;
-    const Box: TBox3D;
-    out IsAboveTheBox: boolean; out HeightAboveTheBox: Single);
-  begin
-    { We use here the assumption that GravityUp is (0, 0, 1). }
-
-    IsAboveTheBox := (not Box.IsEmpty) and
-      (Box.Data[0, 0] <= Point[0]) and (Point[0] <= Box.Data[1, 0]) and
-      (Box.Data[0, 1] <= Point[1]) and (Point[1] <= Box.Data[1, 1]) and
-      (Point[2] >= Box.Data[1, 2]);
-
-    if IsAboveTheBox then
-      HeightAboveTheBox := Point[2] - Box.Data[1, 2] else
-      HeightAboveTheBox := MaxSingle;
-  end;
-
-var
-  I: Integer;
-  IsAboveTheBox: boolean;
-  HeightAboveTheBox: Single;
-begin
-  for I := 0 to Count - 1 do
-    if (Items[I] <> IgnoreCreature) and
-       (Items[I].CollisionsWithCreaturesAndPlayer) then
-    begin
-      GetPointHeightAboveBox3D(Position, Items[I].BoundingBox,
-        IsAboveTheBox, HeightAboveTheBox);
-
-      if HeightAboveTheBox < AboveHeight then
-      begin
-        IsAbove := IsAboveTheBox;
-        AboveHeight := HeightAboveTheBox;
-        AboveGround := nil;
-      end;
-    end;
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -2801,11 +2757,12 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       var
         IsAbove: boolean;
         AboveHeight: Single;
+        AboveGround: PTriangle;
       begin
         Result := false;
         if not Kind.Flying then
         begin
-          GetHeightAboveOthers(NewMiddlePosition, IsAbove, AboveHeight);
+          Level.GetHeightAbove(NewMiddlePosition, IsAbove, AboveHeight, AboveGround);
           if AboveHeight > WAKind.MaxHeightAcceptableToFall +
               HeightBetweenLegsAndMiddle then
             Result := true;

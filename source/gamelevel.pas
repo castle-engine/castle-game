@@ -677,9 +677,6 @@ type
     function CameraMoveAllowed(ACamera: TWalkCamera;
       const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean; override;
-    procedure CameraGetHeight(ACamera: TWalkCamera;
-      out IsAbove: boolean; out AboveHeight: Single;
-      out AboveGround: P3DTriangle); override;
     { @groupEnd }
 
     property SickProjection: boolean
@@ -1607,20 +1604,6 @@ begin
       Player.BoundingBox(false),
       Player.BoundingBoxAssuming(NewPos, false),
       ACamera.Position, NewPos, nil) = nil;
-end;
-
-procedure TLevel.CameraGetHeight(ACamera: TWalkCamera;
-  out IsAbove: boolean; out AboveHeight: Single;
-  out AboveGround: P3DTriangle);
-begin
-  { Check is player standing over level. }
-  inherited CameraGetHeight(ACamera, IsAbove, AboveHeight, AboveGround);
-
-  if MenuBackground then Exit;
-
-  { Check is player standing over one of the creatures. }
-  Creatures.GetHeightAbove(ACamera.Position, IsAbove,
-    AboveHeight, AboveGround, nil);
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single;
