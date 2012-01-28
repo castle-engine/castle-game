@@ -473,7 +473,7 @@ var
 begin
   inherited;
 
-  if Player = nil then Exit;
+  if (Player = nil) or Paused then Exit;
 
   if FLevelExitBox.PointInside(Player.Camera.Position) then
   begin
@@ -703,7 +703,7 @@ const
 begin
   inherited;
 
-  if Player = nil then Exit;
+  if (Player = nil) or Paused then Exit;
 
   if FGateExitBox.PointInside(Player.Camera.Position) then
   begin
@@ -1014,7 +1014,7 @@ var
 begin
   inherited;
 
-  if Player = nil then Exit;
+  if (Player = nil) or Paused then Exit;
 
   if not GameWin then
   begin
@@ -1349,7 +1349,7 @@ procedure TDoomE1M1Level.Idle(const CompSpeed: Single;
 begin
   inherited;
 
-  if Player = nil then Exit;
+  if (Player = nil) or Paused then Exit;
 
   if MovingElevator49.CompletelyBeginPosition and
      Elevator49DownBox.PointInside(Player.Camera.Position) then
