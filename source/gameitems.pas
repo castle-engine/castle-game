@@ -345,8 +345,6 @@ type
 
     property Collides default false;
 
-    procedure PlayerCollision(var RemoveMe: TRemoveType); override;
-
     function RayCollision(const RayOrigin, RayDirection: TVector3Single;
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): TRayCollision; override;
   end;
@@ -917,6 +915,15 @@ begin
       Translation := NewTranslation;
     end;
   end;
+
+  if (not Player.Dead) and (not GameWin) and
+    BoundingBox.Collision(Player.BoundingBox) then
+  begin
+    Player.PickItem(ExtractItem);
+    RemoveMe := rtRemoveAndFree;
+    if AutoOpenInventory then
+      InventoryVisible := true;
+  end;
 end;
 
 function TItemOnLevel.PointingDeviceActivate(const Active: boolean;
@@ -937,17 +944,6 @@ begin
     Notifications.Show(S);
   end else
     Notifications.Show('You see some item, but it''s too far to tell exactly what it is');
-end;
-
-procedure TItemOnLevel.PlayerCollision(var RemoveMe: TRemoveType);
-begin
-  inherited;
-  Player.PickItem(ExtractItem);
-
-  RemoveMe := rtRemoveAndFree;
-
-  if AutoOpenInventory then
-    InventoryVisible := true;
 end;
 
 function TItemOnLevel.GetExists: boolean;

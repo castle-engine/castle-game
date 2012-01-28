@@ -472,9 +472,6 @@ begin
   if Level.SickProjection then
     Level.SickProjectionSpeed := Player.SickProjectionSpeed;
 
-  if (not Player.Dead) and (not GameWin) then
-    Level.PlayerCollisions;
-
   Player.Idle(CompSpeed);
 
   LevelFinishedFlush;

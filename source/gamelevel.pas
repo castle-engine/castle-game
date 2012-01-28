@@ -687,14 +687,6 @@ type
     property SickProjectionSpeed: TFloatTime
       read FSickProjectionSpeed write SetSickProjectionSpeed;
 
-    { Process collisions between alive player and level objects.
-      This is not for avoiding collisions --- it's for processing collisions
-      that can happen, and already happened.
-      Like for picking up items that you stepped upon.
-      It happens only for alive players moving in normal mode (not in preprogrammed
-      mode, like when GameWin sequence is happening).  }
-    procedure PlayerCollisions;
-
     { Instance of boss creature, if any, on the level. @nil if no boss creature
       exists on this level. }
     property BossCreature: TCreature read FBossCreature;
@@ -1830,36 +1822,6 @@ begin
   begin
     FSickProjectionSpeed := Value;
     if SickProjection then ApplyProjectionNeeded := true;
-  end;
-end;
-
-procedure TLevel.PlayerCollisions;
-var
-  PlayerBoundingBox: TBox3D;
-  I: Integer;
-  RemoveItem: TRemoveType;
-  Item: T3D;
-begin
-  PlayerBoundingBox := Player.BoundingBox;
-
-  I := 0;
-  while I < Items.Count do
-  begin
-    Item := Items[I];
-    if (Item.Collision = ctItem) and
-        Item.BoundingBox.Collision(PlayerBoundingBox) then
-    begin
-      RemoveItem := rtNone;
-      Item.PlayerCollision(RemoveItem);
-      if RemoveItem in [rtRemove, rtRemoveAndFree] then
-      begin
-        Items.List.Delete(I);
-        if RemoveItem = rtRemoveAndFree then
-          FreeAndNil(Item);
-        Continue;
-      end;
-    end;
-    Inc(I);
   end;
 end;
 
