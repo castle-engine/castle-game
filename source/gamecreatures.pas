@@ -762,12 +762,8 @@ type
     { Constructor. Note for AnimationTime: usually I will take
       AnimationTime from global Level.AnimationTime, but in the case of
       constructor it's safer to just take it as param. }
-    constructor Create(AOwner: TComponent; AKind: TCreatureKind;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AMaxLife: Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList);
-      virtual; reintroduce;
+    constructor Create(AOwner: TComponent;
+      const AMaxLife: Single; const AnimationTime: Single); virtual; reintroduce;
 
     destructor Destroy; override;
 
@@ -964,11 +960,8 @@ type
 
     function DebugCaption: string; override;
   public
-    constructor Create(AOwner: TComponent; AKind: TCreatureKind;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AMaxLife: Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList); override;
+    constructor Create(AOwner: TComponent;
+      const AMaxLife: Single; const AnimationTime: Single); override;
 
     destructor Destroy; override;
 
@@ -1013,11 +1006,8 @@ type
   private
     NextHowlTime: Single;
   public
-    constructor Create(AOwner: TComponent; AKind: TCreatureKind;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AMaxLife: Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList); override;
+    constructor Create(AOwner: TComponent;
+      const AMaxLife: Single; const AnimationTime: Single); override;
 
     procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
@@ -1063,11 +1053,8 @@ type
   private
     LastSoundIdleTime: Single;
   public
-    constructor Create(AOwner: TComponent; AKind: TCreatureKind;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AMaxLife: Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList); override;
+    constructor Create(AOwner: TComponent;
+      const AMaxLife: Single; const AnimationTime: Single); override;
 
     { Shortcut for TMissileCreatureKind(Kind). }
     function MissileKind: TMissileCreatureKind;
@@ -1192,8 +1179,17 @@ function TCreatureKind.CreateDefaultCreature(AOwner: TComponent;
   const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
-  Result := CreatureClass.Create(AOwner, Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime, BaseLights);
+  { This is only needed if you used --debug-no-creatures or forgot
+    to add creature to <required_resources> }
+  RequireCreature(BaseLights, Self);
+
+  Result := CreatureClass.Create(AOwner, MaxLife, AnimationTime);
+  { set properties that in practice must have other-than-default values
+    to sensibly use the creature }
+  Result.FKind := Self;
+  Result.LegsPosition := ALegsPosition;
+  Result.Direction := Normalized(ADirection);
+  Result.Life := MaxLife;
 end;
 
 { TCreatureKindList -------------------------------------------------------- }
@@ -1618,40 +1614,15 @@ type
 
 { TCreature ------------------------------------------------------------------ }
 
-constructor TCreature.Create(AOwner: TComponent; AKind: TCreatureKind;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AMaxLife: Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList);
+constructor TCreature.Create(AOwner: TComponent;
+  const AMaxLife: Single; const AnimationTime: Single);
 begin
   inherited Create(AOwner);
-
-  FKind := AKind;
-
   Collision := ctCreature;
-
-  { This is only needed if you used --debug-no-creatures or forgot
-    to add creature to <required_resources> }
-  RequireCreature(BaseLights, Kind);
-
-  FLegsPosition := ALegsPosition;
-  FDirection := Normalized(ADirection);
-
   FMaxLife := AMaxLife;
-  FLife := MaxLife;
-
+  FDirection := UnitVector3Single[0];
   FSoundDyingEnabled := true;
-
   UsedSounds := TALSoundList.Create(false);
-
-  { FLegsPosition and FDirection changed, so RecalculateBoundingBox must be
-    called. At this point CurrentScene is needed (by RecalculateBoundingBox),
-    and CurrentScene may require some animations to be loaded -- so we check
-    PrepareRenderDone. }
-  if not Kind.PrepareRenderDone then
-    raise EInternalError.CreateFmt('PrepareRender of creature kind "%s" not done',
-      [Kind.ShortName]);
-  RecalculateBoundingBox;
 end;
 
 function TCreature.GetExists: boolean;
@@ -2316,15 +2287,12 @@ end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
 
-constructor TWalkAttackCreature.Create(AOwner: TComponent; AKind: TCreatureKind;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AMaxLife: Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList);
+constructor TWalkAttackCreature.Create(AOwner: TComponent;
+  const AMaxLife: Single; const AnimationTime: Single);
 begin
   inherited;
 
-  if AMaxLife > 0 then
+  if MaxLife > 0 then
   begin
     FState := wasStand;
     FStateChangeTime := AnimationTime;
@@ -3100,11 +3068,8 @@ end;
 
 { TWerewolfCreature ---------------------------------------------------------- }
 
-constructor TWerewolfCreature.Create(AOwner: TComponent; AKind: TCreatureKind;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AMaxLife: Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList);
+constructor TWerewolfCreature.Create(AOwner: TComponent;
+  const AMaxLife: Single; const AnimationTime: Single);
 begin
   inherited;
   NextHowlTime := AnimationTime + Random * 60.0;
@@ -3318,11 +3283,8 @@ end;
 
 { TMissileCreature ----------------------------------------------------------- }
 
-constructor TMissileCreature.Create(AOwner: TComponent; AKind: TCreatureKind;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AMaxLife: Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList);
+constructor TMissileCreature.Create(AOwner: TComponent;
+  const AMaxLife: Single; const AnimationTime: Single);
 begin
   inherited;
 
