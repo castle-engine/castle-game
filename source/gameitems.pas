@@ -344,9 +344,6 @@ type
       const Distance: Single): boolean; override;
 
     property Collides default false;
-
-    function RayCollision(const RayOrigin, RayDirection: TVector3Single;
-      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): TRayCollision; override;
   end;
 
   TItemOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
@@ -824,9 +821,9 @@ begin
 
   Add(Item.Kind.Scene);
 
-  { TODO: we resolve collisions ourselves, without the help of T3D and scene
-    manager methods. For them, we're not collidable, for now.
-    In the future, we should just switch to use T3D and scene manager methods. }
+  { Items are not collidable, player can enter them to pick them up.
+    For now, this also means that creatures can pass through them,
+    which isn't really troublesome now. }
   Collides := false;
 end;
 
@@ -951,31 +948,6 @@ end;
 function TItemOnLevel.GetExists: boolean;
 begin
   Result := (inherited GetExists) and (not DebugRenderForLevelScreenshot);
-end;
-
-function TItemOnLevel.RayCollision(const RayOrigin, RayDirection: TVector3Single;
-  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): TRayCollision;
-var
-  Intersection: TVector3Single;
-  IntersectionDistance: Single;
-  NewNode: PRayCollisionNode;
-begin
-  { Overridden, to resolve collision by looking at bounding box.
-    No need to look at actual scene geometry, no need for octree inside scene. }
-
-  if GetExists and BoundingBox.TryRayClosestIntersection(
-    Intersection, IntersectionDistance, RayOrigin, RayDirection) then
-  begin
-    Result := TRayCollision.Create;
-    Result.Distance := IntersectionDistance;
-    NewNode := Result.Add;
-    NewNode^.Item := Self;
-    NewNode^.Point := Intersection;
-    NewNode^.Triangle := nil;
-    NewNode^.RayOrigin := RayOrigin;
-    NewNode^.RayDirection := RayDirection;
-  end else
-    Result := nil;
 end;
 
 { other global stuff --------------------------------------------------- }

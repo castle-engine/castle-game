@@ -793,8 +793,6 @@ type
 
     property Kind: TCreatureKind read FKind;
 
-    property Collides default false;
-
     function BoundingBox: TBox3D; override;
 
     procedure Render(const Frustum: TFrustum;
@@ -824,7 +822,7 @@ type
       How precisely this is calculated for given creature depends
       on MiddlePositionFromLegs implementation in this class.
 
-      All collision detection (MoveAllowed, GetHeightAbove)
+      All collision detection (Move, MyGetHeightAbove)
       should be done using MiddlePosition, and then appropriately translated
       back to LegsPosition. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
@@ -874,19 +872,6 @@ type
     property LastAttackDirection: TVector3Single
       read FLastAttackDirection write SetLastAttackDirection;
 
-    { If @false, then TCreature.MoveAllowed and
-      TCreature.GetHeightAbove will ignore this
-      creature, which means that collisions between this creature
-      and player/other creatures will not be checked.
-      You should set this to @false only in exceptional situations,
-      when you're doing collision checking elsewhere
-      (e.g. for TMissileCreatureKind, collision is done when
-      the missile moves).
-
-      For all "normal" creatures this should be left as default implementation
-      that always returns @true. }
-    function CollisionsWithCreaturesAndPlayer: boolean; virtual;
-
     { Play SoundType where the creature's position is.
 
       Exactly, the position is between LegsPosition and MiddlePosition
@@ -916,9 +901,6 @@ type
       and MiddlePosition to be high. }
     function UseSphere: boolean; override;
     procedure Sphere(out Center: TVector3Single; out Radius: Single); override;
-
-    function RayCollision(const RayOrigin, RayDirection: TVector3Single;
-      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): TRayCollision; override;
 
     function PointingDeviceActivate(const Active: boolean;
       const Distance: Single): boolean; override;
@@ -1077,14 +1059,10 @@ type
   end;
 
   TGhostCreature = class(TWalkAttackCreature)
+  protected
+    procedure SetState(Value: TWalkAttackCreatureState); override;
   public
     procedure ActualAttack; override;
-
-    { Ghosts dead animation is quite unique, so we will not check
-      collisions with ghost when it's in dying state.
-      Ghost is blended anyway, so checking for collisions with him
-      is not really necessary anyway. }
-    function CollisionsWithCreaturesAndPlayer: boolean; override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
@@ -1097,16 +1075,18 @@ type
   private
     LastSoundIdleTime: Single;
   public
+    constructor Create(AKind: TCreatureKind;
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single;
+      const AMaxLife: Single;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList);
+
     { Shortcut for TMissileCreatureKind(Kind). }
     function MissileKind: TMissileCreatureKind;
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     function CurrentScene: TCastleScene; override;
-
-    { Missiles return @false here.
-      We will check for collisions when missile moves. }
-    function CollisionsWithCreaturesAndPlayer: boolean; override;
   end;
 
   TStillCreature = class(TCreature)
@@ -1690,11 +1670,6 @@ begin
 
   FKind := AKind;
 
-  { TODO: we resolve collisions ourselves, without the help of T3D and scene
-    manager methods. For them, we're not collidable, for now.
-    In the future, we should just switch to use T3D and scene manager methods. }
-  Collides := false;
-
   Collision := ctCreature;
 
   { This is only needed if you used --debug-no-creatures or forgot
@@ -2230,11 +2205,6 @@ begin
   Result := Level.Sectors.SectorWithPoint(MiddlePosition);
 end;
 
-function TCreature.CollisionsWithCreaturesAndPlayer: boolean;
-begin
-  Result := true;
-end;
-
 procedure TCreature.ShortRangeAttackHurt;
 var
   Damage: Single;
@@ -2257,31 +2227,6 @@ procedure TCreature.Sphere(out Center: TVector3Single; out Radius: Single);
 begin
   Center := MiddlePosition;
   Radius := Kind.CameraRadius;
-end;
-
-function TCreature.RayCollision(const RayOrigin, RayDirection: TVector3Single;
-  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): TRayCollision;
-var
-  Intersection: TVector3Single;
-  IntersectionDistance: Single;
-  NewNode: PRayCollisionNode;
-begin
-  { Overridden, to resolve collision by looking at bounding box.
-    No need to look at actual scene geometry, no need for octree inside scene. }
-
-  if GetExists and BoundingBox.TryRayClosestIntersection(
-    Intersection, IntersectionDistance, RayOrigin, RayDirection) then
-  begin
-    Result := TRayCollision.Create;
-    Result.Distance := IntersectionDistance;
-    NewNode := Result.Add;
-    NewNode^.Item := Self;
-    NewNode^.Point := Intersection;
-    NewNode^.Triangle := nil;
-    NewNode^.RayOrigin := RayOrigin;
-    NewNode^.RayDirection := RayDirection;
-  end else
-    Result := nil;
 end;
 
 function TCreature.PointingDeviceActivate(const Active: boolean;
@@ -2330,12 +2275,7 @@ begin
   AboveHeight := MaxSingle;
   AboveGround := nil;
 
-  { TODO: this *should* check Collides, for consistency with other stuff.
-    Also, this should have Collides = true.
-    CollisionsWithCreaturesAndPlayer should disappear (all it's uses
-    should change to just Collides?) }
-  if GetExists and CollisionsWithCreaturesAndPlayer and
-    (DisableCollisions = 0) then
+  if GetExists and Collides and (DisableCollisions = 0) then
   begin
     Box := BoundingBox;
     { TODO: this assumes GravityUp is +Z }
@@ -2361,12 +2301,7 @@ begin
 
   Result := true;
 
-  { TODO: this *should* check Collides, for consistency with other stuff.
-    Also, this should have Collides = true.
-    CollisionsWithCreaturesAndPlayer should disappear (all it's uses
-    should change to just Collides?) }
-  if GetExists and CollisionsWithCreaturesAndPlayer and
-    (DisableCollisions = 0) then
+  if GetExists and Collides and (DisableCollisions = 0) then
   begin
     if NewBox.Collision(BoundingBox) then
     begin
@@ -3385,17 +3320,23 @@ end;
 
 { TGhostCreature ---------------------------------------------------------- }
 
+procedure TGhostCreature.SetState(Value: TWalkAttackCreatureState);
+begin
+  inherited;
+
+  { Ghosts dead animation is quite unique, so we will not check
+    collisions with ghost when it's in dying state.
+    Ghost is blended anyway, so checking for collisions with him
+    is not really necessary anyway. }
+  if Value = wasDying then Collides := false;
+end;
+
 procedure TGhostCreature.ActualAttack;
 begin
   if ShortRangeActualAttackHits then
   begin
     ShortRangeAttackHurt;
   end;
-end;
-
-function TGhostCreature.CollisionsWithCreaturesAndPlayer: boolean;
-begin
-  Result := State <> wasDying;
 end;
 
 procedure TGhostCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
@@ -3407,6 +3348,18 @@ begin
 end;
 
 { TMissileCreature ----------------------------------------------------------- }
+
+constructor TMissileCreature.Create(AKind: TCreatureKind;
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AMaxLife: Single;
+  const AnimationTime: Single; const BaseLights: TLightInstancesList);
+begin
+  inherited;
+
+  { We will check for collisions when missile moves. }
+  Collides := false;
+end;
 
 function TMissileCreature.MissileKind: TMissileCreatureKind;
 begin
@@ -3454,7 +3407,7 @@ begin
         is adjusted by creatures/kinds.xml). }
       for I := 0 to Level.Creatures.Count - 1 do
         if (Level.Creatures[I] <> Self) and
-           (Level.Creatures[I].CollisionsWithCreaturesAndPlayer) and
+           (Level.Creatures[I].Collides) and
            (Level.Creatures[I].BoundingBox.SphereSimpleCollision(
              MiddlePosition, Kind.CameraRadius)) then
         begin
@@ -3547,11 +3500,6 @@ begin
   Creature.Life := Creature.Life -
     (Kind.ShortRangeAttackDamageConst +
       Random * Kind.ShortRangeAttackDamageRandom);
-end;
-
-function TMissileCreature.CollisionsWithCreaturesAndPlayer: boolean;
-begin
-  Result := false;
 end;
 
 { TStillCreature ----------------------------------------------------------- }
