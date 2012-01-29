@@ -382,7 +382,7 @@ const
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
     begin
-      WerewolfCreature[I] := Werewolf.CreateDefaultCreature(Self,
+      WerewolfCreature[I] := Werewolf.CreateCreature(Self,
         WerewolfAppearPosition[I],
         VectorSubtract(Player.Camera.Position, WerewolfAppearPosition[I]),
         AnimationTime, BaseLights, Werewolf.DefaultMaxLife) as TWerewolfCreature;
@@ -674,7 +674,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
       CreatureDirection := VectorSubtract(Player.Camera.Position,
         CreaturePosition);
-      Creature := Ghost.CreateDefaultCreature(Self, CreaturePosition,
+      Creature := Ghost.CreateCreature(Self, CreaturePosition,
         CreatureDirection, AnimationTime, BaseLights, Ghost.DefaultMaxLife);
       Items.Add(Creature);
     end;
@@ -691,7 +691,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
       CreaturePosition := SwordAmbushStartingPosition[I];
       CreatureDirection := VectorSubtract(Player.Camera.Position,
         CreaturePosition);
-      Creature := Ghost.CreateDefaultCreature(Self, CreaturePosition,
+      Creature := Ghost.CreateCreature(Self, CreaturePosition,
         CreatureDirection, AnimationTime, BaseLights, Ghost.DefaultMaxLife);
       Items.Add(Creature);
     end;
@@ -1065,7 +1065,7 @@ begin
         SpiderDirection :=
           VectorSubtract(Player.Camera.Position, SpiderPosition);
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.GravityUp);
-        SpiderCreature := Spider.CreateDefaultCreature(Self,
+        SpiderCreature := Spider.CreateCreature(Self,
           SpiderPosition, SpiderDirection, AnimationTime, BaseLights, Spider.DefaultMaxLife);
         Items.Add(SpiderCreature);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);

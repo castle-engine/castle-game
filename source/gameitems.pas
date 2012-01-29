@@ -747,7 +747,7 @@ begin
     { shoot the arrow }
     MissilePosition := Player.Camera.Position;
     MissileDirection := Player.Camera.Direction;
-    Missile := Arrow.CreateDefaultCreature(Level, MissilePosition, MissileDirection,
+    Missile := Arrow.CreateCreature(Level, MissilePosition, MissileDirection,
       Level.AnimationTime, Level.BaseLights, Arrow.DefaultMaxLife);
     Level.Items.Add(Missile);
     SoundEngine.Sound(stArrowFired);

@@ -1499,7 +1499,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     end;
 
     { calculate Creature }
-    Creature := CreatureKind.CreateDefaultCreature(Self, CreaturePosition,
+    Creature := CreatureKind.CreateCreature(Self, CreaturePosition,
       CreatureDirection, AnimationTime, BaseLights, MaxLife);
 
     Items.Add(Creature);

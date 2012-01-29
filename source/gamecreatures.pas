@@ -161,7 +161,7 @@ type
 
       You cannot depend that every creature has this MaxLife ---
       caller can pass any MaxLife value when creating creature by
-      CreateDefaultCreature or by any other means.
+      CreateCreature or by any other means.
       This is only a "suggested" default for MaxLife of this creature. }
     property DefaultMaxLife: Single
       read FDefaultMaxLife write FDefaultMaxLife default DefaultDefaultMaxLife;
@@ -171,19 +171,10 @@ type
       e.g. if this kind has settings for short-range fight,
       then the TCreature instance will be able to short-range fight.
 
-      TODO: remove this paragraph, actually all creatures should be created
-      this way?
-
-      TODO: add TLevel instance, to take care of common stuff?
-
-      Note that you don't have to use this function to create
-      creature instances with this Kind. You can freely create
-      TCreature instances on your own, using all flexibility.
-      (be careful though as some TCreature desdendants require
-      particular TCreatureKind descendants).
-      This function just serves as a comfortable way to create
-      creature instance as easily as possible. }
-    function CreateDefaultCreature(AOwner: TComponent;
+      This is the only way to create TCreature instances.
+      Usually, you actually want to use TLevel.CreateCreature,
+      that is even simpler. }
+    function CreateCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -1173,7 +1164,7 @@ begin
     Options, BaseLights);
 end;
 
-function TCreatureKind.CreateDefaultCreature(AOwner: TComponent;
+function TCreatureKind.CreateCreature(AOwner: TComponent;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -3056,7 +3047,7 @@ begin
   begin
     MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := BallMissile.CreateDefaultCreature(Owner,
+    Missile := BallMissile.CreateCreature(Owner,
       MissilePosition, MissileDirection,
       Level.AnimationTime, Level.BaseLights, BallMissile.DefaultMaxLife);
 
@@ -3237,7 +3228,7 @@ begin
   begin
     MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := ThrownWeb.CreateDefaultCreature(Owner,
+    Missile := ThrownWeb.CreateCreature(Owner,
       MissilePosition, MissileDirection,
       Level.AnimationTime, Level.BaseLights, ThrownWeb.DefaultMaxLife);
 
