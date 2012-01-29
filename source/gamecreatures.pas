@@ -765,13 +765,11 @@ type
       creatures. }
     function Move(
       const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
-      out NewMiddlePosition: TVector3Single;
-      const BecauseOfGravity: boolean): boolean;
+      out NewMiddlePosition: TVector3Single): boolean;
 
-    { Like @link(Move), but this is only a "yes/no" collision check. }
-    function MoveSimple(
-      const OldMiddlePosition, NewMiddlePosition: TVector3Single;
-      const BecauseOfGravity: boolean): boolean;
+    { Like previous @link(Move), but this is only a "yes/no" collision check. }
+    function Move(
+      const OldMiddlePosition, NewMiddlePosition: TVector3Single): boolean;
 
     procedure ShortRangeAttackHurt;
 
@@ -934,8 +932,9 @@ type
       out AboveGround: P3DTriangle); override;
 
     { Is move through this creature allowed. }
-    function MoveBoxAllowedSimple(
+    function MoveAllowed(
       const OldPos, NewPos: TVector3Single;
+      const IsRadius: boolean; const Radius: Single;
       const OldBox, NewBox: TBox3D;
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean; override;
   end;
@@ -1094,7 +1093,6 @@ type
   private
     procedure ExplodeCore;
     procedure ExplodeWithPlayer;
-    procedure ExplodeWithLevel;
     procedure ExplodeWithCreature(Creature: TCreature);
   private
     LastSoundIdleTime: Single;
@@ -1989,57 +1987,34 @@ end;
 
 function TCreature.Move(
   const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
-  out NewMiddlePosition: TVector3Single;
-  const BecauseOfGravity: boolean): boolean;
+  out NewMiddlePosition: TVector3Single): boolean;
 begin
   Inc(DisableCollisions);
   try
-    { Check creature<->level+other creatures collision. }
-    if UseSphere then
-    begin
-      Result := Level.MoveAllowed(
+    Result :=
+      { Check creature<->level+other creatures collision. }
+      Level.MoveAllowed(
         OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
-        BecauseOfGravity, Kind.CameraRadius);
-    end else
-    begin
-      NewMiddlePosition := ProposedNewMiddlePosition;
-      Result := Level.MoveBoxAllowedSimple(
-        OldMiddlePosition, NewMiddlePosition,
-        BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
-        BecauseOfGravity);
-    end;
-
-    if Result then
-      Result :=
-        { Check creature<->player collision. }
-        (not MiddleCollisionWithPlayer(NewMiddlePosition));
+        UseSphere, Kind.CameraRadius,
+        BoundingBox, BoundingBoxAssumingMiddle(ProposedNewMiddlePosition, Direction)) and
+      { Check creature<->player collision. }
+      (not MiddleCollisionWithPlayer(NewMiddlePosition));
   finally Dec(DisableCollisions) end;
 end;
 
-function TCreature.MoveSimple(
-  const OldMiddlePosition, NewMiddlePosition: TVector3Single;
-  const BecauseOfGravity: boolean): boolean;
+function TCreature.Move(
+  const OldMiddlePosition, NewMiddlePosition: TVector3Single): boolean;
 begin
   Inc(DisableCollisions);
   try
-    { Check creature<->level+other creatures collision. }
-    if UseSphere then
-    begin
-      Result := Level.MoveAllowedSimple(
+    Result :=
+      { Check creature<->level+other creatures collision. }
+      Level.MoveAllowed(
         OldMiddlePosition, NewMiddlePosition,
-        BecauseOfGravity, Kind.CameraRadius);
-    end else
-    begin
-      Result := Level.MoveBoxAllowedSimple(
-        OldMiddlePosition, NewMiddlePosition,
-        BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
-        BecauseOfGravity);
-    end;
-
-    if Result then
-      Result :=
-        { Check creature<->player collision. }
-        (not MiddleCollisionWithPlayer(NewMiddlePosition));
+        UseSphere, Kind.CameraRadius,
+        BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction)) and
+      { Check creature<->player collision. }
+      (not MiddleCollisionWithPlayer(NewMiddlePosition));
   finally Dec(DisableCollisions) end;
 end;
 
@@ -2101,7 +2076,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       ProposedNewMiddlePosition[2] += Distance;
 
       Result := Move(OldMiddlePosition, ProposedNewMiddlePosition,
-        NewMiddlePosition, true);
+        NewMiddlePosition);
 
       if Result then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
@@ -2374,12 +2349,15 @@ begin
   end;
 end;
 
-function TCreature.MoveBoxAllowedSimple(
+function TCreature.MoveAllowed(
   const OldPos, NewPos: TVector3Single;
+  const IsRadius: boolean; const Radius: Single;
   const OldBox, NewBox: TBox3D;
   const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
 begin
-  { check collision with creature's bounding box }
+  { check collision with creature's bounding box.
+    We ignore IsRadius, Radius for now --- we always check collisions
+    with other boxes. }
 
   Result := true;
 
@@ -2784,18 +2762,16 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         (not TooHighAboveTheGround(VectorAdd(OldMiddlePosition,
           VectorScale(Direction, WAKind.MoveSpeed * 0.2 * 50)))) and
 
-        { MoveAllowed is free to just return true and set
-          NewMiddlePosition to OldMiddlePosition (or something very close)
-          instead of returning false. But this is not good for
-          MoveAlongTheDirection, as things using MoveAlongTheDirection
-          depend on the fact that MoveAlongTheDirection will return false
-          if no further way is possible.
+        { Use Move without wall-sliding here.
+          Things using MoveAlongTheDirection depend on the fact that
+          MoveAlongTheDirection will return false
+          if no further way is possible (and wall-sliding would try instead
+          to return true and correct target position).
 
-          That's why I use MoveAllowedSimple below.
           Our trick with "AlternativeTarget" should handle
-          eventual problems with the track of creature, so MoveAllowed
+          eventual problems with the track of creature, so wall-sliding
           should not be needed. }
-        MoveSimple(OldMiddlePosition, NewMiddlePosition, false);
+        Move(OldMiddlePosition, NewMiddlePosition);
 
       if Result then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
@@ -3058,7 +3034,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         VectorScale(LastAttackDirection, CurrentKnockBackDistance));
 
       if Move(OldMiddlePosition, ProposedNewMiddlePosition,
-        NewMiddlePosition, false) then
+        NewMiddlePosition) then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
   end;
@@ -3439,7 +3415,7 @@ end;
 
 procedure TMissileCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 var
-  NewMiddlePosition: TVector3Single;
+  OldMiddlePosition, NewMiddlePosition: TVector3Single;
   AngleBetween, AngleChange: Single;
   NewDirection, TargetDirection: TVector3Single;
   I: Integer;
@@ -3453,41 +3429,42 @@ begin
   if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
   { Note that for now missiles are removed from level as soon as they are dead,
-    so I don't bother with checking here Dead. Or UseSphere
-    --- you can safely assume that UseSphere is @true here,
-    and use Level.MoveAllowedSimple instead of Level.MoveBoxAllowedSimple. }
+    so I don't bother with checking here Dead. }
 
+  OldMiddlePosition := MiddlePosition;
   NewMiddlePosition := VectorAdd(MiddlePosition,
     VectorScale(Direction, MissileKind.MoveSpeed * CompSpeed * 50));
 
-  if Level.MoveAllowedSimple(MiddlePosition, NewMiddlePosition,
-    false, Kind.CameraRadius) then
-  begin
-    LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
-  end else
-    ExplodeWithLevel;
+  { missile moves *always*, disregarding Move method result.
+    Only after move, if the move made us colliding with something --- we explode. }
+  LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
 
-  { Check bounding Box of the missile <-> player's BoundingBox.
-    Maybe I'll switch to using bounding Sphere here one day ?  }
-  if MissileKind.HitsPlayer and LegsCollisionWithPlayer(LegsPosition) then
-    ExplodeWithPlayer;
-
-  if MissileKind.HitsCreatures then
+  if not Move(OldMiddlePosition, NewMiddlePosition) then
   begin
-    { Check bounding Sphere of the missile <-> creature's BoundingBox.
-      Bounding Sphere is better for arrow, that has very large geometry
-      but small enough bounding Sphere (because bounding Sphere radius
-      is adjusted by creatures/kinds.xml). }
-    for I := 0 to Level.Creatures.Count - 1 do
-      if (Level.Creatures[I] <> Self) and
-         (Level.Creatures[I].CollisionsWithCreaturesAndPlayer) and
-         (Level.Creatures[I].BoundingBox.SphereSimpleCollision(
-           MiddlePosition, Kind.CameraRadius)) then
-      begin
-        ExplodeWithCreature(Level.Creatures[I]);
-        { TODO: projectiles shouldn't do here "break". }
-        break;
-      end;
+    { Check bounding Box of the missile <-> player's BoundingBox.
+      Maybe I'll switch to using bounding Sphere here one day ?  }
+    if MissileKind.HitsPlayer and LegsCollisionWithPlayer(LegsPosition) then
+      ExplodeWithPlayer;
+
+    if MissileKind.HitsCreatures then
+    begin
+      { Check bounding Sphere of the missile <-> creature's BoundingBox.
+        Bounding Sphere is better for arrow, that has very large geometry
+        but small enough bounding Sphere (because bounding Sphere radius
+        is adjusted by creatures/kinds.xml). }
+      for I := 0 to Level.Creatures.Count - 1 do
+        if (Level.Creatures[I] <> Self) and
+           (Level.Creatures[I].CollisionsWithCreaturesAndPlayer) and
+           (Level.Creatures[I].BoundingBox.SphereSimpleCollision(
+             MiddlePosition, Kind.CameraRadius)) then
+        begin
+          ExplodeWithCreature(Level.Creatures[I]);
+          { TODO: projectiles shouldn't do here "break". }
+          break;
+        end;
+    end;
+
+    ExplodeCore;
   end;
 
   if MissileKind.FallsDown and
@@ -3560,18 +3537,11 @@ end;
 
 procedure TMissileCreature.ExplodeWithPlayer;
 begin
-  ExplodeCore;
   ShortRangeAttackHurt;
-end;
-
-procedure TMissileCreature.ExplodeWithLevel;
-begin
-  ExplodeCore;
 end;
 
 procedure TMissileCreature.ExplodeWithCreature(Creature: TCreature);
 begin
-  ExplodeCore;
   { TODO: knockback for creatures should be done here. }
   Creature.LastAttackDirection := Direction;
   Creature.Life := Creature.Life -

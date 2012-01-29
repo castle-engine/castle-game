@@ -644,7 +644,7 @@ procedure EventDown(AKey: TKey;
         PushVector);
 
       { Now check is DropPosition actually possible
-        (i.e. check collisions item<->level).
+        (i.e. check collisions item<->everything).
         The assumption is that item starts from
         Player.Camera.Position and is moved to DropPosition.
 
@@ -654,10 +654,12 @@ procedure EventDown(AKey: TKey;
         could get *partially* stuck within the wall, which wouldn't
         look good. }
 
-      Result := Level.MoveAllowedSimple(
+      Result := Level.MoveAllowed(
         VectorAdd(Player.Camera.Position, ItemBoxMiddle),
         VectorAdd(DropPosition, ItemBoxMiddle),
-        false, ItemBoxRadius)
+        true, ItemBoxRadius,
+        ItemBox.Translate(Player.Camera.Position),
+        ItemBox.Translate(DropPosition));
     end;
 
   var

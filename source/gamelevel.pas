@@ -533,31 +533,25 @@ type
 
       Note about AboveGround: it is set to @nil if the ground item
       can't be represented as any octree item. Right now, this means that
-      soemthing stands on another creature/player/item.
+      something stands on another creature/player/item.
 
       @groupBegin }
     function LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
       virtual;
 
-    function MoveAllowed(const Position: TVector3Single;
-      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean; virtual;
+    function MoveAllowed(
+      const OldPos, ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
+      const IsRadius: boolean; const Radius: Single;
+      const OldBox, NewBox: TBox3D): boolean;
 
-    function MoveAllowedSimple(const Position: TVector3Single;
-      const NewPos: TVector3Single;
-      const BecauseOfGravity: boolean;
-      const MovingObjectCameraRadius: Single): boolean; virtual;
-
-    function MoveBoxAllowedSimple(
-      const Position, NewPos: TVector3Single;
-      const OldBox, NewBox: TBox3D;
-      const BecauseOfGravity: boolean): boolean; virtual;
+    function MoveAllowed(
+      const OldPos, NewPos: TVector3Single;
+      const IsRadius: boolean; const Radius: Single;
+      const OldBox, NewBox: TBox3D): boolean;
 
     procedure GetHeightAbove(const Position: TVector3Single;
       out IsAbove: boolean; out AboveHeight: Single;
       out AboveGround: PTriangle);
-      virtual;
     { @groupEnd }
 
     { Call this to allow level object to update some things,
@@ -747,7 +741,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
     Result := GetExists and Collides;
     if Result then
     begin
-      { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+      { We use the same trick as in T3DCustomTransform.MoveAllowed to
         use "inherited SphereCollsion" with Translation. }
 
       Result := inherited SphereCollision(
@@ -763,7 +757,7 @@ procedure TLevelMovingObject.BeforeTimeIncrease(
     Result := GetExists and Collides;
     if Result then
     begin
-      { We use the same trick as in TLevelMovingObject.MoveAllowedSimple to
+      { We use the same trick as in T3DCustomTransform.MoveAllowed to
         use "inherited BoxCollision" with Translation. }
 
       Result := inherited BoxCollision(
@@ -1544,38 +1538,24 @@ begin
     @MainScene.OctreeCollisions.IgnoreTransparentItem)
 end;
 
-function TLevel.MoveAllowed(const Position: TVector3Single;
-  const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
+function TLevel.MoveAllowed(
+  const OldPos, ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
+  const IsRadius: boolean; const Radius: Single;
+  const OldBox, NewBox: TBox3D): boolean;
 begin
-  Result := Items.MoveAllowed(Position, ProposedNewPos, NewPos,
-    MovingObjectCameraRadius, @CollisionIgnoreItem);
-
+  Result := Items.MoveAllowed(OldPos, ProposedNewPos, NewPos,
+    IsRadius, Radius, OldBox, NewBox, @CollisionIgnoreItem);
   if Result then
     Result := CameraBox.PointInside(NewPos);
 end;
 
-function TLevel.MoveAllowedSimple(const Position: TVector3Single;
-  const NewPos: TVector3Single;
-  const BecauseOfGravity: boolean;
-  const MovingObjectCameraRadius: Single): boolean;
+function TLevel.MoveAllowed(
+  const OldPos, NewPos: TVector3Single;
+  const IsRadius: boolean; const Radius: Single;
+  const OldBox, NewBox: TBox3D): boolean;
 begin
-  Result := Items.MoveAllowedSimple(Position, NewPos,
-    MovingObjectCameraRadius, @CollisionIgnoreItem);
-
-  if Result then
-    Result := CameraBox.PointInside(NewPos);
-end;
-
-function TLevel.MoveBoxAllowedSimple(const Position: TVector3Single;
-  const NewPos: TVector3Single;
-  const OldBox, NewBox: TBox3D;
-  const BecauseOfGravity: boolean): boolean;
-begin
-  Result := Items.MoveBoxAllowedSimple(Position, NewPos, OldBox, NewBox,
-    @CollisionIgnoreItem);
-
+  Result := Items.MoveAllowed(OldPos, NewPos,
+    IsRadius, Radius, OldBox, NewBox, @CollisionIgnoreItem);
   if Result then
     Result := CameraBox.PointInside(NewPos);
 end;
@@ -1592,19 +1572,9 @@ function TLevel.CameraMoveAllowed(ACamera: TWalkCamera;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  { Check collision Player <-> level. }
+  { Check collision Player <-> level+creatures. }
   Result := inherited CameraMoveAllowed(ACamera,
     ProposedNewPos, NewPos, BecauseOfGravity);
-
-  if MenuBackground then Exit;
-
-  { Check collision Player <-> Creatures here. }
-  { TODO: CameraMoveAllowed shoudl check it, by TCreature.MoveAllowed overrides?
-  if Result then
-    Result := Creatures.MoveBoxAllowedSimple(
-      Player.BoundingBox(false),
-      Player.BoundingBoxAssuming(NewPos, false),
-      ACamera.Position, NewPos, nil) = nil; }
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single;
