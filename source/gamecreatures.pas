@@ -2378,13 +2378,6 @@ begin
     IsAbove := (not Box.IsEmpty) and
       (Box.Data[0, 0] <= Position[0]) and (Position[0] <= Box.Data[1, 0]) and
       (Box.Data[0, 1] <= Position[1]) and (Position[1] <= Box.Data[1, 1]) and
-      { Actually, we look only at the top rectangle of bounding box.
-        That's why self-collision is not a problem here: even if Position
-        equals this creature's own MiddlePosition or LegsPosition,
-        it's still below Box.Data[1, 2].
-        If you replace the check below with ">= Box.Data[0, 2]",
-        then creature will always be considered standing on it's own head,
-        and will fly up into infinity :) }
       (Position[2] >= Box.Data[1, 2]);
 
     if IsAbove then
