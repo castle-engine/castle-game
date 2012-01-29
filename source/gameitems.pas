@@ -902,8 +902,8 @@ begin
     NewTranslation := ShiftedTranslation;
     NewTranslation[2] -= FallingDownLength;
 
-    { TODO: I could use Level.MoveAllowed here, not
-      Level.MoveAllowedSimple. But then left life potion on gate
+    { TODO: I could use Level.MoveAllowed with wall-sliding here.
+      But then left life potion on gate
       level must be corrected (possibly by correcting the large sword mesh)
       to not "slip down" from the sword. }
     {if Level.MoveAllowed(ShiftedTranslation, NewTranslation,

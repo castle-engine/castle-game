@@ -874,7 +874,7 @@ type
     property LastAttackDirection: TVector3Single
       read FLastAttackDirection write SetLastAttackDirection;
 
-    { If @false, then TCreatureList.MoveAllowedSimple and
+    { If @false, then TCreature.MoveAllowed and
       TCreature.GetHeightAbove will ignore this
       creature, which means that collisions between this creature
       and player/other creatures will not be checked.
@@ -2129,19 +2129,19 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
           then you will get exatly into collision with the ground.
           So actually this is too large MaximumFallingDownDistance.
 
-          But actually it's OK when UseSphere, because then
-          MoveVertical (actually MoveAllowed) can correct new position,
+          But actually it's OK when UseSphere, because then wall-sliding
+          in MoveVertical (actually MoveAllowed) can correct new position,
           so actually it will be slightly above the ground. So falling
           down will work.
 
           But when not UseSphere, the situation is worse,
-          because then MoveAllowed actually calls MoveAllowedSimple.
-          And MoveAllowedSimple will always simply reject such move
+          because then MoveAllowed doesn't do wall-sliding.
+          And it will always simply reject such move
           with MaximumFallingDownDistance.
           If FPS is low (so we would like to fall down at once
           by large distance), this is noticeable: in such case, instead
           of falling down, creature hangs over the ground,
-          because MoveAllowedSimple simply doesn't allow it fall
+          because MoveAllowed simply doesn't allow it fall
           exactly by AboveHeight - HeightBetweenLegsAndMiddle.
           So MaximumFallingDownDistance has to be a little smaller in this case.
           In particular, this was noticeable for the initially dead alien
@@ -2150,9 +2150,8 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
           TODO: the better version would be to improve
           MoveAllowed for not UseSphere case, instead of
-          workarounding it here with this epsilon,
-          but this requires implementing "wall-sliding" for the whole box3d
-          in our octree. }
+          workarounding it here with this epsilon.
+          See TBaseTrianglesOctree.MoveAllowed. }
         if not UseSphere then
           MaximumFallingDownDistance -= 0.01;
         MinTo1st(FallingDownDistance, MaximumFallingDownDistance);
