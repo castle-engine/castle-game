@@ -765,12 +765,12 @@ type
 
       Check collisions with the level, with player, and with other
       creatures. }
-    function Move(
+    function MyMoveAllowed(
       const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
       out NewMiddlePosition: TVector3Single): boolean;
 
     { Like previous @link(Move), but this is only a "yes/no" collision check. }
-    function Move(
+    function MyMoveAllowed(
       const OldMiddlePosition, NewMiddlePosition: TVector3Single): boolean;
 
     procedure ShortRangeAttackHurt;
@@ -824,7 +824,7 @@ type
       How precisely this is calculated for given creature depends
       on MiddlePositionFromLegs implementation in this class.
 
-      All collision detection (Move, MyGetHeightAbove, MyLineOfSight)
+      All collision detection (MyMoveAllowed, MyGetHeightAbove, MyLineOfSight)
       should be done using MiddlePosition, and then appropriately translated
       back to LegsPosition. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
@@ -1965,7 +1965,7 @@ begin
     Player.BoundingBox);
 end;
 
-function TCreature.Move(
+function TCreature.MyMoveAllowed(
   const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
   out NewMiddlePosition: TVector3Single): boolean;
 begin
@@ -1982,7 +1982,7 @@ begin
   finally Dec(DisableCollisions) end;
 end;
 
-function TCreature.Move(
+function TCreature.MyMoveAllowed(
   const OldMiddlePosition, NewMiddlePosition: TVector3Single): boolean;
 begin
   Inc(DisableCollisions);
@@ -2063,7 +2063,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       ProposedNewMiddlePosition := OldMiddlePosition;
       ProposedNewMiddlePosition[2] += Distance;
 
-      Result := Move(OldMiddlePosition, ProposedNewMiddlePosition,
+      Result := MyMoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
         NewMiddlePosition);
 
       if Result then
@@ -2726,7 +2726,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
           Our trick with "AlternativeTarget" should handle
           eventual problems with the track of creature, so wall-sliding
           should not be needed. }
-        Move(OldMiddlePosition, NewMiddlePosition);
+        MyMoveAllowed(OldMiddlePosition, NewMiddlePosition);
 
       if Result then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
@@ -2988,7 +2988,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       ProposedNewMiddlePosition := VectorAdd(OldMiddlePosition,
         VectorScale(LastAttackDirection, CurrentKnockBackDistance));
 
-      if Move(OldMiddlePosition, ProposedNewMiddlePosition,
+      if MyMoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
         NewMiddlePosition) then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
@@ -3412,7 +3412,7 @@ begin
     Only after move, if the move made us colliding with something --- we explode. }
   LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
 
-  if not Move(OldMiddlePosition, NewMiddlePosition) then
+  if not MyMoveAllowed(OldMiddlePosition, NewMiddlePosition) then
   begin
     { Check bounding Box of the missile <-> player's BoundingBox.
       Maybe I'll switch to using bounding Sphere here one day ?  }
