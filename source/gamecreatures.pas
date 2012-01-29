@@ -667,6 +667,9 @@ type
     FLife: Single;
     FMaxLife: Single;
     FLastAttackDirection: TVector3Single;
+    { > 0 means to ignore collisions. This may be used inside,
+      to prevent collisions with self. }
+    DisableCollisions: Cardinal;
     procedure SetLastAttackDirection(const Value: TVector3Single);
   private
     { For gravity work. }
@@ -696,6 +699,10 @@ type
     FSoundDyingEnabled: boolean;
   protected
     function GetExists: boolean; override;
+
+    { Get height of my own point above the rest of the 3D world. }
+    procedure MyGetHeightAbove(const MyPosition: TVector3Single;
+      out IsAbove: boolean; out AboveHeight: Single);
 
     { Like TransformMatricesMult, but assumes that LegsPosition and Direction
       is as specified. }
@@ -2047,6 +2054,17 @@ begin
         OldMiddlePosition, NewMiddlePosition, Self) = nil);
 end;
 
+procedure TCreature.MyGetHeightAbove(const MyPosition: TVector3Single;
+  out IsAbove: boolean; out AboveHeight: Single);
+var
+  AboveGround: PTriangle; {< just ignored for now }
+begin
+  Inc(DisableCollisions);
+  try
+    Level.GetHeightAbove(MyPosition, IsAbove, AboveHeight, AboveGround);
+  finally Dec(DisableCollisions) end;
+end;
+
 procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
   procedure UpdateUsedSounds;
@@ -2113,7 +2131,6 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
   var
     IsAbove: boolean;
     AboveHeight: Single;
-    AboveGround: PTriangle;
     OldIsFallingDown: boolean;
     FallingDownDistance, MaximumFallingDownDistance: Single;
   begin
@@ -2127,7 +2144,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     OldIsFallingDown := FIsFallingDown;
     OldMiddlePosition := MiddlePosition;
 
-    Level.GetHeightAbove(OldMiddlePosition, IsAbove, AboveHeight, AboveGround);
+    MyGetHeightAbove(OldMiddlePosition, IsAbove, AboveHeight);
 
     if AboveHeight > HeightBetweenLegsAndMiddle * HeightMargin then
     begin
@@ -2343,7 +2360,9 @@ procedure TCreature.GetHeightAbove(const Position, GravityUp: TVector3Single;
 var
   Box: TBox3D;
 begin
-  { we check collision with creature's bounding box }
+  { check collision with creature's bounding box.
+    Actually, with top rectangle of this creature's bounding box. }
+
   { inherited already initializes all out parameters,
     so code lower only updates what's necessary }
   inherited;
@@ -2351,7 +2370,8 @@ begin
     Also, this should have Collides = true.
     CollisionsWithCreaturesAndPlayer should disappear (all it's uses
     should change to just Collides?) }
-  if GetExists and CollisionsWithCreaturesAndPlayer then
+  if GetExists and CollisionsWithCreaturesAndPlayer and
+    (DisableCollisions = 0) then
   begin
     Box := BoundingBox;
     { TODO: this assumes GravityUp is +Z }
@@ -2755,12 +2775,11 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       var
         IsAbove: boolean;
         AboveHeight: Single;
-        AboveGround: PTriangle;
       begin
         Result := false;
         if not Kind.Flying then
         begin
-          Level.GetHeightAbove(NewMiddlePosition, IsAbove, AboveHeight, AboveGround);
+          MyGetHeightAbove(NewMiddlePosition, IsAbove, AboveHeight);
           if AboveHeight > WAKind.MaxHeightAcceptableToFall +
               HeightBetweenLegsAndMiddle then
             Result := true;
