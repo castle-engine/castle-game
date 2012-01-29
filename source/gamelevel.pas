@@ -1599,11 +1599,12 @@ begin
   if MenuBackground then Exit;
 
   { Check collision Player <-> Creatures here. }
+  { TODO: CameraMoveAllowed shoudl check it, by TCreature.MoveAllowed overrides?
   if Result then
-    Result := Creatures.MoveAllowedSimple(
+    Result := Creatures.MoveBoxAllowedSimple(
       Player.BoundingBox(false),
       Player.BoundingBoxAssuming(NewPos, false),
-      ACamera.Position, NewPos, nil) = nil;
+      ACamera.Position, NewPos, nil) = nil; }
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single;

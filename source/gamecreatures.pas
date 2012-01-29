@@ -932,24 +932,15 @@ type
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
       out IsAbove: boolean; out AboveHeight: Single;
       out AboveGround: P3DTriangle); override;
+
+    { Is move through this creature allowed. }
+    function MoveBoxAllowedSimple(
+      const OldPos, NewPos: TVector3Single;
+      const OldBox, NewBox: TBox3D;
+      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean; override;
   end;
 
   TCreatureList = class(specialize TFPGObjectList<TCreature>)
-    { This checks whether someone (player or creature) moving from
-      OldBoundingBox to NewBoundingBox(and OldPosition to NewPosition
-      --- appropriate positions should be within their bounding boxes)
-      collides with any creature on the the list.
-
-      Returns nil if no collision or reference of (one of) colliding
-      creatures.
-
-      You can pass IgnoreCreature <> nil if you want to ignore
-      collisions with given creature (this will obviously be useful
-      when checking for collisions for this creature). }
-    function MoveAllowedSimple(
-      const OldBoundingBox, NewBoundingBox: TBox3D;
-      const OldPosition, NewPosition: TVector3Single;
-      IgnoreCreature: TCreature): TCreature;
   end;
 
   TWalkAttackCreatureState = (wasStand, wasWalk, wasAttack,
@@ -2001,57 +1992,55 @@ function TCreature.Move(
   out NewMiddlePosition: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  { Check creature<->level collision. }
-  if UseSphere then
-  begin
-    Result := Level.MoveAllowed(
-      OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
-      BecauseOfGravity, Kind.CameraRadius);
-  end else
-  begin
-    NewMiddlePosition := ProposedNewMiddlePosition;
-    Result := Level.MoveBoxAllowedSimple(
-      OldMiddlePosition, NewMiddlePosition,
-      BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
-      BecauseOfGravity);
-  end;
-
-  if Result then
-    Result :=
-      { Check creature<->player collision. }
-      (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
-      { Check creature<->other creatures collision. }
-      (Level.Creatures.MoveAllowedSimple(
+  Inc(DisableCollisions);
+  try
+    { Check creature<->level+other creatures collision. }
+    if UseSphere then
+    begin
+      Result := Level.MoveAllowed(
+        OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
+        BecauseOfGravity, Kind.CameraRadius);
+    end else
+    begin
+      NewMiddlePosition := ProposedNewMiddlePosition;
+      Result := Level.MoveBoxAllowedSimple(
+        OldMiddlePosition, NewMiddlePosition,
         BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
-        OldMiddlePosition, NewMiddlePosition, Self) = nil);
+        BecauseOfGravity);
+    end;
+
+    if Result then
+      Result :=
+        { Check creature<->player collision. }
+        (not MiddleCollisionWithPlayer(NewMiddlePosition));
+  finally Dec(DisableCollisions) end;
 end;
 
 function TCreature.MoveSimple(
   const OldMiddlePosition, NewMiddlePosition: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  { Check creature<->level collision. }
-  if UseSphere then
-  begin
-    Result := Level.MoveAllowedSimple(
-      OldMiddlePosition, NewMiddlePosition,
-      BecauseOfGravity, Kind.CameraRadius);
-  end else
-  begin
-    Result := Level.MoveBoxAllowedSimple(
-      OldMiddlePosition, NewMiddlePosition,
-      BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
-      BecauseOfGravity);
-  end;
-
-  if Result then
-    Result :=
-      { Check creature<->player collision. }
-      (not MiddleCollisionWithPlayer(NewMiddlePosition)) and
-      { Check creature<->other creatures collision. }
-      (Level.Creatures.MoveAllowedSimple(
+  Inc(DisableCollisions);
+  try
+    { Check creature<->level+other creatures collision. }
+    if UseSphere then
+    begin
+      Result := Level.MoveAllowedSimple(
+        OldMiddlePosition, NewMiddlePosition,
+        BecauseOfGravity, Kind.CameraRadius);
+    end else
+    begin
+      Result := Level.MoveBoxAllowedSimple(
+        OldMiddlePosition, NewMiddlePosition,
         BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction),
-        OldMiddlePosition, NewMiddlePosition, Self) = nil);
+        BecauseOfGravity);
+    end;
+
+    if Result then
+      Result :=
+        { Check creature<->player collision. }
+        (not MiddleCollisionWithPlayer(NewMiddlePosition));
+  finally Dec(DisableCollisions) end;
 end;
 
 procedure TCreature.MyGetHeightAbove(const MyPosition: TVector3Single;
@@ -2385,64 +2374,62 @@ begin
   end;
 end;
 
-{ TCreatureList -------------------------------------------------------------- }
-
-function TCreatureList.MoveAllowedSimple(
-  const OldBoundingBox, NewBoundingBox: TBox3D;
-  const OldPosition, NewPosition: TVector3Single;
-  IgnoreCreature: TCreature): TCreature;
-var
-  I: Integer;
+function TCreature.MoveBoxAllowedSimple(
+  const OldPos, NewPos: TVector3Single;
+  const OldBox, NewBox: TBox3D;
+  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
 begin
-  for I := 0 to Count - 1 do
+  { check collision with creature's bounding box }
+
+  Result := true;
+
+  { TODO: this *should* check Collides, for consistency with other stuff.
+    Also, this should have Collides = true.
+    CollisionsWithCreaturesAndPlayer should disappear (all it's uses
+    should change to just Collides?) }
+  if GetExists and CollisionsWithCreaturesAndPlayer and
+    (DisableCollisions = 0) then
   begin
-    Result := Items[I];
-    if (Result <> IgnoreCreature) and
-      Result.CollisionsWithCreaturesAndPlayer then
+    if NewBox.Collision(BoundingBox) then
     begin
-      if NewBoundingBox.Collision(Result.BoundingBox) then
-      begin
-        { Strictly thinking, now I know that I have a collision with creature
-          and I should exit with false. But it's not that simple.
+      { Strictly thinking, now I know that I have a collision with creature
+        and I should exit with false. But it's not that simple.
 
-          Note that there is weakness in collision checking with creatures,
-          because when AnimationTime changes then effectively creature's
-          CurrentScene.BoundingBox changes, and there is no way how I can
-          check for collision there (what could I do ? Stop the animation ?
-          Throw the creature back ? None of this seems sensible...)
-          This means that we cannot prevent the situation when someone's
-          (player's or creature's) and other creature's bounding boxes collide.
+        Note that there is weakness in collision checking with creatures,
+        because when AnimationTime changes then effectively creature's
+        CurrentScene.BoundingBox changes, and there is no way how I can
+        check for collision there (what could I do ? Stop the animation ?
+        Throw the creature back ? None of this seems sensible...)
+        This means that we cannot prevent the situation when someone's
+        (player's or creature's) and other creature's bounding boxes collide.
 
-          So we must take precautions to not make someone "stuck"
-          with this creature (because any potential move collides
-          with this creature).
+        So we must take precautions to not make someone "stuck"
+        with this creature (because any potential move collides
+        with this creature).
 
-          That's the reasoning behind using OldBoundingBox and checks below.
-          I disallow the collision only if there was no collision before
-          (so the pathologic situation doesn't occur) or if someone
-          tries to get closer to the creature (so if the pathologic situation
-          occurs, someone can't make it worse, and can't "abuse" this
-          by entering into creature's bounding box). }
-        if (not OldBoundingBox.Collision(Result.BoundingBox)) or
-           ( PointsDistanceSqr(NewPosition, Result.MiddlePosition) <
-             PointsDistanceSqr(OldPosition, Result.MiddlePosition) ) then
-          Exit;
-      end else
-      { If NewBoundingBox doesn't collide with Result.BoundingBox,
-        and OldBoundingBox also doesn't collide (so pathological
-        situation above occurs) we know that segment between
-        OldPosition and NewPosition cannot collide with Result.BoundingBox.
+        That's the reasoning behind using OldBox and checks below.
+        I disallow the collision only if there was no collision before
+        (so the pathologic situation doesn't occur) or if someone
+        tries to get closer to the creature (so if the pathologic situation
+        occurs, someone can't make it worse, and can't "abuse" this
+        by entering into creature's bounding box). }
+      if (not OldBox.Collision(BoundingBox)) or
+         ( PointsDistanceSqr(NewPos, MiddlePosition) <
+           PointsDistanceSqr(OldPos, MiddlePosition) ) then
+        Exit(false);
+    end else
+    { If NewBox doesn't collide with BoundingBox,
+      and OldBox also doesn't collide (so pathological
+      situation above occurs) we know that segment between
+      OldPos and NewPos cannot collide with BoundingBox.
 
-        Without this check, player could get on the other side
-        of the creature if the creature is slim (e.g. Alien) and player
-        tries very hard, and he has large speed. }
-      if (not OldBoundingBox.Collision(Result.BoundingBox)) and
-         Result.BoundingBox.IsSegmentCollision(OldPosition, NewPosition) then
-        Exit;
-    end;
+      Without this check, player could get on the other side
+      of the creature if the creature is slim (e.g. Alien) and player
+      tries very hard, and he has large speed. }
+    if (not OldBox.Collision(BoundingBox)) and
+       BoundingBox.IsSegmentCollision(OldPos, NewPos) then
+      Exit(false);
   end;
-
-  Result := nil;
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
