@@ -2405,7 +2405,7 @@ begin
       of the creature if the creature is slim (e.g. Alien) and player
       tries very hard, and he has large speed. }
     if (not OldBox.Collision(BoundingBox)) and
-       BoundingBox.IsSegmentCollision(OldPos, NewPos) then
+       BoundingBox.SegmentCollision(OldPos, NewPos) then
       Exit(false);
   end;
 end;
