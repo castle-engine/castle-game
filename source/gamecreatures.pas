@@ -79,6 +79,8 @@ const
 type
   TCreature = class;
 
+  TCreatureClass = class of TCreature;
+
   TCreatureKind = class(TObjectKind)
   private
     FFlying: boolean;
@@ -164,8 +166,15 @@ type
     property DefaultMaxLife: Single
       read FDefaultMaxLife write FDefaultMaxLife default DefaultDefaultMaxLife;
 
-    { This creates the "default creature instance" with Kind = Self.
-      It uses the TCreature descendant most suitable for this TCreatureKind.
+    { Create the TCreature instance of this kind.
+      Uses TCreature descendant that can best cooperate with this kind,
+      e.g. if this kind has settings for short-range fight,
+      then the TCreature instance will be able to short-range fight.
+
+      TODO: remove this paragraph, actually all creatures should be created
+      this way?
+
+      TODO: add TLevel instance, to take care of common stuff?
 
       Note that you don't have to use this function to create
       creature instances with this Kind. You can freely create
@@ -178,7 +187,9 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
-      const MaxLife: Single): TCreature; virtual; abstract;
+      const MaxLife: Single): TCreature;
+
+    function CreatureClass: TCreatureClass; virtual; abstract;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
 
@@ -461,29 +472,17 @@ type
 
   TBallThrowerCreatureKind = class(TWalkAttackCreatureKind)
   public
-    function CreateDefaultCreature(AOwner: TComponent;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList;
-      const MaxLife: Single): TCreature; override;
+    function CreatureClass: TCreatureClass; override;
   end;
 
   TWerewolfKind = class(TWalkAttackCreatureKind)
   public
-    function CreateDefaultCreature(AOwner: TComponent;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList;
-      const MaxLife: Single): TCreature; override;
+    function CreatureClass: TCreatureClass; override;
   end;
 
   TSpiderKind = class(TWalkAttackCreatureKind)
   public
-    function CreateDefaultCreature(AOwner: TComponent;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList;
-      const MaxLife: Single): TCreature; override;
+    function CreatureClass: TCreatureClass; override;
   end;
 
   TSpiderQueenKind = class(TWalkAttackCreatureKind)
@@ -505,11 +504,7 @@ type
     function PrepareRenderSteps: Cardinal; override;
     procedure FreePrepareRender; override;
 
-    function CreateDefaultCreature(AOwner: TComponent;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList;
-      const MaxLife: Single): TCreature; override;
+    function CreatureClass: TCreatureClass; override;
 
     property MinDelayBetweenThrowWebAttacks: Single
       read FMinDelayBetweenThrowWebAttacks
@@ -537,11 +532,7 @@ type
   protected
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
-    function CreateDefaultCreature(AOwner: TComponent;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList;
-      const MaxLife: Single): TCreature; override;
+    function CreatureClass: TCreatureClass; override;
   end;
 
   { A missile. As you can see, this is also treated as a creature
@@ -588,11 +579,7 @@ type
     property SoundExplosion: TSoundType
       read FSoundExplosion write FSoundExplosion default stNone;
 
-    function CreateDefaultCreature(AOwner: TComponent;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList;
-      const MaxLife: Single): TCreature; override;
+    function CreatureClass: TCreatureClass; override;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
 
@@ -649,11 +636,7 @@ type
       In the simplest case, you can just place here a single scene. }
     property Animation: TCastlePrecalculatedAnimation read FAnimation;
 
-    function CreateDefaultCreature(AOwner: TComponent;
-      const ALegsPosition: TVector3Single;
-      const ADirection: TVector3Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList;
-      const MaxLife: Single): TCreature; override;
+    function CreatureClass: TCreatureClass; override;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
@@ -783,7 +766,8 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList); reintroduce;
+      const AnimationTime: Single; const BaseLights: TLightInstancesList);
+      virtual; reintroduce;
 
     destructor Destroy; override;
 
@@ -984,7 +968,7 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList);
+      const AnimationTime: Single; const BaseLights: TLightInstancesList); override;
 
     destructor Destroy; override;
 
@@ -1033,7 +1017,7 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList);
+      const AnimationTime: Single; const BaseLights: TLightInstancesList); override;
 
     procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
@@ -1083,7 +1067,7 @@ type
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList);
+      const AnimationTime: Single; const BaseLights: TLightInstancesList); override;
 
     { Shortcut for TMissileCreatureKind(Kind). }
     function MissileKind: TMissileCreatureKind;
@@ -1200,6 +1184,16 @@ begin
 
   inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimationFile,
     Options, BaseLights);
+end;
+
+function TCreatureKind.CreateDefaultCreature(AOwner: TComponent;
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single;
+  const AnimationTime: Single; const BaseLights: TLightInstancesList;
+  const MaxLife: Single): TCreature;
+begin
+  Result := CreatureClass.Create(AOwner, Self, ALegsPosition, ADirection,
+    MaxLife, AnimationTime, BaseLights);
 end;
 
 { TCreatureKindList -------------------------------------------------------- }
@@ -1380,38 +1374,23 @@ end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
 
-function TBallThrowerCreatureKind.CreateDefaultCreature(AOwner: TComponent;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList;
-  const MaxLife: Single): TCreature;
+function TBallThrowerCreatureKind.CreatureClass: TCreatureClass;
 begin
-  Result := TBallThrowerCreature.Create(AOwner, Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime, BaseLights);
+  Result := TBallThrowerCreature;
 end;
 
 { TWerewolfKind -------------------------------------------------------------- }
 
-function TWerewolfKind.CreateDefaultCreature(AOwner: TComponent;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList;
-  const MaxLife: Single): TCreature;
+function TWerewolfKind.CreatureClass: TCreatureClass;
 begin
-  Result := TWerewolfCreature.Create(AOwner, Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime, BaseLights);
+  Result := TWerewolfCreature;
 end;
 
 { TSpiderKind -------------------------------------------------------------- }
 
-function TSpiderKind.CreateDefaultCreature(AOwner: TComponent;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList;
-  const MaxLife: Single): TCreature;
+function TSpiderKind.CreatureClass: TCreatureClass;
 begin
-  Result := TSpiderCreature.Create(AOwner, Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime, BaseLights);
+  Result := TSpiderCreature;
 end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
@@ -1447,14 +1426,9 @@ begin
   inherited;
 end;
 
-function TSpiderQueenKind.CreateDefaultCreature(AOwner: TComponent;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList;
-  const MaxLife: Single): TCreature;
+function TSpiderQueenKind.CreatureClass: TCreatureClass;
 begin
-  Result := TSpiderQueenCreature.Create(AOwner, Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime, BaseLights);
+  Result := TSpiderQueenCreature;
 end;
 
 procedure TSpiderQueenKind.LoadFromFile(KindsConfig: TCastleConfig);
@@ -1493,14 +1467,9 @@ begin
     ReferenceScene.BoundingBox.Data[1, 2] / 2);
 end;
 
-function TGhostKind.CreateDefaultCreature(AOwner: TComponent;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList;
-  const MaxLife: Single): TCreature;
+function TGhostKind.CreatureClass: TCreatureClass;
 begin
-  Result := TGhostCreature.Create(AOwner, Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime, BaseLights);
+  Result := TGhostCreature;
 end;
 
 { TMissileCreatureKind ---------------------------------------------------- }
@@ -1551,14 +1520,9 @@ begin
   if Animation <> nil then Animation.GLContextClose;
 end;
 
-function TMissileCreatureKind.CreateDefaultCreature(AOwner: TComponent;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList;
-  const MaxLife: Single): TCreature;
+function TMissileCreatureKind.CreatureClass: TCreatureClass;
 begin
-  Result := TMissileCreature.Create(AOwner, Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime, BaseLights);
+  Result := TMissileCreature;
 end;
 
 procedure TMissileCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
@@ -1631,14 +1595,9 @@ begin
   if Animation <> nil then Animation.GLContextClose;
 end;
 
-function TStillCreatureKind.CreateDefaultCreature(AOwner: TComponent;
-  const ALegsPosition: TVector3Single;
-  const ADirection: TVector3Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList;
-  const MaxLife: Single): TCreature;
+function TStillCreatureKind.CreatureClass: TCreatureClass;
 begin
-  Result := TStillCreature.Create(AOwner, Self, ALegsPosition, ADirection,
-    MaxLife, AnimationTime, BaseLights);
+  Result := TStillCreature;
 end;
 
 procedure TStillCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
@@ -2363,8 +2322,7 @@ constructor TWalkAttackCreature.Create(AOwner: TComponent; AKind: TCreatureKind;
   const AMaxLife: Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList);
 begin
-  inherited Create(AOwner, AKind, ALegsPosition, ADirection, AMaxLife,
-    AnimationTime, BaseLights);
+  inherited;
 
   if AMaxLife > 0 then
   begin
