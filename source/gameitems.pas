@@ -708,16 +708,19 @@ begin
   WeaponBoundingBox := Player.BoundingBox.Translate(
     VectorAdjustToLength(Player.Camera.Direction, 1.0));
   { Tests: Writeln('WeaponBoundingBox is ', WeaponBoundingBox.ToNiceStr); }
-  for I := 0 to Level.Creatures.Count - 1 do
-  begin
-    C := Level.Creatures[I];
-    { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
-    if C.BoundingBox.Collision(WeaponBoundingBox) then
+  { TODO: we would prefer to use Level.Items.BoxCollision for this,
+    but we need to know which creature was hit. }
+  for I := 0 to Level.Items.Count - 1 do
+    if Level.Items[I] is TCreature then
     begin
-      C.Life := C.Life - DamageConst - Random * DamageRandom;
-      C.LastAttackDirection := Player.Camera.Direction;
+      C := TCreature(Level.Items[I]);
+      { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
+      if C.BoundingBox.Collision(WeaponBoundingBox) then
+      begin
+        C.Life := C.Life - DamageConst - Random * DamageRandom;
+        C.LastAttackDirection := Player.Camera.Direction;
+      end;
     end;
-  end;
 end;
 
 { TItemBowKind ------------------------------------------------------------- }
@@ -744,9 +747,9 @@ begin
     { shoot the arrow }
     MissilePosition := Player.Camera.Position;
     MissileDirection := Player.Camera.Direction;
-    Missile := Arrow.CreateDefaultCreature(MissilePosition, MissileDirection,
+    Missile := Arrow.CreateDefaultCreature(Level, MissilePosition, MissileDirection,
       Level.AnimationTime, Level.BaseLights, Arrow.DefaultMaxLife);
-    Level.AddCreature(Missile);
+    Level.Items.Add(Missile);
     SoundEngine.Sound(stArrowFired);
   end;
 end;

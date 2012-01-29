@@ -382,11 +382,11 @@ const
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
     begin
-      WerewolfCreature[I] := Werewolf.CreateDefaultCreature(
+      WerewolfCreature[I] := Werewolf.CreateDefaultCreature(Self,
         WerewolfAppearPosition[I],
         VectorSubtract(Player.Camera.Position, WerewolfAppearPosition[I]),
         AnimationTime, BaseLights, Werewolf.DefaultMaxLife) as TWerewolfCreature;
-      AddCreature(WerewolfCreature[I]);
+      Items.Add(WerewolfCreature[I]);
     end;
 
     WerewolfAppeared := true;
@@ -674,9 +674,9 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
       CreatureDirection := VectorSubtract(Player.Camera.Position,
         CreaturePosition);
-      Creature := Ghost.CreateDefaultCreature(CreaturePosition,
+      Creature := Ghost.CreateDefaultCreature(Self, CreaturePosition,
         CreatureDirection, AnimationTime, BaseLights, Ghost.DefaultMaxLife);
-      AddCreature(Creature);
+      Items.Add(Creature);
     end;
   end;
 
@@ -691,9 +691,9 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
       CreaturePosition := SwordAmbushStartingPosition[I];
       CreatureDirection := VectorSubtract(Player.Camera.Position,
         CreaturePosition);
-      Creature := Ghost.CreateDefaultCreature(CreaturePosition,
+      Creature := Ghost.CreateDefaultCreature(Self, CreaturePosition,
         CreatureDirection, AnimationTime, BaseLights, Ghost.DefaultMaxLife);
-      AddCreature(Creature);
+      Items.Add(Creature);
     end;
   end;
 
@@ -1065,9 +1065,9 @@ begin
         SpiderDirection :=
           VectorSubtract(Player.Camera.Position, SpiderPosition);
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.GravityUp);
-        SpiderCreature := Spider.CreateDefaultCreature(
+        SpiderCreature := Spider.CreateDefaultCreature(Self,
           SpiderPosition, SpiderDirection, AnimationTime, BaseLights, Spider.DefaultMaxLife);
-        AddCreature(SpiderCreature);
+        Items.Add(SpiderCreature);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
         FreeAndNil(SA); { it will be automatically removed from SpidersAppearing list }
       end else

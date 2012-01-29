@@ -358,9 +358,9 @@ procedure TDebugCreaturesMenu.Click;
         VectorScale(Player.Camera.Direction, DirectionAttenuation));
       Direction := Player.Camera.Direction;
 
-      Level.AddCreature(
-        Kind.CreateDefaultCreature(Position, Direction, Level.AnimationTime,
-          Level.BaseLights, Kind.DefaultMaxLife));
+      Level.Items.Add( Kind.CreateDefaultCreature(
+        Level, Position, Direction, Level.AnimationTime,
+        Level.BaseLights, Kind.DefaultMaxLife));
 
       UserQuit := true;
     end;

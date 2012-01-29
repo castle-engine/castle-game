@@ -453,9 +453,7 @@ type
     procedure InitializeLights(const Lights: TLightInstancesList); override;
     procedure ApplyProjection; override;
     procedure PointingDeviceActivateFailed(const Active: boolean); override;
-
   public
-    property Creatures: TCreatureList read FCreatures;
 
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
@@ -511,11 +509,6 @@ type
       but his feet are in the water. In some sense he/she is swimming,
       in some not. }
     property AboveWaterBox: TBox3D read FAboveWaterBox;
-
-    { Creatures on the level. Note that objects on this list are owned
-      by level object. Add by AddCreature, remove by setting
-      RemoveMeFromLevel to @true. }
-    procedure AddCreature(C: TCreature);
 
     { LineOfSight, MoveAllowed and GetHeightAbove perform
       collision detection with the level @link(Items).
@@ -1506,10 +1499,10 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     end;
 
     { calculate Creature }
-    Creature := CreatureKind.CreateDefaultCreature(CreaturePosition,
+    Creature := CreatureKind.CreateDefaultCreature(Self, CreaturePosition,
       CreatureDirection, AnimationTime, BaseLights, MaxLife);
 
-    AddCreature(Creature);
+    Items.Add(Creature);
   end;
 
 const
@@ -1524,12 +1517,6 @@ begin
       This avoids problems with removing nodes while traversing. }
     ItemsToRemove.Add(Shape.BlenderObjectNode);
   end;
-end;
-
-procedure TLevel.AddCreature(C: TCreature);
-begin
-  Creatures.Add(C);
-  Items.Add(C);
 end;
 
 function TLevel.LineOfSight(const Pos1, Pos2: TVector3Single): boolean;

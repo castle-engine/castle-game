@@ -174,7 +174,7 @@ type
       particular TCreatureKind descendants).
       This function just serves as a comfortable way to create
       creature instance as easily as possible. }
-    function CreateDefaultCreature(
+    function CreateDefaultCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -461,7 +461,7 @@ type
 
   TBallThrowerCreatureKind = class(TWalkAttackCreatureKind)
   public
-    function CreateDefaultCreature(
+    function CreateDefaultCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -470,7 +470,7 @@ type
 
   TWerewolfKind = class(TWalkAttackCreatureKind)
   public
-    function CreateDefaultCreature(
+    function CreateDefaultCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -479,7 +479,7 @@ type
 
   TSpiderKind = class(TWalkAttackCreatureKind)
   public
-    function CreateDefaultCreature(
+    function CreateDefaultCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -505,7 +505,7 @@ type
     function PrepareRenderSteps: Cardinal; override;
     procedure FreePrepareRender; override;
 
-    function CreateDefaultCreature(
+    function CreateDefaultCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -537,7 +537,7 @@ type
   protected
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
-    function CreateDefaultCreature(
+    function CreateDefaultCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -588,7 +588,7 @@ type
     property SoundExplosion: TSoundType
       read FSoundExplosion write FSoundExplosion default stNone;
 
-    function CreateDefaultCreature(
+    function CreateDefaultCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -639,7 +639,6 @@ type
   protected
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
-    constructor Create(const AShortName: string);
     destructor Destroy; override;
 
     function PrepareRenderSteps: Cardinal; override;
@@ -650,7 +649,7 @@ type
       In the simplest case, you can just place here a single scene. }
     property Animation: TCastlePrecalculatedAnimation read FAnimation;
 
-    function CreateDefaultCreature(
+    function CreateDefaultCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AnimationTime: Single; const BaseLights: TLightInstancesList;
@@ -780,7 +779,7 @@ type
     { Constructor. Note for AnimationTime: usually I will take
       AnimationTime from global Level.AnimationTime, but in the case of
       constructor it's safer to just take it as param. }
-    constructor Create(AKind: TCreatureKind;
+    constructor Create(AOwner: TComponent; AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
@@ -981,7 +980,7 @@ type
 
     function DebugCaption: string; override;
   public
-    constructor Create(AKind: TCreatureKind;
+    constructor Create(AOwner: TComponent; AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
@@ -1030,7 +1029,7 @@ type
   private
     NextHowlTime: Single;
   public
-    constructor Create(AKind: TCreatureKind;
+    constructor Create(AOwner: TComponent; AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
@@ -1080,7 +1079,7 @@ type
   private
     LastSoundIdleTime: Single;
   public
-    constructor Create(AKind: TCreatureKind;
+    constructor Create(AOwner: TComponent; AKind: TCreatureKind;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
       const AMaxLife: Single;
@@ -1381,37 +1380,37 @@ end;
 
 { TBallThrowerCreatureKind --------------------------------------------------- }
 
-function TBallThrowerCreatureKind.CreateDefaultCreature(
+function TBallThrowerCreatureKind.CreateDefaultCreature(AOwner: TComponent;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
-  Result := TBallThrowerCreature.Create(Self, ALegsPosition, ADirection,
+  Result := TBallThrowerCreature.Create(AOwner, Self, ALegsPosition, ADirection,
     MaxLife, AnimationTime, BaseLights);
 end;
 
 { TWerewolfKind -------------------------------------------------------------- }
 
-function TWerewolfKind.CreateDefaultCreature(
+function TWerewolfKind.CreateDefaultCreature(AOwner: TComponent;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
-  Result := TWerewolfCreature.Create(Self, ALegsPosition, ADirection,
+  Result := TWerewolfCreature.Create(AOwner, Self, ALegsPosition, ADirection,
     MaxLife, AnimationTime, BaseLights);
 end;
 
 { TSpiderKind -------------------------------------------------------------- }
 
-function TSpiderKind.CreateDefaultCreature(
+function TSpiderKind.CreateDefaultCreature(AOwner: TComponent;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
-  Result := TSpiderCreature.Create(Self, ALegsPosition, ADirection,
+  Result := TSpiderCreature.Create(AOwner, Self, ALegsPosition, ADirection,
     MaxLife, AnimationTime, BaseLights);
 end;
 
@@ -1448,13 +1447,13 @@ begin
   inherited;
 end;
 
-function TSpiderQueenKind.CreateDefaultCreature(
+function TSpiderQueenKind.CreateDefaultCreature(AOwner: TComponent;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
-  Result := TSpiderQueenCreature.Create(Self, ALegsPosition, ADirection,
+  Result := TSpiderQueenCreature.Create(AOwner, Self, ALegsPosition, ADirection,
     MaxLife, AnimationTime, BaseLights);
 end;
 
@@ -1494,13 +1493,13 @@ begin
     ReferenceScene.BoundingBox.Data[1, 2] / 2);
 end;
 
-function TGhostKind.CreateDefaultCreature(
+function TGhostKind.CreateDefaultCreature(AOwner: TComponent;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
-  Result := TGhostCreature.Create(Self, ALegsPosition, ADirection,
+  Result := TGhostCreature.Create(AOwner, Self, ALegsPosition, ADirection,
     MaxLife, AnimationTime, BaseLights);
 end;
 
@@ -1552,13 +1551,13 @@ begin
   if Animation <> nil then Animation.GLContextClose;
 end;
 
-function TMissileCreatureKind.CreateDefaultCreature(
+function TMissileCreatureKind.CreateDefaultCreature(AOwner: TComponent;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
-  Result := TMissileCreature.Create(Self, ALegsPosition, ADirection,
+  Result := TMissileCreature.Create(AOwner, Self, ALegsPosition, ADirection,
     MaxLife, AnimationTime, BaseLights);
 end;
 
@@ -1600,11 +1599,6 @@ end;
 
 { TStillCreatureKind ---------------------------------------------------- }
 
-constructor TStillCreatureKind.Create(const AShortName: string);
-begin
-  inherited Create(AShortName);
-end;
-
 destructor TStillCreatureKind.Destroy;
 begin
   FreeAndNil(FAnimation);
@@ -1637,13 +1631,13 @@ begin
   if Animation <> nil then Animation.GLContextClose;
 end;
 
-function TStillCreatureKind.CreateDefaultCreature(
+function TStillCreatureKind.CreateDefaultCreature(AOwner: TComponent;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
-  Result := TStillCreature.Create(Self, ALegsPosition, ADirection,
+  Result := TStillCreature.Create(AOwner, Self, ALegsPosition, ADirection,
     MaxLife, AnimationTime, BaseLights);
 end;
 
@@ -1665,13 +1659,13 @@ type
 
 { TCreature ------------------------------------------------------------------ }
 
-constructor TCreature.Create(AKind: TCreatureKind;
+constructor TCreature.Create(AOwner: TComponent; AKind: TCreatureKind;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AMaxLife: Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList);
 begin
-  inherited Create(nil);
+  inherited Create(AOwner);
 
   FKind := AKind;
 
@@ -1710,10 +1704,6 @@ destructor TCreature.Destroy;
 var
   I: Integer;
 begin
-  { TODO: dirty, temporary solution, Level.Creatures will be removed soon }
-  if (Level <> nil) and (Level.Creatures <> nil) then
-    Level.Creatures.Extract(Self);
-
   if UsedSounds <> nil then
   begin
     for I := 0 to UsedSounds.Count - 1 do
@@ -2367,13 +2357,14 @@ end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
 
-constructor TWalkAttackCreature.Create(AKind: TCreatureKind;
+constructor TWalkAttackCreature.Create(AOwner: TComponent; AKind: TCreatureKind;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AMaxLife: Single;
   const AnimationTime: Single; const BaseLights: TLightInstancesList);
 begin
-  inherited Create(AKind, ALegsPosition, ADirection, AMaxLife, AnimationTime, BaseLights);
+  inherited Create(AOwner, AKind, ALegsPosition, ADirection, AMaxLife,
+    AnimationTime, BaseLights);
 
   if AMaxLife > 0 then
   begin
@@ -3139,11 +3130,11 @@ begin
   begin
     MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := BallMissile.CreateDefaultCreature(
+    Missile := BallMissile.CreateDefaultCreature(Owner,
       MissilePosition, MissileDirection,
       Level.AnimationTime, Level.BaseLights, BallMissile.DefaultMaxLife);
 
-    Level.AddCreature(Missile);
+    Level.Items.Add(Missile);
 
     Missile.Sound3d(stBallMissileFired, 0.0);
   end;
@@ -3151,7 +3142,7 @@ end;
 
 { TWerewolfCreature ---------------------------------------------------------- }
 
-constructor TWerewolfCreature.Create(AKind: TCreatureKind;
+constructor TWerewolfCreature.Create(AOwner: TComponent; AKind: TCreatureKind;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AMaxLife: Single;
@@ -3323,11 +3314,11 @@ begin
   begin
     MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := ThrownWeb.CreateDefaultCreature(
+    Missile := ThrownWeb.CreateDefaultCreature(Owner,
       MissilePosition, MissileDirection,
       Level.AnimationTime, Level.BaseLights, ThrownWeb.DefaultMaxLife);
 
-    Level.AddCreature(Missile);
+    Level.Items.Add(Missile);
 
     Missile.Sound3d(stThrownWebFired, 0.0);
   end;
@@ -3369,7 +3360,7 @@ end;
 
 { TMissileCreature ----------------------------------------------------------- }
 
-constructor TMissileCreature.Create(AKind: TCreatureKind;
+constructor TMissileCreature.Create(AOwner: TComponent; AKind: TCreatureKind;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
   const AMaxLife: Single;
@@ -3392,6 +3383,7 @@ var
   AngleBetween, AngleChange: Single;
   NewDirection, TargetDirection: TVector3Single;
   I: Integer;
+  C: TCreature;
 begin
   inherited;
 
@@ -3421,19 +3413,29 @@ begin
 
     if MissileKind.HitsCreatures then
     begin
+      { TODO: this is unclean. We would prefer to use Level.Items.SphereCollision,
+        wrapped inside MySphereCollision to prevent self-collisions.
+        However, we need to know which TCreature was actually hit ---
+        so SphereCollision would need to return a hierarchy of T3D objects,
+        much like RayCollision.
+
+        For now, just browse Level.Items directly. }
+
       { Check bounding Sphere of the missile <-> creature's BoundingBox.
         Bounding Sphere is better for arrow, that has very large geometry
         but small enough bounding Sphere (because bounding Sphere radius
         is adjusted by creatures/kinds.xml). }
-      for I := 0 to Level.Creatures.Count - 1 do
-        if (Level.Creatures[I] <> Self) and
-           (Level.Creatures[I].Collides) and
-           (Level.Creatures[I].BoundingBox.SphereSimpleCollision(
-             MiddlePosition, Kind.CameraRadius)) then
+      for I := 0 to Level.Items.Count - 1 do
+        if Level.Items[I] is TCreature then
         begin
-          ExplodeWithCreature(Level.Creatures[I]);
-          { TODO: projectiles shouldn't do here "break". }
-          break;
+          C := TCreature(Level.Items[I]);
+          if (C <> Self) and C.GetExists and C.Collides and
+            C.BoundingBox.SphereSimpleCollision(MiddlePosition, Kind.CameraRadius) then
+          begin
+            ExplodeWithCreature(C);
+            { TODO: projectiles shouldn't do here "break". }
+            break;
+          end;
         end;
     end;
 
