@@ -704,6 +704,8 @@ type
     procedure MyGetHeightAbove(const MyPosition: TVector3Single;
       out IsAbove: boolean; out AboveHeight: Single);
 
+    function MyLineOfSight(const Pos1, Pos2: TVector3Single): boolean;
+
     { Like TransformMatricesMult, but assumes that LegsPosition and Direction
       is as specified. }
     procedure TransformAssuming(
@@ -822,7 +824,7 @@ type
       How precisely this is calculated for given creature depends
       on MiddlePositionFromLegs implementation in this class.
 
-      All collision detection (Move, MyGetHeightAbove)
+      All collision detection (Move, MyGetHeightAbove, MyLineOfSight)
       should be done using MiddlePosition, and then appropriately translated
       back to LegsPosition. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
@@ -918,6 +920,9 @@ type
       const OldPos, NewPos: TVector3Single;
       const IsRadius: boolean; const Radius: Single;
       const OldBox, NewBox: TBox3D;
+      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean; override;
+
+    function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean; override;
   end;
 
@@ -2004,6 +2009,14 @@ begin
   finally Dec(DisableCollisions) end;
 end;
 
+function TCreature.MyLineOfSight(const Pos1, Pos2: TVector3Single): boolean;
+begin
+  Inc(DisableCollisions);
+  try
+    Result := Level.LineOfSight(Pos1, Pos2);
+  finally Dec(DisableCollisions) end;
+end;
+
 procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
   procedure UpdateUsedSounds;
@@ -2343,6 +2356,13 @@ begin
        BoundingBox.SegmentCollision(OldPos, NewPos) then
       Exit(false);
   end;
+end;
+
+function TCreature.SegmentCollision(const Pos1, Pos2: TVector3Single;
+  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
+begin
+  Result := GetExists and Collides and (DisableCollisions = 0) and
+    BoundingBox.SegmentCollision(Pos1, Pos2);
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -2998,7 +3018,7 @@ begin
     Exit;
   end;
 
-  IdleSeesPlayer := Level.LineOfSight(MiddlePosition, Player.Camera.Position);
+  IdleSeesPlayer := MyLineOfSight(MiddlePosition, Player.Camera.Position);
   if IdleSeesPlayer then
   begin
     HasLastSeenPlayer := true;
