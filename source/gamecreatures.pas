@@ -2326,9 +2326,10 @@ begin
   { check collision with creature's bounding box.
     Actually, with top rectangle of this creature's bounding box. }
 
-  { inherited already initializes all out parameters,
-    so code lower only updates what's necessary }
-  inherited;
+  IsAbove := false;
+  AboveHeight := MaxSingle;
+  AboveGround := nil;
+
   { TODO: this *should* check Collides, for consistency with other stuff.
     Also, this should have Collides = true.
     CollisionsWithCreaturesAndPlayer should disappear (all it's uses
