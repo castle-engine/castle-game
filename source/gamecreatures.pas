@@ -177,7 +177,7 @@ type
     function CreateCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
-      const AnimationTime: Single; const BaseLights: TLightInstancesList;
+      const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature;
 
     function CreatureClass: TCreatureClass; virtual; abstract;
@@ -250,9 +250,7 @@ type
   end;
 
   { A TCreatureKind that has simple states:
-    standing stil, walking (aka running), performing an attack and dying.
-    Note that you should specify all animation times in seconds
-    (just like Level.AnimationTime). }
+    standing stil, walking (aka running), performing an attack and dying. }
   TWalkAttackCreatureKind = class(TCreatureKind)
   private
     FStandAnimation: TCastlePrecalculatedAnimation;
@@ -643,6 +641,7 @@ type
     { > 0 means to ignore collisions. This may be used inside,
       to prevent collisions with self. }
     DisableCollisions: Cardinal;
+    LifeTime: Single;
     procedure SetLastAttackDirection(const Value: TVector3Single);
   private
     { For gravity work. }
@@ -750,11 +749,7 @@ type
 
     function DebugCaption: string; virtual;
   public
-    { Constructor. Note for AnimationTime: usually I will take
-      AnimationTime from global Level.AnimationTime, but in the case of
-      constructor it's safer to just take it as param. }
-    constructor Create(AOwner: TComponent;
-      const AMaxLife: Single; const AnimationTime: Single); virtual; reintroduce;
+    constructor Create(AOwner: TComponent; const AMaxLife: Single); virtual; reintroduce;
 
     destructor Destroy; override;
 
@@ -909,7 +904,7 @@ type
 
     FStateChangeTime: Single;
 
-    { time of last FState change to wasAttack, taken from Level.AnimationTime. }
+    { time of last FState change to wasAttack, taken from LifeTime. }
     LastAttackTime: Single;
     { Set to true each time you enter wasAttack, set back to false
       if ActualAttack was called. }
@@ -925,7 +920,7 @@ type
     HasAlternativeTarget: boolean;
     AlternativeTarget: TVector3Single;
     { Time of last setting HasAlternativeTarget to true and AlternativeTarget
-      value, taken from Level.AnimationTime. Used to not fall into loop
+      value, taken from LifeTime. Used to not fall into loop
       when the creature tries to walk to AlternativeTarget, and is not
       permanently blocked (so MoveAllowed returns true all the time)
       but at the same time the creature can't get close enough to the
@@ -950,9 +945,11 @@ type
     procedure SetLife(const Value: Single); override;
 
     function DebugCaption: string; override;
+
+    { Last State change time, taken from LifeTime. }
+    property StateChangeTime: Single read FStateChangeTime;
   public
-    constructor Create(AOwner: TComponent;
-      const AMaxLife: Single; const AnimationTime: Single); override;
+    constructor Create(AOwner: TComponent; const AMaxLife: Single); override;
 
     destructor Destroy; override;
 
@@ -961,9 +958,6 @@ type
 
     property State: TWalkAttackCreatureState read FState
       default wasStand;
-
-    { Last State change time, taken from Level.AnimationTime. }
-    property StateChangeTime: Single read FStateChangeTime;
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
@@ -997,8 +991,7 @@ type
   private
     NextHowlTime: Single;
   public
-    constructor Create(AOwner: TComponent;
-      const AMaxLife: Single; const AnimationTime: Single); override;
+    constructor Create(AOwner: TComponent; const AMaxLife: Single); override;
 
     procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
@@ -1044,8 +1037,7 @@ type
   private
     LastSoundIdleTime: Single;
   public
-    constructor Create(AOwner: TComponent;
-      const AMaxLife: Single; const AnimationTime: Single); override;
+    constructor Create(AOwner: TComponent; const AMaxLife: Single); override;
 
     { Shortcut for TMissileCreatureKind(Kind). }
     function MissileKind: TMissileCreatureKind;
@@ -1167,14 +1159,14 @@ end;
 function TCreatureKind.CreateCreature(AOwner: TComponent;
   const ALegsPosition: TVector3Single;
   const ADirection: TVector3Single;
-  const AnimationTime: Single; const BaseLights: TLightInstancesList;
+  const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
   { This is only needed if you used --debug-no-creatures or forgot
     to add creature to <required_resources> }
   RequireCreature(BaseLights, Self);
 
-  Result := CreatureClass.Create(AOwner, MaxLife, AnimationTime);
+  Result := CreatureClass.Create(AOwner, MaxLife);
   { set properties that in practice must have other-than-default values
     to sensibly use the creature }
   Result.FKind := Self;
@@ -1605,8 +1597,7 @@ type
 
 { TCreature ------------------------------------------------------------------ }
 
-constructor TCreature.Create(AOwner: TComponent;
-  const AMaxLife: Single; const AnimationTime: Single);
+constructor TCreature.Create(AOwner: TComponent; const AMaxLife: Single);
 begin
   inherited Create(AOwner);
   Collision := ctCreature;
@@ -2078,18 +2069,9 @@ begin
   inherited;
   if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
-  { CurrentScene (possibly) changed, since Level.AnimationTime changed now.
-    So recalculate bounding box.
-
-    Note that this is somewhat too late:
-    Level.AnimationTime changed earlier (some other code possibly already
-    checked our BoundingBox and got wrong answer, because our Idle
-    didn't update BoundingBoxyet). But in practice this is not a problem,
-    since BoundingBox doesn't change too rapidly --- and we're always
-    prepared for unpredictable changes of BoundingBox anyway (since they
-    are caused by animation frame changes). So we don't depend on
-    "BoundingBox of the creature doesn't collide with others", even if
-    we try to achieve this. }
+  LifeTime += CompSpeed;
+  { CurrentScene (possibly) changed, since LifeTime changed.
+    So recalculate bounding box. }
   RecalculateBoundingBox;
 
   UpdateUsedSounds;
@@ -2233,7 +2215,7 @@ begin
         and I should exit with false. But it's not that simple.
 
         Note that there is weakness in collision checking with creatures,
-        because when AnimationTime changes then effectively creature's
+        because when LifeTime changes then effectively creature's
         CurrentScene.BoundingBox changes, and there is no way how I can
         check for collision there (what could I do ? Stop the animation ?
         Throw the creature back ? None of this seems sensible...)
@@ -2279,14 +2261,14 @@ end;
 { TWalkAttackCreature -------------------------------------------------------- }
 
 constructor TWalkAttackCreature.Create(AOwner: TComponent;
-  const AMaxLife: Single; const AnimationTime: Single);
+  const AMaxLife: Single);
 begin
   inherited;
 
   if MaxLife > 0 then
   begin
     FState := wasStand;
-    FStateChangeTime := AnimationTime;
+    FStateChangeTime := 0;
   end else
   begin
     { This means that the creature is created already in dead state...
@@ -2296,7 +2278,7 @@ begin
       This way the creature is created as a dead corpse, without making
       any kind of dying (or wounded) sound or animation. }
     FState := wasDying;
-    FStateChangeTime := AnimationTime - 1000;
+    FStateChangeTime := -1000;
   end;
 
   WaypointsSaved := TSceneWaypointList.Create(false);
@@ -2318,7 +2300,7 @@ begin
   if FState <> Value then
   begin
     FState := Value;
-    FStateChangeTime := Level.AnimationTime;
+    FStateChangeTime := LifeTime;
     { Some states require special initialization here. }
     case FState of
       wasAttack:
@@ -2341,7 +2323,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     AngleRadBetweenTheDirectionToPlayer: Single;
   begin
     Result := IdleSeesPlayer and
-      (Level.AnimationTime - LastAttackTime > WAKind.MinDelayBetweenAttacks) and
+      (LifeTime - LastAttackTime > WAKind.MinDelayBetweenAttacks) and
       (IdleSqrDistanceToLastSeenPlayer <= Sqr(WAKind.MaxAttackDistance));
 
     if Result then
@@ -2533,7 +2515,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
 
     HasAlternativeTarget := true;
 
-    AlternativeTargetTime := Level.AnimationTime;
+    AlternativeTargetTime := LifeTime;
   end;
 
   procedure DoStand;
@@ -2711,7 +2693,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     if HasAlternativeTarget then
     begin
       if CloseEnoughToTarget(AlternativeTarget) or
-         (Level.AnimationTime - AlternativeTargetTime > MaxTimeForAlternativeTarget) then
+         (LifeTime - AlternativeTargetTime > MaxTimeForAlternativeTarget) then
       begin
         HasAlternativeTarget := false;
         Exit;
@@ -2851,7 +2833,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
   var
     StateTime: Single;
   begin
-    StateTime := Level.AnimationTime - StateChangeTime;
+    StateTime := LifeTime - StateChangeTime;
 
     if (not ActualAttackDone) and (StateTime >= WAKind.ActualAttackTime) then
     begin
@@ -2872,7 +2854,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition: TVector3Single;
     CurrentKnockBackDistance: Single;
   begin
-    StateTime := Level.AnimationTime - StateChangeTime;
+    StateTime := LifeTime - StateChangeTime;
 
     if StateTime > WAKind.HurtAnimation.TimeDurationWithBack then
       SetState(wasStand) else
@@ -2957,7 +2939,7 @@ var
 begin
   { Time from the change to this state. }
   if Level <> nil then
-    StateTime := Level.AnimationTime - StateChangeTime else
+    StateTime := LifeTime - StateChangeTime else
     StateTime := 0;
 
   case FState of
@@ -3054,11 +3036,10 @@ end;
 
 { TWerewolfCreature ---------------------------------------------------------- }
 
-constructor TWerewolfCreature.Create(AOwner: TComponent;
-  const AMaxLife: Single; const AnimationTime: Single);
+constructor TWerewolfCreature.Create(AOwner: TComponent; const AMaxLife: Single);
 begin
   inherited;
-  NextHowlTime := AnimationTime + Random * 60.0;
+  NextHowlTime := Random * 60.0;
 end;
 
 procedure TWerewolfCreature.ActualAttack;
@@ -3075,7 +3056,7 @@ begin
   inherited;
   if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
-  if (not Dead) and (Level.AnimationTime > NextHowlTime) then
+  if (not Dead) and (LifeTime > NextHowlTime) then
     Howl(false);
 end;
 
@@ -3087,7 +3068,7 @@ begin
     Sound3d(stWerewolfHowling, 1.0);
 
   { Whether you actually howled or not, schedule next howl. }
-  NextHowlTime := Level.AnimationTime + Random * 60.0;
+  NextHowlTime := LifeTime + Random * 60.0;
 end;
 
 { TSpiderCreature ---------------------------------------------------------- }
@@ -3108,7 +3089,7 @@ begin
     stay on Cages level and slow down the rendering.
     Dying animation scales the model down, to make it gradually disappear. }
   if (State = wasDying) and
-    (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd) then
+    (LifeTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd) then
     RemoveMe := rtRemoveAndFree;
 end;
 
@@ -3132,7 +3113,7 @@ procedure TSpiderQueenCreature.SetState(Value: TWalkAttackCreatureState);
 begin
   if (State <> Value) and (Value = wasSpecial1) then
   begin
-    LastThrowWebAttackTime := Level.AnimationTime;
+    LastThrowWebAttackTime := LifeTime;
     ActualThrowWebAttackDone := false;
   end;
 
@@ -3148,7 +3129,7 @@ procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemo
   begin
     ThrowWebAttackAllowed :=
       IdleSeesPlayer and
-      (Level.AnimationTime - LastThrowWebAttackTime >
+      (LifeTime - LastThrowWebAttackTime >
         SQKind.MinDelayBetweenThrowWebAttacks) and
       (IdleSqrDistanceToLastSeenPlayer <=
         Sqr(SQKind.MaxThrowWebAttackDistance));
@@ -3171,7 +3152,7 @@ procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemo
   var
     StateTime: Single;
   begin
-    StateTime := Level.AnimationTime - StateChangeTime;
+    StateTime := LifeTime - StateChangeTime;
 
     if (not ActualThrowWebAttackDone) and
        (StateTime >= SQKind.ActualThrowWebAttackTime) then
@@ -3204,7 +3185,7 @@ begin
   begin
     { Time from the change to this state. }
     if Level <> nil then
-      StateTime := Level.AnimationTime - StateChangeTime else
+      StateTime := LifeTime - StateChangeTime else
       StateTime := 0;
 
     Result := SQKind.ThrowWebAttackAnimation.SceneFromTime(StateTime);
@@ -3258,14 +3239,13 @@ procedure TGhostCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType
 begin
   inherited;
   if (State = wasDying) and
-    (Level.AnimationTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd) then
+    (LifeTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd) then
     RemoveMe := rtRemoveAndFree;
 end;
 
 { TMissileCreature ----------------------------------------------------------- }
 
-constructor TMissileCreature.Create(AOwner: TComponent;
-  const AMaxLife: Single; const AnimationTime: Single);
+constructor TMissileCreature.Create(AOwner: TComponent; const AMaxLife: Single);
 begin
   inherited;
 
@@ -3377,10 +3357,9 @@ begin
   end;
 
   if (LastSoundIdleTime = 0) or
-     (Level.AnimationTime - LastSoundIdleTime >
-       MissileKind.PauseBetweenSoundIdle) then
+     (LifeTime - LastSoundIdleTime > MissileKind.PauseBetweenSoundIdle) then
   begin
-    LastSoundIdleTime := Level.AnimationTime;
+    LastSoundIdleTime := LifeTime;
     Sound3d(MissileKind.SoundIdle, 0.0);
   end;
 end;
@@ -3388,7 +3367,7 @@ end;
 function TMissileCreature.CurrentScene: TCastleScene;
 begin
   if Level <> nil then
-    Result := MissileKind.Animation.SceneFromTime(Level.AnimationTime) else
+    Result := MissileKind.Animation.SceneFromTime(LifeTime) else
     Result := MissileKind.Animation.SceneFromTime(0);
 end;
 
@@ -3435,7 +3414,7 @@ end;
 function TStillCreature.CurrentScene: TCastleScene;
 begin
   if Level <> nil then
-    Result := StillKind.Animation.SceneFromTime(Level.AnimationTime) else
+    Result := StillKind.Animation.SceneFromTime(LifeTime) else
     Result := StillKind.Animation.SceneFromTime(0);
 end;
 

@@ -1529,7 +1529,7 @@ function TLevel.CreateCreature(const Kind: TCreatureKind;
   const ADirection: TVector3Single; const MaxLife: Single): TCreature;
 begin
   Result := Kind.CreateCreature(Self, ALegsPosition,
-    ADirection, AnimationTime, BaseLights, MaxLife);
+    ADirection, BaseLights, MaxLife);
   Items.Add(Result);
 end;
 
