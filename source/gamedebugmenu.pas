@@ -348,19 +348,13 @@ procedure TDebugCreaturesMenu.Click;
 
   procedure AddLevelCreature(DirectionAttenuation: Single);
   var
-    Position: TVector3Single;
-    Direction: TVector3Single;
     Kind: TCreatureKind;
   begin
     if ChooseCreatureKind(Kind) then
     begin
-      Position := VectorAdd(Player.Camera.Position,
-        VectorScale(Player.Camera.Direction, DirectionAttenuation));
-      Direction := Player.Camera.Direction;
-
-      Level.Items.Add( Kind.CreateCreature(
-        Level, Position, Direction, Level.AnimationTime,
-        Level.BaseLights, Kind.DefaultMaxLife));
+      Level.CreateCreature(Kind,
+        Player.Camera.Position + Player.Camera.Direction * DirectionAttenuation,
+        Player.Camera.Direction);
 
       UserQuit := true;
     end;

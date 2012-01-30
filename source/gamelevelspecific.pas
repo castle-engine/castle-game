@@ -381,13 +381,10 @@ const
     Assert(not WerewolfAppeared);
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
-    begin
-      WerewolfCreature[I] := Werewolf.CreateCreature(Self,
+      WerewolfCreature[I] := CreateCreature(Werewolf,
         WerewolfAppearPosition[I],
-        VectorSubtract(Player.Camera.Position, WerewolfAppearPosition[I]),
-        AnimationTime, BaseLights, Werewolf.DefaultMaxLife) as TWerewolfCreature;
-      Items.Add(WerewolfCreature[I]);
-    end;
+        VectorSubtract(Player.Camera.Position, WerewolfAppearPosition[I]))
+        as TWerewolfCreature;
 
     WerewolfAppeared := true;
 
@@ -666,17 +663,13 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
   var
     I: Integer;
     CreaturePosition, CreatureDirection: TVector3Single;
-    Creature: TCreature;
   begin
     SoundEngine.Sound(stSacrilegeAmbush);
     for I := 0 to High(SacrilegeAmbushStartingPosition) do
     begin
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
-      CreatureDirection := VectorSubtract(Player.Camera.Position,
-        CreaturePosition);
-      Creature := Ghost.CreateCreature(Self, CreaturePosition,
-        CreatureDirection, AnimationTime, BaseLights, Ghost.DefaultMaxLife);
-      Items.Add(Creature);
+      CreatureDirection := Player.Camera.Position - CreaturePosition;
+      CreateCreature(Ghost, CreaturePosition, CreatureDirection);
     end;
   end;
 
@@ -684,16 +677,12 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
   var
     I: Integer;
     CreaturePosition, CreatureDirection: TVector3Single;
-    Creature: TCreature;
   begin
     for I := 0 to High(SwordAmbushStartingPosition) do
     begin
       CreaturePosition := SwordAmbushStartingPosition[I];
-      CreatureDirection := VectorSubtract(Player.Camera.Position,
-        CreaturePosition);
-      Creature := Ghost.CreateCreature(Self, CreaturePosition,
-        CreatureDirection, AnimationTime, BaseLights, Ghost.DefaultMaxLife);
-      Items.Add(Creature);
+      CreatureDirection := Player.Camera.Position - CreaturePosition;
+      CreateCreature(Ghost, CreaturePosition, CreatureDirection);
     end;
   end;
 
@@ -1065,9 +1054,7 @@ begin
         SpiderDirection :=
           VectorSubtract(Player.Camera.Position, SpiderPosition);
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.GravityUp);
-        SpiderCreature := Spider.CreateCreature(Self,
-          SpiderPosition, SpiderDirection, AnimationTime, BaseLights, Spider.DefaultMaxLife);
-        Items.Add(SpiderCreature);
+        SpiderCreature := CreateCreature(Spider, SpiderPosition, SpiderDirection);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
         FreeAndNil(SA); { it will be automatically removed from SpidersAppearing list }
       end else

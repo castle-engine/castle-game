@@ -161,7 +161,7 @@ type
 
       You cannot depend that every creature has this MaxLife ---
       caller can pass any MaxLife value when creating creature by
-      CreateCreature or by any other means.
+      CreateCreature.
       This is only a "suggested" default for MaxLife of this creature. }
     property DefaultMaxLife: Single
       read FDefaultMaxLife write FDefaultMaxLife default DefaultDefaultMaxLife;
@@ -173,7 +173,7 @@ type
 
       This is the only way to create TCreature instances.
       Usually, you actually want to use TLevel.CreateCreature,
-      that is even simpler. }
+      that is even simpler wrapper around this method. }
     function CreateCreature(AOwner: TComponent;
       const ALegsPosition: TVector3Single;
       const ADirection: TVector3Single;
@@ -3047,12 +3047,7 @@ begin
   begin
     MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := BallMissile.CreateCreature(Owner,
-      MissilePosition, MissileDirection,
-      Level.AnimationTime, Level.BaseLights, BallMissile.DefaultMaxLife);
-
-    Level.Items.Add(Missile);
-
+    Missile := Level.CreateCreature(BallMissile, MissilePosition, MissileDirection);
     Missile.Sound3d(stBallMissileFired, 0.0);
   end;
 end;
@@ -3228,12 +3223,7 @@ begin
   begin
     MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := ThrownWeb.CreateCreature(Owner,
-      MissilePosition, MissileDirection,
-      Level.AnimationTime, Level.BaseLights, ThrownWeb.DefaultMaxLife);
-
-    Level.Items.Add(Missile);
-
+    Missile := Level.CreateCreature(ThrownWeb, MissilePosition, MissileDirection);
     Missile.Sound3d(stThrownWebFired, 0.0);
   end;
 end;

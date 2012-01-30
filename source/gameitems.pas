@@ -728,8 +728,6 @@ end;
 procedure TItemBowKind.ActualAttack(Item: TItem);
 var
   QuiverIndex: Integer;
-  Missile: TCreature;
-  MissilePosition, MissileDirection: TVector3Single;
 begin
   QuiverIndex := Player.Items.FindKind(Quiver);
   if QuiverIndex = -1 then
@@ -745,11 +743,7 @@ begin
       Player.DeleteItem(QuiverIndex).Free;
 
     { shoot the arrow }
-    MissilePosition := Player.Camera.Position;
-    MissileDirection := Player.Camera.Direction;
-    Missile := Arrow.CreateCreature(Level, MissilePosition, MissileDirection,
-      Level.AnimationTime, Level.BaseLights, Arrow.DefaultMaxLife);
-    Level.Items.Add(Missile);
+    Level.CreateCreature(Arrow, Player.Camera.Position, Player.Camera.Direction);
     SoundEngine.Sound(stArrowFired);
   end;
 end;

@@ -674,6 +674,16 @@ type
     { Instance of boss creature, if any, on the level. @nil if no boss creature
       exists on this level. }
     property BossCreature: TCreature read FBossCreature;
+
+    { Comfortably create and add creature to level.
+      @groupBegin }
+    function CreateCreature(const Kind: TCreatureKind;
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single; const MaxLife: Single): TCreature;
+    function CreateCreature(const Kind: TCreatureKind;
+      const ALegsPosition: TVector3Single;
+      const ADirection: TVector3Single): TCreature;
+    { @groupEnd }
   end;
 
   TLevelClass = class of TLevel;
@@ -1445,7 +1455,6 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     CreaturePosition, CreatureDirection: TVector3Single;
     CreatureKind: TCreatureKind;
     CreatureKindName: string;
-    Creature: TCreature;
     IgnoredBegin: Integer;
     MaxLifeBegin: Integer;
     IsMaxLife: boolean;
@@ -1498,11 +1507,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
       MaxLife := CreatureKind.DefaultMaxLife;
     end;
 
-    { calculate Creature }
-    Creature := CreatureKind.CreateCreature(Self, CreaturePosition,
-      CreatureDirection, AnimationTime, BaseLights, MaxLife);
-
-    Items.Add(Creature);
+    CreateCreature(CreatureKind, CreaturePosition, CreatureDirection, MaxLife);
   end;
 
 const
@@ -1517,6 +1522,22 @@ begin
       This avoids problems with removing nodes while traversing. }
     ItemsToRemove.Add(Shape.BlenderObjectNode);
   end;
+end;
+
+function TLevel.CreateCreature(const Kind: TCreatureKind;
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single; const MaxLife: Single): TCreature;
+begin
+  Result := Kind.CreateCreature(Self, ALegsPosition,
+    ADirection, AnimationTime, BaseLights, MaxLife);
+  Items.Add(Result);
+end;
+
+function TLevel.CreateCreature(const Kind: TCreatureKind;
+  const ALegsPosition: TVector3Single;
+  const ADirection: TVector3Single): TCreature;
+begin
+  Result := CreateCreature(Kind, ALegsPosition, ADirection, Kind.DefaultMaxLife);
 end;
 
 function TLevel.LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
