@@ -155,10 +155,7 @@ var
 const
   DefaultUseOcclusionQuery = false;
 var
-  { This determines UseOcclusionQuery for some VRML scenes
-    (I cannot do this generally for absolutely all VRML scenes,
-    as it doesn't behave Ok for scenes rendered multiple times
-    (like for creatures or items)). }
+  { Should we use use occlusion query for levels. }
   UseOcclusionQuery: boolean;
 
 implementation
