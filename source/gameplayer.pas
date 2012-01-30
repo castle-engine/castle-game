@@ -280,8 +280,7 @@ type
     function DeleteItem(ItemIndex: Integer): TItem;
 
     { Like BoundingBox, but assumes that Camera.Position is as specified. }
-    function BoundingBoxAssuming(const AssumePosition: TVector3Single;
-      Tall: boolean = true): TBox3D;
+    function BoundingBoxAssuming(const AssumePosition: TVector3Single): TBox3D;
 
     { Calculates what can be considered "bounding box of the player",
       taking into account global Level.CameRadius around current Position.
@@ -299,7 +298,7 @@ type
       collision with creatures, because then the player will "grow"
       anyway (using GetHeightAbove), so Camera.RealCameraPreferredHeight
       will be taken into account but in a different way. }
-    function BoundingBox(Tall: boolean = true): TBox3D;
+    function BoundingBox: TBox3D;
 
     { Weapon the player is using right now, or nil if none.
 
@@ -610,26 +609,23 @@ begin
     EquippedWeapon := nil;
 end;
 
-function TPlayer.BoundingBoxAssuming(const AssumePosition: TVector3Single;
-  Tall: boolean): TBox3D;
+function TPlayer.BoundingBoxAssuming(const AssumePosition: TVector3Single): TBox3D;
 begin
   Result.Data[0] := AssumePosition;
   Result.Data[1] := AssumePosition;
 
   Result.Data[0, 0] -= Level.CameraRadius;
   Result.Data[0, 1] -= Level.CameraRadius;
-  if Tall then
-    Result.Data[0, 2] -= Camera.RealCameraPreferredHeight else
-    Result.Data[0, 2] -= Level.CameraRadius;
+  Result.Data[0, 2] -= Camera.RealCameraPreferredHeight;
 
   Result.Data[1, 0] += Level.CameraRadius;
   Result.Data[1, 1] += Level.CameraRadius;
   Result.Data[1, 2] += Level.CameraRadius;
 end;
 
-function TPlayer.BoundingBox(Tall: boolean): TBox3D;
+function TPlayer.BoundingBox: TBox3D;
 begin
-  Result := BoundingBoxAssuming(Player.Camera.Position, Tall);
+  Result := BoundingBoxAssuming(Player.Camera.Position);
 end;
 
 procedure TPlayer.SetEquippedWeapon(Value: TItem);
