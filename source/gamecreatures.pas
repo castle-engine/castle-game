@@ -875,19 +875,13 @@ type
     procedure Translate(const T: TVector3Single); override;
 
     { Height above this creature. }
-    procedure GetHeightAbove(const Position, GravityUp: TVector3Single;
-      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
-      out IsAbove: boolean; out AboveHeight: Single;
-      out AboveGround: P3DTriangle); override;
+    function GetCollides: boolean; override;
 
     { Is move through this creature allowed. }
     function MoveAllowed(
       const OldPos, NewPos: TVector3Single;
       const IsRadius: boolean; const Radius: Single;
       const OldBox, NewBox: TBox3D;
-      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean; override;
-
-    function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean; override;
   end;
 
@@ -2167,34 +2161,6 @@ begin
   LegsPosition := LegsPosition + T;
 end;
 
-procedure TCreature.GetHeightAbove(const Position, GravityUp: TVector3Single;
-  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
-  out IsAbove: boolean; out AboveHeight: Single;
-  out AboveGround: P3DTriangle);
-var
-  Box: TBox3D;
-begin
-  { check collision with creature's bounding box.
-    Actually, with top rectangle of this creature's bounding box. }
-
-  IsAbove := false;
-  AboveHeight := MaxSingle;
-  AboveGround := nil;
-
-  if GetExists and Collides and (DisableCollisions = 0) then
-  begin
-    Box := BoundingBox;
-    { TODO: this assumes GravityUp is +Z }
-    IsAbove := (not Box.IsEmpty) and
-      (Box.Data[0, 0] <= Position[0]) and (Position[0] <= Box.Data[1, 0]) and
-      (Box.Data[0, 1] <= Position[1]) and (Position[1] <= Box.Data[1, 1]) and
-      (Position[2] >= Box.Data[1, 2]);
-
-    if IsAbove then
-      AboveHeight := Position[2] - Box.Data[1, 2];
-  end;
-end;
-
 function TCreature.MoveAllowed(
   const OldPos, NewPos: TVector3Single;
   const IsRadius: boolean; const Radius: Single;
@@ -2207,7 +2173,7 @@ begin
 
   Result := true;
 
-  if GetExists and Collides and (DisableCollisions = 0) then
+  if GetCollides and (DisableCollisions = 0) then
   begin
     if NewBox.Collision(BoundingBox) then
     begin
@@ -2251,11 +2217,9 @@ begin
   end;
 end;
 
-function TCreature.SegmentCollision(const Pos1, Pos2: TVector3Single;
-  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
+function TCreature.GetCollides: boolean;
 begin
-  Result := GetExists and Collides and (DisableCollisions = 0) and
-    BoundingBox.SegmentCollision(Pos1, Pos2);
+  Result := (inherited GetCollides) and (DisableCollisions = 0);
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -3310,7 +3274,7 @@ begin
         if Level.Items[I] is TCreature then
         begin
           C := TCreature(Level.Items[I]);
-          if (C <> Self) and C.GetExists and C.Collides and
+          if (C <> Self) and C.GetCollides and
             C.BoundingBox.SphereSimpleCollision(MiddlePosition, Kind.CameraRadius) then
           begin
             ExplodeWithCreature(C);
