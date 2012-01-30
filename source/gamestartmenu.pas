@@ -320,7 +320,6 @@ begin
   AntiAliasingSlider := TAntiAliasingSlider.Create;
 
   Items.Add('View video information');
-  Items.Add('Occlusion query');
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
   Items.AddObject('Shadow volumes', RenderShadowsArgument);
   Items.AddObject('Animation smoothness', CreatureAnimationSlider);
@@ -425,12 +424,11 @@ begin
 
   case CurrentItem of
     0: ViewVideoInfo;
-    1: ;
-    2: begin
+    1: begin
          AllowScreenChange := not AllowScreenChange;
          AllowScreenChangeArgument.Value := AllowScreenChange;
        end;
-    3: begin
+    2: begin
          RenderShadows := not RenderShadows;
          RenderShadowsArgument.Value := RenderShadows;
          if (not RenderShadowsPossible) and RenderShadows then
@@ -441,15 +439,15 @@ begin
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
        end;
-    4: ;
-    5: ChangeColorDepthBits;
-    6: ChangeVideoFrequency;
-    7: begin
+    3: ;
+    4: ChangeColorDepthBits;
+    5: ChangeVideoFrequency;
+    6: begin
          BumpMapping := not BumpMapping;
          BumpMappingArgument.Value := BumpMapping;
        end;
-    8: ;
-    9: begin
+    7: ;
+    8: begin
          AllowScreenChange := DefaultAllowScreenChange;
          AllowScreenChangeArgument.Value := AllowScreenChange;
 
@@ -503,7 +501,7 @@ begin
 
          MessageOK(Window, 'All video settings restored to defaults.', taLeft);
        end;
-    10: SetCurrentMenu(CurrentMenu, MainMenu);
+    9 : SetCurrentMenu(CurrentMenu, MainMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -511,7 +509,7 @@ end;
 procedure TVideoMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
-    4: begin
+    3: begin
          if AnimationScenesPerTime <>
            Cardinal(CreatureAnimationSlider.Value) then
          begin
@@ -519,7 +517,7 @@ begin
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
        end;
-    8: SetAntiAliasing(AntiAliasingSlider.Value, false);
+    7: SetAntiAliasing(AntiAliasingSlider.Value, false);
   end;
 end;
 
