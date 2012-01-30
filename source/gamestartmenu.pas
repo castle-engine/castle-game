@@ -53,11 +53,6 @@ type
     procedure Click; override;
   end;
 
-  TTextureMinificationQualitySlider = class(TMenuIntegerSlider)
-    constructor Create;
-    function ValueToStr(const AValue: Integer): string; override;
-  end;
-
   TAntiAliasingSlider = class(TMenuIntegerSlider)
     constructor Create;
     function ValueToStr(const AValue: Integer): string; override;
@@ -65,7 +60,6 @@ type
 
   TVideoMenu = class(TSubMenu)
   public
-    TextureMinificationQualitySlider: TMenuIntegerSlider;
     AllowScreenChangeArgument: TMenuBooleanArgument;
     RenderShadowsArgument: TMenuBooleanArgument;
     CreatureAnimationSlider: TMenuIntegerSlider;
@@ -75,9 +69,6 @@ type
     BumpMappingArgument: TMenuBooleanArgument;
     AntiAliasingSlider: TAntiAliasingSlider;
     constructor Create(AOwner: TComponent); override;
-    procedure SetTextureMinificationQuality(
-      Value: TTextureMinificationQuality;
-      UpdateSlider: boolean);
     procedure SetAntiAliasing(
       Value: TAntiAliasing;
       UpdateSlider: boolean);
@@ -283,23 +274,6 @@ begin
   Result := AntiAliasingToStr(AValue);
 end;
 
-{ TTextureMinificationQualitySlider ------------------------------------------ }
-
-constructor TTextureMinificationQualitySlider.Create;
-begin
-  inherited Create(
-    Ord(Low(TTextureMinificationQuality)),
-    Ord(High(TTextureMinificationQuality)),
-    Ord(TextureMinificationQuality));
-end;
-
-function TTextureMinificationQualitySlider.ValueToStr(
-  const AValue: Integer): string;
-begin
-  Result := TextureMinificationQualityToStr[
-    TTextureMinificationQuality(AValue)];
-end;
-
 { TVideoMenu ------------------------------------------------------------- }
 
 const
@@ -326,7 +300,6 @@ constructor TVideoMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  TextureMinificationQualitySlider := TTextureMinificationQualitySlider.Create;
   AllowScreenChangeArgument := TMenuBooleanArgument.Create(AllowScreenChange);
   RenderShadowsArgument := TMenuBooleanArgument.Create(RenderShadows);
   CreatureAnimationSlider := TMenuIntegerSlider.Create(
@@ -347,7 +320,7 @@ begin
   AntiAliasingSlider := TAntiAliasingSlider.Create;
 
   Items.Add('View video information');
-  Items.AddObject('Texture quality', TextureMinificationQualitySlider);
+  Items.Add('Occlusion query');
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
   Items.AddObject('Shadow volumes', RenderShadowsArgument);
   Items.AddObject('Animation smoothness', CreatureAnimationSlider);
@@ -359,6 +332,10 @@ begin
   Items.Add('Back to main menu');
 
   { Resigned ideas for menu options:
+
+    - Texture minification quality: Initially done, but removed later,
+      in practice useless --- mipmaps are best and work without problems,
+      disabling them doesn't allow any noticeable mem/speed saving.
 
     - Texture magnification quality
       Resigned, because magnification GL_NEAREST will look too awful
@@ -387,23 +364,6 @@ begin
   SubMenuAdditionalInfo := '';
 
   RegularSpaceBetweenItems := 5;
-end;
-
-procedure TVideoMenu.SetTextureMinificationQuality(
-  Value: TTextureMinificationQuality;
-  UpdateSlider: boolean);
-begin
-  if TextureMinificationQuality <> Value then
-  begin
-    TextureMinificationQuality := Value;
-    if UpdateSlider then
-      TextureMinificationQualitySlider.Value := Ord(TextureMinificationQuality);
-
-    { All items and creatures must be reloaded after
-      texture minification filter changed.
-      Actually, creatures are not loaded now, so only free items. }
-    ItemsKinds.FreePrepareRender;
-  end;
 end;
 
 procedure TVideoMenu.SetAntiAliasing(
@@ -496,8 +456,6 @@ begin
          RenderShadows := DefaultRenderShadows;
          RenderShadowsArgument.Value := RenderShadows;
 
-         SetTextureMinificationQuality(DefaultTextureMinificationQuality, true);
-
          if AnimationScenesPerTime <> DefaultAnimationScenesPerTime then
          begin
            AnimationScenesPerTime := DefaultAnimationScenesPerTime;
@@ -553,11 +511,6 @@ end;
 procedure TVideoMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
-    1: begin
-         SetTextureMinificationQuality(
-           TTextureMinificationQuality(TextureMinificationQualitySlider.Value),
-           false);
-       end;
     4: begin
          if AnimationScenesPerTime <>
            Cardinal(CreatureAnimationSlider.Value) then

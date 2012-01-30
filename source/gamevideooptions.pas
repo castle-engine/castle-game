@@ -47,32 +47,8 @@ type
 const
   DefaultBlendingType = btIncrease;
 
-type
-  { Approximately from worst to best. }
-  TTextureMinificationQuality =
-  ( tqNearest, tqLinear,
-    tqNearestMipmapNearest, tqNearestMipmapLinear,
-    tqLinearMipmapNearest, tqLinearMipmapLinear );
-
-const
-  TextureMinificationQualityToStr:
-    array[TTextureMinificationQuality] of string =
-  ( 'NEAREST', 'LINEAR',
-    'NEAREST_MIPMAP_NEAREST', 'NEAREST_MIPMAP_LINEAR',
-    'LINEAR_MIPMAP_NEAREST', 'LINEAR_MIPMAP_LINEAR' );
-
-  { Default value for TextureMinificationQuality.
-
-    This is the slowest one, but it looks perfect.
-    In fact, it's not so very slow on my system, so I think that
-    this can be the default. }
-  DefaultTextureMinificationQuality = tqLinearMipmapLinear;
-
-var
-  TextureMinificationQuality: TTextureMinificationQuality;
-
 { Set Attributes as needed. Right now this means setting
-  current TextureMinificationQuality, and UseSceneLights = @false
+  UseSceneLights = @false
   (main scene will override UseSceneLights back to @true,
   for other scenes we ignore lights --- for historic reasons,
   we couldn't support them well in the past.) }
@@ -165,16 +141,7 @@ uses SysUtils, CastleUtils, GameConfig, GameWindow, RaysWindow,
 
 procedure AttributesSet(Attributes: TSceneRenderingAttributes;
   BlendingType: TBlendingType);
-const
-  TextureMinificationQualityToGL:
-    array[TTextureMinificationQuality] of TGLint =
-  ( GL_NEAREST, GL_LINEAR,
-    GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR,
-    GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR );
 begin
-  Attributes.TextureMinFilter :=
-    TextureMinificationQualityToGL[TextureMinificationQuality];
-
   case BlendingType of
     btIncrease:
       begin
@@ -208,10 +175,6 @@ begin
 end;
 
 initialization
-  TextureMinificationQuality := TTextureMinificationQuality(
-    ConfigFile.GetValue(
-    'video_options/texture_minification_quality',
-    Ord(DefaultTextureMinificationQuality)));
   AllowScreenChange := ConfigFile.GetValue(
     'video_options/allow_screen_change', DefaultAllowScreenChange);
   AnimationScenesPerTime := ConfigFile.GetValue(
@@ -230,9 +193,6 @@ initialization
   UseOcclusionQuery := ConfigFile.GetValue(
     'video_options/use_occlusion_query', DefaultUseOcclusionQuery);
 finalization
-  ConfigFile.SetDeleteValue(
-    'video_options/texture_minification_quality',
-    Ord(TextureMinificationQuality), Ord(DefaultTextureMinificationQuality));
   ConfigFile.SetDeleteValue(
     'video_options/allow_screen_change',
     AllowScreenChange, DefaultAllowScreenChange);
