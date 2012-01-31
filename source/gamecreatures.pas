@@ -1070,6 +1070,9 @@ uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow,
   CastleFilesUtils, CastleGLUtils, ProgressUnit, GamePlay,
   GameVideoOptions, GameNotifications, GameRequiredResources;
 
+var
+  DisableCreatureCollisions: Cardinal;
+
 { TCreatureKind -------------------------------------------------------------- }
 
 constructor TCreatureKind.Create(const AShortName: string);
@@ -2173,7 +2176,7 @@ begin
 
   Result := true;
 
-  if GetCollides and (DisableCollisions = 0) then
+  if GetCollides then
   begin
     if NewBox.Collision(BoundingBox) then
     begin
@@ -2219,7 +2222,9 @@ end;
 
 function TCreature.GetCollides: boolean;
 begin
-  Result := (inherited GetCollides) and (DisableCollisions = 0);
+  Result := (inherited GetCollides) and
+    (DisableCollisions = 0) and
+    (DisableCreatureCollisions = 0);
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -3223,6 +3228,17 @@ begin
 end;
 
 procedure TMissileCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+
+  function MissileMoveAllowed(const OldPos, NewPos: TVector3Single): boolean;
+  begin
+    if not MissileKind.HitsCreatures then Inc(DisableCreatureCollisions);
+    try
+      Result := MyMoveAllowed(OldPos, NewPos);
+    finally
+      if not MissileKind.HitsCreatures then Dec(DisableCreatureCollisions);
+    end;
+  end;
+
 var
   OldMiddlePosition, NewMiddlePosition: TVector3Single;
   AngleBetween, AngleChange: Single;
@@ -3249,7 +3265,7 @@ begin
     Only after move, if the move made us colliding with something --- we explode. }
   LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
 
-  if not MyMoveAllowed(OldMiddlePosition, NewMiddlePosition) then
+  if not MissileMoveAllowed(OldMiddlePosition, NewMiddlePosition) then
   begin
     { Check bounding Box of the missile <-> player's BoundingBox.
       Maybe I'll switch to using bounding Sphere here one day ?  }
