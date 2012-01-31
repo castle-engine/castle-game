@@ -158,7 +158,7 @@ begin
     WantsStart := true;
     while WantsStart do
     begin
-      LocalPlayer := TPlayer.Create;
+      LocalPlayer := TPlayer.Create(nil);
       try
         PlayGame(LocalLevel, LocalPlayer, true);
 

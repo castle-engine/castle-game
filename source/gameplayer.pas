@@ -73,7 +73,7 @@ type
     Generally all things are allowed except things that are explicitly
     forbidden.
   }
-  TPlayer = class
+  TPlayer = class(T3D)
   private
     FLife: Single;
     FMaxLife: Single;
@@ -174,7 +174,7 @@ type
 
     FRequiredCreatures: TStringList;
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     property Life: Single read FLife write SetLife default DefaultMaxLife;
@@ -298,7 +298,7 @@ type
       collision with creatures, because then the player will "grow"
       anyway (using GetHeightAbove), so Camera.RealCameraPreferredHeight
       will be taken into account but in a different way. }
-    function BoundingBox: TBox3D;
+    function BoundingBox: TBox3D; override;
 
     { Weapon the player is using right now, or nil if none.
 
@@ -321,7 +321,7 @@ type
     { Adjust some things based on passing time.
       For now, this is for things like FlyingModeTimeout to "wear out".
       @noAutoLinkHere }
-    procedure Idle(const CompSpeed: Single);
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     { Make blackout with given Color (so it's not really a "black"out,
       it's fadeout + fadein with given Color; e.g. pass here red
@@ -426,11 +426,11 @@ var
 
 { TPlayer -------------------------------------------------------------------- }
 
-constructor TPlayer.Create;
+constructor TPlayer.Create(AOwner: TComponent);
 var
   BaseLights: TLightInstancesList;
 begin
-  inherited Create;
+  inherited Create(AOwner);
   FLife := DefaultMaxLife;
   FMaxLife := DefaultMaxLife;
 
@@ -611,16 +611,20 @@ end;
 
 function TPlayer.BoundingBoxAssuming(const AssumePosition: TVector3Single): TBox3D;
 begin
-  Result.Data[0] := AssumePosition;
-  Result.Data[1] := AssumePosition;
+  if GetExists then
+  begin
+    Result.Data[0] := AssumePosition;
+    Result.Data[1] := AssumePosition;
 
-  Result.Data[0, 0] -= Level.CameraRadius;
-  Result.Data[0, 1] -= Level.CameraRadius;
-  Result.Data[0, 2] -= Camera.RealCameraPreferredHeight;
+    Result.Data[0, 0] -= Level.CameraRadius;
+    Result.Data[0, 1] -= Level.CameraRadius;
+    Result.Data[0, 2] -= Camera.RealCameraPreferredHeight;
 
-  Result.Data[1, 0] += Level.CameraRadius;
-  Result.Data[1, 1] += Level.CameraRadius;
-  Result.Data[1, 2] += Level.CameraRadius;
+    Result.Data[1, 0] += Level.CameraRadius;
+    Result.Data[1, 1] += Level.CameraRadius;
+    Result.Data[1, 2] += Level.CameraRadius;
+  end else
+    Result := EmptyBox3D;
 end;
 
 function TPlayer.BoundingBox: TBox3D;
@@ -958,7 +962,7 @@ begin
   AllocatedSwimmingSource := nil;
 end;
 
-procedure TPlayer.Idle(const CompSpeed: Single);
+procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
   { Perform various things related to player swimming. }
   procedure UpdateSwimming;
@@ -1189,6 +1193,7 @@ procedure TPlayer.Idle(const CompSpeed: Single);
   end;
 
 begin
+  inherited;
   if FlyingMode then
   begin
     FFlyingModeTimeOut := FFlyingModeTimeOut - CompSpeed;

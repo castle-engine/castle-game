@@ -465,6 +465,8 @@ const
   GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
   GameWinDirection: TVector3Single = (0, 1, 0);
   GameWinUp: TVector3Single = (0, 0, 1);
+var
+  RemovePlayer: TRemoveType;
 begin
   CompSpeed := Window.Fps.IdleSpeed;
 
@@ -472,7 +474,8 @@ begin
   if Level.SickProjection then
     Level.SickProjectionSpeed := Player.SickProjectionSpeed;
 
-  Player.Idle(CompSpeed);
+  RemovePlayer := rtNone;
+  Player.Idle(CompSpeed, RemovePlayer); { RemovePlayer ignored }
 
   LevelFinishedFlush;
 
