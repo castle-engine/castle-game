@@ -1589,7 +1589,7 @@ type
 constructor TCreature.Create(AOwner: TComponent; const AMaxLife: Single);
 begin
   inherited Create(AOwner);
-  Collision := ctCreature;
+  Pushable := true;
   FMaxLife := AMaxLife;
   FDirection := UnitVector3Single[0];
   FSoundDyingEnabled := true;

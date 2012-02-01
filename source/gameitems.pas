@@ -814,7 +814,7 @@ begin
   { most item models are not 2-manifold }
   CastShadowVolumes := false;
 
-  Collision := ctItem;
+  Pushable := true;
 
   Add(Item.Kind.Scene);
 
