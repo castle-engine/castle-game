@@ -3205,11 +3205,13 @@ procedure TMissileCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveTy
 
   function MissileMoveAllowed(const OldPos, NewPos: TVector3Single): boolean;
   begin
+    if not MissileKind.HitsPlayer then Inc(Player.DisableCollisions);
     if not MissileKind.HitsCreatures then Inc(DisableCreatureCollisions);
     try
       Result := MyMoveAllowed(OldPos, NewPos);
     finally
       if not MissileKind.HitsCreatures then Dec(DisableCreatureCollisions);
+      if not MissileKind.HitsPlayer then Dec(Player.DisableCollisions);
     end;
   end;
 
