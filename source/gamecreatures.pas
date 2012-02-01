@@ -719,14 +719,6 @@ type
     function BoundingBoxAssumingMiddle(
       const AssumeMiddlePosition, AssumeDirection: TVector3Single): TBox3D;
 
-    { This checks collision with Player.BoundingBox, assuming that MiddlePosition
-      (and implied LegsPosition) is as given. }
-    function MiddleCollisionWithPlayer(
-      const AssumeMiddlePosition: TVector3Single): boolean;
-
-    function LegsCollisionWithPlayer(
-      const AssumeLegsPosition: TVector3Single): boolean;
-
     procedure SetLife(const Value: Single); virtual;
 
     { Tries to move from OldMiddlePosition to ProposedNewMiddlePosition.
@@ -1850,34 +1842,16 @@ begin
     [Kind.ShortName, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
 end;
 
-function TCreature.MiddleCollisionWithPlayer(
-  const AssumeMiddlePosition: TVector3Single): boolean;
-begin
-  Result := BoundingBoxAssumingMiddle(AssumeMiddlePosition, Direction).Collision(
-    Player.BoundingBox);
-end;
-
-function TCreature.LegsCollisionWithPlayer(
-  const AssumeLegsPosition: TVector3Single): boolean;
-begin
-  Result := BoundingBoxAssumingLegs(AssumeLegsPosition, Direction).Collision(
-    Player.BoundingBox);
-end;
-
 function TCreature.MyMoveAllowed(
   const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
   out NewMiddlePosition: TVector3Single): boolean;
 begin
   Inc(DisableCollisions);
   try
-    Result :=
-      { Check creature<->level+other creatures collision. }
-      Level.MoveAllowed(
-        OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
-        UseSphere, Kind.CameraRadius,
-        BoundingBox, BoundingBoxAssumingMiddle(ProposedNewMiddlePosition, Direction)) and
-      { Check creature<->player collision. }
-      (not MiddleCollisionWithPlayer(NewMiddlePosition));
+    Result := Level.MoveAllowed(
+      OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
+      UseSphere, Kind.CameraRadius,
+      BoundingBox, BoundingBoxAssumingMiddle(ProposedNewMiddlePosition, Direction));
   finally Dec(DisableCollisions) end;
 end;
 
@@ -1886,14 +1860,10 @@ function TCreature.MyMoveAllowed(
 begin
   Inc(DisableCollisions);
   try
-    Result :=
-      { Check creature<->level+other creatures collision. }
-      Level.MoveAllowed(
-        OldMiddlePosition, NewMiddlePosition,
-        UseSphere, Kind.CameraRadius,
-        BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction)) and
-      { Check creature<->player collision. }
-      (not MiddleCollisionWithPlayer(NewMiddlePosition));
+    Result := Level.MoveAllowed(
+      OldMiddlePosition, NewMiddlePosition,
+      UseSphere, Kind.CameraRadius,
+      BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction));
   finally Dec(DisableCollisions) end;
 end;
 
@@ -3271,9 +3241,10 @@ begin
 
   if not MissileMoveAllowed(OldMiddlePosition, NewMiddlePosition) then
   begin
-    { Check bounding Box of the missile <-> player's BoundingBox.
-      Maybe I'll switch to using bounding Sphere here one day ?  }
-    if MissileKind.HitsPlayer and LegsCollisionWithPlayer(LegsPosition) then
+    { Check collision missile <-> player.
+      Maybe I'll switch to using bounding Sphere here one day?
+      No reason for sphere or box, either way, for now. }
+    if MissileKind.HitsPlayer and Player.BoundingBox.Collision(BoundingBox) then
       ExplodeWithPlayer;
 
     if MissileKind.HitsCreatures then
