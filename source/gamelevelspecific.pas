@@ -983,7 +983,7 @@ const
   begin
     Result := 0;
     for I := 0 to Items.Count - 1 do
-      if Items[I].Collision = ctCreature then
+      if Items[I] is TCreature then
         Inc(Result);
   end;
 
@@ -1114,7 +1114,7 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
       Exit;
 
     for I := 0 to ParentLevel.Items.Count - 1 do
-      if ParentLevel.Items[I].Collision in [ctItem, ctCreature] then
+      if ParentLevel.Items[I].Pushable then
       begin
         Result := DoorBox.Collision(ParentLevel.Items[I].BoundingBox);
         if Result then

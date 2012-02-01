@@ -792,18 +792,10 @@ begin
 
       if MovePushesOthersUsesBoxes then
       begin
-        if Player <> nil then
-        begin
-          Box := Player.BoundingBox;
-          if Box.Collision(NewBox) or
-             Box.Collision(CurrentBox) then
-            Player.Camera.Position := Player.Camera.Position + Move;
-        end;
-
         for I := 0 to ParentLevel.Items.Count - 1 do
         begin
           Item := ParentLevel.Items[I];
-          if Item.Collision in [ctItem, ctCreature] then
+          if Item.Pushable then
           begin
             Box := Item.BoundingBox;
             if Box.Collision(NewBox) or
@@ -813,18 +805,10 @@ begin
         end;
       end else
       begin
-        if Player <> nil then
-        begin
-          if SphereCollisionAssumeTranslation(NewTranslation,
-            Player.Camera.Position, ParentLevel.CameraRadius,
-            @ParentLevel.CollisionIgnoreItem) then
-            Player.Camera.Position := Player.Camera.Position + Move;
-        end;
-
         for I := 0 to ParentLevel.Items.Count - 1 do
         begin
           Item := ParentLevel.Items[I];
-          if Item.Collision in [ctItem, ctCreature] then
+          if Item.Pushable then
             if Item.UseSphere then
             begin
               Item.Sphere(SphereC, SphereR);
