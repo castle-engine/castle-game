@@ -652,18 +652,14 @@ type
     procedure BeforeDraw; override;
     function CreateDefaultCamera(AOwner: TComponent): TCamera; override;
 
-    { CameraMoveAllowed and CameraGetHeight just
-      call appropriate non-player methods.
-      They use Camera.Position, and they use level's CameraRadius
-      (i.e. they assume that it's the player who's moving).
-      Use these to perform collision detection between player and the level.
-
-      In addition, CameraMoveAllowed checks collisions with Creatures.
-
+    { Check Player.Camera collisions with world.
       @groupBegin }
     function CameraMoveAllowed(ACamera: TWalkCamera;
       const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean; override;
+    procedure CameraGetHeight(ACamera: TWalkCamera;
+      out IsAbove: boolean; out AboveHeight: Single;
+      out AboveGround: P3DTriangle); override;
     { @groupEnd }
 
     property SickProjection: boolean
@@ -1016,6 +1012,10 @@ constructor TLevelArea.Create(AOwner: TComponent);
 begin
   inherited;
   FBox := EmptyBox3D;
+  { Actually, the fact that out BoundingBox is empty also prevents collisions.
+    For for some methods, knowing that Collides = false allows them to exit
+    faster. }
+  Collides := false;
 end;
 
 function TLevelArea.BoundingBox: TBox3D;
@@ -1580,9 +1580,23 @@ function TLevel.CameraMoveAllowed(ACamera: TWalkCamera;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  { Check collision Player <-> level+creatures. }
-  Result := inherited CameraMoveAllowed(ACamera,
-    ProposedNewPos, NewPos, BecauseOfGravity);
+  if Player <> nil then Inc(Player.DisableCollisions);
+  try
+    Result := inherited CameraMoveAllowed(ACamera, ProposedNewPos, NewPos, BecauseOfGravity);
+  finally
+    if Player <> nil then Dec(Player.DisableCollisions)
+  end;
+end;
+
+procedure TLevel.CameraGetHeight(ACamera: TWalkCamera;
+  out IsAbove: boolean; out AboveHeight: Single; out AboveGround: P3DTriangle);
+begin
+  if Player <> nil then Inc(Player.DisableCollisions);
+  try
+    inherited CameraGetHeight(ACamera, IsAbove, AboveHeight, AboveGround);
+  finally
+    if Player <> nil then Dec(Player.DisableCollisions)
+  end;
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single;

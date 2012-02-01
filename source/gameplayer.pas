@@ -174,6 +174,9 @@ type
 
     FRequiredCreatures: TStringList;
   public
+    { > 0 means to ignore collisions. Useful to prevent self-collisions. }
+    DisableCollisions: Cardinal;
+
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
@@ -406,6 +409,8 @@ type
 
       It's loaded from player.xml }
     property RequiredCreatures: TStringList read FRequiredCreatures;
+
+    function GetCollides: boolean; override;
   end;
 
 implementation
@@ -976,6 +981,12 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       with stPlayerDrowning. }
     SwimSoundPauseSeconds = 3.11111111;
   begin
+    if Level.AboveWaterBox.PointInside(Camera.Position) then
+      Swimming := psAboveWater else
+    if Level.WaterBox.PointInside(Camera.Position) then
+      Swimming := psUnderWater else
+      Swimming := psNo;
+
     if Swimming = psUnderWater then
     begin
       { Take care of drowning. }
@@ -1463,6 +1474,11 @@ end;
 function TPlayer.Ground: PTriangle;
 begin
   Result := PTriangle(Camera.AboveGround);
+end;
+
+function TPlayer.GetCollides: boolean;
+begin
+  Result := (DisableCollisions = 0) and inherited GetCollides;
 end;
 
 { CastleWindow open / close ------------------------------------------------------ }

@@ -1910,10 +1910,14 @@ end;
 
 function TCreature.MyLineOfSight(const Pos1, Pos2: TVector3Single): boolean;
 begin
+  Inc(Player.DisableCollisions); { allow to see player's middle point inside player's box }
   Inc(DisableCollisions);
   try
     Result := Level.LineOfSight(Pos1, Pos2);
-  finally Dec(DisableCollisions) end;
+  finally
+    Dec(DisableCollisions);
+    Dec(Player.DisableCollisions);
+  end;
 end;
 
 procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);

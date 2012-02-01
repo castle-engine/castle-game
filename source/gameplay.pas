@@ -465,17 +465,12 @@ const
   GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
   GameWinDirection: TVector3Single = (0, 1, 0);
   GameWinUp: TVector3Single = (0, 0, 1);
-var
-  RemovePlayer: TRemoveType;
 begin
   CompSpeed := Window.Fps.IdleSpeed;
 
   Level.SickProjection := Player.Swimming = psUnderWater;
   if Level.SickProjection then
     Level.SickProjectionSpeed := Player.SickProjectionSpeed;
-
-  RemovePlayer := rtNone;
-  Player.Idle(CompSpeed, RemovePlayer); { RemovePlayer ignored }
 
   LevelFinishedFlush;
 
@@ -496,6 +491,7 @@ begin
     LevelFinishedSchedule := false;
 
     NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel;
+    NewLevel.Items.Add(Player);
 
     { copy DisableContextOpenClose value to new level.
       This is needed when it's called from inside debug menu,
@@ -898,20 +894,6 @@ begin
   GameCancel(true);
 end;
 
-type
-  TPlayGameHelper = class
-    class procedure PlayerCameraChange(Sender: TObject);
-  end;
-
-class procedure TPlayGameHelper.PlayerCameraChange(Sender: TObject);
-begin
-  if Level.AboveWaterBox.PointInside(Player.Camera.Position) then
-    Player.Swimming := psAboveWater else
-  if Level.WaterBox.PointInside(Player.Camera.Position) then
-    Player.Swimming := psUnderWater else
-    Player.Swimming := psNo;
-end;
-
 procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer;
   PrepareNewPlayer: boolean);
 var
@@ -933,11 +915,7 @@ begin
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
       GL_ENABLE_BIT, true, nil, nil, @CloseQuery);
     try
-      { No need to actually create TPlayGameHelper class,
-        but I must pass here an instance, not a TPlayGameHelper
-        only --- at least in objfpc mode, see
-        [http://lists.freepascal.org/lists/fpc-devel/2006-March/007370.html] }
-      Level.OnCameraChanged := @TPlayGameHelper(nil).PlayerCameraChange;
+      Level.Items.Add(Player);
 
       Window.AutoRedisplay := true;
 
