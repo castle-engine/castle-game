@@ -864,6 +864,7 @@ type
     function PointingDeviceActivate(const Active: boolean;
       const Distance: Single): boolean; override;
 
+    property Pushable default true;
     procedure Translate(const T: TVector3Single); override;
 
     { Height above this creature. }

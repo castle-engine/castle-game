@@ -344,6 +344,7 @@ type
       const Distance: Single): boolean; override;
 
     property Collides default false;
+    property Pushable default true;
   end;
 
   TItemOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
