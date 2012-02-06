@@ -414,6 +414,8 @@ type
 
     function GetCollides: boolean; override;
     function GetExists: boolean; override;
+    property Pushable default true;
+    procedure Translate(const T: TVector3Single); override;
   end;
 
 implementation
@@ -439,6 +441,7 @@ var
   BaseLights: TLightInstancesList;
 begin
   inherited Create(AOwner);
+  Pushable := true;
   FLife := DefaultMaxLife;
   FMaxLife := DefaultMaxLife;
 
@@ -1487,6 +1490,11 @@ end;
 function TPlayer.GetExists: boolean;
 begin
   Result := (DisableExists = 0) and inherited GetExists;
+end;
+
+procedure TPlayer.Translate(const T: TVector3Single);
+begin
+  Camera.Position := Camera.Position + T;
 end;
 
 { CastleWindow open / close ------------------------------------------------------ }
