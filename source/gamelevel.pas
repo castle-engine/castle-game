@@ -660,6 +660,7 @@ type
     procedure CameraGetHeight(ACamera: TWalkCamera;
       out IsAbove: boolean; out AboveHeight: Single;
       out AboveGround: P3DTriangle); override;
+    function CameraRay(const RayOrigin, RayDirection: TVector3Single): TRayCollision; override;
     { @groupEnd }
 
     property SickProjection: boolean
@@ -1569,6 +1570,16 @@ begin
     Result := inherited CameraMoveAllowed(ACamera, ProposedNewPos, NewPos, BecauseOfGravity);
   finally
     if Player <> nil then Dec(Player.DisableCollisions)
+  end;
+end;
+
+function TLevel.CameraRay(const RayOrigin, RayDirection: TVector3Single): TRayCollision;
+begin
+  if Player <> nil then Inc(Player.DisableExists);
+  try
+    Result := inherited CameraRay(RayOrigin, RayDirection);
+  finally
+    if Player <> nil then Dec(Player.DisableExists);
   end;
 end;
 

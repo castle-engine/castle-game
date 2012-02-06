@@ -176,6 +176,8 @@ type
   public
     { > 0 means to ignore collisions. Useful to prevent self-collisions. }
     DisableCollisions: Cardinal;
+    { > 0 means to not exist. Useful to prevent self-testing in TLevel.CameraRay. }
+    DisableExists: Cardinal;
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -411,6 +413,7 @@ type
     property RequiredCreatures: TStringList read FRequiredCreatures;
 
     function GetCollides: boolean; override;
+    function GetExists: boolean; override;
   end;
 
 implementation
@@ -1479,6 +1482,11 @@ end;
 function TPlayer.GetCollides: boolean;
 begin
   Result := (DisableCollisions = 0) and inherited GetCollides;
+end;
+
+function TPlayer.GetExists: boolean;
+begin
+  Result := (DisableExists = 0) and inherited GetExists;
 end;
 
 { CastleWindow open / close ------------------------------------------------------ }
