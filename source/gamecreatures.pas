@@ -1840,25 +1840,44 @@ end;
 function TCreature.MyMoveAllowed(
   const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
   out NewMiddlePosition: TVector3Single): boolean;
+var
+  Sp: boolean;
+  SpRadius: Single;
+  OldBox, NewBox: TBox3D;
 begin
+  { save bounding volume information before calling Disable, that makes
+    bounding volume empty }
+  Sp := UseSphere;
+  SpRadius := Kind.CameraRadius;
+  OldBox := BoundingBox;
+  NewBox := BoundingBoxAssumingMiddle(ProposedNewMiddlePosition, Direction);
+
   Disable;
   try
     Result := Level.MoveAllowed(
       OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
-      UseSphere, Kind.CameraRadius,
-      BoundingBox, BoundingBoxAssumingMiddle(ProposedNewMiddlePosition, Direction));
+      Sp, SpRadius, OldBox, NewBox);
   finally Enable end;
 end;
 
 function TCreature.MyMoveAllowed(
   const OldMiddlePosition, NewMiddlePosition: TVector3Single): boolean;
+var
+  Sp: boolean;
+  SpRadius: Single;
+  OldBox, NewBox: TBox3D;
 begin
+  { save bounding volume information before calling Disable, that makes
+    bounding volume empty }
+  Sp := UseSphere;
+  SpRadius := Kind.CameraRadius;
+  OldBox := BoundingBox;
+  NewBox := BoundingBoxAssumingMiddle(NewMiddlePosition, Direction);
+
   Disable;
   try
-    Result := Level.MoveAllowed(
-      OldMiddlePosition, NewMiddlePosition,
-      UseSphere, Kind.CameraRadius,
-      BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction));
+    Result := Level.MoveAllowed(OldMiddlePosition, NewMiddlePosition,
+      Sp, SpRadius, OldBox, NewBox);
   finally Enable end;
 end;
 
