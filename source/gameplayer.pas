@@ -174,11 +174,6 @@ type
 
     FRequiredCreatures: TStringList;
   public
-    { > 0 means to ignore collisions. Useful to prevent self-collisions. }
-    DisableCollisions: Cardinal;
-    { > 0 means to not exist. Useful to prevent self-testing in TLevel.CameraRay. }
-    DisableExists: Cardinal;
-
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
@@ -412,8 +407,6 @@ type
       It's loaded from player.xml }
     property RequiredCreatures: TStringList read FRequiredCreatures;
 
-    function GetCollides: boolean; override;
-    function GetExists: boolean; override;
     property Pushable default true;
     procedure Translate(const T: TVector3Single); override;
   end;
@@ -1480,16 +1473,6 @@ end;
 function TPlayer.Ground: PTriangle;
 begin
   Result := PTriangle(Camera.AboveGround);
-end;
-
-function TPlayer.GetCollides: boolean;
-begin
-  Result := (DisableCollisions = 0) and inherited GetCollides;
-end;
-
-function TPlayer.GetExists: boolean;
-begin
-  Result := (DisableExists = 0) and inherited GetExists;
 end;
 
 procedure TPlayer.Translate(const T: TVector3Single);

@@ -1565,32 +1565,32 @@ function TLevel.CameraMoveAllowed(ACamera: TWalkCamera;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  if Player <> nil then Inc(Player.DisableCollisions);
+  if Player <> nil then Player.Disable;
   try
     Result := inherited CameraMoveAllowed(ACamera, ProposedNewPos, NewPos, BecauseOfGravity);
   finally
-    if Player <> nil then Dec(Player.DisableCollisions)
+    if Player <> nil then Player.Enable;
   end;
 end;
 
 function TLevel.CameraRay(const RayOrigin, RayDirection: TVector3Single): TRayCollision;
 begin
-  if Player <> nil then Inc(Player.DisableExists);
+  if Player <> nil then Player.Disable;
   try
     Result := inherited CameraRay(RayOrigin, RayDirection);
   finally
-    if Player <> nil then Dec(Player.DisableExists);
+    if Player <> nil then Player.Enable;
   end;
 end;
 
 procedure TLevel.CameraGetHeight(ACamera: TWalkCamera;
   out IsAbove: boolean; out AboveHeight: Single; out AboveGround: P3DTriangle);
 begin
-  if Player <> nil then Inc(Player.DisableCollisions);
+  if Player <> nil then Player.Disable;
   try
     inherited CameraGetHeight(ACamera, IsAbove, AboveHeight, AboveGround);
   finally
-    if Player <> nil then Dec(Player.DisableCollisions)
+    if Player <> nil then Player.Enable;
   end;
 end;
 

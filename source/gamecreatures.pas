@@ -638,9 +638,6 @@ type
     FLife: Single;
     FMaxLife: Single;
     FLastAttackDirection: TVector3Single;
-    { > 0 means to ignore collisions. This may be used inside,
-      to prevent collisions with self. }
-    DisableCollisions: Cardinal;
     LifeTime: Single;
     procedure SetLastAttackDirection(const Value: TVector3Single);
   private
@@ -1064,7 +1061,7 @@ uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow,
   GameVideoOptions, GameNotifications, GameRequiredResources;
 
 var
-  DisableCreatureCollisions: Cardinal;
+  DisableCreatures: Cardinal;
 
 { TCreatureKind -------------------------------------------------------------- }
 
@@ -1847,25 +1844,25 @@ function TCreature.MyMoveAllowed(
   const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
   out NewMiddlePosition: TVector3Single): boolean;
 begin
-  Inc(DisableCollisions);
+  Disable;
   try
     Result := Level.MoveAllowed(
       OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
       UseSphere, Kind.CameraRadius,
       BoundingBox, BoundingBoxAssumingMiddle(ProposedNewMiddlePosition, Direction));
-  finally Dec(DisableCollisions) end;
+  finally Enable end;
 end;
 
 function TCreature.MyMoveAllowed(
   const OldMiddlePosition, NewMiddlePosition: TVector3Single): boolean;
 begin
-  Inc(DisableCollisions);
+  Disable;
   try
     Result := Level.MoveAllowed(
       OldMiddlePosition, NewMiddlePosition,
       UseSphere, Kind.CameraRadius,
       BoundingBox, BoundingBoxAssumingMiddle(NewMiddlePosition, Direction));
-  finally Dec(DisableCollisions) end;
+  finally Enable end;
 end;
 
 procedure TCreature.MyGetHeightAbove(const MyPosition: TVector3Single;
@@ -1873,21 +1870,21 @@ procedure TCreature.MyGetHeightAbove(const MyPosition: TVector3Single;
 var
   AboveGround: PTriangle; {< just ignored for now }
 begin
-  Inc(DisableCollisions);
+  Disable;
   try
     Level.GetHeightAbove(MyPosition, IsAbove, AboveHeight, AboveGround);
-  finally Dec(DisableCollisions) end;
+  finally Enable end;
 end;
 
 function TCreature.MyLineOfSight(const Pos1, Pos2: TVector3Single): boolean;
 begin
-  Inc(Player.DisableCollisions); { allow to see player's middle point inside player's box }
-  Inc(DisableCollisions);
+  Player.Disable; { allow to see player's middle point inside player's box }
+  Disable;
   try
     Result := Level.LineOfSight(Pos1, Pos2);
   finally
-    Dec(DisableCollisions);
-    Dec(Player.DisableCollisions);
+    Enable;
+    Player.Enable;
   end;
 end;
 
@@ -2197,9 +2194,7 @@ end;
 
 function TCreature.GetCollides: boolean;
 begin
-  Result := (inherited GetCollides) and
-    (DisableCollisions = 0) and
-    (DisableCreatureCollisions = 0);
+  Result := (inherited GetCollides) and (DisableCreatures = 0);
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -3206,13 +3201,13 @@ procedure TMissileCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveTy
 
   function MissileMoveAllowed(const OldPos, NewPos: TVector3Single): boolean;
   begin
-    if not MissileKind.HitsPlayer then Inc(Player.DisableCollisions);
-    if not MissileKind.HitsCreatures then Inc(DisableCreatureCollisions);
+    if not MissileKind.HitsPlayer then Player.Enable;
+    if not MissileKind.HitsCreatures then Inc(DisableCreatures);
     try
       Result := MyMoveAllowed(OldPos, NewPos);
     finally
-      if not MissileKind.HitsCreatures then Dec(DisableCreatureCollisions);
-      if not MissileKind.HitsPlayer then Dec(Player.DisableCollisions);
+      if not MissileKind.HitsCreatures then Dec(DisableCreatures);
+      if not MissileKind.HitsPlayer then Player.Enable;
     end;
   end;
 
