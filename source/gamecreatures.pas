@@ -864,9 +864,6 @@ type
     property Pushable default true;
     procedure Translate(const T: TVector3Single); override;
 
-    { Height above this creature. }
-    function GetCollides: boolean; override;
-
     { Is move through this creature allowed. }
     function MoveAllowed(
       const OldPos, NewPos: TVector3Single;
@@ -1596,7 +1593,7 @@ end;
 
 function TCreature.GetExists: boolean;
 begin
-  Result := (inherited GetExists) and (not GameWin);
+  Result := (inherited GetExists) and (not GameWin) and (DisableCreatures = 0);
 end;
 
 destructor TCreature.Destroy;
@@ -2190,11 +2187,6 @@ begin
        BoundingBox.SegmentCollision(OldPos, NewPos) then
       Exit(false);
   end;
-end;
-
-function TCreature.GetCollides: boolean;
-begin
-  Result := (inherited GetCollides) and (DisableCreatures = 0);
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
@@ -3201,7 +3193,7 @@ procedure TMissileCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveTy
 
   function MissileMoveAllowed(const OldPos, NewPos: TVector3Single): boolean;
   begin
-    if not MissileKind.HitsPlayer then Player.Enable;
+    if not MissileKind.HitsPlayer then Player.Disable;
     if not MissileKind.HitsCreatures then Inc(DisableCreatures);
     try
       Result := MyMoveAllowed(OldPos, NewPos);
