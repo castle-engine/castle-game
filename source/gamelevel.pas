@@ -1016,7 +1016,7 @@ constructor TLevelArea.Create(AOwner: TComponent);
 begin
   inherited;
   FBox := EmptyBox3D;
-  { Actually, the fact that out BoundingBox is empty also prevents collisions.
+  { Actually, the fact that our BoundingBox is empty also prevents collisions.
     For for some methods, knowing that Collides = false allows them to exit
     faster. }
   Collides := false;
