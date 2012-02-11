@@ -1113,10 +1113,10 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
     if Result then
       Exit;
 
-    for I := 0 to ParentLevel.Items.Count - 1 do
-      if ParentLevel.Items[I].Pushable then
+    for I := 0 to World.Count - 1 do
+      if World[I].Pushable then
       begin
-        Result := DoorBox.Collision(ParentLevel.Items[I].BoundingBox);
+        Result := DoorBox.Collision(World[I].BoundingBox);
         if Result then
           Exit;
       end;

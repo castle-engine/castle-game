@@ -20,20 +20,7 @@
   ----------------------------------------------------------------------------
 }
 
-{ TLevel class and some specialized descendants.
-
-  About usage of T3D stuff in castle:
-
-  @unorderedList(
-    @item(
-      Owner of T3D must be always set to the containing TLevel.
-      ParentLevel simply returns Owner, typecasted to TLevel.
-      This wasn't really necessary (I could introduce separate ParentLevel)
-      but in practice it's the simplest and Ok for castle for now.)
-
-  )
-}
-
+{ TLevel class and some specialized descendants. }
 unit GameLevel;
 
 interface
@@ -808,9 +795,9 @@ begin
       begin
         CurrentBox := BoundingBox;
         NewBox := BoundingBoxAssumeTranslation(NewTranslation);
-        for I := 0 to ParentLevel.Items.Count - 1 do
+        for I := 0 to World.Count - 1 do
         begin
-          Item := ParentLevel.Items[I];
+          Item := World[I];
           if Item.Pushable then
           begin
             { This case doesn't really use Item.UseSphere. But it's not really
@@ -825,9 +812,9 @@ begin
         end;
       end else
       begin
-        for I := 0 to ParentLevel.Items.Count - 1 do
+        for I := 0 to World.Count - 1 do
         begin
-          Item := ParentLevel.Items[I];
+          Item := World[I];
           if Item.Pushable then
             if Item.UseSphere then
             begin
