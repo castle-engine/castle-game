@@ -678,6 +678,9 @@ uses SysUtils, GL,
 
 { T3DMoving --------------------------------------------------------- }
 
+{ TODO: this browser World list, doesn't take into acount Pushable items
+  that may be inside a sublist. }
+
 constructor T3DMoving.Create(AOwner: TComponent);
 begin
   inherited;
