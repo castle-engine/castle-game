@@ -1088,7 +1088,7 @@ begin
     DefaultSoundDyingTiedToCreature);
   DefaultMaxLife := KindsConfig.GetFloat(ShortName + '/default_max_life',
     DefaultDefaultMaxLife);
-  RadiusFromFile := KindsConfig.GetFloat(ShortName + '/camera_radius',
+  RadiusFromFile := KindsConfig.GetFloat(ShortName + '/radius',
     0.0);
   ShortRangeAttackDamageConst :=
     KindsConfig.GetFloat(ShortName + '/short_range_attack/damage/const',

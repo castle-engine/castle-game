@@ -59,7 +59,7 @@
     life_to_run_away="0.2"
 
     middle_position_height="0.7"
-    camera_radius="1.0"
+    radius="1.0"
 
     sound_sudden_pain="werewolf_sudden_pain"
     sound_attack_start="werewolf_attack_start"
@@ -237,7 +237,7 @@
     move_speed="2.0"
 
     middle_position_height="0.0"
-    camera_radius="0.3"
+    radius="0.3"
 
     sound_explosion="arrow_hit"
 
@@ -252,7 +252,7 @@
   </Arrow>
 
   <DoomBarrel
-    camera_radius="0.5"
+    radius="0.5"
     default_max_life="1.0"
 
     stand_animation="barrel/barrel.wrl"
