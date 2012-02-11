@@ -108,7 +108,6 @@ type
 
   TLevel = class(TCastleSceneManager)
   private
-    FCameraRadius: Single;
     FCameraPreferredHeight: Single;
     FMoveHorizontalSpeed: Single;
     FMoveVerticalSpeed: Single;
@@ -236,7 +235,6 @@ type
     { @groupEnd }
 
     { }
-    property CameraRadius: Single read FCameraRadius;
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
     property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
     property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
@@ -516,7 +514,7 @@ constructor TLevel.Create(
     InitialDirection: TVector3Single;
     InitialUp: TVector3Single;
     GravityUp: TVector3Single;
-    MoveSpeed: Single;
+    MoveSpeed, CameraRadius: Single;
     NavigationNode: TNavigationInfoNode;
     NavigationSpeed: Single;
     WalkCamera: TWalkCamera;
@@ -527,12 +525,12 @@ constructor TLevel.Create(
     NavigationNode := MainScene.NavigationInfoStack.Top as TNavigationInfoNode;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
-      FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
-      FCameraRadius := MainScene.BoundingBox.AverageSize(false, 1) * 0.007;
+      CameraRadius := NavigationNode.FdAvatarSize.Items[0] else
+      CameraRadius := MainScene.BoundingBox.AverageSize(false, 1) * 0.007;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
       FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
-      FCameraPreferredHeight := FCameraRadius * 5;
+      FCameraPreferredHeight := CameraRadius * 5;
     CorrectPreferredHeight(FCameraPreferredHeight, CameraRadius,
       DefaultCrouchHeight, DefaultHeadBobbing);
 

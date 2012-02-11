@@ -770,14 +770,12 @@ procedure TPlayer.UpdateCamera;
 var
   LevelMoveHorizontalSpeed: Single;
   LevelMoveVerticalSpeed: Single;
-  LevelCameraRadius: Single;
   LevelCameraPreferredHeight: Single;
 begin
   if Level <> nil then
   begin
     LevelMoveHorizontalSpeed := Level.MoveHorizontalSpeed;
     LevelMoveVerticalSpeed := Level.MoveVerticalSpeed;
-    LevelCameraRadius := Level.CameraRadius;
     LevelCameraPreferredHeight := Level.CameraPreferredHeight;
   end else
   begin
@@ -786,7 +784,6 @@ begin
       much, as user will not be able to play anyway without a Level loaded. }
     LevelMoveHorizontalSpeed := 1.0;
     LevelMoveVerticalSpeed := 1.0;
-    LevelCameraRadius := 0.0;
     LevelCameraPreferredHeight := 0.0;
   end;
 
@@ -798,7 +795,6 @@ begin
   Camera.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
   Camera.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
   Camera.InvertVerticalMouseLook := InvertVerticalMouseLook;
-  Camera.Radius := LevelCameraRadius;
 
   { MouseLook is allowed always, even when player is dead.
     Just like rotation keys.
@@ -842,7 +838,7 @@ begin
     Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
     Camera.HeadBobbing := 0.0;
-    Camera.PreferredHeight := LevelCameraRadius * 1.01;
+    Camera.PreferredHeight := Camera.Radius * 1.01;
 
     Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
     Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
@@ -870,7 +866,7 @@ begin
     Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
     Camera.HeadBobbing := 0.0;
-    Camera.PreferredHeight := LevelCameraRadius * 1.01;
+    Camera.PreferredHeight := Camera.Radius * 1.01;
 
     Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
     Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
@@ -911,7 +907,7 @@ begin
       Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
       Camera.FallingDownSpeedIncrease := 1.0;
       Camera.HeadBobbing := 0.0;
-      Camera.PreferredHeight := LevelCameraRadius * 1.01;
+      Camera.PreferredHeight := Camera.Radius * 1.01;
 
       Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed / 2;
       Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed / 2;
