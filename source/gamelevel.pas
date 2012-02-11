@@ -57,131 +57,123 @@ type
   TCastleSceneClass = class of TCastleScene;
   TCastlePrecalculatedAnimationClass = class of TCastlePrecalculatedAnimation;
 
-  { See T3DCustomTransform.
+  { 3D object moving and potentially pushing other 3D objects.
+    Good for elevators, doors and such.
 
-    Note that if Translation actually changes over time then
-    you have to think of at least one additional thing yourself:
-    what happens when collision occurs because of the move of this object ?
-    Should the moving object push other objects (player, creatures, items),
-    like the elevator going up ?
-    That's the default behavior, but you can turn it off by setting
-    MovePushesOthers to @false.
-    See e.g. the DoomLevelDoor.BeforeTimeIncrease method to see how the behavior
-    "something blocks the move" can be handled. }
-  TLevelMovingObject = class(T3DCustomTransform)
+    Other 3D objects may be pushed, if @link(Pushes).
+    There are two methods of pushing available, see @link(PushesEverythingInside).
+    Only the 3D objects with @link(T3D.Pushable) are ever pushed by this object
+    (the rest of 3D world is treated as static, does not interact with
+    elevators / doors or such).
+
+    You can also stop/reverse the move to prevent some collisions
+    from occuring at all. This way you can e.g. prevent the door
+    from automatically closing, if someone/something blocks the way.
+    You do this by overriding BeforeTimeIncrease.
+    See TDoomLevelDoor.BeforeTimeIncrease in "The Castle" for example how to
+    do this. }
+  T3DMoving = class(T3DCustomTransform)
   private
-    FMovePushesOthers: boolean;
-    FMovePushesOthersUsesBoxes: boolean;
+    FPushes: boolean;
+    FPushesEverythingInside: boolean;
     FAnimationTime: TFloatTime;
-  public
-    constructor Create(AOwner: TComponent); override;
-
+  protected
     { Local object time, always increasing, used to track animations. }
     property AnimationTime: TFloatTime read FAnimationTime;
 
-    function ParentLevel: TLevel;
-
     { Implements T3D.GetTranslation by always calling
       GetTranslationFromTime(AnimationTime).
-      Descendants should override GetTranslationFromTime. }
+      Descendants should only override GetTranslationFromTime. }
     function GetTranslation: TVector3Single; override;
     function OnlyTranslation: boolean; override;
 
     function GetTranslationFromTime(const AnAnimationTime: TFloatTime):
       TVector3Single; virtual; abstract;
 
-    { This will be called at the beginning of our @link(Idle),
+    { Do something right before animation progresses.
+      Called at the beginning of our @link(Idle),
       @italic(right before) AnimationTime changes to NewAnimationTime.
 
-      This is usefull for taking care of collision detection issues,
+      Useful for taking care of collision detection issues,
       as our assumption always is that "nothing collides". Which means
-      that if you don't want your TLevelMovingObject to collide
+      that if you don't want your T3DMoving to collide
       with e.g. player or creatures or items, then you should
       prevent the collision @italic(before it happens).
       This is the place to do it. }
     procedure BeforeTimeIncrease(const NewAnimationTime: TFloatTime); virtual;
-
-    { If @true (and GetCollides also @true)
-      then moving this object moves everything on it's way.
-      I mean, if you put a creature/player/item on it's way of move,
-      the creature/player/item will be pushed by this object.
-      This is probably a good thing for things like elevators etc.
-
-      Be aware of some limitations of this collision checking:
-      @unorderedList(
-        @item(Collisions between this level object and the basic
-          level geometry and other level objects is not done.
-          Just design your level to make sure that it doesn't ever happen.)
-
-        @item(When pushing the creature/player/item, right now
-          we don't check whether the creature/player/item will not be
-          pushed into collision with something else.
-
-          For now, design your level to minimize the chance that it will ever happen.
-          Although in theory you cannot design your level to guarantee
-          that it will never happen (because e.g. a creature may be pushed
-          into collision with other creature, and since creatures move
-          on their own they can arrange themselves (in theory) in all manners of
-          funny configurations...). But in practice it's not so difficult,
-          just make sure that there is enough space on the way of move.)
-      )
-    }
-    property MovePushesOthers: boolean
-      read FMovePushesOthers write FMovePushesOthers default true;
-
-    { This controls how MovePushesOthers works.
-      There are two methods how this may work:
-      @orderedList(
-        @item(When MovePushesOthersUsesBoxes, then we check each
-          possible collider (being it player, creature or item) bounding box
-          with bounding box of this level object. If there's a collision,
-          then we decide that the collider moves along with this level object
-          --- because it's inside this level object (e.g. inside
-          the elevator), or it's pushed by this object.
-
-          Disadvantage: we approximate whole level object as it's bounding box.
-          It's good only if level object's bounding box is a good approximation
-          of it's actual shape. And the level object is relatively small
-          --- because even when e.g. player is flying and is exactly in the
-          middle of the elevator, he is moved instantly with the elevator
-          (instead of hitting elevator floor/ceiling first).
-        )
-
-        @item(When not MovePushesOthersUsesBoxes, then we try to check
-          using precise octree of level objects (assuming they are
-          used in SphereCollision/BoxCollision overrides).
-          And for player and creatures with UseSphere = @true,
-          we use their spheres instead of their bounding boxes.
-          This is the way of checking that more resembles reality
-          (as we use the actual geometry within the octrees instead of
-          just the bounding box).
-
-          Disadvantage: if player/creature is pushed up by this level object,
-          it takes some time for them to "raise up" to a standing position
-          (because we compare using their spheres). Conversely,
-          if the level object moves down, it takes some time for a
-          player/creature to actually fall down on the level object.
-          This means that if the level object doesn't move too fast,
-          you get strange effect when e.g. player is standing within
-          the level object: the player position seems to bounce within
-          the elevator.)) }
-    property MovePushesOthersUsesBoxes: boolean
-      read FMovePushesOthersUsesBoxes write FMovePushesOthersUsesBoxes
-      default true;
-
+  public
+    constructor Create(AOwner: TComponent); override;
+    function ParentLevel: TLevel;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+  published
+    { Are other 3D objects pushed when this object moves.
+      Only the 3D objects with @link(T3D.Pushable) are ever pushed by this object
+      (the rest of 3D world is treated as static, does not interact with
+      elevators / doors or such).
+
+      Only relevant if GetCollides. Non-colliding objects never push others. }
+    property Pushes: boolean read FPushes write FPushes default true;
+
+    { If @link(Pushes) is @true, this determines how pushing actually works.
+      There two methods:
+
+      @orderedList(
+        @item(PushesEverythingInside = @true: We move every
+          pushable 3D object that is inside our bounding box.
+          This is sensible if we can reasonably assume that things
+          inside our box are standing. For example if this is
+          a (vertical or horizontal) elevator, then creatures/items
+          are usually standing/lying inside, and naturally move with
+          the same speed (and direction) as the elevator.)
+
+        @item(When PushesEverythingInside = @false: We check precise
+          collision between pushable 3D objects and our triangle mesh.
+          Actually, we use T3DList.BoxCollision / T3DList.SphereCollsion,
+          that will use children's T3D.BoxCollision / T3D.SphereCollsion;
+          they check collisions with triangle mesh in case of TCastleScene
+          with Spatial containing e.g. ssDynamicCollisions.)
+      )
+
+      Neither method is really perfect.
+
+      PushesEverythingInside = @false seems like a more precise check,
+      as it actually compares the triangle mesh, taking into account
+      the interior of (this) moving 3D object. PushesEverythingInside = @true
+      just approximates the moving 3D object by it's bounding box.
+
+      On the other hand, PushesEverythingInside = @true makes the elevator
+      more "sticky". With PushesEverythingInside = @false,
+      when player hits the floor, it takes them some time to raise up.
+      This creates a "bouncing camera" effect when the elevator goes up
+      quickly: player constantly falls to the ground, tries to get up,
+      but elevator moves up and player falls to it's ground again.
+      When the elevator goes down, the player/creature constantly falls
+      down on it because of gravity, which again causes artifacts
+      as gravity may work significantly slower/faster than elavator moving speed.
+      When the elevator is a horizontal moving platform, it will "slip"
+      from under the player/creature, leaving the poor fella suddenly hanging
+      in the air, and falling down because of gravity in the next second.
+
+      In practice: PushesEverythingInside should be @true for small
+      containers, when you can reasonably assume that things (creatures,
+      player, items) stand inside, and when you intend to use it for transport
+      of 3D stuff. For very large moving stuff, that possibly
+      interacts with flying players/creatures in some creative way,
+      PushesEverythingInside may be @false. }
+    property PushesEverythingInside: boolean
+      read FPushesEverythingInside write FPushesEverythingInside default true;
   end;
 
-  { This is a TLevelMovingObject that moves with a constant speed
+  { This is a T3DMoving that moves with a constant speed
     from Translation (0, 0, 0) to Translation TranslationEnd.
     They are called @italic(begin position) and @italic(end position).
 
-    In practice, this is less flexible than TLevelMovingObject but often
+    In practice, this is less flexible than T3DMoving but often
     more comfortable: you get easy to use GoBeginPosition, GoEndPosition
     properties, you can easily set sounds by SoundGoBeginPosition and
     SoundGoEndPosition etc.
   }
-  TLevelLinearMovingObject = class(TLevelMovingObject)
+  T3DLinearMoving = class(T3DMoving)
   private
     FEndPosition: boolean;
     FEndPositionStateChangeTime: Single;
@@ -697,32 +689,45 @@ uses SysUtils, GL,
 
 {$define read_implementation}
 
-{ TLevelMovingObject --------------------------------------------------------- }
+{ T3DMoving --------------------------------------------------------- }
 
-constructor TLevelMovingObject.Create(AOwner: TComponent);
+constructor T3DMoving.Create(AOwner: TComponent);
 begin
   inherited;
-  FMovePushesOthers := true;
-  FMovePushesOthersUsesBoxes := true;
+  FPushes := true;
+  FPushesEverythingInside := true;
   FAnimationTime := 0;
 end;
 
-function TLevelMovingObject.ParentLevel: TLevel;
+function T3DMoving.ParentLevel: TLevel;
 begin
   Result := Owner as TLevel;
 end;
 
-function TLevelMovingObject.GetTranslation: TVector3Single;
+function T3DMoving.GetTranslation: TVector3Single;
 begin
   Result := GetTranslationFromTime(AnimationTime);
 end;
 
-function TLevelMovingObject.OnlyTranslation: boolean;
+function T3DMoving.OnlyTranslation: boolean;
 begin
-  Result := true; { TLevelMovingObject always uses only translation }
+  Result := true; { T3DMoving always uses only translation }
 end;
 
-procedure TLevelMovingObject.BeforeTimeIncrease(
+{ Note: When pushing the creature/player/item, right now
+  we don't check whether the creature/player/item will not be
+  pushed into collision with something else.
+
+  For now, design your level to minimize the chance that it will ever happen.
+  Although in theory you cannot design your level to guarantee
+  that it will never happen (because e.g. a creature may be pushed
+  into collision with other creature, and since creatures move
+  on their own they can arrange themselves (in theory) in all manners of
+  funny configurations...). But in practice it's not so difficult,
+  just make sure that there is enough space on the way of move.
+}
+
+procedure T3DMoving.BeforeTimeIncrease(
   const NewAnimationTime: TFloatTime);
 
   function BoundingBoxAssumeTranslation(
@@ -774,30 +779,44 @@ var
   SphereR: Single;
   Item: T3D;
 begin
-  if GetCollides and MovePushesOthers then
+  if GetCollides and Pushes then
   begin
     CurrentTranslation := GetTranslationFromTime(AnimationTime);
     NewTranslation := GetTranslationFromTime(NewAnimationTime);
 
-    { It's an often expected situation that TLevelMovingObject
-      doesn't move at all, and then Translation doesn't change at all
+    { It often happens that T3DMoving doesn't move at all,
+      and then Translation doesn't change at all
       (even when compared precisely, without usual epsilon used to compare
-      floats). So the check below is worth the time, because we expect
-      that usually is will render the rest if the code unnecessary. }
+      floats). So the check below may be worth the time, we expect
+      it will avoid doing actual work. }
 
     if not VectorsPerfectlyEqual(CurrentTranslation, NewTranslation) then
     begin
-      CurrentBox := BoundingBox;
-      NewBox := BoundingBoxAssumeTranslation(NewTranslation);
       Move := NewTranslation - CurrentTranslation;
 
-      if MovePushesOthersUsesBoxes then
+      { TODO: it may be sensible to add a pushing method when we compare
+        other object's bounding box (never a sphere, and be sure to use
+        the "tall" box for player, including it's legs) with octree
+        (that is, using inherited BoxCollision).
+        This can have the advantages of both PushesEverythingInside=true
+        (reacts more sticky, more eager to move colliding stuff with
+        the same speed as elevator)
+        and PushesEverythingInside=false (takes into account triangle mesh,
+        not just our bounding volume). }
+
+      if PushesEverythingInside then
       begin
+        CurrentBox := BoundingBox;
+        NewBox := BoundingBoxAssumeTranslation(NewTranslation);
         for I := 0 to ParentLevel.Items.Count - 1 do
         begin
           Item := ParentLevel.Items[I];
           if Item.Pushable then
           begin
+            { This case doesn't really use Item.UseSphere. But it's not really
+              terribly important design decision, we may use Item.UseSphere
+              one day here. It's most comfortable to just use
+              here Item.BoundingBox, as we perform collisions with our box. }
             Box := Item.BoundingBox;
             if Box.Collision(NewBox) or
                Box.Collision(CurrentBox) then
@@ -829,7 +848,7 @@ begin
   end;
 end;
 
-procedure TLevelMovingObject.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure T3DMoving.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 var
   NewAnimationTime: TFloatTime;
 begin
@@ -840,9 +859,9 @@ begin
   FAnimationTime := NewAnimationTime;
 end;
 
-{ TLevelLinearMovingObject --------------------------------------------------- }
+{ T3DLinearMoving --------------------------------------------------- }
 
-constructor TLevelLinearMovingObject.Create(AOwner: TComponent);
+constructor T3DLinearMoving.Create(AOwner: TComponent);
 begin
   inherited;
 
@@ -858,7 +877,7 @@ begin
   UsedSound := nil;
 end;
 
-destructor TLevelLinearMovingObject.Destroy;
+destructor T3DLinearMoving.Destroy;
 begin
   { Otherwise, if you exit from the game while some sound was played,
     and the sound was e.g. looping (like the elevator on "Tower" level),
@@ -869,19 +888,19 @@ begin
   inherited;
 end;
 
-procedure TLevelLinearMovingObject.SoundSourceUsingEnd(Sender: TALSound);
+procedure T3DLinearMoving.SoundSourceUsingEnd(Sender: TALSound);
 begin
   Assert(Sender = UsedSound);
   UsedSound.OnUsingEnd := nil;
   UsedSound := nil;
 end;
 
-function TLevelLinearMovingObject.SoundPosition: TVector3Single;
+function T3DLinearMoving.SoundPosition: TVector3Single;
 begin
   Result := BoundingBox.Middle;
 end;
 
-procedure TLevelLinearMovingObject.PlaySound(SoundType: TSoundType;
+procedure T3DLinearMoving.PlaySound(SoundType: TSoundType;
   Looping: boolean);
 begin
   { The object can play only one sound (going to begin or end position)
@@ -894,21 +913,21 @@ begin
     UsedSound.OnUsingEnd := @SoundSourceUsingEnd;
 end;
 
-procedure TLevelLinearMovingObject.GoEndPosition;
+procedure T3DLinearMoving.GoEndPosition;
 begin
   FEndPosition := true;
   FEndPositionStateChangeTime := AnimationTime;
   PlaySound(SoundGoEndPosition, SoundGoEndPositionLooping);
 end;
 
-procedure TLevelLinearMovingObject.GoBeginPosition;
+procedure T3DLinearMoving.GoBeginPosition;
 begin
   FEndPosition := false;
   FEndPositionStateChangeTime := AnimationTime;
   PlaySound(SoundGoBeginPosition, SoundGoBeginPositionLooping);
 end;
 
-procedure TLevelLinearMovingObject.RevertGoEndPosition;
+procedure T3DLinearMoving.RevertGoEndPosition;
 begin
   FEndPosition := true;
   FEndPositionStateChangeTime := { AnimationTime -
@@ -918,7 +937,7 @@ begin
   PlaySound(SoundGoEndPosition, SoundGoEndPositionLooping);
 end;
 
-procedure TLevelLinearMovingObject.RevertGoBeginPosition;
+procedure T3DLinearMoving.RevertGoBeginPosition;
 begin
   FEndPosition := false;
   FEndPositionStateChangeTime := { AnimationTime -
@@ -928,7 +947,7 @@ begin
   PlaySound(SoundGoEndPosition, SoundGoBeginPositionLooping);
 end;
 
-procedure TLevelLinearMovingObject.GoOtherPosition;
+procedure T3DLinearMoving.GoOtherPosition;
 begin
   if CompletelyEndPosition then
     GoBeginPosition else
@@ -941,7 +960,7 @@ begin
   end;
 end;
 
-function TLevelLinearMovingObject.GetTranslationFromTime(
+function T3DLinearMoving.GetTranslationFromTime(
   const AnAnimationTime: TFloatTime): TVector3Single;
 begin
   if not EndPosition then
@@ -963,19 +982,19 @@ begin
   end;
 end;
 
-function TLevelLinearMovingObject.CompletelyEndPosition: boolean;
+function T3DLinearMoving.CompletelyEndPosition: boolean;
 begin
   Result := EndPosition and
     (AnimationTime - EndPositionStateChangeTime > MoveTime);
 end;
 
-function TLevelLinearMovingObject.CompletelyBeginPosition: boolean;
+function T3DLinearMoving.CompletelyBeginPosition: boolean;
 begin
   Result := (not EndPosition) and
     (AnimationTime - EndPositionStateChangeTime > MoveTime);
 end;
 
-procedure TLevelLinearMovingObject.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure T3DLinearMoving.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 begin
   inherited;
 

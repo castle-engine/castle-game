@@ -108,7 +108,7 @@ type
 
   TTowerLevel = class(TLevel)
   private
-    MovingElevator: TLevelLinearMovingObject;
+    MovingElevator: T3DLinearMoving;
     Elevator: TCastleScene;
     ElevatorButton: TCastlePrecalculatedAnimation;
   public
@@ -162,7 +162,7 @@ type
     function Background: TBackground; override;
   end;
 
-  TDoomLevelDoor = class(TLevelLinearMovingObject)
+  TDoomLevelDoor = class(T3DLinearMoving)
   public
     StayOpenTime: Single;
 
@@ -171,7 +171,7 @@ type
     procedure BeforeTimeIncrease(const NewAnimationTime: TFloatTime); override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
-    property MovePushesOthers default false;
+    property Pushes default false;
 
     { No way to express this:
     property SoundGoBeginPosition default stDoorClose;
@@ -188,11 +188,11 @@ type
   private
     FakeWall: TCastleScene;
 
-    MovingElevator49: TLevelLinearMovingObject;
+    MovingElevator49: T3DLinearMoving;
     Elevator49: TCastleScene;
     Elevator49DownBox: TBox3D;
 
-    MovingElevator9a9b: TLevelLinearMovingObject;
+    MovingElevator9a9b: T3DLinearMoving;
     Elevator9a9b: TCastleScene;
     Elevator9a9bPickBox: TBox3D;
 
@@ -791,7 +791,7 @@ begin
   ElevatorButton := LoadLevelAnimation(TowerLevelPath + 'elevator_button.kanim', true, false,
     TTowerElevatorButton);
 
-  MovingElevator := TLevelLinearMovingObject.Create(Self);
+  MovingElevator := T3DLinearMoving.Create(Self);
   MovingElevator.Add(Elevator);
   MovingElevator.Add(ElevatorButton);
   MovingElevator.MoveTime := 10.0;
@@ -1093,7 +1093,7 @@ end;
 constructor TDoomLevelDoor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  MovePushesOthers := false;
+  Pushes := false;
   SoundGoEndPosition := stDoorOpen;
   SoundGoBeginPosition := stDoorClose;
   CastShadowVolumes := false; { looks bad }
@@ -1125,12 +1125,9 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
 begin
   inherited;
 
-  { First check the doors that are during closing:
-    if the player or creatures will collide
-    with them after AnimationTime will change,
-    then we must stop and open again (to avoid
-    entering into collision with player/creature because of
-    door move). }
+  { Check the closing doors: if some 3D pushable (player/creature/item)
+    will collide after AnimationTime change to NewAnimationTime,
+    then we must open door again. }
 
   if (not EndPosition) and
     (AnimationTime - EndPositionStateChangeTime < MoveTime) and
@@ -1174,7 +1171,7 @@ type
 function TElevator9a9b.PointingDeviceActivate(const Active: boolean;
   const Distance: Single): boolean;
 var
-  MovingElevator9a9b: TLevelLinearMovingObject;
+  MovingElevator9a9b: T3DLinearMoving;
   Elevator9a9bPickBox: TBox3D;
 begin
   Result := Active;
@@ -1265,7 +1262,7 @@ begin
   Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
     true { create octrees }, false);
 
-  MovingElevator49 := TLevelLinearMovingObject.Create(Self);
+  MovingElevator49 := T3DLinearMoving.Create(Self);
   MovingElevator49.Add(Elevator49);
   MovingElevator49.MoveTime := 3.0;
   MovingElevator49.TranslationEnd := Vector3Single(0, 0, -6.7);
@@ -1280,7 +1277,7 @@ begin
   Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
     true { create octrees }, false, TElevator9a9b);
 
-  MovingElevator9a9b := TLevelLinearMovingObject.Create(Self);
+  MovingElevator9a9b := T3DLinearMoving.Create(Self);
   MovingElevator9a9b.Add(Elevator9a9b);
   MovingElevator9a9b.MoveTime := 3.0;
   MovingElevator9a9b.TranslationEnd := Vector3Single(0, 0, -7.5);
