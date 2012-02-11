@@ -90,7 +90,6 @@ type
     procedure BeforeTimeIncrease(const NewAnimationTime: TFloatTime); virtual;
   public
     constructor Create(AOwner: TComponent); override;
-    function ParentLevel: TLevel;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   published
     { Are other 3D objects pushed when this object moves.
@@ -689,11 +688,6 @@ begin
   FAnimationTime := 0;
 end;
 
-function T3DMoving.ParentLevel: TLevel;
-begin
-  Result := Owner as TLevel;
-end;
-
 function T3DMoving.GetTranslation: TVector3Single;
 begin
   Result := GetTranslationFromTime(AnimationTime);
@@ -823,13 +817,13 @@ begin
             begin
               Item.Sphere(SphereC, SphereR);
               if SphereCollisionAssumeTranslation(NewTranslation, SphereC, SphereR,
-                @ParentLevel.CollisionIgnoreItem) then
+                @World.CollisionIgnoreItem) then
                 Item.Translate(Move);
             end else
             begin
               if BoxCollisionAssumeTranslation(NewTranslation,
                 Item.BoundingBox,
-                @ParentLevel.CollisionIgnoreItem) then
+                @World.CollisionIgnoreItem) then
                 Item.Translate(Move);
             end;
         end;
