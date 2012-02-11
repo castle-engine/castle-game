@@ -132,8 +132,7 @@ var
   TPlayer and TLevel instances differently. }
 procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
 var
-  LocalPlayer: TPlayer;
-  LocalLevel, NewLocalLevel: TLevel;
+  NewLevel: TLevel;
   BaseLights: TLightInstancesList;
 begin
   { All kinds must be prepared before instances are created.
@@ -145,30 +144,29 @@ begin
     ItemsKinds.PrepareRender(BaseLights);
   finally FreeAndNil(BaseLights) end;
 
-  LocalLevel := nil;
+  Level := nil;
   try
-    LocalPlayer := TPlayer.Create(nil);
+    Player := TPlayer.Create(nil);
     try
-      LocalLevel := NewGameLevelAvailable.CreateLevel(LocalPlayer);
-      PlayGame(LocalLevel, LocalPlayer, true);
-    finally FreeAndNil(LocalPlayer) end;
+      Level := NewGameLevelAvailable.CreateLevel;
+      PlayGame(true);
+    finally FreeAndNil(Player) end;
 
     while GameEnded and (GameEndedWantsRestart <> '') do
     begin
-      LocalPlayer := TPlayer.Create(nil);
+      Player := TPlayer.Create(nil);
       try
-        { Replace LocalLevel this way, so that restarting level doesn't
+        { Replace Level this way, so that restarting level doesn't
           free and reload all creature animations again. }
-        NewLocalLevel := LevelsAvailable.FindName(GameEndedWantsRestart).
-          CreateLevel(LocalPlayer);
-        FreeAndNil(LocalLevel);
-        LocalLevel := NewLocalLevel;
+        NewLevel := LevelsAvailable.FindName(GameEndedWantsRestart).CreateLevel;
+        FreeAndNil(Level);
+        Level := NewLevel;
 
-        PlayGame(LocalLevel, LocalPlayer, true);
-      finally FreeAndNil(LocalPlayer) end;
+        PlayGame(true);
+      finally FreeAndNil(Player) end;
     end;
 
-  finally FreeAndNil(LocalLevel) end;
+  finally FreeAndNil(Level) end;
 
   SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
   SoundMenu.SoundVolume.RefreshAccessory;

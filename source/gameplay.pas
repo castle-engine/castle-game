@@ -30,21 +30,17 @@ uses Classes, GameLevel, GamePlayer, Base3D, OpenGLFonts;
 
 { Play the game.
 
-  This initializes Level and Player global variables to
-  ALevel and APlayer. Upon exit, it will set Player and Level
-  back to nil.
+  Level and Player global variables must be already initialized.
+  Note that TLevel must be created after Player is initialized.
 
   Note that Level may change during the PlayGame, because
   of LevelFinished. In such case old Level value will be freeed,
   and Level will be set to new value. Last Level value should
-  be freed by the caller of PlayGame. ALevel upon exit is set to this
-  last Level value (global Level value is then set to nil, so it
-  becomes useless).
+  be freed by the caller of PlayGame.
 
   If PrepareNewPlayer then it will call Level.PrepareNewPlayer
   right before starting the actual game. }
-procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer;
-  PrepareNewPlayer: boolean);
+procedure PlayGame(PrepareNewPlayer: boolean);
 
 var
   { Currently used player by PlayGame. nil if PlayGame doesn't work
@@ -501,7 +497,7 @@ begin
       Window.Controls.Delete(WindowControlsPos) else
       WindowControlsPos := Window.Controls.Count;
 
-    NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel(Player);
+    NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel;
 
     { copy DisableContextOpenClose value to new level.
       This is needed when it's called from inside debug menu,
@@ -895,8 +891,7 @@ begin
   GameCancel(true);
 end;
 
-procedure PlayGame(var ALevel: TLevel; APlayer: TPlayer;
-  PrepareNewPlayer: boolean);
+procedure PlayGame(PrepareNewPlayer: boolean);
 var
   SavedMode: TGLMode;
   C2D: TGame2DControls;
@@ -906,67 +901,58 @@ begin
 
   GameWin := false;
 
-  Level := ALevel;
-  Player := APlayer;
   InventoryVisible := false;
   LevelFinishedSchedule := false;
+
+  SavedMode := TGLMode.CreateReset(Window,
+    { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
+    GL_ENABLE_BIT, true, nil, nil, @CloseQuery);
   try
+    Window.AutoRedisplay := true;
 
-    SavedMode := TGLMode.CreateReset(Window,
-      { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
-      GL_ENABLE_BIT, true, nil, nil, @CloseQuery);
-    try
-      Window.AutoRedisplay := true;
+    { OnTimer should be executed quite often, because footsteps sound
+      (done in TPlayer.Idle) relies on the fact that OnUsingEnd
+      of it's source will be called more-or-less immediately after
+      sound stopped. And our Timer calls RefreshUsed that will
+      call OnUsingEnd. }
+    Application.TimerMilisec := 100;
+    Window.OnTimer := @Timer;
 
-      { OnTimer should be executed quite often, because footsteps sound
-        (done in TPlayer.Idle) relies on the fact that OnUsingEnd
-        of it's source will be called more-or-less immediately after
-        sound stopped. And our Timer calls RefreshUsed that will
-        call OnUsingEnd. }
-      Application.TimerMilisec := 100;
-      Window.OnTimer := @Timer;
+    Window.OnIdle := @Idle;
+    Window.OnKeyDown := @KeyDown;
+    Window.OnMouseDown := @MouseDown;
+    Window.OnMouseWheel := @MouseWheel;
+    Window.OnDrawStyle := ds3D;
 
-      Window.OnIdle := @Idle;
-      Window.OnKeyDown := @KeyDown;
-      Window.OnMouseDown := @MouseDown;
-      Window.OnMouseWheel := @MouseWheel;
-      Window.OnDrawStyle := ds3D;
+    C2D := TGame2DControls.Create(nil);
+    C3D := TGame3DControls.Create(nil);
+    GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, C3D, Level]);
 
-      C2D := TGame2DControls.Create(nil);
-      C3D := TGame3DControls.Create(nil);
-      GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, C3D, Level]);
+    Window.Controls.AddList(GameControls);
 
-      Window.Controls.AddList(GameControls);
+    InitNewLevel;
 
-      InitNewLevel;
+    GameEnded := false;
+    GameEndedWantsRestart := '';
 
-      GameEnded := false;
-      GameEndedWantsRestart := '';
+    glEnable(GL_LIGHTING);
 
-      glEnable(GL_LIGHTING);
+    MessagesTheme.RectColor[3] := 0.4;
 
-      MessagesTheme.RectColor[3] := 0.4;
+    if PrepareNewPlayer then
+      Level.PrepareNewPlayer(Player);
 
-      if PrepareNewPlayer then
-        Level.PrepareNewPlayer(Player);
-
-      repeat
-        Application.ProcessMessage(true, true);
-      until GameEnded;
-    finally
-      { Clear some Player.Camera callbacks. }
-      Level.OnCameraChanged := nil;
-
-      FreeAndNil(GameControls);
-      FreeAndNil(C2D);
-      FreeAndNil(C3D);
-      FreeAndNil(SavedMode);
-    end;
+    repeat
+      Application.ProcessMessage(true, true);
+    until GameEnded;
   finally
-    { clear global vars, for safety }
-    ALevel := Level;
-    Level := nil;
-    Player := nil;
+    { Clear some Player.Camera callbacks. }
+    Level.OnCameraChanged := nil;
+
+    FreeAndNil(GameControls);
+    FreeAndNil(C2D);
+    FreeAndNil(C3D);
+    FreeAndNil(SavedMode);
   end;
 end;
 

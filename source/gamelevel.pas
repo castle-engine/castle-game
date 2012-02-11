@@ -220,7 +220,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean; APlayer: TPlayer); reintroduce; virtual;
+      AMenuBackground: boolean); reintroduce; virtual;
 
     destructor Destroy; override;
 
@@ -506,7 +506,7 @@ constructor TLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AMenuBackground: boolean; APlayer: TPlayer);
+  AMenuBackground: boolean);
 
   procedure RemoveItemsToRemove;
   var
@@ -574,8 +574,8 @@ constructor TLevel.Create(
       { Make GravityUp = (0, 0, 1) more "precisely" }
       GravityUp := Vector3Single(0, 0, 1);
 
-    if APlayer <> nil then
-      WalkCamera := APlayer.Camera else
+    if Player <> nil then
+      WalkCamera := Player.Camera else
       { Camera suitable for background level and castle-view-level.
         For actual game, camera will be taken from APlayer.Camera. }
       WalkCamera := TWalkCamera.Create(Self);
@@ -634,8 +634,8 @@ begin
       use Scene for wall-sliding (see T3DList.MoveAllowed implementation). }
     Items.Add(MainScene);
 
-    if APlayer <> nil then
-      Items.Add(APlayer);
+    if Player <> nil then
+      Items.Add(Player);
 
     LoadFromDOMElement(DOMElement);
 

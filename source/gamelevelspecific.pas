@@ -56,7 +56,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean; APlayer: TPlayer); override;
+      AMenuBackground: boolean); override;
 
     procedure Idle(const CompSpeed: Single;
       const HandleMouseAndKeys: boolean;
@@ -96,7 +96,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean; APlayer: TPlayer); override;
+      AMenuBackground: boolean); override;
 
     function CollisionIgnoreItem(
       const Sender: TObject;
@@ -118,7 +118,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean; APlayer: TPlayer); override;
+      AMenuBackground: boolean); override;
   end;
 
   TSpiderAppearing = class(T3DTransform)
@@ -146,7 +146,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean; APlayer: TPlayer); override;
+      AMenuBackground: boolean); override;
 
     procedure Idle(const CompSpeed: Single;
       const HandleMouseAndKeys: boolean;
@@ -207,7 +207,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean; APlayer: TPlayer); override;
+      AMenuBackground: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
@@ -224,7 +224,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean; APlayer: TPlayer); override;
+      AMenuBackground: boolean); override;
   end;
 
   TFountainLevel = class(TLevel)
@@ -237,7 +237,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean; APlayer: TPlayer); override;
+      AMenuBackground: boolean); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
 
@@ -314,7 +314,7 @@ constructor TCastleHallLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AMenuBackground: boolean; APlayer: TPlayer);
+  AMenuBackground: boolean);
 var
   CastleHallLevelPath: string;
 begin
@@ -542,7 +542,7 @@ constructor TGateLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AMenuBackground: boolean; APlayer: TPlayer);
+  AMenuBackground: boolean);
 var
   Cart: TCastlePrecalculatedAnimation;
   GateLevelPath: string;
@@ -778,7 +778,7 @@ constructor TTowerLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AMenuBackground: boolean; APlayer: TPlayer);
+  AMenuBackground: boolean);
 var
   TowerLevelPath: string;
 begin
@@ -874,7 +874,7 @@ constructor TCagesLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AMenuBackground: boolean; APlayer: TPlayer);
+  AMenuBackground: boolean);
 
   function FindCreatureKind(Kind: TCreatureKind): TCreature;
   var
@@ -1224,7 +1224,7 @@ constructor TDoomE1M1Level.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AMenuBackground: boolean; APlayer: TPlayer);
+  AMenuBackground: boolean);
 var
   DoomDoorsPathPrefix: string;
 
@@ -1381,7 +1381,7 @@ constructor TGateBackgroundLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AMenuBackground: boolean; APlayer: TPlayer);
+  AMenuBackground: boolean);
 var
   Water: TCastlePrecalculatedAnimation;
 begin
@@ -1407,7 +1407,7 @@ constructor TFountainLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AMenuBackground: boolean; APlayer: TPlayer);
+  AMenuBackground: boolean);
 var
   Fountain: TBlendedLoopingAnimation;
   LoadWaterAnimation: boolean;
