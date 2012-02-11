@@ -409,6 +409,9 @@ type
 
     property Pushable default true;
     procedure Translate(const T: TVector3Single); override;
+    function SegmentCollision(const Pos1, Pos2: TVector3Single;
+      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
+      const LineOfSight: boolean): boolean; override;
   end;
 
 implementation
@@ -1474,6 +1477,18 @@ end;
 procedure TPlayer.Translate(const T: TVector3Single);
 begin
   Camera.Position := Camera.Position + T;
+end;
+
+function TPlayer.SegmentCollision(const Pos1, Pos2: TVector3Single;
+  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
+  const LineOfSight: boolean): boolean;
+begin
+  if LineOfSight then
+    { Player box is collidable (creatures cannot enter on player),
+      but is not visible, so LineOfSight ignores it.
+      This allows creatures to see player's middle point. }
+    Result := false else
+    Result := inherited;
 end;
 
 { CastleWindow open / close ------------------------------------------------------ }
