@@ -150,15 +150,14 @@ type
       read FPushesEverythingInside write FPushesEverythingInside default true;
   end;
 
-  { This is a T3DMoving that moves with a constant speed
-    from Translation (0, 0, 0) to Translation TranslationEnd.
+  { 3D moving with constant speed between 2 points.
+    Moves with a constant speed from (0, 0, 0) to TranslationEnd.
     They are called @italic(begin position) and @italic(end position).
 
-    In practice, this is less flexible than T3DMoving but often
-    more comfortable: you get easy to use GoBeginPosition, GoEndPosition
+    This is a simplified, more comfortable descendant of T3DMoving.
+    You get easy to use GoBeginPosition, GoEndPosition
     properties, you can easily set sounds by SoundGoBeginPosition and
-    SoundGoEndPosition etc.
-  }
+    SoundGoEndPosition and such. }
   T3DLinearMoving = class(T3DMoving)
   private
     FEndPosition: boolean;
@@ -178,7 +177,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    { Is this object in @italic(end position), or going to it ?
+    { Is this object in @italic(end position), or going to it.
       If @false, then this object is in @italic(begin position)
       or going to it. See also CompletelyEndPosion and CompletelyBeginPosition.
 
@@ -192,21 +191,20 @@ type
     function CompletelyEndPosition: boolean;
     function CompletelyBeginPosition: boolean;
 
-    { This starts going to @italic(begin position), assuming that
+    { Start going to @italic(begin position), assuming that
       currently we're in @italic(end position) (i.e. CompletelyEndPosion). }
     procedure GoBeginPosition;
 
-    { This starts going to @italic(end position), assuming that
+    { Start going to @italic(end position), assuming that
       currently we're in @italic(begin position) (i.e. CompletelyBeginPosion). }
     procedure GoEndPosition;
 
-    { Call this to stop going from @italic(end position) to @italic(begin position)
+    { Stop going from @italic(end position) to @italic(begin position)
       and go back to @italic(end position). Call this only when currently
       EndPosition is @false and we were in the middle of going to
       @italic(begin position).
 
-      If you don't understand this description, here's an example:
-      this is what happens when door on DOOM level gets blocked.
+      As an example, this is what happens when door on DOOM level gets blocked.
       In the middle of closing (which ig going to @italic(begin position))
       it will realize that something blocks it, and open back
       (go back to @italic(end position)).  }
@@ -256,16 +254,14 @@ type
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
-  { This is an abstract class for a special group of objects:
-    they define an invisible and non-colliding areas on the level
-    that...well, have @italic(some purpose). What exactly this
-    "purpose" is, is defined in each TLevelArea descendant.
+  { Invisible and non-colliding areas on the level that have some special purpose.
+    What exactly this "purpose" is, is defined in each TLevelArea descendant.
 
     This class defines only a properties to define the area.
     For now, each area is just one TBox3D. }
   TLevelArea = class(T3D)
   private
-    FVRMLName: string;
+    FShortName: string;
     FBox: TBox3D;
 
     { Area. Default value is EmptyBox3D. }
@@ -273,17 +269,17 @@ type
   public
     constructor Create(AOwner: TComponent); override;
 
-    { Name used to recognize this object's area in level VRML file.
+    { Name used to recognize this object's area in level VRML/X3D file.
 
       If this object is present during ChangeLevelScene call from
-      TLevel constructor then the shape with a parent named like VRMLName
+      TLevel constructor then the shape with a parent named like ShortName
       will be removed from VRML file, and it's BoundingBox will be used
       as Box3D of this object.
 
       This way you can easily configure area of this object in Blender:
-      just add a cube, set it's mesh name to match with this VRMLName,
+      just add a cube, set it's mesh name to match with this ShortName,
       and then this cube defines Box3D of this object. }
-    property VRMLName: string read FVRMLName write FVRMLName;
+    property ShortName: string read FShortName write FShortName;
 
     function PointInside(const Point: TVector3Single): boolean;
 
@@ -1013,7 +1009,7 @@ end;
 procedure TLevelArea.ChangeLevelScene(AParentLevel: TLevel);
 begin
   inherited;
-  AParentLevel.RemoveBoxNodeCheck(FBox, VRMLName);
+  AParentLevel.RemoveBoxNodeCheck(FBox, ShortName);
 end;
 
 function TLevelArea.PointInside(const Point: TVector3Single): boolean;
@@ -1287,8 +1283,8 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
       raise Exception.CreateFmt('Not allowed children element of <area>: "%s"',
         [Child.TagName]);
 
-    if not DOMGetAttribute(Element, 'vrml_name', Result.FVRMLName) then
-      MissingRequiredAttribute('vrml_name', 'area');
+    if not DOMGetAttribute(Element, 'name', Result.FShortName) then
+      MissingRequiredAttribute('name', 'area');
   end;
 
   function LevelObjectFromDOMElement(Element: TDOMElement): T3D;
