@@ -33,8 +33,6 @@ uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
   Background, DOM, XmlSoundEngine, Base3D, Shape,
   Classes, CastleTimeUtils, CastleSceneManager, GLRendererShader;
 
-{$define read_interface}
-
 const
   DefaultGlobalAmbientLight: TVector4Single = (0.2, 0.2, 0.2, 1.0);
 
@@ -429,8 +427,6 @@ type
 
   TLevelClass = class of TLevel;
 
-{$undef read_interface}
-
 implementation
 
 uses SysUtils, GL,
@@ -438,8 +434,6 @@ uses SysUtils, GL,
   GameVideoOptions, GameConfig, GameNotifications,
   GameInputs, GameWindow, CastleXMLUtils,
   GameRequiredResources, GLRenderer, RenderingCameraUnit, Math;
-
-{$define read_implementation}
 
 { TLevelArea ----------------------------------------------------------------- }
 
