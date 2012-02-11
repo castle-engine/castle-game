@@ -256,43 +256,6 @@ type
       in some not. }
     property AboveWaterBox: TBox3D read FAboveWaterBox;
 
-    { LineOfSight, MoveAllowed and GetHeightAbove perform
-      collision detection with the level @link(Items).
-
-      Note that MoveAllowed and GetHeightAbove treat transparent
-      objects as others --- i.e., they collide. You have to override
-      CollisionIgnoreItem to eventually change this for some items
-      (transparent or opaque) to make them not colliding.
-
-      But LineOfSight checks just collision between segment (Pos1, Pos2)
-      and it *does ignore transparent materials*. This means that
-      e.g. creatures can see through glass --- even though they
-      can't walk through it. CollisionIgnoreItem doesn't matter
-      for LineOfSight.
-
-      Note about AboveGround: it is set to @nil if the ground item
-      can't be represented as any octree item. Right now, this means that
-      something stands on another creature/player/item.
-
-      @groupBegin }
-    function LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
-      virtual;
-
-    function MoveAllowed(
-      const OldPos, ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-      const IsRadius: boolean; const Radius: Single;
-      const OldBox, NewBox: TBox3D): boolean;
-
-    function MoveAllowed(
-      const OldPos, NewPos: TVector3Single;
-      const IsRadius: boolean; const Radius: Single;
-      const OldBox, NewBox: TBox3D): boolean;
-
-    procedure GetHeightAbove(const Position: TVector3Single;
-      out IsAbove: boolean; out AboveHeight: Single;
-      out AboveGround: PTriangle);
-    { @groupEnd }
-
     { Call this to allow level object to update some things,
       animate level objects etc. }
     procedure Idle(const CompSpeed: Single;
@@ -978,42 +941,6 @@ function TLevel.CreateCreature(const Kind: TCreatureKind;
   const ADirection: TVector3Single): TCreature;
 begin
   Result := CreateCreature(Kind, ALegsPosition, ADirection, Kind.DefaultMaxLife);
-end;
-
-function TLevel.LineOfSight(const Pos1, Pos2: TVector3Single): boolean;
-begin
-  Result := not Items.SegmentCollision(Pos1, Pos2,
-    @MainScene.OctreeCollisions.IgnoreTransparentItem)
-end;
-
-function TLevel.MoveAllowed(
-  const OldPos, ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-  const IsRadius: boolean; const Radius: Single;
-  const OldBox, NewBox: TBox3D): boolean;
-begin
-  Result := Items.MoveAllowed(OldPos, ProposedNewPos, NewPos,
-    IsRadius, Radius, OldBox, NewBox, @CollisionIgnoreItem);
-  if Result then
-    Result := CameraBox.PointInside(NewPos);
-end;
-
-function TLevel.MoveAllowed(
-  const OldPos, NewPos: TVector3Single;
-  const IsRadius: boolean; const Radius: Single;
-  const OldBox, NewBox: TBox3D): boolean;
-begin
-  Result := Items.MoveAllowed(OldPos, NewPos,
-    IsRadius, Radius, OldBox, NewBox, @CollisionIgnoreItem);
-  if Result then
-    Result := CameraBox.PointInside(NewPos);
-end;
-
-procedure TLevel.GetHeightAbove(const Position: TVector3Single;
-  out IsAbove: boolean; out AboveHeight: Single;
-  out AboveGround: PTriangle);
-begin
-  Items.GetHeightAbove(Position, GravityUp, @CollisionIgnoreItem,
-    IsAbove, AboveHeight, AboveGround);
 end;
 
 function TLevel.CameraMoveAllowed(ACamera: TWalkCamera;

@@ -650,12 +650,12 @@ procedure EventDown(AKey: TKey;
         could get *partially* stuck within the wall, which wouldn't
         look good. }
 
-      Result := Level.MoveAllowed(
+      Result := Level.Items.WorldMoveAllowed(
         VectorAdd(Player.Camera.Position, ItemBoxMiddle),
         VectorAdd(DropPosition, ItemBoxMiddle),
         true, ItemBoxRadius,
         ItemBox.Translate(Player.Camera.Position),
-        ItemBox.Translate(DropPosition));
+        ItemBox.Translate(DropPosition), false);
     end;
 
   var

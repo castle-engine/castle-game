@@ -1057,7 +1057,7 @@ begin
     begin
       SA := SpidersAppearing[I] as TSpiderAppearing;
       SpiderPosition := SA.Translation;
-      GetHeightAbove(SpiderPosition, IsAbove, AboveHeight, AboveGround);
+      Items.WorldGetHeightAbove(SpiderPosition, IsAbove, AboveHeight, AboveGround);
       if AboveHeight < Spider.Radius * 2 then
       begin
         SpiderDirection :=

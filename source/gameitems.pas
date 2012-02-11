@@ -886,7 +886,7 @@ begin
     For the same reason, I use sphere around ShiftedTranslation
     when doing Level.MoveAllowed below. }
 
-  Level.GetHeightAbove(ShiftedTranslation, IsAbove, AboveHeight, AboveGround);
+  World.WorldGetHeightAbove(ShiftedTranslation, IsAbove, AboveHeight, AboveGround);
   if AboveHeight > Radius then
   begin
     { Item falls down because of gravity. }
@@ -904,9 +904,9 @@ begin
     {if Level.MoveAllowed(ShiftedTranslation, NewTranslation,
       RealNewTranslation, true, Radius) then}
     { TODO: just use item box here, instead of (invalid) radius? }
-    if Level.MoveAllowed(ShiftedTranslation, NewTranslation, true, Radius,
+    if World.WorldMoveAllowed(ShiftedTranslation, NewTranslation, true, Radius,
       Box3DAroundPoint(ShiftedTranslation, Radius * 2),
-      Box3DAroundPoint(NewTranslation    , Radius * 2)) then
+      Box3DAroundPoint(NewTranslation    , Radius * 2), true) then
     begin
       NewTranslation[2] -= Radius;
       Translation := NewTranslation;

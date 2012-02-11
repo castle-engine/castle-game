@@ -1854,9 +1854,10 @@ begin
 
   Disable;
   try
-    Result := Level.MoveAllowed(
+    Result := World.WorldMoveAllowed(
       OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
-      Sp, SpRadius, OldBox, NewBox);
+      Sp, SpRadius, OldBox, NewBox,
+      false { BecauseOfGravity not really important for now });
   finally Enable end;
 end;
 
@@ -1876,8 +1877,9 @@ begin
 
   Disable;
   try
-    Result := Level.MoveAllowed(OldMiddlePosition, NewMiddlePosition,
-      Sp, SpRadius, OldBox, NewBox);
+    Result := World.WorldMoveAllowed(OldMiddlePosition, NewMiddlePosition,
+      Sp, SpRadius, OldBox, NewBox,
+      false { BecauseOfGravity not really important for now });
   finally Enable end;
 end;
 
@@ -1888,7 +1890,7 @@ var
 begin
   Disable;
   try
-    Level.GetHeightAbove(MyPosition, IsAbove, AboveHeight, AboveGround);
+    World.WorldGetHeightAbove(MyPosition, IsAbove, AboveHeight, AboveGround);
   finally Enable end;
 end;
 
@@ -1897,7 +1899,7 @@ begin
   Player.Disable; { allow to see player's middle point inside player's box }
   Disable;
   try
-    Result := Level.LineOfSight(Pos1, Pos2);
+    Result := World.WorldLineOfSight(Pos1, Pos2);
   finally
     Enable;
     Player.Enable;
