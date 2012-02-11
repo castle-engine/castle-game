@@ -225,7 +225,7 @@ type
       @unorderedList(
         @item(Camera.Position, Direction, Up and InitialCameraXxx ---
           these are exactly player's camera settings.)
-        @item(Camera.CameraPreferredHeight. In fact, it's OK to just call
+        @item(Camera.PreferredHeight. In fact, it's OK to just call
           Camera.Init.)
         @item(Camera.RotationHorizontal/VerticalSpeed
           (you can read and write this --- although it should be
@@ -287,7 +287,7 @@ type
       Use for collision detection etc.
 
       If Tall then the returned box uses current camera height
-      (i.e. Camera.RealCameraPreferredHeight).
+      (i.e. Camera.RealPreferredHeight).
 
       If not Tall, then the box is just Camera.Radius around
       Position, so it could be more accurately described
@@ -296,7 +296,7 @@ type
       (you can say that player's "legs" are not included in the box).
       However, not Tall box can still be useful (e.g. when checking for
       collision with creatures, because then the player will "grow"
-      anyway (using GetHeightAbove), so Camera.RealCameraPreferredHeight
+      anyway (using GetHeightAbove), so Camera.RealPreferredHeight
       will be taken into account but in a different way. }
     function BoundingBox: TBox3D; override;
 
@@ -446,8 +446,8 @@ begin
   { turn off keys that are totally unavailable for the player }
   Camera.Input_MoveSpeedInc.MakeClear;
   Camera.Input_MoveSpeedDec.MakeClear;
-  Camera.Input_IncreaseCameraPreferredHeight.MakeClear;
-  Camera.Input_DecreaseCameraPreferredHeight.MakeClear;
+  Camera.Input_IncreasePreferredHeight.MakeClear;
+  Camera.Input_DecreasePreferredHeight.MakeClear;
 
   Camera.CheckModsDown := false;
   Camera.OnFalledDown := @FalledDown;
@@ -622,7 +622,7 @@ begin
 
     Result.Data[0, 0] -= Camera.Radius;
     Result.Data[0, 1] -= Camera.Radius;
-    Result.Data[0, 2] -= Camera.RealCameraPreferredHeight;
+    Result.Data[0, 2] -= Camera.RealPreferredHeight;
 
     Result.Data[1, 0] += Camera.Radius;
     Result.Data[1, 1] += Camera.Radius;
@@ -842,7 +842,7 @@ begin
     Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
     Camera.HeadBobbing := 0.0;
-    Camera.CameraPreferredHeight := LevelCameraRadius * 1.01;
+    Camera.PreferredHeight := LevelCameraRadius * 1.01;
 
     Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
     Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
@@ -870,7 +870,7 @@ begin
     Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
     Camera.HeadBobbing := 0.0;
-    Camera.CameraPreferredHeight := LevelCameraRadius * 1.01;
+    Camera.PreferredHeight := LevelCameraRadius * 1.01;
 
     Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
     Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
@@ -890,7 +890,7 @@ begin
       Camera.Input_DownMove.Assign(CastleInput_DownMove.Shortcut, false);
 
       { Camera.HeadBobbing and
-        Camera.CameraPreferredHeight and
+        Camera.PreferredHeight and
         Camera.FallingDownStartSpeed and
         Camera.FallingDownSpeedIncrease
         ... don't matter here, because Gravity is false. }
@@ -911,7 +911,7 @@ begin
       Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed / 6;
       Camera.FallingDownSpeedIncrease := 1.0;
       Camera.HeadBobbing := 0.0;
-      Camera.CameraPreferredHeight := LevelCameraRadius * 1.01;
+      Camera.PreferredHeight := LevelCameraRadius * 1.01;
 
       Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed / 2;
       Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed / 2;
@@ -928,7 +928,7 @@ begin
       Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
       Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
       Camera.HeadBobbing := DefaultHeadBobbing;
-      Camera.CameraPreferredHeight := LevelCameraPreferredHeight;
+      Camera.PreferredHeight := LevelCameraPreferredHeight;
 
       Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
       Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;

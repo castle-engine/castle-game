@@ -545,7 +545,7 @@ constructor TLevel.Create(
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
       FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
       FCameraPreferredHeight := FCameraRadius * 5;
-    CorrectCameraPreferredHeight(FCameraPreferredHeight, CameraRadius,
+    CorrectPreferredHeight(FCameraPreferredHeight, CameraRadius,
       DefaultCrouchHeight, DefaultHeadBobbing);
 
     if NavigationNode <> nil then

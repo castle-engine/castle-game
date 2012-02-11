@@ -632,7 +632,7 @@ procedure EventDown(AKey: TKey;
         immediately. }
       PushVector := Player.Camera.DirectionInGravityPlane;
       PushVectorLength := Max(
-        Player.Camera.RealCameraPreferredHeight,
+        Player.Camera.RealPreferredHeight,
         ItemBox.SizeX * 2,
         ItemBox.SizeY * 2);
       VectorAdjustToLengthTo1st(PushVector, PushVectorLength);
