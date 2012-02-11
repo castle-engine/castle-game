@@ -110,8 +110,6 @@ type
   private
     FCameraRadius: Single;
     FCameraPreferredHeight: Single;
-    FLevelProjectionNear: Single;
-    FLevelProjectionFar: Single;
     FMoveHorizontalSpeed: Single;
     FMoveVerticalSpeed: Single;
     FSickProjection: boolean;
@@ -240,10 +238,6 @@ type
     { }
     property CameraRadius: Single read FCameraRadius;
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
-    property LevelProjectionNear: Single read FLevelProjectionNear;
-    property LevelProjectionFar: Single read FLevelProjectionFar;
-    { LevelProjectionFar or infinity (if shadow volumes are used). }
-    function LevelProjectionFarFinal: Single;
     property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
     property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
 
@@ -546,9 +540,6 @@ constructor TLevel.Create(
       NavigationSpeed := NavigationNode.FdSpeed.Value else
       NavigationSpeed := 1.0;
 
-    FLevelProjectionNear := CameraRadius * 0.75;
-    FLevelProjectionFar := MainScene.BoundingBox.MaxSize(false, 1.0) * 5;
-
     { Fix InitialDirection length, and set MoveXxxSpeed.
 
       We want to have horizontal and vertical speeds controlled independently,
@@ -577,9 +568,7 @@ constructor TLevel.Create(
     Camera := WalkCamera;
 
     WalkCamera.Init(InitialPosition, InitialDirection,
-      InitialUp, GravityUp, CameraPreferredHeight,
-      0.0 { CameraPreferredHeight is already corrected if necessary,
-            so I pass here 0.0 instead of CameraRadius } );
+      InitialUp, GravityUp, CameraPreferredHeight, CameraRadius);
     WalkCamera.MoveSpeed := MoveSpeed;
     WalkCamera.CancelFallingDown;
   end;
@@ -682,9 +671,6 @@ begin
     Sectors.ExtractBoundingBoxes(MainScene);
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
 
-    MainScene.BackgroundSkySphereRadius := TBackground.NearFarToSkySphereRadius
-      (LevelProjectionNear, LevelProjectionFar);
-
     MainScene.CastShadowVolumes := SceneDynamicShadows;
 
     { calculate Options for PrepareResources }
@@ -722,6 +708,10 @@ begin
   end;
 
   MainScene.ProcessEvents := true;
+
+  { Needed for sick projection effect, that potentially updates
+    DistortFieldOfViewY and such every frame. }
+  AlwaysApplyProjection := true;
 end;
 
 destructor TLevel.Destroy;
@@ -1196,17 +1186,9 @@ begin
   inherited;
 end;
 
-function TLevel.LevelProjectionFarFinal: Single;
-begin
-  if RenderShadowsPossible and RenderShadows then
-    Result := ZFarInfinity else
-    Result := LevelProjectionFar;
-end;
-
 procedure TLevel.ApplyProjection;
 var
   S, C: Extended;
-  Fov, Aspect: Single;
 begin
   Assert(Camera <> nil, 'TLevel always creates camera in constructor');
 
@@ -1214,24 +1196,16 @@ begin
   ShadowVolumesPossible := RenderShadowsPossible;
   ShadowVolumes := RenderShadows;
 
-  Fov := ViewAngleDegY;
-  Aspect := ContainerWidth / ContainerHeight;
-
+  DistortFieldOfViewY := 1;
+  DistortViewAspect := 1;
   if SickProjection then
   begin
     SinCos(AnimationTime * SickProjectionSpeed, S, C);
-    Fov := Fov + Fov * C * 0.03;
-    Aspect := Aspect + Aspect * S * 0.03;
+    DistortFieldOfViewY += C * 0.03;
+    DistortViewAspect += S * 0.03;
   end;
 
-  { Below is actually quite similar to what "inherited" would do,
-    with some limitations (e.g. we always want perspective),
-    and we always use our ViewAngleDegY.
-    Also, we apply SickProjection. }
-  { update glViewport and projection }
-  glViewport(0, 0, ContainerWidth, ContainerHeight);
-  Camera.ProjectionMatrix := PerspectiveProjection(
-    Fov, Aspect, LevelProjectionNear, LevelProjectionFarFinal);
+  inherited;
 end;
 
 procedure TLevel.SetSickProjection(const Value: boolean);
