@@ -1058,7 +1058,7 @@ begin
       SA := SpidersAppearing[I] as TSpiderAppearing;
       SpiderPosition := SA.Translation;
       GetHeightAbove(SpiderPosition, IsAbove, AboveHeight, AboveGround);
-      if AboveHeight < Spider.CameraRadius * 2 then
+      if AboveHeight < Spider.Radius * 2 then
       begin
         SpiderDirection :=
           VectorSubtract(Player.Camera.Position, SpiderPosition);
@@ -1070,7 +1070,7 @@ begin
       begin
         { calculate SpiderMoveDistance }
         SpiderMoveDistance := SpidersFallingSpeed * CompSpeed * 50;
-        MinTo1st(SpiderMoveDistance, AboveHeight - Spider.CameraRadius);
+        MinTo1st(SpiderMoveDistance, AboveHeight - Spider.Radius);
         SpiderPosition[2] -= SpiderMoveDistance;
         SA.Translation := SpiderPosition;
         Inc(I);

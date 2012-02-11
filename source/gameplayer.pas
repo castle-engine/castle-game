@@ -289,9 +289,9 @@ type
       If Tall then the returned box uses current camera height
       (i.e. Camera.RealCameraPreferredHeight).
 
-      If not Tall, then the box is just CameraRadius around
+      If not Tall, then the box is just Camera.Radius around
       Position, so it could be more accurately described
-      as a sphere with CameraRadius around Position.
+      as a sphere with Camera.Radius around Position.
       In this case, the box doesn't really represent player
       (you can say that player's "legs" are not included in the box).
       However, not Tall box can still be useful (e.g. when checking for
@@ -620,13 +620,13 @@ begin
     Result.Data[0] := AssumePosition;
     Result.Data[1] := AssumePosition;
 
-    Result.Data[0, 0] -= Level.CameraRadius;
-    Result.Data[0, 1] -= Level.CameraRadius;
+    Result.Data[0, 0] -= Camera.Radius;
+    Result.Data[0, 1] -= Camera.Radius;
     Result.Data[0, 2] -= Camera.RealCameraPreferredHeight;
 
-    Result.Data[1, 0] += Level.CameraRadius;
-    Result.Data[1, 1] += Level.CameraRadius;
-    Result.Data[1, 2] += Level.CameraRadius;
+    Result.Data[1, 0] += Camera.Radius;
+    Result.Data[1, 1] += Camera.Radius;
+    Result.Data[1, 2] += Camera.Radius;
   end else
     Result := EmptyBox3D;
 end;
@@ -798,7 +798,7 @@ begin
   Camera.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
   Camera.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
   Camera.InvertVerticalMouseLook := InvertVerticalMouseLook;
-  Camera.CameraRadius := LevelCameraRadius;
+  Camera.Radius := LevelCameraRadius;
 
   { MouseLook is allowed always, even when player is dead.
     Just like rotation keys.

@@ -89,7 +89,7 @@ type
     FSoundDyingTiedToCreature: boolean;
     FDefaultMaxLife: Single;
 
-    CameraRadiusFromFile: Single;
+    RadiusFromFile: Single;
 
     FShortRangeAttackDamageConst: Single;
     FShortRangeAttackDamageRandom: Single;
@@ -103,7 +103,7 @@ type
     FRequiredCount: Cardinal;
   protected
     { In descendants only PrepareRender can (and should!) set this. }
-    CameraRadiusFromPrepareRender: Single;
+    RadiusFromPrepareRender: Single;
 
     { Like @inherited, but it passes proper values for boolean parameters
       specifying what to prepare. }
@@ -125,24 +125,24 @@ type
       You should make sure that it's something <> 0 for collision detection.
 
       This is always calculated like:
-      If CameraRadiusFromFile <> 0, then take it.
-      Otherwise take CameraRadiusFromPrepareRender.
+      If RadiusFromFile <> 0, then take it.
+      Otherwise take RadiusFromPrepareRender.
       So there are 2 ways to initialize this:
       1. Set this in creatures/kinds.xml file.
-      2. Set CameraRadiusFromPrepareRender properly.
+      2. Set RadiusFromPrepareRender properly.
 
       Setting this in creatures/kinds.xml file to non-zero will effectively
-      ignore any CameraRadiusFromPrepareRender value.
+      ignore any RadiusFromPrepareRender value.
 
-      And PrepareRender should always set CameraRadiusFromPrepareRender
+      And PrepareRender should always set RadiusFromPrepareRender
       to something non-zero. So note that before PrepareRender was called,
-      CameraRadius may remain zero. But you can depend on the fact that
+      Radius may remain zero. But you can depend on the fact that
       it's non-zero after PrepareRender.
 
       Note that this is always measured from MiddlePosition of given
       creature. So take this into account when calcuating
-      CameraRadiusFromPrepareRender or writing it in kinds.xml file. }
-    function CameraRadius: Single;
+      RadiusFromPrepareRender or writing it in kinds.xml file. }
+    function Radius: Single;
 
     property SoundSuddenPain: TSoundType
       read FSoundSuddenPain write FSoundSuddenPain default stNone;
@@ -287,7 +287,7 @@ type
     { Make all TCastlePrecalculatedAnimation properties non-nil. I.e. load them from their
       XxxInfo counterparts.
 
-      Also calculates CameraRadiusFromPrepareRender
+      Also calculates RadiusFromPrepareRender
       from StandAnimation.Scenes[0]. }
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
@@ -788,14 +788,14 @@ type
       and the ground.
 
       So for creatures not Flying, MiddlePosition should
-      be always higher (at least by CameraRadius) than LegsPosition.
+      be always higher (at least by Radius) than LegsPosition.
 
       For Flying creatures this is not a problem, they could use LegsPosition
-      surrounded by CameraRadius for collision detection. But this would
-      be inefficient --- since LegsPosition surrounded by CameraRadius
+      surrounded by Radius for collision detection. But this would
+      be inefficient --- since LegsPosition surrounded by Radius
       would unnecessarily block creature's moves. So for Flying creatures
       it's best to actually set MiddlePosition right in the middle of
-      creature's model, and so you can make CameraRadius slightly smaller. }
+      creature's model, and so you can make Radius slightly smaller. }
     function MiddlePosition: TVector3Single;
 
     { Return the one of Level.Sectors that contains MiddlePosition.
@@ -847,7 +847,7 @@ type
     { Can the approximate sphere be used for some collision-detection
       tasks.
 
-      Set to @false in descendants if Kind.CameraRadius
+      Set to @false in descendants if Kind.Radius
       is not appropriate for this creature state.
 
       In this class, this is implemented to return @code(not Dead).
@@ -1088,7 +1088,7 @@ begin
     DefaultSoundDyingTiedToCreature);
   DefaultMaxLife := KindsConfig.GetFloat(ShortName + '/default_max_life',
     DefaultDefaultMaxLife);
-  CameraRadiusFromFile := KindsConfig.GetFloat(ShortName + '/camera_radius',
+  RadiusFromFile := KindsConfig.GetFloat(ShortName + '/camera_radius',
     0.0);
   ShortRangeAttackDamageConst :=
     KindsConfig.GetFloat(ShortName + '/short_range_attack/damage/const',
@@ -1117,11 +1117,11 @@ begin
     KindsConfig.GetValue(ShortName + '/sound_dying', ''));
 end;
 
-function TCreatureKind.CameraRadius: Single;
+function TCreatureKind.Radius: Single;
 begin
-  if CameraRadiusFromFile <> 0 then
-    Result := CameraRadiusFromFile else
-    Result := CameraRadiusFromPrepareRender;
+  if RadiusFromFile <> 0 then
+    Result := RadiusFromFile else
+    Result := RadiusFromPrepareRender;
 end;
 
 procedure TCreatureKind.CreateAnimationIfNeeded(
@@ -1247,7 +1247,7 @@ begin
   CreateAnimationIfNeeded('DyingBack'  , FDyingBackAnimation  , FDyingBackAnimationFile  , BaseLights);
   CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationFile       , BaseLights);
 
-  CameraRadiusFromPrepareRender :=
+  RadiusFromPrepareRender :=
     Min(StandAnimation.Scenes[0].BoundingBox.XYRadius,
         StandAnimation.Scenes[0].BoundingBox.Data[1, 2] * 0.75);
 end;
@@ -1418,11 +1418,11 @@ var
 begin
   inherited;
 
-  { For Flying creatures, larger CameraRadius (that *really* surrounds whole
+  { For Flying creatures, larger Radius (that *really* surrounds whole
     model from MiddlePosition) is better. }
   ReferenceScene := StandAnimation.Scenes[0];
 
-  CameraRadiusFromPrepareRender :=
+  RadiusFromPrepareRender :=
     Max(ReferenceScene.BoundingBox.XYRadius,
     { I can do here "/ 2" thanks to the fact that middle_position_height
       of ghost is 0.5 (so I have room for another "BoundingBox.Data[1, 2] / 2"
@@ -1469,7 +1469,7 @@ begin
   inherited;
   CreateAnimationIfNeeded('Move', FAnimation, FAnimationFile, BaseLights);
 
-  CameraRadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
+  RadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
 
 function TMissileCreatureKind.PrepareRenderSteps: Cardinal;
@@ -1544,7 +1544,7 @@ begin
   inherited;
   CreateAnimationIfNeeded('Stand', FAnimation, FAnimationFile, BaseLights);
 
-  CameraRadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
+  RadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
 
 function TStillCreatureKind.PrepareRenderSteps: Cardinal;
@@ -1777,7 +1777,7 @@ procedure TCreature.Render(const Frustum: TFrustum;
         glTranslatev(MiddlePosition);
         Q := NewGLUQuadric(false, GLU_NONE, GLU_OUTSIDE, GLU_LINE);
         try
-          gluSphere(Q, Kind.CameraRadius, 10, 10);
+          gluSphere(Q, Kind.Radius, 10, 10);
         finally gluDeleteQuadric(Q); end;
       glPopMatrix;
     glPopAttrib;
@@ -1848,7 +1848,7 @@ begin
   { save bounding volume information before calling Disable, that makes
     bounding volume empty }
   Sp := UseSphere;
-  SpRadius := Kind.CameraRadius;
+  SpRadius := Kind.Radius;
   OldBox := BoundingBox;
   NewBox := BoundingBoxAssumingMiddle(ProposedNewMiddlePosition, Direction);
 
@@ -1870,7 +1870,7 @@ begin
   { save bounding volume information before calling Disable, that makes
     bounding volume empty }
   Sp := UseSphere;
-  SpRadius := Kind.CameraRadius;
+  SpRadius := Kind.Radius;
   OldBox := BoundingBox;
   NewBox := BoundingBoxAssumingMiddle(NewMiddlePosition, Direction);
 
@@ -2117,7 +2117,7 @@ end;
 procedure TCreature.Sphere(out Center: TVector3Single; out Radius: Single);
 begin
   Center := MiddlePosition;
-  Radius := Kind.CameraRadius;
+  Radius := Kind.Radius;
 end;
 
 function TCreature.PointingDeviceActivate(const Active: boolean;
@@ -3275,7 +3275,7 @@ begin
         begin
           C := TCreature(Level.Items[I]);
           if (C <> Self) and C.GetCollides and
-            C.BoundingBox.SphereSimpleCollision(MiddlePosition, Kind.CameraRadius) then
+            C.BoundingBox.SphereSimpleCollision(MiddlePosition, Kind.Radius) then
           begin
             ExplodeWithCreature(C);
             { TODO: projectiles shouldn't do here "break". }
