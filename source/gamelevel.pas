@@ -136,12 +136,6 @@ type
     FCreatures: TCreatureList;
     procedure TraverseForCreatures(Shape: TShape);
   private
-    FInitialPosition: TVector3Single;
-    FInitialDirection: TVector3Single;
-    FInitialUp: TVector3Single;
-    FGravityUp: TVector3Single;
-    FMoveSpeed: Single;
-
     FAnimationTime: TFloatTime;
 
     FSectors: TSceneSectorList;
@@ -226,7 +220,7 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       ARequiredCreatures: TStringList;
-      AMenuBackground: boolean); reintroduce; virtual;
+      AMenuBackground: boolean; APlayer: TPlayer); reintroduce; virtual;
 
     destructor Destroy; override;
 
@@ -319,17 +313,6 @@ type
       This is updated in our Idle. }
     property AnimationTime: TFloatTime read FAnimationTime;
 
-    property InitialPosition : TVector3Single read FInitialPosition;
-    property InitialDirection: TVector3Single read FInitialDirection;
-    property InitialUp       : TVector3Single read FInitialUp;
-    property MoveSpeed: Single read FMoveSpeed;
-
-    { Actually, this must be (0, 0, 1) for this game.
-      Some things in this game are prepared to handle any
-      GravityUp value --- but some not (for simplicity, and sometimes
-      code efficiency). }
-    property GravityUp: TVector3Single read FGravityUp;
-
     property Sectors: TSceneSectorList read FSectors;
     property Waypoints: TSceneWaypointList read FWaypoints;
 
@@ -412,7 +395,6 @@ type
       CreateOctreeCollisions, PrepareBackground: boolean): TCastleScene;
 
     procedure BeforeDraw; override;
-    function CreateDefaultCamera(AOwner: TComponent): TCamera; override;
 
     { Check Player.Camera collisions with world.
       @groupBegin }
@@ -524,7 +506,7 @@ constructor TLevel.Create(
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   ARequiredCreatures: TStringList;
-  AMenuBackground: boolean);
+  AMenuBackground: boolean; APlayer: TPlayer);
 
   procedure RemoveItemsToRemove;
   var
@@ -536,11 +518,81 @@ constructor TLevel.Create(
     MainScene.ChangedAll;
   end;
 
+  { Assign Camera, knowing MainScene and APlayer.
+    We need to assign Camera early, as initial Camera also is used
+    when placing initial creatures on the level (to determine their
+    gravity up, initial direciton etc.) }
+  procedure InitializeCamera;
+  var
+    InitialPosition: TVector3Single;
+    InitialDirection: TVector3Single;
+    InitialUp: TVector3Single;
+    GravityUp: TVector3Single;
+    MoveSpeed: Single;
+    NavigationNode: TNavigationInfoNode;
+    NavigationSpeed: Single;
+    WalkCamera: TWalkCamera;
+  begin
+    MainScene.GetPerspectiveViewpoint(InitialPosition,
+      InitialDirection, InitialUp, GravityUp);
+
+    NavigationNode := MainScene.NavigationInfoStack.Top as TNavigationInfoNode;
+
+    if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
+      FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
+      FCameraRadius := MainScene.BoundingBox.AverageSize(false, 1) * 0.007;
+
+    if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
+      FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
+      FCameraPreferredHeight := FCameraRadius * 5;
+    CorrectCameraPreferredHeight(FCameraPreferredHeight, CameraRadius,
+      DefaultCrouchHeight, DefaultHeadBobbing);
+
+    if NavigationNode <> nil then
+      NavigationSpeed := NavigationNode.FdSpeed.Value else
+      NavigationSpeed := 1.0;
+
+    FLevelProjectionNear := CameraRadius * 0.75;
+    FLevelProjectionFar := MainScene.BoundingBox.MaxSize(false, 1.0) * 5;
+
+    { Fix InitialDirection length, and set MoveXxxSpeed.
+
+      We want to have horizontal and vertical speeds controlled independently,
+      so we just normalize InitialDirection and set speeds in appropriate
+      MoveXxxSpeed. }
+    NormalizeTo1st(InitialDirection);
+    MoveSpeed := 1;
+    FMoveHorizontalSpeed := NavigationSpeed;
+    FMoveVerticalSpeed := 20;
+
+    { Check and fix GravityUp. }
+    if not VectorsEqual(Normalized(GravityUp),
+             Vector3Single(0, 0, 1), 0.001) then
+      raise EInternalError.CreateFmt(
+        'Gravity up vector must be +Z, but is %s',
+        [ VectorToRawStr(Normalized(GravityUp)) ]) else
+      { Make GravityUp = (0, 0, 1) more "precisely" }
+      GravityUp := Vector3Single(0, 0, 1);
+
+    if APlayer <> nil then
+      WalkCamera := APlayer.Camera else
+      { Camera suitable for background level and castle-view-level.
+        For actual game, camera will be taken from APlayer.Camera. }
+      WalkCamera := TWalkCamera.Create(Self);
+
+    Camera := WalkCamera;
+
+    WalkCamera.Init(InitialPosition, InitialDirection,
+      InitialUp, GravityUp, CameraPreferredHeight,
+      0.0 { CameraPreferredHeight is already corrected if necessary,
+            so I pass here 0.0 instead of CameraRadius } );
+    WalkCamera.MoveSpeed := MoveSpeed;
+    WalkCamera.CancelFallingDown;
+  end;
+
 const
   SectorsMargin = 0.5;
 var
-  NavigationNode: TNavigationInfoNode;
-  NavigationSpeed: Single;
   Options: TPrepareResourcesOptions;
   NewCameraBox: TBox3D;
   SI: TShapeTreeIterator;
@@ -578,20 +630,18 @@ begin
       MainScene.Attributes.BumpMapping := bmNone;
     MainScene.Attributes.UseOcclusionQuery := UseOcclusionQuery;
 
-    { Calculate InitialPosition, InitialDirection, InitialUp.
-      Must be done before initializing creatures, as they right now
-      use InitialPosition. FInitialDirection, FInitialUp will be
-      actually changed later in this procedure. }
-    MainScene.GetPerspectiveViewpoint(FInitialPosition,
-      FInitialDirection, FInitialUp, FGravityUp);
-
     { Scene must be the first one on Items, this way MoveAllowed will
       use Scene for wall-sliding (see T3DList.MoveAllowed implementation). }
     Items.Add(MainScene);
 
+    if APlayer <> nil then
+      Items.Add(APlayer);
+
     LoadFromDOMElement(DOMElement);
 
     ChangeLevelScene;
+
+    InitializeCamera;
 
     ItemsToRemove := TX3DNodeList.Create(false);
     try
@@ -637,44 +687,6 @@ begin
     Waypoints.ExtractPositions(MainScene);
     Sectors.ExtractBoundingBoxes(MainScene);
     Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
-
-    NavigationNode := MainScene.NavigationInfoStack.Top as TNavigationInfoNode;
-
-    if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 1) then
-      FCameraRadius := NavigationNode.FdAvatarSize.Items[0] else
-      FCameraRadius := MainScene.BoundingBox.AverageSize(false, 1) * 0.007;
-
-    if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
-      FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
-      FCameraPreferredHeight := FCameraRadius * 5;
-    CorrectCameraPreferredHeight(FCameraPreferredHeight, CameraRadius,
-      DefaultCrouchHeight, DefaultHeadBobbing);
-
-    if NavigationNode <> nil then
-      NavigationSpeed := NavigationNode.FdSpeed.Value else
-      NavigationSpeed := 1.0;
-
-    FLevelProjectionNear := CameraRadius * 0.75;
-    FLevelProjectionFar := MainScene.BoundingBox.MaxSize(false, 1.0) * 5;
-
-    { Fix InitialDirection length, and set MoveXxxSpeed.
-
-      We want to have horizontal and vertical speeds controlled independently,
-      so we just normalize InitialDirection and set speeds in appropriate
-      MoveXxxSpeed. }
-    NormalizeTo1st(FInitialDirection);
-    FMoveSpeed := 1;
-    FMoveHorizontalSpeed := NavigationSpeed;
-    FMoveVerticalSpeed := 20;
-
-    { Check and fix GravityUp. }
-    if not VectorsEqual(Normalized(GravityUp),
-             Vector3Single(0, 0, 1), 0.001) then
-      raise EInternalError.CreateFmt(
-        'Gravity up vector must be +Z, but is %s',
-        [ VectorToRawStr(Normalized(GravityUp)) ]) else
-      { Make GravityUp = (0, 0, 1) more "precisely" }
-      FGravityUp := Vector3Single(0, 0, 1);
 
     MainScene.BackgroundSkySphereRadius := TBackground.NearFarToSkySphereRadius
       (LevelProjectionNear, LevelProjectionFar);
@@ -944,7 +956,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     { TODO --- CreatureDirection configurable.
       Right now, it just points to the player start pos --- this is
       more-or-less sensible, usually. }
-    CreatureDirection := VectorSubtract(InitialPosition, CreaturePosition);
+    CreatureDirection := VectorSubtract(Camera.GetPosition, CreaturePosition);
     if not CreatureKind.Flying then
       MakeVectorsOrthoOnTheirPlane(CreatureDirection, GravityUp);
 
@@ -1202,8 +1214,7 @@ var
   S, C: Extended;
   Fov, Aspect: Single;
 begin
-  if Camera = nil then
-    Camera := CreateDefaultCamera;
+  Assert(Camera <> nil, 'TLevel always creates camera in constructor');
 
   ShadowVolumesDraw := DebugRenderShadowVolume;
   ShadowVolumesPossible := RenderShadowsPossible;
@@ -1227,18 +1238,6 @@ begin
   glViewport(0, 0, ContainerWidth, ContainerHeight);
   Camera.ProjectionMatrix := PerspectiveProjection(
     Fov, Aspect, LevelProjectionNear, LevelProjectionFarFinal);
-end;
-
-function TLevel.CreateDefaultCamera(AOwner: TComponent): TCamera;
-begin
-  { This camera is suitable for background level and castle-view-level.
-    For actual game, camera will be taken from Player.Camera. }
-
-  Result := TWalkCamera.Create(AOwner);
-  (Result as TWalkCamera).Init(
-    InitialPosition, InitialDirection, InitialUp, GravityUp,
-    0, 0 { unused, we don't use Gravity here });
-  (Result as TWalkCamera).MoveSpeed := MoveSpeed;
 end;
 
 procedure TLevel.SetSickProjection(const Value: boolean);

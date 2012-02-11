@@ -134,7 +134,6 @@ procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
 var
   LocalPlayer: TPlayer;
   LocalLevel, NewLocalLevel: TLevel;
-  WantsStart: boolean;
   BaseLights: TLightInstancesList;
 begin
   { All kinds must be prepared before instances are created.
@@ -146,29 +145,26 @@ begin
     ItemsKinds.PrepareRender(BaseLights);
   finally FreeAndNil(BaseLights) end;
 
-  LocalLevel := NewGameLevelAvailable.CreateLevel;
+  LocalLevel := nil;
   try
+    LocalPlayer := TPlayer.Create(nil);
+    try
+      LocalLevel := NewGameLevelAvailable.CreateLevel(LocalPlayer);
+      PlayGame(LocalLevel, LocalPlayer, true);
+    finally FreeAndNil(LocalPlayer) end;
 
-    { We loop here, using WantsStart, because user may want to restart
-      the level. TPlayer instance can be created each time again when
-      restarting, but the replace of LocalLevel with NewLocalLevel must
-      be handled in appropriate order (so that restarting leve doesn't
-      free and reload all creature animations again, in case of "conserve memory"). }
-
-    WantsStart := true;
-    while WantsStart do
+    while GameEnded and (GameEndedWantsRestart <> '') do
     begin
       LocalPlayer := TPlayer.Create(nil);
       try
-        PlayGame(LocalLevel, LocalPlayer, true);
+        { Replace LocalLevel this way, so that restarting level doesn't
+          free and reload all creature animations again. }
+        NewLocalLevel := LevelsAvailable.FindName(GameEndedWantsRestart).
+          CreateLevel(LocalPlayer);
+        FreeAndNil(LocalLevel);
+        LocalLevel := NewLocalLevel;
 
-        WantsStart := GameEnded and (GameEndedWantsRestart <> '');
-        if WantsStart then
-        begin
-          NewLocalLevel := LevelsAvailable.FindName(GameEndedWantsRestart).CreateLevel;
-          FreeAndNil(LocalLevel);
-          LocalLevel := NewLocalLevel;
-        end;
+        PlayGame(LocalLevel, LocalPlayer, true);
       finally FreeAndNil(LocalPlayer) end;
     end;
 

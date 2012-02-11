@@ -385,18 +385,7 @@ begin
     newly added to Window.Controls (and possibly newly created) level will have
     ApplyProjectionNeeded := true. }
 
-  Level.Camera := Player.Camera;
-
   Player.LevelChanged;
-
-  { Init initial camera pos }
-  Player.Camera.Init(Level.InitialPosition, Level.InitialDirection,
-    Level.InitialUp, Level.GravityUp, Level.CameraPreferredHeight,
-    0.0 { Level.CameraPreferredHeight is already corrected if necessary,
-          so I pass here 0.0 instead of CameraRadius } );
-  Player.Camera.MoveSpeed := Level.MoveSpeed;
-
-  Player.Camera.CancelFallingDown;
 
   glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
 
@@ -485,13 +474,34 @@ end;
 procedure LevelFinishedFlush;
 var
   NewLevel: TLevel;
+  GameControlsPos, WindowControlsPos: Integer;
 begin
   if LevelFinishedSchedule then
   begin
     LevelFinishedSchedule := false;
 
-    NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel;
-    NewLevel.Items.Add(Player);
+    { First, we have to disconnect Player.Camera from old Level.Camera.
+      That is because when creating new level, Player.Camera must be connected
+      with new level in it's constructor (that's how our TLevel.Create works),
+      and you should not keep the same T3D (Player) and TCamera (Player.Camera)
+      within w different scene managers --- it would cause troubles with
+      connecting callbacks to Camera, and Player.Parent. }
+    Level.Camera := nil;
+
+    { We cannot draw old level now, since it's Camera is nil,
+      and TLevel.ApplyProjection is not prepared for this.
+      So remove it from controls (otherwise progress bar when loading new level
+      would want to draw it). }
+    GameControlsPos := GameControls.IndexOf(Level);
+    if GameControlsPos <> -1 then
+      GameControls.Delete(GameControlsPos) else
+      GameControlsPos := GameControls.Count;
+    WindowControlsPos := Window.Controls.IndexOf(Level);
+    if WindowControlsPos <> -1 then
+      Window.Controls.Delete(WindowControlsPos) else
+      WindowControlsPos := Window.Controls.Count;
+
+    NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel(Player);
 
     { copy DisableContextOpenClose value to new level.
       This is needed when it's called from inside debug menu,
@@ -505,21 +515,12 @@ begin
 
     { right before freeing old Level, insert NewLevel at the same place
       in GameControls and Window.Controls as Level was. }
-    GameControls.MakeSingle(TLevel, NewLevel);
-    Window.Controls.MakeSingle(TLevel, NewLevel);
+    GameControls.Insert(GameControlsPos, NewLevel);
+    Window.Controls.Insert(WindowControlsPos, NewLevel);
 
-    { First TLevel constructor was called.
-      This actully loaded the level, displaying some progress bar.
-      Background of this progress bar is our old Level --- so Level variable
-      must stay valid and non-nil during loading of new level.
-      Only after NewLevel is initialized, we quickly change Level variable. }
+    { After NewLevel is initialized, we quickly change Level variable. }
     FreeAndNil(Level);
     Level := NewLevel;
-
-    { Note that InitNewLevel connects Level.Camera with Player.Camera.
-      This occurs *after* previous Level was destroyed (which disconnected
-      Player.Camera from old level), and this is good (other order could
-      leave camera callbacks unassigned). }
 
     InitNewLevel;
   end;
@@ -915,8 +916,6 @@ begin
       { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
       GL_ENABLE_BIT, true, nil, nil, @CloseQuery);
     try
-      Level.Items.Add(Player);
-
       Window.AutoRedisplay := true;
 
       { OnTimer should be executed quite often, because footsteps sound

@@ -28,7 +28,7 @@ unit GameLevelAvailable;
 interface
 
 uses GameLevel, CastleUtils, Classes,
-  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, CastleProgress,
+  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, CastleProgress, GamePlayer,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type
@@ -66,7 +66,7 @@ type
 
     Demo: boolean;
 
-    function CreateLevel(MenuBackground: boolean = false): TLevel;
+    function CreateLevel(APlayer: TPlayer; MenuBackground: boolean = false): TLevel;
   end;
 
   TLevelAvailableList = class(specialize TFPGObjectList<TLevelAvailable>)
@@ -237,12 +237,13 @@ begin
   glPopAttrib;
 end;
 
-function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
+function TLevelAvailable.CreateLevel(APlayer: TPlayer; MenuBackground: boolean): TLevel;
 
   procedure CreateLevelCore;
   begin
     Result := LevelClass.Create(Name, SceneFileName,
-      Title, TitleHint, Number, LevelDOMElement, RequiredCreatures, MenuBackground);
+      Title, TitleHint, Number, LevelDOMElement, RequiredCreatures, 
+      MenuBackground, APlayer);
     if not MenuBackground then
       AvailableForNewGame := true;
   end;

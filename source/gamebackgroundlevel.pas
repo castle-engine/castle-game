@@ -127,7 +127,7 @@ begin
 
   { initialize BackgroundLevel }
   BackgroundLevel := LevelsAvailable.FindName(LevelsAvailable.MenuBackgroundLevelName).
-    CreateLevel(true);
+    CreateLevel(nil, true);
   BackgroundControls.Add(BackgroundLevel);
 
   { create BackgroundLevel.Camera now, for next assignment }
