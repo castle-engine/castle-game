@@ -514,7 +514,7 @@ constructor TLevel.Create(
     InitialDirection: TVector3Single;
     InitialUp: TVector3Single;
     GravityUp: TVector3Single;
-    MoveSpeed, CameraRadius: Single;
+    CameraRadius: Single;
     NavigationNode: TNavigationInfoNode;
     NavigationSpeed: Single;
     WalkCamera: TWalkCamera;
@@ -544,7 +544,6 @@ constructor TLevel.Create(
       so we just normalize InitialDirection and set speeds in appropriate
       MoveXxxSpeed. }
     NormalizeTo1st(InitialDirection);
-    MoveSpeed := 1;
     FMoveHorizontalSpeed := NavigationSpeed;
     FMoveVerticalSpeed := 20;
 
@@ -567,7 +566,6 @@ constructor TLevel.Create(
 
     WalkCamera.Init(InitialPosition, InitialDirection,
       InitialUp, GravityUp, CameraPreferredHeight, CameraRadius);
-    WalkCamera.MoveSpeed := MoveSpeed;
     WalkCamera.CancelFallingDown;
   end;
 
