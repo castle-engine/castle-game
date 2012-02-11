@@ -273,8 +273,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
 
-    function ParentLevel: TLevel;
-
     { Name used to recognize this object's area in level VRML file.
 
       If this object is present during ChangeLevelScene call from
@@ -292,7 +290,7 @@ type
     function BoundingBox: TBox3D; override;
 
     { Called from TLevel constructor. This is the place when you
-      can modify ParentLevel.MainScene.RootNode, e.g. by calling
+      can modify AParentLevel.MainScene.RootNode, e.g. by calling
       RemoveBoxNode. }
     procedure ChangeLevelScene(AParentLevel: TLevel);
   end;
@@ -1021,11 +1019,6 @@ end;
 function TLevelArea.PointInside(const Point: TVector3Single): boolean;
 begin
   Result := Box.PointInside(Point);
-end;
-
-function TLevelArea.ParentLevel: TLevel;
-begin
-  Result := Owner as TLevel;
 end;
 
 { TLevelHintArea ----------------------------------------------------------- }
