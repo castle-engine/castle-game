@@ -890,6 +890,17 @@ constructor TCagesLevel.Create(
     Result := nil;
   end;
 
+  function FindHintArea(const ShortName: string): TLevelHintArea;
+  var
+    I: Integer;
+  begin
+    for I := 0 to Items.Count - 1 do
+      if (Items[I] is TLevelHintArea) and
+         (TLevelHintArea(Items[I]).ShortName = ShortName) then
+        Exit(TLevelHintArea(Items[I]));
+    raise Exception.CreateFmt('Level hint area named "%s" not found', [ShortName]);
+  end;
+
 begin
   inherited;
 
@@ -899,9 +910,7 @@ begin
   Items.Add(SpidersAppearing);
   NextSpidersAppearingTime := 0;
 
-  { TODO: this is not nice; I should add TLevelObject.Name for such
-    purposes, and use here Items.FindName('hint_button_box'). }
-  HintOpenDoor := Items[2] as TLevelHintArea;
+  HintOpenDoor := FindHintArea('HintOpenDoorBox');
 
   FEndSequence := LoadLevelScene(
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
