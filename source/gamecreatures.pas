@@ -28,7 +28,7 @@ interface
 uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, CastleUtils,
   CastleScene, GameSound, SceneWaypoints,
   GameObjectKinds, ALSoundAllocator, CastleXMLConfig, Base3D,
-  XmlSoundEngine, GLShadowVolumeRenderer, Triangle, Frustum, X3DNodes,
+  XmlSoundEngine, Triangle, Frustum, X3DNodes,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, CastleColors;
 
 const
@@ -117,7 +117,7 @@ type
 
     { If @true, then the creature flies. Otherwise it always tries to move only
       horizontally (which means that Direction is always orthogonal
-      to Level.GravityUp), and it falls down when Position is above
+      to World.GravityUp), and it falls down when Position is above
       the ground. }
     property Flying: boolean read FFlying write FFlying default DefaultFlying;
 
@@ -1015,6 +1015,8 @@ var
   ThrownWeb: TMissileCreatureKind;
   Arrow: TMissileCreatureKind;
   Barrel: TStillCreatureKind;
+
+  DebugTimeStopForCreatures: boolean = false;
 
 implementation
 
@@ -2167,7 +2169,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     { calculate DirectionToTarget }
     DirectionToTarget := VectorSubtract(Target, MiddlePosition);
     if not Kind.Flying then
-      MakeVectorsOrthoOnTheirPlane(DirectionToTarget, Level.GravityUp);
+      MakeVectorsOrthoOnTheirPlane(DirectionToTarget, World.GravityUp);
 
     { calculate AngleRadBetweenDirectionToTarget }
     AngleRadBetweenDirectionToTarget :=
@@ -2222,7 +2224,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         Actually, I didn't observe anything bad caused by the above,
         but I'm safeguarding anyway, for safety. }
       if not Kind.Flying then
-        MakeVectorsOrthoOnTheirPlane(FDirection, Level.GravityUp);
+        MakeVectorsOrthoOnTheirPlane(FDirection, World.GravityUp);
       NormalizeTo1st(FDirection);
       RecalculateBoundingBox;
     end;
@@ -2421,7 +2423,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       Result :=
         { First check to not step into some deep fall.
           Note that I'm not using here NewMiddlePosition
-          (that will be calculated later by Level.MoveAllowed)
+          (that will be calculated later by MyMoveAllowed)
           or ProposedNewMiddlePosition, because they are too close
           to OldMiddlePosition to be good to test against.
           I'm calculating here where I would get after 0.2 second
@@ -2760,9 +2762,7 @@ var
   StateTime: Single;
 begin
   { Time from the change to this state. }
-  if Level <> nil then
-    StateTime := LifeTime - StateChangeTime else
-    StateTime := 0;
+  StateTime := LifeTime - StateChangeTime;
 
   case FState of
     wasStand:
@@ -3006,9 +3006,7 @@ begin
   if State = wasSpecial1 then
   begin
     { Time from the change to this state. }
-    if Level <> nil then
-      StateTime := LifeTime - StateChangeTime else
-      StateTime := 0;
+    StateTime := LifeTime - StateChangeTime;
 
     Result := SQKind.ThrowWebAttackAnimation.SceneFromTime(StateTime);
   end else
@@ -3130,22 +3128,22 @@ begin
 
     if MissileKind.HitsCreatures then
     begin
-      { TODO: this is unclean. We would prefer to use Level.Items.SphereCollision,
+      { TODO: this is unclean. We would prefer to use World.WorldSphereCollision,
         wrapped inside MySphereCollision to prevent self-collisions.
         However, we need to know which TCreature was actually hit ---
         so SphereCollision would need to return a hierarchy of T3D objects,
         much like RayCollision.
 
-        For now, just browse Level.Items directly. }
+        For now, just browse World directly. }
 
       { Check bounding Sphere of the missile <-> creature's BoundingBox.
         Bounding Sphere is better for arrow, that has very large geometry
         but small enough bounding Sphere (because bounding Sphere radius
         is adjusted by creatures/kinds.xml). }
-      for I := 0 to Level.Items.Count - 1 do
-        if Level.Items[I] is TCreature then
+      for I := 0 to World.Count - 1 do
+        if World[I] is TCreature then
         begin
-          C := TCreature(Level.Items[I]);
+          C := TCreature(World[I]);
           if (C <> Self) and C.GetCollides and
             C.BoundingBox.SphereSimpleCollision(MiddlePosition, Kind.Radius) then
           begin
@@ -3202,9 +3200,7 @@ end;
 
 function TMissileCreature.CurrentScene: TCastleScene;
 begin
-  if Level <> nil then
-    Result := MissileKind.Animation.SceneFromTime(LifeTime) else
-    Result := MissileKind.Animation.SceneFromTime(0);
+  Result := MissileKind.Animation.SceneFromTime(LifeTime);
 end;
 
 procedure TMissileCreature.ExplodeCore;
@@ -3249,9 +3245,7 @@ end;
 
 function TStillCreature.CurrentScene: TCastleScene;
 begin
-  if Level <> nil then
-    Result := StillKind.Animation.SceneFromTime(LifeTime) else
-    Result := StillKind.Animation.SceneFromTime(0);
+  Result := StillKind.Animation.SceneFromTime(LifeTime);
 end;
 
 procedure TStillCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);

@@ -95,7 +95,6 @@ procedure GameCancel(RequireConfirmation: boolean);
 
 var
   DebugRenderForLevelScreenshot: boolean = false;
-  DebugTimeStopForCreatures: boolean = false;
 
 implementation
 
