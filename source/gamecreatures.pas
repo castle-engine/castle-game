@@ -697,15 +697,6 @@ type
       const A: Single): TVector3Single; virtual;
     { @groupEnd }
 
-    { Returns BoundingBox, assuming that LegsPosition
-      or MiddlePosition are as specified here.
-      @groupBegin }
-    function BoundingBoxAssumingLegs(
-      const AssumeLegsPosition: TVector3Single): TBox3D;
-    function BoundingBoxAssumingMiddle(
-      const AssumeMiddlePosition: TVector3Single): TBox3D;
-    { @groupEnd }
-
     procedure SetLife(const Value: Single); virtual;
 
     { Is the move from OldPos to ProposedNewPos possible.
@@ -1700,20 +1691,6 @@ end;
 function TCreature.OnlyTranslation: boolean;
 begin
   Result := false;
-end;
-
-function TCreature.BoundingBoxAssumingLegs(
-  const AssumeLegsPosition: TVector3Single): TBox3D;
-begin
-  Result := CurrentScene.BoundingBox.Transform(Transform).Translate(
-    AssumeLegsPosition - LegsPosition);
-end;
-
-function TCreature.BoundingBoxAssumingMiddle(
-  const AssumeMiddlePosition: TVector3Single): TBox3D;
-begin
-  Result := CurrentScene.BoundingBox.Transform(Transform).Translate(
-    AssumeMiddlePosition - MiddlePosition);
 end;
 
 procedure TCreature.SetLegsPosition(const Value: TVector3Single);
