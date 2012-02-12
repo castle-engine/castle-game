@@ -356,7 +356,7 @@ type
       const BecauseOfGravity: boolean): boolean; override;
     function CameraHeight(ACamera: TWalkCamera;
       out AboveHeight: Single; out AboveGround: P3DTriangle): boolean; override;
-    function CameraRay(const RayOrigin, RayDirection: TVector3Single): TRayCollision; override;
+    function CameraRayCollision(const RayOrigin, RayDirection: TVector3Single): TRayCollision; override;
     { @groupEnd }
 
     property SickProjection: boolean
@@ -953,14 +953,13 @@ begin
     Result := inherited CameraMoveAllowed(ACamera, ProposedNewPos, NewPos, BecauseOfGravity);
 end;
 
-function TLevel.CameraRay(const RayOrigin, RayDirection: TVector3Single): TRayCollision;
+function TLevel.CameraRayCollision(const RayOrigin, RayDirection: TVector3Single): TRayCollision;
 begin
-  if Player <> nil then Player.Disable;
-  try
-    Result := inherited CameraRay(RayOrigin, RayDirection);
-  finally
-    if Player <> nil then Player.Enable;
-  end;
+  { Both version result in calling WorldRayCollision.
+    Player version adds Player.Disable/Enable around, so don't collide with self. }
+  if Player <> nil then
+    Result := Player.MyRayCollision(RayOrigin, RayDirection) else
+    Result := inherited CameraRayCollision(RayOrigin, RayDirection);
 end;
 
 function TLevel.CameraHeight(ACamera: TWalkCamera;
