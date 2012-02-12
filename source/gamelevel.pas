@@ -946,12 +946,11 @@ function TLevel.CameraMoveAllowed(ACamera: TWalkCamera;
   const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
   const BecauseOfGravity: boolean): boolean;
 begin
-  if Player <> nil then Player.Disable;
-  try
+  { Both version result in calling WorldMoveAllowed.
+    Player version adds Player.Disable/Enable around, so don't collide with self. }
+  if Player <> nil then
+    Result := Player.MyMoveAllowed(ACamera.Position, ProposedNewPos, NewPos, BecauseOfGravity) else
     Result := inherited CameraMoveAllowed(ACamera, ProposedNewPos, NewPos, BecauseOfGravity);
-  finally
-    if Player <> nil then Player.Enable;
-  end;
 end;
 
 function TLevel.CameraRay(const RayOrigin, RayDirection: TVector3Single): TRayCollision;
@@ -967,12 +966,11 @@ end;
 function TLevel.CameraHeight(ACamera: TWalkCamera;
   out AboveHeight: Single; out AboveGround: P3DTriangle): boolean;
 begin
-  if Player <> nil then Player.Disable;
-  try
+  { Both version result in calling WorldHeight.
+    Player version adds Player.Disable/Enable around, so don't collide with self. }
+  if Player <> nil then
+    Result := Player.MyHeight(ACamera.Position, AboveHeight, AboveGround) else
     Result := inherited CameraHeight(ACamera, AboveHeight, AboveGround);
-  finally
-    if Player <> nil then Player.Enable;
-  end;
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single;

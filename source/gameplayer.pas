@@ -412,6 +412,8 @@ type
     function SegmentCollision(const Pos1, Pos2: TVector3Single;
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
       const LineOfSight: boolean): boolean; override;
+    function UseSphere: boolean; override;
+    procedure Sphere(out Center: TVector3Single; out Radius: Single); override;
   end;
 
 implementation
@@ -1489,6 +1491,17 @@ begin
       This allows creatures to see player's middle point. }
     Result := false else
     Result := inherited;
+end;
+
+function TPlayer.UseSphere: boolean;
+begin
+  Result := true;
+end;
+
+procedure TPlayer.Sphere(out Center: TVector3Single; out Radius: Single);
+begin
+  Center := Camera.Position;
+  Radius := Camera.Radius;
 end;
 
 { CastleWindow open / close ------------------------------------------------------ }
