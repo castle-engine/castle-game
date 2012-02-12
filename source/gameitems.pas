@@ -901,10 +901,7 @@ begin
       to not "slip down" from the sword. }
     {if Level.MoveAllowed(ShiftedTranslation, NewTranslation,
       RealNewTranslation, true, Radius) then}
-    { TODO: just use item box here, instead of (invalid) radius? }
-    if World.WorldMoveAllowed(ShiftedTranslation, NewTranslation, true, Radius,
-      Box3DAroundPoint(ShiftedTranslation, Radius * 2),
-      Box3DAroundPoint(NewTranslation    , Radius * 2), true) then
+    if MyMoveAllowed(ShiftedTranslation, NewTranslation, true) then
     begin
       NewTranslation[2] -= Radius;
       Translation := NewTranslation;

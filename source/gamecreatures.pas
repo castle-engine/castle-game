@@ -699,18 +699,6 @@ type
 
     procedure SetLife(const Value: Single); virtual;
 
-    { Is the move from OldPos to ProposedNewPos possible.
-      Returns true and sets NewPos if some move is allowed.
-      Overloaded version without ProposedNewPos doesn't do wall-sliding,
-      and only answers if exactly this move is allowed.
-      @groupBegin }
-    function MyMoveAllowed(
-      const OldPos, ProposedNewPos: TVector3Single;
-      out NewPos: TVector3Single): boolean;
-    function MyMoveAllowed(
-      const OldPos, NewPos: TVector3Single): boolean;
-    { @groupEnd }
-
     procedure ShortRangeAttackHurt;
 
     function DebugCaption: string; virtual;
@@ -1788,52 +1776,6 @@ begin
     [Kind.ShortName, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
 end;
 
-function TCreature.MyMoveAllowed(
-  const OldPos, ProposedNewPos: TVector3Single;
-  out NewPos: TVector3Single): boolean;
-var
-  Sp: boolean;
-  SpRadius: Single;
-  OldBox, NewBox: TBox3D;
-begin
-  { save bounding volume information before calling Disable, that makes
-    bounding volume empty }
-  Sp := UseSphere;
-  SpRadius := Kind.Radius;
-  OldBox := BoundingBox;
-  NewBox := OldBox.Translate(ProposedNewPos - OldPos);
-
-  Disable;
-  try
-    Result := World.WorldMoveAllowed(
-      OldPos, ProposedNewPos, NewPos,
-      Sp, SpRadius, OldBox, NewBox,
-      false { BecauseOfGravity not really important for now });
-  finally Enable end;
-end;
-
-function TCreature.MyMoveAllowed(
-  const OldPos, NewPos: TVector3Single): boolean;
-var
-  Sp: boolean;
-  SpRadius: Single;
-  OldBox, NewBox: TBox3D;
-begin
-  { save bounding volume information before calling Disable, that makes
-    bounding volume empty }
-  Sp := UseSphere;
-  SpRadius := Kind.Radius;
-  OldBox := BoundingBox;
-  NewBox := OldBox.Translate(NewPos - OldPos);
-
-  Disable;
-  try
-    Result := World.WorldMoveAllowed(OldPos, NewPos,
-      Sp, SpRadius, OldBox, NewBox,
-      false { BecauseOfGravity not really important for now });
-  finally Enable end;
-end;
-
 procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
   procedure UpdateUsedSounds;
@@ -1873,7 +1815,8 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
   var
     OldMiddlePosition: TVector3Single;
 
-    function MoveVertical(const Distance: Single): boolean;
+    function MoveVertical(const Distance: Single;
+      const BecauseOfGravity: boolean): boolean;
     var
       NewMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
     begin
@@ -1881,7 +1824,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       ProposedNewMiddlePosition[2] += Distance;
 
       Result := MyMoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
-        NewMiddlePosition);
+        NewMiddlePosition, BecauseOfGravity);
 
       if Result then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
@@ -1962,7 +1905,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
         MinTo1st(FallingDownDistance, MaximumFallingDownDistance);
       end;
 
-      if not MoveVertical(-FallingDownDistance) then
+      if not MoveVertical(-FallingDownDistance, true) then
         FIsFallingDown := false;
     end else
     begin
@@ -1972,7 +1915,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       begin
         { Growing up }
         MoveVertical(Min(GrowingUpSpeed * CompSpeed * 50,
-          HeightBetweenLegsAndMiddle - AboveHeight));
+          HeightBetweenLegsAndMiddle - AboveHeight), false);
       end;
     end;
 
@@ -2495,7 +2438,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
           Our trick with "AlternativeTarget" should handle
           eventual problems with the track of creature, so wall-sliding
           should not be needed. }
-        MyMoveAllowed(OldMiddlePosition, NewMiddlePosition);
+        MyMoveAllowed(OldMiddlePosition, NewMiddlePosition, false);
 
       if Result then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
@@ -2758,7 +2701,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         VectorScale(LastAttackDirection, CurrentKnockBackDistance));
 
       if MyMoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
-        NewMiddlePosition) then
+        NewMiddlePosition, false) then
         LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
     end;
   end;
@@ -3144,7 +3087,7 @@ procedure TMissileCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveTy
     if not MissileKind.HitsPlayer then Player.Disable;
     if not MissileKind.HitsCreatures then Inc(DisableCreatures);
     try
-      Result := MyMoveAllowed(OldPos, NewPos);
+      Result := MyMoveAllowed(OldPos, NewPos, false);
     finally
       if not MissileKind.HitsCreatures then Dec(DisableCreatures);
       if not MissileKind.HitsPlayer then Player.Enable;
