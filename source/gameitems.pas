@@ -223,7 +223,7 @@ type
     { Perform real attack here.
       This may mean hurting some creature within the range,
       or shooting some missile. You can also play some sound here. }
-    procedure ActualAttack(Item: TItem); virtual; abstract;
+    procedure ActualAttack(Item: TItem; World: T3DWorld); virtual; abstract;
 
     property SoundAttackStart: TSoundType
       read FSoundAttackStart write FSoundAttackStart default stNone;
@@ -248,12 +248,12 @@ type
 
   TItemSwordKind = class(TItemShortRangeWeaponKind)
   public
-    procedure ActualAttack(Item: TItem); override;
+    procedure ActualAttack(Item: TItem; World: T3DWorld); override;
   end;
 
   TItemBowKind = class(TItemWeaponKind)
   public
-    procedure ActualAttack(Item: TItem); override;
+    procedure ActualAttack(Item: TItem; World: T3DWorld); override;
   end;
 
   TItemScrollOfFlyingKind = class(TItemKind)
@@ -700,7 +700,7 @@ end;
 
 { TItemSwordKind ------------------------------------------------------------- }
 
-procedure TItemSwordKind.ActualAttack(Item: TItem);
+procedure TItemSwordKind.ActualAttack(Item: TItem; World: T3DWorld);
 var
   WeaponBoundingBox: TBox3D;
   I: Integer;
@@ -709,12 +709,12 @@ begin
   WeaponBoundingBox := Player.BoundingBox.Translate(
     VectorAdjustToLength(Player.Camera.Direction, 1.0));
   { Tests: Writeln('WeaponBoundingBox is ', WeaponBoundingBox.ToNiceStr); }
-  { TODO: we would prefer to use Level.Items.BoxCollision for this,
+  { TODO: we would prefer to use World.BoxCollision for this,
     but we need to know which creature was hit. }
-  for I := 0 to Level.Items.Count - 1 do
-    if Level.Items[I] is TCreature then
+  for I := 0 to World.Count - 1 do
+    if World[I] is TCreature then
     begin
-      C := TCreature(Level.Items[I]);
+      C := TCreature(World[I]);
       { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
       if C.BoundingBox.Collision(WeaponBoundingBox) then
       begin
@@ -726,7 +726,7 @@ end;
 
 { TItemBowKind ------------------------------------------------------------- }
 
-procedure TItemBowKind.ActualAttack(Item: TItem);
+procedure TItemBowKind.ActualAttack(Item: TItem; World: T3DWorld);
 var
   QuiverIndex: Integer;
 begin
@@ -882,7 +882,7 @@ begin
     it may "slip through" this ground down.
 
     For the same reason, I use sphere around ShiftedTranslation
-    when doing Level.MoveAllowed below. }
+    when doing MyMoveAllowed below. }
 
   MyHeight(ShiftedTranslation, AboveHeight);
   if AboveHeight > Radius then
@@ -895,12 +895,12 @@ begin
     NewTranslation := ShiftedTranslation;
     NewTranslation[2] -= FallingDownLength;
 
-    { TODO: I could use Level.MoveAllowed with wall-sliding here.
+    { TODO: I could use MyMoveAllowed with wall-sliding here.
       But then left life potion on gate
       level must be corrected (possibly by correcting the large sword mesh)
       to not "slip down" from the sword. }
-    {if Level.MoveAllowed(ShiftedTranslation, NewTranslation,
-      RealNewTranslation, true, Radius) then}
+    {if MyMoveAllowed(ShiftedTranslation, NewTranslation,
+      RealNewTranslation) then}
     if MyMoveAllowed(ShiftedTranslation, NewTranslation, true) then
     begin
       NewTranslation[2] -= Radius;

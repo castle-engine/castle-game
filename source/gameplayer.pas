@@ -1223,7 +1223,7 @@ begin
     AttackStartTime >= EquippedWeaponKind.ActualAttackTime) then
   begin
     ActualAttackDone := true;
-    EquippedWeaponKind.ActualAttack(EquippedWeapon);
+    EquippedWeaponKind.ActualAttack(EquippedWeapon, World);
   end;
 
   if not HintEscapeKeyShown then
