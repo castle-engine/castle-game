@@ -669,12 +669,6 @@ type
   protected
     function GetExists: boolean; override;
 
-    { Get height of my own point above the rest of the 3D world. }
-    function MyHeight(const MyPosition: TVector3Single;
-      out AboveHeight: Single): boolean;
-
-    function MyLineOfSight(const Pos1, Pos2: TVector3Single): boolean;
-
     { Like TransformMatricesMult, but assumes that LegsPosition and Direction
       is as specified. }
     procedure TransformAssuming(
@@ -1880,25 +1874,6 @@ begin
     Result := World.WorldMoveAllowed(OldMiddlePosition, NewMiddlePosition,
       Sp, SpRadius, OldBox, NewBox,
       false { BecauseOfGravity not really important for now });
-  finally Enable end;
-end;
-
-function TCreature.MyHeight(const MyPosition: TVector3Single;
-  out AboveHeight: Single): boolean;
-var
-  AboveGround: PTriangle; {< just ignored for now }
-begin
-  Disable;
-  try
-    Result := World.WorldHeight(MyPosition, AboveHeight, AboveGround);
-  finally Enable end;
-end;
-
-function TCreature.MyLineOfSight(const Pos1, Pos2: TVector3Single): boolean;
-begin
-  Disable;
-  try
-    Result := World.WorldLineOfSight(Pos1, Pos2);
   finally Enable end;
 end;
 

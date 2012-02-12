@@ -1005,7 +1005,6 @@ var
   SpiderCreature: TCreature;
   SpiderPosition, SpiderDirection: TVector3Single;
   SpiderMoveDistance: Single;
-  AboveGround: PTriangle;
   SA: TSpiderAppearing;
   TorchLight: PLightInstance;
 begin
@@ -1050,12 +1049,11 @@ begin
     { Move spiders down }
     I := 0;
     AboveHeight := MaxSingle;
-    AboveGround := nil;
     while I < SpidersAppearing.Count do
     begin
       SA := SpidersAppearing[I] as TSpiderAppearing;
       SpiderPosition := SA.Translation;
-      Items.WorldHeight(SpiderPosition, AboveHeight, AboveGround);
+      SA.MyHeight(SpiderPosition, AboveHeight);
       if AboveHeight < Spider.Radius * 2 then
       begin
         SpiderDirection :=

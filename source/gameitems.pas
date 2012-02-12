@@ -863,7 +863,6 @@ var
   ShiftedTranslation: TVector3Single;
   NewTranslation: TVector3Single;
   FallingDownLength: Single;
-  AboveGround: PTriangle;
   Rot: TVector4Single;
 begin
   inherited;
@@ -885,7 +884,7 @@ begin
     For the same reason, I use sphere around ShiftedTranslation
     when doing Level.MoveAllowed below. }
 
-  World.WorldHeight(ShiftedTranslation, AboveHeight, AboveGround);
+  MyHeight(ShiftedTranslation, AboveHeight);
   if AboveHeight > Radius then
   begin
     { Item falls down because of gravity. }
