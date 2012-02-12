@@ -669,10 +669,10 @@ type
   protected
     function GetExists: boolean; override;
 
-    { Like TransformMatricesMult, but assumes that LegsPosition and Direction
+    { Like TransformMatricesMult, but assumes that LegsPosition
       is as specified. }
     procedure TransformAssuming(
-      const AssumeLegsPosition, AssumeDirection: TVector3Single;
+      const AssumeLegsPosition: TVector3Single;
       out M, MInverse: TMatrix4Single);
     procedure TransformMatricesMult(var M, MInverse: TMatrix4Single); override;
     function OnlyTranslation: boolean; override;
@@ -705,10 +705,10 @@ type
     { Returns BoundingBox, assuming that LegsPosition and Direction are
       as specified here. }
     function BoundingBoxAssumingLegs(
-      const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3D;
+      const AssumeLegsPosition: TVector3Single): TBox3D;
 
     function BoundingBoxAssumingMiddle(
-      const AssumeMiddlePosition, AssumeDirection: TVector3Single): TBox3D;
+      const AssumeMiddlePosition: TVector3Single): TBox3D;
 
     procedure SetLife(const Value: Single); virtual;
 
@@ -1678,37 +1678,37 @@ begin
 end;
 
 procedure TCreature.TransformAssuming(
-  const AssumeLegsPosition, AssumeDirection: TVector3Single;
+  const AssumeLegsPosition: TVector3Single;
   out M, MInverse: TMatrix4Single);
 var
   GoodUp, Side: TVector3Single;
 begin
   GoodUp := UnitVector3Single[2];
   { If not Flying, then we know that GoodUp is already
-    orthogonal to AssumeDirection. }
+    orthogonal to Direction. }
   if Kind.Flying then
-    MakeVectorsOrthoOnTheirPlane(GoodUp, AssumeDirection);
+    MakeVectorsOrthoOnTheirPlane(GoodUp, Direction);
 
-  Side := VectorProduct(GoodUp, AssumeDirection);
+  Side := VectorProduct(GoodUp, Direction);
 
   { Note that actually I could do here TransformToCoordsNoScaleMatrix,
     as obviously I don't want any scaling. But in this case I know
-    that AssumeDirection length = 1 and GoodUp = 1 (so their product
+    that Direction length = 1 and GoodUp = 1 (so their product
     length is also = 1), so no need to do
     TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
     on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
 
   M := TransformToCoordsMatrix(AssumeLegsPosition,
-    AssumeDirection, Side, GoodUp);
+    Direction, Side, GoodUp);
   MInverse := TransformFromCoordsMatrix(AssumeLegsPosition,
-    AssumeDirection, Side, GoodUp);
+    Direction, Side, GoodUp);
 end;
 
 procedure TCreature.TransformMatricesMult(var M, MInverse: TMatrix4Single);
 var
   NewM, NewMInverse: TMatrix4Single;
 begin
-  TransformAssuming(LegsPosition, Direction, NewM, NewMInverse);
+  TransformAssuming(LegsPosition, NewM, NewMInverse);
   M := M * NewM;
   MInverse := NewMInverse * MInverse;
 end;
@@ -1719,21 +1719,21 @@ begin
 end;
 
 function TCreature.BoundingBoxAssumingLegs(
-  const AssumeLegsPosition, AssumeDirection: TVector3Single): TBox3D;
+  const AssumeLegsPosition: TVector3Single): TBox3D;
 var
   M, MInverse: TMatrix4Single;
 begin
-  TransformAssuming(AssumeLegsPosition, AssumeDirection, M, MInverse);
+  TransformAssuming(AssumeLegsPosition, M, MInverse);
   Result := CurrentScene.BoundingBox.Transform(M);
 end;
 
 function TCreature.BoundingBoxAssumingMiddle(
-  const AssumeMiddlePosition, AssumeDirection: TVector3Single): TBox3D;
+  const AssumeMiddlePosition: TVector3Single): TBox3D;
 var
   AssumeLegsPosition: TVector3Single;
 begin
   AssumeLegsPosition := LegsPositionFromMiddle(AssumeMiddlePosition);
-  Result := BoundingBoxAssumingLegs(AssumeLegsPosition, AssumeDirection);
+  Result := BoundingBoxAssumingLegs(AssumeLegsPosition);
 end;
 
 procedure TCreature.SetLegsPosition(const Value: TVector3Single);
@@ -1750,7 +1750,7 @@ end;
 
 procedure TCreature.RecalculateBoundingBox;
 begin
-  FBoundingBox := BoundingBoxAssumingLegs(LegsPosition, Direction);
+  FBoundingBox := BoundingBoxAssumingLegs(LegsPosition);
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum;
@@ -1844,7 +1844,7 @@ begin
   Sp := UseSphere;
   SpRadius := Kind.Radius;
   OldBox := BoundingBox;
-  NewBox := BoundingBoxAssumingMiddle(ProposedNewMiddlePosition, Direction);
+  NewBox := BoundingBoxAssumingMiddle(ProposedNewMiddlePosition);
 
   Disable;
   try
@@ -1867,7 +1867,7 @@ begin
   Sp := UseSphere;
   SpRadius := Kind.Radius;
   OldBox := BoundingBox;
-  NewBox := BoundingBoxAssumingMiddle(NewMiddlePosition, Direction);
+  NewBox := BoundingBoxAssumingMiddle(NewMiddlePosition);
 
   Disable;
   try
