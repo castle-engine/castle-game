@@ -669,11 +669,6 @@ type
   protected
     function GetExists: boolean; override;
 
-    { Like TransformMatricesMult, but assumes that LegsPosition
-      is as specified. }
-    procedure TransformAssuming(
-      const AssumeLegsPosition: TVector3Single;
-      out M, MInverse: TMatrix4Single);
     procedure TransformMatricesMult(var M, MInverse: TMatrix4Single); override;
     function OnlyTranslation: boolean; override;
 
@@ -702,31 +697,28 @@ type
       const A: Single): TVector3Single; virtual;
     { @groupEnd }
 
-    { Returns BoundingBox, assuming that LegsPosition and Direction are
-      as specified here. }
+    { Returns BoundingBox, assuming that LegsPosition
+      or MiddlePosition are as specified here.
+      @groupBegin }
     function BoundingBoxAssumingLegs(
       const AssumeLegsPosition: TVector3Single): TBox3D;
-
     function BoundingBoxAssumingMiddle(
       const AssumeMiddlePosition: TVector3Single): TBox3D;
+    { @groupEnd }
 
     procedure SetLife(const Value: Single); virtual;
 
-    { Tries to move from OldMiddlePosition to ProposedNewMiddlePosition.
-      Returns true and sets NewMiddlePosition if some move is allowed.
-
-      Note that OldMiddlePosition @italic(must be equal to MiddlePosition).
-      It's passed here only for speed.
-
-      Check collisions with the level, with player, and with other
-      creatures. }
+    { Is the move from OldPos to ProposedNewPos possible.
+      Returns true and sets NewPos if some move is allowed.
+      Overloaded version without ProposedNewPos doesn't do wall-sliding,
+      and only answers if exactly this move is allowed.
+      @groupBegin }
     function MyMoveAllowed(
-      const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
-      out NewMiddlePosition: TVector3Single): boolean;
-
-    { Like previous @link(Move), but this is only a "yes/no" collision check. }
+      const OldPos, ProposedNewPos: TVector3Single;
+      out NewPos: TVector3Single): boolean;
     function MyMoveAllowed(
-      const OldMiddlePosition, NewMiddlePosition: TVector3Single): boolean;
+      const OldPos, NewPos: TVector3Single): boolean;
+    { @groupEnd }
 
     procedure ShortRangeAttackHurt;
 
@@ -1677,9 +1669,9 @@ begin
   Result := MiddlePositionFromLegs(LegsPosition);
 end;
 
-procedure TCreature.TransformAssuming(
-  const AssumeLegsPosition: TVector3Single;
-  out M, MInverse: TMatrix4Single);
+procedure TCreature.TransformMatricesMult(var M, MInverse: TMatrix4Single);
+var
+  NewM, NewMInverse: TMatrix4Single;
 var
   GoodUp, Side: TVector3Single;
 begin
@@ -1698,17 +1690,9 @@ begin
     TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
     on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
 
-  M := TransformToCoordsMatrix(AssumeLegsPosition,
-    Direction, Side, GoodUp);
-  MInverse := TransformFromCoordsMatrix(AssumeLegsPosition,
-    Direction, Side, GoodUp);
-end;
+  NewM := TransformToCoordsMatrix(LegsPosition, Direction, Side, GoodUp);
+  NewMInverse := TransformFromCoordsMatrix(LegsPosition, Direction, Side, GoodUp);
 
-procedure TCreature.TransformMatricesMult(var M, MInverse: TMatrix4Single);
-var
-  NewM, NewMInverse: TMatrix4Single;
-begin
-  TransformAssuming(LegsPosition, NewM, NewMInverse);
   M := M * NewM;
   MInverse := NewMInverse * MInverse;
 end;
@@ -1720,20 +1704,16 @@ end;
 
 function TCreature.BoundingBoxAssumingLegs(
   const AssumeLegsPosition: TVector3Single): TBox3D;
-var
-  M, MInverse: TMatrix4Single;
 begin
-  TransformAssuming(AssumeLegsPosition, M, MInverse);
-  Result := CurrentScene.BoundingBox.Transform(M);
+  Result := CurrentScene.BoundingBox.Transform(Transform).Translate(
+    AssumeLegsPosition - LegsPosition);
 end;
 
 function TCreature.BoundingBoxAssumingMiddle(
   const AssumeMiddlePosition: TVector3Single): TBox3D;
-var
-  AssumeLegsPosition: TVector3Single;
 begin
-  AssumeLegsPosition := LegsPositionFromMiddle(AssumeMiddlePosition);
-  Result := BoundingBoxAssumingLegs(AssumeLegsPosition);
+  Result := CurrentScene.BoundingBox.Transform(Transform).Translate(
+    AssumeMiddlePosition - MiddlePosition);
 end;
 
 procedure TCreature.SetLegsPosition(const Value: TVector3Single);
@@ -1750,7 +1730,7 @@ end;
 
 procedure TCreature.RecalculateBoundingBox;
 begin
-  FBoundingBox := BoundingBoxAssumingLegs(LegsPosition);
+  FBoundingBox := CurrentScene.BoundingBox.Transform(Transform);
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum;
@@ -1832,8 +1812,8 @@ begin
 end;
 
 function TCreature.MyMoveAllowed(
-  const OldMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
-  out NewMiddlePosition: TVector3Single): boolean;
+  const OldPos, ProposedNewPos: TVector3Single;
+  out NewPos: TVector3Single): boolean;
 var
   Sp: boolean;
   SpRadius: Single;
@@ -1844,19 +1824,19 @@ begin
   Sp := UseSphere;
   SpRadius := Kind.Radius;
   OldBox := BoundingBox;
-  NewBox := BoundingBoxAssumingMiddle(ProposedNewMiddlePosition);
+  NewBox := OldBox.Translate(ProposedNewPos - OldPos);
 
   Disable;
   try
     Result := World.WorldMoveAllowed(
-      OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition,
+      OldPos, ProposedNewPos, NewPos,
       Sp, SpRadius, OldBox, NewBox,
       false { BecauseOfGravity not really important for now });
   finally Enable end;
 end;
 
 function TCreature.MyMoveAllowed(
-  const OldMiddlePosition, NewMiddlePosition: TVector3Single): boolean;
+  const OldPos, NewPos: TVector3Single): boolean;
 var
   Sp: boolean;
   SpRadius: Single;
@@ -1867,11 +1847,11 @@ begin
   Sp := UseSphere;
   SpRadius := Kind.Radius;
   OldBox := BoundingBox;
-  NewBox := BoundingBoxAssumingMiddle(NewMiddlePosition);
+  NewBox := OldBox.Translate(NewPos - OldPos);
 
   Disable;
   try
-    Result := World.WorldMoveAllowed(OldMiddlePosition, NewMiddlePosition,
+    Result := World.WorldMoveAllowed(OldPos, NewPos,
       Sp, SpRadius, OldBox, NewBox,
       false { BecauseOfGravity not really important for now });
   finally Enable end;
