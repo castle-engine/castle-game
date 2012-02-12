@@ -658,7 +658,7 @@ type
 
       This is especially noticeable when there are many creatures on the level:
       then a lot of time is wasted in DoGravity, and main time of this
-      is iterating over creatures checking their GetHeightAbove,
+      is iterating over creatures checking their @link(Height),
       and main time of this
       would be spend within BoundingBox calculations. Yes, this is
       checked with profiler. }
@@ -670,8 +670,8 @@ type
     function GetExists: boolean; override;
 
     { Get height of my own point above the rest of the 3D world. }
-    procedure MyGetHeightAbove(const MyPosition: TVector3Single;
-      out IsAbove: boolean; out AboveHeight: Single);
+    function MyHeight(const MyPosition: TVector3Single;
+      out AboveHeight: Single): boolean;
 
     function MyLineOfSight(const Pos1, Pos2: TVector3Single): boolean;
 
@@ -778,7 +778,7 @@ type
       How precisely this is calculated for given creature depends
       on MiddlePositionFromLegs implementation in this class.
 
-      All collision detection (MyMoveAllowed, MyGetHeightAbove, MyLineOfSight)
+      All collision detection (MyMoveAllowed, MyHeight, MyLineOfSight)
       should be done using MiddlePosition, and then appropriately translated
       back to LegsPosition. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
@@ -1883,14 +1883,14 @@ begin
   finally Enable end;
 end;
 
-procedure TCreature.MyGetHeightAbove(const MyPosition: TVector3Single;
-  out IsAbove: boolean; out AboveHeight: Single);
+function TCreature.MyHeight(const MyPosition: TVector3Single;
+  out AboveHeight: Single): boolean;
 var
   AboveGround: PTriangle; {< just ignored for now }
 begin
   Disable;
   try
-    World.WorldGetHeightAbove(MyPosition, IsAbove, AboveHeight, AboveGround);
+    Result := World.WorldHeight(MyPosition, AboveHeight, AboveGround);
   finally Enable end;
 end;
 
@@ -1981,7 +1981,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     OldIsFallingDown := FIsFallingDown;
     OldMiddlePosition := MiddlePosition;
 
-    MyGetHeightAbove(OldMiddlePosition, IsAbove, AboveHeight);
+    IsAbove := MyHeight(OldMiddlePosition, AboveHeight);
 
     if AboveHeight > HeightBetweenLegsAndMiddle * HeightMargin then
     begin
@@ -2524,13 +2524,12 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       function TooHighAboveTheGround(const NewMiddlePosition: TVector3Single):
         boolean;
       var
-        IsAbove: boolean;
         AboveHeight: Single;
       begin
         Result := false;
         if not Kind.Flying then
         begin
-          MyGetHeightAbove(NewMiddlePosition, IsAbove, AboveHeight);
+          MyHeight(NewMiddlePosition, AboveHeight);
           if AboveHeight > WAKind.MaxHeightAcceptableToFall +
               HeightBetweenLegsAndMiddle then
             Result := true;

@@ -859,7 +859,6 @@ const
   Radius = 1.0;
   FallingDownSpeed = 0.2;
 var
-  IsAbove: boolean;
   AboveHeight: Single;
   ShiftedTranslation: TVector3Single;
   NewTranslation: TVector3Single;
@@ -886,7 +885,7 @@ begin
     For the same reason, I use sphere around ShiftedTranslation
     when doing Level.MoveAllowed below. }
 
-  World.WorldGetHeightAbove(ShiftedTranslation, IsAbove, AboveHeight, AboveGround);
+  World.WorldHeight(ShiftedTranslation, AboveHeight, AboveGround);
   if AboveHeight > Radius then
   begin
     { Item falls down because of gravity. }

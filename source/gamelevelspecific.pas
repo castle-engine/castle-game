@@ -1000,7 +1000,6 @@ const
   SpidersFallingSpeed = 0.5;
   CreaturesCountToAddSpiders = 20;
 var
-  IsAbove: boolean;
   AboveHeight: Single;
   I: Integer;
   SpiderCreature: TCreature;
@@ -1050,14 +1049,13 @@ begin
 
     { Move spiders down }
     I := 0;
-    IsAbove := false;
     AboveHeight := MaxSingle;
     AboveGround := nil;
     while I < SpidersAppearing.Count do
     begin
       SA := SpidersAppearing[I] as TSpiderAppearing;
       SpiderPosition := SA.Translation;
-      Items.WorldGetHeightAbove(SpiderPosition, IsAbove, AboveHeight, AboveGround);
+      Items.WorldHeight(SpiderPosition, AboveHeight, AboveGround);
       if AboveHeight < Spider.Radius * 2 then
       begin
         SpiderDirection :=

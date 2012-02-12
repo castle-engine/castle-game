@@ -296,7 +296,7 @@ type
       (you can say that player's "legs" are not included in the box).
       However, not Tall box can still be useful (e.g. when checking for
       collision with creatures, because then the player will "grow"
-      anyway (using GetHeightAbove), so Camera.RealPreferredHeight
+      anyway (using @link(Height)), so Camera.RealPreferredHeight
       will be taken into account but in a different way. }
     function BoundingBox: TBox3D; override;
 

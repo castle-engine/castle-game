@@ -354,9 +354,8 @@ type
     function CameraMoveAllowed(ACamera: TWalkCamera;
       const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
       const BecauseOfGravity: boolean): boolean; override;
-    procedure CameraGetHeight(ACamera: TWalkCamera;
-      out IsAbove: boolean; out AboveHeight: Single;
-      out AboveGround: P3DTriangle); override;
+    function CameraHeight(ACamera: TWalkCamera;
+      out AboveHeight: Single; out AboveGround: P3DTriangle): boolean; override;
     function CameraRay(const RayOrigin, RayDirection: TVector3Single): TRayCollision; override;
     { @groupEnd }
 
@@ -965,12 +964,12 @@ begin
   end;
 end;
 
-procedure TLevel.CameraGetHeight(ACamera: TWalkCamera;
-  out IsAbove: boolean; out AboveHeight: Single; out AboveGround: P3DTriangle);
+function TLevel.CameraHeight(ACamera: TWalkCamera;
+  out AboveHeight: Single; out AboveGround: P3DTriangle): boolean;
 begin
   if Player <> nil then Player.Disable;
   try
-    inherited CameraGetHeight(ACamera, IsAbove, AboveHeight, AboveGround);
+    Result := inherited CameraHeight(ACamera, AboveHeight, AboveGround);
   finally
     if Player <> nil then Player.Enable;
   end;
