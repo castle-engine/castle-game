@@ -349,16 +349,6 @@ type
 
     procedure BeforeDraw; override;
 
-    { Check Player.Camera collisions with world.
-      @groupBegin }
-    function CameraMoveAllowed(ACamera: TWalkCamera;
-      const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-      const BecauseOfGravity: boolean): boolean; override;
-    function CameraHeight(ACamera: TWalkCamera;
-      out AboveHeight: Single; out AboveGround: P3DTriangle): boolean; override;
-    function CameraRayCollision(const RayOrigin, RayDirection: TVector3Single): TRayCollision; override;
-    { @groupEnd }
-
     property SickProjection: boolean
       read FSickProjection write SetSickProjection;
     property SickProjectionSpeed: TFloatTime
@@ -519,7 +509,7 @@ constructor TLevel.Create(
       GravityUp := Vector3Single(0, 0, 1);
 
     if Player <> nil then
-      WalkCamera := Player.Camera else
+      WalkCamera := GamePlay.Player.Camera else
       { Camera suitable for background level and castle-view-level.
         For actual game, camera will be taken from APlayer.Camera. }
       WalkCamera := TWalkCamera.Create(Self);
@@ -539,6 +529,8 @@ var
   SI: TShapeTreeIterator;
 begin
   inherited Create(nil);
+
+  Player := GamePlay.Player;
 
   UseGlobalLights := true;
   ApproximateActivation := true;
@@ -940,36 +932,6 @@ function TLevel.CreateCreature(const Kind: TCreatureKind;
   const ADirection: TVector3Single): TCreature;
 begin
   Result := CreateCreature(Kind, ALegsPosition, ADirection, Kind.DefaultMaxLife);
-end;
-
-function TLevel.CameraMoveAllowed(ACamera: TWalkCamera;
-  const ProposedNewPos: TVector3Single; out NewPos: TVector3Single;
-  const BecauseOfGravity: boolean): boolean;
-begin
-  { Both version result in calling WorldMoveAllowed.
-    Player version adds Player.Disable/Enable around, so don't collide with self. }
-  if Player <> nil then
-    Result := Player.MyMoveAllowed(ACamera.Position, ProposedNewPos, NewPos, BecauseOfGravity) else
-    Result := inherited CameraMoveAllowed(ACamera, ProposedNewPos, NewPos, BecauseOfGravity);
-end;
-
-function TLevel.CameraRayCollision(const RayOrigin, RayDirection: TVector3Single): TRayCollision;
-begin
-  { Both version result in calling WorldRayCollision.
-    Player version adds Player.Disable/Enable around, so don't collide with self. }
-  if Player <> nil then
-    Result := Player.MyRayCollision(RayOrigin, RayDirection) else
-    Result := inherited CameraRayCollision(RayOrigin, RayDirection);
-end;
-
-function TLevel.CameraHeight(ACamera: TWalkCamera;
-  out AboveHeight: Single; out AboveGround: P3DTriangle): boolean;
-begin
-  { Both version result in calling WorldHeight.
-    Player version adds Player.Disable/Enable around, so don't collide with self. }
-  if Player <> nil then
-    Result := Player.MyHeight(ACamera.Position, AboveHeight, AboveGround) else
-    Result := inherited CameraHeight(ACamera, AboveHeight, AboveGround);
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single;
