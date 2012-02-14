@@ -173,9 +173,12 @@ type
 
       This is the only way to create TCreature instances.
       Usually, you actually want to use TLevel.CreateCreature,
-      that is even simpler wrapper around this method. }
+      that is even simpler wrapper around this method.
+
+      ADirection passed here is normalized, and then used
+      as initial TCreature.Direction value. }
     function CreateCreature(AOwner: TComponent;
-      const ALegsPosition: TVector3Single;
+      const APosition: TVector3Single;
       const ADirection: TVector3Single;
       const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature;
@@ -630,10 +633,13 @@ type
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
 
-  TCreature = class(T3DCustomTransform)
+  T3DOrient = class(T3DCustomTransform)
+  end;
+
+  TCreature = class(T3DOrient)
   private
     FKind: TCreatureKind;
-    FLegsPosition: TVector3Single;
+    FPosition: TVector3Single;
     FDirection: TVector3Single;
     FLife: Single;
     FMaxLife: Single;
@@ -649,11 +655,11 @@ type
 
     procedure SoundSourceUsingEnd(Sender: TALSound);
 
-    procedure SetLegsPosition(const Value: TVector3Single);
+    procedure SetPosition(const Value: TVector3Single);
     procedure SetDirection(const Value: TVector3Single);
   private
     { It's faster to keep FBoundingBox precalculated (and only update
-      it each time we change Direction or LegsPosition)
+      it each time we change Direction or Position)
       instead of completely recalculating it in each BoundingBox call.
 
       This is especially noticeable when there are many creatures on the level:
@@ -674,13 +680,13 @@ type
 
     { These define exactly what "MiddlePosition" means for this creature.
 
-      LegsPositionFromMiddle must always specify reverse function.
+      PositionFromMiddle must always specify reverse function.
 
       LerpLegsMiddlePosition must always be equal to
-      Lerp(A, LegsPosition, MiddlePosition)
+      Lerp(A, Position, MiddlePosition)
       (but usually can be calculated more efficiently than calling Lerp).
 
-      In this class they calculate MiddlePosition as LegsPosition
+      In this class they calculate MiddlePosition as Position
       moved higher than HeightBetweenLegsAndMiddle.
       So if you want to change the meaning of these functions
       you can simply override only HeightBetweenLegsAndMiddle
@@ -690,8 +696,8 @@ type
 
       @groupBegin }
     function MiddlePositionFromLegs(
-      const AssumeLegsPosition: TVector3Single): TVector3Single; virtual;
-    function LegsPositionFromMiddle(
+      const AssumePosition: TVector3Single): TVector3Single; virtual;
+    function PositionFromMiddle(
       const AssumeMiddlePosition: TVector3Single): TVector3Single; virtual;
     function LerpLegsMiddlePosition(
       const A: Single): TVector3Single; virtual;
@@ -729,10 +735,10 @@ type
 
     { The position of the (0, 0, 0) point of creature model
       (or rather, currently used model! Creatures are animated after all). }
-    property LegsPosition: TVector3Single read FLegsPosition
-      write SetLegsPosition;
+    property Position: TVector3Single read FPosition
+      write SetPosition;
 
-    { The height of MiddlePosition above LegsPosition.
+    { The height of MiddlePosition above Position.
       Calculated in this class using CurrentScene.BoundingBox.Data[1, 2]
       and Kind.MiddlePositionHeight.
       Note that while CurrentScene may change, this also may change. }
@@ -745,19 +751,19 @@ type
 
       All collision detection (MyMoveAllowed, MyHeight, MyLineOfSight)
       should be done using MiddlePosition, and then appropriately translated
-      back to LegsPosition. Why ? Because this avoids the problems
+      back to Position. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
       are not Flying and have already fallen down on the ground) on the
-      same level as the ground, so checking collisions versus LegsPosition
-      is always vulnerable to accidentaly finding collision between LegsPosition
+      same level as the ground, so checking collisions versus Position
+      is always vulnerable to accidentaly finding collision between Position
       and the ground.
 
       So for creatures not Flying, MiddlePosition should
-      be always higher (at least by Radius) than LegsPosition.
+      be always higher (at least by Radius) than Position.
 
-      For Flying creatures this is not a problem, they could use LegsPosition
+      For Flying creatures this is not a problem, they could use Position
       surrounded by Radius for collision detection. But this would
-      be inefficient --- since LegsPosition surrounded by Radius
+      be inefficient --- since Position surrounded by Radius
       would unnecessarily block creature's moves. So for Flying creatures
       it's best to actually set MiddlePosition right in the middle of
       creature's model, and so you can make Radius slightly smaller. }
@@ -795,11 +801,11 @@ type
 
     { Play SoundType where the creature's position is.
 
-      Exactly, the position is between LegsPosition and MiddlePosition
-      --- SoundHeight = 0 means LegsPosition, SoundHeight = 1 means MiddlePosition,
-      SoundHeight between means ... well, between LegsPosition and MiddlePosition.
+      Exactly, the position is between Position and MiddlePosition
+      --- SoundHeight = 0 means Position, SoundHeight = 1 means MiddlePosition,
+      SoundHeight between means ... well, between Position and MiddlePosition.
       This can also be higher than 1 or lower than 0, should be treated like
-      lerp between LegsPosition and MiddlePosition.
+      lerp between Position and MiddlePosition.
 
       If TiedToCreature then the sounds position will be updated
       as the creature will move, and when the creature object will
@@ -914,7 +920,7 @@ type
 
       This happens in the middle of AttackAnimation,
       see also ActualAttackTime. Of course you should use
-      current creature LegsPosition, MiddlePosition, Direction
+      current creature Position, MiddlePosition, Direction
       etc. to determine things like missile starting position
       and direction.
 
@@ -1108,7 +1114,7 @@ begin
 end;
 
 function TCreatureKind.CreateCreature(AOwner: TComponent;
-  const ALegsPosition: TVector3Single;
+  const APosition: TVector3Single;
   const ADirection: TVector3Single;
   const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
@@ -1121,7 +1127,7 @@ begin
   { set properties that in practice must have other-than-default values
     to sensibly use the creature }
   Result.FKind := Self;
-  Result.LegsPosition := ALegsPosition;
+  Result.Position := APosition;
   Result.Direction := Normalized(ADirection);
   Result.Life := MaxLife;
 end;
@@ -1626,13 +1632,13 @@ begin
 end;
 
 function TCreature.MiddlePositionFromLegs(
-  const AssumeLegsPosition: TVector3Single): TVector3Single;
+  const AssumePosition: TVector3Single): TVector3Single;
 begin
-  Result := AssumeLegsPosition;
+  Result := AssumePosition;
   Result[2] += HeightBetweenLegsAndMiddle;
 end;
 
-function TCreature.LegsPositionFromMiddle(
+function TCreature.PositionFromMiddle(
   const AssumeMiddlePosition: TVector3Single): TVector3Single;
 begin
   Result := AssumeMiddlePosition;
@@ -1641,13 +1647,13 @@ end;
 
 function TCreature.LerpLegsMiddlePosition(const A: Single): TVector3Single;
 begin
-  Result := LegsPosition;
+  Result := Position;
   Result[2] += HeightBetweenLegsAndMiddle * A;
 end;
 
 function TCreature.MiddlePosition: TVector3Single;
 begin
-  Result := MiddlePositionFromLegs(LegsPosition);
+  Result := MiddlePositionFromLegs(Position);
 end;
 
 procedure TCreature.TransformMatricesMult(var M, MInverse: TMatrix4Single);
@@ -1671,8 +1677,8 @@ begin
     TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
     on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
 
-  NewM := TransformToCoordsMatrix(LegsPosition, Direction, Side, GoodUp);
-  NewMInverse := TransformFromCoordsMatrix(LegsPosition, Direction, Side, GoodUp);
+  NewM := TransformToCoordsMatrix(Position, Direction, Side, GoodUp);
+  NewMInverse := TransformFromCoordsMatrix(Position, Direction, Side, GoodUp);
 
   M := M * NewM;
   MInverse := NewMInverse * MInverse;
@@ -1683,9 +1689,9 @@ begin
   Result := false;
 end;
 
-procedure TCreature.SetLegsPosition(const Value: TVector3Single);
+procedure TCreature.SetPosition(const Value: TVector3Single);
 begin
-  FLegsPosition := Value;
+  FPosition := Value;
   RecalculateBoundingBox;
 end;
 
@@ -1799,7 +1805,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     var
       FallenHeight, LifeLoss: Single;
     begin
-      FallenHeight := FallingDownStartHeight - LegsPosition[2];
+      FallenHeight := FallingDownStartHeight - Position[2];
       if FallenHeight > 1.0 then
       begin
         Sound3d(stCreatureFalledDown, 0.1, false);
@@ -1829,7 +1835,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
         NewMiddlePosition, BecauseOfGravity);
 
       if Result then
-        LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
+        Position := PositionFromMiddle(NewMiddlePosition);
     end;
 
   const
@@ -1853,7 +1859,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       (simplified, because creature doesn't need all these effects). }
 
     { Note that also here we do collision detection using MiddlePosition,
-      not LegsPosition. See MiddlePosition docs for reasoning. }
+      not Position. See MiddlePosition docs for reasoning. }
 
     OldIsFallingDown := FIsFallingDown;
     OldMiddlePosition := MiddlePosition;
@@ -1864,7 +1870,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     begin
       { Fall down }
       if not FIsFallingDown then
-        FallingDownStartHeight := LegsPosition[2];
+        FallingDownStartHeight := Position[2];
 
       FIsFallingDown := true;
 
@@ -2024,7 +2030,7 @@ end;
 
 procedure TCreature.Translate(const T: TVector3Single);
 begin
-  LegsPosition := LegsPosition + T;
+  Position := Position + T;
 end;
 
 function TCreature.MoveAllowed(
@@ -2385,7 +2391,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
 
   procedure DoWalk;
 
-    { This performs the real move, which means that it changes LegsPosition
+    { This performs the real move, which means that it changes Position
       and MiddlePosition along the Direction vector.
 
       This doesn't check whether this is a sensible move, so use this
@@ -2443,7 +2449,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         MyMoveAllowed(OldMiddlePosition, NewMiddlePosition, false);
 
       if Result then
-        LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
+        Position := PositionFromMiddle(NewMiddlePosition);
     end;
 
     { Go the way to LastSeenPlayer, *not* by using waypoints.
@@ -2704,7 +2710,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
 
       if MyMoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
         NewMiddlePosition, false) then
-        LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
+        Position := PositionFromMiddle(NewMiddlePosition);
     end;
   end;
 
@@ -3116,7 +3122,7 @@ begin
 
   { missile moves *always*, disregarding Move method result.
     Only after move, if the move made us colliding with something --- we explode. }
-  LegsPosition := LegsPositionFromMiddle(NewMiddlePosition);
+  Position := PositionFromMiddle(NewMiddlePosition);
 
   if not MissileMoveAllowed(OldMiddlePosition, NewMiddlePosition) then
   begin
@@ -3177,7 +3183,7 @@ begin
      (MissileKind.CloseDirectionToTargetSpeed <> 0) then
   begin
     TargetDirection := VectorSubtract(Player.Camera.Position,
-      LegsPosition);
+      Position);
     AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
     AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed * 50;
     if AngleBetween <= AngleChange then
@@ -3212,7 +3218,7 @@ begin
     --- because when the creature will be destroyed (and missile will
     be destroyed in nearest RemoveFromLevel pass), we want this sound
     to go on. }
-  SoundEngine.Sound3d(MissileKind.SoundExplosion, LegsPosition);
+  SoundEngine.Sound3d(MissileKind.SoundExplosion, Position);
 
   Life := 0.0;
 
