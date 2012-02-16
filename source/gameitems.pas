@@ -706,8 +706,8 @@ var
   I: Integer;
   C: TCreature;
 begin
-  WeaponBoundingBox := Player.BoundingBox.Translate(
-    VectorAdjustToLength(Player.Direction, 1.0));
+  { Player.Direction may be multiplied by something here for long-range weapons }
+  WeaponBoundingBox := Player.BoundingBox.Translate(Player.Direction);
   { Tests: Writeln('WeaponBoundingBox is ', WeaponBoundingBox.ToNiceStr); }
   { TODO: we would prefer to use World.BoxCollision for this,
     but we need to know which creature was hit. }
