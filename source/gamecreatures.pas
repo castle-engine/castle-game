@@ -651,7 +651,7 @@ type
     procedure SetLastAttackDirection(const Value: TVector3Single);
   protected
     function GetExists: boolean; override;
-    procedure DoRecalculateBoundingBox(out Box: TBox3D); override;
+    procedure RecalculateBoundingBox(out Box: TBox3D); override;
 
     { These define exactly what "MiddlePosition" means for this creature.
 
@@ -702,7 +702,7 @@ type
 
     { Return current scene to be rendered.
       Note that this is called at the end of our constructor
-      (through RecalculateBoundingBox),
+      (through VectorsChanged),
       so it must be implemented to work even when Level is not assigned yet. }
     function CurrentScene: TCastleScene; virtual; abstract;
 
@@ -1607,7 +1607,7 @@ begin
   Result := MiddlePositionFromLegs(Position);
 end;
 
-procedure TCreature.DoRecalculateBoundingBox(out Box: TBox3D);
+procedure TCreature.RecalculateBoundingBox(out Box: TBox3D);
 begin
   Box := CurrentScene.BoundingBox.Transform(Transform);
 end;
@@ -1844,7 +1844,7 @@ begin
   LifeTime += CompSpeed;
   { CurrentScene (possibly) changed, since LifeTime changed.
     So recalculate bounding box. }
-  RecalculateBoundingBox;
+  VectorsChanged;
 
   UpdateUsedSounds;
 
