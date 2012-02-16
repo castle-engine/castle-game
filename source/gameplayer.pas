@@ -281,9 +281,6 @@ type
       a message that he's no longer using that weapon. }
     function DeleteItem(ItemIndex: Integer): TItem;
 
-    { Like BoundingBox, but assumes that Camera.Position is as specified. }
-    function BoundingBoxAssuming(const AssumePosition: TVector3Single): TBox3D;
-
     { Weapon the player is using right now, or nil if none.
 
       EquippedWeapon.Kind must be TItemWeaponKind.
@@ -602,27 +599,18 @@ begin
     EquippedWeapon := nil;
 end;
 
-function TPlayer.BoundingBoxAssuming(const AssumePosition: TVector3Single): TBox3D;
-begin
-  if GetExists then
-  begin
-    Result.Data[0] := AssumePosition;
-    Result.Data[1] := AssumePosition;
-
-    Result.Data[0, 0] -= Camera.Radius;
-    Result.Data[0, 1] -= Camera.Radius;
-    Result.Data[0, 2] -= Camera.RealPreferredHeight;
-
-    Result.Data[1, 0] += Camera.Radius;
-    Result.Data[1, 1] += Camera.Radius;
-    Result.Data[1, 2] += Camera.Radius;
-  end else
-    Result := EmptyBox3D;
-end;
-
 procedure TPlayer.RecalculateBoundingBox(out Box: TBox3D);
 begin
-  Box := BoundingBoxAssuming(Position);
+  Box.Data[0] := Position;
+  Box.Data[1] := Position;
+
+  Box.Data[0, 0] -= Camera.Radius;
+  Box.Data[0, 1] -= Camera.Radius;
+  Box.Data[0, 2] -= Camera.RealPreferredHeight;
+
+  Box.Data[1, 0] += Camera.Radius;
+  Box.Data[1, 1] += Camera.Radius;
+  Box.Data[1, 2] += Camera.Radius;
 end;
 
 procedure TPlayer.SetEquippedWeapon(Value: TItem);
