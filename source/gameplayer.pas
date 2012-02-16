@@ -81,12 +81,72 @@ type
     FItems: TItemList;
     FEquippedWeapon: TItem;
     FFlyingModeTimeOut: Single; { > 0 means he's flying. In seconds. }
-    function GetFlyingMode: boolean;
-    procedure SetEquippedWeapon(Value: TItem);
-  private
+
     { blackout things }
     BlackOutIntensity: TGLfloat;
     BlackOutColor: TVector3f;
+
+    { This means that weapon AttackAnimation is being done.
+      This also means that EquippedWeapon <> nil. }
+    Attacking: boolean;
+    { If Attacking, then this is time of attack start, from Level.AnimationTime. }
+    AttackStartTime: Single;
+    { If Attacking, then this says whether EquippedWeapon.Kind.ActualAttack
+      was already called. }
+    ActualAttackDone: boolean;
+
+    HintEscapeKeyShown: boolean;
+
+    { If Swimming = psUnderWater, then this is the time (from Level.AnimationTime)
+      of setting Swimming to psUnderWater. }
+    SwimBeginTime: Single;
+    { If Swimming = psUnderWater, this is the time of last
+      drowning (or 0.0 if there was no drowning yet in this swimming session). }
+    SwimLastDrownTime: Single;
+    { If Swimming = psUnderWater, this is the time of last stPlayerSwimming sound
+      (or 0.0 if there was no stPlayerSwimming played yet in this
+      swimming session). }
+    SwimLastSoundTime: Single;
+    FSwimming: TPlayerSwimming;
+
+    { Did last Idle detected that we're on lava ? }
+    IsLava: boolean;
+    { Relevant if IsLava, this is Level.AnimationTime when
+      last time lava damage was done. When player steps on lava for the
+      first time, he immediately gets damage, so LavaLastDamageTime is
+      always valid when IsLava. }
+    LavaLastDamageTime: Single;
+
+    AllocatedSwimmingChangeSource: TALSound;
+    AllocatedSwimmingSource: TALSound;
+
+    { Did last Idle detected that we are on the ground. }
+    IsOnTheGround: boolean;
+    { <> @nil if IsOnTheGround and last ground had some TTextureRule. }
+    GroundRule: TTextureRule;
+    ReallyIsOnTheGroundTime: Single;
+
+    { There always must be satisfied:
+        AllocatedFootstepsSource <> nil
+      if and only if
+        FootstepsSoundPlaying <> stNone. }
+    AllocatedFootstepsSource: TALSound;
+    FootstepsSoundPlaying: TSoundType;
+    ReallyWalkingOnTheGroundTime: Single;
+
+    { FKnockbackDistance <= 0 means "no knockback currently" }
+    FKnockbackDistance: Single;
+    { This must be valid and non-zero when FKnockbackDistance > 0 }
+    FKnockbackDirection: TVector3Single;
+    KnockBackSpeed: Single;
+
+    FInventoryCurrentItem: Integer;
+    FSickProjectionSpeed: Single;
+
+    FRequiredCreatures: TStringList;
+
+    function GetFlyingMode: boolean;
+    procedure SetEquippedWeapon(Value: TItem);
 
     { Update Camera properties, including inputs.
       Also updates Level.Input_PointingDeviceActivate, it's suitable to do it here.
@@ -102,77 +162,18 @@ type
       Color (while SetLife always uses red color). }
     procedure SetLifeCustomBlackOut(const Value: Single;
       const Color: TVector3Single);
-  private
-    { This means that weapon AttackAnimation is being done.
-      This also means that EquippedWeapon <> nil. }
-    Attacking: boolean;
-    { If Attacking, then this is time of attack start, from Level.AnimationTime. }
-    AttackStartTime: Single;
-    { If Attacking, then this says whether EquippedWeapon.Kind.ActualAttack
-      was already called. }
-    ActualAttackDone: boolean;
-
-    HintEscapeKeyShown: boolean;
 
     { Shortcut for TItemWeaponKind(EquippedWeapon.Kind).
       Call this only when EquippedWeapon <> nil. }
     function EquippedWeaponKind: TItemWeaponKind;
 
     procedure InputChanged(InputConfiguration: TInputConfiguration);
-  private
-    { If Swimming = psUnderWater, then this is the time (from Level.AnimationTime)
-      of setting Swimming to psUnderWater. }
-    SwimBeginTime: Single;
-    { If Swimming = psUnderWater, this is the time of last
-      drowning (or 0.0 if there was no drowning yet in this swimming session). }
-    SwimLastDrownTime: Single;
-    { If Swimming = psUnderWater, this is the time of last stPlayerSwimming sound
-      (or 0.0 if there was no stPlayerSwimming played yet in this
-      swimming session). }
-    SwimLastSoundTime: Single;
 
-    { Did last Idle detected that we're on lava ? }
-    IsLava: boolean;
-    { Relevant if IsLava, this is Level.AnimationTime when
-      last time lava damage was done. When player steps on lava for the
-      first time, he immediately gets damage, so LavaLastDamageTime is
-      always valid when IsLava. }
-    LavaLastDamageTime: Single;
-
-    AllocatedSwimmingChangeSource: TALSound;
     procedure AllocatedSwimmingChangeSourceUsingEnd(Sender: TALSound);
-  private
-    AllocatedSwimmingSource: TALSound;
     procedure AllocatedSwimmingSourceUsingEnd(Sender: TALSound);
-  private
-    FSwimming: TPlayerSwimming;
     procedure SetSwimming(const Value: TPlayerSwimming);
-  private
-    { Did last Idle detected that we are on the ground. }
-    IsOnTheGround: boolean;
-    { <> @nil if IsOnTheGround and last ground had some TTextureRule. }
-    GroundRule: TTextureRule;
-    ReallyIsOnTheGroundTime: Single;
 
-    { There always must be satisfied:
-        AllocatedFootstepsSource <> nil
-      if and only if
-        FootstepsSoundPlaying <> stNone. }
-    AllocatedFootstepsSource: TALSound;
-    FootstepsSoundPlaying: TSoundType;
-    ReallyWalkingOnTheGroundTime: Single;
     procedure AllocatedFootstepsSourceUsingEnd(Sender: TALSound);
-  private
-    { FKnockbackDistance <= 0 means "no knockback currently" }
-    FKnockbackDistance: Single;
-    { This must be valid and non-zero when FKnockbackDistance > 0 }
-    FKnockbackDirection: TVector3Single;
-    KnockBackSpeed: Single;
-
-    FInventoryCurrentItem: Integer;
-    FSickProjectionSpeed: Single;
-
-    FRequiredCreatures: TStringList;
   protected
     procedure RecalculateBoundingBox(out Box: TBox3D); override;
   public
