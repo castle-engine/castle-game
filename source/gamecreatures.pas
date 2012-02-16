@@ -178,8 +178,7 @@ type
       ADirection passed here is normalized, and then used
       as initial TCreature.Direction value. }
     function CreateCreature(AOwner: TComponent;
-      const APosition: TVector3Single;
-      const ADirection: TVector3Single;
+      const APosition, ADirection, AUp: TVector3Single;
       const BaseLights: TLightInstancesList;
       const MaxLife: Single): TCreature;
 
@@ -634,30 +633,9 @@ type
   end;
 
   T3DOrient = class(T3DCustomTransform)
-  end;
-
-  TCreature = class(T3DOrient)
   private
-    FKind: TCreatureKind;
-    FPosition: TVector3Single;
-    FDirection: TVector3Single;
-    FLife: Single;
-    FMaxLife: Single;
-    FLastAttackDirection: TVector3Single;
-    LifeTime: Single;
-    procedure SetLastAttackDirection(const Value: TVector3Single);
-  private
-    { For gravity work. }
-    FallingDownStartHeight: Single;
-    FIsFallingDown: boolean;
+    FPosition, FDirection, FUp: TVector3Single;
 
-    UsedSounds: TALSoundList;
-
-    procedure SoundSourceUsingEnd(Sender: TALSound);
-
-    procedure SetPosition(const Value: TVector3Single);
-    procedure SetDirection(const Value: TVector3Single);
-  private
     { It's faster to keep FBoundingBox precalculated (and only update
       it each time we change Direction or Position)
       instead of completely recalculating it in each BoundingBox call.
@@ -669,14 +647,73 @@ type
       would be spend within BoundingBox calculations. Yes, this is
       checked with profiler. }
     FBoundingBox: TBox3D;
-    procedure RecalculateBoundingBox;
-  private
-    FSoundDyingEnabled: boolean;
-  protected
-    function GetExists: boolean; override;
 
+    procedure SetPosition(const Value: TVector3Single);
+    procedure SetDirection(const Value: TVector3Single);
+    procedure SetUp(const Value: TVector3Single);
+  protected
+    procedure RecalculateBoundingBox; virtual; abstract;
     procedure TransformMatricesMult(var M, MInverse: TMatrix4Single); override;
     function OnlyTranslation: boolean; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+
+    function BoundingBox: TBox3D; override;
+
+    { Position (translation) of this 3D object. }
+    property Position: TVector3Single read FPosition write SetPosition;
+
+    { Direction the creature is facing, and up vector.
+
+      The @link(Direction) and @link(Up) vectors should always be normalized
+      (have length 1). When setting them by these properties, we will normalize
+      them automatically.
+
+      They must also always be orthogonal.
+      When setting @link(Direction), @link(Up) will always be automatically
+      adjusted to be orthogonal to @link(Direction). And vice versa ---
+      when setting @link(Up), @link(Direction) will be adjusted.
+
+      Initially, they follow VRML/X3D standard vectors suitable for gravity along
+      the Y axis. So direction is -Z (DefaultCameraDirection),
+      up is +Y (DefaultCameraUp).
+
+      @groupBegin }
+    property Direction: TVector3Single read FDirection write SetDirection;
+    property Up: TVector3Single read FUp write SetUp;
+    { @groupEnd }
+
+    { Set at once vectors: position, direction, up.
+
+      ADir and AUp given here do not have to be normalized
+      (they will be normalized if needed).
+      They cannot be parallel (will be fixed internally to be exactly orthogonal,
+      by changing up vector). }
+    procedure SetView(const APos, ADir, AUp: TVector3Single);
+
+    procedure Translate(const T: TVector3Single); override;
+  end;
+
+  TCreature = class(T3DOrient)
+  private
+    FKind: TCreatureKind;
+    FLife: Single;
+    FMaxLife: Single;
+    FLastAttackDirection: TVector3Single;
+    LifeTime: Single;
+
+    { For gravity work. }
+    FallingDownStartHeight: Single;
+    FIsFallingDown: boolean;
+
+    UsedSounds: TALSoundList;
+    FSoundDyingEnabled: boolean;
+
+    procedure SoundSourceUsingEnd(Sender: TALSound);
+    procedure SetLastAttackDirection(const Value: TVector3Single);
+  protected
+    function GetExists: boolean; override;
+    procedure RecalculateBoundingBox; override;
 
     { These define exactly what "MiddlePosition" means for this creature.
 
@@ -720,8 +757,6 @@ type
 
     property Kind: TCreatureKind read FKind;
 
-    function BoundingBox: TBox3D; override;
-
     procedure Render(const Frustum: TFrustum;
       const Params: TRenderParams); override;
 
@@ -732,11 +767,6 @@ type
       (through RecalculateBoundingBox),
       so it must be implemented to work even when Level is not assigned yet. }
     function CurrentScene: TCastleScene; virtual; abstract;
-
-    { The position of the (0, 0, 0) point of creature model
-      (or rather, currently used model! Creatures are animated after all). }
-    property Position: TVector3Single read FPosition
-      write SetPosition;
 
     { The height of MiddlePosition above Position.
       Calculated in this class using CurrentScene.BoundingBox.Data[1, 2]
@@ -773,12 +803,6 @@ type
       Nil if none. Yes, this is just a shortcut for
       Level.Sectors.SectorWithPoint(MiddlePosition). }
     function MiddlePositionSector: TSceneSector;
-
-    { Direction the creature is facing.
-      It always must be normalized.
-
-      In constructor, when setting this from ADirection, we normalize it. }
-    property Direction: TVector3Single read FDirection write SetDirection;
 
     { Shortcut for Life <= 0. }
     function Dead: boolean;
@@ -833,7 +857,6 @@ type
       const Distance: Single): boolean; override;
 
     property Pushable default true;
-    procedure Translate(const T: TVector3Single); override;
 
     { Is move through this creature allowed. }
     function MoveAllowed(
@@ -1026,7 +1049,7 @@ var
 
 implementation
 
-uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow,
+uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow, Cameras,
   CastleFilesUtils, CastleGLUtils, ProgressUnit, GamePlay,
   GameVideoOptions, GameNotifications, GameRequiredResources;
 
@@ -1114,8 +1137,7 @@ begin
 end;
 
 function TCreatureKind.CreateCreature(AOwner: TComponent;
-  const APosition: TVector3Single;
-  const ADirection: TVector3Single;
+  const APosition, ADirection, AUp: TVector3Single;
   const BaseLights: TLightInstancesList;
   const MaxLife: Single): TCreature;
 begin
@@ -1127,8 +1149,7 @@ begin
   { set properties that in practice must have other-than-default values
     to sensibly use the creature }
   Result.FKind := Self;
-  Result.Position := APosition;
-  Result.Direction := Normalized(ADirection);
+  Result.SetView(APosition, ADirection, AUp);
   Result.Life := MaxLife;
 end;
 
@@ -1543,6 +1564,82 @@ begin
   AnimationFromConfig(FAnimationFile, KindsConfig, 'stand');
 end;
 
+{ T3DOrient ------------------------------------------------------------------ }
+
+constructor T3DOrient.Create(AOwner: TComponent);
+begin
+  inherited;
+  FDirection := DefaultCameraDirection;
+  FUp := DefaultCameraUp;
+end;
+
+procedure T3DOrient.TransformMatricesMult(var M, MInverse: TMatrix4Single);
+var
+  NewM, NewMInverse: TMatrix4Single;
+var
+  Side: TVector3Single;
+begin
+  Side := VectorProduct(Up, Direction);
+
+  { Note that actually I could do here TransformToCoordsNoScaleMatrix,
+    as obviously I don't want any scaling. But in this case I know
+    that Direction and Up lengths = 1 (so their product
+    length is also = 1), so no need to do
+    TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
+    on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
+
+  NewM := TransformToCoordsMatrix(Position, Direction, Side, Up);
+  NewMInverse := TransformFromCoordsMatrix(Position, Direction, Side, Up);
+
+  M := M * NewM;
+  MInverse := NewMInverse * MInverse;
+end;
+
+function T3DOrient.OnlyTranslation: boolean;
+begin
+  Result := false;
+end;
+
+procedure T3DOrient.SetPosition(const Value: TVector3Single);
+begin
+  FPosition := Value;
+  RecalculateBoundingBox;
+end;
+
+procedure T3DOrient.SetDirection(const Value: TVector3Single);
+begin
+  FDirection := Normalized(Value);
+  MakeVectorsOrthoOnTheirPlane(FUp, FDirection);
+  RecalculateBoundingBox;
+end;
+
+procedure T3DOrient.SetUp(const Value: TVector3Single);
+begin
+  FUp := Normalized(Value);
+  MakeVectorsOrthoOnTheirPlane(FDirection, FUp);
+  RecalculateBoundingBox;
+end;
+
+procedure T3DOrient.SetView(const APos, ADir, AUp: TVector3Single);
+begin
+  FPosition := APos;
+  FDirection := Normalized(ADir);
+  FUp := Normalized(AUp);
+  MakeVectorsOrthoOnTheirPlane(FUp, FDirection);
+end;
+
+function T3DOrient.BoundingBox: TBox3D;
+begin
+  if GetExists then
+    Result := FBoundingBox else
+    Result := EmptyBox3D;
+end;
+
+procedure T3DOrient.Translate(const T: TVector3Single);
+begin
+  Position := Position + T;
+end;
+
 { TCreatureSoundSourceData --------------------------------------------------- }
 
 type
@@ -1559,7 +1656,6 @@ begin
   inherited Create(AOwner);
   Pushable := true;
   FMaxLife := AMaxLife;
-  FDirection := UnitVector3Single[0];
   FSoundDyingEnabled := true;
   UsedSounds := TALSoundList.Create(false);
 end;
@@ -1593,13 +1689,6 @@ begin
     UnRequireCreature(Kind);
 
   inherited;
-end;
-
-function TCreature.BoundingBox: TBox3D;
-begin
-  if GetExists then
-    Result := FBoundingBox else
-    Result := EmptyBox3D;
 end;
 
 procedure TCreature.SoundSourceUsingEnd(Sender: TALSound);
@@ -1654,51 +1743,6 @@ end;
 function TCreature.MiddlePosition: TVector3Single;
 begin
   Result := MiddlePositionFromLegs(Position);
-end;
-
-procedure TCreature.TransformMatricesMult(var M, MInverse: TMatrix4Single);
-var
-  NewM, NewMInverse: TMatrix4Single;
-var
-  GoodUp, Side: TVector3Single;
-begin
-  GoodUp := UnitVector3Single[2];
-  { If not Flying, then we know that GoodUp is already
-    orthogonal to Direction. }
-  if Kind.Flying then
-    MakeVectorsOrthoOnTheirPlane(GoodUp, Direction);
-
-  Side := VectorProduct(GoodUp, Direction);
-
-  { Note that actually I could do here TransformToCoordsNoScaleMatrix,
-    as obviously I don't want any scaling. But in this case I know
-    that Direction length = 1 and GoodUp = 1 (so their product
-    length is also = 1), so no need to do
-    TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
-    on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
-
-  NewM := TransformToCoordsMatrix(Position, Direction, Side, GoodUp);
-  NewMInverse := TransformFromCoordsMatrix(Position, Direction, Side, GoodUp);
-
-  M := M * NewM;
-  MInverse := NewMInverse * MInverse;
-end;
-
-function TCreature.OnlyTranslation: boolean;
-begin
-  Result := false;
-end;
-
-procedure TCreature.SetPosition(const Value: TVector3Single);
-begin
-  FPosition := Value;
-  RecalculateBoundingBox;
-end;
-
-procedure TCreature.SetDirection(const Value: TVector3Single);
-begin
-  FDirection := Value;
-  RecalculateBoundingBox;
 end;
 
 procedure TCreature.RecalculateBoundingBox;
@@ -2026,11 +2070,6 @@ begin
     Notifications.Show(S);
   end else
     Notifications.Show('You see some creature, but it''s too far to tell exactly what it is');
-end;
-
-procedure TCreature.Translate(const T: TVector3Single);
-begin
-  Position := Position + T;
 end;
 
 function TCreature.MoveAllowed(
@@ -3168,14 +3207,6 @@ begin
   begin
     NewDirection := Direction;
     NewDirection[2] -= MissileKind.FallsDownSpeed * CompSpeed * 50;
-
-    { Above makes Direction potentially not normalized, but very slowly
-      (MissileKind.FallsDownSpeed is very small...) so it would be a waste
-      of time to call Normalize(Sqrt) each Idle. Call it only when it's really
-      much needed. }
-    if not Between(VectorLenSqr(NewDirection), Sqr(0.8), Sqr(1.2)) then
-      NormalizeTo1st(NewDirection);
-
     Direction := NewDirection;
   end;
 
@@ -3187,12 +3218,12 @@ begin
     AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
     AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed * 50;
     if AngleBetween <= AngleChange then
-      Direction := Normalized(TargetDirection) else
+      Direction := TargetDirection else
     begin
       NewDirection := Direction;
       MakeVectorsAngleRadOnTheirPlane(NewDirection, TargetDirection,
         AngleBetween - AngleChange);
-      Direction := Normalized(NewDirection);
+      Direction := NewDirection;
     end;
   end;
 

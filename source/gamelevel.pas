@@ -361,10 +361,10 @@ type
     { Comfortably create and add creature to level.
       @groupBegin }
     function CreateCreature(const Kind: TCreatureKind;
-      const ALegsPosition: TVector3Single;
+      const APosition: TVector3Single;
       const ADirection: TVector3Single; const MaxLife: Single): TCreature;
     function CreateCreature(const Kind: TCreatureKind;
-      const ALegsPosition: TVector3Single;
+      const APosition: TVector3Single;
       const ADirection: TVector3Single): TCreature;
     { @groupEnd }
   end;
@@ -919,19 +919,19 @@ begin
 end;
 
 function TLevel.CreateCreature(const Kind: TCreatureKind;
-  const ALegsPosition: TVector3Single;
+  const APosition: TVector3Single;
   const ADirection: TVector3Single; const MaxLife: Single): TCreature;
 begin
-  Result := Kind.CreateCreature(Self, ALegsPosition,
-    ADirection, BaseLights, MaxLife);
+  Result := Kind.CreateCreature(Self, APosition,
+    ADirection, GravityUp, BaseLights, MaxLife);
   Items.Add(Result);
 end;
 
 function TLevel.CreateCreature(const Kind: TCreatureKind;
-  const ALegsPosition: TVector3Single;
+  const APosition: TVector3Single;
   const ADirection: TVector3Single): TCreature;
 begin
-  Result := CreateCreature(Kind, ALegsPosition, ADirection, Kind.DefaultMaxLife);
+  Result := CreateCreature(Kind, APosition, ADirection, Kind.DefaultMaxLife);
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single;
