@@ -691,6 +691,18 @@ type
       by changing up vector). }
     procedure SetView(const APos, ADir, AUp: TVector3Single);
 
+    { Change up vector, but (when it needs to be fixed to have direction and up
+      orthogonal) keep the direction unchanged.
+
+      This is contrary to assigning @link(Up) vector using the property setter.
+      In that case, the @link(Direction) is changed (to be orthogonal to up).
+      In the case of this method, the up vector is change (to be orthogonal to
+      direction).
+
+      It's good to use this if you have a preferred up vector for creatures,
+      but still preserving the direction vector has the highest priority. }
+    procedure UpPrefer(const AUp: TVector3Single);
+
     procedure Translate(const T: TVector3Single); override;
   end;
 
@@ -1617,6 +1629,13 @@ procedure T3DOrient.SetUp(const Value: TVector3Single);
 begin
   FUp := Normalized(Value);
   MakeVectorsOrthoOnTheirPlane(FDirection, FUp);
+  RecalculateBoundingBox;
+end;
+
+procedure T3DOrient.UpPrefer(const AUp: TVector3Single);
+begin
+  FUp := Normalized(AUp);
+  MakeVectorsOrthoOnTheirPlane(FUp, FDirection);
   RecalculateBoundingBox;
 end;
 
@@ -2800,6 +2819,16 @@ begin
     wasSpecial1: { Should be handled in descendants. };
     else raise EInternalError.Create('FState ?');
   end;
+
+  { Flying creatures may change their direction vector freely.
+    However, we want them to keep their sense of up --- they should try
+    to keep straight, so their up vector should try to remain close
+    to GravityUp, not just change wildly.
+
+    For non-flying, this is not needed, as then Up should always remain equal
+    to initial value, which is GravityUp. }
+  if Kind.Flying then
+    UpPrefer(World.GravityUp);
 end;
 
 function TWalkAttackCreature.CurrentScene: TCastleScene;
