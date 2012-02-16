@@ -651,7 +651,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
     if TeleportBox.PointInside(Player.Position) then
     begin
       Player.Position := Destination;
-      Player.Camera.CancelFallingDown;
+      GamePlay.Player.Camera.CancelFallingDown;
 
       MainScene.ViewChangedSuddenly;
 
@@ -1353,7 +1353,7 @@ begin
        2.0) then
     MovingElevator9a9b.GoBeginPosition;
 
-  if ExitMessagePending and (not Player.Camera.FallingOnTheGround) then
+  if ExitMessagePending and (not GamePlay.Player.Camera.FallingOnTheGround) then
   begin
     { ExitMessagePending is displayed when player FallOnTheGround effect
       (when dying) ended. }
