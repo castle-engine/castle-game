@@ -383,7 +383,7 @@ const
     for I := 0 to CastleHallWerewolvesCount - 1 do
       WerewolfCreature[I] := CreateCreature(Werewolf,
         WerewolfAppearPosition[I],
-        VectorSubtract(GamePlay.Player.Camera.Position, WerewolfAppearPosition[I]))
+        VectorSubtract(Player.Position, WerewolfAppearPosition[I]))
         as TWerewolfCreature;
 
     WerewolfAppeared := true;
@@ -472,7 +472,7 @@ begin
 
   if (Player = nil) or Paused then Exit;
 
-  if FLevelExitBox.PointInside(GamePlay.Player.Camera.Position) then
+  if FLevelExitBox.PointInside(Player.Position) then
   begin
     LevelFinished('cages');
   end;
@@ -630,11 +630,11 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
   var
     NewPosition: TVector3Single;
   begin
-    NewPosition := GamePlay.Player.Camera.Position;
+    NewPosition := Player.Position;
     { Although I do him knockback, I also change the position
       to make sure that he is thrown outside of FGateExitBox. }
     NewPosition[1] := FGateExitBox.Data[0, 1] - 0.1;
-    GamePlay.Player.Camera.Position := NewPosition;
+    Player.Position := NewPosition;
 
     GamePlay.Player.Knockback(0, 2, Vector3Single(0, -1, 0));
   end;
@@ -648,10 +648,10 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
     Rot[3] += 0.175 * CompSpeed;
     Teleport.Rotation := Rot;
 
-    if TeleportBox.PointInside(GamePlay.Player.Camera.Position) then
+    if TeleportBox.PointInside(Player.Position) then
     begin
-      GamePlay.Player.Camera.Position := Destination;
-      GamePlay.Player.Camera.CancelFallingDown;
+      Player.Position := Destination;
+      Player.Camera.CancelFallingDown;
 
       MainScene.ViewChangedSuddenly;
 
@@ -668,7 +668,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
     for I := 0 to High(SacrilegeAmbushStartingPosition) do
     begin
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
-      CreatureDirection := GamePlay.Player.Camera.Position - CreaturePosition;
+      CreatureDirection := Player.Position - CreaturePosition;
       CreateCreature(Ghost, CreaturePosition, CreatureDirection);
     end;
   end;
@@ -681,7 +681,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
     for I := 0 to High(SwordAmbushStartingPosition) do
     begin
       CreaturePosition := SwordAmbushStartingPosition[I];
-      CreatureDirection := GamePlay.Player.Camera.Position - CreaturePosition;
+      CreatureDirection := Player.Position - CreaturePosition;
       CreateCreature(Ghost, CreaturePosition, CreatureDirection);
     end;
   end;
@@ -694,7 +694,7 @@ begin
 
   if (Player = nil) or Paused then Exit;
 
-  if FGateExitBox.PointInside(GamePlay.Player.Camera.Position) then
+  if FGateExitBox.PointInside(Player.Position) then
   begin
     if GamePlay.Player.Items.FindKind(KeyItemKind) = -1 then
     begin
@@ -716,7 +716,7 @@ begin
     TeleportWork(Teleport2, Teleport2Box, Teleport2Destination);
 
     if (not SacrilegeAmbushDone) and
-      FSacrilegeBox.PointInside(GamePlay.Player.Camera.Position) then
+      FSacrilegeBox.PointInside(Player.Position) then
     begin
       SacrilegeAmbushDone := true;
       SacrilegeAmbush;
@@ -977,10 +977,10 @@ const
   const
     RandomDist = 10.0;
   begin
-    Result[0] := GamePlay.Player.Camera.Position[0] +
+    Result[0] := Player.Position[0] +
       MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
     Result[0] := Clamped(Result[0], MinSpiderX, MaxSpiderX);
-    Result[1] := GamePlay.Player.Camera.Position[1] +
+    Result[1] := Player.Position[1] +
       MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
     Result[1] := Clamped(Result[1], MinSpiderY, MaxSpiderY);
     Result[2] := SpiderZ;
@@ -1057,7 +1057,7 @@ begin
       if AboveHeight < Spider.Radius * 2 then
       begin
         SpiderDirection :=
-          VectorSubtract(GamePlay.Player.Camera.Position, SpiderPosition);
+          VectorSubtract(Player.Position, SpiderPosition);
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, GravityUp);
         SpiderCreature := CreateCreature(Spider, SpiderPosition, SpiderDirection);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
@@ -1186,7 +1186,7 @@ begin
   Elevator9a9bPickBox := (Level as TDoomE1M1Level).Elevator9a9bPickBox;
 
   Result := MovingElevator9a9b.CompletelyBeginPosition and
-    Elevator9a9bPickBox.PointInside(Player.Camera.Position);
+    Elevator9a9bPickBox.PointInside(Player.Position);
 
   if Result then
   begin
@@ -1341,7 +1341,7 @@ begin
   if (Player = nil) or Paused then Exit;
 
   if MovingElevator49.CompletelyBeginPosition and
-     Elevator49DownBox.PointInside(GamePlay.Player.Camera.Position) then
+     Elevator49DownBox.PointInside(Player.Position) then
   begin
     MovingElevator49.GoEndPosition;
   end;
@@ -1353,7 +1353,7 @@ begin
        2.0) then
     MovingElevator9a9b.GoBeginPosition;
 
-  if ExitMessagePending and (not GamePlay.Player.Camera.FallingOnTheGround) then
+  if ExitMessagePending and (not Player.Camera.FallingOnTheGround) then
   begin
     { ExitMessagePending is displayed when player FallOnTheGround effect
       (when dying) ended. }

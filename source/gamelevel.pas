@@ -417,7 +417,7 @@ begin
   inherited;
   if (not MessageDone) and
      (Player <> nil) and
-     PointInside(Player.Camera.Position) then
+     PointInside(Player.Position) then
   begin
     ReplaceInteractInput.C := 'i';
     ReplaceInteractInput.S := InteractInputDescription;

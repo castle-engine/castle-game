@@ -707,7 +707,7 @@ var
   C: TCreature;
 begin
   WeaponBoundingBox := Player.BoundingBox.Translate(
-    VectorAdjustToLength(Player.Camera.Direction, 1.0));
+    VectorAdjustToLength(Player.Direction, 1.0));
   { Tests: Writeln('WeaponBoundingBox is ', WeaponBoundingBox.ToNiceStr); }
   { TODO: we would prefer to use World.BoxCollision for this,
     but we need to know which creature was hit. }
@@ -719,7 +719,7 @@ begin
       if C.BoundingBox.Collision(WeaponBoundingBox) then
       begin
         C.Life := C.Life - DamageConst - Random * DamageRandom;
-        C.LastAttackDirection := Player.Camera.Direction;
+        C.LastAttackDirection := Player.Direction;
       end;
     end;
 end;
@@ -744,7 +744,7 @@ begin
       Player.DeleteItem(QuiverIndex).Free;
 
     { shoot the arrow }
-    Level.CreateCreature(Arrow, Player.Camera.Position, Player.Camera.Direction);
+    Level.CreateCreature(Arrow, Player.Position, Player.Direction);
     SoundEngine.Sound(stArrowFired);
   end;
 end;

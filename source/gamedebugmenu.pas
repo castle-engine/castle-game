@@ -353,8 +353,8 @@ procedure TDebugCreaturesMenu.Click;
     if ChooseCreatureKind(Kind) then
     begin
       Level.CreateCreature(Kind,
-        Player.Camera.Position + Player.Camera.Direction * DirectionAttenuation,
-        Player.Camera.Direction);
+        Player.Position + Player.Direction * DirectionAttenuation,
+        Player.Direction);
 
       UserQuit := true;
     end;
@@ -445,6 +445,10 @@ procedure TDebugLevelMenu.Click;
 
     LevelFinished(Level.Name);
     LevelFinishedFlush;
+    
+    { Change Player.Camera, they will be automtically set also for Player 
+      properties by TCastleSceneManager.CameraVisibleChange.
+      TODO: maybe different one day? }
 
     Player.Camera.Position := Pos;
     Player.Camera.Direction := Dir;
@@ -803,7 +807,7 @@ begin
            Vector := TAbstractDirectionalLightNode(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
-             Vector, taLeft, Player.Camera.Direction) then
+             Vector, taLeft, Player.Direction) then
              TAbstractDirectionalLightNode(Light).FdDirection.Send(Vector);
          end;
        end;
@@ -813,7 +817,7 @@ begin
            Vector := TSpotLightNode_1(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
-             Vector, taLeft, Player.Camera.Direction) then
+             Vector, taLeft, Player.Direction) then
              TSpotLightNode_1(Light).FdDirection.Send(Vector);
          end else
          if Light is TSpotLightNode then
@@ -821,7 +825,7 @@ begin
            Vector := TSpotLightNode(Light).FdDirection.Value;
            if MessageInputQueryVector3SingleP(Window, 'Change direction' +nl+
              '(Input "P" to use current player''s direction)',
-             Vector, taLeft, Player.Camera.Direction) then
+             Vector, taLeft, Player.Direction) then
              TSpotLightNode(Light).FdDirection.Send(Vector);
          end;
        end;
