@@ -632,80 +632,6 @@ type
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
 
-  T3DOrient = class(T3DCustomTransform)
-  private
-    FPosition, FDirection, FUp: TVector3Single;
-
-    { It's faster to keep FBoundingBox precalculated (and only update
-      it each time we change Direction or Position)
-      instead of completely recalculating it in each BoundingBox call.
-
-      This is especially noticeable when there are many creatures on the level:
-      then a lot of time is wasted in DoGravity, and main time of this
-      is iterating over creatures checking their @link(Height),
-      and main time of this
-      would be spend within BoundingBox calculations. Yes, this is
-      checked with profiler. }
-    FBoundingBox: TBox3D;
-
-    procedure SetPosition(const Value: TVector3Single);
-    procedure SetDirection(const Value: TVector3Single);
-    procedure SetUp(const Value: TVector3Single);
-  protected
-    procedure RecalculateBoundingBox; virtual; abstract;
-    procedure TransformMatricesMult(var M, MInverse: TMatrix4Single); override;
-    function OnlyTranslation: boolean; override;
-  public
-    constructor Create(AOwner: TComponent); override;
-
-    function BoundingBox: TBox3D; override;
-
-    { Position (translation) of this 3D object. }
-    property Position: TVector3Single read FPosition write SetPosition;
-
-    { Direction the creature is facing, and up vector.
-
-      The @link(Direction) and @link(Up) vectors should always be normalized
-      (have length 1). When setting them by these properties, we will normalize
-      them automatically.
-
-      They must also always be orthogonal.
-      When setting @link(Direction), @link(Up) will always be automatically
-      adjusted to be orthogonal to @link(Direction). And vice versa ---
-      when setting @link(Up), @link(Direction) will be adjusted.
-
-      Initially, they follow VRML/X3D standard vectors suitable for gravity along
-      the Y axis. So direction is -Z (DefaultCameraDirection),
-      up is +Y (DefaultCameraUp).
-
-      @groupBegin }
-    property Direction: TVector3Single read FDirection write SetDirection;
-    property Up: TVector3Single read FUp write SetUp;
-    { @groupEnd }
-
-    { Set at once vectors: position, direction, up.
-
-      ADir and AUp given here do not have to be normalized
-      (they will be normalized if needed).
-      They cannot be parallel (will be fixed internally to be exactly orthogonal,
-      by changing up vector). }
-    procedure SetView(const APos, ADir, AUp: TVector3Single);
-
-    { Change up vector, but (when it needs to be fixed to have direction and up
-      orthogonal) keep the direction unchanged.
-
-      This is contrary to assigning @link(Up) vector using the property setter.
-      In that case, the @link(Direction) is changed (to be orthogonal to up).
-      In the case of this method, the up vector is change (to be orthogonal to
-      direction).
-
-      It's good to use this if you have a preferred up vector for creatures,
-      but still preserving the direction vector has the highest priority. }
-    procedure UpPrefer(const AUp: TVector3Single);
-
-    procedure Translate(const T: TVector3Single); override;
-  end;
-
   TCreature = class(T3DOrient)
   private
     FKind: TCreatureKind;
@@ -725,7 +651,7 @@ type
     procedure SetLastAttackDirection(const Value: TVector3Single);
   protected
     function GetExists: boolean; override;
-    procedure RecalculateBoundingBox; override;
+    procedure DoRecalculateBoundingBox(out Box: TBox3D); override;
 
     { These define exactly what "MiddlePosition" means for this creature.
 
@@ -1576,89 +1502,6 @@ begin
   AnimationFromConfig(FAnimationFile, KindsConfig, 'stand');
 end;
 
-{ T3DOrient ------------------------------------------------------------------ }
-
-constructor T3DOrient.Create(AOwner: TComponent);
-begin
-  inherited;
-  FDirection := DefaultCameraDirection;
-  FUp := DefaultCameraUp;
-end;
-
-procedure T3DOrient.TransformMatricesMult(var M, MInverse: TMatrix4Single);
-var
-  NewM, NewMInverse: TMatrix4Single;
-var
-  Side: TVector3Single;
-begin
-  Side := VectorProduct(Up, Direction);
-
-  { Note that actually I could do here TransformToCoordsNoScaleMatrix,
-    as obviously I don't want any scaling. But in this case I know
-    that Direction and Up lengths = 1 (so their product
-    length is also = 1), so no need to do
-    TransformToCoordsNoScaleMatrix here (and I can avoid wasting my time
-    on Sqrts needed inside TransformToCoordsNoScaleMatrix). }
-
-  NewM := TransformToCoordsMatrix(Position, Direction, Side, Up);
-  NewMInverse := TransformFromCoordsMatrix(Position, Direction, Side, Up);
-
-  M := M * NewM;
-  MInverse := NewMInverse * MInverse;
-end;
-
-function T3DOrient.OnlyTranslation: boolean;
-begin
-  Result := false;
-end;
-
-procedure T3DOrient.SetPosition(const Value: TVector3Single);
-begin
-  FPosition := Value;
-  RecalculateBoundingBox;
-end;
-
-procedure T3DOrient.SetDirection(const Value: TVector3Single);
-begin
-  FDirection := Normalized(Value);
-  MakeVectorsOrthoOnTheirPlane(FUp, FDirection);
-  RecalculateBoundingBox;
-end;
-
-procedure T3DOrient.SetUp(const Value: TVector3Single);
-begin
-  FUp := Normalized(Value);
-  MakeVectorsOrthoOnTheirPlane(FDirection, FUp);
-  RecalculateBoundingBox;
-end;
-
-procedure T3DOrient.UpPrefer(const AUp: TVector3Single);
-begin
-  FUp := Normalized(AUp);
-  MakeVectorsOrthoOnTheirPlane(FUp, FDirection);
-  RecalculateBoundingBox;
-end;
-
-procedure T3DOrient.SetView(const APos, ADir, AUp: TVector3Single);
-begin
-  FPosition := APos;
-  FDirection := Normalized(ADir);
-  FUp := Normalized(AUp);
-  MakeVectorsOrthoOnTheirPlane(FUp, FDirection);
-end;
-
-function T3DOrient.BoundingBox: TBox3D;
-begin
-  if GetExists then
-    Result := FBoundingBox else
-    Result := EmptyBox3D;
-end;
-
-procedure T3DOrient.Translate(const T: TVector3Single);
-begin
-  Position := Position + T;
-end;
-
 { TCreatureSoundSourceData --------------------------------------------------- }
 
 type
@@ -1764,9 +1607,9 @@ begin
   Result := MiddlePositionFromLegs(Position);
 end;
 
-procedure TCreature.RecalculateBoundingBox;
+procedure TCreature.DoRecalculateBoundingBox(out Box: TBox3D);
 begin
-  FBoundingBox := CurrentScene.BoundingBox.Transform(Transform);
+  Box := CurrentScene.BoundingBox.Transform(Transform);
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum;
@@ -2268,6 +2111,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     AngleRadChangeSpeed = 0.1;
   var
     AngleRadChange: Single;
+    NewDirection: TVector3Single;
   begin
     if not VectorsParallel(DirectionToTarget, Direction) then
     begin
@@ -2277,20 +2121,13 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       AngleRadChange := AngleRadChangeSpeed * CompSpeed * 50;
       MinTo1st(AngleRadChange, AngleRadBetweenDirectionToTarget);
 
-      Direction := RotatePointAroundAxisRad(AngleRadChange, Direction,
+      NewDirection := RotatePointAroundAxisRad(AngleRadChange, Direction,
         VectorProduct(Direction, DirectionToTarget));
 
-      { From time to time it's good to fix Direction, to make sure it's
-        1. normalized,
-        2. and orthogonal to GravityUp if not Flying
-        Otherwise rounding errors could accumulate and cause some nasty things.
-
-        Actually, I didn't observe anything bad caused by the above,
-        but I'm safeguarding anyway, for safety. }
+      { Make sure direction for non-flying creatures is orthogonal to GravityUp. }
       if not Kind.Flying then
-        MakeVectorsOrthoOnTheirPlane(FDirection, World.GravityUp);
-      NormalizeTo1st(FDirection);
-      RecalculateBoundingBox;
+        MakeVectorsOrthoOnTheirPlane(NewDirection, World.GravityUp);
+      Direction := NewDirection;
     end;
   end;
 
