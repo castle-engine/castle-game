@@ -73,7 +73,7 @@ type
     Generally all things are allowed except things that are explicitly
     forbidden.
   }
-  TPlayer = class(T3D)
+  TPlayer = class(T3DOrient)
   private
     FLife: Single;
     FMaxLife: Single;
@@ -173,6 +173,8 @@ type
     FSickProjectionSpeed: Single;
 
     FRequiredCreatures: TStringList;
+  protected
+    procedure RecalculateBoundingBox(out Box: TBox3D); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -281,24 +283,6 @@ type
 
     { Like BoundingBox, but assumes that Camera.Position is as specified. }
     function BoundingBoxAssuming(const AssumePosition: TVector3Single): TBox3D;
-
-    { Calculates what can be considered "bounding box of the player",
-      taking into account global Level.CameRadius around current Position.
-      Use for collision detection etc.
-
-      If Tall then the returned box uses current camera height
-      (i.e. Camera.RealPreferredHeight).
-
-      If not Tall, then the box is just Camera.Radius around
-      Position, so it could be more accurately described
-      as a sphere with Camera.Radius around Position.
-      In this case, the box doesn't really represent player
-      (you can say that player's "legs" are not included in the box).
-      However, not Tall box can still be useful (e.g. when checking for
-      collision with creatures, because then the player will "grow"
-      anyway (using @link(Height)), so Camera.RealPreferredHeight
-      will be taken into account but in a different way. }
-    function BoundingBox: TBox3D; override;
 
     { Weapon the player is using right now, or nil if none.
 
@@ -636,9 +620,9 @@ begin
     Result := EmptyBox3D;
 end;
 
-function TPlayer.BoundingBox: TBox3D;
+procedure TPlayer.RecalculateBoundingBox(out Box: TBox3D);
 begin
-  Result := BoundingBoxAssuming(Player.Camera.Position);
+  Box := BoundingBoxAssuming(Position);
 end;
 
 procedure TPlayer.SetEquippedWeapon(Value: TItem);
