@@ -174,8 +174,6 @@ type
     procedure SetSwimming(const Value: TPlayerSwimming);
 
     procedure AllocatedFootstepsSourceUsingEnd(Sender: TALSound);
-  protected
-    function CalculateBoundingBox: TBox3D; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -628,20 +626,6 @@ begin
   Items.Delete(ItemIndex);
   if Result = EquippedWeapon then
     EquippedWeapon := nil;
-end;
-
-function TPlayer.CalculateBoundingBox: TBox3D;
-begin
-  Result.Data[0] := Position;
-  Result.Data[1] := Position;
-
-  Result.Data[0, 0] -= Camera.Radius;
-  Result.Data[0, 1] -= Camera.Radius;
-  Result.Data[0, 2] -= Camera.RealPreferredHeight;
-
-  Result.Data[1, 0] += Camera.Radius;
-  Result.Data[1, 1] += Camera.Radius;
-  Result.Data[1, 2] += Camera.Radius;
 end;
 
 procedure TPlayer.SetEquippedWeapon(Value: TItem);

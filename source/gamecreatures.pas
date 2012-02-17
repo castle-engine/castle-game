@@ -653,7 +653,6 @@ type
     procedure UpdateCurrentScene;
   protected
     function GetExists: boolean; override;
-    function CalculateBoundingBox: TBox3D; override;
 
     { These define exactly what "MiddlePosition" means for this creature.
 
@@ -703,9 +702,8 @@ type
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     { Return current scene to be rendered.
-      Note that this is called at the end of our constructor
-      (through VectorsChanged),
-      so it must be implemented to work even when Level is not assigned yet. }
+      Note that this may be called before were added to World (at the end of our
+      construction), so make it work always reliably. }
     function CurrentScene: TCastleScene; virtual; abstract;
 
     { The height of MiddlePosition above Position.
@@ -1610,11 +1608,6 @@ begin
   Result := MiddlePositionFromLegs(Position);
 end;
 
-function TCreature.CalculateBoundingBox: TBox3D;
-begin
-  Result := CurrentScene.BoundingBox.Transform(Transform);
-end;
-
 procedure TCreature.UpdateCurrentScene;
 begin
   { self-shadows on creatures look bad, esp. see werewolves at the end
@@ -1849,9 +1842,6 @@ begin
   if (not GetExists) or DebugTimeStopForCreatures then Exit;
 
   LifeTime += CompSpeed;
-  { CurrentScene (possibly) changed, since LifeTime changed.
-    So recalculate bounding box. }
-  VectorsChanged;
 
   UpdateUsedSounds;
 
