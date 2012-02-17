@@ -1939,6 +1939,8 @@ function TCreature.MoveAllowed(
   const IsRadius: boolean; const Radius: Single;
   const OldBox, NewBox: TBox3D;
   const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
+var
+  MyBox: TBox3D;
 begin
   { check collision with creature's bounding box.
     We ignore IsRadius, Radius for now --- we always check collisions
