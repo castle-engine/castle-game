@@ -1449,6 +1449,7 @@ begin
   Result := PTriangle(Camera.AboveGround);
 end;
 
+{TODO: this should disappear, we should depend on T3DOrient doing this}
 procedure TPlayer.Translate(const T: TVector3Single);
 begin
   Camera.Position := Camera.Position + T;
