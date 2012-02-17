@@ -3025,7 +3025,7 @@ begin
   NewMiddlePosition := MiddlePosition +
     Direction * (MissileKind.MoveSpeed * CompSpeed * 50);
 
-  { missile moves *always*, disregarding Move method result.
+  { missile moves *always*, disregarding MissileMoveAllowed result.
     Only after move, if the move made us colliding with something --- we explode. }
   Position := PositionFromMiddle(NewMiddlePosition);
 
