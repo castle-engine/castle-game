@@ -3022,8 +3022,8 @@ begin
     so I don't bother with checking here Dead. }
 
   OldMiddlePosition := MiddlePosition;
-  NewMiddlePosition := VectorAdd(MiddlePosition,
-    VectorScale(Direction, MissileKind.MoveSpeed * CompSpeed * 50));
+  NewMiddlePosition := MiddlePosition +
+    Direction * (MissileKind.MoveSpeed * CompSpeed * 50);
 
   { missile moves *always*, disregarding Move method result.
     Only after move, if the move made us colliding with something --- we explode. }
@@ -3079,8 +3079,7 @@ begin
   if MissileKind.CloseDirectionToPlayer and
      (MissileKind.CloseDirectionToTargetSpeed <> 0) then
   begin
-    TargetDirection := VectorSubtract(Player.Position,
-      Position);
+    TargetDirection := Player.Position - Position;
     AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
     AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed * 50;
     if AngleBetween <= AngleChange then
@@ -3134,9 +3133,8 @@ procedure TMissileCreature.ExplodeWithCreature(Creature: TCreature);
 begin
   { TODO: knockback for creatures should be done here. }
   Creature.LastAttackDirection := Direction;
-  Creature.Life := Creature.Life -
-    (Kind.ShortRangeAttackDamageConst +
-      Random * Kind.ShortRangeAttackDamageRandom);
+  Creature.Life := Creature.Life - (Kind.ShortRangeAttackDamageConst +
+    Random * Kind.ShortRangeAttackDamageRandom);
 end;
 
 { TStillCreature ----------------------------------------------------------- }
