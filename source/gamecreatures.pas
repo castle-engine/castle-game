@@ -1948,7 +1948,8 @@ begin
 
   if GetCollides then
   begin
-    if NewBox.Collision(BoundingBox) then
+    MyBox := BoundingBox;
+    if NewBox.Collision(MyBox) then
     begin
       { Strictly thinking, now I know that I have a collision with creature
         and I should exit with false. But it's not that simple.
@@ -1971,21 +1972,21 @@ begin
         tries to get closer to the creature (so if the pathologic situation
         occurs, someone can't make it worse, and can't "abuse" this
         by entering into creature's bounding box). }
-      if (not OldBox.Collision(BoundingBox)) or
+      if (not OldBox.Collision(MyBox)) or
          ( PointsDistanceSqr(NewPos, MiddlePosition) <
            PointsDistanceSqr(OldPos, MiddlePosition) ) then
         Exit(false);
     end else
-    { If NewBox doesn't collide with BoundingBox,
+    { If NewBox doesn't collide with MyBox,
       and OldBox also doesn't collide (so pathological
       situation above occurs) we know that segment between
-      OldPos and NewPos cannot collide with BoundingBox.
+      OldPos and NewPos cannot collide with MyBox.
 
       Without this check, player could get on the other side
       of the creature if the creature is slim (e.g. Alien) and player
       tries very hard, and he has large speed. }
-    if (not OldBox.Collision(BoundingBox)) and
-       BoundingBox.SegmentCollision(OldPos, NewPos) then
+    if (not OldBox.Collision(MyBox)) and
+       MyBox.SegmentCollision(OldPos, NewPos) then
       Exit(false);
   end;
 end;
@@ -2260,10 +2261,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         SetState(wasWalk) else
       if (not Kind.Flying) and
          (AngleRadBetweenDirectionToPlayer < 0.01) and
-         (BoundingBox.Data[0][0] <= LastSeenPlayer[0]) and
-         (BoundingBox.Data[1][0] >= LastSeenPlayer[0]) and
-         (BoundingBox.Data[0][1] <= LastSeenPlayer[1]) and
-         (BoundingBox.Data[1][1] >= LastSeenPlayer[1]) then
+         BoundingBox.PointInsideXY(LastSeenPlayer) then
       begin
         { Then the player (or it's LastSeenPlayer) is right above or below us.
           Since we can't fly, we can't get there. Standing in place
@@ -2271,7 +2269,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
           - We become easier target to shoot for player with the bow.
           - Most importantly, this way player can stand on our head and
             slash us with a sword without any risk. (This was almost
-            a standard technique on killing Werewolf or SpiderQueen bosses).
+            a standard technique of killing Werewolf or SpiderQueen bosses).
           So we move a little --- just for the sake of moving. }
         SetState(wasWalk);
         InitAlternativeTarget;
