@@ -649,6 +649,8 @@ type
 
     procedure SoundSourceUsingEnd(Sender: TALSound);
     procedure SetLastAttackDirection(const Value: TVector3Single);
+    { Insert CurrentScene to out list. }
+    procedure UpdateCurrentScene;
   protected
     function GetExists: boolean; override;
     function CalculateBoundingBox: TBox3D; override;
@@ -1089,6 +1091,7 @@ begin
   Result.FKind := Self;
   Result.SetView(APosition, ADirection, AUp);
   Result.Life := MaxLife;
+  Result.UpdateCurrentScene;
 end;
 
 { TCreatureKindList -------------------------------------------------------- }
@@ -1612,8 +1615,21 @@ begin
   Result := CurrentScene.BoundingBox.Transform(Transform);
 end;
 
-procedure TCreature.Render(const Frustum: TFrustum;
-  const Params: TRenderParams);
+procedure TCreature.UpdateCurrentScene;
+begin
+  { self-shadows on creatures look bad, esp. see werewolves at the end
+    of "castle hall" level. Changing XxxShadowVolumes here
+    is a little hacky (would be cleaner to do it at loading), but easy. }
+  CurrentScene.ReceiveShadowVolumes := false;
+  CurrentScene.CastShadowVolumes := Kind.CastShadowVolumes;
+
+  { Make sure our List contains exactly CurrentScene }
+  if Count = 1 then
+    List[0] := CurrentScene else
+    Add(CurrentScene);
+end;
+
+procedure TCreature.Render(const Frustum: TFrustum; const Params: TRenderParams);
 
   procedure RenderBoundingGeometry;
   var
@@ -1656,16 +1672,7 @@ procedure TCreature.Render(const Frustum: TFrustum;
   end;
 
 begin
-  { self-shadows on creatures look bad, esp. see werewolves at the end
-    of "castle hall" level. Changing XxxShadowVolumes here
-    is a little hacky (would be cleaner to do it at loading), but easy. }
-  CurrentScene.ReceiveShadowVolumes := false;
-  CurrentScene.CastShadowVolumes := Kind.CastShadowVolumes;
-
-  { Make sure our List contains exactly CurrentScene }
-  if Count = 1 then
-    List[0] := CurrentScene else
-    Add(CurrentScene);
+  UpdateCurrentScene;
 
   inherited;
 
