@@ -651,7 +651,7 @@ type
     procedure SetLastAttackDirection(const Value: TVector3Single);
   protected
     function GetExists: boolean; override;
-    procedure RecalculateBoundingBox(out Box: TBox3D); override;
+    function CalculateBoundingBox: TBox3D; override;
 
     { These define exactly what "MiddlePosition" means for this creature.
 
@@ -1607,9 +1607,9 @@ begin
   Result := MiddlePositionFromLegs(Position);
 end;
 
-procedure TCreature.RecalculateBoundingBox(out Box: TBox3D);
+function TCreature.CalculateBoundingBox: TBox3D;
 begin
-  Box := CurrentScene.BoundingBox.Transform(Transform);
+  Result := CurrentScene.BoundingBox.Transform(Transform);
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum;

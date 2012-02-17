@@ -175,7 +175,7 @@ type
 
     procedure AllocatedFootstepsSourceUsingEnd(Sender: TALSound);
   protected
-    procedure RecalculateBoundingBox(out Box: TBox3D); override;
+    function CalculateBoundingBox: TBox3D; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -600,18 +600,18 @@ begin
     EquippedWeapon := nil;
 end;
 
-procedure TPlayer.RecalculateBoundingBox(out Box: TBox3D);
+function TPlayer.CalculateBoundingBox: TBox3D;
 begin
-  Box.Data[0] := Position;
-  Box.Data[1] := Position;
+  Result.Data[0] := Position;
+  Result.Data[1] := Position;
 
-  Box.Data[0, 0] -= Camera.Radius;
-  Box.Data[0, 1] -= Camera.Radius;
-  Box.Data[0, 2] -= Camera.RealPreferredHeight;
+  Result.Data[0, 0] -= Camera.Radius;
+  Result.Data[0, 1] -= Camera.Radius;
+  Result.Data[0, 2] -= Camera.RealPreferredHeight;
 
-  Box.Data[1, 0] += Camera.Radius;
-  Box.Data[1, 1] += Camera.Radius;
-  Box.Data[1, 2] += Camera.Radius;
+  Result.Data[1, 0] += Camera.Radius;
+  Result.Data[1, 1] += Camera.Radius;
+  Result.Data[1, 2] += Camera.Radius;
 end;
 
 procedure TPlayer.SetEquippedWeapon(Value: TItem);
