@@ -414,6 +414,34 @@ var
   GLList_DrawWaterRect: TGLuint;
   GLList_BossIndicatorImage: TGLuint;
 
+{ TPlayerBox ----------------------------------------------------------------- }
+
+type
+  { Invisible box, that is added to make TPlayer collidable thanks to default
+    T3DOrient (actually T3DList) methods. Owner must be TPlayer. }
+  TPlayerBox = class(T3D)
+  public
+    function BoundingBox: TBox3D; override;
+  end;
+
+function TPlayerBox.BoundingBox: TBox3D;
+var
+  Camera: TWalkCamera;
+begin
+  if GetExists then
+  begin
+    Camera := TPlayer(Owner).Camera;
+    Result.Data[0, 0] := -Camera.Radius;
+    Result.Data[0, 1] := -Camera.Radius;
+    Result.Data[0, 2] := -Camera.RealPreferredHeight;
+
+    Result.Data[1, 0] := Camera.Radius;
+    Result.Data[1, 1] := Camera.Radius;
+    Result.Data[1, 2] := Camera.Radius;
+  end else
+    Result := EmptyBox3D;
+end;
+
 { TPlayer -------------------------------------------------------------------- }
 
 constructor TPlayer.Create(AOwner: TComponent);
@@ -424,6 +452,8 @@ begin
   Pushable := true;
   FLife := DefaultMaxLife;
   FMaxLife := DefaultMaxLife;
+
+  Add(TPlayerBox.Create(Self));
 
   FItems := TItemList.Create(false);
   FInventoryCurrentItem := -1;
