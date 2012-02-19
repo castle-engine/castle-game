@@ -475,13 +475,15 @@ begin
   begin
     LevelFinishedSchedule := false;
 
-    { First, we have to disconnect Player.Camera from old Level.Camera.
-      That is because when creating new level, Player.Camera must be connected
+    { First, we have to disconnect Player and Camera from old Level.
+      That is because when creating new level, Player and Camera must be connected
       with new level in it's constructor (that's how our TLevel.Create works),
       and you should not keep the same T3D (Player) and TCamera (Player.Camera)
-      within w different scene managers --- it would cause troubles with
+      within different scene managers --- it would cause troubles with
       connecting callbacks to Camera, and Player.Parent. }
     Level.Camera := nil;
+    Level.Player := nil;
+    Level.Items.Remove(Player);
 
     { We cannot draw old level now, since it's Camera is nil,
       and TLevel.ApplyProjection is not prepared for this.
