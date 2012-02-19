@@ -649,7 +649,7 @@ type
 
     procedure SoundSourceUsingEnd(Sender: TALSound);
     procedure SetLastAttackDirection(const Value: TVector3Single);
-    { Insert CurrentScene to out list. }
+    { Insert CurrentScene to our list. }
     procedure UpdateCurrentScene;
   protected
     function GetExists: boolean; override;
