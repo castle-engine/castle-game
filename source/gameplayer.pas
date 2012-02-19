@@ -295,9 +295,6 @@ type
     { Render 2D things (but not weapon) of the player. }
     procedure Render2D;
 
-    { Render 2D weapon of the player. }
-    procedure RenderWeapon2D;
-
     { Adjust some things based on passing time.
       For now, this is for things like FlyingModeTimeout to "wear out".
       @noAutoLinkHere }
@@ -320,10 +317,10 @@ type
     { @noAutoLinkHere }
     procedure Attack;
 
-    { This will render player's weapon attacking.
+    { This will render player's weapon (attacking or not).
       This is a 3D rendering. Note that this may clear depth buffer
       and set matrix to identity. }
-    procedure RenderAttack(Params: TRenderParams);
+    procedure RenderWeapon(Params: TRenderParams);
 
     { You should set this property as appropriate.
       This object will just use this property (changing it's Camera
@@ -1293,28 +1290,31 @@ begin
   end;
 end;
 
-procedure TPlayer.RenderWeapon2D;
-begin
-  if (EquippedWeapon <> nil) and (not Attacking) then
-    glCallList(EquippedWeaponKind.GLList_DrawScreenImage);
-end;
-
-procedure TPlayer.RenderAttack(Params: TRenderParams);
+procedure TPlayer.RenderWeapon(Params: TRenderParams);
 var
   AttackTime: Single;
-  Anim: TCastlePrecalculatedAnimation;
+  AttackAnim: TCastlePrecalculatedAnimation;
 begin
-  if Attacking then
+  if EquippedWeapon <> nil then
   begin
+    AttackAnim := EquippedWeaponKind.AttackAnimation;
+    { clear depth, to never cover weapon by scene items }
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity;
     AttackTime := Level.AnimationTime - AttackStartTime;
-    Anim := EquippedWeaponKind.AttackAnimation;
-    if AttackTime <= Anim.TimeEnd then
+    if Attacking and (AttackTime <= AttackAnim.TimeEnd) then
     begin
-      glClear(GL_DEPTH_BUFFER_BIT);
-      glLoadIdentity;
-      Anim.SceneFromTime(AttackTime).Render(nil, Params);
+      AttackAnim.SceneFromTime(AttackTime).Render(nil, Params);
     end else
+    begin
+      { turn off Attacking, if AttackTime passed }
       Attacking := false;
+      { although current weapons animations are just static,
+        we use Level.AnimationTime to enable weapon animation
+        (weapon swaying) in the future. }
+      EquippedWeaponKind.ReadyAnimation.SceneFromTime(
+        Level.AnimationTime).Render(nil, Params);
+    end;
   end;
 end;
 

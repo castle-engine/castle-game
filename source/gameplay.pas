@@ -324,8 +324,6 @@ procedure TGame2DControls.Draw;
 begin
   if DebugRenderForLevelScreenshot then Exit;
 
-  Player.RenderWeapon2D;
-
   glLoadIdentity;
   glRasterPos2i(0, 0);
 
@@ -365,10 +363,10 @@ begin
   try
     Params.FBaseLights.AppendInWorldCoordinates(Level.MainScene.GlobalLights);
 
-    Params.Transparent := false; Params.ShadowVolumesReceivers := false; Player.RenderAttack(Params);
-    Params.Transparent := false; Params.ShadowVolumesReceivers := true ; Player.RenderAttack(Params);
-    Params.Transparent := true ; Params.ShadowVolumesReceivers := false; Player.RenderAttack(Params);
-    Params.Transparent := true ; Params.ShadowVolumesReceivers := true ; Player.RenderAttack(Params);
+    Params.Transparent := false; Params.ShadowVolumesReceivers := false; Player.RenderWeapon(Params);
+    Params.Transparent := false; Params.ShadowVolumesReceivers := true ; Player.RenderWeapon(Params);
+    Params.Transparent := true ; Params.ShadowVolumesReceivers := false; Player.RenderWeapon(Params);
+    Params.Transparent := true ; Params.ShadowVolumesReceivers := true ; Player.RenderWeapon(Params);
   finally FreeAndNil(Params) end;
 end;
 

@@ -1,0 +1,13 @@
+#VRML V1.0 ascii
+
+Group {
+  Translation { translation 0 0 -0.5 }
+
+  Translation { translation 1.0 1.0 -0.5 }
+
+  Rotation { rotation 0 1 0 0.7 }
+
+  Rotation { rotation 1 0 0 2 }
+
+  WWWInline { name "model_final.wrl" }
+}

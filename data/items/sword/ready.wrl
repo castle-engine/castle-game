@@ -1,0 +1,8 @@
+#VRML V1.0 ascii
+
+Group {
+  Translation { translation 2 -0.25 0.5 }
+  Rotation { rotation 0 1 0 0.3 }
+  WWWInline { name "attack_header.wrl" separate FALSE }
+  WWWInline { name "model.wrl" }
+}

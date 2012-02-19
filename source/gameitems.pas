@@ -158,14 +158,11 @@ type
 
   TItemWeaponKind = class(TItemKind)
   private
-    FScreenImageFileName: string;
-    FScreenImage: TImage;
-    FGLList_DrawScreenImage: TGLuint;
-    FScreenImageAlignLeft: boolean;
-    FScreenImageAlignBottom : boolean;
     FEquippingSound: TSoundType;
     FAttackAnimation: TCastlePrecalculatedAnimation;
     FAttackAnimationFile: string;
+    FReadyAnimation: TCastlePrecalculatedAnimation;
+    FReadyAnimationFile: string;
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
@@ -173,38 +170,18 @@ type
   public
     destructor Destroy; override;
 
-    { Because whole screen is quite large, we want our ScreenImage
-      to be much smaller. So I can't simply cover whole screen with
-      ScreenImage --- instead these properties tell me where to
-      put the ScreenImage on the screen. }
-    property ScreenImageAlignLeft: boolean read FScreenImageAlignLeft;
-    property ScreenImageAlignBottom: boolean read FScreenImageAlignBottom;
-
-    { "Screen image" will be displayed on player's screen when this
-      item will be equipped.
-
-      GLList_DrawScreenImage will draw the image temporarily
-      turning on alpha test.
-      It will be displayed with alpha test,
-      so it's OK to use sharp alpha channel on this image.
-
-      GLList_DrawScreenImage changes raster position and current matrix.
-
-      @groupBegin }
-    property ScreenImageFileName: string read FScreenImageFileName;
-    function ScreenImage: TImage;
-    function GLList_DrawScreenImage: TGLuint;
-    { @groupEnd }
-
     { Sound to make on equipping. Each weapon can have it's own
       equipping sound. }
     property EquippingSound: TSoundType
       read FEquippingSound write FEquippingSound;
 
-    { This is an animation of attack with this weapon.
-      TimeBegin must be 0. }
+    { Animation of attack with this weapon. TimeBegin must be 0. }
     property AttackAnimation: TCastlePrecalculatedAnimation
       read FAttackAnimation;
+
+    { Animation of keeping weapon ready. }
+    property ReadyAnimation: TCastlePrecalculatedAnimation
+      read FReadyAnimation;
 
     procedure Use(Item: TItem); override;
 
@@ -212,7 +189,7 @@ type
     procedure FreePrepareRender; override;
     procedure GLContextClose; override;
 
-    { This is the time point within AttackAnimation
+    { Time within AttackAnimation
       at which ActualAttack method will be called.
       Note that actually ActualAttack may be called a *very little* later
       (hopefully it shouldn't be noticeable to the player). }
@@ -583,44 +560,9 @@ destructor TItemWeaponKind.Destroy;
 begin
   FreeAndNil(FAttackAnimation);
   FAttackAnimationFile := '';
-  FreeAndNil(FScreenImage);
+  FreeAndNil(FReadyAnimation);
+  FReadyAnimationFile := '';
   inherited;
-end;
-
-function TItemWeaponKind.ScreenImage: TImage;
-begin
-  if FScreenImage = nil then
-    FScreenImage := LoadImage(ScreenImageFileName, [], []);
-  Result := FScreenImage;
-end;
-
-function TItemWeaponKind.GLList_DrawScreenImage: TGLuint;
-var
-  X, Y: Integer;
-begin
-  if FGLList_DrawScreenImage = 0 then
-  begin
-    FGLList_DrawScreenImage := glGenListsCheck(1, 'TItemWeaponKind.GLList_DrawScreenImage');
-    glNewList(FGLList_DrawScreenImage, GL_COMPILE);
-    try
-      if ScreenImageAlignLeft then
-        X := 0 else
-        X := Cardinal(Window.Width) - ScreenImage.Width;
-      if ScreenImageAlignBottom then
-        Y := 0 else
-        Y := Cardinal(Window.Height) - ScreenImage.Height;
-
-      glLoadIdentity;
-      glRasterPos2i(X, Y);
-
-      glPushAttrib(GL_COLOR_BUFFER_BIT);
-        glAlphaFunc(GL_GREATER, 0.5);
-        glEnable(GL_ALPHA_TEST);
-          ImageDraw(ScreenImage);
-      glPopAttrib;
-    finally glEndList end;
-  end;
-  Result := FGLList_DrawScreenImage;
 end;
 
 procedure TItemWeaponKind.Use(Item: TItem);
@@ -633,6 +575,8 @@ begin
   inherited;
   CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationFile,
     BaseLights);
+  CreateAnimationIfNeeded('Ready', FReadyAnimation, FReadyAnimationFile,
+    BaseLights);
 end;
 
 function TItemWeaponKind.PrepareRenderSteps: Cardinal;
@@ -643,6 +587,7 @@ end;
 procedure TItemWeaponKind.FreePrepareRender;
 begin
   FreeAndNil(FAttackAnimation);
+  FreeAndNil(FReadyAnimation);
   inherited;
 end;
 
@@ -650,30 +595,22 @@ procedure TItemWeaponKind.GLContextClose;
 begin
   inherited;
   if AttackAnimation <> nil then AttackAnimation.GLContextClose;
+  if ReadyAnimation <> nil then ReadyAnimation.GLContextClose;
 end;
 
 procedure TItemWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
-var
-  BasePath: string;
 begin
   inherited;
 
   ActualAttackTime := KindsConfig.GetFloat(ShortName + '/actual_attack_time',
     DefaultItemActualAttackTime);
 
-  BasePath := ExtractFilePath(KindsConfig.FileName);
-
-  FScreenImageFileName := GetStringCheckNonEmpty(KindsConfig, 'screen_image/file_name');
-  FScreenImageFileName := CombinePaths(BasePath, FScreenImageFileName);
-
-  FScreenImageAlignLeft := KindsConfig.GetValue(ShortName + 'screen_image/align_left', false);
-  FScreenImageAlignBottom := KindsConfig.GetValue(ShortName + 'screen_image/align_bottom', true);
-
   EquippingSound := SoundEngine.SoundFromName(
     KindsConfig.GetValue(ShortName + '/equipping_sound', ''));
   SoundAttackStart := SoundEngine.SoundFromName(
     KindsConfig.GetValue(ShortName + '/sound_attack_start', ''));
 
+  AnimationFromConfig(FReadyAnimationFile, KindsConfig, 'ready');
   { TODO: TItemWeaponKind impl allows to have FAttackAnimationFile = ''
     if you don't want attack animation, but line below doesn't allow it. }
   AnimationFromConfig(FAttackAnimationFile, KindsConfig, 'attack');

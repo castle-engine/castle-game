@@ -39,8 +39,8 @@
     sound_attack_start="sword_attack_start"
 
     attack_animation="sword/attack.kanim"
+    ready_animation="sword/ready.wrl"
   >
-    <screen_image file_name="sword/equipped.png" align_left="false" align_bottom="true" />
     <damage const="20.0" random="20.0" />
   </Sword>
 
@@ -54,8 +54,8 @@
     sound_attack_start="bow_attack_start"
 
     attack_animation="bow/attack.kanim"
+    ready_animation="bow/ready.wrl"
   >
-    <screen_image file_name="bow/equipped.png" align_left="false" align_bottom="true" />
   </Bow>
 
   <ScrFlying
