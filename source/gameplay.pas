@@ -139,12 +139,6 @@ type
     function DrawStyle: TUIControlDrawStyle; override;
   end;
 
-  TGame3DControls = class(TUIControl)
-  public
-    procedure Draw; override;
-    function DrawStyle: TUIControlDrawStyle; override;
-  end;
-
 function TGame2DControls.DrawStyle: TUIControlDrawStyle;
 begin
   Result := ds2D;
@@ -346,28 +340,6 @@ begin
     DoShowGameWinInfo;
 
   Player.Render2D;
-end;
-
-function TGame3DControls.DrawStyle: TUIControlDrawStyle;
-begin
-  Result := ds3D;
-end;
-
-procedure TGame3DControls.Draw;
-var
-  Params: TBasicRenderParams;
-begin
-  { TODO: avoid creating this. In fact, just place this within scene manager,
-    instead of drawing in ds3D. }
-  Params := TBasicRenderParams.Create;
-  try
-    Params.FBaseLights.AppendInWorldCoordinates(Level.MainScene.GlobalLights);
-
-    Params.Transparent := false; Params.ShadowVolumesReceivers := false; Player.RenderWeapon(Params);
-    Params.Transparent := false; Params.ShadowVolumesReceivers := true ; Player.RenderWeapon(Params);
-    Params.Transparent := true ; Params.ShadowVolumesReceivers := false; Player.RenderWeapon(Params);
-    Params.Transparent := true ; Params.ShadowVolumesReceivers := true ; Player.RenderWeapon(Params);
-  finally FreeAndNil(Params) end;
 end;
 
 { Call this when Level value changed (because of LevelFinished
@@ -894,7 +866,6 @@ procedure PlayGame(PrepareNewPlayer: boolean);
 var
   SavedMode: TGLMode;
   C2D: TGame2DControls;
-  C3D: TGame3DControls;
 begin
   Notifications.Clear;
 
@@ -924,8 +895,7 @@ begin
     Window.OnDrawStyle := ds3D;
 
     C2D := TGame2DControls.Create(nil);
-    C3D := TGame3DControls.Create(nil);
-    GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, C3D, Level]);
+    GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, Level]);
 
     Window.Controls.AddList(GameControls);
 
@@ -950,7 +920,6 @@ begin
 
     FreeAndNil(GameControls);
     FreeAndNil(C2D);
-    FreeAndNil(C3D);
     FreeAndNil(SavedMode);
   end;
 end;

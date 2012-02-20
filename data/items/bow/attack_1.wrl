@@ -1,6 +1,10 @@
 #VRML V1.0 ascii
 
 Group {
+  # original model has up in +Y, we want it in +Z
+  Rotation { rotation 1 0 0 1.5707963268 }
+  Rotation { rotation 0 1 0 -1.5707963268 }
+
   PointLight {
     location -0.570138692855835 -0.783580601215363 3.139318227767944
   }

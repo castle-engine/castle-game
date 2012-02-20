@@ -28,7 +28,7 @@ interface
 uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
   SceneWaypoints, GameInputs, ALSoundAllocator, GameSound,
   Triangle, GameTextures, XmlSoundEngine, Classes, Base3D,
-  CastleGLUtils, CastleColors;
+  CastleGLUtils, CastleColors, Frustum, CastleScene;
 
 const
   DefaultMaxLife = 100;
@@ -174,6 +174,7 @@ type
     procedure SetSwimming(const Value: TPlayerSwimming);
 
     procedure AllocatedFootstepsSourceUsingEnd(Sender: TALSound);
+    procedure UpdateCurrentScene;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -317,11 +318,6 @@ type
     { @noAutoLinkHere }
     procedure Attack;
 
-    { This will render player's weapon (attacking or not).
-      This is a 3D rendering. Note that this may clear depth buffer
-      and set matrix to identity. }
-    procedure RenderWeapon(Params: TRenderParams);
-
     { You should set this property as appropriate.
       This object will just use this property (changing it's Camera
       properties etc.). }
@@ -391,6 +387,8 @@ type
       const LineOfSight: boolean): boolean; override;
     function UseSphere: boolean; override;
     procedure Sphere(out Center: TVector3Single; out Radius: Single); override;
+
+    procedure Render(const Frustum: TFrustum; const Params: TRenderParams); override;
   end;
 
 implementation
@@ -1290,34 +1288,6 @@ begin
   end;
 end;
 
-procedure TPlayer.RenderWeapon(Params: TRenderParams);
-var
-  AttackTime: Single;
-  AttackAnim: TCastlePrecalculatedAnimation;
-begin
-  if EquippedWeapon <> nil then
-  begin
-    AttackAnim := EquippedWeaponKind.AttackAnimation;
-    { clear depth, to never cover weapon by scene items }
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity;
-    AttackTime := Level.AnimationTime - AttackStartTime;
-    if Attacking and (AttackTime <= AttackAnim.TimeEnd) then
-    begin
-      AttackAnim.SceneFromTime(AttackTime).Render(nil, Params);
-    end else
-    begin
-      { turn off Attacking, if AttackTime passed }
-      Attacking := false;
-      { although current weapons animations are just static,
-        we use Level.AnimationTime to enable weapon animation
-        (weapon swaying) in the future. }
-      EquippedWeaponKind.ReadyAnimation.SceneFromTime(
-        Level.AnimationTime).Render(nil, Params);
-    end;
-  end;
-end;
-
 function TPlayer.EquippedWeaponKind: TItemWeaponKind;
 begin
   Result := TItemWeaponKind(EquippedWeapon.Kind);
@@ -1490,6 +1460,50 @@ procedure TPlayer.Sphere(out Center: TVector3Single; out Radius: Single);
 begin
   Center := Camera.Position;
   Radius := Camera.Radius;
+end;
+
+procedure TPlayer.UpdateCurrentScene;
+var
+  AttackTime: Single;
+  AttackAnim: TCastlePrecalculatedAnimation;
+  CurrentScene: TCastleScene;
+begin
+  CurrentScene := nil;
+  if EquippedWeapon <> nil then
+  begin
+    AttackAnim := EquippedWeaponKind.AttackAnimation;
+    AttackTime := Level.AnimationTime - AttackStartTime;
+    if Attacking and (AttackTime <= AttackAnim.TimeEnd) then
+    begin
+      CurrentScene := AttackAnim.SceneFromTime(AttackTime);
+    end else
+    begin
+      { turn off Attacking, if AttackTime passed }
+      Attacking := false;
+      { although current weapons animations are just static,
+        we use Level.AnimationTime to enable weapon animation
+        (weapon swaying) in the future. }
+      CurrentScene :=  EquippedWeaponKind.ReadyAnimation.SceneFromTime(
+        Level.AnimationTime);
+    end;
+  end;
+
+  if CurrentScene = nil then
+    Clear else
+  begin
+    CurrentScene.CastShadowVolumes := false; { they look bad for our weapon models }
+
+    { Make sure our List contains exactly CurrentScene }
+    if Count = 1 then
+      List[0] := CurrentScene else
+      Add(CurrentScene);
+  end;
+end;
+
+procedure TPlayer.Render(const Frustum: TFrustum; const Params: TRenderParams);
+begin
+  UpdateCurrentScene;
+  inherited;
 end;
 
 { CastleWindow open / close ------------------------------------------------------ }

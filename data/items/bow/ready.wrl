@@ -1,6 +1,10 @@
 #VRML V1.0 ascii
 
 Group {
+  # original model has up in +Y, we want it in +Z
+  Rotation { rotation 1 0 0 1.5707963268 }
+  Rotation { rotation 0 1 0 -1.5707963268 }
+
   Translation { translation 0 0 -0.5 }
 
   Translation { translation 1.0 1.0 -0.5 }
