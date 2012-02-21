@@ -174,7 +174,9 @@ type
     procedure SetSwimming(const Value: TPlayerSwimming);
 
     procedure AllocatedFootstepsSourceUsingEnd(Sender: TALSound);
-    procedure UpdateCurrentScene;
+  protected
+    function GetChild: T3D; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -387,8 +389,6 @@ type
       const LineOfSight: boolean): boolean; override;
     function UseSphere: boolean; override;
     procedure Sphere(out Center: TVector3Single; out Radius: Single); override;
-
-    procedure Render(const Frustum: TFrustum; const Params: TRenderParams); override;
   end;
 
 implementation
@@ -485,6 +485,8 @@ end;
 
 destructor TPlayer.Destroy;
 begin
+  EquippedWeapon := nil; { unregister free notification }
+
   if OnInputChanged <> nil then
     OnInputChanged.Remove(@InputChanged);
 
@@ -627,15 +629,20 @@ procedure TPlayer.SetEquippedWeapon(Value: TItem);
 begin
   if Value <> FEquippedWeapon then
   begin
+    if FEquippedWeapon <> nil then
+      FEquippedWeapon.RemoveFreeNotification(Self);
+
     FEquippedWeapon := Value;
-    if EquippedWeapon = nil then
-      Notifications.Show('You''re no longer using your weapon') else
+
+    if FEquippedWeapon <> nil then
     begin
       Notifications.Show(Format('You''re using weapon "%s" now',
         [EquippedWeapon.Kind.Name]));
       Assert(EquippedWeapon.Kind is TItemWeaponKind);
       SoundEngine.Sound(EquippedWeaponKind.EquippingSound);
-    end;
+      FEquippedWeapon.FreeNotification(Self);
+    end else
+      Notifications.Show('You''re no longer using your weapon');
 
     { Any attack done with previous weapon must be stopped now. }
     Attacking := false;
@@ -1462,20 +1469,20 @@ begin
   Radius := Camera.Radius;
 end;
 
-procedure TPlayer.UpdateCurrentScene;
+function TPlayer.GetChild: T3D;
 var
   AttackTime: Single;
   AttackAnim: TCastlePrecalculatedAnimation;
-  CurrentScene: TCastleScene;
 begin
-  CurrentScene := nil;
-  if EquippedWeapon <> nil then
+  Result := nil;
+  if (EquippedWeapon <> nil) and
+    EquippedWeaponKind.PrepareRenderDone then
   begin
     AttackAnim := EquippedWeaponKind.AttackAnimation;
     AttackTime := Level.AnimationTime - AttackStartTime;
     if Attacking and (AttackTime <= AttackAnim.TimeEnd) then
     begin
-      CurrentScene := AttackAnim.SceneFromTime(AttackTime);
+      Result := AttackAnim.SceneFromTime(AttackTime);
     end else
     begin
       { turn off Attacking, if AttackTime passed }
@@ -1483,27 +1490,21 @@ begin
       { although current weapons animations are just static,
         we use Level.AnimationTime to enable weapon animation
         (weapon swaying) in the future. }
-      CurrentScene :=  EquippedWeaponKind.ReadyAnimation.SceneFromTime(
+      Result :=  EquippedWeaponKind.ReadyAnimation.SceneFromTime(
         Level.AnimationTime);
     end;
   end;
 
-  if CurrentScene = nil then
-    Clear else
-  begin
-    CurrentScene.CastShadowVolumes := false; { they look bad for our weapon models }
-
-    { Make sure our List contains exactly CurrentScene }
-    if Count = 1 then
-      List[0] := CurrentScene else
-      Add(CurrentScene);
-  end;
+  if Result <> nil then
+    Result.CastShadowVolumes := false; { they look bad for our weapon models }
 end;
 
-procedure TPlayer.Render(const Frustum: TFrustum; const Params: TRenderParams);
+procedure TPlayer.Notification(AComponent: TComponent; Operation: TOperation);
 begin
-  UpdateCurrentScene;
   inherited;
+
+  if (Operation = opRemove) and (AComponent = FEquippedWeapon) then
+    FEquippedWeapon := nil;
 end;
 
 { CastleWindow open / close ------------------------------------------------------ }

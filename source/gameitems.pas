@@ -239,12 +239,12 @@ type
 
   { An item. Actually, this represents a collection of
     "stacked" items that have the same properties --- see Quantity property. }
-  TItem = class
+  TItem = class(TComponent)
   private
     FKind: TItemKind;
     FQuantity: Cardinal;
   public
-    constructor Create(AKind: TItemKind; AQuantity: Cardinal);
+    constructor Create(AKind: TItemKind; AQuantity: Cardinal); reintroduce;
 
     property Kind: TItemKind read FKind;
 
@@ -700,7 +700,7 @@ end;
 
 constructor TItem.Create(AKind: TItemKind; AQuantity: Cardinal);
 begin
-  inherited Create;
+  inherited Create(nil);
   FKind := AKind;
   FQuantity := AQuantity;
   Assert(Quantity >= 1, 'Item''s Quantity must be >= 1');
