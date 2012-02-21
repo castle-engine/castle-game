@@ -649,10 +649,13 @@ type
 
     procedure SoundSourceUsingEnd(Sender: TALSound);
     procedure SetLastAttackDirection(const Value: TVector3Single);
-    { Insert CurrentScene to our list. }
-    procedure UpdateCurrentScene;
   protected
     function GetExists: boolean; override;
+
+    { Current scene to be rendered.
+      Note that this may be called before were added to World (at the end of our
+      construction), so make it work always reliably. }
+    { function GetChild: T3D; override; }
 
     { These define exactly what "MiddlePosition" means for this creature.
 
@@ -701,15 +704,10 @@ type
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
-    { Return current scene to be rendered.
-      Note that this may be called before were added to World (at the end of our
-      construction), so make it work always reliably. }
-    function CurrentScene: TCastleScene; virtual; abstract;
-
     { The height of MiddlePosition above Position.
-      Calculated in this class using CurrentScene.BoundingBox.Data[1, 2]
+      Calculated in this class using GetChild.BoundingBox.Data[1, 2]
       and Kind.MiddlePositionHeight.
-      Note that while CurrentScene may change, this also may change. }
+      Note that while GetChild may change, this also may change. }
     function HeightBetweenLegsAndMiddle: Single; virtual;
 
     { The "middle" position of the creature.
@@ -861,6 +859,8 @@ type
 
     { Last State change time, taken from LifeTime. }
     property StateChangeTime: Single read FStateChangeTime;
+
+    function GetChild: T3D; override;
   public
     constructor Create(AOwner: TComponent; const AMaxLife: Single); override;
 
@@ -873,8 +873,6 @@ type
       default wasStand;
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
-
-    function CurrentScene: TCastleScene; override;
 
     { The method where you must actually do your attack
       --- fire a missile, lower player's life etc.
@@ -927,10 +925,10 @@ type
   protected
     procedure SetState(Value: TWalkAttackCreatureState); override;
     procedure SetLife(const Value: Single); override;
+    function GetChild: T3D; override;
   public
     procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
-    function CurrentScene: TCastleScene; override;
   end;
 
   TGhostCreature = class(TWalkAttackCreature)
@@ -944,11 +942,12 @@ type
   { A TCreature that has a kind always of TMissileCreatureKind. }
   TMissileCreature = class(TCreature)
   private
+    LastSoundIdleTime: Single;
     procedure ExplodeCore;
     procedure ExplodeWithPlayer;
     procedure ExplodeWithCreature(Creature: TCreature);
-  private
-    LastSoundIdleTime: Single;
+  protected
+    function GetChild: T3D; override;
   public
     constructor Create(AOwner: TComponent; const AMaxLife: Single); override;
 
@@ -956,16 +955,14 @@ type
     function MissileKind: TMissileCreatureKind;
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
-
-    function CurrentScene: TCastleScene; override;
   end;
 
   TStillCreature = class(TCreature)
+  protected
+    function GetChild: T3D; override;
   public
     { Shortcut for TStillCreatureKind(Kind). }
     function StillKind: TStillCreatureKind;
-
-    function CurrentScene: TCastleScene; override;
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
@@ -1089,7 +1086,6 @@ begin
   Result.FKind := Self;
   Result.SetView(APosition, ADirection, AUp);
   Result.Life := MaxLife;
-  Result.UpdateCurrentScene;
 end;
 
 { TCreatureKindList -------------------------------------------------------- }
@@ -1580,7 +1576,7 @@ end;
 
 function TCreature.HeightBetweenLegsAndMiddle: Single;
 begin
-  Result := CurrentScene.BoundingBox.Data[1, 2] * Kind.MiddlePositionHeight;
+  Result := GetChild.BoundingBox.Data[1, 2] * Kind.MiddlePositionHeight;
 end;
 
 function TCreature.MiddlePositionFromLegs(
@@ -1606,20 +1602,6 @@ end;
 function TCreature.MiddlePosition: TVector3Single;
 begin
   Result := MiddlePositionFromLegs(Position);
-end;
-
-procedure TCreature.UpdateCurrentScene;
-begin
-  { self-shadows on creatures look bad, esp. see werewolves at the end
-    of "castle hall" level. Changing XxxShadowVolumes here
-    is a little hacky (would be cleaner to do it at loading), but easy. }
-  CurrentScene.ReceiveShadowVolumes := false;
-  CurrentScene.CastShadowVolumes := Kind.CastShadowVolumes;
-
-  { Make sure our List contains exactly CurrentScene }
-  if Count = 1 then
-    List[0] := CurrentScene else
-    Add(CurrentScene);
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum; const Params: TRenderParams);
@@ -1650,7 +1632,7 @@ procedure TCreature.Render(const Frustum: TFrustum; const Params: TRenderParams)
     FontSize = 0.5;
   begin
     glPushMatrix;
-      glTranslatef(0, 0, CurrentScene.BoundingBox.Data[1, 2]);
+      glTranslatef(0, 0, GetChild.BoundingBox.Data[1, 2]);
       glRotatef(90, 0, 0, 1);
       glRotatef(90, 1, 0, 0);
       glScalef(FontSize / Font3d.RowHeight, FontSize / Font3d.RowHeight, 1);
@@ -1665,8 +1647,6 @@ procedure TCreature.Render(const Frustum: TFrustum; const Params: TRenderParams)
   end;
 
 begin
-  UpdateCurrentScene;
-
   inherited;
 
   if GetExists and Frustum.Box3DCollisionPossibleSimple(BoundingBox) then
@@ -1955,7 +1935,7 @@ begin
 
         Note that there is weakness in collision checking with creatures,
         because when LifeTime changes then effectively creature's
-        CurrentScene.BoundingBox changes, and there is no way how I can
+        GetChild.BoundingBox changes, and there is no way how I can
         check for collision there (what could I do ? Stop the animation ?
         Throw the creature back ? None of this seems sensible...)
         This means that we cannot prevent the situation when someone's
@@ -2665,10 +2645,12 @@ begin
     UpPrefer(World.GravityUp);
 end;
 
-function TWalkAttackCreature.CurrentScene: TCastleScene;
+function TWalkAttackCreature.GetChild: T3D;
 var
   StateTime: Single;
 begin
+  if not Kind.PrepareRenderDone then Exit(nil);
+
   { Time from the change to this state. }
   StateTime := LifeTime - StateChangeTime;
 
@@ -2690,6 +2672,12 @@ begin
       Result := WAKind.HurtAnimation.SceneFromTime(StateTime);
     else raise EInternalError.Create('FState ?');
   end;
+
+  { self-shadows on creatures look bad, esp. see werewolves at the end
+    of "castle hall" level. Changing XxxShadowVolumes here
+    is a little hacky (would be cleaner to do it at loading), but easy. }
+  TCastleScene(Result).ReceiveShadowVolumes := false;
+  Result.CastShadowVolumes := Kind.CastShadowVolumes;
 end;
 
 procedure TWalkAttackCreature.SetLife(const Value: Single);
@@ -2907,10 +2895,12 @@ begin
     end;
 end;
 
-function TSpiderQueenCreature.CurrentScene: TCastleScene;
+function TSpiderQueenCreature.GetChild: T3D;
 var
   StateTime: Single;
 begin
+  if not Kind.PrepareRenderDone then Exit(nil);
+
   if State = wasSpecial1 then
   begin
     { Time from the change to this state. }
@@ -2919,6 +2909,12 @@ begin
     Result := SQKind.ThrowWebAttackAnimation.SceneFromTime(StateTime);
   end else
     Result := inherited;
+
+  { self-shadows on creatures look bad, esp. see werewolves at the end
+    of "castle hall" level. Changing XxxShadowVolumes here
+    is a little hacky (would be cleaner to do it at loading), but easy. }
+  TCastleScene(Result).ReceiveShadowVolumes := false;
+  Result.CastShadowVolumes := Kind.CastShadowVolumes;
 end;
 
 procedure TSpiderQueenCreature.ActualThrowWebAttack;
@@ -3097,9 +3093,16 @@ begin
   end;
 end;
 
-function TMissileCreature.CurrentScene: TCastleScene;
+function TMissileCreature.GetChild: T3D;
 begin
+  if not Kind.PrepareRenderDone then Exit(nil);
+
   Result := MissileKind.Animation.SceneFromTime(LifeTime);
+  { self-shadows on creatures look bad, esp. see werewolves at the end
+    of "castle hall" level. Changing XxxShadowVolumes here
+    is a little hacky (would be cleaner to do it at loading), but easy. }
+  TCastleScene(Result).ReceiveShadowVolumes := false;
+  Result.CastShadowVolumes := Kind.CastShadowVolumes;
 end;
 
 procedure TMissileCreature.ExplodeCore;
@@ -3141,9 +3144,16 @@ begin
   Result := TStillCreatureKind(Kind);
 end;
 
-function TStillCreature.CurrentScene: TCastleScene;
+function TStillCreature.GetChild: T3D;
 begin
+  if not Kind.PrepareRenderDone then Exit(nil);
+
   Result := StillKind.Animation.SceneFromTime(LifeTime);
+  { self-shadows on creatures look bad, esp. see werewolves at the end
+    of "castle hall" level. Changing XxxShadowVolumes here
+    is a little hacky (would be cleaner to do it at loading), but easy. }
+  TCastleScene(Result).ReceiveShadowVolumes := false;
+  Result.CastShadowVolumes := Kind.CastShadowVolumes;
 end;
 
 procedure TStillCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
