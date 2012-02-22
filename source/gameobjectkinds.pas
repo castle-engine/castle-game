@@ -136,8 +136,6 @@ begin
 end;
 
 procedure TObjectKind.PrepareRender(const BaseLights: TLightInstancesList);
-var
-  I: Integer;
 begin
   FPrepareRenderDone := true;
 
