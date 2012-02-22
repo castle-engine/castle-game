@@ -35,8 +35,6 @@ type
     FShortName: string;
     FPrepareRenderDone: boolean;
     FBlendingType: TBlendingType;
-    { This is internal for PrepareRender. }
-    AnimationsPrepared: TCastlePrecalculatedAnimationList;
   protected
     { Create Anim from given AnimationFile, only if Anim = nil.
       Then it sets attributes for the animation and then prepares
@@ -77,7 +75,6 @@ type
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); virtual;
   public
     constructor Create(const AShortName: string);
-    destructor Destroy; override;
 
     procedure PrepareRender(const BaseLights: TLightInstancesList);
 
@@ -136,13 +133,6 @@ begin
   inherited Create;
   FShortName := AShortName;
   FBlendingType := DefaultBlendingType;
-  AnimationsPrepared := TCastlePrecalculatedAnimationList.Create(false);
-end;
-
-destructor TObjectKind.Destroy;
-begin
-  FreeAndNil(AnimationsPrepared);
-  inherited;
 end;
 
 procedure TObjectKind.PrepareRender(const BaseLights: TLightInstancesList);
@@ -154,52 +144,7 @@ begin
   { call this to satisfy Progress.Step = 1 in this class. }
   Progress.Step;
 
-  Assert(AnimationsPrepared.Count = 0);
-
-  try
-    PrepareRenderInternal(BaseLights);
-
-    { During AnimationsPrepared we collect prepared animations,
-      to now handle them in general.
-
-      For now, we just call FreeResources on them. It would be bad
-      to call Anim.FreeResources inside CreateAnimationIfNeeded,
-      right after preparing animation, since then animations for
-      the same object kind would not share the texture image
-      (in ImagesCache). And usually the same texture image is used
-      in all animations.
-
-      On the other hand, we want to call FreeResources on them at some
-      time, to free memory. }
-
-    for I := 0 to AnimationsPrepared.Count - 1 do
-    begin
-      { I could add here frRootNode.
-
-        There were weird problems for 0.7.0
-        with this (most probably FPC 2.0.4 bug --- see TODO file
-        in revision 2231 about "wrong anim when Alien dying" problem).
-        Later, these problems disappeared
-        (most probably fixed in FPC 2.2.0, but also many things
-        changed since 0.7.0, including some creature loading code).
-
-        But since the invention of "conserve memory" feature,
-        frRootNode is not really useful
-        anymore, it saves only 6 MB memory for DOOM level (most
-        resource-costly level for now). So it's not turned on,
-        as it's still risky
-        (freeing RootNode always was risky) and has little use.
-
-        Do not free here frTrianglesListShadowCasters
-        or frManifoldAndBorderEdges --- we will need them during
-        rendering to render shadow volumes. }
-
-      AnimationsPrepared[I].FreeResources([frTextureDataInNodes]);
-    end;
-  finally
-    { keep AnimationsPrepared empty when outside of PrepareRender. }
-    AnimationsPrepared.Clear;
-  end;
+  PrepareRenderInternal(BaseLights);
 end;
 
 procedure TObjectKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
@@ -285,8 +230,6 @@ begin
 
     AnimationAttributesSet(Anim.Attributes, BlendingType);
     Anim.PrepareResources(Options, false, BaseLights);
-
-    AnimationsPrepared.Add(Anim);
   end;
   Progress.Step;
 end;
