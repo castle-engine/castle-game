@@ -108,7 +108,7 @@ type
       This must be composed of only letters, use CamelCase.
       (Reason: This must be a valid identifier in all possible languages.
       Also digits and underscore are reserved, as we may use them internally
-      to other other info in VRML/X3D and XML node names.) }
+      for other info in VRML/X3D and XML node names.) }
     property ShortName: string read FShortName;
 
     property BlendingType: TBlendingType
