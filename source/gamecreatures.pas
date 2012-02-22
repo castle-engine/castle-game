@@ -1918,53 +1918,67 @@ function TCreature.MoveAllowed(
   const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
 var
   MyBox: TBox3D;
+  OldCollision, NewCollision: boolean;
 begin
-  { check collision with creature's bounding box.
-    We ignore IsRadius, Radius for now --- we always check collisions
-    with other boxes. }
+  { check collision with our bounding box.
+
+    We do not look here at our own sphere. When other objects move,
+    it's better to treat ourself as larger (not smaller), to prevent
+    collisions rather then allow them in case of uncertainty.
+    So we ignore Self.UseSphere, Self.Sphere methods.
+
+    But we do take into account that other (moving) object may prefer to
+    be treated as a sphere, so we take into account IsRadius, Radius parameters.
+    This allows a player to climb on top of dead corpses (with flat
+    bbox), since player's sphere is slightly above the ground.
+    And it allows the missiles (like arrow) to use their spheres
+    for determining what is hit, which is good because e.g. arrow
+    has a very large bbox, sphere is much better (otherwise it may be too easy
+    to hit with arrow). }
 
   Result := true;
 
   if GetCollides then
   begin
     MyBox := BoundingBox;
-    if NewBox.Collision(MyBox) then
+
+    if IsRadius then
     begin
-      { Strictly thinking, now I know that I have a collision with creature
-        and I should exit with false. But it's not that simple.
+      OldCollision := MyBox.SphereCollision(OldPos, Radius);
+      NewCollision := MyBox.SphereCollision(NewPos, Radius);
+    end else
+    begin
+      OldCollision := MyBox.Collision(OldBox);
+      NewCollision := MyBox.Collision(NewBox);
+    end;
 
-        Note that there is weakness in collision checking with creatures,
-        because when LifeTime changes then effectively creature's
-        GetChild.BoundingBox changes, and there is no way how I can
-        check for collision there (what could I do ? Stop the animation ?
-        Throw the creature back ? None of this seems sensible...)
-        This means that we cannot prevent the situation when someone's
-        (player's or creature's) and other creature's bounding boxes collide.
+    if NewCollision then
+    begin
+      { We now know that we have a collision with new position.
+        Strictly thinking, move should be disallowed
+        (we should exit with false). But it's not that simple.
 
-        So we must take precautions to not make someone "stuck"
-        with this creature (because any potential move collides
-        with this creature).
+        There is a weakness in collision checking with dynamic objects,
+        like creatures, because when LifeTime changes then effectively
+        BoundingBox changes, and there is no way how I can prevent collisions
+        from occuring (we cannot stop/reverse an arbitrary animation,
+        this would look bad and require AI preparations, see UseSphere comments).
 
-        That's the reasoning behind using OldBox and checks below.
-        I disallow the collision only if there was no collision before
-        (so the pathologic situation doesn't occur) or if someone
-        tries to get closer to the creature (so if the pathologic situation
-        occurs, someone can't make it worse, and can't "abuse" this
-        by entering into creature's bounding box). }
-      if (not OldBox.Collision(MyBox)) or
+        So we must allow some moves, to allow player/creature that is already
+        stuck (already collidable with Self) to get out of the collision.
+        To do this, we are going to enable a move, only if *old position
+        was already collidable (so the other object is stuck with us already)
+        and new position is further from us (so the other object tries
+        to get unstuck)". }
+      if (not OldCollision) or
          ( PointsDistanceSqr(NewPos, MiddlePosition) <
            PointsDistanceSqr(OldPos, MiddlePosition) ) then
         Exit(false);
     end else
-    { If NewBox doesn't collide with MyBox,
-      and OldBox also doesn't collide (so pathological
-      situation above occurs) we know that segment between
-      OldPos and NewPos cannot collide with MyBox.
-
-      Without this check, player could get on the other side
-      of the creature if the creature is slim (e.g. Alien) and player
-      tries very hard, and he has large speed. }
-    if (not OldBox.Collision(MyBox)) and
+    if (not OldCollision) and
+       { new and old positions are Ok (not collidable), so check also
+         line segment. Otherwise fast moving player could run through slim
+         creature. }
        MyBox.SegmentCollision(OldPos, NewPos) then
       Exit(false);
   end;
