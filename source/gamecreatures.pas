@@ -190,15 +190,18 @@ type
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
 
-    { These will be used only by creatures doing ShortRangeAttackHurt
-      in their ActualAttack implementation.
+    { Short range attack damage and knockback.
+      These will be used only by some creatures, the ones that do
+      ShortRangeAttackHurt in their ActualAttack implementation.
 
       ShortRangeAttackDamageConst and ShortRangeAttackDamageRandom
       and ShortRangeAttackKnockbackDistance must be >= 0.
 
       ShortRangeAttackKnockbackDistance = 0 means no knockback.
 
-      For now exploding missiles also use these properties.
+      Exploding missiles also use these properties.
+      When missile explodes on impact with other alive 3D object,
+      it's damage and knockback are taken from these properties.
 
       @groupBegin }
     property ShortRangeAttackDamageConst: Single
@@ -222,7 +225,7 @@ type
       write FFallDownLifeLossScale
       default DefaultFallDownLifeLossScale;
 
-    { This determines how the creature's Middle will be calculated.
+    { Determines how the creature's Middle will be calculated.
       Actually, this determines how the HeightBetweenLegsAndMiddle
       will be calculated, and this is used to calculate Middle.
       HeightBetweenLegsAndMiddle is just current scene box height
@@ -397,22 +400,33 @@ type
       read FActualAttackTime write FActualAttackTime
       default DefaultActualAttackTime;
 
-    { When this creature is knocked back by something (i.e. goes to wasHurt
-      state), then it's forced to move in general LastHurtDirection
-      for the time HurtAnimation.TimeDurationWithBack, until
-      HurtAnimation (and wasHurt state) ends, or until it was forced to move
-      by KnockedBackDistance * weapon's KnockedBackDistance. }
+    { Distance the creature is knocked back when hurt (should reflect
+      the creature weight, how easy it is to push this creature).
+
+      Will always be multiplied by the knocking distance of the weapon that
+      caused the push (which should reflect the force of the weapon blow),
+      see TItemShortRangeWeaponKind.AttackKnockbackDistance.
+
+      The final distance the creature is knocked back is capped
+      by the time of the HurtAnimation (HurtAnimation.TimeDurationWithBack).
+      When the hurt animation ends, the knockback effect always ends,
+      even if the distance (creature * weapon) indicates it should be knocked
+      further. Otherwise knockback would work on standing creature,
+      which could look bad. This may be changed some day. }
     property KnockedBackDistance: Single
       read FKnockedBackDistance write FKnockedBackDistance
       default DefaultKnockedBackDistance;
 
-    { This will be played at Middle when entering wasAttack state.
+    { Player when attacking, that is when entering wasAttack state.
+      Played at creature Middle.
       Sometimes you may prefer to rather play a sound at ActualAttack
-      --- then just do it in overriden ActualAttack. }
+      (at hit/miss) --- then just do it in overriden ActualAttack. }
     property SoundAttackStart: TSoundType
       read FSoundAttackStart write FSoundAttackStart default stNone;
 
-    { If @code(Life <= MaxLife * LifeToRunAway) and distance to the
+    { Portion of life when the creature decides it's best to run away
+      from enemy (player).
+      If @code(Life <= MaxLife * LifeToRunAway) and distance to the
       player is too short (shorter than MaxAttackDistance / 4),
       the creature runs away. }
     property LifeToRunAway: Single
