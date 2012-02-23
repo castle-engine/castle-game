@@ -322,6 +322,7 @@ type
 
     property Collides default false;
     property Pushable default true;
+    function Middle: TVector3Single; override;
   end;
 
   TItemOnLevelList = class(specialize TFPGObjectList<TItemOnLevel>)
@@ -791,14 +792,15 @@ begin
   end;
 end;
 
+const
+  ItemRadius = 1.0;
+
 procedure TItemOnLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 const
-  Radius = 1.0;
   FallingDownSpeed = 0.2;
 var
   AboveHeight: Single;
   ShiftedTranslation: TVector3Single;
-  NewTranslation: TVector3Single;
   FallingDownLength: Single;
   Rot: TVector4Single;
 begin
@@ -810,39 +812,27 @@ begin
   Rotation := Rot;
 
   ShiftedTranslation := Translation;
-  ShiftedTranslation[2] += Radius;
+  ShiftedTranslation[2] += ItemRadius;
 
   { Note that I'm using ShiftedTranslation, not Translation,
-    and later I'm comparing "AboveHeight > Radius",
+    and later I'm comparing "AboveHeight > ItemRadius",
     instead of "AboveHeight > 0".
     Otherwise, I risk that when item will be placed perfectly on the ground,
-    it may "slip through" this ground down.
-
-    For the same reason, I use sphere around ShiftedTranslation
-    when doing MyMoveAllowed below. }
+    it may "slip through" this ground down. }
 
   MyHeight(ShiftedTranslation, AboveHeight);
-  if AboveHeight > Radius then
+  if AboveHeight > ItemRadius then
   begin
     { Item falls down because of gravity. }
 
     FallingDownLength := CompSpeed * 50 * FallingDownSpeed;
-    MinTo1st(FallingDownLength, AboveHeight - Radius);
+    MinTo1st(FallingDownLength, AboveHeight - ItemRadius);
 
-    NewTranslation := ShiftedTranslation;
-    NewTranslation[2] -= FallingDownLength;
-
-    { TODO: I could use MyMoveAllowed with wall-sliding here.
-      But then left life potion on gate
-      level must be corrected (possibly by correcting the large sword mesh)
-      to not "slip down" from the sword. }
-    {if MyMoveAllowed(ShiftedTranslation, NewTranslation,
-      RealNewTranslation) then}
-    if MyMoveAllowed(ShiftedTranslation, NewTranslation, true) then
-    begin
-      NewTranslation[2] -= Radius;
-      Translation := NewTranslation;
-    end;
+    MyMove(Vector3Single(0, 0, -FallingDownLength), true,
+      { TODO: wall-sliding here breaks left life potion on gate:
+        it must be corrected (possibly by correcting the large sword mesh)
+        to not "slip down" from the sword. }
+      false);
   end;
 
   if (not Player.Dead) and (not GameWin) and
@@ -878,6 +868,12 @@ end;
 function TItemOnLevel.GetExists: boolean;
 begin
   Result := (inherited GetExists) and (not DebugRenderForLevelScreenshot);
+end;
+
+function TItemOnLevel.Middle: TVector3Single;
+begin
+  Result := inherited Middle;
+  Result[2] += ItemRadius;
 end;
 
 { other global stuff --------------------------------------------------- }

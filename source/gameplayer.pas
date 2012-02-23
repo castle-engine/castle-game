@@ -1166,7 +1166,6 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
   procedure DoKnockback;
   var
-    ProposedNewPosition, NewPosition: TVector3Single;
     CurrentKnockBackDistance: Single;
   begin
     if FKnockbackDistance > 0 then
@@ -1176,12 +1175,7 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       MinTo1st(CurrentKnockBackDistance, FKnockbackDistance);
       FKnockbackDistance -= CurrentKnockBackDistance;
 
-      ProposedNewPosition := VectorAdd(Camera.Position,
-        VectorScale(FKnockbackDirection, CurrentKnockBackDistance));
-
-      if MyMoveAllowed(Camera.Position, ProposedNewPosition,
-        NewPosition, false) then
-        Camera.Position := NewPosition;
+      MyMove(FKnockbackDirection * CurrentKnockBackDistance, false);
     end;
   end;
 

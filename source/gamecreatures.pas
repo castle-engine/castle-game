@@ -1670,24 +1670,6 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       end;
     end;
 
-  var
-    OldMiddle: TVector3Single;
-
-    function MoveVertical(const Distance: Single;
-      const BecauseOfGravity: boolean): boolean;
-    var
-      NewMiddle, ProposedNewMiddle: TVector3Single;
-    begin
-      ProposedNewMiddle := OldMiddle;
-      ProposedNewMiddle[2] += Distance;
-
-      Result := MyMoveAllowed(OldMiddle, ProposedNewMiddle,
-        NewMiddle, BecauseOfGravity);
-
-      if Result then
-        Position := PositionFromMiddle(NewMiddle);
-    end;
-
   const
     FallingDownSpeed = 1.0;
     { Beware: GrowingUpSpeed is not only a graphical effect. Too large
@@ -1712,9 +1694,8 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       not Position. See Middle docs for reasoning. }
 
     OldIsFallingDown := FIsFallingDown;
-    OldMiddle := Middle;
 
-    IsAbove := MyHeight(OldMiddle, AboveHeight);
+    IsAbove := MyHeight(Middle, AboveHeight);
 
     if AboveHeight > HeightBetweenLegsAndMiddle * HeightMargin then
     begin
@@ -1736,7 +1717,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
           So actually this is too large MaximumFallingDownDistance.
 
           But actually it's OK when Sphere is used, because then wall-sliding
-          in MoveVertical (actually MoveAllowed) can correct new position,
+          in MoveAllowed can correct new position,
           so actually it will be slightly above the ground. So falling
           down will work.
 
@@ -1763,7 +1744,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
         MinTo1st(FallingDownDistance, MaximumFallingDownDistance);
       end;
 
-      if not MoveVertical(-FallingDownDistance, true) then
+      if not MyMove(Vector3Single(0, 0, -FallingDownDistance), true) then
         FIsFallingDown := false;
     end else
     begin
@@ -1772,8 +1753,8 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       if AboveHeight < HeightBetweenLegsAndMiddle / HeightMargin then
       begin
         { Growing up }
-        MoveVertical(Min(GrowingUpSpeed * CompSpeed * 50,
-          HeightBetweenLegsAndMiddle - AboveHeight), false);
+        MyMove(Vector3Single(0, 0, Min(GrowingUpSpeed * CompSpeed * 50,
+          HeightBetweenLegsAndMiddle - AboveHeight)), false);
       end;
     end;
 
@@ -2190,24 +2171,18 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         end;
       end;
 
-    var
-      OldMiddle, NewMiddle: TVector3Single;
     begin
-      OldMiddle := Middle;
-      NewMiddle := OldMiddle + Direction * (WAKind.MoveSpeed * CompSpeed * 50);
-
       Result :=
         { First check to not step into some deep fall.
           Note that I'm not using here NewMiddle
-          (that will be calculated later by MyMoveAllowed)
-          or ProposedNewMiddle, because they are too close
-          to OldMiddle to be good to test against.
+          (that will be calculated later by MyMove)
+          because they are too close to Middle to be good to test against.
           I'm calculating here where I would get after 0.2 second
           (WAKind.MoveSpeed * 0.2 * 50). }
-        (not TooHighAboveTheGround(VectorAdd(OldMiddle,
-          VectorScale(Direction, WAKind.MoveSpeed * 0.2 * 50)))) and
+        (not TooHighAboveTheGround(Middle +
+          Direction * (WAKind.MoveSpeed * 0.2 * 50))) and
 
-        { Use Move without wall-sliding here.
+        { Use MyMove without wall-sliding here.
           Things using MoveAlongTheDirection depend on the fact that
           MoveAlongTheDirection will return false
           if no further way is possible (and wall-sliding would try instead
@@ -2216,10 +2191,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
           Our trick with "AlternativeTarget" should handle
           eventual problems with the track of creature, so wall-sliding
           should not be needed. }
-        MyMoveAllowed(OldMiddle, NewMiddle, false);
-
-      if Result then
-        Position := PositionFromMiddle(NewMiddle);
+        MyMove(Direction * (WAKind.MoveSpeed * CompSpeed * 50), false, false);
     end;
 
     { Go the way to LastSeenPlayer, *not* by using waypoints.
@@ -2451,7 +2423,6 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     KnockedBackSpeed = 1.0 * 0.7;
   var
     StateTime: Single;
-    OldMiddle, ProposedNewMiddle, NewMiddle: TVector3Single;
     CurrentKnockBackDistance: Single;
   begin
     StateTime := LifeTime - StateChangeTime;
@@ -2460,8 +2431,6 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       SetState(wasStand) else
     if KnockedBackDistance <= WAKind.MaxKnockedBackDistance then
     begin
-      OldMiddle := Middle;
-
       { Calculate CurrentKnockBackDistance, update KnockedBackDistance }
       CurrentKnockBackDistance := KnockedBackSpeed * CompSpeed * 50;
       if CurrentKnockBackDistance >
@@ -2475,11 +2444,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         KnockedBackDistance += CurrentKnockBackDistance;
       end;
 
-      ProposedNewMiddle := OldMiddle +
-        LastAttackDirection * CurrentKnockBackDistance;
-
-      if MyMoveAllowed(OldMiddle, ProposedNewMiddle, NewMiddle, false) then
-        Position := PositionFromMiddle(NewMiddle);
+      MyMove(LastAttackDirection * CurrentKnockBackDistance, false);
     end;
   end;
 
