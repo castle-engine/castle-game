@@ -797,13 +797,6 @@ type
       const Distance: Single): boolean; override;
 
     property Pushable default true;
-
-    { Is move through this creature allowed. }
-    function MoveAllowed(
-      const OldPos, NewPos: TVector3Single;
-      const IsRadius: boolean; const Radius: Single;
-      const OldBox, NewBox: TBox3D;
-      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean; override;
   end;
 
   TCreatureList = class(specialize TFPGObjectList<TCreature>)
@@ -1929,79 +1922,6 @@ begin
     Notifications.Show(S);
   end else
     Notifications.Show('You see some creature, but it''s too far to tell exactly what it is');
-end;
-
-function TCreature.MoveAllowed(
-  const OldPos, NewPos: TVector3Single;
-  const IsRadius: boolean; const Radius: Single;
-  const OldBox, NewBox: TBox3D;
-  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc): boolean;
-var
-  MyBox: TBox3D;
-  OldCollision, NewCollision: boolean;
-begin
-  { check collision with our bounding box.
-
-    We do not look here at our own sphere. When other objects move,
-    it's better to treat ourself as larger (not smaller), to prevent
-    collisions rather then allow them in case of uncertainty.
-    So we ignore Self.UseSphere, Self.Sphere methods.
-
-    But we do take into account that other (moving) object may prefer to
-    be treated as a sphere, so we take into account IsRadius, Radius parameters.
-    This allows a player to climb on top of dead corpses (with flat
-    bbox), since player's sphere is slightly above the ground.
-    And it allows the missiles (like arrow) to use their spheres
-    for determining what is hit, which is good because e.g. arrow
-    has a very large bbox, sphere is much better (otherwise it may be too easy
-    to hit with arrow). }
-
-  Result := true;
-
-  if GetCollides then
-  begin
-    MyBox := BoundingBox;
-
-    if IsRadius then
-    begin
-      OldCollision := MyBox.SphereCollision(OldPos, Radius);
-      NewCollision := MyBox.SphereCollision(NewPos, Radius);
-    end else
-    begin
-      OldCollision := MyBox.Collision(OldBox);
-      NewCollision := MyBox.Collision(NewBox);
-    end;
-
-    if NewCollision then
-    begin
-      { We now know that we have a collision with new position.
-        Strictly thinking, move should be disallowed
-        (we should exit with false). But it's not that simple.
-
-        There is a weakness in collision checking with dynamic objects,
-        like creatures, because when LifeTime changes then effectively
-        BoundingBox changes, and there is no way how I can prevent collisions
-        from occuring (we cannot stop/reverse an arbitrary animation,
-        this would look bad and require AI preparations, see UseSphere comments).
-
-        So we must allow some moves, to allow player/creature that is already
-        stuck (already collidable with Self) to get out of the collision.
-        To do this, we are going to enable a move, only if *old position
-        was already collidable (so the other object is stuck with us already)
-        and new position is further from us (so the other object tries
-        to get unstuck)". }
-      if (not OldCollision) or
-         ( PointsDistanceSqr(NewPos, MiddlePosition) <
-           PointsDistanceSqr(OldPos, MiddlePosition) ) then
-        Exit(false);
-    end else
-    if (not OldCollision) and
-       { new and old positions are Ok (not collidable), so check also
-         line segment. Otherwise fast moving player could run through slim
-         creature. }
-       MyBox.SegmentCollision(OldPos, NewPos) then
-      Exit(false);
-  end;
 end;
 
 { TWalkAttackCreature -------------------------------------------------------- }
