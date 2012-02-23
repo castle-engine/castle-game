@@ -28,7 +28,7 @@ interface
 uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, CastleUtils,
   CastleScene, GameSound, SceneWaypoints,
   GameObjectKinds, ALSoundAllocator, CastleXMLConfig, Base3D,
-  XmlSoundEngine, Triangle, Frustum, X3DNodes,
+  XmlSoundEngine, Frustum, X3DNodes,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, CastleColors;
 
 const
@@ -988,9 +988,9 @@ var
 
 implementation
 
-uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow, Cameras,
+uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow,
   CastleFilesUtils, CastleGLUtils, ProgressUnit, GamePlay,
-  GameVideoOptions, GameNotifications, GameRequiredResources;
+  GameVideoOptions, GameNotifications;
 
 var
   DisableCreatures: Cardinal;

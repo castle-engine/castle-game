@@ -26,7 +26,7 @@ unit GameObjectKinds;
 interface
 
 uses Classes, CastleXMLConfig, PrecalculatedAnimation,
-  GameVideoOptions, CastleSceneCore, CastleScene, X3DNodes;
+  GameVideoOptions, CastleScene, X3DNodes;
 
 type
   { This is a common class for item kind and creature kind. }
@@ -125,7 +125,7 @@ type
 
 implementation
 
-uses SysUtils, ProgressUnit, X3DLoad, DOM, GameWindow,
+uses SysUtils, ProgressUnit, DOM, GameWindow,
   CastleStringUtils, CastleLog, CastleFilesUtils, PrecalculatedAnimationCore;
 
 constructor TObjectKind.Create(const AShortName: string);

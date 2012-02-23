@@ -26,11 +26,11 @@ unit GameLevel;
 interface
 
 uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
-  X3DNodes, X3DFields, GameItems, Cameras, Triangle,
+  X3DNodes, X3DFields, GameItems, Cameras,
   GameCreatures, SceneWaypoints, GameSound,
   CastleUtils, CastleClassUtils, GamePlayer, GameThunder,
-  ProgressUnit, PrecalculatedAnimation, ALSoundAllocator,
-  Background, DOM, XmlSoundEngine, Base3D, Shape,
+  ProgressUnit, PrecalculatedAnimation,
+  DOM, XmlSoundEngine, Base3D, Shape,
   Classes, CastleTimeUtils, CastleSceneManager, GLRendererShader;
 
 const

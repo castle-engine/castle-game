@@ -356,7 +356,7 @@ implementation
 uses SysUtils, CastleWindow, GameWindow,
   GamePlay, CastleFilesUtils, ProgressUnit,
   GameCreatures, GameVideoOptions, GameNotifications, GameConfig,
-  CastleSceneCore, Triangle, GLImages;
+  CastleSceneCore, GLImages;
 
 { TItemKind ------------------------------------------------------------ }
 

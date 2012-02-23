@@ -42,11 +42,6 @@ var
   RequestedScreenWidth: Integer = DefaultRequestedScreenWidth;
   RequestedScreenHeight: Integer = DefaultRequestedScreenHeight;
 
-function RequestedScreenSize: string;
-begin
-  Result := Format('%dx%d', [RequestedScreenWidth, RequestedScreenHeight]);
-end;
-
 function DefaultRequestedScreenSize: string;
 begin
   Result := Format('%dx%d',

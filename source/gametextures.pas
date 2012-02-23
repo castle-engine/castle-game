@@ -89,6 +89,7 @@ begin
   if not DOMGetAttribute(Element, 'base_name', BaseName) then
     raise Exception.Create('<texture> element must have "base_name" attribute');
 
+  FootstepsSoundName := '';
   HasFootstepsSound := DOMGetAttribute(Element,
     'footsteps_sound', FootstepsSoundName) and
     (FootstepsSoundName <> '');

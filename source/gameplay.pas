@@ -26,7 +26,7 @@ unit GamePlay;
 
 interface
 
-uses Classes, GameLevel, GamePlayer, Base3D, OpenGLFonts;
+uses Classes, GameLevel, GamePlayer, OpenGLFonts;
 
 { Play the game.
 
@@ -98,16 +98,16 @@ var
 
 implementation
 
-uses Math, SysUtils, CastleUtils, CastleWindow,
+uses SysUtils, CastleUtils, CastleWindow,
   WindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
   VectorMath, Boxes3D, Images,
   GameHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, UIControls,
-  GameItems, RaysWindow, CastleStringUtils,
+  GameItems, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
-  GameVideoOptions, GameConfig, GameCreatures,
+  GameVideoOptions, GameConfig,
   GameNotifications, GameControlsMenu,
-  GameLevelSpecific, CastleScene, GameLevelAvailable,
+  GameLevelSpecific, GameLevelAvailable,
   CastleTimeUtils, GLImages, KeysMouse;
 
 var

@@ -28,7 +28,7 @@ unit GameLevelAvailable;
 interface
 
 uses GameLevel, CastleUtils, Classes,
-  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, CastleProgress, GamePlayer,
+  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, CastleProgress,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type
@@ -110,7 +110,7 @@ implementation
 
 uses SysUtils, GameConfig, CastleXMLUtils, CastleFilesUtils,
   GameLevelSpecific, XMLRead, GameWindow, GLImages,
-  Images, CastleWindow, WindowModes, CastleTimeUtils, UIControls,
+  Images, CastleWindow, WindowModes, UIControls,
   GameRequiredResources;
 
 { TLevelAvailable ------------------------------------------------------------ }
