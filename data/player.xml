@@ -16,7 +16,7 @@
 
 <CONFIG>
   <player
-    knock_back_speed="0.3"
+    knock_back_speed="15"
     sick_projection_speed="2"
     head_bobbing_time="0.5">
     <!-- head_bobbing_time is adjusted to match

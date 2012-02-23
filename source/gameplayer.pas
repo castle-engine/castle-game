@@ -1327,7 +1327,7 @@ begin
       'player.xml';
 
     KnockBackSpeed :=
-      PlayerConfig.GetFloat('player/knock_back_speed', 0.3);
+      PlayerConfig.GetFloat('player/knock_back_speed', DefaultKnockBackSpeed);
     Camera.MaxJumpHeight :=
       PlayerConfig.GetFloat('player/jump/max_height',
       DefaultMaxJumpHeight);

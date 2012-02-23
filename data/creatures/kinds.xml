@@ -21,6 +21,7 @@
     min_delay_between_attacks="2.0"
     move_speed="0.1"
     knocked_back_distance="4.2"
+    knock_back_speed="35"
     life_to_run_away="1.0"
     default_max_life="90.0"
     max_height_acceptable_to_fall="1.4"
@@ -52,6 +53,7 @@
     min_delay_between_attacks="2.0"
     default_max_life="300.0"
     knocked_back_distance="4.2"
+    knock_back_speed="35"
     max_angle_to_attack="1.04"
     min_life_loss_to_hurt="0.05"
     chance_to_hurt="0.3"
@@ -83,6 +85,7 @@
     close_direction_to_player="True"
     close_direction_to_target_speed="0.02"
     pause_between_sound_idle="2.5"
+    knocked_back_distance="0.0"
 
     middle_position_height="0.0"
 
@@ -105,6 +108,7 @@
     life_to_run_away="0.01"
     default_max_life="30.0"
     knocked_back_distance="4.2"
+    knock_back_speed="35"
     sound_dying_tied_to_creature="False"
     max_height_acceptable_to_fall="1.4"
 
@@ -141,6 +145,7 @@
     min_delay_between_attacks="2.0"
     default_max_life="50.0"
     knocked_back_distance="2.0"
+    knock_back_speed="35"
     max_angle_to_attack="1.04"
     max_height_acceptable_to_fall="1.4"
 
@@ -177,6 +182,7 @@
     min_delay_between_attacks="2.0"
     default_max_life="1100.0"
     knocked_back_distance="2.0"
+    knock_back_speed="35"
     max_angle_to_attack="1.04"
     max_height_acceptable_to_fall="5"
     fall_down_life_loss_scale="0.5"
@@ -213,6 +219,7 @@
     flying="True"
     default_max_life="1.0"
     close_direction_to_player="False"
+    knocked_back_distance="0.0"
 
     middle_position_height="0.0"
 
@@ -235,6 +242,7 @@
     hits_player="False"
     hits_creatures="True"
     move_speed="2.0"
+    knocked_back_distance="0.0"
 
     middle_position_height="0.0"
     radius="0.3"
@@ -254,6 +262,7 @@
   <DoomBarrel
     radius="0.5"
     default_max_life="1.0"
+    knock_back_speed="35"
 
     stand_animation="barrel/barrel.wrl"
   />

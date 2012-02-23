@@ -88,6 +88,8 @@ type
     FSoundDying: TSoundType;
     FSoundDyingTiedToCreature: boolean;
     FDefaultMaxLife: Single;
+    FKnockedBackDistance: Single;
+    FKnockBackSpeed: Single;
 
     RadiusFromFile: Single;
 
@@ -190,6 +192,28 @@ type
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
 
+    { Distance the creature is knocked back when hurt (should reflect
+      the creature weight, how easy it is to push this creature).
+
+      Will always be multiplied by the knocking distance of the weapon that
+      caused the push (which should reflect the force of the weapon blow),
+      see TItemShortRangeWeaponKind.AttackKnockbackDistance.
+
+      Only for TWalkAttackCreature, the final distance the creature
+      is knocked back is capped
+      by the time of the HurtAnimation (HurtAnimation.TimeDurationWithBack).
+      When the hurt animation ends, the knockback effect always ends,
+      even if the distance (creature * weapon) indicates it should be knocked
+      further. Otherwise knockback would work on standing creature,
+      which could look bad. This may be changed some day. }
+    property KnockedBackDistance: Single
+      read FKnockedBackDistance write FKnockedBackDistance
+      default DefaultKnockedBackDistance;
+
+    { See T3DAlive.KnockBackSpeed. }
+    property KnockBackSpeed: Single
+      read FKnockBackSpeed write FKnockBackSpeed default DefaultKnockBackSpeed;
+
     { Short range attack damage and knockback.
       These will be used only by some creatures, the ones that do
       ShortRangeAttackHurt in their ActualAttack implementation.
@@ -283,7 +307,6 @@ type
     FMaxAttackDistance: Single;
     FPreferredAttackDistance: Single;
     FActualAttackTime: Single;
-    FKnockedBackDistance: Single;
 
     FSoundAttackStart: TSoundType;
     FLifeToRunAway: Single;
@@ -399,23 +422,6 @@ type
     property ActualAttackTime: Single
       read FActualAttackTime write FActualAttackTime
       default DefaultActualAttackTime;
-
-    { Distance the creature is knocked back when hurt (should reflect
-      the creature weight, how easy it is to push this creature).
-
-      Will always be multiplied by the knocking distance of the weapon that
-      caused the push (which should reflect the force of the weapon blow),
-      see TItemShortRangeWeaponKind.AttackKnockbackDistance.
-
-      The final distance the creature is knocked back is capped
-      by the time of the HurtAnimation (HurtAnimation.TimeDurationWithBack).
-      When the hurt animation ends, the knockback effect always ends,
-      even if the distance (creature * weapon) indicates it should be knocked
-      further. Otherwise knockback would work on standing creature,
-      which could look bad. This may be changed some day. }
-    property KnockedBackDistance: Single
-      read FKnockedBackDistance write FKnockedBackDistance
-      default DefaultKnockedBackDistance;
 
     { Player when attacking, that is when entering wasAttack state.
       Played at creature Middle.
@@ -784,9 +790,6 @@ type
       if ActualAttack was called. }
     ActualAttackDone: boolean;
 
-    { Set to 0 each time FState changes to wasHurt }
-    KnockedBackDistance: Single;
-
     HasLastSeenPlayer: boolean;
     LastSeenPlayer: TVector3Single;
     LastSeenPlayerSector: TSceneSector;
@@ -963,6 +966,8 @@ begin
   inherited Create(AShortName);
   FFlying := DefaultFlying;
   FDefaultMaxLife := DefaultDefaultMaxLife;
+  FKnockedBackDistance := DefaultKnockedBackDistance;
+  FKnockBackSpeed := DefaultKnockBackSpeed;
   FSoundDyingTiedToCreature := DefaultSoundDyingTiedToCreature;
   FShortRangeAttackDamageConst := DefaultShortRangeAttackDamageConst;
   FShortRangeAttackDamageRandom := DefaultShortRangeAttackDamageRandom;
@@ -977,6 +982,10 @@ procedure TCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
+  KnockBackSpeed := KindsConfig.GetFloat(ShortName + '/knock_back_speed',
+    DefaultKnockBackSpeed);
+  KnockedBackDistance := KindsConfig.GetFloat(ShortName + '/knocked_back_distance',
+    DefaultKnockedBackDistance);
   Flying := KindsConfig.GetValue(ShortName + '/flying',
     DefaultFlying);
   SoundDyingTiedToCreature :=
@@ -1053,6 +1062,7 @@ begin
   Result.FKind := Self;
   Result.SetView(APosition, ADirection, World.GravityUp);
   Result.Life := MaxLife;
+  Result.KnockBackSpeed := KnockBackSpeed;
 
   World.Add(Result);
 end;
@@ -1108,7 +1118,6 @@ begin
   FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
   FMaxAttackDistance := DefaultMaxAttackDistance;
   FPreferredAttackDistance := DefaultPreferredAttackDistance;
-  FKnockedBackDistance := DefaultKnockedBackDistance;
   FLifeToRunAway := DefaultLifeToRunAway;
   FActualAttackTime := DefaultActualAttackTime;
   FMaxAngleToAttack := DefaultMaxAngleToAttack;
@@ -1208,9 +1217,6 @@ begin
   LifeToRunAway :=
     KindsConfig.GetFloat(ShortName + '/life_to_run_away',
     DefaultLifeToRunAway);
-  KnockedBackDistance :=
-    KindsConfig.GetFloat(ShortName + '/knocked_back_distance',
-    DefaultKnockedBackDistance);
   MaxAngleToAttack :=
     KindsConfig.GetFloat(ShortName + '/max_angle_to_attack',
     DefaultMaxAngleToAttack);
@@ -1492,7 +1498,6 @@ begin
   MaxLife := AMaxLife;
   FSoundDyingEnabled := true;
   UsedSounds := TALSoundList.Create(false);
-  KnockBackSpeed := 0.7;
 end;
 
 function TCreature.GetExists: boolean;
@@ -1898,8 +1903,6 @@ begin
           LastAttackTime := StateChangeTime;
           ActualAttackDone := false;
         end;
-      wasHurt:
-        KnockedBackDistance := 0.0;
     end;
   end;
 end;
