@@ -177,6 +177,9 @@ type
   protected
     function GetChild: T3D; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function Height(const APosition, GravityUp: TVector3Single;
+      const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
+      out AboveHeight: Single; out AboveGround: P3DTriangle): boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1505,6 +1508,24 @@ begin
 
   if (Operation = opRemove) and (AComponent = FEquippedWeapon) then
     FEquippedWeapon := nil;
+end;
+
+function TPlayer.Height(const APosition, GravityUp: TVector3Single;
+  const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
+  out AboveHeight: Single; out AboveGround: P3DTriangle): boolean;
+begin
+  { instead of allowing inherited to do the work (and allow other stuff
+    like items and creatures to stand on player's head), for now just
+    make player non-collidable for Height. Otherwise, when trying really
+    hard to walk "into" a creature, sometimes the creature may start to
+    raise up and stand on your own (player's) head.
+    This doesn't have any adverse effects for castle, after all
+    items can fall down through us (they are immediately picked up then),
+    and creature never fall down because of gravity on our head. }
+
+  Result := false;
+  AboveHeight := MaxSingle;
+  AboveGround := nil;
 end;
 
 { CastleWindow open / close ------------------------------------------------------ }
