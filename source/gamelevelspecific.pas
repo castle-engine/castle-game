@@ -1114,10 +1114,6 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
     DoorBox := (inherited BoundingBox).Translate(
       GetTranslationFromTime(NewAnimationTime));
 
-    Result := (Player <> nil) and DoorBox.Collision(Player.BoundingBox);
-    if Result then
-      Exit;
-
     for I := 0 to World.Count - 1 do
       if World[I].Pushable then
       begin
