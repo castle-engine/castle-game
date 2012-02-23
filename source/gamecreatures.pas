@@ -43,7 +43,7 @@ const
   DefaultMaxAttackDistance = 50.0 * 0.7;
   DefaultPreferredAttackDistance = 30.0 * 0.7;
   DefaultMissileMoveSpeed = 1.0 * 0.7;
-  DefaultMaxKnockedBackDistance = 6.0 * 0.7;
+  DefaultKnockedBackDistance = 6.0 * 0.7;
   DefaultLifeToRunAway = 0.3;
   DefaultActualAttackTime = 0.0;
   DefaultMaxAngleToAttack = Pi / 6 { 30 degrees };
@@ -280,7 +280,7 @@ type
     FMaxAttackDistance: Single;
     FPreferredAttackDistance: Single;
     FActualAttackTime: Single;
-    FMaxKnockedBackDistance: Single;
+    FKnockedBackDistance: Single;
 
     FSoundAttackStart: TSoundType;
     FLifeToRunAway: Single;
@@ -401,10 +401,10 @@ type
       state), then it's forced to move in general LastHurtDirection
       for the time HurtAnimation.TimeDurationWithBack, until
       HurtAnimation (and wasHurt state) ends, or until it was forced to move
-      by MaxKnockedBackDistance. }
-    property MaxKnockedBackDistance: Single
-      read FMaxKnockedBackDistance write FMaxKnockedBackDistance
-      default DefaultMaxKnockedBackDistance;
+      by KnockedBackDistance * weapon's KnockedBackDistance. }
+    property KnockedBackDistance: Single
+      read FKnockedBackDistance write FKnockedBackDistance
+      default DefaultKnockedBackDistance;
 
     { This will be played at Middle when entering wasAttack state.
       Sometimes you may prefer to rather play a sound at ActualAttack
@@ -1094,7 +1094,7 @@ begin
   FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
   FMaxAttackDistance := DefaultMaxAttackDistance;
   FPreferredAttackDistance := DefaultPreferredAttackDistance;
-  FMaxKnockedBackDistance := DefaultMaxKnockedBackDistance;
+  FKnockedBackDistance := DefaultKnockedBackDistance;
   FLifeToRunAway := DefaultLifeToRunAway;
   FActualAttackTime := DefaultActualAttackTime;
   FMaxAngleToAttack := DefaultMaxAngleToAttack;
@@ -1194,9 +1194,9 @@ begin
   LifeToRunAway :=
     KindsConfig.GetFloat(ShortName + '/life_to_run_away',
     DefaultLifeToRunAway);
-  MaxKnockedBackDistance :=
-    KindsConfig.GetFloat(ShortName + '/max_knocked_back_distance',
-    DefaultMaxKnockedBackDistance);
+  KnockedBackDistance :=
+    KindsConfig.GetFloat(ShortName + '/knocked_back_distance',
+    DefaultKnockedBackDistance);
   MaxAngleToAttack :=
     KindsConfig.GetFloat(ShortName + '/max_angle_to_attack',
     DefaultMaxAngleToAttack);
@@ -2569,8 +2569,7 @@ procedure TWalkAttackCreature.Hurt(const LifeLoss: Single;
   const AKnockbackDistance: Single);
 begin
   inherited Hurt(LifeLoss, HurtDirection,
-    { we always use creature's knockback distance for now }
-    WAKind.MaxKnockedBackDistance);
+    AKnockbackDistance * WAKind.KnockedBackDistance);
 end;
 
 { TAlienCreature ------------------------------------------------------- }
@@ -2965,7 +2964,8 @@ end;
 procedure TMissileCreature.ExplodeWithCreature(Creature: TCreature);
 begin
   Creature.Hurt(Kind.ShortRangeAttackDamageConst +
-    Random * Kind.ShortRangeAttackDamageRandom, Direction, 1.0);
+    Random * Kind.ShortRangeAttackDamageRandom, Direction,
+    Kind.ShortRangeAttackKnockbackDistance);
 end;
 
 { TStillCreature ----------------------------------------------------------- }

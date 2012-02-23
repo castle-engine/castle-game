@@ -20,7 +20,7 @@
     actual_attack_time="0.4"
     min_delay_between_attacks="2.0"
     move_speed="0.1"
-    max_knocked_back_distance="4.2"
+    knocked_back_distance="4.2"
     life_to_run_away="1.0"
     default_max_life="90.0"
     max_height_acceptable_to_fall="1.4"
@@ -51,7 +51,7 @@
     preferred_attack_distance="4.2"
     min_delay_between_attacks="2.0"
     default_max_life="300.0"
-    max_knocked_back_distance="4.2"
+    knocked_back_distance="4.2"
     max_angle_to_attack="1.04"
     min_life_loss_to_hurt="0.05"
     chance_to_hurt="0.3"
@@ -104,7 +104,7 @@
     min_delay_between_attacks="2.0"
     life_to_run_away="0.01"
     default_max_life="30.0"
-    max_knocked_back_distance="4.2"
+    knocked_back_distance="4.2"
     sound_dying_tied_to_creature="False"
     max_height_acceptable_to_fall="1.4"
 
@@ -140,7 +140,7 @@
     preferred_attack_distance="2.0"
     min_delay_between_attacks="2.0"
     default_max_life="50.0"
-    max_knocked_back_distance="2.0"
+    knocked_back_distance="2.0"
     max_angle_to_attack="1.04"
     max_height_acceptable_to_fall="1.4"
 
@@ -176,7 +176,7 @@
     preferred_attack_distance="8.0"
     min_delay_between_attacks="2.0"
     default_max_life="1100.0"
-    max_knocked_back_distance="2.0"
+    knocked_back_distance="2.0"
     max_angle_to_attack="1.04"
     max_height_acceptable_to_fall="5"
     fall_down_life_loss_scale="0.5"
@@ -246,7 +246,7 @@
 
     fly_animation="arrow/arrow.wrl"
   >
-    <short_range_attack knockback_distance="5">
+    <short_range_attack knockback_distance="1">
       <damage const="20" random="20"/>
     </short_range_attack>
   </Arrow>

@@ -35,6 +35,7 @@ const
   DefaultItemDamageConst = 5.0;
   DefaultItemDamageRandom = 5.0;
   DefaultItemActualAttackTime = 0.0;
+  DefaultItemAttackKnockbackDistance = 1.0;
 
 type
   TItem = class;
@@ -212,6 +213,7 @@ type
   private
     FDamageConst: Single;
     FDamageRandom: Single;
+    FAttackKnockbackDistance: Single;
   public
     constructor Create(const AShortName: string);
 
@@ -219,6 +221,9 @@ type
       default DefaultItemDamageConst;
     property DamageRandom: Single read FDamageRandom write FDamageRandom
       default DefaultItemDamageRandom;
+    property AttackKnockbackDistance: Single
+      read FAttackKnockbackDistance write FAttackKnockbackDistance
+      default DefaultItemAttackKnockbackDistance;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
@@ -624,6 +629,7 @@ begin
   inherited;
   FDamageConst := DefaultItemDamageConst;
   FDamageRandom := DefaultItemDamageRandom;
+  FAttackKnockbackDistance := DefaultItemAttackKnockbackDistance;
 end;
 
 procedure TItemShortRangeWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
@@ -632,8 +638,11 @@ begin
 
   DamageConst := KindsConfig.GetFloat(ShortName + '/damage/const',
     DefaultItemDamageConst);
-  DamageRandom :=KindsConfig.GetFloat(ShortName + '/damage/random',
+  DamageRandom := KindsConfig.GetFloat(ShortName + '/damage/random',
     DefaultItemDamageRandom);
+  AttackKnockbackDistance :=
+    KindsConfig.GetFloat(ShortName + '/attack_knockback_distance',
+    DefaultItemAttackKnockbackDistance);
 end;
 
 { TItemSwordKind ------------------------------------------------------------- }
@@ -656,7 +665,7 @@ begin
       { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
       if C.BoundingBox.Collision(WeaponBoundingBox) then
       begin
-        C.Hurt(DamageConst + Random * DamageRandom, Player.Direction, 1);
+        C.Hurt(DamageConst + Random * DamageRandom, Player.Direction, AttackKnockbackDistance);
       end;
     end;
 end;

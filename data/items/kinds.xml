@@ -37,6 +37,7 @@
 
     equipping_sound="sword_equipping"
     sound_attack_start="sword_attack_start"
+    attack_knockback_distance="1.0"
 
     attack_animation="sword/attack.kanim"
     ready_animation="sword/ready.wrl"
