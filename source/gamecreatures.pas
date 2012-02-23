@@ -465,7 +465,7 @@ type
       default DefaultCreatureRandomWalkDistance;
   end;
 
-  TBallThrowerCreatureKind = class(TWalkAttackCreatureKind)
+  TAlienCreatureKind = class(TWalkAttackCreatureKind)
   public
     function CreatureClass: TCreatureClass; override;
   end;
@@ -897,7 +897,7 @@ type
     procedure ActualAttack; virtual; abstract;
   end;
 
-  TBallThrowerCreature = class(TWalkAttackCreature)
+  TAlienCreature = class(TWalkAttackCreature)
   public
     procedure ActualAttack; override;
   end;
@@ -974,7 +974,7 @@ type
 var
   CreaturesKinds: TCreatureKindList;
 
-  Alien: TBallThrowerCreatureKind;
+  Alien: TAlienCreatureKind;
   Werewolf: TWerewolfKind;
   BallMissile: TMissileCreatureKind;
   Ghost: TGhostKind;
@@ -1278,11 +1278,11 @@ begin
   AnimationFromConfig(FHurtAnimationFile, KindsConfig, 'hurt');
 end;
 
-{ TBallThrowerCreatureKind --------------------------------------------------- }
+{ TAlienCreatureKind --------------------------------------------------- }
 
-function TBallThrowerCreatureKind.CreatureClass: TCreatureClass;
+function TAlienCreatureKind.CreatureClass: TCreatureClass;
 begin
-  Result := TBallThrowerCreature;
+  Result := TAlienCreature;
 end;
 
 { TWerewolfKind -------------------------------------------------------------- }
@@ -2764,9 +2764,9 @@ begin
   Result := (inherited DebugCaption) + ' ' + StateName[State];
 end;
 
-{ TBallThrowerCreature ------------------------------------------------------- }
+{ TAlienCreature ------------------------------------------------------- }
 
-procedure TBallThrowerCreature.ActualAttack;
+procedure TAlienCreature.ActualAttack;
 const
   FiringMissileHeight = 0.6;
 var
@@ -3221,7 +3221,7 @@ begin
 
   CreaturesKinds := TCreatureKindList.Create(true);
 
-  Alien := TBallThrowerCreatureKind.Create('Alien');
+  Alien := TAlienCreatureKind.Create('Alien');
   Werewolf := TWerewolfKind.Create('Werewolf');
   BallMissile := TMissileCreatureKind.Create('BallMissile');
   Ghost := TGhostKind.Create('Ghost');
