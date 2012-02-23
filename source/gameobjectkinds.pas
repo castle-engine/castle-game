@@ -34,7 +34,6 @@ type
   private
     FShortName: string;
     FPrepareRenderDone: boolean;
-    FBlendingType: TBlendingType;
   protected
     { Create Anim from given AnimationFile, only if Anim = nil.
       Then it sets attributes for the animation and then prepares
@@ -111,9 +110,6 @@ type
       for other info in VRML/X3D and XML node names.) }
     property ShortName: string read FShortName;
 
-    property BlendingType: TBlendingType
-      read FBlendingType write FBlendingType default DefaultBlendingType;
-
     procedure LoadFromFile(KindsConfig: TCastleConfig); virtual;
 
     { This is a debug command, will cause FreePrepareRender
@@ -132,7 +128,6 @@ constructor TObjectKind.Create(const AShortName: string);
 begin
   inherited Create;
   FShortName := AShortName;
-  FBlendingType := DefaultBlendingType;
 end;
 
 procedure TObjectKind.PrepareRender(const BaseLights: TLightInstancesList);
@@ -166,19 +161,8 @@ begin
 end;
 
 procedure TObjectKind.LoadFromFile(KindsConfig: TCastleConfig);
-const
-  SBlendingTypeIncrease = 'increase';
-  SBlendingTypeScale = 'scale';
-var
-  SBlendingType: string;
 begin
-  SBlendingType := KindsConfig.GetValue(ShortName + '/blending_type',
-    SBlendingTypeIncrease);
-  if SBlendingType = SBlendingTypeIncrease then
-    BlendingType := btIncrease else
-  if SBlendingType = SBlendingTypeScale then
-    BlendingType := btScale else
-    raise Exception.CreateFmt('Wrong blending_type value "%s"', [SBlendingType]);
+  { Nothing to do in this class. }
 end;
 
 procedure TObjectKind.RedoPrepareRender(const BaseLights: TLightInstancesList);
@@ -226,7 +210,7 @@ begin
           Anim.ScenesCount,
           Anim.Scenes[0].TrianglesCount(true) ]));
 
-    AnimationAttributesSet(Anim.Attributes, BlendingType);
+    AttributesSet(Anim.Attributes);
     Anim.PrepareResources(Options, false, BaseLights);
   end;
   Progress.Step;

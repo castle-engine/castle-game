@@ -1426,7 +1426,7 @@ begin
     Fountain := TBlendedLoopingAnimationShader.CreateCustomCache(Self, GLContextCache);
     Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
       PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true);
-    AnimationAttributesSet(Fountain.Attributes, btIncrease);
+    AttributesSet(Fountain.Attributes);
     Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
     try
       Fountain.PrepareResources([prRender, prBoundingBox], true, BaseLights);

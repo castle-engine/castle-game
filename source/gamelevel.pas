@@ -546,7 +546,7 @@ begin
     { initialize FAnimationTime. Must be initialized before creating creatures. }
     FAnimationTime := 0.0;
 
-    AttributesSet(MainScene.Attributes, btIncrease);
+    AttributesSet(MainScene.Attributes);
     MainScene.Attributes.UseSceneLights := true;
     if BumpMapping then
       MainScene.Attributes.BumpMapping := bmBasic else
@@ -934,7 +934,7 @@ var
 begin
   Result := SceneClass.CreateCustomCache(Self, GLContextCache);
   Result.Load(FileName);
-  AttributesSet(Result.Attributes, btIncrease);
+  AttributesSet(Result.Attributes);
 
   { calculate Options for PrepareResources }
   Options := [prRender, prBoundingBox { always needed }];
@@ -971,7 +971,7 @@ begin
   Result := AnimationClass.CreateCustomCache(Self, GLContextCache);
   Result.LoadFromFile(FileName, false, true);
 
-  AnimationAttributesSet(Result.Attributes, btIncrease);
+  AttributesSet(Result.Attributes);
 
   { calculate Options for PrepareResources }
   Options := [prRender, prBoundingBox { always needed }];

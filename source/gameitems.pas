@@ -462,7 +462,7 @@ begin
     FScene := TCastleScene.CreateCustomCache(nil, GLContextCache);
     FScene.Load(ModelFileName);
 
-    AttributesSet(Scene.Attributes, BlendingType);
+    AttributesSet(Scene.Attributes);
     Scene.PrepareResources([prRender, prBoundingBox], false, BaseLights);
     Scene.FreeResources([frTextureDataInNodes]);
   end;

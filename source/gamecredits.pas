@@ -188,7 +188,7 @@ begin
   CreditsModel := TCastleScene.CreateCustomCache(nil, GLContextCache);
   CreditsModel.Load(LoadX3DClassicFromString(VRMLContents, ''), true);
 
-  AttributesSet(CreditsModel.Attributes, btIncrease);
+  AttributesSet(CreditsModel.Attributes);
   CreditsModel.Attributes.UseSceneLights := true;
 
   Info := (CreditsModel.RootNode.FindNodeByName(TWorldInfoNode,

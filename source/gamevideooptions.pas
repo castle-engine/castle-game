@@ -28,39 +28,8 @@ interface
 uses GL, CastleGLUtils, CastleScene, X3DNodes,
   PrecalculatedAnimationCore;
 
-type
-  { This determines OpenGL blending factors used when rendering given model. }
-  TBlendingType = (
-
-    { Use OpenGL blending factors (GL_SRC_ALPHA, GL_ONE).
-      These are the default OpenGL blending factors.
-      Disadvantage: it only increases the image color, so partially
-      transparent objects have a tendency to look all white on the level. }
-    btIncrease,
-
-    { Use OpenGL blending factors (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA).
-      Disadvantage: it has a tendency to make color of the level
-      (things behind the partially transparent object) to look too dark
-      (since it scales image color down). }
-    btScale);
-
-const
-  DefaultBlendingType = btIncrease;
-
-{ Set Attributes as needed. Right now this means setting
-  UseSceneLights = @false
-  (main scene will override UseSceneLights back to @true,
-  for other scenes we ignore lights --- for historic reasons,
-  we couldn't support them well in the past.) }
-procedure AttributesSet(Attributes: TSceneRenderingAttributes;
-  BlendingType: TBlendingType);
-
-{ Set Attributes of animation as needed. In theory you should
-  call AttributesSet here, but in practice animation's attributes
-  must be a little different, otherwise animations can
-  take too much memory to load. }
-procedure AnimationAttributesSet(Attributes: TSceneRenderingAttributes;
-  BlendingType: TBlendingType);
+{ Set some Attributes as needed for castle models. }
+procedure AttributesSet(Attributes: TSceneRenderingAttributes);
 
 const
   DefaultAllowScreenChange = true;
@@ -139,33 +108,24 @@ implementation
 uses SysUtils, CastleUtils, GameConfig, GameWindow, RaysWindow,
   GLAntiAliasing;
 
-procedure AttributesSet(Attributes: TSceneRenderingAttributes;
-  BlendingType: TBlendingType);
+procedure AttributesSet(Attributes: TSceneRenderingAttributes);
 begin
-  case BlendingType of
-    btIncrease:
-      begin
-        Attributes.BlendingSourceFactor := GL_SRC_ALPHA;
-        Attributes.BlendingDestinationFactor := GL_ONE;
-      end;
-    btScale:
-      begin
-        Attributes.BlendingSourceFactor := GL_SRC_ALPHA;
-        Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;
-      end;
-    else
-      raise EInternalError.Create('20061126-case BlendingType');
-  end;
+  { Disadvantage: it only increases the image color, so partially
+    transparent objects have a tendency to look all white on the level.
+    Advantage: no sorting problems. }
+  Attributes.BlendingSourceFactor := GL_SRC_ALPHA;
+  Attributes.BlendingDestinationFactor := GL_ONE;
 
+  { Disadvantage: it has a tendency to make color of the level
+    (things behind the partially transparent object) seem too dark
+    (since it scales image color down).
+  Attributes.BlendingSourceFactor := GL_SRC_ALPHA;
+  Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA; }
+
+  { main scene will override UseSceneLights back to @true,
+    for other scenes we ignore lights --- for historic reasons,
+    we couldn't support them well in the past. }
   Attributes.UseSceneLights := false;
-end;
-
-procedure AnimationAttributesSet(Attributes: TSceneRenderingAttributes;
-  BlendingType: TBlendingType);
-begin
-  { Despite the comments in the interface, this is the same thing
-    as AttributesSet for now. }
-  AttributesSet(Attributes, BlendingType);
 end;
 
 function ViewAngleDegY: Single;
