@@ -681,7 +681,7 @@ begin
       Player.DeleteItem(QuiverIndex).Free;
 
     { shoot the arrow }
-    Level.CreateCreature(Arrow, Player.Position, Player.Direction);
+    Arrow.CreateCreature(Player.World, Player.Position, Player.Direction);
     SoundEngine.Sound(stArrowFired);
   end;
 end;

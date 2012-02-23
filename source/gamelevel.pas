@@ -357,16 +357,6 @@ type
     { Instance of boss creature, if any, on the level. @nil if no boss creature
       exists on this level. }
     property BossCreature: TCreature read FBossCreature;
-
-    { Comfortably create and add creature to level.
-      @groupBegin }
-    function CreateCreature(const Kind: TCreatureKind;
-      const APosition: TVector3Single;
-      const ADirection: TVector3Single; const MaxLife: Single): TCreature;
-    function CreateCreature(const Kind: TCreatureKind;
-      const APosition: TVector3Single;
-      const ADirection: TVector3Single): TCreature;
-    { @groupEnd }
   end;
 
   TLevelClass = class of TLevel;
@@ -901,7 +891,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
       MaxLife := CreatureKind.DefaultMaxLife;
     end;
 
-    CreateCreature(CreatureKind, CreaturePosition, CreatureDirection, MaxLife);
+    CreatureKind.CreateCreature(Items, CreaturePosition, CreatureDirection, MaxLife);
   end;
 
 const
@@ -916,22 +906,6 @@ begin
       This avoids problems with removing nodes while traversing. }
     ItemsToRemove.Add(Shape.BlenderObjectNode);
   end;
-end;
-
-function TLevel.CreateCreature(const Kind: TCreatureKind;
-  const APosition: TVector3Single;
-  const ADirection: TVector3Single; const MaxLife: Single): TCreature;
-begin
-  Result := Kind.CreateCreature(Self, APosition,
-    ADirection, GravityUp, BaseLights, MaxLife);
-  Items.Add(Result);
-end;
-
-function TLevel.CreateCreature(const Kind: TCreatureKind;
-  const APosition: TVector3Single;
-  const ADirection: TVector3Single): TCreature;
-begin
-  Result := CreateCreature(Kind, APosition, ADirection, Kind.DefaultMaxLife);
 end;
 
 procedure TLevel.Idle(const CompSpeed: Single;

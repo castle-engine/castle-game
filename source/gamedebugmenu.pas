@@ -352,7 +352,7 @@ procedure TDebugCreaturesMenu.Click;
   begin
     if ChooseCreatureKind(Kind) then
     begin
-      Level.CreateCreature(Kind,
+      Kind.CreateCreature(Level.Items,
         Player.Position + Player.Direction * DirectionAttenuation,
         Player.Direction);
 

@@ -381,7 +381,7 @@ const
     Assert(not WerewolfAppeared);
 
     for I := 0 to CastleHallWerewolvesCount - 1 do
-      WerewolfCreature[I] := CreateCreature(Werewolf,
+      WerewolfCreature[I] := Werewolf.CreateCreature(Items,
         WerewolfAppearPosition[I],
         VectorSubtract(Player.Position, WerewolfAppearPosition[I]))
         as TWerewolfCreature;
@@ -669,7 +669,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
     begin
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
       CreatureDirection := Player.Position - CreaturePosition;
-      CreateCreature(Ghost, CreaturePosition, CreatureDirection);
+      Ghost.CreateCreature(Items, CreaturePosition, CreatureDirection);
     end;
   end;
 
@@ -682,7 +682,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
     begin
       CreaturePosition := SwordAmbushStartingPosition[I];
       CreatureDirection := Player.Position - CreaturePosition;
-      CreateCreature(Ghost, CreaturePosition, CreatureDirection);
+      Ghost.CreateCreature(Items, CreaturePosition, CreatureDirection);
     end;
   end;
 
@@ -1059,7 +1059,7 @@ begin
         SpiderDirection :=
           VectorSubtract(Player.Position, SpiderPosition);
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, GravityUp);
-        SpiderCreature := CreateCreature(Spider, SpiderPosition, SpiderDirection);
+        SpiderCreature := Spider.CreateCreature(Items, SpiderPosition, SpiderDirection);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
         FreeAndNil(SA); { it will be automatically removed from SpidersAppearing list }
       end else

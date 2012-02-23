@@ -171,16 +171,20 @@ type
       e.g. if this kind has settings for short-range fight,
       then the TCreature instance will be able to short-range fight.
 
+      The creature is added to the World, and it's owned by World.
+
       This is the only way to create TCreature instances.
-      Usually, you actually want to use TLevel.CreateCreature,
-      that is even simpler wrapper around this method.
 
       ADirection passed here is normalized, and then used
-      as initial TCreature.Direction value. }
-    function CreateCreature(AOwner: TComponent;
-      const APosition, ADirection, AUp: TVector3Single;
-      const BaseLights: TLightInstancesList;
+      as initial TCreature.Direction value.
+
+      @groupBegin }
+    function CreateCreature(World: T3DWorld;
+      const APosition, ADirection: TVector3Single;
       const MaxLife: Single): TCreature;
+    function CreateCreature(World: T3DWorld;
+      const APosition, ADirection: TVector3Single): TCreature;
+    { @groupEnd }
 
     function CreatureClass: TCreatureClass; virtual; abstract;
 
@@ -1071,21 +1075,28 @@ begin
     Options, BaseLights);
 end;
 
-function TCreatureKind.CreateCreature(AOwner: TComponent;
-  const APosition, ADirection, AUp: TVector3Single;
-  const BaseLights: TLightInstancesList;
+function TCreatureKind.CreateCreature(World: T3DWorld;
+  const APosition, ADirection: TVector3Single;
   const MaxLife: Single): TCreature;
 begin
   { This is only needed if you used --debug-no-creatures or forgot
     to add creature to <required_resources> }
-  RequireCreature(BaseLights, Self);
+  // TODO: eliminate RequireCreature(BaseLights, Self);
 
-  Result := CreatureClass.Create(AOwner, MaxLife);
+  Result := CreatureClass.Create(World { owner }, MaxLife);
   { set properties that in practice must have other-than-default values
     to sensibly use the creature }
   Result.FKind := Self;
-  Result.SetView(APosition, ADirection, AUp);
+  Result.SetView(APosition, ADirection, World.GravityUp);
   Result.Life := MaxLife;
+
+  World.Add(Result);
+end;
+
+function TCreatureKind.CreateCreature(World: T3DWorld;
+  const APosition, ADirection: TVector3Single): TCreature;
+begin
+  Result := CreateCreature(World, APosition, ADirection, DefaultMaxLife);
 end;
 
 { TCreatureKindList -------------------------------------------------------- }
@@ -2761,7 +2772,7 @@ begin
   begin
     MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := Level.CreateCreature(BallMissile, MissilePosition, MissileDirection);
+    Missile := BallMissile.CreateCreature(World, MissilePosition, MissileDirection);
     Missile.Sound3d(stBallMissileFired, 0.0);
   end;
 end;
@@ -2942,7 +2953,7 @@ begin
   begin
     MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := Level.CreateCreature(ThrownWeb, MissilePosition, MissileDirection);
+    Missile := ThrownWeb.CreateCreature(World, MissilePosition, MissileDirection);
     Missile.Sound3d(stThrownWebFired, 0.0);
   end;
 end;
