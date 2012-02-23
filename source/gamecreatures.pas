@@ -72,7 +72,7 @@ const
   DefaultFallsDown = false;
   DefaultFallsDownSpeed = 0.003;
 
-  DefaultMiddlePositionHeight = 1.0;
+  DefaultMiddleHeight = 1.0;
 
   DefaultCastShadowVolumes = true;
 
@@ -97,7 +97,7 @@ type
 
     FFallDownLifeLossScale: Single;
 
-    FMiddlePositionHeight: Single;
+    FMiddleHeight: Single;
 
     FCastShadowVolumes: boolean;
     FRequiredCount: Cardinal;
@@ -139,7 +139,7 @@ type
       Radius may remain zero. But you can depend on the fact that
       it's non-zero after PrepareRender.
 
-      Note that this is always measured from MiddlePosition of given
+      Note that this is always measured from Middle of given
       creature. So take this into account when calcuating
       RadiusFromPrepareRender or writing it in kinds.xml file. }
     function Radius: Single;
@@ -222,16 +222,16 @@ type
       write FFallDownLifeLossScale
       default DefaultFallDownLifeLossScale;
 
-    { This determines how the creature's MiddlePosition will be calculated.
+    { This determines how the creature's Middle will be calculated.
       Actually, this determines how the HeightBetweenLegsAndMiddle
-      will be calculated, and this is used to calculate MiddlePosition.
+      will be calculated, and this is used to calculate Middle.
       HeightBetweenLegsAndMiddle is just current scene box height
-      multiplied by this, so 1.0 means that MiddlePosition is at the top
+      multiplied by this, so 1.0 means that Middle is at the top
       of the box, 0.0 means at the bottom, 0.5 means at the middle etc. }
-    property MiddlePositionHeight: Single
-      read FMiddlePositionHeight
-      write FMiddlePositionHeight
-      default DefaultMiddlePositionHeight;
+    property MiddleHeight: Single
+      read FMiddleHeight
+      write FMiddleHeight
+      default DefaultMiddleHeight;
 
     property CastShadowVolumes: boolean
       read FCastShadowVolumes write FCastShadowVolumes
@@ -375,7 +375,7 @@ type
 
     { Maximum distance between player and creature to allow creature
       to start attack. More precisely, this is measured between
-      Player.Position and creature's MiddlePosition. }
+      Player.Position and creature's Middle. }
     property MaxAttackDistance: Single
       read FMaxAttackDistance write FMaxAttackDistance
       default DefaultMaxAttackDistance;
@@ -406,7 +406,7 @@ type
       read FMaxKnockedBackDistance write FMaxKnockedBackDistance
       default DefaultMaxKnockedBackDistance;
 
-    { This will be played at MiddlePosition when entering wasAttack state.
+    { This will be played at Middle when entering wasAttack state.
       Sometimes you may prefer to rather play a sound at ActualAttack
       --- then just do it in overriden ActualAttack. }
     property SoundAttackStart: TSoundType
@@ -427,7 +427,7 @@ type
 
       More precisely, the attack is allowed to start only when
       the angle between current Direction and the vector
-      from creature's MiddlePosition to the player's Position
+      from creature's Middle to the player's Position
       is <= MaxAngleToAttack.
 
       This is in radians. }
@@ -660,15 +660,15 @@ type
       construction), so make it work always reliably. }
     { function GetChild: T3D; override; }
 
-    { These define exactly what "MiddlePosition" means for this creature.
+    { These define exactly what "Middle" means for this creature.
 
       PositionFromMiddle must always specify reverse function.
 
-      LerpLegsMiddlePosition must always be equal to
-      Lerp(A, Position, MiddlePosition)
+      LerpLegsMiddle must always be equal to
+      Lerp(A, Position, Middle)
       (but usually can be calculated more efficiently than calling Lerp).
 
-      In this class they calculate MiddlePosition as Position
+      In this class they calculate Middle as Position
       moved higher than HeightBetweenLegsAndMiddle.
       So if you want to change the meaning of these functions
       you can simply override only HeightBetweenLegsAndMiddle
@@ -677,11 +677,11 @@ type
       HeightBetweenLegsAndMiddle), to keep them "synchronized".
 
       @groupBegin }
-    function MiddlePositionFromLegs(
+    function MiddleFromLegs(
       const AssumePosition: TVector3Single): TVector3Single; virtual;
     function PositionFromMiddle(
-      const AssumeMiddlePosition: TVector3Single): TVector3Single; virtual;
-    function LerpLegsMiddlePosition(
+      const AssumeMiddle: TVector3Single): TVector3Single; virtual;
+    function LerpLegsMiddle(
       const A: Single): TVector3Single; virtual;
     { @groupEnd }
 
@@ -700,19 +700,19 @@ type
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
-    { The height of MiddlePosition above Position.
+    { The height of Middle above Position.
       Calculated in this class using GetChild.BoundingBox.Data[1, 2]
-      and Kind.MiddlePositionHeight.
+      and Kind.MiddleHeight.
       Note that while GetChild may change, this also may change. }
     function HeightBetweenLegsAndMiddle: Single; virtual;
 
     { The "middle" position of the creature.
       For some creatures it can be considered the position of their "heads".
       How precisely this is calculated for given creature depends
-      on MiddlePositionFromLegs implementation in this class.
+      on MiddleFromLegs implementation in this class.
 
       All collision detection (MyMoveAllowed, MyHeight, MyLineOfSight)
-      should be done using MiddlePosition, and then appropriately translated
+      should be done using Middle, and then appropriately translated
       back to Position. Why ? Because this avoids the problems
       of collisions with ground objects. Legs are (for creatures that
       are not Flying and have already fallen down on the ground) on the
@@ -720,21 +720,21 @@ type
       is always vulnerable to accidentaly finding collision between Position
       and the ground.
 
-      So for creatures not Flying, MiddlePosition should
+      So for creatures not Flying, Middle should
       be always higher (at least by Radius) than Position.
 
       For Flying creatures this is not a problem, they could use Position
       surrounded by Radius for collision detection. But this would
       be inefficient --- since Position surrounded by Radius
       would unnecessarily block creature's moves. So for Flying creatures
-      it's best to actually set MiddlePosition right in the middle of
+      it's best to actually set Middle right in the middle of
       creature's model, and so you can make Radius slightly smaller. }
-    function MiddlePosition: TVector3Single;
+    function Middle: TVector3Single; override;
 
-    { Return the one of Level.Sectors that contains MiddlePosition.
+    { Return the one of Level.Sectors that contains Middle.
       Nil if none. Yes, this is just a shortcut for
-      Level.Sectors.SectorWithPoint(MiddlePosition). }
-    function MiddlePositionSector: TSceneSector;
+      Level.Sectors.SectorWithPoint(Middle). }
+    function MiddleSector: TSceneSector;
 
     { You can set this to @false to force the creature to die without
       making any sound. This is really seldom needed, usefull only to avoid
@@ -753,11 +753,11 @@ type
 
     { Play SoundType where the creature's position is.
 
-      Exactly, the position is between Position and MiddlePosition
-      --- SoundHeight = 0 means Position, SoundHeight = 1 means MiddlePosition,
-      SoundHeight between means ... well, between Position and MiddlePosition.
+      Exactly, the position is between Position and Middle
+      --- SoundHeight = 0 means Position, SoundHeight = 1 means Middle,
+      SoundHeight between means ... well, between Position and Middle.
       This can also be higher than 1 or lower than 0, should be treated like
-      lerp between Position and MiddlePosition.
+      lerp between Position and Middle.
 
       If TiedToCreature then the sounds position will be updated
       as the creature will move, and when the creature object will
@@ -777,9 +777,8 @@ type
       This is usually sensible, since only alive creatures need bounding
       sphere advantages (stairs climbing), and using sphere with dead
       creatures would unnecessarily force the sphere radius to be small
-      and MiddlePosition to be high. }
-    function UseSphere: boolean; override;
-    procedure Sphere(out Center: TVector3Single; out Radius: Single); override;
+      and Middle to be high. }
+    function Sphere(out Radius: Single): boolean; override;
 
     function PointingDeviceActivate(const Active: boolean;
       const Distance: Single): boolean; override;
@@ -864,7 +863,7 @@ type
 
       This happens in the middle of AttackAnimation,
       see also ActualAttackTime. Of course you should use
-      current creature Position, MiddlePosition, Direction
+      current creature Position, Middle, Direction
       etc. to determine things like missile starting position
       and direction.
 
@@ -987,7 +986,7 @@ begin
   FShortRangeAttackDamageRandom := DefaultShortRangeAttackDamageRandom;
   FShortRangeAttackKnockbackDistance := DefaultShortRangeAttackKnockbackDistance;
   FFallDownLifeLossScale := DefaultFallDownLifeLossScale;
-  FMiddlePositionHeight := DefaultMiddlePositionHeight;
+  FMiddleHeight := DefaultMiddleHeight;
   FCastShadowVolumes := DefaultCastShadowVolumes;
   CreaturesKinds.Add(Self);
 end;
@@ -1019,9 +1018,9 @@ begin
     KindsConfig.GetFloat(ShortName + '/fall_down_life_loss_scale',
     DefaultFallDownLifeLossScale);
 
-  MiddlePositionHeight :=
+  MiddleHeight :=
     KindsConfig.GetFloat(ShortName + '/middle_position_height',
-    DefaultMiddlePositionHeight);
+    DefaultMiddleHeight);
 
   CastShadowVolumes :=
     KindsConfig.GetValue(ShortName + '/casts_shadow', DefaultCastShadowVolumes);
@@ -1342,7 +1341,7 @@ begin
   inherited;
 
   { For Flying creatures, larger Radius (that *really* surrounds whole
-    model from MiddlePosition) is better. }
+    model from Middle) is better. }
   ReferenceScene := StandAnimation.Scenes[0];
 
   RadiusFromPrepareRender :=
@@ -1560,7 +1559,7 @@ var
   NewSource: TALSound;
   SoundPosition: TVector3Single;
 begin
-  SoundPosition := LerpLegsMiddlePosition(SoundHeight);
+  SoundPosition := LerpLegsMiddle(SoundHeight);
   NewSource := SoundEngine.Sound3d(SoundType, SoundPosition);
   if TiedToCreature and (NewSource <> nil) then
   begin
@@ -1572,10 +1571,10 @@ end;
 
 function TCreature.HeightBetweenLegsAndMiddle: Single;
 begin
-  Result := GetChild.BoundingBox.Data[1, 2] * Kind.MiddlePositionHeight;
+  Result := GetChild.BoundingBox.Data[1, 2] * Kind.MiddleHeight;
 end;
 
-function TCreature.MiddlePositionFromLegs(
+function TCreature.MiddleFromLegs(
   const AssumePosition: TVector3Single): TVector3Single;
 begin
   Result := AssumePosition;
@@ -1583,21 +1582,21 @@ begin
 end;
 
 function TCreature.PositionFromMiddle(
-  const AssumeMiddlePosition: TVector3Single): TVector3Single;
+  const AssumeMiddle: TVector3Single): TVector3Single;
 begin
-  Result := AssumeMiddlePosition;
+  Result := AssumeMiddle;
   Result[2] -= HeightBetweenLegsAndMiddle;
 end;
 
-function TCreature.LerpLegsMiddlePosition(const A: Single): TVector3Single;
+function TCreature.LerpLegsMiddle(const A: Single): TVector3Single;
 begin
   Result := Position;
   Result[2] += HeightBetweenLegsAndMiddle * A;
 end;
 
-function TCreature.MiddlePosition: TVector3Single;
+function TCreature.Middle: TVector3Single;
 begin
-  Result := MiddlePositionFromLegs(Position);
+  Result := MiddleFromLegs(Position);
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum; const Params: TRenderParams);
@@ -1614,7 +1613,7 @@ procedure TCreature.Render(const Frustum: TFrustum; const Params: TRenderParams)
       glDrawBox3DWire(BoundingBox);
 
       glPushMatrix;
-        glTranslatev(MiddlePosition);
+        glTranslatev(Middle);
         Q := NewGLUQuadric(false, GLU_NONE, GLU_OUTSIDE, GLU_LINE);
         try
           gluSphere(Q, Kind.Radius, 10, 10);
@@ -1675,7 +1674,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
   begin
     for I := 0 to UsedSounds.Count - 1 do
     begin
-      SoundPosition := LerpLegsMiddlePosition(
+      SoundPosition := LerpLegsMiddle(
         TCreatureSoundSourceData(UsedSounds[I].UserData).SoundHeight);
       UsedSounds[I].Position := SoundPosition;
     end;
@@ -1703,21 +1702,21 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     end;
 
   var
-    OldMiddlePosition: TVector3Single;
+    OldMiddle: TVector3Single;
 
     function MoveVertical(const Distance: Single;
       const BecauseOfGravity: boolean): boolean;
     var
-      NewMiddlePosition, ProposedNewMiddlePosition: TVector3Single;
+      NewMiddle, ProposedNewMiddle: TVector3Single;
     begin
-      ProposedNewMiddlePosition := OldMiddlePosition;
-      ProposedNewMiddlePosition[2] += Distance;
+      ProposedNewMiddle := OldMiddle;
+      ProposedNewMiddle[2] += Distance;
 
-      Result := MyMoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
-        NewMiddlePosition, BecauseOfGravity);
+      Result := MyMoveAllowed(OldMiddle, ProposedNewMiddle,
+        NewMiddle, BecauseOfGravity);
 
       if Result then
-        Position := PositionFromMiddle(NewMiddlePosition);
+        Position := PositionFromMiddle(NewMiddle);
     end;
 
   const
@@ -1732,7 +1731,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     HeightMargin = 1.01;
   var
     IsAbove: boolean;
-    AboveHeight: Single;
+    AboveHeight, RadiusIgnored: Single;
     OldIsFallingDown: boolean;
     FallingDownDistance, MaximumFallingDownDistance: Single;
   begin
@@ -1740,13 +1739,13 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       This is extremely simplified version of Gravity work in TWalkCamera.
       (simplified, because creature doesn't need all these effects). }
 
-    { Note that also here we do collision detection using MiddlePosition,
-      not Position. See MiddlePosition docs for reasoning. }
+    { Note that also here we do collision detection using Middle,
+      not Position. See Middle docs for reasoning. }
 
     OldIsFallingDown := FIsFallingDown;
-    OldMiddlePosition := MiddlePosition;
+    OldMiddle := Middle;
 
-    IsAbove := MyHeight(OldMiddlePosition, AboveHeight);
+    IsAbove := MyHeight(OldMiddle, AboveHeight);
 
     if AboveHeight > HeightBetweenLegsAndMiddle * HeightMargin then
     begin
@@ -1767,12 +1766,12 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
           then you will get exatly into collision with the ground.
           So actually this is too large MaximumFallingDownDistance.
 
-          But actually it's OK when UseSphere, because then wall-sliding
+          But actually it's OK when Sphere is used, because then wall-sliding
           in MoveVertical (actually MoveAllowed) can correct new position,
           so actually it will be slightly above the ground. So falling
           down will work.
 
-          But when not UseSphere, the situation is worse,
+          But when Sphere is not used, the situation is worse,
           because then MoveAllowed doesn't do wall-sliding.
           And it will always simply reject such move
           with MaximumFallingDownDistance.
@@ -1787,10 +1786,10 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
           FPS is low, that's why the bug was noticeable only with shadows = on).
 
           TODO: the better version would be to improve
-          MoveAllowed for not UseSphere case, instead of
+          MoveAllowed for Sphere=false case, instead of
           workarounding it here with this epsilon.
           See TBaseTrianglesOctree.MoveAllowed. }
-        if not UseSphere then
+        if not Sphere(RadiusIgnored) then
           MaximumFallingDownDistance -= 0.01;
         MinTo1st(FallingDownDistance, MaximumFallingDownDistance);
       end;
@@ -1846,9 +1845,9 @@ begin
   FLastAttackDirection := Value;
 end;
 
-function TCreature.MiddlePositionSector: TSceneSector;
+function TCreature.MiddleSector: TSceneSector;
 begin
-  Result := Level.Sectors.SectorWithPoint(MiddlePosition);
+  Result := Level.Sectors.SectorWithPoint(Middle);
 end;
 
 procedure TCreature.ShortRangeAttackHurt;
@@ -1868,14 +1867,9 @@ begin
     Player.Life := Player.Life - Damage;
 end;
 
-function TCreature.UseSphere: boolean;
+function TCreature.Sphere(out Radius: Single): boolean;
 begin
   Result := GetExists and (not Dead);
-end;
-
-procedure TCreature.Sphere(out Center: TVector3Single; out Radius: Single);
-begin
-  Center := MiddlePosition;
   Radius := Kind.Radius;
 end;
 
@@ -1978,7 +1972,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     begin
       { Calculate and check AngleRadBetweenTheDirectionToPlayer. }
       AngleRadBetweenTheDirectionToPlayer := AngleRadBetweenVectors(
-        VectorSubtract(LastSeenPlayer, MiddlePosition),
+        VectorSubtract(LastSeenPlayer, Middle),
         Direction);
       Result := AngleRadBetweenTheDirectionToPlayer <= WAKind.MaxAngleToAttack;
     end;
@@ -1990,7 +1984,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     out AngleRadBetweenDirectionToTarget: Single);
   begin
     { calculate DirectionToTarget }
-    DirectionToTarget := VectorSubtract(Target, MiddlePosition);
+    DirectionToTarget := VectorSubtract(Target, Middle);
     if not Kind.Flying then
       MakeVectorsOrthoOnTheirPlane(DirectionToTarget, World.GravityUp);
 
@@ -2054,8 +2048,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     SqrDistanceToTarget: Single;
   begin
     if WAKind.Flying then
-      SqrDistanceToTarget := PointsDistanceSqr(MiddlePosition, Target) else
-      SqrDistanceToTarget := PointsDistanceXYSqr(MiddlePosition, Target);
+      SqrDistanceToTarget := PointsDistanceSqr(Middle, Target) else
+      SqrDistanceToTarget := PointsDistanceXYSqr(Middle, Target);
     Result :=
       { If creature is ideally at the target
         (for not Flying creatures, this means "ideally under/above the target"),
@@ -2063,7 +2057,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
 
         We check this with some "epsilon" (MinDistanceToTarget), as usual, to
 
-        1. Avoid the unnecessary moving when MiddlePosition is in fact
+        1. Avoid the unnecessary moving when Middle is in fact
            close enough to the target, but lack of floating precision
            can't move it really ideally to Target.
 
@@ -2149,7 +2143,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
   begin
     Distance := WAKind.RandomWalkDistance;
 
-    AlternativeTarget := MiddlePosition;
+    AlternativeTarget := Middle;
     AlternativeTarget[0] += Random * Distance * 2 - Distance;
     AlternativeTarget[1] += Random * Distance * 2 - Distance;
     if WAKind.Flying then
@@ -2200,7 +2194,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
   procedure DoWalk;
 
     { This performs the real move, which means that it changes Position
-      and MiddlePosition along the Direction vector.
+      and Middle along the Direction vector.
 
       This doesn't check whether this is a sensible move, so use this
       only if you know that the creature really wants to go in this Direction.
@@ -2212,7 +2206,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     function MoveAlongTheDirection: boolean;
 
       { Don't be stupid, and don't walk where you see you will fall down. }
-      function TooHighAboveTheGround(const NewMiddlePosition: TVector3Single):
+      function TooHighAboveTheGround(const NewMiddle: TVector3Single):
         boolean;
       var
         AboveHeight: Single;
@@ -2220,7 +2214,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         Result := false;
         if not Kind.Flying then
         begin
-          MyHeight(NewMiddlePosition, AboveHeight);
+          MyHeight(NewMiddle, AboveHeight);
           if AboveHeight > WAKind.MaxHeightAcceptableToFall +
               HeightBetweenLegsAndMiddle then
             Result := true;
@@ -2228,21 +2222,20 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       end;
 
     var
-      OldMiddlePosition, NewMiddlePosition: TVector3Single;
+      OldMiddle, NewMiddle: TVector3Single;
     begin
-      OldMiddlePosition := MiddlePosition;
-      NewMiddlePosition := VectorAdd(OldMiddlePosition,
-        VectorScale(Direction, WAKind.MoveSpeed * CompSpeed * 50));
+      OldMiddle := Middle;
+      NewMiddle := OldMiddle + Direction * (WAKind.MoveSpeed * CompSpeed * 50);
 
       Result :=
         { First check to not step into some deep fall.
-          Note that I'm not using here NewMiddlePosition
+          Note that I'm not using here NewMiddle
           (that will be calculated later by MyMoveAllowed)
-          or ProposedNewMiddlePosition, because they are too close
-          to OldMiddlePosition to be good to test against.
+          or ProposedNewMiddle, because they are too close
+          to OldMiddle to be good to test against.
           I'm calculating here where I would get after 0.2 second
           (WAKind.MoveSpeed * 0.2 * 50). }
-        (not TooHighAboveTheGround(VectorAdd(OldMiddlePosition,
+        (not TooHighAboveTheGround(VectorAdd(OldMiddle,
           VectorScale(Direction, WAKind.MoveSpeed * 0.2 * 50)))) and
 
         { Use Move without wall-sliding here.
@@ -2254,10 +2247,10 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
           Our trick with "AlternativeTarget" should handle
           eventual problems with the track of creature, so wall-sliding
           should not be needed. }
-        MyMoveAllowed(OldMiddlePosition, NewMiddlePosition, false);
+        MyMoveAllowed(OldMiddle, NewMiddle, false);
 
       if Result then
-        Position := PositionFromMiddle(NewMiddlePosition);
+        Position := PositionFromMiddle(NewMiddle);
     end;
 
     { Go the way to LastSeenPlayer, *not* by using waypoints.
@@ -2325,7 +2318,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
   var
     DirectionToTarget: TVector3Single;
     AngleRadBetweenDirectionToTarget: Single;
-    MiddlePositionSectorNow: TSceneSector;
+    MiddleSectorNow: TSceneSector;
     UseWalkNormal: boolean;
   begin
     if HasAlternativeTarget then
@@ -2414,20 +2407,20 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
 
       UseWalkNormal := true;
 
-      MiddlePositionSectorNow := MiddlePositionSector;
-      if (MiddlePositionSectorNow <> LastSeenPlayerSector) and
-         (MiddlePositionSectorNow <> nil) and
+      MiddleSectorNow := MiddleSector;
+      if (MiddleSectorNow <> LastSeenPlayerSector) and
+         (MiddleSectorNow <> nil) and
          (LastSeenPlayerSector <> nil) then
       begin
         { The way to LastSeenPlayer is using waypoints. }
 
         { Recalculate WaypointsSaved.
-          Note that I recalculate only when MiddlePositionSectorNow or
+          Note that I recalculate only when MiddleSectorNow or
           LastSeenPlayerSector changed. }
-        if (MiddlePositionSectorNow <> WaypointsSaved_Begin) or
+        if (MiddleSectorNow <> WaypointsSaved_Begin) or
            (LastSeenPlayerSector <> WaypointsSaved_End) then
         begin
-          WaypointsSaved_Begin := MiddlePositionSectorNow;
+          WaypointsSaved_Begin := MiddleSectorNow;
           WaypointsSaved_End := LastSeenPlayerSector;
           TSceneSectorList.FindWay(WaypointsSaved_Begin, WaypointsSaved_End,
             WaypointsSaved);
@@ -2489,7 +2482,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     KnockedBackSpeed = 1.0 * 0.7;
   var
     StateTime: Single;
-    OldMiddlePosition, ProposedNewMiddlePosition, NewMiddlePosition: TVector3Single;
+    OldMiddle, ProposedNewMiddle, NewMiddle: TVector3Single;
     CurrentKnockBackDistance: Single;
   begin
     StateTime := LifeTime - StateChangeTime;
@@ -2498,7 +2491,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       SetState(wasStand) else
     if KnockedBackDistance <= WAKind.MaxKnockedBackDistance then
     begin
-      OldMiddlePosition := MiddlePosition;
+      OldMiddle := Middle;
 
       { Calculate CurrentKnockBackDistance, update KnockedBackDistance }
       CurrentKnockBackDistance := KnockedBackSpeed * CompSpeed * 50;
@@ -2513,12 +2506,11 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         KnockedBackDistance += CurrentKnockBackDistance;
       end;
 
-      ProposedNewMiddlePosition := OldMiddlePosition +
+      ProposedNewMiddle := OldMiddle +
         LastAttackDirection * CurrentKnockBackDistance;
 
-      if MyMoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
-        NewMiddlePosition, false) then
-        Position := PositionFromMiddle(NewMiddlePosition);
+      if MyMoveAllowed(OldMiddle, ProposedNewMiddle, NewMiddle, false) then
+        Position := PositionFromMiddle(NewMiddle);
     end;
   end;
 
@@ -2549,7 +2541,7 @@ begin
   end;
 
   Player := World.Player as TPlayer;
-  IdleSeesPlayer := (Player <> nil) and MyLineOfSight(MiddlePosition, Player.Position);
+  IdleSeesPlayer := (Player <> nil) and MyLineOfSight(Middle, Player.Position);
   if IdleSeesPlayer then
   begin
     HasLastSeenPlayer := true;
@@ -2560,7 +2552,7 @@ begin
   if HasLastSeenPlayer then
   begin
     IdleSqrDistanceToLastSeenPlayer :=
-      PointsDistanceSqr(LastSeenPlayer, MiddlePosition);
+      PointsDistanceSqr(LastSeenPlayer, Middle);
   end;
 
   case FState of
@@ -2685,7 +2677,7 @@ var
 begin
   if HasLastSeenPlayer then
   begin
-    MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
+    MissilePosition := LerpLegsMiddle(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
     Missile := BallMissile.CreateCreature(World, MissilePosition, MissileDirection);
     Missile.Sound3d(stBallMissileFired, 0.0);
@@ -2796,8 +2788,7 @@ procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemo
     begin
       { Calculate and check AngleRadBetweenTheDirectionToPlayer. }
       AngleRadBetweenTheDirectionToPlayer := AngleRadBetweenVectors(
-        VectorSubtract(LastSeenPlayer, MiddlePosition),
-        Direction);
+        LastSeenPlayer - Middle, Direction);
       ThrowWebAttackAllowed := AngleRadBetweenTheDirectionToPlayer <=
         SQKind.MaxAngleToThrowWebAttack;
 
@@ -2866,7 +2857,7 @@ var
 begin
   if HasLastSeenPlayer then
   begin
-    MissilePosition := LerpLegsMiddlePosition(FiringMissileHeight);
+    MissilePosition := LerpLegsMiddle(FiringMissileHeight);
     MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
     Missile := ThrownWeb.CreateCreature(World, MissilePosition, MissileDirection);
     Missile.Sound3d(stThrownWebFired, 0.0);
@@ -2934,7 +2925,7 @@ var
   end;
 
 var
-  OldMiddlePosition, NewMiddlePosition: TVector3Single;
+  OldMiddle, NewMiddle: TVector3Single;
   AngleBetween, AngleChange: Single;
   NewDirection, TargetDirection: TVector3Single;
   I: Integer;
@@ -2952,15 +2943,14 @@ begin
   { Note that for now missiles are removed from level as soon as they are dead,
     so I don't bother with checking here Dead. }
 
-  OldMiddlePosition := MiddlePosition;
-  NewMiddlePosition := MiddlePosition +
-    Direction * (MissileKind.MoveSpeed * CompSpeed * 50);
+  OldMiddle := Middle;
+  NewMiddle := Middle + Direction * (MissileKind.MoveSpeed * CompSpeed * 50);
 
   { missile moves *always*, disregarding MissileMoveAllowed result.
     Only after move, if the move made us colliding with something --- we explode. }
-  Position := PositionFromMiddle(NewMiddlePosition);
+  Position := PositionFromMiddle(NewMiddle);
 
-  if not MissileMoveAllowed(OldMiddlePosition, NewMiddlePosition) then
+  if not MissileMoveAllowed(OldMiddle, NewMiddle) then
   begin
     { Check collision missile <-> player.
       Maybe I'll switch to using bounding Sphere here one day?
@@ -2989,7 +2979,7 @@ begin
         begin
           C := TCreature(World[I]);
           if (C <> Self) and C.GetCollides and
-            C.BoundingBox.SphereSimpleCollision(MiddlePosition, Kind.Radius) then
+            C.BoundingBox.SphereSimpleCollision(Middle, Kind.Radius) then
           begin
             ExplodeWithCreature(C);
             { TODO: projectiles shouldn't do here "break". }

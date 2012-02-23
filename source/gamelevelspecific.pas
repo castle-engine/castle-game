@@ -452,7 +452,7 @@ var
         LightNode := MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
           TAbstractPositionalLightNode;
         LightNode.FdOn.Send(not WerewolfCreature[I].Dead);
-        LightNode.FdLocation.Send(WerewolfCreature[I].MiddlePosition);
+        LightNode.FdLocation.Send(WerewolfCreature[I].Middle);
       end;
     end;
   end;
