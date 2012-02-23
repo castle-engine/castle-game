@@ -340,8 +340,7 @@ procedure TDebugCreaturesMenu.Click;
         if (C.Life > 0) and (IncludeStill or (not (C is TStillCreature))) then
         begin
           C.SoundDyingEnabled := false;
-          C.Life := 0;
-          C.LastAttackDirection := ZeroVector3Single;
+          C.Hurt(1000 * 1000, ZeroVector3Single, 0);
         end;
       end;
   end;

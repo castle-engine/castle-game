@@ -636,7 +636,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single;
     NewPosition[1] := FGateExitBox.Data[0, 1] - 0.1;
     Player.Position := NewPosition;
 
-    GamePlay.Player.Knockback(0, 2, Vector3Single(0, -1, 0));
+    GamePlay.Player.Hurt(0, Vector3Single(0, -1, 0), 2);
   end;
 
   procedure TeleportWork(Teleport: T3DTransform; const TeleportBox: TBox3D;
@@ -854,7 +854,7 @@ begin
     begin
       if (Level.BossCreature <> nil) and (not Level.BossCreature.Dead) then
       begin
-        Player.Knockback(2 + Random(5), 2, Vector3Single(0, -1, 0));
+        Player.Hurt(2 + Random(5), Vector3Single(0, -1, 0), 2);
         SoundEngine.Sound(stEvilLaugh);
         Notifications.Show('No exit for the one who does not fight');
       end else

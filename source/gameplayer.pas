@@ -132,12 +132,6 @@ type
     FootstepsSoundPlaying: TSoundType;
     ReallyWalkingOnTheGroundTime: Single;
 
-    { FKnockbackDistance <= 0 means "no knockback currently" }
-    FKnockbackDistance: Single;
-    { This must be valid and non-zero when FKnockbackDistance > 0 }
-    FKnockbackDirection: TVector3Single;
-    KnockBackSpeed: Single;
-
     FInventoryCurrentItem: Integer;
     FSickProjectionSpeed: Single;
 
@@ -318,18 +312,6 @@ type
       This object will just use this property (changing it's Camera
       properties etc.). }
     property Swimming: TPlayerSwimming read FSwimming write SetSwimming;
-
-    { Do knockback. KnockbackDistance must be > 0.
-      KnockbackDirection must be normalized (so, obviously, also non-zero)
-      vector.
-
-      This also lowers player's life (exactly like
-      Player.Life := Player.Life - LifeLoss), because usually knockback
-      is caused by life loss, so usually you want to lower life
-      along with doing knockback. }
-    procedure Knockback(const LifeLoss: Single;
-      const AKnockbackDistance: Single;
-      const AKnockbackDirection: TVector3Single);
 
     { This loads player's properties from player.xml file.
       This is called from constructor, you can also call this
@@ -1164,21 +1146,6 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       (FootstepsSoundPlaying <> stNone));
   end;
 
-  procedure DoKnockback;
-  var
-    CurrentKnockBackDistance: Single;
-  begin
-    if FKnockbackDistance > 0 then
-    begin
-      { Calculate CurrentKnockBackDistance, update KnockedBackDistance }
-      CurrentKnockBackDistance := KnockBackSpeed * CompSpeed * 50;
-      MinTo1st(CurrentKnockBackDistance, FKnockbackDistance);
-      FKnockbackDistance -= CurrentKnockBackDistance;
-
-      MyMove(FKnockbackDirection * CurrentKnockBackDistance, false);
-    end;
-  end;
-
 begin
   inherited;
   if FlyingMode then
@@ -1214,7 +1181,7 @@ begin
   UpdateLava;
   UpdateFootstepsSoundPlaying;
 
-  DoKnockback;
+  Knockback(CompSpeed);
 end;
 
 procedure TPlayer.BlackOut(const Color: TVector3f);
@@ -1350,15 +1317,6 @@ begin
       So the safeguard below is needed. }
     UpdateCamera;
   end;
-end;
-
-procedure TPlayer.Knockback(const LifeLoss: Single;
-  const AKnockbackDistance: Single;
-  const AKnockbackDirection: TVector3Single);
-begin
-  Life := Life - LifeLoss;
-  FKnockbackDistance := AKnockbackDistance;
-  FKnockbackDirection := AKnockbackDirection;
 end;
 
 procedure TPlayer.LoadFromFile;

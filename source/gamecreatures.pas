@@ -349,7 +349,7 @@ type
       if creature is killed by hitting it in the back (and normal
       DyingAnimation is used only when it's killed by hitting from the front).
 
-      The direction of last hit is taken from LastAttackDirection. }
+      The direction of last hit is taken from LastHurtDirection. }
     property DyingBackAnimation: TCastlePrecalculatedAnimation read FDyingBackAnimation;
 
     { Animation when the creature will be hurt.
@@ -398,7 +398,7 @@ type
       default DefaultActualAttackTime;
 
     { When this creature is knocked back by something (i.e. goes to wasHurt
-      state), then it's forced to move in general LastAttackDirection
+      state), then it's forced to move in general LastHurtDirection
       for the time HurtAnimation.TimeDurationWithBack, until
       HurtAnimation (and wasHurt state) ends, or until it was forced to move
       by MaxKnockedBackDistance. }
@@ -639,7 +639,6 @@ type
   TCreature = class(T3DAlive)
   private
     FKind: TCreatureKind;
-    FLastAttackDirection: TVector3Single;
     LifeTime: Single;
 
     { For gravity work. }
@@ -650,7 +649,6 @@ type
     FSoundDyingEnabled: boolean;
 
     procedure SoundSourceUsingEnd(Sender: TALSound);
-    procedure SetLastAttackDirection(const Value: TVector3Single);
   protected
     procedure SetLife(const Value: Single); override;
     function GetExists: boolean; override;
@@ -717,14 +715,6 @@ type
       Primarily for use by debug menu "kill all creatures" and similar things. }
     property SoundDyingEnabled: boolean read FSoundDyingEnabled
       write FSoundDyingEnabled default true;
-
-    { Each time you decrease life of this creature, set this property.
-      This is the direction from where the attack came.
-      You can set this to (0, 0, 0) (ZeroVector3Single)
-      if there was no specific direction of attack,
-      otherwise this @italic(must be a normalized (length 1) vector). }
-    property LastAttackDirection: TVector3Single
-      read FLastAttackDirection write SetLastAttackDirection;
 
     { Play SoundType where the creature's position is.
 
@@ -802,15 +792,15 @@ type
     WaypointsSaved_End: TSceneSector;
     WaypointsSaved: TSceneWaypointList;
   protected
-    procedure SetState(Value: TWalkAttackCreatureState); virtual;
-
-    { Use this in ActualAttack for short range creatures. }
-    function ShortRangeActualAttackHits: boolean;
-  protected
     { Set by Idle in this class, may be used by descendants
       in their Idle calls (to not calculate the same thing twice). }
     IdleSeesPlayer: boolean;
     IdleSqrDistanceToLastSeenPlayer: Single;
+
+    procedure SetState(Value: TWalkAttackCreatureState); virtual;
+
+    { Use this in ActualAttack for short range creatures. }
+    function ShortRangeActualAttackHits: boolean;
 
     procedure SetLife(const Value: Single); override;
 
@@ -832,6 +822,9 @@ type
       default wasStand;
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+
+    procedure Hurt(const LifeLoss: Single; const HurtDirection: TVector3Single;
+      const AKnockbackDistance: Single); override;
 
     { The method where you must actually do your attack
       --- fire a missile, lower player's life etc.
@@ -1485,6 +1478,7 @@ begin
   MaxLife := AMaxLife;
   FSoundDyingEnabled := true;
   UsedSounds := TALSoundList.Create(false);
+  KnockBackSpeed := 0.7;
 end;
 
 function TCreature.GetExists: boolean;
@@ -1653,7 +1647,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
     procedure FalledDown;
     var
-      FallenHeight, LifeLoss: Single;
+      FallenHeight: Single;
     begin
       FallenHeight := FallingDownStartHeight - Position[2];
       if FallenHeight > 1.0 then
@@ -1661,11 +1655,10 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
         Sound3d(stCreatureFalledDown, 0.1, false);
         if FallenHeight > 4.0 then
         begin
-          LifeLoss := Max(0,
+          Hurt(Max(0,
             Kind.FallDownLifeLossScale *
-            FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2));
-          Life := Life - LifeLoss;
-          LastAttackDirection := ZeroVector3Single;
+            FallenHeight * MapRange(Random, 0.0, 1.0, 0.8, 1.2)),
+            ZeroVector3Single, 0);
         end;
       end;
     end;
@@ -1790,11 +1783,6 @@ begin
   inherited;
 end;
 
-procedure TCreature.SetLastAttackDirection(const Value: TVector3Single);
-begin
-  FLastAttackDirection := Value;
-end;
-
 function TCreature.MiddleSector: TSceneSector;
 begin
   Result := Level.Sectors.SectorWithPoint(Middle);
@@ -1802,19 +1790,14 @@ end;
 
 procedure TCreature.ShortRangeAttackHurt;
 var
-  Damage: Single;
   Player: TPlayer;
 begin
-  Damage := Kind.ShortRangeAttackDamageConst +
-    Random * Kind.ShortRangeAttackDamageRandom;
-
   Player := World.Player as TPlayer;
   if Player = nil then Exit; { no Player to hurt }
 
-  if Kind.ShortRangeAttackKnockbackDistance <> 0 then
-    Player.Knockback(Damage, Kind.ShortRangeAttackKnockbackDistance,
-      Direction) else
-    Player.Life := Player.Life - Damage;
+  Player.Hurt(Kind.ShortRangeAttackDamageConst +
+    Random * Kind.ShortRangeAttackDamageRandom, Direction,
+    Kind.ShortRangeAttackKnockbackDistance);
 end;
 
 function TCreature.Sphere(out Radius: Single): boolean;
@@ -2419,41 +2402,22 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
   end;
 
   procedure DoHurt;
-  const
-    KnockedBackSpeed = 1.0 * 0.7;
   var
     StateTime: Single;
-    CurrentKnockBackDistance: Single;
   begin
     StateTime := LifeTime - StateChangeTime;
 
     if StateTime > WAKind.HurtAnimation.TimeDurationWithBack then
       SetState(wasStand) else
-    if KnockedBackDistance <= WAKind.MaxKnockedBackDistance then
-    begin
-      { Calculate CurrentKnockBackDistance, update KnockedBackDistance }
-      CurrentKnockBackDistance := KnockedBackSpeed * CompSpeed * 50;
-      if CurrentKnockBackDistance >
-        WAKind.MaxKnockedBackDistance - KnockedBackDistance then
-      begin
-        CurrentKnockBackDistance :=
-          WAKind.MaxKnockedBackDistance - KnockedBackDistance;
-        KnockedBackDistance := WAKind.MaxKnockedBackDistance;
-      end else
-      begin
-        KnockedBackDistance += CurrentKnockBackDistance;
-      end;
-
-      MyMove(LastAttackDirection * CurrentKnockBackDistance, false);
-    end;
+      Knockback(CompSpeed);
   end;
 
   { @true if last attack was from the back of the creature,
-    @false if from the front or unknown (when LastAttackDirection is zero). }
+    @false if from the front or unknown (when LastHurtDirection is zero). }
   function WasLackAttackBack: boolean;
   begin
     try
-      Result := AngleRadBetweenVectors(LastAttackDirection, Direction) < Pi/2;
+      Result := AngleRadBetweenVectors(LastHurtDirection, Direction) < Pi/2;
     except
       on EVectorMathInvalidOp do Result := false;
     end;
@@ -2598,6 +2562,15 @@ const
   ( 'Stand', 'Walk', 'Attack', 'Dying', 'DyingBack', 'Hurt', 'Special1' );
 begin
   Result := (inherited DebugCaption) + ' ' + StateName[State];
+end;
+
+procedure TWalkAttackCreature.Hurt(const LifeLoss: Single;
+  const HurtDirection: TVector3Single;
+  const AKnockbackDistance: Single);
+begin
+  inherited Hurt(LifeLoss, HurtDirection,
+    { we always use creature's knockback distance for now }
+    WAKind.MaxKnockedBackDistance);
 end;
 
 { TAlienCreature ------------------------------------------------------- }
@@ -2981,12 +2954,7 @@ begin
     to go on. }
   SoundEngine.Sound3d(MissileKind.SoundExplosion, Position);
 
-  Life := 0.0;
-
-  { Actually in this case setting LastAttackDirection is not really needed
-    (TMissileCreature doesn't use it anyway), but I'm doing it for
-    consistency. }
-  LastAttackDirection := ZeroVector3Single;
+  Hurt(1000 * 1000, ZeroVector3Single, 0);
 end;
 
 procedure TMissileCreature.ExplodeWithPlayer;
@@ -2996,10 +2964,8 @@ end;
 
 procedure TMissileCreature.ExplodeWithCreature(Creature: TCreature);
 begin
-  { TODO: knockback for creatures should be done here. }
-  Creature.LastAttackDirection := Direction;
-  Creature.Life := Creature.Life - (Kind.ShortRangeAttackDamageConst +
-    Random * Kind.ShortRangeAttackDamageRandom);
+  Creature.Hurt(Kind.ShortRangeAttackDamageConst +
+    Random * Kind.ShortRangeAttackDamageRandom, Direction, 1.0);
 end;
 
 { TStillCreature ----------------------------------------------------------- }

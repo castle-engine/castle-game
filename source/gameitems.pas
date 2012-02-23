@@ -656,8 +656,7 @@ begin
       { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
       if C.BoundingBox.Collision(WeaponBoundingBox) then
       begin
-        C.Life := C.Life - DamageConst - Random * DamageRandom;
-        C.LastAttackDirection := Player.Direction;
+        C.Hurt(DamageConst + Random * DamageRandom, Player.Direction, 1);
       end;
     end;
 end;
