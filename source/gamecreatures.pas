@@ -544,14 +544,14 @@ type
     function CreatureClass: TCreatureClass; override;
   end;
 
-  { A missile. As you can see, this is also treated as a creature
-    --- it's just a very dumb creature, that just moves into the given
-    direction and explodes on any collision.
+  { A missile is also a creature.
+    It's a little dumb creature, that just moves into the given
+    direction (with some possible twists, e.g. it can be a "homing"
+    missile and/or be dragged down by gravity).
+    On any collision, it explodes, potentially hurting the alive 3D object
+    that was colliding.
 
-    Missile must be generally considered as Flying, otherwise
-    it doesn't have much sense... Don't set Flying to false
-    for this class (because TMissileCreature may depend on it and never
-    cares to keep Direction horizontal). }
+    Missiles are always Flying for now. }
   TMissileCreatureKind = class(TCreatureKind)
   private
     FAnimation: TCastlePrecalculatedAnimation;
@@ -2866,7 +2866,7 @@ begin
     so I don't bother with checking here Dead. }
 
   OldMiddle := Middle;
-  NewMiddle := Middle + Direction * (MissileKind.MoveSpeed * CompSpeed * 50);
+  NewMiddle := OldMiddle + Direction * (MissileKind.MoveSpeed * CompSpeed * 50);
 
   { missile moves *always*, disregarding MissileMoveAllowed result.
     Only after move, if the move made us colliding with something --- we explode. }
