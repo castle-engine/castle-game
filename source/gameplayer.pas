@@ -1180,8 +1180,6 @@ begin
   UpdateIsOnTheGround;
   UpdateLava;
   UpdateFootstepsSoundPlaying;
-
-  Knockback(CompSpeed);
 end;
 
 procedure TPlayer.BlackOut(const Color: TVector3f);

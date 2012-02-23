@@ -2408,8 +2408,10 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     StateTime := LifeTime - StateChangeTime;
 
     if StateTime > WAKind.HurtAnimation.TimeDurationWithBack then
-      SetState(wasStand) else
-      Knockback(CompSpeed);
+    begin
+      CancelKnockback;
+      SetState(wasStand);
+    end;
   end;
 
   { @true if last attack was from the back of the creature,
