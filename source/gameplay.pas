@@ -352,8 +352,6 @@ begin
 
   Player.LevelChanged;
 
-  glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
-
   SoundEngine.MusicPlayer.PlayedSound := Level.PlayedMusicSound;
 
   { First Notification for this level. }

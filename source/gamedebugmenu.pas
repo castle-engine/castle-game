@@ -445,8 +445,8 @@ procedure TDebugLevelMenu.Click;
 
     LevelFinished(Level.Name);
     LevelFinishedFlush;
-    
-    { Change Player.Camera, they will be automtically set also for Player 
+
+    { Change Player.Camera, they will be automatically set also for Player
       properties by TCastleSceneManager.CameraVisibleChange.
       TODO: maybe different one day? }
 
@@ -600,6 +600,19 @@ end;
 
 { TEditLevelLightsMenu ------------------------------------------------------- }
 
+{ GlobalAmbientLight is just a hack now, it is modified and directly set
+  for OpenGL now.
+  Default is equal to OpenGL default.
+
+  This menu for editing lights may be moved
+  one day to view3dscene, and control of global ambient may be changed
+  to control NavigationInfo.globalAmbient field
+  (InstantReality extension that we may implement too,
+  see http://doc.instantreality.org/documentation/nodetype/NavigationInfo/ ). }
+
+var
+  GlobalAmbientLight: TVector3Single = (0.2, 0.2, 0.2);
+
 constructor TEditLevelLightsMenu.Create(AOwner: TComponent);
 var
   I: Integer;
@@ -607,12 +620,12 @@ var
 begin
   inherited;
 
-  { To better visualize changes to Level.GlobalAmbientLight }
+  { To better visualize changes to lights }
   DrawBackgroundRectangle := false;
 
-  AmbientColorSlider[0] := TMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[0]);
-  AmbientColorSlider[1] := TMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[1]);
-  AmbientColorSlider[2] := TMenuFloatSlider.Create(0, 1, Level.GlobalAmbientLight[2]);
+  AmbientColorSlider[0] := TMenuFloatSlider.Create(0, 1, GlobalAmbientLight[0]);
+  AmbientColorSlider[1] := TMenuFloatSlider.Create(0, 1, GlobalAmbientLight[1]);
+  AmbientColorSlider[2] := TMenuFloatSlider.Create(0, 1, GlobalAmbientLight[2]);
 
   for I := 0 to Level.MainScene.GlobalLights.Count - 1 do
   begin
@@ -675,13 +688,13 @@ end;
 procedure TEditLevelLightsMenu.AccessoryValueChanged;
 begin
   case CurrentItem - Level.MainScene.GlobalLights.Count of
-    2: Level.GlobalAmbientLight[0] := AmbientColorSlider[0].Value;
-    3: Level.GlobalAmbientLight[1] := AmbientColorSlider[1].Value;
-    4: Level.GlobalAmbientLight[2] := AmbientColorSlider[2].Value;
+    2: GlobalAmbientLight[0] := AmbientColorSlider[0].Value;
+    3: GlobalAmbientLight[1] := AmbientColorSlider[1].Value;
+    4: GlobalAmbientLight[2] := AmbientColorSlider[2].Value;
     else Exit;
   end;
 
-  glLightModelv(GL_LIGHT_MODEL_AMBIENT, Level.GlobalAmbientLight);
+  glLightModelv(GL_LIGHT_MODEL_AMBIENT, Vector4Single(GlobalAmbientLight, 1.0));
 end;
 
 { TEditOneLightMenu ---------------------------------------------------------- }
