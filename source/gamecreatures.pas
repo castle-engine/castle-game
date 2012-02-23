@@ -757,9 +757,8 @@ type
     { Each time you decrease life of this creature, set this property.
       This is the direction from where the attack came.
       You can set this to (0, 0, 0) (ZeroVector3Single)
-      if there was no specific direction of attack.
-
-      On set, this vector will be normalized. }
+      if there was no specific direction of attack,
+      otherwise this @italic(must be a normalized (length 1) vector). }
     property LastAttackDirection: TVector3Single
       read FLastAttackDirection write SetLastAttackDirection;
 
@@ -1861,7 +1860,7 @@ end;
 
 procedure TCreature.SetLastAttackDirection(const Value: TVector3Single);
 begin
-  FLastAttackDirection := Normalized(Value);
+  FLastAttackDirection := Value;
 end;
 
 function TCreature.MiddlePositionSector: TSceneSector;
@@ -2531,8 +2530,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         KnockedBackDistance += CurrentKnockBackDistance;
       end;
 
-      ProposedNewMiddlePosition := VectorAdd(OldMiddlePosition,
-        VectorScale(LastAttackDirection, CurrentKnockBackDistance));
+      ProposedNewMiddlePosition := OldMiddlePosition +
+        LastAttackDirection * CurrentKnockBackDistance;
 
       if MyMoveAllowed(OldMiddlePosition, ProposedNewMiddlePosition,
         NewMiddlePosition, false) then
