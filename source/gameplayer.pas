@@ -31,7 +31,7 @@ uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
   CastleGLUtils, CastleColors;
 
 const
-  DefaultMaxLife = 100;
+  DefaultPlayerLife = 100;
 
 type
   TPlayerSwimming = (psNo, psAboveWater, psUnderWater);
@@ -73,10 +73,8 @@ type
     Generally all things are allowed except things that are explicitly
     forbidden.
   }
-  TPlayer = class(T3DOrient)
+  TPlayer = class(T3DAlive)
   private
-    FLife: Single;
-    FMaxLife: Single;
     FCamera: TWalkCamera;
     FItems: TItemList;
     FEquippedWeapon: TItem;
@@ -155,7 +153,6 @@ type
     procedure UpdateCamera;
 
     procedure FalledDown(Camera: TWalkCamera; const FallenHeight: Single);
-    procedure SetLife(const Value: Single);
 
     { This sets life, just like SetLife.
       But in case of life loss, the fadeout is done with specified
@@ -175,6 +172,7 @@ type
 
     procedure AllocatedFootstepsSourceUsingEnd(Sender: TALSound);
   protected
+    procedure SetLife(const Value: Single); override;
     function GetChild: T3D; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function Height(const APosition, GravityUp: TVector3Single;
@@ -183,9 +181,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-
-    property Life: Single read FLife write SetLife default DefaultMaxLife;
-    property MaxLife: Single read FMaxLife write FMaxLife default DefaultMaxLife;
 
     property FlyingMode: boolean read GetFlyingMode;
 
@@ -316,10 +311,6 @@ type
       @noAutoLinkHere }
     procedure RedOut;
 
-    { Just a shortcut for Life <= 0.
-      @noAutoLinkHere }
-    function Dead: boolean;
-
     { @noAutoLinkHere }
     procedure Attack;
 
@@ -446,8 +437,8 @@ var
 begin
   inherited Create(AOwner);
   Pushable := true;
-  FLife := DefaultMaxLife;
-  FMaxLife := DefaultMaxLife;
+  Life := DefaultPlayerLife;
+  MaxLife := DefaultPlayerLife;
 
   Add(TPlayerBox.Create(Self));
 
@@ -1269,17 +1260,12 @@ begin
     BlackOut(Color);
     SoundEngine.Sound(stPlayerSuddenPain);
   end;
-  FLife := Value;
+  inherited SetLife(Value);
 end;
 
 procedure TPlayer.SetLife(const Value: Single);
 begin
   SetLifeCustomBlackOut(Value, Red3Single);
-end;
-
-function TPlayer.Dead: boolean;
-begin
-  Result := Life <= 0;
 end;
 
 procedure TPlayer.Attack;

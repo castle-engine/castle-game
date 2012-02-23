@@ -636,11 +636,9 @@ type
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
 
-  TCreature = class(T3DOrient)
+  TCreature = class(T3DAlive)
   private
     FKind: TCreatureKind;
-    FLife: Single;
-    FMaxLife: Single;
     FLastAttackDirection: TVector3Single;
     LifeTime: Single;
 
@@ -654,6 +652,7 @@ type
     procedure SoundSourceUsingEnd(Sender: TALSound);
     procedure SetLastAttackDirection(const Value: TVector3Single);
   protected
+    procedure SetLife(const Value: Single); override;
     function GetExists: boolean; override;
 
     { Current scene to be rendered.
@@ -686,8 +685,6 @@ type
       const A: Single): TVector3Single; virtual;
     { @groupEnd }
 
-    procedure SetLife(const Value: Single); virtual;
-
     procedure ShortRangeAttackHurt;
 
     function DebugCaption: string; virtual;
@@ -695,11 +692,6 @@ type
     constructor Create(AOwner: TComponent; const AMaxLife: Single); virtual; reintroduce;
 
     destructor Destroy; override;
-
-    { Current Life. Initially set from MaxLife. }
-    property Life: Single read FLife write SetLife;
-
-    property MaxLife: Single read FMaxLife write FMaxLife;
 
     property Kind: TCreatureKind read FKind;
 
@@ -743,9 +735,6 @@ type
       Nil if none. Yes, this is just a shortcut for
       Level.Sectors.SectorWithPoint(MiddlePosition). }
     function MiddlePositionSector: TSceneSector;
-
-    { Shortcut for Life <= 0. }
-    function Dead: boolean;
 
     { You can set this to @false to force the creature to die without
       making any sound. This is really seldom needed, usefull only to avoid
@@ -920,7 +909,6 @@ type
     procedure ActualThrowWebAttack;
   protected
     procedure SetState(Value: TWalkAttackCreatureState); override;
-    procedure SetLife(const Value: Single); override;
     function GetChild: T3D; override;
   public
     procedure ActualAttack; override;
@@ -1520,7 +1508,7 @@ constructor TCreature.Create(AOwner: TComponent; const AMaxLife: Single);
 begin
   inherited Create(AOwner);
   Pushable := true;
-  FMaxLife := AMaxLife;
+  MaxLife := AMaxLife;
   FSoundDyingEnabled := true;
   UsedSounds := TALSoundList.Create(false);
 end;
@@ -1850,12 +1838,7 @@ begin
     Sound3d(Kind.SoundSuddenPain, 1.0);
   end;
 
-  FLife := Value;
-end;
-
-function TCreature.Dead: boolean;
-begin
-  Result := Life <= 0;
+  inherited;
 end;
 
 procedure TCreature.SetLastAttackDirection(const Value: TVector3Single);
@@ -2888,11 +2871,6 @@ begin
     Missile := ThrownWeb.CreateCreature(World, MissilePosition, MissileDirection);
     Missile.Sound3d(stThrownWebFired, 0.0);
   end;
-end;
-
-procedure TSpiderQueenCreature.SetLife(const Value: Single);
-begin
-  inherited;
 end;
 
 { TGhostCreature ---------------------------------------------------------- }
