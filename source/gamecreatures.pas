@@ -656,33 +656,31 @@ type
     function GetExists: boolean; override;
 
     { Current scene to be rendered.
-      Note that this may be called before were added to World (at the end of our
+      Note that this may be called before we're added to World (at the end of our
       construction), so make it work always reliably. }
     { function GetChild: T3D; override; }
 
-    { These define exactly what "Middle" means for this creature.
+    { PositionFromMiddle calculates value of T3DOrient.Position,
+      assuming that T3DOrient.Middle is as given.
+      Since our Middle implementation is derived from Position,
+      PositionFromMiddle is the reverse.
 
-      PositionFromMiddle must always specify reverse function.
-
-      LerpLegsMiddle must always be equal to
-      Lerp(A, Position, Middle)
+      LerpLegsMiddle interpolated between Position and Middle
+      (intuitively, legs and eye positions).
+      It must be equal to Lerp(A, Position, Middle)
       (but usually can be calculated more efficiently than calling Lerp).
 
       In this class they calculate Middle as Position
       moved higher than HeightBetweenLegsAndMiddle.
       So if you want to change the meaning of these functions
       you can simply override only HeightBetweenLegsAndMiddle
-      (and all things below will still work OK).
-      *Or* you can change all 4 functions (3 functions below and
-      HeightBetweenLegsAndMiddle), to keep them "synchronized".
+      (and everything else will work OK).
+      *Or* you can change all Middle, PositionFromMiddle, LerpLegsMiddle
+      functions to use any approach to convert between legs and eye position.
 
       @groupBegin }
-    function MiddleFromLegs(
-      const AssumePosition: TVector3Single): TVector3Single; virtual;
-    function PositionFromMiddle(
-      const AssumeMiddle: TVector3Single): TVector3Single; virtual;
-    function LerpLegsMiddle(
-      const A: Single): TVector3Single; virtual;
+    function PositionFromMiddle(const AssumeMiddle: TVector3Single): TVector3Single; virtual;
+    function LerpLegsMiddle(const A: Single): TVector3Single; virtual;
     { @groupEnd }
 
     procedure ShortRangeAttackHurt;
@@ -706,29 +704,6 @@ type
       Note that while GetChild may change, this also may change. }
     function HeightBetweenLegsAndMiddle: Single; virtual;
 
-    { The "middle" position of the creature.
-      For some creatures it can be considered the position of their "heads".
-      How precisely this is calculated for given creature depends
-      on MiddleFromLegs implementation in this class.
-
-      All collision detection (MyMoveAllowed, MyHeight, MyLineOfSight)
-      should be done using Middle, and then appropriately translated
-      back to Position. Why ? Because this avoids the problems
-      of collisions with ground objects. Legs are (for creatures that
-      are not Flying and have already fallen down on the ground) on the
-      same level as the ground, so checking collisions versus Position
-      is always vulnerable to accidentaly finding collision between Position
-      and the ground.
-
-      So for creatures not Flying, Middle should
-      be always higher (at least by Radius) than Position.
-
-      For Flying creatures this is not a problem, they could use Position
-      surrounded by Radius for collision detection. But this would
-      be inefficient --- since Position surrounded by Radius
-      would unnecessarily block creature's moves. So for Flying creatures
-      it's best to actually set Middle right in the middle of
-      creature's model, and so you can make Radius slightly smaller. }
     function Middle: TVector3Single; override;
 
     { Return the one of Level.Sectors that contains Middle.
@@ -1574,13 +1549,6 @@ begin
   Result := GetChild.BoundingBox.Data[1, 2] * Kind.MiddleHeight;
 end;
 
-function TCreature.MiddleFromLegs(
-  const AssumePosition: TVector3Single): TVector3Single;
-begin
-  Result := AssumePosition;
-  Result[2] += HeightBetweenLegsAndMiddle;
-end;
-
 function TCreature.PositionFromMiddle(
   const AssumeMiddle: TVector3Single): TVector3Single;
 begin
@@ -1596,7 +1564,8 @@ end;
 
 function TCreature.Middle: TVector3Single;
 begin
-  Result := MiddleFromLegs(Position);
+  Result := inherited Middle;
+  Result[2] += HeightBetweenLegsAndMiddle;
 end;
 
 procedure TCreature.Render(const Frustum: TFrustum; const Params: TRenderParams);
