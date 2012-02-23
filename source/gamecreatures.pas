@@ -990,7 +990,7 @@ implementation
 
 uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow,
   CastleFilesUtils, CastleGLUtils, ProgressUnit, GamePlay,
-  GameVideoOptions, GameNotifications;
+  GameVideoOptions, GameNotifications, GamePlayer;
 
 var
   DisableCreatures: Cardinal;
@@ -1879,9 +1879,13 @@ end;
 procedure TCreature.ShortRangeAttackHurt;
 var
   Damage: Single;
+  Player: TPlayer;
 begin
   Damage := Kind.ShortRangeAttackDamageConst +
     Random * Kind.ShortRangeAttackDamageRandom;
+
+  Player := World.Player as TPlayer;
+  if Player = nil then Exit; { no Player to hurt }
 
   if Kind.ShortRangeAttackKnockbackDistance <> 0 then
     Player.Knockback(Damage, Kind.ShortRangeAttackKnockbackDistance,
@@ -2627,6 +2631,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
     end;
   end;
 
+var
+  Player: TPlayer;
 begin
   inherited;
   if (not GetExists) or DebugTimeStopForCreatures then Exit;
@@ -2640,7 +2646,8 @@ begin
     Exit;
   end;
 
-  IdleSeesPlayer := MyLineOfSight(MiddlePosition, Player.Position);
+  Player := World.Player as TPlayer;
+  IdleSeesPlayer := (Player <> nil) and MyLineOfSight(MiddlePosition, Player.Position);
   if IdleSeesPlayer then
   begin
     HasLastSeenPlayer := true;
@@ -2725,8 +2732,9 @@ var
   B, PB: TBox3D;
   DistanceLength, DistanceIncrease: Single;
 begin
+  if World.Player = nil then Exit(false); { no Plaeyr to hurt }
   B := BoundingBox;
-  PB := Player.BoundingBox;
+  PB := World.Player.BoundingBox;
 
   { We would like to check collision between PB and our B translated
     by our Direction now, i.e.
@@ -3013,16 +3021,18 @@ begin
 end;
 
 procedure TMissileCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+var
+  Player: TPlayer;
 
   function MissileMoveAllowed(const OldPos, NewPos: TVector3Single): boolean;
   begin
-    if not MissileKind.HitsPlayer then Player.Disable;
+    if (not MissileKind.HitsPlayer) and (Player <> nil) then Player.Disable;
     if not MissileKind.HitsCreatures then Inc(DisableCreatures);
     try
       Result := MyMoveAllowed(OldPos, NewPos, false);
     finally
       if not MissileKind.HitsCreatures then Dec(DisableCreatures);
-      if not MissileKind.HitsPlayer then Player.Enable;
+      if (not MissileKind.HitsPlayer) and (Player <> nil) then Player.Enable;
     end;
   end;
 
@@ -3034,6 +3044,7 @@ var
   C: TCreature;
 begin
   inherited;
+  Player := World.Player as TPlayer;
 
   { TODO: do some missile explosion animation for some missiles. }
   if Life <= 0.0 then
@@ -3057,7 +3068,9 @@ begin
     { Check collision missile <-> player.
       Maybe I'll switch to using bounding Sphere here one day?
       No reason for sphere or box, either way, for now. }
-    if MissileKind.HitsPlayer and Player.BoundingBox.Collision(BoundingBox) then
+    if MissileKind.HitsPlayer and
+      (Player <> nil) and
+      Player.BoundingBox.Collision(BoundingBox) then
       ExplodeWithPlayer;
 
     if MissileKind.HitsCreatures then
@@ -3100,7 +3113,8 @@ begin
   end;
 
   if MissileKind.CloseDirectionToPlayer and
-     (MissileKind.CloseDirectionToTargetSpeed <> 0) then
+     (MissileKind.CloseDirectionToTargetSpeed <> 0) and
+     (Player <> nil) then
   begin
     TargetDirection := Player.Position - Position;
     AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
