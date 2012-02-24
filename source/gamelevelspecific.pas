@@ -999,7 +999,7 @@ const
   end;
 
 const
-  SpidersFallingSpeed = 0.5;
+  SpidersFallingSpeed = 25;
   CreaturesCountToAddSpiders = 20;
 var
   AboveHeight: Single;
@@ -1021,7 +1021,7 @@ begin
     Check(TorchLight <> nil, 'Torch light not found on cages level');
     TorchLight^.Node.FdIntensity.Send(Clamped(
         TorchLight^.Node.FdIntensity.Value +
-          MapRange(Random, 0, 1, -0.1, 0.1) * CompSpeed  * 50{TODO50},
+          MapRange(Random, 0, 1, -5.0, 5.0) * CompSpeed,
         0.5, 1));
 
     { Maybe appear new spiders }
@@ -1067,7 +1067,7 @@ begin
       end else
       begin
         { calculate SpiderMoveDistance }
-        SpiderMoveDistance := SpidersFallingSpeed * CompSpeed * 50{TODO50};
+        SpiderMoveDistance := SpidersFallingSpeed * CompSpeed;
         MinTo1st(SpiderMoveDistance, AboveHeight - Spider.Radius);
         SpiderPosition[2] -= SpiderMoveDistance;
         SA.Translation := SpiderPosition;

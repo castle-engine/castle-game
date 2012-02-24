@@ -40,7 +40,7 @@ const
 
   DefaultMoveSpeed = 0.2;
   DefaultMinDelayBetweenAttacks = 5.0;
-  DefaultMaxAttackDistance = 50.0{TODO50} * 0.7;
+  DefaultMaxAttackDistance = 35.0;
   DefaultPreferredAttackDistance = 30.0 * 0.7;
   DefaultMissileMoveSpeed = 1.0 * 0.7;
   DefaultKnockedBackDistance = 6.0 * 0.7;
@@ -1683,11 +1683,11 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     end;
 
   const
-    FallingDownSpeed = 1.0;
+    FallingDownSpeed = 50.0;
     { Beware: GrowingUpSpeed is not only a graphical effect. Too large
       GrowingUpSpeed will allow creature to climb walls that are at high
       (almost-vertical) angle. }
-    GrowingUpSpeed = 0.1;
+    GrowingUpSpeed = 5.0;
     { HeightMargin is used to safeguard against floating point inaccuracy.
       Without this, creature would too often be considered "falling down"
       or "growing up". }
@@ -1717,7 +1717,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
       FIsFallingDown := true;
 
-      FallingDownDistance := FallingDownSpeed * CompSpeed * 50{TODO50};
+      FallingDownDistance := FallingDownSpeed * CompSpeed;
       if IsAbove then
       begin
         MaximumFallingDownDistance :=
@@ -1765,7 +1765,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       if AboveHeight < HeightBetweenLegsAndMiddle / HeightMargin then
       begin
         { Growing up }
-        MyMove(Vector3Single(0, 0, Min(GrowingUpSpeed * CompSpeed * 50{TODO50},
+        MyMove(Vector3Single(0, 0, Min(GrowingUpSpeed * CompSpeed,
           HeightBetweenLegsAndMiddle - AboveHeight)), false);
       end;
     end;
@@ -1968,7 +1968,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
   procedure RotateDirectionToFaceTarget(const DirectionToTarget: TVector3Single;
     const AngleRadBetweenDirectionToTarget: Single);
   const
-    AngleRadChangeSpeed = 0.1;
+    AngleRadChangeSpeed = 5.0;
   var
     AngleRadChange: Single;
     NewDirection: TVector3Single;
@@ -1978,7 +1978,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       { Rotate Direction, to be closer to DirectionToTarget }
 
       { calculate AngleRadChange }
-      AngleRadChange := AngleRadChangeSpeed * CompSpeed * 50{TODO50};
+      AngleRadChange := AngleRadChangeSpeed * CompSpeed;
       MinTo1st(AngleRadChange, AngleRadBetweenDirectionToTarget);
 
       NewDirection := RotatePointAroundAxisRad(AngleRadChange, Direction,

@@ -805,7 +805,7 @@ const
 
 procedure TItemOnLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 const
-  FallingDownSpeed = 0.2;
+  FallingDownSpeed = 10.0;
 var
   AboveHeight: Single;
   ShiftedTranslation: TVector3Single;
@@ -833,7 +833,7 @@ begin
   begin
     { Item falls down because of gravity. }
 
-    FallingDownLength := CompSpeed * 50{TODO50} * FallingDownSpeed;
+    FallingDownLength := CompSpeed * FallingDownSpeed;
     MinTo1st(FallingDownLength, AboveHeight - ItemRadius);
 
     MyMove(Vector3Single(0, 0, -FallingDownLength), true,
