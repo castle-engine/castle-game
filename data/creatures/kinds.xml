@@ -86,6 +86,7 @@
     close_direction_to_target_speed="0.02"
     pause_between_sound_idle="2.5"
     knocked_back_distance="0.0"
+    falling_down_speed="0.0"
 
     middle_position_height="0.0"
 
@@ -111,6 +112,7 @@
     knock_back_speed="35"
     sound_dying_tied_to_creature="False"
     max_height_acceptable_to_fall="1.4"
+    falling_down_speed="0.0"
 
     middle_position_height="0.5"
 
@@ -220,6 +222,7 @@
     default_max_life="1.0"
     close_direction_to_player="False"
     knocked_back_distance="0.0"
+    falling_down_speed="0.0"
 
     middle_position_height="0.0"
 
@@ -243,14 +246,12 @@
     hits_creatures="True"
     move_speed="100.0"
     knocked_back_distance="0.0"
+    falling_down_speed="0.15"
 
     middle_position_height="0.0"
     radius="0.3"
 
     sound_explosion="arrow_hit"
-
-    falls_down="True"
-    falls_down_speed="0.003"
 
     fly_animation="arrow/arrow.wrl"
   >

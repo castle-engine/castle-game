@@ -69,8 +69,7 @@ const
 
   DefaultHitsPlayer = true;
   DefaultHitsCreatures = false;
-  DefaultFallsDown = false;
-  DefaultFallsDownSpeed = 0.003;
+  DefaultFallingDownSpeed = 50.0;
 
   DefaultMiddleHeight = 1.0;
 
@@ -90,6 +89,7 @@ type
     FDefaultMaxLife: Single;
     FKnockedBackDistance: Single;
     FKnockBackSpeed: Single;
+    FFallingDownSpeed: Single;
 
     RadiusFromFile: Single;
 
@@ -263,6 +263,15 @@ type
     property CastShadowVolumes: boolean
       read FCastShadowVolumes write FCastShadowVolumes
       default DefaultCastShadowVolumes;
+
+    { How fast the creature falls down, in units per second.
+
+      May be zero if creature is invulnerable to gravity
+      (which is usually, but not always, sensible for flying creatures).
+      For now, FallingDownSpeed also turns off "growing up" effect
+      to make creature stand above the ground. }
+    property FallingDownSpeed: Single
+      read FFallingDownSpeed write FFallingDownSpeed default DefaultFallingDownSpeed;
 
     { Used by RequireCreatures, UnRequireCreatures to count
       how many times this kind is required. Idea is that when this drops
@@ -570,8 +579,6 @@ type
     FSoundIdle: TSoundType;
     FHitsPlayer: boolean;
     FHitsCreatures: boolean;
-    FFallsDown: boolean;
-    FFallsDownSpeed: Single;
   protected
     procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
   public
@@ -623,12 +630,6 @@ type
       read FHitsPlayer write FHitsPlayer default DefaultHitsPlayer;
     property HitsCreatures: boolean
       read FHitsCreatures write FHitsCreatures default DefaultHitsCreatures;
-
-    property FallsDown: boolean
-      read FFallsDown write FFallsDown default DefaultFallsDown;
-
-    property FallsDownSpeed: Single
-      read FFallsDownSpeed write FFallsDownSpeed default DefaultFallsDownSpeed;
   end;
 
   { A really dumb creature that just stays still during the whole
@@ -975,6 +976,7 @@ begin
   FFallDownLifeLossScale := DefaultFallDownLifeLossScale;
   FMiddleHeight := DefaultMiddleHeight;
   FCastShadowVolumes := DefaultCastShadowVolumes;
+  FFallingDownSpeed := DefaultFallingDownSpeed;
   CreaturesKinds.Add(Self);
 end;
 
@@ -1008,6 +1010,9 @@ begin
   FallDownLifeLossScale :=
     KindsConfig.GetFloat(ShortName + '/fall_down_life_loss_scale',
     DefaultFallDownLifeLossScale);
+  FFallingDownSpeed :=
+    KindsConfig.GetFloat(ShortName + '/falling_down_speed',
+    DefaultFallingDownSpeed);
 
   MiddleHeight :=
     KindsConfig.GetFloat(ShortName + '/middle_position_height',
@@ -1357,8 +1362,6 @@ begin
   FPauseBetweenSoundIdle := DefaultPauseBetweenSoundIdle;
   FHitsPlayer := DefaultHitsPlayer;
   FHitsCreatures := DefaultHitsCreatures;
-  FFallsDown := DefaultFallsDown;
-  FFallsDownSpeed := DefaultFallsDownSpeed;
 end;
 
 destructor TMissileCreatureKind.Destroy;
@@ -1420,11 +1423,6 @@ begin
   HitsCreatures :=
     KindsConfig.GetValue(ShortName + '/hits_creatures',
     DefaultHitsCreatures);
-  FFallsDown :=
-    KindsConfig.GetValue(ShortName + '/falls_down', DefaultFallsDown);
-  FFallsDownSpeed :=
-    KindsConfig.GetFloat(ShortName + '/falls_down_speed',
-    DefaultFallsDownSpeed);
 
   SoundExplosion := SoundEngine.SoundFromName(
     KindsConfig.GetValue(ShortName + '/sound_explosion', ''));
@@ -1683,7 +1681,6 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     end;
 
   const
-    FallingDownSpeed = 50.0;
     { Beware: GrowingUpSpeed is not only a graphical effect. Too large
       GrowingUpSpeed will allow creature to climb walls that are at high
       (almost-vertical) angle. }
@@ -1717,7 +1714,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
       FIsFallingDown := true;
 
-      FallingDownDistance := FallingDownSpeed * CompSpeed;
+      FallingDownDistance := Kind.FallingDownSpeed * CompSpeed;
       if IsAbove then
       begin
         MaximumFallingDownDistance :=
@@ -1782,7 +1779,7 @@ begin
 
   UpdateUsedSounds;
 
-  if not Kind.Flying then
+  if Kind.FallingDownSpeed <> 0.0 then
     DoGravity;
 end;
 
@@ -2914,11 +2911,10 @@ begin
     ExplodeCore;
   end;
 
-  if MissileKind.FallsDown and
-     (MissileKind.FallsDownSpeed <> 0) then
+  if MissileKind.FallingDownSpeed <> 0 then
   begin
     NewDirection := Direction;
-    NewDirection[2] -= MissileKind.FallsDownSpeed * CompSpeed * 50{TODO50};
+    NewDirection[2] -= MissileKind.FallingDownSpeed * CompSpeed;
     Direction := NewDirection;
   end;
 
