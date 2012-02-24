@@ -367,9 +367,9 @@ var
     const TargetDirection: TVector3Single;
     const TargetUp: TVector3Single);
   const
-    PositionChangeSpeed = 0.05 * 50;
-    DirectionChangeSpeed = 0.01 * 50;
-    UpChangeSpeed = 0.01 * 50;
+    PositionChangeSpeed = 0.05 * 50{TODO50};
+    DirectionChangeSpeed = 0.01 * 50{TODO50};
+    UpChangeSpeed = 0.01 * 50{TODO50};
   var
     ToPosition: TVector3Single;
     ToDirection: TVector3Single;

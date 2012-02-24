@@ -40,7 +40,7 @@ const
 
   DefaultMoveSpeed = 0.2;
   DefaultMinDelayBetweenAttacks = 5.0;
-  DefaultMaxAttackDistance = 50.0 * 0.7;
+  DefaultMaxAttackDistance = 50.0{TODO50} * 0.7;
   DefaultPreferredAttackDistance = 30.0 * 0.7;
   DefaultMissileMoveSpeed = 1.0 * 0.7;
   DefaultKnockedBackDistance = 6.0 * 0.7;
@@ -1717,7 +1717,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 
       FIsFallingDown := true;
 
-      FallingDownDistance := FallingDownSpeed * CompSpeed * 50;
+      FallingDownDistance := FallingDownSpeed * CompSpeed * 50{TODO50};
       if IsAbove then
       begin
         MaximumFallingDownDistance :=
@@ -1765,7 +1765,7 @@ procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       if AboveHeight < HeightBetweenLegsAndMiddle / HeightMargin then
       begin
         { Growing up }
-        MyMove(Vector3Single(0, 0, Min(GrowingUpSpeed * CompSpeed * 50,
+        MyMove(Vector3Single(0, 0, Min(GrowingUpSpeed * CompSpeed * 50{TODO50},
           HeightBetweenLegsAndMiddle - AboveHeight)), false);
       end;
     end;
@@ -1978,7 +1978,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
       { Rotate Direction, to be closer to DirectionToTarget }
 
       { calculate AngleRadChange }
-      AngleRadChange := AngleRadChangeSpeed * CompSpeed * 50;
+      AngleRadChange := AngleRadChangeSpeed * CompSpeed * 50{TODO50};
       MinTo1st(AngleRadChange, AngleRadBetweenDirectionToTarget);
 
       NewDirection := RotatePointAroundAxisRad(AngleRadChange, Direction,
@@ -2178,9 +2178,9 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
           (that will be calculated later by MyMove)
           because they are too close to Middle to be good to test against.
           I'm calculating here where I would get after 0.2 second
-          (WAKind.MoveSpeed * 0.2 * 50). }
+          (WAKind.MoveSpeed * 0.2). }
         (not TooHighAboveTheGround(Middle +
-          Direction * (WAKind.MoveSpeed * 0.2 * 50))) and
+          Direction * (WAKind.MoveSpeed * 0.2 * 50{TODO50}))) and
 
         { Use MyMove without wall-sliding here.
           Things using MoveAlongTheDirection depend on the fact that
@@ -2191,7 +2191,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
           Our trick with "AlternativeTarget" should handle
           eventual problems with the track of creature, so wall-sliding
           should not be needed. }
-        MyMove(Direction * (WAKind.MoveSpeed * CompSpeed * 50), false, false);
+        MyMove(Direction * (WAKind.MoveSpeed * CompSpeed * 50{TODO50}), false, false);
     end;
 
     { Go the way to LastSeenPlayer, *not* by using waypoints.
@@ -2869,7 +2869,7 @@ begin
     so I don't bother with checking here Dead. }
 
   OldMiddle := Middle;
-  NewMiddle := OldMiddle + Direction * (MissileKind.MoveSpeed * CompSpeed * 50);
+  NewMiddle := OldMiddle + Direction * (MissileKind.MoveSpeed * CompSpeed * 50{TODO50});
 
   { missile moves *always*, disregarding MissileMoveAllowed result.
     Only after move, if the move made us colliding with something --- we explode. }
@@ -2920,7 +2920,7 @@ begin
      (MissileKind.FallsDownSpeed <> 0) then
   begin
     NewDirection := Direction;
-    NewDirection[2] -= MissileKind.FallsDownSpeed * CompSpeed * 50;
+    NewDirection[2] -= MissileKind.FallsDownSpeed * CompSpeed * 50{TODO50};
     Direction := NewDirection;
   end;
 
@@ -2930,7 +2930,7 @@ begin
   begin
     TargetDirection := Player.Position - Position;
     AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
-    AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed * 50;
+    AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed * 50{TODO50};
     if AngleBetween <= AngleChange then
       Direction := TargetDirection else
     begin

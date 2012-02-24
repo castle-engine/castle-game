@@ -1162,7 +1162,7 @@ begin
   UpdateSwimming;
 
   if BlackOutIntensity > 0 then
-    BlackOutIntensity -= 0.04 * CompSpeed * 50;
+    BlackOutIntensity -= 0.04 * CompSpeed * 50{TODO50};
 
   if Attacking and (not ActualAttackDone) and (Level.AnimationTime -
     AttackStartTime >= EquippedWeaponKind.ActualAttackTime) then

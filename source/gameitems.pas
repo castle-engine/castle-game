@@ -833,7 +833,7 @@ begin
   begin
     { Item falls down because of gravity. }
 
-    FallingDownLength := CompSpeed * 50 * FallingDownSpeed;
+    FallingDownLength := CompSpeed * 50{TODO50} * FallingDownSpeed;
     MinTo1st(FallingDownLength, AboveHeight - ItemRadius);
 
     MyMove(Vector3Single(0, 0, -FallingDownLength), true,
