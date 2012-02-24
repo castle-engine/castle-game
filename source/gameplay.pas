@@ -359,67 +359,14 @@ begin
 end;
 
 procedure Idle(Window: TCastleWindowBase);
-var
-  CompSpeed: Single;
-
-  procedure ModifyPlayerEndSequence(
-    const TargetPosition: TVector3Single;
-    const TargetDirection: TVector3Single;
-    const TargetUp: TVector3Single);
-  const
-    PositionChangeSpeed = 0.05 * 50{TODO50};
-    DirectionChangeSpeed = 0.01 * 50{TODO50};
-    UpChangeSpeed = 0.01 * 50{TODO50};
-  var
-    ToPosition: TVector3Single;
-    ToDirection: TVector3Single;
-    ToUp: TVector3Single;
-
-    ToPositionLength: Single;
-    ToDirectionLength: Single;
-    ToUpLength: Single;
-  begin
-    ToPosition  := VectorSubtract(TargetPosition , Player.Camera.Position);
-    ToDirection := VectorSubtract(TargetDirection, Player.Camera.Direction);
-    ToUp        := VectorSubtract(TargetUp       , Player.Camera.Up);
-
-    ToPositionLength  := VectorLen(ToPosition);
-    ToDirectionLength := VectorLen(ToDirection);
-    ToUpLength        := VectorLen(ToUp);
-
-    if Zero(ToPositionLength) and
-       Zero(ToDirectionLength) and
-       Zero(ToUpLength) then
-      TCagesLevel(Level).DoEndSequence := true else
-    begin
-      if ToPositionLength < CompSpeed * PositionChangeSpeed then
-        Player.Camera.Position := TargetPosition else
-        Player.Camera.Position := VectorAdd(
-          Player.Camera.Position,
-          VectorAdjustToLength(ToPosition, CompSpeed * PositionChangeSpeed));
-
-      if ToDirectionLength < CompSpeed * DirectionChangeSpeed then
-        Player.Camera.Direction := TargetDirection else
-        Player.Camera.Direction := VectorAdd(
-          Player.Camera.Direction,
-          VectorAdjustToLength(ToDirection, CompSpeed * DirectionChangeSpeed));
-
-      if ToUpLength < CompSpeed * UpChangeSpeed then
-        Player.Camera.Up := TargetUp else
-        Player.Camera.Up := VectorAdd(
-          Player.Camera.Up,
-          VectorAdjustToLength(ToUp, CompSpeed * UpChangeSpeed));
-    end;
-  end;
-
 const
   GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
   GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
   GameWinDirection: TVector3Single = (0, 1, 0);
   GameWinUp: TVector3Single = (0, 0, 1);
+var
+  Cages: TCagesLevel;
 begin
-  CompSpeed := Window.Fps.IdleSpeed;
-
   Level.SickProjection := Player.Swimming = psUnderWater;
   if Level.SickProjection then
     Level.SickProjectionSpeed := Player.SickProjectionSpeed;
@@ -428,9 +375,25 @@ begin
 
   if GameWin and (Level is TCagesLevel) then
   begin
-    if TCagesLevel(Level).DoEndSequence then
-      ModifyPlayerEndSequence(GameWinPosition2, GameWinDirection, GameWinUp) else
-      ModifyPlayerEndSequence(GameWinPosition1, GameWinDirection, GameWinUp);
+    Cages := TCagesLevel(Level);
+    case Cages.GameWinAnimation of
+      gwaNone:
+        begin
+          Assert(not Player.Camera.Animation);
+          Player.Camera.AnimateTo(GameWinPosition1, GameWinDirection, GameWinUp, 4);
+          Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
+        end;
+      gwaAnimateTo1:
+        if not Player.Camera.Animation then
+        begin
+          SoundEngine.Sound(stKeyDoorUse);
+          Player.Camera.AnimateTo(GameWinPosition2, GameWinDirection, GameWinUp, 4);
+          Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
+        end;
+      gwaAnimateTo2:
+        if not Player.Camera.Animation then
+          Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
+    end;
   end;
 end;
 

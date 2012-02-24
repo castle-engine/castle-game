@@ -125,6 +125,12 @@ type
     procedure Render(const Frustum: TFrustum; const Params: TRenderParams); override;
   end;
 
+  TGameWinAnimation = (
+    gwaNone,
+    gwaAnimateTo1,
+    gwaAnimateTo2,
+    gwaFinished);
+
   TCagesLevel = class(TLevel)
   private
     { List of TSpiderAppearing instances }
@@ -135,10 +141,10 @@ type
 
     FGateExit: TCastleScene;
 
-    FDoEndSequence: boolean;
+    FGameWinAnimation: TGameWinAnimation;
 
     FEndSequence: TCastleScene;
-    procedure SetDoEndSequence(Value: boolean);
+    procedure SetGameWinAnimation(Value: TGameWinAnimation);
   public
     constructor Create(
       const AName: string;
@@ -154,10 +160,10 @@ type
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
 
-    { True means that GateExit will not be rendered (or collided)
-      and EndSequence will be rendered. }
-    property DoEndSequence: boolean
-      read FDoEndSequence write SetDoEndSequence default false;
+    { Stage of game win animation. Known by this level, to display appropriate
+      geometry and background. }
+    property GameWinAnimation: TGameWinAnimation
+      read FGameWinAnimation write SetGameWinAnimation default gwaNone;
 
     function Background: TBackground; override;
   end;
@@ -933,15 +939,11 @@ begin
   FBossCreature := FindCreatureKind(SpiderQueen);
 end;
 
-procedure TCagesLevel.SetDoEndSequence(Value: boolean);
+procedure TCagesLevel.SetGameWinAnimation(Value: TGameWinAnimation);
 begin
-  { Changing from false to true ? Make sound. }
-  if (not FDoEndSequence) and Value then
-    SoundEngine.Sound(stKeyDoorUse);
-
-  FDoEndSequence := Value;
-  FEndSequence.Exists := DoEndSequence;
-  FGateExit.Exists := not DoEndSequence;
+  FGameWinAnimation := Value;
+  FEndSequence.Exists := GameWinAnimation >= gwaAnimateTo2;
+  FGateExit.Exists    := GameWinAnimation <  gwaAnimateTo2;
 end;
 
 procedure TCagesLevel.Idle(const CompSpeed: Single;
@@ -1088,7 +1090,7 @@ end;
 
 function TCagesLevel.Background: TBackground;
 begin
-  if DoEndSequence then
+  if FEndSequence.Exists then
     Result := FEndSequence.Background else
     Result := inherited;
 end;
