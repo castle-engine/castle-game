@@ -19,7 +19,7 @@
   <Alien
     actual_attack_time="0.4"
     min_delay_between_attacks="2.0"
-    move_speed="0.1"
+    move_speed="5.0"
     knocked_back_distance="4.2"
     knock_back_speed="35"
     life_to_run_away="1.0"
@@ -47,7 +47,7 @@
 
   <Werewolf
     actual_attack_time="0.3"
-    move_speed="0.3"
+    move_speed="15.0"
     max_attack_distance="4.2"
     preferred_attack_distance="4.2"
     min_delay_between_attacks="2.0"
@@ -100,7 +100,7 @@
   </BallMissile>
 
   <Ghost
-    move_speed="0.5"
+    move_speed="25.0"
     flying="True"
     max_attack_distance="2.0"
     preferred_attack_distance="2.0"
@@ -139,7 +139,7 @@
 
   <Spider
     actual_attack_time="0.25"
-    move_speed="0.1"
+    move_speed="5.0"
     max_attack_distance="2.0"
     preferred_attack_distance="2.0"
     min_delay_between_attacks="2.0"
@@ -176,7 +176,7 @@
 
   <SpiderQueen
     actual_attack_time="0.4"
-    move_speed="0.35"
+    move_speed="17.5"
     max_attack_distance="8.0"
     preferred_attack_distance="8.0"
     min_delay_between_attacks="2.0"
@@ -241,7 +241,7 @@
     close_direction_to_player="False"
     hits_player="False"
     hits_creatures="True"
-    move_speed="2.0"
+    move_speed="100.0"
     knocked_back_distance="0.0"
 
     middle_position_height="0.0"

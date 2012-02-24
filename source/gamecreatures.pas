@@ -38,11 +38,11 @@ const
 
   DefaultFlying = false;
 
-  DefaultMoveSpeed = 0.2;
+  DefaultMoveSpeed = 10.0;
   DefaultMinDelayBetweenAttacks = 5.0;
   DefaultMaxAttackDistance = 35.0;
   DefaultPreferredAttackDistance = 30.0 * 0.7;
-  DefaultMissileMoveSpeed = 1.0 * 0.7;
+  DefaultMissileMoveSpeed = 35.0;
   DefaultKnockedBackDistance = 6.0 * 0.7;
   DefaultLifeToRunAway = 0.3;
   DefaultActualAttackTime = 0.0;
@@ -2177,10 +2177,8 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
           Note that I'm not using here NewMiddle
           (that will be calculated later by MyMove)
           because they are too close to Middle to be good to test against.
-          I'm calculating here where I would get after 0.2 second
-          (WAKind.MoveSpeed * 0.2). }
-        (not TooHighAboveTheGround(Middle +
-          Direction * (WAKind.MoveSpeed * 0.2 * 50{TODO50}))) and
+          I'm calculating here where I would get after 0.2 second. }
+        (not TooHighAboveTheGround(Middle + Direction * (WAKind.MoveSpeed * 0.2))) and
 
         { Use MyMove without wall-sliding here.
           Things using MoveAlongTheDirection depend on the fact that
@@ -2191,7 +2189,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
           Our trick with "AlternativeTarget" should handle
           eventual problems with the track of creature, so wall-sliding
           should not be needed. }
-        MyMove(Direction * (WAKind.MoveSpeed * CompSpeed * 50{TODO50}), false, false);
+        MyMove(Direction * (WAKind.MoveSpeed * CompSpeed), false, false);
     end;
 
     { Go the way to LastSeenPlayer, *not* by using waypoints.
@@ -2869,7 +2867,7 @@ begin
     so I don't bother with checking here Dead. }
 
   OldMiddle := Middle;
-  NewMiddle := OldMiddle + Direction * (MissileKind.MoveSpeed * CompSpeed * 50{TODO50});
+  NewMiddle := OldMiddle + Direction * (MissileKind.MoveSpeed * CompSpeed);
 
   { missile moves *always*, disregarding MissileMoveAllowed result.
     Only after move, if the move made us colliding with something --- we explode. }
