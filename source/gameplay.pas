@@ -533,15 +533,12 @@ procedure EventDown(AKey: TKey;
 
   procedure DropItem;
 
-    function GetItemDropPosition(
-      DroppedItemKind: TItemKind;
+    function GetItemDropPosition(DroppedItemKind: TItemKind;
       out DropPosition: TVector3Single): boolean;
     var
       ItemBox: TBox3D;
       ItemBoxRadius: Single;
       ItemBoxMiddle: TVector3Single;
-      PushVector: TVector3Single;
-      PushVectorLength: Single;
     begin
       ItemBox := DroppedItemKind.BoundingBoxRotated;
       ItemBoxMiddle := ItemBox.Middle;
@@ -555,21 +552,17 @@ procedure EventDown(AKey: TKey;
         1. show visually player that the item was dropped
         2. to avoid automatically picking it again
 
-        Note that I take PushVector from DirectionInGravityPlane,
+        Note that I take direction from DirectionInGravityPlane,
         not from Direction, otherwise when player is looking
         down he could be able to put item "inside the ground".
         Collision detection with the level below would actually
         prevent putting item "inside the ground", but the item
         would be too close to the player --- he could pick it up
         immediately. }
-      PushVector := Player.Camera.DirectionInGravityPlane;
-      PushVectorLength := Max(
-        Player.Camera.RealPreferredHeight,
-        ItemBox.SizeX * 2,
-        ItemBox.SizeY * 2);
-      VectorAdjustToLengthTo1st(PushVector, PushVectorLength);
-      DropPosition := VectorAdd(Player.Camera.Position,
-        PushVector);
+      DropPosition := Player.Camera.Position +
+        Player.Camera.DirectionInGravityPlane * Sqrt2 * Max(
+          Player.Camera.RealPreferredHeight,
+          ItemBox.SizeX * 2, ItemBox.SizeY * 2);
 
       { Now check is DropPosition actually possible
         (i.e. check collisions item<->everything).
