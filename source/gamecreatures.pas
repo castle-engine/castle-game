@@ -53,8 +53,7 @@ const
   DefaultMinLifeLossToHurt = 0.0;
   DefaultChanceToHurt = 1.0;
 
-  DefaultCloseDirectionToPlayer = false;
-  DefaultCloseDirectionToTargetSpeed = 0.1;
+  DefaultCloseDirectionToTargetSpeed = 0.0;
 
   DefaultShortRangeAttackDamageConst = 10.0;
   DefaultShortRangeAttackDamageRandom = 10.0;
@@ -573,7 +572,6 @@ type
     FAnimationFile: string;
     FMoveSpeed: Single;
     FSoundExplosion: TSoundType;
-    FCloseDirectionToPlayer: boolean;
     FCloseDirectionToTargetSpeed: Single;
     FPauseBetweenSoundIdle: Single;
     FSoundIdle: TSoundType;
@@ -605,13 +603,8 @@ type
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
 
-    property CloseDirectionToPlayer: boolean
-      read FCloseDirectionToPlayer
-      write FCloseDirectionToPlayer
-      default DefaultCloseDirectionToPlayer;
-
-    { How fast direction to the target is corrected.
-      Used only if CloseDirectionToPlayer. }
+    { For "homing" missiles, how fast direction to the target is corrected.
+      Zero (default) means that the missile is not "homing". }
     property CloseDirectionToTargetSpeed: Single
       read FCloseDirectionToTargetSpeed
       write FCloseDirectionToTargetSpeed
@@ -1357,7 +1350,6 @@ begin
   inherited Create(AShortName);
   Flying := true;
   FMoveSpeed := DefaultMissileMoveSpeed;
-  FCloseDirectionToPlayer := DefaultCloseDirectionToPlayer;
   FCloseDirectionToTargetSpeed := DefaultCloseDirectionToTargetSpeed;
   FPauseBetweenSoundIdle := DefaultPauseBetweenSoundIdle;
   FHitsPlayer := DefaultHitsPlayer;
@@ -1408,9 +1400,6 @@ begin
   MoveSpeed :=
     KindsConfig.GetFloat(ShortName + '/move_speed',
     DefaultMissileMoveSpeed);
-  CloseDirectionToPlayer :=
-    KindsConfig.GetValue(ShortName + '/close_direction_to_player',
-    DefaultCloseDirectionToPlayer);
   CloseDirectionToTargetSpeed :=
     KindsConfig.GetFloat(ShortName + '/close_direction_to_target_speed',
     DefaultCloseDirectionToTargetSpeed);
@@ -2918,13 +2907,11 @@ begin
     Direction := NewDirection;
   end;
 
-  if MissileKind.CloseDirectionToPlayer and
-     (MissileKind.CloseDirectionToTargetSpeed <> 0) and
-     (Player <> nil) then
+  if (MissileKind.CloseDirectionToTargetSpeed <> 0.0) and (Player <> nil) then
   begin
     TargetDirection := Player.Position - Position;
     AngleBetween := AngleRadBetweenVectors(TargetDirection, Direction);
-    AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed * 50{TODO50};
+    AngleChange := MissileKind.CloseDirectionToTargetSpeed * CompSpeed;
     if AngleBetween <= AngleChange then
       Direction := TargetDirection else
     begin
