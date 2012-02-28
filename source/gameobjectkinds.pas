@@ -35,14 +35,25 @@ type
     FShortName: string;
     FPrepared: boolean;
   protected
-    { Load precalculated animation Anim from given AnimationFile,
+    { Prepare precalculated animation Anim from given AnimationFile,
       only if Anim = nil.
       It then sets attributes for the animation and prepares
       the animation by TCastlePrecalculatedAnimation.PrepareResources.
 
-      Useful in Prepare overrides.
+      Call only in Prepare overrides.
 
       It calls Progress.Step 2 times.
+
+      TODO: Animation is automatically added to our list of prepared 3D resources.
+      So it will be automatically released in @link(Release),
+      it's OpenGL resources will be released in @link(GLContextClose),
+      it will be freed in destructor.
+      TODO: this requires to actually keep a list of animation names,
+      and just prepare/release them always by ourselves.
+      And call Release from desctructor.
+      The point of overridden Prepare/Release will be to only initialize
+      fields like StandAnimation to non-nil (from PreparedList['Stand'])
+      or to nil (at Release).
 
       @param(AnimationName is here only for debug purposes (it may be used
       by some debug messages etc.)) }
