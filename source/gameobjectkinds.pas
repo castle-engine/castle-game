@@ -46,11 +46,10 @@ type
 
       @param(AnimationName is here only for debug purposes (it may be used
       by some debug messages etc.)) }
-    procedure CreateAnimationIfNeeded(
+    procedure PreparePrecalculatedAnimation(
       const AnimationName: string;
       var Anim: TCastlePrecalculatedAnimation;
-      AnimationFile: string;
-      Options: TPrepareResourcesOptions;
+      const AnimationFile: string;
       const BaseLights: TLightInstancesList);
 
     { Read animation filename, reading from XML file KindsConfig.
@@ -162,11 +161,10 @@ begin
   finally Progress.Fini; end;
 end;
 
-procedure TObjectKind.CreateAnimationIfNeeded(
+procedure TObjectKind.PreparePrecalculatedAnimation(
   const AnimationName: string;
   var Anim: TCastlePrecalculatedAnimation;
-  AnimationFile: string;
-  Options: TPrepareResourcesOptions;
+  const AnimationFile: string;
   const BaseLights: TLightInstancesList);
 begin
   if (AnimationFile <> '') and (Anim = nil) then
@@ -190,7 +188,8 @@ begin
           Anim.Scenes[0].TrianglesCount(true) ]));
 
     AttributesSet(Anim.Attributes);
-    Anim.PrepareResources(Options, false, BaseLights);
+    Anim.PrepareResources([prRender, prBoundingBox] + prShadowVolume,
+      false, BaseLights);
   end;
   Progress.Step;
 end;

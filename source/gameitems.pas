@@ -73,15 +73,6 @@ type
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   protected
-
-    { This is like @inherited, but it passes proper values for boolean parameters
-      specifying what to prepare. }
-    procedure CreateAnimationIfNeeded(
-      const AnimationName: string;
-      var Anim: TCastlePrecalculatedAnimation;
-      AnimInfo: string;
-      const BaseLights: TLightInstancesList);
-
     function GetStringCheckNonEmpty(KindsConfig: TCastleConfig;
       const AttrName: string): string;
   public
@@ -495,16 +486,6 @@ begin
   inherited;
 end;
 
-procedure TItemKind.CreateAnimationIfNeeded(
-  const AnimationName: string;
-  var Anim: TCastlePrecalculatedAnimation;
-  AnimInfo: string;
-  const BaseLights: TLightInstancesList);
-begin
-  inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimInfo,
-    [prRender, prBoundingBox], BaseLights);
-end;
-
 { TItemKindList ------------------------------------------------------------- }
 
 procedure TItemKindList.Prepare(const BaseLights: TLightInstancesList);
@@ -581,9 +562,9 @@ end;
 procedure TItemWeaponKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
-  CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationFile,
+  PreparePrecalculatedAnimation('Attack', FAttackAnimation, FAttackAnimationFile,
     BaseLights);
-  CreateAnimationIfNeeded('Ready', FReadyAnimation, FReadyAnimationFile,
+  PreparePrecalculatedAnimation('Ready', FReadyAnimation, FReadyAnimationFile,
     BaseLights);
 end;
 

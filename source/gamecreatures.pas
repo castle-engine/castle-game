@@ -105,14 +105,6 @@ type
   protected
     { In descendants only Prepare can (and should!) set this. }
     RadiusFromPrepare: Single;
-
-    { Like @inherited, but it passes proper values for boolean parameters
-      specifying what to prepare. }
-    procedure CreateAnimationIfNeeded(
-      const AnimationName: string;
-      var Anim: TCastlePrecalculatedAnimation;
-      AnimationFile: string;
-      const BaseLights: TLightInstancesList);
   public
     constructor Create(const AShortName: string);
 
@@ -1017,22 +1009,6 @@ begin
     Result := RadiusFromPrepare;
 end;
 
-procedure TCreatureKind.CreateAnimationIfNeeded(
-  const AnimationName: string;
-  var Anim: TCastlePrecalculatedAnimation;
-  AnimationFile: string;
-  const BaseLights: TLightInstancesList);
-var
-  Options: TPrepareResourcesOptions;
-begin
-  Options := [prRender, prBoundingBox];
-  if RenderShadowsPossible then
-    Options := Options + prShadowVolume;
-
-  inherited CreateAnimationIfNeeded(AnimationName, Anim, AnimationFile,
-    Options, BaseLights);
-end;
-
 function TCreatureKind.CreateCreature(World: T3DWorld;
   const APosition, ADirection: TVector3Single;
   const MaxLife: Single): TCreature;
@@ -1140,13 +1116,13 @@ procedure TWalkAttackCreatureKind.Prepare(const BaseLights: TLightInstancesList)
 begin
   inherited;
 
-  CreateAnimationIfNeeded('Stand'      , FStandAnimation      , FStandAnimationFile      , BaseLights);
-  CreateAnimationIfNeeded('StandToWalk', FStandToWalkAnimation, FStandToWalkAnimationFile, BaseLights);
-  CreateAnimationIfNeeded('Walk'       , FWalkAnimation       , FWalkAnimationFile       , BaseLights);
-  CreateAnimationIfNeeded('Attack'     , FAttackAnimation     , FAttackAnimationFile     , BaseLights);
-  CreateAnimationIfNeeded('Dying'      , FDyingAnimation      , FDyingAnimationFile      , BaseLights);
-  CreateAnimationIfNeeded('DyingBack'  , FDyingBackAnimation  , FDyingBackAnimationFile  , BaseLights);
-  CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationFile       , BaseLights);
+  PreparePrecalculatedAnimation('Stand'      , FStandAnimation      , FStandAnimationFile      , BaseLights);
+  PreparePrecalculatedAnimation('StandToWalk', FStandToWalkAnimation, FStandToWalkAnimationFile, BaseLights);
+  PreparePrecalculatedAnimation('Walk'       , FWalkAnimation       , FWalkAnimationFile       , BaseLights);
+  PreparePrecalculatedAnimation('Attack'     , FAttackAnimation     , FAttackAnimationFile     , BaseLights);
+  PreparePrecalculatedAnimation('Dying'      , FDyingAnimation      , FDyingAnimationFile      , BaseLights);
+  PreparePrecalculatedAnimation('DyingBack'  , FDyingBackAnimation  , FDyingBackAnimationFile  , BaseLights);
+  PreparePrecalculatedAnimation('Hurt'       , FHurtAnimation       , FHurtAnimationFile       , BaseLights);
 
   RadiusFromPrepare :=
     Min(StandAnimation.Scenes[0].BoundingBox.XYRadius,
@@ -1272,7 +1248,7 @@ end;
 procedure TSpiderQueenKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
-  CreateAnimationIfNeeded('ThrowWebAttack',
+  PreparePrecalculatedAnimation('ThrowWebAttack',
     FThrowWebAttackAnimation, FThrowWebAttackAnimationFile, BaseLights);
 end;
 
@@ -1362,7 +1338,7 @@ end;
 procedure TMissileCreatureKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
-  CreateAnimationIfNeeded('Move', FAnimation, FAnimationFile, BaseLights);
+  PreparePrecalculatedAnimation('Move', FAnimation, FAnimationFile, BaseLights);
 
   RadiusFromPrepare := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
@@ -1429,7 +1405,7 @@ end;
 procedure TStillCreatureKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
-  CreateAnimationIfNeeded('Stand', FAnimation, FAnimationFile, BaseLights);
+  PreparePrecalculatedAnimation('Stand', FAnimation, FAnimationFile, BaseLights);
 
   RadiusFromPrepare := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
