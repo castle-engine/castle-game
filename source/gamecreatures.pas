@@ -323,18 +323,12 @@ type
     FChanceToHurt: Single;
     FMaxHeightAcceptableToFall: Single;
     FRandomWalkDistance: Single;
-  protected
-    { Make all TCastlePrecalculatedAnimation properties non-nil. I.e. load them from their
-      XxxInfo counterparts.
-
-      Also calculates RadiusFromPrepare
-      from StandAnimation.Scenes[0]. }
-    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     constructor Create(const AShortName: string);
 
     destructor Destroy; override;
 
+    procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
     procedure GLContextClose; override;
@@ -517,13 +511,12 @@ type
     FMaxThrowWebAttackDistance: Single;
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
-  protected
-    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     destructor Destroy; override;
 
     procedure GLContextClose; override;
 
+    procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
 
@@ -552,9 +545,8 @@ type
   end;
 
   TGhostKind = class(TWalkAttackCreatureKind)
-  protected
-    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
+    procedure Prepare(const BaseLights: TLightInstancesList); override;
     function CreatureClass: TCreatureClass; override;
   end;
 
@@ -577,12 +569,11 @@ type
     FSoundIdle: TSoundType;
     FHitsPlayer: boolean;
     FHitsCreatures: boolean;
-  protected
-    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     constructor Create(const AShortName: string);
     destructor Destroy; override;
 
+    procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
     procedure GLContextClose; override;
@@ -632,11 +623,10 @@ type
   private
     FAnimation: TCastlePrecalculatedAnimation;
     FAnimationFile: string;
-  protected
-    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     destructor Destroy; override;
 
+    procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
     procedure GLContextClose; override;
@@ -1146,7 +1136,7 @@ begin
   inherited;
 end;
 
-procedure TWalkAttackCreatureKind.PrepareInternal(const BaseLights: TLightInstancesList);
+procedure TWalkAttackCreatureKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
 
@@ -1279,7 +1269,7 @@ begin
   if ThrowWebAttackAnimation <> nil then ThrowWebAttackAnimation.GLContextClose;
 end;
 
-procedure TSpiderQueenKind.PrepareInternal(const BaseLights: TLightInstancesList);
+procedure TSpiderQueenKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('ThrowWebAttack',
@@ -1320,7 +1310,7 @@ end;
 
 { TGhostKind ------------------------------------------------------------- }
 
-procedure TGhostKind.PrepareInternal(const BaseLights: TLightInstancesList);
+procedure TGhostKind.Prepare(const BaseLights: TLightInstancesList);
 var
   ReferenceScene: TCastleScene;
 begin
@@ -1369,7 +1359,7 @@ begin
   inherited;
 end;
 
-procedure TMissileCreatureKind.PrepareInternal(const BaseLights: TLightInstancesList);
+procedure TMissileCreatureKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('Move', FAnimation, FAnimationFile, BaseLights);
@@ -1436,7 +1426,7 @@ begin
   inherited;
 end;
 
-procedure TStillCreatureKind.PrepareInternal(const BaseLights: TLightInstancesList);
+procedure TStillCreatureKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('Stand', FAnimation, FAnimationFile, BaseLights);

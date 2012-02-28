@@ -67,16 +67,12 @@ type
     procedure AnimationFromConfig(var AnimationFile: string;
       KindsConfig: TCastleConfig; const AnimationName: string;
       EmptyIfNoAttribute: boolean = false); virtual;
-
-    { Prepare anything needed when starting new game.
-      It must call Progress.Step PrepareSteps times.
-      It has a funny name to differentiate from Prepare,
-      that should be called outside. }
-    procedure PrepareInternal(const BaseLights: TLightInstancesList); virtual;
   public
     constructor Create(const AShortName: string);
 
-    procedure Prepare(const BaseLights: TLightInstancesList);
+    { Prepare everything needed for using this resource.
+      It must call Progress.Step PrepareSteps times. }
+    procedure Prepare(const BaseLights: TLightInstancesList); virtual;
 
     { How many times Progress.Step will be called during Prepare
       of this object.
@@ -112,10 +108,8 @@ type
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); virtual;
 
-    { This is a debug command, will cause Release
-      and then (wrapped within Progress.Init...Fini) will
-      call Prepare. This should reload / regenerate all
-      things prepared in Prepare. }
+    { Release and then immediately prepare again this resource.
+      Does progress (by Progress.Init...Fini inside). }
     procedure RedoPrepare(const BaseLights: TLightInstancesList);
   end;
 
@@ -136,13 +130,6 @@ begin
 
   { call this to satisfy Progress.Step = 1 in this class. }
   Progress.Step;
-
-  PrepareInternal(BaseLights);
-end;
-
-procedure TObjectKind.PrepareInternal(const BaseLights: TLightInstancesList);
-begin
-  { Nothing to do here in this class. }
 end;
 
 function TObjectKind.PrepareSteps: Cardinal;

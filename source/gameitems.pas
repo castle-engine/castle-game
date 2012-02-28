@@ -73,7 +73,6 @@ type
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   protected
-    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
 
     { This is like @inherited, but it passes proper values for boolean parameters
       specifying what to prepare. }
@@ -134,6 +133,7 @@ type
       to account the fact that Scene may be rotated around +Z vector. }
     function BoundingBoxRotated: TBox3D;
 
+    procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
     procedure GLContextClose; override;
@@ -166,8 +166,6 @@ type
     FReadyAnimationFile: string;
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
-  protected
-    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     destructor Destroy; override;
 
@@ -186,6 +184,7 @@ type
 
     procedure Use(Item: TItem); override;
 
+    procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
     procedure GLContextClose; override;
@@ -461,8 +460,10 @@ begin
   Result := FBoundingBoxRotated;
 end;
 
-procedure TItemKind.PrepareInternal(const BaseLights: TLightInstancesList);
+procedure TItemKind.Prepare(const BaseLights: TLightInstancesList);
 begin
+  inherited;
+
   if FScene = nil then
   begin
     FScene := TCastleScene.CreateCustomCache(nil, GLContextCache);
@@ -576,7 +577,7 @@ begin
   Player.EquippedWeapon := Item;
 end;
 
-procedure TItemWeaponKind.PrepareInternal(const BaseLights: TLightInstancesList);
+procedure TItemWeaponKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationFile,
