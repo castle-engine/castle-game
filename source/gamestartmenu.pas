@@ -141,7 +141,7 @@ begin
     (since TLevel constructor creates some creatures and items on the level). }
   BaseLights := TLightInstancesList.Create; {TODO:dirty to create BaseLights here}
   try
-    ItemsKinds.PrepareRender(BaseLights);
+    ItemsKinds.Prepare(BaseLights);
   finally FreeAndNil(BaseLights) end;
 
   Level := nil;

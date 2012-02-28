@@ -73,7 +73,7 @@ type
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   protected
-    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
+    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
 
     { This is like @inherited, but it passes proper values for boolean parameters
       specifying what to prepare. }
@@ -97,7 +97,7 @@ type
     { Nice name for user. }
     property Name: string read FName;
 
-    { Note that the Scene is nil if not PrepareRenderDone. }
+    { Note that the Scene is nil if not Prepared. }
     function Scene: TCastleScene;
 
     { This is a 2d image, to be used for inventory slots etc.
@@ -134,19 +134,19 @@ type
       to account the fact that Scene may be rotated around +Z vector. }
     function BoundingBoxRotated: TBox3D;
 
-    function PrepareRenderSteps: Cardinal; override;
-    procedure FreePrepareRender; override;
+    function PrepareSteps: Cardinal; override;
+    procedure Release; override;
     procedure GLContextClose; override;
   end;
 
   TItemKindList = class(specialize TFPGObjectList<TItemKind>)
   public
-    { Calls PrepareRender for all items.
+    { Calls Prepare for all items.
       This does Progress.Init, Step, Fini. }
-    procedure PrepareRender(const BaseLights: TLightInstancesList);
+    procedure Prepare(const BaseLights: TLightInstancesList);
 
-    { Call FreePrepareRender for all items. }
-    procedure FreePrepareRender;
+    { Call Release for all items. }
+    procedure Release;
 
     { This opens items/kinds.xml file and calls LoadFromFile for
       all existing TItemKind instances. }
@@ -167,7 +167,7 @@ type
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
-    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
+    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     destructor Destroy; override;
 
@@ -186,8 +186,8 @@ type
 
     procedure Use(Item: TItem); override;
 
-    function PrepareRenderSteps: Cardinal; override;
-    procedure FreePrepareRender; override;
+    function PrepareSteps: Cardinal; override;
+    procedure Release; override;
     procedure GLContextClose; override;
 
     { Time within AttackAnimation
@@ -461,7 +461,7 @@ begin
   Result := FBoundingBoxRotated;
 end;
 
-procedure TItemKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
+procedure TItemKind.PrepareInternal(const BaseLights: TLightInstancesList);
 begin
   if FScene = nil then
   begin
@@ -476,12 +476,12 @@ begin
   Progress.Step;
 end;
 
-function TItemKind.PrepareRenderSteps: Cardinal;
+function TItemKind.PrepareSteps: Cardinal;
 begin
-  Result := (inherited PrepareRenderSteps) + 1;
+  Result := (inherited PrepareSteps) + 1;
 end;
 
-procedure TItemKind.FreePrepareRender;
+procedure TItemKind.Release;
 begin
   FreeAndNil(FScene);
   inherited;
@@ -505,28 +505,28 @@ end;
 
 { TItemKindList ------------------------------------------------------------- }
 
-procedure TItemKindList.PrepareRender(const BaseLights: TLightInstancesList);
+procedure TItemKindList.Prepare(const BaseLights: TLightInstancesList);
 var
   I: Integer;
-  PrepareRenderSteps: Cardinal;
+  PrepareSteps: Cardinal;
 begin
-  PrepareRenderSteps := 0;
+  PrepareSteps := 0;
   for I := 0 to Count - 1 do
-    PrepareRenderSteps += Items[I].PrepareRenderSteps;
+    PrepareSteps += Items[I].PrepareSteps;
 
-  Progress.Init(PrepareRenderSteps, 'Loading items');
+  Progress.Init(PrepareSteps, 'Loading items');
   try
     for I := 0 to Count - 1 do
-      Items[I].PrepareRender(BaseLights);
+      Items[I].Prepare(BaseLights);
   finally Progress.Fini; end;
 end;
 
-procedure TItemKindList.FreePrepareRender;
+procedure TItemKindList.Release;
 var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
-    Items[I].FreePrepareRender;
+    Items[I].Release;
 end;
 
 procedure TItemKindList.LoadFromFile;
@@ -576,7 +576,7 @@ begin
   Player.EquippedWeapon := Item;
 end;
 
-procedure TItemWeaponKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
+procedure TItemWeaponKind.PrepareInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('Attack', FAttackAnimation, FAttackAnimationFile,
@@ -585,12 +585,12 @@ begin
     BaseLights);
 end;
 
-function TItemWeaponKind.PrepareRenderSteps: Cardinal;
+function TItemWeaponKind.PrepareSteps: Cardinal;
 begin
-  Result := (inherited PrepareRenderSteps) + 2;
+  Result := (inherited PrepareSteps) + 2;
 end;
 
-procedure TItemWeaponKind.FreePrepareRender;
+procedure TItemWeaponKind.Release;
 begin
   FreeAndNil(FAttackAnimation);
   FreeAndNil(FReadyAnimation);

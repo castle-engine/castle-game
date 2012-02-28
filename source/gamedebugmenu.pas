@@ -368,7 +368,7 @@ procedure TDebugCreaturesMenu.Click;
       if Kind.RequiredCount = 0 then
         MessageOK(Window, Format('Creature "%s" is not used by anything, ' +
           'cannot reload',  [Kind.ShortName])) else
-        Kind.RedoPrepareRender(Level.BaseLights);
+        Kind.RedoPrepare(Level.BaseLights);
     end;
   end;
 
@@ -516,7 +516,7 @@ procedure TDebugItemsMenu.Click;
     Kind: TItemKind;
   begin
     if ChooseItemKind(Kind) then
-      Kind.RedoPrepareRender(Level.BaseLights);
+      Kind.RedoPrepare(Level.BaseLights);
   end;
 
 begin

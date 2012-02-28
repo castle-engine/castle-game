@@ -57,7 +57,7 @@ const
 var
   { If false then you should do *nothing* related to the shadows,
     i.e. you even shouldn't request stencil buffer for our window
-    or do in PrepareRender appropriate preparations for shadows.
+    or do in Prepare appropriate preparations for shadows.
 
     In other words, RenderShadowsPossible = @false means that
     for the whole lifetime of this program RenderShadows will

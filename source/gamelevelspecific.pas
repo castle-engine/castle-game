@@ -1025,10 +1025,10 @@ begin
         0.5, 1));
 
     { Maybe appear new spiders }
-    if { Spider.PrepareRenderDone may be false here only if
+    if { Spider.Prepared may be false here only if
          --debug-no-creatures was specified. In this case,
          leave Spider unprepared and don't use spider's on this level. }
-       Spider.PrepareRenderDone then
+       Spider.Prepared then
     begin
       if NextSpidersAppearingTime = 0 then
       begin

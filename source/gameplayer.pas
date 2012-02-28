@@ -1411,7 +1411,7 @@ var
 begin
   Result := nil;
   if (EquippedWeapon <> nil) and
-    EquippedWeaponKind.PrepareRenderDone then
+    EquippedWeaponKind.Prepared then
   begin
     AttackAnim := EquippedWeaponKind.AttackAnimation;
     AttackTime := Level.AnimationTime - AttackStartTime;

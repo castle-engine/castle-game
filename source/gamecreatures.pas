@@ -103,8 +103,8 @@ type
     FCastShadowVolumes: boolean;
     FRequiredCount: Cardinal;
   protected
-    { In descendants only PrepareRender can (and should!) set this. }
-    RadiusFromPrepareRender: Single;
+    { In descendants only Prepare can (and should!) set this. }
+    RadiusFromPrepare: Single;
 
     { Like @inherited, but it passes proper values for boolean parameters
       specifying what to prepare. }
@@ -127,22 +127,22 @@ type
 
       This is always calculated like:
       If RadiusFromFile <> 0, then take it.
-      Otherwise take RadiusFromPrepareRender.
+      Otherwise take RadiusFromPrepare.
       So there are 2 ways to initialize this:
       1. Set this in creatures/kinds.xml file.
-      2. Set RadiusFromPrepareRender properly.
+      2. Set RadiusFromPrepare properly.
 
       Setting this in creatures/kinds.xml file to non-zero will effectively
-      ignore any RadiusFromPrepareRender value.
+      ignore any RadiusFromPrepare value.
 
-      And PrepareRender should always set RadiusFromPrepareRender
-      to something non-zero. So note that before PrepareRender was called,
+      And Prepare should always set RadiusFromPrepare
+      to something non-zero. So note that before Prepare was called,
       Radius may remain zero. But you can depend on the fact that
-      it's non-zero after PrepareRender.
+      it's non-zero after Prepare.
 
       Note that this is always measured from Middle of given
       creature. So take this into account when calcuating
-      RadiusFromPrepareRender or writing it in kinds.xml file. }
+      RadiusFromPrepare or writing it in kinds.xml file. }
     function Radius: Single;
 
     property SoundSuddenPain: TSoundType
@@ -274,7 +274,7 @@ type
 
     { Used by RequireCreatures, UnRequireCreatures to count
       how many times this kind is required. Idea is that when this drops
-      to zero, we can FreePrepareRender to free resources. }
+      to zero, we can Release to free resources. }
     property RequiredCount: Cardinal
       read FRequiredCount write FRequiredCount default 0;
   end;
@@ -327,16 +327,16 @@ type
     { Make all TCastlePrecalculatedAnimation properties non-nil. I.e. load them from their
       XxxInfo counterparts.
 
-      Also calculates RadiusFromPrepareRender
+      Also calculates RadiusFromPrepare
       from StandAnimation.Scenes[0]. }
-    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
+    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     constructor Create(const AShortName: string);
 
     destructor Destroy; override;
 
-    function PrepareRenderSteps: Cardinal; override;
-    procedure FreePrepareRender; override;
+    function PrepareSteps: Cardinal; override;
+    procedure Release; override;
     procedure GLContextClose; override;
 
     { An animation of standing still.
@@ -518,14 +518,14 @@ type
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
   protected
-    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
+    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     destructor Destroy; override;
 
     procedure GLContextClose; override;
 
-    function PrepareRenderSteps: Cardinal; override;
-    procedure FreePrepareRender; override;
+    function PrepareSteps: Cardinal; override;
+    procedure Release; override;
 
     function CreatureClass: TCreatureClass; override;
 
@@ -553,7 +553,7 @@ type
 
   TGhostKind = class(TWalkAttackCreatureKind)
   protected
-    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
+    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     function CreatureClass: TCreatureClass; override;
   end;
@@ -578,13 +578,13 @@ type
     FHitsPlayer: boolean;
     FHitsCreatures: boolean;
   protected
-    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
+    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     constructor Create(const AShortName: string);
     destructor Destroy; override;
 
-    function PrepareRenderSteps: Cardinal; override;
-    procedure FreePrepareRender; override;
+    function PrepareSteps: Cardinal; override;
+    procedure Release; override;
     procedure GLContextClose; override;
 
     { Missile uses the same animation all the time.
@@ -633,12 +633,12 @@ type
     FAnimation: TCastlePrecalculatedAnimation;
     FAnimationFile: string;
   protected
-    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); override;
+    procedure PrepareInternal(const BaseLights: TLightInstancesList); override;
   public
     destructor Destroy; override;
 
-    function PrepareRenderSteps: Cardinal; override;
-    procedure FreePrepareRender; override;
+    function PrepareSteps: Cardinal; override;
+    procedure Release; override;
     procedure GLContextClose; override;
 
     { Missile uses the same animation all the time.
@@ -1024,7 +1024,7 @@ function TCreatureKind.Radius: Single;
 begin
   if RadiusFromFile <> 0 then
     Result := RadiusFromFile else
-    Result := RadiusFromPrepareRender;
+    Result := RadiusFromPrepare;
 end;
 
 procedure TCreatureKind.CreateAnimationIfNeeded(
@@ -1050,7 +1050,7 @@ begin
   { This is only needed if you used --debug-no-creatures or forgot
     to add creature to <required_resources> }
   // TODO: waits for porting TObjectKind to T3D,
-  // then PrepareRender will get BaseLights in param,
+  // then Prepare will get BaseLights in param,
   // and somehow it should call
   // RequireCreature(BaseLights, Self);
 
@@ -1146,7 +1146,7 @@ begin
   inherited;
 end;
 
-procedure TWalkAttackCreatureKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
+procedure TWalkAttackCreatureKind.PrepareInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
 
@@ -1158,17 +1158,17 @@ begin
   CreateAnimationIfNeeded('DyingBack'  , FDyingBackAnimation  , FDyingBackAnimationFile  , BaseLights);
   CreateAnimationIfNeeded('Hurt'       , FHurtAnimation       , FHurtAnimationFile       , BaseLights);
 
-  RadiusFromPrepareRender :=
+  RadiusFromPrepare :=
     Min(StandAnimation.Scenes[0].BoundingBox.XYRadius,
         StandAnimation.Scenes[0].BoundingBox.Data[1, 2] * 0.75);
 end;
 
-function TWalkAttackCreatureKind.PrepareRenderSteps: Cardinal;
+function TWalkAttackCreatureKind.PrepareSteps: Cardinal;
 begin
-  Result := (inherited PrepareRenderSteps) + 12;
+  Result := (inherited PrepareSteps) + 12;
 end;
 
-procedure TWalkAttackCreatureKind.FreePrepareRender;
+procedure TWalkAttackCreatureKind.Release;
 begin
   FreeAndNil(FStandAnimation);
   FreeAndNil(FStandToWalkAnimation);
@@ -1279,19 +1279,19 @@ begin
   if ThrowWebAttackAnimation <> nil then ThrowWebAttackAnimation.GLContextClose;
 end;
 
-procedure TSpiderQueenKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
+procedure TSpiderQueenKind.PrepareInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('ThrowWebAttack',
     FThrowWebAttackAnimation, FThrowWebAttackAnimationFile, BaseLights);
 end;
 
-function TSpiderQueenKind.PrepareRenderSteps: Cardinal;
+function TSpiderQueenKind.PrepareSteps: Cardinal;
 begin
-  Result := (inherited PrepareRenderSteps) + 2;
+  Result := (inherited PrepareSteps) + 2;
 end;
 
-procedure TSpiderQueenKind.FreePrepareRender;
+procedure TSpiderQueenKind.Release;
 begin
   FreeAndNil(FThrowWebAttackAnimation);
   inherited;
@@ -1320,7 +1320,7 @@ end;
 
 { TGhostKind ------------------------------------------------------------- }
 
-procedure TGhostKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
+procedure TGhostKind.PrepareInternal(const BaseLights: TLightInstancesList);
 var
   ReferenceScene: TCastleScene;
 begin
@@ -1330,7 +1330,7 @@ begin
     model from Middle) is better. }
   ReferenceScene := StandAnimation.Scenes[0];
 
-  RadiusFromPrepareRender :=
+  RadiusFromPrepare :=
     Max(ReferenceScene.BoundingBox.XYRadius,
     { I can do here "/ 2" thanks to the fact that middle_position_height
       of ghost is 0.5 (so I have room for another "BoundingBox.Data[1, 2] / 2"
@@ -1363,23 +1363,23 @@ begin
   inherited;
 end;
 
-procedure TMissileCreatureKind.FreePrepareRender;
+procedure TMissileCreatureKind.Release;
 begin
   FreeAndNil(FAnimation);
   inherited;
 end;
 
-procedure TMissileCreatureKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
+procedure TMissileCreatureKind.PrepareInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('Move', FAnimation, FAnimationFile, BaseLights);
 
-  RadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
+  RadiusFromPrepare := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
 
-function TMissileCreatureKind.PrepareRenderSteps: Cardinal;
+function TMissileCreatureKind.PrepareSteps: Cardinal;
 begin
-  Result := (inherited PrepareRenderSteps) + 2;
+  Result := (inherited PrepareSteps) + 2;
 end;
 
 procedure TMissileCreatureKind.GLContextClose;
@@ -1430,23 +1430,23 @@ begin
   inherited;
 end;
 
-procedure TStillCreatureKind.FreePrepareRender;
+procedure TStillCreatureKind.Release;
 begin
   FreeAndNil(FAnimation);
   inherited;
 end;
 
-procedure TStillCreatureKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
+procedure TStillCreatureKind.PrepareInternal(const BaseLights: TLightInstancesList);
 begin
   inherited;
   CreateAnimationIfNeeded('Stand', FAnimation, FAnimationFile, BaseLights);
 
-  RadiusFromPrepareRender := Animation.Scenes[0].BoundingBox.XYRadius;
+  RadiusFromPrepare := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
 
-function TStillCreatureKind.PrepareRenderSteps: Cardinal;
+function TStillCreatureKind.PrepareSteps: Cardinal;
 begin
-  Result := (inherited PrepareRenderSteps) + 2;
+  Result := (inherited PrepareSteps) + 2;
 end;
 
 procedure TStillCreatureKind.GLContextClose;
@@ -2481,7 +2481,7 @@ function TWalkAttackCreature.GetChild: T3D;
 var
   StateTime: Single;
 begin
-  if not Kind.PrepareRenderDone then Exit(nil);
+  if not Kind.Prepared then Exit(nil);
 
   { Time from the change to this state. }
   StateTime := LifeTime - StateChangeTime;
@@ -2739,7 +2739,7 @@ function TSpiderQueenCreature.GetChild: T3D;
 var
   StateTime: Single;
 begin
-  if not Kind.PrepareRenderDone then Exit(nil);
+  if not Kind.Prepared then Exit(nil);
 
   if State = wasSpecial1 then
   begin
@@ -2932,7 +2932,7 @@ end;
 
 function TMissileCreature.GetChild: T3D;
 begin
-  if not Kind.PrepareRenderDone then Exit(nil);
+  if not Kind.Prepared then Exit(nil);
 
   Result := MissileKind.Animation.SceneFromTime(LifeTime);
   { self-shadows on creatures look bad, esp. see werewolves at the end
@@ -2977,7 +2977,7 @@ end;
 
 function TStillCreature.GetChild: T3D;
 begin
-  if not Kind.PrepareRenderDone then Exit(nil);
+  if not Kind.Prepared then Exit(nil);
 
   Result := StillKind.Animation.SceneFromTime(LifeTime);
   { self-shadows on creatures look bad, esp. see werewolves at the end

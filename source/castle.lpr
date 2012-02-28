@@ -204,8 +204,8 @@ begin
   Progress.UserInterface := WindowProgressInterface;
   { I'm turning UseDescribePosition to false, because it's usually
     confusing for the user.
-    E.g. each creature is counted as PrepareRenderSteps steps,
-    each item is counted as PrepareRenderSteps steps,
+    E.g. each creature is counted as PrepareSteps steps,
+    each item is counted as PrepareSteps steps,
     when loading levels user would have to know what an "octree" is. }
   Progress.UseDescribePosition := false;
 

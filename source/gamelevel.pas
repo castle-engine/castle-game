@@ -855,7 +855,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     { The creature kind may be unprepared here only because
       --debug-no-creatures was specified. In this case, leave this
       creature kind unprepared and don't add this creature. }
-    if not CreatureKind.PrepareRenderDone then
+    if not CreatureKind.Prepared then
     begin
       Assert(DebugNoCreatures);
       Exit;

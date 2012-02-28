@@ -69,15 +69,15 @@ procedure RequireCreatures(const BaseLights: TLightInstancesList; Names: TString
 var
   I: Integer;
   Kind: TCreatureKind;
-  PrepareRenderSteps: Cardinal;
+  PrepareSteps: Cardinal;
   TimeBegin: TProcessTimerResult;
 begin
   { We iterate two times over Names, first time only to calculate
-    PrepareRenderSteps, 2nd time does actual work.
+    PrepareSteps, 2nd time does actual work.
     1st time increments RequiredCount (as 2nd pass may be optimized
     out, if not needed). }
 
-  PrepareRenderSteps := 0;
+  PrepareSteps := 0;
   for I := 0 to CreaturesKinds.Count - 1 do
   begin
     Kind := CreaturesKinds[I];
@@ -86,18 +86,18 @@ begin
       Kind.RequiredCount := Kind.RequiredCount + 1;
       if Kind.RequiredCount = 1 then
       begin
-        Assert(not Kind.PrepareRenderDone);
-        PrepareRenderSteps += Kind.PrepareRenderSteps;
+        Assert(not Kind.Prepared);
+        PrepareSteps += Kind.PrepareSteps;
       end;
     end;
   end;
 
-  if PrepareRenderSteps <> 0 then
+  if PrepareSteps <> 0 then
   begin
     if Log then
       TimeBegin := ProcessTimerNow;
 
-    Progress.Init(PrepareRenderSteps, 'Loading creatures');
+    Progress.Init(PrepareSteps, 'Loading creatures');
     try
       for I := 0 to CreaturesKinds.Count - 1 do
       begin
@@ -108,7 +108,7 @@ begin
           if Log then
             WritelnLog('Resources', Format(
               'Creature "%s" becomes required, loading', [Kind.ShortName]));
-          Kind.PrepareRender(BaseLights);
+          Kind.Prepare(BaseLights);
         end;
       end;
     finally Progress.Fini end;
@@ -141,17 +141,17 @@ begin
 
         { If everything went OK, I could place here an assertion
 
-            Assert(Kind.PrepareRenderDone);
+            Assert(Kind.Prepared);
 
           However, if creature loading inside RequireCreatures will fail,
           then TLevel destructor is forced to call UnRequireCreatures
           on creatures that, although had RequiredCount
-          increased, didn't have actually PrepareRender call.
+          increased, didn't have actually Prepare call.
           Still, a correct run of the program (when creature loading goes 100% OK)
           should always have Kind.RequiredCount > 0 here. }
 
-        if Kind.PrepareRenderDone then
-          Kind.FreePrepareRender;
+        if Kind.Prepared then
+          Kind.Release;
       end;
     end;
   end;

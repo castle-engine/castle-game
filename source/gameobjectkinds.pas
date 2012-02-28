@@ -33,13 +33,14 @@ type
   TObjectKind = class
   private
     FShortName: string;
-    FPrepareRenderDone: boolean;
+    FPrepared: boolean;
   protected
-    { Create Anim from given AnimationFile, only if Anim = nil.
-      Then it sets attributes for the animation and then prepares
-      the animation by calling animation's @noAutoLink(PrepareRender).
+    { Load precalculated animation Anim from given AnimationFile,
+      only if Anim = nil.
+      It then sets attributes for the animation and prepares
+      the animation by TCastlePrecalculatedAnimation.PrepareResources.
 
-      So this may be helpful to use in PrepareRenderInside implementations.
+      Useful in Prepare overrides.
 
       It calls Progress.Step 2 times.
 
@@ -68,35 +69,34 @@ type
       EmptyIfNoAttribute: boolean = false); virtual;
 
     { Prepare anything needed when starting new game.
-      It must call Progress.Step PrepareRenderSteps times.
-      It has a funny name to differentiate from PrepareRender,
+      It must call Progress.Step PrepareSteps times.
+      It has a funny name to differentiate from Prepare,
       that should be called outside. }
-    procedure PrepareRenderInternal(const BaseLights: TLightInstancesList); virtual;
+    procedure PrepareInternal(const BaseLights: TLightInstancesList); virtual;
   public
     constructor Create(const AShortName: string);
 
-    procedure PrepareRender(const BaseLights: TLightInstancesList);
+    procedure Prepare(const BaseLights: TLightInstancesList);
 
-    { How many times Progress.Step will be called during PrepareRender
+    { How many times Progress.Step will be called during Prepare
       of this object.
 
-      In this class this returns 1 and PrepareRender will actually do one
+      In this class this returns 1 and Prepare will actually do one
       dummy Progress.Step call. That's because this must be > 0,
       some code depends on it, and will optimize out (i.e. not call)
-      PrepareRender if sum of some PrepareRenderSteps will be 0. }
-    function PrepareRenderSteps: Cardinal; virtual;
+      Prepare if sum of some PrepareSteps will be 0. }
+    function PrepareSteps: Cardinal; virtual;
 
-    { Are we between PrepareRender and FreePrepareRender. }
-    property PrepareRenderDone: boolean read FPrepareRenderDone;
+    { Are we in prepared state, that is after @link(Prepare) call and before @link(Release). }
+    property Prepared: boolean read FPrepared;
 
-    { This should release everything done by PrepareRender.
+    { Release everything done by Prepare.
 
-      When such thing should be called ? E.g. because PrepareRender
-      must be done once again, because some attributes (e.g. things
-      set by AnimationAttributesSet) changed.
+      Useful to call e.g. because Prepare must be done once again,
+      because some attributes (e.g. things set by AttributesSet) changed.
 
-      In this class this just sets PrepareRenderDone to @false. }
-    procedure FreePrepareRender; virtual;
+      In this class this just sets Prepared to @false. }
+    procedure Release; virtual;
 
     { Free any association with current OpenGL context. }
     procedure GLContextClose; virtual;
@@ -112,11 +112,11 @@ type
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); virtual;
 
-    { This is a debug command, will cause FreePrepareRender
+    { This is a debug command, will cause Release
       and then (wrapped within Progress.Init...Fini) will
-      call PrepareRender. This should reload / regenerate all
-      things prepared in PrepareRender. }
-    procedure RedoPrepareRender(const BaseLights: TLightInstancesList);
+      call Prepare. This should reload / regenerate all
+      things prepared in Prepare. }
+    procedure RedoPrepare(const BaseLights: TLightInstancesList);
   end;
 
 implementation
@@ -130,29 +130,29 @@ begin
   FShortName := AShortName;
 end;
 
-procedure TObjectKind.PrepareRender(const BaseLights: TLightInstancesList);
+procedure TObjectKind.Prepare(const BaseLights: TLightInstancesList);
 begin
-  FPrepareRenderDone := true;
+  FPrepared := true;
 
   { call this to satisfy Progress.Step = 1 in this class. }
   Progress.Step;
 
-  PrepareRenderInternal(BaseLights);
+  PrepareInternal(BaseLights);
 end;
 
-procedure TObjectKind.PrepareRenderInternal(const BaseLights: TLightInstancesList);
+procedure TObjectKind.PrepareInternal(const BaseLights: TLightInstancesList);
 begin
   { Nothing to do here in this class. }
 end;
 
-function TObjectKind.PrepareRenderSteps: Cardinal;
+function TObjectKind.PrepareSteps: Cardinal;
 begin
   Result := 1;
 end;
 
-procedure TObjectKind.FreePrepareRender;
+procedure TObjectKind.Release;
 begin
-  FPrepareRenderDone := false;
+  FPrepared := false;
 end;
 
 procedure TObjectKind.GLContextClose;
@@ -165,21 +165,21 @@ begin
   { Nothing to do in this class. }
 end;
 
-procedure TObjectKind.RedoPrepareRender(const BaseLights: TLightInstancesList);
+procedure TObjectKind.RedoPrepare(const BaseLights: TLightInstancesList);
 begin
-  Progress.Init(PrepareRenderSteps, 'Loading object ' + ShortName);
+  Progress.Init(PrepareSteps, 'Loading object ' + ShortName);
   try
-    { It's important to do FreePrepareRender after Progress.Init.
+    { It's important to do Release after Progress.Init.
       Why ? Because Progress.Init does TCastleWindowBase.SaveScreeToDisplayList,
       and this may call Window.OnDraw, and this may want to redraw
       the object (e.g. if creature of given kind already exists
-      on the screen) and this requires PrepareRender to be already done.
+      on the screen) and this requires Prepare to be already done.
 
-      So we should call Progress.Init before we invalidate PrepareRender
+      So we should call Progress.Init before we invalidate Prepare
       work. }
-    FreePrepareRender;
+    Release;
 
-    PrepareRender(BaseLights);
+    Prepare(BaseLights);
   finally Progress.Fini; end;
 end;
 
@@ -201,8 +201,8 @@ begin
 
   if Anim <> nil then
   begin
-    { Write info before PrepareRender, otherwise it could not
-      be available after freeing scene RootNodes in Anim.PrepareRender. }
+    { Write info before Prepare, otherwise it could not
+      be available after freeing scene RootNodes in Anim.Prepare. }
     if Log then
       WritelnLog('Animation info',
         Format('%40s %3d scenes * %8d triangles',
