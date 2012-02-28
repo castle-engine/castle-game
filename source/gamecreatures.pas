@@ -318,12 +318,9 @@ type
   public
     constructor Create(const AShortName: string);
 
-    destructor Destroy; override;
-
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
-    procedure GLContextClose; override;
 
     { An animation of standing still.
       Beginning must be on time 0.
@@ -504,10 +501,6 @@ type
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
   public
-    destructor Destroy; override;
-
-    procedure GLContextClose; override;
-
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
@@ -563,12 +556,10 @@ type
     FHitsCreatures: boolean;
   public
     constructor Create(const AShortName: string);
-    destructor Destroy; override;
 
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
-    procedure GLContextClose; override;
 
     { Missile uses the same animation all the time.
       In the simplest case, you can just place here a single scene. }
@@ -616,12 +607,9 @@ type
     FAnimation: TCastlePrecalculatedAnimation;
     FAnimationFile: string;
   public
-    destructor Destroy; override;
-
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
-    procedure GLContextClose; override;
 
     { Missile uses the same animation all the time.
       In the simplest case, you can just place here a single scene. }
@@ -1091,27 +1079,6 @@ begin
   FRandomWalkDistance := DefaultCreatureRandomWalkDistance;
 end;
 
-destructor TWalkAttackCreatureKind.Destroy;
-begin
-  FreeAndNil(FStandAnimation);
-  FreeAndNil(FStandToWalkAnimation);
-  FreeAndNil(FWalkAnimation);
-  FreeAndNil(FAttackAnimation);
-  FreeAndNil(FDyingAnimation);
-  FreeAndNil(FDyingBackAnimation);
-  FreeAndNil(FHurtAnimation);
-
-  FStandAnimationFile := '';
-  FStandToWalkAnimationFile := '';
-  FWalkAnimationFile := '';
-  FAttackAnimationFile := '';
-  FDyingAnimationFile := '';
-  FDyingBackAnimationFile := '';
-  FHurtAnimationFile := '';
-
-  inherited;
-end;
-
 procedure TWalkAttackCreatureKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
@@ -1136,27 +1103,15 @@ end;
 
 procedure TWalkAttackCreatureKind.Release;
 begin
-  FreeAndNil(FStandAnimation);
-  FreeAndNil(FStandToWalkAnimation);
-  FreeAndNil(FWalkAnimation);
-  FreeAndNil(FAttackAnimation);
-  FreeAndNil(FDyingAnimation);
-  FreeAndNil(FDyingBackAnimation);
-  FreeAndNil(FHurtAnimation);
+  FStandAnimation := nil;
+  FStandToWalkAnimation := nil;
+  FWalkAnimation := nil;
+  FAttackAnimation := nil;
+  FDyingAnimation := nil;
+  FDyingBackAnimation := nil;
+  FHurtAnimation := nil;
 
   inherited;
-end;
-
-procedure TWalkAttackCreatureKind.GLContextClose;
-begin
-  inherited;
-  if StandAnimation <> nil then StandAnimation.GLContextClose;
-  if StandToWalkAnimation <> nil then StandToWalkAnimation.GLContextClose;
-  if WalkAnimation <> nil then WalkAnimation.GLContextClose;
-  if AttackAnimation <> nil then AttackAnimation.GLContextClose;
-  if DyingAnimation <> nil then DyingAnimation.GLContextClose;
-  if DyingBackAnimation <> nil then DyingBackAnimation.GLContextClose;
-  if HurtAnimation <> nil then HurtAnimation.GLContextClose;
 end;
 
 procedure TWalkAttackCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
@@ -1232,19 +1187,6 @@ end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
 
-destructor TSpiderQueenKind.Destroy;
-begin
-  FreeAndNil(FThrowWebAttackAnimation);
-  FThrowWebAttackAnimationFile := '';
-  inherited;
-end;
-
-procedure TSpiderQueenKind.GLContextClose;
-begin
-  inherited;
-  if ThrowWebAttackAnimation <> nil then ThrowWebAttackAnimation.GLContextClose;
-end;
-
 procedure TSpiderQueenKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
@@ -1259,7 +1201,7 @@ end;
 
 procedure TSpiderQueenKind.Release;
 begin
-  FreeAndNil(FThrowWebAttackAnimation);
+  FThrowWebAttackAnimation := nil;
   inherited;
 end;
 
@@ -1322,19 +1264,6 @@ begin
   FHitsCreatures := DefaultHitsCreatures;
 end;
 
-destructor TMissileCreatureKind.Destroy;
-begin
-  FreeAndNil(FAnimation);
-  FAnimationFile := '';
-  inherited;
-end;
-
-procedure TMissileCreatureKind.Release;
-begin
-  FreeAndNil(FAnimation);
-  inherited;
-end;
-
 procedure TMissileCreatureKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
@@ -1348,10 +1277,10 @@ begin
   Result := (inherited PrepareSteps) + 2;
 end;
 
-procedure TMissileCreatureKind.GLContextClose;
+procedure TMissileCreatureKind.Release;
 begin
+  FAnimation := nil;
   inherited;
-  if Animation <> nil then Animation.GLContextClose;
 end;
 
 function TMissileCreatureKind.CreatureClass: TCreatureClass;
@@ -1389,19 +1318,6 @@ end;
 
 { TStillCreatureKind ---------------------------------------------------- }
 
-destructor TStillCreatureKind.Destroy;
-begin
-  FreeAndNil(FAnimation);
-  FAnimationFile := '';
-  inherited;
-end;
-
-procedure TStillCreatureKind.Release;
-begin
-  FreeAndNil(FAnimation);
-  inherited;
-end;
-
 procedure TStillCreatureKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
@@ -1415,10 +1331,10 @@ begin
   Result := (inherited PrepareSteps) + 2;
 end;
 
-procedure TStillCreatureKind.GLContextClose;
+procedure TStillCreatureKind.Release;
 begin
+  FAnimation := nil;
   inherited;
-  if Animation <> nil then Animation.GLContextClose;
 end;
 
 function TStillCreatureKind.CreatureClass: TCreatureClass;

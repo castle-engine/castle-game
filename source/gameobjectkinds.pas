@@ -26,7 +26,7 @@ unit GameObjectKinds;
 interface
 
 uses Classes, CastleXMLConfig, PrecalculatedAnimation,
-  GameVideoOptions, CastleScene, X3DNodes;
+  GameVideoOptions, CastleScene, X3DNodes, Base3D;
 
 type
   { This is a common class for item kind and creature kind. }
@@ -34,6 +34,7 @@ type
   private
     FShortName: string;
     FPrepared: boolean;
+    Resources: T3DListCore;
   protected
     { Prepare precalculated animation Anim from given AnimationFile,
       only if Anim = nil.
@@ -44,16 +45,10 @@ type
 
       It calls Progress.Step 2 times.
 
-      TODO: Animation is automatically added to our list of prepared 3D resources.
+      Animation is automatically added to our list of prepared 3D resources.
       So it will be automatically released in @link(Release),
       it's OpenGL resources will be released in @link(GLContextClose),
       it will be freed in destructor.
-      TODO: this requires to actually keep a list of animation names,
-      and just prepare/release them always by ourselves.
-      And call Release from desctructor.
-      The point of overridden Prepare/Release will be to only initialize
-      fields like StandAnimation to non-nil (from PreparedList['Stand'])
-      or to nil (at Release).
 
       @param(AnimationName is here only for debug purposes (it may be used
       by some debug messages etc.)) }
@@ -61,6 +56,11 @@ type
       const AnimationName: string;
       var Anim: TCastlePrecalculatedAnimation;
       const AnimationFile: string;
+      const BaseLights: TLightInstancesList);
+
+    procedure PrepareScene(
+      var Scene: TCastleScene;
+      const SceneFileName: string;
       const BaseLights: TLightInstancesList);
 
     { Read animation filename, reading from XML file KindsConfig.
@@ -79,6 +79,7 @@ type
       EmptyIfNoAttribute: boolean = false); virtual;
   public
     constructor Create(const AShortName: string);
+    destructor Destroy; override;
 
     { Prepare everything needed for using this resource.
       It must call Progress.Step PrepareSteps times. }
@@ -127,6 +128,14 @@ constructor TObjectKind.Create(const AShortName: string);
 begin
   inherited Create;
   FShortName := AShortName;
+  Resources := T3DListCore.Create(true, nil);
+end;
+
+destructor TObjectKind.Destroy;
+begin
+  Release;
+  FreeAndNil(Resources);
+  inherited;
 end;
 
 procedure TObjectKind.Prepare(const BaseLights: TLightInstancesList);
@@ -141,12 +150,20 @@ end;
 
 procedure TObjectKind.Release;
 begin
+  if Resources <> nil then
+  begin
+    { since Resources owns all it's items, this is enough to free them }
+    Resources.Clear;
+  end;
   FPrepared := false;
 end;
 
 procedure TObjectKind.GLContextClose;
+var
+  I: Integer;
 begin
-  { Nothing to do in this class. }
+  for I := 0 to Resources.Count - 1 do
+    Resources[I].GLContextClose;
 end;
 
 procedure TObjectKind.LoadFromFile(KindsConfig: TCastleConfig);
@@ -181,6 +198,7 @@ begin
   if (AnimationFile <> '') and (Anim = nil) then
   begin
     Anim := TCastlePrecalculatedAnimation.CreateCustomCache(nil, GLContextCache);
+    Resources.Add(Anim);
     Anim.LoadFromFile(AnimationFile, { AllowStdIn } false, { LoadTime } true,
       { rescale scenes_per_time }
       AnimationScenesPerTime / DefaultKAnimScenesPerTime);
@@ -200,6 +218,28 @@ begin
 
     AttributesSet(Anim.Attributes);
     Anim.PrepareResources([prRender, prBoundingBox] + prShadowVolume,
+      false, BaseLights);
+  end;
+  Progress.Step;
+end;
+
+procedure TObjectKind.PrepareScene(
+  var Scene: TCastleScene;
+  const SceneFileName: string;
+  const BaseLights: TLightInstancesList);
+begin
+  if (SceneFileName <> '') and (Scene = nil) then
+  begin
+    Scene := TCastleScene.CreateCustomCache(nil, GLContextCache);
+    Resources.Add(Scene);
+    Scene.Load(SceneFileName);
+  end;
+  Progress.Step;
+
+  if Scene <> nil then
+  begin
+    AttributesSet(Scene.Attributes);
+    Scene.PrepareResources([prRender, prBoundingBox] + prShadowVolume,
       false, BaseLights);
   end;
   Progress.Step;

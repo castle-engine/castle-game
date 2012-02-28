@@ -127,7 +127,6 @@ type
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
-    procedure GLContextClose; override;
   end;
 
   TItemKindList = class(specialize TFPGObjectList<TItemKind>)
@@ -158,8 +157,6 @@ type
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   public
-    destructor Destroy; override;
-
     { Sound to make on equipping. Each weapon can have it's own
       equipping sound. }
     property EquippingSound: TSoundType
@@ -178,7 +175,6 @@ type
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
-    procedure GLContextClose; override;
 
     { Time within AttackAnimation
       at which ActualAttack method will be called.
@@ -365,7 +361,6 @@ end;
 destructor TItemKind.Destroy;
 begin
   FreeAndNil(FImage);
-  FreeAndNil(FScene);
   inherited;
 end;
 
@@ -454,35 +449,17 @@ end;
 procedure TItemKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
-
-  if FScene = nil then
-  begin
-    FScene := TCastleScene.CreateCustomCache(nil, GLContextCache);
-    FScene.Load(ModelFileName);
-
-    AttributesSet(Scene.Attributes);
-    Scene.PrepareResources([prRender, prBoundingBox], false, BaseLights);
-    Scene.FreeResources([frTextureDataInNodes]);
-  end;
-
-  Progress.Step;
+  PrepareScene(FScene, ModelFileName, BaseLights);
 end;
 
 function TItemKind.PrepareSteps: Cardinal;
 begin
-  Result := (inherited PrepareSteps) + 1;
+  Result := (inherited PrepareSteps) + 2;
 end;
 
 procedure TItemKind.Release;
 begin
-  FreeAndNil(FScene);
-  inherited;
-end;
-
-procedure TItemKind.GLContextClose;
-begin
-  if FScene <> nil then
-    FScene.GLContextClose;
+  FScene := nil;
   inherited;
 end;
 
@@ -545,15 +522,6 @@ end;
 
 { TItemWeaponKind ------------------------------------------------------------ }
 
-destructor TItemWeaponKind.Destroy;
-begin
-  FreeAndNil(FAttackAnimation);
-  FAttackAnimationFile := '';
-  FreeAndNil(FReadyAnimation);
-  FReadyAnimationFile := '';
-  inherited;
-end;
-
 procedure TItemWeaponKind.Use(Item: TItem);
 begin
   Player.EquippedWeapon := Item;
@@ -575,16 +543,9 @@ end;
 
 procedure TItemWeaponKind.Release;
 begin
-  FreeAndNil(FAttackAnimation);
-  FreeAndNil(FReadyAnimation);
+  FAttackAnimation := nil;
+  FReadyAnimation := nil;
   inherited;
-end;
-
-procedure TItemWeaponKind.GLContextClose;
-begin
-  inherited;
-  if AttackAnimation <> nil then AttackAnimation.GLContextClose;
-  if ReadyAnimation <> nil then ReadyAnimation.GLContextClose;
 end;
 
 procedure TItemWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
