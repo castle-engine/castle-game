@@ -492,6 +492,7 @@ procedure TItemKind.GLContextClose;
 begin
   if FScene <> nil then
     FScene.GLContextClose;
+  inherited;
 end;
 
 procedure TItemKind.CreateAnimationIfNeeded(
