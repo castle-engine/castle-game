@@ -192,8 +192,6 @@ begin
 
   if Anim <> nil then
   begin
-    { Write info before Prepare, otherwise it could not
-      be available after freeing scene RootNodes in Anim.Prepare. }
     if Log then
       WritelnLog('Animation info',
         Format('%40s %3d scenes * %8d triangles',
