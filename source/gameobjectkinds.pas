@@ -62,21 +62,6 @@ type
       var Scene: TCastleScene;
       const SceneFileName: string;
       const BaseLights: TLightInstancesList);
-
-    { Read animation filename, reading from XML file KindsConfig.
-      The path of responsible XML attribute
-      depends on ShortName and given AnimationName.
-
-      If EmptyIfNoAttribute, then this will just set AnimationFile to ''
-      if appropriate XML attribute not found. Otherwise
-      (when EmptyIfNoAttribute = @false, this is default),
-      error will be raised.
-
-      @param(AnimationName determines the XML attribute name, so it must
-        be a valid part of XML name) }
-    procedure AnimationFromConfig(var AnimationFile: string;
-      KindsConfig: TCastleConfig; const AnimationName: string;
-      EmptyIfNoAttribute: boolean = false); virtual;
   public
     constructor Create(const AShortName: string);
     destructor Destroy; override;
@@ -243,26 +228,6 @@ begin
       false, BaseLights);
   end;
   Progress.Step;
-end;
-
-procedure TObjectKind.AnimationFromConfig(var AnimationFile: string;
-  KindsConfig: TCastleConfig; const AnimationName: string;
-  EmptyIfNoAttribute: boolean);
-var
-  FileName: string;
-begin
-  AnimationFile := '';
-
-  FileName := KindsConfig.GetValue(ShortName + '/' + AnimationName + '_animation', '');
-  if FileName = '' then
-  begin
-    if not EmptyIfNoAttribute then
-      raise Exception.CreateFmt('Missing "%s_animation" for object "%s"',
-        [AnimationName, ShortName]);
-  end else
-  begin
-    AnimationFile := CombinePaths(ExtractFilePath(KindsConfig.FileName), FileName);
-  end;
 end;
 
 end.

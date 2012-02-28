@@ -1155,13 +1155,13 @@ begin
   SoundAttackStart := SoundEngine.SoundFromName(
     KindsConfig.GetValue(ShortName + '/sound_attack_start', ''));
 
-  AnimationFromConfig(FStandAnimationFile, KindsConfig, 'stand');
-  AnimationFromConfig(FStandToWalkAnimationFile, KindsConfig, 'stand_to_walk');
-  AnimationFromConfig(FWalkAnimationFile, KindsConfig, 'walk');
-  AnimationFromConfig(FAttackAnimationFile, KindsConfig, 'attack');
-  AnimationFromConfig(FDyingAnimationFile, KindsConfig, 'dying');
-  AnimationFromConfig(FDyingBackAnimationFile, KindsConfig, 'dying_back', true);
-  AnimationFromConfig(FHurtAnimationFile, KindsConfig, 'hurt');
+  FStandAnimationFile := KindsConfig.GetFileName(ShortName + '/stand_animation');
+  FStandToWalkAnimationFile := KindsConfig.GetFileName(ShortName + '/stand_to_walk_animation');
+  FWalkAnimationFile := KindsConfig.GetFileName(ShortName + '/walk_animation');
+  FAttackAnimationFile := KindsConfig.GetFileName(ShortName + '/attack_animation');
+  FDyingAnimationFile := KindsConfig.GetFileName(ShortName + '/dying_animation');
+  FDyingBackAnimationFile := KindsConfig.GetFileName(ShortName + '/dying_back_animation', true);
+  FHurtAnimationFile := KindsConfig.GetFileName(ShortName + '/hurt_animation');
 end;
 
 { TAlienCreatureKind --------------------------------------------------- }
@@ -1223,7 +1223,7 @@ begin
   ActualThrowWebAttackTime :=
     KindsConfig.GetFloat(ShortName + '/throw_web/actual_attack_time', 0.0);
 
-  AnimationFromConfig(FThrowWebAttackAnimationFile, KindsConfig, 'throw_web_attack');
+  FThrowWebAttackAnimationFile := KindsConfig.GetFileName(ShortName + '/throw_web_attack_animation');
 end;
 
 { TGhostKind ------------------------------------------------------------- }
@@ -1313,7 +1313,7 @@ begin
   SoundIdle := SoundEngine.SoundFromName(
     KindsConfig.GetValue(ShortName + '/sound_idle', ''));
 
-  AnimationFromConfig(FAnimationFile, KindsConfig, 'fly');
+  FAnimationFile := KindsConfig.GetFileName(ShortName + '/fly_animation');
 end;
 
 { TStillCreatureKind ---------------------------------------------------- }
@@ -1346,7 +1346,7 @@ procedure TStillCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  AnimationFromConfig(FAnimationFile, KindsConfig, 'stand');
+  FAnimationFile := KindsConfig.GetFileName(ShortName + '/stand_animation');
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }

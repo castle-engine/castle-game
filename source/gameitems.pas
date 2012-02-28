@@ -60,11 +60,11 @@ type
     Note that after creating an instance of this item,
     before you do anything else, you have to initialize some of it's
     properties by calling LoadFromFile. In this class, this initializes
-    it's ModelFileName, Name amd ImageFileName --- in descendants, more
+    it's SceneFileName, Name amd ImageFileName --- in descendants, more
     required properties may be initialized here. }
   TItemKind = class(TObjectKind)
   private
-    FModelFileName: string;
+    FSceneFileName: string;
     FScene: TCastleScene;
     FName: string;
     FImageFileName: string;
@@ -82,7 +82,7 @@ type
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
 
-    property ModelFileName: string read FModelFileName;
+    property SceneFileName: string read FSceneFileName;
 
     { Nice name for user. }
     property Name: string read FName;
@@ -381,8 +381,8 @@ begin
 
   BasePath := ExtractFilePath(KindsConfig.FileName);
 
-  FModelFileName := GetStringCheckNonEmpty(KindsConfig, 'model_file_name');
-  FModelFileName := CombinePaths(BasePath, FModelFileName);
+  FSceneFileName := GetStringCheckNonEmpty(KindsConfig, 'model_file_name');
+  FSceneFileName := CombinePaths(BasePath, FSceneFileName);
 
   FName := GetStringCheckNonEmpty(KindsConfig, 'name');
 
@@ -449,7 +449,7 @@ end;
 procedure TItemKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   inherited;
-  PrepareScene(FScene, ModelFileName, BaseLights);
+  PrepareScene(FScene, SceneFileName, BaseLights);
 end;
 
 function TItemKind.PrepareSteps: Cardinal;
@@ -560,10 +560,8 @@ begin
   SoundAttackStart := SoundEngine.SoundFromName(
     KindsConfig.GetValue(ShortName + '/sound_attack_start', ''));
 
-  AnimationFromConfig(FReadyAnimationFile, KindsConfig, 'ready');
-  { TODO: TItemWeaponKind impl allows to have FAttackAnimationFile = ''
-    if you don't want attack animation, but line below doesn't allow it. }
-  AnimationFromConfig(FAttackAnimationFile, KindsConfig, 'attack');
+  FReadyAnimationFile:= KindsConfig.GetFileName(ShortName + '/ready_animation');
+  FAttackAnimationFile := KindsConfig.GetFileName(ShortName + '/attack_animation');
 end;
 
 { TItemShortRangeWeaponKind -------------------------------------------------- }
