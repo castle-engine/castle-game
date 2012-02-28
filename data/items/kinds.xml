@@ -24,16 +24,16 @@
 
 <CONFIG>
   <LifePotion
-    model_file_name="life_potion/model_processed.wrl"
+    scene="life_potion/model_processed.wrl"
     name="Potion of Life"
-    image_file_name="life_potion/image.png"
+    image="life_potion/image.png"
   />
 
   <Sword
     actual_attack_time="0.294"
-    model_file_name="sword/model.wrl"
+    scene="sword/model.wrl"
     name="Sword"
-    image_file_name="sword/image.png"
+    image="sword/image.png"
 
     equipping_sound="sword_equipping"
     sound_attack_start="sword_attack_start"
@@ -47,9 +47,9 @@
 
   <Bow
     actual_attack_time="0.0"
-    model_file_name="bow/model_final.wrl"
+    scene="bow/model_final.wrl"
     name="Bow"
-    image_file_name="bow/image.png"
+    image="bow/image.png"
 
     equipping_sound="bow_equipping"
     sound_attack_start="bow_attack_start"
@@ -60,26 +60,26 @@
   </Bow>
 
   <ScrFlying
-    model_file_name="scroll/model_final.wrl"
+    scene="scroll/model_final.wrl"
     name="Scroll Of Flying"
-    image_file_name="scroll/image.png"
+    image="scroll/image.png"
   />
 
   <Key
-    model_file_name="key/model.wrl"
+    scene="key/model.wrl"
     name="Key"
-    image_file_name="key/image.png"
+    image="key/image.png"
   />
 
   <RedKey
-    model_file_name="red_key/model.wrl"
+    scene="red_key/model.wrl"
     name="Red Key"
-    image_file_name="red_key/image.png"
+    image="red_key/image.png"
   />
 
   <Arrow
-    model_file_name="quiver/model.wrl"
+    scene="quiver/model.wrl"
     name="Arrow"
-    image_file_name="quiver/image.png"
+    image="quiver/image.png"
   />
 </CONFIG>

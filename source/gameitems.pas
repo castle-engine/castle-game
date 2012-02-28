@@ -72,9 +72,6 @@ type
     FGLList_DrawImage: TGLuint;
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
-  protected
-    function GetStringCheckNonEmpty(KindsConfig: TCastleConfig;
-      const AttrName: string): string;
   public
     { The constructor. }
     constructor Create(const AShortName: string);
@@ -364,30 +361,16 @@ begin
   inherited;
 end;
 
-function TItemKind.GetStringCheckNonEmpty(
-  KindsConfig: TCastleConfig; const AttrName: string): string;
-begin
-  Result := KindsConfig.GetValue(ShortName + '/' + AttrName, '');
-  if Result = '' then
-    raise Exception.CreateFmt('Empty "%s" attribute for item "%s"',
-      [AttrName, ShortName]);
-end;
-
 procedure TItemKind.LoadFromFile(KindsConfig: TCastleConfig);
-var
-  BasePath: string;
 begin
   inherited;
 
-  BasePath := ExtractFilePath(KindsConfig.FileName);
+  FSceneFileName := KindsConfig.GetFileName(ShortName + '/scene');
+  FImageFileName := KindsConfig.GetFileName(ShortName + '/image');
 
-  FSceneFileName := GetStringCheckNonEmpty(KindsConfig, 'model_file_name');
-  FSceneFileName := CombinePaths(BasePath, FSceneFileName);
-
-  FName := GetStringCheckNonEmpty(KindsConfig, 'name');
-
-  FImageFileName := GetStringCheckNonEmpty(KindsConfig, 'image_file_name');
-  FImageFileName := CombinePaths(BasePath, FImageFileName);
+  FName := KindsConfig.GetValue(ShortName + '/name', '');
+  if FName = '' then
+    raise Exception.CreateFmt('Empty name attribute for item "%s"', [ShortName]);
 end;
 
 function TItemKind.Scene: TCastleScene;
