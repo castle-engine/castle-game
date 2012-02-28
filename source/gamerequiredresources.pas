@@ -71,6 +71,7 @@ var
   Kind: TCreatureKind;
   PrepareSteps: Cardinal;
   TimeBegin: TProcessTimerResult;
+  PrepareNeeded: boolean;
 begin
   { We iterate two times over Names, first time only to calculate
     PrepareSteps, 2nd time does actual work.
@@ -78,6 +79,7 @@ begin
     out, if not needed). }
 
   PrepareSteps := 0;
+  PrepareNeeded := false;
   for I := 0 to CreaturesKinds.Count - 1 do
   begin
     Kind := CreaturesKinds[I];
@@ -88,11 +90,12 @@ begin
       begin
         Assert(not Kind.Prepared);
         PrepareSteps += Kind.PrepareSteps;
+        PrepareNeeded := true;
       end;
     end;
   end;
 
-  if PrepareSteps <> 0 then
+  if PrepareNeeded then
   begin
     if Log then
       TimeBegin := ProcessTimerNow;

@@ -75,12 +75,7 @@ type
     procedure Prepare(const BaseLights: TLightInstancesList); virtual;
 
     { How many times Progress.Step will be called during Prepare
-      of this object.
-
-      In this class this returns 1 and Prepare will actually do one
-      dummy Progress.Step call. That's because this must be > 0,
-      some code depends on it, and will optimize out (i.e. not call)
-      Prepare if sum of some PrepareSteps will be 0. }
+      of this object. In this class this returns 0. }
     function PrepareSteps: Cardinal; virtual;
 
     { Are we in prepared state, that is after @link(Prepare) call and before @link(Release). }
@@ -127,14 +122,11 @@ end;
 procedure TObjectKind.Prepare(const BaseLights: TLightInstancesList);
 begin
   FPrepared := true;
-
-  { call this to satisfy Progress.Step = 1 in this class. }
-  Progress.Step;
 end;
 
 function TObjectKind.PrepareSteps: Cardinal;
 begin
-  Result := 1;
+  Result := 0;
 end;
 
 procedure TObjectKind.Release;
