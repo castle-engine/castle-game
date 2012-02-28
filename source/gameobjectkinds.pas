@@ -161,13 +161,12 @@ begin
   Progress.Init(PrepareSteps, 'Loading object ' + ShortName);
   try
     { It's important to do Release after Progress.Init.
-      Why ? Because Progress.Init does TCastleWindowBase.SaveScreeToDisplayList,
+      That is because Progress.Init does TCastleWindowBase.SaveScreenToDisplayList,
       and this may call Window.OnDraw, and this may want to redraw
       the object (e.g. if creature of given kind already exists
       on the screen) and this requires Prepare to be already done.
 
-      So we should call Progress.Init before we invalidate Prepare
-      work. }
+      So we should call Progress.Init before we make outselves unprepared. }
     Release;
 
     Prepare(BaseLights);
