@@ -36,32 +36,36 @@ type
     FPrepared: boolean;
     Resources: T3DListCore;
   protected
-    { Prepare precalculated animation Anim from given AnimationFile,
-      only if Anim = nil.
-      It then sets attributes for the animation and prepares
-      the animation by TCastlePrecalculatedAnimation.PrepareResources.
+    { Prepare 3D resource loading it from given filename.
+      Loads the resource only if filename is not empty,
+      and only if it's not already loaded (that is, when Anim = nil).
+      Sets rendering attributes and prepares for fast rendering
+      and other processing by T3D.PrepareResources.
 
       Call only in Prepare overrides.
 
       It calls Progress.Step 2 times.
 
-      Animation is automatically added to our list of prepared 3D resources.
-      So it will be automatically released in @link(Release),
-      it's OpenGL resources will be released in @link(GLContextClose),
-      it will be freed in destructor.
+      Animation or Scene is automatically added to our list of prepared
+      3D resources.
+      So it's OpenGL resources will be automatically released in
+      @link(GLContextClose), it will be fully released
+      in @link(Release) and destructor.
 
       @param(AnimationName is here only for debug purposes (it may be used
-      by some debug messages etc.)) }
+      by some debug messages etc.))
+
+      @groupBegin }
     procedure PreparePrecalculatedAnimation(
       const AnimationName: string;
       var Anim: TCastlePrecalculatedAnimation;
       const AnimationFile: string;
       const BaseLights: TLightInstancesList);
-
     procedure PrepareScene(
       var Scene: TCastleScene;
       const SceneFileName: string;
       const BaseLights: TLightInstancesList);
+    { @groupEnd }
   public
     constructor Create(const AShortName: string);
     destructor Destroy; override;
