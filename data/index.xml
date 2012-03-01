@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 
+<CONFIG>
 <!--
-  This file configures many aspects of creatures' kinds.
+  ==============================================================================
+
+  Creatures kinds.
   For the documentation and default values of properties that you can
   set here see TObjectKind, TCreatureKind and descendants
   classes documentation (in units GameObjectKinds and GameCreatures).
@@ -15,7 +18,6 @@
   sound name always means "no sound for this event".
 -->
 
-<CONFIG>
   <Alien
     actual_attack_time="0.4"
     min_delay_between_attacks="2.0"
@@ -31,13 +33,13 @@
     sound_sudden_pain="alien_sudden_pain"
     sound_dying="alien_dying"
 
-    stand_animation="alien/alien_still_final.wrl"
-    stand_to_walk_animation="alien/stand_to_walk.kanim"
-    walk_animation="alien/walk.kanim"
-    attack_animation="alien/attack.kanim"
-    dying_animation="alien/dying.kanim"
-    dying_back_animation="alien/dying_back.kanim"
-    hurt_animation="alien/hurt.kanim"
+    stand_animation="creatures/alien/alien_still_final.wrl"
+    stand_to_walk_animation="creatures/alien/stand_to_walk.kanim"
+    walk_animation="creatures/alien/walk.kanim"
+    attack_animation="creatures/alien/attack.kanim"
+    dying_animation="creatures/alien/dying.kanim"
+    dying_back_animation="creatures/alien/dying_back.kanim"
+    hurt_animation="creatures/alien/hurt.kanim"
   />
 
   <!-- max_angle_to_attack in Werewolf comments:
@@ -67,12 +69,12 @@
     sound_attack_start="werewolf_attack_start"
     sound_dying="werewolf_dying"
 
-    stand_animation="werewolf/werewolf_still_final.wrl"
-    stand_to_walk_animation="werewolf/werewolf_still_final.wrl"
-    walk_animation="werewolf/walk.kanim"
-    attack_animation="werewolf/attack.kanim"
-    dying_animation="werewolf/dying.kanim"
-    hurt_animation="werewolf/hurt.kanim"
+    stand_animation="creatures/werewolf/werewolf_still_final.wrl"
+    stand_to_walk_animation="creatures/werewolf/werewolf_still_final.wrl"
+    walk_animation="creatures/werewolf/walk.kanim"
+    attack_animation="creatures/werewolf/attack.kanim"
+    dying_animation="creatures/werewolf/dying.kanim"
+    hurt_animation="creatures/werewolf/hurt.kanim"
   >
     <short_range_attack knockback_distance="6.0">
       <damage const="5" random="5"/>
@@ -92,7 +94,7 @@
     sound_explosion="ball_missile_explode"
     sound_idle="ball_missile_idle"
 
-    fly_animation="ball_missile/fly.kanim"
+    fly_animation="creatures/ball_missile/fly.kanim"
   >
     <short_range_attack knockback_distance="5">
       <damage const="10" random="10"/>
@@ -119,12 +121,12 @@
     sound_attack_start="ghost_attack_start"
     sound_dying="ghost_dying"
 
-    stand_animation="ghost/stand.kanim"
-    stand_to_walk_animation="ghost/stand_to_walk.kanim"
-    walk_animation="ghost/walk.kanim"
-    attack_animation="ghost/attack.kanim"
-    dying_animation="ghost/dying.kanim"
-    hurt_animation="ghost/hurt.kanim"
+    stand_animation="creatures/ghost/stand.kanim"
+    stand_to_walk_animation="creatures/ghost/stand_to_walk.kanim"
+    walk_animation="creatures/ghost/walk.kanim"
+    attack_animation="creatures/ghost/attack.kanim"
+    dying_animation="creatures/ghost/dying.kanim"
+    hurt_animation="creatures/ghost/hurt.kanim"
   >
     <short_range_attack knockback_distance="0.0">
       <damage const="7" random="8"/>
@@ -154,12 +156,12 @@
     sound_attack_start="spider_attack_start"
     sound_dying="spider_dying"
 
-    stand_animation="spider/spider_stand.wrl"
-    stand_to_walk_animation="spider/spider_stand.wrl"
-    walk_animation="spider/walk.kanim"
-    attack_animation="spider/attack.kanim"
-    dying_animation="spider/dying.kanim"
-    hurt_animation="spider/hurt.kanim"
+    stand_animation="creatures/spider/spider_stand.wrl"
+    stand_to_walk_animation="creatures/spider/spider_stand.wrl"
+    walk_animation="creatures/spider/walk.kanim"
+    attack_animation="creatures/spider/attack.kanim"
+    dying_animation="creatures/spider/dying.kanim"
+    hurt_animation="creatures/spider/hurt.kanim"
   >
     <short_range_attack knockback_distance="0.1">
       <damage const="10" random="10"/>
@@ -196,13 +198,13 @@
     sound_attack_start="spider_queen_attack_start"
     sound_dying="spider_queen_dying"
 
-    stand_animation="spider_queen/spider_queen_stand.wrl"
-    stand_to_walk_animation="spider_queen/spider_queen_stand.wrl"
-    walk_animation="spider_queen/walk.kanim"
-    attack_animation="spider_queen/attack.kanim"
-    dying_animation="spider_queen/dying.kanim"
-    hurt_animation="spider_queen/hurt.kanim"
-    throw_web_attack_animation="spider_queen/throw_web_attack.kanim"
+    stand_animation="creatures/spider_queen/spider_queen_stand.wrl"
+    stand_to_walk_animation="creatures/spider_queen/spider_queen_stand.wrl"
+    walk_animation="creatures/spider_queen/walk.kanim"
+    attack_animation="creatures/spider_queen/attack.kanim"
+    dying_animation="creatures/spider_queen/dying.kanim"
+    hurt_animation="creatures/spider_queen/hurt.kanim"
+    throw_web_attack_animation="creatures/spider_queen/throw_web_attack.kanim"
   >
     <short_range_attack knockback_distance="5">
       <damage const="10" random="10"/>
@@ -230,7 +232,7 @@
 
     casts_shadow="False"
 
-    fly_animation="web/web.wrl"
+    fly_animation="creatures/web/web.wrl"
   >
     <short_range_attack knockback_distance="5">
       <damage const="10" random="10"/>
@@ -252,7 +254,7 @@
 
     sound_explosion="arrow_hit"
 
-    fly_animation="arrow/arrow.wrl"
+    fly_animation="creatures/arrow/arrow.wrl"
   >
     <short_range_attack knockback_distance="1">
       <damage const="20" random="20"/>
@@ -264,6 +266,90 @@
     default_max_life="1.0"
     knock_back_speed="35"
 
-    stand_animation="barrel/barrel.wrl"
+    stand_animation="creatures/barrel/barrel.wrl"
+  />
+
+<!--
+  ==============================================================================
+
+  Pickable items kinds.
+  For the documentation and default values of properties that you can
+  set here see TItemKind and descendants classes documentation
+  (in unit CastleItems).
+
+  This file is read each time when the program starts.
+  When you manually change this file, you can also force reloading this file
+  into the game by command "Reload index.xml file"
+  in "Debug options" menu. This way you can test various settings
+  without restarting the game. (But note that some item settings don't
+  immediately change if you reload this file while the game runs.)
+
+  For available sound names see sounds/index.xml. Empty (or not specified)
+  sound name always means "no sound for this event".
+
+  Paths should be relative to the location of this file
+  (i.e. data/items/ subdir inside "The Castle" data).
+  As path delimiter use slashes ("/"), the engine will make sure they
+  are handled OK on all platforms.
+-->
+
+  <LifePotion
+    scene="items/life_potion/model_processed.wrl"
+    name="Potion of Life"
+    image="items/life_potion/image.png"
+  />
+
+  <Sword
+    actual_attack_time="0.294"
+    scene="items/sword/model.wrl"
+    name="Sword"
+    image="items/sword/image.png"
+
+    equipping_sound="sword_equipping"
+    sound_attack_start="sword_attack_start"
+    attack_knockback_distance="1.0"
+
+    attack_animation="items/sword/attack.kanim"
+    ready_animation="items/sword/ready.wrl"
+  >
+    <damage const="20.0" random="20.0" />
+  </Sword>
+
+  <Bow
+    actual_attack_time="0.0"
+    scene="items/bow/model_final.wrl"
+    name="Bow"
+    image="items/bow/image.png"
+
+    equipping_sound="bow_equipping"
+    sound_attack_start="bow_attack_start"
+
+    attack_animation="items/bow/attack.kanim"
+    ready_animation="items/bow/ready.wrl"
+  >
+  </Bow>
+
+  <ScrFlying
+    scene="items/scroll/model_final.wrl"
+    name="Scroll Of Flying"
+    image="items/scroll/image.png"
+  />
+
+  <Key
+    scene="items/key/model.wrl"
+    name="Key"
+    image="items/key/image.png"
+  />
+
+  <RedKey
+    scene="items/red_key/model.wrl"
+    name="Red Key"
+    image="items/red_key/image.png"
+  />
+
+  <Quiver
+    scene="items/quiver/model.wrl"
+    name="Arrow"
+    image="items/quiver/image.png"
   />
 </CONFIG>
