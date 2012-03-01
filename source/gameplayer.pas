@@ -26,7 +26,7 @@ unit GamePlayer;
 interface
 
 uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
-  SceneWaypoints, GameInputs, ALSoundAllocator, GameSound,
+  SceneWaypoints, GameInputs, ALSoundAllocator, GameSound, GameObjectKinds,
   Triangle, GameTextures, XmlSoundEngine, Classes, Base3D,
   CastleGLUtils, CastleColors;
 
@@ -135,7 +135,7 @@ type
     FInventoryCurrentItem: Integer;
     FSickProjectionSpeed: Single;
 
-    FRequiredCreatures: TStringList;
+    FRequiredResources: T3DResourceList;
 
     function GetFlyingMode: boolean;
     procedure SetEquippedWeapon(Value: TItem);
@@ -356,7 +356,7 @@ type
       so this should contain Arrow creature.
 
       It's loaded from player.xml }
-    property RequiredCreatures: TStringList read FRequiredCreatures;
+    property RequiredResources: T3DResourceList read FRequiredResources;
 
     property Pushable default true;
     procedure Translate(const T: TVector3Single); override;
@@ -441,7 +441,7 @@ begin
 
   OnInputChanged.Add(@InputChanged);
 
-  FRequiredCreatures := TStringList.Create;
+  FRequiredResources := T3DResourceList.Create(false);
 
   LoadFromFile;
 
@@ -449,7 +449,7 @@ begin
     player creatures should be required/released at each level start probably. }
   BaseLights := TLightInstancesList.Create;
   try
-    RequireCreatures(BaseLights, RequiredCreatures);
+    RequireCreatures(BaseLights, RequiredResources);
   finally FreeAndNil(BaseLights) end;
 
   { Although it will be called in every OnIdle anyway,
@@ -481,10 +481,10 @@ begin
   if AllocatedSwimmingSource <> nil then
     AllocatedSwimmingSource.DoUsingEnd;
 
-  if RequiredCreatures <> nil then
+  if RequiredResources <> nil then
   begin
-    UnRequireCreatures(RequiredCreatures);
-    FreeAndNil(FRequiredCreatures);
+    UnRequireCreatures(RequiredResources);
+    FreeAndNil(FRequiredResources);
   end;
 
   inherited;
@@ -1345,7 +1345,7 @@ begin
     SickProjectionSpeed := PlayerConfig.GetFloat('player/sick_projection_speed',
       10.0);
 
-    LoadRequiredResources(PlayerConfig.PathElement('player'), FRequiredCreatures);
+    LoadRequiredResources(PlayerConfig.PathElement('player'), FRequiredResources);
   finally SysUtils.FreeAndNil(PlayerConfig); end;
 end;
 

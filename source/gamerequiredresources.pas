@@ -25,7 +25,7 @@ unit GameRequiredResources;
 
 interface
 
-uses Classes, DOM, GameCreatures, X3DNodes;
+uses Classes, DOM, GameCreatures, X3DNodes, GameObjectKinds;
 
 { These increment/decrement RequiredCount for creatures on given list.
 
@@ -39,12 +39,12 @@ uses Classes, DOM, GameCreatures, X3DNodes;
   have to load each time.
 
   @groupBegin }
-procedure RequireCreatures(const BaseLights: TLightInstancesList; Names: TStringList);
-procedure UnRequireCreatures(Names: TStringList);
+procedure RequireCreatures(const BaseLights: TLightInstancesList; Names: T3DResourceList);
+procedure UnRequireCreatures(Names: T3DResourceList);
 { @groupEnd }
 
-procedure RequireCreature(const BaseLights: TLightInstancesList; Kind: TCreatureKind);
-procedure UnRequireCreature(Kind: TCreatureKind);
+procedure RequireCreature(const BaseLights: TLightInstancesList; Kind: T3DResource);
+procedure UnRequireCreature(Kind: T3DResource);
 
 { Loads a <resources_required> XML element (required child of given
   ParentElement) into a RequiredCreatures list.
@@ -53,7 +53,7 @@ procedure UnRequireCreature(Kind: TCreatureKind);
   will be wiped by this procedure at the beginning. }
 procedure LoadRequiredResources(
   ParentElement: TDOMElement;
-  RequiredCreatures: TStringList);
+  RequiredCreatures: T3DResourceList);
 
 var
   DebugNoCreatures: boolean = false;
@@ -61,11 +61,11 @@ var
 implementation
 
 uses SysUtils, CastleLog, ProgressUnit, CastleTimeUtils, GameConfig,
-  CastleXMLUtils, GameObjectKinds;
+  CastleXMLUtils;
 
 { [Un]RequireCreatures ------------------------------------------------------- }
 
-procedure RequireCreatures(const BaseLights: TLightInstancesList; Names: TStringList);
+procedure RequireCreatures(const BaseLights: TLightInstancesList; Names: T3DResourceList);
 var
   I: Integer;
   Kind: T3DResource;
@@ -80,18 +80,15 @@ begin
 
   PrepareSteps := 0;
   PrepareNeeded := false;
-  for I := 0 to CreaturesKinds.Count - 1 do
+  for I := 0 to Names.Count - 1 do
   begin
-    Kind := CreaturesKinds[I];
-    if Names.IndexOf(Kind.Id) <> -1 then
+    Kind := Names[I];
+    Kind.RequiredCount := Kind.RequiredCount + 1;
+    if Kind.RequiredCount = 1 then
     begin
-      Kind.RequiredCount := Kind.RequiredCount + 1;
-      if Kind.RequiredCount = 1 then
-      begin
-        Assert(not Kind.Prepared);
-        PrepareSteps += Kind.PrepareSteps;
-        PrepareNeeded := true;
-      end;
+      Assert(not Kind.Prepared);
+      PrepareSteps += Kind.PrepareSteps;
+      PrepareNeeded := true;
     end;
   end;
 
@@ -102,11 +99,10 @@ begin
 
     Progress.Init(PrepareSteps, 'Loading creatures');
     try
-      for I := 0 to CreaturesKinds.Count - 1 do
+      for I := 0 to Names.Count - 1 do
       begin
-        Kind := CreaturesKinds[I];
-        if (Names.IndexOf(Kind.Id) <> -1) and
-           (Kind.RequiredCount = 1) then
+        Kind := Names[I];
+        if Kind.RequiredCount = 1 then
         begin
           if Log then
             WritelnLog('Resources', Format(
@@ -122,62 +118,58 @@ begin
   end;
 end;
 
-procedure UnRequireCreatures(Names: TStringList);
+procedure UnRequireCreatures(Names: T3DResourceList);
 var
   I: Integer;
   Kind: T3DResource;
 begin
-  for I := 0 to CreaturesKinds.Count - 1 do
+  for I := 0 to Names.Count - 1 do
   begin
-    Kind := CreaturesKinds[I];
+    Kind := Names[I];
+    Assert(Kind.RequiredCount > 0);
 
-    if Names.IndexOf(Kind.Id) <> -1 then
+    Kind.RequiredCount := Kind.RequiredCount - 1;
+    if Kind.RequiredCount = 0 then
     begin
-      Assert(Kind.RequiredCount > 0);
+      if Log then
+        WritelnLog('Resources', Format(
+          'Creature "%s" is no longer required, freeing', [Kind.Id]));
 
-      Kind.RequiredCount := Kind.RequiredCount - 1;
-      if Kind.RequiredCount = 0 then
-      begin
-        if Log then
-          WritelnLog('Resources', Format(
-            'Creature "%s" is no longer required, freeing', [Kind.Id]));
+      { If everything went OK, I could place here an assertion
 
-        { If everything went OK, I could place here an assertion
+          Assert(Kind.Prepared);
 
-            Assert(Kind.Prepared);
+        However, if creature loading inside RequireCreatures will fail,
+        then TLevel destructor is forced to call UnRequireCreatures
+        on creatures that, although had RequiredCount
+        increased, didn't have actually Prepare call.
+        Still, a correct run of the program (when creature loading goes 100% OK)
+        should always have Kind.RequiredCount > 0 here. }
 
-          However, if creature loading inside RequireCreatures will fail,
-          then TLevel destructor is forced to call UnRequireCreatures
-          on creatures that, although had RequiredCount
-          increased, didn't have actually Prepare call.
-          Still, a correct run of the program (when creature loading goes 100% OK)
-          should always have Kind.RequiredCount > 0 here. }
-
-        if Kind.Prepared then
-          Kind.Release;
-      end;
+      if Kind.Prepared then
+        Kind.Release;
     end;
   end;
 end;
 
-procedure RequireCreature(const BaseLights: TLightInstancesList; Kind: TCreatureKind);
+procedure RequireCreature(const BaseLights: TLightInstancesList; Kind: T3DResource);
 var
-  Names: TStringList;
+  Names: T3DResourceList;
 begin
-  Names := TStringList.Create;
+  Names := T3DResourceList.Create(false);
   try
-    Names.Append(Kind.Id);
+    Names.Add(Kind);
     RequireCreatures(BaseLights, Names);
   finally FreeAndNil(Names) end;
 end;
 
-procedure UnRequireCreature(Kind: TCreatureKind);
+procedure UnRequireCreature(Kind: T3DResource);
 var
-  Names: TStringList;
+  Names: T3DResourceList;
 begin
-  Names := TStringList.Create;
+  Names := T3DResourceList.Create(false);
   try
-    Names.Append(Kind.Id);
+    Names.Add(Kind);
     UnRequireCreatures(Names);
   finally FreeAndNil(Names) end;
 end;
@@ -186,9 +178,9 @@ end;
 
 procedure LoadRequiredResources(
   ParentElement: TDOMElement;
-  RequiredCreatures: TStringList);
+  RequiredCreatures: T3DResourceList);
 var
-  RequiredResources, Resource: TDOMElement;
+  RequiredResources, ResourceElement: TDOMElement;
   Children: TDOMNodeList;
   ResourceName: string;
   I: Integer;
@@ -206,14 +198,14 @@ begin
       Node := Children.Item[I];
       if Node.NodeType = ELEMENT_NODE then
       begin
-        Resource := Node as TDOMElement;
-        if Resource.TagName <> 'creature' then
+        ResourceElement := Node as TDOMElement;
+        if ResourceElement.TagName <> 'resource' then
           raise Exception.CreateFmt(
             'Element "%s" is not allowed in <required_resources>',
-            [Resource.TagName]);
-        if not DOMGetAttribute(Resource, 'name', ResourceName) then
-          raise Exception.Create('<creature> must have a "name" attribute');
-        RequiredCreatures.Append(ResourceName);
+            [ResourceElement.TagName]);
+        if not DOMGetAttribute(ResourceElement, 'name', ResourceName) then
+          raise Exception.Create('<resource> must have a "name" attribute');
+        RequiredCreatures.Add(AllResources.FindId(ResourceName));
       end;
     end;
   finally FreeChildNodes(Children) end;

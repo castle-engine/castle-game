@@ -48,8 +48,8 @@
     footsteps_sound="player_footsteps_grass"
   >
     <required_resources>
-      <creature name="Ghost" />
-      <creature name="Spider" />
+      <resource name="Ghost" />
+      <resource name="Spider" />
     </required_resources>
   </level>
 
@@ -78,9 +78,9 @@
     </area>
 
     <required_resources>
-      <creature name="Alien" />
-      <creature name="Werewolf" />
-      <creature name="BallMissile" />
+      <resource name="Alien" />
+      <resource name="Werewolf" />
+      <resource name="BallMissile" />
     </required_resources>
 
   </level>
@@ -101,9 +101,9 @@
     </area>
 
     <required_resources>
-      <creature name="Spider" />
-      <creature name="SpiderQueen" />
-      <creature name="ThrownWeb" />
+      <resource name="Spider" />
+      <resource name="SpiderQueen" />
+      <resource name="ThrownWeb" />
     </required_resources>
 
   </level>
@@ -127,8 +127,8 @@
     </area>
 
     <required_resources>
-      <creature name="Alien" />
-      <creature name="BallMissile" />
+      <resource name="Alien" />
+      <resource name="BallMissile" />
     </required_resources>
 
   </level>
@@ -155,11 +155,11 @@
     </area>
 
     <required_resources>
-      <creature name="Alien" />
-      <creature name="Werewolf" />
-      <creature name="BallMissile" />
-      <creature name="Ghost" />
-      <creature name="DoomBarrel" />
+      <resource name="Alien" />
+      <resource name="Werewolf" />
+      <resource name="BallMissile" />
+      <resource name="Ghost" />
+      <resource name="DoomBarrel" />
     </required_resources>
 
   </level>
@@ -211,8 +211,8 @@
   >
 
     <required_resources>
-      <creature name="Alien" />
-      <creature name="BallMissile" />
+      <resource name="Alien" />
+      <resource name="BallMissile" />
     </required_resources>
   </level>
 
@@ -234,8 +234,8 @@
   >
 
     <required_resources>
-      <creature name="Alien" />
-      <creature name="BallMissile" />
+      <resource name="Alien" />
+      <resource name="BallMissile" />
     </required_resources>
   </level>
 

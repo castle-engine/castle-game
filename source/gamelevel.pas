@@ -28,7 +28,7 @@ interface
 uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
   X3DNodes, X3DFields, GameItems, Cameras,
   GameCreatures, SceneWaypoints, GameSound,
-  CastleUtils, CastleClassUtils, GamePlayer, GameThunder,
+  CastleUtils, CastleClassUtils, GamePlayer, GameThunder, GameObjectKinds,
   ProgressUnit, PrecalculatedAnimation,
   DOM, XmlSoundEngine, Base3D, Shape,
   Classes, CastleTimeUtils, CastleSceneManager, GLRendererShader;
@@ -150,7 +150,7 @@ type
     FMenuBackground: boolean;
     FSceneDynamicShadows: boolean;
 
-    FRequiredCreatures: TStringList;
+    FRequiredResources: T3DResourceList;
   protected
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
@@ -210,7 +210,7 @@ type
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
-      ARequiredCreatures: TStringList;
+      ARequiredResources: T3DResourceList;
       AMenuBackground: boolean); reintroduce; virtual;
 
     destructor Destroy; override;
@@ -350,7 +350,7 @@ type
 
 implementation
 
-uses SysUtils, GL, GameObjectKinds,
+uses SysUtils, GL,
   GamePlay, CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   GameVideoOptions, GameConfig, GameNotifications,
   GameInputs, GameWindow, CastleXMLUtils,
@@ -420,7 +420,7 @@ constructor TLevel.Create(
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
-  ARequiredCreatures: TStringList;
+  ARequiredResources: T3DResourceList;
   AMenuBackground: boolean);
 
   procedure RemoveItemsToRemove;
@@ -519,11 +519,11 @@ begin
   FTitleHint := ATitleHint;
   FNumber := ANumber;
   FMenuBackground := AMenuBackground;
-  FRequiredCreatures := TStringList.Create;
-  FRequiredCreatures.Assign(ARequiredCreatures);
+  FRequiredResources := T3DResourceList.Create(false);
+  FRequiredResources.Assign(ARequiredResources);
 
   if not DebugNoCreatures then
-    RequireCreatures(BaseLights, FRequiredCreatures);
+    RequireCreatures(BaseLights, FRequiredResources);
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -645,9 +645,9 @@ begin
   FreeAndNil(FSectors);
   FreeAndNil(FWaypoints);
   FreeAndNil(FCreatures);
-  if (FRequiredCreatures <> nil) and not DebugNoCreatures then
-    UnRequireCreatures(FRequiredCreatures);
-  FreeAndNil(FRequiredCreatures);
+  if (FRequiredResources <> nil) and not DebugNoCreatures then
+    UnRequireCreatures(FRequiredResources);
+  FreeAndNil(FRequiredResources);
   inherited;
 end;
 

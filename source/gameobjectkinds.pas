@@ -152,6 +152,9 @@ type
     procedure Release;
   end;
 
+var
+  AllResources: T3DResourceList;
+
 implementation
 
 uses SysUtils, ProgressUnit, DOM, GameWindow,
@@ -162,12 +165,22 @@ begin
   inherited Create;
   FId := AId;
   Resources := T3DListCore.Create(true, nil);
+
+  { if for some weird reason (when using RTTI), this constructor happens
+    before unit finalization --- then make sure to create AllResources first. }
+  if AllResources = nil then
+    AllResources := T3DResourceList.Create(false);
+  AllResources.Add(Self);
 end;
 
 destructor T3DResource.Destroy;
 begin
   Release;
   FreeAndNil(Resources);
+
+  if AllResources <> nil then
+    AllResources.Remove(Self);
+
   inherited;
 end;
 
@@ -331,4 +344,8 @@ begin
   raise Exception.CreateFmt('Not existing resource name "%s"', [AId]);
 end;
 
+initialization
+  AllResources := T3DResourceList.Create(false);
+finalization
+  FreeAndNil(AllResources);
 end.

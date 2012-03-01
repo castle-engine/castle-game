@@ -28,7 +28,7 @@ unit GameLevelAvailable;
 interface
 
 uses GameLevel, CastleUtils, Classes,
-  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, CastleProgress,
+  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, CastleProgress, GameObjectKinds,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type
@@ -62,7 +62,7 @@ type
 
     LevelDOMElement: TDOMElement;
 
-    RequiredCreatures: TStringList;
+    RequiredResources: T3DResourceList;
 
     Demo: boolean;
 
@@ -118,12 +118,12 @@ uses SysUtils, GameConfig, CastleXMLUtils, CastleFilesUtils,
 constructor TLevelAvailable.Create;
 begin
   inherited;
-  RequiredCreatures := TStringList.Create;
+  RequiredResources := T3DResourceList.Create(false);
 end;
 
 destructor TLevelAvailable.Destroy;
 begin
-  FreeAndNil(RequiredCreatures);
+  FreeAndNil(RequiredResources);
 
   { Thanks to WindowClose implementation, we can be sure that gl context
     is active now, so it's not a problem to call glFreeDisplayList now. }
@@ -223,7 +223,7 @@ begin
     LoadingBarYPosition) then
     LoadingBarYPosition := DefaultBarYPosition;
 
-  LoadRequiredResources(Element, RequiredCreatures);
+  LoadRequiredResources(Element, RequiredResources);
 end;
 
 procedure DrawCreateLevel(Window: TCastleWindowBase);
@@ -242,7 +242,7 @@ function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
   procedure CreateLevelCore;
   begin
     Result := LevelClass.Create(Name, SceneFileName,
-      Title, TitleHint, Number, LevelDOMElement, RequiredCreatures, 
+      Title, TitleHint, Number, LevelDOMElement, RequiredResources, 
       MenuBackground);
     if not MenuBackground then
       AvailableForNewGame := true;

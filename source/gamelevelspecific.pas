@@ -26,7 +26,7 @@ unit GameLevelSpecific;
 interface
 
 uses CastleScene, Boxes3D, VectorMath,
-  GamePlayer, GameLevel, Background, Triangle,
+  GamePlayer, GameLevel, Background, Triangle, GameObjectKinds,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation,
   GameCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
 
@@ -55,7 +55,7 @@ type
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
-      ARequiredCreatures: TStringList;
+      ARequiredResources: T3DResourceList;
       AMenuBackground: boolean); override;
 
     procedure Idle(const CompSpeed: Single;
@@ -95,7 +95,7 @@ type
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
-      ARequiredCreatures: TStringList;
+      ARequiredResources: T3DResourceList;
       AMenuBackground: boolean); override;
 
     function CollisionIgnoreItem(
@@ -117,7 +117,7 @@ type
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
-      ARequiredCreatures: TStringList;
+      ARequiredResources: T3DResourceList;
       AMenuBackground: boolean); override;
   end;
 
@@ -151,7 +151,7 @@ type
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
-      ARequiredCreatures: TStringList;
+      ARequiredResources: T3DResourceList;
       AMenuBackground: boolean); override;
 
     procedure Idle(const CompSpeed: Single;
@@ -212,7 +212,7 @@ type
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
-      ARequiredCreatures: TStringList;
+      ARequiredResources: T3DResourceList;
       AMenuBackground: boolean); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
@@ -229,7 +229,7 @@ type
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
-      ARequiredCreatures: TStringList;
+      ARequiredResources: T3DResourceList;
       AMenuBackground: boolean); override;
   end;
 
@@ -242,7 +242,7 @@ type
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
-      ARequiredCreatures: TStringList;
+      ARequiredResources: T3DResourceList;
       AMenuBackground: boolean); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
@@ -319,7 +319,7 @@ constructor TCastleHallLevel.Create(
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
-  ARequiredCreatures: TStringList;
+  ARequiredResources: T3DResourceList;
   AMenuBackground: boolean);
 var
   CastleHallLevelPath: string;
@@ -547,7 +547,7 @@ constructor TGateLevel.Create(
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
-  ARequiredCreatures: TStringList;
+  ARequiredResources: T3DResourceList;
   AMenuBackground: boolean);
 var
   Cart: TCastlePrecalculatedAnimation;
@@ -783,7 +783,7 @@ constructor TTowerLevel.Create(
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
-  ARequiredCreatures: TStringList;
+  ARequiredResources: T3DResourceList;
   AMenuBackground: boolean);
 var
   TowerLevelPath: string;
@@ -879,7 +879,7 @@ constructor TCagesLevel.Create(
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
-  ARequiredCreatures: TStringList;
+  ARequiredResources: T3DResourceList;
   AMenuBackground: boolean);
 
   function FindCreatureKind(Kind: TCreatureKind): TCreature;
@@ -1226,7 +1226,7 @@ constructor TDoomE1M1Level.Create(
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
-  ARequiredCreatures: TStringList;
+  ARequiredResources: T3DResourceList;
   AMenuBackground: boolean);
 var
   DoomDoorsPathPrefix: string;
@@ -1383,7 +1383,7 @@ constructor TGateBackgroundLevel.Create(
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
-  ARequiredCreatures: TStringList;
+  ARequiredResources: T3DResourceList;
   AMenuBackground: boolean);
 var
   Water: TCastlePrecalculatedAnimation;
@@ -1409,7 +1409,7 @@ constructor TFountainLevel.Create(
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
-  ARequiredCreatures: TStringList;
+  ARequiredResources: T3DResourceList;
   AMenuBackground: boolean);
 var
   Fountain: TBlendedLoopingAnimation;
