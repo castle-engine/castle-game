@@ -35,7 +35,7 @@ type
     But some 3D objects may need to have such resource prepared to work.
 
     It can also load it's configuration from XML config file.
-    For this purpose, it has a unique identifier in ShortName property. }
+    For this purpose, it has a unique identifier in @link(Id) property. }
   T3DResource = class
   private
   { Internal design notes: Having resource expressed as
@@ -51,7 +51,7 @@ type
     be no need of Resources list in TCastleSceneManager, simple
     TCastleSceneManager.Items would suffice.) }
 
-    FShortName: string;
+    FId: string;
     FPrepared: boolean;
     Resources: T3DListCore;
     FRequiredCount: Cardinal;
@@ -87,7 +87,7 @@ type
       const BaseLights: TLightInstancesList);
     { @groupEnd }
   public
-    constructor Create(const AShortName: string);
+    constructor Create(const AId: string);
     destructor Destroy; override;
 
     { Prepare everything needed for using this resource.
@@ -119,7 +119,7 @@ type
       (Reason: This must be a valid identifier in all possible languages.
       Also digits and underscore are reserved, as we may use them internally
       for other info in VRML/X3D and XML node names.) }
-    property ShortName: string read FShortName;
+    property Id: string read FId;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); virtual;
 
@@ -136,9 +136,9 @@ type
 
   T3DResourceList = class(specialize TFPGObjectList<T3DResource>)
   public
-    { Find resource with given ShortName.
+    { Find resource with given T3DResource.Id.
       @raises Exception if not found. }
-    function FindByShortName(const AShortName: string): T3DResource;
+    function FindId(const AId: string): T3DResource;
 
     { Load all items configuration from XML files. }
     procedure LoadFromFile;
@@ -157,10 +157,10 @@ implementation
 uses SysUtils, ProgressUnit, DOM, GameWindow,
   CastleStringUtils, CastleLog, CastleFilesUtils, PrecalculatedAnimationCore;
 
-constructor T3DResource.Create(const AShortName: string);
+constructor T3DResource.Create(const AId: string);
 begin
   inherited Create;
-  FShortName := AShortName;
+  FId := AId;
   Resources := T3DListCore.Create(true, nil);
 end;
 
@@ -206,7 +206,7 @@ end;
 
 procedure T3DResource.RedoPrepare(const BaseLights: TLightInstancesList);
 begin
-  Progress.Init(PrepareSteps, 'Loading object ' + ShortName);
+  Progress.Init(PrepareSteps, 'Loading ' + Id);
   try
     { It's important to do Release after Progress.Init.
       That is because Progress.Init does TCastleWindowBase.SaveScreenToDisplayList,
@@ -242,7 +242,7 @@ begin
     if Log then
       WritelnLog('Animation info',
         Format('%40s %3d scenes * %8d triangles',
-        [ ShortName + '.' + AnimationName + ' animation: ',
+        [ Id + '.' + AnimationName + ' animation: ',
           Anim.ScenesCount,
           Anim.Scenes[0].TrianglesCount(true) ]));
 
@@ -317,18 +317,18 @@ begin
   finally FreeAndNil(KindsConfig); end;
 end;
 
-function T3DResourceList.FindByShortName(const AShortName: string): T3DResource;
+function T3DResourceList.FindId(const AId: string): T3DResource;
 var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
   begin
     Result := Items[I];
-    if Result.ShortName = AShortName then
+    if Result.Id = AId then
       Exit;
   end;
 
-  raise Exception.CreateFmt('Not existing resource name "%s"', [AShortName]);
+  raise Exception.CreateFmt('Not existing resource name "%s"', [AId]);
 end;
 
 end.

@@ -83,7 +83,7 @@ begin
   for I := 0 to CreaturesKinds.Count - 1 do
   begin
     Kind := CreaturesKinds[I];
-    if Names.IndexOf(Kind.ShortName) <> -1 then
+    if Names.IndexOf(Kind.Id) <> -1 then
     begin
       Kind.RequiredCount := Kind.RequiredCount + 1;
       if Kind.RequiredCount = 1 then
@@ -105,12 +105,12 @@ begin
       for I := 0 to CreaturesKinds.Count - 1 do
       begin
         Kind := CreaturesKinds[I];
-        if (Names.IndexOf(Kind.ShortName) <> -1) and
+        if (Names.IndexOf(Kind.Id) <> -1) and
            (Kind.RequiredCount = 1) then
         begin
           if Log then
             WritelnLog('Resources', Format(
-              'Creature "%s" becomes required, loading', [Kind.ShortName]));
+              'Creature "%s" becomes required, loading', [Kind.Id]));
           Kind.Prepare(BaseLights);
         end;
       end;
@@ -131,7 +131,7 @@ begin
   begin
     Kind := CreaturesKinds[I];
 
-    if Names.IndexOf(Kind.ShortName) <> -1 then
+    if Names.IndexOf(Kind.Id) <> -1 then
     begin
       Assert(Kind.RequiredCount > 0);
 
@@ -140,7 +140,7 @@ begin
       begin
         if Log then
           WritelnLog('Resources', Format(
-            'Creature "%s" is no longer required, freeing', [Kind.ShortName]));
+            'Creature "%s" is no longer required, freeing', [Kind.Id]));
 
         { If everything went OK, I could place here an assertion
 
@@ -166,7 +166,7 @@ var
 begin
   Names := TStringList.Create;
   try
-    Names.Append(Kind.ShortName);
+    Names.Append(Kind.Id);
     RequireCreatures(BaseLights, Names);
   finally FreeAndNil(Names) end;
 end;
@@ -177,7 +177,7 @@ var
 begin
   Names := TStringList.Create;
   try
-    Names.Append(Kind.ShortName);
+    Names.Append(Kind.Id);
     UnRequireCreatures(Names);
   finally FreeAndNil(Names) end;
 end;

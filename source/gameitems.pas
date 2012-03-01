@@ -74,7 +74,7 @@ type
     FBoundingBoxRotatedCalculated: boolean;
   public
     { The constructor. }
-    constructor Create(const AShortName: string);
+    constructor Create(const AId: string);
     destructor Destroy; override;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
@@ -184,7 +184,7 @@ type
     FDamageRandom: Single;
     FAttackKnockbackDistance: Single;
   public
-    constructor Create(const AShortName: string);
+    constructor Create(const AId: string);
 
     property DamageConst: Single read FDamageConst write FDamageConst
       default DefaultItemDamageConst;
@@ -332,9 +332,9 @@ uses SysUtils, CastleWindow, GameWindow,
 
 { TItemKind ------------------------------------------------------------ }
 
-constructor TItemKind.Create(const AShortName: string);
+constructor TItemKind.Create(const AId: string);
 begin
-  inherited Create(AShortName);
+  inherited Create(AId);
   ItemsKinds.Add(Self);
 end;
 
@@ -348,12 +348,12 @@ procedure TItemKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  FSceneFileName := KindsConfig.GetFileName(ShortName + '/scene');
-  FImageFileName := KindsConfig.GetFileName(ShortName + '/image');
+  FSceneFileName := KindsConfig.GetFileName(Id + '/scene');
+  FImageFileName := KindsConfig.GetFileName(Id + '/image');
 
-  FName := KindsConfig.GetValue(ShortName + '/name', '');
+  FName := KindsConfig.GetValue(Id + '/name', '');
   if FName = '' then
-    raise Exception.CreateFmt('Empty name attribute for item "%s"', [ShortName]);
+    raise Exception.CreateFmt('Empty name attribute for item "%s"', [Id]);
 end;
 
 function TItemKind.Scene: TCastleScene;
@@ -475,21 +475,21 @@ procedure TItemWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  ActualAttackTime := KindsConfig.GetFloat(ShortName + '/actual_attack_time',
+  ActualAttackTime := KindsConfig.GetFloat(Id + '/actual_attack_time',
     DefaultItemActualAttackTime);
 
   EquippingSound := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(ShortName + '/equipping_sound', ''));
+    KindsConfig.GetValue(Id + '/equipping_sound', ''));
   SoundAttackStart := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(ShortName + '/sound_attack_start', ''));
+    KindsConfig.GetValue(Id + '/sound_attack_start', ''));
 
-  FReadyAnimationFile:= KindsConfig.GetFileName(ShortName + '/ready_animation');
-  FAttackAnimationFile := KindsConfig.GetFileName(ShortName + '/attack_animation');
+  FReadyAnimationFile:= KindsConfig.GetFileName(Id + '/ready_animation');
+  FAttackAnimationFile := KindsConfig.GetFileName(Id + '/attack_animation');
 end;
 
 { TItemShortRangeWeaponKind -------------------------------------------------- }
 
-constructor TItemShortRangeWeaponKind.Create(const AShortName: string);
+constructor TItemShortRangeWeaponKind.Create(const AId: string);
 begin
   inherited;
   FDamageConst := DefaultItemDamageConst;
@@ -501,12 +501,11 @@ procedure TItemShortRangeWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  DamageConst := KindsConfig.GetFloat(ShortName + '/damage/const',
+  DamageConst := KindsConfig.GetFloat(Id + '/damage/const',
     DefaultItemDamageConst);
-  DamageRandom := KindsConfig.GetFloat(ShortName + '/damage/random',
+  DamageRandom := KindsConfig.GetFloat(Id + '/damage/random',
     DefaultItemDamageRandom);
-  AttackKnockbackDistance :=
-    KindsConfig.GetFloat(ShortName + '/attack_knockback_distance',
+  AttackKnockbackDistance := KindsConfig.GetFloat(Id + '/attack_knockback_distance',
     DefaultItemAttackKnockbackDistance);
 end;
 

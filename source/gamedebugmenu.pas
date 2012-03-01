@@ -319,7 +319,7 @@ procedure TDebugCreaturesMenu.Click;
     try
       for I := 0 to CreaturesKinds.Count - 1 do
         S.Append(Format('Creature %s (%d users)',
-          [CreaturesKinds[I].ShortName, CreaturesKinds[I].RequiredCount]));
+          [CreaturesKinds[I].Id, CreaturesKinds[I].RequiredCount]));
       S.Append('Cancel');
       ResultIndex := ChooseByMenu(ControlsUnder, S);
       Result := ResultIndex <> CreaturesKinds.Count;
@@ -367,7 +367,7 @@ procedure TDebugCreaturesMenu.Click;
     begin
       if Kind.RequiredCount = 0 then
         MessageOK(Window, Format('Creature "%s" is not used by anything, ' +
-          'cannot reload',  [Kind.ShortName])) else
+          'cannot reload',  [Kind.Id])) else
         Kind.RedoPrepare(Level.BaseLights);
     end;
   end;
@@ -493,7 +493,7 @@ procedure TDebugItemsMenu.Click;
     S := TStringList.Create;
     try
       for I := 0 to ItemsKinds.Count - 1 do
-        S.Append('Item ' + ItemsKinds[I].ShortName);
+        S.Append('Item ' + ItemsKinds[I].Id);
       S.Append('Cancel');
       ResultIndex := ChooseByMenu(ControlsUnder, S);
       Result := ResultIndex <> ItemsKinds.Count;

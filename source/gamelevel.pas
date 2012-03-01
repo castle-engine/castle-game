@@ -46,7 +46,7 @@ type
     For now, each area is just one TBox3D. }
   TLevelArea = class(T3D)
   private
-    FShortName: string;
+    FId: string;
     FBox: TBox3D;
 
     { Area. Default value is EmptyBox3D. }
@@ -57,14 +57,14 @@ type
     { Name used to recognize this object's area in level VRML/X3D file.
 
       If this object is present during ChangeLevelScene call from
-      TLevel constructor then the shape with a parent named like ShortName
-      will be removed from VRML file, and it's BoundingBox will be used
+      TLevel constructor then the shape with a parent named like @link(Id)
+      will be removed from VRML/X3D file, and it's BoundingBox will be used
       as Box3D of this object.
 
       This way you can easily configure area of this object in Blender:
-      just add a cube, set it's mesh name to match with this ShortName,
+      just add a cube, set it's mesh name to match with this @link(Id),
       and then this cube defines Box3D of this object. }
-    property ShortName: string read FShortName write FShortName;
+    property Id: string read FId write FId;
 
     function PointInside(const Point: TVector3Single): boolean;
 
@@ -377,7 +377,7 @@ end;
 procedure TLevelArea.ChangeLevelScene(AParentLevel: TLevel);
 begin
   inherited;
-  AParentLevel.RemoveBoxNodeCheck(FBox, ShortName);
+  AParentLevel.RemoveBoxNodeCheck(FBox, Id);
 end;
 
 function TLevelArea.PointInside(const Point: TVector3Single): boolean;
@@ -675,7 +675,7 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
       raise Exception.CreateFmt('Not allowed children element of <area>: "%s"',
         [Child.TagName]);
 
-    if not DOMGetAttribute(Element, 'name', Result.FShortName) then
+    if not DOMGetAttribute(Element, 'name', Result.FId) then
       MissingRequiredAttribute('name', 'area');
   end;
 
@@ -766,7 +766,7 @@ procedure TLevel.TraverseForItems(Shape: TShape);
     Resource: T3DResource;
     ItemKind: TItemKind;
     IgnoredBegin, ItemQuantityBegin: Integer;
-    ItemKindQuantity, ItemKindShortName: string;
+    ItemKindQuantity, ItemKindId: string;
     ItemQuantity: Cardinal;
     ItemStubBoundingBox: TBox3D;
     ItemPosition: TVector3Single;
@@ -777,22 +777,22 @@ procedure TLevel.TraverseForItems(Shape: TShape);
       ItemKindQuantity := ItemNodeName else
       ItemKindQuantity := Copy(ItemNodeName, 1, IgnoredBegin - 1);
 
-    { Calculate ItemKindShortName, ItemQuantity }
+    { Calculate ItemKindId, ItemQuantity }
     ItemQuantityBegin := CharsPos(['0'..'9'], ItemKindQuantity);
     if ItemQuantityBegin = 0 then
     begin
-      ItemKindShortName := ItemKindQuantity;
+      ItemKindId := ItemKindQuantity;
       ItemQuantity := 1;
     end else
     begin
-      ItemKindShortName := Copy(ItemKindQuantity, 1, ItemQuantityBegin - 1);
+      ItemKindId := Copy(ItemKindQuantity, 1, ItemQuantityBegin - 1);
       ItemQuantity := StrToInt(SEnding(ItemKindQuantity, ItemQuantityBegin));
     end;
 
-    Resource := ItemsKinds.FindByShortName(ItemKindShortName);
+    Resource := ItemsKinds.FindId(ItemKindId);
     if not (Resource is TItemKind) then
       raise Exception.CreateFmt('Resource "%s" is not an item, but is referenced in model with Item prefix',
-        [ItemKindShortName]);
+        [ItemKindId]);
     ItemKind := TItemKind(Resource);
 
     ItemStubBoundingBox := Shape.BoundingBox;
@@ -854,7 +854,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     CreaturePosition[2] := StubBoundingBox.Data[0, 2];
 
     { calculate CreatureKind }
-    Resource := CreaturesKinds.FindByShortName(CreatureKindName);
+    Resource := CreaturesKinds.FindId(CreatureKindName);
     if not (Resource is TCreatureKind) then
       raise Exception.CreateFmt('Resource "%s" is not a creature, but is referenced in model with Crea prefix',
         [CreatureKindName]);

@@ -105,7 +105,7 @@ type
     { In descendants only Prepare can (and should!) set this. }
     RadiusFromPrepare: Single;
   public
-    constructor Create(const AShortName: string);
+    constructor Create(const AId: string);
 
     { If @true, then the creature flies. Otherwise it always tries to move only
       horizontally (which means that Direction is always orthogonal
@@ -298,7 +298,7 @@ type
     FMaxHeightAcceptableToFall: Single;
     FRandomWalkDistance: Single;
   public
-    constructor Create(const AShortName: string);
+    constructor Create(const AId: string);
 
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
@@ -537,7 +537,7 @@ type
     FHitsPlayer: boolean;
     FHitsCreatures: boolean;
   public
-    constructor Create(const AShortName: string);
+    constructor Create(const AId: string);
 
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
@@ -907,9 +907,9 @@ var
 
 { TCreatureKind -------------------------------------------------------------- }
 
-constructor TCreatureKind.Create(const AShortName: string);
+constructor TCreatureKind.Create(const AId: string);
 begin
-  inherited Create(AShortName);
+  inherited Create(AId);
   FFlying := DefaultFlying;
   FDefaultMaxLife := DefaultDefaultMaxLife;
   FKnockedBackDistance := DefaultKnockedBackDistance;
@@ -929,47 +929,40 @@ procedure TCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  KnockBackSpeed := KindsConfig.GetFloat(ShortName + '/knock_back_speed',
+  KnockBackSpeed := KindsConfig.GetFloat(Id + '/knock_back_speed',
     DefaultKnockBackSpeed);
-  KnockedBackDistance := KindsConfig.GetFloat(ShortName + '/knocked_back_distance',
+  KnockedBackDistance := KindsConfig.GetFloat(Id + '/knocked_back_distance',
     DefaultKnockedBackDistance);
-  Flying := KindsConfig.GetValue(ShortName + '/flying',
+  Flying := KindsConfig.GetValue(Id + '/flying',
     DefaultFlying);
-  SoundDyingTiedToCreature :=
-    KindsConfig.GetValue(ShortName + '/sound_dying_tied_to_creature',
+  SoundDyingTiedToCreature := KindsConfig.GetValue(Id + '/sound_dying_tied_to_creature',
     DefaultSoundDyingTiedToCreature);
-  DefaultMaxLife := KindsConfig.GetFloat(ShortName + '/default_max_life',
+  DefaultMaxLife := KindsConfig.GetFloat(Id + '/default_max_life',
     DefaultDefaultMaxLife);
-  RadiusFromFile := KindsConfig.GetFloat(ShortName + '/radius',
+  RadiusFromFile := KindsConfig.GetFloat(Id + '/radius',
     0.0);
-  ShortRangeAttackDamageConst :=
-    KindsConfig.GetFloat(ShortName + '/short_range_attack/damage/const',
+  ShortRangeAttackDamageConst := KindsConfig.GetFloat(Id + '/short_range_attack/damage/const',
     DefaultShortRangeAttackDamageConst);
-  ShortRangeAttackDamageRandom :=
-    KindsConfig.GetFloat(ShortName + '/short_range_attack/damage/random',
+  ShortRangeAttackDamageRandom := KindsConfig.GetFloat(Id + '/short_range_attack/damage/random',
     DefaultShortRangeAttackDamageRandom);
-  ShortRangeAttackKnockbackDistance :=
-    KindsConfig.GetFloat(ShortName + '/short_range_attack/knockback_distance',
+  ShortRangeAttackKnockbackDistance := KindsConfig.GetFloat(Id + '/short_range_attack/knockback_distance',
     DefaultShortRangeAttackKnockbackDistance);
 
-  FallDownLifeLossScale :=
-    KindsConfig.GetFloat(ShortName + '/fall_down_life_loss_scale',
+  FallDownLifeLossScale := KindsConfig.GetFloat(Id + '/fall_down_life_loss_scale',
     DefaultFallDownLifeLossScale);
-  FFallingDownSpeed :=
-    KindsConfig.GetFloat(ShortName + '/falling_down_speed',
+  FFallingDownSpeed := KindsConfig.GetFloat(Id + '/falling_down_speed',
     DefaultFallingDownSpeed);
 
-  MiddleHeight :=
-    KindsConfig.GetFloat(ShortName + '/middle_position_height',
+  MiddleHeight := KindsConfig.GetFloat(Id + '/middle_position_height',
     DefaultMiddleHeight);
 
-  CastShadowVolumes :=
-    KindsConfig.GetValue(ShortName + '/casts_shadow', DefaultCastShadowVolumes);
+  CastShadowVolumes := KindsConfig.GetValue(Id + '/casts_shadow',
+    DefaultCastShadowVolumes);
 
   SoundSuddenPain := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(ShortName + '/sound_sudden_pain', ''));
+    KindsConfig.GetValue(Id + '/sound_sudden_pain', ''));
   SoundDying := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(ShortName + '/sound_dying', ''));
+    KindsConfig.GetValue(Id + '/sound_dying', ''));
 end;
 
 function TCreatureKind.Radius: Single;
@@ -1009,9 +1002,9 @@ end;
 
 { TWalkAttackCreatureKind ---------------------------------------------------- }
 
-constructor TWalkAttackCreatureKind.Create(const AShortName: string);
+constructor TWalkAttackCreatureKind.Create(const AId: string);
 begin
-  inherited Create(AShortName);
+  inherited Create(AId);
 
   MoveSpeed := DefaultMoveSpeed;
   FMinDelayBetweenAttacks := DefaultMinDelayBetweenAttacks;
@@ -1065,50 +1058,39 @@ procedure TWalkAttackCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  ActualAttackTime :=
-    KindsConfig.GetFloat(ShortName + '/actual_attack_time',
+  ActualAttackTime := KindsConfig.GetFloat(Id + '/actual_attack_time',
     DefaultActualAttackTime);
-  MoveSpeed :=
-    KindsConfig.GetFloat(ShortName + '/move_speed',
+  MoveSpeed := KindsConfig.GetFloat(Id + '/move_speed',
     DefaultMoveSpeed);
-  MaxAttackDistance :=
-    KindsConfig.GetFloat(ShortName + '/max_attack_distance',
+  MaxAttackDistance := KindsConfig.GetFloat(Id + '/max_attack_distance',
     DefaultMaxAttackDistance);
-  PreferredAttackDistance :=
-    KindsConfig.GetFloat(ShortName + '/preferred_attack_distance',
+  PreferredAttackDistance := KindsConfig.GetFloat(Id + '/preferred_attack_distance',
     DefaultPreferredAttackDistance);
-  MinDelayBetweenAttacks :=
-    KindsConfig.GetFloat(ShortName + '/min_delay_between_attacks',
+  MinDelayBetweenAttacks := KindsConfig.GetFloat(Id + '/min_delay_between_attacks',
     DefaultMinDelayBetweenAttacks);
-  LifeToRunAway :=
-    KindsConfig.GetFloat(ShortName + '/life_to_run_away',
+  LifeToRunAway := KindsConfig.GetFloat(Id + '/life_to_run_away',
     DefaultLifeToRunAway);
-  MaxAngleToAttack :=
-    KindsConfig.GetFloat(ShortName + '/max_angle_to_attack',
+  MaxAngleToAttack := KindsConfig.GetFloat(Id + '/max_angle_to_attack',
     DefaultMaxAngleToAttack);
-  MinLifeLossToHurt :=
-    KindsConfig.GetFloat(ShortName + '/min_life_loss_to_hurt',
+  MinLifeLossToHurt := KindsConfig.GetFloat(Id + '/min_life_loss_to_hurt',
     DefaultMinLifeLossToHurt);
-  ChanceToHurt :=
-    KindsConfig.GetFloat(ShortName + '/chance_to_hurt',
+  ChanceToHurt := KindsConfig.GetFloat(Id + '/chance_to_hurt',
     DefaultChanceToHurt);
-  MaxHeightAcceptableToFall :=
-    KindsConfig.GetFloat(ShortName + '/max_height_acceptable_to_fall',
+  MaxHeightAcceptableToFall := KindsConfig.GetFloat(Id + '/max_height_acceptable_to_fall',
     DefaultMaxHeightAcceptableToFall);
-  RandomWalkDistance :=
-    KindsConfig.GetFloat(ShortName + '/random_walk_distance',
+  RandomWalkDistance := KindsConfig.GetFloat(Id + '/random_walk_distance',
     DefaultCreatureRandomWalkDistance);
 
   SoundAttackStart := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(ShortName + '/sound_attack_start', ''));
+    KindsConfig.GetValue(Id + '/sound_attack_start', ''));
 
-  FStandAnimationFile := KindsConfig.GetFileName(ShortName + '/stand_animation');
-  FStandToWalkAnimationFile := KindsConfig.GetFileName(ShortName + '/stand_to_walk_animation');
-  FWalkAnimationFile := KindsConfig.GetFileName(ShortName + '/walk_animation');
-  FAttackAnimationFile := KindsConfig.GetFileName(ShortName + '/attack_animation');
-  FDyingAnimationFile := KindsConfig.GetFileName(ShortName + '/dying_animation');
-  FDyingBackAnimationFile := KindsConfig.GetFileName(ShortName + '/dying_back_animation', true);
-  FHurtAnimationFile := KindsConfig.GetFileName(ShortName + '/hurt_animation');
+  FStandAnimationFile := KindsConfig.GetFileName(Id + '/stand_animation');
+  FStandToWalkAnimationFile := KindsConfig.GetFileName(Id + '/stand_to_walk_animation');
+  FWalkAnimationFile := KindsConfig.GetFileName(Id + '/walk_animation');
+  FAttackAnimationFile := KindsConfig.GetFileName(Id + '/attack_animation');
+  FDyingAnimationFile := KindsConfig.GetFileName(Id + '/dying_animation');
+  FDyingBackAnimationFile := KindsConfig.GetFileName(Id + '/dying_back_animation', true);
+  FHurtAnimationFile := KindsConfig.GetFileName(Id + '/hurt_animation');
 end;
 
 { TAlienCreatureKind --------------------------------------------------- }
@@ -1162,15 +1144,15 @@ begin
   inherited;
 
   MinDelayBetweenThrowWebAttacks :=
-    KindsConfig.GetFloat(ShortName + '/throw_web/min_delay_between_attacks', 0.0);
+    KindsConfig.GetFloat(Id + '/throw_web/min_delay_between_attacks', 0.0);
   MaxThrowWebAttackDistance :=
-    KindsConfig.GetFloat(ShortName + '/throw_web/max_attack_distance', 0.0);
+    KindsConfig.GetFloat(Id + '/throw_web/max_attack_distance', 0.0);
   MaxAngleToThrowWebAttack :=
-    KindsConfig.GetFloat(ShortName + '/throw_web/max_angle_to_attack', 0.0);
+    KindsConfig.GetFloat(Id + '/throw_web/max_angle_to_attack', 0.0);
   ActualThrowWebAttackTime :=
-    KindsConfig.GetFloat(ShortName + '/throw_web/actual_attack_time', 0.0);
+    KindsConfig.GetFloat(Id + '/throw_web/actual_attack_time', 0.0);
 
-  FThrowWebAttackAnimationFile := KindsConfig.GetFileName(ShortName + '/throw_web_attack_animation');
+  FThrowWebAttackAnimationFile := KindsConfig.GetFileName(Id + '/throw_web_attack_animation');
 end;
 
 { TGhostKind ------------------------------------------------------------- }
@@ -1200,9 +1182,9 @@ end;
 
 { TMissileCreatureKind ---------------------------------------------------- }
 
-constructor TMissileCreatureKind.Create(const AShortName: string);
+constructor TMissileCreatureKind.Create(const AId: string);
 begin
-  inherited Create(AShortName);
+  inherited Create(AId);
   Flying := true;
   FMoveSpeed := DefaultMissileMoveSpeed;
   FCloseDirectionToTargetSpeed := DefaultCloseDirectionToTargetSpeed;
@@ -1239,28 +1221,23 @@ procedure TMissileCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  MoveSpeed :=
-    KindsConfig.GetFloat(ShortName + '/move_speed',
+  MoveSpeed := KindsConfig.GetFloat(Id + '/move_speed',
     DefaultMissileMoveSpeed);
-  CloseDirectionToTargetSpeed :=
-    KindsConfig.GetFloat(ShortName + '/close_direction_to_target_speed',
+  CloseDirectionToTargetSpeed := KindsConfig.GetFloat(Id + '/close_direction_to_target_speed',
     DefaultCloseDirectionToTargetSpeed);
-  PauseBetweenSoundIdle :=
-    KindsConfig.GetFloat(ShortName + '/pause_between_sound_idle',
+  PauseBetweenSoundIdle := KindsConfig.GetFloat(Id + '/pause_between_sound_idle',
     DefaultPauseBetweenSoundIdle);
-  HitsPlayer :=
-    KindsConfig.GetValue(ShortName + '/hits_player',
+  HitsPlayer := KindsConfig.GetValue(Id + '/hits_player',
     DefaultHitsPlayer);
-  HitsCreatures :=
-    KindsConfig.GetValue(ShortName + '/hits_creatures',
+  HitsCreatures := KindsConfig.GetValue(Id + '/hits_creatures',
     DefaultHitsCreatures);
 
   SoundExplosion := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(ShortName + '/sound_explosion', ''));
+    KindsConfig.GetValue(Id + '/sound_explosion', ''));
   SoundIdle := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(ShortName + '/sound_idle', ''));
+    KindsConfig.GetValue(Id + '/sound_idle', ''));
 
-  FAnimationFile := KindsConfig.GetFileName(ShortName + '/fly_animation');
+  FAnimationFile := KindsConfig.GetFileName(Id + '/fly_animation');
 end;
 
 { TStillCreatureKind ---------------------------------------------------- }
@@ -1293,7 +1270,7 @@ procedure TStillCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  FAnimationFile := KindsConfig.GetFileName(ShortName + '/stand_animation');
+  FAnimationFile := KindsConfig.GetFileName(Id + '/stand_animation');
 end;
 
 { TCreatureSoundSourceData --------------------------------------------------- }
@@ -1460,7 +1437,7 @@ end;
 function TCreature.DebugCaption: string;
 begin
   Result := Format('%s [%s / %s]',
-    [Kind.ShortName, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
+    [Kind.Id, FloatToNiceStr(Life), FloatToNiceStr(MaxLife)]);
 end;
 
 procedure TCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
@@ -1652,7 +1629,7 @@ begin
 
   if Distance <= VisibleItemDistance then
   begin
-    S := Format('You see a creature "%s"', [Kind.ShortName]);
+    S := Format('You see a creature "%s"', [Kind.Id]);
 
     if Life >= MaxLife then
       S += ' (not wounded)' else

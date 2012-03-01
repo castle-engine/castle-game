@@ -896,15 +896,15 @@ constructor TCagesLevel.Create(
     Result := nil;
   end;
 
-  function FindHintArea(const ShortName: string): TLevelHintArea;
+  function FindHintArea(const Id: string): TLevelHintArea;
   var
     I: Integer;
   begin
     for I := 0 to Items.Count - 1 do
       if (Items[I] is TLevelHintArea) and
-         (TLevelHintArea(Items[I]).ShortName = ShortName) then
+         (TLevelHintArea(Items[I]).Id = Id) then
         Exit(TLevelHintArea(Items[I]));
-    raise Exception.CreateFmt('Level hint area named "%s" not found', [ShortName]);
+    raise Exception.CreateFmt('Level hint area named "%s" not found', [Id]);
   end;
 
 begin
