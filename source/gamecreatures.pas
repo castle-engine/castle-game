@@ -79,7 +79,7 @@ type
 
   TCreatureClass = class of TCreature;
 
-  TCreatureKind = class(TObjectKind)
+  TCreatureKind = class(T3DResource)
   private
     FFlying: boolean;
     FSoundSuddenPain: TSoundType;
@@ -1003,7 +1003,7 @@ function TCreatureKind.CreateCreature(World: T3DWorld;
 begin
   { This is only needed if you used --debug-no-creatures or forgot
     to add creature to <required_resources> }
-  // TODO: waits for porting TObjectKind to T3D,
+  // TODO: waits for porting T3DResource to T3D,
   // then Prepare will get BaseLights in param,
   // and somehow it should call
   // RequireCreature(BaseLights, Self);
@@ -1395,7 +1395,7 @@ begin
   end;
 
   // TODO: commented out, as RequireCreature in CreateCreature
-  // commented out, waits for porting TObjectKind to T3D,
+  // commented out, waits for porting T3DResource to T3D,
 {  if Kind <> nil then
     UnRequireCreature(Kind);}
 

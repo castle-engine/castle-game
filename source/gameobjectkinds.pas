@@ -29,9 +29,27 @@ uses Classes, CastleXMLConfig, PrecalculatedAnimation,
   GameVideoOptions, CastleScene, X3DNodes, Base3D;
 
 type
-  { This is a common class for item kind and creature kind. }
-  TObjectKind = class
+  { Resource used for rendering and processing of 3D objects.
+    By itself this doesn't render or do anything.
+    But some 3D objects may need to have such resource prepared to work.
+
+    It can also load it's configuration from XML config file.
+    For this purpose, it has a unique identifier in ShortName property. }
+  T3DResource = class
   private
+  { Internal design notes: Having resource expressed as
+    T3DResource instance, as opposed to overusing dummy T3D instances
+    for it, is sometimes good. That's because such resource may be shared by many
+    3D objects, may be used for different purposes by various 3D objects
+    (e.g. various creatures may be in different state / animation time),
+    it's users (3D objects) may not always initially exist on the level
+    (e.g. TItem, that is not even T3D, may refer to it), etc.
+    There were ideas to unify T3DResource to be like a T3D descendant
+    (or ancestor), but they turned out to cause more confusion (special cases,
+    special treatment) than the gain from unification (which would
+    be no need of Resources list in TCastleSceneManager, simple
+    TCastleSceneManager.Items would suffice.) }
+
     FShortName: string;
     FPrepared: boolean;
     Resources: T3DListCore;
@@ -113,31 +131,31 @@ implementation
 uses SysUtils, ProgressUnit, DOM, GameWindow,
   CastleStringUtils, CastleLog, CastleFilesUtils, PrecalculatedAnimationCore;
 
-constructor TObjectKind.Create(const AShortName: string);
+constructor T3DResource.Create(const AShortName: string);
 begin
   inherited Create;
   FShortName := AShortName;
   Resources := T3DListCore.Create(true, nil);
 end;
 
-destructor TObjectKind.Destroy;
+destructor T3DResource.Destroy;
 begin
   Release;
   FreeAndNil(Resources);
   inherited;
 end;
 
-procedure TObjectKind.Prepare(const BaseLights: TLightInstancesList);
+procedure T3DResource.Prepare(const BaseLights: TLightInstancesList);
 begin
   FPrepared := true;
 end;
 
-function TObjectKind.PrepareSteps: Cardinal;
+function T3DResource.PrepareSteps: Cardinal;
 begin
   Result := 0;
 end;
 
-procedure TObjectKind.Release;
+procedure T3DResource.Release;
 begin
   if Resources <> nil then
   begin
@@ -147,7 +165,7 @@ begin
   FPrepared := false;
 end;
 
-procedure TObjectKind.GLContextClose;
+procedure T3DResource.GLContextClose;
 var
   I: Integer;
 begin
@@ -155,12 +173,12 @@ begin
     Resources[I].GLContextClose;
 end;
 
-procedure TObjectKind.LoadFromFile(KindsConfig: TCastleConfig);
+procedure T3DResource.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   { Nothing to do in this class. }
 end;
 
-procedure TObjectKind.RedoPrepare(const BaseLights: TLightInstancesList);
+procedure T3DResource.RedoPrepare(const BaseLights: TLightInstancesList);
 begin
   Progress.Init(PrepareSteps, 'Loading object ' + ShortName);
   try
@@ -177,7 +195,7 @@ begin
   finally Progress.Fini; end;
 end;
 
-procedure TObjectKind.PreparePrecalculatedAnimation(
+procedure T3DResource.PreparePrecalculatedAnimation(
   const AnimationName: string;
   var Anim: TCastlePrecalculatedAnimation;
   const AnimationFile: string;
@@ -209,7 +227,7 @@ begin
   Progress.Step;
 end;
 
-procedure TObjectKind.PrepareScene(
+procedure T3DResource.PrepareScene(
   var Scene: TCastleScene;
   const SceneFileName: string;
   const BaseLights: TLightInstancesList);

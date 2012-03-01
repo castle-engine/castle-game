@@ -62,7 +62,7 @@ type
     properties by calling LoadFromFile. In this class, this initializes
     it's SceneFileName, Name amd ImageFileName --- in descendants, more
     required properties may be initialized here. }
-  TItemKind = class(TObjectKind)
+  TItemKind = class(T3DResource)
   private
     FSceneFileName: string;
     FScene: TCastleScene;

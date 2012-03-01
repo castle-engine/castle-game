@@ -135,9 +135,8 @@ var
   NewLevel: TLevel;
   BaseLights: TLightInstancesList;
 begin
-  { All kinds must be prepared before instances are created.
-    TObjectKind constructors are allowed to depend on this.
-    So we must prepare everything before creating the level
+  { All 3D resources must be prepared before 3D users are created.
+    So we must prepare items before creating the level
     (since TLevel constructor creates some creatures and items on the level). }
   BaseLights := TLightInstancesList.Create; {TODO:dirty to create BaseLights here}
   try
