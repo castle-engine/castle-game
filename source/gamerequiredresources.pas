@@ -61,14 +61,14 @@ var
 implementation
 
 uses SysUtils, CastleLog, ProgressUnit, CastleTimeUtils, GameConfig,
-  CastleXMLUtils;
+  CastleXMLUtils, GameObjectKinds;
 
 { [Un]RequireCreatures ------------------------------------------------------- }
 
 procedure RequireCreatures(const BaseLights: TLightInstancesList; Names: TStringList);
 var
   I: Integer;
-  Kind: TCreatureKind;
+  Kind: T3DResource;
   PrepareSteps: Cardinal;
   TimeBegin: TProcessTimerResult;
   PrepareNeeded: boolean;
@@ -125,7 +125,7 @@ end;
 procedure UnRequireCreatures(Names: TStringList);
 var
   I: Integer;
-  Kind: TCreatureKind;
+  Kind: T3DResource;
 begin
   for I := 0 to CreaturesKinds.Count - 1 do
   begin

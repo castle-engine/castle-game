@@ -26,7 +26,8 @@ unit GameObjectKinds;
 interface
 
 uses Classes, CastleXMLConfig, PrecalculatedAnimation,
-  GameVideoOptions, CastleScene, X3DNodes, Base3D;
+  GameVideoOptions, CastleScene, X3DNodes, Base3D,
+  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type
   { Resource used for rendering and processing of 3D objects.
@@ -53,6 +54,7 @@ type
     FShortName: string;
     FPrepared: boolean;
     Resources: T3DListCore;
+    FRequiredCount: Cardinal;
   protected
     { Prepare 3D resource loading it from given filename.
       Loads the resource only if filename is not empty,
@@ -124,6 +126,30 @@ type
     { Release and then immediately prepare again this resource.
       Does progress (by Progress.Init...Fini inside). }
     procedure RedoPrepare(const BaseLights: TLightInstancesList);
+
+    { Used by RequireCreatures, UnRequireCreatures to count
+      how many times this kind is required. Idea is that when this drops
+      to zero, we can Release to free resources. }
+    property RequiredCount: Cardinal
+      read FRequiredCount write FRequiredCount default 0;
+  end;
+
+  T3DResourceList = class(specialize TFPGObjectList<T3DResource>)
+  public
+    { Find resource with given ShortName.
+      @raises Exception if not found. }
+    function FindByShortName(const AShortName: string): T3DResource;
+
+    { Load all items configuration from XML files. }
+    procedure LoadFromFile;
+
+    { Prepare all items. This does progress bar rendering
+      (using Progress.Init, Progress.Step, Progress.Fini). }
+    procedure Prepare(const BaseLights: TLightInstancesList;
+      const ResourcesName: string = 'resources');
+
+    { Release all items. }
+    procedure Release;
   end;
 
 implementation
@@ -247,6 +273,62 @@ begin
       false, BaseLights);
   end;
   Progress.Step;
+end;
+
+{ T3DResourceList ------------------------------------------------------------- }
+
+procedure T3DResourceList.Prepare(const BaseLights: TLightInstancesList;
+  const ResourcesName: string);
+var
+  I: Integer;
+  PrepareSteps: Cardinal;
+begin
+  PrepareSteps := 0;
+  for I := 0 to Count - 1 do
+    PrepareSteps += Items[I].PrepareSteps;
+
+  Progress.Init(PrepareSteps, 'Loading ' + ResourcesName);
+  try
+    for I := 0 to Count - 1 do
+      Items[I].Prepare(BaseLights);
+  finally Progress.Fini; end;
+end;
+
+procedure T3DResourceList.Release;
+var
+  I: Integer;
+begin
+  for I := 0 to Count - 1 do
+    Items[I].Release;
+end;
+
+procedure T3DResourceList.LoadFromFile;
+var
+  I: Integer;
+  KindsConfig: TCastleConfig;
+begin
+  KindsConfig := TCastleConfig.Create(nil);
+  try
+    KindsConfig.FileName := ProgramDataPath + 'data' + PathDelim + 'index.xml';
+    for I := 0 to Count - 1 do
+    begin
+      Items[I].LoadFromFile(KindsConfig);
+    end;
+  finally FreeAndNil(KindsConfig); end;
+end;
+
+function T3DResourceList.FindByShortName(const AShortName: string): T3DResource;
+var
+  I: Integer;
+begin
+  for I := 0 to Count - 1 do
+  begin
+    Result := Items[I];
+    if Result.ShortName = AShortName then
+      Exit;
+  end;
+
+  raise Exception.CreateFmt('Not existing resource name "%s"', [AShortName]);
 end;
 
 end.

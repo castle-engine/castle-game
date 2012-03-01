@@ -28,8 +28,8 @@ interface
 uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, CastleUtils,
   CastleScene, GameSound, SceneWaypoints,
   GameObjectKinds, ALSoundAllocator, CastleXMLConfig, Base3D,
-  XmlSoundEngine, Frustum, X3DNodes,
-  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, CastleColors;
+  XmlSoundEngine, Frustum, X3DNodes, CastleColors,
+  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 const
   { Default value for TCreatureKind.DefaultMaxLife.
@@ -101,7 +101,6 @@ type
     FMiddleHeight: Single;
 
     FCastShadowVolumes: boolean;
-    FRequiredCount: Cardinal;
   protected
     { In descendants only Prepare can (and should!) set this. }
     RadiusFromPrepare: Single;
@@ -263,23 +262,6 @@ type
       to make creature stand above the ground. }
     property FallingDownSpeed: Single
       read FFallingDownSpeed write FFallingDownSpeed default DefaultFallingDownSpeed;
-
-    { Used by RequireCreatures, UnRequireCreatures to count
-      how many times this kind is required. Idea is that when this drops
-      to zero, we can Release to free resources. }
-    property RequiredCount: Cardinal
-      read FRequiredCount write FRequiredCount default 0;
-  end;
-
-  TCreatureKindList = class(specialize TFPGObjectList<TCreatureKind>)
-  public
-    { Find item with given ShortName.
-      @raises Exception if not found. }
-    function FindByShortName(const AShortName: string): TCreatureKind;
-
-    { This opens creatures/kinds.xml file and calls LoadFromFile for
-      all existing TCreatureKind instances. }
-    procedure LoadFromFile;
   end;
 
   { A TCreatureKind that has simple states:
@@ -900,7 +882,7 @@ type
   end;
 
 var
-  CreaturesKinds: TCreatureKindList;
+  CreaturesKinds: T3DResourceList;
 
   Alien: TAlienCreatureKind;
   Werewolf: TWerewolfKind;
@@ -1023,41 +1005,6 @@ function TCreatureKind.CreateCreature(World: T3DWorld;
   const APosition, ADirection: TVector3Single): TCreature;
 begin
   Result := CreateCreature(World, APosition, ADirection, DefaultMaxLife);
-end;
-
-{ TCreatureKindList -------------------------------------------------------- }
-
-function TCreatureKindList.FindByShortName(
-  const AShortName: string): TCreatureKind;
-var
-  I: Integer;
-begin
-  for I := 0 to Count - 1 do
-  begin
-    Result := Items[I];
-    if Result.ShortName = AShortName then
-      Exit;
-  end;
-
-  raise Exception.CreateFmt('Not existing creature kind name "%s"',
-    [AShortName]);
-end;
-
-procedure TCreatureKindList.LoadFromFile;
-var
-  I: Integer;
-  KindsConfig: TCastleConfig;
-begin
-  KindsConfig := TCastleConfig.Create(nil);
-  try
-    KindsConfig.FileName := ProgramDataPath + 'data' + PathDelim +
-      'creatures' + PathDelim + 'kinds.xml';
-
-    for I := 0 to Count - 1 do
-    begin
-      Items[I].LoadFromFile(KindsConfig);
-    end;
-  finally SysUtils.FreeAndNil(KindsConfig); end;
 end;
 
 { TWalkAttackCreatureKind ---------------------------------------------------- }
@@ -2902,7 +2849,7 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@WindowClose);
 
-  CreaturesKinds := TCreatureKindList.Create(true);
+  CreaturesKinds := T3DResourceList.Create(true);
 
   Alien := TAlienCreatureKind.Create('Alien');
   Werewolf := TWerewolfKind.Create('Werewolf');

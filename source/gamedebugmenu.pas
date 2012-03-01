@@ -324,7 +324,7 @@ procedure TDebugCreaturesMenu.Click;
       ResultIndex := ChooseByMenu(ControlsUnder, S);
       Result := ResultIndex <> CreaturesKinds.Count;
       if Result then
-        ChooseCreature := CreaturesKinds[ResultIndex];
+        ChooseCreature := CreaturesKinds[ResultIndex] as TCreatureKind;
     finally S.Free end;
   end;
 
@@ -498,7 +498,7 @@ procedure TDebugItemsMenu.Click;
       ResultIndex := ChooseByMenu(ControlsUnder, S);
       Result := ResultIndex <> ItemsKinds.Count;
       if Result then
-        ChooseItem := ItemsKinds[ResultIndex];
+        ChooseItem := ItemsKinds[ResultIndex] as TItemKind;
     finally S.Free end;
   end;
 
@@ -507,7 +507,7 @@ procedure TDebugItemsMenu.Click;
     I: Integer;
   begin
     for I := 0 to ItemsKinds.Count - 1 do
-      Player.PickItem(TItem.Create(ItemsKinds[I], 20));
+      Player.PickItem(TItem.Create(ItemsKinds[I] as TItemKind, 20));
     UserQuit := true;
   end;
 

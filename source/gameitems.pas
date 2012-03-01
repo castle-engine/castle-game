@@ -126,20 +126,6 @@ type
     procedure Release; override;
   end;
 
-  TItemKindList = class(specialize TFPGObjectList<TItemKind>)
-  public
-    { Calls Prepare for all items.
-      This does Progress.Init, Step, Fini. }
-    procedure Prepare(const BaseLights: TLightInstancesList);
-
-    { Call Release for all items. }
-    procedure Release;
-
-    { This opens items/kinds.xml file and calls LoadFromFile for
-      all existing TItemKind instances. }
-    procedure LoadFromFile;
-  end;
-
   TItemPotionOfLifeKind = class(TItemKind)
     procedure Use(Item: TItem); override;
   end;
@@ -317,7 +303,7 @@ type
   end;
 
 var
-  ItemsKinds: TItemKindList;
+  ItemsKinds: T3DResourceList;
 
   Sword: TItemSwordKind;
   Bow: TItemBowKind;
@@ -336,9 +322,6 @@ var
   AutoOpenInventory: boolean;
 
   InventoryVisible: boolean;
-
-{ Returns nil if not found. }
-function ItemKindWithShortName(const ShortName: string): TItemKind;
 
 implementation
 
@@ -444,49 +427,6 @@ procedure TItemKind.Release;
 begin
   FScene := nil;
   inherited;
-end;
-
-{ TItemKindList ------------------------------------------------------------- }
-
-procedure TItemKindList.Prepare(const BaseLights: TLightInstancesList);
-var
-  I: Integer;
-  PrepareSteps: Cardinal;
-begin
-  PrepareSteps := 0;
-  for I := 0 to Count - 1 do
-    PrepareSteps += Items[I].PrepareSteps;
-
-  Progress.Init(PrepareSteps, 'Loading items');
-  try
-    for I := 0 to Count - 1 do
-      Items[I].Prepare(BaseLights);
-  finally Progress.Fini; end;
-end;
-
-procedure TItemKindList.Release;
-var
-  I: Integer;
-begin
-  for I := 0 to Count - 1 do
-    Items[I].Release;
-end;
-
-procedure TItemKindList.LoadFromFile;
-var
-  I: Integer;
-  KindsConfig: TCastleConfig;
-begin
-  KindsConfig := TCastleConfig.Create(nil);
-  try
-    KindsConfig.FileName := ProgramDataPath + 'data' + PathDelim +
-      'items' + PathDelim + 'kinds.xml';
-
-    for I := 0 to Count - 1 do
-    begin
-      Items[I].LoadFromFile(KindsConfig);
-    end;
-  finally SysUtils.FreeAndNil(KindsConfig); end;
 end;
 
 { TItemPotionOfLifeKind ---------------------------------------------------- }
@@ -809,21 +749,6 @@ begin
   Result[2] += ItemRadius;
 end;
 
-{ other global stuff --------------------------------------------------- }
-
-function ItemKindWithShortName(const ShortName: string): TItemKind;
-var
-  I: Integer;
-begin
-  for I := 0 to ItemsKinds.Count - 1 do
-  begin
-    Result := ItemsKinds.Items[I];
-    if Result.ShortName = ShortName then
-      Exit;
-  end;
-  Result := nil;
-end;
-
 { initialization / finalization ---------------------------------------- }
 
 procedure WindowClose(Window: TCastleWindowBase);
@@ -849,7 +774,7 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@WindowClose);
 
-  ItemsKinds := TItemKindList.Create(true);
+  ItemsKinds := T3DResourceList.Create(true);
 
   Sword := TItemSwordKind.Create('Sword');
   Bow := TItemBowKind.Create('Bow');
@@ -857,7 +782,7 @@ begin
   ScrollOfFlying := TItemScrollOfFlyingKind.Create('ScrFlying');
   KeyItemKind := TItemKind.Create('Key');
   RedKeyItemKind := TItemKind.Create('RedKey');
-  Quiver := TItemKind.Create('Arrow');
+  Quiver := TItemKind.Create('Quiver');
 
   ItemsKinds.LoadFromFile;
 end;

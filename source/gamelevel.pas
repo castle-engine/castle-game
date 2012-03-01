@@ -350,7 +350,7 @@ type
 
 implementation
 
-uses SysUtils, GL,
+uses SysUtils, GL, GameObjectKinds,
   GamePlay, CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   GameVideoOptions, GameConfig, GameNotifications,
   GameInputs, GameWindow, CastleXMLUtils,
@@ -763,6 +763,7 @@ procedure TLevel.TraverseForItems(Shape: TShape);
 
   procedure CreateNewItem(const ItemNodeName: string);
   var
+    Resource: T3DResource;
     ItemKind: TItemKind;
     IgnoredBegin, ItemQuantityBegin: Integer;
     ItemKindQuantity, ItemKindShortName: string;
@@ -788,10 +789,11 @@ procedure TLevel.TraverseForItems(Shape: TShape);
       ItemQuantity := StrToInt(SEnding(ItemKindQuantity, ItemQuantityBegin));
     end;
 
-    ItemKind := ItemKindWithShortName(ItemKindShortName);
-    if ItemKind = nil then
-      raise Exception.CreateFmt('Item kind with ShortName "%s" doesn''t exist',
+    Resource := ItemsKinds.FindByShortName(ItemKindShortName);
+    if not (Resource is TItemKind) then
+      raise Exception.CreateFmt('Resource "%s" is not an item, but is referenced in model with Item prefix',
         [ItemKindShortName]);
+    ItemKind := TItemKind(Resource);
 
     ItemStubBoundingBox := Shape.BoundingBox;
     ItemPosition[0] := (ItemStubBoundingBox.Data[0, 0] + ItemStubBoundingBox.Data[1, 0]) / 2;
@@ -822,6 +824,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
   var
     StubBoundingBox: TBox3D;
     CreaturePosition, CreatureDirection: TVector3Single;
+    Resource: T3DResource;
     CreatureKind: TCreatureKind;
     CreatureKindName: string;
     IgnoredBegin: Integer;
@@ -851,7 +854,11 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     CreaturePosition[2] := StubBoundingBox.Data[0, 2];
 
     { calculate CreatureKind }
-    CreatureKind := CreaturesKinds.FindByShortName(CreatureKindName);
+    Resource := CreaturesKinds.FindByShortName(CreatureKindName);
+    if not (Resource is TCreatureKind) then
+      raise Exception.CreateFmt('Resource "%s" is not a creature, but is referenced in model with Crea prefix',
+        [CreatureKindName]);
+    CreatureKind := TCreatureKind(Resource);
     { The creature kind may be unprepared here only because
       --debug-no-creatures was specified. In this case, leave this
       creature kind unprepared and don't add this creature. }
