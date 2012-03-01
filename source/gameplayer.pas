@@ -1345,7 +1345,7 @@ begin
     SickProjectionSpeed := PlayerConfig.GetFloat('player/sick_projection_speed',
       10.0);
 
-    LoadRequiredResources(PlayerConfig.PathElement('player'), FRequiredResources);
+    FRequiredResources.LoadRequiredResources(PlayerConfig.PathElement('player'));
   finally SysUtils.FreeAndNil(PlayerConfig); end;
 end;
 

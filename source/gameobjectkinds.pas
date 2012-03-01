@@ -26,7 +26,7 @@ unit GameObjectKinds;
 interface
 
 uses Classes, CastleXMLConfig, PrecalculatedAnimation,
-  GameVideoOptions, CastleScene, X3DNodes, Base3D,
+  GameVideoOptions, CastleScene, X3DNodes, Base3D, DOM,
   FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
 
 type
@@ -150,6 +150,12 @@ type
 
     { Release all items. }
     procedure Release;
+
+    { Reads <resources_required> XML element. <resources_required> element
+      is required child of given ParentElement.
+      Sets current list value with all mentioned required
+      resources (subset of AllResources). }
+    procedure LoadRequiredResources(ParentElement: TDOMElement);
   end;
 
 var
@@ -157,7 +163,7 @@ var
 
 implementation
 
-uses SysUtils, ProgressUnit, DOM, GameWindow,
+uses SysUtils, ProgressUnit, GameWindow, CastleXMLUtils,
   CastleStringUtils, CastleLog, CastleFilesUtils, PrecalculatedAnimationCore;
 
 constructor T3DResource.Create(const AId: string);
@@ -342,6 +348,32 @@ begin
   end;
 
   raise Exception.CreateFmt('Not existing resource name "%s"', [AId]);
+end;
+
+procedure T3DResourceList.LoadRequiredResources(ParentElement: TDOMElement);
+var
+  RequiredResources: TDOMElement;
+  ResourceName: string;
+  I: TXMLElementIterator;
+begin
+  Clear;
+
+  RequiredResources := DOMGetChildElement(ParentElement, 'required_resources',
+    true);
+
+  I := TXMLElementIterator.Create(RequiredResources);
+  try
+    while I.GetNext do
+    begin
+      if I.Current.TagName <> 'resource' then
+        raise Exception.CreateFmt(
+          'Element "%s" is not allowed in <required_resources>',
+          [I.Current.TagName]);
+      if not DOMGetAttribute(I.Current, 'name', ResourceName) then
+        raise Exception.Create('<resource> must have a "name" attribute');
+      Add(AllResources.FindId(ResourceName));
+    end;
+  finally FreeAndNil(I) end;
 end;
 
 initialization

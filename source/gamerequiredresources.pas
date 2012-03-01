@@ -46,15 +46,6 @@ procedure UnRequireCreatures(Names: T3DResourceList);
 procedure RequireCreature(const BaseLights: TLightInstancesList; Kind: T3DResource);
 procedure UnRequireCreature(Kind: T3DResource);
 
-{ Loads a <resources_required> XML element (required child of given
-  ParentElement) into a RequiredCreatures list.
-
-  Passs here a created RequiredCreatures instance. It's contents
-  will be wiped by this procedure at the beginning. }
-procedure LoadRequiredResources(
-  ParentElement: TDOMElement;
-  RequiredCreatures: T3DResourceList);
-
 var
   DebugNoCreatures: boolean = false;
 
@@ -172,43 +163,6 @@ begin
     Names.Add(Kind);
     UnRequireCreatures(Names);
   finally FreeAndNil(Names) end;
-end;
-
-{ XML stuff ------------------------------------------------------------------ }
-
-procedure LoadRequiredResources(
-  ParentElement: TDOMElement;
-  RequiredCreatures: T3DResourceList);
-var
-  RequiredResources, ResourceElement: TDOMElement;
-  Children: TDOMNodeList;
-  ResourceName: string;
-  I: Integer;
-  Node: TDOMNode;
-begin
-  RequiredCreatures.Clear;
-
-  RequiredResources := DOMGetChildElement(ParentElement, 'required_resources',
-    true);
-
-  Children := RequiredResources.ChildNodes;
-  try
-    for I := 0 to Integer(Children.Count) - 1 do
-    begin
-      Node := Children.Item[I];
-      if Node.NodeType = ELEMENT_NODE then
-      begin
-        ResourceElement := Node as TDOMElement;
-        if ResourceElement.TagName <> 'resource' then
-          raise Exception.CreateFmt(
-            'Element "%s" is not allowed in <required_resources>',
-            [ResourceElement.TagName]);
-        if not DOMGetAttribute(ResourceElement, 'name', ResourceName) then
-          raise Exception.Create('<resource> must have a "name" attribute');
-        RequiredCreatures.Add(AllResources.FindId(ResourceName));
-      end;
-    end;
-  finally FreeChildNodes(Children) end;
 end;
 
 end.

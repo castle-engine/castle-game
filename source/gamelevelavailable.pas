@@ -223,7 +223,7 @@ begin
     LoadingBarYPosition) then
     LoadingBarYPosition := DefaultBarYPosition;
 
-  LoadRequiredResources(Element, RequiredResources);
+  RequiredResources.LoadRequiredResources(Element);
 end;
 
 procedure DrawCreateLevel(Window: TCastleWindowBase);
