@@ -348,13 +348,16 @@ type
 
   TLevelClass = class of TLevel;
 
+var
+  DebugNoCreatures: boolean = false;
+
 implementation
 
 uses SysUtils, GL,
   GamePlay, CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   GameVideoOptions, GameConfig, GameNotifications,
   GameInputs, GameWindow, CastleXMLUtils,
-  GameRequiredResources, GLRenderer, RenderingCameraUnit, Math;
+  GLRenderer, RenderingCameraUnit, Math;
 
 { TLevelArea ----------------------------------------------------------------- }
 
@@ -523,7 +526,7 @@ begin
   FRequiredResources.Assign(ARequiredResources);
 
   if not DebugNoCreatures then
-    RequireCreatures(BaseLights, FRequiredResources);
+    FRequiredResources.Require(BaseLights);
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -646,7 +649,7 @@ begin
   FreeAndNil(FWaypoints);
   FreeAndNil(FCreatures);
   if (FRequiredResources <> nil) and not DebugNoCreatures then
-    UnRequireCreatures(FRequiredResources);
+    FRequiredResources.UnRequire;
   FreeAndNil(FRequiredResources);
   inherited;
 end;

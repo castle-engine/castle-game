@@ -28,8 +28,8 @@ uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
   CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
-  GameCreatures, GamePlay, GameGeneralMenu,
-  GameRequiredResources, GameCredits, GLAntiAliasing, ALSoundEngine,
+  GameCreatures, GamePlay, GameGeneralMenu, GameLevel,
+  GameCredits, GLAntiAliasing, ALSoundEngine,
   GLRenderer;
 
 { requested screen size ------------------------------------------------------ }

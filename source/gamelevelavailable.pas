@@ -110,8 +110,7 @@ implementation
 
 uses SysUtils, GameConfig, CastleXMLUtils, CastleFilesUtils,
   GameLevelSpecific, XMLRead, GameWindow, GLImages,
-  Images, CastleWindow, WindowModes, UIControls,
-  GameRequiredResources;
+  Images, CastleWindow, WindowModes, UIControls;
 
 { TLevelAvailable ------------------------------------------------------------ }
 

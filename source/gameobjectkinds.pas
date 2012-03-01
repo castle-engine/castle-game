@@ -127,11 +127,14 @@ type
       Does progress (by Progress.Init...Fini inside). }
     procedure RedoPrepare(const BaseLights: TLightInstancesList);
 
-    { Used by RequireCreatures, UnRequireCreatures to count
+    { Used by Require, UnRequire to count
       how many times this kind is required. Idea is that when this drops
       to zero, we can Release to free resources. }
     property RequiredCount: Cardinal
       read FRequiredCount write FRequiredCount default 0;
+
+    procedure Require(const BaseLights: TLightInstancesList);
+    procedure UnRequire;
   end;
 
   T3DResourceList = class(specialize TFPGObjectList<T3DResource>)
@@ -156,6 +159,16 @@ type
       Sets current list value with all mentioned required
       resources (subset of AllResources). }
     procedure LoadRequiredResources(ParentElement: TDOMElement);
+
+    { Make sure given resource is required.
+      Internally, requiring a resource increases it's usage count.
+      The actual allocated memory is only released one required count gets back
+      to zero.
+      @groupBegin }
+    procedure Require(const BaseLights: TLightInstancesList;
+      const ResourcesName: string = 'resources');
+    procedure UnRequire;
+    { @groupEnd }
   end;
 
 var
@@ -163,7 +176,7 @@ var
 
 implementation
 
-uses SysUtils, ProgressUnit, GameWindow, CastleXMLUtils,
+uses SysUtils, ProgressUnit, GameWindow, CastleXMLUtils, CastleTimeUtils,
   CastleStringUtils, CastleLog, CastleFilesUtils, PrecalculatedAnimationCore;
 
 constructor T3DResource.Create(const AId: string);
@@ -294,6 +307,28 @@ begin
   Progress.Step;
 end;
 
+procedure T3DResource.Require(const BaseLights: TLightInstancesList);
+var
+  List: T3DResourceList;
+begin
+  List := T3DResourceList.Create(false);
+  try
+    List.Add(Self);
+    List.Require(BaseLights);
+  finally FreeAndNil(List) end;
+end;
+
+procedure T3DResource.UnRequire;
+var
+  List: T3DResourceList;
+begin
+  List := T3DResourceList.Create(false);
+  try
+    List.Add(Self);
+    List.UnRequire;
+  finally FreeAndNil(List) end;
+end;
+
 { T3DResourceList ------------------------------------------------------------- }
 
 procedure T3DResourceList.Prepare(const BaseLights: TLightInstancesList;
@@ -374,6 +409,95 @@ begin
       Add(AllResources.FindId(ResourceName));
     end;
   finally FreeAndNil(I) end;
+end;
+
+procedure T3DResourceList.Require(const BaseLights: TLightInstancesList;
+  const ResourcesName: string);
+var
+  I: Integer;
+  Resource: T3DResource;
+  PrepareSteps: Cardinal;
+  TimeBegin: TProcessTimerResult;
+  PrepareNeeded: boolean;
+begin
+  { We iterate two times over Items, first time only to calculate
+    PrepareSteps, 2nd time does actual work.
+    1st time increments RequiredCount (as 2nd pass may be optimized
+    out, if not needed). }
+
+  PrepareSteps := 0;
+  PrepareNeeded := false;
+  for I := 0 to Count - 1 do
+  begin
+    Resource := Items[I];
+    Resource.RequiredCount := Resource.RequiredCount + 1;
+    if Resource.RequiredCount = 1 then
+    begin
+      Assert(not Resource.Prepared);
+      PrepareSteps += Resource.PrepareSteps;
+      PrepareNeeded := true;
+    end;
+  end;
+
+  if PrepareNeeded then
+  begin
+    if Log then
+      TimeBegin := ProcessTimerNow;
+
+    Progress.Init(PrepareSteps, 'Loading ' + ResourcesName);
+    try
+      for I := 0 to Count - 1 do
+      begin
+        Resource := Items[I];
+        if Resource.RequiredCount = 1 then
+        begin
+          if Log then
+            WritelnLog('Resources', Format(
+              'Resource "%s" becomes required, loading', [Resource.Id]));
+          Resource.Prepare(BaseLights);
+        end;
+      end;
+    finally Progress.Fini end;
+
+    if Log then
+      WritelnLog('Resources', Format('Loading %s time: %f seconds',
+        [ ResourcesName,
+          ProcessTimerDiff(ProcessTimerNow, TimeBegin) / ProcessTimersPerSec ]));
+  end;
+end;
+
+procedure T3DResourceList.UnRequire;
+var
+  I: Integer;
+  Resource: T3DResource;
+begin
+  for I := 0 to Count - 1 do
+  begin
+    Resource := Items[I];
+    Assert(Resource.RequiredCount > 0);
+
+    Resource.RequiredCount := Resource.RequiredCount - 1;
+    if Resource.RequiredCount = 0 then
+    begin
+      if Log then
+        WritelnLog('Resources', Format(
+          'Creature "%s" is no longer required, freeing', [Resource.Id]));
+
+      { If everything went OK, I could place here an assertion
+
+          Assert(Resource.Prepared);
+
+        However, if resource loading inside Require will fail,
+        then scene manager destructor is forced to call UnRequire
+        on resources that, although had RequiredCount
+        increased, didn't have actually Prepare call.
+        Still, a correct run of the program (when resource loading goes 100% OK)
+        should always have Resource.RequiredCount > 0 here. }
+
+      if Resource.Prepared then
+        Resource.Release;
+    end;
+  end;
 end;
 
 initialization

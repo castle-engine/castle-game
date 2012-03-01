@@ -372,8 +372,7 @@ uses Math, SysUtils, CastleClassUtils, GamePlay, CastleMessages,
   GameWindow, CastleUtils, X3DNodes,
   CastleWindow, Images, CastleFilesUtils,
   PrecalculatedAnimation, ALUtils, CastleOpenAL, GameControlsMenu,
-  GameNotifications, CastleXMLConfig, GLImages,
-  GameRequiredResources;
+  GameNotifications, CastleXMLConfig, GLImages;
 
 var
   GLList_BlankIndicatorImage: TGLuint;
@@ -449,7 +448,7 @@ begin
     player creatures should be required/released at each level start probably. }
   BaseLights := TLightInstancesList.Create;
   try
-    RequireCreatures(BaseLights, RequiredResources);
+    RequiredResources.Require(BaseLights);
   finally FreeAndNil(BaseLights) end;
 
   { Although it will be called in every OnIdle anyway,
@@ -483,7 +482,7 @@ begin
 
   if RequiredResources <> nil then
   begin
-    UnRequireCreatures(RequiredResources);
+    RequiredResources.UnRequire;
     FreeAndNil(FRequiredResources);
   end;
 
