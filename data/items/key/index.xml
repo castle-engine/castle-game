@@ -5,6 +5,6 @@
   type="Item"
 
   scene="model.wrl"
-  name="Key"
+  caption="Key"
   image="image.png"
 />

@@ -422,7 +422,7 @@ end;
 procedure T3DResourceList.LoadRequiredResources(ParentElement: TDOMElement);
 var
   RequiredResources: TDOMElement;
-  ResourceName: string;
+  ResourceId: string;
   I: TXMLElementIterator;
 begin
   Clear;
@@ -438,9 +438,9 @@ begin
         raise Exception.CreateFmt(
           'Element "%s" is not allowed in <required_resources>',
           [I.Current.TagName]);
-      if not DOMGetAttribute(I.Current, 'name', ResourceName) then
-        raise Exception.Create('<resource> must have a "name" attribute');
-      Add(AllResources.FindId(ResourceName));
+      if not DOMGetAttribute(I.Current, 'id', ResourceId) then
+        raise Exception.Create('<resource> must have a "id" attribute');
+      Add(AllResources.FindId(ResourceId));
     end;
   finally FreeAndNil(I) end;
 end;

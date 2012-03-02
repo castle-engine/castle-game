@@ -422,7 +422,7 @@ procedure TDebugLevelMenu.Click;
 
       if Index <> LevelsAvailable.Count then
       begin
-        LevelFinished(LevelsAvailable[Index].Name);
+        LevelFinished(LevelsAvailable[Index].Id);
         { Flush LevelFinished now, to give new items when new level is loaded.
           Otherwise, some sounds (like equipping the sword, if player gets
           his first weapon) could be done before loading level progress,
@@ -442,7 +442,7 @@ procedure TDebugLevelMenu.Click;
     Dir := Player.Camera.Direction;
     Up := Player.Camera.Up;
 
-    LevelFinished(Level.Name);
+    LevelFinished(Level.Id);
     LevelFinishedFlush;
 
     { Change Player.Camera, they will be automatically set also for Player

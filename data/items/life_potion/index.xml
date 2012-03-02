@@ -5,6 +5,6 @@
   type="LifePotion"
 
   scene="model_processed.wrl"
-  name="Potion of Life"
+  caption="Potion of Life"
   image="image.png"
 />

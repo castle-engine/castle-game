@@ -519,7 +519,7 @@ function TPlayer.PickItem(Item: TItem): Integer;
 var
   S: string;
 begin
-  S := Format('You pick "%s"', [Item.Kind.Name]);
+  S := Format('You pick "%s"', [Item.Kind.Caption]);
   if Item.Quantity <> 1 then
     S += Format(' (quantity %d)', [Item.Quantity]);
   Notifications.Show(S);
@@ -562,7 +562,7 @@ begin
 
     if not MessageInputQueryCardinal(Window,
       Format('You have %d items "%s". How many of them do you want to drop ?',
-        [SelectedItem.Quantity, SelectedItem.Kind.Name]),
+        [SelectedItem.Quantity, SelectedItem.Kind.Caption]),
       DropQuantity, taLeft) then
       Exit(nil);
 
@@ -583,7 +583,7 @@ begin
     Result := SelectedItem.Split(DropQuantity);
   end;
 
-  S := Format('You drop "%s"', [Result.Kind.Name]);
+  S := Format('You drop "%s"', [Result.Kind.Caption]);
   if Result.Quantity <> 1 then
     S += Format(' (quantity %d)', [Result.Quantity]);
   Notifications.Show(S);
@@ -611,7 +611,7 @@ begin
     if FEquippedWeapon <> nil then
     begin
       Notifications.Show(Format('You''re using weapon "%s" now',
-        [EquippedWeapon.Kind.Name]));
+        [EquippedWeapon.Kind.Caption]));
       Assert(EquippedWeapon.Kind is TItemWeaponKind);
       SoundEngine.Sound(EquippedWeaponKind.EquippingSound);
       FEquippedWeapon.FreeNotification(Self);

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  name="gate"
+  id="gate"
   scene_file_name="gate_final.wrl"
   title="The Gate"
   number="1"
@@ -12,7 +12,7 @@
   footsteps_sound="player_footsteps_grass"
 >
   <required_resources>
-    <resource name="Ghost" />
-    <resource name="Spider" />
+    <resource id="Ghost" />
+    <resource id="Spider" />
   </required_resources>
 </level>

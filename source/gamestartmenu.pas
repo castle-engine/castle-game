@@ -157,7 +157,7 @@ begin
       try
         { Replace Level this way, so that restarting level doesn't
           free and reload all creature animations again. }
-        NewLevel := LevelsAvailable.FindName(GameEndedWantsRestart).CreateLevel;
+        NewLevel := LevelsAvailable.FindId(GameEndedWantsRestart).CreateLevel;
         FreeAndNil(Level);
         Level := NewLevel;
 

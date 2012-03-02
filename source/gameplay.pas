@@ -59,8 +59,8 @@ var
   Note that this doesn't work immediately, but will perform
   at nearest possibility. While LevelFinished is scheduled but not
   performed yet, you of course can't call LevelFinished once again
-  with different NextLevelName. }
-procedure LevelFinished(NextLevelName: string);
+  with different NextLevelId. }
+procedure LevelFinished(NextLevelId: string);
 
 { If some LevelFinished call is scheduled, this will force changing
   level @italic(now). Don't use this, unless you know that you can
@@ -124,7 +124,7 @@ var
   LevelFinishedSchedule: boolean = false;
   { If LevelFinishedSchedule, then this is not-'', and should be the name
     of next Level to load. }
-  LevelFinishedNextLevelName: string;
+  LevelFinishedNextLevelId: string;
 
   GameControls: TUIControlList;
 
@@ -221,7 +221,7 @@ procedure TGame2DControls.Draw;
 
       glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
 
-      S := Player.Items[I].Kind.Name;
+      S := Player.Items[I].Kind.Caption;
       if Player.Items[I].Quantity <> 1 then
         S += ' (' + IntToStr(Player.Items[I].Quantity) + ')';
       Font_BFNT_BitstreamVeraSans_m10.Print(S);
@@ -429,7 +429,7 @@ begin
       Window.Controls.Delete(WindowControlsPos) else
       WindowControlsPos := Window.Controls.Count;
 
-    NewLevel := LevelsAvailable.FindName(LevelFinishedNextLevelName).CreateLevel;
+    NewLevel := LevelsAvailable.FindId(LevelFinishedNextLevelId).CreateLevel;
 
     { copy DisableContextOpenClose value to new level.
       This is needed when it's called from inside debug menu,
@@ -732,7 +732,7 @@ procedure EventDown(AKey: TKey;
       TCastleSceneManager.Input_PointingDeviceActivate is equal to interact key. }
     if GameWin or Player.Dead then
     begin
-      GameEndedWantsRestart := Level.Name;
+      GameEndedWantsRestart := Level.Id;
       GameEnded := true;
     end;
   end;
@@ -878,9 +878,9 @@ begin
   end;
 end;
 
-procedure LevelFinished(NextLevelName: string);
+procedure LevelFinished(NextLevelId: string);
 begin
-  if NextLevelName = '' then
+  if NextLevelId = '' then
   begin
     Notifications.Show('Congratulations, game finished');
     GameWin := true;
@@ -888,12 +888,12 @@ begin
   end else
   begin
     if LevelFinishedSchedule and
-      (LevelFinishedNextLevelName <> NextLevelName) then
+      (LevelFinishedNextLevelId <> NextLevelId) then
       raise EInternalError.Create(
         'You cannot call LevelFinished while previous LevelFinished is not done yet');
 
     LevelFinishedSchedule := true;
-    LevelFinishedNextLevelName := NextLevelName;
+    LevelFinishedNextLevelId := NextLevelId;
   end;
 end;
 

@@ -60,13 +60,13 @@ type
     Note that after creating an instance of this item,
     before you do anything else, you have to initialize some of it's
     properties by calling LoadFromFile. In this class, this initializes
-    it's SceneFileName, Name amd ImageFileName --- in descendants, more
+    it's SceneFileName, Caption amd ImageFileName --- in descendants, more
     required properties may be initialized here. }
   TItemKind = class(T3DResource)
   private
     FSceneFileName: string;
     FScene: TCastleScene;
-    FName: string;
+    FCaption: string;
     FImageFileName: string;
     FImage: TImage;
     FGLList_DrawImage: TGLuint;
@@ -80,8 +80,8 @@ type
 
     property SceneFileName: string read FSceneFileName;
 
-    { Nice name for user. }
-    property Name: string read FName;
+    { Nice caption to display. }
+    property Caption: string read FCaption;
 
     { Note that the Scene is nil if not Prepared. }
     function Scene: TCastleScene;
@@ -351,9 +351,9 @@ begin
   FSceneFileName := KindsConfig.GetFileName('scene');
   FImageFileName := KindsConfig.GetFileName('image');
 
-  FName := KindsConfig.GetValue('name', '');
-  if FName = '' then
-    raise Exception.CreateFmt('Empty name attribute for item "%s"', [Id]);
+  FCaption := KindsConfig.GetValue('caption', '');
+  if FCaption = '' then
+    raise Exception.CreateFmt('Empty caption attribute for item "%s"', [Id]);
 end;
 
 function TItemKind.Scene: TCastleScene;
@@ -436,7 +436,7 @@ begin
   if Player.Life < Player.MaxLife then
   begin
     Player.Life := Min(Player.Life + 50, Player.MaxLife);
-    Notifications.Show(Format('You drink "%s"', [Item.Kind.Name]));
+    Notifications.Show(Format('You drink "%s"', [Item.Kind.Caption]));
     Item.Quantity := Item.Quantity - 1;
     SoundEngine.Sound(stPlayerPotionDrink);
   end else
@@ -563,7 +563,7 @@ end;
 
 procedure TItemScrollOfFlyingKind.Use(Item: TItem);
 begin
-  Notifications.Show(Format('You cast spell from "%s"', [Item.Kind.Name]));
+  Notifications.Show(Format('You cast spell from "%s"', [Item.Kind.Caption]));
   Player.FlyingModeTimeoutBegin(30.0);
   Item.Quantity := Item.Quantity - 1;
   SoundEngine.Sound(stPlayerCastFlyingSpell);
@@ -729,7 +729,7 @@ begin
 
   if Distance <= VisibleItemDistance then
   begin
-    S := Format('You see an item "%s"', [Item.Kind.Name]);
+    S := Format('You see an item "%s"', [Item.Kind.Caption]);
     if Item.Quantity <> 1 then
       S += Format(' (quantity %d)', [Item.Quantity]);
     Notifications.Show(S);

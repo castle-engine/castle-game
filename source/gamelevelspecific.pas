@@ -51,7 +51,7 @@ type
     procedure ChangeLevelScene; override;
   public
     constructor Create(
-      const AName: string;
+      const AId: string;
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
@@ -91,7 +91,7 @@ type
     procedure ChangeLevelScene; override;
   public
     constructor Create(
-      const AName: string;
+      const AId: string;
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
@@ -113,7 +113,7 @@ type
     ElevatorButton: TCastlePrecalculatedAnimation;
   public
     constructor Create(
-      const AName: string;
+      const AId: string;
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
@@ -147,7 +147,7 @@ type
     procedure SetGameWinAnimation(Value: TGameWinAnimation);
   public
     constructor Create(
-      const AName: string;
+      const AId: string;
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
@@ -208,7 +208,7 @@ type
     procedure ChangeLevelScene; override;
   public
     constructor Create(
-      const AName: string;
+      const AId: string;
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
@@ -225,7 +225,7 @@ type
   TGateBackgroundLevel = class(TLevel)
   public
     constructor Create(
-      const AName: string;
+      const AId: string;
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
@@ -238,7 +238,7 @@ type
     procedure ChangeLevelScene; override;
   public
     constructor Create(
-      const AName: string;
+      const AId: string;
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
@@ -315,7 +315,7 @@ end;
 { TCastleHallLevel ----------------------------------------------------------- }
 
 constructor TCastleHallLevel.Create(
-  const AName: string;
+  const AId: string;
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
@@ -543,7 +543,7 @@ end;
 { TGateLevel ----------------------------------------------------------------- }
 
 constructor TGateLevel.Create(
-  const AName: string;
+  const AId: string;
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
@@ -779,7 +779,7 @@ end;
 { TTowerLevel ---------------------------------------------------------------- }
 
 constructor TTowerLevel.Create(
-  const AName: string;
+  const AId: string;
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
@@ -875,7 +875,7 @@ end;
 { TCagesLevel ---------------------------------------------------------------- }
 
 constructor TCagesLevel.Create(
-  const AName: string;
+  const AId: string;
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
@@ -1222,7 +1222,7 @@ end;
 { TDoomE1M1Level ------------------------------------------------------------- }
 
 constructor TDoomE1M1Level.Create(
-  const AName: string;
+  const AId: string;
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
@@ -1379,7 +1379,7 @@ end;
 { TGateBackgroundLevel ------------------------------------------------------- }
 
 constructor TGateBackgroundLevel.Create(
-  const AName: string;
+  const AId: string;
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
@@ -1405,7 +1405,7 @@ end;
 { TFountainLevel ------------------------------------------------------------- }
 
 constructor TFountainLevel.Create(
-  const AName: string;
+  const AId: string;
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;

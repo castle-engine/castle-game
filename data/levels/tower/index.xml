@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  name="tower"
+  id="tower"
   scene_file_name="basic_castle_final.wrl"
 
   title="Tower"
@@ -14,13 +14,13 @@
   footsteps_sound="player_footsteps_grass"
 >
 
-  <area name="HintElevButton">
+  <area id="HintElevButton">
     <hint>Hint: press the elevator button using the %i</hint>
   </area>
 
   <required_resources>
-    <resource name="Alien" />
-    <resource name="BallMissile" />
+    <resource id="Alien" />
+    <resource id="BallMissile" />
   </required_resources>
 
 </level>

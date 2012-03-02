@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  name="doom_e1m1"
+  id="doom_e1m1"
   scene_file_name="e1m1/e1m1_final.wrl"
 
   title="Doom E1M1"
@@ -17,16 +17,16 @@
   played_music_sound="doom_e1m1"
   footsteps_sound="player_footsteps_concrete">
 
-  <area name="HintOpenDoorBox">
+  <area id="HintOpenDoorBox">
     <hint>Hint: open doors using the %i</hint>
   </area>
 
   <required_resources>
-    <resource name="Alien" />
-    <resource name="Werewolf" />
-    <resource name="BallMissile" />
-    <resource name="Ghost" />
-    <resource name="DoomBarrel" />
+    <resource id="Alien" />
+    <resource id="Werewolf" />
+    <resource id="BallMissile" />
+    <resource id="Ghost" />
+    <resource id="DoomBarrel" />
   </required_resources>
 
 </level>

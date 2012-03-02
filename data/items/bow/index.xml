@@ -6,7 +6,7 @@
 
   actual_attack_time="0.0"
   scene="model_final.wrl"
-  name="Bow"
+  caption="Bow"
   image="image.png"
 
   equipping_sound="bow_equipping"

@@ -6,7 +6,7 @@
 
   actual_attack_time="0.294"
   scene="model.wrl"
-  name="Sword"
+  caption="Sword"
   image="image.png"
 
   equipping_sound="sword_equipping"

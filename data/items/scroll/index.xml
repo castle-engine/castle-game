@@ -5,6 +5,6 @@
   type="ScrFlying"
 
   scene="model_final.wrl"
-  name="Scroll Of Flying"
+  caption="Scroll Of Flying"
   image="image.png"
 />

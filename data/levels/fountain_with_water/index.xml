@@ -2,7 +2,7 @@
 
 <!-- Another entry for fountain level, to load it with water animation -->
 <level
-  name="fountain-with-water"
+  id="fountain-with-water"
   scene_file_name="../fountain/fountain_final.wrl"
   title="Fountain"
   title_hint="with costly water animation"
@@ -18,7 +18,7 @@
 >
 
   <required_resources>
-    <resource name="Alien" />
-    <resource name="BallMissile" />
+    <resource id="Alien" />
+    <resource id="BallMissile" />
   </required_resources>
 </level>

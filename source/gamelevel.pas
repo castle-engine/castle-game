@@ -139,7 +139,7 @@ type
     FPlayedMusicSound: TSoundType;
     FThunderEffect: TThunderEffect;
   private
-    FName: string;
+    FId: string;
     FSceneFileName: string;
     FTitle: string;
     FTitleHint: string;
@@ -206,7 +206,7 @@ type
       This uses ProgressUnit while loading creating octrees,
       be sure to initialize Progress.UserInterface before calling this. }
     constructor Create(
-      const AName: string;
+      const AId: string;
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
@@ -215,15 +215,10 @@ type
 
     destructor Destroy; override;
 
-    { This is an internal name for this level.
-      Should follow the same
-      rules as Pascal identifier: 1st character (_ or letter),
-      then any number of letters or _ or digits.
-
-      All available levels must have different Name.
-
+    { Unique identifier for this level.
+      Should be a suitable identifier in Pascal.
       @noAutoLinkHere }
-    property Name: string read FName;
+    property Id: string read FId;
 
     { These will be used in constructor to load level.
       @groupBegin }
@@ -421,7 +416,7 @@ const
     ssCollidableTriangles;
 
 constructor TLevel.Create(
-  const AName: string;
+  const AId: string;
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
@@ -518,7 +513,7 @@ begin
   ApproximateActivation := true;
   Input_PointingDeviceActivate.Assign(CastleInput_Interact.Shortcut, false);
 
-  FName := AName;
+  FId := AId;
   FSceneFileName := ASceneFileName;
   FTitle := ATitle;
   FTitleHint := ATitleHint;
@@ -680,8 +675,8 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
       raise Exception.CreateFmt('Not allowed children element of <area>: "%s"',
         [Child.TagName]);
 
-    if not DOMGetAttribute(Element, 'name', Result.FId) then
-      MissingRequiredAttribute('name', 'area');
+    if not DOMGetAttribute(Element, 'id', Result.FId) then
+      MissingRequiredAttribute('id', 'area');
   end;
 
   function LevelObjectFromDOMElement(Element: TDOMElement): T3D;

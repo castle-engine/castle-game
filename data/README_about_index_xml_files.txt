@@ -73,8 +73,8 @@ Documentation for level description, in levels/*/index.xml:
   handled with vanilla TLevel implementation.
   Many advanced tricks are possible by implementing in the game code
   (GameLevelSpecific unit) a descendant class of TLevel that does
-  something special, then you should set this attribute to the name
-  of that class.
+  something special, then you should set this attribute to the id
+  of that class (see bottom of GameLevelSpecific for possible names).
 
 - loading_bg: filename of image file to display while loading the
   level (under the progress bar). Optional.

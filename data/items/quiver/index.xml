@@ -5,6 +5,6 @@
   type="Item"
 
   scene="model.wrl"
-  name="Arrow"
+  caption="Arrow"
   image="image.png"
 />

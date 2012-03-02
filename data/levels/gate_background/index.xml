@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  name="gate_background"
+  id="gate_background"
   scene_file_name="gate_final.wrl"
   title="Background"
   number="101"

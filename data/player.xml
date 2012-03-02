@@ -30,7 +30,7 @@
     />
 
     <required_resources>
-      <resource name="Arrow" />
+      <resource id="Arrow" />
     </required_resources>
   </player>
 </CONFIG>

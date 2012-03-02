@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  name="castle_hall"
+  id="castle_hall"
   scene_file_name="castle_hall_final.wrl"
   title="Castle Hall"
   number="2"
@@ -10,14 +10,14 @@
   played_music_sound="castle_hall_music"
   footsteps_sound="player_footsteps_concrete">
 
-  <area name="HintButtonBox">
+  <area id="HintButtonBox">
     <hint>Hint: press this red button with the %i</hint>
   </area>
 
   <required_resources>
-    <resource name="Alien" />
-    <resource name="Werewolf" />
-    <resource name="BallMissile" />
+    <resource id="Alien" />
+    <resource id="Werewolf" />
+    <resource id="BallMissile" />
   </required_resources>
 
 </level>

@@ -53,7 +53,7 @@ type
 
     { These will be passed to TLevel constructor --- see appropriate TLevel
       properties for description. }
-    Name: string;
+    Id: string;
     SceneFileName: string;
     Title: string;
     TitleHint: string;
@@ -77,8 +77,8 @@ type
   private
     procedure LoadIndexXml(const FileName: string);
   public
-    { raises Exception if such Name is not on the list. }
-    function FindName(const AName: string): TLevelAvailable;
+    { raises Exception if such Id is not on the list. }
+    function FindId(const AId: string): TLevelAvailable;
 
     procedure SortByNumber;
 
@@ -168,8 +168,8 @@ begin
 
   { Required atttributes }
 
-  if not DOMGetAttribute(Element, 'name', Name) then
-    MissingRequiredAttribute('name');
+  if not DOMGetAttribute(Element, 'id', Id) then
+    MissingRequiredAttribute('id');
 
   if not DOMGetAttribute(Element, 'scene_file_name', SceneFileName) then
     MissingRequiredAttribute('scene_file_name');
@@ -226,7 +226,7 @@ function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
 
   procedure CreateLevelCore;
   begin
-    Result := LevelClass.Create(Name, SceneFileName,
+    Result := LevelClass.Create(Id, SceneFileName,
       Title, TitleHint, Number, Element, RequiredResources,
       MenuBackground);
     if not MenuBackground then
@@ -284,16 +284,16 @@ end;
 
 { TLevelAvailableList ------------------------------------------------------- }
 
-function TLevelAvailableList.FindName(const AName: string): TLevelAvailable;
+function TLevelAvailableList.FindId(const AId: string): TLevelAvailable;
 var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
-    if Items[I].Name = AName then
+    if Items[I].Id = AId then
       Exit(Items[I]);
 
   raise Exception.CreateFmt(
-    'Level "%s" not found on LevelsAvailable list', [AName]);
+    'Level id "%s" not found on LevelsAvailable list', [AId]);
 end;
 
 function IsSmallerByNumber(const A, B: TLevelAvailable): Integer;
@@ -312,7 +312,7 @@ var
 begin
   for I := 0 to Count - 1 do
     Items[I].AvailableForNewGame := ConfigFile.GetValue(
-      'levels_available/' + Items[I].Name,
+      'levels_available/' + Items[I].Id,
       Items[I].DefaultAvailableForNewGame);
 end;
 
@@ -322,7 +322,7 @@ var
 begin
   for I := 0 to Count - 1 do
     ConfigFile.SetDeleteValue(
-      'levels_available/' + Items[I].Name,
+      'levels_available/' + Items[I].Id,
       Items[I].AvailableForNewGame,
       Items[I].DefaultAvailableForNewGame);
 end;
