@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<Resource
+<resource
   id="Ghost"
   type="Ghost"
 
@@ -32,4 +32,4 @@
   <short_range_attack knockback_distance="0.0">
     <damage const="7" random="8"/>
   </short_range_attack>
-</Resource>
+</resource>

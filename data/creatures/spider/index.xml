@@ -7,7 +7,7 @@
      player could avoid attacks just by standing very close to the spider
      (without crouching). -->
 
-<Resource
+<resource
   id="Spider"
   type="Spider"
 
@@ -36,4 +36,4 @@
   <short_range_attack knockback_distance="0.1">
     <damage const="10" random="10"/>
   </short_range_attack>
-</Resource>
+</resource>

@@ -9,7 +9,7 @@
      For now, not used - - - let's allow inventive players to use it.
 -->
 
-<Resource
+<resource
   id="SpiderQueen"
   type="SpiderQueen"
 
@@ -51,4 +51,4 @@
     max_angle_to_attack="4"
     actual_attack_time="0.6"
   />
-</Resource>
+</resource>

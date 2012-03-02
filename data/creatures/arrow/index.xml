@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<Resource
+<resource
   id="Arrow"
   type="Missile"
 
@@ -22,4 +22,4 @@
   <short_range_attack knockback_distance="1">
     <damage const="20" random="20"/>
   </short_range_attack>
-</Resource>
+</resource>

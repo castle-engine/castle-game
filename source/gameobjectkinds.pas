@@ -389,7 +389,7 @@ procedure T3DResourceList.LoadFromFile;
         begin
           Xml := TCastleConfig.Create(nil);
           try
-            Xml.RootName := 'Resource';
+            Xml.RootName := 'resource';
             Xml.NotModified; { otherwise changing RootName makes it modified, and saved back at freeing }
             Xml.FileName := XmlName;
             if Log then

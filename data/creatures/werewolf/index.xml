@@ -5,7 +5,7 @@
      so without this special large max_angle_to_attack value,
      player could avoid attacks just by crouching. -->
 
-<Resource
+<resource
   id="Werewolf"
   type="Werewolf"
 
@@ -39,4 +39,4 @@
   <short_range_attack knockback_distance="6.0">
     <damage const="5" random="5"/>
   </short_range_attack>
-</Resource>
+</resource>

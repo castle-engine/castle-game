@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<Resource
+<resource
   id="ThrownWeb"
   type="Missile"
 
@@ -20,4 +20,4 @@
   <short_range_attack knockback_distance="5">
     <damage const="10" random="10"/>
   </short_range_attack>
-</Resource>
+</resource>
