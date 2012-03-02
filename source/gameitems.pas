@@ -305,8 +305,8 @@ type
 var
   ItemsKinds: T3DResourceList;
 
-  Sword: TItemSwordKind;
-  Bow: TItemBowKind;
+  Sword: TItemKind;
+  Bow: TItemKind;
   LifePotion: TItemKind;
   ScrollOfFlying: TItemKind;
   KeyItemKind: TItemKind;
@@ -773,15 +773,16 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@WindowClose);
 
+// TODO
   ItemsKinds := T3DResourceList.Create(true);
 
-  Sword := TItemSwordKind.Create('Sword');
-  Bow := TItemBowKind.Create('Bow');
-  LifePotion := TItemPotionOfLifeKind.Create('LifePotion');
-  ScrollOfFlying := TItemScrollOfFlyingKind.Create('ScrFlying');
-  KeyItemKind := TItemKind.Create('Key');
-  RedKeyItemKind := TItemKind.Create('RedKey');
-  Quiver := TItemKind.Create('Quiver');
+  Sword := AllResources.FindId('Sword') as TItemKind;
+  Bow := AllResources.FindId('Bow') as TItemKind;
+  LifePotion := AllResources.FindId('LifePotion') as TItemKind;
+  ScrollOfFlying := AllResources.FindId('ScrFlying') as TItemKind;
+  KeyItemKind := AllResources.FindId('Key') as TItemKind;
+  RedKeyItemKind := AllResources.FindId('RedKey') as TItemKind;
+  Quiver := AllResources.FindId('Quiver') as TItemKind;
 
   ItemsKinds.LoadFromFile;
 end;
@@ -795,6 +796,12 @@ initialization
   DoInitialization;
   AutoOpenInventory := ConfigFile.GetValue(
     'auto_open_inventory', DefaultAutoOpenInventory);
+
+  RegisterResourceClass(TItemKind, 'Item');
+  RegisterResourceClass(TItemSwordKind, 'Sword');
+  RegisterResourceClass(TItemBowKind, 'Bow');
+  RegisterResourceClass(TItemPotionOfLifeKind, 'LifePotion');
+  RegisterResourceClass(TItemScrollOfFlyingKind, 'ScrFlying');
 finalization
   DoFinalization;
   ConfigFile.SetDeleteValue('auto_open_inventory',

@@ -137,6 +137,8 @@ type
     procedure UnRequire;
   end;
 
+  T3DResourceClass = class of T3DResource;
+
   T3DResourceList = class(specialize TFPGObjectList<T3DResource>)
   public
     { Find resource with given T3DResource.Id.
@@ -173,6 +175,10 @@ type
 
 var
   AllResources: T3DResourceList;
+
+{ Register a class, to allow user to create creatures/items of this class
+  by using appropriate type="xxx" inside index.xml file. }
+procedure RegisterResourceClass(const AClass: T3DResourceClass; const TypeName: string);
 
 implementation
 
@@ -500,8 +506,22 @@ begin
   end;
 end;
 
+{ resource classes ----------------------------------------------------------- }
+
+type
+  TResourceClasses = specialize TFPGMap<string, T3DResourceClass>;
+var
+  ResourceClasses: TResourceClasses;
+
+procedure RegisterResourceClass(const AClass: T3DResourceClass; const TypeName: string);
+begin
+  ResourceClasses.KeyData[TypeName] := AClass;
+end;
+
 initialization
   AllResources := T3DResourceList.Create(false);
+  ResourceClasses := TResourceClasses.Create;
 finalization
   FreeAndNil(AllResources);
+  FreeAndNil(ResourceClasses);
 end.

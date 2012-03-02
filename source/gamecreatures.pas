@@ -2826,17 +2826,18 @@ procedure DoInitialization;
 begin
   Window.OnCloseList.Add(@WindowClose);
 
+// TODO
   CreaturesKinds := T3DResourceList.Create(true);
 
-  Alien := TAlienCreatureKind.Create('Alien');
-  Werewolf := TWerewolfKind.Create('Werewolf');
-  BallMissile := TMissileCreatureKind.Create('BallMissile');
-  Ghost := TGhostKind.Create('Ghost');
-  Spider := TSpiderKind.Create('Spider');
-  SpiderQueen := TSpiderQueenKind.Create('SpiderQueen');
-  ThrownWeb := TMissileCreatureKind.Create('ThrownWeb');
-  Arrow := TMissileCreatureKind.Create('Arrow');
-  Barrel := TStillCreatureKind.Create('DoomBarrel');
+  Alien := AllResources.FindId('Alien') as TAlienCreatureKind;
+  Werewolf := AllResources.FindId('Werewolf') as TWerewolfKind;
+  BallMissile := AllResources.FindId('BallMissile') as TMissileCreatureKind;
+  Ghost := AllResources.FindId('Ghost') as TGhostKind;
+  Spider := AllResources.FindId('Spider') as TSpiderKind;
+  SpiderQueen := AllResources.FindId('SpiderQueen') as TSpiderQueenKind;
+  ThrownWeb := AllResources.FindId('ThrownWeb') as TMissileCreatureKind;
+  Arrow := AllResources.FindId('Arrow') as TMissileCreatureKind;
+  Barrel := AllResources.FindId('DoomBarrel') as TStillCreatureKind;
 
   CreaturesKinds.LoadFromFile;
 end;
@@ -2848,6 +2849,14 @@ end;
 
 initialization
   DoInitialization;
+
+  RegisterResourceClass(TAlienCreatureKind, 'Alien');
+  RegisterResourceClass(TWerewolfKind, 'Werewolf');
+  RegisterResourceClass(TMissileCreatureKind, 'Missile');
+  RegisterResourceClass(TGhostKind, 'Ghost');
+  RegisterResourceClass(TSpiderKind, 'Spider');
+  RegisterResourceClass(TSpiderQueenKind, 'SpiderQueen');
+  RegisterResourceClass(TStillCreatureKind, 'Still');
 finalization
   DoFinalization;
 end.
