@@ -102,8 +102,9 @@ type
   end;
 
 var
-  { List of all available TLevel classes, along with information
-    whether they are allowed to be placed in "New Game" levels.
+  { List of all available levels.
+    This has all the information needed to present user a list of levels,
+    and to actually load a given level (create suitable TLevel instance).
     Created in initialization of this unit, destroyed in finalization.
     Owns it's Items. }
   LevelsAvailable: TLevelAvailableList;
@@ -381,7 +382,7 @@ initialization
   Window.OnOpenList.Add(@WindowOpen);
   Window.OnCloseList.Add(@WindowClose);
 finalization
-  { Call CloseGLW in case OnClose event would happen after finalization
+  { Call WindowClose in case OnClose event would happen after finalization
     of this unit. }
   WindowClose(Window);
 end.
