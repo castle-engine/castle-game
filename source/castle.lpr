@@ -30,7 +30,7 @@ uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, GameLevel,
   GameCredits, GLAntiAliasing, ALSoundEngine,
-  GLRenderer;
+  GLRenderer, GameObjectKinds, GameItems, GameLevelAvailable;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -208,6 +208,13 @@ begin
     each item is counted as PrepareSteps steps,
     when loading levels user would have to know what an "octree" is. }
   Progress.UseDescribePosition := false;
+
+  { initialize available creatures and items and levels }
+  AllResources.LoadFromFile;
+  ItemsKindsInit;
+  CreaturesKindsInit;
+  LevelsAvailable.LoadFromFile;
+  LevelsAvailable.LoadFromConfig;
 
   { init OpenAL (after initing Glw and Progress, because ALContextOpen
     wants to display progress of "Loading sounds") }

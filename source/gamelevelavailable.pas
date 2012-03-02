@@ -88,12 +88,18 @@ type
     procedure LoadFromConfig;
     procedure SaveToConfig;
 
-    { This fills this list with items read from levels/index.xml.
+    { Fill this list with items read from levels/index.xml.
 
       All AvailableForNewGame are initially set to @false
       (LoadFromConfig will set them to something read from user's
       config file or to DefaultAvailableForNewGame if nothing in user's
-      config file). }
+      config file).
+
+      This can be done only once Window is open,
+      because loading levels requires knowledge of window size
+      (to scale level loading background images).
+      Also, this can be done only once creatures and items resources are known,
+      as they may be referenced in levels XML files. }
     procedure LoadFromFile;
 
     property MenuBackgroundLevelName: string read FMenuBackgroundLevelName write FMenuBackgroundLevelName;
@@ -241,7 +247,7 @@ function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
   procedure CreateLevelCore;
   begin
     Result := LevelClass.Create(Name, SceneFileName,
-      Title, TitleHint, Number, LevelDOMElement, RequiredResources, 
+      Title, TitleHint, Number, LevelDOMElement, RequiredResources,
       MenuBackground);
     if not MenuBackground then
       AvailableForNewGame := true;
@@ -387,11 +393,6 @@ end;
 
 procedure WindowOpen(Window: TCastleWindowBase);
 begin
-  { Do this now (not at initialization), because loading available
-    levels requires knowledge of Glw window sizes (because LoadingBg
-    image is scaled to this size). }
-  LevelsAvailable.LoadFromFile;
-  LevelsAvailable.LoadFromConfig;
 end;
 
 procedure WindowClose(Window: TCastleWindowBase);

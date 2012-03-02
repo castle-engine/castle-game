@@ -87,7 +87,7 @@ type
       const BaseLights: TLightInstancesList);
     { @groupEnd }
   public
-    constructor Create(const AId: string);
+    constructor Create(const AId: string); virtual;
     destructor Destroy; override;
 
     { Prepare everything needed for using this resource.
@@ -184,6 +184,13 @@ implementation
 
 uses SysUtils, ProgressUnit, GameWindow, CastleXMLUtils, CastleTimeUtils,
   CastleStringUtils, CastleLog, CastleFilesUtils, PrecalculatedAnimationCore;
+
+type
+  TResourceClasses = specialize TFPGMap<string, T3DResourceClass>;
+var
+  ResourceClasses: TResourceClasses;
+
+{ T3DResource ---------------------------------------------------------------- }
 
 constructor T3DResource.Create(const AId: string);
 begin
@@ -363,18 +370,51 @@ begin
 end;
 
 procedure T3DResourceList.LoadFromFile;
-var
-  I: Integer;
-  KindsConfig: TCastleConfig;
+
+  procedure LoadFromPath(const Path: string);
+  var
+    F: TSearchRec;
+    XmlName: string;
+    Xml: TCastleConfig;
+    ResourceClassName, ResourceId: string;
+    ResourceClassIndex: Integer;
+    Resource: T3DResource;
+  begin
+    if FindFirst(Path + '*', faDirectory, F) = 0 then
+    repeat
+      if F.Attr and faDirectory = faDirectory then
+      begin
+        XmlName := Path + F.Name + PathDelim + 'index.xml';
+        if FileExists(XmlName) then
+        begin
+          Xml := TCastleConfig.Create(nil);
+          try
+            Xml.RootName := 'Resource';
+            Xml.NotModified; { otherwise changing RootName makes it modified, and saved back at freeing }
+            Xml.FileName := XmlName;
+            if Log then
+              WritelnLog('Resources', Format('Loading T3DResource from "%s"', [XmlName]));
+            ResourceClassName := Xml.GetNonEmptyValue('type');
+            ResourceId := Xml.GetNonEmptyValue('id');
+            ResourceClassIndex := ResourceClasses.IndexOf(ResourceClassName);
+            if ResourceClassIndex <> -1 then
+            begin
+              Resource := ResourceClasses.Data[ResourceClassIndex].Create(ResourceId);
+              Add(Resource);
+              Resource.LoadFromFile(Xml);
+            end else
+              raise Exception.CreateFmt('Resource type "%s" not found, mentioned in file "%s"',
+                [ResourceClassName, XmlName]);
+          finally FreeAndNil(Xml) end;
+        end;
+      end;
+    until FindNext(F) <> 0;
+    FindClose(F);
+  end;
+
 begin
-  KindsConfig := TCastleConfig.Create(nil);
-  try
-    KindsConfig.FileName := ProgramDataPath + 'data' + PathDelim + 'index.xml';
-    for I := 0 to Count - 1 do
-    begin
-      Items[I].LoadFromFile(KindsConfig);
-    end;
-  finally FreeAndNil(KindsConfig); end;
+  LoadFromPath(ProgramDataPath + 'data' + PathDelim + 'creatures' + PathDelim);
+  LoadFromPath(ProgramDataPath + 'data' + PathDelim + 'items' + PathDelim);
 end;
 
 function T3DResourceList.FindId(const AId: string): T3DResource;
@@ -507,11 +547,6 @@ begin
 end;
 
 { resource classes ----------------------------------------------------------- }
-
-type
-  TResourceClasses = specialize TFPGMap<string, T3DResourceClass>;
-var
-  ResourceClasses: TResourceClasses;
 
 procedure RegisterResourceClass(const AClass: T3DResourceClass; const TypeName: string);
 begin

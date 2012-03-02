@@ -73,8 +73,7 @@ type
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   public
-    { The constructor. }
-    constructor Create(const AId: string);
+    constructor Create(const AId: string); override;
     destructor Destroy; override;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
@@ -184,7 +183,7 @@ type
     FDamageRandom: Single;
     FAttackKnockbackDistance: Single;
   public
-    constructor Create(const AId: string);
+    constructor Create(const AId: string); override;
 
     property DamageConst: Single read FDamageConst write FDamageConst
       default DefaultItemDamageConst;
@@ -323,6 +322,8 @@ var
 
   InventoryVisible: boolean;
 
+procedure ItemsKindsInit;
+
 implementation
 
 uses SysUtils, CastleWindow, GameWindow,
@@ -348,10 +349,10 @@ procedure TItemKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  FSceneFileName := KindsConfig.GetFileName(Id + '/scene');
-  FImageFileName := KindsConfig.GetFileName(Id + '/image');
+  FSceneFileName := KindsConfig.GetFileName('scene');
+  FImageFileName := KindsConfig.GetFileName('image');
 
-  FName := KindsConfig.GetValue(Id + '/name', '');
+  FName := KindsConfig.GetValue('name', '');
   if FName = '' then
     raise Exception.CreateFmt('Empty name attribute for item "%s"', [Id]);
 end;
@@ -475,16 +476,16 @@ procedure TItemWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  ActualAttackTime := KindsConfig.GetFloat(Id + '/actual_attack_time',
+  ActualAttackTime := KindsConfig.GetFloat('actual_attack_time',
     DefaultItemActualAttackTime);
 
   EquippingSound := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(Id + '/equipping_sound', ''));
+    KindsConfig.GetValue('equipping_sound', ''));
   SoundAttackStart := SoundEngine.SoundFromName(
-    KindsConfig.GetValue(Id + '/sound_attack_start', ''));
+    KindsConfig.GetValue('sound_attack_start', ''));
 
-  FReadyAnimationFile:= KindsConfig.GetFileName(Id + '/ready_animation');
-  FAttackAnimationFile := KindsConfig.GetFileName(Id + '/attack_animation');
+  FReadyAnimationFile:= KindsConfig.GetFileName('ready_animation');
+  FAttackAnimationFile := KindsConfig.GetFileName('attack_animation');
 end;
 
 { TItemShortRangeWeaponKind -------------------------------------------------- }
@@ -501,11 +502,11 @@ procedure TItemShortRangeWeaponKind.LoadFromFile(KindsConfig: TCastleConfig);
 begin
   inherited;
 
-  DamageConst := KindsConfig.GetFloat(Id + '/damage/const',
+  DamageConst := KindsConfig.GetFloat('damage/const',
     DefaultItemDamageConst);
-  DamageRandom := KindsConfig.GetFloat(Id + '/damage/random',
+  DamageRandom := KindsConfig.GetFloat('damage/random',
     DefaultItemDamageRandom);
-  AttackKnockbackDistance := KindsConfig.GetFloat(Id + '/attack_knockback_distance',
+  AttackKnockbackDistance := KindsConfig.GetFloat('attack_knockback_distance',
     DefaultItemAttackKnockbackDistance);
 end;
 
@@ -769,13 +770,8 @@ begin
   end;
 end;
 
-procedure DoInitialization;
+procedure ItemsKindsInit;
 begin
-  Window.OnCloseList.Add(@WindowClose);
-
-// TODO
-  ItemsKinds := T3DResourceList.Create(true);
-
   Sword := AllResources.FindId('Sword') as TItemKind;
   Bow := AllResources.FindId('Bow') as TItemKind;
   LifePotion := AllResources.FindId('LifePotion') as TItemKind;
@@ -783,27 +779,34 @@ begin
   KeyItemKind := AllResources.FindId('Key') as TItemKind;
   RedKeyItemKind := AllResources.FindId('RedKey') as TItemKind;
   Quiver := AllResources.FindId('Quiver') as TItemKind;
-
-  ItemsKinds.LoadFromFile;
 end;
 
-procedure DoFinalization;
+procedure DoInitialization;
 begin
-  FreeAndNil(ItemsKinds);
-end;
+  Window.OnCloseList.Add(@WindowClose);
 
-initialization
-  DoInitialization;
-  AutoOpenInventory := ConfigFile.GetValue(
-    'auto_open_inventory', DefaultAutoOpenInventory);
+  ItemsKinds := T3DResourceList.Create(true);
 
   RegisterResourceClass(TItemKind, 'Item');
   RegisterResourceClass(TItemSwordKind, 'Sword');
   RegisterResourceClass(TItemBowKind, 'Bow');
   RegisterResourceClass(TItemPotionOfLifeKind, 'LifePotion');
   RegisterResourceClass(TItemScrollOfFlyingKind, 'ScrFlying');
-finalization
-  DoFinalization;
+
+  AutoOpenInventory := ConfigFile.GetValue(
+    'auto_open_inventory', DefaultAutoOpenInventory);
+end;
+
+procedure DoFinalization;
+begin
+  FreeAndNil(ItemsKinds);
+
   ConfigFile.SetDeleteValue('auto_open_inventory',
     AutoOpenInventory, DefaultAutoOpenInventory);
+end;
+
+initialization
+  DoInitialization;
+finalization
+  DoFinalization;
 end.
