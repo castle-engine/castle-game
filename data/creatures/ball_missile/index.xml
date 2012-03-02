@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<Resource
+  id="BallMissile"
+  type="Missile"
+
+  flying="True"
+  default_max_life="1.0"
+  close_direction_to_target_speed="1.0"
+  pause_between_sound_idle="2.5"
+  knocked_back_distance="0.0"
+  falling_down_speed="0.0"
+  middle_position_height="0.0"
+
+  sound_explosion="ball_missile_explode"
+  sound_idle="ball_missile_idle"
+
+  fly_animation="fly.kanim"
+>
+  <short_range_attack knockback_distance="5">
+    <damage const="10" random="10"/>
+  </short_range_attack>
+</Resource>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<Resource
+  id="Quiver"
+  type="Item"
+
+  scene="model.wrl"
+  name="Arrow"
+  image="image.png"
+/>

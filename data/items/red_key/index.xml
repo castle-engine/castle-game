@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<Resource
+  id="RedKey"
+  type="Item"
+
+  scene="model.wrl"
+  name="Red Key"
+  image="image.png"
+/>

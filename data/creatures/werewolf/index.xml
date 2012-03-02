@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<!-- max_angle_to_attack in Werewolf comments:
+     Werewolf is quite big and has MiddlePosition high and doesn't fly,
+     so without this special large max_angle_to_attack value,
+     player could avoid attacks just by crouching. -->
+
+<Resource
+  id="Werewolf"
+  type="Werewolf"
+
+  actual_attack_time="0.3"
+  move_speed="15.0"
+  max_attack_distance="4.2"
+  preferred_attack_distance="4.2"
+  min_delay_between_attacks="2.0"
+  default_max_life="300.0"
+  knocked_back_distance="4.2"
+  knock_back_speed="35"
+  max_angle_to_attack="1.04"
+  min_life_loss_to_hurt="0.05"
+  chance_to_hurt="0.3"
+  max_height_acceptable_to_fall="1.4"
+  life_to_run_away="0.2"
+  middle_position_height="0.7"
+  radius="1.0"
+
+  sound_sudden_pain="werewolf_sudden_pain"
+  sound_attack_start="werewolf_attack_start"
+  sound_dying="werewolf_dying"
+
+  stand_animation="werewolf_still_final.wrl"
+  stand_to_walk_animation="werewolf_still_final.wrl"
+  walk_animation="walk.kanim"
+  attack_animation="attack.kanim"
+  dying_animation="dying.kanim"
+  hurt_animation="hurt.kanim"
+>
+  <short_range_attack knockback_distance="6.0">
+    <damage const="5" random="5"/>
+  </short_range_attack>
+</Resource>

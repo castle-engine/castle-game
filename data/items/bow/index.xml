@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<Resource
+  id="Bow"
+  type="Bow"
+
+  actual_attack_time="0.0"
+  scene="model_final.wrl"
+  name="Bow"
+  image="image.png"
+
+  equipping_sound="bow_equipping"
+  sound_attack_start="bow_attack_start"
+
+  attack_animation="attack.kanim"
+  ready_animation="ready.wrl"
+/>

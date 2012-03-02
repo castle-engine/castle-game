@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<Resource
+  id="Sword"
+  type="Sword"
+
+  actual_attack_time="0.294"
+  scene="model.wrl"
+  name="Sword"
+  image="image.png"
+
+  equipping_sound="sword_equipping"
+  sound_attack_start="sword_attack_start"
+  attack_knockback_distance="1.0"
+
+  attack_animation="attack.kanim"
+  ready_animation="ready.wrl"
+>
+  <damage const="20.0" random="20.0" />
+</Resource>

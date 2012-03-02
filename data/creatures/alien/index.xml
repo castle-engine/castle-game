@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<Resource
+  id="Alien"
+  type="Alien"
+
+  actual_attack_time="0.4"
+  min_delay_between_attacks="2.0"
+  move_speed="5.0"
+  knocked_back_distance="4.2"
+  knock_back_speed="35"
+  life_to_run_away="1.0"
+  default_max_life="90.0"
+  max_height_acceptable_to_fall="1.4"
+  middle_position_height="0.8"
+
+  sound_sudden_pain="alien_sudden_pain"
+  sound_dying="alien_dying"
+
+  stand_animation="alien_still_final.wrl"
+  stand_to_walk_animation="stand_to_walk.kanim"
+  walk_animation="walk.kanim"
+  attack_animation="attack.kanim"
+  dying_animation="dying.kanim"
+  dying_back_animation="dying_back.kanim"
+  hurt_animation="hurt.kanim"
+/>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<Resource
+  id="LifePotion"
+  type="LifePotion"
+
+  scene="model_processed.wrl"
+  name="Potion of Life"
+  image="image.png"
+/>

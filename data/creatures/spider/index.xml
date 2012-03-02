@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<!-- max_angle_to_attack on Spider comments:
+     Spider is quite flat and has MiddlePosition low and doesn't fly.
+     This is analogous to Werewolf situation, but this time it's low.
+     Without this special large max_angle_to_attack value,
+     player could avoid attacks just by standing very close to the spider
+     (without crouching). -->
+
+<Resource
+  id="Spider"
+  type="Spider"
+
+  actual_attack_time="0.25"
+  move_speed="5.0"
+  max_attack_distance="2.0"
+  preferred_attack_distance="2.0"
+  min_delay_between_attacks="2.0"
+  default_max_life="50.0"
+  knocked_back_distance="2.0"
+  knock_back_speed="35"
+  max_angle_to_attack="1.04"
+  max_height_acceptable_to_fall="1.4"
+
+  sound_sudden_pain="spider_sudden_pain"
+  sound_attack_start="spider_attack_start"
+  sound_dying="spider_dying"
+
+  stand_animation="spider_stand.wrl"
+  stand_to_walk_animation="spider_stand.wrl"
+  walk_animation="walk.kanim"
+  attack_animation="attack.kanim"
+  dying_animation="dying.kanim"
+  hurt_animation="hurt.kanim"
+>
+  <short_range_attack knockback_distance="0.1">
+    <damage const="10" random="10"/>
+  </short_range_attack>
+</Resource>

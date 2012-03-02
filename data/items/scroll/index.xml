@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<Resource
+  id="ScrFlying"
+  type="ScrFlying"
+
+  scene="model_final.wrl"
+  name="Scroll Of Flying"
+  image="image.png"
+/>

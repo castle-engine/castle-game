@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<Resource
+  id="Ghost"
+  type="Ghost"
+
+  move_speed="25.0"
+  flying="True"
+  max_attack_distance="2.0"
+  preferred_attack_distance="2.0"
+  min_delay_between_attacks="2.0"
+  life_to_run_away="0.01"
+  default_max_life="30.0"
+  knocked_back_distance="4.2"
+  knock_back_speed="35"
+  sound_dying_tied_to_creature="False"
+  max_height_acceptable_to_fall="1.4"
+  falling_down_speed="0.0"
+  middle_position_height="0.5"
+
+  sound_sudden_pain="ghost_sudden_pain"
+  sound_attack_start="ghost_attack_start"
+  sound_dying="ghost_dying"
+
+  stand_animation="stand.kanim"
+  stand_to_walk_animation="stand_to_walk.kanim"
+  walk_animation="walk.kanim"
+  attack_animation="attack.kanim"
+  dying_animation="dying.kanim"
+  hurt_animation="hurt.kanim"
+>
+  <short_range_attack knockback_distance="0.0">
+    <damage const="7" random="8"/>
+  </short_range_attack>
+</Resource>
