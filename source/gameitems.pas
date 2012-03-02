@@ -307,7 +307,6 @@ var
   Sword: TItemKind;
   Bow: TItemKind;
   LifePotion: TItemKind;
-  ScrollOfFlying: TItemKind;
   KeyItemKind: TItemKind;
   RedKeyItemKind: TItemKind;
   Quiver: TItemKind;
@@ -775,7 +774,6 @@ begin
   Sword := AllResources.FindId('Sword') as TItemKind;
   Bow := AllResources.FindId('Bow') as TItemKind;
   LifePotion := AllResources.FindId('LifePotion') as TItemKind;
-  ScrollOfFlying := AllResources.FindId('ScrFlying') as TItemKind;
   KeyItemKind := AllResources.FindId('Key') as TItemKind;
   RedKeyItemKind := AllResources.FindId('RedKey') as TItemKind;
   Quiver := AllResources.FindId('Quiver') as TItemKind;

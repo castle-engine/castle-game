@@ -884,7 +884,6 @@ type
 var
   CreaturesKinds: T3DResourceList;
 
-  Alien: TAlienCreatureKind;
   Werewolf: TWerewolfKind;
   BallMissile: TMissileCreatureKind;
   Ghost: TGhostKind;
@@ -892,7 +891,6 @@ var
   SpiderQueen: TSpiderQueenKind;
   ThrownWeb: TMissileCreatureKind;
   Arrow: TMissileCreatureKind;
-  Barrel: TStillCreatureKind;
 
   DebugTimeStopForCreatures: boolean = false;
 
@@ -2826,7 +2824,6 @@ end;
 
 procedure CreaturesKindsInit;
 begin
-  Alien := AllResources.FindId('Alien') as TAlienCreatureKind;
   Werewolf := AllResources.FindId('Werewolf') as TWerewolfKind;
   BallMissile := AllResources.FindId('BallMissile') as TMissileCreatureKind;
   Ghost := AllResources.FindId('Ghost') as TGhostKind;
@@ -2834,7 +2831,6 @@ begin
   SpiderQueen := AllResources.FindId('SpiderQueen') as TSpiderQueenKind;
   ThrownWeb := AllResources.FindId('ThrownWeb') as TMissileCreatureKind;
   Arrow := AllResources.FindId('Arrow') as TMissileCreatureKind;
-  Barrel := AllResources.FindId('DoomBarrel') as TStillCreatureKind;
 end;
 
 procedure DoInitialization;
