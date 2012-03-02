@@ -31,8 +31,8 @@ About index.xml files:
   The engine will make sure they are handled OK on all platforms.
 
 ------------------------------------------------------------------------------
-Specific documentation for creature or item kind description,
-that is creatures/*/index.xml and items/*/index.xml:
+Documentation for creature or item kind description,
+in creatures/*/index.xml and items/*/index.xml:
 
 - id: the object id to indicate initial position of this creature in
   the level 3D file. IOW, this determines Blender object name
@@ -58,3 +58,28 @@ that is creatures/*/index.xml and items/*/index.xml:
   They have lot's of properties, and almost all their properties
   can be set by appopriate XML attribute.
 
+------------------------------------------------------------------------------
+Documentation for level description, in levels/*/index.xml:
+
+- See TLevel properties documentation if in doubt.
+
+- default_available_for_new_game: (optional, default "false")
+  Should the level be initially available (visible in "New Game" menu)
+  for new players.
+
+- type: (optional, default just generic "Level")
+  Use specific ObjectPascal class to implement this level behavior.
+  Default value is "Level", which means that the level will be
+  handled with vanilla TLevel implementation.
+  Many advanced tricks are possible by implementing in the game code
+  (GameLevelSpecific unit) a descendant class of TLevel that does
+  something special, then you should set this attribute to the name
+  of that class.
+
+- loading_bg: filename of image file to display while loading the
+  level (under the progress bar). Optional.
+
+- loading_bar_y_position: between 0 and 1, indicates vertical position
+  of progress bar when loading level. Should be synchronized
+  with loading_bg image, to look right. Optional, default value
+  is 0.5 which simply means "middle of the screen".

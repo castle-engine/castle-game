@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<level
+  name="hello_world"
+  scene_file_name="hello_world_final.wrl"
+  title="Hello world"
+  number="95"
+  type="Level"
+
+  demo="True"
+  default_available_for_new_game="True"
+
+  footsteps_sound="player_footsteps_concrete">
+
+  <required_resources>
+  </required_resources>
+</level>

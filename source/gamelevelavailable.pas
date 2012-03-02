@@ -35,7 +35,11 @@ type
   { }
   TLevelAvailable = class
   private
-    procedure LoadFromDOMElement(Element: TDOMElement; const BasePath: string);
+    { We keep Document reference through lifetime of this object,
+      because actual TLevel instance also reads some stuff from it. }
+    Document: TXMLDocument;
+    DocumentBasePath: string;
+    procedure LoadFromDocument;
   public
     constructor Create;
     destructor Destroy; override;
@@ -60,7 +64,7 @@ type
     { Loading level background image (in OpenGL list), 0 if none. }
     GLList_LoadingBgImage: TGLuint;
 
-    LevelDOMElement: TDOMElement;
+    Element: TDOMElement;
 
     RequiredResources: T3DResourceList;
 
@@ -71,14 +75,8 @@ type
 
   TLevelAvailableList = class(specialize TFPGObjectList<TLevelAvailable>)
   private
-    { We keep Document reference through lifetime of this object,
-      because each TLevelAvailable instance needs a reference to
-      LevelDOMElement (this is parsed during TLevel.Create). }
-    Document: TXMLDocument;
-    FMenuBackgroundLevelName: string;
+    procedure LoadIndexXml(const FileName: string);
   public
-    destructor Destroy; override;
-
     { raises Exception if such Name is not on the list. }
     function FindName(const AName: string): TLevelAvailable;
 
@@ -101,8 +99,6 @@ type
       Also, this can be done only once creatures and items resources are known,
       as they may be referenced in levels XML files. }
     procedure LoadFromFile;
-
-    property MenuBackgroundLevelName: string read FMenuBackgroundLevelName write FMenuBackgroundLevelName;
   end;
 
 var
@@ -128,6 +124,7 @@ end;
 
 destructor TLevelAvailable.Destroy;
 begin
+  FreeAndNil(Document);
   FreeAndNil(RequiredResources);
 
   { Thanks to WindowClose implementation, we can be sure that gl context
@@ -137,8 +134,7 @@ begin
   inherited;
 end;
 
-procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
-  const BasePath: string);
+procedure TLevelAvailable.LoadFromDocument;
 
   procedure MissingRequiredAttribute(const AttrName: string);
   begin
@@ -157,21 +153,21 @@ procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
     begin
       { TODO: I would like to use RTTI here.
         Also GameLevelSpecific will be removed from uses clause then. }
-      if ValueStr = 'TLevel' then
+      if ValueStr = 'Level' then
         Value := TLevel else
-      if ValueStr = 'TCagesLevel' then
+      if ValueStr = 'Cages' then
         Value := TCagesLevel else
-      if ValueStr = 'TGateLevel' then
+      if ValueStr = 'Gate' then
         Value := TGateLevel else
-      if ValueStr = 'TGateBackgroundLevel' then
+      if ValueStr = 'GateBackground' then
         Value := TGateBackgroundLevel else
-      if ValueStr = 'TCastleHallLevel' then
+      if ValueStr = 'CastleHall' then
         Value := TCastleHallLevel else
-      if ValueStr = 'TDoomE1M1Level' then
+      if ValueStr = 'DoomE1M1' then
         Value := TDoomE1M1Level else
-      if ValueStr = 'TTowerLevel' then
+      if ValueStr = 'Tower' then
         Value := TTowerLevel else
-      if ValueStr = 'TFountainLevel' then
+      if ValueStr = 'Fountain' then
         Value := TFountainLevel else
         raise Exception.CreateFmt('Unknown level class "%s"', [ValueStr]);
     end;
@@ -180,10 +176,11 @@ procedure TLevelAvailable.LoadFromDOMElement(Element: TDOMElement;
 var
   LoadingBgFileName: string;
 begin
-  Check(Element.TagName = 'level',
-    'Each child of levels/index.xml root node must be the <level> element');
+  Element := Document.DocumentElement;
 
-  LevelDOMElement := Element;
+  if Element.TagName <> 'level' then
+    raise Exception.CreateFmt('Root node of levels/*/index.xml file must be <level>, but is "%s", in index.xml inside "%s"',
+      [Element.TagName, DocumentBasePath]);
 
   { Required atttributes }
 
@@ -192,7 +189,7 @@ begin
 
   if not DOMGetAttribute(Element, 'scene_file_name', SceneFileName) then
     MissingRequiredAttribute('scene_file_name');
-  SceneFileName := CombinePaths(BasePath, SceneFileName);
+  SceneFileName := CombinePaths(DocumentBasePath, SceneFileName);
 
   if not DOMGetAttribute(Element, 'title', Title) then
     MissingRequiredAttribute('title');
@@ -212,13 +209,12 @@ begin
     DefaultAvailableForNewGame) then
     DefaultAvailableForNewGame := false;
 
-  if not DOMGetLevelClassAttribute(Element, 'implementation_class',
-    LevelClass) then
+  if not DOMGetLevelClassAttribute(Element, 'type', LevelClass) then
     LevelClass := TLevel;
 
   if DOMGetAttribute(Element, 'loading_bg', LoadingBgFileName) then
   begin
-    LoadingBgFileName := CombinePaths(BasePath, LoadingBgFileName);
+    LoadingBgFileName := CombinePaths(DocumentBasePath, LoadingBgFileName);
     GLList_LoadingBgImage := LoadImageToDisplayList(LoadingBgFileName,
       [TRGBImage], [], Window.Width, Window.Height);
   end else
@@ -247,7 +243,7 @@ function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
   procedure CreateLevelCore;
   begin
     Result := LevelClass.Create(Name, SceneFileName,
-      Title, TitleHint, Number, LevelDOMElement, RequiredResources,
+      Title, TitleHint, Number, Element, RequiredResources,
       MenuBackground);
     if not MenuBackground then
       AvailableForNewGame := true;
@@ -304,12 +300,6 @@ end;
 
 { TLevelAvailableList ------------------------------------------------------- }
 
-destructor TLevelAvailableList.Destroy;
-begin
-  SysUtils.FreeAndNil(Document);
-  inherited;
-end;
-
 function TLevelAvailableList.FindName(const AName: string): TLevelAvailable;
 var
   I: Integer;
@@ -353,40 +343,22 @@ begin
       Items[I].DefaultAvailableForNewGame);
 end;
 
-procedure TLevelAvailableList.LoadFromFile;
+procedure TLevelAvailableList.LoadIndexXml(const FileName: string);
 var
-  LevelsList: TDOMNodeList;
-  LevelNode: TDOMNode;
-  I: Integer;
   NewLevelAvailable: TLevelAvailable;
-  BasePath: string;
 begin
-  SysUtils.FreeAndNil(Document);
+  NewLevelAvailable := TLevelAvailable.Create;
+  Add(NewLevelAvailable);
+  NewLevelAvailable.AvailableForNewGame := false;
 
-  BasePath := ProgramDataPath + 'data' +  PathDelim + 'levels' + PathDelim;
-  ReadXMLFile(Document, BasePath + 'index.xml');
+  ReadXMLFile(NewLevelAvailable.Document, FileName);
+  NewLevelAvailable.DocumentBasePath := ExtractFilePath(FileName);
+  NewLevelAvailable.LoadFromDocument;
+end;
 
-  Check(Document.DocumentElement.TagName = 'levels',
-    'Root node of levels/index.xml must be <levels>');
-
-  Check(DOMGetAttribute(Document.DocumentElement, 'background_level_name',
-    FMenuBackgroundLevelName), '<levels> must have attribute "background_level_name"');
-
-  LevelsList := Document.DocumentElement.ChildNodes;
-  try
-    for I := 0 to LevelsList.Count - 1 do
-    begin
-      LevelNode := LevelsList.Item[I];
-      if LevelNode.NodeType = ELEMENT_NODE then
-      begin
-        NewLevelAvailable := TLevelAvailable.Create;
-        Add(NewLevelAvailable);
-        NewLevelAvailable.AvailableForNewGame := false;
-        NewLevelAvailable.LoadFromDOMElement(LevelNode as TDOMElement,
-          BasePath);
-      end;
-    end;
-  finally FreeChildNodes(LevelsList); end;
+procedure TLevelAvailableList.LoadFromFile;
+begin
+  ScanForFiles(ProgramDataPath + 'data' +  PathDelim + 'levels', 'index.xml', @LoadIndexXml);
 end;
 
 { initialization / finalization ---------------------------------------------- }

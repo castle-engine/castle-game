@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<!-- Another entry for fountain level, to load it with water animation -->
+<level
+  name="fountain-with-water"
+  scene_file_name="../fountain/fountain_final.wrl"
+  title="Fountain"
+  title_hint="with costly water animation"
+  number="16"
+  type="Fountain"
+  footsteps_sound="player_footsteps_concrete"
+  scene_dynamic_shadows="True"
+
+  demo="True"
+  default_available_for_new_game="True"
+
+  load_water_animation="True"
+>
+
+  <required_resources>
+    <resource name="Alien" />
+    <resource name="BallMissile" />
+  </required_resources>
+</level>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<level
+  name="fountain"
+  scene_file_name="fountain_final.wrl"
+  title="Fountain"
+  title_hint="shadows and bump mapping ON advised"
+  number="15"
+  type="Fountain"
+  footsteps_sound="player_footsteps_concrete"
+  scene_dynamic_shadows="True"
+
+  demo="True"
+  default_available_for_new_game="True"
+>
+
+  <required_resources>
+    <resource name="Alien" />
+    <resource name="BallMissile" />
+  </required_resources>
+</level>

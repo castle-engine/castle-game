@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<level
+  name="gate"
+  scene_file_name="gate_final.wrl"
+  title="The Gate"
+  number="1"
+  default_available_for_new_game="true"
+  type="Gate"
+
+  played_music_sound="gate_music"
+  footsteps_sound="player_footsteps_grass"
+>
+  <required_resources>
+    <resource name="Ghost" />
+    <resource name="Spider" />
+  </required_resources>
+</level>

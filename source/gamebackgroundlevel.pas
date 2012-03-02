@@ -119,6 +119,9 @@ end;
 { routines ------------------------------------------------------------------- }
 
 procedure BackgroundCreate;
+const
+  { hardcoded for now }
+  MenuBackgroundLevelName = 'gate_background';
 var
   BackgroundCaptions: TUIControl;
   BackgroundLevel: TLevel;
@@ -126,7 +129,7 @@ begin
   BackgroundControls := TUIControlList.Create(true);
 
   { initialize BackgroundLevel }
-  BackgroundLevel := LevelsAvailable.FindName(LevelsAvailable.MenuBackgroundLevelName).
+  BackgroundLevel := LevelsAvailable.FindName(MenuBackgroundLevelName).
     CreateLevel(true);
   BackgroundControls.Add(BackgroundLevel);
 

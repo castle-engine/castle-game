@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<level
+  name="tower"
+  scene_file_name="basic_castle_final.wrl"
+
+  title="Tower"
+  number="99"
+  type="Tower"
+
+  demo="True"
+  default_available_for_new_game="True"
+
+  footsteps_sound="player_footsteps_grass"
+>
+
+  <area name="HintElevButton">
+    <hint>Hint: press the elevator button using the %i</hint>
+  </area>
+
+  <required_resources>
+    <resource name="Alien" />
+    <resource name="BallMissile" />
+  </required_resources>
+
+</level>
