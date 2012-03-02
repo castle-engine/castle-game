@@ -140,6 +140,8 @@ type
   T3DResourceClass = class of T3DResource;
 
   T3DResourceList = class(specialize TFPGObjectList<T3DResource>)
+  private
+    procedure LoadIndexXml(const FileName: string);
   public
     { Find resource with given T3DResource.Id.
       @raises Exception if not found. }
@@ -369,52 +371,38 @@ begin
     Items[I].Release;
 end;
 
-procedure T3DResourceList.LoadFromFile;
-
-  procedure LoadFromPath(const Path: string);
-  var
-    F: TSearchRec;
-    XmlName: string;
-    Xml: TCastleConfig;
-    ResourceClassName, ResourceId: string;
-    ResourceClassIndex: Integer;
-    Resource: T3DResource;
-  begin
-    if FindFirst(Path + '*', faDirectory, F) = 0 then
-    repeat
-      if F.Attr and faDirectory = faDirectory then
-      begin
-        XmlName := Path + F.Name + PathDelim + 'index.xml';
-        if FileExists(XmlName) then
-        begin
-          Xml := TCastleConfig.Create(nil);
-          try
-            Xml.RootName := 'resource';
-            Xml.NotModified; { otherwise changing RootName makes it modified, and saved back at freeing }
-            Xml.FileName := XmlName;
-            if Log then
-              WritelnLog('Resources', Format('Loading T3DResource from "%s"', [XmlName]));
-            ResourceClassName := Xml.GetNonEmptyValue('type');
-            ResourceId := Xml.GetNonEmptyValue('id');
-            ResourceClassIndex := ResourceClasses.IndexOf(ResourceClassName);
-            if ResourceClassIndex <> -1 then
-            begin
-              Resource := ResourceClasses.Data[ResourceClassIndex].Create(ResourceId);
-              Add(Resource);
-              Resource.LoadFromFile(Xml);
-            end else
-              raise Exception.CreateFmt('Resource type "%s" not found, mentioned in file "%s"',
-                [ResourceClassName, XmlName]);
-          finally FreeAndNil(Xml) end;
-        end;
-      end;
-    until FindNext(F) <> 0;
-    FindClose(F);
-  end;
-
+procedure T3DResourceList.LoadIndexXml(const FileName: string);
+var
+  Xml: TCastleConfig;
+  ResourceClassName, ResourceId: string;
+  ResourceClassIndex: Integer;
+  Resource: T3DResource;
 begin
-  LoadFromPath(ProgramDataPath + 'data' + PathDelim + 'creatures' + PathDelim);
-  LoadFromPath(ProgramDataPath + 'data' + PathDelim + 'items' + PathDelim);
+  Xml := TCastleConfig.Create(nil);
+  try
+    Xml.RootName := 'resource';
+    Xml.NotModified; { otherwise changing RootName makes it modified, and saved back at freeing }
+    Xml.FileName := FileName;
+    if Log then
+      WritelnLog('Resources', Format('Loading T3DResource from "%s"', [FileName]));
+    ResourceClassName := Xml.GetNonEmptyValue('type');
+    ResourceId := Xml.GetNonEmptyValue('id');
+    ResourceClassIndex := ResourceClasses.IndexOf(ResourceClassName);
+    if ResourceClassIndex <> -1 then
+    begin
+      Resource := ResourceClasses.Data[ResourceClassIndex].Create(ResourceId);
+      Add(Resource);
+      Resource.LoadFromFile(Xml);
+    end else
+      raise Exception.CreateFmt('Resource type "%s" not found, mentioned in file "%s"',
+        [ResourceClassName, FileName]);
+  finally FreeAndNil(Xml) end;
+end;
+
+procedure T3DResourceList.LoadFromFile;
+begin
+  ScanForFiles(ProgramDataPath + 'data' + PathDelim + 'creatures', 'index.xml', @LoadIndexXml);
+  ScanForFiles(ProgramDataPath + 'data' + PathDelim + 'items', 'index.xml', @LoadIndexXml);
 end;
 
 function T3DResourceList.FindId(const AId: string): T3DResource;
