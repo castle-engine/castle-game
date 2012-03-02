@@ -538,7 +538,7 @@ end;
 
 procedure RegisterResourceClass(const AClass: T3DResourceClass; const TypeName: string);
 begin
-  ResourceClasses.KeyData[TypeName] := AClass;
+  ResourceClasses[TypeName] := AClass;
 end;
 
 initialization

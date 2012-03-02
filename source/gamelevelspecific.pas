@@ -1458,4 +1458,18 @@ begin
   NewPlayer.PickItem(TItem.Create(Sword, 1));
 end;
 
+initialization
+  { if for some reason (uses clauses) GameLevel is not initialized yet
+    --- the initialize it now }
+  if LevelClasses = nil then
+    LevelClasses := TLevelClasses.Create;
+
+  LevelClasses['Level'] := TLevel;
+  LevelClasses['Cages'] := TCagesLevel;
+  LevelClasses['Gate'] := TGateLevel;
+  LevelClasses['GateBackground'] := TGateBackgroundLevel;
+  LevelClasses['CastleHall'] := TCastleHallLevel;
+  LevelClasses['DoomE1M1'] := TDoomE1M1Level;
+  LevelClasses['Tower'] := TTowerLevel;
+  LevelClasses['Fountain'] := TFountainLevel;
 end.

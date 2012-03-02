@@ -112,7 +112,7 @@ var
 implementation
 
 uses SysUtils, GameConfig, CastleXMLUtils, CastleFilesUtils,
-  GameLevelSpecific, XMLRead, GameWindow, GLImages,
+  XMLRead, GameWindow, GLImages,
   Images, CastleWindow, WindowModes, UIControls;
 
 { TLevelAvailable ------------------------------------------------------------ }
@@ -148,30 +148,13 @@ procedure TLevelAvailable.LoadFromDocument;
     const AttrName: string; var Value: TLevelClass): boolean;
   var
     ValueStr: string;
+    LevelClassIndex: Integer;
   begin
     Result := DOMGetAttribute(Element, AttrName, ValueStr);
-    if Result then
-    begin
-      { TODO: I would like to use RTTI here.
-        Also GameLevelSpecific will be removed from uses clause then. }
-      if ValueStr = 'Level' then
-        Value := TLevel else
-      if ValueStr = 'Cages' then
-        Value := TCagesLevel else
-      if ValueStr = 'Gate' then
-        Value := TGateLevel else
-      if ValueStr = 'GateBackground' then
-        Value := TGateBackgroundLevel else
-      if ValueStr = 'CastleHall' then
-        Value := TCastleHallLevel else
-      if ValueStr = 'DoomE1M1' then
-        Value := TDoomE1M1Level else
-      if ValueStr = 'Tower' then
-        Value := TTowerLevel else
-      if ValueStr = 'Fountain' then
-        Value := TFountainLevel else
-        raise Exception.CreateFmt('Unknown level class "%s"', [ValueStr]);
-    end;
+    LevelClassIndex := LevelClasses.IndexOf(ValueStr);
+    if LevelClassIndex <> -1 then
+      Value := LevelClasses.Data[LevelClassIndex] else
+      raise Exception.CreateFmt('Unknown level type "%s"', [ValueStr]);
   end;
 
 var

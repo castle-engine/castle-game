@@ -31,7 +31,7 @@ uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
   CastleUtils, CastleClassUtils, GamePlayer, GameThunder, GameObjectKinds,
   ProgressUnit, PrecalculatedAnimation,
   DOM, XmlSoundEngine, Base3D, Shape,
-  Classes, CastleTimeUtils, CastleSceneManager, GLRendererShader;
+  Classes, CastleTimeUtils, CastleSceneManager, GLRendererShader, FGL;
 
 type
   TLevel = class;
@@ -347,9 +347,11 @@ type
   end;
 
   TLevelClass = class of TLevel;
+  TLevelClasses = specialize TFPGMap<string, TLevelClass>;
 
 var
   DebugNoCreatures: boolean = false;
+  LevelClasses: TLevelClasses;
 
 implementation
 
@@ -1090,4 +1092,9 @@ begin
     SoundEngine.Sound(stPlayerInteractFailed);
 end;
 
+initialization
+  if LevelClasses = nil then
+    LevelClasses := TLevelClasses.Create;
+finalization
+  FreeAndNil(LevelClasses);
 end.
