@@ -882,8 +882,6 @@ type
   end;
 
 var
-  CreaturesKinds: T3DResourceList;
-
   Werewolf: TWerewolfKind;
   BallMissile: TMissileCreatureKind;
   Ghost: TGhostKind;
@@ -922,7 +920,6 @@ begin
   FMiddleHeight := DefaultMiddleHeight;
   FCastShadowVolumes := DefaultCastShadowVolumes;
   FFallingDownSpeed := DefaultFallingDownSpeed;
-  CreaturesKinds.Add(Self);
 end;
 
 procedure TCreatureKind.LoadFromFile(KindsConfig: TCastleConfig);
@@ -2803,25 +2800,6 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowClose(Window: TCastleWindowBase);
-var
-  I: Integer;
-begin
-  { In fact, CreaturesKinds will always be nil here, because
-    WindowClose will be called from GameWindow unit finalization
-    that will be done after this unit's finalization (DoFinalization).
-
-    That's OK --- DoFinalization already freed
-    every item on CreaturesKinds.Items, and this implicitly did GLContextClose,
-    so everything is OK. }
-
-  if CreaturesKinds <> nil then
-  begin
-    for I := 0 to CreaturesKinds.Count - 1 do
-      TCreatureKind(CreaturesKinds.Items[I]).GLContextClose;
-  end;
-end;
-
 procedure CreaturesKindsInit;
 begin
   Werewolf := AllResources.FindId('Werewolf') as TWerewolfKind;
@@ -2835,10 +2813,6 @@ end;
 
 procedure DoInitialization;
 begin
-  Window.OnCloseList.Add(@WindowClose);
-
-  CreaturesKinds := T3DResourceList.Create(true);
-
   RegisterResourceClass(TAlienCreatureKind, 'Alien');
   RegisterResourceClass(TWerewolfKind, 'Werewolf');
   RegisterResourceClass(TMissileCreatureKind, 'Missile');
@@ -2848,13 +2822,6 @@ begin
   RegisterResourceClass(TStillCreatureKind, 'Still');
 end;
 
-procedure DoFinalization;
-begin
-  FreeAndNil(CreaturesKinds);
-end;
-
 initialization
   DoInitialization;
-finalization
-  DoFinalization;
 end.

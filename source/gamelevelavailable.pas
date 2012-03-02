@@ -112,7 +112,7 @@ var
 implementation
 
 uses SysUtils, GameConfig, CastleXMLUtils, CastleFilesUtils,
-  XMLRead, GameWindow, GLImages,
+  XMLRead, GameWindow, GLImages, GameItems,
   Images, CastleWindow, WindowModes, UIControls;
 
 { TLevelAvailable ------------------------------------------------------------ }
@@ -155,6 +155,20 @@ procedure TLevelAvailable.LoadFromDocument;
     if LevelClassIndex <> -1 then
       Value := LevelClasses.Data[LevelClassIndex] else
       raise Exception.CreateFmt('Unknown level type "%s"', [ValueStr]);
+  end;
+
+  { Add all item kinds (TItemKind from AllResources) to the Resources.
+    We use this now, as all levels should prepare all items -- always.
+    This is easier, as player may pick/drop any item on any level,
+    so it's best to have all items prepared. }
+  procedure AddItems(Resources: T3DResourceList);
+  var
+    I: Integer;
+  begin
+    for I := 0 to AllResources.Count - 1 do
+      if (AllResources[I] is TItemKind) and 
+         (Resources.IndexOf(AllResources[I]) = -1) then
+      Resources.Add(AllResources[I]);
   end;
 
 var
@@ -209,6 +223,7 @@ begin
     LoadingBarYPosition := DefaultBarYPosition;
 
   RequiredResources.LoadRequiredResources(Element);
+  AddItems(RequiredResources);
 end;
 
 procedure DrawCreateLevel(Window: TCastleWindowBase);

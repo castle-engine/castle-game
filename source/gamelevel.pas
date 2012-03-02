@@ -345,7 +345,6 @@ type
   TLevelClasses = specialize TFPGMap<string, TLevelClass>;
 
 var
-  DebugNoCreatures: boolean = false;
   LevelClasses: TLevelClasses;
 
 implementation
@@ -522,8 +521,7 @@ begin
   FRequiredResources := T3DResourceList.Create(false);
   FRequiredResources.Assign(ARequiredResources);
 
-  if not DebugNoCreatures then
-    FRequiredResources.Require(BaseLights);
+  FRequiredResources.Require(BaseLights);
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -645,7 +643,7 @@ begin
   FreeAndNil(FSectors);
   FreeAndNil(FWaypoints);
   FreeAndNil(FCreatures);
-  if (FRequiredResources <> nil) and not DebugNoCreatures then
+  if FRequiredResources <> nil then
     FRequiredResources.UnRequire;
   FreeAndNil(FRequiredResources);
   inherited;
@@ -796,7 +794,7 @@ procedure TLevel.TraverseForItems(Shape: TShape);
     if ItemKindId = 'Arrow' then
       ItemKindId := 'Quiver';
 
-    Resource := ItemsKinds.FindId(ItemKindId);
+    Resource := AllResources.FindId(ItemKindId);
     if not (Resource is TItemKind) then
       raise Exception.CreateFmt('Resource "%s" is not an item, but is referenced in model with Item prefix',
         [ItemKindId]);
@@ -861,19 +859,12 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
     CreaturePosition[2] := StubBoundingBox.Data[0, 2];
 
     { calculate CreatureKind }
-    Resource := CreaturesKinds.FindId(CreatureKindName);
+    Resource := AllResources.FindId(CreatureKindName);
     if not (Resource is TCreatureKind) then
       raise Exception.CreateFmt('Resource "%s" is not a creature, but is referenced in model with Crea prefix',
         [CreatureKindName]);
     CreatureKind := TCreatureKind(Resource);
-    { The creature kind may be unprepared here only because
-      --debug-no-creatures was specified. In this case, leave this
-      creature kind unprepared and don't add this creature. }
-    if not CreatureKind.Prepared then
-    begin
-      Assert(DebugNoCreatures);
-      Exit;
-    end;
+    Check(CreatureKind.Prepared, 'Creature is not prepared, but is used on the level. You probably did not add it to <required_resources> inside level index.xml file');
 
     { calculate CreatureDirection }
     { TODO --- CreatureDirection configurable.

@@ -37,7 +37,7 @@ uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
   GameControlsMenu, GameInputs, GameCreatures, GameChooseMenu,
   GameItems, OnScreenMenu, RaysWindow, GameVideoOptions,
   GameSound, X3DNodes, CastleClassUtils, GameNotifications,
-  GameLevelAvailable, KeysMouse;
+  GameLevelAvailable, KeysMouse, GameObjectKinds;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -161,6 +161,28 @@ var
   EditOneLightMenu: TEditOneLightMenu;
   EditHeadlightMenu: TEditHeadlightMenu;
 
+{ utility -------------------------------------------------------------------- }
+
+function ChooseResource(out Resource: T3DResource;
+  const OnlyCreatures: boolean): boolean;
+var
+  S: TStringList;
+  I, ResultIndex: Integer;
+begin
+  S := TStringList.Create;
+  try
+    for I := 0 to AllResources.Count - 1 do
+      if (not OnlyCreatures) or (AllResources[I] is TCreatureKind) then
+        S.AddObject(Format('Resource %s (%d users)',
+          [AllResources[I].Id, AllResources[I].RequiredCount]), AllResources[I]);
+    S.Append('Cancel');
+    ResultIndex := ChooseByMenu(ControlsUnder, S);
+    Result := ResultIndex <> S.Count;
+    if Result then
+      Resource := S.Objects[ResultIndex] as T3DResource;
+  finally S.Free end;
+end;
+
 { TDebugMenu ------------------------------------------------------------ }
 
 constructor TDebugMenu.Create(AOwner: TComponent);
@@ -173,21 +195,36 @@ begin
   DebugRenderForLevelScreenshotArgument := TMenuBooleanArgument.Create(
     DebugRenderForLevelScreenshot);
 
-  Items.Add('Player debug menu');
-  Items.Add('Creatures debug menu');
-  Items.Add('Items debug menu');
-  Items.Add('Level debug menu');
+  Items.Add('Player debug menu ...');
+  Items.Add('Creatures debug menu ...');
+  Items.Add('Items debug menu ...');
+  Items.Add('Level debug menu ...');
+  Items.Add('Reload resources index.xml files (TODO)');
+  Items.Add('Reload resource animation ...');
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
   Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
   Items.AddObject('Render shadow volumes', DebugRenderShadowVolumeArgument);
-  Items.AddObject('Render for level screenshot',
-    DebugRenderForLevelScreenshotArgument);
+  Items.AddObject('Render for level screenshot', DebugRenderForLevelScreenshotArgument);
   Items.Add('Reload sounds/index.xml');
-  Items.Add('Edit lights');
+  Items.Add('Edit lights ...');
   Items.Add('Back to game');
 end;
 
 procedure TDebugMenu.Click;
+
+  procedure ReloadResource;
+  var
+    Resource: T3DResource;
+  begin
+    if ChooseResource(Resource, false) then
+    begin
+      if Resource.RequiredCount = 0 then
+        MessageOK(Window, Format('Resource "%s" is not used by anything, ' +
+          'cannot reload',  [Resource.Id])) else
+        Resource.RedoPrepare(Level.BaseLights);
+    end;
+  end;
+
 begin
   inherited;
 
@@ -196,30 +233,32 @@ begin
     1: SetCurrentMenu(CurrentMenu, DebugCreaturesMenu);
     2: SetCurrentMenu(CurrentMenu, DebugItemsMenu);
     3: SetCurrentMenu(CurrentMenu, DebugLevelMenu);
-    4: begin
+    4: { TODO };
+    5: ReloadResource;
+    6: begin
          RenderBoundingBoxes := not RenderBoundingBoxes;
          RenderBoundingBoxesArgument.Value := RenderBoundingBoxes;
        end;
-    5: begin
+    7: begin
          RenderDebugCaptions := not RenderDebugCaptions;
          RenderDebugCaptionsArgument.Value := RenderDebugCaptions;
        end;
-    6: begin
+    8: begin
          DebugRenderShadowVolume := not DebugRenderShadowVolume;
          DebugRenderShadowVolumeArgument.Value := DebugRenderShadowVolume;
        end;
-    7: begin
+    9: begin
          DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
          DebugRenderForLevelScreenshotArgument.Value :=
            DebugRenderForLevelScreenshot;
        end;
-    8: SoundEngine.ReadSounds;
-    9: begin
+    10:SoundEngine.ReadSounds;
+    11:begin
          FreeAndNil(EditLevelLightsMenu);
          EditLevelLightsMenu := TEditLevelLightsMenu.Create(Application);
          SetCurrentMenu(CurrentMenu, EditLevelLightsMenu);
        end;
-    10:UserQuit := true;
+    12:UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -302,31 +341,11 @@ begin
   Items.Add('Kill all creatures');
   Items.Add('Kill all non-still creatures');
   Items.Add('Add creature to level before player');
-  Items.Add('Reload creatures/kinds.xml file');
-  Items.Add('Reload animations of specific creature');
   Items.AddObject('Time stop for creatures', DebugTimeStopForCreaturesArgument);
   Items.Add('Back');
 end;
 
 procedure TDebugCreaturesMenu.Click;
-
-  function ChooseCreatureKind(out ChooseCreature: TCreatureKind): boolean;
-  var
-    S: TStringList;
-    I, ResultIndex: Integer;
-  begin
-    S := TStringList.Create;
-    try
-      for I := 0 to CreaturesKinds.Count - 1 do
-        S.Append(Format('Creature %s (%d users)',
-          [CreaturesKinds[I].Id, CreaturesKinds[I].RequiredCount]));
-      S.Append('Cancel');
-      ResultIndex := ChooseByMenu(ControlsUnder, S);
-      Result := ResultIndex <> CreaturesKinds.Count;
-      if Result then
-        ChooseCreature := CreaturesKinds[ResultIndex] as TCreatureKind;
-    finally S.Free end;
-  end;
 
   procedure KillAll(const IncludeStill: boolean);
   var
@@ -347,28 +366,15 @@ procedure TDebugCreaturesMenu.Click;
 
   procedure AddLevelCreature(DirectionAttenuation: Single);
   var
-    Kind: TCreatureKind;
+    Kind: T3DResource;
   begin
-    if ChooseCreatureKind(Kind) then
+    if ChooseResource(Kind, true) then
     begin
-      Kind.CreateCreature(Level.Items,
+      (Kind as TCreatureKind).CreateCreature(Level.Items,
         Player.Position + Player.Direction * DirectionAttenuation,
         Player.Direction);
 
       UserQuit := true;
-    end;
-  end;
-
-  procedure ReloadCreatureAnimation;
-  var
-    Kind: TCreatureKind;
-  begin
-    if ChooseCreatureKind(Kind) then
-    begin
-      if Kind.RequiredCount = 0 then
-        MessageOK(Window, Format('Creature "%s" is not used by anything, ' +
-          'cannot reload',  [Kind.Id])) else
-        Kind.RedoPrepare(Level.BaseLights);
     end;
   end;
 
@@ -379,13 +385,11 @@ begin
     0: KillAll(true);
     1: KillAll(false);
     2: AddLevelCreature(10);
-    3: CreaturesKinds.LoadFromFile;
-    4: ReloadCreatureAnimation;
-    5: begin
+    3: begin
          DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
          DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
        end;
-    6: SetCurrentMenu(CurrentMenu, DebugMenu);
+    4: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
 end;
 
@@ -478,45 +482,19 @@ begin
   inherited;
 
   Items.Add('Give me 20 instances of every possible item');
-  Items.Add('Reload items/kinds.xml file');
-  Items.Add('Reload animations/models of specific item');
   Items.Add('Back');
 end;
 
 procedure TDebugItemsMenu.Click;
 
-  function ChooseItemKind(out ChooseItem: TItemKind): boolean;
-  var
-    S: TStringList;
-    I, ResultIndex: Integer;
-  begin
-    S := TStringList.Create;
-    try
-      for I := 0 to ItemsKinds.Count - 1 do
-        S.Append('Item ' + ItemsKinds[I].Id);
-      S.Append('Cancel');
-      ResultIndex := ChooseByMenu(ControlsUnder, S);
-      Result := ResultIndex <> ItemsKinds.Count;
-      if Result then
-        ChooseItem := ItemsKinds[ResultIndex] as TItemKind;
-    finally S.Free end;
-  end;
-
   procedure GiveItems;
   var
     I: Integer;
   begin
-    for I := 0 to ItemsKinds.Count - 1 do
-      Player.PickItem(TItem.Create(ItemsKinds[I] as TItemKind, 20));
+    for I := 0 to AllResources.Count - 1 do
+      if AllResources[I] is TItemKind then
+        Player.PickItem(TItem.Create(TItemKind(AllResources[I]), 20));
     UserQuit := true;
-  end;
-
-  procedure ReloadItemAnimation;
-  var
-    Kind: TItemKind;
-  begin
-    if ChooseItemKind(Kind) then
-      Kind.RedoPrepare(Level.BaseLights);
   end;
 
 begin
@@ -524,9 +502,7 @@ begin
 
   case CurrentItem of
     0: GiveItems;
-    1: ItemsKinds.LoadFromFile;
-    2: ReloadItemAnimation;
-    3: SetCurrentMenu(CurrentMenu, DebugMenu);
+    1: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
 end;
 

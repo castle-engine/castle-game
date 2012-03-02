@@ -133,16 +133,7 @@ var
 procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
 var
   NewLevel: TLevel;
-  BaseLights: TLightInstancesList;
 begin
-  { All 3D resources must be prepared before 3D users are created.
-    So we must prepare items before creating the level
-    (since TLevel constructor creates some creatures and items on the level). }
-  BaseLights := TLightInstancesList.Create; {TODO:dirty to create BaseLights here}
-  try
-    ItemsKinds.Prepare(BaseLights);
-  finally FreeAndNil(BaseLights) end;
-
   Level := nil;
   try
     Player := TPlayer.Create(nil);

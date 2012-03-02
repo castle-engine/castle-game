@@ -185,7 +185,8 @@ procedure RegisterResourceClass(const AClass: T3DResourceClass; const TypeName: 
 implementation
 
 uses SysUtils, ProgressUnit, GameWindow, CastleXMLUtils, CastleTimeUtils,
-  CastleStringUtils, CastleLog, CastleFilesUtils, PrecalculatedAnimationCore;
+  CastleStringUtils, CastleLog, CastleFilesUtils, PrecalculatedAnimationCore,
+  CastleWindow;
 
 type
   TResourceClasses = specialize TFPGMap<string, T3DResourceClass>;
@@ -199,22 +200,12 @@ begin
   inherited Create;
   FId := AId;
   Resources := T3DListCore.Create(true, nil);
-
-  { if for some weird reason (when using RTTI), this constructor happens
-    before unit finalization --- then make sure to create AllResources first. }
-  if AllResources = nil then
-    AllResources := T3DResourceList.Create(false);
-  AllResources.Add(Self);
 end;
 
 destructor T3DResource.Destroy;
 begin
   Release;
   FreeAndNil(Resources);
-
-  if AllResources <> nil then
-    AllResources.Remove(Self);
-
   inherited;
 end;
 
@@ -541,8 +532,30 @@ begin
   ResourceClasses[TypeName] := AClass;
 end;
 
+{ initialization / finalization ---------------------------------------------- }
+
+procedure WindowClose(Window: TCastleWindowBase);
+var
+  I: Integer;
+begin
+  { AllResources may be nil here, because
+    WindowClose will be called from CastleWindow unit finalization
+    that will be done after this unit's finalization (DoFinalization).
+
+    That's OK --- DoFinalization already freed
+    every item on AllResources, and this implicitly did GLContextClose,
+    so everything is OK. }
+
+  if AllResources <> nil then
+  begin
+    for I := 0 to AllResources.Count - 1 do
+      AllResources[I].GLContextClose;
+  end;
+end;
+
 initialization
-  AllResources := T3DResourceList.Create(false);
+  Window.OnCloseList.Add(@WindowClose);
+  AllResources := T3DResourceList.Create(true);
   ResourceClasses := TResourceClasses.Create;
 finalization
   FreeAndNil(AllResources);

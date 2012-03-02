@@ -94,9 +94,6 @@ begin
            'Debug options (don''t use unless you know what you''re doing):' +nl+
            '  --debug-log           Write various log info on stdout' +nl+
            '  --debug-log-cache     Write log info, including cache, on stdout' +nl+
-           '  --debug-no-creatures  Creatures animations will be loaded' +nl+
-           '                        only when you explicitly request them' +nl+
-           '                        from debug menu' +nl+
            '  --debug-menu-designer   Run menus is designer mode');
          ProgramBreak;
        end;
@@ -106,7 +103,7 @@ begin
        end;
     2: WasParam_NoScreenChange := true;
     3: RenderShadowsPossible := false;
-    4: DebugNoCreatures := true;
+    4: { --debug-no-creatures not implemented for now };
     5: InitializeLog(Version);
     6: begin
          InitializeLog(Version);

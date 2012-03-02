@@ -93,8 +93,14 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
   MenuItems: TStringList): Integer;
 var
   SavedMode: TGLMode;
+  I: Integer;
 begin
   ChooseMenu.Items.Assign(MenuItems);
+  { MenuItems.Objects may be used by called to store some information.
+    Remove them now from ChooseMenu.Items, otherwise TOnScreenMenu
+    would treat them as accessories. }
+  for I := 0 to ChooseMenu.Items.Count - 1 do
+    ChooseMenu.Items.Objects[I] := nil;
   ChooseMenu.FixItemsRectangles;
 
   SavedMode := TGLMode.CreateReset(Window, 0, true,

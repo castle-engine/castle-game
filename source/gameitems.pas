@@ -73,7 +73,6 @@ type
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   public
-    constructor Create(const AId: string); override;
     destructor Destroy; override;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
@@ -302,8 +301,6 @@ type
   end;
 
 var
-  ItemsKinds: T3DResourceList;
-
   Sword: TItemKind;
   Bow: TItemKind;
   LifePotion: TItemKind;
@@ -331,12 +328,6 @@ uses SysUtils, CastleWindow, GameWindow,
   CastleSceneCore, GLImages;
 
 { TItemKind ------------------------------------------------------------ }
-
-constructor TItemKind.Create(const AId: string);
-begin
-  inherited Create(AId);
-  ItemsKinds.Add(Self);
-end;
 
 destructor TItemKind.Destroy;
 begin
@@ -750,25 +741,6 @@ end;
 
 { initialization / finalization ---------------------------------------- }
 
-procedure WindowClose(Window: TCastleWindowBase);
-var
-  I: Integer;
-begin
-  { In fact, ItemsKinds will always be nil here, because
-    WindowClose will be called from CastleWindow unit finalization
-    that will be done after this unit's finalization (DoFinalization).
-
-    That's OK --- DoFinalization already freed
-    every item on ItemsKinds, and this implicitly did GLContextClose,
-    so everything is OK. }
-
-  if ItemsKinds <> nil then
-  begin
-    for I := 0 to ItemsKinds.Count - 1 do
-      ItemsKinds[I].GLContextClose;
-  end;
-end;
-
 procedure ItemsKindsInit;
 begin
   Sword := AllResources.FindId('Sword') as TItemKind;
@@ -781,10 +753,6 @@ end;
 
 procedure DoInitialization;
 begin
-  Window.OnCloseList.Add(@WindowClose);
-
-  ItemsKinds := T3DResourceList.Create(true);
-
   RegisterResourceClass(TItemKind, 'Item');
   RegisterResourceClass(TItemSwordKind, 'Sword');
   RegisterResourceClass(TItemBowKind, 'Bow');
@@ -797,8 +765,6 @@ end;
 
 procedure DoFinalization;
 begin
-  FreeAndNil(ItemsKinds);
-
   ConfigFile.SetDeleteValue('auto_open_inventory',
     AutoOpenInventory, DefaultAutoOpenInventory);
 end;
