@@ -199,7 +199,7 @@ begin
   Items.Add('Creatures debug menu ...');
   Items.Add('Items debug menu ...');
   Items.Add('Level debug menu ...');
-  Items.Add('Reload resources index.xml files (TODO)');
+  Items.Add('Reload resources index.xml files');
   Items.Add('Reload resource animation ...');
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
   Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
@@ -233,7 +233,7 @@ begin
     1: SetCurrentMenu(CurrentMenu, DebugCreaturesMenu);
     2: SetCurrentMenu(CurrentMenu, DebugItemsMenu);
     3: SetCurrentMenu(CurrentMenu, DebugLevelMenu);
-    4: { TODO };
+    4: AllResources.LoadFromFiles(true);
     5: ReloadResource;
     6: begin
          RenderBoundingBoxes := not RenderBoundingBoxes;

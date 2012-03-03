@@ -159,14 +159,22 @@ type
 
   T3DResourceList = class(specialize TFPGObjectList<T3DResource>)
   private
+    IndexXmlReload: boolean;
     procedure LoadIndexXml(const FileName: string);
   public
     { Find resource with given T3DResource.Id.
       @raises Exception if not found and NilWhenNotFound = false. }
     function FindId(const AId: string; const NilWhenNotFound: boolean = false): T3DResource;
 
-    { Load all items configuration from XML files. }
-    procedure LoadFromFiles;
+    { Load all items configuration from XML files.
+
+      If Reload, then we will not clear the initial list contents.
+      Instead, index.xml files found that refer to the existing id
+      will cause T3DResource.LoadFromFile call on an existing resource.
+      Using Reload is a nice debug feature, if you want to reload configuration
+      from index.xml files (and eventually add new resources in new index.xml files),
+      but you don't want to recreate existing resource instances. }
+    procedure LoadFromFiles(const Reload: boolean = false);
 
     { Reads <resources> XML element. <resources> element
       is required child of given ParentElement.
@@ -352,6 +360,7 @@ var
   Xml: TCastleConfig;
   ResourceClassName, ResourceId: string;
   ResourceClassIndex: Integer;
+  ResourceClass: T3DResourceClass;
   Resource: T3DResource;
 begin
   Xml := TCastleConfig.Create(nil);
@@ -362,26 +371,40 @@ begin
     if Log then
       WritelnLog('Resources', Format('Loading T3DResource from "%s"', [FileName]));
 
-    ResourceId := Xml.GetNonEmptyValue('id');
-    if FindId(ResourceId, true) <> nil then
-      raise Exception.CreateFmt('Resource id "%s" already exists. All resource ids inside index.xml files must be unique',
-        [ResourceId]);
-
     ResourceClassName := Xml.GetNonEmptyValue('type');
     ResourceClassIndex := ResourceClasses.IndexOf(ResourceClassName);
     if ResourceClassIndex <> -1 then
-    begin
-      Resource := ResourceClasses.Data[ResourceClassIndex].Create(ResourceId);
-      Add(Resource);
-      Resource.LoadFromFile(Xml);
-    end else
+      ResourceClass := ResourceClasses.Data[ResourceClassIndex] else
       raise Exception.CreateFmt('Resource type "%s" not found, mentioned in file "%s"',
         [ResourceClassName, FileName]);
+
+    ResourceId := Xml.GetNonEmptyValue('id');
+    Resource := FindId(ResourceId, true);
+    if Resource <> nil then
+    begin
+      if IndexXmlReload then
+      begin
+        if ResourceClass <> Resource.ClassType then
+          raise Exception.CreateFmt('Resource id "%s" already exists, but with different type. Old class is %s, new class is %s. Cannot reload index.xml file in this situation',
+            [ResourceId, Resource.ClassType.ClassName, ResourceClass.ClassName]);
+      end else
+        raise Exception.CreateFmt('Resource id "%s" already exists. All resource ids inside index.xml files must be unique',
+          [ResourceId]);
+    end else
+    begin
+      Resource := ResourceClass.Create(ResourceId);
+      Add(Resource);
+    end;
+
+    Resource.LoadFromFile(Xml);
   finally FreeAndNil(Xml) end;
 end;
 
-procedure T3DResourceList.LoadFromFiles;
+procedure T3DResourceList.LoadFromFiles(const Reload: boolean);
 begin
+  if not Reload then
+    Clear;
+  IndexXmlReload := Reload;
   ScanForFiles(ProgramDataPath + 'data' + PathDelim + 'creatures', 'index.xml', @LoadIndexXml);
   ScanForFiles(ProgramDataPath + 'data' + PathDelim + 'items', 'index.xml', @LoadIndexXml);
 end;
