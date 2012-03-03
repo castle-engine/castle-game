@@ -86,22 +86,26 @@ type
       const SceneFileName: string;
       const BaseLights: TLightInstancesList);
     { @groupEnd }
-  protected
-    { Prepare everything needed for using this resource.
-      It must call Progress.Step PrepareSteps times. }
-    procedure Prepare(const BaseLights: TLightInstancesList); virtual;
 
-    { How many times Progress.Step will be called during Prepare
-      of this object. In this class this returns 0. }
-    function PrepareSteps: Cardinal; virtual;
+    { Prepare or release everything needed to use this resource.
+      PrepareCore and ReleaseCore should never be called directly,
+      they are only to be overridden in descendants.
+      These are used by actual @link(Prepare) and @link(Release)
+      when the actual allocation / deallocation should take place
+      (when required counter raises from zero or drops back to zero).
 
-    { Release everything done by Prepare.
+      ReleaseCore is also called in destructor, regardless of required count.
+      This is done to free resources even if user forgot to call Release
+      before destroying this resource instance.
 
-      Useful to call e.g. because Prepare must be done once again,
-      because some attributes (e.g. things set by AttributesSet) changed.
-
-      In this class this just sets Prepared to @false. }
-    procedure Release; virtual;
+      PrepareCore must call Progress.Step exactly PrepareCoreSteps times.
+      This allows to make nice progress bar in @link(Prepare).
+      In this class, PrepareCoreSteps returns 0.
+      @groupBegin }
+    procedure PrepareCore(const BaseLights: TLightInstancesList); virtual;
+    function PrepareCoreSteps: Cardinal; virtual;
+    procedure ReleaseCore; virtual;
+    { @groupEnd }
   public
     constructor Create(const AId: string); virtual;
     destructor Destroy; override;
@@ -124,6 +128,7 @@ type
     procedure LoadFromFile(KindsConfig: TCastleConfig); virtual;
 
     { Release and then immediately prepare again this resource.
+      Call only when RequiredCount <> 0, that is when resource is prepared.
       Shows nice progress bar, using @link(Progress). }
     procedure RedoPrepare(const BaseLights: TLightInstancesList);
 
@@ -163,14 +168,6 @@ type
 
     { Load all items configuration from XML files. }
     procedure LoadFromFile;
-
-    { Prepare all items. This does progress bar rendering
-      (using Progress.Init, Progress.Step, Progress.Fini). }
-    procedure Prepare(const BaseLights: TLightInstancesList;
-      const ResourcesName: string = 'resources');
-
-    { Release all items. }
-    procedure Release;
 
     { Reads <resources_required> XML element. <resources_required> element
       is required child of given ParentElement.
@@ -218,22 +215,22 @@ end;
 
 destructor T3DResource.Destroy;
 begin
-  Release;
+  ReleaseCore;
   FreeAndNil(Resources);
   inherited;
 end;
 
-procedure T3DResource.Prepare(const BaseLights: TLightInstancesList);
+procedure T3DResource.PrepareCore(const BaseLights: TLightInstancesList);
 begin
   FPrepared := true;
 end;
 
-function T3DResource.PrepareSteps: Cardinal;
+function T3DResource.PrepareCoreSteps: Cardinal;
 begin
   Result := 0;
 end;
 
-procedure T3DResource.Release;
+procedure T3DResource.ReleaseCore;
 begin
   if Resources <> nil then
   begin
@@ -258,18 +255,18 @@ end;
 
 procedure T3DResource.RedoPrepare(const BaseLights: TLightInstancesList);
 begin
-  Progress.Init(PrepareSteps, 'Loading ' + Id);
+  Assert(RequiredCount <> 0);
+  Progress.Init(PrepareCoreSteps, 'Loading ' + Id);
   try
-    { It's important to do Release after Progress.Init.
+    { It's important to do ReleaseCore after Progress.Init.
       That is because Progress.Init does TCastleWindowBase.SaveScreenToDisplayList,
       and this may call Window.OnDraw, and this may want to redraw
       the object (e.g. if creature of given kind already exists
       on the screen) and this requires Prepare to be already done.
 
       So we should call Progress.Init before we make outselves unprepared. }
-    Release;
-
-    Prepare(BaseLights);
+    ReleaseCore;
+    PrepareCore(BaseLights);
   finally Progress.Fini; end;
 end;
 
@@ -350,31 +347,6 @@ begin
 end;
 
 { T3DResourceList ------------------------------------------------------------- }
-
-procedure T3DResourceList.Prepare(const BaseLights: TLightInstancesList;
-  const ResourcesName: string);
-var
-  I: Integer;
-  PrepareSteps: Cardinal;
-begin
-  PrepareSteps := 0;
-  for I := 0 to Count - 1 do
-    PrepareSteps += Items[I].PrepareSteps;
-
-  Progress.Init(PrepareSteps, 'Loading ' + ResourcesName);
-  try
-    for I := 0 to Count - 1 do
-      Items[I].Prepare(BaseLights);
-  finally Progress.Fini; end;
-end;
-
-procedure T3DResourceList.Release;
-var
-  I: Integer;
-begin
-  for I := 0 to Count - 1 do
-    Items[I].Release;
-end;
 
 procedure T3DResourceList.LoadIndexXml(const FileName: string);
 var
@@ -473,7 +445,7 @@ begin
     if Resource.RequiredCount = 1 then
     begin
       Assert(not Resource.Prepared);
-      PrepareSteps += Resource.PrepareSteps;
+      PrepareSteps += Resource.PrepareCoreSteps;
       PrepareNeeded := true;
     end;
   end;
@@ -493,7 +465,7 @@ begin
           if Log then
             WritelnLog('Resources', Format(
               'Resource "%s" becomes required, loading', [Resource.Id]));
-          Resource.Prepare(BaseLights);
+          Resource.PrepareCore(BaseLights);
         end;
       end;
     finally Progress.Fini end;
@@ -534,7 +506,7 @@ begin
         should always have Resource.RequiredCount > 0 here. }
 
       if Resource.Prepared then
-        Resource.Release;
+        Resource.ReleaseCore;
     end;
   end;
 end;

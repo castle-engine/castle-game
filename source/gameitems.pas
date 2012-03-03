@@ -40,9 +40,10 @@ const
 type
   TItem = class;
 
-  { Kind of item.
-
-    Design question: Maybe it's better making TSword a descendant of TItem,
+  { Kind of item. }
+  TItemKind = class(T3DResource)
+  private
+  { Design question: Maybe it's better making TSword a descendant of TItem,
     and not creating TItemKind class ? This seems somewhat cleaner
     from OOP approach. Then various functions/properties
     of TItemKind must be handled as "class function" of TItem.
@@ -50,20 +51,8 @@ type
     not comfortable --- for example I would need associative array
     (like LoadedModels) to keep TItemKind.FScene value
     (to not load and not construct new GL display list each time
-    I create TSword instance).
+    I create TSword instance). }
 
-    Note that this unit handles all destruction of TItemKind instances
-    (and also creates most (all, for now) instances of TItemKind).
-    You're free to create new descendants and instances of TItemKind
-    outside this unit, but then leave freeing them to this unit.
-
-    Note that after creating an instance of this item,
-    before you do anything else, you have to initialize some of it's
-    properties by calling LoadFromFile. In this class, this initializes
-    it's SceneFileName, Caption amd ImageFileName --- in descendants, more
-    required properties may be initialized here. }
-  TItemKind = class(T3DResource)
-  private
     FSceneFileName: string;
     FScene: TCastleScene;
     FCaption: string;
@@ -73,9 +62,9 @@ type
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   protected
-    procedure Prepare(const BaseLights: TLightInstancesList); override;
-    function PrepareSteps: Cardinal; override;
-    procedure Release; override;
+    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    function PrepareCoreSteps: Cardinal; override;
+    procedure ReleaseCore; override;
   public
     destructor Destroy; override;
 
@@ -98,7 +87,7 @@ type
 
     property ImageFileName: string read FImageFileName;
 
-    { This is OpenGL display list to draw @link(Image). }
+    { OpenGL display list to draw @link(Image). }
     function GLList_DrawImage: TGLuint;
 
     { Use this item.
@@ -138,9 +127,9 @@ type
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
-    procedure Prepare(const BaseLights: TLightInstancesList); override;
-    function PrepareSteps: Cardinal; override;
-    procedure Release; override;
+    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    function PrepareCoreSteps: Cardinal; override;
+    procedure ReleaseCore; override;
   public
     { Sound to make on equipping. Each weapon can have it's own
       equipping sound. }
@@ -403,18 +392,18 @@ begin
   Result := FBoundingBoxRotated;
 end;
 
-procedure TItemKind.Prepare(const BaseLights: TLightInstancesList);
+procedure TItemKind.PrepareCore(const BaseLights: TLightInstancesList);
 begin
   inherited;
   PrepareScene(FScene, SceneFileName, BaseLights);
 end;
 
-function TItemKind.PrepareSteps: Cardinal;
+function TItemKind.PrepareCoreSteps: Cardinal;
 begin
-  Result := (inherited PrepareSteps) + 2;
+  Result := (inherited PrepareCoreSteps) + 2;
 end;
 
-procedure TItemKind.Release;
+procedure TItemKind.ReleaseCore;
 begin
   FScene := nil;
   inherited;
@@ -441,7 +430,7 @@ begin
   Player.EquippedWeapon := Item;
 end;
 
-procedure TItemWeaponKind.Prepare(const BaseLights: TLightInstancesList);
+procedure TItemWeaponKind.PrepareCore(const BaseLights: TLightInstancesList);
 begin
   inherited;
   PreparePrecalculatedAnimation('Attack', FAttackAnimation, FAttackAnimationFile,
@@ -450,12 +439,12 @@ begin
     BaseLights);
 end;
 
-function TItemWeaponKind.PrepareSteps: Cardinal;
+function TItemWeaponKind.PrepareCoreSteps: Cardinal;
 begin
-  Result := (inherited PrepareSteps) + 2;
+  Result := (inherited PrepareCoreSteps) + 2;
 end;
 
-procedure TItemWeaponKind.Release;
+procedure TItemWeaponKind.ReleaseCore;
 begin
   FAttackAnimation := nil;
   FReadyAnimation := nil;

@@ -298,9 +298,9 @@ type
     FMaxHeightAcceptableToFall: Single;
     FRandomWalkDistance: Single;
   protected
-    procedure Prepare(const BaseLights: TLightInstancesList); override;
-    function PrepareSteps: Cardinal; override;
-    procedure Release; override;
+    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    function PrepareCoreSteps: Cardinal; override;
+    procedure ReleaseCore; override;
   public
     constructor Create(const AId: string); override;
 
@@ -483,9 +483,9 @@ type
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
   protected
-    procedure Prepare(const BaseLights: TLightInstancesList); override;
-    function PrepareSteps: Cardinal; override;
-    procedure Release; override;
+    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    function PrepareCoreSteps: Cardinal; override;
+    procedure ReleaseCore; override;
   public
     function CreatureClass: TCreatureClass; override;
 
@@ -513,7 +513,7 @@ type
 
   TGhostKind = class(TWalkAttackCreatureKind)
   protected
-    procedure Prepare(const BaseLights: TLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
   public
     function CreatureClass: TCreatureClass; override;
   end;
@@ -538,9 +538,9 @@ type
     FHitsPlayer: boolean;
     FHitsCreatures: boolean;
   protected
-    procedure Prepare(const BaseLights: TLightInstancesList); override;
-    function PrepareSteps: Cardinal; override;
-    procedure Release; override;
+    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    function PrepareCoreSteps: Cardinal; override;
+    procedure ReleaseCore; override;
   public
     constructor Create(const AId: string); override;
 
@@ -590,9 +590,9 @@ type
     FAnimation: TCastlePrecalculatedAnimation;
     FAnimationFile: string;
   protected
-    procedure Prepare(const BaseLights: TLightInstancesList); override;
-    function PrepareSteps: Cardinal; override;
-    procedure Release; override;
+    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    function PrepareCoreSteps: Cardinal; override;
+    procedure ReleaseCore; override;
   public
     { Missile uses the same animation all the time.
       In the simplest case, you can just place here a single scene. }
@@ -1017,7 +1017,7 @@ begin
   FRandomWalkDistance := DefaultCreatureRandomWalkDistance;
 end;
 
-procedure TWalkAttackCreatureKind.Prepare(const BaseLights: TLightInstancesList);
+procedure TWalkAttackCreatureKind.PrepareCore(const BaseLights: TLightInstancesList);
 begin
   inherited;
 
@@ -1034,12 +1034,12 @@ begin
         StandAnimation.Scenes[0].BoundingBox.Data[1, 2] * 0.75);
 end;
 
-function TWalkAttackCreatureKind.PrepareSteps: Cardinal;
+function TWalkAttackCreatureKind.PrepareCoreSteps: Cardinal;
 begin
-  Result := (inherited PrepareSteps) + 12;
+  Result := (inherited PrepareCoreSteps) + 12;
 end;
 
-procedure TWalkAttackCreatureKind.Release;
+procedure TWalkAttackCreatureKind.ReleaseCore;
 begin
   FStandAnimation := nil;
   FStandToWalkAnimation := nil;
@@ -1114,19 +1114,19 @@ end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
 
-procedure TSpiderQueenKind.Prepare(const BaseLights: TLightInstancesList);
+procedure TSpiderQueenKind.PrepareCore(const BaseLights: TLightInstancesList);
 begin
   inherited;
   PreparePrecalculatedAnimation('ThrowWebAttack',
     FThrowWebAttackAnimation, FThrowWebAttackAnimationFile, BaseLights);
 end;
 
-function TSpiderQueenKind.PrepareSteps: Cardinal;
+function TSpiderQueenKind.PrepareCoreSteps: Cardinal;
 begin
-  Result := (inherited PrepareSteps) + 2;
+  Result := (inherited PrepareCoreSteps) + 2;
 end;
 
-procedure TSpiderQueenKind.Release;
+procedure TSpiderQueenKind.ReleaseCore;
 begin
   FThrowWebAttackAnimation := nil;
   inherited;
@@ -1155,7 +1155,7 @@ end;
 
 { TGhostKind ------------------------------------------------------------- }
 
-procedure TGhostKind.Prepare(const BaseLights: TLightInstancesList);
+procedure TGhostKind.PrepareCore(const BaseLights: TLightInstancesList);
 var
   ReferenceScene: TCastleScene;
 begin
@@ -1191,7 +1191,7 @@ begin
   FHitsCreatures := DefaultHitsCreatures;
 end;
 
-procedure TMissileCreatureKind.Prepare(const BaseLights: TLightInstancesList);
+procedure TMissileCreatureKind.PrepareCore(const BaseLights: TLightInstancesList);
 begin
   inherited;
   PreparePrecalculatedAnimation('Move', FAnimation, FAnimationFile, BaseLights);
@@ -1199,12 +1199,12 @@ begin
   RadiusFromPrepare := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
 
-function TMissileCreatureKind.PrepareSteps: Cardinal;
+function TMissileCreatureKind.PrepareCoreSteps: Cardinal;
 begin
-  Result := (inherited PrepareSteps) + 2;
+  Result := (inherited PrepareCoreSteps) + 2;
 end;
 
-procedure TMissileCreatureKind.Release;
+procedure TMissileCreatureKind.ReleaseCore;
 begin
   FAnimation := nil;
   inherited;
@@ -1240,7 +1240,7 @@ end;
 
 { TStillCreatureKind ---------------------------------------------------- }
 
-procedure TStillCreatureKind.Prepare(const BaseLights: TLightInstancesList);
+procedure TStillCreatureKind.PrepareCore(const BaseLights: TLightInstancesList);
 begin
   inherited;
   PreparePrecalculatedAnimation('Stand', FAnimation, FAnimationFile, BaseLights);
@@ -1248,12 +1248,12 @@ begin
   RadiusFromPrepare := Animation.Scenes[0].BoundingBox.XYRadius;
 end;
 
-function TStillCreatureKind.PrepareSteps: Cardinal;
+function TStillCreatureKind.PrepareCoreSteps: Cardinal;
 begin
-  Result := (inherited PrepareSteps) + 2;
+  Result := (inherited PrepareCoreSteps) + 2;
 end;
 
-procedure TStillCreatureKind.Release;
+procedure TStillCreatureKind.ReleaseCore;
 begin
   FAnimation := nil;
   inherited;
