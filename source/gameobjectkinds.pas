@@ -115,7 +115,7 @@ type
     { Free any association with current OpenGL context. }
     procedure GLContextClose; virtual;
 
-    { Unique identifier of this creature kind.
+    { Unique identifier of this resource.
       Used to refer to this kind from VRML/X3D models, XML files and other data.
 
       This must be composed of only letters, use CamelCase.
