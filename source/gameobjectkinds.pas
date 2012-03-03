@@ -166,7 +166,7 @@ type
     function FindId(const AId: string): T3DResource;
 
     { Load all items configuration from XML files. }
-    procedure LoadFromFile;
+    procedure LoadFromFiles;
 
     { Reads <resources_required> XML element. <resources_required> element
       is required child of given ParentElement.
@@ -375,7 +375,7 @@ begin
   finally FreeAndNil(Xml) end;
 end;
 
-procedure T3DResourceList.LoadFromFile;
+procedure T3DResourceList.LoadFromFiles;
 begin
   ScanForFiles(ProgramDataPath + 'data' + PathDelim + 'creatures', 'index.xml', @LoadIndexXml);
   ScanForFiles(ProgramDataPath + 'data' + PathDelim + 'items', 'index.xml', @LoadIndexXml);

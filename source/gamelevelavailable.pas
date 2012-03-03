@@ -98,7 +98,7 @@ type
       (to scale level loading background images).
       Also, this can be done only once creatures and items resources are known,
       as they may be referenced in levels XML files. }
-    procedure LoadFromFile;
+    procedure LoadFromFiles;
   end;
 
 var
@@ -355,7 +355,7 @@ begin
   NewLevelAvailable.LoadFromDocument;
 end;
 
-procedure TLevelAvailableList.LoadFromFile;
+procedure TLevelAvailableList.LoadFromFiles;
 begin
   ScanForFiles(ProgramDataPath + 'data' +  PathDelim + 'levels', 'index.xml', @LoadIndexXml);
 end;

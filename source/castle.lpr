@@ -207,10 +207,10 @@ begin
   Progress.UseDescribePosition := false;
 
   { initialize available creatures and items and levels }
-  AllResources.LoadFromFile;
+  AllResources.LoadFromFiles;
   ItemsKindsInit;
   CreaturesKindsInit;
-  LevelsAvailable.LoadFromFile;
+  LevelsAvailable.LoadFromFiles;
   LevelsAvailable.LoadFromConfig;
 
   { init OpenAL (after initing Glw and Progress, because ALContextOpen
