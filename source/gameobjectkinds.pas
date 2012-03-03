@@ -52,7 +52,7 @@ type
     TCastleSceneManager.Items would suffice.) }
 
     FId: string;
-    Resources: T3DListCore;
+    Allocated: T3DListCore;
     FRequiredCount: Cardinal;
   protected
     { Prepare 3D resource loading it from given filename.
@@ -61,7 +61,7 @@ type
       Sets rendering attributes and prepares for fast rendering
       and other processing by T3D.PrepareResources.
 
-      Call only in Prepare overrides.
+      Call only in PrepareCore overrides.
 
       It calls Progress.Step 2 times.
 
@@ -69,10 +69,10 @@ type
       3D resources.
       So it's OpenGL resources will be automatically released in
       @link(GLContextClose), it will be fully released
-      in @link(Release) and destructor.
+      in @link(ReleaseCore) and destructor.
 
       @param(AnimationName is here only for debug purposes (it may be used
-      by some debug messages etc.))
+        by some debug messages etc.))
 
       @groupBegin }
     procedure PreparePrecalculatedAnimation(
@@ -209,13 +209,13 @@ constructor T3DResource.Create(const AId: string);
 begin
   inherited Create;
   FId := AId;
-  Resources := T3DListCore.Create(true, nil);
+  Allocated := T3DListCore.Create(true, nil);
 end;
 
 destructor T3DResource.Destroy;
 begin
   ReleaseCore;
-  FreeAndNil(Resources);
+  FreeAndNil(Allocated);
   inherited;
 end;
 
@@ -230,10 +230,10 @@ end;
 
 procedure T3DResource.ReleaseCore;
 begin
-  if Resources <> nil then
+  if Allocated <> nil then
   begin
-    { since Resources owns all it's items, this is enough to free them }
-    Resources.Clear;
+    { since Allocated owns all it's items, this is enough to free them }
+    Allocated.Clear;
   end;
 end;
 
@@ -241,8 +241,8 @@ procedure T3DResource.GLContextClose;
 var
   I: Integer;
 begin
-  for I := 0 to Resources.Count - 1 do
-    Resources[I].GLContextClose;
+  for I := 0 to Allocated.Count - 1 do
+    Allocated[I].GLContextClose;
 end;
 
 procedure T3DResource.LoadFromFile(KindsConfig: TCastleConfig);
@@ -276,7 +276,7 @@ begin
   if (AnimationFile <> '') and (Anim = nil) then
   begin
     Anim := TCastlePrecalculatedAnimation.CreateCustomCache(nil, GLContextCache);
-    Resources.Add(Anim);
+    Allocated.Add(Anim);
     Anim.LoadFromFile(AnimationFile, { AllowStdIn } false, { LoadTime } true,
       { rescale scenes_per_time }
       AnimationScenesPerTime / DefaultKAnimScenesPerTime);
@@ -307,7 +307,7 @@ begin
   if (SceneFileName <> '') and (Scene = nil) then
   begin
     Scene := TCastleScene.CreateCustomCache(nil, GLContextCache);
-    Resources.Add(Scene);
+    Allocated.Add(Scene);
     Scene.Load(SceneFileName);
   end;
   Progress.Step;
