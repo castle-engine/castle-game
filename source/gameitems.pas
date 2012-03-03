@@ -72,6 +72,10 @@ type
     FGLList_DrawImage: TGLuint;
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
+  protected
+    procedure Prepare(const BaseLights: TLightInstancesList); override;
+    function PrepareSteps: Cardinal; override;
+    procedure Release; override;
   public
     destructor Destroy; override;
 
@@ -118,10 +122,6 @@ type
     { This returns Scene.BoundingBox enlarged a little (along X and Y)
       to account the fact that Scene may be rotated around +Z vector. }
     function BoundingBoxRotated: TBox3D;
-
-    procedure Prepare(const BaseLights: TLightInstancesList); override;
-    function PrepareSteps: Cardinal; override;
-    procedure Release; override;
   end;
 
   TItemPotionOfLifeKind = class(TItemKind)
@@ -137,6 +137,10 @@ type
     FReadyAnimationFile: string;
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
+  protected
+    procedure Prepare(const BaseLights: TLightInstancesList); override;
+    function PrepareSteps: Cardinal; override;
+    procedure Release; override;
   public
     { Sound to make on equipping. Each weapon can have it's own
       equipping sound. }
@@ -152,10 +156,6 @@ type
       read FReadyAnimation;
 
     procedure Use(Item: TItem); override;
-
-    procedure Prepare(const BaseLights: TLightInstancesList); override;
-    function PrepareSteps: Cardinal; override;
-    procedure Release; override;
 
     { Time within AttackAnimation
       at which ActualAttack method will be called.

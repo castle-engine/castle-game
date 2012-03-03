@@ -297,12 +297,12 @@ type
     FChanceToHurt: Single;
     FMaxHeightAcceptableToFall: Single;
     FRandomWalkDistance: Single;
-  public
-    constructor Create(const AId: string); override;
-
+  protected
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
+  public
+    constructor Create(const AId: string); override;
 
     { An animation of standing still.
       Beginning must be on time 0.
@@ -482,11 +482,11 @@ type
     FMaxThrowWebAttackDistance: Single;
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
-  public
+  protected
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
-
+  public
     function CreatureClass: TCreatureClass; override;
 
     property MinDelayBetweenThrowWebAttacks: Single
@@ -512,8 +512,9 @@ type
   end;
 
   TGhostKind = class(TWalkAttackCreatureKind)
-  public
+  protected
     procedure Prepare(const BaseLights: TLightInstancesList); override;
+  public
     function CreatureClass: TCreatureClass; override;
   end;
 
@@ -536,12 +537,12 @@ type
     FSoundIdle: TSoundType;
     FHitsPlayer: boolean;
     FHitsCreatures: boolean;
-  public
-    constructor Create(const AId: string); override;
-
+  protected
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
+  public
+    constructor Create(const AId: string); override;
 
     { Missile uses the same animation all the time.
       In the simplest case, you can just place here a single scene. }
@@ -588,11 +589,11 @@ type
   private
     FAnimation: TCastlePrecalculatedAnimation;
     FAnimationFile: string;
-  public
+  protected
     procedure Prepare(const BaseLights: TLightInstancesList); override;
     function PrepareSteps: Cardinal; override;
     procedure Release; override;
-
+  public
     { Missile uses the same animation all the time.
       In the simplest case, you can just place here a single scene. }
     property Animation: TCastlePrecalculatedAnimation read FAnimation;

@@ -86,10 +86,7 @@ type
       const SceneFileName: string;
       const BaseLights: TLightInstancesList);
     { @groupEnd }
-  public
-    constructor Create(const AId: string); virtual;
-    destructor Destroy; override;
-
+  protected
     { Prepare everything needed for using this resource.
       It must call Progress.Step PrepareSteps times. }
     procedure Prepare(const BaseLights: TLightInstancesList); virtual;
@@ -98,9 +95,6 @@ type
       of this object. In this class this returns 0. }
     function PrepareSteps: Cardinal; virtual;
 
-    { Are we in prepared state, that is after @link(Prepare) call and before @link(Release). }
-    property Prepared: boolean read FPrepared;
-
     { Release everything done by Prepare.
 
       Useful to call e.g. because Prepare must be done once again,
@@ -108,6 +102,12 @@ type
 
       In this class this just sets Prepared to @false. }
     procedure Release; virtual;
+  public
+    constructor Create(const AId: string); virtual;
+    destructor Destroy; override;
+
+    { Are we in prepared state, that is after @link(Prepare) call and before @link(Release). }
+    property Prepared: boolean read FPrepared;
 
     { Free any association with current OpenGL context. }
     procedure GLContextClose; virtual;
@@ -124,7 +124,7 @@ type
     procedure LoadFromFile(KindsConfig: TCastleConfig); virtual;
 
     { Release and then immediately prepare again this resource.
-      Does progress (by Progress.Init...Fini inside). }
+      Shows nice progress bar, using @link(Progress). }
     procedure RedoPrepare(const BaseLights: TLightInstancesList);
 
     { Used by Require, UnRequire to count
@@ -133,8 +133,22 @@ type
     property RequiredCount: Cardinal
       read FRequiredCount write FRequiredCount default 0;
 
+    { Prepare or release everything needed to use this resource.
+
+      There is an internal counter tracking how many times given
+      resource was prepared and released. Which means that preparing
+      and releasing resource multiple times is correct --- but make
+      sure that every single call to prepare is paired with exactly one
+      call to release. Actual allocation / deallocation
+      (when protected methods PrepareCore, ReleaseCore are called)
+      happens only when required count raises from zero or drops back to zero.
+
+      Show nice progress bar, using @link(Progress).
+
+      @groupBegin }
     procedure Require(const BaseLights: TLightInstancesList);
     procedure UnRequire;
+    { @groupEnd }
   end;
 
   T3DResourceClass = class of T3DResource;
