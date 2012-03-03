@@ -162,8 +162,8 @@ type
     procedure LoadIndexXml(const FileName: string);
   public
     { Find resource with given T3DResource.Id.
-      @raises Exception if not found. }
-    function FindId(const AId: string): T3DResource;
+      @raises Exception if not found and NilWhenNotFound = false. }
+    function FindId(const AId: string; const NilWhenNotFound: boolean = false): T3DResource;
 
     { Load all items configuration from XML files. }
     procedure LoadFromFiles;
@@ -361,8 +361,13 @@ begin
     Xml.FileName := FileName;
     if Log then
       WritelnLog('Resources', Format('Loading T3DResource from "%s"', [FileName]));
-    ResourceClassName := Xml.GetNonEmptyValue('type');
+
     ResourceId := Xml.GetNonEmptyValue('id');
+    if FindId(ResourceId, true) <> nil then
+      raise Exception.CreateFmt('Resource id "%s" already exists. All resource ids inside index.xml files must be unique',
+        [ResourceId]);
+
+    ResourceClassName := Xml.GetNonEmptyValue('type');
     ResourceClassIndex := ResourceClasses.IndexOf(ResourceClassName);
     if ResourceClassIndex <> -1 then
     begin
@@ -381,7 +386,7 @@ begin
   ScanForFiles(ProgramDataPath + 'data' + PathDelim + 'items', 'index.xml', @LoadIndexXml);
 end;
 
-function T3DResourceList.FindId(const AId: string): T3DResource;
+function T3DResourceList.FindId(const AId: string; const NilWhenNotFound: boolean): T3DResource;
 var
   I: Integer;
 begin
@@ -392,7 +397,9 @@ begin
       Exit;
   end;
 
-  raise Exception.CreateFmt('Not existing resource name "%s"', [AId]);
+  if NilWhenNotFound then
+    Result := nil else
+    raise Exception.CreateFmt('Not existing resource name "%s"', [AId]);
 end;
 
 procedure T3DResourceList.LoadResources(ParentElement: TDOMElement);
