@@ -177,7 +177,7 @@ begin
           [AllResources[I].Id, AllResources[I].UsageCount]), AllResources[I]);
     S.Append('Cancel');
     ResultIndex := ChooseByMenu(ControlsUnder, S);
-    Result := ResultIndex <> S.Count;
+    Result := ResultIndex <> S.Count - 1;
     if Result then
       Resource := S.Objects[ResultIndex] as T3DResource;
   finally S.Free end;
