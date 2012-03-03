@@ -53,7 +53,7 @@ type
 
     FId: string;
     Allocated: T3DListCore;
-    FRequiredCount: Cardinal;
+    FUsageCount: Cardinal;
   protected
     { Prepare 3D resource loading it from given filename.
       Loads the resource only if filename is not empty,
@@ -127,15 +127,15 @@ type
     procedure LoadFromFile(KindsConfig: TCastleConfig); virtual;
 
     { Release and then immediately prepare again this resource.
-      Call only when RequiredCount <> 0, that is when resource is prepared.
+      Call only when UsageCount <> 0, that is when resource is prepared.
       Shows nice progress bar, using @link(Progress). }
     procedure RedoPrepare(const BaseLights: TLightInstancesList);
 
-    { Used by Require, UnRequire to count
-      how many times this kind is required. Idea is that when this drops
-      to zero, we can Release to free resources. }
-    property RequiredCount: Cardinal
-      read FRequiredCount write FRequiredCount default 0;
+    { How many times this resource is used. Used by Prepare and Release:
+      actual allocation / deallocation happens when this raises from zero
+      or drops back to zero. }
+    property UsageCount: Cardinal
+      read FUsageCount write FUsageCount default 0;
 
     { Prepare or release everything needed to use this resource.
 
@@ -252,7 +252,7 @@ end;
 
 procedure T3DResource.RedoPrepare(const BaseLights: TLightInstancesList);
 begin
-  Assert(RequiredCount <> 0);
+  Assert(UsageCount <> 0);
   Progress.Init(PrepareCoreSteps, 'Loading ' + Id);
   try
     { It's important to do ReleaseCore after Progress.Init.
@@ -345,7 +345,7 @@ end;
 
 function T3DResource.Prepared: boolean;
 begin
-  Result := RequiredCount <> 0;
+  Result := UsageCount <> 0;
 end;
 
 { T3DResourceList ------------------------------------------------------------- }
@@ -435,7 +435,7 @@ var
 begin
   { We iterate two times over Items, first time only to calculate
     PrepareSteps, 2nd time does actual work.
-    1st time increments RequiredCount (as 2nd pass may be optimized
+    1st time increments UsageCount (as 2nd pass may be optimized
     out, if not needed). }
 
   PrepareSteps := 0;
@@ -443,8 +443,8 @@ begin
   for I := 0 to Count - 1 do
   begin
     Resource := Items[I];
-    Resource.RequiredCount := Resource.RequiredCount + 1;
-    if Resource.RequiredCount = 1 then
+    Resource.UsageCount := Resource.UsageCount + 1;
+    if Resource.UsageCount = 1 then
     begin
       PrepareSteps += Resource.PrepareCoreSteps;
       PrepareNeeded := true;
@@ -461,7 +461,7 @@ begin
       for I := 0 to Count - 1 do
       begin
         Resource := Items[I];
-        if Resource.RequiredCount = 1 then
+        if Resource.UsageCount = 1 then
         begin
           if Log then
             WritelnLog('Resources', Format(
@@ -486,10 +486,10 @@ begin
   for I := 0 to Count - 1 do
   begin
     Resource := Items[I];
-    Assert(Resource.RequiredCount > 0);
+    Assert(Resource.UsageCount > 0);
 
-    Resource.RequiredCount := Resource.RequiredCount - 1;
-    if Resource.RequiredCount = 0 then
+    Resource.UsageCount := Resource.UsageCount - 1;
+    if Resource.UsageCount = 0 then
     begin
       if Log then
         WritelnLog('Resources', Format(

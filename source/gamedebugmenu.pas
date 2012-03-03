@@ -174,7 +174,7 @@ begin
     for I := 0 to AllResources.Count - 1 do
       if (not OnlyCreatures) or (AllResources[I] is TCreatureKind) then
         S.AddObject(Format('Resource %s (%d users)',
-          [AllResources[I].Id, AllResources[I].RequiredCount]), AllResources[I]);
+          [AllResources[I].Id, AllResources[I].UsageCount]), AllResources[I]);
     S.Append('Cancel');
     ResultIndex := ChooseByMenu(ControlsUnder, S);
     Result := ResultIndex <> S.Count;
@@ -218,7 +218,7 @@ procedure TDebugMenu.Click;
   begin
     if ChooseResource(Resource, false) then
     begin
-      if Resource.RequiredCount = 0 then
+      if Resource.UsageCount = 0 then
         MessageOK(Window, Format('Resource "%s" is not used by anything, ' +
           'cannot reload',  [Resource.Id])) else
         Resource.RedoPrepare(Level.BaseLights);
