@@ -52,7 +52,6 @@ type
     TCastleSceneManager.Items would suffice.) }
 
     FId: string;
-    FPrepared: boolean;
     Resources: T3DListCore;
     FRequiredCount: Cardinal;
   protected
@@ -111,7 +110,7 @@ type
     destructor Destroy; override;
 
     { Are we in prepared state, that is after @link(Prepare) call and before @link(Release). }
-    property Prepared: boolean read FPrepared;
+    function Prepared: boolean;
 
     { Free any association with current OpenGL context. }
     procedure GLContextClose; virtual;
@@ -222,7 +221,6 @@ end;
 
 procedure T3DResource.PrepareCore(const BaseLights: TLightInstancesList);
 begin
-  FPrepared := true;
 end;
 
 function T3DResource.PrepareCoreSteps: Cardinal;
@@ -237,7 +235,6 @@ begin
     { since Resources owns all it's items, this is enough to free them }
     Resources.Clear;
   end;
-  FPrepared := false;
 end;
 
 procedure T3DResource.GLContextClose;
@@ -346,6 +343,11 @@ begin
   finally FreeAndNil(List) end;
 end;
 
+function T3DResource.Prepared: boolean;
+begin
+  Result := RequiredCount <> 0;
+end;
+
 { T3DResourceList ------------------------------------------------------------- }
 
 procedure T3DResourceList.LoadIndexXml(const FileName: string);
@@ -444,7 +446,6 @@ begin
     Resource.RequiredCount := Resource.RequiredCount + 1;
     if Resource.RequiredCount = 1 then
     begin
-      Assert(not Resource.Prepared);
       PrepareSteps += Resource.PrepareCoreSteps;
       PrepareNeeded := true;
     end;
@@ -493,20 +494,7 @@ begin
       if Log then
         WritelnLog('Resources', Format(
           'Creature "%s" is no longer required, freeing', [Resource.Id]));
-
-      { If everything went OK, I could place here an assertion
-
-          Assert(Resource.Prepared);
-
-        However, if resource loading inside Require will fail,
-        then scene manager destructor is forced to call UnRequire
-        on resources that, although had RequiredCount
-        increased, didn't have actually Prepare call.
-        Still, a correct run of the program (when resource loading goes 100% OK)
-        should always have Resource.RequiredCount > 0 here. }
-
-      if Resource.Prepared then
-        Resource.ReleaseCore;
+      Resource.ReleaseCore;
     end;
   end;
 end;
