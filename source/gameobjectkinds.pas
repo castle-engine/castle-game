@@ -168,11 +168,11 @@ type
     { Load all items configuration from XML files. }
     procedure LoadFromFiles;
 
-    { Reads <resources_required> XML element. <resources_required> element
+    { Reads <resources> XML element. <resources> element
       is required child of given ParentElement.
       Sets current list value with all mentioned required
       resources (subset of AllResources). }
-    procedure LoadRequiredResources(ParentElement: TDOMElement);
+    procedure LoadResources(ParentElement: TDOMElement);
 
     { Prepare / release all resources on list.
       @groupBegin }
@@ -395,24 +395,23 @@ begin
   raise Exception.CreateFmt('Not existing resource name "%s"', [AId]);
 end;
 
-procedure T3DResourceList.LoadRequiredResources(ParentElement: TDOMElement);
+procedure T3DResourceList.LoadResources(ParentElement: TDOMElement);
 var
-  RequiredResources: TDOMElement;
+  ResourcesElement: TDOMElement;
   ResourceId: string;
   I: TXMLElementIterator;
 begin
   Clear;
 
-  RequiredResources := DOMGetChildElement(ParentElement, 'required_resources',
-    true);
+  ResourcesElement := DOMGetChildElement(ParentElement, 'resources', true);
 
-  I := TXMLElementIterator.Create(RequiredResources);
+  I := TXMLElementIterator.Create(ResourcesElement);
   try
     while I.GetNext do
     begin
       if I.Current.TagName <> 'resource' then
         raise Exception.CreateFmt(
-          'Element "%s" is not allowed in <required_resources>',
+          'Element "%s" is not allowed in <resources>',
           [I.Current.TagName]);
       if not DOMGetAttribute(I.Current, 'id', ResourceId) then
         raise Exception.Create('<resource> must have a "id" attribute');

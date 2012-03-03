@@ -975,7 +975,7 @@ function TCreatureKind.CreateCreature(World: T3DWorld;
   const MaxLife: Single): TCreature;
 begin
   { This is only needed if you used --debug-no-creatures or forgot
-    to add creature to <required_resources> }
+    to add creature to <resources> }
   // TODO: waits for porting T3DResource to T3D,
   // then Prepare will get BaseLights in param,
   // and somehow it should call

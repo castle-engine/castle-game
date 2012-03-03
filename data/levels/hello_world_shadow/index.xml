@@ -12,6 +12,6 @@
 
   footsteps_sound="player_footsteps_concrete">
 
-  <required_resources>
-  </required_resources>
+  <resources>
+  </resources>
 </level>

@@ -17,8 +17,8 @@
   load_water_animation="True"
 >
 
-  <required_resources>
+  <resources>
     <resource id="Alien" />
     <resource id="BallMissile" />
-  </required_resources>
+  </resources>
 </level>

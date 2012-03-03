@@ -14,10 +14,10 @@
     <hint>Hint: press this red button with the %i</hint>
   </area>
 
-  <required_resources>
+  <resources>
     <resource id="Alien" />
     <resource id="Werewolf" />
     <resource id="BallMissile" />
-  </required_resources>
+  </resources>
 
 </level>

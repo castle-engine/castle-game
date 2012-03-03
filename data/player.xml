@@ -1,18 +1,6 @@
 <?xml version="1.0"?>
 
-<!--
-  This file configures many aspects of player's behavior.
-
-  Note that, unlike e.g. creatures/kinds.xml file, values in this
-  file generally *don't have sensible defaults in program's code*.
-  After all, this file is used to set these defaults, so if I would
-  like to set them in code, I would set them to the same values
-  as they are set here...
-
-  Which is to say: you can't simply delete
-  values from this file and depend that "game will initialize some
-  default player settings". It will not.
--->
+<!-- Configures player. -->
 
 <CONFIG>
   <player
@@ -29,8 +17,8 @@
       power="4.5"
     />
 
-    <required_resources>
+    <resources>
       <resource id="Arrow" />
-    </required_resources>
+    </resources>
   </player>
 </CONFIG>

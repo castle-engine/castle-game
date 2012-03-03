@@ -21,12 +21,12 @@
     <hint>Hint: open doors using the %i</hint>
   </area>
 
-  <required_resources>
+  <resources>
     <resource id="Alien" />
     <resource id="Werewolf" />
     <resource id="BallMissile" />
     <resource id="Ghost" />
     <resource id="DoomBarrel" />
-  </required_resources>
+  </resources>
 
 </level>

@@ -66,7 +66,7 @@ type
 
     Element: TDOMElement;
 
-    RequiredResources: T3DResourceList;
+    Resources: T3DResourceList;
 
     Demo: boolean;
 
@@ -120,13 +120,13 @@ uses SysUtils, GameConfig, CastleXMLUtils, CastleFilesUtils,
 constructor TLevelAvailable.Create;
 begin
   inherited;
-  RequiredResources := T3DResourceList.Create(false);
+  Resources := T3DResourceList.Create(false);
 end;
 
 destructor TLevelAvailable.Destroy;
 begin
   FreeAndNil(Document);
-  FreeAndNil(RequiredResources);
+  FreeAndNil(Resources);
 
   { Thanks to WindowClose implementation, we can be sure that gl context
     is active now, so it's not a problem to call glFreeDisplayList now. }
@@ -222,8 +222,8 @@ begin
     LoadingBarYPosition) then
     LoadingBarYPosition := DefaultBarYPosition;
 
-  RequiredResources.LoadRequiredResources(Element);
-  AddItems(RequiredResources);
+  Resources.LoadResources(Element);
+  AddItems(Resources);
 end;
 
 procedure DrawCreateLevel(Window: TCastleWindowBase);
@@ -242,7 +242,7 @@ function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
   procedure CreateLevelCore;
   begin
     Result := LevelClass.Create(Id, SceneFileName,
-      Title, TitleHint, Number, Element, RequiredResources,
+      Title, TitleHint, Number, Element, Resources,
       MenuBackground);
     if not MenuBackground then
       AvailableForNewGame := true;

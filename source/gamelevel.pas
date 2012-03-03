@@ -150,7 +150,7 @@ type
     FMenuBackground: boolean;
     FSceneDynamicShadows: boolean;
 
-    FRequiredResources: T3DResourceList;
+    FResources: T3DResourceList;
   protected
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
@@ -210,7 +210,7 @@ type
       const ASceneFileName: string;
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
-      ARequiredResources: T3DResourceList;
+      AResources: T3DResourceList;
       AMenuBackground: boolean); reintroduce; virtual;
 
     destructor Destroy; override;
@@ -419,7 +419,7 @@ constructor TLevel.Create(
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
-  ARequiredResources: T3DResourceList;
+  AResources: T3DResourceList;
   AMenuBackground: boolean);
 
   procedure RemoveItemsToRemove;
@@ -518,10 +518,10 @@ begin
   FTitleHint := ATitleHint;
   FNumber := ANumber;
   FMenuBackground := AMenuBackground;
-  FRequiredResources := T3DResourceList.Create(false);
-  FRequiredResources.Assign(ARequiredResources);
+  FResources := T3DResourceList.Create(false);
+  FResources.Assign(AResources);
 
-  FRequiredResources.Prepare(BaseLights);
+  FResources.Prepare(BaseLights);
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -643,9 +643,11 @@ begin
   FreeAndNil(FSectors);
   FreeAndNil(FWaypoints);
   FreeAndNil(FCreatures);
-  if FRequiredResources <> nil then
-    FRequiredResources.Release;
-  FreeAndNil(FRequiredResources);
+  if FResources <> nil then
+  begin
+    FResources.Release;
+    FreeAndNil(FResources);
+  end;
   inherited;
 end;
 
@@ -681,7 +683,7 @@ procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
   begin
     if Element.TagName = 'area' then
       Result := LevelAreaFromDOMElement(Element) else
-    if (Element.TagName = 'required_resources') or
+    if (Element.TagName = 'resources') or
        (Element.TagName = 'bump_mapping_light') then
     begin
       { These are handled elsewhere, and don't produce any T3D. }
@@ -864,7 +866,7 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
       raise Exception.CreateFmt('Resource "%s" is not a creature, but is referenced in model with Crea prefix',
         [CreatureKindName]);
     CreatureKind := TCreatureKind(Resource);
-    Check(CreatureKind.Prepared, 'Creature is not prepared, but is used on the level. You probably did not add it to <required_resources> inside level index.xml file');
+    Check(CreatureKind.Prepared, 'Creature is not prepared, but is used on the level. You probably did not add it to <resources> inside level index.xml file');
 
     { calculate CreatureDirection }
     { TODO --- CreatureDirection configurable.

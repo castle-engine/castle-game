@@ -11,8 +11,8 @@
   played_music_sound="gate_music"
   footsteps_sound="player_footsteps_grass"
 >
-  <required_resources>
+  <resources>
     <resource id="Ghost" />
     <resource id="Spider" />
-  </required_resources>
+  </resources>
 </level>

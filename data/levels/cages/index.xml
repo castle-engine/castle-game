@@ -15,10 +15,10 @@
     <hint>Hint: open this door using the %i</hint>
   </area>
 
-  <required_resources>
+  <resources>
     <resource id="Spider" />
     <resource id="SpiderQueen" />
     <resource id="ThrownWeb" />
-  </required_resources>
+  </resources>
 
 </level>

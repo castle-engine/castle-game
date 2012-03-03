@@ -18,9 +18,9 @@
     <hint>Hint: press the elevator button using the %i</hint>
   </area>
 
-  <required_resources>
+  <resources>
     <resource id="Alien" />
     <resource id="BallMissile" />
-  </required_resources>
+  </resources>
 
 </level>

@@ -135,7 +135,7 @@ type
     FInventoryCurrentItem: Integer;
     FSickProjectionSpeed: Single;
 
-    FRequiredResources: T3DResourceList;
+    FResources: T3DResourceList;
 
     function GetFlyingMode: boolean;
     procedure SetEquippedWeapon(Value: TItem);
@@ -350,13 +350,13 @@ type
     property SickProjectionSpeed: Single
       read FSickProjectionSpeed write FSickProjectionSpeed;
 
-    { Creatures that have to be prepared for mere presence of player on a level.
+    { Resource that have to be prepared for mere presence of player on a level.
       This is a place for any creatures that may be created by player
       actions. For example player may always have a bow and shoot an arrow,
       so this should contain Arrow creature.
 
       It's loaded from player.xml }
-    property RequiredResources: T3DResourceList read FRequiredResources;
+    property Resources: T3DResourceList read FResources;
 
     property Pushable default true;
     procedure Translate(const T: TVector3Single); override;
@@ -440,7 +440,7 @@ begin
 
   OnInputChanged.Add(@InputChanged);
 
-  FRequiredResources := T3DResourceList.Create(false);
+  FResources := T3DResourceList.Create(false);
 
   LoadFromFile;
 
@@ -448,7 +448,7 @@ begin
     player creatures should be required/released at each level start probably. }
   BaseLights := TLightInstancesList.Create;
   try
-    RequiredResources.Prepare(BaseLights);
+    Resources.Prepare(BaseLights);
   finally FreeAndNil(BaseLights) end;
 
   { Although it will be called in every OnIdle anyway,
@@ -480,10 +480,10 @@ begin
   if AllocatedSwimmingSource <> nil then
     AllocatedSwimmingSource.DoUsingEnd;
 
-  if RequiredResources <> nil then
+  if Resources <> nil then
   begin
-    RequiredResources.Release;
-    FreeAndNil(FRequiredResources);
+    Resources.Release;
+    FreeAndNil(FResources);
   end;
 
   inherited;
@@ -1344,7 +1344,7 @@ begin
     SickProjectionSpeed := PlayerConfig.GetFloat('player/sick_projection_speed',
       10.0);
 
-    FRequiredResources.LoadRequiredResources(PlayerConfig.PathElement('player'));
+    FResources.LoadResources(PlayerConfig.PathElement('player'));
   finally SysUtils.FreeAndNil(PlayerConfig); end;
 end;
 

@@ -7,5 +7,5 @@
   number="101"
   type="GateBackground"
 >
-  <required_resources />
+  <resources />
 </level>
