@@ -1319,7 +1319,7 @@ begin
   // TODO: commented out, as RequireCreature in CreateCreature
   // commented out, waits for porting T3DResource to T3D,
 {  if Kind <> nil then
-    UnRequireCreature(Kind);}
+    ReleaseCreature(Kind);}
 
   inherited;
 end;

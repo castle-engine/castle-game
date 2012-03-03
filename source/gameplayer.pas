@@ -448,7 +448,7 @@ begin
     player creatures should be required/released at each level start probably. }
   BaseLights := TLightInstancesList.Create;
   try
-    RequiredResources.Require(BaseLights);
+    RequiredResources.Prepare(BaseLights);
   finally FreeAndNil(BaseLights) end;
 
   { Although it will be called in every OnIdle anyway,
@@ -482,7 +482,7 @@ begin
 
   if RequiredResources <> nil then
   begin
-    RequiredResources.UnRequire;
+    RequiredResources.Release;
     FreeAndNil(FRequiredResources);
   end;
 

@@ -91,9 +91,9 @@ type
       they are only to be overridden in descendants.
       These are used by actual @link(Prepare) and @link(Release)
       when the actual allocation / deallocation should take place
-      (when required counter raises from zero or drops back to zero).
+      (when UsageCount raises from zero or drops back to zero).
 
-      ReleaseCore is also called in destructor, regardless of required count.
+      ReleaseCore is also called in destructor, regardless of UsageCount.
       This is done to free resources even if user forgot to call Release
       before destroying this resource instance.
 
@@ -145,13 +145,13 @@ type
       sure that every single call to prepare is paired with exactly one
       call to release. Actual allocation / deallocation
       (when protected methods PrepareCore, ReleaseCore are called)
-      happens only when required count raises from zero or drops back to zero.
+      happens only when UsageCount raises from zero or drops back to zero.
 
       Show nice progress bar, using @link(Progress).
 
       @groupBegin }
-    procedure Require(const BaseLights: TLightInstancesList);
-    procedure UnRequire;
+    procedure Prepare(const BaseLights: TLightInstancesList);
+    procedure Release;
     { @groupEnd }
   end;
 
@@ -174,14 +174,11 @@ type
       resources (subset of AllResources). }
     procedure LoadRequiredResources(ParentElement: TDOMElement);
 
-    { Make sure given resource is required.
-      Internally, requiring a resource increases it's usage count.
-      The actual allocated memory is only released one required count gets back
-      to zero.
+    { Prepare / release all resources on list.
       @groupBegin }
-    procedure Require(const BaseLights: TLightInstancesList;
+    procedure Prepare(const BaseLights: TLightInstancesList;
       const ResourcesName: string = 'resources');
-    procedure UnRequire;
+    procedure Release;
     { @groupEnd }
   end;
 
@@ -321,25 +318,25 @@ begin
   Progress.Step;
 end;
 
-procedure T3DResource.Require(const BaseLights: TLightInstancesList);
+procedure T3DResource.Prepare(const BaseLights: TLightInstancesList);
 var
   List: T3DResourceList;
 begin
   List := T3DResourceList.Create(false);
   try
     List.Add(Self);
-    List.Require(BaseLights);
+    List.Prepare(BaseLights);
   finally FreeAndNil(List) end;
 end;
 
-procedure T3DResource.UnRequire;
+procedure T3DResource.Release;
 var
   List: T3DResourceList;
 begin
   List := T3DResourceList.Create(false);
   try
     List.Add(Self);
-    List.UnRequire;
+    List.Release;
   finally FreeAndNil(List) end;
 end;
 
@@ -424,7 +421,7 @@ begin
   finally FreeAndNil(I) end;
 end;
 
-procedure T3DResourceList.Require(const BaseLights: TLightInstancesList;
+procedure T3DResourceList.Prepare(const BaseLights: TLightInstancesList;
   const ResourcesName: string);
 var
   I: Integer;
@@ -465,7 +462,7 @@ begin
         begin
           if Log then
             WritelnLog('Resources', Format(
-              'Resource "%s" becomes required, loading', [Resource.Id]));
+              'Resource "%s" becomes used, preparing', [Resource.Id]));
           Resource.PrepareCore(BaseLights);
         end;
       end;
@@ -478,7 +475,7 @@ begin
   end;
 end;
 
-procedure T3DResourceList.UnRequire;
+procedure T3DResourceList.Release;
 var
   I: Integer;
   Resource: T3DResource;
@@ -493,7 +490,7 @@ begin
     begin
       if Log then
         WritelnLog('Resources', Format(
-          'Creature "%s" is no longer required, freeing', [Resource.Id]));
+          'Resource "%s" is no longer used, releasing', [Resource.Id]));
       Resource.ReleaseCore;
     end;
   end;

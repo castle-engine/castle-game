@@ -521,7 +521,7 @@ begin
   FRequiredResources := T3DResourceList.Create(false);
   FRequiredResources.Assign(ARequiredResources);
 
-  FRequiredResources.Require(BaseLights);
+  FRequiredResources.Prepare(BaseLights);
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
@@ -644,7 +644,7 @@ begin
   FreeAndNil(FWaypoints);
   FreeAndNil(FCreatures);
   if FRequiredResources <> nil then
-    FRequiredResources.UnRequire;
+    FRequiredResources.Release;
   FreeAndNil(FRequiredResources);
   inherited;
 end;
