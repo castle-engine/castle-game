@@ -975,11 +975,16 @@ function TCreatureKind.CreateCreature(World: T3DWorld;
   const MaxLife: Single): TCreature;
 begin
   { This is only needed if you used --debug-no-creatures or forgot
-    to add creature to <resources> }
-  // TODO: waits for porting T3DResource to T3D,
-  // then Prepare will get BaseLights in param,
-  // and somehow it should call
-  // RequireCreature(BaseLights, Self);
+    to add creature to <resources>.
+
+    Note: we experimented with moving this to TCreature.PrepareResource,
+    call Kind.Prepare from there. But it just doesn't fully work:
+    some creatures really want kind to be prepared
+    before PrepareResource (from scene manager BeforeDraw) had a chance to work.
+    For example, on missiles like thrown web we do Sound3d that uses LerpLegsMiddle.
+    Also TCreature.Idle (which definitely needs kind) may get called before
+    PrepareResource. IOW, PrepareResource is just too late. }
+  Prepare(World.BaseLights);
 
   Result := CreatureClass.Create(World { owner }, MaxLife);
   { set properties that in practice must have other-than-default values
@@ -1315,10 +1320,8 @@ begin
     FreeAndNil(UsedSounds);
   end;
 
-  // TODO: commented out, as RequireCreature in CreateCreature
-  // commented out, waits for porting T3DResource to T3D,
-{  if Kind <> nil then
-    ReleaseCreature(Kind);}
+  if Kind <> nil then
+    Kind.Release;
 
   inherited;
 end;
