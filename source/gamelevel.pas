@@ -353,7 +353,7 @@ uses SysUtils, GL,
   GamePlay, CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   GameVideoOptions, GameConfig, GameNotifications,
   GameInputs, GameWindow, CastleXMLUtils,
-  GLRenderer, RenderingCameraUnit, Math;
+  GLRenderer, RenderingCameraUnit, Math, CastleWarnings;
 
 { TLevelArea ----------------------------------------------------------------- }
 
@@ -866,7 +866,9 @@ procedure TLevel.TraverseForCreatures(Shape: TShape);
       raise Exception.CreateFmt('Resource "%s" is not a creature, but is referenced in model with Crea prefix',
         [CreatureKindName]);
     CreatureKind := TCreatureKind(Resource);
-    Check(CreatureKind.Prepared, 'Creature is not prepared, but is used on the level. You probably did not add it to <resources> inside level index.xml file');
+    if not CreatureKind.Prepared then
+      OnWarning(wtMajor, 'Resource', Format('Creature "%s" is initially present on the level, but was not prepared yet --- which probably means you did not add it to <resources> inside level index.xml file. This causes loading on-demand, which is less comfortable for player.',
+        [CreatureKind.Id]));
 
     { calculate CreatureDirection }
     { TODO --- CreatureDirection configurable.

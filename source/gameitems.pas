@@ -62,7 +62,8 @@ type
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   protected
-    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList;
+      const DoProgress: boolean); override;
     function PrepareCoreSteps: Cardinal; override;
     procedure ReleaseCore; override;
   public
@@ -127,7 +128,8 @@ type
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
-    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList;
+      const DoProgress: boolean); override;
     function PrepareCoreSteps: Cardinal; override;
     procedure ReleaseCore; override;
   public
@@ -392,10 +394,11 @@ begin
   Result := FBoundingBoxRotated;
 end;
 
-procedure TItemKind.PrepareCore(const BaseLights: TAbstractLightInstancesList);
+procedure TItemKind.PrepareCore(const BaseLights: TAbstractLightInstancesList;
+  const DoProgress: boolean);
 begin
   inherited;
-  PrepareScene(FScene, SceneFileName, BaseLights);
+  PrepareScene(FScene, SceneFileName, BaseLights, DoProgress);
 end;
 
 function TItemKind.PrepareCoreSteps: Cardinal;
@@ -430,13 +433,12 @@ begin
   Player.EquippedWeapon := Item;
 end;
 
-procedure TItemWeaponKind.PrepareCore(const BaseLights: TAbstractLightInstancesList);
+procedure TItemWeaponKind.PrepareCore(const BaseLights: TAbstractLightInstancesList;
+  const DoProgress: boolean);
 begin
   inherited;
-  PreparePrecalculatedAnimation('Attack', FAttackAnimation, FAttackAnimationFile,
-    BaseLights);
-  PreparePrecalculatedAnimation('Ready', FReadyAnimation, FReadyAnimationFile,
-    BaseLights);
+  PreparePrecalculatedAnimation(FAttackAnimation, FAttackAnimationFile, BaseLights, DoProgress);
+  PreparePrecalculatedAnimation(FReadyAnimation , FReadyAnimationFile , BaseLights, DoProgress);
 end;
 
 function TItemWeaponKind.PrepareCoreSteps: Cardinal;

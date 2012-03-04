@@ -64,7 +64,7 @@ type
 
       Call only in PrepareCore overrides.
 
-      It calls Progress.Step 2 times.
+      It calls Progress.Step 2 times, if DoProgress.
 
       Animation or Scene is automatically added to our list of prepared
       3D resources.
@@ -72,19 +72,17 @@ type
       @link(GLContextClose), it will be fully released
       in @link(ReleaseCore) and destructor.
 
-      @param(AnimationName is here only for debug purposes (it may be used
-        by some debug messages etc.))
-
       @groupBegin }
     procedure PreparePrecalculatedAnimation(
-      const AnimationName: string;
       var Anim: TCastlePrecalculatedAnimation;
       const AnimationFile: string;
-      const BaseLights: TAbstractLightInstancesList);
+      const BaseLights: TAbstractLightInstancesList;
+      const DoProgress: boolean);
     procedure PrepareScene(
       var Scene: TCastleScene;
       const SceneFileName: string;
-      const BaseLights: TAbstractLightInstancesList);
+      const BaseLights: TAbstractLightInstancesList;
+      const DoProgress: boolean);
     { @groupEnd }
 
     { Prepare or release everything needed to use this resource.
@@ -98,11 +96,13 @@ type
       This is done to free resources even if user forgot to call Release
       before destroying this resource instance.
 
-      PrepareCore must call Progress.Step exactly PrepareCoreSteps times.
+      PrepareCore must call Progress.Step exactly PrepareCoreSteps times,
+      only if DoProgress.
       This allows to make nice progress bar in @link(Prepare).
       In this class, PrepareCoreSteps returns 0.
       @groupBegin }
-    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); virtual;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList;
+      const DoProgress: boolean); virtual;
     function PrepareCoreSteps: Cardinal; virtual;
     procedure ReleaseCore; virtual;
     { @groupEnd }
@@ -231,7 +231,8 @@ begin
   inherited;
 end;
 
-procedure T3DResource.PrepareCore(const BaseLights: TAbstractLightInstancesList);
+procedure T3DResource.PrepareCore(const BaseLights: TAbstractLightInstancesList;
+  const DoProgress: boolean);
 begin
 end;
 
@@ -263,9 +264,12 @@ begin
 end;
 
 procedure T3DResource.RedoPrepare(const BaseLights: TAbstractLightInstancesList);
+var
+  DoProgress: boolean;
 begin
   Assert(UsageCount <> 0);
-  Progress.Init(PrepareCoreSteps, 'Loading ' + Id);
+  DoProgress := not Progress.Active;
+  if DoProgress then Progress.Init(PrepareCoreSteps, 'Loading ' + Id);
   try
     { It's important to do ReleaseCore after Progress.Init.
       That is because Progress.Init does TCastleWindowBase.SaveScreenToDisplayList,
@@ -276,16 +280,18 @@ begin
       So we should call Progress.Init before we make outselves unprepared. }
     FPrepared := false;
     ReleaseCore;
-    PrepareCore(BaseLights);
+    PrepareCore(BaseLights, DoProgress);
     FPrepared := true;
-  finally Progress.Fini; end;
+  finally
+    if DoProgress then Progress.Fini;
+  end;
 end;
 
 procedure T3DResource.PreparePrecalculatedAnimation(
-  const AnimationName: string;
   var Anim: TCastlePrecalculatedAnimation;
   const AnimationFile: string;
-  const BaseLights: TAbstractLightInstancesList);
+  const BaseLights: TAbstractLightInstancesList;
+  const DoProgress: boolean);
 begin
   if (AnimationFile <> '') and (Anim = nil) then
   begin
@@ -295,28 +301,22 @@ begin
       { rescale scenes_per_time }
       AnimationScenesPerTime / DefaultKAnimScenesPerTime);
   end;
-  Progress.Step;
+  if DoProgress then Progress.Step;
 
   if Anim <> nil then
   begin
-    if Log then
-      WritelnLog('Animation info',
-        Format('%40s %3d scenes * %8d triangles',
-        [ Id + '.' + AnimationName + ' animation: ',
-          Anim.ScenesCount,
-          Anim.Scenes[0].TrianglesCount(true) ]));
-
     AttributesSet(Anim.Attributes);
     Anim.PrepareResources([prRender, prBoundingBox] + prShadowVolume,
       false, BaseLights);
   end;
-  Progress.Step;
+  if DoProgress then Progress.Step;
 end;
 
 procedure T3DResource.PrepareScene(
   var Scene: TCastleScene;
   const SceneFileName: string;
-  const BaseLights: TAbstractLightInstancesList);
+  const BaseLights: TAbstractLightInstancesList;
+  const DoProgress: boolean);
 begin
   if (SceneFileName <> '') and (Scene = nil) then
   begin
@@ -324,7 +324,7 @@ begin
     Allocated.Add(Scene);
     Scene.Load(SceneFileName);
   end;
-  Progress.Step;
+  if DoProgress then Progress.Step;
 
   if Scene <> nil then
   begin
@@ -332,7 +332,7 @@ begin
     Scene.PrepareResources([prRender, prBoundingBox] + prShadowVolume,
       false, BaseLights);
   end;
-  Progress.Step;
+  if DoProgress then Progress.Step;
 end;
 
 procedure T3DResource.Prepare(const BaseLights: TAbstractLightInstancesList);
@@ -461,7 +461,7 @@ var
   Resource: T3DResource;
   PrepareSteps: Cardinal;
   TimeBegin: TProcessTimerResult;
-  PrepareNeeded: boolean;
+  PrepareNeeded, DoProgress: boolean;
 begin
   { We iterate two times over Items, first time only to calculate
     PrepareSteps, 2nd time does actual work.
@@ -486,7 +486,8 @@ begin
     if Log then
       TimeBegin := ProcessTimerNow;
 
-    Progress.Init(PrepareSteps, 'Loading ' + ResourcesName);
+    DoProgress := not Progress.Active;
+    if DoProgress then Progress.Init(PrepareSteps, 'Loading ' + ResourcesName);
     try
       for I := 0 to Count - 1 do
       begin
@@ -497,11 +498,13 @@ begin
             WritelnLog('Resources', Format(
               'Resource "%s" becomes used, preparing', [Resource.Id]));
           Assert(not Resource.Prepared);
-          Resource.PrepareCore(BaseLights);
+          Resource.PrepareCore(BaseLights, DoProgress);
           Resource.FPrepared := true;
         end;
       end;
-    finally Progress.Fini end;
+    finally
+      if DoProgress then Progress.Fini;
+    end;
 
     if Log then
       WritelnLog('Resources', Format('Loading %s time: %f seconds',
