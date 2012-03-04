@@ -62,7 +62,7 @@ type
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
   protected
-    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); override;
     function PrepareCoreSteps: Cardinal; override;
     procedure ReleaseCore; override;
   public
@@ -127,7 +127,7 @@ type
     FActualAttackTime: Single;
     FSoundAttackStart: TSoundType;
   protected
-    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); override;
     function PrepareCoreSteps: Cardinal; override;
     procedure ReleaseCore; override;
   public
@@ -392,7 +392,7 @@ begin
   Result := FBoundingBoxRotated;
 end;
 
-procedure TItemKind.PrepareCore(const BaseLights: TLightInstancesList);
+procedure TItemKind.PrepareCore(const BaseLights: TAbstractLightInstancesList);
 begin
   inherited;
   PrepareScene(FScene, SceneFileName, BaseLights);
@@ -430,7 +430,7 @@ begin
   Player.EquippedWeapon := Item;
 end;
 
-procedure TItemWeaponKind.PrepareCore(const BaseLights: TLightInstancesList);
+procedure TItemWeaponKind.PrepareCore(const BaseLights: TAbstractLightInstancesList);
 begin
   inherited;
   PreparePrecalculatedAnimation('Attack', FAttackAnimation, FAttackAnimationFile,
