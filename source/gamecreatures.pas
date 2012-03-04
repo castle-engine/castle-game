@@ -298,7 +298,7 @@ type
     FMaxHeightAcceptableToFall: Single;
     FRandomWalkDistance: Single;
   protected
-    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); override;
     function PrepareCoreSteps: Cardinal; override;
     procedure ReleaseCore; override;
   public
@@ -483,7 +483,7 @@ type
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
   protected
-    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); override;
     function PrepareCoreSteps: Cardinal; override;
     procedure ReleaseCore; override;
   public
@@ -513,7 +513,7 @@ type
 
   TGhostKind = class(TWalkAttackCreatureKind)
   protected
-    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); override;
   public
     function CreatureClass: TCreatureClass; override;
   end;
@@ -538,7 +538,7 @@ type
     FHitsPlayer: boolean;
     FHitsCreatures: boolean;
   protected
-    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); override;
     function PrepareCoreSteps: Cardinal; override;
     procedure ReleaseCore; override;
   public
@@ -590,7 +590,7 @@ type
     FAnimation: TCastlePrecalculatedAnimation;
     FAnimationFile: string;
   protected
-    procedure PrepareCore(const BaseLights: TLightInstancesList); override;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); override;
     function PrepareCoreSteps: Cardinal; override;
     procedure ReleaseCore; override;
   public
@@ -1017,7 +1017,7 @@ begin
   FRandomWalkDistance := DefaultCreatureRandomWalkDistance;
 end;
 
-procedure TWalkAttackCreatureKind.PrepareCore(const BaseLights: TLightInstancesList);
+procedure TWalkAttackCreatureKind.PrepareCore(const BaseLights: TAbstractLightInstancesList);
 begin
   inherited;
 
@@ -1114,7 +1114,7 @@ end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
 
-procedure TSpiderQueenKind.PrepareCore(const BaseLights: TLightInstancesList);
+procedure TSpiderQueenKind.PrepareCore(const BaseLights: TAbstractLightInstancesList);
 begin
   inherited;
   PreparePrecalculatedAnimation('ThrowWebAttack',
@@ -1155,7 +1155,7 @@ end;
 
 { TGhostKind ------------------------------------------------------------- }
 
-procedure TGhostKind.PrepareCore(const BaseLights: TLightInstancesList);
+procedure TGhostKind.PrepareCore(const BaseLights: TAbstractLightInstancesList);
 var
   ReferenceScene: TCastleScene;
 begin
@@ -1191,7 +1191,7 @@ begin
   FHitsCreatures := DefaultHitsCreatures;
 end;
 
-procedure TMissileCreatureKind.PrepareCore(const BaseLights: TLightInstancesList);
+procedure TMissileCreatureKind.PrepareCore(const BaseLights: TAbstractLightInstancesList);
 begin
   inherited;
   PreparePrecalculatedAnimation('Move', FAnimation, FAnimationFile, BaseLights);
@@ -1240,7 +1240,7 @@ end;
 
 { TStillCreatureKind ---------------------------------------------------- }
 
-procedure TStillCreatureKind.PrepareCore(const BaseLights: TLightInstancesList);
+procedure TStillCreatureKind.PrepareCore(const BaseLights: TAbstractLightInstancesList);
 begin
   inherited;
   PreparePrecalculatedAnimation('Stand', FAnimation, FAnimationFile, BaseLights);
@@ -1276,7 +1276,6 @@ end;
 type
   TCreatureSoundSourceData = class
   public
-    { TODO: unused ? }
     SoundHeight: Single;
   end;
 
