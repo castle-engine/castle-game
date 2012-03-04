@@ -138,21 +138,21 @@ Resigned: fountain new level for castle 1.0.0:
     alternative entrance there (through the barrels) --- different wall
     color ?
 
-- weapons should be rendered correctly in 3d.
-  - Sword should also glow red when "castle hall" glows red --- even
-    the static sword should be rendered in 3d.
+- weapons:
   - weapon "swaying" (when you walk, your weapon moves with your steps)
-  - also, sword must "feel" better (Szymon):
-    - render weapon (both when static and when attacking) as truly 3d,
-      truly inside the level (so sword size must match level/creatures
-      proportions etc.)
-    - some anim of blood when hit (more feedback that you hit)
-    - design just better (and more, maybe randomized) animations
-      of sword attack. Do them in Blender, not by hand, like current
-      anim.
-    - better checking for collision with sword? Maybe actually calculate
-      oriented bounding box of the sword for collision with creatures each
-      frame?
+    Careful of motion sickness: it seems, we should either to head bobbing,
+    or weapon swaying, never both!
+  - render weapon (both when static and when attacking) as truly 3d (done already),
+    truly inside the level (so sword size must match level/creatures
+    proportions etc.).
+    To be tested when 3rd person camera in engine done easily.
+  - some anim of blood when hit (more feedback that you hit)
+  - design just better (and more, maybe randomized) animations
+    of sword attack. Do them in Blender, not by hand, like current
+    anim.
+  - better checking for collision with sword? Maybe actually calculate
+    oriented bounding box of the sword for collision with creatures each
+    frame?
 
 - bow must work better to really appreciate the doom level !
 
@@ -168,7 +168,6 @@ Resigned: fountain new level for castle 1.0.0:
 
 - levels/index.xml:
   - level objects hierarchy could be defined in such file
-  - the base level scene can be TLevelStaticObject too !
 
 - knockback for player sword (or for some other short-range weapon ?)
 
@@ -260,7 +259,6 @@ cages level:
 
 Cages level:
 - this natural rock thing better ?
-- torch model base : use nice mesh from the base on lantern3.3ds from 3dcafe.com ?
 
 - headlight on cages level ? By torch item ?
   No ? Spot headlight looks poor (must over-triangulate meshes),
@@ -275,10 +273,6 @@ Cages level:
   - homing missiles make great effect on a vast empty space, like in "Tower" level. Demonstrate this in some "real" level too!
 
 - chooseNewLevel menu: display thumbnails of levels
-
-- when player walks, his weapon should slowly move.
-  Careful of motion sickness: it seems, we should either to head bobbing,
-  or weapon swaying, never both!
 
 - mouse smoothing for mouse look ?
   Seems not needed, at least with my mouse ?
