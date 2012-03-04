@@ -52,6 +52,7 @@ type
     TCastleSceneManager.Items would suffice.) }
 
     FId: string;
+    FPrepared: boolean;
     Allocated: T3DListCore;
     FUsageCount: Cardinal;
   protected
@@ -79,11 +80,11 @@ type
       const AnimationName: string;
       var Anim: TCastlePrecalculatedAnimation;
       const AnimationFile: string;
-      const BaseLights: TLightInstancesList);
+      const BaseLights: TAbstractLightInstancesList);
     procedure PrepareScene(
       var Scene: TCastleScene;
       const SceneFileName: string;
-      const BaseLights: TLightInstancesList);
+      const BaseLights: TAbstractLightInstancesList);
     { @groupEnd }
 
     { Prepare or release everything needed to use this resource.
@@ -101,7 +102,7 @@ type
       This allows to make nice progress bar in @link(Prepare).
       In this class, PrepareCoreSteps returns 0.
       @groupBegin }
-    procedure PrepareCore(const BaseLights: TLightInstancesList); virtual;
+    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList); virtual;
     function PrepareCoreSteps: Cardinal; virtual;
     procedure ReleaseCore; virtual;
     { @groupEnd }
@@ -109,8 +110,13 @@ type
     constructor Create(const AId: string); virtual;
     destructor Destroy; override;
 
-    { Are we in prepared state, that is after @link(Prepare) call and before @link(Release). }
-    function Prepared: boolean;
+    { Are we in a (fully) prepared state. That is after a (fully successfull)
+      @link(Prepare) call and before @link(Release).
+      Note that this is slightly different than checking @code(UsageCount <> 0):
+      in some situations, UsageCount may be non-zero while the preparation
+      is not finished yet. This property is guaranteed to be @true only if
+      preparation was fully successfully (no exceptions) finished. }
+    property Prepared: boolean read FPrepared;
 
     { Free any association with current OpenGL context. }
     procedure GLContextClose; virtual;
@@ -129,7 +135,7 @@ type
     { Release and then immediately prepare again this resource.
       Call only when UsageCount <> 0, that is when resource is prepared.
       Shows nice progress bar, using @link(Progress). }
-    procedure RedoPrepare(const BaseLights: TLightInstancesList);
+    procedure RedoPrepare(const BaseLights: TAbstractLightInstancesList);
 
     { How many times this resource is used. Used by Prepare and Release:
       actual allocation / deallocation happens when this raises from zero
@@ -150,7 +156,7 @@ type
       Show nice progress bar, using @link(Progress).
 
       @groupBegin }
-    procedure Prepare(const BaseLights: TLightInstancesList);
+    procedure Prepare(const BaseLights: TAbstractLightInstancesList);
     procedure Release;
     { @groupEnd }
   end;
@@ -184,7 +190,7 @@ type
 
     { Prepare / release all resources on list.
       @groupBegin }
-    procedure Prepare(const BaseLights: TLightInstancesList;
+    procedure Prepare(const BaseLights: TAbstractLightInstancesList;
       const ResourcesName: string = 'resources');
     procedure Release;
     { @groupEnd }
@@ -219,12 +225,13 @@ end;
 
 destructor T3DResource.Destroy;
 begin
+  FPrepared := false;
   ReleaseCore;
   FreeAndNil(Allocated);
   inherited;
 end;
 
-procedure T3DResource.PrepareCore(const BaseLights: TLightInstancesList);
+procedure T3DResource.PrepareCore(const BaseLights: TAbstractLightInstancesList);
 begin
 end;
 
@@ -255,7 +262,7 @@ begin
   { Nothing to do in this class. }
 end;
 
-procedure T3DResource.RedoPrepare(const BaseLights: TLightInstancesList);
+procedure T3DResource.RedoPrepare(const BaseLights: TAbstractLightInstancesList);
 begin
   Assert(UsageCount <> 0);
   Progress.Init(PrepareCoreSteps, 'Loading ' + Id);
@@ -267,8 +274,10 @@ begin
       on the screen) and this requires Prepare to be already done.
 
       So we should call Progress.Init before we make outselves unprepared. }
+    FPrepared := false;
     ReleaseCore;
     PrepareCore(BaseLights);
+    FPrepared := true;
   finally Progress.Fini; end;
 end;
 
@@ -276,7 +285,7 @@ procedure T3DResource.PreparePrecalculatedAnimation(
   const AnimationName: string;
   var Anim: TCastlePrecalculatedAnimation;
   const AnimationFile: string;
-  const BaseLights: TLightInstancesList);
+  const BaseLights: TAbstractLightInstancesList);
 begin
   if (AnimationFile <> '') and (Anim = nil) then
   begin
@@ -307,7 +316,7 @@ end;
 procedure T3DResource.PrepareScene(
   var Scene: TCastleScene;
   const SceneFileName: string;
-  const BaseLights: TLightInstancesList);
+  const BaseLights: TAbstractLightInstancesList);
 begin
   if (SceneFileName <> '') and (Scene = nil) then
   begin
@@ -326,7 +335,7 @@ begin
   Progress.Step;
 end;
 
-procedure T3DResource.Prepare(const BaseLights: TLightInstancesList);
+procedure T3DResource.Prepare(const BaseLights: TAbstractLightInstancesList);
 var
   List: T3DResourceList;
 begin
@@ -346,11 +355,6 @@ begin
     List.Add(Self);
     List.Release;
   finally FreeAndNil(List) end;
-end;
-
-function T3DResource.Prepared: boolean;
-begin
-  Result := UsageCount <> 0;
 end;
 
 { T3DResourceList ------------------------------------------------------------- }
@@ -450,7 +454,7 @@ begin
   finally FreeAndNil(I) end;
 end;
 
-procedure T3DResourceList.Prepare(const BaseLights: TLightInstancesList;
+procedure T3DResourceList.Prepare(const BaseLights: TAbstractLightInstancesList;
   const ResourcesName: string);
 var
   I: Integer;
@@ -492,7 +496,9 @@ begin
           if Log then
             WritelnLog('Resources', Format(
               'Resource "%s" becomes used, preparing', [Resource.Id]));
+          Assert(not Resource.Prepared);
           Resource.PrepareCore(BaseLights);
+          Resource.FPrepared := true;
         end;
       end;
     finally Progress.Fini end;
@@ -520,6 +526,7 @@ begin
       if Log then
         WritelnLog('Resources', Format(
           'Resource "%s" is no longer used, releasing', [Resource.Id]));
+      Resource.FPrepared := false;
       Resource.ReleaseCore;
     end;
   end;
