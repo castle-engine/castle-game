@@ -78,7 +78,7 @@ type
     FCamera: TWalkCamera;
     FItems: TItemList;
     FEquippedWeapon: TItem;
-    FFlyingModeTimeOut: Single; { > 0 means he's flying. In seconds. }
+    FFlyingModeTimeOut: Single; { > 0 means flying. In seconds. }
 
     { blackout things }
     BlackOutIntensity: TGLfloat;
@@ -287,7 +287,7 @@ type
       GameMessage about using/not using a weapon. }
     property EquippedWeapon: TItem read FEquippedWeapon write SetEquippedWeapon;
 
-    { Render 2D things (but not weapon) of the player. }
+    { Render 2D things of the player. }
     procedure Render2D;
 
     { Adjust some things based on passing time.
