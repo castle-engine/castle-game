@@ -789,13 +789,6 @@ procedure TLevel.TraverseForItems(Shape: TShape);
       ItemQuantity := StrToInt(SEnding(ItemKindQuantity, ItemQuantityBegin));
     end;
 
-    { Hack for castle 1: item kind name 'Arrow' should be interpreted as
-      'Quiver', to not mess with creature kind 'Arrow'.
-      We do it this way, since there's no way anymore to edit and reexport
-      castle VRML 1.0 blend files. }
-    if ItemKindId = 'Arrow' then
-      ItemKindId := 'Quiver';
-
     Resource := AllResources.FindId(ItemKindId);
     if not (Resource is TItemKind) then
       raise Exception.CreateFmt('Resource "%s" is not an item, but is referenced in model with Item prefix',

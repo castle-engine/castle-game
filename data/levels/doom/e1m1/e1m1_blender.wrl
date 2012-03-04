@@ -5867,7 +5867,7 @@ Switch {
 			]
 		}
 	}
-	DEF ItemArrow10
+	DEF ItemQuiver10 # Kambi: ItemArrow10
 	Separator {
 		Coordinate3 {
 			point [
@@ -5892,7 +5892,7 @@ Switch {
 			]
 		}
 	}
-	DEF ItemArrow5
+	DEF ItemQuiver5 # Kambi: ItemArrow5
 	Separator {
 		Coordinate3 {
 			point [
@@ -5917,7 +5917,7 @@ Switch {
 			]
 		}
 	}
-	DEF ItemArrow5_
+	DEF ItemQuiver5_ # Kambi: ItemArrow5_
 	Separator {
 		Coordinate3 {
 			point [
@@ -5942,7 +5942,7 @@ Switch {
 			]
 		}
 	}
-	DEF ItemArrow5__001
+	DEF ItemQuiver5__001 # Kambi: ItemArrow5__001
 	Separator {
 		Coordinate3 {
 			point [
@@ -5967,7 +5967,7 @@ Switch {
 			]
 		}
 	}
-	DEF ItemArrow5__002
+	DEF ItemQuiver5__002 # Kambi: ItemArrow5__002
 	Separator {
 		Coordinate3 {
 			point [
@@ -7654,7 +7654,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3261.447998 -34.912067 -3923.268799 1.000000
 		}
-		USE ItemArrow5__002
+		USE ItemQuiver5__002 # Kambi: ItemArrow5__002
 	}
 	Separator {
 		MatrixTransform {
@@ -7724,7 +7724,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2446.164551 -118.493744 -3982.293945 1.000000
 		}
-		USE ItemArrow5__001
+		USE ItemQuiver5__001 # Kambi: ItemArrow5__001
 	}
 	Separator {
 		MatrixTransform {
@@ -7874,7 +7874,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-116.589966 12.216387 -3373.347168 1.000000
 		}
-		USE ItemArrow5_
+		USE ItemQuiver5_ # Kambi: ItemArrow5_
 	}
 	Separator {
 		MatrixTransform {
@@ -7884,7 +7884,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-116.589966 12.216387 -3093.347168 1.000000
 		}
-		USE ItemArrow10
+		USE ItemQuiver10 # Kambi: ItemArrow10
 	}
 	Separator {
 		MatrixTransform {
@@ -7944,7 +7944,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2232.616943 35.207855 -2525.429443 1.000000
 		}
-		USE ItemArrow5
+		USE ItemQuiver5 # Kambi: ItemArrow5
 	}
 	Separator {
 		MatrixTransform {

@@ -166,7 +166,7 @@ Switch {
 			]
 		}
 	}
-	DEF ItemArrow20
+	DEF ItemQuiver20 # Kambi: ItemArrow20
 	Separator {
 		Coordinate3 {
 			point [
@@ -20276,7 +20276,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-6.006711 -2.397975 -6.090298 1.000000
 		}
-		USE ItemArrow20
+		USE ItemQuiver20 # Kambi: ItemArrow20
 	}
 	Separator {
 		MatrixTransform {
