@@ -133,8 +133,8 @@ begin
     if Inlined <> nil then
     begin
       if TWWWInlineNode_1(Node).FdSeparate.Value then
-        G1 := TSeparatorNode_1.Create(Node.NodeName, Node.WWWBasePath) else
-        G1 := TGroupNode_1.Create(Node.NodeName, Node.WWWBasePath);
+        G1 := TSeparatorNode_1.Create(Node.NodeName, Node.BaseUrl) else
+        G1 := TGroupNode_1.Create(Node.NodeName, Node.BaseUrl);
       G1.PositionInParent := Node.PositionInParent;
       G1.VRML1ChildAdd(Inlined);
       Node := G1;
@@ -148,7 +148,7 @@ begin
 
     if Inlined <> nil then
     begin
-      G2 := TGroupNode.Create(Node.NodeName, Node.WWWBasePath);
+      G2 := TGroupNode.Create(Node.NodeName, Node.BaseUrl);
       { update PositionInParent,
         to make the resulting VRML look more similar to original
         (otherwise resolved inline could move up in the file) }

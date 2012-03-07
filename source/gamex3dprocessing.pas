@@ -76,7 +76,7 @@ begin
   E := TEnumerateAddNormalMapToTexture.Create;
   try
     E.TextureName := TextureName;
-    E.NormalMap := TImageTextureNode.Create(NormalMapName, Node.WWWBasePath);
+    E.NormalMap := TImageTextureNode.Create(NormalMapName, Node.BaseUrl);
     E.NormalMap.FdUrl.Items.Add(NormalMapUrl);
     Node.EnumerateReplaceChildren(@E.Enumerate);
     if not E.NormalMapUsed then
@@ -125,11 +125,11 @@ begin
     CM.FdUpdate.Value := 'NEXT_FRAME_ONLY';
     CM.FdSize.Value := 512;}
 
-    CM := TImageCubeMapTextureNode.Create('', RootNode.WWWBasePath);
+    CM := TImageCubeMapTextureNode.Create('', RootNode.BaseUrl);
     CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
     CM.FdUrl.Items.Add('water_reflections/water_environment_map.dds');
 
-    MT := TMovieTextureNode.Create('', RootNode.WWWBasePath);
+    MT := TMovieTextureNode.Create('', RootNode.BaseUrl);
     CS.AddCustomField(TSFNode.Create(CS, 'normalMap', [], MT));
     MT.FdUrl.Items.Add('water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png');
     MT.FdLoop.Value := true;
@@ -137,12 +137,12 @@ begin
     ShaderCamMatrix := TSFMatrix3f.Create(CS, 'cameraRotationInverseMatrix', IdentityMatrix3Single);
     CS.AddCustomField(ShaderCamMatrix, true);
 
-    Part := TShaderPartNode.Create('', RootNode.WWWBasePath);
+    Part := TShaderPartNode.Create('', RootNode.BaseUrl);
     CS.FdParts.Add(Part);
     Part.FdType.Value := 'FRAGMENT';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.fs');
 
-    Part := TShaderPartNode.Create('', RootNode.WWWBasePath);
+    Part := TShaderPartNode.Create('', RootNode.BaseUrl);
     CS.FdParts.Add(Part);
     Part.FdType.Value := 'VERTEX';
     Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.vs');
