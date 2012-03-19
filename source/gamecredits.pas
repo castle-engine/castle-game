@@ -41,7 +41,8 @@ uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
   GameNotifications, CastleStringUtils, WindowModes,
   GameInputs, GamePlay, GameWindow,
   GameVideoOptions, VectorMath, CastleScene, CastleFilesUtils,
-  GameHelp, CastleUtils, X3DFields, CastleTimeUtils, KeysMouse;
+  GameHelp, CastleUtils, X3DFields, CastleTimeUtils, KeysMouse,
+  Frustum;
 
 var
   UserQuit: boolean;
@@ -50,16 +51,18 @@ var
   AnimationSpeed, AnimationEnd: TFloatTime;
 
 procedure Draw(Window: TCastleWindowBase);
+var
+  ModelviewMatrix, ProjectionMatrix: TMatrix4Single;
 
   procedure ProjectionPushSet;
   begin
     glMatrixMode(GL_PROJECTION);
       glPushMatrix;
-      glLoadIdentity;
-      glMultMatrix(PerspectiveProjMatrixDeg(
+      ProjectionMatrix := PerspectiveProjMatrixDeg(
         ViewAngleDegY, Window.Width / Window.Height,
         { constant near / far here is Ok, since I render known geometry }
-        0.1, 100));
+        0.1, 100);
+      glLoadMatrix(ProjectionMatrix);
     glMatrixMode(GL_MODELVIEW);
   end;
 
@@ -71,6 +74,7 @@ procedure Draw(Window: TCastleWindowBase);
   end;
 
 var
+  Frustum: TFrustum;
   Params: TBasicRenderParams;
 begin
   glScissor(25, 20, Window.Width - 25, Window.Height - 20 -  160);
@@ -84,15 +88,19 @@ begin
     glClear(GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity;
-    glTranslatef(0, AnimationSpeed * AnimationTime, 0);
+    ModelviewMatrix := TranslationMatrix(0, AnimationSpeed * AnimationTime, 0);
+    glLoadMatrix(ModelviewMatrix);
+
+    { TODO: remove need for Frustum, render CreditsModel as part of scene manager }
+    Frustum.Init(ProjectionMatrix, ModelviewMatrix);
 
     { TODO: remove need for Params, render CreditsModel as part of scene manager }
     Params := TBasicRenderParams.Create;
     try
-      Params.Transparent := false; Params.ShadowVolumesReceivers := false; CreditsModel.Render(nil, Params);
-      Params.Transparent := false; Params.ShadowVolumesReceivers := true ; CreditsModel.Render(nil, Params);
-      Params.Transparent := true ; Params.ShadowVolumesReceivers := false; CreditsModel.Render(nil, Params);
-      Params.Transparent := true ; Params.ShadowVolumesReceivers := true ; CreditsModel.Render(nil, Params);
+      Params.Transparent := false; Params.ShadowVolumesReceivers := false; CreditsModel.Render(nil, Frustum, Params);
+      Params.Transparent := false; Params.ShadowVolumesReceivers := true ; CreditsModel.Render(nil, Frustum, Params);
+      Params.Transparent := true ; Params.ShadowVolumesReceivers := false; CreditsModel.Render(nil, Frustum, Params);
+      Params.Transparent := true ; Params.ShadowVolumesReceivers := true ; CreditsModel.Render(nil, Frustum, Params);
     finally FreeAndNil(Params) end;
   finally ProjectionPop end;
 
