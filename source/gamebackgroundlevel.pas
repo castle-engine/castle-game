@@ -141,7 +141,7 @@ begin
     in case in the future TLevel will enable ProcessEvents and some animation
     through it --- but we can also depend that background level will not
     have any TouchSensors, KeySensors etc. }
-  BackgroundLevel.Camera.IgnoreAllInputs := true;
+  BackgroundLevel.Camera.Input := [];
 
   BackgroundCaptions := TBackgroundCaptions.Create(nil);
   BackgroundControls.Add(BackgroundCaptions);

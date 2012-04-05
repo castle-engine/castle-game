@@ -735,6 +735,8 @@ begin
 end;
 
 procedure TPlayer.UpdateCamera;
+const
+  CastleCameraInput = [ciNormal, ci3dMouse]; { do not include ciMouseDragging }
 var
   LevelMoveHorizontalSpeed: Single;
   LevelMoveVerticalSpeed: Single;
@@ -768,7 +770,7 @@ begin
     Just like rotation keys.
 
     Note that when GameWin, rotating will actually
-    be disable by IgnoreAllInputs. But still mouse look will cause mouse
+    be disabled by Input := []. But still mouse look will cause mouse
     to remain hidden, which is good (why pop the mouse cursor on game
     win animation?). }
   Camera.MouseLook := UseMouseLook;
@@ -776,10 +778,10 @@ begin
   if GameWin then
   begin
     { When GameWin, we navigate camera by code. }
-    Camera.IgnoreAllInputs := true;
+    Camera.Input := [];
   end else
   begin
-    Camera.IgnoreAllInputs := false;
+    Camera.Input := CastleCameraInput;
 
     { Rotation keys work always, even when player is dead.
       Initially I disabled them, but after some thought:
@@ -801,7 +803,7 @@ begin
     Camera.PreferGravityUpForRotations := false;
 
     { No need to do MakeClear now on any inputs, as we already set
-      IgnoreAllInputs to false. }
+      Input := []. }
 
     Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
     Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
