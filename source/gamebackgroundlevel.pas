@@ -98,7 +98,7 @@ end;
 
 procedure TBackgroundCaptions.GLContextOpen;
 var
-  ImageCaption: TImage;
+  ImageCaption: TCastleImage;
 begin
   inherited;
   ImageCaption := LoadImage(ProgramDataPath + 'data' +

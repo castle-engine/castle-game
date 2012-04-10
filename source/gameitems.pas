@@ -57,7 +57,7 @@ type
     FScene: TCastleScene;
     FCaption: string;
     FImageFileName: string;
-    FImage: TImage;
+    FImage: TCastleImage;
     FGLList_DrawImage: TGLuint;
     FBoundingBoxRotated: TBox3D;
     FBoundingBoxRotatedCalculated: boolean;
@@ -84,7 +84,7 @@ type
       from ImageFileName.
 
       @noAutoLinkHere }
-    function Image: TImage;
+    function Image: TCastleImage;
 
     property ImageFileName: string read FImageFileName;
 
@@ -343,7 +343,7 @@ begin
   Result := FScene;
 end;
 
-function TItemKind.Image: TImage;
+function TItemKind.Image: TCastleImage;
 begin
   if FImage = nil then
     FImage := LoadImage(ImageFileName, [], []);
