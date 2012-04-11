@@ -432,6 +432,7 @@ begin
   Camera.Input_MoveSpeedDec.MakeClear;
   Camera.Input_IncreasePreferredHeight.MakeClear;
   Camera.Input_DecreasePreferredHeight.MakeClear;
+  Camera.Input_Run.MakeClear; { speed in castle is so fast that we're always running }
 
   Camera.CheckModsDown := false;
   Camera.OnFalledDown := @FalledDown;
