@@ -249,13 +249,13 @@ end;
 
 constructor TAntiAliasingSlider.Create;
 begin
-  inherited Create(0, MaxAntiAliasing, AntiAliasing);
+  inherited Create(Ord(Low(TAntiAliasing)), Ord(High(TAntiAliasing)), Ord(AntiAliasing));
 end;
 
 function TAntiAliasingSlider.ValueToStr(
   const AValue: Integer): string;
 begin
-  Result := AntiAliasingToStr(AValue);
+  Result := AntiAliasingNames[TAntiAliasing(AValue)];
 end;
 
 { TVideoMenu ------------------------------------------------------------- }
@@ -357,7 +357,7 @@ begin
   begin
     AntiAliasing := Value;
     if UpdateSlider then
-      AntiAliasingSlider.Value := AntiAliasing;
+      AntiAliasingSlider.Value := Ord(AntiAliasing);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
 end;
@@ -501,7 +501,7 @@ begin
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
        end;
-    7: SetAntiAliasing(AntiAliasingSlider.Value, false);
+    7: SetAntiAliasing(TAntiAliasing(AntiAliasingSlider.Value), false);
   end;
 end;
 

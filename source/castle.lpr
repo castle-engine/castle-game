@@ -122,7 +122,7 @@ end;
 
 procedure MultiSamplingOff(Window: TCastleWindowBase; const FailureMessage: string);
 begin
-  AntiAliasing := 0;
+  AntiAliasing := aaNone;
   if Log then WritelnLogMultiline('GL context', FailureMessage);
 end;
 
@@ -193,7 +193,7 @@ begin
   Window.ResizeAllowed := raOnlyAtOpen;
   if RenderShadowsPossible then
     Window.StencilBufferBits := 8;
-  Window.MultiSampling := AntiAliasingGlwMultiSampling;
+  Window.MultiSampling := AntiAliasingGLMultiSampling;
   OpenContext;
 
   { init progress }

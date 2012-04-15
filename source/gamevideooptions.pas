@@ -148,8 +148,8 @@ initialization
     'video_options/frequency', DefaultVideoFrequency);
   BumpMapping := ConfigFile.GetValue(
     'video_options/bump_mapping', DefaultBumpMapping);
-  AntiAliasing := ConfigFile.GetValue(
-    'video_options/anti_aliasing', DefaultAntiAliasing);
+  AntiAliasing := TAntiAliasing(ConfigFile.GetValue(
+    'video_options/anti_aliasing', Ord(DefaultAntiAliasing)));
   UseOcclusionQuery := ConfigFile.GetValue(
     'video_options/use_occlusion_query', DefaultUseOcclusionQuery);
 finalization
@@ -171,7 +171,7 @@ finalization
   ConfigFile.SetDeleteValue('video_options/bump_mapping',
     BumpMapping, DefaultBumpMapping);
   ConfigFile.SetDeleteValue('video_options/anti_aliasing',
-    AntiAliasing, DefaultAntiAliasing);
+    Ord(AntiAliasing), Ord(DefaultAntiAliasing));
   ConfigFile.SetDeleteValue('video_options/use_occlusion_query',
     UseOcclusionQuery, DefaultUseOcclusionQuery);
 end.
