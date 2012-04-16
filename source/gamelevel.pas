@@ -593,7 +593,8 @@ begin
     if RenderShadowsPossible and SceneDynamicShadows then
       Options := Options + prShadowVolume;
 
-    MainScene.PrepareResources(Options, false, BaseLights);
+    MainScene.PrepareResources(Options, false, BaseLights,
+      1 { MultiSampling = 1, it is ignored as we do not include prScreenEffects });
 
     MainScene.FreeResources([frTextureDataInNodes]);
 
@@ -610,7 +611,8 @@ begin
     MainScene.TriangleOctreeProgressTitle := 'Loading level (triangle octree)';
     MainScene.ShapeOctreeProgressTitle := 'Loading level (Shape octree)';
     MainScene.Spatial := [ssRendering, ssDynamicCollisions];
-    MainScene.PrepareResources([prSpatial], false, BaseLights);
+    MainScene.PrepareResources([prSpatial], false, BaseLights,
+      1 { MultiSampling = 1, it is ignored as we do not include prScreenEffects });
   end;
 
   MainScene.ProcessEvents := true;
@@ -913,7 +915,8 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareResources(Options, false, BaseLights);
+  Result.PrepareResources(Options, false, BaseLights,
+    1 { MultiSampling = 1, it is ignored as we do not include prScreenEffects });
 
   if CreateOctreeCollisions then
     Result.Spatial := [ssDynamicCollisions];
@@ -948,7 +951,8 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareResources(Options, false, BaseLights);
+  Result.PrepareResources(Options, false, BaseLights,
+    1 { MultiSampling = 1, it is ignored as we do not include prScreenEffects });
 
   if CreateFirstOctreeCollisions then
     Result.FirstScene.Spatial := [ssDynamicCollisions];

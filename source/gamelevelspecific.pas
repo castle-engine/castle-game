@@ -1427,7 +1427,8 @@ begin
     AttributesSet(Fountain.Attributes);
     Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
     try
-      Fountain.PrepareResources([prRender, prBoundingBox], true, BaseLights);
+      Fountain.PrepareResources([prRender, prBoundingBox], true, BaseLights,
+        1 { MultiSampling = 1, it is ignored as we do not include prScreenEffects });
     finally Progress.Fini end;
     Fountain.FreeResources([frTextureDataInNodes]);
     Fountain.CastShadowVolumes := false; { not manifold }

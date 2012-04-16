@@ -307,7 +307,8 @@ begin
   begin
     AttributesSet(Anim.Attributes);
     Anim.PrepareResources([prRender, prBoundingBox] + prShadowVolume,
-      false, BaseLights);
+      false, BaseLights, 1 { MultiSampling = 1, it is ignored
+        as we do not include prScreenEffects });
   end;
   if DoProgress then Progress.Step;
 end;
@@ -330,7 +331,8 @@ begin
   begin
     AttributesSet(Scene.Attributes);
     Scene.PrepareResources([prRender, prBoundingBox] + prShadowVolume,
-      false, BaseLights);
+      false, BaseLights, 1 { MultiSampling = 1, it is ignored
+        as we do not include prScreenEffects });
   end;
   if DoProgress then Progress.Step;
 end;
