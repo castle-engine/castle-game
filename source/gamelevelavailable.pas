@@ -27,9 +27,8 @@ unit GameLevelAvailable;
 
 interface
 
-uses GameLevel, CastleUtils, Classes,
-  CastleClassUtils, DOM, GL, GLU, CastleGLUtils, CastleProgress, GameObjectKinds,
-  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
+uses GameLevel, CastleUtils, Classes, CastleClassUtils, DOM, GL, GLU, 
+  CastleGLUtils, CastleProgress, GameObjectKinds, FGL;
 
 type
   { }

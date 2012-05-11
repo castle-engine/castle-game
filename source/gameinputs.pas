@@ -26,7 +26,7 @@ unit GameInputs;
 interface
 
 uses KeysMouse, Cameras, CastleUtils, CastleClassUtils, Classes,
-  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, GenericStructList;
+  FGL, GenericStructList;
 
 type
   TInputGroup = (kgBasic, kgItems, kgOther);

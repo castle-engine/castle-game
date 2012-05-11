@@ -28,8 +28,7 @@ interface
 uses Boxes3D, X3DNodes, CastleScene, VectorMath, CastleUtils,
   CastleClassUtils, Classes, Images, GL, GLU, CastleGLUtils, GameSound,
   PrecalculatedAnimation, GameObjectKinds,
-  CastleXMLConfig, XmlSoundEngine, Frustum, Base3D,
-  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif}, CastleColors;
+  CastleXMLConfig, XmlSoundEngine, Frustum, Base3D, FGL, CastleColors;
 
 const
   DefaultItemDamageConst = 5.0;

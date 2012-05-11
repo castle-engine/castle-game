@@ -26,8 +26,7 @@ unit GameObjectKinds;
 interface
 
 uses Classes, CastleXMLConfig, PrecalculatedAnimation,
-  GameVideoOptions, CastleScene, X3DNodes, Base3D, DOM,
-  FGL {$ifdef VER2_2}, FGLObjectList22 {$endif};
+  GameVideoOptions, CastleScene, X3DNodes, Base3D, DOM, FGL;
 
 type
   { Resource used for rendering and processing of 3D objects.
