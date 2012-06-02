@@ -192,7 +192,7 @@ begin
   Window.Caption := 'The Castle';
   Window.ResizeAllowed := raOnlyAtOpen;
   if RenderShadowsPossible then
-    Window.StencilBufferBits := 8;
+    Window.StencilBits := 8;
   Window.MultiSampling := AntiAliasingGLMultiSampling;
   OpenContext;
 
