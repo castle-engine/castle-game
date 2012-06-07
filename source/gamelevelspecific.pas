@@ -1114,7 +1114,9 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
     I: Integer;
   begin
     DoorBox := (inherited BoundingBox).Translate(
-      GetTranslationFromTime(NewAnimationTime));
+      GetTranslationFromTime(NewAnimationTime) - GetTranslation);
+
+    Result := false;
 
     for I := 0 to World.Count - 1 do
       if World[I].Pushable then
