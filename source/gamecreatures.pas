@@ -720,6 +720,8 @@ type
       const Distance: Single): boolean; override;
 
     property Pushable default true;
+    { Orientation matching creatures designed for castle1. }
+    property Orientation default otUpZDirectionX;
   end;
 
   TCreatureList = class(specialize TFPGObjectList<TCreature>)
@@ -1301,6 +1303,7 @@ begin
   MaxLife := AMaxLife;
   FSoundDyingEnabled := true;
   UsedSounds := TALSoundList.Create(false);
+  Orientation := otUpZDirectionX;
 end;
 
 function TCreature.GetExists: boolean;

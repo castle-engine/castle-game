@@ -364,6 +364,9 @@ type
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
       const LineOfSight: boolean): boolean; override;
     function Sphere(out Radius: Single): boolean; override;
+
+    { Orientation matching creatures designed for castle1. }
+    property Orientation default otUpZDirectionX;
   end;
 
 implementation
@@ -417,6 +420,7 @@ var
 begin
   inherited Create(AOwner);
   Pushable := true;
+  Orientation := otUpZDirectionX;
   Life := DefaultPlayerLife;
   MaxLife := DefaultPlayerLife;
 
