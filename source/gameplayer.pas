@@ -182,6 +182,11 @@ type
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
       out AboveHeight: Single; out AboveGround: P3DTriangle): boolean; override;
   public
+    { Various navigation properties that may depend on loaded level. }
+    DefaultMoveHorizontalSpeed: Single;
+    DefaultMoveVerticalSpeed: Single;
+    DefaultPreferredHeight: Single;
+
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
@@ -427,6 +432,9 @@ begin
   Orientation := otUpZDirectionX;
   Life := DefaultPlayerLife;
   MaxLife := DefaultPlayerLife;
+  DefaultMoveHorizontalSpeed := 1.0;
+  DefaultMoveVerticalSpeed := 1.0;
+  DefaultPreferredHeight := 0.0;
 
   Add(TPlayerBox.Create(Self));
 
@@ -746,26 +754,7 @@ end;
 procedure TPlayer.UpdateCamera;
 const
   CastleCameraInput = [ciNormal, ci3dMouse]; { do not include ciMouseDragging }
-var
-  LevelMoveHorizontalSpeed: Single;
-  LevelMoveVerticalSpeed: Single;
-  LevelCameraPreferredHeight: Single;
 begin
-  if SceneManager <> nil then
-  begin
-    LevelMoveHorizontalSpeed := SceneManager.MoveHorizontalSpeed;
-    LevelMoveVerticalSpeed := SceneManager.MoveVerticalSpeed;
-    LevelCameraPreferredHeight := SceneManager.CameraPreferredHeight;
-  end else
-  begin
-    { This must work even when Level = nil. So we secure ourselves here,
-      if Level = nil then we just apply some default values. They don't matter
-      much, as user will not be able to play anyway without a Level loaded. }
-    LevelMoveHorizontalSpeed := 1.0;
-    LevelMoveVerticalSpeed := 1.0;
-    LevelCameraPreferredHeight := 0.0;
-  end;
-
   Camera.Gravity := (not FlyingMode) and (not GameWin);
   { Note that when not Camera.Gravity then FallingDownEffect will not
     work anyway. }
@@ -819,8 +808,8 @@ begin
     Camera.HeadBobbing := 0.0;
     Camera.PreferredHeight := Camera.Radius * 1.01;
 
-    Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
-    Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+    Camera.MoveHorizontalSpeed := DefaultMoveHorizontalSpeed;
+    Camera.MoveVerticalSpeed := DefaultMoveVerticalSpeed;
 
     if SceneManager <> nil then
       SceneManager.Input_PointingDeviceActivate.MakeClear;
@@ -847,8 +836,8 @@ begin
     Camera.HeadBobbing := 0.0;
     Camera.PreferredHeight := Camera.Radius * 1.01;
 
-    Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
-    Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+    Camera.MoveHorizontalSpeed := DefaultMoveHorizontalSpeed;
+    Camera.MoveVerticalSpeed := DefaultMoveVerticalSpeed;
 
     if SceneManager <> nil then
       SceneManager.Input_PointingDeviceActivate.MakeClear;
@@ -870,8 +859,8 @@ begin
         Camera.FallingDownSpeedIncrease
         ... don't matter here, because Gravity is false. }
 
-      Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
-      Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+      Camera.MoveHorizontalSpeed := DefaultMoveHorizontalSpeed;
+      Camera.MoveVerticalSpeed := DefaultMoveVerticalSpeed;
     end else
     if Swimming <> psNo then
     begin
@@ -888,8 +877,8 @@ begin
       Camera.HeadBobbing := 0.0;
       Camera.PreferredHeight := Camera.Radius * 1.01;
 
-      Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed / 2;
-      Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed / 2;
+      Camera.MoveHorizontalSpeed := DefaultMoveHorizontalSpeed / 2;
+      Camera.MoveVerticalSpeed := DefaultMoveVerticalSpeed / 2;
     end else
     begin
       Camera.PreferGravityUpForMoving := true;
@@ -903,10 +892,10 @@ begin
       Camera.FallingDownStartSpeed := DefaultFallingDownStartSpeed;
       Camera.FallingDownSpeedIncrease := DefaultFallingDownSpeedIncrease;
       Camera.HeadBobbing := DefaultHeadBobbing;
-      Camera.PreferredHeight := LevelCameraPreferredHeight;
+      Camera.PreferredHeight := DefaultPreferredHeight;
 
-      Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
-      Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
+      Camera.MoveHorizontalSpeed := DefaultMoveHorizontalSpeed;
+      Camera.MoveVerticalSpeed := DefaultMoveVerticalSpeed;
     end;
 
     Camera.Input_Forward.Assign(CastleInput_Forward.Shortcut, false);

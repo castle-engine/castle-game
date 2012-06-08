@@ -198,9 +198,6 @@ type
 
   TGameSceneManager = class(TCastleSceneManager)
   private
-    FCameraPreferredHeight: Single;
-    FMoveHorizontalSpeed: Single;
-    FMoveVerticalSpeed: Single;
     FSickProjection: boolean;
     FSickProjectionSpeed: TFloatTime;
 
@@ -223,11 +220,6 @@ type
     destructor Destroy; override;
 
     property Info: TLevelAvailable read FInfo;
-
-    { }
-    property CameraPreferredHeight: Single read FCameraPreferredHeight;
-    property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
-    property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
 
     property MenuBackground: boolean read FMenuBackground write FMenuBackground;
 
@@ -359,7 +351,7 @@ var
 
 implementation
 
-uses SysUtils, Triangle,
+uses SysUtils, Triangle, CastleLog,
   GamePlay, CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   CastleWindow, GLImages, Images, WindowModes, UIControls, XMLRead,
   GameVideoOptions, GameConfig, GameNotifications,
@@ -636,9 +628,8 @@ var
     InitialDirection: TVector3Single;
     InitialUp: TVector3Single;
     GravityUp: TVector3Single;
-    CameraRadius: Single;
+    CameraRadius, PreferredHeight: Single;
     NavigationNode: TNavigationInfoNode;
-    NavigationSpeed: Single;
     WalkCamera: TWalkCamera;
   begin
     MainScene.GetPerspectiveViewpoint(InitialPosition,
@@ -651,32 +642,27 @@ var
       CameraRadius := MainScene.BoundingBox.AverageSize(false, 1) * 0.007;
 
     if (NavigationNode <> nil) and (NavigationNode.FdAvatarSize.Count >= 2) then
-      FCameraPreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
-      FCameraPreferredHeight := CameraRadius * 5;
-    CorrectPreferredHeight(FCameraPreferredHeight, CameraRadius,
+      PreferredHeight := NavigationNode.FdAvatarSize.Items[1] else
+      PreferredHeight := CameraRadius * 5;
+    CorrectPreferredHeight(PreferredHeight, CameraRadius,
       DefaultCrouchHeight, DefaultHeadBobbing);
 
-    if NavigationNode <> nil then
-      NavigationSpeed := NavigationNode.FdSpeed.Value else
-      NavigationSpeed := 1.0;
+    { initialize some navigation settings of player }
+    if GamePlay.Player <> nil then
+    begin
+      GamePlay.Player.DefaultPreferredHeight := PreferredHeight;
 
-    { Fix InitialDirection length, and set MoveXxxSpeed.
+      if NavigationNode <> nil then
+        GamePlay.Player.DefaultMoveHorizontalSpeed := NavigationNode.FdSpeed.Value else
+        GamePlay.Player.DefaultMoveHorizontalSpeed := 1.0;
 
-      We want to have horizontal and vertical speeds controlled independently,
-      so we just normalize InitialDirection and set speeds in appropriate
-      MoveXxxSpeed. }
-    NormalizeTo1st(InitialDirection);
-    FMoveHorizontalSpeed := NavigationSpeed;
-    FMoveVerticalSpeed := 20;
+      GamePlay.Player.DefaultMoveVerticalSpeed := 20;
+    end;
 
-    { Check and fix GravityUp. }
-    if not VectorsEqual(Normalized(GravityUp),
-             Vector3Single(0, 0, 1), 0.001) then
-      raise EInternalError.CreateFmt(
-        'Gravity up vector must be +Z, but is %s',
-        [ VectorToRawStr(Normalized(GravityUp)) ]) else
-      { Make GravityUp = (0, 0, 1) more "precisely" }
-      GravityUp := Vector3Single(0, 0, 1);
+    { Check GravityUp }
+    if not VectorsEqual(GravityUp, Vector3Single(0, 0, 1), 0.001) then
+      if Log then
+        WritelnLog('Camera', 'Gravity up vector is not +Z. Everything should work fine, but it''s not fully tested');
 
     if Player <> nil then
       WalkCamera := GamePlay.Player.Camera else
@@ -687,7 +673,7 @@ var
     Camera := WalkCamera;
 
     WalkCamera.Init(InitialPosition, InitialDirection,
-      InitialUp, GravityUp, CameraPreferredHeight, CameraRadius);
+      InitialUp, GravityUp, PreferredHeight, CameraRadius);
     WalkCamera.CancelFallingDown;
   end;
 
