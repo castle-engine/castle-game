@@ -35,7 +35,7 @@ type
     use Level.AnimationTime for timing. }
   TThunderEffect = class
   private
-    LastBeginTime, NextBeginTime: Single;
+    Time, LastBeginTime, NextBeginTime: Single;
     ThunderLightNode: TDirectionalLightNode;
     ThunderLight: TLightInstance;
   public
@@ -45,7 +45,7 @@ type
     { Add thunder light, if visible. }
     procedure AddLight(const BaseLights: TLightInstancesList);
 
-    procedure Idle;
+    procedure Idle(const CompSpeed: Single);
     { Force thunder happening in next Idle call. }
     procedure ForceNow;
   end;
@@ -86,7 +86,7 @@ procedure TThunderEffect.AddLight(const BaseLights: TLightInstancesList);
     Result := false;
     if LastBeginTime <> 0 then
     begin
-      ThunderTime := Level.AnimationTime - LastBeginTime;
+      ThunderTime := Time - LastBeginTime;
       if (ThunderTime < 1.0) or
          ((1.5 < ThunderTime) and (ThunderTime < 2.5)) then
         Result := true;
@@ -98,15 +98,17 @@ begin
     BaseLights.Add(ThunderLight);
 end;
 
-procedure TThunderEffect.Idle;
+procedure TThunderEffect.Idle(const CompSpeed: Single);
 begin
-  if NextBeginTime = 0 then
-    NextBeginTime := Level.AnimationTime + 10 + Random(10);
+  Time += CompSpeed;
 
-  if NextBeginTime <= Level.AnimationTime then
+  if NextBeginTime = 0 then
+    NextBeginTime := Time + 10 + Random(10);
+
+  if NextBeginTime <= Time then
   begin
-    LastBeginTime := Level.AnimationTime;
-    NextBeginTime := Level.AnimationTime + 10 + Random(20);
+    LastBeginTime := Time;
+    NextBeginTime := Time + 10 + Random(20);
 
     {ThunderAllocatedSound := }SoundEngine.Sound(stThunder);
   end;
@@ -114,7 +116,7 @@ end;
 
 procedure TThunderEffect.ForceNow;
 begin
-  NextBeginTime := Level.AnimationTime;
+  NextBeginTime := Time;
 end;
 
 end.

@@ -51,7 +51,7 @@ var
   { Currently used level by PlayGame. nil if PlayGame doesn't work
     right now.
     @noAutoLinkHere }
-  Level: TLevel;
+  Level: TGameSceneManager;
 
 { If NextLevel = '', then end the game,
   else free current Level and set Level to NextLevel.
@@ -373,9 +373,9 @@ begin
 
   LevelFinishedFlush;
 
-  if GameWin and (Level is TCagesLevel) then
+  if GameWin and (Level.Level is TCagesLevel) then
   begin
-    Cages := TCagesLevel(Level);
+    Cages := TCagesLevel(Level.Level);
     case Cages.GameWinAnimation of
       gwaNone:
         begin
@@ -399,7 +399,7 @@ end;
 
 procedure LevelFinishedFlush;
 var
-  NewLevel: TLevel;
+  NewLevel: TGameSceneManager;
   GameControlsPos, WindowControlsPos: Integer;
 begin
   if LevelFinishedSchedule then
@@ -429,16 +429,18 @@ begin
       Window.Controls.Delete(WindowControlsPos) else
       WindowControlsPos := Window.Controls.Count;
 
-    NewLevel := LevelsAvailable.FindId(LevelFinishedNextLevelId).CreateLevel;
+    NewLevel := LevelsAvailable.FindId(LevelFinishedNextLevelId).LoadLevel;
 
     { copy DisableContextOpenClose value to new level.
       This is needed when it's called from inside debug menu,
       to make Window.Controls.Begin/EndDisableContextOpenClose
       matching. }
+    // TODO: should not be needed with persisting SceneManager
     NewLevel.DisableContextOpenClose := Level.DisableContextOpenClose;
 
     { initialize NewLevel.GLContextOpen already, in case this is called
       from inside debug menu (where explicit GLContextOpen may be disabled). }
+      // TODO: should not be needed with persisting SceneManager?? rather some other preparation do
     NewLevel.GLContextOpen;
 
     { right before freeing old Level, insert NewLevel at the same place
@@ -863,7 +865,7 @@ begin
     MessagesTheme.RectColor[3] := 0.4;
 
     if PrepareNewPlayer then
-      Level.PrepareNewPlayer(Player);
+      Level.Level.PrepareNewPlayer(Player);
 
     repeat
       Application.ProcessMessage(true, true);

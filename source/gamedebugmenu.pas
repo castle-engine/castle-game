@@ -432,7 +432,7 @@ procedure TDebugLevelMenu.Click;
           his first weapon) could be done before loading level progress,
           which sounds awkward for player. }
         LevelFinishedFlush;
-        Level.PrepareNewPlayer(Player);
+        Level.Level.PrepareNewPlayer(Player);
         UserQuit := true;
       end;
     finally S.Free end;

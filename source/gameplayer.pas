@@ -688,7 +688,7 @@ var
 begin
   RenderLifeIndicator(Life, MaxLife, GLList_RedIndicatorImage, 0, true);
 
-  BossCreatureIndicator := Level.BossCreatureIndicator(
+  BossCreatureIndicator := Level.Level.BossCreatureIndicator(
     BossCreatureLife, BossCreatureMaxLife);
   if BossCreatureIndicator then
   begin

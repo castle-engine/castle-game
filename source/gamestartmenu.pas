@@ -132,13 +132,13 @@ var
   TPlayer and TLevel instances differently. }
 procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
 var
-  NewLevel: TLevel;
+  NewLevel: TGameSceneManager;
 begin
   Level := nil;
   try
     Player := TPlayer.Create(nil);
     try
-      Level := NewGameLevelAvailable.CreateLevel;
+      Level := NewGameLevelAvailable.LoadLevel;
       PlayGame(true);
     finally FreeAndNil(Player) end;
 
@@ -148,7 +148,7 @@ begin
       try
         { Replace Level this way, so that restarting level doesn't
           free and reload all creature animations again. }
-        NewLevel := LevelsAvailable.FindId(GameEndedWantsRestart).CreateLevel;
+        NewLevel := LevelsAvailable.FindId(GameEndedWantsRestart).LoadLevel;
         FreeAndNil(Level);
         Level := NewLevel;
 

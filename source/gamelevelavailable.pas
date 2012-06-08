@@ -27,7 +27,7 @@ unit GameLevelAvailable;
 
 interface
 
-uses GameLevel, CastleUtils, Classes, CastleClassUtils, DOM, GL, GLU, 
+uses GameLevel, CastleUtils, Classes, CastleClassUtils, DOM, GL, GLU,
   CastleGLUtils, CastleProgress, GameObjectKinds, FGL;
 
 type
@@ -69,7 +69,7 @@ type
 
     Demo: boolean;
 
-    function CreateLevel(MenuBackground: boolean = false): TLevel;
+    function LoadLevel(MenuBackground: boolean = false): TGameSceneManager;
   end;
 
   TLevelAvailableList = class(specialize TFPGObjectList<TLevelAvailable>)
@@ -165,7 +165,7 @@ procedure TLevelAvailable.LoadFromDocument;
     I: Integer;
   begin
     for I := 0 to AllResources.Count - 1 do
-      if (AllResources[I] is TItemKind) and 
+      if (AllResources[I] is TItemKind) and
          (Resources.IndexOf(AllResources[I]) = -1) then
       Resources.Add(AllResources[I]);
   end;
@@ -225,7 +225,7 @@ begin
   AddItems(Resources);
 end;
 
-procedure DrawCreateLevel(Window: TCastleWindowBase);
+procedure DrawLoadLevel(Window: TCastleWindowBase);
 begin
   glClear(GL_COLOR_BUFFER_BIT);
   glLoadIdentity;
@@ -236,25 +236,25 @@ begin
   glPopAttrib;
 end;
 
-function TLevelAvailable.CreateLevel(MenuBackground: boolean): TLevel;
+function TLevelAvailable.LoadLevel(MenuBackground: boolean): TGameSceneManager;
 
-  procedure CreateLevelCore;
+  procedure LoadLevelCore;
   begin
-    Result := LevelClass.Create(Id, SceneFileName,
+    Result := TGameSceneManager.Create(Id, SceneFileName,
       Title, TitleHint, Number, Element, Resources,
-      MenuBackground);
+      MenuBackground, LevelClass);
     if not MenuBackground then
       AvailableForNewGame := true;
   end;
 
-  procedure CreateLevelNoBackground;
+  procedure LoadLevelNoBackground;
   var
     SavedBarYPosition: Single;
   begin
     SavedBarYPosition := WindowProgressInterface.BarYPosition;
     WindowProgressInterface.BarYPosition := LoadingBarYPosition;
     try
-      CreateLevelCore;
+      LoadLevelCore;
     finally
       WindowProgressInterface.BarYPosition := SavedBarYPosition;
     end;
@@ -271,7 +271,7 @@ begin
   if GLList_LoadingBgImage <> 0 then
   begin
     SavedMode := TGLMode.CreateReset(Window, 0, true,
-      @DrawCreateLevel, @Resize2D, @NoClose);
+      @DrawLoadLevel, @Resize2D, @NoClose);
     try
       Window.UserData := Self;
 
@@ -279,7 +279,7 @@ begin
 
       Window.EventResize;
 
-      CreateLevelNoBackground;
+      LoadLevelNoBackground;
 
       { Just a dirty hack to make user to actually see the
         "DOOM E1M1" loading background --- otherwise loading of doom
@@ -287,13 +287,13 @@ begin
         Maybe in the future I'll remove this hack (if level loading
         will be slow enough to actually make time for user to see
         background image), or make this hack more intelligent
-        (like checking how much time was spent inside CreateLevelNoBackground
+        (like checking how much time was spent inside LoadLevelNoBackground
         and doing Sleep() only if necessary). }
       SleepIfNeeded;
 
     finally FreeAndNil(SavedMode) end;
   end else
-    CreateLevelNoBackground;
+    LoadLevelNoBackground;
 end;
 
 { TLevelAvailableList ------------------------------------------------------- }

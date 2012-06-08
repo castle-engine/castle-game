@@ -124,13 +124,13 @@ const
   MenuBackgroundLevelId = 'gate_background';
 var
   BackgroundCaptions: TUIControl;
-  BackgroundLevel: TLevel;
+  BackgroundLevel: TGameSceneManager;
 begin
   BackgroundControls := TUIControlList.Create(true);
 
   { initialize BackgroundLevel }
   BackgroundLevel := LevelsAvailable.FindId(MenuBackgroundLevelId).
-    CreateLevel(true);
+    LoadLevel(true);
   BackgroundControls.Add(BackgroundLevel);
 
   { create BackgroundLevel.Camera now, for next assignment }

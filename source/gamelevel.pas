@@ -20,14 +20,14 @@
   ----------------------------------------------------------------------------
 }
 
-{ TLevel class and some specialized descendants. }
+{ TGameSceneManager class and level loading. }
 unit GameLevel;
 
 interface
 
 uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
   X3DNodes, X3DFields, GameItems, Cameras,
-  GameCreatures, GameSound,
+  GameCreatures, GameSound, Background,
   CastleUtils, CastleClassUtils, GamePlayer, GameThunder, GameObjectKinds,
   ProgressUnit, PrecalculatedAnimation,
   DOM, XmlSoundEngine, Base3D, Shape,
@@ -35,9 +35,12 @@ uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
 
 type
   TLevel = class;
+  TLevelClass = class of TLevel;
 
   TCastleSceneClass = class of TCastleScene;
   TCastlePrecalculatedAnimationClass = class of TCastlePrecalculatedAnimation;
+
+  TLevelScene = class;
 
   { Invisible and non-colliding areas on the level that have some special purpose.
     What exactly this "purpose" is, is defined in each TLevelArea descendant.
@@ -56,8 +59,8 @@ type
 
     { Name used to recognize this object's area in level VRML/X3D file.
 
-      If this object is present during ChangeLevelScene call from
-      TLevel constructor then the shape with a parent named like @link(Id)
+      If this object is present during ChangeLevelScene call
+      then the shape with a parent named like @link(Id)
       will be removed from VRML/X3D file, and it's BoundingBox will be used
       as Box3D of this object.
 
@@ -70,10 +73,9 @@ type
 
     function BoundingBox: TBox3D; override;
 
-    { Called from TLevel constructor. This is the place when you
-      can modify AParentLevel.MainScene.RootNode, e.g. by calling
-      RemoveBoxNode. }
-    procedure ChangeLevelScene(AParentLevel: TLevel);
+    { Called when loading level. This is the place when you
+      can modify MainScene, e.g. by calling MainScene.RemoveBoxNode. }
+    procedure ChangeLevelScene(MainScene: TLevelScene);
   end;
 
   { This defines area on the level that causes
@@ -103,7 +105,21 @@ type
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
-  TLevel = class(TCastleSceneManager)
+  TLevelScene = class(TCastleScene)
+  public
+    { Find Blender mesh with given name, extract it's bounding box
+      and remove it from scene.
+      See also [http://castle-engine.sourceforge.net/castle-development.php]
+      for description of CameraBox and WaterBox trick.
+      Remember that this may change MainScene.BoundingBox (in case we will
+      find and remove the node). }
+    function RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
+
+    { Like RemoveBoxNode, but raise EInternalError if not found. }
+    procedure RemoveBoxNodeCheck(out Box: TBox3D; const NodeName: string);
+  end;
+
+  TGameSceneManager = class(TCastleSceneManager)
   private
     FCameraPreferredHeight: Single;
     FMoveHorizontalSpeed: Single;
@@ -121,83 +137,34 @@ type
       early. }
     ItemsToRemove: TX3DNodeList;
 
-    procedure TraverseForItems(Shape: TShape);
-    procedure SetSickProjection(const Value: boolean);
-    procedure SetSickProjectionSpeed(const Value: TFloatTime);
-  private
-    FCreatures: TCreatureList;
-    procedure TraverseForCreatures(Shape: TShape);
-  private
-    FAnimationTime: TFloatTime;
+    FLevel: TLevel;
 
+    FCreatures: TCreatureList;
     FPlayedMusicSound: TSoundType;
-    FThunderEffect: TThunderEffect;
-  private
     FId: string;
     FSceneFileName: string;
     FTitle: string;
     FTitleHint: string;
     FNumber: Integer;
 
-    procedure LoadFromDOMElement(Element: TDOMElement);
-  private
     FMenuBackground: boolean;
     FSceneDynamicShadows: boolean;
 
     FResources: T3DResourceList;
+
+    procedure TraverseForItems(Shape: TShape);
+    procedure SetSickProjection(const Value: boolean);
+    procedure SetSickProjectionSpeed(const Value: TFloatTime);
+    procedure TraverseForCreatures(Shape: TShape);
+    procedure LoadFromDOMElement(Element: TDOMElement);
   protected
-    FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
-
-    { Find Blender mesh with given name, extract it's bounding box
-      and remove it from scene.
-      See also [http://castle-engine.sourceforge.net/castle-development.php]
-      for description of CameraBox and WaterBox trick.
-      Remember that this may change MainScene.BoundingBox (in case we will
-      find and remove the node). }
-    function RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
-
-    { Like RemoveBoxNode, but raise EInternalError if not found. }
-    procedure RemoveBoxNodeCheck(out Box: TBox3D; const NodeName: string);
-
-    { This will be called from our constructor before initializing
-      our octrees. Even before initializing creatures and items.
-
-      You can override this to do here some operations
-      that change the MainScene.RootNode (e.g. you can do here tricks like
-      extracting some specific objects using RemoveBoxNode).
-      Be very cautious what you do here --- remember that this is called
-      while TLevel.Create constructor did not finish it's work yet !
-
-      This is your only chance to insert into @link(Items) list some
-      object that has meaningfull ChangeLevelScene method. }
-    procedure ChangeLevelScene; virtual;
-
-    { Load TCastlePrecalculatedAnimation from *.kanim file, doing common tasks.
-      @unorderedList(
-        @item sets Attributes according to AnimationAttributesSet
-        @item optionally creates triangle octree for the FirstScene and/or LastScene
-        @item(call PrepareResources, with prRender, prBoundingBox, prShadowVolume
-          (if shadow volumes enabled by RenderShadowsPossible))
-        @item FreeExternalResources, since they will not be needed anymore
-        @item TimePlaying is by default @false, so the animation is not playing.
-      ) }
-    function LoadLevelAnimation(
-      const FileName: string;
-      CreateFirstOctreeCollisions,
-      CreateLastOctreeCollisions: boolean;
-      const AnimationClass: TCastlePrecalculatedAnimationClass): TCastlePrecalculatedAnimation;
-    function LoadLevelAnimation(
-      const FileName: string;
-      CreateFirstOctreeCollisions,
-      CreateLastOctreeCollisions: boolean): TCastlePrecalculatedAnimation;
 
     procedure RenderFromViewEverything; override;
     procedure InitializeLights(const Lights: TLightInstancesList); override;
     procedure ApplyProjection; override;
     procedure PointingDeviceActivateFailed(const Active: boolean); override;
   public
-
     { Load level from file, create octrees, prepare for OpenGL etc.
       This uses ProgressUnit while loading creating octrees,
       be sure to initialize Progress.UserInterface before calling this. }
@@ -207,7 +174,8 @@ type
       const ATitle: string; const ATitleHint: string; const ANumber: Integer;
       DOMElement: TDOMElement;
       AResources: T3DResourceList;
-      AMenuBackground: boolean); reintroduce; virtual;
+      AMenuBackground: boolean;
+      LevelClass: TLevelClass); reintroduce; virtual;
 
     destructor Destroy; override;
 
@@ -225,16 +193,6 @@ type
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
     property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
     property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
-
-    { Call this to allow level object to update some things,
-      animate level objects etc. }
-    procedure Idle(const CompSpeed: Single;
-      const HandleMouseAndKeys: boolean;
-      var LetOthersHandleMouseAndKeys: boolean); override;
-
-    { This is the time of the level, in seconds. Time 0 when level is created.
-      This is updated in our Idle. }
-    property AnimationTime: TFloatTime read FAnimationTime;
 
     property PlayedMusicSound: TSoundType
       read FPlayedMusicSound write FPlayedMusicSound default stNone;
@@ -255,32 +213,6 @@ type
       why this is needed. }
     property Number: Integer read FNumber;
 
-    { This will be called when new player starts game on this level.
-      This is supposed to equip the player with some basic weapon/items.
-
-      Usually level design assumes that player came to level from some
-      other level in the game, so he already owns some weapon / items etc.
-      But when player uses "New Game" command to get to some already
-      AvailableForNewGame non-first level, this method will be called and it should
-      give player some basic weapon / items suitable for starting this level.
-
-      In TLevel class implementation of this does nothing.  }
-    procedure PrepareNewPlayer(NewPlayer: TPlayer); virtual;
-
-    { For thunder effect. nil if no thunder effect should be done for this level.
-
-      Descendants can set this in their constructor.
-      We will call it's Idle, GamePlay will call it's InitGLLight and Render,
-      our destructor will free it. }
-    property ThunderEffect: TThunderEffect
-      read FThunderEffect write FThunderEffect;
-
-    { This returns whether and what to show on boss creature indicator.
-      Default implementation in this class uses BossCreature property:
-      if it's non-nil and BossCreature is alive, then indicator shows
-      BossCreature life. }
-    function BossCreatureIndicator(out Life, MaxLife: Single): boolean; virtual;
-
     property MenuBackground: boolean read FMenuBackground write FMenuBackground;
 
     { If @true, we will render dynamic shadows (shadow volumes) for
@@ -289,6 +221,64 @@ type
       attribute scene_dynamic_shadows. }
     property SceneDynamicShadows: boolean
       read FSceneDynamicShadows write FSceneDynamicShadows default false;
+
+    procedure BeforeDraw; override;
+
+    property SickProjection: boolean
+      read FSickProjection write SetSickProjection;
+    property SickProjectionSpeed: TFloatTime
+      read FSickProjectionSpeed write SetSickProjectionSpeed;
+
+    { Level logic. }
+    property Level: TLevel read FLevel;
+
+    function CollisionIgnoreItem(
+      const Sender: TObject;
+      const Triangle: P3DTriangle): boolean; override;
+    function Background: TBackground; override;
+  end;
+
+  { Level logic. We use T3D descendant, since this is the comfortable
+    way to add any behavior to the 3D world (it doesn't matter that
+    "level logic" is not a usual 3D object --- it doesn't have to collide
+    or be visible). And we add some game-specific stuff,
+    like BossCreatureIndicator. }
+  TLevel = class(T3D)
+  private
+    FAnimationTime: TFloatTime;
+    FThunderEffect: TThunderEffect;
+  protected
+    { Scene manager containing this level. }
+    SceneManager: TGameSceneManager;
+
+    FBossCreature: TCreature;
+
+    { Called before initializing
+      our octrees. Even before initializing creatures and items.
+
+      You can override this to do here some operations
+      that change the MainScene (e.g. you can do here tricks like
+      extracting some specific objects using MainScene.RemoveBoxNode). }
+    procedure ChangeLevelScene(MainScene: TLevelScene); virtual;
+
+    { Load TCastlePrecalculatedAnimation from *.kanim file, doing common tasks.
+      @unorderedList(
+        @item sets Attributes according to AnimationAttributesSet
+        @item optionally creates triangle octree for the FirstScene and/or LastScene
+        @item(call PrepareResources, with prRender, prBoundingBox, prShadowVolume
+          (if shadow volumes enabled by RenderShadowsPossible))
+        @item FreeExternalResources, since they will not be needed anymore
+        @item TimePlaying is by default @false, so the animation is not playing.
+      ) }
+    function LoadLevelAnimation(
+      const FileName: string;
+      CreateFirstOctreeCollisions,
+      CreateLastOctreeCollisions: boolean;
+      const AnimationClass: TCastlePrecalculatedAnimationClass): TCastlePrecalculatedAnimation;
+    function LoadLevelAnimation(
+      const FileName: string;
+      CreateFirstOctreeCollisions,
+      CreateLastOctreeCollisions: boolean): TCastlePrecalculatedAnimation;
 
     { Just load TCastleScene from file, doing some common tasks:
       @unorderedList(
@@ -304,20 +294,52 @@ type
       const SceneClass: TCastleSceneClass): TCastleScene;
     function LoadLevelScene(const FileName: string;
       CreateOctreeCollisions, PrepareBackground: boolean): TCastleScene;
+  public
+    constructor Create(AOwner: TComponent; AWorld: T3DWorld; DOMElement: TDOMElement); reintroduce; virtual;
+    destructor Destroy; override;
+    function BoundingBox: TBox3D; override;
 
-    procedure BeforeDraw; override;
+    { Called when new player starts game on this level.
+      This is supposed to equip the player with some basic weapon/items.
 
-    property SickProjection: boolean
-      read FSickProjection write SetSickProjection;
-    property SickProjectionSpeed: TFloatTime
-      read FSickProjectionSpeed write SetSickProjectionSpeed;
+      Usually level design assumes that player came to level from some
+      other level in the game, so he already owns some weapon / items etc.
+      But when player uses "New Game" command to get to some already
+      AvailableForNewGame non-first level, this method will be called and it should
+      give player some basic weapon / items suitable for starting this level.
+
+      In TLevel class implementation of this does nothing.  }
+    procedure PrepareNewPlayer(NewPlayer: TPlayer); virtual;
+
+    { What to show on boss creature indicator.
+      Default implementation in this class uses BossCreature property:
+      if it's non-nil and BossCreature is alive, then indicator shows
+      BossCreature life. }
+    function BossCreatureIndicator(out Life, MaxLife: Single): boolean; virtual;
 
     { Instance of boss creature, if any, on the level. @nil if no boss creature
       exists on this level. }
     property BossCreature: TCreature read FBossCreature;
+
+    { Time of the level, in seconds. Time 0 when level is created.
+      This is updated in our Idle. }
+    property AnimationTime: TFloatTime read FAnimationTime;
+
+    { For thunder effect. nil if no thunder effect should be done for this level.
+
+      Descendants can set this in their constructor.
+      We will call it's Idle, GamePlay will call it's InitGLLight and Render,
+      our destructor will free it. }
+    property ThunderEffect: TThunderEffect
+      read FThunderEffect write FThunderEffect;
+
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+
+    { Override background of the world. Leave @nil to let scene manager
+      use default (from MainScene.Background). }
+    function Background: TBackground; virtual;
   end;
 
-  TLevelClass = class of TLevel;
   TLevelClasses = specialize TFPGMap<string, TLevelClass>;
 
 var
@@ -325,11 +347,36 @@ var
 
 implementation
 
-uses SysUtils, GL,
+uses SysUtils, GL, Triangle,
   GamePlay, CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   GameVideoOptions, GameConfig, GameNotifications,
   GameInputs, GameWindow, CastleXMLUtils,
   GLRenderer, RenderingCameraUnit, Math, CastleWarnings;
+
+{ TLevelScene ---------------------------------------------------------------- }
+
+function TLevelScene.RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
+var
+  BoxShape: TShape;
+begin
+  BoxShape := Shapes.FindBlenderMesh(NodeName);
+  Result := BoxShape <> nil;
+  if Result then
+  begin
+    { When node with name NodeName is found, then we calculate our
+      Box from this node (and we delete this node from the scene,
+      as it should not be visible).
+      This way we can comfortably set such boxes from Blender. }
+    Box := BoxShape.BoundingBox;
+    RemoveShapeGeometry(BoxShape);
+  end;
+end;
+
+procedure TLevelScene.RemoveBoxNodeCheck(out Box: TBox3D; const NodeName: string);
+begin
+  if not RemoveBoxNode(Box, NodeName) then
+    raise EInternalError.CreateFmt('Error: no box named "%s" found', [NodeName]);
+end;
 
 { TLevelArea ----------------------------------------------------------------- }
 
@@ -338,7 +385,7 @@ begin
   inherited;
   FBox := EmptyBox3D;
   { Actually, the fact that our BoundingBox is empty also prevents collisions.
-    For for some methods, knowing that Collides = false allows them to exit
+    But for some methods, knowing that Collides = false allows them to exit
     faster. }
   Collides := false;
 end;
@@ -349,10 +396,10 @@ begin
   Result := EmptyBox3D;
 end;
 
-procedure TLevelArea.ChangeLevelScene(AParentLevel: TLevel);
+procedure TLevelArea.ChangeLevelScene(MainScene: TLevelScene);
 begin
   inherited;
-  AParentLevel.RemoveBoxNodeCheck(FBox, Id);
+  MainScene.RemoveBoxNodeCheck(FBox, Id);
 end;
 
 function TLevelArea.PointInside(const Point: TVector3Single): boolean;
@@ -378,15 +425,16 @@ begin
   end;
 end;
 
-{ TLevel --------------------------------------------------------------------- }
+{ TGameSceneManager --------------------------------------------------------------------- }
 
-constructor TLevel.Create(
+constructor TGameSceneManager.Create(
   const AId: string;
   const ASceneFileName: string;
   const ATitle: string; const ATitleHint: string; const ANumber: Integer;
   DOMElement: TDOMElement;
   AResources: T3DResourceList;
-  AMenuBackground: boolean);
+  AMenuBackground: boolean;
+  LevelClass: TLevelClass);
 
   procedure RemoveItemsToRemove;
   var
@@ -467,6 +515,8 @@ var
   Options: TPrepareResourcesOptions;
   NewCameraBox, NewWaterBox: TBox3D;
   SI: TShapeTreeIterator;
+  MainLevelScene: TLevelScene;
+  I: Integer;
 begin
   inherited Create(nil);
 
@@ -489,11 +539,9 @@ begin
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    MainScene := TCastleScene.CreateCustomCache(Self, GLContextCache);
+    MainLevelScene := TLevelScene.CreateCustomCache(Self, GLContextCache);
+    MainScene := MainLevelScene;
     MainScene.Load(SceneFileName);
-
-    { initialize FAnimationTime. Must be initialized before creating creatures. }
-    FAnimationTime := 0.0;
 
     AttributesSet(MainScene.Attributes);
     MainScene.Attributes.UseSceneLights := true;
@@ -510,8 +558,12 @@ begin
       Items.Add(Player);
 
     LoadFromDOMElement(DOMElement);
-
-    ChangeLevelScene;
+    { call ChangeLevelScene on TLevelArea created by LoadFromDOMElement }
+    for I := 0 to Items.Count - 1 do
+    begin
+      if Items[I] is TLevelArea then
+        TLevelArea(Items[I]).ChangeLevelScene(MainLevelScene);
+    end;
 
     InitializeCamera;
 
@@ -534,7 +586,7 @@ begin
     finally ItemsToRemove.Free end;
 
     { Calculate CameraBox. }
-    if not RemoveBoxNode(NewCameraBox, 'LevelBox') then
+    if not MainLevelScene.RemoveBoxNode(NewCameraBox, 'LevelBox') then
     begin
       { Set CameraBox to MainScene.BoundingBox, and make maximum Z larger. }
       NewCameraBox := MainScene.BoundingBox;
@@ -542,10 +594,18 @@ begin
     end;
     CameraBox := NewCameraBox;
 
-    if RemoveBoxNode(NewWaterBox, 'WaterBox') then
+    if MainLevelScene.RemoveBoxNode(NewWaterBox, 'WaterBox') then
       WaterBox := NewWaterBox;
 
     CreateSectors(MainScene);
+
+    { create Level after creatures and hint areas are initialized
+      (some TLevel descendant constructors depend on this),
+      but still before preparing resources like octrees (because we still
+      need to call Level.ChangeLevelScene that may change 3D scene). }
+    FLevel := LevelClass.Create(Self, Items, DOMElement);
+    Level.ChangeLevelScene(MainLevelScene);
+    Items.Add(Level);
 
     MainScene.CastShadowVolumes := SceneDynamicShadows;
 
@@ -581,9 +641,8 @@ begin
   AlwaysApplyProjection := true;
 end;
 
-destructor TLevel.Destroy;
+destructor TGameSceneManager.Destroy;
 begin
-  FreeAndNil(FThunderEffect);
   FreeAndNil(FCreatures);
   if FResources <> nil then
   begin
@@ -593,7 +652,7 @@ begin
   inherited;
 end;
 
-procedure TLevel.LoadFromDOMElement(Element: TDOMElement);
+procedure TGameSceneManager.LoadFromDOMElement(Element: TDOMElement);
 
   procedure MissingRequiredAttribute(const AttrName, ElementName: string);
   begin
@@ -666,42 +725,7 @@ begin
   DOMGetBooleanAttribute(Element, 'scene_dynamic_shadows', FSceneDynamicShadows);
 end;
 
-function TLevel.RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
-var
-  BoxShape: TShape;
-begin
-  BoxShape := MainScene.Shapes.FindBlenderMesh(NodeName);
-  Result := BoxShape <> nil;
-  if Result then
-  begin
-    { When node with name NodeName is found, then we calculate our
-      Box from this node (and we delete this node from the scene,
-      as it should not be visible).
-      This way we can comfortably set such boxes from Blender. }
-    Box := BoxShape.BoundingBox;
-    MainScene.RemoveShapeGeometry(BoxShape);
-  end;
-end;
-
-procedure TLevel.RemoveBoxNodeCheck(out Box: TBox3D; const NodeName: string);
-begin
-  if not RemoveBoxNode(Box, NodeName) then
-    raise EInternalError.CreateFmt('Error in level "%s": no box named "%s" found',
-      [Title, NodeName]);
-end;
-
-procedure TLevel.ChangeLevelScene;
-var
-  I: Integer;
-begin
-  for I := 0 to Items.Count - 1 do
-  begin
-    if Items[I] is TLevelArea then
-      TLevelArea(Items[I]).ChangeLevelScene(Self);
-  end;
-end;
-
-procedure TLevel.TraverseForItems(Shape: TShape);
+procedure TGameSceneManager.TraverseForItems(Shape: TShape);
 
   procedure CreateNewItem(const ItemNodeName: string);
   var
@@ -760,7 +784,7 @@ begin
   end;
 end;
 
-procedure TLevel.TraverseForCreatures(Shape: TShape);
+procedure TGameSceneManager.TraverseForCreatures(Shape: TShape);
 
   procedure CreateNewCreature(const CreatureNodeName: string);
   var
@@ -837,17 +861,132 @@ begin
   end;
 end;
 
-procedure TLevel.Idle(const CompSpeed: Single;
-  const HandleMouseAndKeys: boolean;
-  var LetOthersHandleMouseAndKeys: boolean);
+procedure TGameSceneManager.InitializeLights(const Lights: TLightInstancesList);
 begin
-  if not Paused then
-    FAnimationTime += CompSpeed;
-
   inherited;
 
-  if (not Paused) and (ThunderEffect <> nil) then
-    ThunderEffect.Idle;
+  { This is used to prepare BaseLights, which may be necessary in constructor
+    before we even assign Level. }
+  if (Level <> nil) and (Level.ThunderEffect <> nil) then
+    Level.ThunderEffect.AddLight(Lights);
+end;
+
+procedure TGameSceneManager.RenderFromViewEverything;
+begin
+  ShadowVolumesDraw := DebugRenderShadowVolume;
+  ShadowVolumesPossible := RenderShadowsPossible;
+  ShadowVolumes := RenderShadows;
+
+  { Actually, this is needed only when "(not MenuBackground) and ShowDebugInfo".
+    But it's practically free, time use isn't really noticeable. }
+  ShadowVolumeRenderer.Count := true;
+
+  inherited;
+end;
+
+procedure TGameSceneManager.BeforeDraw;
+begin
+  ShadowVolumesDraw := DebugRenderShadowVolume;
+  ShadowVolumesPossible := RenderShadowsPossible;
+  ShadowVolumes := RenderShadows;
+
+  inherited;
+end;
+
+procedure TGameSceneManager.ApplyProjection;
+var
+  S, C: Extended;
+begin
+  Assert(Camera <> nil, 'TGameSceneManager always creates camera in constructor');
+
+  ShadowVolumesDraw := DebugRenderShadowVolume;
+  ShadowVolumesPossible := RenderShadowsPossible;
+  ShadowVolumes := RenderShadows;
+
+  DistortFieldOfViewY := 1;
+  DistortViewAspect := 1;
+  if SickProjection then
+  begin
+    SinCos(Level.AnimationTime * SickProjectionSpeed, S, C);
+    DistortFieldOfViewY += C * 0.03;
+    DistortViewAspect += S * 0.03;
+  end;
+
+  inherited;
+end;
+
+procedure TGameSceneManager.SetSickProjection(const Value: boolean);
+begin
+  if FSickProjection <> Value then
+  begin
+    FSickProjection := Value;
+    ApplyProjectionNeeded := true;
+  end;
+end;
+
+procedure TGameSceneManager.SetSickProjectionSpeed(const Value: TFloatTime);
+begin
+  if FSickProjectionSpeed <> Value then
+  begin
+    FSickProjectionSpeed := Value;
+    if SickProjection then ApplyProjectionNeeded := true;
+  end;
+end;
+
+procedure TGameSceneManager.PointingDeviceActivateFailed(const Active: boolean);
+begin
+  inherited;
+  if Active then
+    SoundEngine.Sound(stPlayerInteractFailed);
+end;
+
+function TGameSceneManager.CollisionIgnoreItem(
+  const Sender: TObject; const Triangle: P3DTriangle): boolean;
+begin
+  Result :=
+    (inherited CollisionIgnoreItem(Sender, Triangle)) or
+    (PTriangle(Triangle)^.State.LastNodes.Material.NodeName = 'MatWater');
+end;
+
+function TGameSceneManager.Background: TBackground;
+begin
+  Result := Level.Background;
+  if Result = nil then
+    Result := inherited;
+end;
+
+{ TLevel ---------------------------------------------------------------- }
+
+constructor TLevel.Create(AOwner: TComponent; AWorld: T3DWorld; DOMElement: TDOMElement);
+begin
+  inherited Create(AOwner);
+  SceneManager := AOwner as TGameSceneManager;
+  { Actually, the fact that our BoundingBox is empty also prevents collisions.
+    But for some methods, knowing that Collides = false allows them to exit
+    faster. }
+  Collides := false;
+end;
+
+destructor TLevel.Destroy;
+begin
+  FreeAndNil(FThunderEffect);
+  inherited;
+end;
+
+function TLevel.BoundingBox: TBox3D;
+begin
+  { This object is invisible and non-colliding. }
+  Result := EmptyBox3D;
+end;
+
+function TLevel.BossCreatureIndicator(out Life, MaxLife: Single): boolean;
+begin
+  Result := (BossCreature <> nil) and (not BossCreature.Dead);
+  if Result then
+  begin
+    Life := BossCreature.Life;
+    MaxLife := BossCreature.MaxLife;
+  end;
 end;
 
 procedure TLevel.PrepareNewPlayer(NewPlayer: TPlayer);
@@ -872,7 +1011,7 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareResources(Options, false, BaseLights);
+  Result.PrepareResources(Options, false, SceneManager.BaseLights);
 
   if CreateOctreeCollisions then
     Result.Spatial := [ssDynamicCollisions];
@@ -907,7 +1046,7 @@ begin
   if RenderShadowsPossible then
     Options := Options + prShadowVolume;
 
-  Result.PrepareResources(Options, false, BaseLights);
+  Result.PrepareResources(Options, false, SceneManager.BaseLights);
 
   if CreateFirstOctreeCollisions then
     Result.FirstScene.Spatial := [ssDynamicCollisions];
@@ -930,91 +1069,21 @@ begin
     TCastlePrecalculatedAnimation);
 end;
 
-function TLevel.BossCreatureIndicator(out Life, MaxLife: Single): boolean;
-begin
-  Result := (BossCreature <> nil) and (not BossCreature.Dead);
-  if Result then
-  begin
-    Life := BossCreature.Life;
-    MaxLife := BossCreature.MaxLife;
-  end;
-end;
-
-procedure TLevel.InitializeLights(const Lights: TLightInstancesList);
+procedure TLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 begin
   inherited;
-
+  FAnimationTime += CompSpeed;
   if ThunderEffect <> nil then
-    ThunderEffect.AddLight(Lights);
+    ThunderEffect.Idle(CompSpeed);
 end;
 
-procedure TLevel.RenderFromViewEverything;
+procedure TLevel.ChangeLevelScene(MainScene: TLevelScene);
 begin
-  ShadowVolumesDraw := DebugRenderShadowVolume;
-  ShadowVolumesPossible := RenderShadowsPossible;
-  ShadowVolumes := RenderShadows;
-
-  { Actually, this is needed only when "(not MenuBackground) and ShowDebugInfo".
-    But it's practically free, time use isn't really noticeable. }
-  ShadowVolumeRenderer.Count := true;
-
-  inherited;
 end;
 
-procedure TLevel.BeforeDraw;
+function TLevel.Background: TBackground;
 begin
-  ShadowVolumesDraw := DebugRenderShadowVolume;
-  ShadowVolumesPossible := RenderShadowsPossible;
-  ShadowVolumes := RenderShadows;
-
-  inherited;
-end;
-
-procedure TLevel.ApplyProjection;
-var
-  S, C: Extended;
-begin
-  Assert(Camera <> nil, 'TLevel always creates camera in constructor');
-
-  ShadowVolumesDraw := DebugRenderShadowVolume;
-  ShadowVolumesPossible := RenderShadowsPossible;
-  ShadowVolumes := RenderShadows;
-
-  DistortFieldOfViewY := 1;
-  DistortViewAspect := 1;
-  if SickProjection then
-  begin
-    SinCos(AnimationTime * SickProjectionSpeed, S, C);
-    DistortFieldOfViewY += C * 0.03;
-    DistortViewAspect += S * 0.03;
-  end;
-
-  inherited;
-end;
-
-procedure TLevel.SetSickProjection(const Value: boolean);
-begin
-  if FSickProjection <> Value then
-  begin
-    FSickProjection := Value;
-    ApplyProjectionNeeded := true;
-  end;
-end;
-
-procedure TLevel.SetSickProjectionSpeed(const Value: TFloatTime);
-begin
-  if FSickProjectionSpeed <> Value then
-  begin
-    FSickProjectionSpeed := Value;
-    if SickProjection then ApplyProjectionNeeded := true;
-  end;
-end;
-
-procedure TLevel.PointingDeviceActivateFailed(const Active: boolean);
-begin
-  inherited;
-  if Active then
-    SoundEngine.Sound(stPlayerInteractFailed);
+  Result := nil;
 end;
 
 initialization
