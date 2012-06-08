@@ -130,9 +130,6 @@ type
   private
     FAnimationTime: TFloatTime;
 
-    FWaterBox: TBox3D;
-    FAboveWaterBox: TBox3D;
-
     FPlayedMusicSound: TSoundType;
     FThunderEffect: TThunderEffect;
   private
@@ -152,10 +149,12 @@ type
     FBossCreature: TCreature;
     FFootstepsSound: TSoundType;
 
-    { See [http://castle-engine.sourceforge.net/castle-development.php]
+    { Find Blender mesh with given name, extract it's bounding box
+      and remove it from scene.
+      See also [http://castle-engine.sourceforge.net/castle-development.php]
       for description of CameraBox and WaterBox trick.
       Remember that this may change MainScene.BoundingBox (in case we will
-      find and remove the node from Scene). }
+      find and remove the node). }
     function RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
 
     { Like RemoveBoxNode, but raise EInternalError if not found. }
@@ -226,23 +225,6 @@ type
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
     property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
     property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
-
-    property WaterBox: TBox3D read FWaterBox;
-
-    { This is always calculated as a box with X, Y borders just like
-      the WaterBox and the Z borders placed such that AboveWaterBox
-      is exactly above WaterBox (top of WaterBox is equal to bottom of
-      AboveWaterBox) and the height of AboveWaterBox is "rather small".
-
-      The intention of "rather small" is such that when player Position
-      is within AboveWaterBox then the player is floating slightly
-      above the water --- not immediately falling down, but also
-      not drowning.
-
-      In other words, this means that player head is above the water surface
-      but his feet are in the water. In some sense he/she is swimming,
-      in some not. }
-    property AboveWaterBox: TBox3D read FAboveWaterBox;
 
     { Call this to allow level object to update some things,
       animate level objects etc. }
@@ -483,7 +465,7 @@ constructor TLevel.Create(
 
 var
   Options: TPrepareResourcesOptions;
-  NewCameraBox: TBox3D;
+  NewCameraBox, NewWaterBox: TBox3D;
   SI: TShapeTreeIterator;
 begin
   inherited Create(nil);
@@ -560,16 +542,8 @@ begin
     end;
     CameraBox := NewCameraBox;
 
-    if RemoveBoxNode(FWaterBox, 'WaterBox') then
-    begin
-      FAboveWaterBox := FWaterBox;
-      FAboveWaterBox.Data[0, 2] := FWaterBox.Data[1, 2];
-      FAboveWaterBox.Data[1, 2] := FAboveWaterBox.Data[0, 2] + 0.4;
-    end else
-    begin
-      FWaterBox := EmptyBox3D;
-      FAboveWaterBox := EmptyBox3D;
-    end;
+    if RemoveBoxNode(NewWaterBox, 'WaterBox') then
+      WaterBox := NewWaterBox;
 
     CreateSectors(MainScene);
 

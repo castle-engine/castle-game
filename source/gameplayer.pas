@@ -34,7 +34,14 @@ const
   DefaultPlayerLife = 100;
 
 type
-  TPlayerSwimming = (psNo, psAboveWater, psUnderWater);
+  TPlayerSwimming = (psNo,
+    { Player is floating on the water.
+      Not falling down, but also not drowning.
+      This means that player head is above the water surface
+      but his feet are in the water. In some sense he/she is swimming,
+      in some not. }
+    psAboveWater,
+    psUnderWater);
 
   { Player class.
 
@@ -947,12 +954,19 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       Remember to set this so that it will *not* easily synchronize
       with stPlayerDrowning. }
     SwimSoundPauseSeconds = 3.11111111;
+  var
+    NewSwimming: TPlayerSwimming;
   begin
-    if Level.AboveWaterBox.PointInside(Camera.Position) then
-      Swimming := psAboveWater else
-    if Level.WaterBox.PointInside(Camera.Position) then
-      Swimming := psUnderWater else
-      Swimming := psNo;
+    { update Swimming }
+    NewSwimming := psNo;
+    if World <> nil then
+    begin
+      if World.WaterBox.PointInside(Position) then
+        NewSwimming := psUnderWater else
+      if World.WaterBox.PointInside(Position - Camera.PreferredHeight) then
+        NewSwimming := psAboveWater;
+    end;
+    Swimming := NewSwimming;
 
     if Swimming = psUnderWater then
     begin
