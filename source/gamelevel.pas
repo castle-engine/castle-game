@@ -101,6 +101,7 @@ type
     property SceneDynamicShadows: boolean
       read FSceneDynamicShadows write FSceneDynamicShadows default false;
 
+    { Load level from file, create camera, octrees, prepare for OpenGL and such. }
     procedure LoadLevel(const SceneManager: TGameSceneManager;
       const MenuBackground: boolean = false);
   end;
@@ -208,7 +209,6 @@ type
     procedure SetSickProjection(const Value: boolean);
     procedure SetSickProjectionSpeed(const Value: TFloatTime);
 
-    { Load level from file, create octrees, prepare for OpenGL etc. }
     procedure LoadLevel(const AInfo: TLevelAvailable;
       const AMenuBackground: boolean);
   protected
@@ -851,7 +851,7 @@ procedure TGameSceneManager.ApplyProjection;
 var
   S, C: Extended;
 begin
-  Assert(Camera <> nil, 'TGameSceneManager always creates camera in constructor');
+  Assert(Camera <> nil, 'TGameSceneManager always creates camera when loading level');
 
   ShadowVolumesDraw := DebugRenderShadowVolume;
   ShadowVolumesPossible := RenderShadowsPossible;

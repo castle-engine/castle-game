@@ -133,10 +133,6 @@ begin
   LevelsAvailable.FindId(MenuBackgroundLevelId).LoadLevel(BackgroundSceneManager, true);
   BackgroundControls.Add(BackgroundSceneManager);
 
-  { TODO: not needed? }
-  { create BackgroundLevel.Camera now, for next assignment }
-  BackgroundSceneManager.Camera := BackgroundSceneManager.CreateDefaultCamera;
-
   { Do not allow to move the camera in any way.
     We should also disable any other interaction with the scene,
     in case in the future TLevel will enable ProcessEvents and some animation
