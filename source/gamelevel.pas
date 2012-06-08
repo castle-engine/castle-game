@@ -203,25 +203,12 @@ type
     FSickProjection: boolean;
     FSickProjectionSpeed: TFloatTime;
 
-    { Used only within constructor.
-      We will process the scene graph, and sometimes it's not comfortable
-      to remove the items while traversing --- so we will instead
-      put them on this list.
-
-      Be careful: never add here two nodes such that one may be parent
-      of another, otherwise freeing one could free the other one too
-      early. }
-    ItemsToRemove: TX3DNodeList;
-
     FLevel: TLevel;
     FMenuBackground: boolean;
     FInfo: TLevelAvailable;
 
-    procedure TraverseForItems(Shape: TShape);
     procedure SetSickProjection(const Value: boolean);
     procedure SetSickProjectionSpeed(const Value: TFloatTime);
-    procedure TraverseForCreatures(Shape: TShape);
-    procedure LoadFromDOMElement(Element: TDOMElement);
   protected
     procedure RenderFromViewEverything; override;
     procedure InitializeLights(const Lights: TLightInstancesList); override;
@@ -429,6 +416,204 @@ end;
 
 constructor TGameSceneManager.Create(const AInfo: TLevelAvailable;
   const AMenuBackground: boolean);
+var
+  { Sometimes it's not comfortable
+    to remove the items while traversing --- so we will instead
+    put them on this list.
+
+    Be careful: never add here two nodes such that one may be parent
+    of another, otherwise freeing one could free the other one too
+    early. }
+  ItemsToRemove: TX3DNodeList;
+
+  procedure LoadAreas(Element: TDOMElement);
+
+    procedure MissingRequiredAttribute(const AttrName, ElementName: string);
+    begin
+      raise Exception.CreateFmt(
+        'Missing required attribute "%s" of <%s> element', [AttrName, ElementName]);
+    end;
+
+    function LevelAreaFromDOMElement(Element: TDOMElement): TLevelHintArea;
+    var
+      Child: TDOMElement;
+    begin
+      if Element.TagName = 'area' then
+      begin
+        Child := DOMGetOneChildElement(Element);
+        if Child.TagName = 'hint' then
+        begin
+          Result := TLevelHintArea.Create(Self);
+          Result.Message := DOMGetTextData(Child);
+        end else
+          raise Exception.CreateFmt('Not allowed children element of <area>: "%s"',
+            [Child.TagName]);
+        if not DOMGetAttribute(Element, 'id', Result.FId) then
+          MissingRequiredAttribute('id', 'area');
+      end else
+      if (Element.TagName = 'resources') or
+         (Element.TagName = 'bump_mapping_light') then
+      begin
+        { These are handled elsewhere, and don't produce any T3D. }
+        Result := nil;
+      end else
+        raise Exception.CreateFmt('Not allowed children element of <level>: "%s"',
+          [Element.TagName]);
+    end;
+
+  var
+    I: TXMLElementIterator;
+    NewArea: TLevelArea;
+  begin
+    I := TXMLElementIterator.Create(Element);
+    try
+      while I.GetNext do
+      begin
+        NewArea := LevelAreaFromDOMElement(I.Current);
+        if NewArea <> nil then
+        begin
+          NewArea.ChangeLevelScene(MainScene);
+          Items.Add(NewArea);
+        end;
+      end;
+    finally FreeAndNil(I) end;
+  end;
+
+  procedure TraverseForItems(Shape: TShape);
+
+    procedure CreateNewItem(const ItemNodeName: string);
+    var
+      Resource: T3DResource;
+      ItemKind: TItemKind;
+      IgnoredBegin, ItemQuantityBegin: Integer;
+      ItemKindQuantity, ItemKindId: string;
+      ItemQuantity: Cardinal;
+      ItemStubBoundingBox: TBox3D;
+      ItemPosition: TVector3Single;
+    begin
+      { Calculate ItemKindQuantity }
+      IgnoredBegin := Pos('_', ItemNodeName);
+      if IgnoredBegin = 0 then
+        ItemKindQuantity := ItemNodeName else
+        ItemKindQuantity := Copy(ItemNodeName, 1, IgnoredBegin - 1);
+
+      { Calculate ItemKindId, ItemQuantity }
+      ItemQuantityBegin := CharsPos(['0'..'9'], ItemKindQuantity);
+      if ItemQuantityBegin = 0 then
+      begin
+        ItemKindId := ItemKindQuantity;
+        ItemQuantity := 1;
+      end else
+      begin
+        ItemKindId := Copy(ItemKindQuantity, 1, ItemQuantityBegin - 1);
+        ItemQuantity := StrToInt(SEnding(ItemKindQuantity, ItemQuantityBegin));
+      end;
+
+      Resource := AllResources.FindId(ItemKindId);
+      if not (Resource is TItemKind) then
+        raise Exception.CreateFmt('Resource "%s" is not an item, but is referenced in model with Item prefix',
+          [ItemKindId]);
+      ItemKind := TItemKind(Resource);
+
+      ItemStubBoundingBox := Shape.BoundingBox;
+      ItemPosition[0] := (ItemStubBoundingBox.Data[0, 0] + ItemStubBoundingBox.Data[1, 0]) / 2;
+      ItemPosition[1] := (ItemStubBoundingBox.Data[0, 1] + ItemStubBoundingBox.Data[1, 1]) / 2;
+      ItemPosition[2] := ItemStubBoundingBox.Data[0, 2];
+
+      Items.Add(TItemOnLevel.Create(Self, TItem.Create(ItemKind, ItemQuantity),
+        ItemPosition));
+    end;
+
+  const
+    ItemPrefix = 'Item';
+  begin
+    if IsPrefix(ItemPrefix, Shape.BlenderMeshName) then
+    begin
+      { For MenuBackground, item models may be not loaded yet }
+      if not MenuBackground then
+        CreateNewItem(SEnding(Shape.BlenderMeshName, Length(ItemPrefix) + 1));
+      { Don't remove BlenderObjectNode now --- will be removed later.
+        This avoids problems with removing nodes while traversing. }
+      ItemsToRemove.Add(Shape.BlenderObjectNode);
+    end;
+  end;
+
+  procedure TraverseForCreatures(Shape: TShape);
+
+    procedure CreateNewCreature(const CreatureNodeName: string);
+    var
+      StubBoundingBox: TBox3D;
+      CreaturePosition, CreatureDirection: TVector3Single;
+      Resource: T3DResource;
+      CreatureKind: TCreatureKind;
+      CreatureKindName: string;
+      IgnoredBegin: Integer;
+      MaxLifeBegin: Integer;
+      IsMaxLife: boolean;
+      MaxLife: Single;
+    begin
+      { calculate CreatureKindName }
+      IgnoredBegin := Pos('_', CreatureNodeName);
+      if IgnoredBegin = 0 then
+        CreatureKindName := CreatureNodeName else
+        CreatureKindName := Copy(CreatureNodeName, 1, IgnoredBegin - 1);
+
+      { possibly calculate MaxLife by truncating last part of CreatureKindName }
+      MaxLifeBegin := CharsPos(['0'..'9'], CreatureKindName);
+      IsMaxLife := MaxLifeBegin <> 0;
+      if IsMaxLife then
+      begin
+        MaxLife := StrToFloat(SEnding(CreatureKindName, MaxLifeBegin));
+        CreatureKindName := Copy(CreatureKindName, 1, MaxLifeBegin - 1);
+      end;
+
+      { calculate CreaturePosition }
+      StubBoundingBox := Shape.BoundingBox;
+      CreaturePosition[0] := (StubBoundingBox.Data[0, 0] + StubBoundingBox.Data[1, 0]) / 2;
+      CreaturePosition[1] := (StubBoundingBox.Data[0, 1] + StubBoundingBox.Data[1, 1]) / 2;
+      CreaturePosition[2] := StubBoundingBox.Data[0, 2];
+
+      { calculate CreatureKind }
+      Resource := AllResources.FindId(CreatureKindName);
+      if not (Resource is TCreatureKind) then
+        raise Exception.CreateFmt('Resource "%s" is not a creature, but is referenced in model with Crea prefix',
+          [CreatureKindName]);
+      CreatureKind := TCreatureKind(Resource);
+      if not CreatureKind.Prepared then
+        OnWarning(wtMajor, 'Resource', Format('Creature "%s" is initially present on the level, but was not prepared yet --- which probably means you did not add it to <resources> inside level index.xml file. This causes loading on-demand, which is less comfortable for player.',
+          [CreatureKind.Id]));
+
+      { calculate CreatureDirection }
+      { TODO --- CreatureDirection configurable.
+        Right now, it just points to the player start pos --- this is
+        more-or-less sensible, usually. }
+      CreatureDirection := VectorSubtract(Camera.GetPosition, CreaturePosition);
+      if not CreatureKind.Flying then
+        MakeVectorsOrthoOnTheirPlane(CreatureDirection, GravityUp);
+
+      { make sure that MaxLife is initialized now }
+      if not IsMaxLife then
+      begin
+        IsMaxLife := true;
+        MaxLife := CreatureKind.DefaultMaxLife;
+      end;
+
+      CreatureKind.CreateCreature(Items, CreaturePosition, CreatureDirection, MaxLife);
+    end;
+
+  const
+    CreaturePrefix = 'Crea';
+  begin
+    if IsPrefix(CreaturePrefix, Shape.BlenderMeshName) then
+    begin
+      { For MenuBackground, creature models may be not loaded yet }
+      if not MenuBackground then
+        CreateNewCreature(SEnding(Shape.BlenderMeshName, Length(CreaturePrefix) + 1));
+      { Don't remove BlenderObjectNode now --- will be removed later.
+        This avoids problems with removing nodes while traversing. }
+      ItemsToRemove.Add(Shape.BlenderObjectNode);
+    end;
+  end;
 
   procedure RemoveItemsToRemove;
   var
@@ -509,7 +694,6 @@ var
   Options: TPrepareResourcesOptions;
   NewCameraBox, NewWaterBox: TBox3D;
   SI: TShapeTreeIterator;
-  I: Integer;
 begin
   inherited Create(nil);
 
@@ -543,13 +727,7 @@ begin
     if Player <> nil then
       Items.Add(Player);
 
-    LoadFromDOMElement(Info.Element);
-    { call ChangeLevelScene on TLevelArea created by LoadFromDOMElement }
-    for I := 0 to Items.Count - 1 do
-    begin
-      if Items[I] is TLevelArea then
-        TLevelArea(Items[I]).ChangeLevelScene(MainScene);
-    end;
+    LoadAreas(Info.Element);
 
     InitializeCamera;
 
@@ -630,200 +808,6 @@ begin
   if (Info <> nil) and (Info.Resources <> nil) then
     Info.Resources.Release;
   inherited;
-end;
-
-procedure TGameSceneManager.LoadFromDOMElement(Element: TDOMElement);
-
-  procedure MissingRequiredAttribute(const AttrName, ElementName: string);
-  begin
-    raise Exception.CreateFmt(
-      'Missing required attribute "%s" of <%s> element', [AttrName, ElementName]);
-  end;
-
-  function LevelHintAreaFromDOMElement(Element: TDOMElement): TLevelHintArea;
-  begin
-    Result := TLevelHintArea.Create(Self);
-    Result.Message := DOMGetTextData(Element);
-  end;
-
-  function LevelAreaFromDOMElement(Element: TDOMElement): TLevelArea;
-  var
-    Child: TDOMElement;
-  begin
-    Child := DOMGetOneChildElement(Element);
-    if Child.TagName = 'hint' then
-      Result := LevelHintAreaFromDOMElement(Child) else
-      raise Exception.CreateFmt('Not allowed children element of <area>: "%s"',
-        [Child.TagName]);
-
-    if not DOMGetAttribute(Element, 'id', Result.FId) then
-      MissingRequiredAttribute('id', 'area');
-  end;
-
-  function LevelObjectFromDOMElement(Element: TDOMElement): T3D;
-  begin
-    if Element.TagName = 'area' then
-      Result := LevelAreaFromDOMElement(Element) else
-    if (Element.TagName = 'resources') or
-       (Element.TagName = 'bump_mapping_light') then
-    begin
-      { These are handled elsewhere, and don't produce any T3D. }
-      Result := nil;
-    end else
-      raise Exception.CreateFmt('Not allowed children element of <level>: "%s"',
-        [Element.TagName]);
-  end;
-
-var
-  I: TXMLElementIterator;
-  NewObject: T3D;
-begin
-  { Load Objects }
-  I := TXMLElementIterator.Create(Element);
-  try
-    while I.GetNext do
-    begin
-      NewObject := LevelObjectFromDOMElement(I.Current);
-      if NewObject <> nil then
-        Items.Add(NewObject);
-    end;
-  finally FreeAndNil(I) end;
-end;
-
-procedure TGameSceneManager.TraverseForItems(Shape: TShape);
-
-  procedure CreateNewItem(const ItemNodeName: string);
-  var
-    Resource: T3DResource;
-    ItemKind: TItemKind;
-    IgnoredBegin, ItemQuantityBegin: Integer;
-    ItemKindQuantity, ItemKindId: string;
-    ItemQuantity: Cardinal;
-    ItemStubBoundingBox: TBox3D;
-    ItemPosition: TVector3Single;
-  begin
-    { Calculate ItemKindQuantity }
-    IgnoredBegin := Pos('_', ItemNodeName);
-    if IgnoredBegin = 0 then
-      ItemKindQuantity := ItemNodeName else
-      ItemKindQuantity := Copy(ItemNodeName, 1, IgnoredBegin - 1);
-
-    { Calculate ItemKindId, ItemQuantity }
-    ItemQuantityBegin := CharsPos(['0'..'9'], ItemKindQuantity);
-    if ItemQuantityBegin = 0 then
-    begin
-      ItemKindId := ItemKindQuantity;
-      ItemQuantity := 1;
-    end else
-    begin
-      ItemKindId := Copy(ItemKindQuantity, 1, ItemQuantityBegin - 1);
-      ItemQuantity := StrToInt(SEnding(ItemKindQuantity, ItemQuantityBegin));
-    end;
-
-    Resource := AllResources.FindId(ItemKindId);
-    if not (Resource is TItemKind) then
-      raise Exception.CreateFmt('Resource "%s" is not an item, but is referenced in model with Item prefix',
-        [ItemKindId]);
-    ItemKind := TItemKind(Resource);
-
-    ItemStubBoundingBox := Shape.BoundingBox;
-    ItemPosition[0] := (ItemStubBoundingBox.Data[0, 0] + ItemStubBoundingBox.Data[1, 0]) / 2;
-    ItemPosition[1] := (ItemStubBoundingBox.Data[0, 1] + ItemStubBoundingBox.Data[1, 1]) / 2;
-    ItemPosition[2] := ItemStubBoundingBox.Data[0, 2];
-
-    Items.Add(TItemOnLevel.Create(Self, TItem.Create(ItemKind, ItemQuantity),
-      ItemPosition));
-  end;
-
-const
-  ItemPrefix = 'Item';
-begin
-  if IsPrefix(ItemPrefix, Shape.BlenderMeshName) then
-  begin
-    { For MenuBackground, item models may be not loaded yet }
-    if not MenuBackground then
-      CreateNewItem(SEnding(Shape.BlenderMeshName, Length(ItemPrefix) + 1));
-    { Don't remove BlenderObjectNode now --- will be removed later.
-      This avoids problems with removing nodes while traversing. }
-    ItemsToRemove.Add(Shape.BlenderObjectNode);
-  end;
-end;
-
-procedure TGameSceneManager.TraverseForCreatures(Shape: TShape);
-
-  procedure CreateNewCreature(const CreatureNodeName: string);
-  var
-    StubBoundingBox: TBox3D;
-    CreaturePosition, CreatureDirection: TVector3Single;
-    Resource: T3DResource;
-    CreatureKind: TCreatureKind;
-    CreatureKindName: string;
-    IgnoredBegin: Integer;
-    MaxLifeBegin: Integer;
-    IsMaxLife: boolean;
-    MaxLife: Single;
-  begin
-    { calculate CreatureKindName }
-    IgnoredBegin := Pos('_', CreatureNodeName);
-    if IgnoredBegin = 0 then
-      CreatureKindName := CreatureNodeName else
-      CreatureKindName := Copy(CreatureNodeName, 1, IgnoredBegin - 1);
-
-    { possibly calculate MaxLife by truncating last part of CreatureKindName }
-    MaxLifeBegin := CharsPos(['0'..'9'], CreatureKindName);
-    IsMaxLife := MaxLifeBegin <> 0;
-    if IsMaxLife then
-    begin
-      MaxLife := StrToFloat(SEnding(CreatureKindName, MaxLifeBegin));
-      CreatureKindName := Copy(CreatureKindName, 1, MaxLifeBegin - 1);
-    end;
-
-    { calculate CreaturePosition }
-    StubBoundingBox := Shape.BoundingBox;
-    CreaturePosition[0] := (StubBoundingBox.Data[0, 0] + StubBoundingBox.Data[1, 0]) / 2;
-    CreaturePosition[1] := (StubBoundingBox.Data[0, 1] + StubBoundingBox.Data[1, 1]) / 2;
-    CreaturePosition[2] := StubBoundingBox.Data[0, 2];
-
-    { calculate CreatureKind }
-    Resource := AllResources.FindId(CreatureKindName);
-    if not (Resource is TCreatureKind) then
-      raise Exception.CreateFmt('Resource "%s" is not a creature, but is referenced in model with Crea prefix',
-        [CreatureKindName]);
-    CreatureKind := TCreatureKind(Resource);
-    if not CreatureKind.Prepared then
-      OnWarning(wtMajor, 'Resource', Format('Creature "%s" is initially present on the level, but was not prepared yet --- which probably means you did not add it to <resources> inside level index.xml file. This causes loading on-demand, which is less comfortable for player.',
-        [CreatureKind.Id]));
-
-    { calculate CreatureDirection }
-    { TODO --- CreatureDirection configurable.
-      Right now, it just points to the player start pos --- this is
-      more-or-less sensible, usually. }
-    CreatureDirection := VectorSubtract(Camera.GetPosition, CreaturePosition);
-    if not CreatureKind.Flying then
-      MakeVectorsOrthoOnTheirPlane(CreatureDirection, GravityUp);
-
-    { make sure that MaxLife is initialized now }
-    if not IsMaxLife then
-    begin
-      IsMaxLife := true;
-      MaxLife := CreatureKind.DefaultMaxLife;
-    end;
-
-    CreatureKind.CreateCreature(Items, CreaturePosition, CreatureDirection, MaxLife);
-  end;
-
-const
-  CreaturePrefix = 'Crea';
-begin
-  if IsPrefix(CreaturePrefix, Shape.BlenderMeshName) then
-  begin
-    { For MenuBackground, creature models may be not loaded yet }
-    if not MenuBackground then
-      CreateNewCreature(SEnding(Shape.BlenderMeshName, Length(CreaturePrefix) + 1));
-    { Don't remove BlenderObjectNode now --- will be removed later.
-      This avoids problems with removing nodes while traversing. }
-    ItemsToRemove.Add(Shape.BlenderObjectNode);
-  end;
 end;
 
 procedure TGameSceneManager.InitializeLights(const Lights: TLightInstancesList);
