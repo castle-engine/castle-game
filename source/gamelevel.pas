@@ -46,6 +46,9 @@ type
       because actual TLevel instance also reads some stuff from it. }
     Document: TXMLDocument;
     DocumentBasePath: string;
+    FMusicSound: TSoundType;
+    FSceneDynamicShadows: boolean;
+    FFootstepsSound: TSoundType;
     procedure LoadFromDocument;
   public
     constructor Create;
@@ -87,6 +90,16 @@ type
     Resources: T3DResourceList;
 
     Demo: boolean;
+
+    property MusicSound: TSoundType read FMusicSound write FMusicSound
+      default stNone;
+
+    property FootstepsSound: TSoundType read FFootstepsSound write FFootstepsSound;
+
+    { Do we will render shadow volumes for all scene geometry.
+      This allows the whole level to use dynamic shadows. }
+    property SceneDynamicShadows: boolean
+      read FSceneDynamicShadows write FSceneDynamicShadows default false;
 
     function LoadLevel(const MenuBackground: boolean = false): TGameSceneManager;
   end;
@@ -201,12 +214,7 @@ type
     ItemsToRemove: TX3DNodeList;
 
     FLevel: TLevel;
-
-    FPlayedMusicSound: TSoundType;
-
     FMenuBackground: boolean;
-    FSceneDynamicShadows: boolean;
-
     FInfo: TLevelAvailable;
 
     procedure TraverseForItems(Shape: TShape);
@@ -215,8 +223,6 @@ type
     procedure TraverseForCreatures(Shape: TShape);
     procedure LoadFromDOMElement(Element: TDOMElement);
   protected
-    FFootstepsSound: TSoundType;
-
     procedure RenderFromViewEverything; override;
     procedure InitializeLights(const Lights: TLightInstancesList); override;
     procedure ApplyProjection; override;
@@ -235,21 +241,7 @@ type
     property MoveHorizontalSpeed: Single read FMoveHorizontalSpeed;
     property MoveVerticalSpeed: Single read FMoveVerticalSpeed;
 
-    property PlayedMusicSound: TSoundType
-      read FPlayedMusicSound write FPlayedMusicSound default stNone;
-
-    { This is read from level XML file, stPlayerFootstepsConcrete by default. }
-    property FootstepsSound: TSoundType
-      read FFootstepsSound write FFootstepsSound;
-
     property MenuBackground: boolean read FMenuBackground write FMenuBackground;
-
-    { If @true, we will render dynamic shadows (shadow volumes) for
-      all scene geometry. This allows the whole level to use dynamic
-      shadows. It's normally read from data/levels/index.xml,
-      attribute scene_dynamic_shadows. }
-    property SceneDynamicShadows: boolean
-      read FSceneDynamicShadows write FSceneDynamicShadows default false;
 
     procedure BeforeDraw; override;
 
@@ -599,11 +591,11 @@ begin
     FLevel := Info.LevelClass.Create(Self, Items, MainScene, Info.Element);
     Items.Add(Level);
 
-    MainScene.CastShadowVolumes := SceneDynamicShadows;
+    MainScene.CastShadowVolumes := Info.SceneDynamicShadows;
 
     { calculate Options for PrepareResources }
     Options := [prRender, prBackground, prBoundingBox];
-    if RenderShadowsPossible and SceneDynamicShadows then
+    if RenderShadowsPossible and Info.SceneDynamicShadows then
       Options := Options + prShadowVolume;
 
     MainScene.PrepareResources(Options, false, BaseLights);
@@ -683,7 +675,6 @@ procedure TGameSceneManager.LoadFromDOMElement(Element: TDOMElement);
   end;
 
 var
-  SoundName: string;
   I: TXMLElementIterator;
   NewObject: T3D;
 begin
@@ -697,20 +688,6 @@ begin
         Items.Add(NewObject);
     end;
   finally FreeAndNil(I) end;
-
-  { Load other level properties (that are not read in
-    TLevelAvailable.LoadFromDOMElement) }
-
-  if DOMGetAttribute(Element, 'played_music_sound', SoundName) then
-    PlayedMusicSound := SoundEngine.SoundFromName(SoundName) else
-    PlayedMusicSound := stNone;
-
-  if DOMGetAttribute(Element, 'footsteps_sound', SoundName) then
-    FootstepsSound := SoundEngine.SoundFromName(SoundName) else
-    FootstepsSound := stPlayerFootstepsConcrete;
-
-  FSceneDynamicShadows := false; { default value }
-  DOMGetBooleanAttribute(Element, 'scene_dynamic_shadows', FSceneDynamicShadows);
 end;
 
 procedure TGameSceneManager.TraverseForItems(Shape: TShape);
@@ -1129,6 +1106,7 @@ procedure TLevelAvailable.LoadFromDocument;
 
 var
   LoadingBgFileName: string;
+  SoundName: string;
 begin
   Element := Document.DocumentElement;
 
@@ -1180,6 +1158,17 @@ begin
 
   Resources.LoadResources(Element);
   AddItems(Resources);
+
+  if DOMGetAttribute(Element, 'music_sound', SoundName) then
+    MusicSound := SoundEngine.SoundFromName(SoundName) else
+    MusicSound := stNone;
+
+  if DOMGetAttribute(Element, 'footsteps_sound', SoundName) then
+    FootstepsSound := SoundEngine.SoundFromName(SoundName) else
+    FootstepsSound := stPlayerFootstepsConcrete;
+
+  FSceneDynamicShadows := false; { default value }
+  DOMGetBooleanAttribute(Element, 'scene_dynamic_shadows', FSceneDynamicShadows);
 end;
 
 procedure DrawLoadLevel(Window: TCastleWindowBase);

@@ -8,7 +8,7 @@
   number="3"
   type="Cages"
 
-  played_music_sound="cages_music_with_rain"
+  music_sound="cages_music_with_rain"
   footsteps_sound="player_footsteps_concrete">
 
   <area id="HintOpenDoorBox">

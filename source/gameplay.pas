@@ -351,7 +351,7 @@ begin
 
   Player.LevelChanged;
 
-  SoundEngine.MusicPlayer.PlayedSound := Level.PlayedMusicSound;
+  SoundEngine.MusicPlayer.PlayedSound := Level.Info.MusicSound;
 
   { First Notification for this level. }
   Notifications.Show('Loaded level "' + Level.Info.Title + '"');

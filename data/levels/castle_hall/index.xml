@@ -7,7 +7,7 @@
   number="2"
   type="CastleHall"
 
-  played_music_sound="castle_hall_music"
+  music_sound="castle_hall_music"
   footsteps_sound="player_footsteps_concrete">
 
   <area id="HintButtonBox">

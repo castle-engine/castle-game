@@ -1095,7 +1095,7 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
         GroundRule field. }
       if (GroundRule <> nil) and GroundRule.HasFootstepsSound then
         NewFootstepsSoundPlaying := GroundRule.FootstepsSound else
-        NewFootstepsSoundPlaying := Level.FootstepsSound;
+        NewFootstepsSoundPlaying := Level.Info.FootstepsSound;
     end else
     if LifeTime - ReallyWalkingOnTheGroundTime >
       TimeToChangeFootstepsSoundPlaying then
