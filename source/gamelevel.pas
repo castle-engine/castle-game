@@ -139,7 +139,6 @@ type
 
     FLevel: TLevel;
 
-    FCreatures: TCreatureList;
     FPlayedMusicSound: TSoundType;
     FId: string;
     FSceneFileName: string;
@@ -572,7 +571,6 @@ begin
       finally SysUtils.FreeAndNil(SI) end;
 
       { Initialize Creatures }
-      FCreatures := TCreatureList.Create(true);
       SI := TShapeTreeIterator.Create(MainScene.Shapes, { OnlyActive } true);
       try
         while SI.GetNext do TraverseForCreatures(SI.Current);
@@ -638,7 +636,6 @@ end;
 
 destructor TGameSceneManager.Destroy;
 begin
-  FreeAndNil(FCreatures);
   if FResources <> nil then
   begin
     FResources.Release;
