@@ -130,9 +130,6 @@ type
   private
     FAnimationTime: TFloatTime;
 
-    FSectors: TSceneSectorList;
-    FWaypoints: TSceneWaypointList;
-
     FWaterBox: TBox3D;
     FAboveWaterBox: TBox3D;
 
@@ -256,9 +253,6 @@ type
     { This is the time of the level, in seconds. Time 0 when level is created.
       This is updated in our Idle. }
     property AnimationTime: TFloatTime read FAnimationTime;
-
-    property Sectors: TSceneSectorList read FSectors;
-    property Waypoints: TSceneWaypointList read FWaypoints;
 
     property PlayedMusicSound: TSoundType
       read FPlayedMusicSound write FPlayedMusicSound default stNone;
@@ -487,8 +481,6 @@ constructor TLevel.Create(
     WalkCamera.CancelFallingDown;
   end;
 
-const
-  SectorsMargin = 0.5;
 var
   Options: TPrepareResourcesOptions;
   NewCameraBox: TBox3D;
@@ -579,12 +571,7 @@ begin
       FAboveWaterBox := EmptyBox3D;
     end;
 
-    { calculate Sectors and Waypoints }
-    FSectors := TSceneSectorList.Create(true);
-    FWaypoints := TSceneWaypointList.Create(true);
-    Waypoints.ExtractPositions(MainScene);
-    Sectors.ExtractBoundingBoxes(MainScene);
-    Sectors.LinkToWaypoints(Waypoints, SectorsMargin);
+    CreateSectors(MainScene);
 
     MainScene.CastShadowVolumes := SceneDynamicShadows;
 
@@ -623,8 +610,6 @@ end;
 destructor TLevel.Destroy;
 begin
   FreeAndNil(FThunderEffect);
-  FreeAndNil(FSectors);
-  FreeAndNil(FWaypoints);
   FreeAndNil(FCreatures);
   if FResources <> nil then
   begin

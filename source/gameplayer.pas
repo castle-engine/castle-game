@@ -241,11 +241,6 @@ type
     }
     property Camera: TWalkCamera read FCamera;
 
-    { Return the one of Level.Sectors that contains Camera.Position.
-      Nil if none. Yes, this is just a shortcut for
-      Level.Sectors.SectorWithPoint(Camera.Position). }
-    function PositionSector: TSceneSector;
-
     { This adds Item to Items, with appropriate GameMessage.
       Returns index inside Items to this item (note that this
       may be actually an index to some other TItem instance
@@ -1253,11 +1248,6 @@ end;
 function TPlayer.EquippedWeaponKind: TItemWeaponKind;
 begin
   Result := TItemWeaponKind(EquippedWeapon.Kind);
-end;
-
-function TPlayer.PositionSector: TSceneSector;
-begin
-  Result := Level.Sectors.SectorWithPoint(Camera.Position);
 end;
 
 procedure TPlayer.InputChanged(InputConfiguration: TInputConfiguration);

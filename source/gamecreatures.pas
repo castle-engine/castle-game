@@ -675,11 +675,6 @@ type
 
     function Middle: TVector3Single; override;
 
-    { Return the one of Level.Sectors that contains Middle.
-      Nil if none. Yes, this is just a shortcut for
-      Level.Sectors.SectorWithPoint(Middle). }
-    function MiddleSector: TSceneSector;
-
     { You can set this to @false to force the creature to die without
       making any sound. This is really seldom needed, usefull only to avoid
       a loud shriek noise when you kill many creatures at once.
@@ -1605,11 +1600,6 @@ begin
   inherited;
 end;
 
-function TCreature.MiddleSector: TSceneSector;
-begin
-  Result := Level.Sectors.SectorWithPoint(Middle);
-end;
-
 procedure TCreature.ShortRangeAttackHurt;
 var
   Player: TPlayer;
@@ -2060,7 +2050,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
   var
     DirectionToTarget: TVector3Single;
     AngleRadBetweenDirectionToTarget: Single;
-    MiddleSectorNow: TSceneSector;
+    SectorNow: TSceneSector;
     UseWalkNormal: boolean;
   begin
     if HasAlternativeTarget then
@@ -2149,20 +2139,20 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
 
       UseWalkNormal := true;
 
-      MiddleSectorNow := MiddleSector;
-      if (MiddleSectorNow <> LastSeenPlayerSector) and
-         (MiddleSectorNow <> nil) and
+      SectorNow := Sector;
+      if (SectorNow <> LastSeenPlayerSector) and
+         (SectorNow <> nil) and
          (LastSeenPlayerSector <> nil) then
       begin
         { The way to LastSeenPlayer is using waypoints. }
 
         { Recalculate WaypointsSaved.
-          Note that I recalculate only when MiddleSectorNow or
+          Note that I recalculate only when SectorNow or
           LastSeenPlayerSector changed. }
-        if (MiddleSectorNow <> WaypointsSaved_Begin) or
+        if (SectorNow <> WaypointsSaved_Begin) or
            (LastSeenPlayerSector <> WaypointsSaved_End) then
         begin
-          WaypointsSaved_Begin := MiddleSectorNow;
+          WaypointsSaved_Begin := SectorNow;
           WaypointsSaved_End := LastSeenPlayerSector;
           TSceneSectorList.FindWay(WaypointsSaved_Begin, WaypointsSaved_End,
             WaypointsSaved);
@@ -2264,7 +2254,7 @@ begin
   begin
     HasLastSeenPlayer := true;
     LastSeenPlayer := Player.Position;
-    LastSeenPlayerSector := Player.PositionSector;
+    LastSeenPlayerSector := Player.Sector;
   end;
 
   if HasLastSeenPlayer then
