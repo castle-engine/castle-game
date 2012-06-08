@@ -107,8 +107,7 @@ uses SysUtils, CastleUtils, CastleWindow,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, GameConfig, GameCreatures,
   GameNotifications, GameControlsMenu,
-  GameLevelSpecific, GameLevelAvailable,
-  CastleTimeUtils, GLImages, KeysMouse;
+  GameLevelSpecific, CastleTimeUtils, GLImages, KeysMouse;
 
 var
   GLList_NotificationsBackground: TGLuint;
