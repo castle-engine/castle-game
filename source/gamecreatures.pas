@@ -26,7 +26,7 @@ unit GameCreatures;
 interface
 
 uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, CastleUtils,
-  CastleScene, GameSound, SceneWaypoints,
+  CastleScene, GameSound, SectorsWaypoints,
   GameObjectKinds, ALSoundAllocator, CastleXMLConfig, Base3D,
   XmlSoundEngine, Frustum, X3DNodes, CastleColors, FGL;
 
@@ -740,7 +740,7 @@ type
 
     HasLastSeenPlayer: boolean;
     LastSeenPlayer: TVector3Single;
-    LastSeenPlayerSector: TSceneSector;
+    LastSeenPlayerSector: TSector;
 
     HasAlternativeTarget: boolean;
     AlternativeTarget: TVector3Single;
@@ -753,9 +753,9 @@ type
       AlternativeTarget after some time. }
     AlternativeTargetTime: Single;
 
-    WaypointsSaved_Begin: TSceneSector;
-    WaypointsSaved_End: TSceneSector;
-    WaypointsSaved: TSceneWaypointList;
+    WaypointsSaved_Begin: TSector;
+    WaypointsSaved_End: TSector;
+    WaypointsSaved: TWaypointList;
   protected
     { Set by Idle in this class, may be used by descendants
       in their Idle calls (to not calculate the same thing twice). }
@@ -1668,7 +1668,7 @@ begin
     FStateChangeTime := -1000;
   end;
 
-  WaypointsSaved := TSceneWaypointList.Create(false);
+  WaypointsSaved := TWaypointList.Create(false);
 end;
 
 destructor TWalkAttackCreature.Destroy;
@@ -2050,7 +2050,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
   var
     DirectionToTarget: TVector3Single;
     AngleRadBetweenDirectionToTarget: Single;
-    SectorNow: TSceneSector;
+    SectorNow: TSector;
     UseWalkNormal: boolean;
   begin
     if HasAlternativeTarget then
@@ -2154,7 +2154,7 @@ procedure TWalkAttackCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemov
         begin
           WaypointsSaved_Begin := SectorNow;
           WaypointsSaved_End := LastSeenPlayerSector;
-          TSceneSectorList.FindWay(WaypointsSaved_Begin, WaypointsSaved_End,
+          TSectorList.FindWay(WaypointsSaved_Begin, WaypointsSaved_End,
             WaypointsSaved);
         end;
 

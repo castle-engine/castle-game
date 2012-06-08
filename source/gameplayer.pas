@@ -26,7 +26,7 @@ unit GamePlayer;
 interface
 
 uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
-  SceneWaypoints, GameInputs, ALSoundAllocator, GameSound, GameObjectKinds,
+  GameInputs, ALSoundAllocator, GameSound, GameObjectKinds,
   Triangle, GameTextures, XmlSoundEngine, Classes, Base3D,
   CastleGLUtils, CastleColors;
 

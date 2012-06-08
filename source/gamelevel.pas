@@ -27,7 +27,7 @@ interface
 
 uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
   X3DNodes, X3DFields, GameItems, Cameras,
-  GameCreatures, SceneWaypoints, GameSound,
+  GameCreatures, GameSound,
   CastleUtils, CastleClassUtils, GamePlayer, GameThunder, GameObjectKinds,
   ProgressUnit, PrecalculatedAnimation,
   DOM, XmlSoundEngine, Base3D, Shape,
