@@ -446,7 +446,7 @@ procedure TDebugLevelMenu.Click;
     Dir := Player.Camera.Direction;
     Up := Player.Camera.Up;
 
-    LevelFinished(Level.Id);
+    LevelFinished(Level.Info.Id);
     LevelFinishedFlush;
 
     { Change Player.Camera, they will be automatically set also for Player
@@ -634,8 +634,8 @@ begin
     1: begin
          if MessageYesNo(Window, Format('This will permanently overwrite file "%s". ' +
            'Are you sure you want to save the level file ?',
-           [Level.SceneFileName]), taLeft) then
-           Save3D(Level.MainScene.RootNode, Level.SceneFileName,
+           [Level.Info.SceneFileName]), taLeft) then
+           Save3D(Level.MainScene.RootNode, Level.Info.SceneFileName,
              SaveGenerator, '', xeClassic);
        end;
     2, 3, 4: ;

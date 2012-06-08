@@ -55,15 +55,26 @@ type
     AvailableForNewGame: boolean;
     DefaultAvailableForNewGame: boolean;
 
-    { Class to use when constructing this level. }
+    { Level logic class. }
     LevelClass: TLevelClass;
 
-    { These will be passed to TLevel constructor --- see appropriate TLevel
-      properties for description. }
+    { Unique identifier for this level.
+      Should be a suitable identifier in Pascal.
+      @noAutoLinkHere }
     Id: string;
+
+    { 3D file to load level. }
     SceneFileName: string;
+
+    { Nice name of the level. }
     Title: string;
     TitleHint: string;
+
+    { Level number, shown for the player in the menu.
+      This *does not* determine the order in which levels are played,
+      as levels do not have to be played in linear order.
+      However, they are displayed in menu in linear order, and that's
+      why this is needed. }
     Number: Integer;
 
     LoadingBarYPosition: Single;
@@ -77,7 +88,7 @@ type
 
     Demo: boolean;
 
-    function LoadLevel(MenuBackground: boolean = false): TGameSceneManager;
+    function LoadLevel(const MenuBackground: boolean = false): TGameSceneManager;
   end;
 
   TLevelAvailableList = class(specialize TFPGObjectList<TLevelAvailable>)
@@ -192,16 +203,11 @@ type
     FLevel: TLevel;
 
     FPlayedMusicSound: TSoundType;
-    FId: string;
-    FSceneFileName: string;
-    FTitle: string;
-    FTitleHint: string;
-    FNumber: Integer;
 
     FMenuBackground: boolean;
     FSceneDynamicShadows: boolean;
 
-    FResources: T3DResourceList;
+    FInfo: TLevelAvailable;
 
     procedure TraverseForItems(Shape: TShape);
     procedure SetSickProjection(const Value: boolean);
@@ -216,29 +222,13 @@ type
     procedure ApplyProjection; override;
     procedure PointingDeviceActivateFailed(const Active: boolean); override;
   public
-    { Load level from file, create octrees, prepare for OpenGL etc.
-      This uses ProgressUnit while loading creating octrees,
-      be sure to initialize Progress.UserInterface before calling this. }
-    constructor Create(
-      const AId: string;
-      const ASceneFileName: string;
-      const ATitle: string; const ATitleHint: string; const ANumber: Integer;
-      DOMElement: TDOMElement;
-      AResources: T3DResourceList;
-      AMenuBackground: boolean;
-      LevelClass: TLevelClass); reintroduce; virtual;
+    { Load level from file, create octrees, prepare for OpenGL etc. }
+    constructor Create(const AInfo: TLevelAvailable;
+      const AMenuBackground: boolean); reintroduce; virtual;
 
     destructor Destroy; override;
 
-    { Unique identifier for this level.
-      Should be a suitable identifier in Pascal.
-      @noAutoLinkHere }
-    property Id: string read FId;
-
-    { These will be used in constructor to load level.
-      @groupBegin }
-    property SceneFileName: string read FSceneFileName;
-    { @groupEnd }
+    property Info: TLevelAvailable read FInfo;
 
     { }
     property CameraPreferredHeight: Single read FCameraPreferredHeight;
@@ -251,18 +241,6 @@ type
     { This is read from level XML file, stPlayerFootstepsConcrete by default. }
     property FootstepsSound: TSoundType
       read FFootstepsSound write FFootstepsSound;
-
-    { This is the nice name of the level. }
-    property Title: string read FTitle;
-
-    property TitleHint: string read FTitleHint;
-
-    { This is level number, shown for the player in the menu.
-      This *does not* determine the order in which levels are played,
-      as levels do not have to be played in linear order.
-      However, they are displayed in menu in linear order, and that's
-      why this is needed. }
-    property Number: Integer read FNumber;
 
     property MenuBackground: boolean read FMenuBackground write FMenuBackground;
 
@@ -457,14 +435,8 @@ end;
 
 { TGameSceneManager --------------------------------------------------------------------- }
 
-constructor TGameSceneManager.Create(
-  const AId: string;
-  const ASceneFileName: string;
-  const ATitle: string; const ATitleHint: string; const ANumber: Integer;
-  DOMElement: TDOMElement;
-  AResources: T3DResourceList;
-  AMenuBackground: boolean;
-  LevelClass: TLevelClass);
+constructor TGameSceneManager.Create(const AInfo: TLevelAvailable;
+  const AMenuBackground: boolean);
 
   procedure RemoveItemsToRemove;
   var
@@ -555,21 +527,15 @@ begin
   ApproximateActivation := true;
   Input_PointingDeviceActivate.Assign(CastleInput_Interact.Shortcut, false);
 
-  FId := AId;
-  FSceneFileName := ASceneFileName;
-  FTitle := ATitle;
-  FTitleHint := ATitleHint;
-  FNumber := ANumber;
   FMenuBackground := AMenuBackground;
-  FResources := T3DResourceList.Create(false);
-  FResources.Assign(AResources);
 
-  FResources.Prepare(BaseLights);
+  FInfo := AInfo;
+  Info.Resources.Prepare(BaseLights);
 
-  Progress.Init(1, 'Loading level "' + Title + '"');
+  Progress.Init(1, 'Loading level "' + Info.Title + '"');
   try
     MainScene := TCastleScene.CreateCustomCache(Self, GLContextCache);
-    MainScene.Load(SceneFileName);
+    MainScene.Load(Info.SceneFileName);
 
     AttributesSet(MainScene.Attributes);
     MainScene.Attributes.UseSceneLights := true;
@@ -585,7 +551,7 @@ begin
     if Player <> nil then
       Items.Add(Player);
 
-    LoadFromDOMElement(DOMElement);
+    LoadFromDOMElement(Info.Element);
     { call ChangeLevelScene on TLevelArea created by LoadFromDOMElement }
     for I := 0 to Items.Count - 1 do
     begin
@@ -630,7 +596,7 @@ begin
       (some TLevel descendant constructors depend on this),
       but still before preparing resources like octrees (because we still
       may want to modify MainScene inside Level constructor). }
-    FLevel := LevelClass.Create(Self, Items, MainScene, DOMElement);
+    FLevel := Info.LevelClass.Create(Self, Items, MainScene, Info.Element);
     Items.Add(Level);
 
     MainScene.CastShadowVolumes := SceneDynamicShadows;
@@ -669,11 +635,8 @@ end;
 
 destructor TGameSceneManager.Destroy;
 begin
-  if FResources <> nil then
-  begin
-    FResources.Release;
-    FreeAndNil(FResources);
-  end;
+  if (Info <> nil) and (Info.Resources <> nil) then
+    Info.Resources.Release;
   inherited;
 end;
 
@@ -1230,13 +1193,11 @@ begin
   glPopAttrib;
 end;
 
-function TLevelAvailable.LoadLevel(MenuBackground: boolean): TGameSceneManager;
+function TLevelAvailable.LoadLevel(const MenuBackground: boolean): TGameSceneManager;
 
   procedure LoadLevelCore;
   begin
-    Result := TGameSceneManager.Create(Id, SceneFileName,
-      Title, TitleHint, Number, Element, Resources,
-      MenuBackground, LevelClass);
+    Result := TGameSceneManager.Create(Self, MenuBackground);
     if not MenuBackground then
       AvailableForNewGame := true;
   end;

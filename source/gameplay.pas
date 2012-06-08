@@ -354,7 +354,7 @@ begin
   SoundEngine.MusicPlayer.PlayedSound := Level.PlayedMusicSound;
 
   { First Notification for this level. }
-  Notifications.Show('Loaded level "' + Level.Title + '"');
+  Notifications.Show('Loaded level "' + Level.Info.Title + '"');
 end;
 
 procedure Idle(Window: TCastleWindowBase);
@@ -733,7 +733,7 @@ procedure EventDown(AKey: TKey;
       TCastleSceneManager.Input_PointingDeviceActivate is equal to interact key. }
     if GameWin or Player.Dead then
     begin
-      GameEndedWantsRestart := Level.Id;
+      GameEndedWantsRestart := Level.Info.Id;
       GameEnded := true;
     end;
   end;
