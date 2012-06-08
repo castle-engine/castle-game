@@ -105,7 +105,7 @@ uses SysUtils, CastleUtils, CastleWindow,
   BFNT_BitstreamVeraSans_Unit, UIControls,
   GameItems, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
-  GameVideoOptions, GameConfig,
+  GameVideoOptions, GameConfig, GameCreatures,
   GameNotifications, GameControlsMenu,
   GameLevelSpecific, GameLevelAvailable,
   CastleTimeUtils, GLImages, KeysMouse;
@@ -907,6 +907,11 @@ begin
   SoundEngine.Sound(stSaveScreen);
 end;
 
+function GameCreatureExists: boolean;
+begin
+  Result := not GameWin;
+end;
+
 { initialization / finalization ---------------------------------------------- }
 
 procedure WindowOpen(Window: TCastleWindowBase);
@@ -972,4 +977,5 @@ initialization
   ShowDebugInfo := false;
   Window.OnOpenList.Add(@WindowOpen);
   Window.OnCloseList.Add(@WindowClose);
+  OnCreatureExists := @GameCreatureExists;
 end.

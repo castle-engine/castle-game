@@ -896,10 +896,16 @@ var
 
 procedure CreaturesKindsInit;
 
+type
+  TExistsEvent = function: boolean;
+var
+  { Global callback to control creatures existence. }
+  OnCreatureExists: TExistsEvent;
+
 implementation
 
 uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow,
-  CastleFilesUtils, CastleGLUtils, ProgressUnit, GamePlay,
+  CastleFilesUtils, CastleGLUtils, ProgressUnit,
   GameVideoOptions, GameNotifications, GamePlayer;
 
 var
@@ -1303,7 +1309,8 @@ end;
 
 function TCreature.GetExists: boolean;
 begin
-  Result := (inherited GetExists) and (not GameWin) and (DisableCreatures = 0);
+  Result := (inherited GetExists) and (DisableCreatures = 0) and
+    ((not Assigned(OnCreatureExists)) or OnCreatureExists());
 end;
 
 destructor TCreature.Destroy;
