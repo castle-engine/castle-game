@@ -253,14 +253,6 @@ type
 
     FBossCreature: TCreature;
 
-    { Called before initializing
-      our octrees. Even before initializing creatures and items.
-
-      You can override this to do here some operations
-      that change the MainScene (e.g. you can do here tricks like
-      extracting some specific objects using MainScene.RemoveBoxNode). }
-    procedure ChangeLevelScene(MainScene: TLevelScene); virtual;
-
     { Load TCastlePrecalculatedAnimation from *.kanim file, doing common tasks.
       @unorderedList(
         @item sets Attributes according to AnimationAttributesSet
@@ -295,7 +287,11 @@ type
     function LoadLevelScene(const FileName: string;
       CreateOctreeCollisions, PrepareBackground: boolean): TCastleScene;
   public
-    constructor Create(AOwner: TComponent; AWorld: T3DWorld; DOMElement: TDOMElement); reintroduce; virtual;
+    { Create new level instance. Called when creatures and hints are already
+      initialized. But before creating resources like octrees,
+      so you can modify MainScene contents. }
+    constructor Create(AOwner: TComponent; AWorld: T3DWorld;
+      MainScene: TLevelScene; DOMElement: TDOMElement); reintroduce; virtual;
     destructor Destroy; override;
     function BoundingBox: TBox3D; override;
 
@@ -602,9 +598,8 @@ begin
     { create Level after creatures and hint areas are initialized
       (some TLevel descendant constructors depend on this),
       but still before preparing resources like octrees (because we still
-      need to call Level.ChangeLevelScene that may change 3D scene). }
-    FLevel := LevelClass.Create(Self, Items, DOMElement);
-    Level.ChangeLevelScene(MainLevelScene);
+      may want to modify MainScene inside Level constructor). }
+    FLevel := LevelClass.Create(Self, Items, MainLevelScene, DOMElement);
     Items.Add(Level);
 
     MainScene.CastShadowVolumes := SceneDynamicShadows;
@@ -957,7 +952,8 @@ end;
 
 { TLevel ---------------------------------------------------------------- }
 
-constructor TLevel.Create(AOwner: TComponent; AWorld: T3DWorld; DOMElement: TDOMElement);
+constructor TLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
+  MainScene: TLevelScene; DOMElement: TDOMElement);
 begin
   inherited Create(AOwner);
   SceneManager := AOwner as TGameSceneManager;
@@ -1075,10 +1071,6 @@ begin
   FAnimationTime += CompSpeed;
   if ThunderEffect <> nil then
     ThunderEffect.Idle(CompSpeed);
-end;
-
-procedure TLevel.ChangeLevelScene(MainScene: TLevelScene);
-begin
 end;
 
 function TLevel.Background: TBackground;
