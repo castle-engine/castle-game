@@ -23,7 +23,7 @@
 { Background stuff displayed under the start menu.
 
   To allow a wide range of 2D and 3D effects, we simply initialize here
-  a full castle level instance in BackgroundLevel. This level may be animated,
+  a full castle level. This level may be animated,
   it can even have some interactive stuff (like touch sensors etc.,
   although not used now).
   So we can make this background level to really show off some features
@@ -42,7 +42,7 @@
   but different. GamePlay unit has global Player and Level instances.
   This unit doesn't use them (so it's a design decision that this
   unit @italic(doesn't use GamePlay unit (even in the implementation))).
-  This unit has own BackgroundLevel instance (and no player, articial
+  This unit has own TGameSceneManager instance (and no player, articial
   camera is created by BackgroundCreate).
 }
 unit GameBackgroundLevel;
@@ -124,24 +124,25 @@ const
   MenuBackgroundLevelId = 'gate_background';
 var
   BackgroundCaptions: TUIControl;
-  BackgroundLevel: TGameSceneManager;
+  BackgroundSceneManager: TGameSceneManager;
 begin
   BackgroundControls := TUIControlList.Create(true);
 
-  { initialize BackgroundLevel }
-  BackgroundLevel := LevelsAvailable.FindId(MenuBackgroundLevelId).
-    LoadLevel(true);
-  BackgroundControls.Add(BackgroundLevel);
+  { initialize BackgroundSceneManager }
+  BackgroundSceneManager := TGameSceneManager.Create(nil);
+  LevelsAvailable.FindId(MenuBackgroundLevelId).LoadLevel(BackgroundSceneManager, true);
+  BackgroundControls.Add(BackgroundSceneManager);
 
+  { TODO: not needed? }
   { create BackgroundLevel.Camera now, for next assignment }
-  BackgroundLevel.Camera := BackgroundLevel.CreateDefaultCamera;
+  BackgroundSceneManager.Camera := BackgroundSceneManager.CreateDefaultCamera;
 
   { Do not allow to move the camera in any way.
     We should also disable any other interaction with the scene,
     in case in the future TLevel will enable ProcessEvents and some animation
     through it --- but we can also depend that background level will not
     have any TouchSensors, KeySensors etc. }
-  BackgroundLevel.Camera.Input := [];
+  BackgroundSceneManager.Camera.Input := [];
 
   BackgroundCaptions := TBackgroundCaptions.Create(nil);
   BackgroundControls.Add(BackgroundCaptions);

@@ -221,7 +221,7 @@ procedure TDebugMenu.Click;
       if Resource.UsageCount = 0 then
         MessageOK(Window, Format('Resource "%s" is not used by anything, ' +
           'cannot reload',  [Resource.Id])) else
-        Resource.RedoPrepare(Level.BaseLights);
+        Resource.RedoPrepare(SceneManager.BaseLights);
     end;
   end;
 
@@ -352,10 +352,10 @@ procedure TDebugCreaturesMenu.Click;
     I: Integer;
     C: TCreature;
   begin
-    for I := 0 to Level.Items.Count - 1 do
-      if Level.Items[I] is TCreature then
+    for I := 0 to SceneManager.Items.Count - 1 do
+      if SceneManager.Items[I] is TCreature then
       begin
-        C := TCreature(Level.Items[I]);
+        C := TCreature(SceneManager.Items[I]);
         if (C.Life > 0) and (IncludeStill or (not (C is TStillCreature))) then
         begin
           C.SoundDyingEnabled := false;
@@ -370,7 +370,7 @@ procedure TDebugCreaturesMenu.Click;
   begin
     if ChooseResource(Kind, true) then
     begin
-      (Kind as TCreatureKind).CreateCreature(Level.Items,
+      (Kind as TCreatureKind).CreateCreature(SceneManager.Items,
         Player.Position + Player.Direction * DirectionAttenuation,
         Player.Direction);
 
@@ -432,7 +432,7 @@ procedure TDebugLevelMenu.Click;
           his first weapon) could be done before loading level progress,
           which sounds awkward for player. }
         LevelFinishedFlush;
-        Level.Level.PrepareNewPlayer(Player);
+        SceneManager.Level.PrepareNewPlayer(Player);
         UserQuit := true;
       end;
     finally S.Free end;
@@ -446,7 +446,7 @@ procedure TDebugLevelMenu.Click;
     Dir := Player.Camera.Direction;
     Up := Player.Camera.Up;
 
-    LevelFinished(Level.Info.Id);
+    LevelFinished(SceneManager.Info.Id);
     LevelFinishedFlush;
 
     { Change Player.Camera, they will be automatically set also for Player
@@ -602,9 +602,9 @@ begin
   AmbientColorSlider[1] := TMenuFloatSlider.Create(0, 1, GlobalAmbientLight[1]);
   AmbientColorSlider[2] := TMenuFloatSlider.Create(0, 1, GlobalAmbientLight[2]);
 
-  for I := 0 to Level.MainScene.GlobalLights.Count - 1 do
+  for I := 0 to SceneManager.MainScene.GlobalLights.Count - 1 do
   begin
-    LightNode := Level.MainScene.GlobalLights.Items[I].Node;
+    LightNode := SceneManager.MainScene.GlobalLights.Items[I].Node;
     Items.Add(Format('Edit %d: %s "%s"',
       [I, LightNode.NodeTypeName, LightNode.NodeName]));
   end;
@@ -623,10 +623,10 @@ const
 var
   H: TLightInstance;
 begin
-  case CurrentItem - Level.MainScene.GlobalLights.Count of
+  case CurrentItem - SceneManager.MainScene.GlobalLights.Count of
     0: begin
          if StdOutStream <> nil then
-           Save3D(Level.MainScene.RootNode, StdOutStream,
+           Save3D(SceneManager.MainScene.RootNode, StdOutStream,
              SaveGenerator, '', xeClassic) else
            MessageOK(Window, 'No stdout available. On Windows you must run the game ' +
              'from the command-line to get stdout.', taLeft);
@@ -634,13 +634,13 @@ begin
     1: begin
          if MessageYesNo(Window, Format('This will permanently overwrite file "%s". ' +
            'Are you sure you want to save the level file ?',
-           [Level.Info.SceneFileName]), taLeft) then
-           Save3D(Level.MainScene.RootNode, Level.Info.SceneFileName,
+           [SceneManager.Info.SceneFileName]), taLeft) then
+           Save3D(SceneManager.MainScene.RootNode, SceneManager.Info.SceneFileName,
              SaveGenerator, '', xeClassic);
        end;
     2, 3, 4: ;
     5: begin
-         if Level.HeadlightInstance(H) then
+         if SceneManager.HeadlightInstance(H) then
          begin
            FreeAndNil(EditHeadlightMenu);
            EditHeadlightMenu := TEditHeadlightMenu.Create(Application, H.Node);
@@ -654,7 +654,7 @@ begin
        begin
          FreeAndNil(EditOneLightMenu);
          EditOneLightMenu := TEditOneLightMenu.Create(nil,
-           Level.MainScene.GlobalLights.Items[CurrentItem].Node);
+           SceneManager.MainScene.GlobalLights.Items[CurrentItem].Node);
          SetCurrentMenu(CurrentMenu, EditOneLightMenu);
        end;
   end;
@@ -662,7 +662,7 @@ end;
 
 procedure TEditLevelLightsMenu.AccessoryValueChanged;
 begin
-  case CurrentItem - Level.MainScene.GlobalLights.Count of
+  case CurrentItem - SceneManager.MainScene.GlobalLights.Count of
     2: GlobalAmbientLight[0] := AmbientColorSlider[0].Value;
     3: GlobalAmbientLight[1] := AmbientColorSlider[1].Value;
     4: GlobalAmbientLight[2] := AmbientColorSlider[2].Value;
@@ -686,11 +686,11 @@ begin
 
   Light := ALight;
 
-  LevelBoxSizes := Level.CameraBox.Sizes;
+  LevelBoxSizes := SceneManager.CameraBox.Sizes;
   for I := 0 to 2 do
     PositionSlider[I] := TMenuFloatSlider.Create(
-      Level.CameraBox.Data[0, I] - LevelBoxSizes[I],
-      Level.CameraBox.Data[1, I] + LevelBoxSizes[I],
+      SceneManager.CameraBox.Data[0, I] - LevelBoxSizes[I],
+      SceneManager.CameraBox.Data[1, I] + LevelBoxSizes[I],
       LightLocation[I]);
 
   RedColorSlider := TMenuFloatSlider.Create(0, 1, Light.FdColor.Value[0]);

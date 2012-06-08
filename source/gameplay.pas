@@ -48,10 +48,10 @@ var
     @noAutoLinkHere }
   Player: TPlayer;
 
-  { Currently used level by PlayGame. nil if PlayGame doesn't work
+  { Currently used scene manager by PlayGame. nil if PlayGame doesn't work
     right now.
     @noAutoLinkHere }
-  Level: TGameSceneManager;
+  SceneManager: TGameSceneManager;
 
 { If NextLevel = '', then end the game,
   else free current Level and set Level to NextLevel.
@@ -260,7 +260,7 @@ procedure TGame2DControls.Draw;
     Font_BFNT_BitstreamVeraSans.Print(
       Format('FPS : %f (real : %f). Shapes : %d / %d',
         [DisplayFpsFrameTime, DisplayFpsRealTime,
-         Level.Statistics.ShapesRendered, Level.Statistics.ShapesVisible]));
+         SceneManager.Statistics.ShapesRendered, SceneManager.Statistics.ShapesVisible]));
   end;
 
   procedure DoShowShadowVolumesCounts;
@@ -271,11 +271,11 @@ procedure TGame2DControls.Draw;
       RasterPosLine(LineShadowVolumesCounts);
       Font_BFNT_BitstreamVeraSans.Print(Format(
         'No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
-        [ Level.ShadowVolumeRenderer.CountShadowsNotVisible,
-          Level.ShadowVolumeRenderer.CountZPass,
-          Level.ShadowVolumeRenderer.CountZFailNoLightCap,
-          Level.ShadowVolumeRenderer.CountZFailAndLightCap,
-          Level.ShadowVolumeRenderer.CountScenes ]));
+        [ SceneManager.ShadowVolumeRenderer.CountShadowsNotVisible,
+          SceneManager.ShadowVolumeRenderer.CountZPass,
+          SceneManager.ShadowVolumeRenderer.CountZFailNoLightCap,
+          SceneManager.ShadowVolumeRenderer.CountZFailAndLightCap,
+          SceneManager.ShadowVolumeRenderer.CountScenes ]));
     end;
   end;
 
@@ -351,10 +351,10 @@ begin
 
   Player.LevelChanged;
 
-  SoundEngine.MusicPlayer.PlayedSound := Level.Info.MusicSound;
+  SoundEngine.MusicPlayer.PlayedSound := SceneManager.Info.MusicSound;
 
   { First Notification for this level. }
-  Notifications.Show('Loaded level "' + Level.Info.Title + '"');
+  Notifications.Show('Loaded level "' + SceneManager.Info.Title + '"');
 end;
 
 procedure Idle(Window: TCastleWindowBase);
@@ -366,15 +366,15 @@ const
 var
   Cages: TCagesLevel;
 begin
-  Level.SickProjection := Player.Swimming = psUnderWater;
-  if Level.SickProjection then
-    Level.SickProjectionSpeed := Player.SickProjectionSpeed;
+  SceneManager.SickProjection := Player.Swimming = psUnderWater;
+  if SceneManager.SickProjection then
+    SceneManager.SickProjectionSpeed := Player.SickProjectionSpeed;
 
   LevelFinishedFlush;
 
-  if GameWin and (Level.Level is TCagesLevel) then
+  if GameWin and (SceneManager.Level is TCagesLevel) then
   begin
-    Cages := TCagesLevel(Level.Level);
+    Cages := TCagesLevel(SceneManager.Level);
     case Cages.GameWinAnimation of
       gwaNone:
         begin
@@ -398,7 +398,6 @@ end;
 
 procedure LevelFinishedFlush;
 var
-  NewLevel: TGameSceneManager;
   GameControlsPos, WindowControlsPos: Integer;
 begin
   if LevelFinishedSchedule then
@@ -411,45 +410,31 @@ begin
       and you should not keep the same T3D (Player) and TCamera (Player.Camera)
       within different scene managers --- it would cause troubles with
       connecting callbacks to Camera, and Player.Parent. }
-    Level.Camera := nil;
-    Level.Player := nil;
-    Level.Items.Remove(Player);
+    SceneManager.Camera := nil;
+    SceneManager.Player := nil;
+    SceneManager.Items.Remove(Player);
 
+    { TODO: simplify this for persistent scene manager }
     { We cannot draw old level now, since it's Camera is nil,
       and TLevel.ApplyProjection is not prepared for this.
       So remove it from controls (otherwise progress bar when loading new level
       would want to draw it). }
-    GameControlsPos := GameControls.IndexOf(Level);
+    GameControlsPos := GameControls.IndexOf(SceneManager);
     if GameControlsPos <> -1 then
       GameControls.Delete(GameControlsPos) else
       GameControlsPos := GameControls.Count;
-    WindowControlsPos := Window.Controls.IndexOf(Level);
+    WindowControlsPos := Window.Controls.IndexOf(SceneManager);
     if WindowControlsPos <> -1 then
       Window.Controls.Delete(WindowControlsPos) else
       WindowControlsPos := Window.Controls.Count;
 
-    NewLevel := LevelsAvailable.FindId(LevelFinishedNextLevelId).LoadLevel;
+    LevelsAvailable.FindId(LevelFinishedNextLevelId).LoadLevel(SceneManager);
 
-    { copy DisableContextOpenClose value to new level.
-      This is needed when it's called from inside debug menu,
-      to make Window.Controls.Begin/EndDisableContextOpenClose
-      matching. }
-    // TODO: should not be needed with persisting SceneManager
-    NewLevel.DisableContextOpenClose := Level.DisableContextOpenClose;
-
-    { initialize NewLevel.GLContextOpen already, in case this is called
-      from inside debug menu (where explicit GLContextOpen may be disabled). }
-      // TODO: should not be needed with persisting SceneManager?? rather some other preparation do
-    NewLevel.GLContextOpen;
-
+    { TODO: simplify this for persistent scene manager }
     { right before freeing old Level, insert NewLevel at the same place
       in GameControls and Window.Controls as Level was. }
-    GameControls.Insert(GameControlsPos, NewLevel);
-    Window.Controls.Insert(WindowControlsPos, NewLevel);
-
-    { After NewLevel is initialized, we quickly change Level variable. }
-    FreeAndNil(Level);
-    Level := NewLevel;
+    GameControls.Insert(GameControlsPos, SceneManager);
+    Window.Controls.Insert(WindowControlsPos, SceneManager);
 
     InitNewLevel;
   end;
@@ -576,7 +561,7 @@ procedure EventDown(AKey: TKey;
         could get *partially* stuck within the wall, which wouldn't
         look good. }
 
-      Result := Level.Items.WorldMoveAllowed(
+      Result := SceneManager.Items.WorldMoveAllowed(
         VectorAdd(Player.Camera.Position, ItemBoxMiddle),
         VectorAdd(DropPosition, ItemBoxMiddle),
         true, ItemBoxRadius,
@@ -609,7 +594,7 @@ procedure EventDown(AKey: TKey;
         if DropppedItem <> nil then
         begin
           UpdateInventoryCurrentItemAfterDelete;
-          Level.Items.Add(TItemOnLevel.Create(Level, DropppedItem, DropPosition));
+          SceneManager.Items.Add(TItemOnLevel.Create(SceneManager, DropppedItem, DropPosition));
         end;
       end else
         Notifications.Show('Not enough room here to drop this item');
@@ -719,9 +704,9 @@ procedure EventDown(AKey: TKey;
     Window.Controls.BeginDisableContextOpenClose;
     Window.Controls.Clear;
 
-    Level.Paused := true;
+    SceneManager.Paused := true;
     ShowDebugMenu(GameControls);
-    Level.Paused := false;
+    SceneManager.Paused := false;
 
     Window.Controls.AddList(GameControls);
     Window.Controls.EndDisableContextOpenClose;
@@ -733,7 +718,7 @@ procedure EventDown(AKey: TKey;
       TCastleSceneManager.Input_PointingDeviceActivate is equal to interact key. }
     if GameWin or Player.Dead then
     begin
-      GameEndedWantsRestart := Level.Info.Id;
+      GameEndedWantsRestart := SceneManager.Info.Id;
       GameEnded := true;
     end;
   end;
@@ -795,9 +780,9 @@ begin
     if Player.Dead or GameWin then
       GameCancel(false) else
     begin
-      Level.Paused := true;
+      SceneManager.Paused := true;
       ShowGameMenu(GameControls);
-      Level.Paused := false;
+      SceneManager.Paused := false;
     end;
   end;
 end;
@@ -850,7 +835,7 @@ begin
     Window.OnDrawStyle := ds3D;
 
     C2D := TGame2DControls.Create(nil);
-    GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, Level]);
+    GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, SceneManager]);
 
     Window.Controls.AddList(GameControls);
 
@@ -864,14 +849,14 @@ begin
     MessagesTheme.RectColor[3] := 0.4;
 
     if PrepareNewPlayer then
-      Level.Level.PrepareNewPlayer(Player);
+      SceneManager.Level.PrepareNewPlayer(Player);
 
     repeat
       Application.ProcessMessage(true, true);
     until GameEnded;
   finally
     { Clear some Player.Camera callbacks. }
-    Level.OnCameraChanged := nil;
+    SceneManager.OnCameraChanged := nil;
 
     FreeAndNil(GameControls);
     FreeAndNil(C2D);

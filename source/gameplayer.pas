@@ -688,8 +688,8 @@ var
 begin
   RenderLifeIndicator(Life, MaxLife, GLList_RedIndicatorImage, 0, true);
 
-  BossCreatureIndicator := Level.Level.BossCreatureIndicator(
-    BossCreatureLife, BossCreatureMaxLife);
+  BossCreatureIndicator := (SceneManager.Level <> nil) and
+    SceneManager.Level.BossCreatureIndicator(BossCreatureLife, BossCreatureMaxLife);
   if BossCreatureIndicator then
   begin
     RenderLifeIndicator(
@@ -751,11 +751,11 @@ var
   LevelMoveVerticalSpeed: Single;
   LevelCameraPreferredHeight: Single;
 begin
-  if Level <> nil then
+  if SceneManager <> nil then
   begin
-    LevelMoveHorizontalSpeed := Level.MoveHorizontalSpeed;
-    LevelMoveVerticalSpeed := Level.MoveVerticalSpeed;
-    LevelCameraPreferredHeight := Level.CameraPreferredHeight;
+    LevelMoveHorizontalSpeed := SceneManager.MoveHorizontalSpeed;
+    LevelMoveVerticalSpeed := SceneManager.MoveVerticalSpeed;
+    LevelCameraPreferredHeight := SceneManager.CameraPreferredHeight;
   end else
   begin
     { This must work even when Level = nil. So we secure ourselves here,
@@ -822,8 +822,8 @@ begin
     Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
     Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
 
-    if Level <> nil then
-      Level.Input_PointingDeviceActivate.MakeClear;
+    if SceneManager <> nil then
+      SceneManager.Input_PointingDeviceActivate.MakeClear;
   end else
   if Dead then
   begin
@@ -850,8 +850,8 @@ begin
     Camera.MoveHorizontalSpeed := LevelMoveHorizontalSpeed;
     Camera.MoveVerticalSpeed := LevelMoveVerticalSpeed;
 
-    if Level <> nil then
-      Level.Input_PointingDeviceActivate.MakeClear;
+    if SceneManager <> nil then
+      SceneManager.Input_PointingDeviceActivate.MakeClear;
   end else
   begin
     if FlyingMode then
@@ -914,8 +914,8 @@ begin
     Camera.Input_LeftStrafe.Assign(CastleInput_LeftStrafe.Shortcut, false);
     Camera.Input_RightStrafe.Assign(CastleInput_RightStrafe.Shortcut, false);
 
-    if Level <> nil then
-      Level.Input_PointingDeviceActivate.Assign(CastleInput_Interact.Shortcut, false);
+    if SceneManager <> nil then
+      SceneManager.Input_PointingDeviceActivate.Assign(CastleInput_Interact.Shortcut, false);
   end;
 end;
 
@@ -1012,7 +1012,7 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       TimeToChangeFootstepsSoundPlaying, see UpdateFootstepsSoundPlaying. }
     TimeToChangeIsOnTheGround = 0.5;
   begin
-    if Level = nil then
+    if SceneManager = nil then
     begin
       GroundRule := nil;
       IsOnTheGround := false;
@@ -1085,7 +1085,7 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       for at least TimeToChangeFootstepsSoundPlaying seconds. }
 
     { calculate NewFootstepsSoundPlaying }
-    if Level = nil then
+    if SceneManager = nil then
       NewFootstepsSoundPlaying := stNone else
     if Camera.IsWalkingOnTheGround then
     begin
@@ -1095,7 +1095,7 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
         GroundRule field. }
       if (GroundRule <> nil) and GroundRule.HasFootstepsSound then
         NewFootstepsSoundPlaying := GroundRule.FootstepsSound else
-        NewFootstepsSoundPlaying := Level.Info.FootstepsSound;
+        NewFootstepsSoundPlaying := SceneManager.Info.FootstepsSound;
     end else
     if LifeTime - ReallyWalkingOnTheGroundTime >
       TimeToChangeFootstepsSoundPlaying then

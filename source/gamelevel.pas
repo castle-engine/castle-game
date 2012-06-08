@@ -101,7 +101,8 @@ type
     property SceneDynamicShadows: boolean
       read FSceneDynamicShadows write FSceneDynamicShadows default false;
 
-    function LoadLevel(const MenuBackground: boolean = false): TGameSceneManager;
+    procedure LoadLevel(const SceneManager: TGameSceneManager;
+      const MenuBackground: boolean = false);
   end;
 
   TLevelAvailableList = class(specialize TFPGObjectList<TLevelAvailable>)
@@ -209,16 +210,16 @@ type
 
     procedure SetSickProjection(const Value: boolean);
     procedure SetSickProjectionSpeed(const Value: TFloatTime);
+
+    { Load level from file, create octrees, prepare for OpenGL etc. }
+    procedure LoadLevel(const AInfo: TLevelAvailable;
+      const AMenuBackground: boolean);
   protected
     procedure RenderFromViewEverything; override;
     procedure InitializeLights(const Lights: TLightInstancesList); override;
     procedure ApplyProjection; override;
     procedure PointingDeviceActivateFailed(const Active: boolean); override;
   public
-    { Load level from file, create octrees, prepare for OpenGL etc. }
-    constructor Create(const AInfo: TLevelAvailable;
-      const AMenuBackground: boolean); reintroduce; virtual;
-
     destructor Destroy; override;
 
     property Info: TLevelAvailable read FInfo;
@@ -414,7 +415,7 @@ end;
 
 { TGameSceneManager --------------------------------------------------------------------- }
 
-constructor TGameSceneManager.Create(const AInfo: TLevelAvailable;
+procedure TGameSceneManager.LoadLevel(const AInfo: TLevelAvailable;
   const AMenuBackground: boolean);
 var
   { Sometimes it's not comfortable
@@ -694,8 +695,15 @@ var
   Options: TPrepareResourcesOptions;
   NewCameraBox, NewWaterBox: TBox3D;
   SI: TShapeTreeIterator;
+  PreviousResources: T3DResourceList;
 begin
-  inherited Create(nil);
+  { release stuff from previous level. Our items must be clean.
+    This releases previous Level (logic), MainScene, our areas added in LoadAreas,
+    and our creatures and items --- the ones added in TraverseForCreatures/Items,
+    but also the ones created dynamically (when creature is added to scene manager,
+    e.g. because player/creature shoots a missile, or when player drops an item). }
+  while Items.Count <> 0 do Items[0].Free;
+  FLevel := nil; { it's freed now }
 
   Player := GamePlay.Player;
 
@@ -705,8 +713,19 @@ begin
 
   FMenuBackground := AMenuBackground;
 
+  { save PreviousResources, before Info is overridden with new level.
+    This allows us to keep PreviousResources while new resources are required,
+    and this means that resources already loaded for previous level
+    don't need to be reloaded for new. }
+  PreviousResources := T3DResourceList.Create(false);
+  if (Info <> nil) then
+    PreviousResources.Assign(Info.Resources);
+
   FInfo := AInfo;
   Info.Resources.Prepare(BaseLights);
+
+  PreviousResources.Release;
+  FreeAndNil(PreviousResources);
 
   Progress.Init(1, 'Loading level "' + Info.Title + '"');
   try
@@ -1166,11 +1185,12 @@ begin
   glPopAttrib;
 end;
 
-function TLevelAvailable.LoadLevel(const MenuBackground: boolean): TGameSceneManager;
+procedure TLevelAvailable.LoadLevel(const SceneManager: TGameSceneManager;
+  const MenuBackground: boolean);
 
   procedure LoadLevelCore;
   begin
-    Result := TGameSceneManager.Create(Self, MenuBackground);
+    SceneManager.LoadLevel(Self, MenuBackground);
     if not MenuBackground then
       AvailableForNewGame := true;
   end;
@@ -1197,11 +1217,8 @@ begin
       @DrawLoadLevel, @Resize2D, @NoClose);
     try
       Window.UserData := Self;
-
       Window.OnDrawStyle := ds3D;
-
       Window.EventResize;
-
       LoadLevelNoBackground;
     finally FreeAndNil(SavedMode) end;
   end else

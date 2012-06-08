@@ -131,14 +131,12 @@ var
   that will also call PlayGame, but creating / initializing
   TPlayer and TLevel instances differently. }
 procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
-var
-  NewLevel: TGameSceneManager;
 begin
-  Level := nil;
+  SceneManager := TGameSceneManager.Create(nil);
   try
     Player := TPlayer.Create(nil);
     try
-      Level := NewGameLevelAvailable.LoadLevel;
+      NewGameLevelAvailable.LoadLevel(SceneManager);
       PlayGame(true);
     finally FreeAndNil(Player) end;
 
@@ -148,15 +146,13 @@ begin
       try
         { Replace Level this way, so that restarting level doesn't
           free and reload all creature animations again. }
-        NewLevel := LevelsAvailable.FindId(GameEndedWantsRestart).LoadLevel;
-        FreeAndNil(Level);
-        Level := NewLevel;
+        LevelsAvailable.FindId(GameEndedWantsRestart).LoadLevel(SceneManager);
 
         PlayGame(true);
       finally FreeAndNil(Player) end;
     end;
 
-  finally FreeAndNil(Level) end;
+  finally FreeAndNil(SceneManager) end;
 
   SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
   SoundMenu.SoundVolume.RefreshAccessory;
