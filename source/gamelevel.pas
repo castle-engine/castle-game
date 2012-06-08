@@ -168,7 +168,7 @@ type
     procedure ChangeLevelScene(MainScene: TCastleScene);
   end;
 
-  { This defines area on the level that causes
+  { Area on the level that causes
     a Notification to be displayed when player enters inside.
     The natural use for it is to display various hint messages when player
     is close to something. }
@@ -1188,11 +1188,6 @@ function TLevelAvailable.LoadLevel(const MenuBackground: boolean): TGameSceneMan
     end;
   end;
 
-  procedure SleepIfNeeded;
-  begin
-    Sleep(2000);
-  end;
-
 var
   SavedMode: TGLMode;
 begin
@@ -1208,17 +1203,6 @@ begin
       Window.EventResize;
 
       LoadLevelNoBackground;
-
-      { Just a dirty hack to make user to actually see the
-        "DOOM E1M1" loading background --- otherwise loading of doom
-        level goes so fast that it's practically not noticeable.
-        Maybe in the future I'll remove this hack (if level loading
-        will be slow enough to actually make time for user to see
-        background image), or make this hack more intelligent
-        (like checking how much time was spent inside LoadLevelNoBackground
-        and doing Sleep() only if necessary). }
-      SleepIfNeeded;
-
     finally FreeAndNil(SavedMode) end;
   end else
     LoadLevelNoBackground;
