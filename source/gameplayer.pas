@@ -78,7 +78,9 @@ type
     FCamera: TWalkCamera;
     FItems: TItemList;
     FEquippedWeapon: TItem;
-    FFlyingModeTimeOut: Single; { > 0 means flying. In seconds. }
+    { When this is > 0 means flying. In seconds. }
+    FFlyingModeTimeOut: Single;
+    LifeTime: Single;
 
     { blackout things }
     BlackOutIntensity: TGLfloat;
@@ -87,7 +89,7 @@ type
     { This means that weapon AttackAnimation is being done.
       This also means that EquippedWeapon <> nil. }
     Attacking: boolean;
-    { If Attacking, then this is time of attack start, from Level.AnimationTime. }
+    { If Attacking, then this is time of attack start, from LifeTime. }
     AttackStartTime: Single;
     { If Attacking, then this says whether EquippedWeapon.Kind.ActualAttack
       was already called. }
@@ -95,7 +97,7 @@ type
 
     HintEscapeKeyShown: boolean;
 
-    { If Swimming = psUnderWater, then this is the time (from Level.AnimationTime)
+    { If Swimming = psUnderWater, then this is the time (from LifeTime)
       of setting Swimming to psUnderWater. }
     SwimBeginTime: Single;
     { If Swimming = psUnderWater, this is the time of last
@@ -109,7 +111,7 @@ type
 
     { Did last Idle detected that we're on lava ? }
     IsLava: boolean;
-    { Relevant if IsLava, this is Level.AnimationTime when
+    { Relevant if IsLava, this is LifeTime when
       last time lava damage was done. When player steps on lava for the
       first time, he immediately gets damage, so LavaLastDamageTime is
       always valid when IsLava. }
@@ -957,14 +959,14 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       { Take care of drowning. }
       if not Dead then
       begin
-        if Level.AnimationTime - SwimBeginTime > SwimBreathSeconds then
+        if LifeTime - SwimBeginTime > SwimBreathSeconds then
         begin
           if (SwimLastDrownTime = 0.0) or
-             (Level.AnimationTime - SwimLastDrownTime > SwimDrownPauseSeconds) then
+             (LifeTime - SwimLastDrownTime > SwimDrownPauseSeconds) then
           begin
             if SwimLastDrownTime = 0.0 then
               Notifications.Show('You''re drowning');
-            SwimLastDrownTime := Level.AnimationTime;
+            SwimLastDrownTime := LifeTime;
             Life := Life - (5 + Random(10));
             SoundEngine.Sound(stPlayerDrowning);
           end;
@@ -977,9 +979,9 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
         only when AllocatedSwimmingSource = nil. }
       if (AllocatedSwimmingSource = nil) and
          ( (SwimLastSoundTime = 0.0) or
-           (Level.AnimationTime - SwimLastSoundTime > SwimSoundPauseSeconds) ) then
+           (LifeTime - SwimLastSoundTime > SwimSoundPauseSeconds) ) then
       begin
-        SwimLastSoundTime := Level.AnimationTime;
+        SwimLastSoundTime := LifeTime;
         AllocatedSwimmingSource := SoundEngine.Sound(stPlayerSwimming);
         if AllocatedSwimmingSource <> nil then
           AllocatedSwimmingSource.OnUsingEnd :=
@@ -1003,12 +1005,11 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     end else
     if Camera.IsOnTheGround then
     begin
-      ReallyIsOnTheGroundTime := Level.AnimationTime;
+      ReallyIsOnTheGroundTime := LifeTime;
       IsOnTheGround := true;
       GroundRule := TextureRules.GroundRule(Ground);
     end else
-    if Level.AnimationTime - ReallyIsOnTheGroundTime >
-      TimeToChangeIsOnTheGround then
+    if LifeTime - ReallyIsOnTheGroundTime > TimeToChangeIsOnTheGround then
     begin
       GroundRule := nil;
       IsOnTheGround := false;
@@ -1028,10 +1029,9 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     if NewIsLava then
     begin
       if (not IsLava) or
-         (Level.AnimationTime - LavaLastDamageTime
-           > GroundRule.LavaDamageTime) then
+         (LifeTime - LavaLastDamageTime > GroundRule.LavaDamageTime) then
       begin
-        LavaLastDamageTime := Level.AnimationTime;
+        LavaLastDamageTime := LifeTime;
         if not Dead then
         begin
           SoundEngine.Sound(stPlayerLavaPain);
@@ -1075,7 +1075,7 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       NewFootstepsSoundPlaying := stNone else
     if Camera.IsWalkingOnTheGround then
     begin
-      ReallyWalkingOnTheGroundTime := Level.AnimationTime;
+      ReallyWalkingOnTheGroundTime := LifeTime;
       { Since Camera.IsWalkingOnTheGroundm then for sure
         Camera.IsOnTheGround, so UpdateIsOnTheGround updated
         GroundRule field. }
@@ -1083,7 +1083,7 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
         NewFootstepsSoundPlaying := GroundRule.FootstepsSound else
         NewFootstepsSoundPlaying := Level.FootstepsSound;
     end else
-    if Level.AnimationTime - ReallyWalkingOnTheGroundTime >
+    if LifeTime - ReallyWalkingOnTheGroundTime >
       TimeToChangeFootstepsSoundPlaying then
       NewFootstepsSoundPlaying := stNone else
       NewFootstepsSoundPlaying := FootstepsSoundPlaying;
@@ -1151,6 +1151,9 @@ const
   BlackOutSpeed = 2.0;
 begin
   inherited;
+  if not GetExists then Exit;
+  LifeTime += CompSpeed;
+
   if FlyingMode then
   begin
     FFlyingModeTimeOut := FFlyingModeTimeOut - CompSpeed;
@@ -1167,7 +1170,7 @@ begin
   if BlackOutIntensity > 0 then
     BlackOutIntensity -= BlackOutSpeed * CompSpeed;
 
-  if Attacking and (not ActualAttackDone) and (Level.AnimationTime -
+  if Attacking and (not ActualAttackDone) and (LifeTime -
     AttackStartTime >= EquippedWeaponKind.ActualAttackTime) then
   begin
     ActualAttackDone := true;
@@ -1236,7 +1239,7 @@ begin
     if EquippedWeapon <> nil then
     begin
       SoundEngine.Sound(EquippedWeaponKind.SoundAttackStart);
-      AttackStartTime := Level.AnimationTime;
+      AttackStartTime := LifeTime;
       Attacking := true;
       ActualAttackDone := false;
     end else
@@ -1291,7 +1294,7 @@ begin
 
     if Swimming = psUnderWater then
     begin
-      SwimBeginTime := Level.AnimationTime;
+      SwimBeginTime := LifeTime;
       SwimLastDrownTime := 0.0;
       SwimLastSoundTime := 0.0;
     end;
@@ -1410,7 +1413,7 @@ begin
     EquippedWeaponKind.Prepared then
   begin
     AttackAnim := EquippedWeaponKind.AttackAnimation;
-    AttackTime := Level.AnimationTime - AttackStartTime;
+    AttackTime := LifeTime - AttackStartTime;
     if Attacking and (AttackTime <= AttackAnim.TimeEnd) then
     begin
       Result := AttackAnim.SceneFromTime(AttackTime);
@@ -1419,10 +1422,9 @@ begin
       { turn off Attacking, if AttackTime passed }
       Attacking := false;
       { although current weapons animations are just static,
-        we use Level.AnimationTime to enable weapon animation
-        (weapon swaying) in the future. }
-      Result :=  EquippedWeaponKind.ReadyAnimation.SceneFromTime(
-        Level.AnimationTime);
+        we use LifeTime to enable any weapon animation
+        (like weapon swaying, or some fire over the sword or such) in the future. }
+      Result :=  EquippedWeaponKind.ReadyAnimation.SceneFromTime(LifeTime);
     end;
   end;
 
