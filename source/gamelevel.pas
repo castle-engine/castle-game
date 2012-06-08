@@ -203,14 +203,13 @@ type
     FSickProjectionSpeed: TFloatTime;
 
     FLevel: TLevel;
-    FMenuBackground: boolean;
     FInfo: TLevelAvailable;
 
     procedure SetSickProjection(const Value: boolean);
     procedure SetSickProjectionSpeed(const Value: TFloatTime);
 
     procedure LoadLevel(const AInfo: TLevelAvailable;
-      const AMenuBackground: boolean);
+      const MenuBackground: boolean);
   protected
     procedure RenderFromViewEverything; override;
     procedure InitializeLights(const Lights: TLightInstancesList); override;
@@ -219,9 +218,11 @@ type
   public
     destructor Destroy; override;
 
-    property Info: TLevelAvailable read FInfo;
+    { Level logic and state. }
+    property Level: TLevel read FLevel;
 
-    property MenuBackground: boolean read FMenuBackground write FMenuBackground;
+    { Level information, independent from current level state. }
+    property Info: TLevelAvailable read FInfo;
 
     procedure BeforeDraw; override;
 
@@ -229,9 +230,6 @@ type
       read FSickProjection write SetSickProjection;
     property SickProjectionSpeed: TFloatTime
       read FSickProjectionSpeed write SetSickProjectionSpeed;
-
-    { Level logic. }
-    property Level: TLevel read FLevel;
 
     function CollisionIgnoreItem(
       const Sender: TObject;
@@ -408,7 +406,7 @@ end;
 { TGameSceneManager --------------------------------------------------------------------- }
 
 procedure TGameSceneManager.LoadLevel(const AInfo: TLevelAvailable;
-  const AMenuBackground: boolean);
+  const MenuBackground: boolean);
 var
   { Sometimes it's not comfortable
     to remove the items while traversing --- so we will instead
@@ -696,8 +694,6 @@ begin
   UseGlobalLights := true;
   ApproximateActivation := true;
   Input_PointingDeviceActivate.Assign(CastleInput_Interact.Shortcut, false);
-
-  FMenuBackground := AMenuBackground;
 
   { save PreviousResources, before Info is overridden with new level.
     This allows us to keep PreviousResources while new resources are required,
