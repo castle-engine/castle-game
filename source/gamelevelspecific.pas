@@ -49,7 +49,7 @@ type
     WerewolfCreature: array [0..CastleHallWerewolvesCount - 1] of TWerewolfCreature;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TLevelScene; DOMElement: TDOMElement); override;
+      MainScene: TCastleScene; DOMElement: TDOMElement); override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
     function BossCreatureIndicator(out Life, MaxLife: Single): boolean; override;
@@ -77,7 +77,7 @@ type
     CartSoundPosition: TVector3Single;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TLevelScene; DOMElement: TDOMElement); override;
+      MainScene: TCastleScene; DOMElement: TDOMElement); override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
@@ -88,7 +88,7 @@ type
     ElevatorButton: TCastlePrecalculatedAnimation;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TLevelScene; DOMElement: TDOMElement); override;
+      MainScene: TCastleScene; DOMElement: TDOMElement); override;
   end;
 
   TSpiderAppearing = class(T3DTransform)
@@ -117,7 +117,7 @@ type
     procedure SetGameWinAnimation(Value: TGameWinAnimation);
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TLevelScene; DOMElement: TDOMElement); override;
+      MainScene: TCastleScene; DOMElement: TDOMElement); override;
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
@@ -168,7 +168,7 @@ type
     ExitButton: TCastleScene;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TLevelScene; DOMElement: TDOMElement); override;
+      MainScene: TCastleScene; DOMElement: TDOMElement); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
@@ -176,13 +176,13 @@ type
   TGateBackgroundLevel = class(TLevel)
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TLevelScene; DOMElement: TDOMElement); override;
+      MainScene: TCastleScene; DOMElement: TDOMElement); override;
   end;
 
   TFountainLevel = class(TLevel)
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TLevelScene; DOMElement: TDOMElement); override;
+      MainScene: TCastleScene; DOMElement: TDOMElement); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
 
@@ -254,7 +254,7 @@ end;
 { TCastleHallLevel ----------------------------------------------------------- }
 
 constructor TCastleHallLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TLevelScene; DOMElement: TDOMElement);
+  MainScene: TCastleScene; DOMElement: TDOMElement);
 
   function BoxDownPosition(const Box: TBox3D): TVector3Single;
   begin
@@ -270,11 +270,11 @@ var
 begin
   inherited;
 
-  MainScene.RemoveBoxNodeCheck(FLevelExitBox, 'LevelExitBox');
+  MainScene.RemoveBlenderBoxCheck(FLevelExitBox, 'LevelExitBox');
 
   for I := 0 to CastleHallWerewolvesCount - 1 do
   begin
-    MainScene.RemoveBoxNodeCheck(TempBox, 'WerewolfAppear_' + IntToStr(I));
+    MainScene.RemoveBlenderBoxCheck(TempBox, 'WerewolfAppear_' + IntToStr(I));
     WerewolfAppearPosition[I] := BoxDownPosition(TempBox);
   end;
 
@@ -470,7 +470,7 @@ end;
 { TGateLevel ----------------------------------------------------------------- }
 
 constructor TGateLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TLevelScene; DOMElement: TDOMElement);
+  MainScene: TCastleScene; DOMElement: TDOMElement);
 
   function AmbushStartingPos(const Box: TBox3D): TVector3Single;
   begin
@@ -487,12 +487,12 @@ var
 begin
   inherited;
 
-  MainScene.RemoveBoxNodeCheck(FGateExitBox, 'GateExitBox');
+  MainScene.RemoveBlenderBoxCheck(FGateExitBox, 'GateExitBox');
 
-  MainScene.RemoveBoxNodeCheck(Teleport1Box, 'Teleport1Box');
-  MainScene.RemoveBoxNodeCheck(Teleport2Box, 'Teleport2Box');
+  MainScene.RemoveBlenderBoxCheck(Teleport1Box, 'Teleport1Box');
+  MainScene.RemoveBlenderBoxCheck(Teleport2Box, 'Teleport2Box');
 
-  MainScene.RemoveBoxNodeCheck(FSacrilegeBox, 'SacrilegeBox');
+  MainScene.RemoveBlenderBoxCheck(FSacrilegeBox, 'SacrilegeBox');
 
   Teleport1Destination := Teleport2Box.Middle;
   Teleport1Destination[0] += 2;
@@ -504,13 +504,13 @@ begin
 
   for I := 0 to High(SacrilegeAmbushStartingPosition) do
   begin
-    MainScene.RemoveBoxNodeCheck(TempBox, 'SacrilegeGhost_' + IntToStr(I));
+    MainScene.RemoveBlenderBoxCheck(TempBox, 'SacrilegeGhost_' + IntToStr(I));
     SacrilegeAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
   end;
 
   for I := 0 to High(SwordAmbushStartingPosition) do
   begin
-    MainScene.RemoveBoxNodeCheck(TempBox, 'SwordGhost_' + IntToStr(I));
+    MainScene.RemoveBlenderBoxCheck(TempBox, 'SwordGhost_' + IntToStr(I));
     SwordAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
   end;
 
@@ -686,7 +686,7 @@ end;
 { TTowerLevel ---------------------------------------------------------------- }
 
 constructor TTowerLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TLevelScene; DOMElement: TDOMElement);
+  MainScene: TCastleScene; DOMElement: TDOMElement);
 var
   TowerLevelPath: string;
 begin
@@ -780,7 +780,7 @@ end;
 { TCagesLevel ---------------------------------------------------------------- }
 
 constructor TCagesLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TLevelScene; DOMElement: TDOMElement);
+  MainScene: TCastleScene; DOMElement: TDOMElement);
 
   function FindCreatureKind(Kind: TCreatureKind): TCreature;
   var
@@ -1151,7 +1151,7 @@ end;
 { TDoomE1M1Level ------------------------------------------------------------- }
 
 constructor TDoomE1M1Level.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TLevelScene; DOMElement: TDOMElement);
+  MainScene: TCastleScene; DOMElement: TDOMElement);
 var
   DoomDoorsPathPrefix: string;
 
@@ -1173,8 +1173,8 @@ begin
   inherited;
 
   MainScene.RootNode.EnumerateNodes(@RenameCreatures, true);
-  MainScene.RemoveBoxNodeCheck(Elevator49DownBox, 'Elevator49DownBox');
-  MainScene.RemoveBoxNodeCheck(Elevator9a9bPickBox, 'Elev9a9bPickBox');
+  MainScene.RemoveBlenderBoxCheck(Elevator49DownBox, 'Elevator49DownBox');
+  MainScene.RemoveBlenderBoxCheck(Elevator9a9bPickBox, 'Elev9a9bPickBox');
   DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +
     PathDelim;
 
@@ -1274,7 +1274,7 @@ end;
 { TGateBackgroundLevel ------------------------------------------------------- }
 
 constructor TGateBackgroundLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TLevelScene; DOMElement: TDOMElement);
+  MainScene: TCastleScene; DOMElement: TDOMElement);
 var
   Water: TCastlePrecalculatedAnimation;
 begin
@@ -1295,7 +1295,7 @@ end;
 { TFountainLevel ------------------------------------------------------------- }
 
 constructor TFountainLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TLevelScene; DOMElement: TDOMElement);
+  MainScene: TCastleScene; DOMElement: TDOMElement);
 var
   Fountain: TBlendedLoopingAnimation;
   LoadWaterAnimation: boolean;

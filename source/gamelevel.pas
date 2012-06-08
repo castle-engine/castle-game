@@ -40,8 +40,6 @@ type
   TCastleSceneClass = class of TCastleScene;
   TCastlePrecalculatedAnimationClass = class of TCastlePrecalculatedAnimation;
 
-  TLevelScene = class;
-
   { Invisible and non-colliding areas on the level that have some special purpose.
     What exactly this "purpose" is, is defined in each TLevelArea descendant.
 
@@ -74,8 +72,8 @@ type
     function BoundingBox: TBox3D; override;
 
     { Called when loading level. This is the place when you
-      can modify MainScene, e.g. by calling MainScene.RemoveBoxNode. }
-    procedure ChangeLevelScene(MainScene: TLevelScene);
+      can modify MainScene, e.g. by calling MainScene.RemoveBlenderBox. }
+    procedure ChangeLevelScene(MainScene: TCastleScene);
   end;
 
   { This defines area on the level that causes
@@ -103,20 +101,6 @@ type
       default false;
 
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
-  end;
-
-  TLevelScene = class(TCastleScene)
-  public
-    { Find Blender mesh with given name, extract it's bounding box
-      and remove it from scene.
-      See also [http://castle-engine.sourceforge.net/castle-development.php]
-      for description of CameraBox and WaterBox trick.
-      Remember that this may change MainScene.BoundingBox (in case we will
-      find and remove the node). }
-    function RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
-
-    { Like RemoveBoxNode, but raise EInternalError if not found. }
-    procedure RemoveBoxNodeCheck(out Box: TBox3D; const NodeName: string);
   end;
 
   TGameSceneManager = class(TCastleSceneManager)
@@ -290,7 +274,7 @@ type
       initialized. But before creating resources like octrees,
       so you can modify MainScene contents. }
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TLevelScene; DOMElement: TDOMElement); reintroduce; virtual;
+      MainScene: TCastleScene; DOMElement: TDOMElement); reintroduce; virtual;
     destructor Destroy; override;
     function BoundingBox: TBox3D; override;
 
@@ -348,31 +332,6 @@ uses SysUtils, GL, Triangle,
   GameInputs, GameWindow, CastleXMLUtils,
   GLRenderer, RenderingCameraUnit, Math, CastleWarnings;
 
-{ TLevelScene ---------------------------------------------------------------- }
-
-function TLevelScene.RemoveBoxNode(out Box: TBox3D; const NodeName: string): boolean;
-var
-  BoxShape: TShape;
-begin
-  BoxShape := Shapes.FindBlenderMesh(NodeName);
-  Result := BoxShape <> nil;
-  if Result then
-  begin
-    { When node with name NodeName is found, then we calculate our
-      Box from this node (and we delete this node from the scene,
-      as it should not be visible).
-      This way we can comfortably set such boxes from Blender. }
-    Box := BoxShape.BoundingBox;
-    RemoveShapeGeometry(BoxShape);
-  end;
-end;
-
-procedure TLevelScene.RemoveBoxNodeCheck(out Box: TBox3D; const NodeName: string);
-begin
-  if not RemoveBoxNode(Box, NodeName) then
-    raise EInternalError.CreateFmt('Error: no box named "%s" found', [NodeName]);
-end;
-
 { TLevelArea ----------------------------------------------------------------- }
 
 constructor TLevelArea.Create(AOwner: TComponent);
@@ -391,10 +350,10 @@ begin
   Result := EmptyBox3D;
 end;
 
-procedure TLevelArea.ChangeLevelScene(MainScene: TLevelScene);
+procedure TLevelArea.ChangeLevelScene(MainScene: TCastleScene);
 begin
   inherited;
-  MainScene.RemoveBoxNodeCheck(FBox, Id);
+  MainScene.RemoveBlenderBoxCheck(FBox, Id);
 end;
 
 function TLevelArea.PointInside(const Point: TVector3Single): boolean;
@@ -510,7 +469,6 @@ var
   Options: TPrepareResourcesOptions;
   NewCameraBox, NewWaterBox: TBox3D;
   SI: TShapeTreeIterator;
-  MainLevelScene: TLevelScene;
   I: Integer;
 begin
   inherited Create(nil);
@@ -534,8 +492,7 @@ begin
 
   Progress.Init(1, 'Loading level "' + Title + '"');
   try
-    MainLevelScene := TLevelScene.CreateCustomCache(Self, GLContextCache);
-    MainScene := MainLevelScene;
+    MainScene := TCastleScene.CreateCustomCache(Self, GLContextCache);
     MainScene.Load(SceneFileName);
 
     AttributesSet(MainScene.Attributes);
@@ -557,7 +514,7 @@ begin
     for I := 0 to Items.Count - 1 do
     begin
       if Items[I] is TLevelArea then
-        TLevelArea(Items[I]).ChangeLevelScene(MainLevelScene);
+        TLevelArea(Items[I]).ChangeLevelScene(MainScene);
     end;
 
     InitializeCamera;
@@ -580,7 +537,7 @@ begin
     finally ItemsToRemove.Free end;
 
     { Calculate CameraBox. }
-    if not MainLevelScene.RemoveBoxNode(NewCameraBox, 'LevelBox') then
+    if not MainScene.RemoveBlenderBox(NewCameraBox, 'LevelBox') then
     begin
       { Set CameraBox to MainScene.BoundingBox, and make maximum Z larger. }
       NewCameraBox := MainScene.BoundingBox;
@@ -588,7 +545,7 @@ begin
     end;
     CameraBox := NewCameraBox;
 
-    if MainLevelScene.RemoveBoxNode(NewWaterBox, 'WaterBox') then
+    if MainScene.RemoveBlenderBox(NewWaterBox, 'WaterBox') then
       WaterBox := NewWaterBox;
 
     CreateSectors(MainScene);
@@ -597,7 +554,7 @@ begin
       (some TLevel descendant constructors depend on this),
       but still before preparing resources like octrees (because we still
       may want to modify MainScene inside Level constructor). }
-    FLevel := LevelClass.Create(Self, Items, MainLevelScene, DOMElement);
+    FLevel := LevelClass.Create(Self, Items, MainScene, DOMElement);
     Items.Add(Level);
 
     MainScene.CastShadowVolumes := SceneDynamicShadows;
@@ -950,7 +907,7 @@ end;
 { TLevel ---------------------------------------------------------------- }
 
 constructor TLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TLevelScene; DOMElement: TDOMElement);
+  MainScene: TCastleScene; DOMElement: TDOMElement);
 begin
   inherited Create(AOwner);
   SceneManager := AOwner as TGameSceneManager;
