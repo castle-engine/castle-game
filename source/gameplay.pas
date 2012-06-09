@@ -341,18 +341,12 @@ begin
   Player.Render2D;
 end;
 
-{ Call this when Level value changed (because of LevelFinished
+{ Call this when level changed (because of LevelFinished
   or because we just started new game). }
 procedure InitNewLevel;
 begin
-  { No need to explicitly call any Window.EventResize or Level.ApplyProjection,
-    newly added to Window.Controls (and possibly newly created) level will have
-    ApplyProjectionNeeded := true. }
-
   Player.LevelChanged;
-
   SoundEngine.MusicPlayer.PlayedSound := SceneManager.Info.MusicSound;
-
   { First Notification for this level. }
   Notifications.Show('Loaded level "' + SceneManager.Info.Title + '"');
 end;
@@ -403,16 +397,6 @@ begin
   if LevelFinishedSchedule then
   begin
     LevelFinishedSchedule := false;
-
-    { First, we have to disconnect Player and Camera from old Level.
-      That is because when creating new level, Player and Camera must be connected
-      with new level in it's constructor (that's how our TLevel.Create works),
-      and you should not keep the same T3D (Player) and TCamera (Player.Camera)
-      within different scene managers --- it would cause troubles with
-      connecting callbacks to Camera, and Player.Parent. }
-    SceneManager.Camera := nil;
-    SceneManager.Player := nil;
-    SceneManager.Items.Remove(Player);
 
     { TODO: simplify this for persistent scene manager }
     { We cannot draw old level now, since it's Camera is nil,
@@ -692,6 +676,7 @@ procedure EventDown(AKey: TKey;
 
   procedure DoDebugMenu;
   begin
+    { TODO: simplify now }
     { We explicitly clear, and later readd GameControls to the Window.Controls.
       Reason? During debug menu, current Level instance may change
       (because debug menu may change the level, and even call LevelFinishedFlush).

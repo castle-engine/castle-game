@@ -119,7 +119,7 @@ var
   ChooseNewLevelMenu: TChooseNewLevelMenu;
   ChangeOpenALDeviceMenu: TChangeOpenALDeviceMenu;
 
-{ NewGame ------------------------------------------------------------- }
+{ NewGame -------------------------------------------------------------------- }
 
 { Just a wrapper that calls PlayGame.
 
@@ -130,28 +130,24 @@ var
   The idea is that in the future there will be LoadGame procedure,
   that will also call PlayGame, but creating / initializing
   TPlayer and TLevel instances differently. }
-procedure NewGame(NewGameLevelAvailable: TLevelAvailable);
+procedure NewGame(Level: TLevelAvailable);
 begin
   SceneManager := TGameSceneManager.Create(nil);
   try
-    Player := TPlayer.Create(nil);
-    try
-      NewGameLevelAvailable.LoadLevel(SceneManager);
-      PlayGame(true);
-    finally FreeAndNil(Player) end;
-
-    while GameEnded and (GameEndedWantsRestart <> '') do
-    begin
+    repeat
       Player := TPlayer.Create(nil);
       try
-        { Replace Level this way, so that restarting level doesn't
-          free and reload all creature animations again. }
-        LevelsAvailable.FindId(GameEndedWantsRestart).LoadLevel(SceneManager);
+        SceneManager.Player := Player;
+        SceneManager.Items.Add(Player);
 
+        Level.LoadLevel(SceneManager);
         PlayGame(true);
       finally FreeAndNil(Player) end;
-    end;
 
+      if GameEnded and (GameEndedWantsRestart <> '') then
+        Level := LevelsAvailable.FindId(GameEndedWantsRestart) else
+        Break;
+    until false;
   finally FreeAndNil(SceneManager) end;
 
   SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;

@@ -350,7 +350,7 @@ var
 implementation
 
 uses SysUtils, Triangle, CastleLog,
-  GamePlay, CastleGLUtils, CastleFilesUtils, CastleStringUtils,
+  CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   CastleWindow, GLImages, Images, WindowModes, UIControls, XMLRead,
   GameVideoOptions, GameConfig, GameNotifications,
   GameInputs, GameWindow, CastleXMLUtils, CastleProgress,
@@ -393,8 +393,8 @@ var
 begin
   inherited;
   if (not MessageDone) and
-     (Player <> nil) and
-     PointInside(Player.Position) then
+     (World.Player <> nil) and
+     PointInside(World.Player.Position) then
   begin
     ReplaceInteractInput.C := 'i';
     ReplaceInteractInput.S := InteractInputDescription;
@@ -646,15 +646,15 @@ var
       DefaultCrouchHeight, DefaultHeadBobbing);
 
     { initialize some navigation settings of player }
-    if GamePlay.Player <> nil then
+    if Player <> nil then
     begin
-      GamePlay.Player.DefaultPreferredHeight := PreferredHeight;
+      (Player as TPlayer).DefaultPreferredHeight := PreferredHeight;
 
       if NavigationNode <> nil then
-        GamePlay.Player.DefaultMoveHorizontalSpeed := NavigationNode.FdSpeed.Value else
-        GamePlay.Player.DefaultMoveHorizontalSpeed := 1.0;
+        (Player as TPlayer).DefaultMoveHorizontalSpeed := NavigationNode.FdSpeed.Value else
+        (Player as TPlayer).DefaultMoveHorizontalSpeed := 1.0;
 
-      GamePlay.Player.DefaultMoveVerticalSpeed := 20;
+      (Player as TPlayer).DefaultMoveVerticalSpeed := 20;
     end;
 
     { Check GravityUp }
@@ -663,9 +663,9 @@ var
         WritelnLog('Camera', 'Gravity up vector is not +Z. Everything should work fine, but it''s not fully tested');
 
     if Player <> nil then
-      WalkCamera := GamePlay.Player.Camera else
+      WalkCamera := (Player as TPlayer).Camera else
       { Camera suitable for background level and castle-view-level.
-        For actual game, camera will be taken from APlayer.Camera. }
+        For actual game, camera will be taken from Player.Camera. }
       WalkCamera := TWalkCamera.Create(Self);
 
     Camera := WalkCamera;
@@ -680,16 +680,20 @@ var
   NewCameraBox, NewWaterBox: TBox3D;
   SI: TShapeTreeIterator;
   PreviousResources: T3DResourceList;
+  I: Integer;
 begin
   { release stuff from previous level. Our items must be clean.
     This releases previous Level (logic), MainScene, our areas added in LoadAreas,
     and our creatures and items --- the ones added in TraverseForCreatures/Items,
     but also the ones created dynamically (when creature is added to scene manager,
-    e.g. because player/creature shoots a missile, or when player drops an item). }
-  while Items.Count <> 0 do Items[0].Free;
+    e.g. because player/creature shoots a missile, or when player drops an item).
+    The only thing that can (and should) remain is Player. }
+  I := 0;
+  while I < Items.Count do
+    if Items[I] <> Player then
+      Items[I].Free else
+      Inc(I);
   FLevel := nil; { it's freed now }
-
-  Player := GamePlay.Player;
 
   UseGlobalLights := true;
   ApproximateActivation := true;
@@ -711,6 +715,12 @@ begin
 
   Progress.Init(1, 'Loading level "' + Info.Title + '"');
   try
+    { disconnect previous Camera from SceneManager.
+      Othwerwise, it would be updated by MainScene loading binding new
+      NavigationInfo (with it's speed) and Viewpoint.
+      We prefer to do it ourselves in InitializeCamera. }
+    Camera := nil;
+
     MainScene := TCastleScene.CreateCustomCache(Self, GLContextCache);
     MainScene.Load(Info.SceneFileName);
 
@@ -723,10 +733,7 @@ begin
 
     { Scene must be the first one on Items, this way MoveAllowed will
       use Scene for wall-sliding (see T3DList.MoveAllowed implementation). }
-    Items.Add(MainScene);
-
-    if Player <> nil then
-      Items.Add(Player);
+    Items.Insert(0, MainScene);
 
     LoadAreas(Info.Element);
 
