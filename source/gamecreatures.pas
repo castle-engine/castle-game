@@ -151,7 +151,7 @@ procedure CreaturesKindsInit;
 
 implementation
 
-uses SysUtils, DOM, GL, GLU, CastleGameWindow, CastleWindow,
+uses SysUtils, DOM, GL, GLU, CastleGameCache, CastleWindow,
   CastleFilesUtils, CastleGLUtils, ProgressUnit,
   CastleGameNotifications, GameSound, GameVideoOptions;
 

@@ -20,40 +20,24 @@
   ----------------------------------------------------------------------------
 }
 
-{ }
-unit GameHelp;
+{ Global @link(Window) variable. }
+unit GameWindow;
 
 interface
 
-const
-  Version = '0.9.4';
-  CastleURL = 'http://castle-engine.sourceforge.net/castle.php';
+uses CastleWindow;
 
-function SCastleVersion: string;
-
-procedure ViewGameMessages;
+var
+  { @noAutoLinkHere }
+  Window: TCastleWindowCustom;
 
 implementation
 
-uses SysUtils, Classes, CastleMessages, GameWindow, CastleUtils,
-  CastleGameNotifications;
+uses SysUtils, UIControls;
 
-function SCastleVersion: string;
-begin
-  Result := ApplicationName + ' version ' + Version + '.';
-end;
-
-procedure ViewGameMessages;
-var
-  SList: TStringList;
-begin
-  SList := TStringList.Create;
-  try
-    SList.Assign(Notifications.History);
-    SList.Insert(0, Format('%d messages :', [Notifications.History.Count]));
-    SList.Insert(1, '');
-    MessageOK(Window, SList, taLeft);
-  finally SList.Free end;
-end;
-
+initialization
+  Window := TCastleWindowCustom.Create(nil);
+  Window.OnDrawStyle := ds3D;
+finalization
+  FreeAndNil(Window);
 end.

@@ -79,10 +79,10 @@ var
 
 implementation
 
-uses SysUtils, WindowModes, CastleGLUtils, CastleMessages, CastleGameWindow,
+uses SysUtils, WindowModes, CastleGLUtils, CastleMessages, CastleGameCache,
   OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
   GameInputs, KeysMouse, VectorMath, CastleUtils, GamePlay, GameItems,
-  CastleGameConfig, CastleStringUtils, CastleGameNotifications;
+  CastleGameConfig, CastleStringUtils, CastleGameNotifications, GameWindow;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 

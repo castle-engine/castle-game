@@ -381,7 +381,7 @@ type
 implementation
 
 uses Math, SysUtils, CastleClassUtils, GamePlay, CastleMessages,
-  CastleGameWindow, CastleUtils, X3DNodes,
+  GameWindow, CastleUtils, X3DNodes,
   CastleWindow, Images, CastleFilesUtils, UIControls,
   PrecalculatedAnimation, ALUtils, CastleOpenAL, GameControlsMenu,
   CastleGameNotifications, CastleXMLConfig, GLImages;

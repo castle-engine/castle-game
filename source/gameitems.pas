@@ -312,7 +312,7 @@ procedure ItemsKindsInit;
 
 implementation
 
-uses SysUtils, CastleWindow, CastleGameWindow,
+uses SysUtils, CastleWindow, CastleGameCache,
   GamePlay, CastleFilesUtils, ProgressUnit,
   GameCreatures, CastleGameNotifications, CastleGameConfig,
   CastleSceneCore, GLImages, CastleCreatures, CastleGameVideoOptions;

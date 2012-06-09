@@ -39,7 +39,7 @@ implementation
 
 uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils, WindowModes,
-  GameInputs, GamePlay, CastleGameWindow,
+  GameInputs, GamePlay, CastleGameCache, GameWindow,
   GameVideoOptions, VectorMath, CastleScene, CastleFilesUtils,
   GameHelp, CastleUtils, X3DFields, CastleTimeUtils, KeysMouse,
   Frustum;

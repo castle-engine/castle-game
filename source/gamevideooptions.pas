@@ -88,8 +88,8 @@ var
 
 implementation
 
-uses SysUtils, CastleUtils, CastleGameConfig, CastleGameWindow, RaysWindow,
-  GLAntiAliasing;
+uses SysUtils, CastleUtils, CastleGameConfig, CastleGameCache, RaysWindow,
+  GLAntiAliasing, GameWindow;
 
 procedure AttributesSet(Attributes: TSceneRenderingAttributes);
 begin

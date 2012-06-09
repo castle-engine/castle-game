@@ -26,7 +26,7 @@ program castle;
 
 uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
-  CastleLog, CastleGameWindow, GameStartMenu, GameHelp, GameSound,
+  CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, GameLevel,
   GameCredits, GLAntiAliasing, ALSoundEngine,
