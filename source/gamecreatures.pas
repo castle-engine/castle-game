@@ -28,7 +28,7 @@ interface
 uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, CastleUtils,
   CastleScene, SectorsWaypoints,
   CastleResources, ALSoundAllocator, CastleXMLConfig, Base3D,
-  XmlSoundEngine, Frustum, X3DNodes, CastleColors, FGL, CastleCreatures;
+  ALSoundEngine, Frustum, X3DNodes, CastleColors, FGL, CastleCreatures;
 
 type
   TAlienCreatureKind = class(TWalkAttackCreatureKind)

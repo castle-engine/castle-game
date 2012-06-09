@@ -26,7 +26,7 @@ unit GameSound;
 
 interface
 
-uses Classes, VectorMath, SysUtils, XmlSoundEngine;
+uses Classes, VectorMath, SysUtils, ALSoundEngine;
 
 var
   { Castle sound types. Will be initialized in initialization of this
@@ -119,7 +119,7 @@ function SoundEngine: TCastleSoundEngine;
 
 implementation
 
-uses CastleGameConfig, ALSoundEngine, CastleFilesUtils;
+uses CastleGameConfig, CastleFilesUtils;
 
 constructor TCastleSoundEngine.Create;
 begin

@@ -28,7 +28,7 @@ unit GameTextures;
 interface
 
 uses CastleUtils, CastleClassUtils, Classes, GameSound, Triangle, DOM,
-  XmlSoundEngine, FGL;
+  ALSoundEngine, FGL;
 
 type
   { }

@@ -103,9 +103,9 @@ constructor TGameSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  SoundInfo := TSoundInfoMenuItem.Create(Window, Self, SoundEngine);
-  SoundVolume := TSoundVolumeMenuItem.Create(Window, Self, SoundEngine);
-  MusicVolume := TMusicVolumeMenuItem.Create(Window, Self, SoundEngine);
+  SoundInfo := TSoundInfoMenuItem.Create(Window, Self);
+  SoundVolume := TSoundVolumeMenuItem.Create(Window, Self);
+  MusicVolume := TMusicVolumeMenuItem.Create(Window, Self);
   Items.Add('Back to game menu');
 end;
 

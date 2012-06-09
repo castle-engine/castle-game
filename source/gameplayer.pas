@@ -27,7 +27,7 @@ interface
 
 uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
   GameInputs, ALSoundAllocator, GameSound, CastleResources,
-  Triangle, GameTextures, XmlSoundEngine, Classes, Base3D,
+  Triangle, GameTextures, ALSoundEngine, Classes, Base3D,
   CastleGLUtils, CastleColors;
 
 const
