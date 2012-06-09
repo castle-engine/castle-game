@@ -919,7 +919,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TCastleWindowBase);
+procedure WindowOpen(const Container: IUIContainer);
 begin
   { Although base TCastleOnScreenMenu doesn't require OpenGL context at constructor,
     our descendants initialize some arguments that require font initialized
@@ -933,7 +933,7 @@ begin
 end;
 
 initialization
-  Window.OnOpenList.Add(@OpenWindow);
+  OnGLContextOpen.Add(@WindowOpen);
 finalization
   { This may be left created }
   FreeAndNil(EditOneLightMenu);

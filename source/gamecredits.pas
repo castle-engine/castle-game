@@ -144,7 +144,7 @@ end;
 { $define DEBUG_ALWAYS_RELOAD_CREDITS}
 
 {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
-procedure OpenWindow(Window: TCastleWindowBase); forward;
+procedure WindowOpen(const Container: IUIContainer); forward;
 {$endif}
 
 procedure ShowCredits(ControlsUnder: TUIControlList);
@@ -153,7 +153,7 @@ var
 begin
   {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
   CredistGLContextRelease;
-  OpenWindow(Window);
+  WindowOpen(Window);
   {$endif}
 
   AnimationTime := 0;
@@ -182,7 +182,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TCastleWindowBase);
+procedure WindowOpen(const Container: IUIContainer);
 var
   VRMLContents: string;
   Info: TMFString;
@@ -209,13 +209,12 @@ begin
   FreeAndNil(CreditsModel);
 end;
 
-procedure CloseWindow(Window: TCastleWindowBase);
+procedure WindowClose(const Container: IUIContainer);
 begin
   CredistGLContextRelease;
 end;
 
 initialization
-  Window.OnOpenList.Add(@OpenWindow);
-  Window.OnCloseList.Add(@CloseWindow);
-finalization
+  OnGLContextOpen.Add(@WindowOpen);
+  OnGLContextClose.Add(@WindowClose);
 end.

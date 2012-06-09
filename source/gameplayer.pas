@@ -382,7 +382,7 @@ implementation
 
 uses Math, SysUtils, CastleClassUtils, GamePlay, CastleMessages,
   CastleGameWindow, CastleUtils, X3DNodes,
-  CastleWindow, Images, CastleFilesUtils,
+  CastleWindow, Images, CastleFilesUtils, UIControls,
   PrecalculatedAnimation, ALUtils, CastleOpenAL, GameControlsMenu,
   CastleGameNotifications, CastleXMLConfig, GLImages;
 
@@ -1463,7 +1463,7 @@ end;
 
 { CastleWindow open / close ------------------------------------------------------ }
 
-procedure WindowOpen(Window: TCastleWindowBase);
+procedure WindowOpen(const Container: IUIContainer);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -1498,7 +1498,7 @@ begin
   finally glEndList; end;
 end;
 
-procedure WindowClose(Window: TCastleWindowBase);
+procedure WindowClose(const Container: IUIContainer);
 begin
   glFreeDisplayList(GLList_BlankIndicatorImage);
   glFreeDisplayList(GLList_RedIndicatorImage);
@@ -1507,6 +1507,6 @@ begin
 end;
 
 initialization
-  Window.OnOpenList.Add(@WindowOpen);
-  Window.OnCloseList.Add(@WindowClose);
+  OnGLContextOpen.Add(@WindowOpen);
+  OnGLContextClose.Add(@WindowClose);
 end.

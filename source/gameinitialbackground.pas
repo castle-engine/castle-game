@@ -30,7 +30,7 @@ procedure DrawInitialBackground;
 
 implementation
 
-uses SysUtils, GL, GLU, CastleWindow, CastleGLUtils, GLImages,
+uses SysUtils, GL, GLU, CastleWindow, CastleGLUtils, GLImages, UIControls,
   CastleGameWindow, CastleFilesUtils, Images, CastleGameNotifications;
 
 var
@@ -59,20 +59,20 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TCastleWindowBase);
+procedure WindowOpen(const Container: IUIContainer);
 begin
   GLList_ScreenImage := LoadImageToDisplayList(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'initial_background.png',
     [TRGBImage], [], Window.Width, Window.Height);
 end;
 
-procedure CloseWindow(Window: TCastleWindowBase);
+procedure WindowClose(const Container: IUIContainer);
 begin
   glFreeDisplayList(GLList_ScreenImage);
 end;
 
 initialization
-  Window.OnOpenList.Add(@OpenWindow);
-  Window.OnCloseList.Add(@CloseWindow);
+  OnGLContextOpen.Add(@WindowOpen);
+  OnGLContextClose.Add(@WindowClose);
 finalization
 end.

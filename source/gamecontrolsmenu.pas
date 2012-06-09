@@ -608,7 +608,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TCastleWindowBase);
+procedure WindowOpen(const Container: IUIContainer);
 begin
   if GLList_DrawFadeRect = 0 then
     GLList_DrawFadeRect := glGenListsCheck(1, 'CastleControlsMenu.OpenGLW');
@@ -628,14 +628,14 @@ begin
   SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
 end;
 
-procedure CloseWindow(Window: TCastleWindowBase);
+procedure WindowClose(const Container: IUIContainer);
 begin
   FreeAndNil(SubMenuTitleFont);
 end;
 
 initialization
-  Window.OnOpenList.Add(@OpenWindow);
-  Window.OnCloseList.Add(@CloseWindow);
+  OnGLContextOpen.Add(@WindowOpen);
+  OnGLContextClose.Add(@WindowClose);
 
   MouseLookHorizontalSensitivity := ConfigFile.GetFloat(
     'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);

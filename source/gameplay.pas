@@ -862,7 +862,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen(Window: TCastleWindowBase);
+procedure WindowOpen(const Container: IUIContainer);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
@@ -912,7 +912,7 @@ begin
   Font_BFNT_BitstreamVeraSans     := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
 end;
 
-procedure WindowClose(Window: TCastleWindowBase);
+procedure WindowClose(const Container: IUIContainer);
 begin
   FreeAndNil(Font_BFNT_BitstreamVeraSans);
   FreeAndNil(Font_BFNT_BitstreamVeraSans_m10);
@@ -923,7 +923,7 @@ end;
 
 initialization
   ShowDebugInfo := false;
-  Window.OnOpenList.Add(@WindowOpen);
-  Window.OnCloseList.Add(@WindowClose);
+  OnGLContextOpen.Add(@WindowOpen);
+  OnGLContextClose.Add(@WindowClose);
   OnCreatureExists := @GameCreatureExists;
 end.

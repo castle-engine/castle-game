@@ -40,7 +40,7 @@ uses SysUtils, Classes, CastleUtils, WindowModes,
   GameCreatures, GameItems, GameGeneralMenu, OnScreenMenu,
   GameControlsMenu, GameInputs, GameVideoOptions, GameHelp,
   CastleStringUtils, CastleClassUtils,
-  CastleGameNotifications, GameBackgroundLevel,
+  CastleGameNotifications, GameBackgroundLevel, UIControls,
   ALSoundEngine, CastleSoundMenu, X3DNodes, CastleResources,
   GameCredits, GLAntiAliasing, KeysMouse, CastleOpenDocument;
 
@@ -748,7 +748,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TCastleWindowBase);
+procedure WindowOpen(const Container: IUIContainer);
 begin
   MainMenu := TMainMenu.Create(Application);
   VideoMenu := TVideoMenu.Create(Application);
@@ -757,6 +757,6 @@ begin
 end;
 
 initialization
-  Window.OnOpenList.Add(@OpenWindow);
+  OnGLContextOpen.Add(@WindowOpen);
 finalization
 end.

@@ -182,13 +182,13 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TCastleWindowBase);
+procedure WindowOpen(const Container: IUIContainer);
 begin
   GameMenu := TGameMenu.Create(Application);
   GameSoundMenu := TGameSoundMenu.Create(Application);
 end;
 
 initialization
-  Window.OnOpenList.Add(@OpenWindow);
+  OnGLContextOpen.Add(@WindowOpen);
 finalization
 end.

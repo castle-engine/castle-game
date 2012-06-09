@@ -58,7 +58,7 @@ function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
 
 implementation
 
-uses SysUtils, CastleWindow, CastleGameWindow, GameSound;
+uses SysUtils, CastleWindow, CastleGameWindow, GameSound, UIControls;
 
 { TCastleGameMenu ---------------------------------------------------------------- }
 
@@ -98,12 +98,11 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure CloseWindow(Window: TCastleWindowBase);
+procedure WindowClose(const Container: IUIContainer);
 begin
   OnScreenMenuCloseGL;
 end;
 
 initialization
-  Window.OnCloseList.Add(@CloseWindow);
-finalization
+  OnGLContextClose.Add(@WindowClose);
 end.

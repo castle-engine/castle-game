@@ -134,18 +134,17 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure OpenWindow(Window: TCastleWindowBase);
+procedure WindowOpen(const Container: IUIContainer);
 begin
   ChooseMenu := TChooseMenu.Create(nil);
 end;
 
-procedure CloseWindow(Window: TCastleWindowBase);
+procedure WindowClose(const Container: IUIContainer);
 begin
   FreeAndNil(ChooseMenu);
 end;
 
 initialization
-  Window.OnOpenList.Add(@OpenWindow);
-  Window.OnCloseList.Add(@CloseWindow);
-finalization
+  OnGLContextOpen.Add(@WindowOpen);
+  OnGLContextClose.Add(@WindowClose);
 end.
