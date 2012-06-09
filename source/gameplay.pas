@@ -391,35 +391,11 @@ begin
 end;
 
 procedure LevelFinishedFlush;
-var
-  GameControlsPos, WindowControlsPos: Integer;
 begin
   if LevelFinishedSchedule then
   begin
     LevelFinishedSchedule := false;
-
-    { TODO: simplify this for persistent scene manager }
-    { We cannot draw old level now, since it's Camera is nil,
-      and TLevel.ApplyProjection is not prepared for this.
-      So remove it from controls (otherwise progress bar when loading new level
-      would want to draw it). }
-    GameControlsPos := GameControls.IndexOf(SceneManager);
-    if GameControlsPos <> -1 then
-      GameControls.Delete(GameControlsPos) else
-      GameControlsPos := GameControls.Count;
-    WindowControlsPos := Window.Controls.IndexOf(SceneManager);
-    if WindowControlsPos <> -1 then
-      Window.Controls.Delete(WindowControlsPos) else
-      WindowControlsPos := Window.Controls.Count;
-
     LevelsAvailable.FindId(LevelFinishedNextLevelId).LoadLevel(SceneManager);
-
-    { TODO: simplify this for persistent scene manager }
-    { right before freeing old Level, insert NewLevel at the same place
-      in GameControls and Window.Controls as Level was. }
-    GameControls.Insert(GameControlsPos, SceneManager);
-    Window.Controls.Insert(WindowControlsPos, SceneManager);
-
     InitNewLevel;
   end;
 end;

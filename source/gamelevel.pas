@@ -907,7 +907,9 @@ end;
 
 function TGameSceneManager.Background: TBackground;
 begin
-  Result := Level.Background;
+  if Level <> nil then
+    Result := Level.Background else
+    Result := nil;
   if Result = nil then
     Result := inherited;
 end;
