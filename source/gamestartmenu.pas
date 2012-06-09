@@ -40,7 +40,7 @@ uses SysUtils, Classes, CastleUtils, WindowModes,
   GameCreatures, GameItems, GameGeneralMenu, OnScreenMenu,
   GameControlsMenu, GameInputs, GameVideoOptions, GameHelp,
   CastleStringUtils, CastleClassUtils,
-  GameNotifications, GameBackgroundLevel,
+  CastleGameNotifications, GameBackgroundLevel,
   XmlSoundEngine, CastleSoundMenu, X3DNodes, CastleResources,
   GameCredits, GLAntiAliasing, KeysMouse, CastleOpenDocument;
 

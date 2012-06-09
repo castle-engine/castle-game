@@ -35,7 +35,7 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 implementation
 
 uses SysUtils, WindowModes, CastleGLUtils, GameInputs, CastleMessages, OnScreenMenu,
-  CastleGameWindow, GameGeneralMenu, GamePlay, VectorMath, GameNotifications,
+  CastleGameWindow, GameGeneralMenu, GamePlay, VectorMath, CastleGameNotifications,
   KeysMouse;
 
 var

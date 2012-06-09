@@ -30,7 +30,7 @@ uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, GameLevel,
   GameCredits, GLAntiAliasing, ALSoundEngine,
-  GLRenderer, CastleResources, GameItems;
+  GLRenderer, CastleResources, GameItems, CastleGameNotifications;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -154,6 +154,9 @@ begin
     - ParamStr(0) is unsure for Unixes.
     - ParamStr(0) is useless for upx executables. }
   OnGetApplicationName := {$ifdef FPC_OBJFPC} @ {$endif} MyGetApplicationName;
+
+  { configure Notifications }
+  Notifications.CollectHistory := true;
 
   { parse parameters }
   SoundEngine.ParseParameters;

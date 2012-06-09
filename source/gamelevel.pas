@@ -352,7 +352,7 @@ implementation
 uses SysUtils, Triangle, CastleLog,
   CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   CastleWindow, GLImages, Images, WindowModes, UIControls, XMLRead,
-  GameVideoOptions, CastleGameConfig, GameNotifications,
+  GameVideoOptions, CastleGameConfig, CastleGameNotifications,
   GameInputs, CastleGameWindow, CastleXMLUtils, CastleProgress,
   GLRenderer, RenderingCameraUnit, Math, CastleWarnings;
 

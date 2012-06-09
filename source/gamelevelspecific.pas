@@ -192,7 +192,7 @@ implementation
 
 uses CastleFilesUtils, SysUtils, CastleUtils,
   GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
-  GamePlay, GameNotifications, GameInputs,
+  GamePlay, CastleGameNotifications, GameInputs,
   GameItems, GameThunder, CastleGameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, ProgressUnit,
   CastleXMLUtils;

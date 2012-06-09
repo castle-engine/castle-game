@@ -38,7 +38,7 @@ procedure CredistGLContextRelease;
 implementation
 
 uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
-  GameNotifications, CastleStringUtils, WindowModes,
+  CastleGameNotifications, CastleStringUtils, WindowModes,
   GameInputs, GamePlay, CastleGameWindow,
   GameVideoOptions, VectorMath, CastleScene, CastleFilesUtils,
   GameHelp, CastleUtils, X3DFields, CastleTimeUtils, KeysMouse,

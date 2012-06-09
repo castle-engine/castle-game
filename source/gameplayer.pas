@@ -384,7 +384,7 @@ uses Math, SysUtils, CastleClassUtils, GamePlay, CastleMessages,
   CastleGameWindow, CastleUtils, X3DNodes,
   CastleWindow, Images, CastleFilesUtils,
   PrecalculatedAnimation, ALUtils, CastleOpenAL, GameControlsMenu,
-  GameNotifications, CastleXMLConfig, GLImages;
+  CastleGameNotifications, CastleXMLConfig, GLImages;
 
 var
   GLList_BlankIndicatorImage: TGLuint;

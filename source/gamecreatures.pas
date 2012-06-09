@@ -906,7 +906,7 @@ implementation
 
 uses SysUtils, DOM, GL, GLU, CastleGameWindow, CastleWindow,
   CastleFilesUtils, CastleGLUtils, ProgressUnit,
-  GameVideoOptions, GameNotifications, GamePlayer;
+  GameVideoOptions, CastleGameNotifications, GamePlayer;
 
 var
   DisableCreatures: Cardinal;
