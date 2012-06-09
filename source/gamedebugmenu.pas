@@ -34,10 +34,10 @@ implementation
 uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, CastleGameWindow,
   VectorMath, CastleWindow, GamePlay, GameGeneralMenu,
-  GameControlsMenu, GameInputs, GameCreatures, GameChooseMenu,
+  GameControlsMenu, GameInputs, CastleCreatures, GameChooseMenu,
   GameItems, OnScreenMenu, RaysWindow, GameVideoOptions,
   GameSound, X3DNodes, CastleClassUtils, CastleGameNotifications,
-  GameLevel, KeysMouse, CastleResources;
+  GameLevel, KeysMouse, CastleResources, CastleGameVideoOptions;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 

@@ -106,7 +106,7 @@ uses SysUtils, CastleUtils, CastleWindow,
   GameItems, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, CastleGameConfig, GameCreatures,
-  CastleGameNotifications, GameControlsMenu, CastleControls,
+  CastleGameNotifications, GameControlsMenu, CastleControls, CastleCreatures,
   GameLevelSpecific, CastleTimeUtils, GLImages, KeysMouse;
 
 var

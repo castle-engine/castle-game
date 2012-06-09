@@ -314,8 +314,8 @@ implementation
 
 uses SysUtils, CastleWindow, CastleGameWindow,
   GamePlay, CastleFilesUtils, ProgressUnit,
-  GameCreatures, GameVideoOptions, CastleGameNotifications, CastleGameConfig,
-  CastleSceneCore, GLImages;
+  GameCreatures, CastleGameNotifications, CastleGameConfig,
+  CastleSceneCore, GLImages, CastleCreatures, CastleGameVideoOptions;
 
 { TItemKind ------------------------------------------------------------ }
 

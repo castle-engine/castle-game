@@ -85,7 +85,6 @@ var
 
   { Creatures sounds.
     @groupBegin }
-  stCreatureFalledDown,
   stWerewolfActualAttackHit,
   stWerewolfHowling,
   stBallMissileFired,
@@ -168,7 +167,6 @@ begin
   stElevator                   := SoundFromName('elevator');
   stDoomExitButton             := SoundFromName('doom_exit_button');
   stCreak                      := SoundFromName('creak');
-  stCreatureFalledDown         := SoundFromName('creature_falled_down');
   stWerewolfActualAttackHit    := SoundFromName('werewolf_actual_attack_hit');
   stWerewolfHowling            := SoundFromName('werewolf_howling');
   stBallMissileFired           := SoundFromName('ball_missile_fired');
