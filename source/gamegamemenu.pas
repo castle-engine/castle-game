@@ -32,7 +32,7 @@ procedure ShowGameMenu(AControlsUnder: TUIControlList);
 implementation
 
 uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
-  GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
+  GL, GLU, CastleGLUtils, CastleMessages, CastleGameWindow,
   VectorMath, CastleWindow, GameHelp, GamePlay, GameGeneralMenu,
   GameControlsMenu, GameInputs, GameChooseMenu,
   GameVideoOptions, GameSound, X3DNodes, CastleClassUtils, GameNotifications,

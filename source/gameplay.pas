@@ -99,13 +99,13 @@ var
 implementation
 
 uses SysUtils, CastleUtils, CastleWindow,
-  WindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
+  WindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, CastleGameWindow,
   VectorMath, Boxes3D, Images,
   GameHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
   BFNT_BitstreamVeraSans_Unit, UIControls,
   GameItems, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
-  GameVideoOptions, GameConfig, GameCreatures,
+  GameVideoOptions, CastleGameConfig, GameCreatures,
   GameNotifications, GameControlsMenu, CastleControls,
   GameLevelSpecific, CastleTimeUtils, GLImages, KeysMouse;
 

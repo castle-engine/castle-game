@@ -27,7 +27,7 @@ interface
 
 uses Boxes3D, X3DNodes, CastleScene, VectorMath, CastleUtils,
   CastleClassUtils, Classes, Images, GL, GLU, CastleGLUtils, GameSound,
-  PrecalculatedAnimation, GameObjectKinds,
+  PrecalculatedAnimation, CastleResources,
   CastleXMLConfig, XmlSoundEngine, Frustum, Base3D, FGL, CastleColors;
 
 const
@@ -312,9 +312,9 @@ procedure ItemsKindsInit;
 
 implementation
 
-uses SysUtils, CastleWindow, GameWindow,
+uses SysUtils, CastleWindow, CastleGameWindow,
   GamePlay, CastleFilesUtils, ProgressUnit,
-  GameCreatures, GameVideoOptions, GameNotifications, GameConfig,
+  GameCreatures, GameVideoOptions, GameNotifications, CastleGameConfig,
   CastleSceneCore, GLImages;
 
 { TItemKind ------------------------------------------------------------ }

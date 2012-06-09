@@ -26,11 +26,11 @@ program castle;
 
 uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
-  CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound,
+  CastleLog, CastleGameWindow, GameStartMenu, GameHelp, GameSound,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, GameLevel,
   GameCredits, GLAntiAliasing, ALSoundEngine,
-  GLRenderer, GameObjectKinds, GameItems;
+  GLRenderer, CastleResources, GameItems;
 
 { requested screen size ------------------------------------------------------ }
 
@@ -140,9 +140,21 @@ begin
   Window.OpenOptionalMultiSamplingAndStencil(@MultiSamplingOff, @StencilOff);
 end;
 
+function MyGetApplicationName: string;
+begin
+  Result := 'castle';
+end;
+
 { main -------------------------------------------------------------------- }
 
 begin
+  { This is needed because
+    - I sometimes display ApplicationName for user, and under Windows
+      ParamStr(0) is ugly uppercased.
+    - ParamStr(0) is unsure for Unixes.
+    - ParamStr(0) is useless for upx executables. }
+  OnGetApplicationName := {$ifdef FPC_OBJFPC} @ {$endif} MyGetApplicationName;
+
   { parse parameters }
   SoundEngine.ParseParameters;
   Window.ParseParameters([poDisplay]);

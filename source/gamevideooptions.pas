@@ -28,22 +28,11 @@ interface
 uses GL, CastleGLUtils, CastleScene, X3DNodes,
   PrecalculatedAnimationCore;
 
-{ Set some Attributes as needed for castle models. }
-procedure AttributesSet(Attributes: TSceneRenderingAttributes);
-
 const
   DefaultAllowScreenChange = true;
 
 var
   AllowScreenChange: boolean;
-
-const
-  DefaultAnimationScenesPerTime = DefaultKAnimScenesPerTime;
-  MinAnimationScenesPerTime = 5;
-  MaxAnimationScenesPerTime = 40;
-
-var
-  AnimationScenesPerTime: Cardinal;
 
 var
   { You can set this to true for testing purposes. }
@@ -105,7 +94,7 @@ var
 
 implementation
 
-uses SysUtils, CastleUtils, GameConfig, GameWindow, RaysWindow,
+uses SysUtils, CastleUtils, CastleGameConfig, CastleGameWindow, RaysWindow,
   GLAntiAliasing;
 
 procedure AttributesSet(Attributes: TSceneRenderingAttributes);
@@ -135,11 +124,10 @@ begin
 end;
 
 initialization
+  TSceneRenderingAttributes.OnCreate := @AttributesSet;
+
   AllowScreenChange := ConfigFile.GetValue(
     'video_options/allow_screen_change', DefaultAllowScreenChange);
-  AnimationScenesPerTime := ConfigFile.GetValue(
-    'video_options/animation_smoothness',
-    DefaultAnimationScenesPerTime);
   RenderShadows := ConfigFile.GetValue(
     'video_options/shadows', DefaultRenderShadows);
   ColorDepthBits := ConfigFile.GetValue(
@@ -156,9 +144,6 @@ finalization
   ConfigFile.SetDeleteValue(
     'video_options/allow_screen_change',
     AllowScreenChange, DefaultAllowScreenChange);
-  ConfigFile.SetDeleteValue(
-    'video_options/animation_smoothness',
-    AnimationScenesPerTime, DefaultAnimationScenesPerTime);
   ConfigFile.SetDeleteValue(
     'video_options/shadows',
     RenderShadows, DefaultRenderShadows);

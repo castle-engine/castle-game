@@ -39,7 +39,7 @@ implementation
 
 uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
   GameNotifications, CastleStringUtils, WindowModes,
-  GameInputs, GamePlay, GameWindow,
+  GameInputs, GamePlay, CastleGameWindow,
   GameVideoOptions, VectorMath, CastleScene, CastleFilesUtils,
   GameHelp, CastleUtils, X3DFields, CastleTimeUtils, KeysMouse,
   Frustum;
@@ -196,7 +196,6 @@ begin
   CreditsModel := TCastleScene.CreateCustomCache(nil, GLContextCache);
   CreditsModel.Load(LoadX3DClassicFromString(VRMLContents, ''), true);
 
-  AttributesSet(CreditsModel.Attributes);
   CreditsModel.Attributes.UseSceneLights := true;
 
   Info := (CreditsModel.RootNode.FindNodeByName(TWorldInfoNode,

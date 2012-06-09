@@ -32,12 +32,12 @@ procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 implementation
 
 uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
-  GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
+  GL, GLU, CastleGLUtils, CastleMessages, CastleGameWindow,
   VectorMath, CastleWindow, GamePlay, GameGeneralMenu,
   GameControlsMenu, GameInputs, GameCreatures, GameChooseMenu,
   GameItems, OnScreenMenu, RaysWindow, GameVideoOptions,
   GameSound, X3DNodes, CastleClassUtils, GameNotifications,
-  GameLevel, KeysMouse, GameObjectKinds;
+  GameLevel, KeysMouse, CastleResources;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 

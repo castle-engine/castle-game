@@ -26,7 +26,7 @@ unit GameLevelSpecific;
 interface
 
 uses CastleScene, Boxes3D, VectorMath,
-  GamePlayer, GameLevel, Background, Triangle, GameObjectKinds,
+  GamePlayer, GameLevel, Background, Triangle, CastleResources,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation,
   GameCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
 
@@ -193,7 +193,7 @@ implementation
 uses CastleFilesUtils, SysUtils, CastleUtils,
   GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
   GamePlay, GameNotifications, GameInputs,
-  GameItems, GameThunder, GameWindow, GameX3DProcessing,
+  GameItems, GameThunder, CastleGameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, ProgressUnit,
   CastleXMLUtils;
 
@@ -1311,7 +1311,6 @@ begin
     Fountain := TBlendedLoopingAnimationShader.CreateCustomCache(Self, GLContextCache);
     Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
       PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true);
-    AttributesSet(Fountain.Attributes);
     { progress is being already done }
     {Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
     try}

@@ -26,7 +26,7 @@ unit GamePlayer;
 interface
 
 uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
-  GameInputs, ALSoundAllocator, GameSound, GameObjectKinds,
+  GameInputs, ALSoundAllocator, GameSound, CastleResources,
   Triangle, GameTextures, XmlSoundEngine, Classes, Base3D,
   CastleGLUtils, CastleColors;
 
@@ -381,7 +381,7 @@ type
 implementation
 
 uses Math, SysUtils, CastleClassUtils, GamePlay, CastleMessages,
-  GameWindow, CastleUtils, X3DNodes,
+  CastleGameWindow, CastleUtils, X3DNodes,
   CastleWindow, Images, CastleFilesUtils,
   PrecalculatedAnimation, ALUtils, CastleOpenAL, GameControlsMenu,
   GameNotifications, CastleXMLConfig, GLImages;

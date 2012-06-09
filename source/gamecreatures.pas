@@ -27,7 +27,7 @@ interface
 
 uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, CastleUtils,
   CastleScene, GameSound, SectorsWaypoints,
-  GameObjectKinds, ALSoundAllocator, CastleXMLConfig, Base3D,
+  CastleResources, ALSoundAllocator, CastleXMLConfig, Base3D,
   XmlSoundEngine, Frustum, X3DNodes, CastleColors, FGL;
 
 const
@@ -904,7 +904,7 @@ var
 
 implementation
 
-uses SysUtils, DOM, GL, GLU, GameWindow, CastleWindow,
+uses SysUtils, DOM, GL, GLU, CastleGameWindow, CastleWindow,
   CastleFilesUtils, CastleGLUtils, ProgressUnit,
   GameVideoOptions, GameNotifications, GamePlayer;
 

@@ -144,7 +144,7 @@ function InteractInputDescription: string;
 
 implementation
 
-uses SysUtils, GameConfig;
+uses SysUtils, CastleGameConfig;
 
 function InteractInputDescription: string;
 begin

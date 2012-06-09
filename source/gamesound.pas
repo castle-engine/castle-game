@@ -126,7 +126,7 @@ function SoundEngine: TCastleSoundEngine;
 
 implementation
 
-uses GameConfig, ALSoundEngine;
+uses CastleGameConfig, ALSoundEngine;
 
 constructor TCastleSoundEngine.Create;
 begin

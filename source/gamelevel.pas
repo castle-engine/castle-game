@@ -28,7 +28,7 @@ interface
 uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
   X3DNodes, X3DFields, GameItems, Cameras,
   GameCreatures, GameSound, Background,
-  CastleUtils, CastleClassUtils, GamePlayer, GameThunder, GameObjectKinds,
+  CastleUtils, CastleClassUtils, GamePlayer, GameThunder, CastleResources,
   ProgressUnit, PrecalculatedAnimation,
   DOM, XmlSoundEngine, Base3D, Shape, GL,
   Classes, CastleTimeUtils, CastleSceneManager, GLRendererShader, FGL;
@@ -352,8 +352,8 @@ implementation
 uses SysUtils, Triangle, CastleLog,
   CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   CastleWindow, GLImages, Images, WindowModes, UIControls, XMLRead,
-  GameVideoOptions, GameConfig, GameNotifications,
-  GameInputs, GameWindow, CastleXMLUtils, CastleProgress,
+  GameVideoOptions, CastleGameConfig, GameNotifications,
+  GameInputs, CastleGameWindow, CastleXMLUtils, CastleProgress,
   GLRenderer, RenderingCameraUnit, Math, CastleWarnings;
 
 { TLevelArea ----------------------------------------------------------------- }
@@ -724,7 +724,6 @@ begin
     MainScene := TCastleScene.CreateCustomCache(Self, GLContextCache);
     MainScene.Load(Info.SceneFileName);
 
-    AttributesSet(MainScene.Attributes);
     MainScene.Attributes.UseSceneLights := true;
     if BumpMapping then
       MainScene.Attributes.BumpMapping := bmBasic else
@@ -962,7 +961,6 @@ var
 begin
   Result := SceneClass.CreateCustomCache(Self, GLContextCache);
   Result.Load(FileName);
-  AttributesSet(Result.Attributes);
 
   { calculate Options for PrepareResources }
   Options := [prRender, prBoundingBox { always needed }];
@@ -998,8 +996,6 @@ var
 begin
   Result := AnimationClass.CreateCustomCache(Self, GLContextCache);
   Result.LoadFromFile(FileName, false, true);
-
-  AttributesSet(Result.Attributes);
 
   { calculate Options for PrepareResources }
   Options := [prRender, prBoundingBox { always needed }];
