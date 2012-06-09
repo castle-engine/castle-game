@@ -106,7 +106,7 @@ uses SysUtils, CastleUtils, CastleWindow,
   GameItems, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, GameConfig, GameCreatures,
-  GameNotifications, GameControlsMenu,
+  GameNotifications, GameControlsMenu, CastleControls,
   GameLevelSpecific, CastleTimeUtils, GLImages, KeysMouse;
 
 var
@@ -391,12 +391,29 @@ begin
 end;
 
 procedure LevelFinishedFlush;
+var
+  ImageBackground: TCastleImageControl;
 begin
   if LevelFinishedSchedule then
   begin
     LevelFinishedSchedule := false;
-    LevelsAvailable.FindId(LevelFinishedNextLevelId).LoadLevel(SceneManager);
-    InitNewLevel;
+
+    { create a background image when loading new level.
+      SceneManager will initialize progress bar when SceneManager.Level
+      will be released, so the background will be completely black
+      if we don't set something up here. }
+    ImageBackground := TCastleImageControl.Create(nil);
+    try
+      { TODO: nicer image background: blur or such? }
+      ImageBackground.Image := Window.SaveScreen;
+      Window.Controls.Add(ImageBackground);
+
+      LevelsAvailable.FindId(LevelFinishedNextLevelId).LoadLevel(SceneManager);
+      InitNewLevel;
+    finally
+      { this will also remove ImageBackground from Window.Controls }
+      FreeAndNil(ImageBackground);
+    end;
   end;
 end;
 
