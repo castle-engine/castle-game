@@ -28,12 +28,6 @@ interface
 
 uses Classes, VectorMath, SysUtils, XmlSoundEngine;
 
-const
-  LevelEventSoundImportance      = 100000;
-  PlayerSoundImportance          = 10000;
-  DefaultCreatureSoundImportance = 1000;
-  MinorNonSpatialSoundImportance = 100;
-
 var
   { Castle sound types. Will be initialized in initialization of this
     unit (actually, along with creating TCastleSoundEngine and filling
@@ -131,11 +125,6 @@ uses CastleGameConfig, ALSoundEngine;
 constructor TCastleSoundEngine.Create;
 begin
   inherited;
-
-  AddSoundImportanceName('level_event', LevelEventSoundImportance);
-  AddSoundImportanceName('player', PlayerSoundImportance);
-  AddSoundImportanceName('default_creature', DefaultCreatureSoundImportance);
-  AddSoundImportanceName('minor_non_spatial', MinorNonSpatialSoundImportance);
 
   LoadFromConfig(ConfigFile);
 
