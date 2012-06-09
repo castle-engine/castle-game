@@ -20,8 +20,7 @@
   ----------------------------------------------------------------------------
 }
 
-{ This keeps global Glw (window) variable. }
-
+{ Global @link(Window) variable. }
 unit GameWindow;
 
 interface
