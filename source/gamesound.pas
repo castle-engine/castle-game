@@ -119,13 +119,16 @@ function SoundEngine: TCastleSoundEngine;
 
 implementation
 
-uses CastleGameConfig, ALSoundEngine;
+uses CastleGameConfig, ALSoundEngine, CastleFilesUtils;
 
 constructor TCastleSoundEngine.Create;
 begin
   inherited;
 
   LoadFromConfig(ConfigFile);
+
+  SoundsXmlFileName := ProgramDataPath + 'data' +
+    PathDelim + 'sounds' + PathDelim + 'index.xml';
 
   ReadSounds;
 
