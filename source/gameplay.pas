@@ -676,25 +676,9 @@ procedure EventDown(AKey: TKey;
 
   procedure DoDebugMenu;
   begin
-    { TODO: simplify now }
-    { We explicitly clear, and later readd GameControls to the Window.Controls.
-      Reason? During debug menu, current Level instance may change
-      (because debug menu may change the level, and even call LevelFinishedFlush).
-      During LevelFinishedFlush old Level instance is destroyed,
-      and new TLevel created, and the lists GameControls and Window.Controls
-      are updated... but our current Window.Controls list would be, at this time,
-      only saved in TGLMode state, so it would still contain invalid pointer
-      to the old level. So we should instead explicitly push/pop our current
-      Window.Controls, this way using current GameControls value. }
-    Window.Controls.BeginDisableContextOpenClose;
-    Window.Controls.Clear;
-
     SceneManager.Paused := true;
     ShowDebugMenu(GameControls);
     SceneManager.Paused := false;
-
-    Window.Controls.AddList(GameControls);
-    Window.Controls.EndDisableContextOpenClose;
   end;
 
   procedure DoInteract;
