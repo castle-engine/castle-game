@@ -26,7 +26,7 @@ unit GameSound;
 
 interface
 
-uses Classes, VectorMath, SysUtils, ALSoundEngine;
+uses Classes, SysUtils, ALSoundEngine;
 
 var
   { Castle sound types. Will be initialized in initialization of this
@@ -108,103 +108,69 @@ var
   { @groupEnd }
     :TSoundType;
 
-type
-  TCastleSoundEngine = class(TXmlSoundEngine)
-  public
-    constructor Create;
-    destructor Destroy; override;
-  end;
-
-function SoundEngine: TCastleSoundEngine;
-
 implementation
 
-uses CastleGameConfig, CastleFilesUtils;
-
-constructor TCastleSoundEngine.Create;
-begin
-  inherited;
-
-  LoadFromConfig(ConfigFile);
-
-  SoundsXmlFileName := ProgramDataPath + 'data' +
-    PathDelim + 'sounds' + PathDelim + 'index.xml';
-
-  ReadSounds;
-
-  stPlayerSuddenPain           := SoundFromName('player_sudden_pain');
-  stPlayerPotionDrink          := SoundFromName('player_potion_drink');
-  stPlayerCastFlyingSpell      := SoundFromName('player_cast_flying_spell');
-  stPlayerPickItem             := SoundFromName('player_pick_item');
-  stPlayerDropItem             := SoundFromName('player_drop_item');
-  stPlayerDies                 := SoundFromName('player_dies');
-  stPlayerSwimmingChange       := SoundFromName('player_swimming_change');
-  stPlayerSwimming             := SoundFromName('player_swimming');
-  stPlayerDrowning             := SoundFromName('player_drowning');
-  stPlayerFalledDown           := SoundFromName('player_falled_down');
-  stPlayerFootstepsConcrete    := SoundFromName('player_footsteps_concrete');
-  stPlayerFootstepsGrass       := SoundFromName('player_footsteps_grass');
-  stPlayerInteractFailed       := SoundFromName('player_interact_failed');
-  stPlayerLavaPain             := SoundFromName('player_lava_pain');
-  stPlayerFootstepsWatery      := SoundFromName('player_footsteps_watery');
-  stSwordEquipping             := SoundFromName('sword_equipping');
-  stSwordAttackStart           := SoundFromName('sword_attack_start');
-  stArrowFired                 := SoundFromName('arrow_fired');
-  stArrowHit                   := SoundFromName('arrow_hit');
-  stKeyUse                     := SoundFromName('key_use');
-  stKeyDoorUse                 := SoundFromName('key_door_use');
-  stBowAttackStart             := SoundFromName('bow_equipping');
-  stBowEquipping               := SoundFromName('bow_attack_start');
-  stGateMusic                  := SoundFromName('gate_music');
-  stCastleHallSymbolMoving     := SoundFromName('castle_hall_symbol_moving');
-  stCastleHallMusic            := SoundFromName('castle_hall_music');
-  stCagesMusic                 := SoundFromName('cages_music_with_rain');
-  stThunder                    := SoundFromName('thunder');
-  stStairsBlockerDestroyed     := SoundFromName('stairs_blocker_destroyed');
-  stTeleport                   := SoundFromName('teleport');
-  stSacrilegeAmbush            := SoundFromName('sacrilege_ambush');
-  stEvilLaugh                  := SoundFromName('evil_laugh');
-  stDoomE1M1Music              := SoundFromName('doom_e1m1');
-  stDoorOpen                   := SoundFromName('door_open');
-  stDoorClose                  := SoundFromName('door_close');
-  stElevator                   := SoundFromName('elevator');
-  stDoomExitButton             := SoundFromName('doom_exit_button');
-  stCreak                      := SoundFromName('creak');
-  stWerewolfActualAttackHit    := SoundFromName('werewolf_actual_attack_hit');
-  stWerewolfHowling            := SoundFromName('werewolf_howling');
-  stBallMissileFired           := SoundFromName('ball_missile_fired');
-  stBallMissileExplode         := SoundFromName('ball_missile_explode');
-  stBallMissileIdle            := SoundFromName('ball_missile_idle');
-  stSpiderActualAttackHit      := SoundFromName('spider_actual_attack_hit');
-  stSpiderAppears              := SoundFromName('spider_appears');
-  stSpiderQueenActualAttackHit := SoundFromName('spider_queen_actual_attack_hit');
-  stThrownWebFired             := SoundFromName('thrown_web_fired');
-  stThrownWebHit               := SoundFromName('thrown_web_hit');
-  stThrownWebIdle              := SoundFromName('thrown_web_idle');
-  stIntroMusic                 := SoundFromName('intro_music');
-  stMenuCurrentItemChanged     := SoundFromName('menu_current_item_changed');
-  stMenuClick                  := SoundFromName('menu_current_item_selected');
-  stSaveScreen                 := SoundFromName('save_screen');
-  stGameWinMusic               := SoundFromName('game_win_music');
-end;
-
-destructor TCastleSoundEngine.Destroy;
-begin
-  if ConfigFile <> nil then
-    SaveToConfig(ConfigFile);
-
-  inherited;
-end;
-
-function SoundEngine: TCastleSoundEngine;
-begin
-  Result := ALSoundEngine.SoundEngine as TCastleSoundEngine;
-end;
-
-{ initialization ------------------------------------------------------------- }
+uses CastleFilesUtils;
 
 initialization
-  ALSoundEngine.SoundEngine := TCastleSoundEngine.Create;
+  SoundEngine.SoundsXmlFileName := ProgramDataPath + 'data' +
+    PathDelim + 'sounds' + PathDelim + 'index.xml';
+
+  stPlayerSuddenPain           := SoundEngine.SoundFromName('player_sudden_pain');
+  stPlayerPotionDrink          := SoundEngine.SoundFromName('player_potion_drink');
+  stPlayerCastFlyingSpell      := SoundEngine.SoundFromName('player_cast_flying_spell');
+  stPlayerPickItem             := SoundEngine.SoundFromName('player_pick_item');
+  stPlayerDropItem             := SoundEngine.SoundFromName('player_drop_item');
+  stPlayerDies                 := SoundEngine.SoundFromName('player_dies');
+  stPlayerSwimmingChange       := SoundEngine.SoundFromName('player_swimming_change');
+  stPlayerSwimming             := SoundEngine.SoundFromName('player_swimming');
+  stPlayerDrowning             := SoundEngine.SoundFromName('player_drowning');
+  stPlayerFalledDown           := SoundEngine.SoundFromName('player_falled_down');
+  stPlayerFootstepsConcrete    := SoundEngine.SoundFromName('player_footsteps_concrete');
+  stPlayerFootstepsGrass       := SoundEngine.SoundFromName('player_footsteps_grass');
+  stPlayerInteractFailed       := SoundEngine.SoundFromName('player_interact_failed');
+  stPlayerLavaPain             := SoundEngine.SoundFromName('player_lava_pain');
+  stPlayerFootstepsWatery      := SoundEngine.SoundFromName('player_footsteps_watery');
+  stSwordEquipping             := SoundEngine.SoundFromName('sword_equipping');
+  stSwordAttackStart           := SoundEngine.SoundFromName('sword_attack_start');
+  stArrowFired                 := SoundEngine.SoundFromName('arrow_fired');
+  stArrowHit                   := SoundEngine.SoundFromName('arrow_hit');
+  stKeyUse                     := SoundEngine.SoundFromName('key_use');
+  stKeyDoorUse                 := SoundEngine.SoundFromName('key_door_use');
+  stBowAttackStart             := SoundEngine.SoundFromName('bow_equipping');
+  stBowEquipping               := SoundEngine.SoundFromName('bow_attack_start');
+  stGateMusic                  := SoundEngine.SoundFromName('gate_music');
+  stCastleHallSymbolMoving     := SoundEngine.SoundFromName('castle_hall_symbol_moving');
+  stCastleHallMusic            := SoundEngine.SoundFromName('castle_hall_music');
+  stCagesMusic                 := SoundEngine.SoundFromName('cages_music_with_rain');
+  stThunder                    := SoundEngine.SoundFromName('thunder');
+  stStairsBlockerDestroyed     := SoundEngine.SoundFromName('stairs_blocker_destroyed');
+  stTeleport                   := SoundEngine.SoundFromName('teleport');
+  stSacrilegeAmbush            := SoundEngine.SoundFromName('sacrilege_ambush');
+  stEvilLaugh                  := SoundEngine.SoundFromName('evil_laugh');
+  stDoomE1M1Music              := SoundEngine.SoundFromName('doom_e1m1');
+  stDoorOpen                   := SoundEngine.SoundFromName('door_open');
+  stDoorClose                  := SoundEngine.SoundFromName('door_close');
+  stElevator                   := SoundEngine.SoundFromName('elevator');
+  stDoomExitButton             := SoundEngine.SoundFromName('doom_exit_button');
+  stCreak                      := SoundEngine.SoundFromName('creak');
+  stWerewolfActualAttackHit    := SoundEngine.SoundFromName('werewolf_actual_attack_hit');
+  stWerewolfHowling            := SoundEngine.SoundFromName('werewolf_howling');
+  stBallMissileFired           := SoundEngine.SoundFromName('ball_missile_fired');
+  stBallMissileExplode         := SoundEngine.SoundFromName('ball_missile_explode');
+  stBallMissileIdle            := SoundEngine.SoundFromName('ball_missile_idle');
+  stSpiderActualAttackHit      := SoundEngine.SoundFromName('spider_actual_attack_hit');
+  stSpiderAppears              := SoundEngine.SoundFromName('spider_appears');
+  stSpiderQueenActualAttackHit := SoundEngine.SoundFromName('spider_queen_actual_attack_hit');
+  stThrownWebFired             := SoundEngine.SoundFromName('thrown_web_fired');
+  stThrownWebHit               := SoundEngine.SoundFromName('thrown_web_hit');
+  stThrownWebIdle              := SoundEngine.SoundFromName('thrown_web_idle');
+  stIntroMusic                 := SoundEngine.SoundFromName('intro_music');
+  stMenuCurrentItemChanged     := SoundEngine.SoundFromName('menu_current_item_changed');
+  stMenuClick                  := SoundEngine.SoundFromName('menu_current_item_selected');
+  stSaveScreen                 := SoundEngine.SoundFromName('save_screen');
+  stGameWinMusic               := SoundEngine.SoundFromName('game_win_music');
+
   { These were chosen experimentally for castle }
   SoundEngine.DistanceModel := dmInverseDistanceClamped; //< OpenAL default
   SoundEngine.DefaultRolloffFactor := 0.1;

@@ -35,7 +35,7 @@ uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
   VectorMath, CastleWindow, GamePlay, GameGeneralMenu,
   GameControlsMenu, GameInputs, CastleCreatures, GameChooseMenu,
-  GameItems, OnScreenMenu, RaysWindow, GameVideoOptions,
+  GameItems, OnScreenMenu, RaysWindow, GameVideoOptions, ALSoundEngine,
   GameSound, X3DNodes, CastleClassUtils, CastleGameNotifications,
   GameLevel, KeysMouse, CastleResources, CastleGameVideoOptions;
 
@@ -252,7 +252,7 @@ begin
          DebugRenderForLevelScreenshotArgument.Value :=
            DebugRenderForLevelScreenshot;
        end;
-    10:SoundEngine.ReadSounds;
+    10:SoundEngine.ReloadSounds;
     11:begin
          FreeAndNil(EditLevelLightsMenu);
          EditLevelLightsMenu := TEditLevelLightsMenu.Create(Application);
