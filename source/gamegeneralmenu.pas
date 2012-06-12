@@ -41,8 +41,6 @@ type
     constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
     property DrawFocused default false;
-    procedure CurrentItemChanged; override;
-    procedure Click; override;
     function PositionInside(const X, Y: Integer): boolean; override;
   end;
 
@@ -71,18 +69,6 @@ begin
   DesignerMode := DebugMenuDesigner;
   ExclusiveEvents := false;
   DrawFocused := false;
-end;
-
-procedure TCastleGameMenu.CurrentItemChanged;
-begin
-  inherited;
-  SoundEngine.Sound(stMenuCurrentItemChanged);
-end;
-
-procedure TCastleGameMenu.Click;
-begin
-  inherited;
-  SoundEngine.Sound(stMenuClick);
 end;
 
 function TCastleGameMenu.PositionInside(const X, Y: Integer): boolean;

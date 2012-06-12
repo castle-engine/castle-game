@@ -101,8 +101,6 @@ var
   { Others.
     @groupBegin }
   stIntroMusic,
-  stMenuCurrentItemChanged,
-  stMenuClick,
   stSaveScreen,
   stGameWinMusic
   { @groupEnd }
@@ -166,8 +164,6 @@ initialization
   stThrownWebHit               := SoundEngine.SoundFromName('thrown_web_hit');
   stThrownWebIdle              := SoundEngine.SoundFromName('thrown_web_idle');
   stIntroMusic                 := SoundEngine.SoundFromName('intro_music');
-  stMenuCurrentItemChanged     := SoundEngine.SoundFromName('menu_current_item_changed');
-  stMenuClick                  := SoundEngine.SoundFromName('menu_current_item_selected');
   stSaveScreen                 := SoundEngine.SoundFromName('save_screen');
   stGameWinMusic               := SoundEngine.SoundFromName('game_win_music');
 
