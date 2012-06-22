@@ -28,11 +28,10 @@ interface
 uses Classes, OnScreenMenu;
 
 type
-  { Just TCastleOnScreenMenu that calls Window.PostRedisplay and plays a sound
-    on each CurrentItem change.
+  { On-screen menu suitable for castle.
 
-    Also, it's PositioInside is overridden to always catch all events
-    (cover the whole screen), as we don't need the focus / non-focus stuff,
+    Full-screen display: PositioInside makes all events captured
+    (covers the whole screen), as we don't need the focus / non-focus stuff,
     menu is the only control used here.
     Also, it let's events further down to our callbacks, thanks
     to ExclusiveEvents being @false. }
@@ -83,13 +82,4 @@ begin
   Result := Window.Controls.MakeSingle(TCastleGameMenu, NewValue) as TCastleGameMenu;
 end;
 
-{ initialization / finalization ---------------------------------------------- }
-
-procedure WindowClose(const Container: IUIContainer);
-begin
-  OnScreenMenuCloseGL;
-end;
-
-initialization
-  OnGLContextClose.Add(@WindowClose);
 end.
