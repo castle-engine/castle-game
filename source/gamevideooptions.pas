@@ -25,8 +25,7 @@ unit GameVideoOptions;
 
 interface
 
-uses GL, CastleGLUtils, CastleScene, X3DNodes,
-  PrecalculatedAnimationCore;
+uses GL, CastleGLUtils, CastleScene, X3DNodes, PrecalculatedAnimationCore;
 
 const
   DefaultAllowScreenChange = true;
@@ -88,10 +87,17 @@ var
 
 implementation
 
-uses SysUtils, CastleUtils, CastleGameConfig, CastleGameCache, RaysWindow,
-  GLAntiAliasing, GameWindow;
+uses SysUtils, CastleUtils, CastleGameCache, RaysWindow,
+  GLAntiAliasing, GameWindow, CastleConfig;
 
-procedure AttributesSet(Attributes: TSceneRenderingAttributes);
+type
+  TGameVideoOptions = class
+    class procedure AttributesSet(Attributes: TSceneRenderingAttributes);
+    class procedure LoadFromConfig(const Config: TCastleConfig);
+    class procedure SaveToConfig(const Config: TCastleConfig);
+  end;
+
+class procedure TGameVideoOptions.AttributesSet(Attributes: TSceneRenderingAttributes);
 begin
   { Disadvantage: it only increases the image color, so partially
     transparent objects have a tendency to look all white on the level.
@@ -111,6 +117,46 @@ begin
   Attributes.UseSceneLights := false;
 end;
 
+class procedure TGameVideoOptions.LoadFromConfig(const Config: TCastleConfig);
+begin
+  AllowScreenChange := Config.GetValue(
+    'video_options/allow_screen_change', DefaultAllowScreenChange);
+  RenderShadows := Config.GetValue(
+    'video_options/shadows', DefaultRenderShadows);
+  ColorDepthBits := Config.GetValue(
+    'video_options/color_depth_bits', DefaultColorDepthBits);
+  VideoFrequency := Config.GetValue(
+    'video_options/frequency', DefaultVideoFrequency);
+  BumpMapping := Config.GetValue(
+    'video_options/bump_mapping', DefaultBumpMapping);
+  AntiAliasing := TAntiAliasing(Config.GetValue(
+    'video_options/anti_aliasing', Ord(DefaultAntiAliasing)));
+  UseOcclusionQuery := Config.GetValue(
+    'video_options/use_occlusion_query', DefaultUseOcclusionQuery);
+end;
+
+class procedure TGameVideoOptions.SaveToConfig(const Config: TCastleConfig);
+begin
+  Config.SetDeleteValue(
+    'video_options/allow_screen_change',
+    AllowScreenChange, DefaultAllowScreenChange);
+  Config.SetDeleteValue(
+    'video_options/shadows',
+    RenderShadows, DefaultRenderShadows);
+  Config.SetDeleteValue(
+    'video_options/color_depth_bits',
+    ColorDepthBits, DefaultColorDepthBits);
+  Config.SetDeleteValue(
+    'video_options/frequency',
+    VideoFrequency, DefaultVideoFrequency);
+  Config.SetDeleteValue('video_options/bump_mapping',
+    BumpMapping, DefaultBumpMapping);
+  Config.SetDeleteValue('video_options/anti_aliasing',
+    Ord(AntiAliasing), Ord(DefaultAntiAliasing));
+  Config.SetDeleteValue('video_options/use_occlusion_query',
+    UseOcclusionQuery, DefaultUseOcclusionQuery);
+end;
+
 function ViewAngleDegY: Single;
 begin
   Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX,
@@ -118,39 +164,7 @@ begin
 end;
 
 initialization
-  TSceneRenderingAttributes.OnCreate := @AttributesSet;
-
-  AllowScreenChange := ConfigFile.GetValue(
-    'video_options/allow_screen_change', DefaultAllowScreenChange);
-  RenderShadows := ConfigFile.GetValue(
-    'video_options/shadows', DefaultRenderShadows);
-  ColorDepthBits := ConfigFile.GetValue(
-    'video_options/color_depth_bits', DefaultColorDepthBits);
-  VideoFrequency := ConfigFile.GetValue(
-    'video_options/frequency', DefaultVideoFrequency);
-  BumpMapping := ConfigFile.GetValue(
-    'video_options/bump_mapping', DefaultBumpMapping);
-  AntiAliasing := TAntiAliasing(ConfigFile.GetValue(
-    'video_options/anti_aliasing', Ord(DefaultAntiAliasing)));
-  UseOcclusionQuery := ConfigFile.GetValue(
-    'video_options/use_occlusion_query', DefaultUseOcclusionQuery);
-finalization
-  ConfigFile.SetDeleteValue(
-    'video_options/allow_screen_change',
-    AllowScreenChange, DefaultAllowScreenChange);
-  ConfigFile.SetDeleteValue(
-    'video_options/shadows',
-    RenderShadows, DefaultRenderShadows);
-  ConfigFile.SetDeleteValue(
-    'video_options/color_depth_bits',
-    ColorDepthBits, DefaultColorDepthBits);
-  ConfigFile.SetDeleteValue(
-    'video_options/frequency',
-    VideoFrequency, DefaultVideoFrequency);
-  ConfigFile.SetDeleteValue('video_options/bump_mapping',
-    BumpMapping, DefaultBumpMapping);
-  ConfigFile.SetDeleteValue('video_options/anti_aliasing',
-    Ord(AntiAliasing), Ord(DefaultAntiAliasing));
-  ConfigFile.SetDeleteValue('video_options/use_occlusion_query',
-    UseOcclusionQuery, DefaultUseOcclusionQuery);
+  TSceneRenderingAttributes.OnCreate := @TGameVideoOptions(nil).AttributesSet;
+  Config.OnLoad.Add(@TGameVideoOptions(nil).LoadFromConfig);
+  Config.OnSave.Add(@TGameVideoOptions(nil).SaveToConfig);
 end.

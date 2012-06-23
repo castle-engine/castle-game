@@ -29,7 +29,7 @@ uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, GameLevel,
-  GameCredits, GLAntiAliasing, ALSoundEngine,
+  GameCredits, GLAntiAliasing, ALSoundEngine, CastleConfig,
   GLRenderer, CastleResources, GameItems, CastleGameNotifications;
 
 { requested screen size ------------------------------------------------------ }
@@ -152,8 +152,9 @@ begin
     - I sometimes display ApplicationName for user, and under Windows
       ParamStr(0) is ugly uppercased.
     - ParamStr(0) is unsure for Unixes.
-    - UserConfigFile uses this. }
-  OnGetApplicationName := {$ifdef FPC_OBJFPC} @ {$endif} MyGetApplicationName;
+    - UserConfigFile uses this, determines Config.FileName. }
+  OnGetApplicationName := @MyGetApplicationName;
+  Config.Load;
 
   { configure Notifications }
   Notifications.CollectHistory := true;
@@ -246,6 +247,8 @@ begin
 
     SoundEngine.ALContextClose;
   end;
+
+  Config.Save;
 end.
 
 {

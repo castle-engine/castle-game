@@ -314,7 +314,7 @@ implementation
 
 uses SysUtils, CastleWindow, CastleGameCache,
   GamePlay, CastleFilesUtils, ProgressUnit,
-  GameCreatures, CastleGameNotifications, CastleGameConfig,
+  GameCreatures, CastleGameNotifications, CastleConfig,
   CastleSceneCore, GLImages, CastleCreatures, CastleGameVideoOptions;
 
 { TItemKind ------------------------------------------------------------ }
@@ -741,26 +741,31 @@ begin
   Quiver := AllResources.FindId('Quiver') as TItemKind;
 end;
 
-procedure DoInitialization;
+type
+  TConfigOptions = class
+    class procedure LoadFromConfig(const Config: TCastleConfig);
+    class procedure SaveToConfig(const Config: TCastleConfig);
+  end;
+
+class procedure TConfigOptions.LoadFromConfig(const Config: TCastleConfig);
 begin
+  AutoOpenInventory := Config.GetValue(
+    'auto_open_inventory', DefaultAutoOpenInventory);
+end;
+
+class procedure TConfigOptions.SaveToConfig(const Config: TCastleConfig);
+begin
+  Config.SetDeleteValue('auto_open_inventory',
+    AutoOpenInventory, DefaultAutoOpenInventory);
+end;
+
+initialization
   RegisterResourceClass(TItemKind, 'Item');
   RegisterResourceClass(TItemSwordKind, 'Sword');
   RegisterResourceClass(TItemBowKind, 'Bow');
   RegisterResourceClass(TItemPotionOfLifeKind, 'LifePotion');
   RegisterResourceClass(TItemScrollOfFlyingKind, 'ScrFlying');
 
-  AutoOpenInventory := ConfigFile.GetValue(
-    'auto_open_inventory', DefaultAutoOpenInventory);
-end;
-
-procedure DoFinalization;
-begin
-  ConfigFile.SetDeleteValue('auto_open_inventory',
-    AutoOpenInventory, DefaultAutoOpenInventory);
-end;
-
-initialization
-  DoInitialization;
-finalization
-  DoFinalization;
+  Config.OnLoad.Add(@TConfigOptions(nil).LoadFromConfig);
+  Config.OnSave.Add(@TConfigOptions(nil).SaveToConfig);
 end.

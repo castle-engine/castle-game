@@ -30,7 +30,7 @@ uses VectorMath, CastleSceneCore, CastleScene, Boxes3D,
   CastleCreatures, GameSound, Background,
   CastleUtils, CastleClassUtils, GamePlayer, GameThunder, CastleResources,
   ProgressUnit, PrecalculatedAnimation,
-  DOM, ALSoundEngine, Base3D, Shape, GL,
+  DOM, ALSoundEngine, Base3D, Shape, GL, CastleConfig,
   Classes, CastleTimeUtils, CastleSceneManager, GLRendererShader, FGL;
 
 type
@@ -109,22 +109,22 @@ type
   TLevelAvailableList = class(specialize TFPGObjectList<TLevelAvailable>)
   private
     procedure LoadIndexXml(const FileName: string);
+    { Save AvailableForNewGame properties of every item. }
+    procedure SaveToConfig(const Config: TCastleConfig);
   public
     { raises Exception if such Id is not on the list. }
     function FindId(const AId: string): TLevelAvailable;
 
     procedure SortByNumber;
 
-    { This loads and saves AvailableForNewGame properties of every item. }
-    procedure LoadFromConfig;
-    procedure SaveToConfig;
-
     { Fill this list with items read from levels/index.xml.
 
-      All AvailableForNewGame are initially set to @false
-      (LoadFromConfig will set them to something read from user's
-      config file or to DefaultAvailableForNewGame if nothing in user's
-      config file).
+      All AvailableForNewGame are initially set to @false.
+      You must later call LoadFromConfig to read user preferences
+      and set AvailableForNewGame correctly (depending on levels that user
+      already finished, looking at DefaultAvailableForNewGame).
+      That's why LoadFromConfig has to be called explicitly,
+      isn't added to Config.OnLoad list.
 
       This can be done only once Window is open,
       because loading levels requires knowledge of window size
@@ -132,6 +132,7 @@ type
       Also, this can be done only once creatures and items resources are known,
       as they may be referenced in levels XML files. }
     procedure LoadFromFiles;
+    procedure LoadFromConfig;
   end;
 
   { Invisible and non-colliding areas on the level that have some special purpose.
@@ -352,7 +353,7 @@ implementation
 uses SysUtils, Triangle, CastleLog,
   CastleGLUtils, CastleFilesUtils, CastleStringUtils,
   CastleWindow, GLImages, Images, WindowModes, UIControls, XMLRead,
-  GameVideoOptions, CastleGameConfig, CastleGameNotifications,
+  GameVideoOptions, CastleGameNotifications,
   GameInputs, CastleGameCache, CastleXMLUtils, CastleProgress,
   GLRenderer, RenderingCameraUnit, Math, CastleWarnings, GameWindow;
 
@@ -1241,17 +1242,17 @@ var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
-    Items[I].AvailableForNewGame := ConfigFile.GetValue(
+    Items[I].AvailableForNewGame := Config.GetValue(
       'levels_available/' + Items[I].Id,
       Items[I].DefaultAvailableForNewGame);
 end;
 
-procedure TLevelAvailableList.SaveToConfig;
+procedure TLevelAvailableList.SaveToConfig(const Config: TCastleConfig);
 var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
-    ConfigFile.SetDeleteValue(
+    Config.SetDeleteValue(
       'levels_available/' + Items[I].Id,
       Items[I].AvailableForNewGame,
       Items[I].DefaultAvailableForNewGame);
@@ -1282,12 +1283,11 @@ initialization
     LevelClasses := TLevelClasses.Create;
 
   LevelsAvailable := TLevelAvailableList.Create(true);
+  Config.OnSave.Add(@LevelsAvailable.SaveToConfig);
 finalization
   FreeAndNil(LevelClasses);
 
-  if LevelsAvailable <> nil then
-  begin
-    LevelsAvailable.SaveToConfig;
-    FreeAndNil(LevelsAvailable);
-  end;
+  if (LevelsAvailable <> nil) and (Config <> nil) then
+    Config.OnSave.Remove(@LevelsAvailable.SaveToConfig);
+  FreeAndNil(LevelsAvailable);
 end.

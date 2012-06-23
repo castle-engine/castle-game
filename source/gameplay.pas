@@ -105,7 +105,7 @@ uses SysUtils, CastleUtils, CastleWindow,
   BFNT_BitstreamVeraSans_Unit, UIControls, ALSoundEngine,
   GameItems, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
-  GameVideoOptions, CastleGameConfig, GameCreatures,
+  GameVideoOptions, GameCreatures,
   CastleGameNotifications, GameControlsMenu, CastleControls, CastleCreatures,
   GameLevelSpecific, CastleTimeUtils, GLImages, KeysMouse;
 

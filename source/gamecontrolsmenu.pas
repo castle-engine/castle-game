@@ -82,7 +82,7 @@ implementation
 uses SysUtils, WindowModes, CastleGLUtils, CastleMessages, CastleGameCache,
   OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
   GameInputs, KeysMouse, VectorMath, CastleUtils, GamePlay, GameItems,
-  CastleGameConfig, CastleStringUtils, CastleGameNotifications, GameWindow;
+  CastleStringUtils, CastleGameNotifications, GameWindow, CastleConfig;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -633,25 +633,40 @@ begin
   FreeAndNil(SubMenuTitleFont);
 end;
 
+type
+  TConfigOptions = class
+    class procedure LoadFromConfig(const Config: TCastleConfig);
+    class procedure SaveToConfig(const Config: TCastleConfig);
+  end;
+
+class procedure TConfigOptions.LoadFromConfig(const Config: TCastleConfig);
+begin
+  MouseLookHorizontalSensitivity := Config.GetFloat(
+    'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);
+  MouseLookVerticalSensitivity := Config.GetFloat(
+    'mouse/vertical_sensitivity', DefaultMouseLookVerticalSensitivity);
+  UseMouseLook := Config.GetValue(
+    'mouse/use_mouse_look', DefaultUseMouseLook);
+  InvertVerticalMouseLook := Config.GetValue(
+    'mouse/invert_vertical_mouse_look', DefaultInvertVerticalMouseLook);
+end;
+
+class procedure TConfigOptions.SaveToConfig(const Config: TCastleConfig);
+begin
+  Config.SetDeleteFloat('mouse/horizontal_sensitivity',
+    MouseLookHorizontalSensitivity, DefaultMouseLookHorizontalSensitivity);
+  Config.SetDeleteFloat('mouse/vertical_sensitivity',
+    MouseLookVerticalSensitivity, DefaultMouseLookVerticalSensitivity);
+  Config.SetDeleteValue('mouse/use_mouse_look',
+    UseMouseLook, DefaultUseMouseLook);
+  Config.SetDeleteValue('mouse/invert_vertical_mouse_look',
+    InvertVerticalMouseLook, DefaultInvertVerticalMouseLook);
+end;
+
 initialization
   OnGLContextOpen.Add(@WindowOpen);
   OnGLContextClose.Add(@WindowClose);
 
-  MouseLookHorizontalSensitivity := ConfigFile.GetFloat(
-    'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);
-  MouseLookVerticalSensitivity := ConfigFile.GetFloat(
-    'mouse/vertical_sensitivity', DefaultMouseLookVerticalSensitivity);
-  UseMouseLook := ConfigFile.GetValue(
-    'mouse/use_mouse_look', DefaultUseMouseLook);
-  InvertVerticalMouseLook := ConfigFile.GetValue(
-    'mouse/invert_vertical_mouse_look', DefaultInvertVerticalMouseLook);
-finalization
-  ConfigFile.SetDeleteFloat('mouse/horizontal_sensitivity',
-    MouseLookHorizontalSensitivity, DefaultMouseLookHorizontalSensitivity);
-  ConfigFile.SetDeleteFloat('mouse/vertical_sensitivity',
-    MouseLookVerticalSensitivity, DefaultMouseLookVerticalSensitivity);
-  ConfigFile.SetDeleteValue('mouse/use_mouse_look',
-    UseMouseLook, DefaultUseMouseLook);
-  ConfigFile.SetDeleteValue('mouse/invert_vertical_mouse_look',
-    InvertVerticalMouseLook, DefaultInvertVerticalMouseLook);
+  Config.OnLoad.Add(@TConfigOptions(nil).LoadFromConfig);
+  Config.OnSave.Add(@TConfigOptions(nil).SaveToConfig);
 end.

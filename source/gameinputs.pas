@@ -26,12 +26,12 @@ unit GameInputs;
 interface
 
 uses KeysMouse, Cameras, CastleUtils, CastleClassUtils, Classes,
-  FGL, GenericStructList;
+  FGL, GenericStructList, CastleConfig;
 
 type
   TInputGroup = (kgBasic, kgItems, kgOther);
 
-  { This is basically a wrapper around TInputShortcut instance
+  { A wrapper around TInputShortcut instance
     (used to describe key/mouse shortcut for given action)
     with additional properties describing the group of the action,
     action name etc.
@@ -46,13 +46,13 @@ type
     FName: string;
     FGroup: TInputGroup;
     FShortcut: TInputShortcut;
-    FConfigFileName: string;
+    FConfigName: string;
     procedure ShortcutChanged(Shortcut: TInputShortcut);
   public
     { Constructor. Note that TInputShortcut instance passed here is owned
       by this object, i.e. it will be freed in our destructor. }
     constructor Create(const AName: string;
-      const AConfigFileName: string;
+      const AConfigName: string;
       const AGroup: TInputGroup;
       const AKey1: TKey;
       const AKey2: TKey = K_None;
@@ -63,7 +63,7 @@ type
     destructor Destroy; override;
 
     property Name: string read FName;
-    property ConfigFileName: string read FConfigFileName;
+    property ConfigName: string read FConfigName;
     property Group: TInputGroup read FGroup;
 
     { The key/mouse shortcut for this action.
@@ -80,6 +80,9 @@ type
   end;
 
   TInputConfigurationList = class(specialize TFPGObjectList<TInputConfiguration>)
+  private
+    procedure LoadFromConfig(const Config: TCastleConfig);
+    procedure SaveToConfig(const Config: TCastleConfig);
   public
     { Seeks for a Shortcut that has matching key or mouse button or mouse wheel.
       @nil if not found. }
@@ -87,9 +90,6 @@ type
       const MousePress: boolean; const MouseButton: TMouseButton;
       const MouseWheel: TMouseWheelDirection): TInputConfiguration;
     procedure RestoreDefaults;
-    procedure SaveToConfigFile;
-    procedure LoadFromConfigFile;
-
     function SeekConflict(out ConflictDescription: string): boolean;
   end;
 
@@ -144,7 +144,7 @@ function InteractInputDescription: string;
 
 implementation
 
-uses SysUtils, CastleGameConfig;
+uses SysUtils;
 
 function InteractInputDescription: string;
 begin
@@ -177,44 +177,58 @@ begin
     Items[I].Shortcut.MakeDefault;
 end;
 
-procedure TInputConfigurationList.SaveToConfigFile;
+procedure TInputConfigurationList.SaveToConfig(const Config: TCastleConfig);
 var
   I: Integer;
 begin
   for I := 0 to Count - 1 do
   begin
-    ConfigFile.SetDeleteValue('inputs/' + Items[I].ConfigFileName + '/key1',
+    Config.SetDeleteValue('inputs/' + Items[I].ConfigName + '/key1',
       Items[I].Shortcut.Key1, Items[I].Shortcut.DefaultKey1);
-    ConfigFile.SetDeleteValue('inputs/' + Items[I].ConfigFileName + '/key2',
+    Config.SetDeleteValue('inputs/' + Items[I].ConfigName + '/key2',
       Items[I].Shortcut.Key2, Items[I].Shortcut.DefaultKey2);
-    ConfigFile.SetDeleteValue('inputs/' + Items[I].ConfigFileName + '/mouse_button_use',
+    Config.SetDeleteValue('inputs/' + Items[I].ConfigName + '/mouse_button_use',
       Items[I].Shortcut.MouseButtonUse, Items[I].Shortcut.DefaultMouseButtonUse);
-    ConfigFile.SetDeleteValue('inputs/' + Items[I].ConfigFileName + '/mouse_button',
+    Config.SetDeleteValue('inputs/' + Items[I].ConfigName + '/mouse_button',
       Ord(Items[I].Shortcut.MouseButton), Ord(Items[I].Shortcut.DefaultMouseButton));
-    ConfigFile.SetDeleteValue('inputs/' + Items[I].ConfigFileName + '/mouse_wheel',
+    Config.SetDeleteValue('inputs/' + Items[I].ConfigName + '/mouse_wheel',
       Ord(Items[I].Shortcut.MouseWheel), Ord(Items[I].Shortcut.DefaultMouseWheel));
   end;
 end;
 
-procedure TInputConfigurationList.LoadFromConfigFile;
+procedure TInputConfigurationList.LoadFromConfig(const Config: TCastleConfig);
 var
   I: Integer;
+  ConflictDescription: string;
 begin
   for I := 0 to Count - 1 do
   begin
-    Items[I].Shortcut.Key1 := ConfigFile.GetValue(
-      'inputs/' + Items[I].ConfigFileName + '/key1', Items[I].Shortcut.DefaultKey1);
-    Items[I].Shortcut.Key2 := ConfigFile.GetValue(
-      'inputs/' + Items[I].ConfigFileName + '/key2', Items[I].Shortcut.DefaultKey2);
-    Items[I].Shortcut.MouseButtonUse := ConfigFile.GetValue(
-      'inputs/' + Items[I].ConfigFileName + '/mouse_button_use',
+    Items[I].Shortcut.Key1 := Config.GetValue(
+      'inputs/' + Items[I].ConfigName + '/key1', Items[I].Shortcut.DefaultKey1);
+    Items[I].Shortcut.Key2 := Config.GetValue(
+      'inputs/' + Items[I].ConfigName + '/key2', Items[I].Shortcut.DefaultKey2);
+    Items[I].Shortcut.MouseButtonUse := Config.GetValue(
+      'inputs/' + Items[I].ConfigName + '/mouse_button_use',
       Items[I].Shortcut.DefaultMouseButtonUse);
-    Items[I].Shortcut.MouseButton := TMouseButton(ConfigFile.GetValue(
-      'inputs/' + Items[I].ConfigFileName + '/mouse_button',
+    Items[I].Shortcut.MouseButton := TMouseButton(Config.GetValue(
+      'inputs/' + Items[I].ConfigName + '/mouse_button',
       Ord(Items[I].Shortcut.DefaultMouseButton)));
-    Items[I].Shortcut.MouseWheel := TMouseWheelDirection(ConfigFile.GetValue(
-      'inputs/' + Items[I].ConfigFileName + '/mouse_wheel',
+    Items[I].Shortcut.MouseWheel := TMouseWheelDirection(Config.GetValue(
+      'inputs/' + Items[I].ConfigName + '/mouse_wheel',
       Ord(Items[I].Shortcut.DefaultMouseWheel)));
+  end;
+
+  if SeekConflict(ConflictDescription) then
+  begin
+    WarningWrite(
+      'Your key/mouse shortcuts layout has conflicts. This can happen if you ' +
+      'just upgraded the game to newer version, and the newer version has new ' +
+      'key/mouse shortcuts or has different default key/mouse shortcuts than previous ' +
+      'version. It can also happen if you manually edited the configuration ' +
+      'file. I will reset your key/mouse shortcuts to default now.' +nl+
+      nl+
+      'Detailed conflict description: ' + ConflictDescription);
+    RestoreDefaults;
   end;
 end;
 
@@ -253,7 +267,7 @@ end;
 { TInputConfiguration ---------------------------------------------------------- }
 
 constructor TInputConfiguration.Create(const AName: string;
-  const AConfigFileName: string;
+  const AConfigName: string;
   const AGroup: TInputGroup;
   const AKey1: TKey;
   const AKey2: TKey;
@@ -264,7 +278,7 @@ constructor TInputConfiguration.Create(const AName: string;
 begin
   inherited Create;
   FName := AName;
-  FConfigFileName := AConfigFileName;
+  FConfigName := AConfigName;
   FGroup := AGroup;
 
   FShortcut := TInputShortcut.Create(nil);
@@ -385,27 +399,19 @@ begin
     raise EInternalError.Create(
       'Default key/mouse shortcuts layout has conflicts: ' + ConflictDescription);
 
-  CastleAllInputs.LoadFromConfigFile;
-
-  if CastleAllInputs.SeekConflict(ConflictDescription) then
-  begin
-    WarningWrite(
-      'Your key/mouse shortcuts layout has conflicts. This can happen if you ' +
-      'just upgraded the game to newer version, and the newer version has new ' +
-      'key/mouse shortcuts or has different default key/mouse shortcuts than previous ' +
-      'version. It can also happen if you manually edited the configuration ' +
-      'file. I will reset your key/mouse shortcuts to default now.' +nl+
-      nl+
-      'Detailed conflict description: ' + ConflictDescription);
-    CastleAllInputs.RestoreDefaults;
-  end;
+  Config.OnLoad.Add(@CastleAllInputs.LoadFromConfig);
+  Config.OnSave.Add(@CastleAllInputs.SaveToConfig);
 end;
 
 procedure DoFinalization;
 var
   InputGroup: TInputGroup;
 begin
-  CastleAllInputs.SaveToConfigFile;
+  if (CastleAllInputs <> nil) and (Config <> nil) then
+  begin
+    Config.OnLoad.Remove(@CastleAllInputs.LoadFromConfig);
+    Config.OnSave.Remove(@CastleAllInputs.SaveToConfig);
+  end;
 
   for InputGroup := Low(InputGroup) to High(InputGroup) do
     FreeAndNil(CastleGroupInputs[InputGroup]);
