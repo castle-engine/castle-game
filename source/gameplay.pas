@@ -26,7 +26,7 @@ unit GamePlay;
 
 interface
 
-uses Classes, GameLevel, GamePlayer, OpenGLFonts;
+uses Classes, GameLevel, GamePlayer, OpenGLFonts, Base3D;
 
 { Play the game.
 
@@ -926,4 +926,5 @@ initialization
   OnGLContextOpen.Add(@WindowOpen);
   OnGLContextClose.Add(@WindowClose);
   OnCreatureExists := @GameCreatureExists;
+  T3DOrient.DefaultOrientation := otUpZDirectionX;
 end.

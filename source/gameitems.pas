@@ -241,14 +241,15 @@ type
     function FindKind(Kind: TItemKind): Integer;
   end;
 
-  TItemOnLevel = class(T3DTransform)
+  TItemOnLevel = class(T3DOrient)
   private
     FItem: TItem;
+    Rotation: Single;
   protected
     function GetExists: boolean; override;
   public
     constructor Create(AOwner: TComponent;
-      AItem: TItem; const ATranslation: TVector3Single); reintroduce;
+      AItem: TItem; const APosition: TVector3Single); reintroduce;
     destructor Destroy; override;
 
     { Note that this Item is owned by TItemOnLevel instance,
@@ -596,12 +597,11 @@ end;
 { TItemOnLevel ------------------------------------------------------------ }
 
 constructor TItemOnLevel.Create(AOwner: TComponent;
-  AItem: TItem; const ATranslation: TVector3Single);
+  AItem: TItem; const APosition: TVector3Single);
 begin
   inherited Create(AOwner);
   FItem := AItem;
-  Translation := ATranslation;
-  Rotation := Vector4Single(UnitVector3Single[2], 0); { angle will animate later }
+  Position := APosition;
 
   { most item models are not 2-manifold }
   CastShadowVolumes := false;
@@ -653,27 +653,27 @@ const
   FallingDownSpeed = 10.0;
 var
   AboveHeight: Single;
-  ShiftedTranslation: TVector3Single;
+  ShiftedPosition: TVector3Single;
   FallingDownLength: Single;
-  Rot: TVector4Single;
 begin
   inherited;
   if not GetExists then Exit;
 
-  Rot := Rotation;
-  Rot[3] += 2.61 * CompSpeed;
-  Rotation := Rot;
+  Rotation += 2.61 * CompSpeed;
+  Direction := Vector3Single(Sin(Rotation), Cos(Rotation), 0);
+  Up := World.GravityUp; // TODO: should be initially set for all items,
+  // and rotations should be around it
 
-  ShiftedTranslation := Translation;
-  ShiftedTranslation[2] += ItemRadius;
+  ShiftedPosition := Position;
+  ShiftedPosition[2] += ItemRadius;
 
-  { Note that I'm using ShiftedTranslation, not Translation,
+  { Note that I'm using ShiftedPosition, not Position,
     and later I'm comparing "AboveHeight > ItemRadius",
     instead of "AboveHeight > 0".
     Otherwise, I risk that when item will be placed perfectly on the ground,
     it may "slip through" this ground down. }
 
-  MyHeight(ShiftedTranslation, AboveHeight);
+  MyHeight(ShiftedPosition, AboveHeight);
   if AboveHeight > ItemRadius then
   begin
     { Item falls down because of gravity. }
