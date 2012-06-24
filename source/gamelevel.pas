@@ -997,7 +997,7 @@ var
   Options: TPrepareResourcesOptions;
 begin
   Result := AnimationClass.CreateCustomCache(Self, GLContextCache);
-  Result.LoadFromFile(FileName, false, true);
+  Result.LoadFromFile(FileName, false, true, 1);
 
   { calculate Options for PrepareResources }
   Options := [prRender, prBoundingBox { always needed }];

@@ -42,7 +42,8 @@ uses SysUtils, Classes, CastleUtils, WindowModes,
   CastleStringUtils, CastleClassUtils,
   CastleGameNotifications, GameBackgroundLevel, UIControls,
   ALSoundEngine, CastleSoundMenu, X3DNodes, CastleResources,
-  GameCredits, GLAntiAliasing, KeysMouse, CastleOpenDocument;
+  GameCredits, GLAntiAliasing, KeysMouse, CastleOpenDocument,
+  PrecalculatedAnimation;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -62,7 +63,7 @@ type
   public
     AllowScreenChangeArgument: TMenuBooleanArgument;
     RenderShadowsArgument: TMenuBooleanArgument;
-    CreatureAnimationSlider: TMenuIntegerSlider;
+    AnimationSmoothnessSlider: TMenuFloatSlider;
     ColorDepthArgument: TMenuArgument;
     VideoFrequencyArgument: TMenuArgument;
     ConserveResourcesArgument: TMenuBooleanArgument;
@@ -258,6 +259,9 @@ const
 
   SSystemDefault = 'System default';
 
+  MinAnimationSmoothness = 0.2;
+  MaxAnimationSmoothness = 1.2;
+
 function ColorDepthBitsToStr(const Value: Cardinal): string;
 begin
   if Value = 0 then
@@ -278,10 +282,10 @@ begin
 
   AllowScreenChangeArgument := TMenuBooleanArgument.Create(AllowScreenChange);
   RenderShadowsArgument := TMenuBooleanArgument.Create(RenderShadows);
-  CreatureAnimationSlider := TMenuIntegerSlider.Create(
-    MinAnimationScenesPerTime,
-    MaxAnimationScenesPerTime,
-    AnimationScenesPerTime);
+  AnimationSmoothnessSlider := TMenuFloatSlider.Create(
+    MinAnimationSmoothness,
+    MaxAnimationSmoothness,
+    AnimationSmoothness);
 
   ColorDepthArgument := TMenuArgument.Create(
     TMenuArgument.TextWidth(SSystemDefault));
@@ -298,7 +302,7 @@ begin
   Items.Add('View video information');
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
   Items.AddObject('Shadow volumes', RenderShadowsArgument);
-  Items.AddObject('Animation smoothness', CreatureAnimationSlider);
+  Items.AddObject('Animation smoothness', AnimationSmoothnessSlider);
   Items.AddObject('Color depth', ColorDepthArgument);
   Items.AddObject('Display frequency', VideoFrequencyArgument);
   Items.AddObject('Bump mapping', BumpMappingArgument);
@@ -319,19 +323,6 @@ begin
     - Blending (for Attrib_Blending somewhere)
       Resigned, because without blending levels and items and creatures
       will really look too bad to be sensible.
-
-    - Creature animation smoothness
-      I actually implemented it.
-
-      But I don't like this implementation. Why ?
-
-      1. CastleCreatures implementation requires that the
-         program must be restarted for new AnimationScenesPerTime
-         value to take effect.
-
-      2. Contrary to my expectations, setting it to
-         MinAnimationScenesPerTime does *not* drastically
-         reduce "Loading creatures" time. Although it does reduce memory usage.
   }
 
   SubMenuTitle := 'Video options';
@@ -430,28 +421,13 @@ begin
          RenderShadows := DefaultRenderShadows;
          RenderShadowsArgument.Value := RenderShadows;
 
-         if AnimationScenesPerTime <> DefaultAnimationScenesPerTime then
+         if AnimationSmoothness <> DefaultAnimationSmoothness then
          begin
-           AnimationScenesPerTime := DefaultAnimationScenesPerTime;
-
-           { TODO: FPC bug below ?
-             When I change below DefaultAnimationScenesPerTime
-             to AnimationScenesPerTime, the assignment below doesn't
-             work anymore. Doing
-               Writeln('Should be ', AnimationScenesPerTime);
-             suddenly makes the assigment working.
-
-             Steps to reproduce : run the game, change the slider value
-             using mouse, press "Reset to defaults" and see if the slider
-             is drawn back with default value.
-
-             Happens only with FPC 2.0.2 (or 2.0.3 from 2006/03/26)
-             with -dRELEASE on Linux.
-             With -dDEBUG doesn't happen.
-             On Win32 with -dRELEASE doesn't happen. }
-
-           CreatureAnimationSlider.Value := DefaultAnimationScenesPerTime;
-           SubMenuAdditionalInfo := SRestartTheGame;
+           AnimationSmoothness := DefaultAnimationSmoothness;
+           AnimationSmoothnessSlider.Value := AnimationSmoothness;
+           { You should SRestartTheGame to see the effect fully,
+             also on items. But for most typical result, to see it on creatures,
+             there's no need to restart the game. }
          end;
 
          if ColorDepthBits <> DefaultColorDepthBits then
@@ -485,14 +461,7 @@ end;
 procedure TVideoMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
-    3: begin
-         if AnimationScenesPerTime <>
-           Cardinal(CreatureAnimationSlider.Value) then
-         begin
-           AnimationScenesPerTime := CreatureAnimationSlider.Value;
-           SubMenuAdditionalInfo := SRestartTheGame;
-         end;
-       end;
+    3: AnimationSmoothness := AnimationSmoothnessSlider.Value;
     7: SetAntiAliasing(TAntiAliasing(AntiAliasingSlider.Value), false);
   end;
 end;

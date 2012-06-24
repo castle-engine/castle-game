@@ -1310,7 +1310,7 @@ begin
     { load Fountain animation, following the similar code as LoadLevelAnimation }
     Fountain := TBlendedLoopingAnimationShader.CreateCustomCache(Self, GLContextCache);
     Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
-      PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true);
+      PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true, 1);
     { progress is being already done }
     {Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
     try}
