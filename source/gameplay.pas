@@ -571,7 +571,7 @@ procedure EventDown(AKey: TKey;
         if DropppedItem <> nil then
         begin
           UpdateInventoryCurrentItemAfterDelete;
-          SceneManager.Items.Add(TItemOnLevel.Create(SceneManager, DropppedItem, DropPosition));
+          DropppedItem.PutOnLevel(SceneManager.Items, DropPosition);
         end;
       end else
         Notifications.Show('Not enough room here to drop this item');

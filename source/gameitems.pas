@@ -199,6 +199,8 @@ type
     procedure Use(Item: TItem); override;
   end;
 
+  TItemOnLevel = class;
+
   { An item. Actually, this represents a collection of
     "stacked" items that have the same properties --- see Quantity property. }
   TItem = class(TComponent)
@@ -227,6 +229,13 @@ type
 
       Always QuantitySplit must be >= 1 and < Quantity. }
     function Split(QuantitySplit: Cardinal): TItem;
+
+    { Create TItemOnLevel instance referencing this item,
+      and add this to given 3D World.
+      This is how you should create new TItemOnLevel instances.
+      It is analogous to TCreatureKind.CreateCreature, but now for items. }
+    function PutOnLevel(World: T3DWorld;
+      const APosition: TVector3Single): TItemOnLevel;
   end;
 
   TItemList = class(specialize TFPGObjectList<TItem>)
@@ -247,9 +256,9 @@ type
     Rotation: Single;
   protected
     function GetExists: boolean; override;
+    function GetChild: T3D; override;
   public
-    constructor Create(AOwner: TComponent;
-      AItem: TItem; const APosition: TVector3Single); reintroduce;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     { Note that this Item is owned by TItemOnLevel instance,
@@ -576,6 +585,17 @@ begin
   FQuantity -= QuantitySplit;
 end;
 
+function TItem.PutOnLevel(World: T3DWorld;
+  const APosition: TVector3Single): TItemOnLevel;
+begin
+  Result := TItemOnLevel.Create(World { owner });
+  { set properties that in practice must have other-than-default values
+    to sensibly use the item }
+  Result.FItem := Self;
+  Result.SetView(APosition, AnyOrthogonalVector(World.GravityUp), World.GravityUp);
+  World.Add(Result);
+end;
+
 { TItemList ------------------------------------------------------------ }
 
 function TItemList.Stackable(Item: TItem): Integer;
@@ -596,19 +616,14 @@ end;
 
 { TItemOnLevel ------------------------------------------------------------ }
 
-constructor TItemOnLevel.Create(AOwner: TComponent;
-  AItem: TItem; const APosition: TVector3Single);
+constructor TItemOnLevel.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FItem := AItem;
-  Position := APosition;
 
   { most item models are not 2-manifold }
   CastShadowVolumes := false;
 
   Pushable := true;
-
-  Add(Item.Kind.Scene);
 
   { Items are not collidable, player can enter them to pick them up.
     For now, this also means that creatures can pass through them,
@@ -620,6 +635,12 @@ destructor TItemOnLevel.Destroy;
 begin
   FreeAndNil(FItem);
   inherited;
+end;
+
+function TItemOnLevel.GetChild: T3D;
+begin
+  if (Item = nil) or not Item.Kind.Prepared then Exit(nil);
+  Result := Item.Kind.Scene;
 end;
 
 function TItemOnLevel.ExtractItem: TItem;
