@@ -1426,9 +1426,6 @@ begin
       Result :=  EquippedWeaponKind.ReadyAnimation.SceneFromTime(LifeTime);
     end;
   end;
-
-  if Result <> nil then
-    Result.CastShadowVolumes := false; { they look bad for our weapon models }
 end;
 
 procedure TPlayer.Notification(AComponent: TComponent; Operation: TOperation);

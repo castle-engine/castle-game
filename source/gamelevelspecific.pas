@@ -518,7 +518,6 @@ begin
 
   Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false, false);
   Teleport.Collides := false;
-  Teleport.CastShadowVolumes := false; { not manifold }
 
   Teleport1 := T3DTransform.Create(Self);
   { set rotation axis. Rotation angle will be increased in each Idle }
@@ -709,9 +708,6 @@ begin
   MovingElevator.SoundGoBeginPosition := stElevator;
   MovingElevator.SoundGoBeginPositionLooping := true;
   MovingElevator.SoundTracksCurrentPosition := true;
-  { no shadow, because looks bad: tower level has uninteresting light
-    and elevator triggers artifacts because of BorderEdges. }
-  MovingElevator.CastShadowVolumes := false;
   AWorld.Add(MovingElevator);
 
   TTowerElevatorButton(ElevatorButton).MovingElevator := MovingElevator;

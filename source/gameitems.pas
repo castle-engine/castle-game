@@ -620,9 +620,6 @@ constructor TItemOnLevel.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  { most item models are not 2-manifold }
-  CastShadowVolumes := false;
-
   Pushable := true;
 
   { Items are not collidable, player can enter them to pick them up.

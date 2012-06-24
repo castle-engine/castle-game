@@ -47,7 +47,6 @@ type
     Document: TXMLDocument;
     DocumentBasePath: string;
     FMusicSound: TSoundType;
-    FSceneDynamicShadows: boolean;
     FFootstepsSound: TSoundType;
     procedure LoadFromDocument;
   public
@@ -95,11 +94,6 @@ type
       default stNone;
 
     property FootstepsSound: TSoundType read FFootstepsSound write FFootstepsSound;
-
-    { Do we will render shadow volumes for all scene geometry.
-      This allows the whole level to use dynamic shadows. }
-    property SceneDynamicShadows: boolean
-      read FSceneDynamicShadows write FSceneDynamicShadows default false;
 
     { Load level from file, create camera, octrees, prepare for OpenGL and such. }
     procedure LoadLevel(const SceneManager: TGameSceneManager;
@@ -778,11 +772,9 @@ begin
     FLevel := Info.LevelClass.Create(Self, Items, MainScene, Info.Element);
     Items.Add(Level);
 
-    MainScene.CastShadowVolumes := Info.SceneDynamicShadows;
-
     { calculate Options for PrepareResources }
     Options := [prRender, prBackground, prBoundingBox];
-    if RenderShadowsPossible and Info.SceneDynamicShadows then
+    if RenderShadowsPossible then
       Options := Options + prShadowVolume;
 
     MainScene.PrepareResources(Options, false, BaseLights);
@@ -1158,9 +1150,6 @@ begin
   if DOMGetAttribute(Element, 'footsteps_sound', SoundName) then
     FootstepsSound := SoundEngine.SoundFromName(SoundName) else
     FootstepsSound := stPlayerFootstepsConcrete;
-
-  FSceneDynamicShadows := false; { default value }
-  DOMGetBooleanAttribute(Element, 'scene_dynamic_shadows', FSceneDynamicShadows);
 end;
 
 procedure DrawLoadLevel(Window: TCastleWindowBase);

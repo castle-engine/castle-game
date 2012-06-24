@@ -8,7 +8,6 @@
   number="15"
   type="Fountain"
   footsteps_sound="player_footsteps_concrete"
-  scene_dynamic_shadows="True"
 
   demo="True"
   default_available_for_new_game="True"
