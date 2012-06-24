@@ -25,10 +25,9 @@ unit GameCreatures;
 
 interface
 
-uses Classes, VectorMath, PrecalculatedAnimation, Boxes3D, CastleClassUtils, CastleUtils,
-  CastleScene, SectorsWaypoints,
-  CastleResources, ALSoundAllocator, CastleXMLConfig, Base3D,
-  ALSoundEngine, Frustum, X3DNodes, CastleColors, FGL, CastleCreatures;
+uses Classes, VectorMath, PrecalculatedAnimation, CastleClassUtils, CastleUtils,
+  CastleScene, CastleResources, CastleXMLConfig, Base3D,
+  ALSoundEngine, X3DNodes, CastleCreatures;
 
 type
   TAlienCreatureKind = class(TWalkAttackCreatureKind)

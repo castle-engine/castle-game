@@ -25,7 +25,7 @@ unit GameVideoOptions;
 
 interface
 
-uses GL, CastleGLUtils, CastleScene, X3DNodes, PrecalculatedAnimationCore;
+uses GL, CastleGLUtils, CastleScene, X3DNodes;
 
 const
   DefaultAllowScreenChange = true;
