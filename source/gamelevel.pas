@@ -476,7 +476,6 @@ var
       ItemQuantity: Cardinal;
       ItemStubBoundingBox: TBox3D;
       ItemPosition: TVector3Single;
-      Item: TItem;
     begin
       { Calculate ItemKindQuantity }
       IgnoredBegin := Pos('_', ItemNodeName);
@@ -507,8 +506,7 @@ var
       ItemPosition[1] := (ItemStubBoundingBox.Data[0, 1] + ItemStubBoundingBox.Data[1, 1]) / 2;
       ItemPosition[2] := ItemStubBoundingBox.Data[0, 2];
 
-      Item := TItem.Create(ItemKind, ItemQuantity);
-      Item.PutOnLevel(Items, ItemPosition);
+      ItemKind.CreateItem(ItemQuantity).PutOnLevel(Items, ItemPosition);
     end;
 
   const

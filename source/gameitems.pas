@@ -111,6 +111,15 @@ type
     { This returns Scene.BoundingBox enlarged a little (along X and Y)
       to account the fact that Scene may be rotated around +Z vector. }
     function BoundingBoxRotated: TBox3D;
+
+    { Create item. This is how you should create new TItem instances.
+      It is analogous to TCreatureKind.CreateCreature, but now for items.
+
+      Note that the item itself doesn't exist on a level --- you have to
+      put it there if you want by TItem.PutOnLevel. That is because items
+      can also exist only in player's backpack and such, and then they
+      are independent from 3D world. }
+    function CreateItem(const AQuantity: Cardinal): TItem;
   end;
 
   TItemPotionOfLifeKind = class(TItemKind)
@@ -201,15 +210,14 @@ type
 
   TItemOnLevel = class;
 
-  { An item. Actually, this represents a collection of
-    "stacked" items that have the same properties --- see Quantity property. }
+  { An item.
+    Thanks to the @link(Quantity) property, this may actually represent
+    many "stacked" items, all having the same properties. }
   TItem = class(TComponent)
   private
     FKind: TItemKind;
     FQuantity: Cardinal;
   public
-    constructor Create(AKind: TItemKind; AQuantity: Cardinal); reintroduce;
-
     property Kind: TItemKind read FKind;
 
     { Quantity of this item.
@@ -222,7 +230,7 @@ type
       of both items are equal, with the exception of Quantity. }
     function Stackable(Item: TItem): boolean;
 
-    { This splits item (with Quantity >= 2) into two items.
+    { Splits item (with Quantity >= 2) into two items.
       It returns newly created object with the same properties
       as this object, and with Quantity set to QuantitySplit.
       And it lowers our Quantity by QuantitySplit.
@@ -421,6 +429,16 @@ begin
   inherited;
 end;
 
+function TItemKind.CreateItem(const AQuantity: Cardinal): TItem;
+begin
+  Result := TItem.Create(nil { for now, TItem.Owner is always nil });
+  { set properties that in practice must have other-than-default values
+    to sensibly use the item }
+  Result.FKind := Self;
+  Result.FQuantity := AQuantity;
+  Assert(Result.Quantity >= 1, 'Item''s Quantity must be >= 1');
+end;
+
 { TItemPotionOfLifeKind ---------------------------------------------------- }
 
 procedure TItemPotionOfLifeKind.Use(Item: TItem);
@@ -562,14 +580,6 @@ end;
 
 { TItem ------------------------------------------------------------ }
 
-constructor TItem.Create(AKind: TItemKind; AQuantity: Cardinal);
-begin
-  inherited Create(nil);
-  FKind := AKind;
-  FQuantity := AQuantity;
-  Assert(Quantity >= 1, 'Item''s Quantity must be >= 1');
-end;
-
 function TItem.Stackable(Item: TItem): boolean;
 begin
   Result := Item.Kind = Kind;
@@ -580,7 +590,7 @@ begin
   Check(Between(Integer(QuantitySplit), 1, Quantity - 1),
     'You must split >= 1 and less than current Quantity');
 
-  Result := TItem.Create(Kind, QuantitySplit);
+  Result := Kind.CreateItem(QuantitySplit);
 
   FQuantity -= QuantitySplit;
 end;

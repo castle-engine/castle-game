@@ -493,7 +493,7 @@ procedure TDebugItemsMenu.Click;
   begin
     for I := 0 to AllResources.Count - 1 do
       if AllResources[I] is TItemKind then
-        Player.PickItem(TItem.Create(TItemKind(AllResources[I]), 20));
+        Player.PickItem(TItemKind(AllResources[I]).CreateItem(20));
     UserQuit := true;
   end;
 

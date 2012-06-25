@@ -439,7 +439,7 @@ begin
   { Give player 1 sword. Otherwise player would start the level
     without any weapon, and there's no weapon to be found on
     the level... }
-  NewPlayer.PickItem(TItem.Create(Sword, 1));
+  NewPlayer.PickItem(Sword.CreateItem(1));
 end;
 
 function TCastleHallLevel.BossCreatureIndicator(
@@ -980,8 +980,8 @@ begin
   inherited;
 
   { Give player 1 sword and 1 bow, to have weapons. }
-  NewPlayer.PickItem(TItem.Create(Sword, 1));
-  NewPlayer.PickItem(TItem.Create(Bow, 1));
+  NewPlayer.PickItem(Sword.CreateItem(1));
+  NewPlayer.PickItem(Bow.CreateItem(1));
 end;
 
 function TCagesLevel.Background: TBackground;
@@ -1243,8 +1243,8 @@ procedure TDoomE1M1Level.PrepareNewPlayer(NewPlayer: TPlayer);
 begin
   inherited;
 
-  NewPlayer.PickItem(TItem.Create(Bow, 1));
-  NewPlayer.PickItem(TItem.Create(Quiver, 10));
+  NewPlayer.PickItem(Bow.CreateItem(1));
+  NewPlayer.PickItem(Quiver.CreateItem(10));
 end;
 
 procedure TDoomE1M1Level.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
@@ -1332,7 +1332,7 @@ begin
   { Give player 1 sword. Otherwise player would start the level
     without any weapon, and there's no weapon to be found on
     the level... }
-  NewPlayer.PickItem(TItem.Create(Sword, 1));
+  NewPlayer.PickItem(Sword.CreateItem(1));
 end;
 
 initialization
