@@ -378,7 +378,7 @@ type
 implementation
 
 uses Math, SysUtils, CastleClassUtils, GamePlay, CastleMessages,
-  GameWindow, CastleUtils, X3DNodes,
+  GameWindow, CastleUtils, X3DNodes, CastleControls,
   CastleWindow, Images, CastleFilesUtils, UIControls,
   PrecalculatedAnimation, ALUtils, CastleOpenAL, GameControlsMenu,
   CastleGameNotifications, CastleXMLConfig, GLImages;
@@ -677,10 +677,10 @@ end;
       glColorv(Vector3Single(0.8, 0.8, 0.8));
       LifeText := Format('%d', [Round(ALife)]);
       LifeTextPosition := XMove + IndicatorMargin +
-        (IndicatorWidth - Font_BFNT_BitstreamVeraSans.TextWidth(LifeText)) div 2;
+        (IndicatorWidth - UIFont.TextWidth(LifeText)) div 2;
       MaxTo1st(LifeTextPosition, IndicatorMargin);
       glRasterPos2i(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2);
-      Font_BFNT_BitstreamVeraSans.Print(LifeText);
+      UIFont.Print(LifeText);
     end;
   end;
 
@@ -705,10 +705,8 @@ begin
   if FlyingMode then
   begin
     glColorv(White3Single);
-    glRasterPos2i(0, Window.Height -
-      Font_BFNT_BitstreamVeraSans.RowHeight - 5 { margin });
-    Font_BFNT_BitstreamVeraSans.Print(Format('Flying (%d more seconds)',
-      [Floor(FFlyingModeTimeout)]));
+    glRasterPos2i(0, Window.Height - UIFont.RowHeight - 5 { margin });
+    UIFont.Print(Format('Flying (%d more seconds)', [Floor(FFlyingModeTimeout)]));
   end;
 
   glLoadIdentity;

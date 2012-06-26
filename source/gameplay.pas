@@ -72,12 +72,6 @@ procedure LevelFinishedFlush;
 procedure SaveScreen;
 
 var
-  { These fonts can be used globally by anything in this game.
-    They are initialized in Window.OnInit and finalized in Window.OnClose in this unit. }
-  Font_BFNT_BitstreamVeraSans_m10: TGLBitmapFont_Abstract;
-  Font_BFNT_BitstreamVeraSans: TGLBitmapFont_Abstract;
-
-var
   { Read-only from outside of this unit. }
   GameEnded: boolean;
   { Will be a level name (<> '') if user wants to immediately restart the game.
@@ -101,8 +95,7 @@ implementation
 uses SysUtils, CastleUtils, CastleWindow,
   WindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
   VectorMath, Boxes3D, Images,
-  GameHelp, OpenGLBmpFonts, BFNT_BitstreamVeraSans_m10_Unit,
-  BFNT_BitstreamVeraSans_Unit, UIControls, ALSoundEngine,
+  GameHelp, OpenGLBmpFonts, UIControls, ALSoundEngine,
   GameItems, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, GameCreatures,
@@ -223,7 +216,7 @@ procedure TGame2DControls.Draw;
       S := Player.Items[I].Kind.Caption;
       if Player.Items[I].Quantity <> 1 then
         S += ' (' + IntToStr(Player.Items[I].Quantity) + ')';
-      Font_BFNT_BitstreamVeraSans_m10.Print(S);
+      UIFontSmall.Print(S);
     end;
   end;
 
@@ -237,8 +230,7 @@ procedure TGame2DControls.Draw;
 
   procedure RasterPosLine(const Line: Cardinal);
   begin
-    glRasterPos2i(0, Window.Height -
-      Font_BFNT_BitstreamVeraSans.RowHeight * Line - 10 { margin });
+    glRasterPos2i(0, Window.Height - UIFont.RowHeight * Line - 10 { margin });
   end;
 
   procedure DoShowFPS;
@@ -257,10 +249,9 @@ procedure TGame2DControls.Draw;
       DisplayFpsRealTime := Window.Fps.RealTime;
     end;
 
-    Font_BFNT_BitstreamVeraSans.Print(
-      Format('FPS : %f (real : %f). Shapes : %d / %d',
-        [DisplayFpsFrameTime, DisplayFpsRealTime,
-         SceneManager.Statistics.ShapesRendered, SceneManager.Statistics.ShapesVisible]));
+    UIFont.Print(Format('FPS : %f (real : %f). Shapes : %d / %d',
+      [DisplayFpsFrameTime, DisplayFpsRealTime,
+       SceneManager.Statistics.ShapesRendered, SceneManager.Statistics.ShapesVisible]));
   end;
 
   procedure DoShowShadowVolumesCounts;
@@ -269,8 +260,7 @@ procedure TGame2DControls.Draw;
     begin
       glColorv(Vector3Single(0.7, 0.7, 0.7));
       RasterPosLine(LineShadowVolumesCounts);
-      Font_BFNT_BitstreamVeraSans.Print(Format(
-        'No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
+      UIFont.Print(Format('No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
         [ SceneManager.ShadowVolumeRenderer.CountShadowsNotVisible,
           SceneManager.ShadowVolumeRenderer.CountZPass,
           SceneManager.ShadowVolumeRenderer.CountZFailNoLightCap,
@@ -293,16 +283,16 @@ procedure TGame2DControls.Draw;
 
   begin
     RasterPosLine(LinePressEscape);
-    Font_BFNT_BitstreamVeraSans.Print(SPressEscapeToExit);
+    UIFont.Print(SPressEscapeToExit);
     RasterPosLine(LinePressAttack);
-    Font_BFNT_BitstreamVeraSans.Print(SPressAttackToRestart);
+    UIFont.Print(SPressAttackToRestart);
   end;
 
   procedure DoShowDeadInfo;
   begin
     glColorv(Vector3Single(1, 0, 0));
     RasterPosLine(LineDeadOrWinner);
-    Font_BFNT_BitstreamVeraSans.Print(SDeadMessage + '.');
+    UIFont.Print(SDeadMessage + '.');
     DoShowDeadOrFinishedKeys;
   end;
 
@@ -310,7 +300,7 @@ procedure TGame2DControls.Draw;
   begin
     glColorv(Vector3Single(0.8, 0.8, 0.8));
     RasterPosLine(LineDeadOrWinner);
-    Font_BFNT_BitstreamVeraSans.Print(SGameWinMessage + '.');
+    UIFont.Print(SGameWinMessage + '.');
     DoShowDeadOrFinishedKeys;
   end;
 
@@ -907,16 +897,10 @@ begin
   finally glEndList end;
 
   GLList_InventorySlot := LoadPlayerControlToDisplayList('item_slot.png');
-
-  Font_BFNT_BitstreamVeraSans_m10 := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans_m10);
-  Font_BFNT_BitstreamVeraSans     := TGLBitmapFont.Create(@BFNT_BitstreamVeraSans);
 end;
 
 procedure WindowClose(const Container: IUIContainer);
 begin
-  FreeAndNil(Font_BFNT_BitstreamVeraSans);
-  FreeAndNil(Font_BFNT_BitstreamVeraSans_m10);
-
   glFreeDisplayList(GLList_NotificationsBackground);
   glFreeDisplayList(GLList_InventorySlot);
 end;
