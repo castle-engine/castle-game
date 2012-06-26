@@ -390,6 +390,14 @@ Cages level:
 
   When loading game, load saved Notifications for this game.
 
+- life potion on gate level: casts ghost shadow on ground and underneath the sword
+  handle. And we just removed the ability to manually disable shadow casting
+  for 2-manifold objects, so there's no way around that.
+  This will probably be forever unsolved for castle1, it would mean
+  polluting code with a setting that should not be needed in modern game:
+  modern game should allow setting shadow volume caster parts using Blender.
+  Also, it's uncertain if I will pursue using shadow volumes in next games,
+  since shadow maps are so nice now.
 ----------------------------------------
 dist-making to-dos:
 

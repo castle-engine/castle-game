@@ -421,7 +421,6 @@ begin
     of "castle hall" level. Changing XxxShadowVolumes here
     is a little hacky (would be cleaner to do it at loading), but easy. }
   TCastleScene(Result).ReceiveShadowVolumes := false;
-  Result.CastShadowVolumes := Kind.CastShadowVolumes;
 end;
 
 procedure TSpiderQueenCreature.ActualThrowWebAttack;
