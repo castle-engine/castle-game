@@ -26,9 +26,9 @@ program castle;
 
 uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
-  CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound,
+  CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound, CastleFilesUtils,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
-  GameCreatures, GamePlay, GameGeneralMenu, GameLevel,
+  GameCreatures, GamePlay, GameGeneralMenu, GameLevel, CastleTextureProperties,
   GameCredits, GLAntiAliasing, ALSoundEngine, CastleConfig,
   GLRenderer, CastleResources, GameItems, CastleGameNotifications;
 
@@ -222,7 +222,9 @@ begin
     when loading levels user would have to know what an "octree" is. }
   Progress.UseDescribePosition := false;
 
-  { initialize available creatures and items and levels }
+  { load game data from XML files }
+  TexturesProperties.XmlFileName := ProgramDataPath + 'data' +
+    PathDelim + 'textures' + PathDelim + 'index.xml';
   AllResources.LoadFromFiles;
   ItemsKindsInit;
   CreaturesKindsInit;

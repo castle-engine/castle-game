@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-  Some configuration of textures.
-  For now, all rules concern the situation when player stands
-  on given texture (i.e. it's used as ground texture).
+Texture properties, see CastleTextureProperties unit of Castle Game Engine.
 -->
 
 <textures>

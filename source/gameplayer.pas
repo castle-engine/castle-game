@@ -27,7 +27,7 @@ interface
 
 uses Boxes3D, Cameras, GameItems, VectorMath, GL, GLU, GLExt,
   GameInputs, ALSoundAllocator, GameSound, CastleResources,
-  Triangle, GameTextures, ALSoundEngine, Classes, Base3D,
+  Triangle, CastleTextureProperties, ALSoundEngine, Classes, Base3D,
   CastleGLUtils, CastleColors;
 
 const
@@ -129,8 +129,8 @@ type
 
     { Did last Idle detected that we are on the ground. }
     IsOnTheGround: boolean;
-    { <> @nil if IsOnTheGround and last ground had some TTextureRule. }
-    GroundRule: TTextureRule;
+    { <> @nil if IsOnTheGround and last ground had some TTextureProperties. }
+    GroundProperties: TTextureProperties;
     ReallyIsOnTheGroundTime: Single;
 
     { There always must be satisfied:
@@ -997,43 +997,43 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
   begin
     if SceneManager = nil then
     begin
-      GroundRule := nil;
+      GroundProperties := nil;
       IsOnTheGround := false;
     end else
     if Camera.IsOnTheGround then
     begin
       ReallyIsOnTheGroundTime := LifeTime;
       IsOnTheGround := true;
-      GroundRule := TextureRules.GroundRule(Ground);
+      GroundProperties := TexturesProperties.Find(Ground);
     end else
     if LifeTime - ReallyIsOnTheGroundTime > TimeToChangeIsOnTheGround then
     begin
-      GroundRule := nil;
+      GroundProperties := nil;
       IsOnTheGround := false;
     end else
     begin
-      { Leave GroundRule and IsOnTheGround unchanged. }
+      { Leave GroundProperties and IsOnTheGround unchanged. }
     end;
   end;
 
   { Update IsLava and related variables, hurt player if on lava.
-    Must be called after UpdateIsOnTheGround (depends on GroundRule). }
+    Must be called after UpdateIsOnTheGround (depends on GroundProperties). }
   procedure UpdateLava;
   var
     NewIsLava: boolean;
   begin
-    NewIsLava := (GroundRule <> nil) and GroundRule.Lava;
+    NewIsLava := (GroundProperties <> nil) and GroundProperties.Lava;
     if NewIsLava then
     begin
       if (not IsLava) or
-         (LifeTime - LavaLastDamageTime > GroundRule.LavaDamageTime) then
+         (LifeTime - LavaLastDamageTime > GroundProperties.LavaDamageTime) then
       begin
         LavaLastDamageTime := LifeTime;
         if not Dead then
         begin
           SoundEngine.Sound(stPlayerLavaPain);
-          SetLifeCustomBlackout(Life - (GroundRule.LavaDamageConst +
-            Random * GroundRule.LavaDamageRandom), Green3Single);
+          SetLifeCustomBlackout(Life - (GroundProperties.LavaDamageConst +
+            Random * GroundProperties.LavaDamageRandom), Green3Single);
         end;
       end;
     end;
@@ -1041,7 +1041,7 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
   end;
 
   { Update FootstepsSoundPlaying and related variables.
-    Must be called after UpdateIsOnTheGround (depends on GroundRule). }
+    Must be called after UpdateIsOnTheGround (depends on GroundProperties). }
   procedure UpdateFootstepsSoundPlaying;
   const
     TimeToChangeFootstepsSoundPlaying = 0.5;
@@ -1075,9 +1075,10 @@ procedure TPlayer.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
       ReallyWalkingOnTheGroundTime := LifeTime;
       { Since Camera.IsWalkingOnTheGroundm then for sure
         Camera.IsOnTheGround, so UpdateIsOnTheGround updated
-        GroundRule field. }
-      if (GroundRule <> nil) and GroundRule.HasFootstepsSound then
-        NewFootstepsSoundPlaying := GroundRule.FootstepsSound else
+        GroundProperties field. }
+      if (GroundProperties <> nil) and
+         (GroundProperties.FootstepsSound <> stNone) then
+        NewFootstepsSoundPlaying := GroundProperties.FootstepsSound else
         NewFootstepsSoundPlaying := SceneManager.Info.FootstepsSound;
     end else
     if LifeTime - ReallyWalkingOnTheGroundTime >
@@ -1364,7 +1365,7 @@ begin
 
   ReallyIsOnTheGroundTime := -1000;
   IsOnTheGround := false;
-  GroundRule := nil;
+  GroundProperties := nil;
 
   IsLava := false;
 
