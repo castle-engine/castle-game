@@ -231,7 +231,7 @@ begin
     1: ShowControlsMenu(BackgroundControls, false, false);
     2: SetCurrentMenu(CurrentMenu, VideoMenu);
     3: SetCurrentMenu(CurrentMenu, SoundMenu);
-    4: ShowCredits(BackgroundControls);
+    4: ShowCredits(BackgroundControls, BackgroundSceneManager);
     5: if not OpenURL(CastleURL) then MessageOK(Window, SCannotOpenURL, taMiddle);
     6: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');

@@ -53,6 +53,7 @@ uses CastleWindow, UIControls, GameLevel;
 
 var
   BackgroundControls: TUIControlList;
+  BackgroundSceneManager: TGameSceneManager;
 
 { Create / destroy BackgroundControls instances.
   @groupBegin }
@@ -124,7 +125,6 @@ const
   MenuBackgroundLevelId = 'gate_background';
 var
   BackgroundCaptions: TUIControl;
-  BackgroundSceneManager: TGameSceneManager;
 begin
   BackgroundControls := TUIControlList.Create(true);
 

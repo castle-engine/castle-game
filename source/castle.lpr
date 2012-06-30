@@ -238,7 +238,7 @@ begin
   try
     ShowStartMenu;
   finally
-    CredistGLContextRelease;
+    CreditsGLContextRelease;
 
     { Usually Window.Closed = false here.
       But this is finally...end clause so we try hard to avoid raising

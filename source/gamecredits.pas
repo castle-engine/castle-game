@@ -25,15 +25,16 @@ unit GameCredits;
 
 interface
 
-uses CastleWindow, UIControls, X3DNodes;
+uses CastleWindow, UIControls, X3DNodes, CastleSceneManager;
 
 { Show credits. }
-procedure ShowCredits(ControlsUnder: TUIControlList);
+procedure ShowCredits(ControlsUnder: TUIControlList;
+  SceneManagerUnder: TCastleSceneManager);
 
 { Although this will be called by Window.Close, it may be too late
   (this must be called before releasing GLContextCache).
   So you should call this explicitly. }
-procedure CredistGLContextRelease;
+procedure CreditsGLContextRelease;
 
 implementation
 
@@ -41,78 +42,60 @@ uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils, WindowModes,
   GameInputs, GamePlay, CastleGameCache, GameWindow,
   GameVideoOptions, VectorMath, CastleScene, CastleFilesUtils,
-  GameHelp, CastleUtils, X3DFields, CastleTimeUtils, KeysMouse,
-  Frustum;
+  GameHelp, CastleUtils, X3DFields, CastleTimeUtils, KeysMouse, Base3D, Classes;
 
 var
   UserQuit: boolean;
-  CreditsModel: TCastleScene;
-  AnimationTime: TFloatTime;
-  AnimationSpeed, AnimationEnd: TFloatTime;
 
-procedure Draw(Window: TCastleWindowBase);
-var
-  ModelviewMatrix, ProjectionMatrix: TMatrix4Single;
+{ TCredits ------------------------------------------------------------------- }
 
-  procedure ProjectionPushSet;
-  begin
-    glMatrixMode(GL_PROJECTION);
-      glPushMatrix;
-      ProjectionMatrix := PerspectiveProjMatrixDeg(
-        ViewAngleDegY, Window.Width / Window.Height,
-        { constant near / far here is Ok, since I render known geometry }
-        0.1, 100);
-      glLoadMatrix(ProjectionMatrix);
-    glMatrixMode(GL_MODELVIEW);
+type
+  TCredits = class(T3DTransform)
+  public
+    AnimationTime, AnimationSpeed, AnimationEnd: TFloatTime;
+    Scene: TCastleScene;
+    constructor Create(AOwner: TComponent); override;
+    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
-  procedure ProjectionPop;
-  begin
-    glMatrixMode(GL_PROJECTION);
-      glPopMatrix;
-    glMatrixMode(GL_MODELVIEW);
-  end;
-
+constructor TCredits.Create(AOwner: TComponent);
 var
-  Frustum: TFrustum;
-  Params: TBasicRenderParams;
+  VRMLContents: string;
+  Info: TMFString;
 begin
-  glScissor(25, 20, Window.Width - 25, Window.Height - 20 -  160);
-  glEnable(GL_SCISSOR_TEST);
+  inherited;
 
-  ProjectionPushSet;
-  try
-    { We want to use depth buffer in CreditsModel, but don't want to mix
-      with background level depth values (as we even use different near/far
-      projection values). }
-    glClear(GL_DEPTH_BUFFER_BIT);
+  VRMLContents := FileToString(ProgramDataPath + 'data' + PathDelim +
+    'menu_bg' + PathDelim + 'credits.wrl');
+  StringReplaceAllTo1st(VRMLContents, '$SCastleVersion', SCastleVersion);
+  StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', 'WWW: ' + CastleURL);
+  StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
-    glLoadIdentity;
-    ModelviewMatrix := TranslationMatrix(0, AnimationSpeed * AnimationTime, 0);
-    glLoadMatrix(ModelviewMatrix);
+  Scene := TCastleScene.CreateCustomCache(Self, GLContextCache);
+  Scene.Load(LoadX3DClassicFromString(VRMLContents, ''), true);
+  Scene.Attributes.UseSceneLights := true;
 
-    { TODO: remove need for Frustum, render CreditsModel as part of scene manager }
-    Frustum.Init(ProjectionMatrix, ModelviewMatrix);
+  Add(Scene);
 
-    { TODO: remove need for Params, render CreditsModel as part of scene manager }
-    Params := TBasicRenderParams.Create;
-    try
-      Params.Transparent := false; Params.ShadowVolumesReceivers := false; CreditsModel.Render(nil, Frustum, Params);
-      Params.Transparent := false; Params.ShadowVolumesReceivers := true ; CreditsModel.Render(nil, Frustum, Params);
-      Params.Transparent := true ; Params.ShadowVolumesReceivers := false; CreditsModel.Render(nil, Frustum, Params);
-      Params.Transparent := true ; Params.ShadowVolumesReceivers := true ; CreditsModel.Render(nil, Frustum, Params);
-    finally FreeAndNil(Params) end;
-  finally ProjectionPop end;
-
-  glDisable(GL_SCISSOR_TEST);
+  Info := (Scene.RootNode.FindNodeByName(TWorldInfoNode,
+    'MainInfo', true) as TWorldInfoNode).FdInfo;
+  AnimationSpeed := StrToFloat(Info.Items[1]);
+  AnimationEnd := StrToFloat(Info.Items[2]);
 end;
 
-procedure Idle(Window: TCastleWindowBase);
+procedure TCredits.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
 begin
-  AnimationTime := AnimationTime + Window.Fps.IdleSpeed;
+  AnimationTime := AnimationTime + CompSpeed;
+  Translation := Vector3Single(0, AnimationSpeed * AnimationTime, 0);
   if AnimationTime > AnimationEnd then
     UserQuit := true;
 end;
+
+{ others --------------------------------------------------------------------- }
+
+var
+  Credits: TCredits;
+  CreditsSceneManager: TCastleSceneManager;
 
 procedure CloseQuery(Window: TCastleWindowBase);
 begin
@@ -141,77 +124,73 @@ begin
     SaveScreen;
 end;
 
-{ $define DEBUG_ALWAYS_RELOAD_CREDITS}
-
-{$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
-procedure WindowOpen(const Container: IUIContainer); forward;
-{$endif}
-
-procedure ShowCredits(ControlsUnder: TUIControlList);
+procedure ShowCredits(ControlsUnder: TUIControlList;
+  SceneManagerUnder: TCastleSceneManager);
 var
   SavedMode: TGLMode;
+  SavedAlwaysApplyProjection: boolean;
 begin
-  {$ifdef DEBUG_ALWAYS_RELOAD_CREDITS}
-  CredistGLContextRelease;
-  WindowOpen(Window);
-  {$endif}
-
-  AnimationTime := 0;
-
-  SavedMode := TGLMode.CreateReset(Window, 0, false, @Draw, nil, @CloseQuery);
+  SavedMode := TGLMode.CreateReset(Window, 0, false, nil, nil, @CloseQuery);
   try
     Window.AutoRedisplay := true; { scrolling text animation }
 
     Window.OnKeyDown := @KeyDown;
     Window.OnMouseDown := @MouseDown;
     Window.OnMouseWheel := @MouseWheel;
-    Window.OnIdle := @Idle;
-    Window.OnDrawStyle := ds3D;
 
     UserQuit := false;
+    Credits.AnimationTime := 0;
 
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
+
+    SavedAlwaysApplyProjection := SceneManagerUnder.AlwaysApplyProjection;
+    SceneManagerUnder.AlwaysApplyProjection := true;
+
+    Window.Controls.Insert(0, CreditsSceneManager);
 
     repeat
       Application.ProcessMessage(true, true);
     until UserQuit;
 
-  finally FreeAndNil(SavedMode); end;
+    SceneManagerUnder.AlwaysApplyProjection := SavedAlwaysApplyProjection;
+  finally FreeAndNil(SavedMode) end;
 end;
 
 { initialization / finalization ---------------------------------------------- }
 
 procedure WindowOpen(const Container: IUIContainer);
-var
-  VRMLContents: string;
-  Info: TMFString;
 begin
-  VRMLContents := FileToString(ProgramDataPath + 'data' + PathDelim +
-    'menu_bg' + PathDelim + 'credits.wrl');
-  StringReplaceAllTo1st(VRMLContents, '$SCastleVersion', SCastleVersion);
-  StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', 'WWW: ' + CastleURL);
-  StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
+  Credits := TCredits.Create(nil);
 
-  CreditsModel := TCastleScene.CreateCustomCache(nil, GLContextCache);
-  CreditsModel.Load(LoadX3DClassicFromString(VRMLContents, ''), true);
+  { We want to create separate scene manager for credits display because:
+    - we want it displayed always on top (so depth buffer should be cleared)
+      of the background,
+    - ignoring UseGlobalLights of the background level.
+    - with own projection, regardles of the background level projection.
+    - with own size. }
+  CreditsSceneManager := TCastleSceneManager.Create(nil);
+  CreditsSceneManager.AlwaysApplyProjection := true;
+  CreditsSceneManager.FullSize := false;
+  CreditsSceneManager.Left := 25;
+  CreditsSceneManager.Bottom := 20;
+  CreditsSceneManager.Width := Window.Width - CreditsSceneManager.Left * 2;
+  CreditsSceneManager.Height := Window.Height - CreditsSceneManager.Bottom * 2 - 160;
+  CreditsSceneManager.Transparent := true;
 
-  CreditsModel.Attributes.UseSceneLights := true;
-
-  Info := (CreditsModel.RootNode.FindNodeByName(TWorldInfoNode,
-    'MainInfo', true) as TWorldInfoNode).FdInfo;
-  AnimationSpeed := StrToFloat(Info.Items[1]);
-  AnimationEnd := StrToFloat(Info.Items[2]);
+  CreditsSceneManager.Items.Add(Credits);
+  CreditsSceneManager.MainScene := Credits.Scene;
 end;
 
-procedure CredistGLContextRelease;
+procedure CreditsGLContextRelease;
 begin
-  FreeAndNil(CreditsModel);
+  FreeAndNil(Credits);
+  FreeAndNil(CreditsSceneManager);
 end;
 
 procedure WindowClose(const Container: IUIContainer);
 begin
-  CredistGLContextRelease;
+  CreditsGLContextRelease;
 end;
 
 initialization
