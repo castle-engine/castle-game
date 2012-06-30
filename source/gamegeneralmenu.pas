@@ -39,7 +39,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
-    property DrawFocused default false;
+    property DrawFocusedBorder default false;
     function PositionInside(const X, Y: Integer): boolean; override;
   end;
 
@@ -67,7 +67,7 @@ begin
     position in OnScreenMenu not working. See TCastleOnScreenMenu.DesignerMode comments. }
   DesignerMode := DebugMenuDesigner;
   ExclusiveEvents := false;
-  DrawFocused := false;
+  DrawFocusedBorder := false;
 end;
 
 function TCastleGameMenu.PositionInside(const X, Y: Integer): boolean;
