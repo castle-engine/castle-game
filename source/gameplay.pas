@@ -26,7 +26,7 @@ unit GamePlay;
 
 interface
 
-uses Classes, CastleLevel, CastlePlayer, OpenGLFonts, Base3D;
+uses Classes, CastleLevel, CastlePlayer, Base3D;
 
 { Play the game.
 
@@ -95,7 +95,7 @@ implementation
 uses SysUtils, CastleUtils, CastleWindow,
   WindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
   VectorMath, Boxes3D, Images, Math,
-  GameHelp, OpenGLBmpFonts, UIControls, ALSoundEngine,
+  GameHelp, UIControls, ALSoundEngine,
   CastleItems, GameItems, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, GameCreatures, CastleColors,
