@@ -32,21 +32,43 @@ uses Boxes3D, X3DNodes, VectorMath, CastleUtils,
 
 type
   TItemPotionOfLifeKind = class(TItemKind)
-    procedure Use(Item: TItem); override;
+  protected
+    function ItemClass: TItemClass; override;
+  end;
+
+  TItemPotionOfLife = class(TItem)
+  public
+    procedure Use; override;
   end;
 
   TItemSwordKind = class(TItemShortRangeWeaponKind)
+  protected
+    function ItemClass: TItemClass; override;
+  end;
+
+  TItemSword = class(TItemWeapon)
   public
-    procedure ActualAttack(Item: TItem; World: T3DWorld); override;
+    procedure ActualAttack(World: T3DWorld); override;
   end;
 
   TItemBowKind = class(TItemWeaponKind)
+  protected
+    function ItemClass: TItemClass; override;
+  end;
+
+  TItemBow = class(TItemWeapon)
   public
-    procedure ActualAttack(Item: TItem; World: T3DWorld); override;
+    procedure ActualAttack(World: T3DWorld); override;
   end;
 
   TItemScrollOfFlyingKind = class(TItemKind)
-    procedure Use(Item: TItem); override;
+  protected
+    function ItemClass: TItemClass; override;
+  end;
+
+  TItemScrollOfFlying = class(TItem)
+  public
+    procedure Use; override;
   end;
 
 var
@@ -66,15 +88,22 @@ uses SysUtils, CastleWindow,
   GameCreatures, CastleGameNotifications, CastleConfig,
   GLImages, CastleCreatures;
 
-{ TItemPotionOfLifeKind ---------------------------------------------------- }
+{ TItemPotionOfLifeKind ------------------------------------------------------ }
 
-procedure TItemPotionOfLifeKind.Use(Item: TItem);
+function TItemPotionOfLifeKind.ItemClass: TItemClass;
+begin
+  Result := TItemPotionOfLife;
+end;
+
+{ TItemPotionOfLife ---------------------------------------------------------- }
+
+procedure TItemPotionOfLife.Use;
 begin
   if Player.Life < Player.MaxLife then
   begin
     Player.Life := Min(Player.Life + 50, Player.MaxLife);
-    Notifications.Show(Format('You drink "%s"', [Item.Kind.Caption]));
-    Item.Quantity := Item.Quantity - 1;
+    Notifications.Show(Format('You drink "%s"', [Kind.Caption]));
+    Quantity := Quantity - 1;
     SoundEngine.Sound(stPlayerPotionDrink);
   end else
     Notifications.Show('You feel quite alright, no need to waste this potion');
@@ -82,11 +111,19 @@ end;
 
 { TItemSwordKind ------------------------------------------------------------- }
 
-procedure TItemSwordKind.ActualAttack(Item: TItem; World: T3DWorld);
+function TItemSwordKind.ItemClass: TItemClass;
+begin
+  Result := TItemSword;
+end;
+
+{ TItemSword ----------------------------------------------------------------- }
+
+procedure TItemSword.ActualAttack(World: T3DWorld);
 var
   WeaponBoundingBox: TBox3D;
   I: Integer;
   C: TCreature;
+  K: TItemShortRangeWeaponKind;
 begin
   { Player.Direction may be multiplied by something here for long-range weapons }
   WeaponBoundingBox := Player.BoundingBox.Translate(Player.Direction);
@@ -100,14 +137,23 @@ begin
       { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
       if C.BoundingBox.Collision(WeaponBoundingBox) then
       begin
-        C.Hurt(DamageConst + Random * DamageRandom, Player.Direction, AttackKnockbackDistance);
+        K := Kind as TItemShortRangeWeaponKind;
+        C.Hurt(K.DamageConst + Random * K.DamageRandom, Player.Direction,
+          K.AttackKnockbackDistance);
       end;
     end;
 end;
 
 { TItemBowKind ------------------------------------------------------------- }
 
-procedure TItemBowKind.ActualAttack(Item: TItem; World: T3DWorld);
+function TItemBowKind.ItemClass: TItemClass;
+begin
+  Result := TItemBow;
+end;
+
+{ TItemBow ------------------------------------------------------------------- }
+
+procedure TItemBow.ActualAttack(World: T3DWorld);
 var
   QuiverIndex: Integer;
 begin
@@ -132,11 +178,18 @@ end;
 
 { TItemScrollOfFlyingKind ---------------------------------------------------- }
 
-procedure TItemScrollOfFlyingKind.Use(Item: TItem);
+function TItemScrollOfFlyingKind.ItemClass: TItemClass;
 begin
-  Notifications.Show(Format('You cast spell from "%s"', [Item.Kind.Caption]));
+  Result := TItemScrollOfFlying;
+end;
+
+{ TItemScrollOfFlying -------------------------------------------------------- }
+
+procedure TItemScrollOfFlying.Use;
+begin
+  Notifications.Show(Format('You cast spell from "%s"', [Kind.Caption]));
   Player.FlyingModeTimeoutBegin(30.0);
-  Item.Quantity := Item.Quantity - 1;
+  Quantity := Quantity - 1;
   SoundEngine.Sound(stPlayerCastFlyingSpell);
 end;
 

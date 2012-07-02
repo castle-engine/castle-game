@@ -701,7 +701,7 @@ procedure EventDown(AKey: TKey;
     if Between(Player.InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
       UsedItem := Player.Items[Player.InventoryCurrentItem];
-      UsedItem.Kind.Use(UsedItem);
+      UsedItem.Use;
       if UsedItem.Quantity = 0 then
       begin
         { Note that I don't delete here using
@@ -739,7 +739,7 @@ procedure EventDown(AKey: TKey;
     if UsedItemIndex <> -1 then
     begin
       UsedItem := Player.Items[UsedItemIndex];
-      UsedItem.Kind.Use(UsedItem);
+      UsedItem.Use;
       if UsedItem.Quantity = 0 then
       begin
         { I seek for UsedItemIndex once again, because using item
