@@ -85,13 +85,7 @@ type
     FCamera: TWalkCamera;
     FItems: TItemList;
     FEquippedWeapon: TItem;
-    { When this is > 0 means flying. In seconds. }
-    FFlyingModeTimeOut: Single;
     LifeTime: Single;
-
-    { blackout things }
-    BlackOutIntensity: TGLfloat;
-    BlackOutColor: TVector3f;
 
     { This means that weapon AttackAnimation is being done.
       This also means that EquippedWeapon <> nil. }
@@ -182,6 +176,13 @@ type
       const TrianglesToIgnoreFunc: T3DTriangleIgnoreFunc;
       out AboveHeight: Single; out AboveGround: P3DTriangle): boolean; override;
   public
+    { When this is > 0 means flying. In seconds. }
+    FlyingModeTimeOut: Single;
+
+    { Blackout settings. }
+    BlackOutIntensity: TGLfloat;
+    BlackOutColor: TVector3f;
+
     { Various navigation properties that may depend on loaded level. }
     DefaultMoveHorizontalSpeed: Single;
     DefaultMoveVerticalSpeed: Single;
@@ -296,9 +297,6 @@ type
       GameMessage about using/not using a weapon. }
     property EquippedWeapon: TItem read FEquippedWeapon write SetEquippedWeapon;
 
-    { Render 2D things of the player. }
-    procedure Render2D;
-
     { Adjust some things based on passing time.
       For now, this is for things like FlyingModeTimeout to "wear out".
       @noAutoLinkHere }
@@ -377,18 +375,11 @@ type
 
 implementation
 
-uses Math, SysUtils, CastleClassUtils, GamePlay, CastleMessages,
+uses Math, SysUtils, CastleClassUtils, CastleMessages,
   GameWindow, CastleUtils, X3DNodes, CastleControls,
   CastleWindow, Images, CastleFilesUtils, UIControls,
   PrecalculatedAnimation, ALUtils, CastleOpenAL, GameControlsMenu,
   CastleGameNotifications, CastleXMLConfig, GLImages;
-
-var
-  GLList_BlankIndicatorImage: TGLuint;
-  GLList_RedIndicatorImage: TGLuint;
-  GLList_BlueIndicatorImage: TGLuint;
-  GLList_DrawWaterRect: TGLuint;
-  GLList_BossIndicatorImage: TGLuint;
 
 { TPlayerBox ----------------------------------------------------------------- }
 
@@ -504,26 +495,26 @@ end;
 
 function TPlayer.GetFlyingMode: boolean;
 begin
-  Result := (FFlyingModeTimeOut > 0) and (not Dead) and (not GameWin);
+  Result := (FlyingModeTimeOut > 0) and (not Dead) and (not GameWin);
 end;
 
 procedure TPlayer.FlyingModeTimeoutBegin(const TimeOut: Single);
 begin
-  if FFlyingModeTimeOut <= 0 then
+  if FlyingModeTimeOut <= 0 then
     Notifications.Show('You start flying');
 
   { It's possible that FlyingModeTimeoutBegin is called when
     FFlyingModeTimeOut is already > 0. In this case, we set
     FFlyingModeTimeOut to maximum of current FFlyingModeTimeOut and TimeOut
     --- i.e. the effect that will allow player to fly longer wins. }
-  FFlyingModeTimeOut := Max(FFlyingModeTimeOut, TimeOut);
+  FlyingModeTimeOut := Max(FlyingModeTimeOut, TimeOut);
 end;
 
 procedure TPlayer.CancelFlying;
 begin
   if FlyingMode then
   begin
-    FFlyingModeTimeOut := 0;
+    FlyingModeTimeOut := 0;
     Notifications.Show('You''re no longer flying');
   end;
 end;
@@ -633,115 +624,6 @@ begin
 
     { Any attack done with previous weapon must be stopped now. }
     Attacking := false;
-  end;
-end;
-
-  procedure RenderLifeIndicator(const ALife, AMaxLife: Single;
-    const GLList_FullIndicatorImage: TGLuint;
-    const XMove: Integer; const PrintText: boolean);
-  const
-    IndicatorHeight = 120;
-    IndicatorWidth = 40;
-    IndicatorMargin = 5;
-  var
-    LifeMapped: Integer;
-    LifeTextPosition: Integer;
-    LifeText: string;
-  begin
-    glRasterPos2i(XMove + IndicatorMargin, IndicatorMargin);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.5);
-
-      LifeMapped := Round(MapRange(ALife, 0, AMaxLife, 0, IndicatorHeight));
-
-      { Note that Life may be > MaxLife, and
-        Life may be < 0. }
-      if LifeMapped >= IndicatorHeight then
-        glCallList(GLList_FullIndicatorImage) else
-      if LifeMapped < 0 then
-        glCallList(GLList_BlankIndicatorImage) else
-      begin
-        glEnable(GL_SCISSOR_TEST);
-          glScissor(IndicatorMargin, IndicatorMargin, Window.Width, LifeMapped);
-          glCallList(GLList_FullIndicatorImage);
-          glScissor(IndicatorMargin, IndicatorMargin + LifeMapped,
-            Window.Width, Window.Height);
-          glCallList(GLList_BlankIndicatorImage);
-        glDisable(GL_SCISSOR_TEST);
-      end;
-
-    glDisable(GL_ALPHA_TEST);
-
-    if PrintText then
-    begin
-      glColorv(Vector3Single(0.8, 0.8, 0.8));
-      LifeText := Format('%d', [Round(ALife)]);
-      LifeTextPosition := XMove + IndicatorMargin +
-        (IndicatorWidth - UIFont.TextWidth(LifeText)) div 2;
-      MaxTo1st(LifeTextPosition, IndicatorMargin);
-      glRasterPos2i(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2);
-      UIFont.Print(LifeText);
-    end;
-  end;
-
-procedure TPlayer.Render2D;
-var
-  BossCreatureIndicator: boolean;
-  BossCreatureLife: Single;
-  BossCreatureMaxLife: Single;
-begin
-  RenderLifeIndicator(Life, MaxLife, GLList_RedIndicatorImage, 0, true);
-
-  BossCreatureIndicator := (SceneManager.Level <> nil) and
-    SceneManager.Level.BossCreatureIndicator(BossCreatureLife, BossCreatureMaxLife);
-  if BossCreatureIndicator then
-  begin
-    RenderLifeIndicator(
-      BossCreatureLife,
-      BossCreatureMaxLife,
-      GLList_BossIndicatorImage, Window.Width - 150, false);
-  end;
-
-  if FlyingMode then
-  begin
-    glColorv(White3Single);
-    glRasterPos2i(0, Window.Height - UIFont.RowHeight - 5 { margin });
-    UIFont.Print(Format('Flying (%d more seconds)', [Floor(FFlyingModeTimeout)]));
-  end;
-
-  glLoadIdentity;
-  if Dead then
-    DrawGLBlackOutRect(Red3Single, 1.0, 0, 0,
-      Window.Width, Window.Height) else
-  begin
-    { The problem with drawing such water screen:
-      Player eyes may be equal to water level,
-      and then camera near plane cuts some water, and then player
-      simultaneously sees things under the water (but not looking
-      through the water surface, so he doesn't see blended water surface)
-      and above the water.
-
-      So effect like "show fog when player pos under the water" will look
-      bad when player is exactly at the water surface: then he will
-      be able to see some part water clearly (without the water fog,
-      and without the blended water surface).
-
-      I checked how this looks in quake2, and they simply ignored the
-      problem (i.e. it is there...). And it's not so noticeable...
-      So I can ignore this problem too :)
-
-      Note: once I had an idea (an I actually did it in 1st szklane_lasy
-      version) to mark water by the blueish fog. This looks cool,
-      but in this case I can't use OpenGL fog, as it may be used
-      by the level itself (as it is, actually, for the 'Gate" level). }
-
-    if Swimming = psUnderWater then
-      glCallList(GLList_DrawWaterRect);
-
-    { Apply black out effect on the possibly watery effect.
-      Yes, they both must mix. }
-    DrawGLBlackOutRect(BlackOutColor, BlackOutIntensity, 0, 0,
-      Window.Width, Window.Height);
   end;
 end;
 
@@ -1154,7 +1036,7 @@ begin
 
   if FlyingMode then
   begin
-    FFlyingModeTimeOut := FFlyingModeTimeOut - CompSpeed;
+    FlyingModeTimeOut := FlyingModeTimeOut - CompSpeed;
     if not FlyingMode then
     begin
       Notifications.Show('You''re no longer flying');
@@ -1453,52 +1335,4 @@ begin
   AboveGround := nil;
 end;
 
-{ CastleWindow open / close ------------------------------------------------------ }
-
-procedure WindowOpen(const Container: IUIContainer);
-
-  function PlayerControlFileName(const BaseName: string): string;
-  begin
-    Result := ProgramDataPath + 'data' + PathDelim +
-      'player_controls' + PathDelim + BaseName;
-  end;
-
-  function LoadPlayerControlToDisplayList(const BaseName: string): TGLuint;
-  begin
-    Result := LoadImageToDisplayList(
-      PlayerControlFileName(BaseName),
-      { We want alpha channel, and we expect it to be recorded in the file }
-      [TRGBAlphaImage], [ilcAlphaAdd], 0, 0);
-  end;
-
-begin
-  GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
-  GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
-  GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
-  GLList_BossIndicatorImage := LoadPlayerControlToDisplayList('boss.png');
-
-  GLList_DrawWaterRect := glGenListsCheck(1, 'CastlePlayer.WindowOpen');
-  glNewList(GLList_DrawWaterRect, GL_COMPILE);
-  try
-    glPushAttrib(GL_COLOR_BUFFER_BIT or GL_CURRENT_BIT);
-      glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_SRC_ALPHA);
-        glColorv(Vector4Single(0, 0, 0.1, 0.5));
-        glRectf(0, 0, Window.Width, Window.Height);
-      glDisable(GL_BLEND);
-    glPopAttrib;
-  finally glEndList; end;
-end;
-
-procedure WindowClose(const Container: IUIContainer);
-begin
-  glFreeDisplayList(GLList_BlankIndicatorImage);
-  glFreeDisplayList(GLList_RedIndicatorImage);
-  glFreeDisplayList(GLList_BlueIndicatorImage);
-  glFreeDisplayList(GLList_BossIndicatorImage);
-end;
-
-initialization
-  OnGLContextOpen.Add(@WindowOpen);
-  OnGLContextClose.Add(@WindowClose);
 end.

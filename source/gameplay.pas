@@ -94,18 +94,22 @@ implementation
 
 uses SysUtils, CastleUtils, CastleWindow,
   WindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
-  VectorMath, Boxes3D, Images,
+  VectorMath, Boxes3D, Images, Math,
   GameHelp, OpenGLBmpFonts, UIControls, ALSoundEngine,
   GameItems, CastleStringUtils,
   CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
-  GameVideoOptions, GameCreatures,
+  GameVideoOptions, GameCreatures, CastleColors,
   CastleGameNotifications, GameControlsMenu, CastleControls, CastleCreatures,
   GameLevelSpecific, CastleTimeUtils, GLImages, KeysMouse;
 
 var
   GLList_NotificationsBackground: TGLuint;
-
   GLList_InventorySlot: TGLuint;
+  GLList_BlankIndicatorImage: TGLuint;
+  GLList_RedIndicatorImage: TGLuint;
+  GLList_BlueIndicatorImage: TGLuint;
+  GLList_DrawWaterRect: TGLuint;
+  GLList_BossIndicatorImage: TGLuint;
 
   DisplayFpsUpdateTick: TMilisecTime;
   DisplayFpsFrameTime: Single;
@@ -304,6 +308,104 @@ procedure TGame2DControls.Draw;
     DoShowDeadOrFinishedKeys;
   end;
 
+  procedure RenderLifeIndicator(const ALife, AMaxLife: Single;
+    const GLList_FullIndicatorImage: TGLuint;
+    const XMove: Integer; const PrintText: boolean);
+  const
+    IndicatorHeight = 120;
+    IndicatorWidth = 40;
+    IndicatorMargin = 5;
+  var
+    LifeMapped: Integer;
+    LifeTextPosition: Integer;
+    LifeText: string;
+  begin
+    glRasterPos2i(XMove + IndicatorMargin, IndicatorMargin);
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.5);
+
+      LifeMapped := Round(MapRange(ALife, 0, AMaxLife, 0, IndicatorHeight));
+
+      { Note that Life may be > MaxLife, and
+        Life may be < 0. }
+      if LifeMapped >= IndicatorHeight then
+        glCallList(GLList_FullIndicatorImage) else
+      if LifeMapped < 0 then
+        glCallList(GLList_BlankIndicatorImage) else
+      begin
+        glEnable(GL_SCISSOR_TEST);
+          glScissor(IndicatorMargin, IndicatorMargin, Window.Width, LifeMapped);
+          glCallList(GLList_FullIndicatorImage);
+          glScissor(IndicatorMargin, IndicatorMargin + LifeMapped,
+            Window.Width, Window.Height);
+          glCallList(GLList_BlankIndicatorImage);
+        glDisable(GL_SCISSOR_TEST);
+      end;
+
+    glDisable(GL_ALPHA_TEST);
+
+    if PrintText then
+    begin
+      glColorv(Vector3Single(0.8, 0.8, 0.8));
+      LifeText := Format('%d', [Round(ALife)]);
+      LifeTextPosition := XMove + IndicatorMargin +
+        (IndicatorWidth - UIFont.TextWidth(LifeText)) div 2;
+      MaxTo1st(LifeTextPosition, IndicatorMargin);
+      glRasterPos2i(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2);
+      UIFont.Print(LifeText);
+    end;
+  end;
+
+  procedure PlayerRender2D;
+  begin
+    RenderLifeIndicator(Player.Life, Player.MaxLife, GLList_RedIndicatorImage, 0, true);
+
+    if Player.FlyingMode then
+    begin
+      glColorv(White3Single);
+      glRasterPos2i(0, Window.Height - UIFont.RowHeight - 5 { margin });
+      UIFont.Print(Format('Flying (%d more seconds)', [Floor(Player.FlyingModeTimeout)]));
+    end;
+
+    glLoadIdentity;
+    if Player.Dead then
+      DrawGLBlackOutRect(Red3Single, 1.0, 0, 0, Window.Width, Window.Height) else
+    begin
+      { The problem with drawing such water screen:
+        Player eyes may be equal to water level,
+        and then camera near plane cuts some water, and then player
+        simultaneously sees things under the water (but not looking
+        through the water surface, so he doesn't see blended water surface)
+        and above the water.
+
+        So effect like "show fog when player pos under the water" will look
+        bad when player is exactly at the water surface: then he will
+        be able to see some part water clearly (without the water fog,
+        and without the blended water surface).
+
+        I checked how this looks in quake2, and they simply ignored the
+        problem (i.e. it is there...). And it's not so noticeable...
+        So I can ignore this problem too :)
+
+        Note: once I had an idea (an I actually did it in 1st szklane_lasy
+        version) to mark water by the blueish fog. This looks cool,
+        but in this case I can't use OpenGL fog, as it may be used
+        by the level itself (as it is, actually, for the 'Gate" level). }
+
+      if Player.Swimming = psUnderWater then
+        glCallList(GLList_DrawWaterRect);
+
+      { Apply black out effect on the possibly watery effect.
+        Yes, they both must mix. }
+      DrawGLBlackOutRect(Player.BlackOutColor, Player.BlackOutIntensity, 0, 0,
+        Window.Width, Window.Height);
+    end;
+  end;
+
+var
+  BossCreatureIndicator: boolean;
+  BossCreatureLife: Single;
+  BossCreatureMaxLife: Single;
 begin
   if DebugRenderForLevelScreenshot then Exit;
 
@@ -328,7 +430,17 @@ begin
   if GameWin then
     DoShowGameWinInfo;
 
-  Player.Render2D;
+  BossCreatureIndicator := (SceneManager.Level <> nil) and
+    SceneManager.Level.BossCreatureIndicator(BossCreatureLife, BossCreatureMaxLife);
+  if BossCreatureIndicator then
+  begin
+    RenderLifeIndicator(
+      BossCreatureLife,
+      BossCreatureMaxLife,
+      GLList_BossIndicatorImage, Window.Width - 150, false);
+  end;
+
+  PlayerRender2D;
 end;
 
 { Call this when level changed (because of LevelFinished
@@ -876,7 +988,6 @@ const
 var
   I: Integer;
 begin
-  { Calculate GLList_NotificationsBackground }
   GLList_NotificationsBackground := glGenListsCheck(1, 'CastlePlay.WindowOpen');
   glNewList(GLList_NotificationsBackground, GL_COMPILE);
   try
@@ -896,13 +1007,34 @@ begin
     glDisable(GL_BLEND);
   finally glEndList end;
 
+  GLList_DrawWaterRect := glGenListsCheck(1, 'CastlePlay.WindowOpen');
+  glNewList(GLList_DrawWaterRect, GL_COMPILE);
+  try
+    glPushAttrib(GL_COLOR_BUFFER_BIT or GL_CURRENT_BIT);
+      glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_SRC_ALPHA);
+        glColorv(Vector4Single(0, 0, 0.1, 0.5));
+        glRectf(0, 0, Window.Width, Window.Height);
+      glDisable(GL_BLEND);
+    glPopAttrib;
+  finally glEndList; end;
+
   GLList_InventorySlot := LoadPlayerControlToDisplayList('item_slot.png');
+  GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
+  GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
+  GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
+  GLList_BossIndicatorImage := LoadPlayerControlToDisplayList('boss.png');
 end;
 
 procedure WindowClose(const Container: IUIContainer);
 begin
   glFreeDisplayList(GLList_NotificationsBackground);
+  glFreeDisplayList(GLList_DrawWaterRect);
   glFreeDisplayList(GLList_InventorySlot);
+  glFreeDisplayList(GLList_BlankIndicatorImage);
+  glFreeDisplayList(GLList_RedIndicatorImage);
+  glFreeDisplayList(GLList_BlueIndicatorImage);
+  glFreeDisplayList(GLList_BossIndicatorImage);
 end;
 
 initialization
