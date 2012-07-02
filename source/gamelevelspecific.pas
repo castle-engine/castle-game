@@ -26,7 +26,7 @@ unit GameLevelSpecific;
 interface
 
 uses CastleScene, Boxes3D, VectorMath,
-  GamePlayer, GameLevel, Background, CastleResources,
+  CastlePlayer, CastleLevel, Background, CastleResources,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation, ALSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
 
@@ -193,9 +193,9 @@ implementation
 uses CastleFilesUtils, SysUtils, CastleUtils,
   GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
   GamePlay, CastleGameNotifications, GameInputs,
-  GameItems, GameThunder, CastleGameCache, GameWindow, GameX3DProcessing,
+  CastleItems, GameThunder, CastleGameCache, GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, ProgressUnit,
-  CastleXMLUtils;
+  CastleXMLUtils, GameItems;
 
 function CastleLevelsPath: string;
 begin
@@ -1336,7 +1336,7 @@ begin
 end;
 
 initialization
-  { if for some reason (uses clauses) GameLevel is not initialized yet
+  { if for some reason (uses clauses) CastleLevel is not initialized yet
     --- the initialize it now }
   if LevelClasses = nil then
     LevelClasses := TLevelClasses.Create;

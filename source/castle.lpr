@@ -28,7 +28,7 @@ uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
   CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound, CastleFilesUtils,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
-  GameCreatures, GamePlay, GameGeneralMenu, GameLevel, CastleTextureProperties,
+  GameCreatures, GamePlay, GameGeneralMenu, CastleLevel, CastleTextureProperties,
   GameCredits, GLAntiAliasing, ALSoundEngine, CastleConfig,
   GLRenderer, CastleResources, GameItems, CastleGameNotifications;
 

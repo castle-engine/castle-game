@@ -49,7 +49,7 @@ unit GameBackgroundLevel;
 
 interface
 
-uses CastleWindow, UIControls, GameLevel;
+uses CastleWindow, UIControls, CastleLevel;
 
 var
   BackgroundControls: TUIControlList;
