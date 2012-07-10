@@ -25,18 +25,73 @@ unit GameWindow;
 
 interface
 
-uses CastleWindow;
+uses CastleWindow, KeysMouse;
+
+type
+  { Window that automatically, always, can do save screen on CastleInput_SaveScreen
+    press. This way our "save screen" button works in game, all menus, credits
+    and such. }
+  TGameWindow = class(TCastleWindowCustom)
+  private
+    procedure EventDown(AKey: TKey;
+      AMousePress: boolean; AMouseButton: TMouseButton;
+      AMouseWheel: TMouseWheelDirection);
+  public
+    procedure EventKeyDown(key: TKey; c: char); override;
+    procedure EventMouseDown(Button: TMouseButton); override;
+    procedure EventMouseWheel(const Scroll: Single; const Vertical: boolean); override;
+  end;
 
 var
   { @noAutoLinkHere }
-  Window: TCastleWindowCustom;
+  Window: TGameWindow;
 
 implementation
 
-uses SysUtils, UIControls;
+uses SysUtils, CastleInputs, UIControls, CastleGameNotifications, CastleFilesUtils,
+  ALSoundEngine, GameSound;
+
+procedure TGameWindow.EventDown(AKey: TKey;
+  AMousePress: boolean; AMouseButton: TMouseButton;
+  AMouseWheel: TMouseWheelDirection);
+
+  { Saves a screen, causing also appropriate Notification and sound. }
+  procedure AutoSaveScreen;
+  var
+    FileName: string;
+  begin
+    FileName := FileNameAutoInc(ApplicationName + '_screen_%d.png');
+    SaveScreen(FileName);
+    Notifications.Show('Screen saved to ' + FileName);
+    SoundEngine.Sound(stSaveScreen);
+  end;
+
+begin
+  if CastleInput_SaveScreen.Shortcut.IsEvent(AKey, #0,
+    AMousePress, AMouseButton, AMouseWheel) then
+    AutoSaveScreen;
+end;
+
+procedure TGameWindow.EventKeyDown(key: TKey; c: char);
+begin
+  EventDown(Key, false, mbLeft, mwNone);
+  inherited;
+end;
+
+procedure TGameWindow.EventMouseDown(Button: TMouseButton);
+begin
+  EventDown(K_None, true, Button, mwNone);
+  inherited;
+end;
+
+procedure TGameWindow.EventMouseWheel(const Scroll: Single; const Vertical: boolean);
+begin
+  EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
+  inherited;
+end;
 
 initialization
-  Window := TCastleWindowCustom.Create(nil);
+  Window := TGameWindow.Create(nil);
   Window.OnDrawStyle := ds3D;
 finalization
   FreeAndNil(Window);

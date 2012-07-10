@@ -68,9 +68,6 @@ procedure LevelFinished(NextLevelId: string);
   destroyed, along with all it's items, creatures etc. references). }
 procedure LevelFinishedFlush;
 
-{ Saves a screen, causing also appropriate Notification. }
-procedure SaveScreen;
-
 var
   { Read-only from outside of this unit. }
   GameEnded: boolean;
@@ -822,8 +819,6 @@ begin
     UseLifePotion else
 
   { Other keys. }
-  if CastleInput_SaveScreen.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    SaveScreen else
   if CastleInput_ViewMessages.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ViewGameMessages else
   if CastleInput_CancelFlying.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
@@ -945,16 +940,6 @@ begin
     LevelFinishedSchedule := true;
     LevelFinishedNextLevelId := NextLevelId;
   end;
-end;
-
-procedure SaveScreen;
-var
-  FileName: string;
-begin
-  FileName := FileNameAutoInc(ApplicationName + '_screen_%d.png');
-  Window.SaveScreen(FileName);
-  Notifications.Show('Screen saved to ' + FileName);
-  SoundEngine.Sound(stSaveScreen);
 end;
 
 type

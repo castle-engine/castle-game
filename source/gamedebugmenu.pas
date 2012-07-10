@@ -484,8 +484,6 @@ begin
     MessagesTheme.RectColor[3] := 1.0;
 
     Window.OnKeyDown := @KeyDown;
-    Window.OnMouseDown := @MouseDown;
-    Window.OnMouseWheel := @MouseWheel;
     Window.OnDrawStyle := ds3D;
 
     SetCurrentMenu(CurrentMenu, DebugMenu);

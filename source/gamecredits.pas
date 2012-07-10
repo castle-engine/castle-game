@@ -40,7 +40,7 @@ implementation
 
 uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils, WindowModes,
-  CastleInputs, GamePlay, CastleGameCache, GameWindow,
+  GamePlay, CastleGameCache, GameWindow,
   GameVideoOptions, VectorMath, CastleScene, CastleFilesUtils,
   GameHelp, CastleUtils, X3DFields, CastleTimeUtils, KeysMouse, Base3D, Classes;
 
@@ -104,24 +104,14 @@ end;
 
 procedure KeyDown(Window: TCastleWindowBase; key: TKey; c: char);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(Key, #0, false, mbLeft, mwNone) then
-    SaveScreen else
   if C in [CharEscape, CharEnter, ' '] then
     UserQuit := true;
 end;
 
 procedure MouseDown(Window: TCastleWindowBase; Button: TMouseButton);
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(K_None, #0, true, Button, mwNone) then
-    SaveScreen else
-    { any mouse press ends credits }
-    UserQuit := true;
-end;
-
-procedure MouseWheel(Window: TCastleWindowBase; const Scroll: Single; const Vertical: boolean);
-begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(K_None, #0, false, mbLeft, MouseWheelDirection(Scroll, Vertical)) then
-    SaveScreen;
+  { any mouse press ends credits }
+  UserQuit := true;
 end;
 
 procedure ShowCredits(ControlsUnder: TUIControlList;
@@ -136,7 +126,6 @@ begin
 
     Window.OnKeyDown := @KeyDown;
     Window.OnMouseDown := @MouseDown;
-    Window.OnMouseWheel := @MouseWheel;
 
     UserQuit := false;
     Credits.AnimationTime := 0;
