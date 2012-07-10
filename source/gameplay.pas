@@ -97,7 +97,7 @@ uses SysUtils, CastleUtils, CastleWindow,
   VectorMath, Boxes3D, Images, Math,
   GameHelp, UIControls, ALSoundEngine,
   CastleItems, GameItems, CastleStringUtils,
-  CastleFilesUtils, GameInputs, GameGameMenu, GameDebugMenu, GameSound,
+  CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, GameCreatures, CastleColors,
   CastleGameNotifications, GameControlsMenu, CastleControls, CastleCreatures,
   GameLevelSpecific, CastleTimeUtils, GLImages, KeysMouse;
