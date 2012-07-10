@@ -957,9 +957,20 @@ begin
   SoundEngine.Sound(stSaveScreen);
 end;
 
-function GameCreatureExists: boolean;
+type
+  TGamePlay = class
+    class function CreatureExists(const Item: T3D): boolean;
+    class function ItemOnLevelExists(const Item: T3D): boolean;
+  end;
+
+class function TGamePlay.CreatureExists(const Item: T3D): boolean;
 begin
   Result := not GameWin;
+end;
+
+class function TGamePlay.ItemOnLevelExists(const Item: T3D): boolean;
+begin
+  Result := (not GameWin) and (not DebugRenderForLevelScreenshot);
 end;
 
 { initialization / finalization ---------------------------------------------- }
@@ -1041,6 +1052,7 @@ initialization
   ShowDebugInfo := false;
   OnGLContextOpen.Add(@WindowOpen);
   OnGLContextClose.Add(@WindowClose);
-  OnCreatureExists := @GameCreatureExists;
+  OnCreatureExists := @TGamePlay(nil).CreatureExists;
+  OnItemOnLevelExists := @TGamePlay(nil).ItemOnLevelExists;
   T3DOrient.DefaultOrientation := otUpZDirectionX;
 end.
