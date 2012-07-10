@@ -38,7 +38,7 @@ type
 
   TItemPotionOfLife = class(TItem)
   public
-    procedure Use; override;
+    procedure Use(World: T3DWorld); override;
   end;
 
   TItemSwordKind = class(TItemShortRangeWeaponKind)
@@ -68,7 +68,7 @@ type
 
   TItemScrollOfFlying = class(TItem)
   public
-    procedure Use; override;
+    procedure Use(World: T3DWorld); override;
   end;
 
 var
@@ -97,7 +97,7 @@ end;
 
 { TItemPotionOfLife ---------------------------------------------------------- }
 
-procedure TItemPotionOfLife.Use;
+procedure TItemPotionOfLife.Use(World: T3DWorld);
 begin
   if Player.Life < Player.MaxLife then
   begin
@@ -185,7 +185,7 @@ end;
 
 { TItemScrollOfFlying -------------------------------------------------------- }
 
-procedure TItemScrollOfFlying.Use;
+procedure TItemScrollOfFlying.Use(World: T3DWorld);
 begin
   Notifications.Show(Format('You cast spell from "%s"', [Kind.Caption]));
   Player.FlyingModeTimeoutBegin(30.0);
