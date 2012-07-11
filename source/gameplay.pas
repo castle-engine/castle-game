@@ -699,17 +699,7 @@ procedure EventDown(AKey: TKey;
     begin
       UsedItem := Player.Items[Player.InventoryCurrentItem];
       UsedItem.Use(SceneManager.Items);
-      if UsedItem.Quantity = 0 then
-      begin
-        { Note that I don't delete here using
-          Player.Items.Delete(InventoryCurrentItem);,
-          because indexes on Player.Items could change because
-          of TItemKind.Use call. }
-        UsedItemIndex := Player.Items.IndexOf(UsedItem);
-        if UsedItemIndex <> -1 then
-          Player.DeleteItem(UsedItemIndex).Free;
-      end;
-
+      Player.Items.CheckDepleted(UsedItem);
       UpdateInventoryCurrentItemAfterDelete;
     end else
       Notifications.Show('Nothing to use - select some item first');
@@ -737,15 +727,7 @@ procedure EventDown(AKey: TKey;
     begin
       UsedItem := Player.Items[UsedItemIndex];
       UsedItem.Use(SceneManager.Items);
-      if UsedItem.Quantity = 0 then
-      begin
-        { I seek for UsedItemIndex once again, because using item
-          could change item indexes. }
-        UsedItemIndex := Player.Items.IndexOf(UsedItem);
-        if UsedItemIndex <> -1 then
-          Player.DeleteItem(UsedItemIndex).Free;
-      end;
-
+      Player.Items.CheckDepleted(UsedItem);
       UpdateInventoryCurrentItemAfterDelete;
     end else
       Notifications.Show('You don''t have any life potion');

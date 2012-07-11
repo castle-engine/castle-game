@@ -156,6 +156,7 @@ end;
 procedure TItemBow.ActualAttack(World: T3DWorld);
 var
   QuiverIndex: Integer;
+  QuiverItem: TItem;
 begin
   QuiverIndex := Player.Items.FindKind(Quiver);
   if QuiverIndex = -1 then
@@ -165,10 +166,9 @@ begin
   end else
   begin
     { delete arrow from player }
-    Player.Items[QuiverIndex].Quantity :=
-      Player.Items[QuiverIndex].Quantity - 1;
-    if Player.Items[QuiverIndex].Quantity = 0 then
-      Player.DeleteItem(QuiverIndex).Free;
+    QuiverItem := Player.Items[QuiverIndex];
+    QuiverItem.Quantity := QuiverItem.Quantity - 1;
+    Player.Items.CheckDepleted(QuiverItem);
 
     { shoot the arrow }
     Arrow.CreateCreature(Player.World, Player.Position, Player.Direction);
