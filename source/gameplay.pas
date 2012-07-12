@@ -681,7 +681,6 @@ procedure EventDown(AKey: TKey;
   procedure UseItem;
   var
     UsedItem: TItem;
-    UsedItemIndex: Integer;
   begin
     if GameWin then
     begin
@@ -698,7 +697,7 @@ procedure EventDown(AKey: TKey;
     if Between(Player.InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
       UsedItem := Player.Items[Player.InventoryCurrentItem];
-      UsedItem.Use(SceneManager.Items);
+      UsedItem.Use;
       Player.Items.CheckDepleted(UsedItem);
       UpdateInventoryCurrentItemAfterDelete;
     end else
@@ -726,7 +725,7 @@ procedure EventDown(AKey: TKey;
     if UsedItemIndex <> -1 then
     begin
       UsedItem := Player.Items[UsedItemIndex];
-      UsedItem.Use(SceneManager.Items);
+      UsedItem.Use;
       Player.Items.CheckDepleted(UsedItem);
       UpdateInventoryCurrentItemAfterDelete;
     end else

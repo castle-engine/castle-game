@@ -38,7 +38,7 @@ type
 
   TItemPotionOfLife = class(TItem)
   public
-    procedure Use(World: T3DWorld); override;
+    procedure Use; override;
   end;
 
   TItemSwordKind = class(TItemShortRangeWeaponKind)
@@ -48,7 +48,7 @@ type
 
   TItemSword = class(TItemWeapon)
   public
-    procedure ActualAttack(World: T3DWorld); override;
+    procedure ActualAttack; override;
   end;
 
   TItemBowKind = class(TItemWeaponKind)
@@ -58,7 +58,7 @@ type
 
   TItemBow = class(TItemWeapon)
   public
-    procedure ActualAttack(World: T3DWorld); override;
+    procedure ActualAttack; override;
   end;
 
   TItemScrollOfFlyingKind = class(TItemKind)
@@ -68,7 +68,7 @@ type
 
   TItemScrollOfFlying = class(TItem)
   public
-    procedure Use(World: T3DWorld); override;
+    procedure Use; override;
   end;
 
 var
@@ -97,7 +97,7 @@ end;
 
 { TItemPotionOfLife ---------------------------------------------------------- }
 
-procedure TItemPotionOfLife.Use(World: T3DWorld);
+procedure TItemPotionOfLife.Use;
 begin
   if Player.Life < Player.MaxLife then
   begin
@@ -118,7 +118,7 @@ end;
 
 { TItemSword ----------------------------------------------------------------- }
 
-procedure TItemSword.ActualAttack(World: T3DWorld);
+procedure TItemSword.ActualAttack;
 var
   WeaponBoundingBox: TBox3D;
   I: Integer;
@@ -153,7 +153,7 @@ end;
 
 { TItemBow ------------------------------------------------------------------- }
 
-procedure TItemBow.ActualAttack(World: T3DWorld);
+procedure TItemBow.ActualAttack;
 var
   QuiverIndex: Integer;
   QuiverItem: TItem;
@@ -171,7 +171,7 @@ begin
     Player.Items.CheckDepleted(QuiverItem);
 
     { shoot the arrow }
-    Arrow.CreateCreature(Player.World, Player.Position, Player.Direction);
+    Arrow.CreateCreature(World, Player.Position, Player.Direction);
     SoundEngine.Sound(stArrowFired);
   end;
 end;
@@ -185,7 +185,7 @@ end;
 
 { TItemScrollOfFlying -------------------------------------------------------- }
 
-procedure TItemScrollOfFlying.Use(World: T3DWorld);
+procedure TItemScrollOfFlying.Use;
 begin
   Notifications.Show(Format('You cast spell from "%s"', [Kind.Caption]));
   Player.FlyingModeTimeoutBegin(30.0);
