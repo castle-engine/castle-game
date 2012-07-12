@@ -679,8 +679,6 @@ procedure EventDown(AKey: TKey;
   end;
 
   procedure UseItem;
-  var
-    UsedItem: TItem;
   begin
     if GameWin then
     begin
@@ -696,9 +694,7 @@ procedure EventDown(AKey: TKey;
 
     if Between(Player.InventoryCurrentItem, 0, Player.Items.Count - 1) then
     begin
-      UsedItem := Player.Items[Player.InventoryCurrentItem];
-      UsedItem.Use;
-      Player.Items.CheckDepleted(UsedItem);
+      Player.Items.Use(Player.InventoryCurrentItem);
       UpdateInventoryCurrentItemAfterDelete;
     end else
       Notifications.Show('Nothing to use - select some item first');
@@ -706,7 +702,6 @@ procedure EventDown(AKey: TKey;
 
   procedure UseLifePotion;
   var
-    UsedItem: TItem;
     UsedItemIndex: Integer;
   begin
     if GameWin then
@@ -724,9 +719,7 @@ procedure EventDown(AKey: TKey;
     UsedItemIndex := Player.Items.FindKind(LifePotion);
     if UsedItemIndex <> -1 then
     begin
-      UsedItem := Player.Items[UsedItemIndex];
-      UsedItem.Use;
-      Player.Items.CheckDepleted(UsedItem);
+      Player.Items.Use(UsedItemIndex);
       UpdateInventoryCurrentItemAfterDelete;
     end else
       Notifications.Show('You don''t have any life potion');
