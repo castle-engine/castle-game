@@ -124,24 +124,30 @@ var
   I: Integer;
   C: TCreature;
   K: TItemShortRangeWeaponKind;
+  O: T3DOrient;
 begin
-  { Player.Direction may be multiplied by something here for long-range weapons }
-  WeaponBoundingBox := Player.BoundingBox.Translate(Player.Direction);
-  { Tests: Writeln('WeaponBoundingBox is ', WeaponBoundingBox.ToNiceStr); }
-  { TODO: we would prefer to use World.BoxCollision for this,
-    but we need to know which creature was hit. }
-  for I := 0 to World.Count - 1 do
-    if World[I] is TCreature then
-    begin
-      C := TCreature(World[I]);
-      { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
-      if C.BoundingBox.Collision(WeaponBoundingBox) then
+  if (Owner3D <> nil) and
+     (Owner3D is T3DOrient) then
+  begin
+    O := T3DOrient(Owner3D); 
+    { O.Direction may be multiplied by something here for long-range weapons }
+    WeaponBoundingBox := O.BoundingBox.Translate(O.Direction);
+    { Tests: Writeln('WeaponBoundingBox is ', WeaponBoundingBox.ToNiceStr); }
+    { TODO: we would prefer to use World.BoxCollision for this,
+      but we need to know which creature was hit. }
+    for I := 0 to World.Count - 1 do
+      if World[I] is TCreature then
       begin
-        K := Kind as TItemShortRangeWeaponKind;
-        C.Hurt(K.DamageConst + Random * K.DamageRandom, Player.Direction,
-          K.AttackKnockbackDistance);
+        C := TCreature(World[I]);
+        { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
+        if C.BoundingBox.Collision(WeaponBoundingBox) then
+        begin
+          K := Kind as TItemShortRangeWeaponKind;
+          C.Hurt(K.DamageConst + Random * K.DamageRandom, O.Direction,
+            K.AttackKnockbackDistance);
+        end;
       end;
-    end;
+  end;
 end;
 
 { TItemBowKind ------------------------------------------------------------- }
