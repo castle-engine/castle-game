@@ -2,7 +2,7 @@
 
 <level
   id="fountain"
-  scene_file_name="fountain_final.wrl"
+  scene="fountain_final.wrl"
   title="Fountain"
   title_hint="shadows and bump mapping ON advised"
   number="15"

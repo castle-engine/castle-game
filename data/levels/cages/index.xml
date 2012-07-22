@@ -2,7 +2,7 @@
 
 <level
   id="cages"
-  scene_file_name="cages_final.wrl"
+  scene="cages_final.wrl"
 
   title="Cages"
   number="3"

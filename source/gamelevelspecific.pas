@@ -1336,12 +1336,7 @@ begin
 end;
 
 initialization
-  { if for some reason (uses clauses) CastleLevel is not initialized yet
-    --- the initialize it now }
-  if LevelClasses = nil then
-    LevelClasses := TLevelClasses.Create;
-
-  LevelClasses['Level'] := TLevel;
+  { register our level logic classes }
   LevelClasses['Cages'] := TCagesLevel;
   LevelClasses['Gate'] := TGateLevel;
   LevelClasses['GateBackground'] := TGateBackgroundLevel;

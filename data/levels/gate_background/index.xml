@@ -2,7 +2,7 @@
 
 <level
   id="gate_background"
-  scene_file_name="gate_final.wrl"
+  scene="gate_final.wrl"
   title="Background"
   number="101"
   type="GateBackground"

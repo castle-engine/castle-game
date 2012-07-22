@@ -2,7 +2,7 @@
 
 <level
   id="hello_world"
-  scene_file_name="hello_world_final.wrl"
+  scene="hello_world_final.wrl"
   title="Hello world"
   number="95"
   type="Level"

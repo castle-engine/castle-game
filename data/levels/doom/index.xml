@@ -2,14 +2,14 @@
 
 <level
   id="doom_e1m1"
-  scene_file_name="e1m1/e1m1_final.wrl"
+  scene="e1m1/e1m1_final.wrl"
 
   title="Doom E1M1"
   title_hint="shadows OFF advised"
   number="666"
   type="DoomE1M1"
-  loading_bg="logo/doom_title.png"
-  loading_bar_y_position="0.2"
+  loading_image="logo/doom_title.png"
+  loading_image_bar_y_position="0.2"
 
   demo="True"
   default_available_for_new_game="True"

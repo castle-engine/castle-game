@@ -61,7 +61,9 @@ in creatures/*/index.xml and items/*/index.xml:
 ------------------------------------------------------------------------------
 Documentation for level description, in levels/*/index.xml:
 
-- See TLevel properties documentation if in doubt.
+- See TLevelAvailable properties documentation if in doubt.
+
+- scene: URL to the 3D file containing the level scene.
 
 - default_available_for_new_game: (optional, default "false")
   Should the level be initially available (visible in "New Game" menu)
@@ -76,10 +78,10 @@ Documentation for level description, in levels/*/index.xml:
   something special, then you should set this attribute to the id
   of that class (see bottom of GameLevelSpecific for possible names).
 
-- loading_bg: filename of image file to display while loading the
+- loading_image: filename of image file to display while loading the
   level (under the progress bar). Optional.
 
-- loading_bar_y_position: between 0 and 1, indicates vertical position
-  of progress bar when loading level. Should be synchronized
-  with loading_bg image, to look right. Optional, default value
-  is 0.5 which simply means "middle of the screen".
+- loading_image_bar_y_position: between 0 and 1, indicates vertical position
+  of progress bar when loading level, used only if loading_image is defined.
+  Should be synchronized with loading_bg image, to look right.
+  Optional, default value is 0.5 which simply means "middle of the screen".

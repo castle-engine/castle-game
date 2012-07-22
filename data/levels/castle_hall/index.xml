@@ -2,7 +2,7 @@
 
 <level
   id="castle_hall"
-  scene_file_name="castle_hall_final.wrl"
+  scene="castle_hall_final.wrl"
   title="Castle Hall"
   number="2"
   type="CastleHall"

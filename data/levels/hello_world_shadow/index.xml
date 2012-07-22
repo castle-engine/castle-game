@@ -2,7 +2,7 @@
 
 <level
   id="hello_world_shadow"
-  scene_file_name="hello_world_shadow_final.wrl"
+  scene="hello_world_shadow_final.wrl"
   title="Hello world (static shadow)"
   number="96"
   type="Level"
