@@ -903,6 +903,7 @@ begin
   begin
     Notifications.Show('Congratulations, game finished');
     GameWin := true;
+    Player.Blocked := true;
     SoundEngine.MusicPlayer.PlayedSound := stGameWinMusic;
   end else
   begin
