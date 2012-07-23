@@ -54,11 +54,10 @@ var
   WasParam_NoScreenChange: boolean = false;
 
 const
-  Options: array[0..8]of TOption =
+  Options: array [0..7] of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
     (Short:'n'; Long: 'no-screen-change'; Argument: oaNone),
-    (Short: #0; Long: 'no-shadows'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
     (Short: #0; Long: 'debug-log'; Argument: oaNone),
     (Short: #0; Long: 'debug-log-cache'; Argument: oaNone),
@@ -84,7 +83,6 @@ begin
            '                        If your screen size is not the required' +nl+
            '                        size (set by --screen-size)' +nl+
            '                        then run in windowed mode.' +nl+
-           '  --no-shadows          Disable initializing and using shadows.' +nl+
            '  --screen-size WIDTHxHEIGHT' +nl+
            '                        Change the screen size (default is ' +
              DefaultRequestedScreenSize + ').' +nl+
@@ -102,18 +100,17 @@ begin
          ProgramBreak;
        end;
     2: WasParam_NoScreenChange := true;
-    3: RenderShadowsPossible := false;
-    4: { --debug-no-creatures not implemented for now };
-    5: InitializeLog(Version);
-    6: begin
+    3: { --debug-no-creatures not implemented for now };
+    4: InitializeLog(Version);
+    5: begin
          InitializeLog(Version);
          LogRendererCache := true;
        end;
-    7: begin
+    6: begin
          DeFormat(Argument, '%dx%d',
            [@RequestedScreenWidth, @RequestedScreenHeight]);
        end;
-    8: DebugMenuDesigner := true;
+    7: DebugMenuDesigner := true;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
@@ -128,7 +125,6 @@ end;
 
 procedure StencilOff(Window: TCastleWindowBase; const FailureMessage: string);
 begin
-  RenderShadowsPossible := false;
   if Log then WritelnLogMultiline('GL context', FailureMessage);
 end;
 
@@ -207,8 +203,7 @@ begin
   { init window }
   Window.Caption := 'The Castle';
   Window.ResizeAllowed := raOnlyAtOpen;
-  if RenderShadowsPossible then
-    Window.StencilBits := 8;
+  Window.StencilBits := 8;
   Window.MultiSampling := AntiAliasingGLMultiSampling;
   OpenContext;
 

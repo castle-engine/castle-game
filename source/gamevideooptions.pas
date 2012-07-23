@@ -37,21 +37,13 @@ const
   DefaultRenderShadows = true;
 
 var
-  { If false then you should do *nothing* related to the shadows,
-    i.e. you even shouldn't request stencil buffer for our window
-    or do in Prepare appropriate preparations for shadows.
-
-    In other words, RenderShadowsPossible = @false means that
-    for the whole lifetime of this program RenderShadows will
-    be treated like @false. }
-  RenderShadowsPossible: boolean = true;
-
-  { Should we actually render shadows ?
-    This is meaningfull only if RenderShadowsPossible. }
+  { Should we actually render shadows?
+    This is meaningfull only if GLShadowVolumesPossible,
+    otherwise we know we will never render shadow volumes. }
   RenderShadows: boolean = DefaultRenderShadows;
 
   { You can set this to true for debug purposes.
-    This is meaningull only if RenderShadowsPossible and RenderShadows. }
+    This is meaningull only if GLShadowVolumesPossible and RenderShadows. }
   DebugRenderShadowVolume: boolean = false;
 
 const

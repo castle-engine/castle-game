@@ -398,13 +398,8 @@ begin
     2: begin
          RenderShadows := not RenderShadows;
          RenderShadowsArgument.Value := RenderShadows;
-         if (not RenderShadowsPossible) and RenderShadows then
-         begin
-           MessageOK(Window, 'Note that shadows are disabled by --no-shadows ' +
-             'command-line option. So you must restart the game to see the ' +
-             'shadows.', taLeft);
-           SubMenuAdditionalInfo := SRestartTheGame;
-         end;
+         if (not GLShadowVolumesPossible) and RenderShadows then
+           MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.', taLeft);
        end;
     3: ;
     4: ChangeColorDepthBits;
