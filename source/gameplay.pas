@@ -89,10 +89,9 @@ var
 
 implementation
 
-uses SysUtils, CastleUtils, CastleWindow,
+uses SysUtils, CastleUtils, CastleWindow, GameInputs,
   WindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
-  VectorMath, Boxes3D, Images, Math,
-  GameHelp, UIControls, ALSoundEngine,
+  VectorMath, Boxes3D, Images, Math, GameHelp, UIControls, ALSoundEngine,
   CastleItems, GameItems, CastleStringUtils,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, GameCreatures, CastleColors,
