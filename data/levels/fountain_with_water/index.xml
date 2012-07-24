@@ -8,14 +8,12 @@
   title_hint="with costly water animation"
   number="16"
   type="Fountain"
-  footsteps_sound="player_footsteps_concrete"
 
   demo="True"
   default_available_for_new_game="True"
 
   load_water_animation="True"
 >
-
   <resources>
     <resource id="Alien" />
     <resource id="BallMissile" />

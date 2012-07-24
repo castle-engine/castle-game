@@ -8,8 +8,7 @@
   type="CastleHall"
 
   music_sound="castle_hall_music"
-  footsteps_sound="player_footsteps_concrete">
-
+>
   <area id="HintButtonBox">
     <hint>Hint: press this red button with the %i</hint>
   </area>
@@ -19,5 +18,4 @@
     <resource id="Werewolf" />
     <resource id="BallMissile" />
   </resources>
-
 </level>

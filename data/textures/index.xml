@@ -13,6 +13,12 @@ Texture properties, see CastleTextureProperties unit of Castle Game Engine.
     footsteps_sound="player_footsteps_concrete" />
   <texture base_name="047roche"
     footsteps_sound="player_footsteps_grass" />
+  <texture base_name="dirtfrancecornergrass"
+    footsteps_sound="player_footsteps_grass" />
+  <texture base_name="grassfull"
+    footsteps_sound="player_footsteps_grass" />
+  <texture base_name="green020"
+    footsteps_sound="player_footsteps_grass" />
 
   <texture base_name="water_grayscale"
     footsteps_sound="player_footsteps_watery">

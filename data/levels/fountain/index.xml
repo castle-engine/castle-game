@@ -7,12 +7,10 @@
   title_hint="shadows and bump mapping ON advised"
   number="15"
   type="Fountain"
-  footsteps_sound="player_footsteps_concrete"
 
   demo="True"
   default_available_for_new_game="True"
 >
-
   <resources>
     <resource id="Alien" />
     <resource id="BallMissile" />

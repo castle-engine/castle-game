@@ -9,7 +9,6 @@
   type="Gate"
 
   music_sound="gate_music"
-  footsteps_sound="player_footsteps_grass"
 >
   <resources>
     <resource id="Ghost" />

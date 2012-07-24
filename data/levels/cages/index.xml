@@ -9,8 +9,7 @@
   type="Cages"
 
   music_sound="cages_music_with_rain"
-  footsteps_sound="player_footsteps_concrete">
-
+>
   <area id="HintOpenDoorBox">
     <hint>Hint: open this door using the %i</hint>
   </area>
@@ -20,5 +19,4 @@
     <resource id="SpiderQueen" />
     <resource id="ThrownWeb" />
   </resources>
-
 </level>

@@ -9,9 +9,7 @@
 
   demo="True"
   default_available_for_new_game="True"
-
-  footsteps_sound="player_footsteps_concrete">
-
+>
   <resources>
   </resources>
 </level>
