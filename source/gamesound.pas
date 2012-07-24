@@ -35,21 +35,8 @@ var
 
   { Player sounds.
     @groupBegin }
-  stPlayerSuddenPain,
   stPlayerPotionDrink,
   stPlayerCastFlyingSpell,
-  stPlayerPickItem,
-  stPlayerDropItem,
-  stPlayerDies,
-  stPlayerSwimmingChange,
-  stPlayerSwimming,
-  stPlayerDrowning,
-  stPlayerFalledDown,
-  stPlayerFootstepsConcrete,
-  stPlayerFootstepsGrass,
-  stPlayerInteractFailed,
-  stPlayerLavaPain,
-  stPlayerFootstepsWatery,
   { @groupEnd }
 
   { Items sounds.
@@ -114,21 +101,8 @@ initialization
   SoundEngine.SoundsXmlFileName := ProgramDataPath + 'data' +
     PathDelim + 'sounds' + PathDelim + 'index.xml';
 
-  stPlayerSuddenPain           := SoundEngine.SoundFromName('player_sudden_pain');
   stPlayerPotionDrink          := SoundEngine.SoundFromName('player_potion_drink');
   stPlayerCastFlyingSpell      := SoundEngine.SoundFromName('player_cast_flying_spell');
-  stPlayerPickItem             := SoundEngine.SoundFromName('player_pick_item');
-  stPlayerDropItem             := SoundEngine.SoundFromName('player_drop_item');
-  stPlayerDies                 := SoundEngine.SoundFromName('player_dies');
-  stPlayerSwimmingChange       := SoundEngine.SoundFromName('player_swimming_change');
-  stPlayerSwimming             := SoundEngine.SoundFromName('player_swimming');
-  stPlayerDrowning             := SoundEngine.SoundFromName('player_drowning');
-  stPlayerFalledDown           := SoundEngine.SoundFromName('player_falled_down');
-  stPlayerFootstepsConcrete    := SoundEngine.SoundFromName('player_footsteps_concrete');
-  stPlayerFootstepsGrass       := SoundEngine.SoundFromName('player_footsteps_grass');
-  stPlayerInteractFailed       := SoundEngine.SoundFromName('player_interact_failed');
-  stPlayerLavaPain             := SoundEngine.SoundFromName('player_lava_pain');
-  stPlayerFootstepsWatery      := SoundEngine.SoundFromName('player_footsteps_watery');
   stSwordEquipping             := SoundEngine.SoundFromName('sword_equipping');
   stSwordAttackStart           := SoundEngine.SoundFromName('sword_attack_start');
   stArrowFired                 := SoundEngine.SoundFromName('arrow_fired');
