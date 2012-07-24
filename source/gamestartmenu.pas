@@ -62,12 +62,11 @@ type
   TVideoMenu = class(TSubMenu)
   public
     AllowScreenChangeArgument: TMenuBooleanArgument;
-    RenderShadowsArgument: TMenuBooleanArgument;
+    ShadowVolumesArgument: TMenuBooleanArgument;
     AnimationSmoothnessSlider: TMenuFloatSlider;
     ColorDepthArgument: TMenuArgument;
     VideoFrequencyArgument: TMenuArgument;
     ConserveResourcesArgument: TMenuBooleanArgument;
-    BumpMappingArgument: TMenuBooleanArgument;
     AntiAliasingSlider: TAntiAliasingSlider;
     constructor Create(AOwner: TComponent); override;
     procedure SetAntiAliasing(
@@ -135,6 +134,8 @@ procedure NewGame(Level: TLevelAvailable);
 begin
   SceneManager := TGameSceneManager.Create(nil);
   try
+    SceneManager.ShadowVolumes := ShadowVolumes;
+    SceneManager.ShadowVolumesDraw := ShadowVolumesDraw;
     repeat
       Player := TPlayer.Create(nil);
       try
@@ -281,7 +282,7 @@ begin
   inherited;
 
   AllowScreenChangeArgument := TMenuBooleanArgument.Create(AllowScreenChange);
-  RenderShadowsArgument := TMenuBooleanArgument.Create(RenderShadows);
+  ShadowVolumesArgument := TMenuBooleanArgument.Create(ShadowVolumes);
   AnimationSmoothnessSlider := TMenuFloatSlider.Create(
     MinAnimationSmoothness,
     MaxAnimationSmoothness,
@@ -295,17 +296,14 @@ begin
     TMenuArgument.TextWidth(SSystemDefault));
   VideoFrequencyArgument.Value := VideoFrequencyToStr(VideoFrequency);
 
-  BumpMappingArgument := TMenuBooleanArgument.Create(BumpMapping);
-
   AntiAliasingSlider := TAntiAliasingSlider.Create;
 
   Items.Add('View video information');
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
-  Items.AddObject('Shadow volumes', RenderShadowsArgument);
+  Items.AddObject('Shadow volumes', ShadowVolumesArgument);
   Items.AddObject('Animation smoothness', AnimationSmoothnessSlider);
   Items.AddObject('Color depth', ColorDepthArgument);
   Items.AddObject('Display frequency', VideoFrequencyArgument);
-  Items.AddObject('Bump mapping', BumpMappingArgument);
   Items.AddObject('Anti-aliasing', AntiAliasingSlider);
   Items.Add('Restore to defaults');
   Items.Add('Back to main menu');
@@ -396,25 +394,21 @@ begin
          AllowScreenChangeArgument.Value := AllowScreenChange;
        end;
     2: begin
-         RenderShadows := not RenderShadows;
-         RenderShadowsArgument.Value := RenderShadows;
-         if (not GLShadowVolumesPossible) and RenderShadows then
+         ShadowVolumes := not ShadowVolumes;
+         ShadowVolumesArgument.Value := ShadowVolumes;
+         if (not GLShadowVolumesPossible) and ShadowVolumes then
            MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.', taLeft);
        end;
     3: ;
     4: ChangeColorDepthBits;
     5: ChangeVideoFrequency;
-    6: begin
-         BumpMapping := not BumpMapping;
-         BumpMappingArgument.Value := BumpMapping;
-       end;
-    7: ;
-    8: begin
+    6: ;
+    7: begin
          AllowScreenChange := DefaultAllowScreenChange;
          AllowScreenChangeArgument.Value := AllowScreenChange;
 
-         RenderShadows := DefaultRenderShadows;
-         RenderShadowsArgument.Value := RenderShadows;
+         ShadowVolumes := DefaultShadowVolumes;
+         ShadowVolumesArgument.Value := ShadowVolumes;
 
          if AnimationSmoothness <> DefaultAnimationSmoothness then
          begin
@@ -439,16 +433,13 @@ begin
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
-         BumpMapping := DefaultBumpMapping;
-         BumpMappingArgument.Value := BumpMapping;
-
          SetAntiAliasing(DefaultAntiAliasing, true);
 
          VisibleChange;
 
          MessageOK(Window, 'All video settings restored to defaults.', taLeft);
        end;
-    9 : SetCurrentMenu(CurrentMenu, MainMenu);
+    8 : SetCurrentMenu(CurrentMenu, MainMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -457,7 +448,7 @@ procedure TVideoMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
     3: AnimationSmoothness := AnimationSmoothnessSlider.Value;
-    7: SetAntiAliasing(TAntiAliasing(AntiAliasingSlider.Value), false);
+    6: SetAntiAliasing(TAntiAliasing(AntiAliasingSlider.Value), false);
   end;
 end;
 

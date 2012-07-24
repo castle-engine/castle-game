@@ -52,7 +52,7 @@ type
   public
     RenderBoundingBoxesArgument: TMenuBooleanArgument;
     RenderDebugCaptionsArgument: TMenuBooleanArgument;
-    DebugRenderShadowVolumeArgument: TMenuBooleanArgument;
+    ShadowVolumesDrawArgument: TMenuBooleanArgument;
     DebugRenderForLevelScreenshotArgument: TMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
@@ -146,7 +146,7 @@ begin
 
   RenderBoundingBoxesArgument := TMenuBooleanArgument.Create(RenderBoundingBoxes);
   RenderDebugCaptionsArgument := TMenuBooleanArgument.Create(RenderDebugCaptions);
-  DebugRenderShadowVolumeArgument := TMenuBooleanArgument.Create(DebugRenderShadowVolume);
+  ShadowVolumesDrawArgument := TMenuBooleanArgument.Create(ShadowVolumesDraw);
   DebugRenderForLevelScreenshotArgument := TMenuBooleanArgument.Create(
     DebugRenderForLevelScreenshot);
 
@@ -158,7 +158,7 @@ begin
   Items.Add('Reload resource animation ...');
   Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
   Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
-  Items.AddObject('Render shadow volumes', DebugRenderShadowVolumeArgument);
+  Items.AddObject('Render shadow volumes', ShadowVolumesDrawArgument);
   Items.AddObject('Render for level screenshot', DebugRenderForLevelScreenshotArgument);
   Items.Add('Reload sounds/index.xml');
   Items.Add('Back to game');
@@ -198,8 +198,8 @@ begin
          RenderDebugCaptionsArgument.Value := RenderDebugCaptions;
        end;
     8: begin
-         DebugRenderShadowVolume := not DebugRenderShadowVolume;
-         DebugRenderShadowVolumeArgument.Value := DebugRenderShadowVolume;
+         ShadowVolumesDraw := not ShadowVolumesDraw;
+         ShadowVolumesDrawArgument.Value := ShadowVolumesDraw;
        end;
     9: begin
          DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;

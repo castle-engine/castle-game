@@ -34,17 +34,17 @@ var
   AllowScreenChange: boolean;
 
 const
-  DefaultRenderShadows = true;
+  DefaultShadowVolumes = true;
 
 var
-  { Should we actually render shadows?
+  { Render shadow volumes.
     This is meaningfull only if GLShadowVolumesPossible,
-    otherwise we know we will never render shadow volumes. }
-  RenderShadows: boolean = DefaultRenderShadows;
+    otherwise we will never render shadow volumes. }
+  ShadowVolumes: boolean = DefaultShadowVolumes;
 
   { You can set this to true for debug purposes.
-    This is meaningull only if GLShadowVolumesPossible and RenderShadows. }
-  DebugRenderShadowVolume: boolean = false;
+    This is meaningull only if GLShadowVolumesPossible and ShadowVolumes. }
+  ShadowVolumesDraw: boolean = false;
 
 const
   DefaultColorDepthBits = 0;
@@ -64,18 +64,6 @@ var
 var
   ViewAngleDegX: Single = 70.0;
 function ViewAngleDegY: Single;
-
-const
-  DefaultBumpMapping = true;
-
-var
-  BumpMapping: boolean;
-
-const
-  DefaultUseOcclusionQuery = false;
-var
-  { Should we use use occlusion query for levels. }
-  UseOcclusionQuery: boolean;
 
 implementation
 
@@ -113,18 +101,14 @@ class procedure TGameVideoOptions.LoadFromConfig(const Config: TCastleConfig);
 begin
   AllowScreenChange := Config.GetValue(
     'video_options/allow_screen_change', DefaultAllowScreenChange);
-  RenderShadows := Config.GetValue(
-    'video_options/shadows', DefaultRenderShadows);
+  ShadowVolumes := Config.GetValue(
+    'video_options/shadows', DefaultShadowVolumes);
   ColorDepthBits := Config.GetValue(
     'video_options/color_depth_bits', DefaultColorDepthBits);
   VideoFrequency := Config.GetValue(
     'video_options/frequency', DefaultVideoFrequency);
-  BumpMapping := Config.GetValue(
-    'video_options/bump_mapping', DefaultBumpMapping);
   AntiAliasing := TAntiAliasing(Config.GetValue(
     'video_options/anti_aliasing', Ord(DefaultAntiAliasing)));
-  UseOcclusionQuery := Config.GetValue(
-    'video_options/use_occlusion_query', DefaultUseOcclusionQuery);
 end;
 
 class procedure TGameVideoOptions.SaveToConfig(const Config: TCastleConfig);
@@ -134,19 +118,15 @@ begin
     AllowScreenChange, DefaultAllowScreenChange);
   Config.SetDeleteValue(
     'video_options/shadows',
-    RenderShadows, DefaultRenderShadows);
+    ShadowVolumes, DefaultShadowVolumes);
   Config.SetDeleteValue(
     'video_options/color_depth_bits',
     ColorDepthBits, DefaultColorDepthBits);
   Config.SetDeleteValue(
     'video_options/frequency',
     VideoFrequency, DefaultVideoFrequency);
-  Config.SetDeleteValue('video_options/bump_mapping',
-    BumpMapping, DefaultBumpMapping);
   Config.SetDeleteValue('video_options/anti_aliasing',
     Ord(AntiAliasing), Ord(DefaultAntiAliasing));
-  Config.SetDeleteValue('video_options/use_occlusion_query',
-    UseOcclusionQuery, DefaultUseOcclusionQuery);
 end;
 
 function ViewAngleDegY: Single;

@@ -4,7 +4,7 @@
   id="fountain"
   scene="fountain_final.wrl"
   title="Fountain"
-  title_hint="shadows and bump mapping ON advised"
+  title_hint="shadows ON advised"
   number="15"
   type="Fountain"
 
