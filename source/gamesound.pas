@@ -57,7 +57,6 @@ var
   stCastleHallSymbolMoving,
   stCastleHallMusic,
   stCagesMusic,
-  stThunder,
   stStairsBlockerDestroyed,
   stTeleport,
   stSacrilegeAmbush,
@@ -115,7 +114,6 @@ initialization
   stCastleHallSymbolMoving     := SoundEngine.SoundFromName('castle_hall_symbol_moving');
   stCastleHallMusic            := SoundEngine.SoundFromName('castle_hall_music');
   stCagesMusic                 := SoundEngine.SoundFromName('cages_music_with_rain');
-  stThunder                    := SoundEngine.SoundFromName('thunder');
   stStairsBlockerDestroyed     := SoundEngine.SoundFromName('stairs_blocker_destroyed');
   stTeleport                   := SoundEngine.SoundFromName('teleport');
   stSacrilegeAmbush            := SoundEngine.SoundFromName('sacrilege_ambush');
