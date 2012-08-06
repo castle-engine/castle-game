@@ -844,9 +844,7 @@ begin
   InventoryVisible := false;
   LevelFinishedSchedule := false;
 
-  SavedMode := TGLMode.CreateReset(Window,
-    { For glEnable(GL_LIGHTING) and GL_LIGHT0 below.}
-    GL_ENABLE_BIT, true, nil, nil, @CloseQuery);
+  SavedMode := TGLMode.CreateReset(Window, 0, true, nil, nil, @CloseQuery);
   try
     Window.AutoRedisplay := true;
 
@@ -873,8 +871,6 @@ begin
 
     GameEnded := false;
     GameEndedWantsRestart := '';
-
-    glEnable(GL_LIGHTING);
 
     MessagesTheme.RectColor[3] := 0.4;
 
