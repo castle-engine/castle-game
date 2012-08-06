@@ -210,12 +210,6 @@ begin
   { init progress }
   WindowProgressInterface.Window := Window;
   Progress.UserInterface := WindowProgressInterface;
-  { I'm turning UseDescribePosition to false, because it's usually
-    confusing for the user.
-    E.g. each creature is counted as PrepareSteps steps,
-    each item is counted as PrepareSteps steps,
-    when loading levels user would have to know what an "octree" is. }
-  Progress.UseDescribePosition := false;
 
   { load game data from XML files }
   TexturesProperties.XmlFileName := ProgramDataPath + 'data' +
