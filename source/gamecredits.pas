@@ -118,7 +118,6 @@ procedure ShowCredits(ControlsUnder: TUIControlList;
   SceneManagerUnder: TCastleSceneManager);
 var
   SavedMode: TGLMode;
-  SavedAlwaysApplyProjection: boolean;
 begin
   SavedMode := TGLMode.CreateReset(Window, 0, false, nil, nil, @CloseQuery);
   try
@@ -133,16 +132,11 @@ begin
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 
-    SavedAlwaysApplyProjection := SceneManagerUnder.AlwaysApplyProjection;
-    SceneManagerUnder.AlwaysApplyProjection := true;
-
     Window.Controls.Insert(0, CreditsSceneManager);
 
     repeat
       Application.ProcessMessage(true, true);
     until UserQuit;
-
-    SceneManagerUnder.AlwaysApplyProjection := SavedAlwaysApplyProjection;
   finally FreeAndNil(SavedMode) end;
 end;
 
@@ -159,7 +153,6 @@ begin
     - with own projection, regardles of the background level projection.
     - with own size. }
   CreditsSceneManager := TCastleSceneManager.Create(nil);
-  CreditsSceneManager.AlwaysApplyProjection := true;
   CreditsSceneManager.FullSize := false;
   CreditsSceneManager.Left := 25;
   CreditsSceneManager.Bottom := 20;
