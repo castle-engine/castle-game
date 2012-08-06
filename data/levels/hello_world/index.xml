@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  id="hello_world"
+  name="hello_world"
   scene="hello_world_final.wrl"
   title="Hello world"
   number="95"

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <resource
-  id="Bow"
+  name="Bow"
   type="Bow"
 
   actual_attack_time="0.0"

@@ -129,7 +129,7 @@ begin
     for I := 0 to AllResources.Count - 1 do
       if (not OnlyCreatures) or (AllResources[I] is TCreatureKind) then
         S.AddObject(Format('Resource %s (%d users)',
-          [AllResources[I].Id, AllResources[I].UsageCount]), AllResources[I]);
+          [AllResources[I].Name, AllResources[I].UsageCount]), AllResources[I]);
     S.Append('Cancel');
     ResultIndex := ChooseByMenu(ControlsUnder, S);
     Result := ResultIndex <> S.Count - 1;
@@ -174,7 +174,7 @@ procedure TDebugMenu.Click;
     begin
       if Resource.UsageCount = 0 then
         MessageOK(Window, Format('Resource "%s" is not used by anything, ' +
-          'cannot reload',  [Resource.Id])) else
+          'cannot reload',  [Resource.Name])) else
         Resource.RedoPrepare(SceneManager.BaseLights);
     end;
   end;
@@ -375,7 +375,7 @@ procedure TDebugLevelMenu.Click;
 
       if Index <> LevelsAvailable.Count then
       begin
-        LevelFinished(LevelsAvailable[Index].Id);
+        LevelFinished(LevelsAvailable[Index].Name);
         { Flush LevelFinished now, to give new items when new level is loaded.
           Otherwise, some sounds (like equipping the sword, if player gets
           his first weapon) could be done before loading level progress,
@@ -395,7 +395,7 @@ procedure TDebugLevelMenu.Click;
     Dir := Player.Camera.Direction;
     Up := Player.Camera.Up;
 
-    LevelFinished(SceneManager.Info.Id);
+    LevelFinished(SceneManager.Info.Name);
     LevelFinishedFlush;
 
     { Change Player.Camera, they will be automatically set also for Player

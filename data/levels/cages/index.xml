@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  id="cages"
+  name="cages"
   scene="cages_final.wrl"
 
   title="Cages"
@@ -10,13 +10,13 @@
 
   music_sound="cages_music_with_rain"
 >
-  <area id="HintOpenDoorBox">
+  <area name="HintOpenDoorBox">
     <hint>Hint: open this door using the %i</hint>
   </area>
 
   <resources>
-    <resource id="Spider" />
-    <resource id="SpiderQueen" />
-    <resource id="ThrownWeb" />
+    <resource name="Spider" />
+    <resource name="SpiderQueen" />
+    <resource name="ThrownWeb" />
   </resources>
 </level>

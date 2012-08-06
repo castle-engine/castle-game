@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  id="gate"
+  name="gate"
   scene="gate_final.wrl"
   title="The Gate"
   number="1"
@@ -11,7 +11,7 @@
   music_sound="gate_music"
 >
   <resources>
-    <resource id="Ghost" />
-    <resource id="Spider" />
+    <resource name="Ghost" />
+    <resource name="Spider" />
   </resources>
 </level>

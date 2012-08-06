@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <resource
-  id="RedKey"
+  name="RedKey"
   type="Item"
 
   scene="model.wrl"

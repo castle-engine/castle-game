@@ -6,7 +6,7 @@
      player could avoid attacks just by crouching. -->
 
 <resource
-  id="Werewolf"
+  name="Werewolf"
   type="Werewolf"
 
   actual_attack_time="0.3"

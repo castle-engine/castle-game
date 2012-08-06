@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <resource
-  id="DoomBarrel"
+  name="DoomBarrel"
   type="Still"
 
   radius="0.5"

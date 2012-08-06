@@ -122,7 +122,7 @@ end;
 procedure BackgroundCreate;
 const
   { hardcoded for now }
-  MenuBackgroundLevelId = 'gate_background';
+  MenuBackgroundLevelName = 'gate_background';
 var
   BackgroundCaptions: TUIControl;
 begin
@@ -130,7 +130,7 @@ begin
 
   { initialize BackgroundSceneManager }
   BackgroundSceneManager := TGameSceneManager.Create(nil);
-  LevelsAvailable.FindId(MenuBackgroundLevelId).LoadLevel(BackgroundSceneManager, true);
+  LevelsAvailable.FindName(MenuBackgroundLevelName).LoadLevel(BackgroundSceneManager, true);
   BackgroundControls.Add(BackgroundSceneManager);
 
   { Do not allow to move the camera in any way.

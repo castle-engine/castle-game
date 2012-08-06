@@ -203,12 +203,12 @@ end;
 
 procedure ItemsKindsInit;
 begin
-  Sword := AllResources.FindId('Sword') as TItemKind;
-  Bow := AllResources.FindId('Bow') as TItemKind;
-  LifePotion := AllResources.FindId('LifePotion') as TItemKind;
-  KeyItemKind := AllResources.FindId('Key') as TItemKind;
-  RedKeyItemKind := AllResources.FindId('RedKey') as TItemKind;
-  Quiver := AllResources.FindId('Quiver') as TItemKind;
+  Sword := AllResources.FindName('Sword') as TItemKind;
+  Bow := AllResources.FindName('Bow') as TItemKind;
+  LifePotion := AllResources.FindName('LifePotion') as TItemKind;
+  KeyItemKind := AllResources.FindName('Key') as TItemKind;
+  RedKeyItemKind := AllResources.FindName('RedKey') as TItemKind;
+  Quiver := AllResources.FindName('Quiver') as TItemKind;
 end;
 
 initialization

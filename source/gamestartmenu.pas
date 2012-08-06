@@ -147,7 +147,7 @@ begin
       finally FreeAndNil(Player) end;
 
       if GameEnded and (GameEndedWantsRestart <> '') then
-        Level := LevelsAvailable.FindId(GameEndedWantsRestart) else
+        Level := LevelsAvailable.FindName(GameEndedWantsRestart) else
         Break;
     until false;
   finally FreeAndNil(SceneManager) end;

@@ -10,7 +10,7 @@
 -->
 
 <resource
-  id="SpiderQueen"
+  name="SpiderQueen"
   type="SpiderQueen"
 
   actual_attack_time="0.4"

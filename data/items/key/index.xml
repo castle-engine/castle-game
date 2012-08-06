@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <resource
-  id="Key"
+  name="Key"
   type="Item"
 
   scene="model.wrl"

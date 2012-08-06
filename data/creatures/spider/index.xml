@@ -8,7 +8,7 @@
      (without crouching). -->
 
 <resource
-  id="Spider"
+  name="Spider"
   type="Spider"
 
   actual_attack_time="0.25"

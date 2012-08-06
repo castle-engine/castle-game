@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <resource
-  id="Alien"
+  name="Alien"
   type="Alien"
 
   actual_attack_time="0.4"

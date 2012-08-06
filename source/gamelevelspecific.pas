@@ -792,15 +792,15 @@ constructor TCagesLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
     Result := nil;
   end;
 
-  function FindHintArea(const Id: string): TLevelHintArea;
+  function FindHintArea(const Name: string): TLevelHintArea;
   var
     I: Integer;
   begin
     for I := 0 to AWorld.Count - 1 do
       if (AWorld[I] is TLevelHintArea) and
-         (TLevelHintArea(AWorld[I]).Id = Id) then
+         (TLevelHintArea(AWorld[I]).Name = Name) then
         Exit(TLevelHintArea(AWorld[I]));
-    raise Exception.CreateFmt('Level hint area named "%s" not found', [Id]);
+    raise Exception.CreateFmt('Level hint area named "%s" not found', [Name]);
   end;
 
 begin

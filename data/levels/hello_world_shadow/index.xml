@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  id="hello_world_shadow"
+  name="hello_world_shadow"
   scene="hello_world_shadow_final.wrl"
   title="Hello world (static shadow)"
   number="96"

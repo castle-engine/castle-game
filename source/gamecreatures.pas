@@ -472,13 +472,13 @@ end;
 
 procedure CreaturesKindsInit;
 begin
-  Werewolf := AllResources.FindId('Werewolf') as TWerewolfKind;
-  BallMissile := AllResources.FindId('BallMissile') as TMissileCreatureKind;
-  Ghost := AllResources.FindId('Ghost') as TGhostKind;
-  Spider := AllResources.FindId('Spider') as TSpiderKind;
-  SpiderQueen := AllResources.FindId('SpiderQueen') as TSpiderQueenKind;
-  ThrownWeb := AllResources.FindId('ThrownWeb') as TMissileCreatureKind;
-  Arrow := AllResources.FindId('Arrow') as TMissileCreatureKind;
+  Werewolf := AllResources.FindName('Werewolf') as TWerewolfKind;
+  BallMissile := AllResources.FindName('BallMissile') as TMissileCreatureKind;
+  Ghost := AllResources.FindName('Ghost') as TGhostKind;
+  Spider := AllResources.FindName('Spider') as TSpiderKind;
+  SpiderQueen := AllResources.FindName('SpiderQueen') as TSpiderQueenKind;
+  ThrownWeb := AllResources.FindName('ThrownWeb') as TMissileCreatureKind;
+  Arrow := AllResources.FindName('Arrow') as TMissileCreatureKind;
 end;
 
 procedure DoInitialization;

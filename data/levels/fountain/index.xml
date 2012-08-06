@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <level
-  id="fountain"
+  name="fountain"
   scene="fountain_final.wrl"
   title="Fountain"
   title_hint="shadows ON advised"
@@ -12,7 +12,7 @@
   default_available_for_new_game="True"
 >
   <resources>
-    <resource id="Alien" />
-    <resource id="BallMissile" />
+    <resource name="Alien" />
+    <resource name="BallMissile" />
   </resources>
 </level>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <resource
-  id="ScrFlying"
+  name="ScrFlying"
   type="ScrFlying"
 
   scene="model_final.wrl"
