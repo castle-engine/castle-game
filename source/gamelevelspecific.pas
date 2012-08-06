@@ -806,10 +806,10 @@ constructor TCagesLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
 begin
   inherited;
 
-  ThunderEffect := TThunderEffect.Create;
-  ThunderEffect.AmbientIntensity := 0.5;
-  ThunderEffect.Color := Vector3Single(0.5, 0.5, 1);
-  ThunderEffect.Direction := Vector3Single(0, -1, 1);
+  Thunder := TThunder.Create;
+  Thunder.AmbientIntensity := 0.5;
+  Thunder.Color := Vector3Single(0.5, 0.5, 1);
+  Thunder.Direction := Vector3Single(0, -1, 1);
 
   SpidersAppearing := T3DList.Create(Self);
   AWorld.Add(SpidersAppearing);
