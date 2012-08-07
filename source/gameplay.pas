@@ -456,10 +456,6 @@ const
 var
   Cages: TCagesLevel;
 begin
-  SceneManager.SickProjection := Player.Swimming = psUnderWater;
-  if SceneManager.SickProjection then
-    SceneManager.SickProjectionSpeed := Player.SickProjectionSpeed;
-
   LevelFinishedFlush;
 
   if GameWin and (SceneManager.Level is TCagesLevel) then
