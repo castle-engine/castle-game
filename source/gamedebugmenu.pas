@@ -32,12 +32,12 @@ procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 implementation
 
 uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
-  GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
+  GL, GLU, CastleGLUtils, CastleMessages, GameWindow, Base3D,
   VectorMath, CastleWindow, GamePlay, GameGeneralMenu,
   CastleInputs, CastleCreatures, GameChooseMenu,
   CastleItems, OnScreenMenu, RaysWindow, GameVideoOptions, ALSoundEngine,
   GameSound, X3DNodes, CastleClassUtils, CastleGameNotifications,
-  CastleLevel, KeysMouse, CastleResources, CastleGameVideoOptions;
+  CastleLevel, KeysMouse, CastleResources;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -50,7 +50,7 @@ type
 
   TDebugMenu = class(TCastleGameMenu)
   public
-    RenderBoundingBoxesArgument: TMenuBooleanArgument;
+    RenderDebugBoundingVolumesArgument: TMenuBooleanArgument;
     RenderDebugCaptionsArgument: TMenuBooleanArgument;
     ShadowVolumesDrawArgument: TMenuBooleanArgument;
     DebugRenderForLevelScreenshotArgument: TMenuBooleanArgument;
@@ -144,7 +144,7 @@ constructor TDebugMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  RenderBoundingBoxesArgument := TMenuBooleanArgument.Create(RenderBoundingBoxes);
+  RenderDebugBoundingVolumesArgument := TMenuBooleanArgument.Create(RenderDebugBoundingVolumes);
   RenderDebugCaptionsArgument := TMenuBooleanArgument.Create(RenderDebugCaptions);
   ShadowVolumesDrawArgument := TMenuBooleanArgument.Create(ShadowVolumesDraw);
   DebugRenderForLevelScreenshotArgument := TMenuBooleanArgument.Create(
@@ -156,7 +156,7 @@ begin
   Items.Add('Level debug menu ...');
   Items.Add('Reload resources index.xml files');
   Items.Add('Reload resource animation ...');
-  Items.AddObject('Render bounding boxes', RenderBoundingBoxesArgument);
+  Items.AddObject('Render bounding volumes', RenderDebugBoundingVolumesArgument);
   Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
   Items.AddObject('Render shadow volumes', ShadowVolumesDrawArgument);
   Items.AddObject('Render for level screenshot', DebugRenderForLevelScreenshotArgument);
@@ -190,8 +190,8 @@ begin
     4: AllResources.LoadFromFiles(true);
     5: ReloadResource;
     6: begin
-         RenderBoundingBoxes := not RenderBoundingBoxes;
-         RenderBoundingBoxesArgument.Value := RenderBoundingBoxes;
+         RenderDebugBoundingVolumes := not RenderDebugBoundingVolumes;
+         RenderDebugBoundingVolumesArgument.Value := RenderDebugBoundingVolumes;
        end;
     7: begin
          RenderDebugCaptions := not RenderDebugCaptions;
