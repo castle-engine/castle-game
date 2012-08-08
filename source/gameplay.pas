@@ -833,8 +833,6 @@ var
   SavedMode: TGLMode;
   C2D: TGame2DControls;
 begin
-  Notifications.Clear;
-
   GameWin := false;
 
   InventoryVisible := false;
