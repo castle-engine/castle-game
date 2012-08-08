@@ -1,0 +1,101 @@
+#X3D V3.2 utf8
+PROFILE Interactive
+
+# Camera settings "encoded" in the VRML/X3D declaration below :
+# direction 0.0103808268904686 0.999946117401123 4.3718070941167753E-008
+# up -4.5380729729593838E-010 -8.742946278061936E-008 1
+# gravityUp 0 -4.3711388286737929E-008 1
+Transform {
+  translation 26.214962005615234 -121.93414306640625 1.9600000381469727
+  rotation 1 0 0 1.5707963705062866
+  children Viewpoint {
+    position 0 0 0 # camera position is expressed by translation
+    orientation 8.7047530294981357E-010 -1.000003457069397 0 0.0103810131549835
+  }
+}
+
+# lights -------------------------------------------------------------------
+
+DEF MainHallTorchLight PointLight {
+        ambientIntensity 1
+        color 1 0.91880339384079 0.034188035875559
+        location 32.704708099365234 102.3721923828125 3.367592811584473
+        attenuation 1 0 0.001000000047497
+        global TRUE
+        radius 100000
+}
+DirectionalLight {
+        ambientIntensity 0.44017094373703
+        intensity 0.44017094373703
+        kambiShadows TRUE
+        direction 0.010538369417191 0.197130039334297 -0.347894430160522
+        global TRUE
+}
+SpotLight {
+        ambientIntensity 0.478632479906082
+        intensity 0.478632479906082
+        color 1 1 0.286324799060822
+        location 31.351716995239258 83.689231872558594 62.185035705566406
+        direction -0.006432402879 -0.298772573471069 -0.265884816646576
+        # dropOffRate 0.090000003576279
+        # For how to convert VRML 1.0 dropOffRate -> beamWidth, see
+        # http://castle-engine.sourceforge.net/vrml_engine_doc/output/xsl/html/chapter.opengl_rendering.html#section.vrml_lights
+        beamWidth 0.043402776
+        cutOffAngle 0.5
+        global TRUE
+        radius 100000
+}
+PointLight {
+        ambientIntensity 0.307692319154739
+        intensity 0.307692319154739
+        location 35.100299835205078 -108.72051239013672 1.799999952316284
+        global TRUE
+        radius 100000
+}
+DEF RightRoomTorchLigh PointLight {
+        ambientIntensity 1
+        color 1 0.91880339384079 0.034188035875559
+        location 86.841522216796875 130.67515563964844 3.222983360290527
+        attenuation 1 0 0.009999999776483
+        global TRUE
+        radius 100000
+}
+DEF FakeShadowPosition PointLight {
+        ambientIntensity 1
+        on FALSE
+        kambiShadows TRUE
+        kambiShadowsMain TRUE
+        location 0 0 1000
+        global TRUE
+        radius 100000
+}
+
+# end lights ---------------------------------------------------------------
+
+KambiNavigationInfo {
+  avatarSize [ 0.5, 2 ]
+  speed 20
+  headlight FALSE
+  type "WALK"
+  # headlightNode SpotLight {
+  #   color 1 1 0.29
+  #   cutOffAngle 0.3
+  #   dropOffRate 0.001
+  # }
+}
+
+Transform {
+  rotation 1 0 0 1.57
+  children Background {
+#       skyColor [ 0.12 0 0.17 ] # , 1 1 0 ]
+#       skyAngle [             ] # 1.7 ]
+    backUrl "../../skies/cages/back.png"
+    bottomUrl "../../skies/cages/bottom.png"
+    frontUrl "../../skies/cages/front.png"
+    leftUrl "../../skies/cages/left.png"
+    rightUrl "../../skies/cages/right.png"
+    topUrl "../../skies/cages/top.png"
+  }
+}
+
+Inline { url "cages_processed.wrl" }

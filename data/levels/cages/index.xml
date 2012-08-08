@@ -2,7 +2,7 @@
 
 <level
   name="cages"
-  scene="cages_final.wrl"
+  scene="cages_final.x3dv"
 
   title="Cages"
   number="3"
