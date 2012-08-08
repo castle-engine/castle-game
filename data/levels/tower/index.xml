@@ -2,7 +2,7 @@
 
 <level
   name="tower"
-  scene="basic_castle_final.wrl"
+  scene="basic_castle_final.x3dv"
 
   title="Tower"
   number="99"

@@ -1,0 +1,91 @@
+#X3D V3.2 utf8
+PROFILE Interactive
+
+# Camera settings "encoded" in the VRML/X3D declaration below :
+# direction -0.0623456053435802 0.9980546236038208 0.0000352881688741
+# up 0.0004884445806965 -4.8890160542214289E-006 0.9999998807907104
+# gravityUp 0 -4.3711388286737929E-008 1
+Transform {
+  translation -1.3881112337112427 -94.821388244628906 -0.7226662635803223
+  rotation 1 0 0 1.5707963705062866
+  children Viewpoint {
+    position 0 0 0 # camera position is expressed by translation
+    orientation 0.0003211775620002 1.0000295639038086 -0.0078244674950838 0.0623841620981693
+  }
+}
+
+# lights ---------------------------------------------------------------------
+
+PointLight {
+        ambientIntensity 1
+        color 0.800000011920929 0.400000005960464 0.400000005960464
+        kambiShadows TRUE
+        location -0.484244674444199 2.030553579330444 5.987204074859619
+        global TRUE
+        radius 100000 # infinity
+}
+PointLight {
+        ambientIntensity 0.512820541858673
+        intensity 0.512820541858673
+        color 0.400000005960464 0.400000005960464 0.400000005960464
+        kambiShadows TRUE
+        location -11.109210014343262 -36.451499938964844 88.175689697265625
+        global TRUE
+        radius 100000 # infinity
+}
+DEF FakeShadowPosition PointLight {
+        ambientIntensity 1
+        on FALSE
+        kambiShadows TRUE
+        kambiShadowsMain TRUE
+        location 0 0 1000
+        global TRUE
+        radius 100000 # infinity
+}
+
+# end lights -----------------------------------------------------------------
+
+Transform {
+  rotation 1 0 0 1.57
+  children Background {
+    backUrl "../../skies/sky_back.png"
+    bottomUrl "../../skies/sky_bottom.png"
+    frontUrl "../../skies/sky_front.png"
+    leftUrl "../../skies/sky_left.png"
+    rightUrl "../../skies/sky_right.png"
+    topUrl "../../skies/sky_top.png"
+  }
+}
+
+KambiNavigationInfo {
+  avatarSize [ 0.5, 2 ]
+  speed 20
+  headlight TRUE
+  type "WALK"
+  headlightNode DirectionalLight {
+    ambientIntensity 0.5
+    intensity 0.5
+    color 1 1 1
+  }
+}
+
+Fog {
+  visibilityRange 200
+  color 0 0 0
+}
+
+#   Fog {
+#     color 0.6 0.6 0.6
+#     visibilityRange 200
+#   }
+
+#   Fog {
+#     color 1 0 0
+#     fogType "LINEAR"
+#     volumetric TRUE
+#     volumetricDirection 0 0 -1
+#     volumetricVisibilityStart 0
+#     visibilityRange 50
+#   }
+
+Inline { url "basic_castle.wrl" }
