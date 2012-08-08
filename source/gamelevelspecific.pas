@@ -282,17 +282,17 @@ begin
 
   Symbol := LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false);
   Symbol.CastShadowVolumes := false; { shadow would not be visible anyway }
-  AWorld.Add(Symbol);
+  World.Add(Symbol);
 
   Button := LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false,
     TCastleHallButton);
   Button.CastShadowVolumes := false; { strange ghost shadow on symbol would be visible }
-  AWorld.Add(Button);
+  World.Add(Button);
 
   StairsBlocker := LoadLevelScene(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl',
     true { create octrees }, false, TStairsBlocker);
   StairsBlocker.CastShadowVolumes := false; { shadow would not be visible anyway }
-  AWorld.Add(StairsBlocker);
+  World.Add(StairsBlocker);
 
   { get StairsBlocker.BoundingBox.Middle when it GetExists.
     Later StairsBlocker will have Exists = false, so bbox will be empty,
@@ -524,17 +524,17 @@ begin
   Teleport1.Rotation :=  Vector4Single(1, 1, 0, 0);
   Teleport1.Translation := Teleport1Box.Middle;
   Teleport1.Add(Teleport);
-  AWorld.Add(Teleport1);
+  World.Add(Teleport1);
 
   Teleport2 := T3DTransform.Create(Self);
   Teleport2.Rotation :=  Vector4Single(1, 1, 0, 0);
   Teleport2.Translation := Teleport2Box.Middle;
   Teleport2.Add(Teleport);
-  AWorld.Add(Teleport2);
+  World.Add(Teleport2);
 
   Cart := LoadLevelAnimation(GateLevelPath + 'cart.kanim', true, true);
   Cart.CollisionUseLastScene := true;
-  AWorld.Add(Cart);
+  World.Add(Cart);
   Cart.TimePlaying := true;
 
   CartSoundPosition := Cart.FirstScene.BoundingBox.Middle;
@@ -708,7 +708,7 @@ begin
   MovingElevator.SoundGoBeginPosition := stElevator;
   MovingElevator.SoundGoBeginPositionLooping := true;
   MovingElevator.SoundTracksCurrentPosition := true;
-  AWorld.Add(MovingElevator);
+  World.Add(MovingElevator);
 
   TTowerElevatorButton(ElevatorButton).MovingElevator := MovingElevator;
 end;
@@ -782,10 +782,10 @@ constructor TCagesLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
   var
     I: Integer;
   begin
-    for I := 0 to AWorld.Count - 1 do
-      if AWorld[I] is TCreature then
+    for I := 0 to World.Count - 1 do
+      if World[I] is TCreature then
       begin
-        Result := TCreature(AWorld[I]);
+        Result := TCreature(World[I]);
         if Result.Kind = Kind then
           Exit;
       end;
@@ -796,10 +796,10 @@ constructor TCagesLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
   var
     I: Integer;
   begin
-    for I := 0 to AWorld.Count - 1 do
-      if (AWorld[I] is TLevelHintArea) and
-         (TLevelHintArea(AWorld[I]).Name = Name) then
-        Exit(TLevelHintArea(AWorld[I]));
+    for I := 0 to World.Count - 1 do
+      if (World[I] is TLevelHintArea) and
+         (TLevelHintArea(World[I]).Name = Name) then
+        Exit(TLevelHintArea(World[I]));
     raise Exception.CreateFmt('Level hint area named "%s" not found', [Name]);
   end;
 
@@ -812,7 +812,7 @@ begin
   Thunder.Direction := Vector3Single(0, -1, 1);
 
   SpidersAppearing := T3DList.Create(Self);
-  AWorld.Add(SpidersAppearing);
+  World.Add(SpidersAppearing);
   NextSpidersAppearingTime := 0;
 
   HintOpenDoor := FindHintArea('HintOpenDoorBox');
@@ -827,13 +827,13 @@ begin
     as player's move along the EndSequence will be programmed. }
   FEndSequence.Collides := false;
   FEndSequence.CastShadowVolumes := false; { shadow is not visible anyway }
-  AWorld.Add(FEndSequence);
+  World.Add(FEndSequence);
 
   FGateExit := LoadLevelScene(
     CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
     true { create octrees }, false, TGateExit);
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
-  AWorld.Add(FGateExit);
+  World.Add(FGateExit);
 
   FBossCreature := FindCreatureKind(SpiderQueen);
 
@@ -1177,16 +1177,16 @@ begin
   DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +
     PathDelim;
 
-  AWorld.Add(MakeDoor('door2_3_closed.wrl'));
-  AWorld.Add(MakeDoor('door4_5_closed.wrl'));
-  AWorld.Add(MakeDoor('door4_7_closed.wrl'));
-  AWorld.Add(MakeDoor('door5_6_closed.wrl'));
+  World.Add(MakeDoor('door2_3_closed.wrl'));
+  World.Add(MakeDoor('door4_5_closed.wrl'));
+  World.Add(MakeDoor('door4_7_closed.wrl'));
+  World.Add(MakeDoor('door5_6_closed.wrl'));
 
   FakeWall := LoadLevelScene( DoomDoorsPathPrefix + 'fake_wall_final.wrl',
     false { no need for octrees, does never collide }, false);
   FakeWall.Collides := false;
   FakeWall.CastShadowVolumes := false;
-  AWorld.Add(FakeWall);
+  World.Add(FakeWall);
 
   Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
     true { create octrees }, false);
@@ -1201,7 +1201,7 @@ begin
   MovingElevator49.SoundGoBeginPositionLooping := true;
   MovingElevator49.SoundTracksCurrentPosition := true;
   MovingElevator49.CastShadowVolumes := false;
-  AWorld.Add(MovingElevator49);
+  World.Add(MovingElevator49);
 
   Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
     true { create octrees }, false, TElevator9a9b);
@@ -1216,12 +1216,12 @@ begin
   MovingElevator9a9b.SoundGoBeginPositionLooping := true;
   MovingElevator9a9b.SoundTracksCurrentPosition := true;
   MovingElevator9a9b.CastShadowVolumes := false;
-  AWorld.Add(MovingElevator9a9b);
+  World.Add(MovingElevator9a9b);
 
   ExitButton := LoadLevelScene(DoomDoorsPathPrefix + 'exit_button_final.wrl',
     true { create octrees }, false, TExitButton);
   ExitButton.CastShadowVolumes := false;
-  AWorld.Add(ExitButton);
+  World.Add(ExitButton);
 
   TElevator9a9b(Elevator9a9b).MovingElevator9a9b := MovingElevator9a9b;
   TElevator9a9b(Elevator9a9b).Elevator9a9bPickBox := Elevator9a9bPickBox;
@@ -1286,7 +1286,7 @@ begin
     walk on this level). For safety, Collides set to @false, in case
     user enters this level by debug menu. }
   Water.Collides := false;
-  AWorld.Add(Water);
+  World.Add(Water);
 
   Water.TimePlaying := true;
 end;
@@ -1324,7 +1324,7 @@ begin
     Fountain.TimePlayingSpeed := 1.5;
     Fountain.TimePlaying := true;
 
-    AWorld.Add(Fountain);
+    World.Add(Fountain);
   end;
 end;
 
