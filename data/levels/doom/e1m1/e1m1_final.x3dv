@@ -1,0 +1,100 @@
+#X3D V3.2 utf8
+PROFILE Interactive
+
+# Camera settings "encoded" in the VRML/X3D declaration below :
+# direction 0.0142354052513838 -0.9998986721038818 -8.7416410110563447E-008
+# up 6.140016921563074E-006 4.3705039587393912E-008 1
+# gravityUp 0 -4.3711388286737929E-008 1
+Transform {
+  translation -52.858566284179688 180.4088134765625 1.8163450956344604
+  rotation 1 0 0 1.5707963705062866
+  children Viewpoint {
+    position 0 0 0 # camera position is expressed by translation
+    orientation -3.0704748041898711E-006 -1 0 3.1273567676544189
+  }
+}
+
+# lights -------------------------------------------------------------------
+
+DirectionalLight {
+        ambientIntensity 1
+        on FALSE
+        direction -1 -1 -1
+        global TRUE
+}
+DirectionalLight {
+        ambientIntensity 1
+        on FALSE
+        direction 1 1 1
+        global TRUE
+}
+DirectionalLight {
+        ambientIntensity 1
+        kambiShadows TRUE
+        direction 1 -1 -1
+        global TRUE
+}
+DirectionalLight {
+        ambientIntensity 1
+        direction -1 1 1
+        global TRUE
+}
+DEF FakeShadowPosition PointLight {
+        ambientIntensity 1
+        on FALSE
+        kambiShadows TRUE
+        kambiShadowsMain TRUE
+        location 0 0 1000
+        global TRUE
+        radius 100000 # infinity
+}
+
+# end lights ---------------------------------------------------------------
+
+NavigationInfo {
+  avatarSize [ 0.5, 2 ]
+  speed 20
+  headlight FALSE
+  type "WALK"
+}
+
+#   Transform {
+#     rotation 1 0 0 1.57
+#     children Background {
+#       backUrl "../../../skies/doom/sky1/back.png"
+#       bottomUrl "../../../skies/doom/sky1/bottom.png"
+#       frontUrl "../../../skies/doom/sky1/front.png"
+#       leftUrl "../../../skies/doom/sky1/left.png"
+#       rightUrl "../../../skies/doom/sky1/right.png"
+#       topUrl "../../../skies/doom/sky1/top.png"
+#     }
+#   }
+
+Transform {
+  rotation 0 0 1 1.5
+  children Transform {
+    rotation 1 0 0 1.57
+    children Background {
+      backUrl "../../../skies/foggy_sky_back.png"
+      bottomUrl "../../../skies/foggy_sky_bottom.png"
+      frontUrl "../../../skies/foggy_sky_front.png"
+      leftUrl "../../../skies/foggy_sky_left.png"
+      rightUrl "../../../skies/foggy_sky_right.png"
+      topUrl "../../../skies/foggy_sky_top.png"
+    }
+  }
+}
+
+Transform {
+  # rotate to make up vector as +Z
+  rotation 1 0 0 1.57
+  children Transform {
+    # proper scaling - original model is scaled down to fit
+    # sizes of my items and creatures
+    scale 0.05 0.05 0.05
+    children [
+      Inline { url "e1m1.wrl" }
+      Inline { url "e1m1_blender.wrl" }
+    ]
+  }
+}

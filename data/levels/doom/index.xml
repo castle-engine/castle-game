@@ -2,7 +2,7 @@
 
 <level
   name="doom_e1m1"
-  scene="e1m1/e1m1_final.wrl"
+  scene="e1m1/e1m1_final.x3dv"
 
   title="Doom E1M1"
   title_hint="shadows OFF advised"
