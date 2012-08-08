@@ -2,7 +2,7 @@
 
 <level
   name="gate_background"
-  scene="gate_final.wrl"
+  scene="gate_final.x3dv"
   title="Background"
   number="101"
   type="GateBackground"

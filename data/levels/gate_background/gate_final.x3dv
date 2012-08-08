@@ -1,0 +1,68 @@
+#X3D V3.2 utf8
+PROFILE Interactive
+
+# Camera settings "encoded" in the VRML/X3D declaration below :
+# direction -0.9534138441085815 0.2899778783321381 0.0831558108329773
+# up 0.0795576348900795 -0.0241966657340527 0.9965366125106812
+# gravityUp 0 -4.3711388286737929E-008 1
+Transform {
+  translation 34.287651062011719 -341.46368408203125 -1.3484642505645752
+  rotation 1 0 0 1.5707963705062866
+  children Viewpoint {
+    position 0 0 0 # camera position is expressed by translation
+    orientation 0.0560652762651443 0.9975623488426208 -0.0415475480258465 1.2778753042221069
+  }
+}
+
+# lights -------------------------------------------------------------------
+
+PointLight {
+        ambientIntensity 1
+        color 0.899999976158142 0.899999976158142 1
+        location 10 10 100
+        kambiShadows TRUE
+        global TRUE
+        radius 100000 # infinity
+}
+DEF FakeShadowPosition PointLight {
+        ambientIntensity 1
+        on FALSE
+        kambiShadows TRUE
+        kambiShadowsMain TRUE
+        location 0 0 1000
+        global TRUE
+        radius 100000 # infinity
+}
+
+# end lights ---------------------------------------------------------------
+
+NavigationInfo {
+  avatarSize [ 0.5, 2 ]
+  speed 20
+  headlight FALSE
+  type "FLY"
+}
+
+Transform {
+  rotation 1 0 0 1.57
+  children Background {
+    backUrl "../../skies/sky_back.png"
+    bottomUrl "../../skies/sky_bottom.png"
+    frontUrl "../../skies/sky_front.png"
+    leftUrl "../../skies/sky_left.png"
+    rightUrl "../../skies/sky_right.png"
+    topUrl "../../skies/sky_top.png"
+  }
+}
+
+Fog {
+  color 0.6 0.6 0.6
+  fogType "LINEAR"
+  volumetric TRUE
+  volumetricDirection 0 0 -1
+  volumetricVisibilityStart -30
+  visibilityRange 50
+}
+
+Inline { url "gate_processed.wrl" }
+#Inline { url "water_1_processed.wrl" }
