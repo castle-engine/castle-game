@@ -1,0 +1,81 @@
+#X3D V3.2 utf8
+PROFILE Interactive
+
+# Camera settings "encoded" in the VRML/X3D declaration below :
+# direction 0.4474243521690369 0.8943217992782593 0.0000801293790573
+# up -0.0003362103889231 0.0000785574302427 1
+# gravityUp 0 -4.3711388286737929E-008 1
+Transform {
+  translation -225.95603942871094 -384.51846313476563 1.8886101245880127
+  rotation 1 0 0 1.5707963705062866
+  children Viewpoint {
+    position 0 0 0 # camera position is expressed by translation
+    orientation -0.0001200069164042 -0.9999985694885254 0.0012659578351304 0.4638839066028595
+  }
+}
+  
+# lights -------------------------------------------------------------------
+
+PointLight {
+        ambientIntensity 1
+        color 0.899999976158142 0.899999976158142 1
+        location 10 10 100
+        kambiShadows TRUE
+        global TRUE
+        radius 100000
+}
+PointLight {
+        on FALSE
+        ambientIntensity 0.300000011920929
+        intensity 0.300000011920929
+        color 1 0 0
+        ambientIntensity 0.020000416785479
+        location -215.25466918945312 -28.800104141235352 -29.862327575683594
+        global TRUE
+        radius 100000
+}
+DEF FakeShadowPosition PointLight {
+        on FALSE
+        ambientIntensity 1
+        kambiShadows TRUE
+        kambiShadowsMain TRUE
+        location 0 0 1000
+        global TRUE
+        radius 100000
+}
+
+# end lights ---------------------------------------------------------------
+
+NavigationInfo {
+  avatarSize [ 0.5, 2 ]
+  speed 20
+  headlight FALSE
+  type "WALK"
+}
+
+Transform {
+  rotation 1 0 0 1.57
+  children Background {
+    backUrl "../../skies/sky_back.png"
+    bottomUrl "../../skies/sky_bottom.png"
+    frontUrl "../../skies/sky_front.png"
+    leftUrl "../../skies/sky_left.png"
+    rightUrl "../../skies/sky_right.png"
+    topUrl "../../skies/sky_top.png"
+  }
+}
+
+# Fog node, for use on main gate geometry and cart.
+# When changing this, remember to synchronize both VRML sources!
+# (cannot use WWWInline for this, as bindable nodes are not searched
+# within inline nodes)
+Fog {
+  color 0.6 0.6 0.6
+  fogType "LINEAR"
+  volumetric TRUE
+  volumetricDirection 0 0 -1
+  volumetricVisibilityStart -30
+  visibilityRange 50
+}
+
+Inline { url "gate_processed.wrl" }

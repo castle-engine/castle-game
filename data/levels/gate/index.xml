@@ -2,7 +2,7 @@
 
 <level
   name="gate"
-  scene="gate_final.wrl"
+  scene="gate_final.x3dv"
   title="The Gate"
   number="1"
   default_available_for_new_game="true"
