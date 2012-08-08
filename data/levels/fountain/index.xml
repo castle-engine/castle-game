@@ -2,7 +2,7 @@
 
 <level
   name="fountain"
-  scene="fountain_final.wrl"
+  scene="fountain_final.x3dv"
   title="Fountain"
   title_hint="shadows ON advised"
   number="15"
