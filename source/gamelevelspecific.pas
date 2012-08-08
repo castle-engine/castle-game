@@ -137,7 +137,7 @@ type
 
     constructor Create(AOwner: TComponent); override;
 
-    procedure BeforeTimeIncrease(const NewAnimationTime: TFloatTime); override;
+    procedure BeforeTimeIncrease(const NewTime: TFloatTime); override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     property Pushes default false;
@@ -649,9 +649,9 @@ begin
     end;
   end;
 
-  if AnimationTime - CartLastSoundTime > CartSoundRepeatTime then
+  if Time - CartLastSoundTime > CartSoundRepeatTime then
   begin
-    CartLastSoundTime := AnimationTime;
+    CartLastSoundTime := Time;
     SoundEngine.Sound3d(stCreak, CartSoundPosition);
   end;
 end;
@@ -931,16 +931,16 @@ begin
     begin
       if NextSpidersAppearingTime = 0 then
       begin
-        if AnimationTime > 1 then
+        if Time > 1 then
         begin
-          NextSpidersAppearingTime := AnimationTime + 5 + Random(20);
+          NextSpidersAppearingTime := Time + 5 + Random(20);
           for I := 1 to 5 + Random(3) do
             AppearSpider(RandomSpiderXY);
         end;
       end else
-      if AnimationTime >= NextSpidersAppearingTime then
+      if Time >= NextSpidersAppearingTime then
       begin
-        NextSpidersAppearingTime := AnimationTime + 2 + Random(10);
+        NextSpidersAppearingTime := Time + 2 + Random(10);
         if CreaturesCount < CreaturesCountToAddSpiders then
           for I := 1 to 1 + Random(3) do
             AppearSpider(RandomSpiderXYAroundPlayer);
@@ -1005,7 +1005,7 @@ begin
   CastShadowVolumes := false; { looks bad }
 end;
 
-procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
+procedure TDoomLevelDoor.BeforeTimeIncrease(const NewTime: TFloatTime);
 
   function SomethingWillBlockClosingDoor: boolean;
   var
@@ -1013,7 +1013,7 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewAnimationTime: TFloatTime);
     I: Integer;
   begin
     DoorBox := (inherited BoundingBox).Translate(
-      GetTranslationFromTime(NewAnimationTime) - GetTranslation);
+      GetTranslationFromTime(NewTime) - GetTranslation);
 
     Result := false;
 
@@ -1030,11 +1030,11 @@ begin
   inherited;
 
   { Check the closing doors: if some 3D pushable (player/creature/item)
-    will collide after AnimationTime change to NewAnimationTime,
+    will collide after Time change to NewTime,
     then we must open door again. }
 
   if (not EndPosition) and
-    (AnimationTime - EndPositionStateChangeTime < MoveTime) and
+    (Time - EndPositionStateChangeTime < MoveTime) and
     SomethingWillBlockClosingDoor then
     RevertGoEndPosition;
 end;
@@ -1044,7 +1044,7 @@ begin
   inherited;
 
   if EndPosition and
-    (AnimationTime - EndPositionStateChangeTime >
+    (Time - EndPositionStateChangeTime >
       MoveTime + StayOpenTime) then
     GoBeginPosition;
 end;
@@ -1263,7 +1263,7 @@ begin
   end;
 
   if MovingElevator9a9b.CompletelyEndPosition and
-     (AnimationTime - MovingElevator9a9b.EndPositionStateChangeTime >
+     (Time - MovingElevator9a9b.EndPositionStateChangeTime >
        MovingElevator9a9b.MoveTime +
        { This is the time for staying in lowered position. }
        2.0) then
