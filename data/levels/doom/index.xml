@@ -16,10 +16,6 @@
 
   music_sound="doom_e1m1"
 >
-  <area name="HintOpenDoorBox">
-    <hint>Hint: open doors using the %i</hint>
-  </area>
-
   <resources>
     <resource name="Alien" />
     <resource name="Werewolf" />

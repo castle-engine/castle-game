@@ -99,3 +99,21 @@ Transform {
 }
 
 Inline { url "cages_processed.wrl" }
+
+# hints ----------------------------------------------------------------------
+
+DEF HintOpenDoorBox ProximitySensor {
+  center 29.72 159.85 3.31
+  size 12.40 12.40 12.40
+}
+DEF HintOpenDoorBoxScript Script {
+  inputOnly SFTime show
+  inputOutput SFBool done FALSE
+  url "castlescript:
+    function show(value, timestamp)
+      when (not(done),
+        writeln('Hint: open this door using the ' + shortcut('interact'));
+        done := true)
+  "
+}
+ROUTE HintOpenDoorBox.enterTime TO HintOpenDoorBoxScript.show

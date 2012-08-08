@@ -89,3 +89,21 @@ Fog {
 #   }
 
 Inline { url "basic_castle.wrl" }
+
+# hints ----------------------------------------------------------------------
+
+DEF HintElevButton ProximitySensor {
+  center 24.23 5.20 -0.42
+  size 4.60 4.60 4.60
+}
+DEF HintElevButtonScript Script {
+  inputOnly SFTime show
+  inputOutput SFBool done FALSE
+  url "castlescript:
+    function show(value, timestamp)
+      when (not(done),
+        writeln('Hint: press the elevator button using the ' + shortcut('interact'));
+        done := true)
+  "
+}
+ROUTE HintElevButton.enterTime TO HintElevButtonScript.show

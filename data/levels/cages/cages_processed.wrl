@@ -45410,16 +45410,17 @@ Separator {
 		}
 		USE CreaSpiderQueen_001
 	}
-	Separator {
-		MatrixTransform {
-		matrix 
-			1.000000 0.000000 0.000000 0.000000
-			0.000000 1.000000 0.000000 0.000000
-			0.000000 0.000000 1.000000 0.000000
-			29.723515 159.852661 3.309005 1.000000
-		}
-		USE HintOpenDoorBox
-	}
+        # Kambi-, this is handled by ProximitySensor in _final.x3dv now
+	# Separator {
+	# 	MatrixTransform {
+	# 	matrix 
+	# 		1.000000 0.000000 0.000000 0.000000
+	# 		0.000000 1.000000 0.000000 0.000000
+	# 		0.000000 0.000000 1.000000 0.000000
+	# 		29.723515 159.852661 3.309005 1.000000
+	# 	}
+	# 	USE HintOpenDoorBox
+	# }
 	Separator {
 		MatrixTransform {
 		matrix 

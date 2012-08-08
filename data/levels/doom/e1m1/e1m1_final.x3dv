@@ -98,3 +98,21 @@ Transform {
     ]
   }
 }
+
+# hints ----------------------------------------------------------------------
+
+DEF HintOpenDoorBox ProximitySensor {
+  center -73.14 125.43 2.04
+  size 7.69 8.61 5.11
+}
+DEF HintOpenDoorBoxScript Script {
+  inputOnly SFTime show
+  inputOutput SFBool done FALSE
+  url "castlescript:
+    function show(value, timestamp)
+      when (not(done),
+        writeln('Hint: open doors using the ' + shortcut('interact'));
+        done := true)
+  "
+}
+ROUTE HintOpenDoorBox.enterTime TO HintOpenDoorBoxScript.show

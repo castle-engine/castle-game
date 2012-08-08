@@ -7856,16 +7856,17 @@ Separator {
 		}
 		USE BaseGeometry_004
 	}
-	Separator {
-		MatrixTransform {
-		matrix 
-			1.000000 0.000000 0.000000 0.000000
-			0.000000 1.000000 0.000000 0.000000
-			0.000000 0.000000 1.000000 0.000000
-			-1503.565796 47.813961 -2498.600098 1.000000
-		}
-		USE HintOpenDoorBox
-	}
+        # Kambi-, this is handled by ProximitySensor in _final.x3dv now
+	# Separator {
+	# 	MatrixTransform {
+	# 	matrix 
+	# 		1.000000 0.000000 0.000000 0.000000
+	# 		0.000000 1.000000 0.000000 0.000000
+	# 		0.000000 0.000000 1.000000 0.000000
+	# 		-1503.565796 47.813961 -2498.600098 1.000000
+	# 	}
+	# 	USE HintOpenDoorBox
+	# }
 	Separator {
 		MatrixTransform {
 		matrix 

@@ -107,7 +107,7 @@ type
     SpidersAppearing: T3DList;
     NextSpidersAppearingTime: Single;
 
-    HintOpenDoor: TLevelHintArea;
+    HintOpenDoorScript: TX3DNode;
 
     FGateExit: TCastleScene;
 
@@ -195,7 +195,7 @@ uses CastleFilesUtils, SysUtils, CastleUtils,
   GamePlay, CastleGameNotifications, CastleInputs,
   CastleGameCache, GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, ProgressUnit,
-  CastleXMLUtils, GameItems;
+  CastleXMLUtils, GameItems, X3DFields;
 
 function CastleLevelsPath: string;
 begin
@@ -792,17 +792,6 @@ constructor TCagesLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
     Result := nil;
   end;
 
-  function FindHintArea(const Name: string): TLevelHintArea;
-  var
-    I: Integer;
-  begin
-    for I := 0 to World.Count - 1 do
-      if (World[I] is TLevelHintArea) and
-         (TLevelHintArea(World[I]).Name = Name) then
-        Exit(TLevelHintArea(World[I]));
-    raise Exception.CreateFmt('Level hint area named "%s" not found', [Name]);
-  end;
-
 begin
   inherited;
 
@@ -815,7 +804,8 @@ begin
   World.Add(SpidersAppearing);
   NextSpidersAppearingTime := 0;
 
-  HintOpenDoor := FindHintArea('HintOpenDoorBox');
+  HintOpenDoorScript := MainScene.RootNode.FindNodeByName(TScriptNode,
+    'HintOpenDoorBoxScript', false);
 
   FEndSequence := LoadLevelScene(
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
@@ -975,7 +965,7 @@ begin
     end;
   end else
     { No longer any need to show this hint. }
-    HintOpenDoor.MessageDone := true;
+    (HintOpenDoorScript.Fields.ByName['done'] as TSFBool).Send(true);
 end;
 
 procedure TCagesLevel.PrepareNewPlayer(NewPlayer: TPlayer);

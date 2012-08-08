@@ -9,10 +9,6 @@
 
   music_sound="castle_hall_music"
 >
-  <area name="HintButtonBox">
-    <hint>Hint: press this red button with the %i</hint>
-  </area>
-
   <resources>
     <resource name="Alien" />
     <resource name="Werewolf" />

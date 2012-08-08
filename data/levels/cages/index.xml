@@ -10,10 +10,6 @@
 
   music_sound="cages_music_with_rain"
 >
-  <area name="HintOpenDoorBox">
-    <hint>Hint: open this door using the %i</hint>
-  </area>
-
   <resources>
     <resource name="Spider" />
     <resource name="SpiderQueen" />

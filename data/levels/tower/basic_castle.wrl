@@ -20611,16 +20611,17 @@ Switch {
 # Visible Objects
 
 Separator {
-	Separator {
-		MatrixTransform {
-		matrix 
-			1.000000 0.000000 0.000000 0.000000
-			0.000000 1.000000 0.000000 0.000000
-			0.000000 0.000000 1.000000 0.000000
-			24.227024 5.203304 -0.424764 1.000000
-		}
-		USE HintElevButton
-	}
+        # Kambi-, this is handled by ProximitySensor in _final.x3dv now
+	# Separator {
+	# 	MatrixTransform {
+	# 	matrix 
+	# 		1.000000 0.000000 0.000000 0.000000
+	# 		0.000000 1.000000 0.000000 0.000000
+	# 		0.000000 0.000000 1.000000 0.000000
+	# 		24.227024 5.203304 -0.424764 1.000000
+	# 	}
+	# 	USE HintElevButton
+	# }
 	Separator {
 		MatrixTransform {
 		matrix 

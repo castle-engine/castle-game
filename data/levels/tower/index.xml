@@ -11,14 +11,8 @@
   demo="True"
   default_available_for_new_game="True"
 >
-
-  <area name="HintElevButton">
-    <hint>Hint: press the elevator button using the %i</hint>
-  </area>
-
   <resources>
     <resource name="Alien" />
     <resource name="BallMissile" />
   </resources>
-
 </level>

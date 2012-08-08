@@ -141,3 +141,21 @@ Transform {
 }
 
 Inline { url "castle_hall_processed.wrl" }
+
+# hints ----------------------------------------------------------------------
+
+DEF HintButtonBox ProximitySensor {
+  center 1.26 0.03 14.08
+  size 20.31 6.03 5.23
+}
+DEF HintButtonBoxScript Script {
+  inputOnly SFTime show
+  inputOutput SFBool done FALSE
+  url "castlescript:
+    function show(value, timestamp)
+      when (not(done),
+        writeln('Hint: press this red button with the ' + shortcut('interact'));
+        done := true)
+  "
+}
+ROUTE HintButtonBox.enterTime TO HintButtonBoxScript.show

@@ -17955,16 +17955,17 @@ Separator {
 		}
 		USE ItemScrFlying_1
 	}
-	Separator {
-		MatrixTransform {
-		matrix 
-			1.000000 0.000000 0.000000 0.000000
-			0.000000 1.000000 0.000000 0.000000
-			0.000000 0.000000 1.000000 0.000000
-			1.261548 0.028220 12.577392 1.000000
-		}
-		USE HintButtonBox
-	}
+        # Kambi-, this is handled by ProximitySensor in _final.x3dv now
+	# Separator {
+	# 	MatrixTransform {
+	# 	matrix 
+	# 		1.000000 0.000000 0.000000 0.000000
+	# 		0.000000 1.000000 0.000000 0.000000
+	# 		0.000000 0.000000 1.000000 0.000000
+	# 		1.261548 0.028220 12.577392 1.000000
+	# 	}
+	# 	USE HintButtonBox
+	# }
 	Separator {
 		MatrixTransform {
 		matrix 
