@@ -2,7 +2,7 @@
 
 <level
   name="hello_world"
-  scene="hello_world_final.wrl"
+  scene="hello_world_final.x3dv"
   title="Hello world"
   number="95"
   type="Level"
