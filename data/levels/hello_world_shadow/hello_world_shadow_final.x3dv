@@ -1,0 +1,43 @@
+#X3D V3.2 utf8
+PROFILE Interactive
+
+# Camera settings "encoded" in the VRML/X3D declaration below :
+# direction 0.2126237004995346 0.9771341681480408 -2.819740352322242E-008
+# up -1.668395088749719E-009 -1.5513986539872349E-008 1
+# gravityUp 0 -4.3711388286737929E-008 1
+Transform {
+  translation -1.1685127019882202 -4.064300537109375 1.9600000381469727
+  rotation 1 0 0 1.5707963705062866
+  children Viewpoint {
+    position 0 0 0 # camera position is expressed by translation
+    orientation 0.0001723000459606 -0.9999997019767761 -0.0016052752034739 0.2142592817544937
+  }
+}
+
+PointLight {
+        ambientIntensity 1
+        kambiShadows TRUE
+        kambiShadowsMain TRUE
+        location 0 0 10
+        global TRUE
+        radius 100000 # infinity
+}
+
+NavigationInfo {
+  avatarSize [ 0.5, 2 ]
+  speed 20
+  headlight FALSE
+  type "WALK"
+}
+
+Transform {
+  rotation 1 0 0 1.57
+  children Background {
+         groundColor [ 0.1 0.1 0.1, 	0.0565629 0.2208154 0.4 ]
+         groundAngle [ 1.57 ]
+         skyColor [ 0.1 0.1 0.1, 	0.0565629 0.2208154 0.4 ]
+         skyAngle [ 1.57 ]
+  }
+}
+
+Inline { url "hello_world_shadow.wrl" }
