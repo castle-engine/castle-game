@@ -2,7 +2,7 @@
 
 <level
   name="castle_hall"
-  scene="castle_hall_final.wrl"
+  scene="castle_hall_final.x3dv"
   title="Castle Hall"
   number="2"
   type="CastleHall"
