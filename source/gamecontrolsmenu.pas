@@ -285,7 +285,7 @@ begin
 
   for I := 0 to CastleGroupInputs[Group].Count - 1 do
     Items.AddObject(
-      CastleGroupInputs[Group].Items[I].Name,
+      CastleGroupInputs[Group].Items[I].Caption,
       InputArgument(CastleGroupInputs[Group].Items[I].Shortcut.
         Description(SNoneInput)));
 
@@ -314,7 +314,7 @@ procedure TControlsSubMenu.Click;
     NewMouseWheel: TMouseWheelDirection;
   begin
     MessageKeyMouse(Window, Format(
-      'Press the new key or mouse button or mouse wheel for "%s".', [InputConfiguration.Name]),
+      'Press the new key or mouse button or mouse wheel for "%s".', [InputConfiguration.Caption]),
       'Cancel [Escape]' + nl + 'Clear [Backspace]', taLeft,
       NewKey, NewMousePress, NewMouseButton, NewMouseWheel);
 
@@ -349,21 +349,21 @@ procedure TControlsSubMenu.Click;
         begin
           Notifications.Show(Format('Note: "%s" mouse shortcut cleared for action "%s"',
             [ MouseButtonStr[ConflictingKey.Shortcut.MouseButton],
-              ConflictingKey.Name ]));
+              ConflictingKey.Caption ]));
           ConflictingKey.Shortcut.MouseButtonUse := false;
         end else
         if NewMouseWheel <> mwNone then
         begin
           Notifications.Show(Format('Note: "%s" mouse wheel cleared for action "%s"',
             [ MouseWheelDirectionStr[ConflictingKey.Shortcut.MouseWheel],
-              ConflictingKey.Name ]));
+              ConflictingKey.Caption ]));
           ConflictingKey.Shortcut.MouseWheel := mwNone;
         end else
         if ConflictingKey.Shortcut.Key1 = NewKey then
         begin
           Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
             [ KeyToStr(ConflictingKey.Shortcut.Key1),
-              ConflictingKey.Name ]));
+              ConflictingKey.Caption ]));
           ConflictingKey.Shortcut.Key1 := K_None;
         end else
         begin
@@ -371,7 +371,7 @@ procedure TControlsSubMenu.Click;
 
           Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
             [ KeyToStr(ConflictingKey.Shortcut.Key2),
-              ConflictingKey.Name ]));
+              ConflictingKey.Caption ]));
           ConflictingKey.Shortcut.Key2 := K_None;
         end;
       end;
