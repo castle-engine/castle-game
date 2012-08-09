@@ -71,18 +71,13 @@ build:
 	cd ../castle_game_engine/ && \
 	  fpc $(FPC_OPTIONS) $${CASTLE_FPC_OPTIONS:-} ../castle/source/castle.lpr
 	mv source/castle$(EXE_EXTENSION) .
-	cd ../castle_game_engine/ && \
-	  fpc $(FPC_OPTIONS) $${CASTLE_FPC_OPTIONS:-} ../castle/source/castle-process-3d-model.lpr
-	mv source/castle-process-3d-model$(EXE_EXTENSION) .
 
 # ------------------------------------------------------------
 # Cleaning targets.
 
 # Clean files which are easily recoverable, or just temporary trash
 # (after compilers or editors).
-# This does not include compiled "castle" binaries, but it *does*
-# include "castle-process-3d-model" binaries (as I don't want to pack
-# them in releases).
+# This does not include compiled "castle" binaries.
 clean:
 	find . -type f '(' -iname '*.ow'  -or -iname '*.ppw' -or -iname '*.aw' -or \
 	                   -iname '*.o'   -or -iname '*.ppu' -or -iname '*.a' -or \
@@ -97,7 +92,6 @@ clean:
 # script inside a temporary copy of castle files, where source/
 # subdirectory isn't supposed to exist.
 	if [ -d source/ ]; then $(MAKE) -C source/ clean; fi
-	rm -f castle-process-3d-model castle-process-3d-model.exe
 	rm -Rf data/levels/fountain/fluidcache/
 
 clean_binaries:

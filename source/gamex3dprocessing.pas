@@ -151,7 +151,7 @@ begin
     if V <> nil then
     begin
       { Add V.NodeName, to allow saving the route to file.
-        Usable for "castle-process-3d-model fountain_final.wrl | view3dscene -" }
+        Not really useful for now, as we don't save the processed level. }
       if V.NodeName = '' then V.NodeName := 'DefaultViewport';
 
       Route := TX3DRoute.Create;
