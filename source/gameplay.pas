@@ -437,16 +437,6 @@ begin
   PlayerRender2D;
 end;
 
-{ Call this when level changed (because of LevelFinished
-  or because we just started new game). }
-procedure InitNewLevel;
-begin
-  Player.LevelChanged;
-  SoundEngine.MusicPlayer.PlayedSound := SceneManager.Info.MusicSound;
-  { First Notification for this level. }
-  Notifications.Show('Loaded level "' + SceneManager.Info.Title + '"');
-end;
-
 procedure Idle(Window: TCastleWindowBase);
 const
   GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
@@ -501,7 +491,6 @@ begin
       Window.Controls.Add(ImageBackground);
 
       LevelsAvailable.FindName(LevelFinishedNextLevelName).LoadLevel(SceneManager);
-      InitNewLevel;
     finally
       { this will also remove ImageBackground from Window.Controls }
       FreeAndNil(ImageBackground);
@@ -861,8 +850,6 @@ begin
 
     Window.Controls.AddList(GameControls);
 
-    InitNewLevel;
-
     GameEnded := false;
     GameEndedWantsRestart := '';
 
@@ -891,7 +878,7 @@ begin
     Notifications.Show('Congratulations, game finished');
     GameWin := true;
     Player.Blocked := true;
-    SoundEngine.MusicPlayer.PlayedSound := stGameWinMusic;
+    SoundEngine.MusicPlayer.Sound := stGameWinMusic;
   end else
   begin
     if LevelFinishedSchedule and

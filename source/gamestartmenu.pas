@@ -153,7 +153,7 @@ begin
     until false;
   finally FreeAndNil(SceneManager) end;
 
-  SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
+  SoundEngine.MusicPlayer.Sound := stIntroMusic;
   SoundMenu.SoundVolume.RefreshAccessory;
   SoundMenu.MusicVolume.RefreshAccessory;
   Notifications.Clear;
@@ -651,7 +651,7 @@ var
 begin
   BackgroundCreate;
   try
-    SoundEngine.MusicPlayer.PlayedSound := stIntroMusic;
+    SoundEngine.MusicPlayer.Sound := stIntroMusic;
     try
       SavedMode := TGLMode.CreateReset(Window, 0, false,
         nil, nil, @CloseQuery);
@@ -668,7 +668,7 @@ begin
           Application.ProcessMessage(true, true);
         until UserQuit;
       finally FreeAndNil(SavedMode); end;
-    finally SoundEngine.MusicPlayer.PlayedSound := stNone; end;
+    finally SoundEngine.MusicPlayer.Sound := stNone; end;
   finally
     BackgroundDestroy;
   end;
