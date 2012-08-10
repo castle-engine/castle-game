@@ -162,7 +162,7 @@ begin
 
   Window.Width := RequestedScreenWidth;
   Window.Height := RequestedScreenHeight;
-  Window.ColorBits := ColorDepthBits;
+  Window.ColorBits := ColorBits;
   if WasParam_NoScreenChange or (not AllowScreenChange) then
   begin
     Window.FullScreen :=
@@ -174,9 +174,9 @@ begin
     if (Application.ScreenWidth <> RequestedScreenWidth) or
        (Application.ScreenHeight <> RequestedScreenHeight) or
        (VideoFrequency <> 0) or
-       (ColorDepthBits <> 0) then
+       (ColorBits <> 0) then
     begin
-      Application.VideoColorBits := ColorDepthBits;
+      Application.VideoColorBits := ColorBits;
       Application.VideoFrequency := VideoFrequency;
       Application.VideoResize := true;
       Application.VideoResizeWidth := RequestedScreenWidth;

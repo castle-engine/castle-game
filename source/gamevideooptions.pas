@@ -47,10 +47,10 @@ var
   ShadowVolumesDraw: boolean = false;
 
 const
-  DefaultColorDepthBits = 0;
+  DefaultColorBits = 0;
 var
   { 0 means "use system default" }
-  ColorDepthBits: Cardinal;
+  ColorBits: Cardinal;
 
 const
   DefaultVideoFrequency = 0 ;
@@ -103,8 +103,8 @@ begin
     'video_options/allow_screen_change', DefaultAllowScreenChange);
   ShadowVolumes := Config.GetValue(
     'video_options/shadows', DefaultShadowVolumes);
-  ColorDepthBits := Config.GetValue(
-    'video_options/color_depth_bits', DefaultColorDepthBits);
+  ColorBits := Config.GetValue(
+    'video_options/color_bits', DefaultColorBits);
   VideoFrequency := Config.GetValue(
     'video_options/frequency', DefaultVideoFrequency);
   AntiAliasing := TAntiAliasing(Config.GetValue(
@@ -120,8 +120,8 @@ begin
     'video_options/shadows',
     ShadowVolumes, DefaultShadowVolumes);
   Config.SetDeleteValue(
-    'video_options/color_depth_bits',
-    ColorDepthBits, DefaultColorDepthBits);
+    'video_options/color_bits',
+    ColorBits, DefaultColorBits);
   Config.SetDeleteValue(
     'video_options/frequency',
     VideoFrequency, DefaultVideoFrequency);

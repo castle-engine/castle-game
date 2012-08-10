@@ -64,7 +64,7 @@ type
     AllowScreenChangeArgument: TMenuBooleanArgument;
     ShadowVolumesArgument: TMenuBooleanArgument;
     AnimationSmoothnessSlider: TMenuFloatSlider;
-    ColorDepthArgument: TMenuArgument;
+    ColorBitsArgument: TMenuArgument;
     VideoFrequencyArgument: TMenuArgument;
     ConserveResourcesArgument: TMenuBooleanArgument;
     AntiAliasingSlider: TAntiAliasingSlider;
@@ -264,7 +264,7 @@ const
   MinAnimationSmoothness = 0.2;
   MaxAnimationSmoothness = 1.2;
 
-function ColorDepthBitsToStr(const Value: Cardinal): string;
+function ColorBitsToStr(const Value: Cardinal): string;
 begin
   if Value = 0 then
     Result := SSystemDefault else
@@ -289,9 +289,9 @@ begin
     MaxAnimationSmoothness,
     AnimationSmoothness);
 
-  ColorDepthArgument := TMenuArgument.Create(
+  ColorBitsArgument := TMenuArgument.Create(
     TMenuArgument.TextWidth(SSystemDefault));
-  ColorDepthArgument.Value := ColorDepthBitsToStr(ColorDepthBits);
+  ColorBitsArgument.Value := ColorBitsToStr(ColorBits);
 
   VideoFrequencyArgument := TMenuArgument.Create(
     TMenuArgument.TextWidth(SSystemDefault));
@@ -303,7 +303,7 @@ begin
   Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
   Items.AddObject('Shadow volumes', ShadowVolumesArgument);
   Items.AddObject('Animation smoothness', AnimationSmoothnessSlider);
-  Items.AddObject('Color depth', ColorDepthArgument);
+  Items.AddObject('Color bits', ColorBitsArgument);
   Items.AddObject('Display frequency', VideoFrequencyArgument);
   Items.AddObject('Anti-aliasing', AntiAliasingSlider);
   Items.Add('Restore to defaults');
@@ -358,14 +358,14 @@ procedure TVideoMenu.Click;
       taLeft);
   end;
 
-  procedure ChangeColorDepthBits;
+  procedure ChangeColorBits;
   begin
-    if ColorDepthBits = 0 then
-      ColorDepthBits := 16 else
-    if ColorDepthBits = 16 then
-      ColorDepthBits := 32 else
-      ColorDepthBits := 0;
-    ColorDepthArgument.Value := ColorDepthBitsToStr(ColorDepthBits);
+    if ColorBits = 0 then
+      ColorBits := 16 else
+    if ColorBits = 16 then
+      ColorBits := 32 else
+      ColorBits := 0;
+    ColorBitsArgument.Value := ColorBitsToStr(ColorBits);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
 
@@ -401,7 +401,7 @@ begin
            MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.', taLeft);
        end;
     3: ;
-    4: ChangeColorDepthBits;
+    4: ChangeColorBits;
     5: ChangeVideoFrequency;
     6: ;
     7: begin
@@ -420,10 +420,10 @@ begin
              there's no need to restart the game. }
          end;
 
-         if ColorDepthBits <> DefaultColorDepthBits then
+         if ColorBits <> DefaultColorBits then
          begin
-           ColorDepthBits := DefaultColorDepthBits;
-           ColorDepthArgument.Value := ColorDepthBitsToStr(DefaultColorDepthBits);
+           ColorBits := DefaultColorBits;
+           ColorBitsArgument.Value := ColorBitsToStr(DefaultColorBits);
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
