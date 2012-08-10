@@ -115,27 +115,6 @@ begin
   end;
 end;
 
-{ initializing GL context --------------------------------------------------- }
-
-{ Try to lower anti-aliasing (multi-sampling) and shadows (stencil buffer)
-  requirements and initialize worse GL context. }
-function RetryOpen(Window: TCastleWindowBase): boolean;
-begin
-  if Window.AntiAliasing <> aaNone then
-  begin
-    Window.AntiAliasing := aaNone;
-    if Log then WritelnLog('OpenGL context', 'OpenGL context cannot be initialized. Multi-sampling (anti-aliasing) turned off, trying to initialize once again.');
-    Result := true;
-  end else
-  if Window.StencilBits > 0 then
-  begin
-    Window.StencilBits := 0;
-    if Log then WritelnLog('OpenGL context', 'OpenGL context cannot be initialized. Stencil buffer (shadow volumes) turned off, trying to initialize once again.');
-    Result := true;
-  end else
-    Result := false;
-end;
-
 function MyGetApplicationName: string;
 begin
   Result := 'castle';
@@ -204,7 +183,7 @@ begin
   Window.Caption := 'The Castle';
   Window.ResizeAllowed := raOnlyAtOpen;
   Window.StencilBits := 8;
-  Window.Open(@RetryOpen);
+  Window.Open;
 
   { init progress }
   WindowProgressInterface.Window := Window;
