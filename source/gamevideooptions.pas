@@ -67,8 +67,8 @@ function ViewAngleDegY: Single;
 
 implementation
 
-uses SysUtils, CastleUtils, CastleGameCache, RaysWindow,
-  GLAntiAliasing, GameWindow, CastleConfig;
+uses SysUtils, CastleUtils, CastleGameCache, RaysWindow, GameWindow, 
+  CastleConfig, CastleWindow;
 
 type
   TGameVideoOptions = class
@@ -107,7 +107,7 @@ begin
     'video_options/color_bits', DefaultColorBits);
   VideoFrequency := Config.GetValue(
     'video_options/frequency', DefaultVideoFrequency);
-  AntiAliasing := TAntiAliasing(Config.GetValue(
+  Window.AntiAliasing := TAntiAliasing(Config.GetValue(
     'video_options/anti_aliasing', Ord(DefaultAntiAliasing)));
 end;
 
@@ -126,7 +126,7 @@ begin
     'video_options/frequency',
     VideoFrequency, DefaultVideoFrequency);
   Config.SetDeleteValue('video_options/anti_aliasing',
-    Ord(AntiAliasing), Ord(DefaultAntiAliasing));
+    Ord(Window.AntiAliasing), Ord(DefaultAntiAliasing));
 end;
 
 function ViewAngleDegY: Single;

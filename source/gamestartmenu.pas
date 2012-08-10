@@ -42,7 +42,7 @@ uses SysUtils, Classes, CastleUtils, WindowModes,
   CastleStringUtils, CastleClassUtils,
   CastleGameNotifications, GameBackgroundLevel, UIControls,
   ALSoundEngine, CastleSoundMenu, X3DNodes, CastleResources,
-  GameCredits, GLAntiAliasing, KeysMouse, CastleOpenDocument,
+  GameCredits, KeysMouse, CastleOpenDocument,
   PrecalculatedAnimation;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
@@ -244,7 +244,8 @@ end;
 
 constructor TAntiAliasingSlider.Create;
 begin
-  inherited Create(Ord(Low(TAntiAliasing)), Ord(High(TAntiAliasing)), Ord(AntiAliasing));
+  inherited Create(Ord(Low(TAntiAliasing)), Ord(High(TAntiAliasing)), 
+    Ord(Window.AntiAliasing));
 end;
 
 function TAntiAliasingSlider.ValueToStr(
@@ -335,11 +336,11 @@ procedure TVideoMenu.SetAntiAliasing(
   Value: TAntiAliasing;
   UpdateSlider: boolean);
 begin
-  if AntiAliasing <> Value then
+  if Window.AntiAliasing <> Value then
   begin
-    AntiAliasing := Value;
+    Window.AntiAliasing := Value;
     if UpdateSlider then
-      AntiAliasingSlider.Value := Ord(AntiAliasing);
+      AntiAliasingSlider.Value := Ord(Window.AntiAliasing);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
 end;

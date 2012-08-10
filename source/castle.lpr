@@ -29,7 +29,7 @@ uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound, CastleFilesUtils,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, CastleLevel, CastleTextureProperties,
-  GameCredits, GLAntiAliasing, ALSoundEngine, CastleConfig,
+  GameCredits, ALSoundEngine, CastleConfig,
   GLRenderer, CastleResources, GameItems, CastleGameNotifications;
 
 { requested screen size ------------------------------------------------------ }
@@ -121,10 +121,9 @@ end;
   requirements and initialize worse GL context. }
 function RetryOpen(Window: TCastleWindowBase): boolean;
 begin
-  if Window.MultiSampling > 1 then
+  if Window.AntiAliasing <> aaNone then
   begin
-    Window.MultiSampling := 1;
-    AntiAliasing := aaNone;
+    Window.AntiAliasing := aaNone;
     if Log then WritelnLog('OpenGL context', 'OpenGL context cannot be initialized. Multi-sampling (anti-aliasing) turned off, trying to initialize once again.');
     Result := true;
   end else
@@ -205,7 +204,6 @@ begin
   Window.Caption := 'The Castle';
   Window.ResizeAllowed := raOnlyAtOpen;
   Window.StencilBits := 8;
-  Window.MultiSampling := AntiAliasingGLMultiSampling;
   Window.Open(@RetryOpen);
 
   { init progress }
