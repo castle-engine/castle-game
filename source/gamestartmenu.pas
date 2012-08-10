@@ -363,7 +363,7 @@ procedure TVideoMenu.Click;
     if ColorBits = 0 then
       ColorBits := 16 else
     if ColorBits = 16 then
-      ColorBits := 32 else
+      ColorBits := 24 else
       ColorBits := 0;
     ColorBitsArgument.Value := ColorBitsToStr(ColorBits);
     SubMenuAdditionalInfo := SRestartTheGame;
