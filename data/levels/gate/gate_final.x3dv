@@ -79,3 +79,4 @@ Fog {
 }
 
 Inline { url "gate_processed.wrl" }
+Inline { url "water.wrl" }
