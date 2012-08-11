@@ -13,7 +13,7 @@ Collision {
       Shape {
         appearance Appearance {
           material Material {
-            diffuseColor 0.000000 0.000000 1.000000
+            diffuseColor 0.2 0.2 1.000000
             specularColor 0.000000 0.000000 0.000000
             shininess 0.500000
             transparency 0.284406
@@ -23,6 +23,7 @@ Collision {
           }
         }
         geometry IndexedFaceSet {
+          solid FALSE
           coord Coordinate {
                  point [
                           186.480011 186.479980 0.000000,
