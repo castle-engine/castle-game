@@ -98,6 +98,21 @@ Transform {
   }
 }
 
+Transform {
+  rotation 0 0 1 1.5
+  children Transform {
+    rotation 1 0 0 1.57
+    children DEF GameWinBackground Background {
+      backUrl "../../skies/foggy_sky_back.png"
+      bottomUrl "../../skies/foggy_sky_bottom.png"
+      frontUrl "../../skies/foggy_sky_front.png"
+      leftUrl "../../skies/foggy_sky_left.png"
+      rightUrl "../../skies/foggy_sky_right.png"
+      topUrl "../../skies/foggy_sky_top.png"
+    }
+  }
+}
+
 Inline { url "cages_processed.wrl" }
 
 # hints ----------------------------------------------------------------------

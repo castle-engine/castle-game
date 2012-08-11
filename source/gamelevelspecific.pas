@@ -26,7 +26,7 @@ unit GameLevelSpecific;
 interface
 
 uses CastleScene, Boxes3D, VectorMath,
-  CastlePlayer, CastleLevel, Background, CastleResources,
+  CastlePlayer, CastleLevel, CastleResources,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation, ALSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
 
@@ -127,8 +127,6 @@ type
       geometry and background. }
     property GameWinAnimation: TGameWinAnimation
       read FGameWinAnimation write SetGameWinAnimation default gwaNone;
-
-    function Background: TBackground; override;
   end;
 
   TDoomLevelDoor = class(T3DLinearMoving)
@@ -290,7 +288,7 @@ begin
   World.Add(Button);
 
   StairsBlocker := LoadLevelScene(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl',
-    true { create octrees }, false, TStairsBlocker);
+    true { create octrees }, TStairsBlocker);
   StairsBlocker.CastShadowVolumes := false; { shadow would not be visible anyway }
   World.Add(StairsBlocker);
 
@@ -516,7 +514,7 @@ begin
 
   GateLevelPath := CastleLevelsPath + 'gate' + PathDelim;
 
-  Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false, false);
+  Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false);
   Teleport.Collides := false;
 
   Teleport1 := T3DTransform.Create(Self);
@@ -693,7 +691,7 @@ begin
 
   TowerLevelPath := CastleLevelsPath + 'tower' + PathDelim;
 
-  Elevator := LoadLevelScene(TowerLevelPath + 'elevator.wrl', true, false);
+  Elevator := LoadLevelScene(TowerLevelPath + 'elevator.wrl', true);
 
   ElevatorButton := LoadLevelAnimation(TowerLevelPath + 'elevator_button.kanim', true, false,
     TTowerElevatorButton);
@@ -809,8 +807,7 @@ begin
 
   FEndSequence := LoadLevelScene(
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
-    true { create octrees },
-    true { true: load background of EndSequence; we will use it });
+    true { create octrees });
   FEndSequence.Exists := false;
   { Even when FEndSequence will exist, we will not check for collisions
     with it --- no reason to waste time, no collisions will be possible
@@ -821,7 +818,7 @@ begin
 
   FGateExit := LoadLevelScene(
     CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
-    true { create octrees }, false, TGateExit);
+    true { create octrees }, TGateExit);
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
   World.Add(FGateExit);
 
@@ -831,10 +828,24 @@ begin
 end;
 
 procedure TCagesLevel.SetGameWinAnimation(Value: TGameWinAnimation);
+var
+  OldGameWinBackground, NewGameWinBackground: boolean;
+  GameWinBackground: TBackgroundNode;
 begin
+  OldGameWinBackground := FEndSequence.Exists;
+
   FGameWinAnimation := Value;
   FEndSequence.Exists := GameWinAnimation >= gwaAnimateTo2;
   FGateExit.Exists    := GameWinAnimation <  gwaAnimateTo2;
+
+  { make the background for game win animation visible }
+  NewGameWinBackground := FEndSequence.Exists;
+  if (not OldGameWinBackground) and NewGameWinBackground then
+  begin
+    GameWinBackground := SceneManager.MainScene.RootNode.FindNodeByName(
+      TBackgroundNode, 'GameWinBackground', false) as TBackgroundNode;
+    GameWinBackground.EventSet_bind.Send(true);
+  end;
 end;
 
 procedure TCagesLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
@@ -975,13 +986,6 @@ begin
   { Give player 1 sword and 1 bow, to have weapons. }
   NewPlayer.PickItem(Sword.CreateItem(1));
   NewPlayer.PickItem(Bow.CreateItem(1));
-end;
-
-function TCagesLevel.Background: TBackground;
-begin
-  if FEndSequence.Exists then
-    Result := FEndSequence.Background else
-    Result := inherited;
 end;
 
 { TDoomLevelDoor ------------------------------------------------------------- }
@@ -1148,7 +1152,7 @@ var
   begin
     Result := TDoomLevelDoor.Create(Self);
     Result.Add(LoadLevelScene(DoomDoorsPathPrefix + FileName,
-      true { create octrees }, false));
+      true { create octrees }));
 
     { Although I didn't know it initially, it turns out that all doors
       on Doom E1M1 level (maybe all doors totally ?) have the same
@@ -1173,13 +1177,13 @@ begin
   World.Add(MakeDoor('door5_6_closed.wrl'));
 
   FakeWall := LoadLevelScene( DoomDoorsPathPrefix + 'fake_wall_final.wrl',
-    false { no need for octrees, does never collide }, false);
+    false { no need for octrees, does never collide });
   FakeWall.Collides := false;
   FakeWall.CastShadowVolumes := false;
   World.Add(FakeWall);
 
   Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
-    true { create octrees }, false);
+    true { create octrees });
 
   MovingElevator49 := T3DLinearMoving.Create(Self);
   MovingElevator49.Add(Elevator49);
@@ -1194,7 +1198,7 @@ begin
   World.Add(MovingElevator49);
 
   Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
-    true { create octrees }, false, TElevator9a9b);
+    true { create octrees }, TElevator9a9b);
 
   MovingElevator9a9b := T3DLinearMoving.Create(Self);
   MovingElevator9a9b.Add(Elevator9a9b);
@@ -1209,7 +1213,7 @@ begin
   World.Add(MovingElevator9a9b);
 
   ExitButton := LoadLevelScene(DoomDoorsPathPrefix + 'exit_button_final.wrl',
-    true { create octrees }, false, TExitButton);
+    true { create octrees }, TExitButton);
   ExitButton.CastShadowVolumes := false;
   World.Add(ExitButton);
 

@@ -1,19 +1,6 @@
 #VRML V1.0 ascii
 
 Group{
-  Separator {
-    Rotation { rotation 0 0 1 1.5 }
-    Rotation { rotation 1 0 0 1.57 }
-    Background {
-      backUrl "../../skies/foggy_sky_back.png"
-      bottomUrl "../../skies/foggy_sky_bottom.png"
-      frontUrl "../../skies/foggy_sky_front.png"
-      leftUrl "../../skies/foggy_sky_left.png"
-      rightUrl "../../skies/foggy_sky_right.png"
-      topUrl "../../skies/foggy_sky_top.png"
-    }
-  }
-
   NavigationInfo {
     avatarSize [ 0.5, 2 ]
     speed 20
