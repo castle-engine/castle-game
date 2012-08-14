@@ -802,8 +802,7 @@ begin
   World.Add(SpidersAppearing);
   NextSpidersAppearingTime := 0;
 
-  HintOpenDoorScript := MainScene.RootNode.FindNodeByName(TScriptNode,
-    'HintOpenDoorBoxScript', false);
+  HintOpenDoorScript := MainScene.Node('HintOpenDoorBoxScript');
 
   FEndSequence := LoadLevelScene(
     CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
