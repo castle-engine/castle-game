@@ -195,7 +195,7 @@ begin
   AllResources.LoadFromFiles;
   ItemsKindsInit;
   CreaturesKindsInit;
-  LevelsAvailable.LoadFromFiles(ProgramDataPath + 'data' +  PathDelim + 'levels');
+  LevelsAvailable.LoadFromFiles;
   LevelsAvailable.LoadFromConfig;
 
   { init OpenAL (after initing Glw and Progress, because ALContextOpen
