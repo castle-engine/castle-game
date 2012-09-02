@@ -154,7 +154,7 @@ begin
   Items.Add('Creatures debug menu ...');
   Items.Add('Items debug menu ...');
   Items.Add('Level debug menu ...');
-  Items.Add('Reload resources index.xml files');
+  Items.Add('Reload resources resource.xml files');
   Items.Add('Reload resource animation ...');
   Items.AddObject('Render bounding volumes', RenderDebugBoundingVolumesArgument);
   Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
