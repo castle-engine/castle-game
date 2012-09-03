@@ -35,7 +35,7 @@ uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, GameWindow, Base3D,
   VectorMath, CastleWindow, GamePlay, GameGeneralMenu,
   CastleInputs, CastleCreatures, GameChooseMenu,
-  CastleItems, OnScreenMenu, RaysWindow, GameVideoOptions, ALSoundEngine,
+  CastleItems, OnScreenMenu, RaysWindow, GameVideoOptions, CastleSoundEngine,
   GameSound, X3DNodes, CastleClassUtils, CastleGameNotifications,
   CastleLevel, KeysMouse, CastleResources;
 

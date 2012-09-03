@@ -41,7 +41,7 @@ uses SysUtils, Classes, CastleUtils, WindowModes,
   GameControlsMenu, CastleInputs, GameVideoOptions, GameHelp,
   CastleStringUtils, CastleClassUtils,
   CastleGameNotifications, GameBackgroundLevel, UIControls,
-  ALSoundEngine, CastleSoundMenu, X3DNodes, CastleResources,
+  CastleSoundEngine, CastleSoundMenu, X3DNodes, CastleResources,
   GameCredits, KeysMouse, CastleOpenDocument,
   PrecalculatedAnimation;
 

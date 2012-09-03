@@ -29,7 +29,7 @@ uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound, CastleFilesUtils,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, CastleLevel, CastleTextureProperties,
-  GameCredits, ALSoundEngine, CastleConfig,
+  GameCredits, CastleSoundEngine, CastleConfig,
   GLRenderer, CastleResources, GameItems, CastleGameNotifications;
 
 { requested screen size ------------------------------------------------------ }

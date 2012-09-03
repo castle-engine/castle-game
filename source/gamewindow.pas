@@ -49,7 +49,7 @@ var
 implementation
 
 uses SysUtils, CastleInputs, UIControls, CastleGameNotifications, CastleFilesUtils,
-  ALSoundEngine, GameSound, GameInputs;
+  CastleSoundEngine, GameSound, GameInputs;
 
 procedure TGameWindow.EventDown(AKey: TKey;
   AMousePress: boolean; AMouseButton: TMouseButton;

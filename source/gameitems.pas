@@ -28,7 +28,7 @@ interface
 uses Boxes3D, X3DNodes, VectorMath, CastleUtils,
   CastleClassUtils, Classes, Images, GL, GLU, CastleGLUtils, GameSound,
   PrecalculatedAnimation, CastleResources,
-  CastleXMLConfig, ALSoundEngine, Base3D, CastleItems;
+  CastleXMLConfig, CastleSoundEngine, Base3D, CastleItems;
 
 type
   TItemPotionOfLifeKind = class(TItemKind)

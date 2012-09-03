@@ -27,7 +27,7 @@ interface
 
 uses CastleScene, Boxes3D, VectorMath,
   CastlePlayer, CastleLevel, CastleResources,
-  GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation, ALSoundEngine,
+  GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
 
 const

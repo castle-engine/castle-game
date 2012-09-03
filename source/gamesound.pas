@@ -20,13 +20,12 @@
   ----------------------------------------------------------------------------
 }
 
-{ Everything related to playing sound in "The Castle".
-  In particular, TCastleSoundEngine descendant from TXmlSoundEngine. }
+{ Sounds in "The Castle". }
 unit GameSound;
 
 interface
 
-uses Classes, SysUtils, ALSoundEngine;
+uses Classes, SysUtils, CastleSoundEngine;
 
 var
   { Castle sound types. Will be initialized in initialization of this
