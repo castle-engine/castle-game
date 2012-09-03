@@ -48,7 +48,8 @@ Switch {
 		shininess 0.500000 
 		transparency 0.000000 
 	}
-	DEF CreaSpider_
+	# Kambi: renamed Crea->Res by hand
+	DEF ResSpider_
 	Separator {
 		Coordinate3 {
 			point [
@@ -73,7 +74,8 @@ Switch {
 			]
 		}
 	}
-	DEF CreaSpider__001
+	# Kambi: renamed Crea->Res by hand
+	DEF ResSpider__001
 	Separator {
 		Coordinate3 {
 			point [
@@ -98,7 +100,8 @@ Switch {
 			]
 		}
 	}
-	DEF CreaSpider__002
+	# Kambi: renamed Crea->Res by hand
+	DEF ResSpider__002
 	Separator {
 		Coordinate3 {
 			point [
@@ -123,7 +126,8 @@ Switch {
 			]
 		}
 	}
-	DEF CreaSpider__003
+	# Kambi: renamed Crea->Res by hand
+	DEF ResSpider__003
 	Separator {
 		Coordinate3 {
 			point [
@@ -148,7 +152,8 @@ Switch {
 			]
 		}
 	}
-	DEF CreaSpider__004
+	# Kambi: renamed Crea->Res by hand
+	DEF ResSpider__004
 	Separator {
 		Coordinate3 {
 			point [
@@ -173,7 +178,8 @@ Switch {
 			]
 		}
 	}
-	DEF CreaSpider__005
+	# Kambi: renamed Crea->Res by hand
+	DEF ResSpider__005
 	Separator {
 		Coordinate3 {
 			point [
@@ -198,7 +204,8 @@ Switch {
 			]
 		}
 	}
-	DEF CreaSpiderQueen_001
+	# Kambi: renamed Crea->Res by hand
+	DEF ResSpiderQueen_001
 	Separator {
 		Coordinate3 {
 			point [
@@ -248,7 +255,8 @@ Switch {
 			]
 		}
 	}
-	DEF ItemQuiver5 # Kambi: ItemArrow5
+	# Kambi: renamed Item->Res by hand
+	DEF ResQuiver5 # Kambi: 5 by hand
 	Separator {
 		Coordinate3 {
 			point [
@@ -273,7 +281,8 @@ Switch {
 			]
 		}
 	}
-	DEF ItemLifePotion_2
+	# Kambi: renamed Item->Res by hand
+	DEF ResLifePotion_2
 	Separator {
 		Coordinate3 {
 			point [
@@ -485,7 +494,8 @@ Switch {
 			]
 		}
 	}
-	DEF ItemLifePotion_4
+	# Kambi: renamed Item->Res by hand
+	DEF ResLifePotion_4
 	Separator {
 		Coordinate3 {
 			point [
@@ -510,7 +520,8 @@ Switch {
 			]
 		}
 	}
-	DEF ItemRedKey
+	# Kambi: renamed Item->Res by hand
+	DEF ResRedKey
 	Separator {
 		Coordinate3 {
 			point [
@@ -46246,7 +46257,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			39.248680 -71.528839 1.759535 1.000000
 		}
-		USE ItemQuiver5 # Kambi: ItemArrow5
+		USE ResQuiver5 # Kambi: 5 by hand
 	}
 	Separator {
 		MatrixTransform {
@@ -46256,7 +46267,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-103.737801 142.293610 -0.000001 1.000000
 		}
-		USE ItemRedKey
+		USE ResRedKey
 	}
 	Separator {
 		MatrixTransform {
@@ -46276,7 +46287,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-30.920853 100.558975 5 1.000000 # Kambi: corrected by hand
 		}
-		USE CreaSpiderQueen_001
+		USE ResSpiderQueen_001
 	}
 	Separator {
 		MatrixTransform {
@@ -46296,7 +46307,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-92.920853 129.558975 -1.2 1.000000 # Kambi: corrected by hand
 		}
-		USE CreaSpider__005
+		USE ResSpider__005
 	}
 	Separator {
 		MatrixTransform {
@@ -46306,7 +46317,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-84.920853 139.558975 -1.2 1.000000 # Kambi: corrected by hand
 		}
-		USE CreaSpider__004
+		USE ResSpider__004
 	}
 	Separator {
 		MatrixTransform {
@@ -46316,7 +46327,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-89.920853 149.558975 -1.2 1.000000 # Kambi: corrected by hand
 		}
-		USE CreaSpider__003
+		USE ResSpider__003
 	}
 	Separator {
 		MatrixTransform {
@@ -46326,7 +46337,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-104.920853 150.558975 -1.2 1.000000 # Kambi: corrected by hand
 		}
-		USE CreaSpider__002
+		USE ResSpider__002
 	}
 	Separator {
 		MatrixTransform {
@@ -46336,7 +46347,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-115.920853 140.558975 -1.2 1.000000 # Kambi: corrected by hand
 		}
-		USE CreaSpider__001
+		USE ResSpider__001
 	}
 	Separator {
 		MatrixTransform {
@@ -46346,7 +46357,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-107.920853 129.558975 -1.2 1.000000 # Kambi: corrected by hand
 		}
-		USE CreaSpider_
+		USE ResSpider_
 	}
 	Separator {
 		MatrixTransform {
@@ -52006,7 +52017,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			85.307945 137.005966 2.356600 1.000000
 		}
-		USE ItemLifePotion_4
+		USE ResLifePotion_4
 	}
 	Separator {
 		MatrixTransform {
@@ -52016,7 +52027,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			85.252731 134.539963 2.356601 1.000000
 		}
-		USE ItemLifePotion_2
+		USE ResLifePotion_2
 	}
 	Separator {
 		MatrixTransform {

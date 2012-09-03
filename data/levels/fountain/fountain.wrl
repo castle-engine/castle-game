@@ -29988,18 +29988,19 @@ DEF OB_Curve Transform {
 		}
 	]
 }
-DEF OB_ItemLifePotion_001 Transform {
+# Kambi Item->Res rename by hand
+DEF OB_ResLifePotion_001 Transform {
 	translation -5.201140 -5.111720 2.000000
 	rotation 1.000000 0.000000 0.000000 1.570796
 	scale 1.000000 1.000000 1.000000
 	children [
-		DEF ME_ItemLifePotion Group {
+		DEF ME_ResLifePotion Group {
 			children [
 				Shape {
 					appearance Appearance {
 					}
 					geometry IndexedLineSet {
-						coord DEF coord_ItemLifePotion Coordinate {
+						coord DEF coord_ResLifePotion Coordinate {
 							point [
 1.0 1.00000011921 -1.00000011921
  1.0 -1.00000011921 -1.00000011921
@@ -30026,26 +30027,27 @@ DEF OB_ItemLifePotion_001 Transform {
 		}
 	]
 }
-DEF OB_ItemLifePotion Transform {
+DEF OB_ResLifePotion Transform {
 	translation 4.798860 -5.111720 2.000000
 	rotation 1.000000 0.000000 0.000000 1.570796
 	scale 1.000000 1.000000 1.000000
 	children [
-		USE ME_ItemLifePotion
+		USE ME_ResLifePotion
 	]
 }
-DEF OB_CreaAlien Transform {
+# Kambi: Crea->Res rename by hand
+DEF OB_ResAlien Transform {
 	translation -0.614636 15.750043 2.000000
 	rotation 1.000000 0.000000 0.000000 1.570796
 	scale 1.000000 1.000000 1.000000
 	children [
-		DEF ME_CreaAlien Group {
+		DEF ME_ResAlien Group {
 			children [
 				Shape {
 					appearance Appearance {
 					}
 					geometry IndexedLineSet {
-						coord DEF coord_CreaAlien Coordinate {
+						coord DEF coord_ResAlien Coordinate {
 							point [
 1.0 1.00000011921 -1.00000011921
  1.0 -1.00000011921 -1.00000011921

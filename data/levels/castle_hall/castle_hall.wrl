@@ -41,7 +41,8 @@ Switch {
 		shininess 0.500000 
 		transparency 0.000000 
 	}
-	DEF CreaAlien_1
+	# Kambi: renamed Crea->Res by hand
+	DEF ResAlien_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -66,7 +67,8 @@ Switch {
 			]
 		}
 	}
-	DEF CreaAlien_2
+	# Kambi: renamed Crea->Res by hand
+	DEF ResAlien_2
 	Separator {
 		Coordinate3 {
 			point [
@@ -91,7 +93,8 @@ Switch {
 			]
 		}
 	}
-	DEF CreaAlien_3
+	# Kambi: renamed Crea->Res by hand
+	DEF ResAlien_3
 	Separator {
 		Coordinate3 {
 			point [
@@ -116,7 +119,8 @@ Switch {
 			]
 		}
 	}
-	DEF CreaAlien_4
+	# Kambi: renamed Crea->Res by hand
+	DEF ResAlien_4
 	Separator {
 		Coordinate3 {
 			point [
@@ -166,7 +170,8 @@ Switch {
 			]
 		}
 	}
-	DEF ItemQuiver20 # Kambi: ItemArrow20
+	# Kambi: renamed Item->Res by hand
+	DEF ResQuiver20 # Kambi: 20 by hand
 	Separator {
 		Coordinate3 {
 			point [
@@ -191,7 +196,8 @@ Switch {
 			]
 		}
 	}
-	DEF ItemBow1
+	# Kambi: renamed Item->Res by hand
+	DEF ResBow1
 	Separator {
 		Coordinate3 {
 			point [
@@ -216,7 +222,8 @@ Switch {
 			]
 		}
 	}
-	DEF ItemLifePotion_1
+	# Kambi: renamed Item->Res by hand
+	DEF ResLifePotion_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -241,7 +248,8 @@ Switch {
 			]
 		}
 	}
-	DEF ItemLifePotion_2
+	# Kambi: renamed Item->Res by hand
+	DEF ResLifePotion_2
 	Separator {
 		Coordinate3 {
 			point [
@@ -266,7 +274,8 @@ Switch {
 			]
 		}
 	}
-	DEF ItemScrFlying_1
+	# Kambi: renamed Item->Res by hand
+	DEF ResScrFlying_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -20266,7 +20275,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-3.006711 -4.397975 -6.090298 1.000000
 		}
-		USE ItemBow1
+		USE ResBow1
 	}
 	Separator {
 		MatrixTransform {
@@ -20276,7 +20285,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-6.006711 -2.397975 -6.090298 1.000000
 		}
-		USE ItemQuiver20 # Kambi: ItemArrow20
+		USE ResQuiver20 # Kambi: 20 by hand
 	}
 	Separator {
 		MatrixTransform {
@@ -20306,7 +20315,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			-20.403389 -54.968620 0.909719 1.000000
 		}
-		USE CreaAlien_4
+		USE ResAlien_4
 	}
 	Separator {
 		MatrixTransform {
@@ -20316,7 +20325,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			4.231586 -0.207937 12.110254 1.000000
 		}
-		USE CreaAlien_3
+		USE ResAlien_3
 	}
 	Separator {
 		MatrixTransform {
@@ -20326,7 +20335,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			61.121429 -14.054967 0.909705 1.000000
 		}
-		USE CreaAlien_2
+		USE ResAlien_2
 	}
 	Separator {
 		MatrixTransform {
@@ -20336,7 +20345,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			-51.741787 -21.707802 0.909704 1.000000
 		}
-		USE CreaAlien_1
+		USE ResAlien_1
 	}
 	Separator {
 		MatrixTransform {
@@ -20346,7 +20355,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			-0.381357 -58.222500 0.909703 1.000000
 		}
-		USE ItemScrFlying_1
+		USE ResScrFlying_1
 	}
 	Separator {
 		MatrixTransform {
@@ -20426,7 +20435,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			0.777972 57.454525 0.853939 1.000000
 		}
-		USE ItemLifePotion_1
+		USE ResLifePotion_1
 	}
 	Separator {
 		MatrixTransform {
@@ -20436,7 +20445,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			-1.568262 57.531410 0.853939 1.000000
 		}
-		USE ItemLifePotion_2
+		USE ResLifePotion_2
 	}
 	Separator {
 		MatrixTransform {
