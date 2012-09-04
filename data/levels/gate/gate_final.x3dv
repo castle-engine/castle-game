@@ -1,19 +1,6 @@
 #X3D V3.2 utf8
 PROFILE Interactive
 
-# Camera settings "encoded" in the VRML/X3D declaration below :
-# direction 0.4474243521690369 0.8943217992782593 0.0000801293790573
-# up -0.0003362103889231 0.0000785574302427 1
-# gravityUp 0 -4.3711388286737929E-008 1
-Transform {
-  translation -225.95603942871094 -384.51846313476563 1.8886101245880127
-  rotation 1 0 0 1.5707963705062866
-  children Viewpoint {
-    position 0 0 0 # camera position is expressed by translation
-    orientation -0.0001200069164042 -0.9999985694885254 0.0012659578351304 0.4638839066028595
-  }
-}
-  
 # lights -------------------------------------------------------------------
 
 PointLight {
@@ -44,7 +31,20 @@ DEF FakeShadowPosition PointLight {
         radius 100000
 }
 
-# end lights ---------------------------------------------------------------
+# bindable ---------------------------------------------------------------
+
+# Camera settings "encoded" in the VRML/X3D declaration below :
+# direction 0.4474243521690369 0.8943217992782593 0.0000801293790573
+# up -0.0003362103889231 0.0000785574302427 1
+# gravityUp 0 -4.3711388286737929E-008 1
+Transform {
+  translation -225.95603942871094 -384.51846313476563 1.8886101245880127
+  rotation 1 0 0 1.5707963705062866
+  children Viewpoint {
+    position 0 0 0 # camera position is expressed by translation
+    orientation -0.0001200069164042 -0.9999985694885254 0.0012659578351304 0.4638839066028595
+  }
+}
 
 NavigationInfo {
   avatarSize [ 0.5, 2 ]
@@ -66,9 +66,9 @@ Transform {
 }
 
 # Fog node, for use on main gate geometry and cart.
-# When changing this, remember to synchronize both VRML sources!
-# (cannot use WWWInline for this, as bindable nodes are not searched
-# within inline nodes)
+# When changing this, remember to synchronize both VRML/X3D sources!
+# (Cannot use Inline for this, as bindable nodes are not searched
+# within inline nodes; hm, could use IMPORT/EXPORT to overcome this.)
 Fog {
   color 0.6 0.6 0.6
   fogType "LINEAR"
@@ -78,5 +78,59 @@ Fog {
   visibilityRange 50
 }
 
+# water ----------------------------------------------------------------------
+
+Collision {
+  enabled FALSE
+  children MatrixTransform {
+    matrix  1.000000 0.000000 0.000000 0.000000
+            0.000000 1.000000 0.000000 0.000000
+            0.000000 0.000000 1.000000 0.000000
+            106.199570 -235.443024 -9.223026 1.000000
+    children [
+      LocalFog { } # don't use fog for water
+      Shape {
+        appearance Appearance {
+          material Material {
+            diffuseColor 0.2 0.2 1.000000
+            specularColor 0.000000 0.000000 0.000000
+            shininess 0.500000
+            transparency 0.284406
+          }
+          texture ImageTexture {
+            url "../../textures/water2.jpg"
+          }
+        }
+        geometry IndexedFaceSet {
+          solid FALSE
+          coord Coordinate {
+                 point [
+                          186.480011 186.479980 0.000000,
+                          186.480011 -186.480026 0.000000,
+                          -186.480057 -186.480011 0.000000,
+                          -186.479965 186.480057 0.000000,
+                 ]
+          }
+          texCoord TextureCoordinate {
+                  point [
+                           -4.511200 5.511200,
+                           -4.511200 -4.511200,
+                           5.511200 -4.511200,
+                           5.511200 5.511200,
+                  ]
+          }
+          coordIndex [
+                   0, 3, 2, 1, -1,
+          ]
+          texCoordIndex [
+                   0, 1, 2, 3, -1,
+          ]
+        }
+      }
+    ]
+  }
+}
+
+# Blender geometry -----------------------------------------------------------
+
 Inline { url "gate_processed.wrl" }
-Inline { url "water.wrl" }
