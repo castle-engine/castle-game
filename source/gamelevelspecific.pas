@@ -1006,7 +1006,7 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewTime: TFloatTime);
     Result := false;
 
     for I := 0 to World.Count - 1 do
-      if World[I].Pushable then
+      if World[I].CollidesWithMoving then
       begin
         Result := DoorBox.Collision(World[I].BoundingBox);
         if Result then
@@ -1017,9 +1017,8 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewTime: TFloatTime);
 begin
   inherited;
 
-  { Check the closing doors: if some 3D pushable (player/creature/item)
-    will collide after Time change to NewTime,
-    then we must open door again. }
+  { Check the closing doors: if some 3D item with CollidesWithMoving=@true
+    will collide after Time change to NewTime, then we must open door again. }
 
   if (not EndPosition) and
     (Time - EndPositionStateChangeTime < MoveTime) and
