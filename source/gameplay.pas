@@ -601,10 +601,8 @@ procedure EventDown(AKey: TKey;
         would be too close to the player --- he could pick it up
         immediately. }
       DropPosition := Player.Camera.Position +
-        Player.Camera.DirectionInGravityPlane * Sqrt2 * Max(
-          Player.Camera.RealPreferredHeight,
-          { TODO: Z up? Look at DefaultOrientation }
-          ItemBox.SizeX * 2, ItemBox.SizeY * 2);
+        Player.Camera.DirectionInGravityPlane *
+          ((Player.BoundingBox.Diagonal + ItemBox.Diagonal) / 2);
 
       { Now check is DropPosition actually possible
         (i.e. check collisions item<->everything).
@@ -618,11 +616,10 @@ procedure EventDown(AKey: TKey;
         look good. }
 
       Result := SceneManager.Items.WorldMoveAllowed(
-        VectorAdd(Player.Camera.Position, ItemBoxMiddle),
-        VectorAdd(DropPosition, ItemBoxMiddle),
-        true, ItemBoxRadius,
-        ItemBox.Translate(Player.Camera.Position),
-        ItemBox.Translate(DropPosition), false);
+        ItemBoxMiddle + Player.Camera.Position,
+        ItemBoxMiddle + DropPosition, true, ItemBoxRadius,
+        ItemBox + Player.Camera.Position,
+        ItemBox + DropPosition, false);
     end;
 
   var
