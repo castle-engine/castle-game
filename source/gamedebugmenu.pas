@@ -50,7 +50,7 @@ type
 
   TDebugMenu = class(TCastleGameMenu)
   public
-    RenderDebugBoundingVolumesArgument: TMenuBooleanArgument;
+    RenderDebug3DArgument: TMenuBooleanArgument;
     RenderDebugCaptionsArgument: TMenuBooleanArgument;
     ShadowVolumesDrawArgument: TMenuBooleanArgument;
     DebugRenderForLevelScreenshotArgument: TMenuBooleanArgument;
@@ -144,7 +144,7 @@ constructor TDebugMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  RenderDebugBoundingVolumesArgument := TMenuBooleanArgument.Create(RenderDebugBoundingVolumes);
+  RenderDebug3DArgument := TMenuBooleanArgument.Create(RenderDebug3D);
   RenderDebugCaptionsArgument := TMenuBooleanArgument.Create(RenderDebugCaptions);
   ShadowVolumesDrawArgument := TMenuBooleanArgument.Create(ShadowVolumesDraw);
   DebugRenderForLevelScreenshotArgument := TMenuBooleanArgument.Create(
@@ -156,7 +156,7 @@ begin
   Items.Add('Level debug menu ...');
   Items.Add('Reload resources resource.xml files');
   Items.Add('Reload resource animation ...');
-  Items.AddObject('Render bounding volumes', RenderDebugBoundingVolumesArgument);
+  Items.AddObject('Render debug 3D information', RenderDebug3DArgument);
   Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
   Items.AddObject('Render shadow volumes', ShadowVolumesDrawArgument);
   Items.AddObject('Render for level screenshot', DebugRenderForLevelScreenshotArgument);
@@ -190,8 +190,8 @@ begin
     4: AllResources.LoadFromFiles(true);
     5: ReloadResource;
     6: begin
-         RenderDebugBoundingVolumes := not RenderDebugBoundingVolumes;
-         RenderDebugBoundingVolumesArgument.Value := RenderDebugBoundingVolumes;
+         RenderDebug3D := not RenderDebug3D;
+         RenderDebug3DArgument.Value := RenderDebug3D;
        end;
     7: begin
          RenderDebugCaptions := not RenderDebugCaptions;
