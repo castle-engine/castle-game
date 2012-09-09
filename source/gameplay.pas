@@ -581,7 +581,7 @@ procedure EventDown(AKey: TKey;
       ItemBoxRadius: Single;
       ItemBoxMiddle: TVector3Single;
     begin
-      ItemBox := DroppedItemKind.BoundingBoxRotated;
+      ItemBox := DroppedItemKind.BoundingBoxRotated(SceneManager.GravityUp);
       ItemBoxMiddle := ItemBox.Middle;
       { Box3DRadius calculates radius around (0, 0, 0) and we want
         radius around ItemBoxMiddle }
@@ -603,6 +603,7 @@ procedure EventDown(AKey: TKey;
       DropPosition := Player.Camera.Position +
         Player.Camera.DirectionInGravityPlane * Sqrt2 * Max(
           Player.Camera.RealPreferredHeight,
+          { TODO: Z up? Look at DefaultOrientation }
           ItemBox.SizeX * 2, ItemBox.SizeY * 2);
 
       { Now check is DropPosition actually possible
