@@ -222,6 +222,7 @@ procedure TGhostKind.PrepareCore(const BaseLights: TAbstractLightInstancesList;
   const DoProgress: boolean);
 var
   ReferenceScene: TCastleScene;
+  UpIndex: Integer;
 begin
   inherited;
 
@@ -229,12 +230,13 @@ begin
     model from Middle) is better. }
   ReferenceScene := StandAnimation.Scenes[0];
 
+  UpIndex := OrientationUpIndex[T3DOrient.DefaultOrientation];
   RadiusFromPrepare :=
-    Max(ReferenceScene.BoundingBox.XYRadius,
+    Max(ReferenceScene.BoundingBox.Radius2D(UpIndex),
     { I can do here "/ 2" thanks to the fact that middle_position_height
-      of ghost is 0.5 (so I have room for another "BoundingBox.Data[1, 2] / 2"
-      for radius). }
-    ReferenceScene.BoundingBox.Data[1, 2] / 2);
+      of ghost is 0.5 (so I have room for another
+      "BoundingBox.Data[1, UpIndex] / 2" for radius). }
+    ReferenceScene.BoundingBox.Data[1, UpIndex] / 2);
 end;
 
 function TGhostKind.CreatureClass: TCreatureClass;
