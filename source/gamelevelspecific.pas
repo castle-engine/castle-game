@@ -613,12 +613,12 @@ begin
 
   if FGateExitBox.PointInside(Player.Position) then
   begin
-    if GamePlay.Player.Items.FindKind(KeyItemKind) = -1 then
+    if GamePlay.Player.Inventory.FindKind(KeyItemKind) = -1 then
     begin
       Notifications.Show('You need a key to open this door');
       RejectGateExitBox;
     end else
-    if GamePlay.Player.Items.FindKind(Sword) = -1 then
+    if GamePlay.Player.Inventory.FindKind(Sword) = -1 then
     begin
       Notifications.Show('Better find a wepon first to protect yourself in the castle');
       RejectGateExitBox;
@@ -640,7 +640,7 @@ begin
     end;
 
     if (not SwordAmbushDone) and
-      (GamePlay.Player.Items.FindKind(Sword) <> -1) then
+      (GamePlay.Player.Inventory.FindKind(Sword) <> -1) then
     begin
       SwordAmbushDone := true;
       SwordAmbush;
@@ -755,7 +755,7 @@ begin
     NotificationInteractFailed(
       'You see a door. You''re too far to open it from here') else
   begin
-    if Player.Items.FindKind(RedKeyItemKind) <> -1 then
+    if Player.Inventory.FindKind(RedKeyItemKind) <> -1 then
     begin
       if (BossCreature <> nil) and (not BossCreature.Dead) then
       begin

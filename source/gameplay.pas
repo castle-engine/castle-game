@@ -168,7 +168,7 @@ procedure TGame2DControls.Draw;
         possibly drawing empty slots. This is needed, because
         otherwise when no items are owned player doesn't see any
         effect of changing InventoryVisible. }
-      for I := 0 to Max(Player.Items.Count - 1,
+      for I := 0 to Max(Player.Inventory.Count - 1,
         InventorySlotsVisibleInColumn - 1) do
       begin
         X := ItemSlotX(I);
@@ -181,17 +181,17 @@ procedure TGame2DControls.Draw;
 
     glAlphaFunc(GL_GREATER, 0.5);
     glEnable(GL_ALPHA_TEST);
-      for I := 0 to Player.Items.Count - 1 do
+      for I := 0 to Player.Inventory.Count - 1 do
       begin
         X := ItemSlotX(I);
         Y := ItemSlotY(I);
 
         glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
-        glCallList(Player.Items[I].Kind.GLList_DrawImage);
+        glCallList(Player.Inventory[I].Kind.GLList_DrawImage);
       end;
     glDisable(GL_ALPHA_TEST);
 
-    if Between(Player.InventoryCurrentItem, 0, Player.Items.Count - 1) then
+    if Between(Player.InventoryCurrentItem, 0, Player.Inventory.Count - 1) then
     begin
       glColor4f(0.8, 0.8, 0.8, 1);
       DrawGLRectBorder(
@@ -204,16 +204,16 @@ procedure TGame2DControls.Draw;
     end;
 
     glColor4f(1, 1, 0.5, 1);
-    for I := 0 to Player.Items.Count - 1 do
+    for I := 0 to Player.Inventory.Count - 1 do
     begin
       X := ItemSlotX(I);
       Y := ItemSlotY(I);
 
       glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
 
-      S := Player.Items[I].Kind.Caption;
-      if Player.Items[I].Quantity <> 1 then
-        S += ' (' + IntToStr(Player.Items[I].Quantity) + ')';
+      S := Player.Inventory[I].Kind.Caption;
+      if Player.Inventory[I].Quantity <> 1 then
+        S += ' (' + IntToStr(Player.Inventory[I].Quantity) + ')';
       UIFontSmall.Print(S);
     end;
   end;
@@ -553,26 +553,26 @@ procedure EventDown(AKey: TKey;
 
   procedure ChangeInventoryCurrentItem(Change: Integer);
   begin
-    if Player.Items.Count = 0 then
+    if Player.Inventory.Count = 0 then
       Player.InventoryCurrentItem := -1 else
-    if Player.InventoryCurrentItem >= Player.Items.Count then
-      Player.InventoryCurrentItem := Player.Items.Count - 1 else
+    if Player.InventoryCurrentItem >= Player.Inventory.Count then
+      Player.InventoryCurrentItem := Player.Inventory.Count - 1 else
     if Player.InventoryCurrentItem < 0 then
       Player.InventoryCurrentItem := 0 else
       Player.InventoryCurrentItem := ChangeIntCycle(
-        Player.InventoryCurrentItem, Change, Player.Items.Count - 1);
+        Player.InventoryCurrentItem, Change, Player.Inventory.Count - 1);
 
-    if Player.Items.Count <> 0 then
+    if Player.Inventory.Count <> 0 then
       InventoryVisible := true;
   end;
 
   procedure UpdateInventoryCurrentItemAfterDelete;
   begin
     { update InventoryCurrentItem.
-      Note that if Player.Items.Count = 0 now, then this will
+      Note that if Player.Inventory.Count = 0 now, then this will
       correctly set InventoryCurrentItem to -1. }
-    if Player.InventoryCurrentItem >= Player.Items.Count then
-      Player.InventoryCurrentItem := Player.Items.Count - 1;
+    if Player.InventoryCurrentItem >= Player.Inventory.Count then
+      Player.InventoryCurrentItem := Player.Inventory.Count - 1;
   end;
 
   procedure DropItem;
@@ -628,7 +628,7 @@ procedure EventDown(AKey: TKey;
     end;
 
   var
-    DropppedItem: TItem;
+    DropppedItem: TInventoryItem;
     DropPosition: TVector3Single;
   begin
     if GameWin then
@@ -643,16 +643,16 @@ procedure EventDown(AKey: TKey;
       Exit;
     end;
 
-    if Between(Player.InventoryCurrentItem, 0, Player.Items.Count - 1) then
+    if Between(Player.InventoryCurrentItem, 0, Player.Inventory.Count - 1) then
     begin
-      if GetItemDropPosition(Player.Items[Player.InventoryCurrentItem].Kind,
+      if GetItemDropPosition(Player.Inventory[Player.InventoryCurrentItem].Kind,
         DropPosition) then
       begin
         DropppedItem := Player.DropItem(Player.InventoryCurrentItem);
         if DropppedItem <> nil then
         begin
           UpdateInventoryCurrentItemAfterDelete;
-          DropppedItem.PutOnLevel(SceneManager.Items, DropPosition);
+          DropppedItem.PutOnWorld(SceneManager.Items, DropPosition);
         end;
       end else
         Notifications.Show('Not enough room here to drop this item');
@@ -674,9 +674,9 @@ procedure EventDown(AKey: TKey;
       Exit;
     end;
 
-    if Between(Player.InventoryCurrentItem, 0, Player.Items.Count - 1) then
+    if Between(Player.InventoryCurrentItem, 0, Player.Inventory.Count - 1) then
     begin
-      Player.Items.Use(Player.InventoryCurrentItem);
+      Player.Inventory.Use(Player.InventoryCurrentItem);
       UpdateInventoryCurrentItemAfterDelete;
     end else
       Notifications.Show('Nothing to use - select some item first');
@@ -698,10 +698,10 @@ procedure EventDown(AKey: TKey;
       Exit;
     end;
 
-    UsedItemIndex := Player.Items.FindKind(LifePotion);
+    UsedItemIndex := Player.Inventory.FindKind(LifePotion);
     if UsedItemIndex <> -1 then
     begin
-      Player.Items.Use(UsedItemIndex);
+      Player.Inventory.Use(UsedItemIndex);
       UpdateInventoryCurrentItemAfterDelete;
     end else
       Notifications.Show('You don''t have any life potion');
@@ -894,7 +894,7 @@ end;
 type
   TGamePlay = class
     class function CreatureExists(const Item: T3D): boolean;
-    class function ItemOnLevelExists(const Item: T3D): boolean;
+    class function ItemOnWorldExists(const Item: T3D): boolean;
   end;
 
 class function TGamePlay.CreatureExists(const Item: T3D): boolean;
@@ -902,7 +902,7 @@ begin
   Result := not GameWin;
 end;
 
-class function TGamePlay.ItemOnLevelExists(const Item: T3D): boolean;
+class function TGamePlay.ItemOnWorldExists(const Item: T3D): boolean;
 begin
   Result := (not GameWin) and (not DebugRenderForLevelScreenshot);
 end;
@@ -987,6 +987,6 @@ initialization
   OnGLContextOpen.Add(@WindowOpen);
   OnGLContextClose.Add(@WindowClose);
   OnCreatureExists := @TGamePlay(nil).CreatureExists;
-  OnItemOnLevelExists := @TGamePlay(nil).ItemOnLevelExists;
+  OnItemOnWorldExists := @TGamePlay(nil).ItemOnWorldExists;
   T3DOrient.DefaultOrientation := otUpZDirectionX;
 end.

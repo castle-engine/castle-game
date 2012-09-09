@@ -33,17 +33,17 @@ uses Boxes3D, X3DNodes, VectorMath, CastleUtils,
 type
   TItemPotionOfLifeKind = class(TItemKind)
   protected
-    function ItemClass: TItemClass; override;
+    function ItemClass: TInventoryItemClass; override;
   end;
 
-  TItemPotionOfLife = class(TItem)
+  TItemPotionOfLife = class(TInventoryItem)
   public
     procedure Use; override;
   end;
 
   TItemSwordKind = class(TItemShortRangeWeaponKind)
   protected
-    function ItemClass: TItemClass; override;
+    function ItemClass: TInventoryItemClass; override;
   end;
 
   TItemSword = class(TItemWeapon)
@@ -53,7 +53,7 @@ type
 
   TItemBowKind = class(TItemWeaponKind)
   protected
-    function ItemClass: TItemClass; override;
+    function ItemClass: TInventoryItemClass; override;
   end;
 
   TItemBow = class(TItemWeapon)
@@ -63,10 +63,10 @@ type
 
   TItemScrollOfFlyingKind = class(TItemKind)
   protected
-    function ItemClass: TItemClass; override;
+    function ItemClass: TInventoryItemClass; override;
   end;
 
-  TItemScrollOfFlying = class(TItem)
+  TItemScrollOfFlying = class(TInventoryItem)
   public
     procedure Use; override;
   end;
@@ -90,7 +90,7 @@ uses SysUtils, CastleWindow,
 
 { TItemPotionOfLifeKind ------------------------------------------------------ }
 
-function TItemPotionOfLifeKind.ItemClass: TItemClass;
+function TItemPotionOfLifeKind.ItemClass: TInventoryItemClass;
 begin
   Result := TItemPotionOfLife;
 end;
@@ -111,7 +111,7 @@ end;
 
 { TItemSwordKind ------------------------------------------------------------- }
 
-function TItemSwordKind.ItemClass: TItemClass;
+function TItemSwordKind.ItemClass: TInventoryItemClass;
 begin
   Result := TItemSword;
 end;
@@ -152,7 +152,7 @@ end;
 
 { TItemBowKind ------------------------------------------------------------- }
 
-function TItemBowKind.ItemClass: TItemClass;
+function TItemBowKind.ItemClass: TInventoryItemClass;
 begin
   Result := TItemBow;
 end;
@@ -162,9 +162,9 @@ end;
 procedure TItemBow.ActualAttack;
 var
   QuiverIndex: Integer;
-  QuiverItem: TItem;
+  QuiverItem: TInventoryItem;
 begin
-  QuiverIndex := Player.Items.FindKind(Quiver);
+  QuiverIndex := Player.Inventory.FindKind(Quiver);
   if QuiverIndex = -1 then
   begin
     Notifications.Show('You have no arrows');
@@ -172,9 +172,9 @@ begin
   end else
   begin
     { delete arrow from player }
-    QuiverItem := Player.Items[QuiverIndex];
+    QuiverItem := Player.Inventory[QuiverIndex];
     QuiverItem.Quantity := QuiverItem.Quantity - 1;
-    Player.Items.CheckDepleted(QuiverItem);
+    Player.Inventory.CheckDepleted(QuiverItem);
 
     { shoot the arrow }
     Arrow.CreateCreature(World, Player.Position, Player.Direction);
@@ -184,7 +184,7 @@ end;
 
 { TItemScrollOfFlyingKind ---------------------------------------------------- }
 
-function TItemScrollOfFlyingKind.ItemClass: TItemClass;
+function TItemScrollOfFlyingKind.ItemClass: TInventoryItemClass;
 begin
   Result := TItemScrollOfFlying;
 end;
