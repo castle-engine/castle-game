@@ -602,7 +602,7 @@ procedure EventDown(AKey: TKey;
         immediately. }
       DropPosition := Player.Camera.Position +
         Player.Camera.DirectionInGravityPlane *
-          ((Player.BoundingBox.Diagonal + ItemBox.Diagonal) / 2);
+          (0.6 * (Player.Camera.RealPreferredHeight * Sqrt3 + ItemBox.Diagonal));
 
       { Now check is DropPosition actually possible
         (i.e. check collisions item<->everything).
