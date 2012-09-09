@@ -397,9 +397,8 @@ procedure TGame2DControls.Draw;
   end;
 
 var
-  BossCreatureIndicator: boolean;
-  BossCreatureLife: Single;
-  BossCreatureMaxLife: Single;
+  BossLife: Single;
+  BossMaxLife: Single;
 begin
   if DebugRenderForLevelScreenshot then Exit;
 
@@ -424,13 +423,11 @@ begin
   if GameWin then
     DoShowGameWinInfo;
 
-  BossCreatureIndicator := (SceneManager.Level <> nil) and
-    SceneManager.Level.BossCreatureIndicator(BossCreatureLife, BossCreatureMaxLife);
-  if BossCreatureIndicator then
+  if (SceneManager.Level <> nil) and
+     (SceneManager.Level is TBossLevel) and
+     TBossLevel(SceneManager.Level).BossIndicator(BossLife, BossMaxLife) then
   begin
-    RenderLifeIndicator(
-      BossCreatureLife,
-      BossCreatureMaxLife,
+    RenderLifeIndicator(BossLife, BossMaxLife,
       GLList_BossIndicatorImage, Window.Width - 150, false);
   end;
 

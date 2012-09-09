@@ -34,7 +34,14 @@ const
   CastleHallWerewolvesCount = 4;
 
 type
-  TCastleHallLevel = class(TLevel)
+  { Level that may have a boss life indicator. }
+  TBossLevel = class(TLevel)
+  public
+    { What to show on boss creature indicator. }
+    function BossIndicator(out Life, MaxLife: Single): boolean; virtual;
+  end;
+
+  TCastleHallLevel = class(TBossLevel)
   private
     Symbol: TCastlePrecalculatedAnimation;
     Button: TCastlePrecalculatedAnimation;
@@ -52,7 +59,7 @@ type
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
-    function BossCreatureIndicator(out Life, MaxLife: Single): boolean; override;
+    function BossIndicator(out Life, MaxLife: Single): boolean; override;
   end;
 
   TGateLevel = class(TLevel)
@@ -101,18 +108,17 @@ type
     gwaAnimateTo2,
     gwaFinished);
 
-  TCagesLevel = class(TLevel)
+  TCagesLevel = class(TBossLevel)
   private
     { List of TSpiderAppearing instances }
     SpidersAppearing: T3DList;
     NextSpidersAppearingTime: Single;
-
+    { Instance of boss creature, if any, on the level. @nil if no boss creature
+      exists on this level. }
+    Boss: TCreature;
     HintOpenDoorScript: TX3DNode;
-
     FGateExit: TCastleScene;
-
     FGameWinAnimation: TGameWinAnimation;
-
     FEndSequence: TCastleScene;
     procedure SetGameWinAnimation(Value: TGameWinAnimation);
   public
@@ -122,6 +128,7 @@ type
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
+    function BossIndicator(out Life, MaxLife: Single): boolean; override;
 
     { Stage of game win animation. Known by this level, to display appropriate
       geometry and background. }
@@ -204,6 +211,13 @@ procedure NotificationInteractFailed(const S: string);
 begin
   Notifications.Show(S);
   SoundEngine.Sound(stPlayerInteractFailed);
+end;
+
+{ TBossLevel ----------------------------------------------------------------- }
+
+function TBossLevel.BossIndicator(out Life, MaxLife: Single): boolean;
+begin
+  Result := false;
 end;
 
 { TStairsBlocker ------------------------------------------------------------- }
@@ -440,7 +454,7 @@ begin
   NewPlayer.PickItem(Sword.CreateItem(1));
 end;
 
-function TCastleHallLevel.BossCreatureIndicator(
+function TCastleHallLevel.BossIndicator(
   out Life, MaxLife: Single): boolean;
 var
   AliveCount: Cardinal;
@@ -740,7 +754,7 @@ end;
 
 type
   TGateExit = class(TCastleScene)
-    BossCreature: TCreature;
+    Boss: TCreature;
     function PointingDeviceActivate(const Active: boolean;
       const Distance: Single): boolean; override;
   end;
@@ -757,7 +771,7 @@ begin
   begin
     if Player.Inventory.FindKind(RedKeyItemKind) <> -1 then
     begin
-      if (BossCreature <> nil) and (not BossCreature.Dead) then
+      if (Boss <> nil) and (not Boss.Dead) then
       begin
         Player.Hurt(2 + Random(5), Vector3Single(0, -1, 0), 2);
         SoundEngine.Sound(stEvilLaugh);
@@ -816,9 +830,9 @@ begin
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
   World.Add(FGateExit);
 
-  FBossCreature := FindCreatureKind(SpiderQueen);
+  Boss := FindCreatureKind(SpiderQueen);
 
-  TGateExit(FGateExit).BossCreature := BossCreature;
+  TGateExit(FGateExit).Boss := Boss;
 end;
 
 procedure TCagesLevel.SetGameWinAnimation(Value: TGameWinAnimation);
@@ -839,6 +853,16 @@ begin
     GameWinBackground := SceneManager.MainScene.RootNode.FindNodeByName(
       TBackgroundNode, 'GameWinBackground', false) as TBackgroundNode;
     GameWinBackground.EventSet_bind.Send(true);
+  end;
+end;
+
+function TCagesLevel.BossIndicator(out Life, MaxLife: Single): boolean;
+begin
+  Result := (Boss <> nil) and (not Boss.Dead);
+  if Result then
+  begin
+    Life := Boss.Life;
+    MaxLife := Boss.MaxLife;
   end;
 end;
 
