@@ -581,7 +581,7 @@ procedure EventDown(AKey: TKey;
       ItemBoxRadius: Single;
       ItemBoxMiddle: TVector3Single;
     begin
-      ItemBox := DroppedItemKind.BoundingBoxRotated(SceneManager.GravityUp);
+      ItemBox := DroppedItemKind.BoundingBoxRotated;
       ItemBoxMiddle := ItemBox.Middle;
       { Box3DRadius calculates radius around (0, 0, 0) and we want
         radius around ItemBoxMiddle }
