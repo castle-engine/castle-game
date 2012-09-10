@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 
+<!--
+  Comments about always_prepared: arrow may be created by an item (bow)
+  owned by player. This means that this creature may appear on any level.
+  So prepare it always.
+-->
+
 <resource
   name="Arrow"
   type="Missile"
@@ -18,6 +24,8 @@
   sound_explosion="arrow_hit"
 
   fly_animation="arrow.wrl"
+
+  always_prepared="True"
 >
   <short_range_attack knockback_distance="1">
     <damage const="20" random="20"/>

@@ -16,9 +16,5 @@
       speed_multiply="2.0"
       power="4.5"
     />
-
-    <resources>
-      <resource name="Arrow" />
-    </resources>
   </player>
 </CONFIG>
