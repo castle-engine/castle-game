@@ -12,7 +12,7 @@
   loading_image_bar_y_position="0.2"
 
   demo="True"
-  default_available_for_new_game="True"
+  default_played="True"
 
   music_sound="doom_e1m1"
 >

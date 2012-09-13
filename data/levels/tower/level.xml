@@ -9,7 +9,7 @@
   type="Tower"
 
   demo="True"
-  default_available_for_new_game="True"
+  default_played="True"
 >
   <resources>
     <resource name="Alien" />

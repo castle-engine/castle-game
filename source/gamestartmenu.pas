@@ -98,7 +98,7 @@ type
 
   TChooseNewLevelMenu = class(TSubMenu)
   public
-    LevelsAvailableForNewGame: TLevelAvailableList;
+    LevelsNewGame: TLevelAvailableList;
     FirstDemoLevelIndex: Cardinal;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -188,7 +188,7 @@ procedure TMainMenu.Click;
 
     procedure SetChooseNewLevelMenu;
     begin
-      { Recreate ChooseNewLevelMenu now, to refresh list of levels AvailableForNewGame. }
+      { Recreate ChooseNewLevelMenu now, to refresh list of LevelsNewGame. }
       FreeAndNil(ChooseNewLevelMenu);
       ChooseNewLevelMenu := TChooseNewLevelMenu.Create(Application);
 
@@ -197,7 +197,7 @@ procedure TMainMenu.Click;
 
   begin
     { Initially I had here code to show SetChooseNewLevelMenu only
-      if I had more than 1 level with AvailableForNewGame.
+      if I had more than 1 level with Played.
 
       But it turns out that this was confusing for users:
       they thought that each "New Level" will always restart from the 1st
@@ -542,7 +542,7 @@ end;
 
 constructor TChooseNewLevelMenu.Create(AOwner: TComponent);
 
-  { Add level to LevelsAvailableForNewGame and Items lists.
+  { Add level to LevelsNewGame and Items lists.
     Index is an index into LevelsAvailable array for this level. }
   procedure AddLevel(Index: Integer);
   var
@@ -550,7 +550,7 @@ constructor TChooseNewLevelMenu.Create(AOwner: TComponent);
     L: TLevelAvailable;
   begin
     L := LevelsAvailable[Index];
-    LevelsAvailableForNewGame.Add(L);
+    LevelsNewGame.Add(L);
     S := Format('%d: %s', [ L.Number, L.Title ]);
     if L.TitleHint <> '' then
       S += ' (' + L.TitleHint + ')';
@@ -562,21 +562,21 @@ var
 begin
   inherited;
 
-  LevelsAvailableForNewGame := TLevelAvailableList.Create(false);
+  LevelsNewGame := TLevelAvailableList.Create(false);
 
   LevelsAvailable.SortByNumber;
 
   { Add non-demo levels }
   for I := 0 to LevelsAvailable.Count - 1 do
-    if LevelsAvailable[I].AvailableForNewGame and
+    if LevelsAvailable[I].Played and
        not LevelsAvailable[I].Demo then
       AddLevel(I);
 
-  FirstDemoLevelIndex := LevelsAvailableForNewGame.Count;
+  FirstDemoLevelIndex := LevelsNewGame.Count;
 
   { Add demo levels }
   for I := 0 to LevelsAvailable.Count - 1 do
-    if LevelsAvailable[I].AvailableForNewGame and
+    if LevelsAvailable[I].Played and
        LevelsAvailable[I].Demo then
       AddLevel(I);
 
@@ -587,7 +587,7 @@ end;
 
 destructor TChooseNewLevelMenu.Destroy;
 begin
-  FreeAndNil(LevelsAvailableForNewGame);
+  FreeAndNil(LevelsNewGame);
   inherited;
 end;
 
@@ -624,16 +624,16 @@ procedure TChooseNewLevelMenu.Click;
 begin
   inherited;
 
-  if CurrentItem = LevelsAvailableForNewGame.Count then
+  if CurrentItem = LevelsNewGame.Count then
   begin
     SetCurrentMenu(CurrentMenu, MainMenu);
   end else
-  if LevelsAvailableForNewGame[CurrentItem] = nil then
+  if LevelsNewGame[CurrentItem] = nil then
   begin
     { separator between non-demo and demo levels, do nothing }
   end else
   begin
-    NewGame(LevelsAvailableForNewGame[CurrentItem]);
+    NewGame(LevelsNewGame[CurrentItem]);
     SetCurrentMenu(CurrentMenu, MainMenu);
   end;
 end;

@@ -5,7 +5,7 @@
   scene="gate_final.x3dv"
   title="The Gate"
   number="1"
-  default_available_for_new_game="true"
+  default_played="true"
   type="Gate"
 
   music_sound="gate_music"
