@@ -973,7 +973,7 @@ begin
     begin
       SA := SpidersAppearing[I] as TSpiderAppearing;
       SpiderPosition := SA.Translation;
-      SA.MyHeight(SpiderPosition, AboveHeight);
+      SA.Height(SpiderPosition, AboveHeight);
       if AboveHeight < Spider.Radius * 2 then
       begin
         SpiderDirection :=
