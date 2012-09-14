@@ -69,7 +69,7 @@ implementation
 uses SysUtils, WindowModes, CastleGLUtils, CastleMessages, CastleGameCache,
   OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
   CastleInputs, KeysMouse, VectorMath, CastleUtils, CastleItems,
-  CastleStringUtils, CastleGameNotifications, GameWindow, CastleConfig;
+  CastleStringUtils, CastleGameNotifications, GameWindow, CastlePlayer;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -408,7 +408,7 @@ end;
 
 constructor TBasicControlsMenu.Create(AOwner: TComponent);
 begin
-  inherited CreateControlsSubMenu(AOwner, kgBasic);
+  inherited CreateControlsSubMenu(AOwner, igBasic);
 
   SubMenuTitle := 'Configure basic controls';
 end;
@@ -417,7 +417,7 @@ end;
 
 constructor TItemsControlsMenu.Create(AOwner: TComponent);
 begin
-  inherited CreateControlsSubMenu(AOwner, kgItems);
+  inherited CreateControlsSubMenu(AOwner, igItems);
 
   SubMenuTitle := 'Configure items controls';
 
@@ -431,7 +431,7 @@ end;
 
 constructor TOtherControlsMenu.Create(AOwner: TComponent);
 begin
-  inherited CreateControlsSubMenu(AOwner, kgOther);
+  inherited CreateControlsSubMenu(AOwner, igOther);
 
   SubMenuTitle := 'Configure other controls';
 
