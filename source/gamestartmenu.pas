@@ -143,7 +143,7 @@ begin
         SceneManager.Player := Player;
         SceneManager.Items.Add(Player);
 
-        Level.LoadLevel(SceneManager);
+        SceneManager.LoadLevel(Level);
         PlayGame(true);
       finally FreeAndNil(Player) end;
 

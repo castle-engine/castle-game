@@ -133,7 +133,7 @@ begin
   { initialize BackgroundSceneManager }
   BackgroundSceneManager := TGameSceneManager.Create(nil);
 
-  LevelsAvailable.FindName(MenuBackgroundLevelName).LoadLevel(BackgroundSceneManager);
+  BackgroundSceneManager.LoadLevel(MenuBackgroundLevelName);
   BackgroundControls.Add(BackgroundSceneManager);
 
   { Do not allow to move the camera in any way. }

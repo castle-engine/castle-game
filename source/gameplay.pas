@@ -487,7 +487,7 @@ begin
       ImageBackground.Image := Window.SaveScreen;
       Window.Controls.Add(ImageBackground);
 
-      LevelsAvailable.FindName(LevelFinishedNextLevelName).LoadLevel(SceneManager);
+      SceneManager.LoadLevel(LevelFinishedNextLevelName);
     finally
       { this will also remove ImageBackground from Window.Controls }
       FreeAndNil(ImageBackground);
