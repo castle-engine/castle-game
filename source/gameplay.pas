@@ -275,7 +275,7 @@ procedure TGame2DControls.Draw;
     function SPressAttackToRestart: string;
     begin
       Result := 'Press [Interact] (' +
-        CastleInput_Interact.Shortcut.Description('not assigned') +
+        CastleInput_Interact.Description('not assigned') +
         ') to restart the level.';
     end;
 
@@ -737,48 +737,48 @@ procedure EventDown(AKey: TKey;
 
 begin
   { Basic keys. }
-  if CastleInput_Attack.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_Attack.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoAttack else
-  if CastleInput_UpMove.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_DownMove.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_Forward.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_Backward.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_LeftStrafe.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_RightStrafe.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_UpMove.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_DownMove.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_Forward.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_Backward.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_LeftStrafe.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_RightStrafe.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     MaybeDeadWinMessage else
   if { Note that rotation keys work even when player is dead.
        See comments in TPlayer.UpdateCamera. }
-     CastleInput_LeftRot.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_RightRot.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_UpRotate.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_DownRotate.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_GravityUp.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+     CastleInput_LeftRot.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_RightRot.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_UpRotate.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_DownRotate.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     CastleInput_GravityUp.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     MaybeWinMessage else
 
   { Items keys. }
-  if CastleInput_InventoryShow.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_InventoryShow.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     InventoryVisible := not InventoryVisible else
-  if CastleInput_InventoryPrevious.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_InventoryPrevious.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ChangeInventoryCurrentItem(-1) else
-  if CastleInput_InventoryNext.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_InventoryNext.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ChangeInventoryCurrentItem(+1) else
-  if CastleInput_DropItem.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_DropItem.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DropItem else
-  if CastleInput_UseItem.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_UseItem.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     UseItem else
-  if CastleInput_UseLifePotion.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_UseLifePotion.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     UseLifePotion else
 
   { Other keys. }
-  if CastleInput_ViewMessages.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_ViewMessages.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ViewGameMessages else
-  if CastleInput_CancelFlying.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_CancelFlying.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     CancelFlying else
-  if CastleInput_FPSShow.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_FPSShow.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ShowDebugInfo := not ShowDebugInfo else
-  if CastleInput_Interact.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_Interact.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoInteract else
-  if CastleInput_DebugMenu.Shortcut.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if CastleInput_DebugMenu.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoDebugMenu;
 end;
 

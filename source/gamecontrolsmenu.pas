@@ -287,7 +287,7 @@ begin
   for I := 0 to InputsGroup[Group].Count - 1 do
     Items.AddObject(
       InputsGroup[Group].Items[I].Caption,
-      InputArgument(InputsGroup[Group].Items[I].Shortcut.
+      InputArgument(InputsGroup[Group].Items[I].
         Description(SNoneInput)));
 
   Items.Add('Back to controls menu');
@@ -297,31 +297,31 @@ end;
 
 procedure TControlsSubMenu.Click;
 
-  procedure ChangeKey(InputConfiguration: TInputConfiguration);
+  procedure ChangeKey(InputShortcut: TInputShortcut);
   var
-    ConflictingKey: TInputConfiguration;
+    ConflictingKey: TInputShortcut;
     NewKey: TKey;
     NewMousePress: boolean;
     NewMouseButton: TMouseButton;
     NewMouseWheel: TMouseWheelDirection;
   begin
     MessageKeyMouse(Window, Format(
-      'Press the new key or mouse button or mouse wheel for "%s".', [InputConfiguration.Caption]),
+      'Press the new key or mouse button or mouse wheel for "%s".', [InputShortcut.Caption]),
       'Cancel [Escape]' + nl + 'Clear [Backspace]', taLeft,
       NewKey, NewMousePress, NewMouseButton, NewMouseWheel);
 
     if NewKey = K_Backspace then
     begin
-      InputConfiguration.Shortcut.MakeClear;
+      InputShortcut.MakeClear;
     end else
     if NewKey = K_Escape then
     begin
       { Don't do anything. }
     end else
     if { We silently ignore situation when NewKey/NewMouse already
-         match InputConfiguration.Shortcut. This is meaningless,
+         match InputShortcut. This is meaningless,
          and otherwise could unnecessarily swap Key1 and Key2 in AddShortcut. }
-       (not InputConfiguration.Shortcut.IsEvent(
+       (not InputShortcut.IsEvent(
          NewKey, #0, NewMousePress, NewMouseButton, NewMouseWheel)) then
     begin
       ConflictingKey := InputsAll.SeekMatchingShortcut(
@@ -340,35 +340,35 @@ procedure TControlsSubMenu.Click;
         if NewMousePress then
         begin
           Notifications.Show(Format('Note: "%s" mouse shortcut cleared for action "%s"',
-            [ MouseButtonStr[ConflictingKey.Shortcut.MouseButton],
+            [ MouseButtonStr[ConflictingKey.MouseButton],
               ConflictingKey.Caption ]));
-          ConflictingKey.Shortcut.MouseButtonUse := false;
+          ConflictingKey.MouseButtonUse := false;
         end else
         if NewMouseWheel <> mwNone then
         begin
           Notifications.Show(Format('Note: "%s" mouse wheel cleared for action "%s"',
-            [ MouseWheelDirectionStr[ConflictingKey.Shortcut.MouseWheel],
+            [ MouseWheelDirectionStr[ConflictingKey.MouseWheel],
               ConflictingKey.Caption ]));
-          ConflictingKey.Shortcut.MouseWheel := mwNone;
+          ConflictingKey.MouseWheel := mwNone;
         end else
-        if ConflictingKey.Shortcut.Key1 = NewKey then
+        if ConflictingKey.Key1 = NewKey then
         begin
           Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
-            [ KeyToStr(ConflictingKey.Shortcut.Key1),
+            [ KeyToStr(ConflictingKey.Key1),
               ConflictingKey.Caption ]));
-          ConflictingKey.Shortcut.Key1 := K_None;
+          ConflictingKey.Key1 := K_None;
         end else
         begin
-          Assert(ConflictingKey.Shortcut.Key2 = NewKey);
+          Assert(ConflictingKey.Key2 = NewKey);
 
           Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
-            [ KeyToStr(ConflictingKey.Shortcut.Key2),
+            [ KeyToStr(ConflictingKey.Key2),
               ConflictingKey.Caption ]));
-          ConflictingKey.Shortcut.Key2 := K_None;
+          ConflictingKey.Key2 := K_None;
         end;
       end;
 
-      InputConfiguration.AddShortcut(NewKey,
+      InputShortcut.AddShortcut(NewKey,
         NewMousePress, NewMouseButton, NewMouseWheel);
     end;
 
@@ -393,7 +393,7 @@ var
 begin
   for I := 0 to InputsGroup[Group].Count - 1 do
     TMenuArgument(Items.Objects[I]).Value :=
-      InputsGroup[Group].Items[I].Shortcut.Description(SNoneInput);
+      InputsGroup[Group].Items[I].Description(SNoneInput);
 end;
 
 { TBasicControlsMenu ------------------------------------------------------------- }

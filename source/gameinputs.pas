@@ -29,22 +29,22 @@ uses CastleInputs;
 
 var
   { Basic shortcuts. }
-  CastleInput_Attack: TInputConfiguration;
+  CastleInput_Attack: TInputShortcut;
 
   { Items shortcuts. }
-  CastleInput_InventoryShow: TInputConfiguration;
-  CastleInput_InventoryPrevious: TInputConfiguration;
-  CastleInput_InventoryNext: TInputConfiguration;
-  CastleInput_UseItem: TInputConfiguration;
-  CastleInput_UseLifePotion: TInputConfiguration;
-  CastleInput_DropItem: TInputConfiguration;
+  CastleInput_InventoryShow: TInputShortcut;
+  CastleInput_InventoryPrevious: TInputShortcut;
+  CastleInput_InventoryNext: TInputShortcut;
+  CastleInput_UseItem: TInputShortcut;
+  CastleInput_UseLifePotion: TInputShortcut;
+  CastleInput_DropItem: TInputShortcut;
 
   { Other shortcuts. }
-  CastleInput_ViewMessages: TInputConfiguration;
-  CastleInput_SaveScreen: TInputConfiguration;
-  CastleInput_CancelFlying: TInputConfiguration;
-  CastleInput_FPSShow: TInputConfiguration;
-  CastleInput_DebugMenu: TInputConfiguration;
+  CastleInput_ViewMessages: TInputShortcut;
+  CastleInput_SaveScreen: TInputShortcut;
+  CastleInput_CancelFlying: TInputShortcut;
+  CastleInput_FPSShow: TInputShortcut;
+  CastleInput_DebugMenu: TInputShortcut;
 
 implementation
 
@@ -52,34 +52,34 @@ uses KeysMouse;
 
 initialization
   { Basic shortcuts. }
-  CastleInput_Attack := TInputConfiguration.Create('Attack', 'attack', igBasic,
-    K_Ctrl, K_None, #0, true, mbLeft);
+  CastleInput_Attack := TInputShortcut.Create(nil, 'Attack', 'attack', igBasic);
+  CastleInput_Attack.Assign(K_Ctrl, K_None, #0, true, mbLeft);
   CastleInput_Attack.GroupOrder := -100; { before other shortcuts }
 
   { Items shortcuts. }
-  CastleInput_InventoryShow := TInputConfiguration.Create('Inventory show / hide', 'inventory_toggle', igItems,
-    K_I, K_None, #0, false, mbLeft);
-  CastleInput_InventoryPrevious := TInputConfiguration.Create('Select previous inventory item', 'inventory_previous', igItems,
-    K_LeftBracket, K_None, #0, false, mbLeft, mwUp);
-  CastleInput_InventoryNext := TInputConfiguration.Create('Select next inventory item', 'inventory_next', igItems,
-    K_RightBracket, K_None, #0, false, mbLeft, mwDown);
-  CastleInput_UseItem := TInputConfiguration.Create('Use (or equip) selected inventory item', 'item_use', igItems,
-    K_Enter, K_None, #0, false, mbLeft);
-  CastleInput_UseLifePotion := TInputConfiguration.Create('Use life potion', 'life_potion_use', igItems,
-    K_L, K_None, #0, false, mbLeft);
-  CastleInput_DropItem := TInputConfiguration.Create('Drop selected inventory item', 'item_drop', igItems,
-    K_R, K_None, #0, false, mbLeft);
+  CastleInput_InventoryShow := TInputShortcut.Create(nil, 'Inventory show / hide', 'inventory_toggle', igItems);
+  CastleInput_InventoryShow.Assign(K_I, K_None, #0, false, mbLeft);
+  CastleInput_InventoryPrevious := TInputShortcut.Create(nil, 'Select previous inventory item', 'inventory_previous', igItems);
+  CastleInput_InventoryPrevious.Assign(K_LeftBracket, K_None, #0, false, mbLeft, mwUp);
+  CastleInput_InventoryNext := TInputShortcut.Create(nil, 'Select next inventory item', 'inventory_next', igItems);
+  CastleInput_InventoryNext.Assign(K_RightBracket, K_None, #0, false, mbLeft, mwDown);
+  CastleInput_UseItem := TInputShortcut.Create(nil, 'Use (or equip) selected inventory item', 'item_use', igItems);
+  CastleInput_UseItem.Assign(K_Enter, K_None, #0, false, mbLeft);
+  CastleInput_UseLifePotion := TInputShortcut.Create(nil, 'Use life potion', 'life_potion_use', igItems);
+  CastleInput_UseLifePotion.Assign(K_L, K_None, #0, false, mbLeft);
+  CastleInput_DropItem := TInputShortcut.Create(nil, 'Drop selected inventory item', 'item_drop', igItems);
+  CastleInput_DropItem.Assign(K_R, K_None, #0, false, mbLeft);
 
   { Other shortcuts. }
-  CastleInput_ViewMessages := TInputConfiguration.Create('View all messages', 'view_messages', igOther,
-    K_M, K_None, #0, false, mbLeft);
-  CastleInput_SaveScreen := TInputConfiguration.Create('Save screen', 'save_screen', igOther,
-    K_F5, K_None, #0, false, mbLeft);
-  CastleInput_CancelFlying := TInputConfiguration.Create('Cancel flying spell', 'cancel_flying', igOther,
-    K_Q, K_None, #0, false, mbLeft);
-  CastleInput_FPSShow := TInputConfiguration.Create('FPS show / hide', 'fps_toggle', igOther,
-    K_Tab, K_None, #0, false, mbLeft);
-  CastleInput_DebugMenu := TInputConfiguration.Create('Debug menu', 'debug_menu', igOther,
-    K_BackQuote, K_None, #0, false, mbLeft);
+  CastleInput_ViewMessages := TInputShortcut.Create(nil, 'View all messages', 'view_messages', igOther);
+  CastleInput_ViewMessages.Assign(K_M, K_None, #0, false, mbLeft);
+  CastleInput_SaveScreen := TInputShortcut.Create(nil, 'Save screen', 'save_screen', igOther);
+  CastleInput_SaveScreen.Assign(K_F5, K_None, #0, false, mbLeft);
+  CastleInput_CancelFlying := TInputShortcut.Create(nil, 'Cancel flying spell', 'cancel_flying', igOther);
+  CastleInput_CancelFlying.Assign(K_Q, K_None, #0, false, mbLeft);
+  CastleInput_FPSShow := TInputShortcut.Create(nil, 'FPS show / hide', 'fps_toggle', igOther);
+  CastleInput_FPSShow.Assign(K_Tab, K_None, #0, false, mbLeft);
+  CastleInput_DebugMenu := TInputShortcut.Create(nil, 'Debug menu', 'debug_menu', igOther);
+  CastleInput_DebugMenu.Assign(K_BackQuote, K_None, #0, false, mbLeft);
 end.
 

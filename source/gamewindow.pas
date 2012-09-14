@@ -67,7 +67,7 @@ procedure TGameWindow.EventDown(AKey: TKey;
   end;
 
 begin
-  if CastleInput_SaveScreen.Shortcut.IsEvent(AKey, #0,
+  if CastleInput_SaveScreen.IsEvent(AKey, #0,
     AMousePress, AMouseButton, AMouseWheel) then
     AutoSaveScreen;
 end;
