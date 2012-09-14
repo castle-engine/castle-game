@@ -222,7 +222,7 @@ begin
          AutoOpenInventoryArgument.Value := AutoOpenInventory;
        end;
     8: begin
-         CastleAllInputs.RestoreDefaults;
+         InputsAll.RestoreDefaults;
 
          UseMouseLook := DefaultUseMouseLook;
          UseMouseLookArgument.Value := UseMouseLook;
@@ -284,10 +284,10 @@ begin
 
   FGroup := AGroup;
 
-  for I := 0 to CastleGroupInputs[Group].Count - 1 do
+  for I := 0 to InputsGroup[Group].Count - 1 do
     Items.AddObject(
-      CastleGroupInputs[Group].Items[I].Caption,
-      InputArgument(CastleGroupInputs[Group].Items[I].Shortcut.
+      InputsGroup[Group].Items[I].Caption,
+      InputArgument(InputsGroup[Group].Items[I].Shortcut.
         Description(SNoneInput)));
 
   Items.Add('Back to controls menu');
@@ -324,7 +324,7 @@ procedure TControlsSubMenu.Click;
        (not InputConfiguration.Shortcut.IsEvent(
          NewKey, #0, NewMousePress, NewMouseButton, NewMouseWheel)) then
     begin
-      ConflictingKey := CastleAllInputs.SeekMatchingShortcut(
+      ConflictingKey := InputsAll.SeekMatchingShortcut(
         NewKey, NewMousePress, NewMouseButton, NewMouseWheel);
 
       if ConflictingKey <> nil then
@@ -378,9 +378,9 @@ procedure TControlsSubMenu.Click;
 begin
   inherited;
 
-  if Between(CurrentItem, 0, CastleGroupInputs[Group].Count - 1) then
-    ChangeKey(CastleGroupInputs[Group].Items[CurrentItem]) else
-  if CurrentItem = CastleGroupInputs[Group].Count then
+  if Between(CurrentItem, 0, InputsGroup[Group].Count - 1) then
+    ChangeKey(InputsGroup[Group].Items[CurrentItem]) else
+  if CurrentItem = InputsGroup[Group].Count then
   begin
     SetCurrentMenu(CurrentMenu, ControlsMenu);
   end else
@@ -391,9 +391,9 @@ procedure TControlsSubMenu.RefreshShortcuts;
 var
   I: Integer;
 begin
-  for I := 0 to CastleGroupInputs[Group].Count - 1 do
+  for I := 0 to InputsGroup[Group].Count - 1 do
     TMenuArgument(Items.Objects[I]).Value :=
-      CastleGroupInputs[Group].Items[I].Shortcut.Description(SNoneInput);
+      InputsGroup[Group].Items[I].Shortcut.Description(SNoneInput);
 end;
 
 { TBasicControlsMenu ------------------------------------------------------------- }
