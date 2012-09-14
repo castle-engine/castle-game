@@ -739,20 +739,20 @@ begin
   { Basic keys. }
   if CastleInput_Attack.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoAttack else
-  if CastleInput_UpMove.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_DownMove.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_Forward.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_Backward.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_LeftStrafe.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_RightStrafe.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if PlayerInput_UpMove.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     PlayerInput_DownMove.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     PlayerInput_Forward.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     PlayerInput_Backward.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     PlayerInput_LeftStrafe.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     PlayerInput_RightStrafe.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     MaybeDeadWinMessage else
   if { Note that rotation keys work even when player is dead.
        See comments in TPlayer.UpdateCamera. }
-     CastleInput_LeftRot.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_RightRot.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_UpRotate.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_DownRotate.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     CastleInput_GravityUp.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+     PlayerInput_LeftRot.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     PlayerInput_RightRot.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     PlayerInput_UpRotate.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     PlayerInput_DownRotate.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
+     PlayerInput_GravityUp.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     MaybeWinMessage else
 
   { Items keys. }
