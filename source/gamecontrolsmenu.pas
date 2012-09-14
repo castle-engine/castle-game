@@ -89,10 +89,11 @@ type
   TControlsSubMenu = class(TSubMenu)
   private
     FGroup: TInputGroup;
-    procedure InputChanged(InputConfiguration: TInputConfiguration);
+    { Refresh shortcuts descriptions displayed in the menu
+      from current values of CastleInput_Xxx variables. }
+    procedure RefreshShortcuts;
   public
     constructor CreateControlsSubMenu(AOwner: TComponent; AGroup: TInputGroup);
-    destructor Destroy; override;
 
     property Group: TInputGroup read FGroup;
     procedure Click; override;
@@ -203,9 +204,9 @@ begin
   inherited;
 
   case CurrentItem of
-    0: SetCurrentMenu(CurrentMenu, BasicControlsMenu);
-    1: SetCurrentMenu(CurrentMenu, ItemsControlsMenu);
-    2: SetCurrentMenu(CurrentMenu, OtherControlsMenu);
+    0: begin BasicControlsMenu.RefreshShortcuts; SetCurrentMenu(CurrentMenu, BasicControlsMenu); end;
+    1: begin ItemsControlsMenu.RefreshShortcuts; SetCurrentMenu(CurrentMenu, ItemsControlsMenu); end;
+    2: begin OtherControlsMenu.RefreshShortcuts; SetCurrentMenu(CurrentMenu, OtherControlsMenu); end;
     3: begin
          UseMouseLook := not UseMouseLook;
          UseMouseLookArgument.Value := UseMouseLook;
@@ -292,15 +293,6 @@ begin
   Items.Add('Back to controls menu');
 
   RegularSpaceBetweenItems := 2;
-
-  OnInputChanged.Add(@InputChanged);
-end;
-
-destructor TControlsSubMenu.Destroy;
-begin
-  if OnInputChanged <> nil then
-    OnInputChanged.Remove(@InputChanged);
-  inherited;
 end;
 
 procedure TControlsSubMenu.Click;
@@ -379,6 +371,8 @@ procedure TControlsSubMenu.Click;
       InputConfiguration.AddShortcut(NewKey,
         NewMousePress, NewMouseButton, NewMouseWheel);
     end;
+
+    RefreshShortcuts;
   end;
 
 begin
@@ -393,12 +387,10 @@ begin
     raise EInternalError.Create('Menu item unknown');
 end;
 
-procedure TControlsSubMenu.InputChanged(InputConfiguration: TInputConfiguration);
+procedure TControlsSubMenu.RefreshShortcuts;
 var
   I: Integer;
 begin
-  { Refresh key names displayed in the menu. }
-
   for I := 0 to CastleGroupInputs[Group].Count - 1 do
     TMenuArgument(Items.Objects[I]).Value :=
       CastleGroupInputs[Group].Items[I].Shortcut.Description(SNoneInput);
