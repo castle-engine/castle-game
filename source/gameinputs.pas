@@ -48,9 +48,13 @@ var
 
 implementation
 
-uses KeysMouse;
+uses KeysMouse, CastleSceneManager;
 
 initialization
+  { change Input_Interact to key "e", since left mouse click
+    is reserved for "attack" }
+  Input_Interact.Assign(K_E, K_None, #0, false, mbLeft);
+
   { Basic shortcuts. }
   CastleInput_Attack := TInputShortcut.Create(nil, 'Attack', 'attack', igBasic);
   CastleInput_Attack.Assign(K_Ctrl, K_None, #0, true, mbLeft);

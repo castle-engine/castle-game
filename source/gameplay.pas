@@ -92,7 +92,7 @@ uses SysUtils, CastleUtils, CastleWindow, GameInputs,
   VectorMath, Boxes3D, Images, Math, GameHelp, UIControls, CastleSoundEngine,
   CastleItems, GameItems, CastleStringUtils,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
-  GameVideoOptions, GameCreatures, CastleColors,
+  GameVideoOptions, GameCreatures, CastleColors, CastleSceneManager,
   CastleGameNotifications, GameControlsMenu, CastleControls, CastleCreatures,
   GameLevelSpecific, CastleTimeUtils, GLImages, KeysMouse;
 
@@ -275,7 +275,7 @@ procedure TGame2DControls.Draw;
     function SPressAttackToRestart: string;
     begin
       Result := 'Press [Interact] (' +
-        CastleInput_Interact.Description('not assigned') +
+        Input_Interact.Description('not assigned') +
         ') to restart the level.';
     end;
 
@@ -727,7 +727,7 @@ procedure EventDown(AKey: TKey;
   procedure DoInteract;
   begin
     { normal interaction is already handled because
-      TCastleSceneManager.Input_PointingDeviceActivate is equal to interact key. }
+      TCastleSceneManager.Input_Interact is equal to interact key. }
     if GameWin or Player.Dead then
     begin
       GameEndedWantsRestart := SceneManager.Info.Name;
@@ -776,7 +776,7 @@ begin
     CancelFlying else
   if CastleInput_FPSShow.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ShowDebugInfo := not ShowDebugInfo else
-  if CastleInput_Interact.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if Input_Interact.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoInteract else
   if CastleInput_DebugMenu.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoDebugMenu;
