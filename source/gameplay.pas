@@ -853,6 +853,8 @@ begin
     if PrepareNewPlayer then
       SceneManager.Level.PrepareNewPlayer(Player);
 
+    Notifications.Show('Hint: press "Escape" for game menu');
+
     repeat
       Application.ProcessMessage(true, true);
     until GameEnded;

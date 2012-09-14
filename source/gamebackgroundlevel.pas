@@ -55,6 +55,10 @@ var
   BackgroundControls: TUIControlList;
   BackgroundSceneManager: TGameSceneManager;
 
+const
+  { hardcoded for now }
+  MenuBackgroundLevelName = 'gate_background';
+
 { Create / destroy BackgroundControls instances.
   @groupBegin }
 procedure BackgroundCreate;
@@ -64,7 +68,7 @@ procedure BackgroundDestroy;
 implementation
 
 uses SysUtils, GL, GLU, GLExt, CastleGLUtils, GLImages,
-  CastleFilesUtils, Images, VectorMath,
+  CastleFilesUtils, Images, VectorMath, CastlePlayer,
   CastleGameCache, GameVideoOptions;
 
 { TBackgroundCaptions -------------------------------------------------------- }
@@ -120,25 +124,27 @@ end;
 { routines ------------------------------------------------------------------- }
 
 procedure BackgroundCreate;
-const
-  { hardcoded for now }
-  MenuBackgroundLevelName = 'gate_background';
 var
   BackgroundCaptions: TUIControl;
+  BackgroundPlayer: TPlayer;
 begin
   BackgroundControls := TUIControlList.Create(true);
 
   { initialize BackgroundSceneManager }
   BackgroundSceneManager := TGameSceneManager.Create(nil);
-  LevelsAvailable.FindName(MenuBackgroundLevelName).LoadLevel(BackgroundSceneManager, true);
+
+  LevelsAvailable.FindName(MenuBackgroundLevelName).LoadLevel(BackgroundSceneManager);
   BackgroundControls.Add(BackgroundSceneManager);
 
-  { Do not allow to move the camera in any way.
-    We should also disable any other interaction with the scene,
-    in case in the future TLevel will enable ProcessEvents and some animation
-    through it --- but we can also depend that background level will not
-    have any TouchSensors, KeySensors etc. }
+  { Do not allow to move the camera in any way. }
   BackgroundSceneManager.Camera.Input := [];
+
+  { Disable interaction with the scene pointing device sensors by having
+    player with Blocked = true. }
+  BackgroundPlayer := TPlayer.Create(BackgroundSceneManager);
+  BackgroundPlayer.Blocked := true;
+  BackgroundSceneManager.Player := BackgroundPlayer;
+  BackgroundSceneManager.Items.Add(BackgroundPlayer);
 
   BackgroundCaptions := TBackgroundCaptions.Create(nil);
   BackgroundControls.Add(BackgroundCaptions);

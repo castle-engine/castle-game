@@ -244,7 +244,7 @@ end;
 
 constructor TAntiAliasingSlider.Create;
 begin
-  inherited Create(Ord(Low(TAntiAliasing)), Ord(High(TAntiAliasing)), 
+  inherited Create(Ord(Low(TAntiAliasing)), Ord(High(TAntiAliasing)),
     Ord(Window.AntiAliasing));
 end;
 
@@ -569,6 +569,7 @@ begin
   { Add non-demo levels }
   for I := 0 to LevelsAvailable.Count - 1 do
     if LevelsAvailable[I].Played and
+       (LevelsAvailable[I].Name <> MenuBackgroundLevelName) and
        not LevelsAvailable[I].Demo then
       AddLevel(I);
 
@@ -577,6 +578,7 @@ begin
   { Add demo levels }
   for I := 0 to LevelsAvailable.Count - 1 do
     if LevelsAvailable[I].Played and
+       (LevelsAvailable[I].Name <> MenuBackgroundLevelName) and
        LevelsAvailable[I].Demo then
       AddLevel(I);
 
