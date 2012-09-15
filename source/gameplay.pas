@@ -118,10 +118,6 @@ var
 
   GameControls: TUIControlList;
 
-const
-  SDeadMessage = 'You''re dead';
-  SGameWinMessage = 'Game finished';
-
 type
   TGame2DControls = class(TUIControl)
   public
@@ -290,7 +286,7 @@ procedure TGame2DControls.Draw;
   begin
     glColorv(Vector3Single(1, 0, 0));
     RasterPosLine(LineDeadOrWinner);
-    UIFont.Print(SDeadMessage + '.');
+    UIFont.Print('You''re dead.');
     DoShowDeadOrFinishedKeys;
   end;
 
@@ -298,7 +294,7 @@ procedure TGame2DControls.Draw;
   begin
     glColorv(Vector3Single(0.8, 0.8, 0.8));
     RasterPosLine(LineDeadOrWinner);
-    UIFont.Print(SGameWinMessage + '.');
+    UIFont.Print('Game finished.');
     DoShowDeadOrFinishedKeys;
   end;
 
@@ -511,202 +507,18 @@ begin
   end;
 end;
 
-procedure DoAttack;
-begin
-  if GameWin then
-  begin
-    Notifications.Show(SGameWinMessage);
-    Exit;
-  end;
-
-  if Player.Dead then
-  begin
-    Notifications.Show(SDeadMessage);
-    Exit;
-  end;
-
-  Player.Attack;
-end;
-
-procedure MaybeDeadWinMessage;
-begin
-  if GameWin then
-    Notifications.Show(SGameWinMessage) else
-  if Player.Dead then
-    Notifications.Show(SDeadMessage);
-end;
-
 procedure EventDown(AKey: TKey;
   AMousePress: boolean; AMouseButton: TMouseButton;
   AMouseWheel: TMouseWheelDirection);
-
-  procedure ChangeInventoryCurrentItem(Change: Integer);
-  begin
-    if Player.Inventory.Count = 0 then
-      Player.InventoryCurrentItem := -1 else
-    if Player.InventoryCurrentItem >= Player.Inventory.Count then
-      Player.InventoryCurrentItem := Player.Inventory.Count - 1 else
-    if Player.InventoryCurrentItem < 0 then
-      Player.InventoryCurrentItem := 0 else
-      Player.InventoryCurrentItem := ChangeIntCycle(
-        Player.InventoryCurrentItem, Change, Player.Inventory.Count - 1);
-
-    if Player.Inventory.Count <> 0 then
-      Player.InventoryVisible := true;
-  end;
-
-  procedure UpdateInventoryCurrentItemAfterDelete;
-  begin
-    { update InventoryCurrentItem.
-      Note that if Player.Inventory.Count = 0 now, then this will
-      correctly set InventoryCurrentItem to -1. }
-    if Player.InventoryCurrentItem >= Player.Inventory.Count then
-      Player.InventoryCurrentItem := Player.Inventory.Count - 1;
-  end;
-
-  procedure DropItem;
-
-    function GetItemDropPosition(DroppedItemKind: TItemKind;
-      out DropPosition: TVector3Single): boolean;
-    var
-      ItemBox: TBox3D;
-      ItemBoxRadius: Single;
-      ItemBoxMiddle: TVector3Single;
-    begin
-      ItemBox := DroppedItemKind.BoundingBoxRotated;
-      ItemBoxMiddle := ItemBox.Middle;
-      { Box3DRadius calculates radius around (0, 0, 0) and we want
-        radius around ItemBoxMiddle }
-      ItemBoxRadius := ItemBox.Translate(VectorNegate(ItemBoxMiddle)).Radius;
-
-      { Calculate DropPosition.
-
-        We must move the item a little before us to
-        1. show visually player that the item was dropped
-        2. to avoid automatically picking it again
-
-        Note that I take direction from DirectionInGravityPlane,
-        not from Direction, otherwise when player is looking
-        down he could be able to put item "inside the ground".
-        Collision detection with the level below would actually
-        prevent putting item "inside the ground", but the item
-        would be too close to the player --- he could pick it up
-        immediately. }
-      DropPosition := Player.Camera.Position +
-        Player.Camera.DirectionInGravityPlane *
-          (0.6 * (Player.Camera.RealPreferredHeight * Sqrt3 + ItemBox.Diagonal));
-
-      { Now check is DropPosition actually possible
-        (i.e. check collisions item<->everything).
-        The assumption is that item starts from
-        Player.Camera.Position and is moved to DropPosition.
-
-        But actually we must shift both these positions,
-        so that we check positions that are ideally in the middle
-        of item's BoundingBoxRotated. Otherwise the item
-        could get *partially* stuck within the wall, which wouldn't
-        look good. }
-
-      Result := SceneManager.Items.WorldMoveAllowed(
-        ItemBoxMiddle + Player.Camera.Position,
-        ItemBoxMiddle + DropPosition, true, ItemBoxRadius,
-        ItemBox + Player.Camera.Position,
-        ItemBox + DropPosition, false);
-    end;
-
-  var
-    DropppedItem: TInventoryItem;
-    DropPosition: TVector3Single;
-  begin
-    if GameWin then
-    begin
-      Notifications.Show(SGameWinMessage);
-      Exit;
-    end;
-
-    if Player.Dead then
-    begin
-      Notifications.Show(SDeadMessage);
-      Exit;
-    end;
-
-    if Between(Player.InventoryCurrentItem, 0, Player.Inventory.Count - 1) then
-    begin
-      if GetItemDropPosition(Player.Inventory[Player.InventoryCurrentItem].Kind,
-        DropPosition) then
-      begin
-        DropppedItem := Player.DropItem(Player.InventoryCurrentItem);
-        if DropppedItem <> nil then
-        begin
-          UpdateInventoryCurrentItemAfterDelete;
-          DropppedItem.PutOnWorld(SceneManager.Items, DropPosition);
-        end;
-      end else
-        Notifications.Show('Not enough room here to drop this item');
-    end else
-      Notifications.Show('Nothing to drop - select some item first');
-  end;
-
-  procedure UseItem;
-  begin
-    if GameWin then
-    begin
-      Notifications.Show(SGameWinMessage);
-      Exit;
-    end;
-
-    if Player.Dead then
-    begin
-      Notifications.Show(SDeadMessage);
-      Exit;
-    end;
-
-    if Between(Player.InventoryCurrentItem, 0, Player.Inventory.Count - 1) then
-    begin
-      Player.Inventory.Use(Player.InventoryCurrentItem);
-      UpdateInventoryCurrentItemAfterDelete;
-    end else
-      Notifications.Show('Nothing to use - select some item first');
-  end;
 
   procedure UseLifePotion;
   var
     UsedItemIndex: Integer;
   begin
-    if GameWin then
-    begin
-      Notifications.Show(SGameWinMessage);
-      Exit;
-    end;
-
-    if Player.Dead then
-    begin
-      Notifications.Show(SDeadMessage);
-      Exit;
-    end;
-
     UsedItemIndex := Player.Inventory.FindKind(LifePotion);
     if UsedItemIndex <> -1 then
-    begin
-      Player.Inventory.Use(UsedItemIndex);
-      UpdateInventoryCurrentItemAfterDelete;
-    end else
+      Player.UseItem(UsedItemIndex) else
       Notifications.Show('You don''t have any life potion');
-  end;
-
-  procedure CancelFlying;
-  begin
-    if GameWin then
-      Notifications.Show(SGameWinMessage) else
-    if not Player.Dead then
-      Player.CancelFlying else
-      Notifications.Show(SDeadMessage);
-  end;
-
-  procedure MaybeWinMessage;
-  begin
-    if GameWin then
-      Notifications.Show(SGameWinMessage);
   end;
 
   procedure DoDebugMenu;
@@ -716,7 +528,7 @@ procedure EventDown(AKey: TKey;
     SceneManager.Paused := false;
   end;
 
-  procedure DoInteract;
+  procedure RestartLevel;
   begin
     { normal interaction is already handled because
       TCastleSceneManager.Input_Interact is equal to interact key. }
@@ -728,49 +540,20 @@ procedure EventDown(AKey: TKey;
   end;
 
 begin
-  { Basic keys. }
-  if CastleInput_Attack.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    DoAttack else
-  if PlayerInput_UpMove.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     PlayerInput_DownMove.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     PlayerInput_Forward.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     PlayerInput_Backward.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     PlayerInput_LeftStrafe.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     PlayerInput_RightStrafe.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    MaybeDeadWinMessage else
-  if { Note that rotation keys work even when player is dead.
-       See comments in TPlayer.UpdateCamera. }
-     PlayerInput_LeftRot.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     PlayerInput_RightRot.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     PlayerInput_UpRotate.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     PlayerInput_DownRotate.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) or
-     PlayerInput_GravityUp.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    MaybeWinMessage else
-
-  { Items keys. }
-  if CastleInput_InventoryShow.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    Player.InventoryVisible := not Player.InventoryVisible else
-  if CastleInput_InventoryPrevious.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    ChangeInventoryCurrentItem(-1) else
-  if CastleInput_InventoryNext.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    ChangeInventoryCurrentItem(+1) else
-  if CastleInput_DropItem.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    DropItem else
-  if CastleInput_UseItem.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    UseItem else
-  if CastleInput_UseLifePotion.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    UseLifePotion else
+  if (Player <> nil) and not (Player.Blocked or Player.Dead) then
+  begin
+    if Input_UseLifePotion.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+      UseLifePotion;
+  end;
 
   { Other keys. }
-  if CastleInput_ViewMessages.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if Input_ViewMessages.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ViewGameMessages else
-  if CastleInput_CancelFlying.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    CancelFlying else
-  if CastleInput_FPSShow.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+  if Input_FPSShow.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ShowDebugInfo := not ShowDebugInfo else
   if Input_Interact.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    DoInteract else
-  if CastleInput_DebugMenu.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
+    RestartLevel else
+  if Input_DebugMenu.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     DoDebugMenu;
 end;
 
@@ -788,16 +571,6 @@ begin
       SceneManager.Paused := false;
     end;
   end;
-end;
-
-procedure MouseDown(Window: TCastleWindowBase; Button: TMouseButton);
-begin
-  EventDown(K_None, true, Button, mwNone);
-end;
-
-procedure MouseWheel(Window: TCastleWindowBase; const Scroll: Single; const Vertical: boolean);
-begin
-  EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
 end;
 
 procedure CloseQuery(Window: TCastleWindowBase);
@@ -828,8 +601,6 @@ begin
 
     Window.OnIdle := @Idle;
     Window.OnKeyDown := @KeyDown;
-    Window.OnMouseDown := @MouseDown;
-    Window.OnMouseWheel := @MouseWheel;
     Window.OnDrawStyle := ds3D;
 
     C2D := TGame2DControls.Create(nil);

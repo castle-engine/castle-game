@@ -28,62 +28,36 @@ interface
 uses CastleInputs;
 
 var
-  { Basic shortcuts. }
-  CastleInput_Attack: TInputShortcut;
+  Input_UseLifePotion: TInputShortcut;
 
-  { Items shortcuts. }
-  CastleInput_InventoryShow: TInputShortcut;
-  CastleInput_InventoryPrevious: TInputShortcut;
-  CastleInput_InventoryNext: TInputShortcut;
-  CastleInput_UseItem: TInputShortcut;
-  CastleInput_UseLifePotion: TInputShortcut;
-  CastleInput_DropItem: TInputShortcut;
-
-  { Other shortcuts. }
-  CastleInput_ViewMessages: TInputShortcut;
-  CastleInput_SaveScreen: TInputShortcut;
-  CastleInput_CancelFlying: TInputShortcut;
-  CastleInput_FPSShow: TInputShortcut;
-  CastleInput_DebugMenu: TInputShortcut;
+  Input_ViewMessages: TInputShortcut;
+  Input_SaveScreen: TInputShortcut;
+  Input_FPSShow: TInputShortcut;
+  Input_DebugMenu: TInputShortcut;
 
 implementation
 
 uses KeysMouse, CastleSceneManager;
 
 initialization
-  { change Input_Interact to key "e", since left mouse click
-    is reserved for "attack" }
+  { change defaults, to make "attack" on mouse click.
+    Consequently, interact must be something else --- key "e" is consistent
+    with other 3D games. }
+  Input_Attack.Assign(K_Ctrl, K_None, #0, true, mbLeft);
   Input_Interact.Assign(K_E, K_None, #0, false, mbLeft);
 
-  { Basic shortcuts. }
-  CastleInput_Attack := TInputShortcut.Create(nil, 'Attack', 'attack', igBasic);
-  CastleInput_Attack.Assign(K_Ctrl, K_None, #0, true, mbLeft);
-  CastleInput_Attack.GroupOrder := -100; { before other shortcuts }
-
   { Items shortcuts. }
-  CastleInput_InventoryShow := TInputShortcut.Create(nil, 'Inventory show / hide', 'inventory_toggle', igItems);
-  CastleInput_InventoryShow.Assign(K_I, K_None, #0, false, mbLeft);
-  CastleInput_InventoryPrevious := TInputShortcut.Create(nil, 'Select previous inventory item', 'inventory_previous', igItems);
-  CastleInput_InventoryPrevious.Assign(K_LeftBracket, K_None, #0, false, mbLeft, mwUp);
-  CastleInput_InventoryNext := TInputShortcut.Create(nil, 'Select next inventory item', 'inventory_next', igItems);
-  CastleInput_InventoryNext.Assign(K_RightBracket, K_None, #0, false, mbLeft, mwDown);
-  CastleInput_UseItem := TInputShortcut.Create(nil, 'Use (or equip) selected inventory item', 'item_use', igItems);
-  CastleInput_UseItem.Assign(K_Enter, K_None, #0, false, mbLeft);
-  CastleInput_UseLifePotion := TInputShortcut.Create(nil, 'Use life potion', 'life_potion_use', igItems);
-  CastleInput_UseLifePotion.Assign(K_L, K_None, #0, false, mbLeft);
-  CastleInput_DropItem := TInputShortcut.Create(nil, 'Drop selected inventory item', 'item_drop', igItems);
-  CastleInput_DropItem.Assign(K_R, K_None, #0, false, mbLeft);
+  Input_UseLifePotion := TInputShortcut.Create(nil, 'Use life potion', 'life_potion_use', igItems);
+  Input_UseLifePotion.Assign(K_L, K_None, #0, false, mbLeft);
 
   { Other shortcuts. }
-  CastleInput_ViewMessages := TInputShortcut.Create(nil, 'View all messages', 'view_messages', igOther);
-  CastleInput_ViewMessages.Assign(K_M, K_None, #0, false, mbLeft);
-  CastleInput_SaveScreen := TInputShortcut.Create(nil, 'Save screen', 'save_screen', igOther);
-  CastleInput_SaveScreen.Assign(K_F5, K_None, #0, false, mbLeft);
-  CastleInput_CancelFlying := TInputShortcut.Create(nil, 'Cancel flying spell', 'cancel_flying', igOther);
-  CastleInput_CancelFlying.Assign(K_Q, K_None, #0, false, mbLeft);
-  CastleInput_FPSShow := TInputShortcut.Create(nil, 'FPS show / hide', 'fps_toggle', igOther);
-  CastleInput_FPSShow.Assign(K_Tab, K_None, #0, false, mbLeft);
-  CastleInput_DebugMenu := TInputShortcut.Create(nil, 'Debug menu', 'debug_menu', igOther);
-  CastleInput_DebugMenu.Assign(K_BackQuote, K_None, #0, false, mbLeft);
+  Input_ViewMessages := TInputShortcut.Create(nil, 'View all messages', 'view_messages', igOther);
+  Input_ViewMessages.Assign(K_M, K_None, #0, false, mbLeft);
+  Input_SaveScreen := TInputShortcut.Create(nil, 'Save screen', 'save_screen', igOther);
+  Input_SaveScreen.Assign(K_F5, K_None, #0, false, mbLeft);
+  Input_FPSShow := TInputShortcut.Create(nil, 'FPS show / hide', 'fps_toggle', igOther);
+  Input_FPSShow.Assign(K_Tab, K_None, #0, false, mbLeft);
+  Input_DebugMenu := TInputShortcut.Create(nil, 'Debug menu', 'debug_menu', igOther);
+  Input_DebugMenu.Assign(K_BackQuote, K_None, #0, false, mbLeft);
 end.
 
