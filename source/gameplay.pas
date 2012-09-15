@@ -408,7 +408,7 @@ begin
   if Notifications.DrawStyle <> dsNone then
     glCallList(GLList_NotificationsBackground);
 
-  if InventoryVisible then
+  if Player.InventoryVisible then
     DoDrawInventory;
 
   if ShowDebugInfo then
@@ -552,7 +552,7 @@ procedure EventDown(AKey: TKey;
         Player.InventoryCurrentItem, Change, Player.Inventory.Count - 1);
 
     if Player.Inventory.Count <> 0 then
-      InventoryVisible := true;
+      Player.InventoryVisible := true;
   end;
 
   procedure UpdateInventoryCurrentItemAfterDelete;
@@ -749,7 +749,7 @@ begin
 
   { Items keys. }
   if CastleInput_InventoryShow.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    InventoryVisible := not InventoryVisible else
+    Player.InventoryVisible := not Player.InventoryVisible else
   if CastleInput_InventoryPrevious.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
     ChangeInventoryCurrentItem(-1) else
   if CastleInput_InventoryNext.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
@@ -812,7 +812,6 @@ var
 begin
   GameWin := false;
 
-  InventoryVisible := false;
   LevelFinishedSchedule := false;
 
   SavedMode := TGLMode.CreateReset(Window, 0, true, nil, nil, @CloseQuery);
