@@ -136,6 +136,7 @@ begin
   try
     SceneManager.ShadowVolumes := ShadowVolumes;
     SceneManager.ShadowVolumesDraw := ShadowVolumesDraw;
+    SceneManager.ApproximateActivation := true;
     repeat
       Notifications.Clear;
       Player := TPlayer.Create(nil);
