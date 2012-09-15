@@ -26,7 +26,7 @@ unit GameControlsMenu;
 interface
 
 uses Classes, CastleWindow, GL, GLU, GameGeneralMenu, Cameras,
-  OpenGLFonts, OpenGLBmpFonts, UIControls;
+  OpenGLFonts, OpenGLBmpFonts, UIControls, CastlePlayer;
 
 type
   TSubMenu = class(TCastleGameMenu)
@@ -64,12 +64,44 @@ var
     Initialized / finalized in CastleWindow Open/Close here. }
   SubMenuTitleFont: TGLBitmapFont_Abstract;
 
+{ Update MouseLook-related player settings, based on what is chosen
+  in "Confgure controls" menu. }
+procedure PlayerUpdateMouseLook(Player: TPlayer);
+
 implementation
 
 uses SysUtils, WindowModes, CastleGLUtils, CastleMessages, CastleGameCache,
-  OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit,
+  OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit, CastleConfig,
   CastleInputs, KeysMouse, VectorMath, CastleUtils, CastleItems,
-  CastleStringUtils, CastleGameNotifications, GameWindow, CastlePlayer;
+  CastleStringUtils, CastleGameNotifications, GameWindow;
+
+const
+  DefaultMouseLook = true;
+  DefaultInvertVerticalMouseLook = false;
+
+var
+  { Game player camera settings.
+    Automatically saved/loaded from user preferences using CastleConfig.
+    @groupBegin }
+  MouseLook: boolean = DefaultMouseLook;
+  InvertVerticalMouseLook: boolean = DefaultInvertVerticalMouseLook;
+  MouseLookHorizontalSensitivity: Single;
+  MouseLookVerticalSensitivity: Single;
+  { @groupEnd }
+
+procedure PlayerUpdateMouseLook(Player: TPlayer);
+begin
+  Player.Camera.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
+  Player.Camera.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
+  Player.Camera.InvertVerticalMouseLook := InvertVerticalMouseLook;
+  { MouseLook is allowed always, even when player is dead.
+    Just like rotation keys.
+    Note that when Blocked, rotating will actually
+    be disabled by Input := []. But still mouse look will cause mouse
+    to remain hidden, which is good (why pop the mouse cursor on game
+    win animation?). }
+  Player.Camera.MouseLook := MouseLook;
+end;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -79,7 +111,7 @@ type
     MouseLookHorizontalSensitivitySlider: TMenuFloatSlider;
     MouseLookVerticalSensitivitySlider: TMenuFloatSlider;
     AutoOpenInventoryArgument: TMenuBooleanArgument;
-    UseMouseLookArgument: TMenuBooleanArgument;
+    MouseLookArgument: TMenuBooleanArgument;
     InvertVerticalMouseLookArgument: TMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
@@ -178,14 +210,14 @@ begin
   MouseLookVerticalSensitivitySlider := TMenuFloatSlider.Create(
     0.01, 0.3, MouseLookVerticalSensitivity);
   AutoOpenInventoryArgument := TMenuBooleanArgument.Create(AutoOpenInventory);
-  UseMouseLookArgument := TMenuBooleanArgument.Create(UseMouseLook);
+  MouseLookArgument := TMenuBooleanArgument.Create(MouseLook);
   InvertVerticalMouseLookArgument :=
     TMenuBooleanArgument.Create(InvertVerticalMouseLook);
 
   Items.Add('Configure basic controls');
   Items.Add('Configure items controls');
   Items.Add('Configure other controls');
-  Items.AddObject('Use mouse look', UseMouseLookArgument);
+  Items.AddObject('Use mouse look', MouseLookArgument);
   Items.AddObject('Mouse look horizontal sensitivity',
     MouseLookHorizontalSensitivitySlider);
   Items.AddObject('Mouse look vertical sensitivity',
@@ -208,8 +240,8 @@ begin
     1: begin ItemsControlsMenu.RefreshShortcuts; SetCurrentMenu(CurrentMenu, ItemsControlsMenu); end;
     2: begin OtherControlsMenu.RefreshShortcuts; SetCurrentMenu(CurrentMenu, OtherControlsMenu); end;
     3: begin
-         UseMouseLook := not UseMouseLook;
-         UseMouseLookArgument.Value := UseMouseLook;
+         MouseLook := not MouseLook;
+         MouseLookArgument.Value := MouseLook;
        end;
     4: ;
     5: ;
@@ -224,8 +256,8 @@ begin
     8: begin
          InputsAll.RestoreDefaults;
 
-         UseMouseLook := DefaultUseMouseLook;
-         UseMouseLookArgument.Value := UseMouseLook;
+         MouseLook := DefaultMouseLook;
+         MouseLookArgument.Value := MouseLook;
 
          InvertVerticalMouseLook := DefaultInvertVerticalMouseLook;
          InvertVerticalMouseLookArgument.Value := InvertVerticalMouseLook;
@@ -590,7 +622,42 @@ begin
   FreeAndNil(SubMenuTitleFont);
 end;
 
+{ TConfigOptions ------------------------------------------------------------- }
+
+type
+  TConfigOptions = class
+    class procedure LoadFromConfig(const Config: TCastleConfig);
+    class procedure SaveToConfig(const Config: TCastleConfig);
+  end;
+
+class procedure TConfigOptions.LoadFromConfig(const Config: TCastleConfig);
+begin
+  MouseLookHorizontalSensitivity := Config.GetFloat(
+    'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);
+  MouseLookVerticalSensitivity := Config.GetFloat(
+    'mouse/vertical_sensitivity', DefaultMouseLookVerticalSensitivity);
+  MouseLook := Config.GetValue(
+    'mouse/use_mouse_look', DefaultMouseLook);
+  InvertVerticalMouseLook := Config.GetValue(
+    'mouse/invert_vertical_mouse_look', DefaultInvertVerticalMouseLook);
+end;
+
+class procedure TConfigOptions.SaveToConfig(const Config: TCastleConfig);
+begin
+  Config.SetDeleteFloat('mouse/horizontal_sensitivity',
+    MouseLookHorizontalSensitivity, DefaultMouseLookHorizontalSensitivity);
+  Config.SetDeleteFloat('mouse/vertical_sensitivity',
+    MouseLookVerticalSensitivity, DefaultMouseLookVerticalSensitivity);
+  Config.SetDeleteValue('mouse/use_mouse_look',
+    MouseLook, DefaultMouseLook);
+  Config.SetDeleteValue('mouse/invert_vertical_mouse_look',
+    InvertVerticalMouseLook, DefaultInvertVerticalMouseLook);
+end;
+
 initialization
   OnGLContextOpen.Add(@WindowOpen);
   OnGLContextClose.Add(@WindowClose);
+
+  Config.OnLoad.Add(@TConfigOptions(nil).LoadFromConfig);
+  Config.OnSave.Add(@TConfigOptions(nil).SaveToConfig);
 end.

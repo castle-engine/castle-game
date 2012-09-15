@@ -536,14 +536,6 @@ begin
     Notifications.Show(SDeadMessage);
 end;
 
-{ Call this always when entering the game mode, or when UseMouseLook changes
-  while we're in game mode. }
-procedure UpdateMouseLook;
-begin
-  { Set Camera.MouseLook now, even though it's set in Player.Idle. }
-  Player.Camera.MouseLook := UseMouseLook;
-end;
-
 procedure EventDown(AKey: TKey;
   AMousePress: boolean; AMouseButton: TMouseButton;
   AMouseWheel: TMouseWheelDirection);
@@ -792,6 +784,7 @@ begin
     begin
       SceneManager.Paused := true;
       ShowGameMenu(GameControls);
+      PlayerUpdateMouseLook(Player);
       SceneManager.Paused := false;
     end;
   end;

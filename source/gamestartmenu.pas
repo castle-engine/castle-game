@@ -141,6 +141,9 @@ begin
       Notifications.Clear;
       Player := TPlayer.Create(nil);
       try
+        Player.Camera.Input_Run.MakeClear; { speed in castle1 is so fast that we're always running }
+        PlayerUpdateMouseLook(Player);
+
         SceneManager.Player := Player;
         SceneManager.Items.Add(Player);
 
