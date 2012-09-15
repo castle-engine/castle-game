@@ -73,7 +73,6 @@ begin
 
   Scene := TCastleScene.CreateCustomCache(Self, GLContextCache);
   Scene.Load(LoadX3DClassicFromString(VRMLContents, ''), true);
-  Scene.Attributes.UseSceneLights := true;
 
   Add(Scene);
 

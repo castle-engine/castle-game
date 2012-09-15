@@ -90,11 +90,6 @@ begin
     (since it scales image color down).
   Attributes.BlendingSourceFactor := GL_SRC_ALPHA;
   Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA; }
-
-  { main scene will override UseSceneLights back to @true,
-    for other scenes we ignore lights --- for historic reasons,
-    we couldn't support them well in the past. }
-  Attributes.UseSceneLights := false;
 end;
 
 class procedure TGameVideoOptions.LoadFromConfig(const Config: TCastleConfig);

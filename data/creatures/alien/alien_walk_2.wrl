@@ -20,21 +20,8 @@ Background {
 	skyAngle [ 1.57 ]
 }
 
-DEF OB_Lamp Transform {
-	translation 0.536681 -0.008029 0.600000
-	rotation 1.000000 0.000000 0.000000 0.000000
-	scale 1.000000 1.000000 1.000000
-	children [
-		DEF Lamp PointLight {
-			ambientIntensity 0.0
-			color 1.0 1.0 1.0
-			intensity 0.5714286
-			location 0.0 0.0 0.0
-			radius 20.0
-		}
-		
-	]
-}
+# Kambi manually removed light
+
 DEF OB_UVOBJECT Transform {
 	translation 100.000000 100.000000 0.000000
 	rotation 1.000000 0.000000 0.000000 0.000000
