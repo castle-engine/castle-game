@@ -14,7 +14,7 @@ Switch {
 		transparency 0.000000 
 	}
 	# Kambi: resource (item removed by hand)
-	# DEF ResScrFlying_1
+	# DEF CasResScrFlying_1
 	# Separator {
 	# 	Coordinate3 {
 	# 		point [
@@ -5423,7 +5423,7 @@ Separator {
 	# 		0.000000 -5.000000 0.000000 0.000000
 	# 		-118.696152 -351.833160 3.840779 1.000000
 	# 	}
-	# 	USE ResScrFlying_1
+	# 	USE CasResScrFlying_1
 	# }
 }
 }

@@ -3687,8 +3687,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien0_
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien0_
 	Separator {
 		Material {
 			diffuseColor [
@@ -3762,8 +3762,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_001
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_001
 	Separator {
 		Coordinate3 {
 			point [
@@ -3788,8 +3788,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_002
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_002
 	Separator {
 		Coordinate3 {
 			point [
@@ -3814,8 +3814,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_004
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_004
 	Separator {
 		Coordinate3 {
 			point [
@@ -3840,8 +3840,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_005
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_005
 	Separator {
 		Coordinate3 {
 			point [
@@ -3866,8 +3866,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_
 	Separator {
 		Coordinate3 {
 			point [
@@ -3892,8 +3892,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_006
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_006
 	Separator {
 		Coordinate3 {
 			point [
@@ -3918,8 +3918,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_007
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_007
 	Separator {
 		Coordinate3 {
 			point [
@@ -3944,8 +3944,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_008
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_008
 	Separator {
 		Coordinate3 {
 			point [
@@ -3970,8 +3970,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_008_001
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_008_001
 	Separator {
 		Coordinate3 {
 			point [
@@ -3996,8 +3996,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_010
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_010
 	Separator {
 		Coordinate3 {
 			point [
@@ -4022,8 +4022,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_011
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_011
 	Separator {
 		Coordinate3 {
 			point [
@@ -4048,8 +4048,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_012
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_012
 	Separator {
 		Coordinate3 {
 			point [
@@ -4074,8 +4074,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_012_001
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_012_001
 	Separator {
 		Coordinate3 {
 			point [
@@ -4100,8 +4100,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_012_002
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_012_002
 	Separator {
 		Coordinate3 {
 			point [
@@ -4126,8 +4126,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_012_003
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_012_003
 	Separator {
 		Coordinate3 {
 			point [
@@ -4152,8 +4152,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_013
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_013
 	Separator {
 		Coordinate3 {
 			point [
@@ -4178,8 +4178,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_1
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -4204,8 +4204,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20_2
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20_2
 	Separator {
 		Coordinate3 {
 			point [
@@ -4230,8 +4230,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_1
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -4256,8 +4256,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_1_001
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_1_001
 	Separator {
 		Material {
 			diffuseColor [
@@ -4331,8 +4331,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_1_002
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_1_002
 	Separator {
 		Material {
 			diffuseColor [
@@ -4406,8 +4406,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien20
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien20
 	Separator {
 		Coordinate3 {
 			point [
@@ -4432,8 +4432,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2
 	Separator {
 		Material {
 			diffuseColor [
@@ -4507,8 +4507,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_001
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_001
 	Separator {
 		Material {
 			diffuseColor [
@@ -4582,8 +4582,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_002
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_002
 	Separator {
 		Material {
 			diffuseColor [
@@ -4657,8 +4657,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_003
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_003
 	Separator {
 		Material {
 			diffuseColor [
@@ -4732,8 +4732,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_004
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_004
 	Separator {
 		Material {
 			diffuseColor [
@@ -4807,8 +4807,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_005
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_005
 	Separator {
 		Material {
 			diffuseColor [
@@ -4882,8 +4882,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_006
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_006
 	Separator {
 		Material {
 			diffuseColor [
@@ -4957,8 +4957,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_007
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_007
 	Separator {
 		Material {
 			diffuseColor [
@@ -5032,8 +5032,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_008
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_008
 	Separator {
 		Material {
 			diffuseColor [
@@ -5107,83 +5107,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_009
-	Separator {
-		Material {
-			diffuseColor [
-				 1.000000 1.000000 1.000000,
-				 1.000000 1.000000 1.000000,
-				 1.000000 1.000000 1.000000,
-				 1.000000 1.000000 1.000000,
-				 1.000000 1.000000 1.000000,
-				 1.000000 1.000000 1.000000,
-				 1.000000 1.000000 1.000000,
-				 1.000000 1.000000 1.000000,
-			]
-		}
-		MaterialBinding { value PER_VERTEX_INDEXED }
-		Coordinate3 {
-			point [
-				 10.400000 10.400004 -20.400002,
-				 10.400000 -10.400000 -20.400002,
-				 -10.400003 -10.399997 -20.400002,
-				 -10.399998 10.400008 -20.400002,
-				 10.400005 10.399998 10.400002,
-				 10.399993 -10.400007 10.400002,
-				 -10.400005 -10.399998 10.400002,
-				 -10.400001 10.400003 10.400002,
-			]
-		}
-		TextureCoordinate2 {
-			point [
-				 0.000000 1.000000,
-				 0.000000 0.000000,
-				 1.000000 0.000000,
-				 1.000000 1.000000,
-				 0.000000 1.000000,
-				 0.000000 0.000000,
-				 1.000000 0.000000,
-				 1.000000 1.000000,
-				 0.000000 1.000000,
-				 0.000000 0.000000,
-				 1.000000 0.000000,
-				 1.000000 1.000000,
-				 0.000000 1.000000,
-				 0.000000 0.000000,
-				 1.000000 0.000000,
-				 1.000000 1.000000,
-				 0.000000 1.000000,
-				 0.000000 0.000000,
-				 1.000000 0.000000,
-				 1.000000 1.000000,
-				 0.000000 1.000000,
-				 0.000000 0.000000,
-				 1.000000 0.000000,
-				 1.000000 1.000000,
-			]
-		}
-		IndexedFaceSet {
-			coordIndex [
-				 0, 1, 2, 3, -1,
-				 4, 7, 6, 5, -1,
-				 0, 4, 5, 1, -1,
-				 1, 5, 6, 2, -1,
-				 2, 6, 7, 3, -1,
-				 4, 0, 3, 7, -1,
-			]
-			textureCoordIndex [
-				 0, 1, 2, 3, -1,
-				 4, 5, 6, 7, -1,
-				 8, 9, 10, 11, -1,
-				 12, 13, 14, 15, -1,
-				 16, 17, 18, 19, -1,
-				 20, 21, 22, 23, -1,
-			]
-		}
-	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_010
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_009
 	Separator {
 		Material {
 			diffuseColor [
@@ -5257,8 +5182,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_011
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_010
 	Separator {
 		Material {
 			diffuseColor [
@@ -5332,8 +5257,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_012
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_011
 	Separator {
 		Material {
 			diffuseColor [
@@ -5407,8 +5332,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_013
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_012
 	Separator {
 		Material {
 			diffuseColor [
@@ -5482,8 +5407,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_014
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_013
 	Separator {
 		Material {
 			diffuseColor [
@@ -5557,8 +5482,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_015
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_014
 	Separator {
 		Material {
 			diffuseColor [
@@ -5632,8 +5557,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResDoomBarrel_2_016
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_015
 	Separator {
 		Material {
 			diffuseColor [
@@ -5707,8 +5632,83 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResGhost40
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResDoomBarrel_2_016
+	Separator {
+		Material {
+			diffuseColor [
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+				 1.000000 1.000000 1.000000,
+			]
+		}
+		MaterialBinding { value PER_VERTEX_INDEXED }
+		Coordinate3 {
+			point [
+				 10.400000 10.400004 -20.400002,
+				 10.400000 -10.400000 -20.400002,
+				 -10.400003 -10.399997 -20.400002,
+				 -10.399998 10.400008 -20.400002,
+				 10.400005 10.399998 10.400002,
+				 10.399993 -10.400007 10.400002,
+				 -10.400005 -10.399998 10.400002,
+				 -10.400001 10.400003 10.400002,
+			]
+		}
+		TextureCoordinate2 {
+			point [
+				 0.000000 1.000000,
+				 0.000000 0.000000,
+				 1.000000 0.000000,
+				 1.000000 1.000000,
+				 0.000000 1.000000,
+				 0.000000 0.000000,
+				 1.000000 0.000000,
+				 1.000000 1.000000,
+				 0.000000 1.000000,
+				 0.000000 0.000000,
+				 1.000000 0.000000,
+				 1.000000 1.000000,
+				 0.000000 1.000000,
+				 0.000000 0.000000,
+				 1.000000 0.000000,
+				 1.000000 1.000000,
+				 0.000000 1.000000,
+				 0.000000 0.000000,
+				 1.000000 0.000000,
+				 1.000000 1.000000,
+				 0.000000 1.000000,
+				 0.000000 0.000000,
+				 1.000000 0.000000,
+				 1.000000 1.000000,
+			]
+		}
+		IndexedFaceSet {
+			coordIndex [
+				 0, 1, 2, 3, -1,
+				 4, 7, 6, 5, -1,
+				 0, 4, 5, 1, -1,
+				 1, 5, 6, 2, -1,
+				 2, 6, 7, 3, -1,
+				 4, 0, 3, 7, -1,
+			]
+			textureCoordIndex [
+				 0, 1, 2, 3, -1,
+				 4, 5, 6, 7, -1,
+				 8, 9, 10, 11, -1,
+				 12, 13, 14, 15, -1,
+				 16, 17, 18, 19, -1,
+				 20, 21, 22, 23, -1,
+			]
+		}
+	}
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResGhost40
 	Separator {
 		Coordinate3 {
 			point [
@@ -5733,8 +5733,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResWerewolf60
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResWerewolf60
 	Separator {
 		Coordinate3 {
 			point [
@@ -5759,8 +5759,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResWerewolf60_1
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResWerewolf60_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -5785,8 +5785,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResWerewolf60_2
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResWerewolf60_2
 	Separator {
 		Coordinate3 {
 			point [
@@ -5811,8 +5811,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResWerewolf60_2_002
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResWerewolf60_2_002
 	Separator {
 		Coordinate3 {
 			point [
@@ -5912,8 +5912,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResQuiver10 # Kambi: 10 by hand
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResQuiver10 # Kambi: 10 by hand
 	Separator {
 		Coordinate3 {
 			point [
@@ -5938,8 +5938,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResQuiver5 # Kambi: 5 by hand
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResQuiver5 # Kambi: 5 by hand
 	Separator {
 		Coordinate3 {
 			point [
@@ -5964,8 +5964,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResQuiver5_ # Kambi: 5 by hand
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResQuiver5_ # Kambi: 5 by hand
 	Separator {
 		Coordinate3 {
 			point [
@@ -5990,8 +5990,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResQuiver5__001 # Kambi: 5 by hand
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResQuiver5__001 # Kambi: 5 by hand
 	Separator {
 		Coordinate3 {
 			point [
@@ -6016,8 +6016,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResQuiver5__002 # Kambi: 5 by hand
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResQuiver5__002 # Kambi: 5 by hand
 	Separator {
 		Coordinate3 {
 			point [
@@ -6042,8 +6042,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomArmor_1_005
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomArmor_1_005
 	Separator {
 		Coordinate3 {
 			point [
@@ -6068,8 +6068,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomBlueArmor
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomBlueArmor
 	Separator {
 		Coordinate3 {
 			point [
@@ -6094,8 +6094,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -6120,8 +6120,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1_001
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1_001
 	Separator {
 		Coordinate3 {
 			point [
@@ -6146,8 +6146,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1_002
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1_002
 	Separator {
 		Coordinate3 {
 			point [
@@ -6172,8 +6172,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1_003
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1_003
 	Separator {
 		Coordinate3 {
 			point [
@@ -6198,8 +6198,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1_004
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1_004
 	Separator {
 		Coordinate3 {
 			point [
@@ -6224,8 +6224,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1_005
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1_005
 	Separator {
 		Coordinate3 {
 			point [
@@ -6250,8 +6250,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1_006
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1_006
 	Separator {
 		Coordinate3 {
 			point [
@@ -6276,8 +6276,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1_007
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1_007
 	Separator {
 		Coordinate3 {
 			point [
@@ -6302,8 +6302,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1_009
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1_009
 	Separator {
 		Coordinate3 {
 			point [
@@ -6328,8 +6328,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_1_010
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_1_010
 	Separator {
 		Coordinate3 {
 			point [
@@ -6354,8 +6354,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_2
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_2
 	Separator {
 		Coordinate3 {
 			point [
@@ -6380,8 +6380,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_2_001
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_2_001
 	Separator {
 		Coordinate3 {
 			point [
@@ -6406,8 +6406,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_2_002
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_2_002
 	Separator {
 		Coordinate3 {
 			point [
@@ -6432,8 +6432,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_2_003
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_2_003
 	Separator {
 		Coordinate3 {
 			point [
@@ -6458,8 +6458,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_2_004
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_2_004
 	Separator {
 		Coordinate3 {
 			point [
@@ -6484,8 +6484,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_2_005
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_2_005
 	Separator {
 		Coordinate3 {
 			point [
@@ -6510,8 +6510,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmArmor_2_006
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmArmor_2_006
 	Separator {
 		Coordinate3 {
 			point [
@@ -6536,8 +6536,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmHeal_1
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmHeal_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -6562,8 +6562,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmHeal_1_001
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmHeal_1_001
 	Separator {
 		Coordinate3 {
 			point [
@@ -6588,8 +6588,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmHeal_1_002
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmHeal_1_002
 	Separator {
 		Coordinate3 {
 			point [
@@ -6614,8 +6614,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmHeal_1_003
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmHeal_1_003
 	Separator {
 		Coordinate3 {
 			point [
@@ -6640,8 +6640,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmHeal_1_004
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmHeal_1_004
 	Separator {
 		Coordinate3 {
 			point [
@@ -6666,8 +6666,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResDoomSmHeal_1_005
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResDoomSmHeal_1_005
 	Separator {
 		Coordinate3 {
 			point [
@@ -6692,8 +6692,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResLifePotion1_
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResLifePotion1_
 	Separator {
 		Coordinate3 {
 			point [
@@ -6718,8 +6718,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResLifePotion1__001
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResLifePotion1__001
 	Separator {
 		Coordinate3 {
 			point [
@@ -6744,8 +6744,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResLifePotion_
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResLifePotion_
 	Separator {
 		Coordinate3 {
 			point [
@@ -6770,8 +6770,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResLifePotion_1
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResLifePotion_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -6796,8 +6796,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResLifePotion_2
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResLifePotion_2
 	Separator {
 		Coordinate3 {
 			point [
@@ -6822,8 +6822,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResLifePotion_3
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResLifePotion_3
 	Separator {
 		Coordinate3 {
 			point [
@@ -6848,8 +6848,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResSword_1
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResSword_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -7181,7 +7181,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-3087.104980 -10.675739 -4315.530273 1.000000
 		}
-		USE ResDoomBarrel_2
+		USE CasResDoomBarrel_2
 	}
 	Separator {
 		MatrixTransform {
@@ -7191,7 +7191,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-1813.570923 -55.532288 -3262.852783 1.000000
 		}
-		USE ResDoomBlueArmor
+		USE CasResDoomBlueArmor
 	}
 	Separator {
 		MatrixTransform {
@@ -7201,7 +7201,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-3439.615234 121.530045 -2963.592041 1.000000
 		}
-		USE ResDoomSmArmor_2_006
+		USE CasResDoomSmArmor_2_006
 	}
 	Separator {
 		MatrixTransform {
@@ -7211,7 +7211,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-3580.951172 121.530045 -2998.489746 1.000000
 		}
-		USE ResDoomSmArmor_2_005
+		USE CasResDoomSmArmor_2_005
 	}
 	Separator {
 		MatrixTransform {
@@ -7221,7 +7221,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-3652.685547 121.530037 -3131.198242 1.000000
 		}
-		USE ResDoomSmArmor_2_004
+		USE CasResDoomSmArmor_2_004
 	}
 	Separator {
 		MatrixTransform {
@@ -7231,7 +7231,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-3720.833008 121.530037 -3242.386230 1.000000
 		}
-		USE ResDoomSmArmor_2_003
+		USE CasResDoomSmArmor_2_003
 	}
 	Separator {
 		MatrixTransform {
@@ -7241,7 +7241,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-3649.098633 121.530029 -3364.334473 1.000000
 		}
-		USE ResDoomSmArmor_2_002
+		USE CasResDoomSmArmor_2_002
 	}
 	Separator {
 		MatrixTransform {
@@ -7251,7 +7251,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-3620.405029 121.530022 -3507.802979 1.000000
 		}
-		USE ResDoomSmArmor_2_001
+		USE CasResDoomSmArmor_2_001
 	}
 	Separator {
 		MatrixTransform {
@@ -7261,7 +7261,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-3645.511963 121.530014 -3669.205078 1.000000
 		}
-		USE ResDoomSmArmor_2
+		USE CasResDoomSmArmor_2
 	}
 	Separator {
 		MatrixTransform {
@@ -7281,7 +7281,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-1014.947998 11.216401 -2911.220947 1.000000
 		}
-		USE ResDoomSmArmor_1
+		USE CasResDoomSmArmor_1
 	}
 	Separator {
 		MatrixTransform {
@@ -7291,7 +7291,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-1692.283691 11.216427 -2135.138916 1.000000
 		}
-		USE ResDoomSmArmor_1_010
+		USE CasResDoomSmArmor_1_010
 	}
 	Separator {
 		MatrixTransform {
@@ -7301,7 +7301,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-1701.757812 11.216408 -2724.431641 1.000000
 		}
-		USE ResDoomSmArmor_1_009
+		USE CasResDoomSmArmor_1_009
 	}
 	Separator {
 		MatrixTransform {
@@ -7311,7 +7311,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-2266.417725 35.216415 -2540.633057 1.000000
 		}
-		USE ResDoomSmArmor_1_007
+		USE CasResDoomSmArmor_1_007
 	}
 	Separator {
 		MatrixTransform {
@@ -7321,7 +7321,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-2266.417725 35.216415 -2320.633057 1.000000
 		}
-		USE ResDoomSmArmor_1_006
+		USE CasResDoomSmArmor_1_006
 	}
 	Separator {
 		MatrixTransform {
@@ -7331,7 +7331,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-2236.417725 35.207855 -2320.633057 1.000000
 		}
-		USE ResDoomSmArmor_1_005
+		USE CasResDoomSmArmor_1_005
 	}
 	Separator {
 		MatrixTransform {
@@ -7341,7 +7341,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			225.582275 142.216415 -3229.633057 1.000000
 		}
-		USE ResDoomArmor_1_005
+		USE CasResDoomArmor_1_005
 	}
 	Separator {
 		MatrixTransform {
@@ -7351,7 +7351,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			145.582275 116.219032 -3229.633057 1.000000
 		}
-		USE ResDoomSmArmor_1_004
+		USE CasResDoomSmArmor_1_004
 	}
 	Separator {
 		MatrixTransform {
@@ -7361,7 +7361,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			95.582275 116.219032 -3229.633057 1.000000
 		}
-		USE ResDoomSmArmor_1_003
+		USE CasResDoomSmArmor_1_003
 	}
 	Separator {
 		MatrixTransform {
@@ -7371,7 +7371,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-116.589966 12.216387 -3093.347168 1.000000
 		}
-		USE ResDoomSmHeal_1_005
+		USE CasResDoomSmHeal_1_005
 	}
 	Separator {
 		MatrixTransform {
@@ -7381,7 +7381,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-136.589966 12.216387 -3153.347168 1.000000
 		}
-		USE ResDoomSmHeal_1_004
+		USE CasResDoomSmHeal_1_004
 	}
 	Separator {
 		MatrixTransform {
@@ -7391,7 +7391,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-136.589966 12.216387 -3313.347168 1.000000
 		}
-		USE ResDoomSmHeal_1_003
+		USE CasResDoomSmHeal_1_003
 	}
 	Separator {
 		MatrixTransform {
@@ -7401,7 +7401,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-116.589966 12.216387 -3373.347168 1.000000
 		}
-		USE ResDoomSmHeal_1_002
+		USE CasResDoomSmHeal_1_002
 	}
 	Separator {
 		MatrixTransform {
@@ -7411,7 +7411,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-424.417725 12.216414 -3429.633057 1.000000
 		}
-		USE ResDoomSmArmor_1_002
+		USE CasResDoomSmArmor_1_002
 	}
 	Separator {
 		MatrixTransform {
@@ -7421,7 +7421,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-424.417725 12.216414 -3029.633057 1.000000
 		}
-		USE ResDoomSmArmor_1_001
+		USE CasResDoomSmArmor_1_001
 	}
 	Separator {
 		MatrixTransform {
@@ -7471,7 +7471,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-736.589966 12.216387 -3523.347168 1.000000
 		}
-		USE ResDoomSmHeal_1_001
+		USE CasResDoomSmHeal_1_001
 	}
 	Separator {
 		MatrixTransform {
@@ -7481,7 +7481,7 @@ Switch {
 			0.000000 -1.000000 0.000000 0.000000
 			-1316.589966 12.216387 -3523.347168 1.000000
 		}
-		USE ResDoomSmHeal_1
+		USE CasResDoomSmHeal_1
 	}
 	Separator {
 		MatrixTransform {
@@ -7506,7 +7506,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3321.322754 58.166256 -3085.247314 1.000000
 		}
-		USE ResDoomBarrel_2_016
+		USE CasResDoomBarrel_2_016
 	}
 	Separator {
 		MatrixTransform {
@@ -7516,7 +7516,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3308.837646 26.139202 -3079.004639 1.000000
 		}
-		USE ResDoomBarrel_2_015
+		USE CasResDoomBarrel_2_015
 	}
 	Separator {
 		MatrixTransform {
@@ -7526,7 +7526,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3313.723145 -5.616435 -3079.004883 1.000000
 		}
-		USE ResDoomBarrel_2_014
+		USE CasResDoomBarrel_2_014
 	}
 	Separator {
 		MatrixTransform {
@@ -7536,7 +7536,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3322.679932 26.139202 -3103.160645 1.000000
 		}
-		USE ResDoomBarrel_2_013
+		USE CasResDoomBarrel_2_013
 	}
 	Separator {
 		MatrixTransform {
@@ -7546,7 +7546,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3338.150635 -5.616436 -3104.517822 1.000000
 		}
-		USE ResDoomBarrel_2_012
+		USE CasResDoomBarrel_2_012
 	}
 	Separator {
 		MatrixTransform {
@@ -7556,7 +7556,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3333.602783 -5.616436 -3134.205811 1.000000
 		}
-		USE ResDoomBarrel_2_011
+		USE CasResDoomBarrel_2_011
 	}
 	Separator {
 		MatrixTransform {
@@ -7566,7 +7566,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3309.923340 -5.616436 -3107.503418 1.000000
 		}
-		USE ResDoomBarrel_2_010
+		USE CasResDoomBarrel_2_010
 	}
 	Separator {
 		MatrixTransform {
@@ -7576,7 +7576,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3320.350830 -36.746571 -3150.678955 1.000000
 		}
-		USE ResDoomBarrel_2_009
+		USE CasResDoomBarrel_2_009
 	}
 	Separator {
 		MatrixTransform {
@@ -7586,7 +7586,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3295.816406 -36.746571 -3122.114258 1.000000
 		}
-		USE ResDoomBarrel_2_008
+		USE CasResDoomBarrel_2_008
 	}
 	Separator {
 		MatrixTransform {
@@ -7596,7 +7596,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3292.623779 -36.746571 -3165.562744 1.000000
 		}
-		USE ResDoomBarrel_2_007
+		USE CasResDoomBarrel_2_007
 	}
 	Separator {
 		MatrixTransform {
@@ -7606,7 +7606,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3262.181641 -36.746571 -3131.884766 1.000000
 		}
-		USE ResDoomBarrel_2_006
+		USE CasResDoomBarrel_2_006
 	}
 	Separator {
 		MatrixTransform {
@@ -7616,7 +7616,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3330.580078 -36.746571 -3117.075928 1.000000
 		}
-		USE ResDoomBarrel_2_005
+		USE CasResDoomBarrel_2_005
 	}
 	Separator {
 		MatrixTransform {
@@ -7626,7 +7626,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3361.233887 -36.746571 -3142.825195 1.000000
 		}
-		USE ResDoomBarrel_2_004
+		USE CasResDoomBarrel_2_004
 	}
 	Separator {
 		MatrixTransform {
@@ -7636,7 +7636,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3310.009277 -36.746571 -3084.049805 1.000000
 		}
-		USE ResDoomBarrel_2_003
+		USE CasResDoomBarrel_2_003
 	}
 	Separator {
 		MatrixTransform {
@@ -7646,7 +7646,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3011.271240 -12.088376 -4454.234375 1.000000
 		}
-		USE ResAlien20_012_003
+		USE CasResAlien20_012_003
 	}
 	Separator {
 		MatrixTransform {
@@ -7656,7 +7656,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3010.192627 -12.088390 -4756.773926 1.000000
 		}
-		USE ResWerewolf60
+		USE CasResWerewolf60
 	}
 	Separator {
 		MatrixTransform {
@@ -7666,7 +7666,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2744.877930 -12.088367 -4163.831055 1.000000
 		}
-		USE ResLifePotion_3
+		USE CasResLifePotion_3
 	}
 	Separator {
 		MatrixTransform {
@@ -7676,7 +7676,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3269.832275 -12.088367 -4163.831055 1.000000
 		}
-		USE ResLifePotion_2
+		USE CasResLifePotion_2
 	}
 	Separator {
 		MatrixTransform {
@@ -7686,7 +7686,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2798.881836 -10.675734 -4163.475586 1.000000
 		}
-		USE ResDoomBarrel_2_002
+		USE CasResDoomBarrel_2_002
 	}
 	Separator {
 		MatrixTransform {
@@ -7696,7 +7696,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3214.195557 -10.675734 -4163.475586 1.000000
 		}
-		USE ResDoomBarrel_2_001
+		USE CasResDoomBarrel_2_001
 	}
 	Separator {
 		MatrixTransform {
@@ -7736,7 +7736,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3261.447998 -34.912067 -3923.268799 1.000000
 		}
-		USE ResQuiver5__002 # Kambi: 5 by hand
+		USE CasResQuiver5__002 # Kambi: 5 by hand
 	}
 	Separator {
 		MatrixTransform {
@@ -7746,7 +7746,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3267.472656 -34.050842 -3785.663574 1.000000
 		}
-		USE ResLifePotion1__001
+		USE CasResLifePotion1__001
 	}
 	Separator {
 		MatrixTransform {
@@ -7756,7 +7756,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3266.979980 -34.711971 -3851.727295 1.000000
 		}
-		USE ResAlien20_008_001
+		USE CasResAlien20_008_001
 	}
 	Separator {
 		MatrixTransform {
@@ -7806,7 +7806,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2446.164551 -118.493744 -3982.293945 1.000000
 		}
-		USE ResQuiver5__001 # Kambi: 5 by hand
+		USE CasResQuiver5__001 # Kambi: 5 by hand
 	}
 	Separator {
 		MatrixTransform {
@@ -7816,7 +7816,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2131.240723 -121.403122 -3947.982422 1.000000
 		}
-		USE ResLifePotion1_
+		USE CasResLifePotion1_
 	}
 	Separator {
 		MatrixTransform {
@@ -7826,7 +7826,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2311.240723 -121.403122 -4027.982422 1.000000
 		}
-		USE ResAlien20_012_002
+		USE CasResAlien20_012_002
 	}
 	Separator {
 		MatrixTransform {
@@ -7836,7 +7836,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2587.512695 -121.403114 -3901.122803 1.000000
 		}
-		USE ResAlien20_012_001
+		USE CasResAlien20_012_001
 	}
 	Separator {
 		MatrixTransform {
@@ -7846,7 +7846,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2107.604736 162.430557 -3328.624023 1.000000
 		}
-		USE ResGhost40
+		USE CasResGhost40
 	}
 	Separator {
 		MatrixTransform {
@@ -7856,7 +7856,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3260.754395 -12.088369 -4259.148926 1.000000
 		}
-		USE ResAlien20_013
+		USE CasResAlien20_013
 	}
 	Separator {
 		MatrixTransform {
@@ -7866,7 +7866,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2770.754395 -12.088369 -4259.148926 1.000000
 		}
-		USE ResAlien20_012
+		USE CasResAlien20_012
 	}
 	Separator {
 		MatrixTransform {
@@ -7876,7 +7876,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3010.754395 -12.088369 -4099.148926 1.000000
 		}
-		USE ResAlien20_011
+		USE CasResAlien20_011
 	}
 	Separator {
 		MatrixTransform {
@@ -7886,7 +7886,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3387.083252 109.610344 -3507.175293 1.000000
 		}
-		USE ResAlien20_010
+		USE CasResAlien20_010
 	}
 	Separator {
 		MatrixTransform {
@@ -7896,7 +7896,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3010.754395 -12.088352 -3584.063232 1.000000
 		}
-		USE ResAlien20_008
+		USE CasResAlien20_008
 	}
 	Separator {
 		MatrixTransform {
@@ -7906,7 +7906,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3118.622559 -10.389651 -3433.047852 1.000000
 		}
-		USE ResAlien20_007
+		USE CasResAlien20_007
 	}
 	Separator {
 		MatrixTransform {
@@ -7916,7 +7916,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2895.695068 -6.346581 -2757.073730 1.000000
 		}
-		USE ResAlien20_006
+		USE CasResAlien20_006
 	}
 	Separator {
 		MatrixTransform {
@@ -7926,7 +7926,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-3030.634033 -10.581139 -3043.770020 1.000000
 		}
-		USE ResWerewolf60_2_002
+		USE CasResWerewolf60_2_002
 	}
 	Separator {
 		MatrixTransform {
@@ -7957,7 +7957,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-116.589966 12.216387 -3373.347168 1.000000
 		}
-		USE ResQuiver5_ # Kambi: 5 by hand
+		USE CasResQuiver5_ # Kambi: 5 by hand
 	}
 	Separator {
 		MatrixTransform {
@@ -7967,7 +7967,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-116.589966 12.216387 -3093.347168 1.000000
 		}
-		USE ResQuiver10 # Kambi: 10 by hand
+		USE CasResQuiver10 # Kambi: 10 by hand
 	}
 	Separator {
 		MatrixTransform {
@@ -7977,7 +7977,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-1701.757812 11.216408 -2724.431641 1.000000
 		}
-		USE ResLifePotion_
+		USE CasResLifePotion_
 	}
 	Separator {
 		MatrixTransform {
@@ -7987,7 +7987,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			225.582275 142.216415 -3229.633057 1.000000
 		}
-		USE ResSword_1
+		USE CasResSword_1
 	}
 	Separator {
 		MatrixTransform {
@@ -8007,7 +8007,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2692.939209 8.626050 -2639.905273 1.000000
 		}
-		USE ResAlien20
+		USE CasResAlien20
 	}
 	Separator {
 		MatrixTransform {
@@ -8017,7 +8017,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2390.745605 10.911684 -2438.418701 1.000000
 		}
-		USE ResAlien20_2
+		USE CasResAlien20_2
 	}
 	Separator {
 		MatrixTransform {
@@ -8027,7 +8027,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2232.616943 35.207855 -2525.429443 1.000000
 		}
-		USE ResQuiver5 # Kambi: 5 by hand
+		USE CasResQuiver5 # Kambi: 5 by hand
 	}
 	Separator {
 		MatrixTransform {
@@ -8037,7 +8037,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-1731.808105 10.911674 -2703.170410 1.000000
 		}
-		USE ResAlien20_001
+		USE CasResAlien20_001
 	}
 	Separator {
 		MatrixTransform {
@@ -8047,7 +8047,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-1720.685303 10.911690 -2154.610840 1.000000
 		}
-		USE ResAlien20_
+		USE CasResAlien20_
 	}
 	Separator {
 		MatrixTransform {
@@ -8057,7 +8057,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2254.578613 35.903122 -2402.855469 1.000000
 		}
-		USE ResWerewolf60_1
+		USE CasResWerewolf60_1
 	}
 	Separator {
 		MatrixTransform {
@@ -8067,7 +8067,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2257.578613 34.903122 -2482.855469 1.000000
 		}
-		USE ResWerewolf60_2
+		USE CasResWerewolf60_2
 	}
 	Separator {
 		MatrixTransform {
@@ -8077,7 +8077,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-2253.578613 34.903122 -2442.855469 1.000000
 		}
-		USE ResAlien20_1
+		USE CasResAlien20_1
 	}
 	Separator {
 		MatrixTransform {
@@ -8087,7 +8087,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			115.421524 117.911682 -3272.855469 1.000000
 		}
-		USE ResAlien20_004
+		USE CasResAlien20_004
 	}
 	Separator {
 		MatrixTransform {
@@ -8097,7 +8097,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			115.421524 117.911682 -3172.855469 1.000000
 		}
-		USE ResAlien20_005
+		USE CasResAlien20_005
 	}
 	Separator {
 		MatrixTransform {
@@ -8107,7 +8107,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-192.132751 12.216387 -3093.347168 1.000000
 		}
-		USE ResAlien20_002
+		USE CasResAlien20_002
 	}
 	Separator {
 		MatrixTransform {
@@ -8137,7 +8137,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-1089.375122 12.216405 -3225.859863 1.000000
 		}
-		USE ResAlien0_
+		USE CasResAlien0_
 	}
 	Separator {
 		MatrixTransform {
@@ -8147,7 +8147,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-866.845154 12.216406 -3298.474854 1.000000
 		}
-		USE ResDoomBarrel_1_002
+		USE CasResDoomBarrel_1_002
 	}
 	Separator {
 		MatrixTransform {
@@ -8157,7 +8157,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-1316.589844 12.216399 -3263.338623 1.000000
 		}
-		USE ResDoomBarrel_1_001
+		USE CasResDoomBarrel_1_001
 	}
 	Separator {
 		MatrixTransform {
@@ -8167,7 +8167,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-1154.962891 12.216414 -2909.633057 1.000000
 		}
-		USE ResDoomBarrel_1
+		USE CasResDoomBarrel_1
 	}
 	Separator {
 		MatrixTransform {
@@ -8177,7 +8177,7 @@ Separator {
 			0.000000 -1.000000 0.000000 0.000000
 			-1014.417725 12.216414 -2909.633057 1.000000
 		}
-		USE ResLifePotion_1
+		USE CasResLifePotion_1
 	}
 	Separator {
 		MatrixTransform {

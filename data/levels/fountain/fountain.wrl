@@ -29988,19 +29988,19 @@ DEF OB_Curve Transform {
 		}
 	]
 }
-# Kambi Item->Res rename by hand
-DEF OB_ResLifePotion_001 Transform {
+# Kambi Item->CasRes rename by hand
+DEF OB_CasResLifePotion_001 Transform {
 	translation -5.201140 -5.111720 2.000000
 	rotation 1.000000 0.000000 0.000000 1.570796
 	scale 1.000000 1.000000 1.000000
 	children [
-		DEF ME_ResLifePotion Group {
+		DEF ME_CasResLifePotion Group {
 			children [
 				Shape {
 					appearance Appearance {
 					}
 					geometry IndexedLineSet {
-						coord DEF coord_ResLifePotion Coordinate {
+						coord DEF coord_CasResLifePotion Coordinate {
 							point [
 1.0 1.00000011921 -1.00000011921
  1.0 -1.00000011921 -1.00000011921
@@ -30027,27 +30027,27 @@ DEF OB_ResLifePotion_001 Transform {
 		}
 	]
 }
-DEF OB_ResLifePotion Transform {
+DEF OB_CasResLifePotion Transform {
 	translation 4.798860 -5.111720 2.000000
 	rotation 1.000000 0.000000 0.000000 1.570796
 	scale 1.000000 1.000000 1.000000
 	children [
-		USE ME_ResLifePotion
+		USE ME_CasResLifePotion
 	]
 }
-# Kambi: Crea->Res rename by hand
-DEF OB_ResAlien Transform {
+# Kambi: Crea->CasRes rename by hand
+DEF OB_CasResAlien Transform {
 	translation -0.614636 15.750043 2.000000
 	rotation 1.000000 0.000000 0.000000 1.570796
 	scale 1.000000 1.000000 1.000000
 	children [
-		DEF ME_ResAlien Group {
+		DEF ME_CasResAlien Group {
 			children [
 				Shape {
 					appearance Appearance {
 					}
 					geometry IndexedLineSet {
-						coord DEF coord_ResAlien Coordinate {
+						coord DEF coord_CasResAlien Coordinate {
 							point [
 1.0 1.00000011921 -1.00000011921
  1.0 -1.00000011921 -1.00000011921
@@ -30074,12 +30074,12 @@ DEF OB_ResAlien Transform {
 		}
 	]
 }
-DEF OB_ObjLevelBox Transform {
+DEF OB_ObjCasMoveLimit Transform {
 	translation -0.115111 -0.038370 0.000000
 	rotation 1.000000 0.000000 0.000000 0.000000
 	scale 10.500000 10.500000 1.000000
 	children [
-		DEF ME_LevelBox Group {
+		DEF ME_CasMoveLimit Group { # Kambi LevelBox -> CasMoveLimit
 			children [
 				Shape {
 					appearance Appearance {

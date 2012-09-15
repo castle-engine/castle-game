@@ -41,8 +41,8 @@ Switch {
 		shininess 0.500000 
 		transparency 0.000000 
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien_1
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -67,8 +67,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien_2
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien_2
 	Separator {
 		Coordinate3 {
 			point [
@@ -93,8 +93,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien_3
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien_3
 	Separator {
 		Coordinate3 {
 			point [
@@ -119,8 +119,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Crea->Res by hand
-	DEF ResAlien_4
+	# Kambi: renamed Crea->CasRes by hand
+	DEF CasResAlien_4
 	Separator {
 		Coordinate3 {
 			point [
@@ -170,8 +170,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResQuiver20 # Kambi: 20 by hand
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResQuiver20 # Kambi: 20 by hand
 	Separator {
 		Coordinate3 {
 			point [
@@ -196,8 +196,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResBow1
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResBow1
 	Separator {
 		Coordinate3 {
 			point [
@@ -222,8 +222,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResLifePotion_1
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResLifePotion_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -248,8 +248,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResLifePotion_2
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResLifePotion_2
 	Separator {
 		Coordinate3 {
 			point [
@@ -274,8 +274,8 @@ Switch {
 			]
 		}
 	}
-	# Kambi: renamed Item->Res by hand
-	DEF ResScrFlying_1
+	# Kambi: renamed Item->CasRes by hand
+	DEF CasResScrFlying_1
 	Separator {
 		Coordinate3 {
 			point [
@@ -300,7 +300,7 @@ Switch {
 			]
 		}
 	}
-	DEF LevelBox
+	DEF CasMoveLimit
 	Separator {
 		Coordinate3 {
 			point [
@@ -19768,7 +19768,7 @@ Switch {
 			]
 		}
 	}
-	DEF Sector0_
+	DEF CasSector0_
 	Separator {
 		Coordinate3 {
 			point [
@@ -19793,7 +19793,7 @@ Switch {
 			]
 		}
 	}
-	DEF Sector1_
+	DEF CasSector1_
 	Separator {
 		Coordinate3 {
 			point [
@@ -19818,7 +19818,7 @@ Switch {
 			]
 		}
 	}
-	DEF Sector2_
+	DEF CasSector2_
 	Separator {
 		Coordinate3 {
 			point [
@@ -19843,7 +19843,7 @@ Switch {
 			]
 		}
 	}
-	DEF Sector3_
+	DEF CasSector3_
 	Separator {
 		Coordinate3 {
 			point [
@@ -19904,7 +19904,7 @@ Switch {
 			]
 		}
 	}
-	DEF Sector4_
+	DEF CasSector4_
 	Separator {
 		Coordinate3 {
 			point [
@@ -19929,7 +19929,7 @@ Switch {
 			]
 		}
 	}
-	DEF Waypoint0_
+	DEF CasWaypoint0_
 	Separator {
 		Coordinate3 {
 			point [
@@ -19954,7 +19954,7 @@ Switch {
 			]
 		}
 	}
-	DEF Waypoint1_
+	DEF CasWaypoint1_
 	Separator {
 		Coordinate3 {
 			point [
@@ -19979,7 +19979,7 @@ Switch {
 			]
 		}
 	}
-	DEF Waypoint2_
+	DEF CasWaypoint2_
 	Separator {
 		Coordinate3 {
 			point [
@@ -20004,7 +20004,7 @@ Switch {
 			]
 		}
 	}
-	DEF Waypoint3_
+	DEF CasWaypoint3_
 	Separator {
 		Coordinate3 {
 			point [
@@ -20185,7 +20185,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			0.339242 50.256256 0.000000 1.000000
 		}
-		USE Waypoint2_
+		USE CasWaypoint2_
 	}
 	Separator {
 		MatrixTransform {
@@ -20195,7 +20195,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			0.339242 50.256256 0.000000 1.000000
 		}
-		USE Waypoint3_
+		USE CasWaypoint3_
 	}
 	Separator {
 		MatrixTransform {
@@ -20205,7 +20205,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			1.000012 82.535934 1.000000 1.000000
 		}
-		USE Sector4_
+		USE CasSector4_
 	}
 	Separator {
 		MatrixTransform {
@@ -20215,7 +20215,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			0.311616 42.646732 1.000000 1.000000
 		}
-		USE Sector3_
+		USE CasSector3_
 	}
 	Separator {
 		MatrixTransform {
@@ -20225,7 +20225,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-0.403190 -50.741295 2.974308 1.000000
 		}
-		USE Waypoint1_
+		USE CasWaypoint1_
 	}
 	Separator {
 		MatrixTransform {
@@ -20235,7 +20235,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-0.175344 -32.816216 2.974308 1.000000
 		}
-		USE Waypoint0_
+		USE CasWaypoint0_
 	}
 	Separator {
 		MatrixTransform {
@@ -20245,7 +20245,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			0.311616 -40.353268 1.000000 1.000000
 		}
-		USE Sector2_
+		USE CasSector2_
 	}
 	Separator {
 		MatrixTransform {
@@ -20255,7 +20255,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-1.000000 -83.000000 1.000000 1.000000
 		}
-		USE Sector0_
+		USE CasSector0_
 	}
 	Separator {
 		MatrixTransform {
@@ -20265,7 +20265,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-1.000000 0.000000 1.000000 1.000000
 		}
-		USE Sector1_
+		USE CasSector1_
 	}
 	Separator {
 		MatrixTransform {
@@ -20275,7 +20275,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-3.006711 -4.397975 -6.090298 1.000000
 		}
-		USE ResBow1
+		USE CasResBow1
 	}
 	Separator {
 		MatrixTransform {
@@ -20285,7 +20285,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			-6.006711 -2.397975 -6.090298 1.000000
 		}
-		USE ResQuiver20 # Kambi: 20 by hand
+		USE CasResQuiver20 # Kambi: 20 by hand
 	}
 	Separator {
 		MatrixTransform {
@@ -20315,7 +20315,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			-20.403389 -54.968620 0.909719 1.000000
 		}
-		USE ResAlien_4
+		USE CasResAlien_4
 	}
 	Separator {
 		MatrixTransform {
@@ -20325,7 +20325,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			4.231586 -0.207937 12.110254 1.000000
 		}
-		USE ResAlien_3
+		USE CasResAlien_3
 	}
 	Separator {
 		MatrixTransform {
@@ -20335,7 +20335,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			61.121429 -14.054967 0.909705 1.000000
 		}
-		USE ResAlien_2
+		USE CasResAlien_2
 	}
 	Separator {
 		MatrixTransform {
@@ -20345,7 +20345,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			-51.741787 -21.707802 0.909704 1.000000
 		}
-		USE ResAlien_1
+		USE CasResAlien_1
 	}
 	Separator {
 		MatrixTransform {
@@ -20355,7 +20355,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			-0.381357 -58.222500 0.909703 1.000000
 		}
-		USE ResScrFlying_1
+		USE CasResScrFlying_1
 	}
 	Separator {
 		MatrixTransform {
@@ -20405,7 +20405,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			0.000000 0.000000 0.000000 1.000000
 		}
-		USE LevelBox
+		USE CasMoveLimit
 	}
 	Separator {
 		MatrixTransform {
@@ -20435,7 +20435,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			0.777972 57.454525 0.853939 1.000000
 		}
-		USE ResLifePotion_1
+		USE CasResLifePotion_1
 	}
 	Separator {
 		MatrixTransform {
@@ -20445,7 +20445,7 @@ Separator {
 			0.000000 -5.000000 0.000000 0.000000
 			-1.568262 57.531410 0.853939 1.000000
 		}
-		USE ResLifePotion_2
+		USE CasResLifePotion_2
 	}
 	Separator {
 		MatrixTransform {

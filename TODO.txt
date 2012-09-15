@@ -60,7 +60,7 @@ Resigned: fountain new level for castle 1.0.0:
     or BallMissile from Alien
 
 - fountain finish:
-  trees, bushes around (natural LevelBox)
+  trees, bushes around (natural CasMoveLimit)
   light changing (fire pots in the corner(s) ?)
   footsteps: splashes on water
   fountain: water sparkling (use blender's particle animation)

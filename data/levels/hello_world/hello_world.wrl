@@ -54,7 +54,7 @@ Switch {
 			]
 		}
 	}
-	DEF LevelBox
+	DEF CasMoveLimit
 	Separator {
 		Coordinate3 {
 			point [
@@ -961,7 +961,7 @@ Separator {
 			0.000000 0.000000 1.000000 0.000000
 			0.000000 0.000000 0.000000 1.000000
 		}
-		USE LevelBox
+		USE CasMoveLimit
 	}
 	Separator {
 		MatrixTransform {
