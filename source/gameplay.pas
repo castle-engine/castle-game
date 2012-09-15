@@ -26,7 +26,7 @@ unit GamePlay;
 
 interface
 
-uses Classes, CastleLevel, CastlePlayer, Base3D;
+uses Classes, CastleLevels, CastlePlayer, Base3D;
 
 { Play the game.
 

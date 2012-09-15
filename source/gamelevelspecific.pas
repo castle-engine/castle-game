@@ -26,7 +26,7 @@ unit GameLevelSpecific;
 interface
 
 uses CastleScene, Boxes3D, VectorMath,
-  CastlePlayer, CastleLevel, CastleResources,
+  CastlePlayer, CastleLevels, CastleResources,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
 
@@ -191,8 +191,6 @@ type
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
 
-function CastleLevelsPath: string;
-
 implementation
 
 uses CastleFilesUtils, SysUtils, CastleUtils,
@@ -202,7 +200,7 @@ uses CastleFilesUtils, SysUtils, CastleUtils,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, ProgressUnit,
   CastleXMLUtils, GameItems, X3DFields;
 
-function CastleLevelsPath: string;
+function LevelsPath: string;
 begin
   Result := ProgramDataPath + 'data' + PathDelim + 'levels' + PathDelim;
 end;
@@ -290,7 +288,7 @@ begin
     WerewolfAppearPosition[I] := BoxDownPosition(TempBox);
   end;
 
-  CastleHallLevelPath := CastleLevelsPath + 'castle_hall' + PathDelim;
+  CastleHallLevelPath := LevelsPath + 'castle_hall' + PathDelim;
 
   Symbol := LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false);
   Symbol.CastShadowVolumes := false; { shadow would not be visible anyway }
@@ -526,7 +524,7 @@ begin
     SwordAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
   end;
 
-  GateLevelPath := CastleLevelsPath + 'gate' + PathDelim;
+  GateLevelPath := LevelsPath + 'gate' + PathDelim;
 
   Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false);
   Teleport.Collides := false;
@@ -703,7 +701,7 @@ var
 begin
   inherited;
 
-  TowerLevelPath := CastleLevelsPath + 'tower' + PathDelim;
+  TowerLevelPath := LevelsPath + 'tower' + PathDelim;
 
   Elevator := LoadLevelScene(TowerLevelPath + 'elevator.wrl', true);
 
@@ -814,7 +812,7 @@ begin
   HintOpenDoorScript := MainScene.Node('HintOpenDoorBoxScript');
 
   FEndSequence := LoadLevelScene(
-    CastleLevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
+    LevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
     true { create octrees });
   FEndSequence.Exists := false;
   { Even when FEndSequence will exist, we will not check for collisions
@@ -825,7 +823,7 @@ begin
   World.Add(FEndSequence);
 
   FGateExit := LoadLevelScene(
-    CastleLevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
+    LevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
     true { create octrees }, TGateExit);
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
   World.Add(FGateExit);
@@ -1185,7 +1183,7 @@ begin
   MainScene.RootNode.EnumerateNodes(@RenameCreatures, true);
   MainScene.RemoveBlenderBoxCheck(Elevator49DownBox, 'Elevator49DownBox');
   MainScene.RemoveBlenderBoxCheck(Elevator9a9bPickBox, 'Elev9a9bPickBox');
-  DoomDoorsPathPrefix := CastleLevelsPath + 'doom' + PathDelim + 'e1m1' +
+  DoomDoorsPathPrefix := LevelsPath + 'doom' + PathDelim + 'e1m1' +
     PathDelim;
 
   World.Add(MakeDoor('door2_3_closed.wrl'));
@@ -1290,7 +1288,7 @@ var
 begin
   inherited;
 
-  Water := LoadLevelAnimation(CastleLevelsPath + 'gate_background' +
+  Water := LoadLevelAnimation(LevelsPath + 'gate_background' +
     PathDelim + 'water.kanim', false, false);
   Water.CastShadowVolumes := false; { water shadow would look awkward }
   { No octrees created for water (because in normal usage, player will not
@@ -1319,7 +1317,7 @@ begin
   begin
     { load Fountain animation, following the similar code as LoadLevelAnimation }
     Fountain := TBlendedLoopingAnimationShader.CreateCustomCache(Self, GLContextCache);
-    Fountain.LoadFromFile(CastleLevelsPath + 'fountain' +
+    Fountain.LoadFromFile(LevelsPath + 'fountain' +
       PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true, 1);
     { progress is being already done }
     {Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
