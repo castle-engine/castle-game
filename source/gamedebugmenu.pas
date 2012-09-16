@@ -362,26 +362,24 @@ procedure TDebugLevelMenu.Click;
   begin
     S := TStringList.Create;
     try
-      LevelsAvailable.SortByNumber;
-
-      for I := 0 to LevelsAvailable.Count - 1 do
+      for I := 0 to Levels.Count - 1 do
       begin
         S.Append(Format('Level %d "%s"',
-          [ LevelsAvailable[I].Number, LevelsAvailable[I].Title ]));
+          [ Levels[I].Number, Levels[I].Title ]));
       end;
       S.Append('Cancel');
 
       Index := ChooseByMenu(ControlsUnder, S);
 
-      if Index <> LevelsAvailable.Count then
+      if Index <> Levels.Count then
       begin
-        LevelFinished(LevelsAvailable[Index].Name);
+        LevelFinished(Levels[Index].Name);
         { Flush LevelFinished now, to give new items when new level is loaded.
           Otherwise, some sounds (like equipping the sword, if player gets
           his first weapon) could be done before loading level progress,
           which sounds awkward for player. }
         LevelFinishedFlush;
-        SceneManager.Level.PrepareNewPlayer(Player);
+        SceneManager.Logic.PrepareNewPlayer(Player);
         UserQuit := true;
       end;
     finally S.Free end;

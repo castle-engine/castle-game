@@ -29,16 +29,8 @@ interface
 uses Classes, CastleLevels, CastlePlayer, Base3D;
 
 { Play the game.
-
-  Level and Player global variables must be already initialized.
-  Note that TLevel must be created after Player is initialized.
-
-  Note that Level may change during the PlayGame, because
-  of LevelFinished. In such case old Level value will be freeed,
-  and Level will be set to new value. Last Level value should
-  be freed by the caller of PlayGame.
-
-  If PrepareNewPlayer then it will call Level.PrepareNewPlayer
+  SceneManager and Player global variables must be already initialized.
+  If PrepareNewPlayer then it will call SceneManager.Logic.PrepareNewPlayer
   right before starting the actual game. }
 procedure PlayGame(PrepareNewPlayer: boolean);
 
@@ -419,9 +411,9 @@ begin
   if GameWin then
     DoShowGameWinInfo;
 
-  if (SceneManager.Level <> nil) and
-     (SceneManager.Level is TBossLevel) and
-     TBossLevel(SceneManager.Level).BossIndicator(BossLife, BossMaxLife) then
+  if (SceneManager.Logic <> nil) and
+     (SceneManager.Logic is TBossLevel) and
+     TBossLevel(SceneManager.Logic).BossIndicator(BossLife, BossMaxLife) then
   begin
     RenderLifeIndicator(BossLife, BossMaxLife,
       GLList_BossIndicatorImage, Window.Width - 150, false);
@@ -441,9 +433,9 @@ var
 begin
   LevelFinishedFlush;
 
-  if GameWin and (SceneManager.Level is TCagesLevel) then
+  if GameWin and (SceneManager.Logic is TCagesLevel) then
   begin
-    Cages := TCagesLevel(SceneManager.Level);
+    Cages := TCagesLevel(SceneManager.Logic);
     case Cages.GameWinAnimation of
       gwaNone:
         begin
@@ -614,7 +606,7 @@ begin
     MessagesTheme.RectColor[3] := 0.4;
 
     if PrepareNewPlayer then
-      SceneManager.Level.PrepareNewPlayer(Player);
+      SceneManager.Logic.PrepareNewPlayer(Player);
 
     Notifications.Show('Hint: press "Escape" for game menu');
 

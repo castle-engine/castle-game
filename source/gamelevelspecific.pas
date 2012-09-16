@@ -20,7 +20,7 @@
   ----------------------------------------------------------------------------
 }
 
-{ TLevel specialized descendants. }
+{ Level logic. TLevelLogic descendants specialized for castle1 levels. }
 unit GameLevelSpecific;
 
 interface
@@ -35,7 +35,7 @@ const
 
 type
   { Level that may have a boss life indicator. }
-  TBossLevel = class(TLevel)
+  TBossLevel = class(TLevelLogic)
   public
     { What to show on boss creature indicator. }
     function BossIndicator(out Life, MaxLife: Single): boolean; virtual;
@@ -62,7 +62,7 @@ type
     function BossIndicator(out Life, MaxLife: Single): boolean; override;
   end;
 
-  TGateLevel = class(TLevel)
+  TGateLevel = class(TLevelLogic)
   private
     FGateExitBox: TBox3D;
 
@@ -88,7 +88,7 @@ type
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
-  TTowerLevel = class(TLevel)
+  TTowerLevel = class(TLevelLogic)
   private
     MovingElevator: T3DLinearMoving;
     Elevator: TCastleScene;
@@ -156,7 +156,7 @@ type
       const Distance: Single): boolean; override;
   end;
 
-  TDoomE1M1Level = class(TLevel)
+  TDoomE1M1Level = class(TLevelLogic)
   private
     procedure RenameCreatures(Node: TX3DNode);
   private
@@ -178,13 +178,13 @@ type
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
-  TGateBackgroundLevel = class(TLevel)
+  TGateBackgroundLevel = class(TLevelLogic)
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
   end;
 
-  TFountainLevel = class(TLevel)
+  TFountainLevel = class(TLevelLogic)
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -1349,11 +1349,11 @@ end;
 
 initialization
   { register our level logic classes }
-  LevelClasses['Cages'] := TCagesLevel;
-  LevelClasses['Gate'] := TGateLevel;
-  LevelClasses['GateBackground'] := TGateBackgroundLevel;
-  LevelClasses['CastleHall'] := TCastleHallLevel;
-  LevelClasses['DoomE1M1'] := TDoomE1M1Level;
-  LevelClasses['Tower'] := TTowerLevel;
-  LevelClasses['Fountain'] := TFountainLevel;
+  LevelLogicClasses['Cages'] := TCagesLevel;
+  LevelLogicClasses['Gate'] := TGateLevel;
+  LevelLogicClasses['GateBackground'] := TGateBackgroundLevel;
+  LevelLogicClasses['CastleHall'] := TCastleHallLevel;
+  LevelLogicClasses['DoomE1M1'] := TDoomE1M1Level;
+  LevelLogicClasses['Tower'] := TTowerLevel;
+  LevelLogicClasses['Fountain'] := TFountainLevel;
 end.

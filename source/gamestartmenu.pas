@@ -98,7 +98,7 @@ type
 
   TChooseNewLevelMenu = class(TSubMenu)
   public
-    LevelsNewGame: TLevelAvailableList;
+    LevelsNewGame: TLevelInfoList;
     FirstDemoLevelIndex: Cardinal;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -128,9 +128,9 @@ var
   (menu item's values that could change during the game and music).
 
   The idea is that in the future there will be LoadGame procedure,
-  that will also call PlayGame, but creating / initializing
-  TPlayer and TLevel instances differently. }
-procedure NewGame(Level: TLevelAvailable);
+  that will also call PlayGame, but initializing player and level
+  differently. }
+procedure NewGame(Level: TLevelInfo);
 begin
   SceneManager := TGameSceneManager.Create(nil);
   try
@@ -152,7 +152,7 @@ begin
       finally FreeAndNil(Player) end;
 
       if GameEnded and (GameEndedWantsRestart <> '') then
-        Level := LevelsAvailable.FindName(GameEndedWantsRestart) else
+        Level := Levels.FindName(GameEndedWantsRestart) else
         Break;
     until false;
   finally FreeAndNil(SceneManager) end;
@@ -547,13 +547,13 @@ end;
 constructor TChooseNewLevelMenu.Create(AOwner: TComponent);
 
   { Add level to LevelsNewGame and Items lists.
-    Index is an index into LevelsAvailable array for this level. }
+    Index is an index into Levels array for this level. }
   procedure AddLevel(Index: Integer);
   var
     S: string;
-    L: TLevelAvailable;
+    L: TLevelInfo;
   begin
-    L := LevelsAvailable[Index];
+    L := Levels[Index];
     LevelsNewGame.Add(L);
     S := Format('%d: %s', [ L.Number, L.Title ]);
     if L.TitleHint <> '' then
@@ -566,24 +566,22 @@ var
 begin
   inherited;
 
-  LevelsNewGame := TLevelAvailableList.Create(false);
-
-  LevelsAvailable.SortByNumber;
+  LevelsNewGame := TLevelInfoList.Create(false);
 
   { Add non-demo levels }
-  for I := 0 to LevelsAvailable.Count - 1 do
-    if LevelsAvailable[I].Played and
-       (LevelsAvailable[I].Name <> MenuBackgroundLevelName) and
-       not LevelsAvailable[I].Demo then
+  for I := 0 to Levels.Count - 1 do
+    if Levels[I].Played and
+       (Levels[I].Name <> MenuBackgroundLevelName) and
+       not Levels[I].Demo then
       AddLevel(I);
 
   FirstDemoLevelIndex := LevelsNewGame.Count;
 
   { Add demo levels }
-  for I := 0 to LevelsAvailable.Count - 1 do
-    if LevelsAvailable[I].Played and
-       (LevelsAvailable[I].Name <> MenuBackgroundLevelName) and
-       LevelsAvailable[I].Demo then
+  for I := 0 to Levels.Count - 1 do
+    if Levels[I].Played and
+       (Levels[I].Name <> MenuBackgroundLevelName) and
+       Levels[I].Demo then
       AddLevel(I);
 
   Items.Add('Cancel');

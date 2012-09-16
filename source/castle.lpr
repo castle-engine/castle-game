@@ -195,8 +195,8 @@ begin
   AllResources.LoadFromFiles;
   ItemsKindsInit;
   CreaturesKindsInit;
-  LevelsAvailable.LoadFromFiles;
-  LevelsAvailable.LoadFromConfig;
+  Levels.LoadFromFiles;
+  Levels.LoadFromConfig;
 
   { init OpenAL (after initing Glw and Progress, because ALContextOpen
     wants to display progress of "Loading sounds") }
