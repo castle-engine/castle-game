@@ -331,37 +331,31 @@ procedure TControlsSubMenu.Click;
 
   procedure ChangeKey(InputShortcut: TInputShortcut);
   var
-    ConflictingKey: TInputShortcut;
-    NewKey: TKey;
-    NewMousePress: boolean;
-    NewMouseButton: TMouseButton;
-    NewMouseWheel: TMouseWheelDirection;
+    ConflictingInput: TInputShortcut;
+    NewEvent: TInputPressRelease;
   begin
     MessageKeyMouse(Window, Format(
       'Press the new key or mouse button or mouse wheel for "%s".', [InputShortcut.Caption]),
-      'Cancel [Escape]' + nl + 'Clear [Backspace]', taLeft,
-      NewKey, NewMousePress, NewMouseButton, NewMouseWheel);
+      'Cancel [Escape]' + nl + 'Clear [Backspace]', taLeft, NewEvent);
 
-    if NewKey = K_Backspace then
+    if NewEvent.IsKey(K_Backspace) then
     begin
       InputShortcut.MakeClear;
     end else
-    if NewKey = K_Escape then
+    if NewEvent.IsKey(K_Escape) then
     begin
       { Don't do anything. }
     end else
-    if { We silently ignore situation when NewKey/NewMouse already
-         match InputShortcut. This is meaningless,
-         and otherwise could unnecessarily swap Key1 and Key2 in AddShortcut. }
-       (not InputShortcut.IsEvent(
-         NewKey, #0, NewMousePress, NewMouseButton, NewMouseWheel)) then
+    { We silently ignore situation when NewEvent already
+      matches InputShortcut. This is meaningless,
+      and otherwise could unnecessarily swap Key1 and Key2 in InputShortcut. }
+    if not InputShortcut.IsEvent(NewEvent) then
     begin
-      ConflictingKey := InputsAll.SeekMatchingShortcut(
-        NewKey, NewMousePress, NewMouseButton, NewMouseWheel);
+      ConflictingInput := InputsAll.SeekMatchingShortcut(NewEvent);
 
-      if ConflictingKey <> nil then
+      if ConflictingInput <> nil then
       begin
-        { I used to have here a confirmation before clearing ConflictingKey.
+        { I used to have here a confirmation before clearing ConflictingInput.
           But this was bad for user experience, as the message would have
           to be either about "clearing the whole shortcut" or just
           "clearing part of the shortcut" --- as each shortcut is
@@ -369,39 +363,42 @@ procedure TControlsSubMenu.Click;
           Also, one of the rules is to avoid modal dialog boxes...
           So now I just uncoditionally remove conflicting key,
           and make a Notification informing user about it. }
-        if NewMousePress then
-        begin
-          Notifications.Show(Format('Note: "%s" mouse shortcut cleared for action "%s"',
-            [ MouseButtonStr[ConflictingKey.MouseButton],
-              ConflictingKey.Caption ]));
-          ConflictingKey.MouseButtonUse := false;
-        end else
-        if NewMouseWheel <> mwNone then
-        begin
-          Notifications.Show(Format('Note: "%s" mouse wheel cleared for action "%s"',
-            [ MouseWheelDirectionStr[ConflictingKey.MouseWheel],
-              ConflictingKey.Caption ]));
-          ConflictingKey.MouseWheel := mwNone;
-        end else
-        if ConflictingKey.Key1 = NewKey then
-        begin
-          Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
-            [ KeyToStr(ConflictingKey.Key1),
-              ConflictingKey.Caption ]));
-          ConflictingKey.Key1 := K_None;
-        end else
-        begin
-          Assert(ConflictingKey.Key2 = NewKey);
+        case NewEvent.EventType of
+          itMouseButton:
+            begin
+              Notifications.Show(Format('Note: "%s" mouse shortcut cleared for action "%s"',
+                [ MouseButtonStr[ConflictingInput.MouseButton],
+                  ConflictingInput.Caption ]));
+              ConflictingInput.MouseButtonUse := false;
+            end;
+          itMouseWheel:
+            begin
+              Notifications.Show(Format('Note: "%s" mouse wheel cleared for action "%s"',
+                [ MouseWheelDirectionStr[ConflictingInput.MouseWheel],
+                  ConflictingInput.Caption ]));
+              ConflictingInput.MouseWheel := mwNone;
+            end;
+          itKey:
+            if ConflictingInput.Key1 = NewEvent.Key then
+            begin
+              Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
+                [ KeyToStr(ConflictingInput.Key1),
+                  ConflictingInput.Caption ]));
+              ConflictingInput.Key1 := K_None;
+            end else
+            begin
+              Assert(ConflictingInput.Key2 = NewEvent.Key);
 
-          Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
-            [ KeyToStr(ConflictingKey.Key2),
-              ConflictingKey.Caption ]));
-          ConflictingKey.Key2 := K_None;
+              Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
+                [ KeyToStr(ConflictingInput.Key2),
+                  ConflictingInput.Caption ]));
+              ConflictingInput.Key2 := K_None;
+            end;
+          else raise EInternalError.Create('ConflictingInput: NewEvent.EventType?');
         end;
       end;
 
-      InputShortcut.AddShortcut(NewKey,
-        NewMousePress, NewMouseButton, NewMouseWheel);
+      InputShortcut.Add(NewEvent);
     end;
 
     RefreshShortcuts;
@@ -504,16 +501,13 @@ begin
   glPopMatrix;
 end;
 
-procedure KeyDown(Window: TCastleWindowBase; key: TKey; c: char);
+procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
 begin
-  if ExitWithEscapeAllowed then
-    case C of
-      CharEscape:
-        begin
-          UserQuit := true;
-          ExitWithEscape := true;
-        end;
-    end;
+  if ExitWithEscapeAllowed and Event.IsKey(CharEscape) then
+  begin
+    UserQuit := true;
+    ExitWithEscape := true;
+  end;
 end;
 
 procedure CloseQuery(Window: TCastleWindowBase);
@@ -553,7 +547,7 @@ begin
   try
     SavedMode.RestoreProjectionMatrix := false;
 
-    Window.OnKeyDown := @KeyDown;
+    Window.OnPress := @Press;
 
     SetCurrentMenu(CurrentMenu, ControlsMenu);
 

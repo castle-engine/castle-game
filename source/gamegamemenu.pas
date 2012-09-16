@@ -163,7 +163,7 @@ begin
       with the menu text. }
     MessagesTheme.RectColor[3] := 1.0;
 
-    Window.OnKeyDown := @KeyDown;
+    Window.OnPress := @Press;
     Window.OnDrawStyle := ds3D;
 
     SetCurrentMenu(CurrentMenu, GameMenu);

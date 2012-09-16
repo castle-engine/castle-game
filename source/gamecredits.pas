@@ -101,16 +101,14 @@ begin
   MessageOK(Window, 'You can''t exit now.');
 end;
 
-procedure KeyDown(Window: TCastleWindowBase; key: TKey; c: char);
+procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
 begin
-  if C in [CharEscape, CharEnter, ' '] then
+  if Event.IsKey(CharEscape) or
+     Event.IsKey(CharEnter) or
+     Event.IsKey(' ') or
+     { any mouse press ends credits }
+     (Event.EventType = itMouseButton) then
     UserQuit := true;
-end;
-
-procedure MouseDown(Window: TCastleWindowBase; Button: TMouseButton);
-begin
-  { any mouse press ends credits }
-  UserQuit := true;
 end;
 
 procedure ShowCredits(ControlsUnder: TUIControlList;
@@ -122,8 +120,7 @@ begin
   try
     Window.AutoRedisplay := true; { scrolling text animation }
 
-    Window.OnKeyDown := @KeyDown;
-    Window.OnMouseDown := @MouseDown;
+    Window.OnPress := @Press;
 
     UserQuit := false;
     Credits.AnimationTime := 0;

@@ -1,8 +1,6 @@
-procedure KeyDown(Window: TCastleWindowBase; key: TKey; c: char);
+procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
 begin
-  case C of
-    CharEscape: UserQuit := true;
-  end;
+  if Event.IsKey(CharEscape) then UserQuit := true;
 end;
 
 procedure CloseQuery(Window: TCastleWindowBase);

@@ -499,9 +499,7 @@ begin
   end;
 end;
 
-procedure EventDown(AKey: TKey;
-  AMousePress: boolean; AMouseButton: TMouseButton;
-  AMouseWheel: TMouseWheelDirection);
+procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
 
   procedure UseLifePotion;
   var
@@ -532,27 +530,7 @@ procedure EventDown(AKey: TKey;
   end;
 
 begin
-  if (Player <> nil) and not (Player.Blocked or Player.Dead) then
-  begin
-    if Input_UseLifePotion.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-      UseLifePotion;
-  end;
-
-  { Other keys. }
-  if Input_ViewMessages.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    ViewGameMessages else
-  if Input_FPSShow.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    ShowDebugInfo := not ShowDebugInfo else
-  if Input_Interact.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    RestartLevel else
-  if Input_DebugMenu.IsEvent(AKey, #0, AMousePress, AMouseButton, AMouseWheel) then
-    DoDebugMenu;
-end;
-
-procedure KeyDown(Window: TCastleWindowBase; Key: TKey; C: char);
-begin
-  EventDown(Key, false, mbLeft, mwNone);
-  if C = CharEscape then
+  if Event.IsKey(CharEscape) then
   begin
     if Player.Dead or GameWin then
       GameCancel(false) else
@@ -563,6 +541,22 @@ begin
       SceneManager.Paused := false;
     end;
   end;
+
+  if (Player <> nil) and not (Player.Blocked or Player.Dead) then
+  begin
+    if Input_UseLifePotion.IsEvent(Event) then
+      UseLifePotion;
+  end;
+
+  { Other keys. }
+  if Input_ViewMessages.IsEvent(Event) then
+    ViewGameMessages else
+  if Input_FPSShow.IsEvent(Event) then
+    ShowDebugInfo := not ShowDebugInfo else
+  if Input_Interact.IsEvent(Event) then
+    RestartLevel else
+  if Input_DebugMenu.IsEvent(Event) then
+    DoDebugMenu;
 end;
 
 procedure CloseQuery(Window: TCastleWindowBase);
@@ -592,7 +586,7 @@ begin
     Window.OnTimer := @Timer;
 
     Window.OnIdle := @Idle;
-    Window.OnKeyDown := @KeyDown;
+    Window.OnPress := @Press;
     Window.OnDrawStyle := ds3D;
 
     C2D := TGame2DControls.Create(nil);

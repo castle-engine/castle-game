@@ -32,14 +32,8 @@ type
     press. This way our "save screen" button works in game, all menus, credits
     and such. }
   TGameWindow = class(TCastleWindowCustom)
-  private
-    procedure EventDown(AKey: TKey;
-      AMousePress: boolean; AMouseButton: TMouseButton;
-      AMouseWheel: TMouseWheelDirection);
   public
-    procedure EventKeyDown(key: TKey; c: char); override;
-    procedure EventMouseDown(Button: TMouseButton); override;
-    procedure EventMouseWheel(const Scroll: Single; const Vertical: boolean); override;
+    procedure EventPress(const Event: TInputPressRelease); override;
   end;
 
 var
@@ -51,9 +45,7 @@ implementation
 uses SysUtils, CastleInputs, UIControls, CastleGameNotifications, CastleFilesUtils,
   CastleSoundEngine, GameSound, GameInputs;
 
-procedure TGameWindow.EventDown(AKey: TKey;
-  AMousePress: boolean; AMouseButton: TMouseButton;
-  AMouseWheel: TMouseWheelDirection);
+procedure TGameWindow.EventPress(const Event: TInputPressRelease);
 
   { Saves a screen, causing also appropriate Notification and sound. }
   procedure AutoSaveScreen;
@@ -67,26 +59,8 @@ procedure TGameWindow.EventDown(AKey: TKey;
   end;
 
 begin
-  if Input_SaveScreen.IsEvent(AKey, #0,
-    AMousePress, AMouseButton, AMouseWheel) then
+  if Input_SaveScreen.IsEvent(Event) then
     AutoSaveScreen;
-end;
-
-procedure TGameWindow.EventKeyDown(key: TKey; c: char);
-begin
-  EventDown(Key, false, mbLeft, mwNone);
-  inherited;
-end;
-
-procedure TGameWindow.EventMouseDown(Button: TMouseButton);
-begin
-  EventDown(K_None, true, Button, mwNone);
-  inherited;
-end;
-
-procedure TGameWindow.EventMouseWheel(const Scroll: Single; const Vertical: boolean);
-begin
-  EventDown(K_None, false, mbLeft, MouseWheelDirection(Scroll, Vertical));
   inherited;
 end;
 
