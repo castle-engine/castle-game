@@ -192,7 +192,7 @@ begin
   { load game data from XML files }
   TexturesProperties.XmlFileName := ProgramDataPath + 'data' +
     PathDelim + 'textures' + PathDelim + 'index.xml';
-  AllResources.LoadFromFiles;
+  Resources.LoadFromFiles;
   ItemsKindsInit;
   CreaturesKindsInit;
   Levels.LoadFromFiles;

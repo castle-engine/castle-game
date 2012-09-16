@@ -126,10 +126,10 @@ var
 begin
   S := TStringList.Create;
   try
-    for I := 0 to AllResources.Count - 1 do
-      if (not OnlyCreatures) or (AllResources[I] is TCreatureKind) then
+    for I := 0 to Resources.Count - 1 do
+      if (not OnlyCreatures) or (Resources[I] is TCreatureKind) then
         S.AddObject(Format('Resource %s (%d users)',
-          [AllResources[I].Name, AllResources[I].UsageCount]), AllResources[I]);
+          [Resources[I].Name, Resources[I].UsageCount]), Resources[I]);
     S.Append('Cancel');
     ResultIndex := ChooseByMenu(ControlsUnder, S);
     Result := ResultIndex <> S.Count - 1;
@@ -187,7 +187,7 @@ begin
     1: SetCurrentMenu(CurrentMenu, DebugCreaturesMenu);
     2: SetCurrentMenu(CurrentMenu, DebugItemsMenu);
     3: SetCurrentMenu(CurrentMenu, DebugLevelMenu);
-    4: AllResources.LoadFromFiles(true);
+    4: Resources.LoadFromFiles(true);
     5: ReloadResource;
     6: begin
          RenderDebug3D := not RenderDebug3D;
@@ -438,9 +438,9 @@ procedure TDebugItemsMenu.Click;
   var
     I: Integer;
   begin
-    for I := 0 to AllResources.Count - 1 do
-      if AllResources[I] is TItemKind then
-        Player.PickItem(TItemKind(AllResources[I]).CreateItem(20));
+    for I := 0 to Resources.Count - 1 do
+      if Resources[I] is TItemKind then
+        Player.PickItem(TItemKind(Resources[I]).CreateItem(20));
     UserQuit := true;
   end;
 
