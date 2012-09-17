@@ -70,7 +70,7 @@ procedure PlayerUpdateMouseLook(Player: TPlayer);
 
 implementation
 
-uses SysUtils, WindowModes, CastleGLUtils, CastleMessages, CastleGameCache,
+uses SysUtils, WindowModes, CastleGLUtils, CastleMessages,
   OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit, CastleConfig,
   CastleInputs, KeysMouse, VectorMath, CastleUtils, CastleItems,
   CastleStringUtils, CastleGameNotifications, GameWindow;

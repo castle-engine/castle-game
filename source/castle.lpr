@@ -205,8 +205,6 @@ begin
   try
     ShowStartMenu;
   finally
-    CreditsGLContextRelease;
-
     { Usually Window.Closed = false here.
       But this is finally...end clause so we try hard to avoid raising
       another exception here --- so we safeguard and eventually change

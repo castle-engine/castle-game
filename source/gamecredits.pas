@@ -31,16 +31,11 @@ uses CastleWindow, UIControls, X3DNodes, CastleSceneManager;
 procedure ShowCredits(ControlsUnder: TUIControlList;
   SceneManagerUnder: TCastleSceneManager);
 
-{ Although this will be called by Window.Close, it may be too late
-  (this must be called before releasing GLContextCache).
-  So you should call this explicitly. }
-procedure CreditsGLContextRelease;
-
 implementation
 
 uses SysUtils, GL, GLU, CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils, WindowModes,
-  GamePlay, CastleGameCache, GameWindow,
+  GamePlay, GameWindow,
   GameVideoOptions, VectorMath, CastleScene, CastleFilesUtils,
   GameHelp, CastleUtils, X3DFields, CastleTimeUtils, KeysMouse, Base3D, Classes;
 
@@ -71,7 +66,7 @@ begin
   StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', 'WWW: ' + CastleURL);
   StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
-  Scene := TCastleScene.CreateCustomCache(Self, GLContextCache);
+  Scene := TCastleScene.Create(Self);
   Scene.Load(LoadX3DClassicFromString(VRMLContents, ''), true);
 
   Add(Scene);
@@ -160,15 +155,10 @@ begin
   CreditsSceneManager.MainScene := Credits.Scene;
 end;
 
-procedure CreditsGLContextRelease;
+procedure WindowClose(const Container: IUIContainer);
 begin
   FreeAndNil(Credits);
   FreeAndNil(CreditsSceneManager);
-end;
-
-procedure WindowClose(const Container: IUIContainer);
-begin
-  CreditsGLContextRelease;
 end;
 
 initialization

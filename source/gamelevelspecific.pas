@@ -196,7 +196,7 @@ implementation
 uses CastleFilesUtils, SysUtils, CastleUtils,
   GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
   GamePlay, CastleGameNotifications, CastleInputs,
-  CastleGameCache, GameWindow, GameX3DProcessing,
+  GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, ProgressUnit,
   CastleXMLUtils, GameItems, X3DFields;
 
@@ -1316,7 +1316,7 @@ begin
     and LoadWaterAnimation then
   begin
     { load Fountain animation, following the similar code as LoadLevelAnimation }
-    Fountain := TBlendedLoopingAnimationShader.CreateCustomCache(Self, GLContextCache);
+    Fountain := TBlendedLoopingAnimationShader.Create(Self);
     Fountain.LoadFromFile(LevelsPath + 'fountain' +
       PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true, 1);
     { progress is being already done }

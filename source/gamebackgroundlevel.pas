@@ -69,7 +69,7 @@ implementation
 
 uses SysUtils, GL, GLU, GLExt, CastleGLUtils, GLImages,
   CastleFilesUtils, Images, VectorMath, CastlePlayer,
-  CastleGameCache, GameVideoOptions;
+  GameVideoOptions;
 
 { TBackgroundCaptions -------------------------------------------------------- }
 
