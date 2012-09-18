@@ -2248,7 +2248,7 @@ DEF OB_Lamp Transform {
 		
 	]
 }
-DEF OB_ObjCasMoveLimit Transform {
+DEF OB_CasMoveLimit Transform { # Kambu ObjCasMoveLimit -> CasMoveLimit
 	translation 0.000000 0.000000 0.000000
 	rotation 1.000000 0.000000 0.000000 0.000000
 	scale 1.000000 1.000000 1.000000
