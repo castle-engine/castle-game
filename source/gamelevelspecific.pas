@@ -25,7 +25,7 @@ unit GameLevelSpecific;
 
 interface
 
-uses CastleScene, Boxes3D, VectorMath,
+uses CastleScene, Boxes3D, VectorMath, Shape,
   CastlePlayer, CastleLevels, CastleResources,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
@@ -54,6 +54,8 @@ type
     WerewolfAppearPosition: array [0..CastleHallWerewolvesCount - 1] of TVector3Single;
     WerewolfAppeared: boolean;
     WerewolfCreature: array [0..CastleHallWerewolvesCount - 1] of TWerewolfCreature;
+  protected
+    function HandlePlaceholder(const Shape: TShape; const ModelerName: string): boolean; override;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -82,6 +84,8 @@ type
 
     CartLastSoundTime: Single;
     CartSoundPosition: TVector3Single;
+  protected
+    function HandlePlaceholder(const Shape: TShape; const ModelerName: string): boolean; override;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -168,9 +172,10 @@ type
 
     MovingElevator9a9b: T3DLinearMoving;
     Elevator9a9b: TCastleScene;
-    Elevator9a9bPickBox: TBox3D;
 
     ExitButton: TCastleScene;
+  protected
+    function HandlePlaceholder(const Shape: TShape; const ModelerName: string): boolean; override;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -265,28 +270,10 @@ end;
 
 constructor TCastleHallLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
   MainScene: TCastleScene; DOMElement: TDOMElement);
-
-  function BoxDownPosition(const Box: TBox3D): TVector3Single;
-  begin
-    Result[0] := (Box.Data[0, 0] + Box.Data[1, 0]) / 2;
-    Result[1] := (Box.Data[0, 1] + Box.Data[1, 1]) / 2;
-    Result[2] := Box.Data[0, 2];
-  end;
-
 var
-  TempBox: TBox3D;
-  I: Integer;
   CastleHallLevelPath: string;
 begin
   inherited;
-
-  MainScene.RemoveBlenderBoxCheck(FLevelExitBox, 'LevelExitBox');
-
-  for I := 0 to CastleHallWerewolvesCount - 1 do
-  begin
-    MainScene.RemoveBlenderBoxCheck(TempBox, 'WerewolfAppear_' + IntToStr(I));
-    WerewolfAppearPosition[I] := BoxDownPosition(TempBox);
-  end;
 
   CastleHallLevelPath := LevelsPath + 'castle_hall' + PathDelim;
 
@@ -308,6 +295,35 @@ begin
     Later StairsBlocker will have Exists = false, so bbox will be empty,
     but we'll need StairsBlockerMiddle position. }
   StairsBlockerMiddle := StairsBlocker.BoundingBox.Middle;
+end;
+
+function BoxDownPosition(const Box: TBox3D): TVector3Single;
+begin
+  Result[0] := (Box.Data[0, 0] + Box.Data[1, 0]) / 2;
+  Result[1] := (Box.Data[0, 1] + Box.Data[1, 1]) / 2;
+  Result[2] := Box.Data[0, 2];
+end;
+
+function TCastleHallLevel.HandlePlaceholder(const Shape: TShape;
+  const ModelerName: string): boolean;
+var
+  I: Integer;
+begin
+  Result := inherited;
+  if Result then Exit;
+
+  if ModelerName = 'LevelExitBox' then
+  begin
+    FLevelExitBox := Shape.BoundingBox;
+    Result := true;
+  end;
+
+  for I := 0 to CastleHallWerewolvesCount - 1 do
+    if ModelerName = 'WerewolfAppear_' + IntToStr(I) then
+    begin
+      WerewolfAppearPosition[I] := BoxDownPosition(Shape.BoundingBox);
+      Result := true;
+    end;
 end;
 
 procedure TCastleHallLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
@@ -481,48 +497,11 @@ end;
 
 constructor TGateLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
   MainScene: TCastleScene; DOMElement: TDOMElement);
-
-  function AmbushStartingPos(const Box: TBox3D): TVector3Single;
-  begin
-    Result[0] := (Box.Data[0, 0] + Box.Data[1, 0]) / 2;
-    Result[1] := (Box.Data[0, 1] + Box.Data[1, 1]) / 2;
-    Result[2] := Box.Data[0, 2];
-  end;
-
 var
-  TempBox: TBox3D;
-  I: Integer;
   Cart: TCastlePrecalculatedAnimation;
   GateLevelPath: string;
 begin
   inherited;
-
-  MainScene.RemoveBlenderBoxCheck(FGateExitBox, 'GateExitBox');
-
-  MainScene.RemoveBlenderBoxCheck(Teleport1Box, 'Teleport1Box');
-  MainScene.RemoveBlenderBoxCheck(Teleport2Box, 'Teleport2Box');
-
-  MainScene.RemoveBlenderBoxCheck(FSacrilegeBox, 'SacrilegeBox');
-
-  Teleport1Destination := Teleport2Box.Middle;
-  Teleport1Destination[0] += 2;
-  Teleport1Destination[1] += 2;
-
-  Teleport2Destination := Teleport1Box.Middle;
-  Teleport2Destination[0] -= 2;
-  Teleport2Destination[1] -= 2;
-
-  for I := 0 to High(SacrilegeAmbushStartingPosition) do
-  begin
-    MainScene.RemoveBlenderBoxCheck(TempBox, 'SacrilegeGhost_' + IntToStr(I));
-    SacrilegeAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
-  end;
-
-  for I := 0 to High(SwordAmbushStartingPosition) do
-  begin
-    MainScene.RemoveBlenderBoxCheck(TempBox, 'SwordGhost_' + IntToStr(I));
-    SwordAmbushStartingPosition[I] := AmbushStartingPos(TempBox);
-  end;
 
   GateLevelPath := LevelsPath + 'gate' + PathDelim;
 
@@ -532,13 +511,11 @@ begin
   Teleport1 := T3DTransform.Create(Self);
   { set rotation axis. Rotation angle will be increased in each Idle }
   Teleport1.Rotation :=  Vector4Single(1, 1, 0, 0);
-  Teleport1.Translation := Teleport1Box.Middle;
   Teleport1.Add(Teleport);
   World.Add(Teleport1);
 
   Teleport2 := T3DTransform.Create(Self);
   Teleport2.Rotation :=  Vector4Single(1, 1, 0, 0);
-  Teleport2.Translation := Teleport2Box.Middle;
   Teleport2.Add(Teleport);
   World.Add(Teleport2);
 
@@ -551,6 +528,60 @@ begin
 
   SacrilegeAmbushDone := false;
   SwordAmbushDone := false;
+end;
+
+function TGateLevel.HandlePlaceholder(const Shape: TShape; const ModelerName: string): boolean;
+var
+  I: Integer;
+begin
+  Result := inherited;
+  if Result then Exit;
+
+  if ModelerName = 'GateExitBox' then
+  begin
+    FGateExitBox := Shape.BoundingBox;
+    Result := true;
+  end;
+
+  if ModelerName = 'Teleport1Box' then
+  begin
+    Teleport1Box := Shape.BoundingBox;
+    Teleport1.Translation := Teleport1Box.Middle;
+    Teleport2Destination := Teleport1Box.Middle;
+    Teleport2Destination[0] -= 2;
+    Teleport2Destination[1] -= 2;
+    Result := true;
+  end;
+
+  if ModelerName = 'Teleport2Box' then
+  begin
+    Teleport2Box := Shape.BoundingBox;
+    Teleport2.Translation := Teleport2Box.Middle;
+    Teleport1Destination := Teleport2Box.Middle;
+    Teleport1Destination[0] += 2;
+    Teleport1Destination[1] += 2;
+    Result := true;
+  end;
+
+  if ModelerName = 'SacrilegeBox' then
+  begin
+    FSacrilegeBox := Shape.BoundingBox;
+    Result := true;
+  end;
+
+  for I := 0 to High(SacrilegeAmbushStartingPosition) do
+    if ModelerName = 'SacrilegeGhost_' + IntToStr(I) then
+    begin
+      SacrilegeAmbushStartingPosition[I] := BoxDownPosition(Shape.BoundingBox);
+      Result := true;
+    end;
+
+  for I := 0 to High(SwordAmbushStartingPosition) do
+    if ModelerName = 'SwordGhost_' + IntToStr(I) then
+    begin
+      SwordAmbushStartingPosition[I] := BoxDownPosition(Shape.BoundingBox);
+      Result := true;
+    end;
 end;
 
 procedure TGateLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
@@ -1181,8 +1212,6 @@ begin
   inherited;
 
   MainScene.RootNode.EnumerateNodes(@RenameCreatures, true);
-  MainScene.RemoveBlenderBoxCheck(Elevator49DownBox, 'Elevator49DownBox');
-  MainScene.RemoveBlenderBoxCheck(Elevator9a9bPickBox, 'Elev9a9bPickBox');
   DoomDoorsPathPrefix := LevelsPath + 'doom' + PathDelim + 'e1m1' +
     PathDelim;
 
@@ -1233,7 +1262,25 @@ begin
   World.Add(ExitButton);
 
   TElevator9a9b(Elevator9a9b).MovingElevator9a9b := MovingElevator9a9b;
-  TElevator9a9b(Elevator9a9b).Elevator9a9bPickBox := Elevator9a9bPickBox;
+end;
+
+function TDoomE1M1Level.HandlePlaceholder(const Shape: TShape;
+  const ModelerName: string): boolean;
+begin
+  Result := inherited;
+  if Result then Exit;
+
+  if ModelerName = 'Elevator49DownBox' then
+  begin
+    Elevator49DownBox := Shape.BoundingBox;
+    Result := true;
+  end;
+
+  if ModelerName = 'Elev9a9bPickBox' then
+  begin
+    TElevator9a9b(Elevator9a9b).Elevator9a9bPickBox := Shape.BoundingBox;
+    Result := true;
+  end;
 end;
 
 procedure TDoomE1M1Level.RenameCreatures(Node: TX3DNode);
