@@ -14,8 +14,8 @@
 
   load_water_animation="True"
 >
-  <resources>
+  <prepare_resources>
     <resource name="Alien" />
     <resource name="BallMissile" />
-  </resources>
+  </prepare_resources>
 </level>

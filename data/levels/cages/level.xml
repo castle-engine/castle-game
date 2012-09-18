@@ -10,9 +10,9 @@
 
   music_sound="cages_music_with_rain"
 >
-  <resources>
+  <prepare_resources>
     <resource name="Spider" />
     <resource name="SpiderQueen" />
     <resource name="ThrownWeb" />
-  </resources>
+  </prepare_resources>
 </level>

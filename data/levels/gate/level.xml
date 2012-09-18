@@ -10,8 +10,8 @@
 
   music_sound="gate_music"
 >
-  <resources>
+  <prepare_resources>
     <resource name="Ghost" />
     <resource name="Spider" />
-  </resources>
+  </prepare_resources>
 </level>

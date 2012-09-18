@@ -9,9 +9,9 @@
 
   music_sound="castle_hall_music"
 >
-  <resources>
+  <prepare_resources>
     <resource name="Alien" />
     <resource name="Werewolf" />
     <resource name="BallMissile" />
-  </resources>
+  </prepare_resources>
 </level>
