@@ -6,6 +6,7 @@
   title="Hello world"
   number="95"
   type="Level"
+  placeholders="blender"
 
   demo="True"
   default_played="True"

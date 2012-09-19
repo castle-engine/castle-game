@@ -8,6 +8,7 @@
   title_hint="with costly water animation"
   number="16"
   type="Fountain"
+  placeholders="blender"
 
   demo="True"
   default_played="True"

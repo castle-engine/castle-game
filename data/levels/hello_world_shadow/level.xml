@@ -6,6 +6,7 @@
   title="Hello world (static shadow)"
   number="96"
   type="Level"
+  placeholders="blender"
 
   demo="True"
   default_played="True"

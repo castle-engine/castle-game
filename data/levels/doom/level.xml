@@ -8,6 +8,7 @@
   title_hint="shadows OFF advised"
   number="666"
   type="DoomE1M1"
+  placeholders="blender"
   loading_image="logo/doom_title.png"
   loading_image_bar_y_position="0.2"
 

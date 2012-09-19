@@ -7,6 +7,7 @@
   number="1"
   default_played="true"
   type="Gate"
+  placeholders="blender"
 
   music_sound="gate_music"
 >

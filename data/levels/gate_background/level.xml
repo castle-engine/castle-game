@@ -6,6 +6,7 @@
   title="Background"
   number="101"
   type="GateBackground"
+  placeholders="blender"
 >
   <resources />
 </level>

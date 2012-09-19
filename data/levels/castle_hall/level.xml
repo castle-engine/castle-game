@@ -6,6 +6,7 @@
   title="Castle Hall"
   number="2"
   type="CastleHall"
+  placeholders="blender"
 
   music_sound="castle_hall_music"
 >

@@ -7,6 +7,7 @@
   title_hint="shadows ON advised"
   number="15"
   type="Fountain"
+  placeholders="blender"
 
   demo="True"
   default_played="True"
