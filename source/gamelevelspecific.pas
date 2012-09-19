@@ -125,6 +125,8 @@ type
     FGameWinAnimation: TGameWinAnimation;
     FEndSequence: TCastleScene;
     procedure SetGameWinAnimation(Value: TGameWinAnimation);
+  protected
+    procedure PlaceholdersEnd; override;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -818,21 +820,6 @@ end;
 
 constructor TCagesLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
   MainScene: TCastleScene; DOMElement: TDOMElement);
-
-  function FindCreatureKind(Kind: TCreatureKind): TCreature;
-  var
-    I: Integer;
-  begin
-    for I := 0 to World.Count - 1 do
-      if World[I] is TCreature then
-      begin
-        Result := TCreature(World[I]);
-        if Result.Kind = Kind then
-          Exit;
-      end;
-    Result := nil;
-  end;
-
 begin
   inherited;
 
@@ -858,9 +845,27 @@ begin
     true { create octrees }, TGateExit);
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
   World.Add(FGateExit);
+end;
 
+procedure TCagesLevel.PlaceholdersEnd;
+
+  function FindCreatureKind(Kind: TCreatureKind): TCreature;
+  var
+    I: Integer;
+  begin
+    for I := 0 to World.Count - 1 do
+      if World[I] is TCreature then
+      begin
+        Result := TCreature(World[I]);
+        if Result.Kind = Kind then
+          Exit;
+      end;
+    Result := nil;
+  end;
+
+begin
+  inherited;
   Boss := FindCreatureKind(SpiderQueen);
-
   TGateExit(FGateExit).Boss := Boss;
 end;
 
