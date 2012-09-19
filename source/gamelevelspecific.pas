@@ -55,7 +55,7 @@ type
     WerewolfAppeared: boolean;
     WerewolfCreature: array [0..CastleHallWerewolvesCount - 1] of TWerewolfCreature;
   protected
-    function HandlePlaceholder(const Shape: TShape; const ModelerName: string): boolean; override;
+    function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -85,7 +85,7 @@ type
     CartLastSoundTime: Single;
     CartSoundPosition: TVector3Single;
   protected
-    function HandlePlaceholder(const Shape: TShape; const ModelerName: string): boolean; override;
+    function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -175,7 +175,7 @@ type
 
     ExitButton: TCastleScene;
   protected
-    function HandlePlaceholder(const Shape: TShape; const ModelerName: string): boolean; override;
+    function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -304,22 +304,22 @@ begin
   Result[2] := Box.Data[0, 2];
 end;
 
-function TCastleHallLevel.HandlePlaceholder(const Shape: TShape;
-  const ModelerName: string): boolean;
+function TCastleHallLevel.Placeholder(const Shape: TShape;
+  const PlaceholderName: string): boolean;
 var
   I: Integer;
 begin
   Result := inherited;
   if Result then Exit;
 
-  if ModelerName = 'LevelExitBox' then
+  if PlaceholderName = 'LevelExitBox' then
   begin
     FLevelExitBox := Shape.BoundingBox;
     Result := true;
   end;
 
   for I := 0 to CastleHallWerewolvesCount - 1 do
-    if ModelerName = 'WerewolfAppear_' + IntToStr(I) then
+    if PlaceholderName = 'WerewolfAppear_' + IntToStr(I) then
     begin
       WerewolfAppearPosition[I] := BoxDownPosition(Shape.BoundingBox);
       Result := true;
@@ -530,20 +530,20 @@ begin
   SwordAmbushDone := false;
 end;
 
-function TGateLevel.HandlePlaceholder(const Shape: TShape; const ModelerName: string): boolean;
+function TGateLevel.Placeholder(const Shape: TShape; const PlaceholderName: string): boolean;
 var
   I: Integer;
 begin
   Result := inherited;
   if Result then Exit;
 
-  if ModelerName = 'GateExitBox' then
+  if PlaceholderName = 'GateExitBox' then
   begin
     FGateExitBox := Shape.BoundingBox;
     Result := true;
   end;
 
-  if ModelerName = 'Teleport1Box' then
+  if PlaceholderName = 'Teleport1Box' then
   begin
     Teleport1Box := Shape.BoundingBox;
     Teleport1.Translation := Teleport1Box.Middle;
@@ -553,7 +553,7 @@ begin
     Result := true;
   end;
 
-  if ModelerName = 'Teleport2Box' then
+  if PlaceholderName = 'Teleport2Box' then
   begin
     Teleport2Box := Shape.BoundingBox;
     Teleport2.Translation := Teleport2Box.Middle;
@@ -563,21 +563,21 @@ begin
     Result := true;
   end;
 
-  if ModelerName = 'SacrilegeBox' then
+  if PlaceholderName = 'SacrilegeBox' then
   begin
     FSacrilegeBox := Shape.BoundingBox;
     Result := true;
   end;
 
   for I := 0 to High(SacrilegeAmbushStartingPosition) do
-    if ModelerName = 'SacrilegeGhost_' + IntToStr(I) then
+    if PlaceholderName = 'SacrilegeGhost_' + IntToStr(I) then
     begin
       SacrilegeAmbushStartingPosition[I] := BoxDownPosition(Shape.BoundingBox);
       Result := true;
     end;
 
   for I := 0 to High(SwordAmbushStartingPosition) do
-    if ModelerName = 'SwordGhost_' + IntToStr(I) then
+    if PlaceholderName = 'SwordGhost_' + IntToStr(I) then
     begin
       SwordAmbushStartingPosition[I] := BoxDownPosition(Shape.BoundingBox);
       Result := true;
@@ -1264,19 +1264,19 @@ begin
   TElevator9a9b(Elevator9a9b).MovingElevator9a9b := MovingElevator9a9b;
 end;
 
-function TDoomE1M1Level.HandlePlaceholder(const Shape: TShape;
-  const ModelerName: string): boolean;
+function TDoomE1M1Level.Placeholder(const Shape: TShape;
+  const PlaceholderName: string): boolean;
 begin
   Result := inherited;
   if Result then Exit;
 
-  if ModelerName = 'Elevator49DownBox' then
+  if PlaceholderName = 'Elevator49DownBox' then
   begin
     Elevator49DownBox := Shape.BoundingBox;
     Result := true;
   end;
 
-  if ModelerName = 'Elev9a9bPickBox' then
+  if PlaceholderName = 'Elev9a9bPickBox' then
   begin
     TElevator9a9b(Elevator9a9b).Elevator9a9bPickBox := Shape.BoundingBox;
     Result := true;
