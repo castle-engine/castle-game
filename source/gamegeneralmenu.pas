@@ -55,8 +55,7 @@ function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
 
 implementation
 
-uses SysUtils, CastleWindow, GameSound, UIControls, GameWindow,
-  CastleSoundEngine;
+uses SysUtils, CastleWindow, UIControls, GameWindow;
 
 { TCastleGameMenu ---------------------------------------------------------------- }
 

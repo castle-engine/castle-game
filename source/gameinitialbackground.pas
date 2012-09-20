@@ -31,7 +31,7 @@ procedure DrawInitialBackground;
 implementation
 
 uses SysUtils, GL, GLU, CastleWindow, CastleGLUtils, GLImages, UIControls,
-  GameWindow, CastleFilesUtils, Images, CastleGameNotifications;
+  GameWindow, CastleFilesUtils, Images;
 
 var
   GLList_ScreenImage: TGLuint;

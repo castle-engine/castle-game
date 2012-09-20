@@ -26,11 +26,11 @@ program castle;
 
 uses CastleWindow, SysUtils, CastleUtils, ProgressUnit, CastleProgress,
   Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
-  CastleLog, GameWindow, GameStartMenu, GameHelp, GameSound, CastleFilesUtils,
+  CastleLog, GameWindow, GameStartMenu, GameHelp, CastleFilesUtils,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, CastleLevels, CastleTextureProperties,
-  GameCredits, CastleSoundEngine, CastleConfig,
-  GLRenderer, CastleResources, GameItems, CastleGameNotifications;
+  CastleSoundEngine, CastleConfig, GLRenderer, CastleResources, GameItems,
+  CastleGameNotifications;
 
 { requested screen size ------------------------------------------------------ }
 

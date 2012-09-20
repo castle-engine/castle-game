@@ -68,8 +68,7 @@ procedure BackgroundDestroy;
 implementation
 
 uses SysUtils, GL, GLU, GLExt, CastleGLUtils, GLImages,
-  CastleFilesUtils, Images, VectorMath, CastlePlayer,
-  GameVideoOptions;
+  CastleFilesUtils, Images, VectorMath, CastlePlayer;
 
 { TBackgroundCaptions -------------------------------------------------------- }
 

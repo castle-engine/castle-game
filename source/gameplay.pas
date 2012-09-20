@@ -82,10 +82,10 @@ implementation
 uses SysUtils, CastleUtils, CastleWindow, GameInputs,
   WindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
   VectorMath, Images, Math, GameHelp, UIControls, CastleSoundEngine,
-  CastleItems, GameItems, CastleStringUtils,
+  GameItems, CastleStringUtils, CastleCreatures, CastleItems,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
-  GameVideoOptions, GameCreatures, CastleColors, CastleSceneManager,
-  CastleGameNotifications, GameControlsMenu, CastleControls, CastleCreatures,
+  GameVideoOptions, CastleColors, CastleSceneManager,
+  CastleGameNotifications, GameControlsMenu, CastleControls,
   GameLevelSpecific, CastleTimeUtils, GLImages, KeysMouse;
 
 var

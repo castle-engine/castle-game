@@ -26,8 +26,8 @@ unit GameCreatures;
 interface
 
 uses Classes, VectorMath, PrecalculatedAnimation, CastleClassUtils, CastleUtils,
-  CastleScene, CastleResources, CastleXMLConfig, Base3D,
-  CastleSoundEngine, X3DNodes, CastleCreatures;
+  CastleScene, CastleResources, CastleXMLConfig, Base3D, X3DNodes,
+  CastleCreatures;
 
 type
   TAlienCreatureKind = class(TWalkAttackCreatureKind)
@@ -152,9 +152,8 @@ procedure CreaturesKindsInit;
 
 implementation
 
-uses SysUtils, DOM, GL, GLU, CastleWindow,
-  CastleFilesUtils, CastleGLUtils, ProgressUnit,
-  CastleGameNotifications, GameSound, GameVideoOptions;
+uses SysUtils, DOM, GL, GLU, CastleWindow, CastleFilesUtils, CastleGLUtils,
+  ProgressUnit, GameSound;
 
 { TAlienCreatureKind --------------------------------------------------- }
 

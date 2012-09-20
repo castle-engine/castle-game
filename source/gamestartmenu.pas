@@ -33,17 +33,13 @@ procedure ShowStartMenu;
 
 implementation
 
-uses SysUtils, Classes, CastleUtils, WindowModes,
-  GL, GLU, CastleGLUtils, CastleMessages, GameWindow,
-  VectorMath, Images, CastleFilesUtils,
+uses SysUtils, Classes, CastleUtils, WindowModes, GL, GLU,
+  CastleGLUtils, CastleMessages, GameWindow, VectorMath, Images, CastleFilesUtils,
   CastleLevels, GamePlay, GameSound, CastlePlayer,
-  GameCreatures, GameGeneralMenu, OnScreenMenu,
-  GameControlsMenu, CastleInputs, GameVideoOptions, GameHelp,
-  CastleStringUtils, CastleClassUtils,
-  CastleGameNotifications, GameBackgroundLevel, UIControls,
-  CastleSoundEngine, CastleSoundMenu, X3DNodes, CastleResources,
-  GameCredits, KeysMouse, CastleOpenDocument,
-  PrecalculatedAnimation;
+  GameGeneralMenu, OnScreenMenu, GameControlsMenu, CastleInputs, GameVideoOptions,
+  GameHelp, CastleStringUtils, CastleClassUtils, CastleGameNotifications,
+  GameBackgroundLevel, UIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes,
+  GameCredits, KeysMouse, CastleOpenDocument, PrecalculatedAnimation;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
