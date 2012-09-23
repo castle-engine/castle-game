@@ -90,12 +90,12 @@ uses SysUtils, CastleUtils, CastleWindow, GameInputs,
 
 var
   GLList_NotificationsBackground: TGLuint;
-  GLList_InventorySlot: TGLuint;
-  GLList_BlankIndicatorImage: TGLuint;
-  GLList_RedIndicatorImage: TGLuint;
-  GLList_BlueIndicatorImage: TGLuint;
   GLList_DrawWaterRect: TGLuint;
-  GLList_BossIndicatorImage: TGLuint;
+  GLInventorySlot: TGLImage;
+  GLBlankIndicatorImage: TGLImage;
+  GLRedIndicatorImage: TGLImage;
+  GLBlueIndicatorImage: TGLImage;
+  GLBossIndicatorImage: TGLImage;
 
   DisplayFpsUpdateTick: TMilisecTime;
   DisplayFpsFrameTime: Single;
@@ -163,7 +163,7 @@ procedure TGame2DControls.Draw;
         Y := ItemSlotY(I);
 
         glRasterPos2i(X, Y);
-        glCallList(GLList_InventorySlot);
+        GLInventorySlot.Draw;
       end;
     glDisable(GL_BLEND);
 
@@ -175,7 +175,7 @@ procedure TGame2DControls.Draw;
         Y := ItemSlotY(I);
 
         glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
-        glCallList(Player.Inventory[I].Kind.GLList_DrawImage);
+        Player.Inventory[I].Kind.GLImage.Draw;
       end;
     glDisable(GL_ALPHA_TEST);
 
@@ -291,7 +291,7 @@ procedure TGame2DControls.Draw;
   end;
 
   procedure RenderLifeIndicator(const ALife, AMaxLife: Single;
-    const GLList_FullIndicatorImage: TGLuint;
+    const GLFullIndicatorImage: TGLImage;
     const XMove: Integer; const PrintText: boolean);
   const
     IndicatorHeight = 120;
@@ -311,16 +311,16 @@ procedure TGame2DControls.Draw;
       { Note that Life may be > MaxLife, and
         Life may be < 0. }
       if LifeMapped >= IndicatorHeight then
-        glCallList(GLList_FullIndicatorImage) else
+        GLFullIndicatorImage.Draw else
       if LifeMapped < 0 then
-        glCallList(GLList_BlankIndicatorImage) else
+        GLBlankIndicatorImage.Draw else
       begin
         glEnable(GL_SCISSOR_TEST);
           glScissor(IndicatorMargin, IndicatorMargin, Window.Width, LifeMapped);
-          glCallList(GLList_FullIndicatorImage);
+          GLFullIndicatorImage.Draw;
           glScissor(IndicatorMargin, IndicatorMargin + LifeMapped,
             Window.Width, Window.Height);
-          glCallList(GLList_BlankIndicatorImage);
+          GLBlankIndicatorImage.Draw;
         glDisable(GL_SCISSOR_TEST);
       end;
 
@@ -340,7 +340,7 @@ procedure TGame2DControls.Draw;
 
   procedure PlayerRender2D;
   begin
-    RenderLifeIndicator(Player.Life, Player.MaxLife, GLList_RedIndicatorImage, 0, true);
+    RenderLifeIndicator(Player.Life, Player.MaxLife, GLRedIndicatorImage, 0, true);
 
     if Player.FlyingMode then
     begin
@@ -416,7 +416,7 @@ begin
      TBossLevel(SceneManager.Logic).BossIndicator(BossLife, BossMaxLife) then
   begin
     RenderLifeIndicator(BossLife, BossMaxLife,
-      GLList_BossIndicatorImage, Window.Width - 150, false);
+      GLBossIndicatorImage, Window.Width - 150, false);
   end;
 
   PlayerRender2D;
@@ -663,9 +663,9 @@ procedure WindowOpen(const Container: IUIContainer);
       'player_controls' + PathDelim + BaseName;
   end;
 
-  function LoadPlayerControlToDisplayList(const BaseName: string): TGLuint;
+  function LoadPlayerControlToGL(const BaseName: string): TGLImage;
   begin
-    Result := LoadImageToDisplayList(
+    Result := TGLImage.Create(
       PlayerControlFileName(BaseName), [TRGBAlphaImage], [], 0, 0);
   end;
 
@@ -710,22 +710,22 @@ begin
     glPopAttrib;
   finally glEndList; end;
 
-  GLList_InventorySlot := LoadPlayerControlToDisplayList('item_slot.png');
-  GLList_BlankIndicatorImage := LoadPlayerControlToDisplayList('blank.png');
-  GLList_RedIndicatorImage := LoadPlayerControlToDisplayList('red.png');
-  GLList_BlueIndicatorImage := LoadPlayerControlToDisplayList('blue.png');
-  GLList_BossIndicatorImage := LoadPlayerControlToDisplayList('boss.png');
+  GLInventorySlot := LoadPlayerControlToGL('item_slot.png');
+  GLBlankIndicatorImage := LoadPlayerControlToGL('blank.png');
+  GLRedIndicatorImage := LoadPlayerControlToGL('red.png');
+  GLBlueIndicatorImage := LoadPlayerControlToGL('blue.png');
+  GLBossIndicatorImage := LoadPlayerControlToGL('boss.png');
 end;
 
 procedure WindowClose(const Container: IUIContainer);
 begin
   glFreeDisplayList(GLList_NotificationsBackground);
   glFreeDisplayList(GLList_DrawWaterRect);
-  glFreeDisplayList(GLList_InventorySlot);
-  glFreeDisplayList(GLList_BlankIndicatorImage);
-  glFreeDisplayList(GLList_RedIndicatorImage);
-  glFreeDisplayList(GLList_BlueIndicatorImage);
-  glFreeDisplayList(GLList_BossIndicatorImage);
+  FreeAndNil(GLInventorySlot);
+  FreeAndNil(GLBlankIndicatorImage);
+  FreeAndNil(GLRedIndicatorImage);
+  FreeAndNil(GLBlueIndicatorImage);
+  FreeAndNil(GLBossIndicatorImage);
 end;
 
 initialization

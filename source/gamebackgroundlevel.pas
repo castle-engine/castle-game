@@ -75,7 +75,7 @@ uses SysUtils, GL, GLU, GLExt, CastleGLUtils, GLImages,
 type
   TBackgroundCaptions = class(TUIControl)
   private
-    GLList_Caption: TGLuint;
+    GLCaption: TGLImage;
     {CaptionWidth, }CaptionHeight: Cardinal;
   public
     function DrawStyle: TUIControlDrawStyle; override;
@@ -96,7 +96,7 @@ begin
 
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.5);
-    glCallList(GLList_Caption);
+    GLCaption.Draw;
   glPopAttrib;
 end;
 
@@ -105,18 +105,21 @@ var
   ImageCaption: TCastleImage;
 begin
   inherited;
-  ImageCaption := LoadImage(ProgramDataPath + 'data' +
-    PathDelim + 'menu_bg' + PathDelim + 'caption.png', [], [], 0, 0);
-  try
-    GLList_Caption := ImageDrawToDisplayList(ImageCaption);
-    {CaptionWidth := ImageCaption.Width; useless for now}
-    CaptionHeight := ImageCaption.Height;
-  finally FreeAndNil(ImageCaption) end;
+  if GLCaption = nil then
+  begin
+    ImageCaption := LoadImage(ProgramDataPath + 'data' +
+      PathDelim + 'menu_bg' + PathDelim + 'caption.png', [], [], 0, 0);
+    try
+      GLCaption := TGLImage.Create(ImageCaption);
+      {CaptionWidth := ImageCaption.Width; useless for now}
+      CaptionHeight := ImageCaption.Height;
+    finally FreeAndNil(ImageCaption) end;
+  end;
 end;
 
 procedure TBackgroundCaptions.GLContextClose;
 begin
-  glFreeDisplayList(GLList_Caption);
+  FreeAndNil(GLCaption);
   inherited;
 end;
 

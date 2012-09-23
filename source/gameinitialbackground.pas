@@ -34,7 +34,7 @@ uses SysUtils, GL, GLU, CastleWindow, CastleGLUtils, GLImages, UIControls,
   GameWindow, CastleFilesUtils, Images;
 
 var
-  GLList_ScreenImage: TGLuint;
+  GLScreenImage: TGLImage;
 
 procedure Resize(Window: TCastleWindowBase);
 begin
@@ -45,7 +45,7 @@ procedure Draw(Window: TCastleWindowBase);
 begin
   glLoadIdentity;
   glRasterPos2i(0, 0);
-  glCallList(GLList_ScreenImage);
+  GLScreenImage.Draw;
 end;
 
 procedure DrawInitialBackground;
@@ -61,14 +61,14 @@ end;
 
 procedure WindowOpen(const Container: IUIContainer);
 begin
-  GLList_ScreenImage := LoadImageToDisplayList(ProgramDataPath + 'data' +
+  GLScreenImage := TGLImage.Create(ProgramDataPath + 'data' +
     PathDelim + 'menu_bg' + PathDelim + 'initial_background.png',
     [TRGBImage], [], Window.Width, Window.Height);
 end;
 
 procedure WindowClose(const Container: IUIContainer);
 begin
-  glFreeDisplayList(GLList_ScreenImage);
+  FreeAndNil(GLScreenImage);
 end;
 
 initialization
