@@ -76,7 +76,6 @@ type
   TBackgroundCaptions = class(TUIControl)
   private
     GLCaption: TGLImage;
-    {CaptionWidth, }CaptionHeight: Cardinal;
   public
     function DrawStyle: TUIControlDrawStyle; override;
     procedure Draw; override;
@@ -92,7 +91,7 @@ end;
 procedure TBackgroundCaptions.Draw;
 begin
   glPushAttrib(GL_ENABLE_BIT);
-    glRasterPos2i(0, ContainerHeight - CaptionHeight);
+    glRasterPos2i(0, ContainerHeight - GLCaption.Height);
 
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.5);
@@ -101,20 +100,11 @@ begin
 end;
 
 procedure TBackgroundCaptions.GLContextOpen;
-var
-  ImageCaption: TCastleImage;
 begin
   inherited;
   if GLCaption = nil then
-  begin
-    ImageCaption := LoadImage(ProgramDataPath + 'data' +
-      PathDelim + 'menu_bg' + PathDelim + 'caption.png', [], [], 0, 0);
-    try
-      GLCaption := TGLImage.Create(ImageCaption);
-      {CaptionWidth := ImageCaption.Width; useless for now}
-      CaptionHeight := ImageCaption.Height;
-    finally FreeAndNil(ImageCaption) end;
-  end;
+    GLCaption := TGLImage.Create(ProgramDataPath + 'data' +
+      PathDelim + 'menu_bg' + PathDelim + 'caption.png', [], []);
 end;
 
 procedure TBackgroundCaptions.GLContextClose;
