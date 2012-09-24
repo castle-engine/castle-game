@@ -316,14 +316,14 @@ begin
   if PlaceholderName = 'LevelExitBox' then
   begin
     FLevelExitBox := Shape.BoundingBox;
-    Result := true;
+    Exit(true);
   end;
 
   for I := 0 to CastleHallWerewolvesCount - 1 do
     if PlaceholderName = 'WerewolfAppear_' + IntToStr(I) then
     begin
       WerewolfAppearPosition[I] := BoxDownPosition(Shape.BoundingBox);
-      Result := true;
+      Exit(true);
     end;
 end;
 
@@ -541,7 +541,7 @@ begin
   if PlaceholderName = 'GateExitBox' then
   begin
     FGateExitBox := Shape.BoundingBox;
-    Result := true;
+    Exit(true);
   end;
 
   if PlaceholderName = 'Teleport1Box' then
@@ -551,7 +551,7 @@ begin
     Teleport2Destination := Teleport1Box.Middle;
     Teleport2Destination[0] -= 2;
     Teleport2Destination[1] -= 2;
-    Result := true;
+    Exit(true);
   end;
 
   if PlaceholderName = 'Teleport2Box' then
@@ -561,27 +561,27 @@ begin
     Teleport1Destination := Teleport2Box.Middle;
     Teleport1Destination[0] += 2;
     Teleport1Destination[1] += 2;
-    Result := true;
+    Exit(true);
   end;
 
   if PlaceholderName = 'SacrilegeBox' then
   begin
     FSacrilegeBox := Shape.BoundingBox;
-    Result := true;
+    Exit(true);
   end;
 
   for I := 0 to High(SacrilegeAmbushStartingPosition) do
     if PlaceholderName = 'SacrilegeGhost_' + IntToStr(I) then
     begin
       SacrilegeAmbushStartingPosition[I] := BoxDownPosition(Shape.BoundingBox);
-      Result := true;
+      Exit(true);
     end;
 
   for I := 0 to High(SwordAmbushStartingPosition) do
     if PlaceholderName = 'SwordGhost_' + IntToStr(I) then
     begin
       SwordAmbushStartingPosition[I] := BoxDownPosition(Shape.BoundingBox);
-      Result := true;
+      Exit(true);
     end;
 end;
 
@@ -1277,13 +1277,13 @@ begin
   if PlaceholderName = 'Elevator49DownBox' then
   begin
     Elevator49DownBox := Shape.BoundingBox;
-    Result := true;
+    Exit(true);
   end;
 
   if PlaceholderName = 'Elev9a9bPickBox' then
   begin
     TElevator9a9b(Elevator9a9b).Elevator9a9bPickBox := Shape.BoundingBox;
-    Result := true;
+    Exit(true);
   end;
 end;
 
