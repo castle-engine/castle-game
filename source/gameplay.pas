@@ -666,7 +666,7 @@ procedure WindowOpen(const Container: IUIContainer);
   function LoadPlayerControlToGL(const BaseName: string): TGLImage;
   begin
     Result := TGLImage.Create(
-      PlayerControlFileName(BaseName), [TRGBAlphaImage], [], 0, 0);
+      PlayerControlFileName(BaseName), [TRGBAlphaImage]);
   end;
 
 const
