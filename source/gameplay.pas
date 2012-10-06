@@ -90,7 +90,6 @@ uses SysUtils, CastleUtils, CastleWindow, GameInputs,
 
 var
   GLList_NotificationsBackground: TGLuint;
-  GLList_DrawWaterRect: TGLuint;
   GLInventorySlot: TGLImage;
   GLBlankIndicatorImage: TGLImage;
   GLRedIndicatorImage: TGLImage;
@@ -148,7 +147,7 @@ procedure TGame2DControls.Draw;
     I, X, Y: Integer;
     S: string;
   begin
-    InventorySlotsVisibleInColumn := Window.Height div InventorySlotHeight;
+    InventorySlotsVisibleInColumn := ContainerHeight div InventorySlotHeight;
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
@@ -216,7 +215,7 @@ procedure TGame2DControls.Draw;
 
   procedure RasterPosLine(const Line: Cardinal);
   begin
-    glRasterPos2i(0, Window.Height - UIFont.RowHeight * Line - 10 { margin });
+    glRasterPos2i(0, ContainerHeight - UIFont.RowHeight * Line - 10 { margin });
   end;
 
   procedure DoShowFPS;
@@ -316,10 +315,10 @@ procedure TGame2DControls.Draw;
         GLBlankIndicatorImage.Draw else
       begin
         glEnable(GL_SCISSOR_TEST);
-          glScissor(IndicatorMargin, IndicatorMargin, Window.Width, LifeMapped);
+          glScissor(IndicatorMargin, IndicatorMargin, ContainerWidth, LifeMapped);
           GLFullIndicatorImage.Draw;
           glScissor(IndicatorMargin, IndicatorMargin + LifeMapped,
-            Window.Width, Window.Height);
+            ContainerWidth, ContainerHeight);
           GLBlankIndicatorImage.Draw;
         glDisable(GL_SCISSOR_TEST);
       end;
@@ -345,42 +344,22 @@ procedure TGame2DControls.Draw;
     if Player.FlyingMode then
     begin
       glColorv(White3Single);
-      glRasterPos2i(0, Window.Height - UIFont.RowHeight - 5 { margin });
+      glRasterPos2i(0, ContainerHeight - UIFont.RowHeight - 5 { margin });
       UIFont.Print(Format('Flying (%d more seconds)', [Floor(Player.FlyingModeTimeout)]));
     end;
 
     glLoadIdentity;
     if Player.Dead then
-      DrawGLBlackOutRect(Red3Single, 1.0, 0, 0, Window.Width, Window.Height) else
+      GLFadeRectangle(0, 0, ContainerWidth, ContainerHeight, Red3Single, 1.0) else
     begin
-      { The problem with drawing such water screen:
-        Player eyes may be equal to water level,
-        and then camera near plane cuts some water, and then player
-        simultaneously sees things under the water (but not looking
-        through the water surface, so he doesn't see blended water surface)
-        and above the water.
-
-        So effect like "show fog when player pos under the water" will look
-        bad when player is exactly at the water surface: then he will
-        be able to see some part water clearly (without the water fog,
-        and without the blended water surface).
-
-        I checked how this looks in quake2, and they simply ignored the
-        problem (i.e. it is there...). And it's not so noticeable...
-        So I can ignore this problem too :)
-
-        Note: once I had an idea (an I actually did it in 1st szklane_lasy
-        version) to mark water by the blueish fog. This looks cool,
-        but in this case I can't use OpenGL fog, as it may be used
-        by the level itself (as it is, actually, for the 'Gate" level). }
-
       if Player.Swimming = psUnderWater then
-        glCallList(GLList_DrawWaterRect);
+        GLBlendRectangle(0, 0, ContainerWidth, ContainerHeight,
+          GL_ONE, GL_SRC_ALPHA, Vector4Single(0, 0, 0.1, 0.5));
 
-      { Apply black out effect on the possibly watery effect.
-        Yes, they both must mix. }
-      DrawGLBlackOutRect(Player.BlackOutColor, Player.BlackOutIntensity, 0, 0,
-        Window.Width, Window.Height);
+      { Possibly, Player.BlackOut* will be applied on top of water effect,
+        that's Ok --- they'll mix. }
+      GLFadeRectangle(0, 0, ContainerWidth, ContainerHeight,
+        Player.BlackOutColor, Player.BlackOutIntensity);
     end;
   end;
 
@@ -416,7 +395,7 @@ begin
      TBossLevel(SceneManager.Logic).BossIndicator(BossLife, BossMaxLife) then
   begin
     RenderLifeIndicator(BossLife, BossMaxLife,
-      GLBossIndicatorImage, Window.Width - 150, false);
+      GLBossIndicatorImage, ContainerWidth - 150, false);
   end;
 
   PlayerRender2D;
@@ -698,18 +677,6 @@ begin
     glDisable(GL_BLEND);
   finally glEndList end;
 
-  GLList_DrawWaterRect := glGenListsCheck(1, 'CastlePlay.WindowOpen');
-  glNewList(GLList_DrawWaterRect, GL_COMPILE);
-  try
-    glPushAttrib(GL_COLOR_BUFFER_BIT or GL_CURRENT_BIT);
-      glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_SRC_ALPHA);
-        glColorv(Vector4Single(0, 0, 0.1, 0.5));
-        glRectf(0, 0, Window.Width, Window.Height);
-      glDisable(GL_BLEND);
-    glPopAttrib;
-  finally glEndList; end;
-
   GLInventorySlot := LoadPlayerControlToGL('item_slot.png');
   GLBlankIndicatorImage := LoadPlayerControlToGL('blank.png');
   GLRedIndicatorImage := LoadPlayerControlToGL('red.png');
@@ -720,7 +687,6 @@ end;
 procedure WindowClose(const Container: IUIContainer);
 begin
   glFreeDisplayList(GLList_NotificationsBackground);
-  glFreeDisplayList(GLList_DrawWaterRect);
   FreeAndNil(GLInventorySlot);
   FreeAndNil(GLBlankIndicatorImage);
   FreeAndNil(GLRedIndicatorImage);
