@@ -227,7 +227,7 @@ begin
   PlayerSpeedSlider := TMenuFloatSlider.Create(0.1, 5, 1);
 
   Items.Add('Infinite Life');
-  Items.Add('Fly');
+  Items.Add('Fly (indefinitely)');
   Items.AddObject('Set view angle', ViewAngleSlider);
   Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
   Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
@@ -254,7 +254,7 @@ begin
 
   case CurrentItem of
     0: PlayerSetMaxLife;
-    1: Player.FlyingModeTimeoutBegin(60 * 60);
+    1: Player.Flying := true;
     2: ;
     3: ;
     4: ;

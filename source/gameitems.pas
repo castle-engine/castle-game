@@ -25,7 +25,7 @@ unit GameItems;
 
 interface
 
-uses Boxes3D, X3DNodes, VectorMath, CastleUtils, CastleClassUtils, 
+uses Boxes3D, X3DNodes, VectorMath, CastleUtils, CastleClassUtils,
   Classes, CastleImages, GL, GLU, CastleGLUtils, GameSound, CastleResources,
   CastleXMLConfig, CastleSoundEngine, Base3D, CastleItems;
 
@@ -128,7 +128,7 @@ begin
   if (Owner3D <> nil) and
      (Owner3D is T3DOrient) then
   begin
-    O := T3DOrient(Owner3D); 
+    O := T3DOrient(Owner3D);
     { O.Direction may be multiplied by something here for long-range weapons }
     WeaponBoundingBox := O.BoundingBox.Translate(O.Direction);
     { Tests: Writeln('WeaponBoundingBox is ', WeaponBoundingBox.ToNiceStr); }
@@ -193,7 +193,7 @@ end;
 procedure TItemScrollOfFlying.Use;
 begin
   Notifications.Show(Format('You cast spell from "%s"', [Kind.Caption]));
-  Player.FlyingModeTimeoutBegin(30.0);
+  Player.FlyingTimeOut := 30.0;
   Quantity := Quantity - 1;
   SoundEngine.Sound(stPlayerCastFlyingSpell);
 end;

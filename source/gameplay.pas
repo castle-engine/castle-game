@@ -338,14 +338,18 @@ procedure TGame2DControls.Draw;
   end;
 
   procedure PlayerRender2D;
+  var
+    S: string;
   begin
     RenderLifeIndicator(Player.Life, Player.MaxLife, GLRedIndicatorImage, 0, true);
 
-    if Player.FlyingMode then
+    if Player.Flying then
     begin
       glColorv(White3Single);
       glRasterPos2i(0, ContainerHeight - UIFont.RowHeight - 5 { margin });
-      UIFont.Print(Format('Flying (%d more seconds)', [Floor(Player.FlyingModeTimeout)]));
+      if Player.FlyingTimeOut > 0 then
+        S := Format(' (%d more seconds)', [Floor(Player.FlyingTimeOut)]);
+      UIFont.Print('Flying' + S);
     end;
 
     glLoadIdentity;
