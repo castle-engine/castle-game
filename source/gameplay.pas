@@ -34,6 +34,13 @@ uses Classes, CastleLevels, CastlePlayer, Base3D;
   right before starting the actual game. }
 procedure PlayGame(PrepareNewPlayer: boolean);
 
+type
+  TCastle1SceneManager = class(TGameSceneManager)
+  protected
+    function PointingDeviceActivate3D(const Item: T3D; const Active: boolean;
+      const Distance: Single): boolean; override;
+  end;
+
 var
   { Currently used player by PlayGame. nil if PlayGame doesn't work
     right now.
@@ -43,7 +50,7 @@ var
   { Currently used scene manager by PlayGame. nil if PlayGame doesn't work
     right now.
     @noAutoLinkHere }
-  SceneManager: TGameSceneManager;
+  SceneManager: TCastle1SceneManager;
 
 { Load new level or (if NextLevelName is empty) end the game.
 
@@ -108,6 +115,8 @@ var
   LevelFinishedNextLevelName: string;
 
   GameControls: TUIControlList;
+
+{ TGame2DControls ------------------------------------------------------------ }
 
 type
   TGame2DControls = class(TUIControl)
@@ -403,6 +412,50 @@ begin
   end;
 
   PlayerRender2D;
+end;
+
+{ TCastle1SceneManager ------------------------------------------------------- }
+
+function TCastle1SceneManager.PointingDeviceActivate3D(const Item: T3D;
+  const Active: boolean; const Distance: Single): boolean;
+const
+  VisibleDistance = 60.0;
+var
+  S: string;
+  I: TItemOnWorld;
+  C: TCreature;
+begin
+  Result := inherited;
+  if Result then Exit;
+
+  if Active and
+     ( (Item is TItemOnWorld) or
+       (Item is TCreature) ) and
+     (Distance <= VisibleDistance) then
+  begin
+    if Item is TCreature then
+    begin
+      C := TCreature(Item);
+      S := Format('You see a creature "%s"', [C.Kind.Name]);
+
+      if C.Life >= C.MaxLife then
+        S += ' (not wounded)' else
+      if C.Life >= C.MaxLife / 3 then
+        S += ' (wounded)' else
+      if C.Life > 0 then
+        S += ' (very wounded)' else
+        S += ' (dead)';
+    end else
+    begin
+      I := TItemOnWorld(Item);
+      S := Format('You see an item "%s"', [I.Item.Kind.Caption]);
+      if I.Item.Quantity <> 1 then
+        S += Format(' (quantity %d)', [I.Item.Quantity]);
+    end;
+
+    Notifications.Show(S);
+    Result := true;
+  end;
 end;
 
 procedure Idle(Window: TCastleWindowBase);

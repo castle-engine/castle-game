@@ -128,7 +128,7 @@ var
   differently. }
 procedure NewGame(Level: TLevelInfo);
 begin
-  SceneManager := TGameSceneManager.Create(nil);
+  SceneManager := TCastle1SceneManager.Create(nil);
   try
     SceneManager.ShadowVolumes := ShadowVolumes;
     SceneManager.ShadowVolumesDraw := ShadowVolumesDraw;
