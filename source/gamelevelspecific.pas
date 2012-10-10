@@ -612,7 +612,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     if TeleportBox.PointInside(Player.Position) then
     begin
       Player.Position := Destination;
-      GamePlay.Player.Camera.CancelFallingDown;
+      GamePlay.Player.Camera.CancelFalling;
 
       SceneManager.MainScene.ViewChangedSuddenly;
 
