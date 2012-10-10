@@ -5,10 +5,10 @@
   type="Missile"
 
   flying="True"
+  fall_speed="0.0"
   default_max_life="1.0"
   close_direction_to_player="False"
   knocked_back_distance="0.0"
-  falling_down_speed="0.0"
   middle_position_height="0.0"
 
   sound_explosion="thrown_web_hit"
