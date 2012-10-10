@@ -16,7 +16,7 @@
 
     There are various ways how you can get hurt, and many of
     them already have appropriate sounds - - - e.g. on drowning you get
-    player_drowning, on falling down you get player_falled_down. When being
+    player_drowning, on falling down you get player_fall. When being
     hit by the creature it's at least supposed that we'll create some
     sounds for particular creatures and their particular attacks
     (e.g. when hit by ball_missile, player gets ball_missile_explode sound
@@ -42,7 +42,7 @@
     default_importance="player"/>
   <sound name="player_drowning"
     default_importance="player"/>
-  <sound name="player_falled_down"
+  <sound name="player_fall"
     default_importance="player"/>
   <sound name="player_footsteps_concrete"
     default_importance="player"/>
@@ -110,7 +110,7 @@
   <sound name="creak" default_importance="level_event" gain="0.3" />
 
   <!-- Creatures sounds. -->
-  <sound name="creature_falled_down"
+  <sound name="creature_fall"
     default_importance="default_creature"/>
 
   <sound name="alien_sudden_pain"
