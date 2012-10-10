@@ -369,10 +369,10 @@ procedure TGame2DControls.Draw;
         GLBlendRectangle(0, 0, ContainerWidth, ContainerHeight,
           GL_ONE, GL_SRC_ALPHA, Vector4Single(0, 0, 0.1, 0.5));
 
-      { Possibly, Player.BlackOut* will be applied on top of water effect,
+      { Possibly, Player.FadeOut* will be applied on top of water effect,
         that's Ok --- they'll mix. }
       GLFadeRectangle(0, 0, ContainerWidth, ContainerHeight,
-        Player.BlackOutColor, Player.BlackOutIntensity);
+        Player.FadeOutColor, Player.FadeOutIntensity);
     end;
   end;
 
