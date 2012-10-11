@@ -15,7 +15,7 @@
   knock_back_speed="35"
   sound_dying_tied_to_creature="False"
   max_height_acceptable_to_fall="1.4"
-  middle_position_height="0.5"
+  middle_height="0.5"
 
   sound_sudden_pain="ghost_sudden_pain"
   sound_attack_start="ghost_attack_start"

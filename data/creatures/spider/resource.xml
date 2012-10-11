@@ -21,6 +21,7 @@
   knock_back_speed="35"
   max_angle_to_attack="1.04"
   max_height_acceptable_to_fall="1.4"
+  middle_height="1.0"
 
   sound_sudden_pain="spider_sudden_pain"
   sound_attack_start="spider_attack_start"

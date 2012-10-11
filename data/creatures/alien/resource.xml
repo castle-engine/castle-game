@@ -12,7 +12,7 @@
   life_to_run_away="1.0"
   default_max_life="90.0"
   max_height_acceptable_to_fall="1.4"
-  middle_position_height="0.8"
+  middle_height="0.8"
 
   sound_sudden_pain="alien_sudden_pain"
   sound_dying="alien_dying"

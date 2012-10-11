@@ -22,7 +22,7 @@
   chance_to_hurt="0.3"
   max_height_acceptable_to_fall="1.4"
   life_to_run_away="0.2"
-  middle_position_height="0.7"
+  middle_height="0.7"
   radius="1.0"
 
   sound_sudden_pain="werewolf_sudden_pain"

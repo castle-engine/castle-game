@@ -28,6 +28,7 @@
   min_life_loss_to_hurt="0.05"
   chance_to_hurt="0.3"
   life_to_run_away="0.25"
+  middle_height="1.0"
 
   sound_sudden_pain="spider_queen_sudden_pain"
   sound_attack_start="spider_queen_attack_start"
