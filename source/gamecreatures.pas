@@ -86,10 +86,6 @@ type
   end;
 
   TGhostKind = class(TWalkAttackCreatureKind)
-  protected
-    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList;
-      const GravityUp: TVector3Single;
-      const DoProgress: boolean); override;
   public
     function CreatureClass: TCreatureClass; override;
   end;
@@ -219,28 +215,6 @@ begin
 end;
 
 { TGhostKind ------------------------------------------------------------- }
-
-procedure TGhostKind.PrepareCore(const BaseLights: TAbstractLightInstancesList;
-  const GravityUp: TVector3Single;
-  const DoProgress: boolean);
-var
-  ReferenceScene: TCastleScene;
-  GravityCoordinate: Integer;
-begin
-  inherited;
-
-  { For Flying creatures, larger Radius (that *really* surrounds whole
-    model from Middle) is better. }
-  ReferenceScene := StandAnimation.Scenes[0];
-
-  GravityCoordinate := MaxAbsVectorCoord(GravityUp);
-  RadiusFromPrepare :=
-    Max(ReferenceScene.BoundingBox.Radius2D(GravityCoordinate),
-    { I can do here "/ 2" thanks to the fact that middle_position_height
-      of ghost is 0.5 (so I have room for another
-      "BoundingBox.Data[1, GravityCoordinate] / 2" for radius). }
-    ReferenceScene.BoundingBox.Data[1, GravityCoordinate] / 2);
-end;
 
 function TGhostKind.CreatureClass: TCreatureClass;
 begin
