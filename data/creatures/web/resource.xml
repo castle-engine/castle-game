@@ -4,7 +4,6 @@
   name="ThrownWeb"
   type="Missile"
 
-  fall_speed="0.0"
   default_max_life="1.0"
   close_direction_to_player="False"
   knocked_back_distance="0.0"
