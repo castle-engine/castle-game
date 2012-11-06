@@ -23,7 +23,6 @@
   knock_back_speed="35"
   max_angle_to_attack="1.04"
   max_height_acceptable_to_fall="5"
-  fall_down_life_loss_scale="0.5"
   random_walk_distance="30"
   min_life_loss_to_hurt="0.05"
   chance_to_hurt="0.3"
@@ -42,6 +41,10 @@
   hurt_animation="hurt.kanim"
   throw_web_attack_animation="throw_web_attack.kanim"
 >
+  <fall>
+    <damage scale_min="0.4" scale_max="0.6"/>
+  </fall>
+
   <short_range_attack knockback_distance="5">
     <damage const="10" random="10"/>
   </short_range_attack>
