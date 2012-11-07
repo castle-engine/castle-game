@@ -53,7 +53,7 @@ type
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
   public
-    constructor Create(const AId: string); override;
+    constructor Create(const AName: string); override;
     function CreatureClass: TCreatureClass; override;
 
     property MinDelayBetweenThrowWebAttacks: Single
@@ -166,7 +166,7 @@ end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
 
-constructor TSpiderQueenKind.Create(const AId: string);
+constructor TSpiderQueenKind.Create(const AName: string);
 begin
   inherited;
   FThrowWebAttackAnimation := T3DResourceAnimation.Create(Self, 'throw_web_attack');
