@@ -5,7 +5,7 @@
   type="Sword"
 
   actual_attack_time="0.294"
-  scene="model.wrl"
+  base_animation="model.wrl"
   caption="Sword"
   image="image.png"
 

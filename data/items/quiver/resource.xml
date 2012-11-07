@@ -4,7 +4,7 @@
   name="Quiver"
   type="Item"
 
-  scene="model.wrl"
+  base_animation="model.wrl"
   caption="Arrow"
   image="image.png"
 />

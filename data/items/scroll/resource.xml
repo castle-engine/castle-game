@@ -4,7 +4,7 @@
   name="ScrFlying"
   type="ScrFlying"
 
-  scene="model_final.wrl"
+  base_animation="model_final.wrl"
   caption="Scroll Of Flying"
   image="image.png"
 />

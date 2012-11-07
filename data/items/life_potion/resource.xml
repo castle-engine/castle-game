@@ -4,7 +4,7 @@
   name="LifePotion"
   type="LifePotion"
 
-  scene="model_processed.wrl"
+  base_animation="model_processed.wrl"
   caption="Potion of Life"
   image="image.png"
 />

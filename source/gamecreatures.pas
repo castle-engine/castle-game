@@ -47,20 +47,13 @@ type
 
   TSpiderQueenKind = class(TWalkAttackCreatureKind)
   private
-    FThrowWebAttackAnimation: TCastlePrecalculatedAnimation;
-    FThrowWebAttackAnimationFile: string;
-
+    FThrowWebAttackAnimation: T3DResourceAnimation;
     FMinDelayBetweenThrowWebAttacks: Single;
     FMaxThrowWebAttackDistance: Single;
     FMaxAngleToThrowWebAttack: Single;
     FActualThrowWebAttackTime: Single;
-  protected
-    procedure PrepareCore(const BaseLights: TAbstractLightInstancesList;
-      const GravityUp: TVector3Single;
-      const DoProgress: boolean); override;
-    function PrepareCoreSteps: Cardinal; override;
-    procedure ReleaseCore; override;
   public
+    constructor Create(const AId: string); override;
     function CreatureClass: TCreatureClass; override;
 
     property MinDelayBetweenThrowWebAttacks: Single
@@ -79,8 +72,7 @@ type
       read FActualThrowWebAttackTime
       write FActualThrowWebAttackTime default 0;
 
-    property ThrowWebAttackAnimation: TCastlePrecalculatedAnimation
-      read FThrowWebAttackAnimation;
+    property ThrowWebAttackAnimation: T3DResourceAnimation read FThrowWebAttackAnimation;
 
     procedure LoadFromFile(KindsConfig: TCastleConfig); override;
   end;
@@ -174,23 +166,10 @@ end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
 
-procedure TSpiderQueenKind.PrepareCore(const BaseLights: TAbstractLightInstancesList;
-  const GravityUp: TVector3Single;
-  const DoProgress: boolean);
+constructor TSpiderQueenKind.Create(const AId: string);
 begin
   inherited;
-  PreparePrecalculatedAnimation(FThrowWebAttackAnimation, FThrowWebAttackAnimationFile, BaseLights, DoProgress);
-end;
-
-function TSpiderQueenKind.PrepareCoreSteps: Cardinal;
-begin
-  Result := (inherited PrepareCoreSteps) + 2;
-end;
-
-procedure TSpiderQueenKind.ReleaseCore;
-begin
-  FThrowWebAttackAnimation := nil;
-  inherited;
+  FThrowWebAttackAnimation := T3DResourceAnimation.Create(Self, 'throw_web_attack');
 end;
 
 function TSpiderQueenKind.CreatureClass: TCreatureClass;
@@ -210,8 +189,6 @@ begin
     KindsConfig.GetFloat('throw_web/max_angle_to_attack', 0.0);
   ActualThrowWebAttackTime :=
     KindsConfig.GetFloat('throw_web/actual_attack_time', 0.0);
-
-  FThrowWebAttackAnimationFile := KindsConfig.GetFileName('throw_web_attack_animation');
 end;
 
 { TGhostKind ------------------------------------------------------------- }
@@ -294,7 +271,7 @@ begin
     stay on Cages level and slow down the rendering.
     Dying animation scales the model down, to make it gradually disappear. }
   if (State = wasDying) and
-    (LifeTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd) then
+    (LifeTime - StateChangeTime > WAKind.DyingAnimation.Animation.TimeEnd) then
     RemoveMe := rtRemoveAndFree;
 end;
 
@@ -365,7 +342,7 @@ procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemo
       ActualThrowWebAttack;
     end;
 
-    if StateTime > SQKind.ThrowWebAttackAnimation.TimeEnd then
+    if StateTime > SQKind.ThrowWebAttackAnimation.Animation.TimeEnd then
       { wasStand will quickly change to wasWalk if it will want to walk. }
       SetState(wasStand);
   end;
@@ -392,7 +369,7 @@ begin
     { Time from the change to this state. }
     StateTime := LifeTime - StateChangeTime;
 
-    Result := SQKind.ThrowWebAttackAnimation.SceneFromTime(StateTime);
+    Result := SQKind.ThrowWebAttackAnimation.Animation.SceneFromTime(StateTime);
   end else
     Result := inherited;
 
@@ -443,7 +420,7 @@ procedure TGhostCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType
 begin
   inherited;
   if (State = wasDying) and
-    (LifeTime - StateChangeTime > WAKind.DyingAnimation.TimeEnd) then
+    (LifeTime - StateChangeTime > WAKind.DyingAnimation.Animation.TimeEnd) then
     RemoveMe := rtRemoveAndFree;
 end;
 

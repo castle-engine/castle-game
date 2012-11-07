@@ -4,7 +4,7 @@
   name="RedKey"
   type="Item"
 
-  scene="model.wrl"
+  base_animation="model.wrl"
   caption="Red Key"
   image="image.png"
 />

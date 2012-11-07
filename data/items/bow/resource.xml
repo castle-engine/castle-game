@@ -5,7 +5,7 @@
   type="Bow"
 
   actual_attack_time="0.0"
-  scene="model_final.wrl"
+  base_animation="model_final.wrl"
   caption="Bow"
   image="image.png"
 

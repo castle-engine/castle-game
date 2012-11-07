@@ -913,7 +913,7 @@ const
     SA: TSpiderAppearing;
   begin
     SA := TSpiderAppearing.Create(Self);
-    SA.Add(Spider.StandAnimation.Scenes[0]);
+    SA.Add(Spider.StandAnimation.Animation.Scenes[0]);
     SA.Collides := false;
     SA.Translation := Position;
     SpidersAppearing.Add(SA);
