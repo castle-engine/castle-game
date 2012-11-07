@@ -252,7 +252,7 @@ begin
   if ShortRangeActualAttackHits then
   begin
     Sound3d(stWerewolfActualAttackHit, 1.0);
-    ShortRangeAttackHurt;
+    AttackHurt;
   end;
 end;
 
@@ -283,7 +283,7 @@ begin
   if ShortRangeActualAttackHits then
   begin
     Sound3d(stSpiderActualAttackHit, 1.0);
-    ShortRangeAttackHurt;
+    AttackHurt;
   end;
 end;
 
@@ -310,7 +310,7 @@ begin
   if ShortRangeActualAttackHits then
   begin
     Sound3d(stSpiderQueenActualAttackHit, 1.0);
-    ShortRangeAttackHurt;
+    AttackHurt;
   end;
 end;
 
@@ -435,7 +435,7 @@ procedure TGhostCreature.ActualAttack;
 begin
   if ShortRangeActualAttackHits then
   begin
-    ShortRangeAttackHurt;
+    AttackHurt;
   end;
 end;
 
