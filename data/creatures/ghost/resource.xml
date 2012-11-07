@@ -19,14 +19,15 @@
   sound_sudden_pain="ghost_sudden_pain"
   sound_attack_start="ghost_attack_start"
   sound_dying="ghost_dying"
-
-  stand_animation="stand.kanim"
-  stand_to_walk_animation="stand_to_walk.kanim"
-  walk_animation="walk.kanim"
-  attack_animation="attack.kanim"
-  dying_animation="dying.kanim"
-  hurt_animation="hurt.kanim"
 >
+  <model>
+    <stand file_name="stand.kanim"/>
+    <stand_to_walk file_name="stand_to_walk.kanim"/>
+    <walk file_name="walk.kanim"/>
+    <attack file_name="attack.kanim"/>
+    <dying file_name="dying.kanim"/>
+    <hurt file_name="hurt.kanim"/>
+  </model>
   <short_range_attack knockback_distance="0.0">
     <damage const="7" random="8"/>
   </short_range_attack>

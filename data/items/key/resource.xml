@@ -4,7 +4,10 @@
   name="Key"
   type="Item"
 
-  base_animation="model.wrl"
   caption="Key"
   image="image.png"
-/>
+>
+  <model>
+    <base file_name="model.wrl"/>
+  </model>
+</resource>

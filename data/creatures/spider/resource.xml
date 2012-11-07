@@ -26,14 +26,15 @@
   sound_sudden_pain="spider_sudden_pain"
   sound_attack_start="spider_attack_start"
   sound_dying="spider_dying"
-
-  stand_animation="spider_stand.wrl"
-  stand_to_walk_animation="spider_stand.wrl"
-  walk_animation="walk.kanim"
-  attack_animation="attack.kanim"
-  dying_animation="dying.kanim"
-  hurt_animation="hurt.kanim"
 >
+  <model>
+    <stand file_name="spider_stand.wrl"/>
+    <stand_to_walk file_name="spider_stand.wrl"/>
+    <walk file_name="walk.kanim"/>
+    <attack file_name="attack.kanim"/>
+    <dying file_name="dying.kanim"/>
+    <hurt file_name="hurt.kanim"/>
+  </model>
   <short_range_attack knockback_distance="0.1">
     <damage const="10" random="10"/>
   </short_range_attack>

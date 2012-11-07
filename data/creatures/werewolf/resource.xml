@@ -28,14 +28,15 @@
   sound_sudden_pain="werewolf_sudden_pain"
   sound_attack_start="werewolf_attack_start"
   sound_dying="werewolf_dying"
-
-  stand_animation="werewolf_still_final.wrl"
-  stand_to_walk_animation="werewolf_still_final.wrl"
-  walk_animation="walk.kanim"
-  attack_animation="attack.kanim"
-  dying_animation="dying.kanim"
-  hurt_animation="hurt.kanim"
 >
+  <model>
+    <stand file_name="werewolf_still_final.wrl"/>
+    <stand_to_walk file_name="werewolf_still_final.wrl"/>
+    <walk file_name="walk.kanim"/>
+    <attack file_name="attack.kanim"/>
+    <dying file_name="dying.kanim"/>
+    <hurt file_name="hurt.kanim"/>
+  </model>
   <short_range_attack knockback_distance="6.0">
     <damage const="5" random="5"/>
   </short_range_attack>

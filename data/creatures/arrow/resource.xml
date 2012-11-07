@@ -21,10 +21,11 @@
 
   sound_explosion="arrow_hit"
 
-  fly_animation="arrow.wrl"
-
   always_prepared="True"
 >
+  <model>
+    <fly file_name="arrow.wrl"/>
+  </model>
   <short_range_attack knockback_distance="1">
     <damage const="20" random="20"/>
   </short_range_attack>

@@ -7,6 +7,8 @@
   radius="0.5"
   default_max_life="1.0"
   knock_back_speed="35"
-
-  stand_animation="barrel.wrl"
-/>
+>
+  <model>
+    <stand file_name="barrel.wrl"/>
+  </model>
+</resource>

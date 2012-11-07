@@ -16,12 +16,14 @@
 
   sound_sudden_pain="alien_sudden_pain"
   sound_dying="alien_dying"
-
-  stand_animation="alien_still_final.wrl"
-  stand_to_walk_animation="stand_to_walk.kanim"
-  walk_animation="walk.kanim"
-  attack_animation="attack.kanim"
-  dying_animation="dying.kanim"
-  dying_back_animation="dying_back.kanim"
-  hurt_animation="hurt.kanim"
-/>
+>
+  <model>
+    <stand file_name="alien_still_final.wrl"/>
+    <stand_to_walk file_name="stand_to_walk.kanim"/>
+    <walk file_name="walk.kanim"/>
+    <attack file_name="attack.kanim"/>
+    <dying file_name="dying.kanim"/>
+    <dying_back file_name="dying_back.kanim"/>
+    <hurt file_name="hurt.kanim"/>
+  </model>
+</resource>

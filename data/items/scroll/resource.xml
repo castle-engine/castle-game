@@ -4,7 +4,10 @@
   name="ScrFlying"
   type="ScrFlying"
 
-  base_animation="model_final.wrl"
   caption="Scroll Of Flying"
   image="image.png"
-/>
+>
+  <model>
+    <base file_name="model_final.wrl"/>
+  </model>
+</resource>

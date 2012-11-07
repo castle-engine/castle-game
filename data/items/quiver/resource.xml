@@ -4,7 +4,10 @@
   name="Quiver"
   type="Item"
 
-  base_animation="model.wrl"
   caption="Arrow"
   image="image.png"
-/>
+>
+  <model>
+    <base file_name="model.wrl"/>
+  </model>
+</resource>

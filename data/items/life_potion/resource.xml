@@ -4,7 +4,10 @@
   name="LifePotion"
   type="LifePotion"
 
-  base_animation="model_processed.wrl"
   caption="Potion of Life"
   image="image.png"
-/>
+>
+  <model>
+    <base file_name="model_processed.wrl"/>
+  </model>
+</resource>

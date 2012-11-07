@@ -5,13 +5,15 @@
   type="Bow"
 
   actual_attack_time="0.0"
-  base_animation="model_final.wrl"
   caption="Bow"
   image="image.png"
 
   equipping_sound="bow_equipping"
   sound_attack_start="bow_attack_start"
-
-  attack_animation="attack.kanim"
-  ready_animation="ready.wrl"
-/>
+>
+  <model>
+    <base file_name="model_final.wrl"/>
+    <attack file_name="attack.kanim"/>
+    <ready file_name="ready.wrl"/>
+  </model>
+</resource>

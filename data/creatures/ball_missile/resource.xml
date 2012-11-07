@@ -11,9 +11,10 @@
 
   sound_explosion="ball_missile_explode"
   sound_idle="ball_missile_idle"
-
-  fly_animation="fly.kanim"
 >
+  <model>
+    <fly file_name="fly.kanim"/>
+  </model>
   <short_range_attack knockback_distance="5">
     <damage const="10" random="10"/>
   </short_range_attack>
