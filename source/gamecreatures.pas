@@ -74,7 +74,7 @@ type
 
     property ThrowWebAttackAnimation: T3DResourceAnimation read FThrowWebAttackAnimation;
 
-    procedure LoadFromFile(KindsConfig: TCastleConfig); override;
+    procedure LoadFromFile(ResourceConfig: TCastleConfig); override;
   end;
 
   TGhostKind = class(TWalkAttackCreatureKind)
@@ -177,18 +177,18 @@ begin
   Result := TSpiderQueenCreature;
 end;
 
-procedure TSpiderQueenKind.LoadFromFile(KindsConfig: TCastleConfig);
+procedure TSpiderQueenKind.LoadFromFile(ResourceConfig: TCastleConfig);
 begin
   inherited;
 
   MinDelayBetweenThrowWebAttacks :=
-    KindsConfig.GetFloat('throw_web/min_delay_between_attacks', 0.0);
+    ResourceConfig.GetFloat('throw_web/min_delay_between_attacks', 0.0);
   MaxThrowWebAttackDistance :=
-    KindsConfig.GetFloat('throw_web/max_attack_distance', 0.0);
+    ResourceConfig.GetFloat('throw_web/max_attack_distance', 0.0);
   MaxAngleToThrowWebAttack :=
-    KindsConfig.GetFloat('throw_web/max_angle_to_attack', 0.0);
+    ResourceConfig.GetFloat('throw_web/max_angle_to_attack', 0.0);
   ActualThrowWebAttackTime :=
-    KindsConfig.GetFloat('throw_web/actual_attack_time', 0.0);
+    ResourceConfig.GetFloat('throw_web/actual_attack_time', 0.0);
 end;
 
 { TGhostKind ------------------------------------------------------------- }
