@@ -35,7 +35,7 @@
     <dying file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
-  <short_range_attack knockback_distance="0.1">
+  <attack knockback_distance="0.1">
     <damage const="10" random="10"/>
-  </short_range_attack>
+  </attack>
 </resource>

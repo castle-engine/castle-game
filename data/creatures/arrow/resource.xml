@@ -26,7 +26,7 @@
   <model>
     <fly file_name="arrow.wrl"/>
   </model>
-  <short_range_attack knockback_distance="1">
+  <attack knockback_distance="1">
     <damage const="20" random="20"/>
-  </short_range_attack>
+  </attack>
 </resource>

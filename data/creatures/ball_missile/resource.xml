@@ -15,7 +15,7 @@
   <model>
     <fly file_name="fly.kanim"/>
   </model>
-  <short_range_attack knockback_distance="5">
+  <attack knockback_distance="5">
     <damage const="10" random="10"/>
-  </short_range_attack>
+  </attack>
 </resource>
