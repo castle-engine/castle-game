@@ -109,7 +109,7 @@ type
   private
     LastThrowWebAttackTime: Single;
     ActualThrowWebAttackDone: boolean;
-    function SQKind: TSpiderQueenKind;
+    function Kind: TSpiderQueenKind;
     procedure ActualThrowWebAttack;
   protected
     procedure SetState(Value: TWalkAttackCreatureState); override;
@@ -271,15 +271,15 @@ begin
     stay on Cages level and slow down the rendering.
     Dying animation scales the model down, to make it gradually disappear. }
   if (State = wasDying) and
-    (LifeTime - StateChangeTime > WAKind.DyingAnimation.Duration) then
+    (LifeTime - StateChangeTime > Kind.DyingAnimation.Duration) then
     RemoveMe := rtRemoveAndFree;
 end;
 
 { TSpiderQueenCreature ---------------------------------------------------- }
 
-function TSpiderQueenCreature.SQKind: TSpiderQueenKind;
+function TSpiderQueenCreature.Kind: TSpiderQueenKind;
 begin
-  Result := TSpiderQueenKind(Kind);
+  Result := TSpiderQueenKind(inherited Kind);
 end;
 
 procedure TSpiderQueenCreature.ActualAttack;
@@ -312,9 +312,9 @@ procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemo
     ThrowWebAttackAllowed :=
       IdleSeesPlayer and
       (LifeTime - LastThrowWebAttackTime >
-        SQKind.MinDelayBetweenThrowWebAttacks) and
+        Kind.MinDelayBetweenThrowWebAttacks) and
       (IdleSqrDistanceToLastSeenPlayer <=
-        Sqr(SQKind.MaxThrowWebAttackDistance));
+        Sqr(Kind.MaxThrowWebAttackDistance));
 
     if ThrowWebAttackAllowed then
     begin
@@ -322,7 +322,7 @@ procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemo
       AngleRadBetweenTheDirectionToPlayer := AngleRadBetweenVectors(
         LastSeenPlayer - Middle, Direction);
       ThrowWebAttackAllowed := AngleRadBetweenTheDirectionToPlayer <=
-        SQKind.MaxAngleToThrowWebAttack;
+        Kind.MaxAngleToThrowWebAttack;
 
       if ThrowWebAttackAllowed then
         SetState(wasSpecial1);
@@ -336,13 +336,13 @@ procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemo
     StateTime := LifeTime - StateChangeTime;
 
     if (not ActualThrowWebAttackDone) and
-       (StateTime >= SQKind.ActualThrowWebAttackTime) then
+       (StateTime >= Kind.ActualThrowWebAttackTime) then
     begin
       ActualThrowWebAttackDone := true;
       ActualThrowWebAttack;
     end;
 
-    if StateTime > SQKind.ThrowWebAttackAnimation.Duration then
+    if StateTime > Kind.ThrowWebAttackAnimation.Duration then
       { wasStand will quickly change to wasWalk if it will want to walk. }
       SetState(wasStand);
   end;
@@ -369,7 +369,7 @@ begin
     { Time from the change to this state. }
     StateTime := LifeTime - StateChangeTime;
 
-    Result := SQKind.ThrowWebAttackAnimation.Scene(StateTime, false);
+    Result := Kind.ThrowWebAttackAnimation.Scene(StateTime, false);
   end else
     Result := inherited;
 end;
@@ -415,7 +415,7 @@ procedure TGhostCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType
 begin
   inherited;
   if (State = wasDying) and
-    (LifeTime - StateChangeTime > WAKind.DyingAnimation.Duration) then
+    (LifeTime - StateChangeTime > Kind.DyingAnimation.Duration) then
     RemoveMe := rtRemoveAndFree;
 end;
 
