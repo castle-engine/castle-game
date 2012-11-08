@@ -271,7 +271,7 @@ begin
     stay on Cages level and slow down the rendering.
     Dying animation scales the model down, to make it gradually disappear. }
   if (State = wasDying) and
-    (LifeTime - StateChangeTime > WAKind.DyingAnimation.Animation.TimeEnd) then
+    (LifeTime - StateChangeTime > WAKind.DyingAnimation.Duration) then
     RemoveMe := rtRemoveAndFree;
 end;
 
@@ -342,7 +342,7 @@ procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemo
       ActualThrowWebAttack;
     end;
 
-    if StateTime > SQKind.ThrowWebAttackAnimation.Animation.TimeEnd then
+    if StateTime > SQKind.ThrowWebAttackAnimation.Duration then
       { wasStand will quickly change to wasWalk if it will want to walk. }
       SetState(wasStand);
   end;
@@ -369,14 +369,9 @@ begin
     { Time from the change to this state. }
     StateTime := LifeTime - StateChangeTime;
 
-    Result := SQKind.ThrowWebAttackAnimation.Animation.SceneFromTime(StateTime);
+    Result := SQKind.ThrowWebAttackAnimation.Scene(StateTime, false);
   end else
     Result := inherited;
-
-  { self-shadows on creatures look bad, esp. see werewolves at the end
-    of "castle hall" level. Changing XxxShadowVolumes here
-    is a little hacky (would be cleaner to do it at loading), but easy. }
-  TCastleScene(Result).ReceiveShadowVolumes := false;
 end;
 
 procedure TSpiderQueenCreature.ActualThrowWebAttack;
@@ -420,7 +415,7 @@ procedure TGhostCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType
 begin
   inherited;
   if (State = wasDying) and
-    (LifeTime - StateChangeTime > WAKind.DyingAnimation.Animation.TimeEnd) then
+    (LifeTime - StateChangeTime > WAKind.DyingAnimation.Duration) then
     RemoveMe := rtRemoveAndFree;
 end;
 
