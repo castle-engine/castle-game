@@ -4,6 +4,7 @@
   name="BallMissile"
   type="Missile"
 
+  move_speed="35.0"
   default_max_life="1.0"
   close_direction_to_target_speed="1.0"
   pause_between_sound_idle="2.5"

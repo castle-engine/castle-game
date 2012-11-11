@@ -1,15 +1,43 @@
 <?xml version="1.0"?>
 
+<!-- Some key properties to making a creature specialized in shooting
+  player from long-range:
+
+  - Of course, define model/fire_missile animation,
+    and define at least fire_missile/name to indicate the missile name.
+
+    To make shooting more aggressive:
+    You can decrease fire_missile/time to fire more often.
+    You can increase fire_missile/max_distance to fire from larger distance,
+    like a sniper
+    (see also close_direction_to_target_speed inside the missile,
+    i.e. ../ball_missile/resource.xml in this case, to make the missile "homing").
+
+  - Set preferred_distance to be as large as possible, which usually means
+    equal to fire_missile/max_distance. You want the creature to only get
+    close enough to shoot, not closer.
+
+  - Make the creature as cowardly as possible:
+    Set run_away/life to 1.0, to make creature always run away
+    when enemy gets closer than run_aray/distance .
+    run_aray/distance is nonzero by default already, but you may want
+    to even increase it.
+
+    To really make the creature difficult, you can set a large move_speed
+    for a cowardly creature. This will really make it difficult to catch.
+
+  And of course don't overdo any of this. Game is supposed to be fun for players.
+-->
+
 <resource
   name="Alien"
   type="WalkAttack"
 
   move_speed="5.0"
-  knocked_back_distance="4.2"
   knock_back_speed="35"
   default_max_life="90.0"
-  max_height_acceptable_to_fall="1.4"
   middle_height="0.8"
+  preferred_distance="30.0"
 
   sound_sudden_pain="alien_sudden_pain"
   sound_dying="alien_dying"
@@ -26,9 +54,7 @@
   <run_away life="1.0"/>
   <fire_missile
     time="0.4"
-    min_delay="2.0"
     max_distance="35.0"
-    max_angle="0.5"
     name="BallMissile"
     sound="ball_missile_fired"
     height="0.6"

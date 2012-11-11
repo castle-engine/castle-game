@@ -7,10 +7,8 @@
   move_speed="25.0"
   flying="True"
   default_max_life="30.0"
-  knocked_back_distance="4.2"
   knock_back_speed="35"
   sound_dying_tied_to_creature="False"
-  max_height_acceptable_to_fall="1.4"
   remove_corpse="True"
   preferred_distance="2.0"
 
@@ -30,7 +28,6 @@
     start_sound="ghost_attack_start"
     knockback_distance="0.0"
     max_distance="2.0"
-    min_delay="2.0"
   >
     <damage const="7" random="8"/>
   </attack>
