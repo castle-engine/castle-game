@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 
-<!-- max_angle_to_attack for SpiderQueen comments:
+<!-- attack/max_angle for SpiderQueen comments:
      SpiderQueen is large, the same reasoning is behind
-     it's max_angle_to_attack as for Werewolf.
+     it's attack/max_angle as for Werewolf.
 
-     Note: max_angle_to_attack > Pi means "no limits".
+     Note: attack/max_angle > Pi means "no limits".
      This makes the trick with jumping/flying on SpiderQueen much harder.
      For now, not used - - - let's allow inventive players to use it.
 -->
@@ -14,13 +14,9 @@
   type="SpiderQueen"
 
   move_speed="17.5"
-  max_attack_distance="8.0"
-  preferred_attack_distance="8.0"
-  min_delay_between_attacks="2.0"
   default_max_life="1100.0"
   knocked_back_distance="2.0"
   knock_back_speed="35"
-  max_angle_to_attack="1.04"
   max_height_acceptable_to_fall="5"
   random_walk_distance="30"
   min_life_loss_to_hurt="0.05"
@@ -29,7 +25,6 @@
   middle_height="1.0"
 
   sound_sudden_pain="spider_queen_sudden_pain"
-
   sound_dying="spider_queen_dying"
 >
   <model>
@@ -51,7 +46,12 @@
     sound="spider_queen_actual_attack_hit"
     start_sound="spider_queen_attack_start"
     knockback_distance="5"
-    time="0.4">
+    time="0.4"
+    max_distance="8.0"
+    preferred_distance="8.0"
+    min_delay="2.0"
+    max_angle="1.04"
+  >
     <damage const="10" random="10"/>
   </attack>
 
