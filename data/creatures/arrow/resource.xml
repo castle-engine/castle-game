@@ -19,7 +19,7 @@
   direction_fall_speed="0.15"
   radius="0.3"
 
-  sound_explosion="arrow_hit"
+  sound_hit="arrow_hit"
 
   always_prepared="True"
 >

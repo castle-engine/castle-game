@@ -8,7 +8,7 @@
   close_direction_to_player="False"
   knocked_back_distance="0.0"
 
-  sound_explosion="thrown_web_hit"
+  sound_hit="thrown_web_hit"
   sound_idle="thrown_web_idle"
 >
   <model>
