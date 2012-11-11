@@ -31,7 +31,6 @@
 >
   <model>
     <stand file_name="spider_stand.wrl"/>
-    <stand_to_walk file_name="spider_stand.wrl"/>
     <walk file_name="walk.kanim"/>
     <attack file_name="attack.kanim"/>
     <dying file_name="dying.kanim"/>
