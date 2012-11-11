@@ -18,6 +18,7 @@
   max_height_acceptable_to_fall="1.4"
   middle_height="0.7"
   radius="1.0"
+  preferred_distance="4.2"
 
   sound_sudden_pain="werewolf_sudden_pain"
   sound_dying="werewolf_dying"
@@ -32,14 +33,12 @@
   </model>
   <run_away life="0.2"/>
   <attack
-    short_range="True"
     sound="werewolf_actual_attack_hit"
     start_sound="werewolf_attack_start"
     time="0.3"
     knockback_distance="6.0"
     min_delay="2.0"
     max_distance="4.2"
-    preferred_distance="4.2"
     max_angle="1.04"
   >
     <damage const="5" random="5"/>

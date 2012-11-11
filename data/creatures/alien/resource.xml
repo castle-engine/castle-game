@@ -18,15 +18,19 @@
     <stand file_name="alien_still_final.wrl"/>
     <stand_to_walk file_name="stand_to_walk.kanim"/>
     <walk file_name="walk.kanim"/>
-    <attack file_name="attack.kanim"/>
+    <fire_missile file_name="attack.kanim"/>
     <dying file_name="dying.kanim"/>
     <dying_back file_name="dying_back.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
   <run_away life="1.0"/>
-  <attack
+  <fire_missile
     time="0.4"
     min_delay="2.0"
+    max_distance="35.0"
+    max_angle="0.5"
+    name="BallMissile"
+    sound="ball_missile_fired"
+    height="0.6"
   />
-  <fire_missile name="BallMissile" sound="ball_missile_fired" height="0.6"/>
 </resource>

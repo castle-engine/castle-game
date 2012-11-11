@@ -12,6 +12,7 @@
   sound_dying_tied_to_creature="False"
   max_height_acceptable_to_fall="1.4"
   remove_corpse="True"
+  preferred_distance="2.0"
 
   sound_sudden_pain="ghost_sudden_pain"
   sound_dying="ghost_dying"
@@ -26,11 +27,9 @@
   </model>
   <run_away life="0.01"/>
   <attack
-    short_range="True"
     start_sound="ghost_attack_start"
     knockback_distance="0.0"
     max_distance="2.0"
-    preferred_distance="2.0"
     min_delay="2.0"
   >
     <damage const="7" random="8"/>

@@ -46,35 +46,8 @@ type
   end;
 
   TSpiderQueenKind = class(TWalkAttackCreatureKind)
-  private
-    FThrowWebAttackAnimation: T3DResourceAnimation;
-    FMinDelayBetweenThrowWebAttacks: Single;
-    FMaxThrowWebAttackDistance: Single;
-    FMaxAngleToThrowWebAttack: Single;
-    FActualThrowWebAttackTime: Single;
   public
-    constructor Create(const AName: string); override;
     function CreatureClass: TCreatureClass; override;
-
-    property MinDelayBetweenThrowWebAttacks: Single
-      read FMinDelayBetweenThrowWebAttacks
-      write FMinDelayBetweenThrowWebAttacks default 0;
-
-    property MaxThrowWebAttackDistance: Single
-      read FMaxThrowWebAttackDistance
-      write FMaxThrowWebAttackDistance default 0;
-
-    property MaxAngleToThrowWebAttack: Single
-      read FMaxAngleToThrowWebAttack
-      write FMaxAngleToThrowWebAttack default 0;
-
-    property ActualThrowWebAttackTime: Single
-      read FActualThrowWebAttackTime
-      write FActualThrowWebAttackTime default 0;
-
-    property ThrowWebAttackAnimation: T3DResourceAnimation read FThrowWebAttackAnimation;
-
-    procedure LoadFromFile(ResourceConfig: TCastleConfig); override;
   end;
 
   TGhostKind = class(TWalkAttackCreatureKind)
@@ -90,9 +63,7 @@ type
     NextHowlTime: Single;
   public
     constructor Create(AOwner: TComponent; const AMaxLife: Single); override;
-
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
-
     procedure Howl(ForceHowl: boolean);
   end;
 
@@ -100,22 +71,11 @@ type
   end;
 
   TSpiderQueenCreature = class(TWalkAttackCreature)
-  private
-    LastThrowWebAttackTime: Single;
-    ActualThrowWebAttackDone: boolean;
-    function Kind: TSpiderQueenKind;
-    procedure ActualThrowWebAttack;
-  protected
-    procedure SetState(Value: TWalkAttackCreatureState); override;
-    function GetChild: T3D; override;
-  public
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   TGhostCreature = class(TWalkAttackCreature)
   protected
     procedure SetState(Value: TWalkAttackCreatureState); override;
-  public
   end;
 
 var
@@ -157,29 +117,9 @@ end;
 
 { TSpiderQueenKind -------------------------------------------------------- }
 
-constructor TSpiderQueenKind.Create(const AName: string);
-begin
-  inherited;
-  FThrowWebAttackAnimation := T3DResourceAnimation.Create(Self, 'throw_web_attack');
-end;
-
 function TSpiderQueenKind.CreatureClass: TCreatureClass;
 begin
   Result := TSpiderQueenCreature;
-end;
-
-procedure TSpiderQueenKind.LoadFromFile(ResourceConfig: TCastleConfig);
-begin
-  inherited;
-
-  MinDelayBetweenThrowWebAttacks :=
-    ResourceConfig.GetFloat('throw_web/min_delay_between_attacks', 0.0);
-  MaxThrowWebAttackDistance :=
-    ResourceConfig.GetFloat('throw_web/max_attack_distance', 0.0);
-  MaxAngleToThrowWebAttack :=
-    ResourceConfig.GetFloat('throw_web/max_angle_to_attack', 0.0);
-  ActualThrowWebAttackTime :=
-    ResourceConfig.GetFloat('throw_web/actual_attack_time', 0.0);
 end;
 
 { TGhostKind ------------------------------------------------------------- }
@@ -215,112 +155,6 @@ begin
 
   { Whether you actually howled or not, schedule next howl. }
   NextHowlTime := LifeTime + Random * 60.0;
-end;
-
-{ TSpiderQueenCreature ---------------------------------------------------- }
-
-function TSpiderQueenCreature.Kind: TSpiderQueenKind;
-begin
-  Result := TSpiderQueenKind(inherited Kind);
-end;
-
-procedure TSpiderQueenCreature.SetState(Value: TWalkAttackCreatureState);
-begin
-  if (State <> Value) and (Value = wasSpecial1) then
-  begin
-    LastThrowWebAttackTime := LifeTime;
-    ActualThrowWebAttackDone := false;
-  end;
-
-  inherited;
-end;
-
-procedure TSpiderQueenCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
-
-  procedure DoMaybeSwitchToThrowWebAttack;
-  var
-    ThrowWebAttackAllowed: boolean;
-    AngleRadBetweenTheDirectionToPlayer: Single;
-  begin
-    ThrowWebAttackAllowed :=
-      IdleSeesPlayer and
-      (LifeTime - LastThrowWebAttackTime >
-        Kind.MinDelayBetweenThrowWebAttacks) and
-      (IdleSqrDistanceToLastSeenPlayer <=
-        Sqr(Kind.MaxThrowWebAttackDistance));
-
-    if ThrowWebAttackAllowed then
-    begin
-      { Calculate and check AngleRadBetweenTheDirectionToPlayer. }
-      AngleRadBetweenTheDirectionToPlayer := AngleRadBetweenVectors(
-        LastSeenPlayer - Middle, Direction);
-      ThrowWebAttackAllowed := AngleRadBetweenTheDirectionToPlayer <=
-        Kind.MaxAngleToThrowWebAttack;
-
-      if ThrowWebAttackAllowed then
-        SetState(wasSpecial1);
-    end;
-  end;
-
-  procedure DoThrowWebAttack;
-  var
-    StateTime: Single;
-  begin
-    StateTime := LifeTime - StateChangeTime;
-
-    if (not ActualThrowWebAttackDone) and
-       (StateTime >= Kind.ActualThrowWebAttackTime) then
-    begin
-      ActualThrowWebAttackDone := true;
-      ActualThrowWebAttack;
-    end;
-
-    if StateTime > Kind.ThrowWebAttackAnimation.Duration then
-      { wasStand will quickly change to wasWalk if it will want to walk. }
-      SetState(wasStand);
-  end;
-
-begin
-  inherited;
-  if (not GetExists) or DebugTimeStopForCreatures then Exit;
-
-  if not Dead then
-    case State of
-      wasStand, wasWalk: DoMaybeSwitchToThrowWebAttack;
-      wasSpecial1: DoThrowWebAttack;
-    end;
-end;
-
-function TSpiderQueenCreature.GetChild: T3D;
-var
-  StateTime: Single;
-begin
-  if not Kind.Prepared then Exit(nil);
-
-  if State = wasSpecial1 then
-  begin
-    { Time from the change to this state. }
-    StateTime := LifeTime - StateChangeTime;
-
-    Result := Kind.ThrowWebAttackAnimation.Scene(StateTime, false);
-  end else
-    Result := inherited;
-end;
-
-procedure TSpiderQueenCreature.ActualThrowWebAttack;
-const
-  FiringMissileHeight = 0.6;
-var
-  Missile: TCreature;
-  MissilePosition, MissileDirection: TVector3Single;
-begin
-  if HasLastSeenPlayer then
-  begin
-    MissilePosition := LerpLegsMiddle(FiringMissileHeight);
-    MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := ThrownWeb.CreateCreature(World, MissilePosition, MissileDirection);
-    Missile.Sound3d(stThrownWebFired, 0.0);
-  end;
 end;
 
 { TGhostCreature ---------------------------------------------------------- }

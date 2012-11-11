@@ -25,6 +25,7 @@
   max_height_acceptable_to_fall="1.4"
   middle_height="1.0"
   remove_corpse="True"
+  preferred_distance="2.0"
 
   sound_sudden_pain="spider_sudden_pain"
   sound_dying="spider_dying"
@@ -38,13 +39,11 @@
     <hurt file_name="hurt.kanim"/>
   </model>
   <attack
-    short_range="True"
     sound="spider_actual_attack_hit"
     start_sound="spider_attack_start"
     knockback_distance="0.1"
     time="0.25"
     max_distance="2.0"
-    preferred_distance="2.0"
     min_delay="2.0"
     max_angle="1.04"
   >

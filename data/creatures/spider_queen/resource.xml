@@ -22,6 +22,7 @@
   min_life_loss_to_hurt="0.05"
   chance_to_hurt="0.3"
   middle_height="1.0"
+  preferred_distance="8.0"
 
   sound_sudden_pain="spider_queen_sudden_pain"
   sound_dying="spider_queen_dying"
@@ -33,7 +34,7 @@
     <attack file_name="attack.kanim"/>
     <dying file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
-    <throw_web_attack file_name="throw_web_attack.kanim"/>
+    <fire_missile file_name="throw_web_attack.kanim"/>
   </model>
 
   <fall>
@@ -41,23 +42,22 @@
   </fall>
   <run_away life="0.25"/>
   <attack
-    short_range="True"
     sound="spider_queen_actual_attack_hit"
     start_sound="spider_queen_attack_start"
     knockback_distance="5"
     time="0.4"
     max_distance="8.0"
-    preferred_distance="8.0"
     min_delay="2.0"
     max_angle="1.04"
   >
     <damage const="10" random="10"/>
   </attack>
-
-  <throw_web
-    min_delay_between_attacks="5.0"
-    max_attack_distance="30.0"
-    max_angle_to_attack="4"
-    actual_attack_time="0.6"
+  <fire_missile
+    min_delay="5.0"
+    max_distance="30.0"
+    max_angle="4"
+    time="0.6"
+    name="ThrownWeb"
+    sound="thrown_web_fired"
   />
 </resource>
