@@ -25,7 +25,6 @@
   radius="1.0"
 
   sound_sudden_pain="werewolf_sudden_pain"
-  sound_attack_start="werewolf_attack_start"
   sound_dying="werewolf_dying"
 >
   <model>
@@ -36,8 +35,12 @@
     <dying file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
-  <attack short_range="True" sound="werewolf_actual_attack_hit"
-    time="0.3" knockback_distance="6.0">
+  <attack
+    short_range="True"
+    sound="werewolf_actual_attack_hit"
+    start_sound="werewolf_attack_start"
+    time="0.3"
+    knockback_distance="6.0">
     <damage const="5" random="5"/>
   </attack>
 </resource>

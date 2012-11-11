@@ -31,7 +31,6 @@
   remove_corpse="True"
 
   sound_sudden_pain="spider_sudden_pain"
-  sound_attack_start="spider_attack_start"
   sound_dying="spider_dying"
 >
   <model>
@@ -42,8 +41,12 @@
     <dying file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
-  <attack short_range="True" sound="spider_actual_attack_hit"
-    knockback_distance="0.1" time="0.25">
+  <attack
+    short_range="True"
+    sound="spider_actual_attack_hit"
+    start_sound="spider_attack_start"
+    knockback_distance="0.1"
+    time="0.25">
     <damage const="10" random="10"/>
   </attack>
 </resource>

@@ -18,7 +18,6 @@
   remove_corpse="True"
 
   sound_sudden_pain="ghost_sudden_pain"
-  sound_attack_start="ghost_attack_start"
   sound_dying="ghost_dying"
 >
   <model>
@@ -29,7 +28,10 @@
     <dying file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
-  <attack short_range="True" knockback_distance="0.0">
+  <attack
+    short_range="True"
+    start_sound="ghost_attack_start"
+    knockback_distance="0.0">
     <damage const="7" random="8"/>
   </attack>
 </resource>
