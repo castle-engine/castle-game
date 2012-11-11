@@ -16,7 +16,6 @@
   min_life_loss_to_hurt="0.05"
   chance_to_hurt="0.3"
   max_height_acceptable_to_fall="1.4"
-  life_to_run_away="0.2"
   middle_height="0.7"
   radius="1.0"
 
@@ -31,6 +30,7 @@
     <dying file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
+  <run_away life="0.2"/>
   <attack
     short_range="True"
     sound="werewolf_actual_attack_hit"

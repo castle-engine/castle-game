@@ -6,7 +6,6 @@
 
   move_speed="25.0"
   flying="True"
-  life_to_run_away="0.01"
   default_max_life="30.0"
   knocked_back_distance="4.2"
   knock_back_speed="35"
@@ -25,6 +24,7 @@
     <dying file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
+  <run_away life="0.01"/>
   <attack
     short_range="True"
     start_sound="ghost_attack_start"

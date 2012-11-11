@@ -21,7 +21,6 @@
   random_walk_distance="30"
   min_life_loss_to_hurt="0.05"
   chance_to_hurt="0.3"
-  life_to_run_away="0.25"
   middle_height="1.0"
 
   sound_sudden_pain="spider_queen_sudden_pain"
@@ -40,7 +39,7 @@
   <fall>
     <damage scale_min="0.4" scale_max="0.6"/>
   </fall>
-
+  <run_away life="0.25"/>
   <attack
     short_range="True"
     sound="spider_queen_actual_attack_hit"

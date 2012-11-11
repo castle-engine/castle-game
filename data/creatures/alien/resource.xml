@@ -7,7 +7,6 @@
   move_speed="5.0"
   knocked_back_distance="4.2"
   knock_back_speed="35"
-  life_to_run_away="1.0"
   default_max_life="90.0"
   max_height_acceptable_to_fall="1.4"
   middle_height="0.8"
@@ -24,6 +23,7 @@
     <dying_back file_name="dying_back.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
+  <run_away life="1.0"/>
   <attack
     time="0.4"
     min_delay="2.0"
