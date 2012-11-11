@@ -102,7 +102,6 @@ type
   TSpiderCreature = class(TWalkAttackCreature)
   public
     procedure ActualAttack; override;
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   TSpiderQueenCreature = class(TWalkAttackCreature)
@@ -124,7 +123,6 @@ type
     procedure SetState(Value: TWalkAttackCreatureState); override;
   public
     procedure ActualAttack; override;
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
 var
@@ -264,17 +262,6 @@ begin
   end;
 end;
 
-procedure TSpiderCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
-begin
-  inherited;
-  { Spiders must be removed from level, otherwise too many of them
-    stay on Cages level and slow down the rendering.
-    Dying animation scales the model down, to make it gradually disappear. }
-  if (State = wasDying) and
-    (LifeTime - StateChangeTime > Kind.DyingAnimation.Duration) then
-    RemoveMe := rtRemoveAndFree;
-end;
-
 { TSpiderQueenCreature ---------------------------------------------------- }
 
 function TSpiderQueenCreature.Kind: TSpiderQueenKind;
@@ -409,14 +396,6 @@ begin
   begin
     AttackHurt;
   end;
-end;
-
-procedure TGhostCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
-begin
-  inherited;
-  if (State = wasDying) and
-    (LifeTime - StateChangeTime > Kind.DyingAnimation.Duration) then
-    RemoveMe := rtRemoveAndFree;
 end;
 
 { initialization / finalization ---------------------------------------------- }

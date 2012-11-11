@@ -5,7 +5,14 @@
      This is analogous to Werewolf situation, but this time it's low.
      Without this special large max_angle_to_attack value,
      player could avoid attacks just by standing very close to the spider
-     (without crouching). -->
+     (without crouching).
+
+     remove_corpse comments:
+     Spiders must be removed from level, otherwise a lot of corpses
+     may lay on the Cages level (they are spawned there constantly)
+     and slow down the rendering.
+     Dying animation scales the model down, to make it gradually disappear.
+-->
 
 <resource
   name="Spider"
@@ -22,6 +29,7 @@
   max_angle_to_attack="1.04"
   max_height_acceptable_to_fall="1.4"
   middle_height="1.0"
+  remove_corpse="True"
 
   sound_sudden_pain="spider_sudden_pain"
   sound_attack_start="spider_attack_start"
