@@ -2,7 +2,7 @@
 
 <resource
   name="Alien"
-  type="Alien"
+  type="WalkAttack"
 
   move_speed="5.0"
   knocked_back_distance="4.2"

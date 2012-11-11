@@ -16,7 +16,7 @@
 
 <resource
   name="Spider"
-  type="Spider"
+  type="WalkAttack"
 
   move_speed="5.0"
   default_max_life="50.0"

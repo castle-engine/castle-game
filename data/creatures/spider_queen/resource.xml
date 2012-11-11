@@ -11,7 +11,7 @@
 
 <resource
   name="SpiderQueen"
-  type="SpiderQueen"
+  type="WalkAttack"
 
   move_speed="17.5"
   default_max_life="1100.0"
