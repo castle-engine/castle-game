@@ -18,7 +18,6 @@
   name="Spider"
   type="Spider"
 
-  actual_attack_time="0.25"
   move_speed="5.0"
   max_attack_distance="2.0"
   preferred_attack_distance="2.0"
@@ -43,7 +42,8 @@
     <dying file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
-  <attack knockback_distance="0.1">
+  <attack short_range="True" sound="spider_actual_attack_hit"
+    knockback_distance="0.1" time="0.25">
     <damage const="10" random="10"/>
   </attack>
 </resource>

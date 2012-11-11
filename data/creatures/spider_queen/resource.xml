@@ -13,7 +13,6 @@
   name="SpiderQueen"
   type="SpiderQueen"
 
-  actual_attack_time="0.4"
   move_speed="17.5"
   max_attack_distance="8.0"
   preferred_attack_distance="8.0"
@@ -47,7 +46,8 @@
     <damage scale_min="0.4" scale_max="0.6"/>
   </fall>
 
-  <attack knockback_distance="5">
+  <attack short_range="True" sound="spider_queen_actual_attack_hit"
+    knockback_distance="5" time="0.4">
     <damage const="10" random="10"/>
   </attack>
 

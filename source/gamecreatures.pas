@@ -83,8 +83,6 @@ type
   end;
 
   TAlienCreature = class(TWalkAttackCreature)
-  public
-    procedure ActualAttack; override;
   end;
 
   TWerewolfCreature = class(TWalkAttackCreature)
@@ -93,15 +91,12 @@ type
   public
     constructor Create(AOwner: TComponent; const AMaxLife: Single); override;
 
-    procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
 
     procedure Howl(ForceHowl: boolean);
   end;
 
   TSpiderCreature = class(TWalkAttackCreature)
-  public
-    procedure ActualAttack; override;
   end;
 
   TSpiderQueenCreature = class(TWalkAttackCreature)
@@ -114,7 +109,6 @@ type
     procedure SetState(Value: TWalkAttackCreatureState); override;
     function GetChild: T3D; override;
   public
-    procedure ActualAttack; override;
     procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
   end;
 
@@ -122,7 +116,6 @@ type
   protected
     procedure SetState(Value: TWalkAttackCreatureState); override;
   public
-    procedure ActualAttack; override;
   end;
 
 var
@@ -196,39 +189,12 @@ begin
   Result := TGhostCreature;
 end;
 
-{ TAlienCreature ------------------------------------------------------- }
-
-procedure TAlienCreature.ActualAttack;
-const
-  FiringMissileHeight = 0.6;
-var
-  Missile: TCreature;
-  MissilePosition, MissileDirection: TVector3Single;
-begin
-  if HasLastSeenPlayer then
-  begin
-    MissilePosition := LerpLegsMiddle(FiringMissileHeight);
-    MissileDirection := VectorSubtract(LastSeenPlayer, MissilePosition);
-    Missile := BallMissile.CreateCreature(World, MissilePosition, MissileDirection);
-    Missile.Sound3d(stBallMissileFired, 0.0);
-  end;
-end;
-
 { TWerewolfCreature ---------------------------------------------------------- }
 
 constructor TWerewolfCreature.Create(AOwner: TComponent; const AMaxLife: Single);
 begin
   inherited;
   NextHowlTime := Random * 60.0;
-end;
-
-procedure TWerewolfCreature.ActualAttack;
-begin
-  if ShortRangeActualAttackHits then
-  begin
-    Sound3d(stWerewolfActualAttackHit, 1.0);
-    AttackHurt;
-  end;
 end;
 
 procedure TWerewolfCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
@@ -251,31 +217,11 @@ begin
   NextHowlTime := LifeTime + Random * 60.0;
 end;
 
-{ TSpiderCreature ---------------------------------------------------------- }
-
-procedure TSpiderCreature.ActualAttack;
-begin
-  if ShortRangeActualAttackHits then
-  begin
-    Sound3d(stSpiderActualAttackHit, 1.0);
-    AttackHurt;
-  end;
-end;
-
 { TSpiderQueenCreature ---------------------------------------------------- }
 
 function TSpiderQueenCreature.Kind: TSpiderQueenKind;
 begin
   Result := TSpiderQueenKind(inherited Kind);
-end;
-
-procedure TSpiderQueenCreature.ActualAttack;
-begin
-  if ShortRangeActualAttackHits then
-  begin
-    Sound3d(stSpiderQueenActualAttackHit, 1.0);
-    AttackHurt;
-  end;
 end;
 
 procedure TSpiderQueenCreature.SetState(Value: TWalkAttackCreatureState);
@@ -388,14 +334,6 @@ begin
     Ghost is blended anyway, so checking for collisions with him
     is not really necessary anyway. }
   if Value = wasDying then Collides := false;
-end;
-
-procedure TGhostCreature.ActualAttack;
-begin
-  if ShortRangeActualAttackHits then
-  begin
-    AttackHurt;
-  end;
 end;
 
 { initialization / finalization ---------------------------------------------- }

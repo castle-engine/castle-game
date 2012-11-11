@@ -4,7 +4,6 @@
   name="Alien"
   type="Alien"
 
-  actual_attack_time="0.4"
   min_delay_between_attacks="2.0"
   move_speed="5.0"
   knocked_back_distance="4.2"
@@ -26,4 +25,6 @@
     <dying_back file_name="dying_back.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
+  <attack time="0.4"/>
+  <fire_missile name="BallMissile" sound="ball_missile_fired" height="0.6"/>
 </resource>

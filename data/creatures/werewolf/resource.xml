@@ -9,7 +9,6 @@
   name="Werewolf"
   type="Werewolf"
 
-  actual_attack_time="0.3"
   move_speed="15.0"
   max_attack_distance="4.2"
   preferred_attack_distance="4.2"
@@ -37,7 +36,8 @@
     <dying file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
-  <attack knockback_distance="6.0">
+  <attack short_range="True" sound="werewolf_actual_attack_hit"
+    time="0.3" knockback_distance="6.0">
     <damage const="5" random="5"/>
   </attack>
 </resource>
