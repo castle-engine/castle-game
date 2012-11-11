@@ -211,7 +211,6 @@ begin
 end;
 
 initialization
-  RegisterResourceClass(TItemKind, 'Item');
   RegisterResourceClass(TItemSwordKind, 'Sword');
   RegisterResourceClass(TItemBowKind, 'Bow');
   RegisterResourceClass(TItemPotionOfLifeKind, 'LifePotion');
