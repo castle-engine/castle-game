@@ -37,8 +37,8 @@
     <hurt file_name="hurt.kanim"/>
   </model>
   <attack
-    sound="spider_actual_attack_hit"
-    start_sound="spider_attack_start"
+    sound_hit="spider_actual_attack_hit"
+    sound_start="spider_attack_start"
     knockback_distance="0.1"
     time="0.25"
     max_distance="2.0"

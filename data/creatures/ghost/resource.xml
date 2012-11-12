@@ -25,7 +25,7 @@
   </model>
   <run_away life="0.01"/>
   <attack
-    start_sound="ghost_attack_start"
+    sound_start="ghost_attack_start"
     knockback_distance="0.0"
     max_distance="2.0"
   >

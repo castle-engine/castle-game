@@ -17,7 +17,7 @@
   <attack
     time="0.294"
     knockback_distance="1"
-    start_sound="sword_attack_start"
+    sound_start="sword_attack_start"
   >
     <damage const="20.0" random="20.0" />
   </attack>

@@ -14,6 +14,9 @@
     <attack file_name="attack.kanim"/>
     <ready file_name="ready.wrl"/>
   </model>
-  <attack attack_start_sound="bow_attack_start" time="0.0"/>
-  <fire_missile name="Arrow" ammo="Quiver"/>
+  <attack time="0.0"/>
+  <fire_missile
+    name="Arrow"
+    ammo="Quiver"
+    sound_start="bow_attack_start" />
 </resource>

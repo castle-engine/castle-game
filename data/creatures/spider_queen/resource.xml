@@ -40,8 +40,8 @@
   </fall>
   <run_away life="0.25"/>
   <attack
-    sound="spider_queen_actual_attack_hit"
-    start_sound="spider_queen_attack_start"
+    sound_hit="spider_queen_actual_attack_hit"
+    sound_start="spider_queen_attack_start"
     knockback_distance="5"
     time="0.4"
     max_distance="8.0"

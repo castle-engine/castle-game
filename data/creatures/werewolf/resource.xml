@@ -30,8 +30,8 @@
   </model>
   <run_away life="0.2"/>
   <attack
-    sound="werewolf_actual_attack_hit"
-    start_sound="werewolf_attack_start"
+    sound_hit="werewolf_actual_attack_hit"
+    sound_start="werewolf_attack_start"
     time="0.3"
     knockback_distance="6.0"
     max_distance="4.2"
