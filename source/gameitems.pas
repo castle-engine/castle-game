@@ -25,9 +25,7 @@ unit GameItems;
 
 interface
 
-uses Boxes3D, X3DNodes, VectorMath, CastleUtils, CastleClassUtils,
-  Classes, CastleImages, GL, GLU, CastleGLUtils, GameSound, CastleResources,
-  CastleXMLConfig, CastleSoundEngine, Base3D, CastleItems;
+uses CastleUtils, GameSound, CastleResources, CastleSoundEngine, CastleItems;
 
 type
   TItemPotionOfLifeKind = class(TItemKind)
@@ -62,10 +60,7 @@ procedure ItemsKindsInit;
 
 implementation
 
-uses SysUtils, CastleWindow,
-  GamePlay, CastleFilesUtils, ProgressUnit,
-  GameCreatures, CastleGameNotifications, CastleConfig,
-  GLImages, CastleCreatures;
+uses SysUtils, GamePlay, CastleGameNotifications;
 
 { TItemPotionOfLifeKind ------------------------------------------------------ }
 
