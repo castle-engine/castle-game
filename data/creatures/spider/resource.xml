@@ -27,13 +27,13 @@
   preferred_distance="2.0"
 
   sound_sudden_pain="spider_sudden_pain"
-  sound_dying="spider_dying"
+  sound_die="spider_dying"
 >
   <model>
-    <stand file_name="spider_stand.wrl"/>
+    <idle file_name="spider_stand.wrl"/>
     <walk file_name="walk.kanim"/>
     <attack file_name="attack.kanim"/>
-    <dying file_name="dying.kanim"/>
+    <die file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
   <attack

@@ -51,7 +51,7 @@ type
 
   TGhostCreature = class(TWalkAttackCreature)
   protected
-    procedure SetState(Value: TWalkAttackCreatureState); override;
+    procedure SetState(Value: TCreatureState); override;
   end;
 
 var
@@ -103,7 +103,7 @@ procedure TWerewolfCreature.Howl(ForceHowl: boolean);
 begin
   { Howl only if player was seen, and only while walking/standing
     (not in the middle of attack e.g., since that would sound stupid). }
-  if ForceHowl or (HasLastSeenPlayer and (State in [wasWalk, wasStand])) then
+  if ForceHowl or (HasLastSeenPlayer and (State in [csWalk, csIdle])) then
     Sound3d(stWerewolfHowling, 1.0);
 
   { Whether you actually howled or not, schedule next howl. }
@@ -112,7 +112,7 @@ end;
 
 { TGhostCreature ---------------------------------------------------------- }
 
-procedure TGhostCreature.SetState(Value: TWalkAttackCreatureState);
+procedure TGhostCreature.SetState(Value: TCreatureState);
 begin
   inherited;
 
@@ -120,7 +120,7 @@ begin
     collisions with ghost when it's in dying state.
     Ghost is blended anyway, so checking for collisions with him
     is not really necessary anyway. }
-  if Value = wasDying then Collides := false;
+  if Value in [csDie, csDieBack] then Collides := false;
 end;
 
 { initialization / finalization ---------------------------------------------- }

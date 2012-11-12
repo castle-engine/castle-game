@@ -307,7 +307,7 @@ procedure TDebugCreaturesMenu.Click;
         C := TCreature(SceneManager.Items[I]);
         if (C.Life > 0) and (IncludeStill or (not (C is TStillCreature))) then
         begin
-          C.SoundDyingEnabled := false;
+          C.SoundDieEnabled := false;
           C.Hurt(1000 * 1000, ZeroVector3Single, 0);
         end;
       end;

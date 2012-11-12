@@ -19,13 +19,13 @@
   preferred_distance="4.2"
 
   sound_sudden_pain="werewolf_sudden_pain"
-  sound_dying="werewolf_dying"
+  sound_die="werewolf_dying"
 >
   <model>
-    <stand file_name="werewolf_still_final.wrl"/>
+    <idle file_name="werewolf_still_final.wrl"/>
     <walk file_name="walk.kanim"/>
     <attack file_name="attack.kanim"/>
-    <dying file_name="dying.kanim"/>
+    <die file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
   <run_away life="0.2"/>

@@ -40,15 +40,15 @@
   preferred_distance="30.0"
 
   sound_sudden_pain="alien_sudden_pain"
-  sound_dying="alien_dying"
+  sound_die="alien_dying"
 >
   <model>
-    <stand file_name="alien_still_final.wrl"/>
-    <stand_to_walk file_name="stand_to_walk.kanim"/>
+    <idle file_name="alien_still_final.wrl"/>
+    <idle_to_walk file_name="stand_to_walk.kanim"/>
     <walk file_name="walk.kanim"/>
     <fire_missile file_name="attack.kanim"/>
-    <dying file_name="dying.kanim"/>
-    <dying_back file_name="dying_back.kanim"/>
+    <die file_name="dying.kanim"/>
+    <die_back file_name="dying_back.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
   <run_away life="1.0"/>

@@ -8,19 +8,19 @@
   flying="True"
   default_max_life="30.0"
   knock_back_speed="35"
-  sound_dying_tied_to_creature="False"
+  sound_die_tied_to_creature="False"
   remove_corpse="True"
   preferred_distance="2.0"
 
   sound_sudden_pain="ghost_sudden_pain"
-  sound_dying="ghost_dying"
+  sound_die="ghost_dying"
 >
   <model>
-    <stand file_name="stand.kanim"/>
-    <stand_to_walk file_name="stand_to_walk.kanim"/>
+    <idle file_name="stand.kanim"/>
+    <idle_to_walk file_name="stand_to_walk.kanim"/>
     <walk file_name="walk.kanim"/>
     <attack file_name="attack.kanim"/>
-    <dying file_name="dying.kanim"/>
+    <die file_name="dying.kanim"/>
     <hurt file_name="hurt.kanim"/>
   </model>
   <run_away life="0.01"/>

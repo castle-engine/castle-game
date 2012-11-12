@@ -9,6 +9,6 @@
   knock_back_speed="35"
 >
   <model>
-    <stand file_name="barrel.wrl"/>
+    <idle file_name="barrel.wrl"/>
   </model>
 </resource>
