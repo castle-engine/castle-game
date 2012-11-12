@@ -9,6 +9,8 @@
   knock_back_speed="35"
   remove_dead="True"
   cast_shadow_volumes="False"
+  fall_speed="20"
+  grow_speed="0"
 >
   <model>
     <idle file_name="idle.x3d"/>
