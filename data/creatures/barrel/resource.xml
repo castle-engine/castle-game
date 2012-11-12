@@ -7,8 +7,11 @@
   radius="0.5"
   default_max_life="1.0"
   knock_back_speed="35"
+  remove_dead="True"
+  cast_shadow_volumes="False"
 >
   <model>
-    <idle file_name="barrel.wrl"/>
+    <idle file_name="idle.x3d"/>
+    <die file_name="die.kanim"/>
   </model>
 </resource>

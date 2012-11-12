@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<animation>
+  <frame file_name="die_0001.x3d.gz" time="0.000000" />
+  <frame file_name="die_0006.x3d.gz" time="0.200000" />
+  <frame file_name="die_0011.x3d.gz" time="0.400000" />
+  <frame file_name="die_0016.x3d.gz" time="0.600000" />
+  <frame file_name="die_0021.x3d.gz" time="0.800000" />
+  <frame file_name="die_0026.x3d.gz" time="1.000000" />
+  <frame file_name="die_0031.x3d.gz" time="1.200000" />
+  <frame file_name="die_0036.x3d.gz" time="1.400000" />
+  <frame file_name="die_0041.x3d.gz" time="1.600000" />
+  <frame file_name="die_0046.x3d.gz" time="1.800000" />
+  <frame file_name="die_0051.x3d.gz" time="2.000000" />
+  <frame file_name="die_0056.x3d.gz" time="2.200000" />
+  <frame file_name="die_0061.x3d.gz" time="2.400000" />
+  <frame file_name="die_0066.x3d.gz" time="2.600000" />
+  <frame file_name="die_0071.x3d.gz" time="2.800000" />
+  <frame file_name="die_0076.x3d.gz" time="3.000000" />
+  <frame file_name="die_0081.x3d.gz" time="3.200000" />
+  <frame file_name="die_0086.x3d.gz" time="3.400000" />
+  <frame file_name="die_0091.x3d.gz" time="3.600000" />
+  <frame file_name="die_0096.x3d.gz" time="3.800000" />
+  <frame file_name="die_0100.x3d.gz" time="3.960000" />
+</animation>
