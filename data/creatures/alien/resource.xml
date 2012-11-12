@@ -38,7 +38,7 @@
   default_max_life="90.0"
   middle_height="0.8"
   preferred_distance="30.0"
-
+  receive_shadow_volumes="False"
   sound_sudden_pain="alien_sudden_pain"
   sound_die="alien_dying"
 >

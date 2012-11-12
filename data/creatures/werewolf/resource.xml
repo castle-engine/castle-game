@@ -17,7 +17,7 @@
   middle_height="0.7"
   radius="1.0"
   preferred_distance="4.2"
-
+  receive_shadow_volumes="False"
   sound_sudden_pain="werewolf_sudden_pain"
   sound_die="werewolf_dying"
 >

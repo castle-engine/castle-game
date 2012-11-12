@@ -25,7 +25,7 @@
   middle_height="1.0"
   remove_dead="True"
   preferred_distance="2.0"
-
+  receive_shadow_volumes="False"
   sound_sudden_pain="spider_sudden_pain"
   sound_die="spider_dying"
 >

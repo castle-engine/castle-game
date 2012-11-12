@@ -11,7 +11,7 @@
   sound_die_tied_to_creature="False"
   remove_dead="True"
   preferred_distance="2.0"
-
+  receive_shadow_volumes="False"
   sound_sudden_pain="ghost_sudden_pain"
   sound_die="ghost_dying"
 >

@@ -18,9 +18,8 @@
   knocked_back_distance="0.0"
   direction_fall_speed="0.15"
   radius="0.3"
-
+  receive_shadow_volumes="False"
   sound_hit="arrow_hit"
-
   always_prepared="True"
 >
   <model>

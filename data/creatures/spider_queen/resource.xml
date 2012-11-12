@@ -22,7 +22,7 @@
   chance_to_hurt="0.3"
   middle_height="1.0"
   preferred_distance="8.0"
-
+  receive_shadow_volumes="False"
   sound_sudden_pain="spider_queen_sudden_pain"
   sound_die="spider_queen_dying"
 >
