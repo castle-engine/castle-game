@@ -2,20 +2,23 @@
 
 <resource
   name="Sword"
-  type="Sword"
+  type="Weapon"
 
-  actual_attack_time="0.294"
   caption="Sword"
   image="image.png"
 
   equipping_sound="sword_equipping"
-  sound_attack_start="sword_attack_start"
-  attack_knockback_distance="1.0"
 >
   <model>
     <base file_name="model.wrl"/>
     <attack file_name="attack.kanim"/>
     <ready file_name="ready.wrl"/>
   </model>
-  <damage const="20.0" random="20.0" />
+  <attack
+    time="0.294"
+    knockback_distance="1"
+    start_sound="sword_attack_start"
+  >
+    <damage const="20.0" random="20.0" />
+  </attack>
 </resource>

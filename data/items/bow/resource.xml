@@ -2,18 +2,18 @@
 
 <resource
   name="Bow"
-  type="Bow"
+  type="Weapon"
 
-  actual_attack_time="0.0"
   caption="Bow"
   image="image.png"
 
   equipping_sound="bow_equipping"
-  sound_attack_start="bow_attack_start"
 >
   <model>
     <base file_name="model_final.wrl"/>
     <attack file_name="attack.kanim"/>
     <ready file_name="ready.wrl"/>
   </model>
+  <attack attack_start_sound="bow_attack_start" time="0.0"/>
+  <fire_missile name="Arrow" ammo="Quiver"/>
 </resource>

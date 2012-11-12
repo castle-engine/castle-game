@@ -40,26 +40,6 @@ type
     procedure Use; override;
   end;
 
-  TItemSwordKind = class(TItemShortRangeWeaponKind)
-  protected
-    function ItemClass: TInventoryItemClass; override;
-  end;
-
-  TItemSword = class(TItemWeapon)
-  public
-    procedure ActualAttack; override;
-  end;
-
-  TItemBowKind = class(TItemWeaponKind)
-  protected
-    function ItemClass: TInventoryItemClass; override;
-  end;
-
-  TItemBow = class(TItemWeapon)
-  public
-    procedure ActualAttack; override;
-  end;
-
   TItemScrollOfFlyingKind = class(TItemKind)
   protected
     function ItemClass: TInventoryItemClass; override;
@@ -108,79 +88,6 @@ begin
     Notifications.Show('You feel quite alright, no need to waste this potion');
 end;
 
-{ TItemSwordKind ------------------------------------------------------------- }
-
-function TItemSwordKind.ItemClass: TInventoryItemClass;
-begin
-  Result := TItemSword;
-end;
-
-{ TItemSword ----------------------------------------------------------------- }
-
-procedure TItemSword.ActualAttack;
-var
-  WeaponBoundingBox: TBox3D;
-  I: Integer;
-  C: TCreature;
-  K: TItemShortRangeWeaponKind;
-  O: T3DOrient;
-begin
-  if (Owner3D <> nil) and
-     (Owner3D is T3DOrient) then
-  begin
-    O := T3DOrient(Owner3D);
-    { O.Direction may be multiplied by something here for long-range weapons }
-    WeaponBoundingBox := O.BoundingBox.Translate(O.Direction);
-    { Tests: Writeln('WeaponBoundingBox is ', WeaponBoundingBox.ToNiceStr); }
-    { TODO: we would prefer to use World.BoxCollision for this,
-      but we need to know which creature was hit. }
-    for I := 0 to World.Count - 1 do
-      if World[I] is TCreature then
-      begin
-        C := TCreature(World[I]);
-        { Tests: Writeln('Creature bbox is ', C.BoundingBox.ToNiceStr); }
-        if C.BoundingBox.Collision(WeaponBoundingBox) then
-        begin
-          K := Kind as TItemShortRangeWeaponKind;
-          C.Hurt(K.DamageConst + Random * K.DamageRandom, O.Direction,
-            K.AttackKnockbackDistance);
-        end;
-      end;
-  end;
-end;
-
-{ TItemBowKind ------------------------------------------------------------- }
-
-function TItemBowKind.ItemClass: TInventoryItemClass;
-begin
-  Result := TItemBow;
-end;
-
-{ TItemBow ------------------------------------------------------------------- }
-
-procedure TItemBow.ActualAttack;
-var
-  QuiverIndex: Integer;
-  QuiverItem: TInventoryItem;
-begin
-  QuiverIndex := Player.Inventory.FindKind(Quiver);
-  if QuiverIndex = -1 then
-  begin
-    Notifications.Show('You have no arrows');
-    SoundEngine.Sound(stPlayerInteractFailed);
-  end else
-  begin
-    { delete arrow from player }
-    QuiverItem := Player.Inventory[QuiverIndex];
-    QuiverItem.Quantity := QuiverItem.Quantity - 1;
-    Player.Inventory.CheckDepleted(QuiverItem);
-
-    { shoot the arrow }
-    Arrow.CreateCreature(World, Player.Position, Player.Direction);
-    SoundEngine.Sound(stArrowFired);
-  end;
-end;
-
 { TItemScrollOfFlyingKind ---------------------------------------------------- }
 
 function TItemScrollOfFlyingKind.ItemClass: TInventoryItemClass;
@@ -211,8 +118,6 @@ begin
 end;
 
 initialization
-  RegisterResourceClass(TItemSwordKind, 'Sword');
-  RegisterResourceClass(TItemBowKind, 'Bow');
   RegisterResourceClass(TItemPotionOfLifeKind, 'LifePotion');
   RegisterResourceClass(TItemScrollOfFlyingKind, 'ScrFlying');
 end.
