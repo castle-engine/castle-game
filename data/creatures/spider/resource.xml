@@ -7,7 +7,7 @@
      player could avoid attacks just by standing very close to the spider
      (without crouching).
 
-     remove_corpse comments:
+     remove_dead comments:
      Spiders must be removed from level, otherwise a lot of corpses
      may lay on the Cages level (they are spawned there constantly)
      and slow down the rendering.
@@ -23,7 +23,7 @@
   knocked_back_distance="2.0"
   knock_back_speed="35"
   middle_height="1.0"
-  remove_corpse="True"
+  remove_dead="True"
   preferred_distance="2.0"
 
   sound_sudden_pain="spider_sudden_pain"

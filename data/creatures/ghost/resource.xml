@@ -9,7 +9,7 @@
   default_max_life="30.0"
   knock_back_speed="35"
   sound_die_tied_to_creature="False"
-  remove_corpse="True"
+  remove_dead="True"
   preferred_distance="2.0"
 
   sound_sudden_pain="ghost_sudden_pain"
