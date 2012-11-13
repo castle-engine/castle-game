@@ -1,7 +1,7 @@
 #VRML V1.0 ascii
 
 Group {
-  # Viewpoint is only for viewing from demo_animation, it will be ignored
+  # Viewpoint is only for viewing from view3dscene, it will be ignored
   # when loaded into game
   Viewpoint  {
     position -0.634338736534119 0.362587004899979 12.031494140625

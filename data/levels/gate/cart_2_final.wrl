@@ -2,7 +2,7 @@
 
 Group {
   # Camera added by Kambi by hand, only to test animation comfortably
-  # in demo_animation.
+  # in view3dscene.
   #
   # Camera settings "encoded" in the VRML declaration below :
   # direction 0.011689215898514 0.027450373396277 -0.011695011518896
