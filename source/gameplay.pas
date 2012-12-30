@@ -334,7 +334,7 @@ procedure TGame2DControls.Draw;
 
     glDisable(GL_ALPHA_TEST);
 
-    if PrintText then
+    if PrintText and (ALife > 0) then
     begin
       glColorv(Vector3Single(0.8, 0.8, 0.8));
       LifeText := Format('%d', [Round(ALife)]);
