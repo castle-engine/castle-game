@@ -103,7 +103,7 @@ procedure TWerewolfCreature.Howl(ForceHowl: boolean);
 begin
   { Howl only if player was seen, and only while walking/standing
     (not in the middle of attack e.g., since that would sound stupid). }
-  if ForceHowl or (HasLastSeenPlayer and (State in [csWalk, csIdle])) then
+  if ForceHowl or (HasLastSeenEnemy and (State in [csWalk, csIdle])) then
     Sound3d(stWerewolfHowling, 1.0);
 
   { Whether you actually howled or not, schedule next howl. }
