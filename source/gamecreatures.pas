@@ -30,12 +30,12 @@ uses Classes, VectorMath, PrecalculatedAnimation, CastleClassUtils, CastleUtils,
   CastleCreatures;
 
 type
-  TWerewolfKind = class(TWalkAttackCreatureKind)
+  TWerewolfResource = class(TWalkAttackCreatureResource)
   public
     function CreatureClass: TCreatureClass; override;
   end;
 
-  TGhostKind = class(TWalkAttackCreatureKind)
+  TGhostResource = class(TWalkAttackCreatureResource)
   public
     function CreatureClass: TCreatureClass; override;
   end;
@@ -55,29 +55,29 @@ type
   end;
 
 var
-  Werewolf: TWerewolfKind;
-  Ghost: TGhostKind;
-  Spider: TWalkAttackCreatureKind;
-  SpiderQueen: TWalkAttackCreatureKind;
-  Arrow: TMissileCreatureKind;
+  Werewolf: TWerewolfResource;
+  Ghost: TGhostResource;
+  Spider: TWalkAttackCreatureResource;
+  SpiderQueen: TWalkAttackCreatureResource;
+  Arrow: TMissileCreatureResource;
 
-procedure CreaturesKindsInit;
+procedure CreaturesResourcesInit;
 
 implementation
 
 uses SysUtils, DOM, GL, GLU, CastleWindow, CastleFilesUtils, CastleGLUtils,
   ProgressUnit, GameSound;
 
-{ TWerewolfKind -------------------------------------------------------------- }
+{ TWerewolfResource -------------------------------------------------------------- }
 
-function TWerewolfKind.CreatureClass: TCreatureClass;
+function TWerewolfResource.CreatureClass: TCreatureClass;
 begin
   Result := TWerewolfCreature;
 end;
 
-{ TGhostKind ------------------------------------------------------------- }
+{ TGhostResource ------------------------------------------------------------- }
 
-function TGhostKind.CreatureClass: TCreatureClass;
+function TGhostResource.CreatureClass: TCreatureClass;
 begin
   Result := TGhostCreature;
 end;
@@ -125,19 +125,19 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure CreaturesKindsInit;
+procedure CreaturesResourcesInit;
 begin
-  Werewolf := Resources.FindName('Werewolf') as TWerewolfKind;
-  Ghost := Resources.FindName('Ghost') as TGhostKind;
-  Spider := Resources.FindName('Spider') as TWalkAttackCreatureKind;
-  SpiderQueen := Resources.FindName('SpiderQueen') as TWalkAttackCreatureKind;
-  Arrow := Resources.FindName('Arrow') as TMissileCreatureKind;
+  Werewolf := Resources.FindName('Werewolf') as TWerewolfResource;
+  Ghost := Resources.FindName('Ghost') as TGhostResource;
+  Spider := Resources.FindName('Spider') as TWalkAttackCreatureResource;
+  SpiderQueen := Resources.FindName('SpiderQueen') as TWalkAttackCreatureResource;
+  Arrow := Resources.FindName('Arrow') as TMissileCreatureResource;
 end;
 
 procedure DoInitialization;
 begin
-  RegisterResourceClass(TWerewolfKind, 'Werewolf');
-  RegisterResourceClass(TGhostKind, 'Ghost');
+  RegisterResourceClass(TWerewolfResource, 'Werewolf');
+  RegisterResourceClass(TGhostResource, 'Ghost');
 end;
 
 initialization

@@ -127,7 +127,7 @@ begin
   S := TStringList.Create;
   try
     for I := 0 to Resources.Count - 1 do
-      if (not OnlyCreatures) or (Resources[I] is TCreatureKind) then
+      if (not OnlyCreatures) or (Resources[I] is TCreatureResource) then
         S.AddObject(Format('Resource %s (%d users)',
           [Resources[I].Name, Resources[I].UsageCount]), Resources[I]);
     S.Append('Cancel');
@@ -315,11 +315,11 @@ procedure TDebugCreaturesMenu.Click;
 
   procedure AddLevelCreature(DirectionAttenuation: Single);
   var
-    Kind: T3DResource;
+    Resource: T3DResource;
   begin
-    if ChooseResource(Kind, true) then
+    if ChooseResource(Resource, true) then
     begin
-      (Kind as TCreatureKind).CreateCreature(SceneManager.Items,
+      (Resource as TCreatureResource).CreateCreature(SceneManager.Items,
         Player.Position + Player.Direction * DirectionAttenuation,
         Player.Direction);
 
@@ -439,8 +439,8 @@ procedure TDebugItemsMenu.Click;
     I: Integer;
   begin
     for I := 0 to Resources.Count - 1 do
-      if Resources[I] is TItemKind then
-        Player.PickItem(TItemKind(Resources[I]).CreateItem(20));
+      if Resources[I] is TItemResource then
+        Player.PickItem(TItemResource(Resources[I]).CreateItem(20));
     UserQuit := true;
   end;
 

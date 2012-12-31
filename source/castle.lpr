@@ -193,8 +193,8 @@ begin
   TexturesProperties.XmlFileName := ProgramDataPath + 'data' +
     PathDelim + 'textures' + PathDelim + 'index.xml';
   Resources.LoadFromFiles;
-  ItemsKindsInit;
-  CreaturesKindsInit;
+  ItemsResourcesInit;
+  CreaturesResourcesInit;
   Levels.LoadFromFiles;
   Levels.LoadFromConfig;
 

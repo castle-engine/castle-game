@@ -28,7 +28,7 @@ interface
 uses CastleUtils, GameSound, CastleResources, CastleSoundEngine, CastleItems;
 
 type
-  TItemPotionOfLifeKind = class(TItemKind)
+  TItemPotionOfLifeResource = class(TItemResource)
   protected
     function ItemClass: TInventoryItemClass; override;
   end;
@@ -38,7 +38,7 @@ type
     procedure Use; override;
   end;
 
-  TItemScrollOfFlyingKind = class(TItemKind)
+  TItemScrollOfFlyingResource = class(TItemResource)
   protected
     function ItemClass: TInventoryItemClass; override;
   end;
@@ -49,22 +49,22 @@ type
   end;
 
 var
-  Sword: TItemKind;
-  Bow: TItemKind;
-  LifePotion: TItemKind;
-  KeyItemKind: TItemKind;
-  RedKeyItemKind: TItemKind;
-  Quiver: TItemKind;
+  Sword: TItemResource;
+  Bow: TItemResource;
+  LifePotion: TItemResource;
+  KeyItemResource: TItemResource;
+  RedKeyItemResource: TItemResource;
+  Quiver: TItemResource;
 
-procedure ItemsKindsInit;
+procedure ItemsResourcesInit;
 
 implementation
 
 uses SysUtils, GamePlay, CastleGameNotifications;
 
-{ TItemPotionOfLifeKind ------------------------------------------------------ }
+{ TItemPotionOfLifeResource ------------------------------------------------------ }
 
-function TItemPotionOfLifeKind.ItemClass: TInventoryItemClass;
+function TItemPotionOfLifeResource.ItemClass: TInventoryItemClass;
 begin
   Result := TItemPotionOfLife;
 end;
@@ -76,16 +76,16 @@ begin
   if Player.Life < Player.MaxLife then
   begin
     Player.Life := Min(Player.Life + 50, Player.MaxLife);
-    Notifications.Show(Format('You drink "%s"', [Kind.Caption]));
+    Notifications.Show(Format('You drink "%s"', [Resource.Caption]));
     Quantity := Quantity - 1;
     SoundEngine.Sound(stPlayerPotionDrink);
   end else
     Notifications.Show('You feel quite alright, no need to waste this potion');
 end;
 
-{ TItemScrollOfFlyingKind ---------------------------------------------------- }
+{ TItemScrollOfFlyingResource ---------------------------------------------------- }
 
-function TItemScrollOfFlyingKind.ItemClass: TInventoryItemClass;
+function TItemScrollOfFlyingResource.ItemClass: TInventoryItemClass;
 begin
   Result := TItemScrollOfFlying;
 end;
@@ -94,7 +94,7 @@ end;
 
 procedure TItemScrollOfFlying.Use;
 begin
-  Notifications.Show(Format('You cast spell from "%s"', [Kind.Caption]));
+  Notifications.Show(Format('You cast spell from "%s"', [Resource.Caption]));
   Player.FlyingTimeOut := 30.0;
   Quantity := Quantity - 1;
   SoundEngine.Sound(stPlayerCastFlyingSpell);
@@ -102,17 +102,17 @@ end;
 
 { initialization / finalization ---------------------------------------- }
 
-procedure ItemsKindsInit;
+procedure ItemsResourcesInit;
 begin
-  Sword := Resources.FindName('Sword') as TItemKind;
-  Bow := Resources.FindName('Bow') as TItemKind;
-  LifePotion := Resources.FindName('LifePotion') as TItemKind;
-  KeyItemKind := Resources.FindName('Key') as TItemKind;
-  RedKeyItemKind := Resources.FindName('RedKey') as TItemKind;
-  Quiver := Resources.FindName('Quiver') as TItemKind;
+  Sword := Resources.FindName('Sword') as TItemResource;
+  Bow := Resources.FindName('Bow') as TItemResource;
+  LifePotion := Resources.FindName('LifePotion') as TItemResource;
+  KeyItemResource := Resources.FindName('Key') as TItemResource;
+  RedKeyItemResource := Resources.FindName('RedKey') as TItemResource;
+  Quiver := Resources.FindName('Quiver') as TItemResource;
 end;
 
 initialization
-  RegisterResourceClass(TItemPotionOfLifeKind, 'LifePotion');
-  RegisterResourceClass(TItemScrollOfFlyingKind, 'ScrFlying');
+  RegisterResourceClass(TItemPotionOfLifeResource, 'LifePotion');
+  RegisterResourceClass(TItemScrollOfFlyingResource, 'ScrFlying');
 end.

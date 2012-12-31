@@ -657,12 +657,12 @@ begin
 
   if FGateExitBox.PointInside(Player.Position) then
   begin
-    if GamePlay.Player.Inventory.FindKind(KeyItemKind) = -1 then
+    if GamePlay.Player.Inventory.FindResource(KeyItemResource) = -1 then
     begin
       Notifications.Show('You need a key to open this door');
       RejectGateExitBox;
     end else
-    if GamePlay.Player.Inventory.FindKind(Sword) = -1 then
+    if GamePlay.Player.Inventory.FindResource(Sword) = -1 then
     begin
       Notifications.Show('Better find a wepon first to protect yourself in the castle');
       RejectGateExitBox;
@@ -684,7 +684,7 @@ begin
     end;
 
     if (not SwordAmbushDone) and
-      (GamePlay.Player.Inventory.FindKind(Sword) <> -1) then
+      (GamePlay.Player.Inventory.FindResource(Sword) <> -1) then
     begin
       SwordAmbushDone := true;
       SwordAmbush;
@@ -799,7 +799,7 @@ begin
     NotificationInteractFailed(
       'You see a door. You''re too far to open it from here') else
   begin
-    if Player.Inventory.FindKind(RedKeyItemKind) <> -1 then
+    if Player.Inventory.FindResource(RedKeyItemResource) <> -1 then
     begin
       if (Boss <> nil) and (not Boss.Dead) then
       begin
@@ -848,7 +848,7 @@ end;
 
 procedure TCagesLevel.PlaceholdersEnd;
 
-  function FindCreatureKind(Kind: TCreatureKind): TCreature;
+  function FindCreatureResource(Resource: TCreatureResource): TCreature;
   var
     I: Integer;
   begin
@@ -856,7 +856,7 @@ procedure TCagesLevel.PlaceholdersEnd;
       if World[I] is TCreature then
       begin
         Result := TCreature(World[I]);
-        if Result.Kind = Kind then
+        if Result.Resource = Resource then
           Exit;
       end;
     Result := nil;
@@ -864,7 +864,7 @@ procedure TCagesLevel.PlaceholdersEnd;
 
 begin
   inherited;
-  Boss := FindCreatureKind(SpiderQueen);
+  Boss := FindCreatureResource(SpiderQueen);
   TGateExit(FGateExit).Boss := Boss;
 end;
 

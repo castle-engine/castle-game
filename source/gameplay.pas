@@ -183,7 +183,7 @@ procedure TGame2DControls.Draw;
         Y := ItemSlotY(I);
 
         glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
-        Player.Inventory[I].Kind.GLImage.Draw;
+        Player.Inventory[I].Resource.GLImage.Draw;
       end;
     glDisable(GL_ALPHA_TEST);
 
@@ -207,7 +207,7 @@ procedure TGame2DControls.Draw;
 
       glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
 
-      S := Player.Inventory[I].Kind.Caption;
+      S := Player.Inventory[I].Resource.Caption;
       if Player.Inventory[I].Quantity <> 1 then
         S += ' (' + IntToStr(Player.Inventory[I].Quantity) + ')';
       UIFontSmall.Print(S);
@@ -436,7 +436,7 @@ begin
     if Item is TCreature then
     begin
       C := TCreature(Item);
-      S := Format('You see a creature "%s"', [C.Kind.Name]);
+      S := Format('You see a creature "%s"', [C.Resource.Name]);
 
       if C.Life >= C.MaxLife then
         S += ' (not wounded)' else
@@ -448,7 +448,7 @@ begin
     end else
     begin
       I := TItemOnWorld(Item);
-      S := Format('You see an item "%s"', [I.Item.Kind.Caption]);
+      S := Format('You see an item "%s"', [I.Item.Resource.Caption]);
       if I.Item.Quantity <> 1 then
         S += Format(' (quantity %d)', [I.Item.Quantity]);
     end;
@@ -541,7 +541,7 @@ procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
   var
     UsedItemIndex: Integer;
   begin
-    UsedItemIndex := Player.Inventory.FindKind(LifePotion);
+    UsedItemIndex := Player.Inventory.FindResource(LifePotion);
     if UsedItemIndex <> -1 then
       Player.UseItem(UsedItemIndex) else
       Notifications.Show('You don''t have any life potion');
