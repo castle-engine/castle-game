@@ -4,13 +4,10 @@
 
 <CONFIG>
   <player
-    knock_back_speed="15"
-    sick_projection_speed="2"
->
+    knock_back_speed="15">
 
     <jump
       max_height="2.0"
-      speed_multiply="2.0"
       power="4.5"
     />
   </player>
