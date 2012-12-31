@@ -262,8 +262,8 @@ begin
          InvertVerticalMouseLook := DefaultInvertVerticalMouseLook;
          InvertVerticalMouseLookArgument.Value := InvertVerticalMouseLook;
 
-         MouseLookHorizontalSensitivity := DefaultMouseLookHorizontalSensitivity;
-         MouseLookVerticalSensitivity   := DefaultMouseLookVerticalSensitivity  ;
+         MouseLookHorizontalSensitivity := TWalkCamera.DefaultMouseLookHorizontalSensitivity;
+         MouseLookVerticalSensitivity   := TWalkCamera.DefaultMouseLookVerticalSensitivity  ;
          MouseLookHorizontalSensitivitySlider.Value := MouseLookHorizontalSensitivity;
          MouseLookVerticalSensitivitySlider  .Value := MouseLookVerticalSensitivity  ;
 
@@ -627,9 +627,9 @@ type
 class procedure TConfigOptions.LoadFromConfig(const Config: TCastleConfig);
 begin
   MouseLookHorizontalSensitivity := Config.GetFloat(
-    'mouse/horizontal_sensitivity', DefaultMouseLookHorizontalSensitivity);
+    'mouse/horizontal_sensitivity', TWalkCamera.DefaultMouseLookHorizontalSensitivity);
   MouseLookVerticalSensitivity := Config.GetFloat(
-    'mouse/vertical_sensitivity', DefaultMouseLookVerticalSensitivity);
+    'mouse/vertical_sensitivity', TWalkCamera.DefaultMouseLookVerticalSensitivity);
   MouseLook := Config.GetValue(
     'mouse/use_mouse_look', DefaultMouseLook);
   InvertVerticalMouseLook := Config.GetValue(
@@ -639,9 +639,9 @@ end;
 class procedure TConfigOptions.SaveToConfig(const Config: TCastleConfig);
 begin
   Config.SetDeleteFloat('mouse/horizontal_sensitivity',
-    MouseLookHorizontalSensitivity, DefaultMouseLookHorizontalSensitivity);
+    MouseLookHorizontalSensitivity, TWalkCamera.DefaultMouseLookHorizontalSensitivity);
   Config.SetDeleteFloat('mouse/vertical_sensitivity',
-    MouseLookVerticalSensitivity, DefaultMouseLookVerticalSensitivity);
+    MouseLookVerticalSensitivity, TWalkCamera.DefaultMouseLookVerticalSensitivity);
   Config.SetDeleteValue('mouse/use_mouse_look',
     MouseLook, DefaultMouseLook);
   Config.SetDeleteValue('mouse/invert_vertical_mouse_look',
