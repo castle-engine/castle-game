@@ -3,10 +3,14 @@
 <!-- attack/max_angle for SpiderQueen comments:
      SpiderQueen is large, the same reasoning is behind
      it's attack/max_angle as for Werewolf.
-
-     Note: attack/max_angle > Pi means "no limits".
-     This makes the trick with jumping/flying on SpiderQueen much harder.
+     Note: we could set attack/max_angle > Pi to mean "no limits".
+     This would make the trick with jumping/flying on SpiderQueen much harder.
      For now, not used - - - let's allow inventive players to use it.
+
+     radius comments: it has to be quite small (smaller than calculated
+     automatically) to allow SpiderQueen to walk without problems
+     over the trash lying on the floor on "Cages" level,
+     and walk over small spiders, and climb back up into the tunnel.
 -->
 
 <resource
@@ -25,6 +29,8 @@
   receive_shadow_volumes="False"
   sound_sudden_pain="spider_queen_sudden_pain"
   sound_die="spider_queen_dying"
+  radius="2.0"
+  max_height_acceptable_to_fall="4.0"
 >
   <model>
     <idle file_name="spider_queen_stand.wrl"/>
