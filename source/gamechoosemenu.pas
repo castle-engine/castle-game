@@ -36,7 +36,7 @@ implementation
 
 uses SysUtils, WindowModes, CastleGLUtils, CastleInputs, CastleMessages, OnScreenMenu,
   GameWindow, GameGeneralMenu, VectorMath, CastleGameNotifications,
-  KeysMouse;
+  CastleKeysMouse;
 
 var
   Selected: boolean;

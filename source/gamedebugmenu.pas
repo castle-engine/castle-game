@@ -37,7 +37,7 @@ uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
   CastleInputs, CastleCreatures, GameChooseMenu,
   CastleItems, OnScreenMenu, RaysWindow, GameVideoOptions, CastleSoundEngine,
   X3DNodes, CastleClassUtils, CastleGameNotifications,
-  CastleLevels, KeysMouse, CastleResources;
+  CastleLevels, CastleKeysMouse, CastleResources;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 

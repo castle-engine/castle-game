@@ -25,7 +25,7 @@ unit GameWindow;
 
 interface
 
-uses CastleWindow, KeysMouse;
+uses CastleWindow, CastleKeysMouse;
 
 type
   { Window that automatically, always, can do save screen on CastleInput_SaveScreen

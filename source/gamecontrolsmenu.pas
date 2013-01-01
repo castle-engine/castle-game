@@ -72,7 +72,7 @@ implementation
 
 uses SysUtils, WindowModes, CastleGLUtils, CastleMessages,
   OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit, CastleConfig,
-  CastleInputs, KeysMouse, VectorMath, CastleUtils,
+  CastleInputs, CastleKeysMouse, VectorMath, CastleUtils,
   CastleStringUtils, CastleGameNotifications, GameWindow;
 
 const

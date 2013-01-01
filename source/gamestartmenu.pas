@@ -39,7 +39,7 @@ uses SysUtils, Classes, CastleUtils, WindowModes, GL, GLU,
   GameGeneralMenu, OnScreenMenu, GameControlsMenu, CastleInputs, GameVideoOptions,
   GameHelp, CastleStringUtils, CastleClassUtils, CastleGameNotifications,
   GameBackgroundLevel, UIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes,
-  GameCredits, KeysMouse, CastleOpenDocument, PrecalculatedAnimation;
+  GameCredits, CastleKeysMouse, CastleOpenDocument, PrecalculatedAnimation;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
