@@ -66,7 +66,7 @@ procedure CreaturesResourcesInit;
 implementation
 
 uses SysUtils, DOM, GL, GLU, CastleWindow, CastleFilesUtils, CastleGLUtils,
-  ProgressUnit, GameSound;
+  CastleProgress, GameSound;
 
 { TWerewolfResource -------------------------------------------------------------- }
 

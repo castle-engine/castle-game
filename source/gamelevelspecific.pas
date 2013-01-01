@@ -203,7 +203,7 @@ uses CastleFilesUtils, SysUtils, CastleUtils,
   GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
   GamePlay, CastleGameNotifications, CastleInputs,
   GameWindow, GameX3DProcessing,
-  GameAnimationTricks, GameVideoOptions, CastleSceneCore, ProgressUnit,
+  GameAnimationTricks, GameVideoOptions, CastleSceneCore, CastleProgress,
   CastleXMLUtils, GameItems, X3DFields;
 
 function LevelsPath: string;
