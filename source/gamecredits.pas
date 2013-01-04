@@ -36,7 +36,7 @@ implementation
 uses SysUtils, Classes, GL, GLU, CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils, WindowModes,
   GamePlay, GameWindow,
-  GameVideoOptions, VectorMath, CastleScene, CastleFilesUtils,
+  GameVideoOptions, CastleVectors, CastleScene, CastleFilesUtils,
   GameHelp, CastleUtils, X3DFields, CastleTimeUtils, CastleKeysMouse, Base3D;
 
 var

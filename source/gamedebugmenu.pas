@@ -33,7 +33,7 @@ implementation
 
 uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, GameWindow, Base3D,
-  VectorMath, CastleWindow, GamePlay, GameGeneralMenu,
+  CastleVectors, CastleWindow, GamePlay, GameGeneralMenu,
   CastleInputs, CastleCreatures, GameChooseMenu,
   CastleItems, OnScreenMenu, RaysWindow, GameVideoOptions, CastleSoundEngine,
   X3DNodes, CastleClassUtils, CastleGameNotifications,

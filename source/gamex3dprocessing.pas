@@ -38,7 +38,7 @@ procedure LevelFountainProcess(Node: TX3DNode);
 
 implementation
 
-uses SysUtils, X3DFields, VectorMath;
+uses SysUtils, X3DFields, CastleVectors;
 
 { AddNormalMapToTexture ------------------------------------------------------ }
 

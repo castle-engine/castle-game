@@ -34,7 +34,7 @@ procedure ShowStartMenu;
 implementation
 
 uses SysUtils, Classes, CastleUtils, WindowModes, GL, GLU,
-  CastleGLUtils, CastleMessages, GameWindow, VectorMath, CastleImages, CastleFilesUtils,
+  CastleGLUtils, CastleMessages, GameWindow, CastleVectors, CastleImages, CastleFilesUtils,
   CastleLevels, GamePlay, GameSound, CastlePlayer,
   GameGeneralMenu, OnScreenMenu, GameControlsMenu, CastleInputs, GameVideoOptions,
   GameHelp, CastleStringUtils, CastleClassUtils, CastleGameNotifications,

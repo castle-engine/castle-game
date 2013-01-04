@@ -88,7 +88,7 @@ implementation
 
 uses SysUtils, CastleUtils, CastleWindow, GameInputs,
   WindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
-  VectorMath, CastleImages, Math, GameHelp, UIControls, CastleSoundEngine,
+  CastleVectors, CastleImages, Math, GameHelp, UIControls, CastleSoundEngine,
   GameItems, CastleStringUtils, CastleCreatures, CastleItems,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, CastleColors, CastleSceneManager,

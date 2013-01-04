@@ -25,7 +25,7 @@ unit GameAnimationTricks;
 
 interface
 
-uses Classes, PrecalculatedAnimation, Frustum, VectorMath, GLShaders, GL, Base3D;
+uses Classes, PrecalculatedAnimation, Frustum, CastleVectors, GLShaders, GL, Base3D;
 
 type
   { Animation forced to seamlessly loop by blending the beginning frames
@@ -66,7 +66,7 @@ type
 implementation
 
 uses Math, CastleUtils, CastleGLUtils, CastleStringUtils, SysUtils,
-  CastleFilesUtils, RenderingCameraUnit, DDS, GLExt, GLImages, GLRenderer;
+  CastleFilesUtils, CastleRenderingCamera, DDS, GLExt, GLImages, GLRenderer;
 
 { TBlendedLoopingAnimation --------------------------------------------------- }
 

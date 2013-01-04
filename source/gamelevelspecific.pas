@@ -25,7 +25,7 @@ unit GameLevelSpecific;
 
 interface
 
-uses CastleScene, Boxes3D, VectorMath, CastleShapes, CastlePlayer, CastleLevels,
+uses CastleScene, Boxes3D, CastleVectors, CastleShapes, CastlePlayer, CastleLevels,
   GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
 
@@ -200,7 +200,7 @@ type
 implementation
 
 uses CastleFilesUtils, SysUtils, CastleUtils,
-  GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, RenderingCameraUnit,
+  GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, CastleRenderingCamera,
   GamePlay, CastleGameNotifications, CastleInputs,
   GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, CastleProgress,
