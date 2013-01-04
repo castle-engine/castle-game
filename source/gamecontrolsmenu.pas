@@ -26,7 +26,7 @@ unit GameControlsMenu;
 interface
 
 uses Classes, CastleWindow, GL, GLU, GameGeneralMenu, Cameras,
-  OpenGLFonts, OpenGLBmpFonts, UIControls, CastlePlayer;
+  CastleGLBitmapFonts, UIControls, CastlePlayer;
 
 type
   TSubMenu = class(TCastleGameMenu)
@@ -62,7 +62,7 @@ procedure ShowControlsMenuEscape(ControlsUnder: TUIControlList;
 var
   { Font used for menu SubMenuTitle.
     Initialized / finalized in CastleWindow Open/Close here. }
-  SubMenuTitleFont: TGLBitmapFont_Abstract;
+  SubMenuTitleFont: TGLBitmapFontAbstract;
 
 { Update MouseLook-related player settings, based on what is chosen
   in "Confgure controls" menu. }
@@ -71,7 +71,7 @@ procedure PlayerUpdateMouseLook(Player: TPlayer);
 implementation
 
 uses SysUtils, WindowModes, CastleGLUtils, CastleMessages,
-  OnScreenMenu, BFNT_BitstreamVeraSansMono_m18_Unit, CastleConfig,
+  OnScreenMenu, CastleBitmapFont_BVSansMono_m18, CastleConfig,
   CastleInputs, CastleKeysMouse, CastleVectors, CastleUtils,
   CastleStringUtils, CastleGameNotifications, GameWindow;
 
@@ -608,7 +608,7 @@ begin
   BasicControlsMenu := TBasicControlsMenu.Create(Application);
   ItemsControlsMenu := TItemsControlsMenu.Create(Application);
   OtherControlsMenu := TOtherControlsMenu.Create(Application);
-  SubMenuTitleFont := TGLBitmapFont.Create(@BFNT_BitstreamVeraSansMono_m18);
+  SubMenuTitleFont := TGLBitmapFont.Create(BitmapFont_BVSansMono_m18);
 end;
 
 procedure WindowClose(const Container: IUIContainer);
