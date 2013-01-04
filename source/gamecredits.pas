@@ -37,7 +37,7 @@ uses SysUtils, Classes, GL, GLU, CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils, WindowModes,
   GamePlay, GameWindow,
   GameVideoOptions, CastleVectors, CastleScene, CastleFilesUtils,
-  GameHelp, CastleUtils, X3DFields, CastleTimeUtils, CastleKeysMouse, Base3D;
+  GameHelp, CastleUtils, X3DFields, CastleTimeUtils, CastleKeysMouse, Castle3D;
 
 var
   UserQuit: boolean;

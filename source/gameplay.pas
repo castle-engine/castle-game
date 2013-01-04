@@ -26,7 +26,7 @@ unit GamePlay;
 
 interface
 
-uses Classes, CastleLevels, CastlePlayer, Base3D;
+uses Classes, CastleLevels, CastlePlayer, Castle3D;
 
 { Play the game.
   SceneManager and Player global variables must be already initialized.

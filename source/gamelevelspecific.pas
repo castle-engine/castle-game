@@ -25,9 +25,9 @@ unit GameLevelSpecific;
 
 interface
 
-uses CastleScene, Boxes3D, CastleVectors, CastleShapes, CastlePlayer, CastleLevels,
-  GameSound, X3DNodes, DOM, Base3D, PrecalculatedAnimation, CastleSoundEngine,
-  GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, Frustum;
+uses CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer, CastleLevels,
+  GameSound, X3DNodes, DOM, Castle3D, PrecalculatedAnimation, CastleSoundEngine,
+  GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, CastleFrustum;
 
 const
   CastleHallWerewolvesCount = 4;
