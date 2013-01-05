@@ -25,7 +25,7 @@ unit GameGeneralMenu;
 
 interface
 
-uses Classes, OnScreenMenu;
+uses Classes, CastleOnScreenMenu;
 
 type
   { On-screen menu suitable for castle.
@@ -55,7 +55,7 @@ function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
 
 implementation
 
-uses SysUtils, CastleWindow, UIControls, GameWindow;
+uses SysUtils, CastleWindow, CastleUIControls, GameWindow;
 
 { TCastleGameMenu ---------------------------------------------------------------- }
 

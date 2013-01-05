@@ -49,7 +49,7 @@ unit GameBackgroundLevel;
 
 interface
 
-uses CastleWindow, UIControls, CastleLevels;
+uses CastleWindow, CastleUIControls, CastleLevels;
 
 var
   BackgroundControls: TUIControlList;
@@ -67,7 +67,7 @@ procedure BackgroundDestroy;
 
 implementation
 
-uses SysUtils, GL, GLU, GLExt, CastleGLUtils, GLImages,
+uses SysUtils, GL, GLU, GLExt, CastleGLUtils, CastleGLImages,
   CastleFilesUtils, CastleImages, CastleVectors, CastlePlayer;
 
 { TBackgroundCaptions -------------------------------------------------------- }

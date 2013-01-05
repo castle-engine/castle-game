@@ -42,7 +42,7 @@ var
 
 implementation
 
-uses SysUtils, CastleInputs, UIControls, CastleGameNotifications, CastleFilesUtils,
+uses SysUtils, CastleInputs, CastleUIControls, CastleGameNotifications, CastleFilesUtils,
   CastleSoundEngine, GameSound, GameInputs;
 
 procedure TGameWindow.EventPress(const Event: TInputPressRelease);

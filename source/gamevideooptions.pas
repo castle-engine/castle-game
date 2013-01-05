@@ -67,8 +67,7 @@ function ViewAngleDegY: Single;
 
 implementation
 
-uses SysUtils, CastleUtils, RaysWindow, GameWindow, 
-  CastleConfig, CastleWindow;
+uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow;
 
 type
   TGameVideoOptions = class

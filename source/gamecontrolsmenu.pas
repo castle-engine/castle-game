@@ -25,8 +25,8 @@ unit GameControlsMenu;
 
 interface
 
-uses Classes, CastleWindow, GL, GLU, GameGeneralMenu, Cameras,
-  CastleGLBitmapFonts, UIControls, CastlePlayer;
+uses Classes, CastleWindow, GL, GLU, GameGeneralMenu, CastleCameras,
+  CastleGLBitmapFonts, CastleUIControls, CastlePlayer;
 
 type
   TSubMenu = class(TCastleGameMenu)
@@ -70,8 +70,8 @@ procedure PlayerUpdateMouseLook(Player: TPlayer);
 
 implementation
 
-uses SysUtils, WindowModes, CastleGLUtils, CastleMessages,
-  OnScreenMenu, CastleBitmapFont_BVSansMono_m18, CastleConfig,
+uses SysUtils, CastleWindowModes, CastleGLUtils, CastleMessages,
+  CastleOnScreenMenu, CastleBitmapFont_BVSansMono_m18, CastleConfig,
   CastleInputs, CastleKeysMouse, CastleVectors, CastleUtils,
   CastleStringUtils, CastleGameNotifications, GameWindow;
 

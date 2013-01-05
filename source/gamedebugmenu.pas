@@ -25,17 +25,17 @@ unit GameDebugMenu;
 
 interface
 
-uses UIControls;
+uses CastleUIControls;
 
 procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 
 implementation
 
-uses SysUtils, Classes, CastleUtils, CastleStringUtils, WindowModes,
+uses SysUtils, Classes, CastleUtils, CastleStringUtils, CastleWindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, GameWindow, Castle3D,
   CastleVectors, CastleWindow, GamePlay, GameGeneralMenu,
   CastleInputs, CastleCreatures, GameChooseMenu,
-  CastleItems, OnScreenMenu, RaysWindow, GameVideoOptions, CastleSoundEngine,
+  CastleItems, CastleOnScreenMenu, CastleRays, GameVideoOptions, CastleSoundEngine,
   X3DNodes, CastleClassUtils, CastleGameNotifications,
   CastleLevels, CastleKeysMouse, CastleResources;
 

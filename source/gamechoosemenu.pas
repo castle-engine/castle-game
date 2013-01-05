@@ -25,7 +25,7 @@ unit GameChooseMenu;
 
 interface
 
-uses Classes, CastleWindow, GL, GLU, UIControls;
+uses Classes, CastleWindow, GL, GLU, CastleUIControls;
 
 { Allows user to choose one item from MenuItems.
   Displays menu using TCastleGameMenu with ControlsUnder background. }
@@ -34,8 +34,8 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 
 implementation
 
-uses SysUtils, WindowModes, CastleGLUtils, CastleInputs, CastleMessages, OnScreenMenu,
-  GameWindow, GameGeneralMenu, CastleVectors, CastleGameNotifications,
+uses SysUtils, CastleWindowModes, CastleGLUtils, CastleInputs, CastleMessages, 
+  CastleOnScreenMenu, GameWindow, GameGeneralMenu, CastleVectors, CastleGameNotifications,
   CastleKeysMouse;
 
 var

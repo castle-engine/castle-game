@@ -30,7 +30,7 @@ procedure DrawInitialBackground;
 
 implementation
 
-uses SysUtils, GL, GLU, CastleWindow, CastleGLUtils, GLImages, UIControls,
+uses SysUtils, GL, GLU, CastleWindow, CastleGLUtils, CastleGLImages, CastleUIControls,
   GameWindow, CastleFilesUtils, CastleImages;
 
 var

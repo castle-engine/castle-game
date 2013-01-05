@@ -26,7 +26,7 @@ unit GameLevelSpecific;
 interface
 
 uses CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer, CastleLevels,
-  GameSound, X3DNodes, DOM, Castle3D, PrecalculatedAnimation, CastleSoundEngine,
+  GameSound, X3DNodes, DOM, Castle3D, CastlePrecalculatedAnimation, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, CastleFrustum;
 
 const
