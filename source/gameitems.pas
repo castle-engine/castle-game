@@ -34,7 +34,7 @@ type
   end;
 
   TItemPotionOfLife = class(TInventoryItem)
-  public
+  protected
     procedure Use; override;
   end;
 
@@ -44,7 +44,7 @@ type
   end;
 
   TItemScrollOfFlying = class(TInventoryItem)
-  public
+  protected
     procedure Use; override;
   end;
 
