@@ -189,14 +189,14 @@ procedure TGame2DControls.Draw;
 
     if Between(Player.InventoryCurrentItem, 0, Player.Inventory.Count - 1) then
     begin
-      glColor4f(0.8, 0.8, 0.8, 1);
       GLRectangleBorder(
         ItemSlotX(Player.InventoryCurrentItem) + InventorySlotMargin,
         ItemSlotY(Player.InventoryCurrentItem) + InventorySlotMargin,
         ItemSlotX(Player.InventoryCurrentItem)
           + InventorySlotWidth - InventorySlotMargin,
         ItemSlotY(Player.InventoryCurrentItem)
-          + InventorySlotHeight - InventorySlotMargin);
+          + InventorySlotHeight - InventorySlotMargin,
+        Vector4Single(0.8, 0.8, 0.8, 1));
     end;
 
     glColor4f(1, 1, 0.5, 1);
