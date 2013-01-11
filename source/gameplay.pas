@@ -519,12 +519,6 @@ begin
   end;
 end;
 
-procedure Timer(Window: TCastleWindowBase);
-begin
-  if SoundEngine.ALActive then
-    SoundEngine.RefreshUsedSources;
-end;
-
 procedure GameCancel(RequireConfirmation: boolean);
 begin
   if Player.Dead or GameWin or (not RequireConfirmation) or
@@ -612,14 +606,6 @@ begin
   SavedMode := TGLMode.CreateReset(Window, 0, true, nil, nil, @CloseQuery);
   try
     Window.AutoRedisplay := true;
-
-    { OnTimer should be executed quite often, because footsteps sound
-      (done in TPlayer.Idle) relies on the fact that OnRelease
-      of it's source will be called more-or-less immediately after
-      sound stopped. And our Timer calls RefreshUsed that will
-      call OnRelease. }
-    Application.TimerMilisec := 100;
-    Window.OnTimer := @Timer;
 
     Window.OnIdle := @Idle;
     Window.OnPress := @Press;
