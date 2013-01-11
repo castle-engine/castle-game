@@ -29,9 +29,6 @@ uses CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer, Castle
   GameSound, X3DNodes, DOM, Castle3D, CastlePrecalculatedAnimation, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, CastleFrustum;
 
-const
-  CastleHallWerewolvesCount = 4;
-
 type
   { Level that may have a boss life indicator. }
   TBossLevel = class(TLevelLogic)
@@ -42,17 +39,20 @@ type
 
   TCastleHallLevel = class(TBossLevel)
   private
-    Symbol: TCastlePrecalculatedAnimation;
-    Button: TCastlePrecalculatedAnimation;
+    const
+      CastleHallWerewolvesCount = 4;
+    var
+      Symbol: TCastlePrecalculatedAnimation;
+      Button: TCastlePrecalculatedAnimation;
 
-    StairsBlocker: TCastleScene;
-    StairsBlockerMiddle: TVector3Single;
+      StairsBlocker: TCastleScene;
+      StairsBlockerMiddle: TVector3Single;
 
-    FLevelExitBox: TBox3D;
+      FLevelExitBox: TBox3D;
 
-    WerewolfAppearPosition: array [0..CastleHallWerewolvesCount - 1] of TVector3Single;
-    WerewolfAppeared: boolean;
-    WerewolfCreature: array [0..CastleHallWerewolvesCount - 1] of TWerewolfCreature;
+      WerewolfAppearPosition: array [0..CastleHallWerewolvesCount - 1] of TVector3Single;
+      WerewolfAppeared: boolean;
+      WerewolfCreature: array [0..CastleHallWerewolvesCount - 1] of TWerewolfCreature;
   protected
     function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
   public
@@ -200,7 +200,7 @@ type
 implementation
 
 uses CastleFilesUtils, SysUtils, CastleUtils,
-  GL, GLU, CastleGLUtils, CastleStringUtils, CastleMessages, CastleRenderingCamera,
+  GL, CastleGLUtils, CastleStringUtils, CastleMessages, CastleRenderingCamera,
   GamePlay, CastleGameNotifications, CastleInputs,
   GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, CastleProgress,
