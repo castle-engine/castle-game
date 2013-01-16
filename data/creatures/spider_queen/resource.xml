@@ -63,4 +63,9 @@
     name="ThrownWeb"
     sound="thrown_web_fired"
   />
+  <!-- Castle1 levels do not define useful initial orientations for creatures
+       (Castle1 was done before VisibilityAngle was introduced).
+       To make everything work the same, make sure that Castle1 creatures can
+       see everything around, making it impossible to sneak upon creature. -->
+  <visibility angle="7"/>
 </resource>
