@@ -50,7 +50,7 @@
     default_importance="player"/>
   <sound name="player_interact_failed"
     default_importance="player"/>
-  <sound name="player_lava_pain" file_name="doom/dsplpain.wav"
+  <sound name="player_toxic_pain" file_name="doom/dsplpain.wav"
     default_importance="player"/>
 
   <!-- From

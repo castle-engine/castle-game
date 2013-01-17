@@ -1,44 +1,45 @@
 <?xml version="1.0"?>
 
 <!--
-Texture properties, see CastleTextureProperties unit of Castle Game Engine.
+  Material and texture properties, CastleMaterialProperties
+  unit of Castle Game Engine.
 -->
 
-<textures>
-  <texture base_name="airbase_radar_panels"
+<properties>
+  <property texture_base_name="airbase_radar_panels"
     footsteps_sound="player_footsteps_concrete" />
-  <texture base_name="wood_clear"
+  <property texture_base_name="wood_clear"
     footsteps_sound="player_footsteps_concrete" />
-  <texture base_name="marble"
+  <property texture_base_name="marble"
     footsteps_sound="player_footsteps_concrete" />
-  <texture base_name="047roche"
+  <property texture_base_name="047roche"
     footsteps_sound="player_footsteps_grass" />
-  <texture base_name="dirtfrancecornergrass"
+  <property texture_base_name="dirtfrancecornergrass"
     footsteps_sound="player_footsteps_grass" />
-  <texture base_name="grassfull"
+  <property texture_base_name="grassfull"
     footsteps_sound="player_footsteps_grass" />
-  <texture base_name="green020"
+  <property texture_base_name="green020"
     footsteps_sound="player_footsteps_grass" />
 
-  <texture base_name="water_grayscale"
+  <property texture_base_name="water_grayscale"
     footsteps_sound="player_footsteps_watery">
-    <lava>
+    <toxic>
       <damage const="5" random="5" time="1.0" />
-    </lava>
-  </texture>
+    </toxic>
+  </property>
 
   <!-- For DOOM textures below: -->
 
-  <texture base_name="nukage3"
+  <property texture_base_name="nukage3"
     footsteps_sound="player_footsteps_watery">
-    <lava>
+    <toxic>
       <damage const="5" random="5" time="1.5" />
-    </lava>
-  </texture>
+    </toxic>
+  </property>
 
-  <texture base_name="flat14"
+  <property texture_base_name="flat14"
     footsteps_sound="player_footsteps_watery" />
 
   <!-- End of DOOM textures. -->
 
-</textures>
+</properties>

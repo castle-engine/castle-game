@@ -28,7 +28,7 @@ uses CastleWindow, SysUtils, CastleUtils, CastleProgress, CastleWindowProgress,
   Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
   CastleLog, GameWindow, GameStartMenu, GameHelp, CastleFilesUtils,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
-  GameCreatures, GamePlay, GameGeneralMenu, CastleLevels, CastleTextureProperties,
+  GameCreatures, GamePlay, GameGeneralMenu, CastleLevels, CastleMaterialProperties,
   CastleSoundEngine, CastleConfig, CastleRenderer, CastleResources, GameItems,
   CastleGameNotifications;
 
@@ -190,8 +190,8 @@ begin
   Progress.UserInterface := WindowProgressInterface;
 
   { load game data from XML files }
-  TexturesProperties.XmlFileName := ProgramDataPath + 'data' +
-    PathDelim + 'textures' + PathDelim + 'index.xml';
+  MaterialProperties.FileName := ProgramDataPath + 'data' +
+    PathDelim + 'textures' + PathDelim + 'material_properties.xml';
   Resources.LoadFromFiles;
   ItemsResourcesInit;
   CreaturesResourcesInit;
