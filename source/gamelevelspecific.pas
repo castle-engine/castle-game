@@ -364,13 +364,13 @@ const
         TAbstractPositionalLightNode;
       LightNode.FdColor.Send(Vector3Single(1, 0, 0));
       LightNode.FdAttenuation.Send(Vector3Single(1, 0.1, 0));
-      LightNode.FdKambiShadows.Send(true);
+      LightNode.FdShadowVolumes.Send(true);
     end;
 
     ShadowLight := SceneManager.MainScene.GlobalLights.FindName('FakeShadowPosition');
     Check(ShadowLight <> nil, 'FakeShadowPosition light not found on castle_hall level');
-    ShadowLight^.Node.FdKambiShadows.Send(true);
-    ShadowLight^.Node.FdKambiShadowsMain.Send(true);
+    ShadowLight^.Node.FdShadowVolumes.Send(true);
+    ShadowLight^.Node.FdShadowVolumesMain.Send(true);
   end;
 
 var

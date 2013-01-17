@@ -19,7 +19,7 @@ Transform {
 PointLight {
         ambientIntensity 1
         color 0.800000011920929 0.400000005960464 0.400000005960464
-        kambiShadows TRUE
+        shadowVolumes TRUE
         location -0.484244674444199 2.030553579330444 5.987204074859619
         global TRUE
         radius 100000 # infinity
@@ -28,7 +28,7 @@ PointLight {
         ambientIntensity 0.512820541858673
         intensity 0.512820541858673
         color 0.400000005960464 0.400000005960464 0.400000005960464
-        kambiShadows TRUE
+        shadowVolumes TRUE
         location -11.109210014343262 -36.451499938964844 88.175689697265625
         global TRUE
         radius 100000 # infinity
@@ -36,8 +36,8 @@ PointLight {
 DEF FakeShadowPosition PointLight {
         ambientIntensity 1
         on FALSE
-        kambiShadows TRUE
-        kambiShadowsMain TRUE
+        shadowVolumes TRUE
+        shadowVolumesMain TRUE
         location 0 0 1000
         global TRUE
         radius 100000 # infinity

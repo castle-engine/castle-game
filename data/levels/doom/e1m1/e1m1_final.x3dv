@@ -30,7 +30,7 @@ DirectionalLight {
 }
 DirectionalLight {
         ambientIntensity 1
-        kambiShadows TRUE
+        shadowVolumes TRUE
         direction 1 -1 -1
         global TRUE
 }
@@ -42,8 +42,8 @@ DirectionalLight {
 DEF FakeShadowPosition PointLight {
         ambientIntensity 1
         on FALSE
-        kambiShadows TRUE
-        kambiShadowsMain TRUE
+        shadowVolumes TRUE
+        shadowVolumesMain TRUE
         location 0 0 1000
         global TRUE
         radius 100000 # infinity

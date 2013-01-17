@@ -20,15 +20,15 @@ PointLight {
         ambientIntensity 1
         color 0.899999976158142 0.899999976158142 1
         location 10 10 100
-        kambiShadows TRUE
+        shadowVolumes TRUE
         global TRUE
         radius 100000 # infinity
 }
 DEF FakeShadowPosition PointLight {
         ambientIntensity 1
         on FALSE
-        kambiShadows TRUE
-        kambiShadowsMain TRUE
+        shadowVolumes TRUE
+        shadowVolumesMain TRUE
         location 0 0 1000
         global TRUE
         radius 100000 # infinity

@@ -108,7 +108,7 @@ Resigned: fountain new level for castle 1.0.0:
   - it's still too slow on some levels (doom e1m1)
   - allow items to cast shadows
   - eventually, allow items and creatures to be in shadow
-  - kambiShadows and kambiShadowsMain:
+  - shadowVolumes and shadowVolumesMain:
     - for headlight should be too
     - background castle level when this light actually moves
   - dyn shadows from more than one light need to be done

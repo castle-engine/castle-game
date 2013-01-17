@@ -27,7 +27,7 @@ DEF MainHallTorchLight PointLight {
 DirectionalLight {
         ambientIntensity 0.44017094373703
         intensity 0.44017094373703
-        kambiShadows TRUE
+        shadowVolumes TRUE
         direction 0.010538369417191 0.197130039334297 -0.347894430160522
         global TRUE
 }
@@ -63,8 +63,8 @@ DEF RightRoomTorchLigh PointLight {
 DEF FakeShadowPosition PointLight {
         ambientIntensity 1
         on FALSE
-        kambiShadows TRUE
-        kambiShadowsMain TRUE
+        shadowVolumes TRUE
+        shadowVolumesMain TRUE
         location 0 0 1000
         global TRUE
         radius 100000

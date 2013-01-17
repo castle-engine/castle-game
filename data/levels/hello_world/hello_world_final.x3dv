@@ -16,8 +16,8 @@ Transform {
 
 PointLight {
         ambientIntensity 1
-        kambiShadows TRUE
-        kambiShadowsMain TRUE
+        shadowVolumes TRUE
+        shadowVolumesMain TRUE
         location 0 0 10
         global TRUE
         radius 100000 # infinity

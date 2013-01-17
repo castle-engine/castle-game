@@ -57,8 +57,8 @@ PointLight {
   ambientIntensity 1
   location  10  10 100
   color 0.3 0.3 0.3
-  kambiShadows TRUE
-  kambiShadowsMain TRUE
+  shadowVolumes TRUE
+  shadowVolumesMain TRUE
   global TRUE
   radius 100000 # infinity
 }
@@ -67,7 +67,7 @@ PointLight {
   ambientIntensity 1
   location -10 -10 100
   color 0.3 0.3 0.3
-  kambiShadows TRUE
+  shadowVolumes TRUE
   global TRUE
   radius 100000 # infinity
 }
