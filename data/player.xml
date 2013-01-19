@@ -2,6 +2,6 @@
 
 <!-- Configures player. -->
 
-<player knock_back_speed="15">
+<player knockback_speed="15">
   <jump max_height="2.0" />
 </player>

@@ -7,7 +7,7 @@
   move_speed="25.0"
   flying="True"
   default_max_life="30.0"
-  knock_back_speed="35"
+  knockback_speed="35"
   sound_die_tied_to_creature="False"
   remove_dead="True"
   preferred_distance="2.0"

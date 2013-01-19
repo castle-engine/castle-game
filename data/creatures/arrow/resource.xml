@@ -15,7 +15,7 @@
   hits_player="False"
   hits_creatures="True"
   move_speed="100.0"
-  knocked_back_distance="0.0"
+  knockback_distance="0.0"
   direction_fall_speed="0.15"
   radius="0.3"
   receive_shadow_volumes="False"

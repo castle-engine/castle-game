@@ -19,8 +19,8 @@
 
   move_speed="17.5"
   default_max_life="1100.0"
-  knocked_back_distance="2.0"
-  knock_back_speed="35"
+  knockback_distance="2.0"
+  knockback_speed="35"
   random_walk_distance="30"
   min_life_loss_to_hurt="0.05"
   chance_to_hurt="0.3"

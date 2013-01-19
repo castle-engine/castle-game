@@ -6,7 +6,7 @@
 
   radius="0.5"
   default_max_life="1.0"
-  knock_back_speed="35"
+  knockback_speed="35"
   remove_dead="True"
   cast_shadow_volumes="False"
   fall_speed="20"

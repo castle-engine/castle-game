@@ -11,7 +11,7 @@
 
   move_speed="15.0"
   default_max_life="300.0"
-  knock_back_speed="35"
+  knockback_speed="35"
   min_life_loss_to_hurt="0.05"
   chance_to_hurt="0.3"
   middle_height="0.7"

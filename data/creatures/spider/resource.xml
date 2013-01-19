@@ -20,8 +20,8 @@
 
   move_speed="5.0"
   default_max_life="50.0"
-  knocked_back_distance="2.0"
-  knock_back_speed="35"
+  knockback_distance="2.0"
+  knockback_speed="35"
   middle_height="1.0"
   remove_dead="True"
   preferred_distance="2.0"
