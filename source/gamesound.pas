@@ -78,7 +78,7 @@ implementation
 uses CastleFilesUtils;
 
 initialization
-  SoundEngine.SoundsXmlFileName := ProgramDataPath + 'data' +
+  SoundEngine.SoundsFileName := ProgramDataPath + 'data' +
     PathDelim + 'sounds' + PathDelim + 'index.xml';
 
   stPlayerPotionDrink          := SoundEngine.SoundFromName('player_potion_drink');
