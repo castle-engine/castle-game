@@ -7,11 +7,11 @@
 
 <properties>
   <property texture_base_name="airbase_radar_panels"
-    footsteps_sound="player_footsteps_concrete" />
+    footsteps_sound="player_footsteps_default" />
   <property texture_base_name="wood_clear"
-    footsteps_sound="player_footsteps_concrete" />
+    footsteps_sound="player_footsteps_default" />
   <property texture_base_name="marble"
-    footsteps_sound="player_footsteps_concrete" />
+    footsteps_sound="player_footsteps_default" />
   <property texture_base_name="047roche"
     footsteps_sound="player_footsteps_grass" />
   <property texture_base_name="dirtfrancecornergrass"

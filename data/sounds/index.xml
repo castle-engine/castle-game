@@ -44,7 +44,7 @@
     default_importance="player"/>
   <sound name="player_fall"
     default_importance="player"/>
-  <sound name="player_footsteps_concrete"
+  <sound name="player_footsteps_default"
     default_importance="player"/>
   <sound name="player_footsteps_grass"
     default_importance="player"/>
