@@ -123,7 +123,7 @@ begin
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 
-    Window.Controls.Insert(0, CreditsSceneManager);
+    Window.Controls.InsertFront(CreditsSceneManager);
 
     repeat
       Application.ProcessMessage(true, true);
