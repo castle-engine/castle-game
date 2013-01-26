@@ -153,6 +153,9 @@ begin
 
   CreditsSceneManager.Items.Add(Credits);
   CreditsSceneManager.MainScene := Credits.Scene;
+  
+  CreditsSceneManager.Camera := CreditsSceneManager.CreateDefaultCamera;
+  CreditsSceneManager.Camera.Input := [];
 end;
 
 procedure WindowClose(const Container: IUIContainer);
