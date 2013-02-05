@@ -1,0 +1,300 @@
+This file contains various unrealized ideas/TODOs for things to add to castle1.
+As I consider this game finished now, this is all resigned now.
+Possibly some of these ideas will be used for future games.
+
+------------------------------------------------------------------------------
+Fountain level:
+
+- tentacles from fountain
+- splash sound when entering fountain
+- touch sensor to bring down elevator and go up over the columns
+- a path over the columns around the fountain
+- animated light, with shadows and bump mapping, circling the fountain
+- water flowing from the fountain (water flowing sound),
+  baked from fluid sim by blender,
+  with mat transparent to look like water really
+- maybe change the scenery to more sunny and indoors:
+  sunny sky
+  part. transp. dome over the fountain
+- footsteps sound with more echo, to show space
+- maybe small fog (3d tex?) rising from the fountain
+
+- trees, bushes around (natural CasMoveLimit)
+- light changing (fire pots in the corner(s) ?)
+- footsteps: splashes on water
+- fountain: water sparkling (use blender's particle animation)
+- sounds: some birds, water sparkling
+
+------------------------------------------------------------------------------
+Creatures:
+
+- Let some creatures be shiny by using generatedcubemaptexture,
+  just to show it off.
+  Or maybe just static ImageCubeMapTexture would be cool enough?
+
+- Alien: I don't like it much, the model just doesn't fit into the game,
+  and I just can't texture it appropriately.
+  The basic model was just taken from www.3dcafe.com when I realized that
+  I don't have time to make some really nice creature model before
+  stage 4 deadline.
+
+- ball missile should hit other creatures too (helpful on crowdy places
+  on Doom level), barrels too
+
+- werewolf's mouth is too dark
+
+- better spider_queen model. Inspiration ?
+  http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen02.jpg
+  http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen01.jpg
+  http://ultimosdiasdegloria.bluehosting.com.br/downloads/arquivos/CitySpiderQueen03.jpg
+
+- spider_appears.wav sound do
+
+- spider: try to climb by doing additional MoveAlowed with higher destination
+  position. They can't climb on logs now (but maybe it's a good thing ?)
+
+  same for spider_queen --- it can't climb back to MeshTunnel.
+
+- spider queen:
+  - lay eggs, produce normal spiders.
+  - remove/fix dying sound, it's too shriek (making it more quiet doesn't
+    help for all positions)
+
+- alien:
+  more aliens on castle_hall ?
+  texture the alien finally ?
+
+- some effects: blood explode when player hits monster.
+
+- sometimes spider_queen may get stuck in the ground ---
+  that's because camera sphere
+  middle changes with anim. Maybe make it non-changing ?
+
+- Enemies:
+  - More enemies attacks.
+  - Nice 3d effects (lighting-like things, explosions etc.).
+  - Models of the two current creatures need to be improved.
+    Model of "alien" creature will probably be just removed and replaced
+    by something else.
+  - Just add more creatures.
+    creature hydra (very tall, very long when killed; will be a nice demo of my good collision checking routines)
+    creature that attacks by snapping it hand (tentacle ?) far out
+
+- non-moving creature (just shooting etc.)
+
+- ball_missile looks rather funny, too colorful.
+  It must look like something fiery, or lighting, or just anything
+  that seems at least a little dangerous :)
+
+------------------------------------------------------------------------------
+DOOM E1M1 level:
+
+- There are some colliding plane walls on doom e1m1 level:
+  - at the first door
+  - right when opening the secret (lighter) door
+
+- creatures should take hurt from lava too, and should know that they
+  don't want to step on lava. Room with lava on e1m1 may require some
+  waypoints for sensible creature move.
+- make small and blue armor for doom level (items' stubs are already placed
+  in blend file, on layer 9/10)
+- room 5: creatures should see through texture with alpha channel
+- if you know how, you can cause bad collisions and get out of the level
+  on elevator 9a-9b because of MovePushesOthers problems.
+- still too dark. Secret on 9a-9b should be activated differently ?
+  Or wall should be specially visible ? Maybe more visible the
+  alternative entrance there (through the barrels) --- different wall
+  color ?
+
+------------------------------------------------------------------------------
+All levels:
+
+- More bump mapping for everything?
+  I actually tried it, it just doesn't look good with castle1 levels lighting.
+  So this would require changing lighting.
+  And also making some lights dynamic, to really appreciate bump mapping in real time?
+
+- Circular (Laz forum), others:
+  move speed too fast
+  more visual hints when monster is hit
+
+- (kasia usability test on castle1) enter/exit on levels should be more black, to suggest more that these are enter/exit, not a normal wall
+
+- Things that I would like to show in new levels:
+  - swimming feels great --- show it off more ?
+  - lights: Spot light. Moving light.
+  - Some moving objects on the level: this is easy to do in my levels. Use it more !
+  - more environ sounds: wind blowing.
+  - homing missiles make great effect on a vast empty space, like in "Tower" level. Demonstrate this in some "real" level too!
+
+- chooseNewLevel menu: display thumbnails of levels
+
+------------------------------------------------------------------------------
+Gate level:
+
+- (rudy) level of oxygen under water could be shown?
+- (rudy) unfixable? (just don't do this in new game...)
+  - no more jumping puzzles
+  - on 1st level, there is a general feeling that "you don't know what to do"
+
+- make gate light darker ? like szymon proposed ? test on kocury.
+
+- (kasia) spider on the gate level is not really interesting. Make spider ambush ?
+  On the cart --- suddenly a group of spiders crawls from an egg ?
+  Or on the sword pit --- suddenly group of spiders crawls from underneath ?
+
+- shadow of ghosts over the wall ?
+
+- shadows baked on ground.
+  This is done in gate blender model, and once I used it actually in the game
+  --- but it looks too ugly. We must be able to handle much larger
+  texture sizes to actually use this on the gate level.
+
+- (Paul) going up the steps could do with a smoother animation
+
+- use S&K red light with maxed intensity to shine on the top of the sword.
+- one tree is inside murek, move it
+- top of columns and "wieza" have wrong UV coords, fix
+
+- Wall of fence around the level, to get rid of invisible walls.
+  (Chebmaster):
+    a) impassabe cliffs/abysses at the edges of the landscape
+       (too high/wide to pass even by flying)
+    b) endless sea (level=island)
+
+    Hmm, both are good ideas. I don't want to surround the whole level with sea (I want the level to "feel" like in the middle of the forest). Actually, maybe I'll use all three ideas ---- on the left side of the level I could do a cliff, on the right and bottom I could use wall of fance, and add a little "opening on the sea" on the right side where the river ends.
+
+- idea from quake: water surface slowly moving (change/move the texture?
+  some deformation of the texture ? I'm not sure how to do this trick,
+  but it looks very nice!)
+
+------------------------------------------------------------------------------
+Background level:
+- add some shadow, with moving light source
+- camera floating around level with fog ?
+
+------------------------------------------------------------------------------
+Weapons:
+
+- weapon "swaying" (when you walk, your weapon moves with your steps)
+  Careful of motion sickness: it seems, we should either do head bobbing,
+  or weapon swaying, never both!
+- some anim of blood when hit (more feedback that you hit)
+- design just better (and more, maybe randomized) animations
+  of sword attack. Do them in Blender, not by hand, like current
+  anim.
+- better checking for collision with sword? Maybe actually calculate
+  oriented bounding box of the sword for collision with creatures each
+  frame?
+
+- bow more interesting:
+  - When you hold attack key, arrow/bolt appears on your bow/crossbow
+    and you're holding the bow. There is also a crosshair (circle target area)
+    that "trembles", because your hands are trembling.
+
+    You shoot when you release Ctrl key. The longer you held Ctrl,
+    the more power has the arrow (more velocity), but also the trembling
+    of your crosshair (and it's circle) is larger, so your accuracy
+    is lower.
+  - crosshair for bow
+  - showing arrow in shooting anim for bow
+
+- various kinds of swinging the sword, with various animations.
+  Also they can yield various damage and various hit chances.
+
+- apply nice "strips" texture to handle of the sword,
+  see http://mediawiki.blender.org/index.php/Manual/PartII/Basic_Mesh_Modelling
+
+------------------------------------------------------------------------------
+Others:
+
+- fire over barrels - pixel pracht or other particle engine.
+
+- why with wide angle the corner geometry is sometimes clipped ?
+
+------------------------------------------------------------------------------
+castle hall level:
+- stand very close the box that has the button on it.
+  Press "crouch". You start slowly getting falling down effect.
+
+- mail to author of
+  http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm
+  : permission to use stars.jpg in my game ?
+
+------------------------------------------------------------------------------
+Items (not weapons):
+
+- (2006-05-08 11:42:27) Szymon: hej tu kasia co do poprawek takich prostych i na szybko to mam pytanie o klucz
+  (2006-05-08 11:43:15) Szymon: bo szczerze mowiac to go ledwo widac... fajnie by bylo gdyby byl jakos oswietlony...
+
+- "shrink" spell (that was *coool* in DUKE 3D !)
+  "freeze" (it's from DUKE 3D also)
+  "fry"
+  "throw back" (throws all enemies slightly backward --- this is also useful
+     for player to actually see that monsters get hurt when falling from high)
+
+- Some buttons visible at lower part of the screen to access some
+  things with mouse and to show (as hints) their key shortcuts ?
+  ("i" - inventory on/off, "m" - messages).
+
+------------------------------------------------------------------------------
+Cages level:
+
+- windows: don't look like windows
+- player can fly through windows --- not good.
+- stairs beginning cages and ending castle_hall: endings should be more black, current vertex colouring is not black enough
+
+- on the other side of the wall, also a door, but blocked by rocks
+- from queen lair, passage to this 2nd hidden room --- some treasures there
+- make real doors that you must click to open them
+
+- thunder: if the light would only shine through the window's shapes it would be even better. So, make the thunder light casting shadows.
+
+- this natural rock thing better ?
+
+- headlight on cages level ? By torch item ?
+  No ? Spot headlight looks poor (must over-triangulate meshes),
+  and it doesn't resemble a torch anyway. Positional light with attenuation
+  also doesn't look too special.
+
+------------------------------------------------------------------------------
+Tower level:
+
+- put some vertical crates around GlassPrison
+
+----------------------------------------
+dist-making to-dos:
+
+- real exe installer for Windows,
+  include OpenAL installer
+  (run after the question "install Creative's OpenAL implementation ?"
+  Problem: OpenAL installer is quite dumb and can only do system-wide
+  installation (you need admin access)).
+
+- real packages for Linux, depend (as recommend:) on OpenAL packages
+
+----------------------------------------
+Each time before uploading release:
+
+- test data/ things easy to forget:
+  - All textures in VRML/X3D files must have relative filenames
+      find data/ -type f -iname '*.wrl' | \
+        xargs grep filename | \
+        grep --invert-match "filename ../" | \
+        grep --invert-match "filename \"../" | \
+        grep --invert-match "filename //../"
+  - All sounds that are intended to be spatialized must be mono:
+      wavidentify data/sounds/*.wav | grep stereo
+
+- make release like for all other programs, see ../www/pack/README.txt
+
+- extract created dist
+  - test running from extracted created dist
+      make install
+      ./castle
+  - test building from extracted created dist ("make")
+
+- upload to WWW:
+  release on SourceForge as usual, see ../www/NOTES.txt
+
+----------------------------------------
