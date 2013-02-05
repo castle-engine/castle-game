@@ -51,13 +51,16 @@ Resigned: fountain new level for castle 1.0.0:
 - make real bump mapping demos:
   - add bump maps everywhere ?, make some lights dynamic
 
-- when loading creatures required by player for doom level, for a second
-  the menu background level flashes between DOOM level splash and doom level gameplay.
-  That's because of the way Doom level splash is done.
-
-- ConserveResource finish:
-  - some creatures are dependencies of others, like ThrownWeb from SpiderQueen
-    or BallMissile from Alien
+- <prepare_resources> simplify:
+  - Some creatures are dependencies of others,
+    like ThrownWeb from SpiderQueen or BallMissile from Alien.
+    There should be no need to specify it every time when you use this creature
+    on level.
+    This dependency is already recorded (as FireMissileName) inside resource.xml,
+    so it's just a matter of making a method like T3DResource.AddOtherResources
+    (returns boolean if anything new added)?
+  - There should be no need to specify creature that is initially placed
+    on the level already.
 
 - fountain finish:
   trees, bushes around (natural CasMoveLimit)
@@ -124,7 +127,6 @@ Resigned: fountain new level for castle 1.0.0:
   texture sizes to actually use this on the gate level.
 
 - doom:
-  - make barrels explode nicely
   - creatures should take hurt from lava too, and should know that they
     don't want to step on lava. Room with lava on e1m1 may require some
     waypoints for sensible creature move.
@@ -142,10 +144,6 @@ Resigned: fountain new level for castle 1.0.0:
   - weapon "swaying" (when you walk, your weapon moves with your steps)
     Careful of motion sickness: it seems, we should either to head bobbing,
     or weapon swaying, never both!
-  - render weapon (both when static and when attacking) as truly 3d (done already),
-    truly inside the level (so sword size must match level/creatures
-    proportions etc.).
-    To be tested when 3rd person camera in engine done easily.
   - some anim of blood when hit (more feedback that you hit)
   - design just better (and more, maybe randomized) animations
     of sword attack. Do them in Blender, not by hand, like current
@@ -165,9 +163,6 @@ Resigned: fountain new level for castle 1.0.0:
 
 - on castle_hall level, stand very close the box that has the button on it.
   Press "crouch". You start slowly getting falling down effect.
-
-- levels/index.xml:
-  - level objects hierarchy could be defined in such file
 
 - knockback for player sword (or for some other short-range weapon ?)
 
@@ -304,8 +299,6 @@ Cages level:
 - There must be a way to say that some sectors are not important
   for AI for creatures with Flying. (like ghost)
 
-- sectors and waypoints finish, see README for TO-DOs.
-
 - Improve collisions player<->creatures and player<->items to
   check not only final collisions, but also segment collisions when moving ?
   Otherwise when moving fast (or low FPS count, so FpsCompSpeed large),
@@ -339,13 +332,13 @@ Cages level:
   Problem: long load times ("Loading creatures...") and memory consumption.
 
 - creatures can climb high (almost-vertical) walls.
-  Actually, player can climb almost-vertical walls too !
+  (This is solvable for player by ClimbHeight, settable by avatarSize)
 
   This is not so very noticeable now, because there are no high walls
   now, and creatures' AI doesn't let them fall into deep pits now.
 
   As a workaround, basic_castle's moat has now edges that are wider down,
-  so player and creatures are never able to climb up from the moat...
+  so are never able to climb up from the moat...
   But that's still just a workaround.
 
 - I really don't like the "alien" model. It's generally nice,
@@ -425,11 +418,8 @@ Each time before uploading release:
 
 - extract created dist
   - test running from extracted created dist
-      rm -f ~/.castle.data
-      ln -s /tmp/ggg/castle/ ~/.castle.data
+      make install
       ./castle
-      rm -f ~/.castle.data
-      ln -s /win/mojepasy/openGL/castle/trunk/ ~/.castle.data
   - test building from extracted created dist ("make")
 
 - upload to WWW:
