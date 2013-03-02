@@ -182,21 +182,14 @@ begin
 
   glColorv(SubMenuTextColor);
 
-  glPushMatrix;
-    glTranslatef(Position[0], Position[1] - 20, 0);
-    glRasterPos2i(0, 0);
-    SubMenuTitleFont.Print(SubMenuTitle + ' :');
-  glPopMatrix;
+  SetWindowPos(Position[0], Position[1] - 20);
+  SubMenuTitleFont.PrintAndMove(SubMenuTitle + ' :');
 
   if SubMenuAdditionalInfo <> '' then
-  begin
-    glPushMatrix;
-      glTranslatef(AllItemsRectangle.X0,
-        AllItemsRectangle.Y0 - SubMenuTitleFont.RowHeight, 0);
-      SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
-        Window.Width - 2 * Round(AllItemsRectangle.X0), 0, 0, true, 0);
-    glPopMatrix;
-  end;
+    SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
+      Window.Width - 2 * Round(AllItemsRectangle.X0),
+      AllItemsRectangle.X0,
+      AllItemsRectangle.Y0 - SubMenuTitleFont.RowHeight, true, 0, false);
 end;
 
 { TControlsMenu ------------------------------------------------------------- }
