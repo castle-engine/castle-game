@@ -170,7 +170,7 @@ procedure TGame2DControls.Draw;
         X := ItemSlotX(I);
         Y := ItemSlotY(I);
 
-        glRasterPos2i(X, Y);
+        SetWindowPos(X, Y);
         GLInventorySlot.Draw;
       end;
     glDisable(GL_BLEND);
@@ -182,7 +182,7 @@ procedure TGame2DControls.Draw;
         X := ItemSlotX(I);
         Y := ItemSlotY(I);
 
-        glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
+        SetWindowPos(X + InventorySlotMargin, Y + InventorySlotMargin);
         Player.Inventory[I].Resource.GLImage.Draw;
       end;
     glDisable(GL_ALPHA_TEST);
@@ -205,12 +205,12 @@ procedure TGame2DControls.Draw;
       X := ItemSlotX(I);
       Y := ItemSlotY(I);
 
-      glRasterPos2i(X + InventorySlotMargin, Y + InventorySlotMargin);
+      SetWindowPos(X + InventorySlotMargin, Y + InventorySlotMargin);
 
       S := Player.Inventory[I].Resource.Caption;
       if Player.Inventory[I].Quantity <> 1 then
         S += ' (' + IntToStr(Player.Inventory[I].Quantity) + ')';
-      UIFontSmall.Print(S);
+      UIFontSmall.PrintAndMove(S);
     end;
   end;
 
@@ -222,15 +222,15 @@ procedure TGame2DControls.Draw;
     LineFPS = 5;
     LineShadowVolumesCounts = 6;
 
-  procedure RasterPosLine(const Line: Cardinal);
+  procedure PosLine(const Line: Cardinal);
   begin
-    glRasterPos2i(0, ContainerHeight - UIFont.RowHeight * Line - 10 { margin });
+    SetWindowPos(0, ContainerHeight - UIFont.RowHeight * Line - 10 { margin });
   end;
 
   procedure DoShowFPS;
   begin
     glColorv(Vector3Single(0.7, 0.7, 0.7));
-    RasterPosLine(LineFPS);
+    PosLine(LineFPS);
 
     { Don't display precise Window.FpsFrameTime and Window.FpsRealTime
       each time --- this would cause too much move for player.
@@ -243,7 +243,7 @@ procedure TGame2DControls.Draw;
       DisplayFpsRealTime := Window.Fps.RealTime;
     end;
 
-    UIFont.Print(Format('FPS : %f (real : %f). Shapes : %d / %d',
+    UIFont.PrintAndMove(Format('FPS : %f (real : %f). Shapes : %d / %d',
       [DisplayFpsFrameTime, DisplayFpsRealTime,
        SceneManager.Statistics.ShapesRendered, SceneManager.Statistics.ShapesVisible]));
   end;
@@ -253,8 +253,8 @@ procedure TGame2DControls.Draw;
     if GLShadowVolumesPossible and ShadowVolumes then
     begin
       glColorv(Vector3Single(0.7, 0.7, 0.7));
-      RasterPosLine(LineShadowVolumesCounts);
-      UIFont.Print(Format('No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
+      PosLine(LineShadowVolumesCounts);
+      UIFont.PrintAndMove(Format('No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
         [ SceneManager.ShadowVolumeRenderer.CountShadowsNotVisible,
           SceneManager.ShadowVolumeRenderer.CountZPass,
           SceneManager.ShadowVolumeRenderer.CountZFailNoLightCap,
@@ -276,25 +276,25 @@ procedure TGame2DControls.Draw;
     end;
 
   begin
-    RasterPosLine(LinePressEscape);
-    UIFont.Print(SPressEscapeToExit);
-    RasterPosLine(LinePressAttack);
-    UIFont.Print(SPressAttackToRestart);
+    PosLine(LinePressEscape);
+    UIFont.PrintAndMove(SPressEscapeToExit);
+    PosLine(LinePressAttack);
+    UIFont.PrintAndMove(SPressAttackToRestart);
   end;
 
   procedure DoShowDeadInfo;
   begin
     glColorv(Vector3Single(1, 0, 0));
-    RasterPosLine(LineDeadOrWinner);
-    UIFont.Print('You''re dead.');
+    PosLine(LineDeadOrWinner);
+    UIFont.PrintAndMove('You''re dead.');
     DoShowDeadOrFinishedKeys;
   end;
 
   procedure DoShowGameWinInfo;
   begin
     glColorv(Vector3Single(0.8, 0.8, 0.8));
-    RasterPosLine(LineDeadOrWinner);
-    UIFont.Print('Game finished.');
+    PosLine(LineDeadOrWinner);
+    UIFont.PrintAndMove('Game finished.');
     DoShowDeadOrFinishedKeys;
   end;
 
@@ -310,7 +310,7 @@ procedure TGame2DControls.Draw;
     LifeTextPosition: Integer;
     LifeText: string;
   begin
-    glRasterPos2i(XMove + IndicatorMargin, IndicatorMargin);
+    SetWindowPos(XMove + IndicatorMargin, IndicatorMargin);
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.5);
 
@@ -341,8 +341,8 @@ procedure TGame2DControls.Draw;
       LifeTextPosition := XMove + IndicatorMargin +
         (IndicatorWidth - UIFont.TextWidth(LifeText)) div 2;
       MaxTo1st(LifeTextPosition, IndicatorMargin);
-      glRasterPos2i(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2);
-      UIFont.Print(LifeText);
+      SetWindowPos(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2);
+      UIFont.PrintAndMove(LifeText);
     end;
   end;
 
@@ -355,10 +355,10 @@ procedure TGame2DControls.Draw;
     if Player.Flying then
     begin
       glColorv(White3Single);
-      glRasterPos2i(0, ContainerHeight - UIFont.RowHeight - 5 { margin });
+      SetWindowPos(0, ContainerHeight - UIFont.RowHeight - 5 { margin });
       if Player.FlyingTimeOut > 0 then
         S := Format(' (%d more seconds)', [Floor(Player.FlyingTimeOut)]);
-      UIFont.Print('Flying' + S);
+      UIFont.PrintAndMove('Flying' + S);
     end;
 
     glLoadIdentity;
@@ -381,9 +381,6 @@ var
   BossMaxLife: Single;
 begin
   if DebugRenderForLevelScreenshot then Exit;
-
-  glLoadIdentity;
-  glRasterPos2i(0, 0);
 
   if Notifications.DrawStyle <> dsNone then
     glCallList(GLList_NotificationsBackground);
@@ -704,9 +701,6 @@ begin
   GLList_NotificationsBackground := glGenListsCheck(1, 'CastlePlay.WindowOpen');
   glNewList(GLList_NotificationsBackground, GL_COMPILE);
   try
-    glLoadIdentity;
-    glRasterPos2i(0, 0);
-
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
       glColor4f(0, 0, 0, DarkAreaAlpha);
