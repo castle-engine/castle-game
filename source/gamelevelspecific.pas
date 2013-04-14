@@ -58,7 +58,7 @@ type
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
     function BossIndicator(out Life, MaxLife: Single): boolean; override;
   end;
@@ -88,7 +88,7 @@ type
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   TTowerLevel = class(TLevelLogic)
@@ -130,7 +130,7 @@ type
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
 
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
 
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
     function BossIndicator(out Life, MaxLife: Single): boolean; override;
@@ -148,7 +148,7 @@ type
     constructor Create(AOwner: TComponent); override;
 
     procedure BeforeTimeIncrease(const NewTime: TFloatTime); override;
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
 
     property Pushes default false;
 
@@ -181,7 +181,7 @@ type
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   TGateBackgroundLevel = class(TLevelLogic)
@@ -327,7 +327,7 @@ begin
     end;
 end;
 
-procedure TCastleHallLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure TCastleHallLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 const
   WerewolfFirstLight = 1;
 
@@ -510,7 +510,7 @@ begin
   Teleport.Collides := false;
 
   Teleport1 := T3DTransform.Create(Self);
-  { set rotation axis. Rotation angle will be increased in each Idle }
+  { set rotation axis. Rotation angle will be increased in each Update }
   Teleport1.Rotation :=  Vector4Single(1, 1, 0, 0);
   Teleport1.Add(Teleport);
   World.Add(Teleport1);
@@ -585,7 +585,7 @@ begin
     end;
 end;
 
-procedure TGateLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 
   procedure RejectGateExitBox;
   var
@@ -606,7 +606,7 @@ procedure TGateLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
     Rot: TVector4Single;
   begin
     Rot := Teleport.Rotation;
-    Rot[3] += 0.175 * CompSpeed;
+    Rot[3] += 0.175 * SecondsPassed;
     Teleport.Rotation := Rot;
 
     if TeleportBox.PointInside(Player.Position) then
@@ -899,7 +899,7 @@ begin
   end;
 end;
 
-procedure TCagesLevel.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure TCagesLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 const
   { Some SpiderRadius is used to not put spider inside the wall. }
   SpiderRadius = 2;
@@ -972,7 +972,7 @@ begin
     Check(TorchLight <> nil, 'Torch light not found on cages level');
     TorchLight^.Node.FdIntensity.Send(Clamped(
         TorchLight^.Node.FdIntensity.Value +
-          MapRange(Random, 0, 1, -5.0, 5.0) * CompSpeed,
+          MapRange(Random, 0, 1, -5.0, 5.0) * SecondsPassed,
         0.5, 1));
 
     { Maybe appear new spiders }
@@ -1018,7 +1018,7 @@ begin
       end else
       begin
         { calculate SpiderMoveDistance }
-        SpiderMoveDistance := SpidersFallingSpeed * CompSpeed;
+        SpiderMoveDistance := SpidersFallingSpeed * SecondsPassed;
         MinTo1st(SpiderMoveDistance, AboveHeight - Spider.Radius);
         SpiderPosition[2] -= SpiderMoveDistance;
         SA.Translation := SpiderPosition;
@@ -1083,7 +1083,7 @@ begin
     RevertGoEndPosition;
 end;
 
-procedure TDoomLevelDoor.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure TDoomLevelDoor.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 begin
   inherited;
 
@@ -1145,7 +1145,7 @@ type
     ExitMessagePending: boolean;
     function PointingDeviceActivate(const Active: boolean;
       const Distance: Single): boolean; override;
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
   end;
 
 function TExitButton.PointingDeviceActivate(const Active: boolean;
@@ -1164,7 +1164,7 @@ begin
     end;
 end;
 
-procedure TExitButton.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure TExitButton.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 begin
   if ExitMessagePending and (not Player.Camera.FallingOnTheGround) then
   begin
@@ -1310,7 +1310,7 @@ begin
   NewPlayer.PickItem(Quiver.CreateItem(10));
 end;
 
-procedure TDoomE1M1Level.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure TDoomE1M1Level.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 begin
   inherited;
 

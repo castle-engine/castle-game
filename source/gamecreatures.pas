@@ -44,7 +44,7 @@ type
     NextHowlTime: Single;
   public
     constructor Create(AOwner: TComponent; const AMaxLife: Single); override;
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
     procedure Howl(ForceHowl: boolean);
   end;
 
@@ -89,7 +89,7 @@ begin
   NextHowlTime := Random * 60.0;
 end;
 
-procedure TWerewolfCreature.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure TWerewolfCreature.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 begin
   inherited;
   if (not GetExists) or DebugTimeStopForCreatures then Exit;

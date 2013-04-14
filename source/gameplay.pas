@@ -455,7 +455,7 @@ begin
   end;
 end;
 
-procedure Idle(Window: TCastleWindowBase);
+procedure Update(Window: TCastleWindowBase);
 const
   GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
   GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
@@ -604,7 +604,7 @@ begin
   try
     Window.AutoRedisplay := true;
 
-    Window.OnIdle := @Idle;
+    Window.OnUpdate := @Update;
     Window.OnPress := @Press;
     Window.OnDrawStyle := ds3D;
 

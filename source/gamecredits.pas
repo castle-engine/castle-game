@@ -50,7 +50,7 @@ type
     AnimationTime, AnimationSpeed, AnimationEnd: TFloatTime;
     Scene: TCastleScene;
     constructor Create(AOwner: TComponent); override;
-    procedure Idle(const CompSpeed: Single; var RemoveMe: TRemoveType); override;
+    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
   end;
 
 constructor TCredits.Create(AOwner: TComponent);
@@ -77,9 +77,9 @@ begin
   AnimationEnd := StrToFloat(Info.Items[2]);
 end;
 
-procedure TCredits.Idle(const CompSpeed: Single; var RemoveMe: TRemoveType);
+procedure TCredits.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 begin
-  AnimationTime := AnimationTime + CompSpeed;
+  AnimationTime := AnimationTime + SecondsPassed;
   Translation := Vector3Single(0, AnimationSpeed * AnimationTime, 0);
   if AnimationTime > AnimationEnd then
     UserQuit := true;
