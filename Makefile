@@ -96,6 +96,7 @@ clean:
 
 clean_binaries:
 	rm -f castle castle.exe
+	rm -Rf castle.app
 
 # Remove private files that Michalis keeps inside his castle/trunk/,
 # but he doesn't want to upload them for public.
