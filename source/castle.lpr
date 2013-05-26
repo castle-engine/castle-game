@@ -190,7 +190,7 @@ begin
   Progress.UserInterface := WindowProgressInterface;
 
   { load game data from XML files }
-  MaterialProperties.FileName := ProgramDataPath + 'data' +
+  MaterialProperties.URL := ProgramDataPath + 'data' +
     PathDelim + 'textures' + PathDelim + 'material_properties.xml';
   Resources.LoadFromFiles;
   ItemsResourcesInit;
