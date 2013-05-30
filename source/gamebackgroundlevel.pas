@@ -103,8 +103,7 @@ procedure TBackgroundCaptions.GLContextOpen;
 begin
   inherited;
   if GLCaption = nil then
-    GLCaption := TGLImage.Create(ProgramDataPath + 'data' +
-      PathDelim + 'menu_bg' + PathDelim + 'caption.png', []);
+    GLCaption := TGLImage.Create(ApplicationData('data/menu_bg/caption.png'), []);
 end;
 
 procedure TBackgroundCaptions.GLContextClose;

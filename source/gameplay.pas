@@ -678,8 +678,7 @@ procedure WindowOpen(const Container: IUIContainer);
 
   function PlayerControlFileName(const BaseName: string): string;
   begin
-    Result := ProgramDataPath + 'data' + PathDelim +
-      'player_controls' + PathDelim + BaseName;
+    Result := ApplicationData('data/player_controls/' + BaseName);
   end;
 
   function LoadPlayerControlToGL(const BaseName: string): TGLImage;

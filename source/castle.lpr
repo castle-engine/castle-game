@@ -127,7 +127,7 @@ begin
     - I sometimes display ApplicationName for user, and under Windows
       ParamStr(0) is ugly uppercased.
     - ParamStr(0) is unsure for Unixes.
-    - UserConfigFile uses this, determines Config.FileName. }
+    - ApplicationConfig uses this, determines Config.FileName. }
   OnGetApplicationName := @MyGetApplicationName;
   Config.Load;
 
@@ -190,8 +190,7 @@ begin
   Progress.UserInterface := WindowProgressInterface;
 
   { load game data from XML files }
-  MaterialProperties.URL := ProgramDataPath + 'data' +
-    PathDelim + 'textures' + PathDelim + 'material_properties.xml';
+  MaterialProperties.URL := ApplicationData('data/textures/material_properties.xml');
   Resources.LoadFromFiles;
   ItemsResourcesInit;
   CreaturesResourcesInit;

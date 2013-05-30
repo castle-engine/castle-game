@@ -18,8 +18,8 @@ update:
 # Simple install.
 # You may as well symlink to /usr/local/share/castle, for system-wide install.
 install:
-	rm -f $(HOME)/.castle.data
-	ln -s $(shell pwd) $(HOME)/.castle.data
+	rm -f $(HOME)/.local/share/castle
+	ln -s $(shell pwd) $(HOME)/.local/share/castle
 
 # ------------------------------------------------------------
 # Building targets.

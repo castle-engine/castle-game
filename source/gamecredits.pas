@@ -60,8 +60,7 @@ var
 begin
   inherited;
 
-  VRMLContents := FileToString(ProgramDataPath + 'data' + PathDelim +
-    'menu_bg' + PathDelim + 'credits.wrl');
+  VRMLContents := FileToString(ApplicationData('data/menu_bg/credits.wrl'));
   StringReplaceAllTo1st(VRMLContents, '$SCastleVersion', SCastleVersion);
   StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', 'WWW: ' + CastleURL);
   StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);

@@ -25,7 +25,7 @@ unit GameAnimationTricks;
 
 interface
 
-uses Classes, CastlePrecalculatedAnimation, CastleFrustum, CastleVectors, 
+uses Classes, CastlePrecalculatedAnimation, CastleFrustum, CastleVectors,
   CastleGLShaders, GL, Castle3D;
 
 type
@@ -166,9 +166,8 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
 
     DDS := TDDSImage.Create;
     try
-      DDS.LoadFromFile(ProgramDataPath + 'data' + PathDelim + 'levels' +
-        PathDelim + 'fountain' + PathDelim +  'water_reflections' +
-        PathDelim + 'water_environment_map.dds');
+      DDS.LoadFromFile(ApplicationData(
+        'data/levels/fountain/water_reflections/water_environment_map.dds'));
 
       glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, Result);
 
@@ -200,9 +199,7 @@ begin
   begin
     WaterEnvMap := LoadWaterEnvMap;
 
-    ShadersPath := ProgramDataPath + 'data' + PathDelim + 'levels' +
-      PathDelim + 'fountain' + PathDelim +  'water_reflections' +
-      PathDelim + 'water_reflections.';
+    ShadersPath := ApplicationData('data/levels/fountain/water_reflections/water_reflections.');
     AttachVertexShader(FileToString(ShadersPath + 'vs'));
     AttachFragmentShader(FileToString(ShadersPath + 'fs'));
     Link(true);
