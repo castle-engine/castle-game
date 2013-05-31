@@ -127,7 +127,7 @@ begin
     - I sometimes display ApplicationName for user, and under Windows
       ParamStr(0) is ugly uppercased.
     - ParamStr(0) is unsure for Unixes.
-    - ApplicationConfig uses this, determines Config.FileName. }
+    - ApplicationConfig uses this, determines Config.URL. }
   OnGetApplicationName := @MyGetApplicationName;
   Config.Load;
 

@@ -276,7 +276,7 @@ var
 begin
   inherited;
 
-  CastleHallLevelPath := LevelsPath + 'castle_hall' + PathDelim;
+  CastleHallLevelPath := LevelsPath + 'castle_hall/';
 
   Symbol := LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false);
   Symbol.CastShadowVolumes := false; { shadow would not be visible anyway }
@@ -504,7 +504,7 @@ var
 begin
   inherited;
 
-  GateLevelPath := LevelsPath + 'gate' + PathDelim;
+  GateLevelPath := LevelsPath + 'gate/';
 
   Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false);
   Teleport.Collides := false;
@@ -733,7 +733,7 @@ var
 begin
   inherited;
 
-  TowerLevelPath := LevelsPath + 'tower' + PathDelim;
+  TowerLevelPath := LevelsPath + 'tower/';
 
   Elevator := LoadLevelScene(TowerLevelPath + 'elevator.wrl', true);
 
@@ -829,7 +829,7 @@ begin
   HintOpenDoorScript := MainScene.Node('HintOpenDoorBoxScript');
 
   FEndSequence := LoadLevelScene(
-    LevelsPath + 'end_sequence' + PathDelim + 'end_sequence_final.wrl',
+    LevelsPath + 'end_sequence/end_sequence_final.wrl',
     true { create octrees });
   FEndSequence.Exists := false;
   { Even when FEndSequence will exist, we will not check for collisions
@@ -840,7 +840,7 @@ begin
   World.Add(FEndSequence);
 
   FGateExit := LoadLevelScene(
-    LevelsPath + 'cages' + PathDelim + 'cages_gate_exit.wrl',
+    LevelsPath + 'cages/cages_gate_exit.wrl',
     true { create octrees }, TGateExit);
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
   World.Add(FGateExit);
@@ -1198,10 +1198,10 @@ constructor TDoomE1M1Level.Create(AOwner: TComponent; AWorld: T3DWorld;
 var
   DoomDoorsPathPrefix: string;
 
-  function MakeDoor(const FileName: string): TDoomLevelDoor;
+  function MakeDoor(const URL: string): TDoomLevelDoor;
   begin
     Result := TDoomLevelDoor.Create(Self);
-    Result.Add(LoadLevelScene(DoomDoorsPathPrefix + FileName,
+    Result.Add(LoadLevelScene(DoomDoorsPathPrefix + URL,
       true { create octrees }));
 
     { Although I didn't know it initially, it turns out that all doors
@@ -1216,8 +1216,7 @@ begin
   inherited;
 
   MainScene.RootNode.EnumerateNodes(@RenameCreatures, true);
-  DoomDoorsPathPrefix := LevelsPath + 'doom' + PathDelim + 'e1m1' +
-    PathDelim;
+  DoomDoorsPathPrefix := LevelsPath + 'doom/e1m1/';
 
   World.Add(MakeDoor('door2_3_closed.wrl'));
   World.Add(MakeDoor('door4_5_closed.wrl'));
@@ -1339,8 +1338,7 @@ var
 begin
   inherited;
 
-  Water := LoadLevelAnimation(LevelsPath + 'gate_background' +
-    PathDelim + 'water.kanim', false, false);
+  Water := LoadLevelAnimation(LevelsPath + 'gate_background/water.kanim', false, false);
   Water.CastShadowVolumes := false; { water shadow would look awkward }
   { No octrees created for water (because in normal usage, player will not
     walk on this level). For safety, Collides set to @false, in case
@@ -1368,8 +1366,7 @@ begin
   begin
     { load Fountain animation, following the similar code as LoadLevelAnimation }
     Fountain := TBlendedLoopingAnimationShader.Create(Self);
-    Fountain.LoadFromFile(LevelsPath + 'fountain' +
-      PathDelim + 'water_stream' + PathDelim + 'fountain.kanim', false, true, 1);
+    Fountain.LoadFromFile(LevelsPath + 'fountain/water_stream/fountain.kanim', false, true, 1);
     { progress is being already done }
     {Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
     try}

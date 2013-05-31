@@ -50,11 +50,11 @@ procedure TGameWindow.EventPress(const Event: TInputPressRelease);
   { Saves a screen, causing also appropriate Notification and sound. }
   procedure AutoSaveScreen;
   var
-    FileName: string;
+    URL: string;
   begin
-    FileName := FileNameAutoInc(ApplicationName + '_screen_%d.png');
-    SaveScreen(FileName);
-    Notifications.Show('Screen saved to ' + FileName);
+    URL := FileNameAutoInc(ApplicationName + '_screen_%d.png');
+    SaveScreen(URL);
+    Notifications.Show('Screen saved to ' + URL);
     SoundEngine.Sound(stSaveScreen);
   end;
 

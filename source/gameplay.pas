@@ -676,15 +676,14 @@ end;
 
 procedure WindowOpen(const Container: IUIContainer);
 
-  function PlayerControlFileName(const BaseName: string): string;
+  function PlayerControlURL(const BaseName: string): string;
   begin
     Result := ApplicationData('data/player_controls/' + BaseName);
   end;
 
   function LoadPlayerControlToGL(const BaseName: string): TGLImage;
   begin
-    Result := TGLImage.Create(
-      PlayerControlFileName(BaseName), [TRGBAlphaImage]);
+    Result := TGLImage.Create(PlayerControlURL(BaseName), [TRGBAlphaImage]);
   end;
 
 const
