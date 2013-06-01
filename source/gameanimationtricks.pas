@@ -167,7 +167,7 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
     DDS := TDDSImage.Create;
     try
       DDS.LoadFromFile(ApplicationData(
-        'data/levels/fountain/water_reflections/water_environment_map.dds'));
+        'levels/fountain/water_reflections/water_environment_map.dds'));
 
       glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, Result);
 
@@ -199,7 +199,7 @@ begin
   begin
     WaterEnvMap := LoadWaterEnvMap;
 
-    ShadersPath := ApplicationData('data/levels/fountain/water_reflections/water_reflections.');
+    ShadersPath := ApplicationData('levels/fountain/water_reflections/water_reflections.');
     AttachVertexShader(FileToString(ShadersPath + 'vs'));
     AttachFragmentShader(FileToString(ShadersPath + 'fs'));
     Link(true);

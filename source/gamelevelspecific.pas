@@ -208,7 +208,7 @@ uses CastleFilesUtils, SysUtils, CastleUtils,
 
 function LevelsPath: string;
 begin
-  Result := ApplicationData('data/levels/');
+  Result := ApplicationData('levels/');
 end;
 
 procedure NotificationInteractFailed(const S: string);

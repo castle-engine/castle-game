@@ -678,7 +678,7 @@ procedure WindowOpen(const Container: IUIContainer);
 
   function PlayerControlURL(const BaseName: string): string;
   begin
-    Result := ApplicationData('data/player_controls/' + BaseName);
+    Result := ApplicationData('player_controls/' + BaseName);
   end;
 
   function LoadPlayerControlToGL(const BaseName: string): TGLImage;

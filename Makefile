@@ -16,10 +16,15 @@ update:
 	$(MAKE) -C data/levels/
 
 # Simple install.
-# You may as well symlink to /usr/local/share/castle, for system-wide install.
+# You may as well symlink data to /usr/local/share/castle,
+# for system-wide install.
 install:
 	rm -f $(HOME)/.local/share/castle
-	ln -s $(shell pwd) $(HOME)/.local/share/castle
+	ln -s $(shell pwd)/data $(HOME)/.local/share/castle
+
+system-install:
+	sudo rm -f /usr/local/share/castle
+	sudo ln -s $(shell pwd)/data /usr/local/share/castle
 
 # ------------------------------------------------------------
 # Building targets.

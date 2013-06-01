@@ -62,7 +62,7 @@ end;
 procedure WindowOpen(const Container: IUIContainer);
 begin
   GLScreenImage := TGLImage.Create(
-    ApplicationData('data/menu_bg/initial_background.png'),
+    ApplicationData('menu_bg/initial_background.png'),
     [TRGBImage], Window.Width, Window.Height);
 end;
 
