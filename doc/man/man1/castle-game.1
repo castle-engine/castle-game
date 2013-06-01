@@ -1,0 +1,65 @@
+.TH castle-game 1 "12 May 2013" "Castle Game Engine" "The Castle"
+.SH NAME
+castle-game \- The Castle.
+
+.SH SYNOPSIS
+
+.B castle-game
+[\fIoptions...\fR]
+
+.SH DESCRIPTION
+
+.B castle-game
+is a first-person 3D game in a dark fantasy setting.
+
+.SH USAGE
+
+.B castle-game
+takes the following optional arguments:
+
+.TP
+.B -h / --help
+Print the help message and exit.
+
+.TP
+.B -v / --version
+Print the version number and exit.
+
+.TP
+.B --audio-device DEVICE-NAME
+Choose specific OpenAL audio device. See the available device names in the --help output, or in the game menu.
+
+.TP
+.B --no-sound
+Turn off sound.
+
+.TP
+.B -n / --no-screen-resize
+Do not try to resize the screen. If your current screen size is not the required size (set by --screen-size) then run in windowed mode.
+
+.TP
+.B --screen-size WIDTHxHEIGHT
+Change the screen size (default is 800x600).
+
+.TP
+.B --display DISPLAY-NAME
+Use given X display name.
+
+.TP
+.B Debug options:
+
+.TP
+.B --debug-log
+Write log info to stdout.
+
+.TP
+.B --debug-log-cache
+Write log info, including cache.
+
+.TP
+.B --debug-menu-designer
+Show on-screen menus in designed mode, see WWW docs for details how this is useful.
+
+.SH SEE ALSO
+.IP
+.BR  view3dscen (1)  tovrmlx3d (1)

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=The Castle
+GenericName=3D Game
+Exec=castle-game %f
+Icon=castle-game
+Type=Application
+Categories=Game
+Comment=First-person 3D game in a dark fantasy setting
