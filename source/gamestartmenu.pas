@@ -174,9 +174,9 @@ begin
   Items.Add('Visit our website');
   Items.Add('Quit');
 
-  Position := Vector2Integer(20, 480);
+  Position := Vector2Integer(20, -120);
   PositionRelativeScreenX := prLowerBorder;
-  PositionRelativeScreenY := prLowerBorder;
+  PositionRelativeScreenY := prHigherBorder;
   PositionRelativeMenuX := prLowerBorder;
   PositionRelativeMenuY := prHigherBorder;
 

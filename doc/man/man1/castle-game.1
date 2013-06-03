@@ -26,6 +26,9 @@ Print the help message and exit.
 Print the version number and exit.
 
 .TP
+.B Sound options:
+
+.TP
 .B --audio-device DEVICE-NAME
 Choose specific OpenAL audio device. See the available device names in the --help output, or in the game menu.
 
@@ -34,12 +37,15 @@ Choose specific OpenAL audio device. See the available device names in the --hel
 Turn off sound.
 
 .TP
-.B -n / --no-screen-resize
-Do not try to resize the screen. If your current screen size is not the required size (set by --screen-size) then run in windowed mode.
+.B Window options:
 
 .TP
-.B --screen-size WIDTHxHEIGHT
-Change the screen size (default is 800x600).
+.B --geometry WIDTHxHEIGHT<sign>XOFF<sign>YOFF
+Set initial window size and/or position.
+
+.TP
+.B --fullscreen
+Set initial window size to cover whole screen.
 
 .TP
 .B --display DISPLAY-NAME

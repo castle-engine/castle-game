@@ -61,7 +61,7 @@ Transform {
                ""
                "Compiled with $SCompilerDescription." ]
       fontStyle FontStyle {
-        size 1
+        size 0.8
         justify "MIDDLE"
         family "SANS"
         style "BOLD"
@@ -74,7 +74,7 @@ Transform {
 DEF MainInfo WorldInfo {
    title "credits for \"The Castle\""
    info [ "the following two lines mean animation speed and animation time end",
-          "2"
-          "18"
+          "1.9"
+          "17"
         ]
 }

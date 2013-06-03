@@ -40,12 +40,11 @@ type
     procedure Draw; override;
 
     { Sets Position and PositionRelative* parameters.
-      Sets position suitable for the StartScreen, and then shifts
-      it by MoveX / MoveY. By default TSubMenu is positioned
-      like (MoveX, MoveY) = (0, 0).
-
-      If DoFixItemsRectangles, also FixItemsRectangles will be called afterwards. }
-    procedure SetPosition(const MoveX, MoveY: Integer; const DoFixItemsRectangles: boolean);
+      If Center = @false then sets position suitable for the background
+      under start menu. Otherwise menu is shifted to be roughly in the center
+      of the screen.
+      If DoFixItemsRectangles, then FixItemsRectangles will be called afterwards. }
+    procedure SetPosition(const Center, DoFixItemsRectangles: boolean);
   end;
 
 { Show menu that allows player to configure controls. }
@@ -159,17 +158,27 @@ var
 constructor TSubMenu.Create(AOwner: TComponent);
 begin
   inherited;
-  SetPosition(0, 0, false);
+  SetPosition(false, false);
   DrawBackgroundRectangle := false;
 end;
 
-procedure TSubMenu.SetPosition(const MoveX, MoveY: Integer; const DoFixItemsRectangles: boolean);
+procedure TSubMenu.SetPosition(const Center, DoFixItemsRectangles: boolean);
 begin
-  Position := Vector2Integer(20 + MoveX, 440 + MoveY);
-  PositionRelativeScreenX := prLowerBorder;
-  PositionRelativeScreenY := prLowerBorder;
-  PositionRelativeMenuX := prLowerBorder;
-  PositionRelativeMenuY := prHigherBorder;
+  if Center then
+  begin
+    Position := Vector2Integer(0, 0);
+    PositionRelativeScreenX := prMiddle;
+    PositionRelativeScreenY := prMiddle;
+    PositionRelativeMenuX := prMiddle;
+    PositionRelativeMenuY := prMiddle;
+  end else
+  begin
+    Position := Vector2Integer(20, -120);
+    PositionRelativeScreenX := prLowerBorder;
+    PositionRelativeScreenY := prHigherBorder;
+    PositionRelativeMenuX := prLowerBorder;
+    PositionRelativeMenuY := prHigherBorder;
+  end;
 
   if DoFixItemsRectangles then FixItemsRectangles;
 end;
@@ -463,17 +472,9 @@ end;
 
 { global things -------------------------------------------------------------- }
 
-const
-  WholeRectangleX0 = 10;
-  WholeRectangleY0 = 50;
-  WholeRectangleX1 = 750;
-  WholeRectangleY1 = 450;
-
 var
-  GLList_DrawFadeRect: TGLuint;
   ExitWithEscapeAllowed: boolean;
   ExitWithEscape: boolean;
-  MoveX, MoveY: Integer;
 
 type
   TFadeRect = class(TUIControl)
@@ -487,11 +488,21 @@ begin
 end;
 
 procedure TFadeRect.Draw;
+const
+  Width = 780;
+  Height = 390;
+var
+  X0, Y0, X1, Y1: Integer;
 begin
-  glPushMatrix;
-    glTranslatef(MoveX, MoveY, 0);
-    glCallList(GLList_DrawFadeRect);
-  glPopMatrix;
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_BLEND);
+    glColor4f(0, 0, 0, 0.4);
+    X0 := (ContainerWidth - Width) div 2;
+    X1 := (ContainerWidth + Width) div 2;
+    Y0 := (ContainerHeight - Height) div 2;
+    Y1 := (ContainerHeight + Height) div 2;
+    glRectf(X0, Y0, X1, Y1);
+  glDisable(GL_BLEND);
 end;
 
 procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
@@ -518,20 +529,10 @@ begin
   ExitWithEscapeAllowed := AExitWithEscapeAllowed;
   ExitWithEscape := false;
 
-  if ADrawCentered then
-  begin
-    MoveX := - WholeRectangleX0 + (Window.Width - (WholeRectangleX1 - WholeRectangleX0)) div 2;
-    MoveY := - WholeRectangleY0 + (Window.Height - (WholeRectangleY1 - WholeRectangleY0)) div 2;
-  end else
-  begin
-    MoveX := 0;
-    MoveY := 0;
-  end;
-
-  ControlsMenu     .SetPosition(MoveX, MoveY, true);
-  BasicControlsMenu.SetPosition(MoveX, MoveY, true);
-  ItemsControlsMenu.SetPosition(MoveX, MoveY, true);
-  OtherControlsMenu.SetPosition(MoveX, MoveY, true);
+  ControlsMenu     .SetPosition(ADrawCentered, true);
+  BasicControlsMenu.SetPosition(ADrawCentered, true);
+  ItemsControlsMenu.SetPosition(ADrawCentered, true);
+  OtherControlsMenu.SetPosition(ADrawCentered, true);
 
   FadeRect := nil;
 
@@ -586,17 +587,6 @@ end;
 
 procedure WindowOpen(const Container: IUIContainer);
 begin
-  if GLList_DrawFadeRect = 0 then
-    GLList_DrawFadeRect := glGenListsCheck(1, 'CastleControlsMenu.OpenGLW');
-  glNewList(GLList_DrawFadeRect, GL_COMPILE);
-  try
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-      glColor4f(0, 0, 0, 0.4);
-      glRectf(WholeRectangleX0, WholeRectangleY0, WholeRectangleX1, WholeRectangleY1);
-    glDisable(GL_BLEND);
-  finally glEndList end;
-
   ControlsMenu := TControlsMenu.Create(Application);
   BasicControlsMenu := TBasicControlsMenu.Create(Application);
   ItemsControlsMenu := TItemsControlsMenu.Create(Application);

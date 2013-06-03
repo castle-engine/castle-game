@@ -32,36 +32,23 @@ uses CastleWindow, SysUtils, CastleUtils, CastleProgress, CastleWindowProgress,
   CastleSoundEngine, CastleConfig, CastleRenderer, CastleResources, GameItems,
   CastleGameNotifications;
 
-{ requested screen size ------------------------------------------------------ }
+{ suggested screen size ------------------------------------------------------ }
 
 const
-  DefaultRequestedScreenWidth = 800;
-  DefaultRequestedScreenHeight = 600;
+  DefaultScreenWidth = 800;
+  DefaultScreenHeight = 600;
 
-var
-  RequestedScreenWidth: Integer = DefaultRequestedScreenWidth;
-  RequestedScreenHeight: Integer = DefaultRequestedScreenHeight;
-
-function DefaultRequestedScreenSize: string;
-begin
-  Result := Format('%dx%d',
-    [DefaultRequestedScreenWidth, DefaultRequestedScreenHeight]);
-end;
+  WindowParameters = [poDisplay, poGeometry];
 
 { parsing parameters --------------------------------------------------------- }
 
-var
-  WasParam_NoScreenChange: boolean = false;
-
 const
-  Options: array [0..7] of TOption =
+  Options: array [0..5] of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
-    (Short:'n'; Long: 'no-screen-change'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
     (Short: #0; Long: 'debug-log'; Argument: oaNone),
     (Short: #0; Long: 'debug-log-cache'; Argument: oaNone),
-    (Short: #0; Long: 'screen-size'; Argument: oaRequired),
     (Short: #0; Long: 'debug-menu-designer'; Argument: oaNone)
   );
 
@@ -78,16 +65,8 @@ begin
            HelpOptionHelp +nl+
            VersionOptionHelp +nl+
            SoundEngine.ParseParametersHelp +nl+
-           '  -n / --no-screen-resize' +nl+
-           '                        Do not try to resize the screen.' +nl+
-           '                        If your screen size is not the required' +nl+
-           '                        size (set by --screen-size)' +nl+
-           '                        then run in windowed mode.' +nl+
-           '  --screen-size WIDTHxHEIGHT' +nl+
-           '                        Change the screen size (default is ' +
-             DefaultRequestedScreenSize + ').' +nl+
            nl+
-           Window.ParseParametersHelp([poDisplay], true) +nl+
+           Window.ParseParametersHelp(WindowParameters, true) +nl+
            nl+
            'Debug options (don''t use unless you know what you''re doing):' +nl+
            '  --debug-log           Write various log info on stdout' +nl+
@@ -99,18 +78,13 @@ begin
          WritelnStr(Version);
          ProgramBreak;
        end;
-    2: WasParam_NoScreenChange := true;
-    3: { --debug-no-creatures not implemented for now };
-    4: InitializeLog(Version);
-    5: begin
+    2: { --debug-no-creatures not implemented for now };
+    3: InitializeLog(Version);
+    4: begin
          InitializeLog(Version);
          LogRendererCache := true;
        end;
-    6: begin
-         DeFormat(Argument, '%dx%d',
-           [@RequestedScreenWidth, @RequestedScreenHeight]);
-       end;
-    7: DebugMenuDesigner := true;
+    5: DebugMenuDesigner := true;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
@@ -134,48 +108,45 @@ begin
   { configure Notifications }
   Notifications.CollectHistory := true;
 
+  { By default, run in FullScreen with DefaultScreenWidth x DefaultScreenHeight.
+    User can change it with options like --geometry,
+    see TCastleWindow.ParseParameters docs. }
+  Window.FullScreen := true;
+  Window.Width := DefaultScreenWidth;
+  Window.Height := DefaultScreenHeight;
+  { On some backends, setting Window.ColorBits is enough.
+    On some backends, setting Application.VideoColorBits and
+    doing Application.TryVideoChange is required (this is handled lower). }
+  Window.ColorBits := ColorBits;
+
   { parse parameters }
   SoundEngine.ParseParameters;
-  Window.ParseParameters([poDisplay]);
+  Window.ParseParameters(WindowParameters);
   Parameters.Parse(Options, @OptionProc, nil);
 
-  Window.Width := RequestedScreenWidth;
-  Window.Height := RequestedScreenHeight;
-  Window.ColorBits := ColorBits;
-  if WasParam_NoScreenChange or (not AllowScreenChange) then
-  begin
-    Window.FullScreen :=
-      (Application.ScreenWidth = RequestedScreenWidth) and
-      (Application.ScreenHeight = RequestedScreenHeight);
-  end else
-  begin
-    Window.FullScreen := true;
-    if (Application.ScreenWidth <> RequestedScreenWidth) or
-       (Application.ScreenHeight <> RequestedScreenHeight) or
+  if AllowScreenChange and Window.FullScreen and
+     ( (Application.ScreenWidth <> DefaultScreenWidth) or
+       (Application.ScreenHeight <> DefaultScreenHeight) or
        (VideoFrequency <> 0) or
-       (ColorBits <> 0) then
-    begin
-      Application.VideoColorBits := ColorBits;
-      Application.VideoFrequency := VideoFrequency;
-      Application.VideoResize := true;
-      Application.VideoResizeWidth := RequestedScreenWidth;
-      Application.VideoResizeHeight := RequestedScreenHeight;
+       (ColorBits <> 0) ) then
+  begin
+    Application.VideoColorBits := ColorBits;
+    Application.VideoFrequency := VideoFrequency;
+    Application.VideoResize := true;
+    Application.VideoResizeWidth := DefaultScreenWidth;
+    Application.VideoResizeHeight := DefaultScreenHeight;
 
-      if not Application.TryVideoChange then
-      begin
-        WarningWrite('Can''t change display settings to: ' +nl+
-          Application.VideoSettingsDescribe +
-          nl+
-          'I will set "Allow screen settings change on startup" option to "No". ' +
-          'You may want to review settings in "Video options" menu and then ' +
-          'set "Allow screen settings change on startup" back to "Yes".' +nl+
-          nl+
-          'Now I will just continue with default system settings. ');
-        Window.FullScreen :=
-          (Application.ScreenWidth = RequestedScreenWidth) and
-          (Application.ScreenHeight = RequestedScreenHeight);
-        AllowScreenChange := false;
-      end;
+    if not Application.TryVideoChange then
+    begin
+      WarningWrite('Can''t change display settings to: ' +nl+
+        Application.VideoSettingsDescribe +
+        nl+
+        'I will set "Allow screen settings change on startup" option to "No". ' +
+        'You may want to review settings in "Video options" menu and then ' +
+        'set "Allow screen settings change on startup" back to "Yes".' +nl+
+        nl+
+        'Now I will just continue with default system screen size. ');
+      AllowScreenChange := false;
     end;
   end;
 
