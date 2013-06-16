@@ -24,7 +24,7 @@
 
     So maybe it's not a good idea to create a general sound
     that will be played always when player is wound ? -->
-  <sound name="player_sudden_pain" file_name=""
+  <sound name="player_sudden_pain" url=""
     default_importance="player"/>
   <sound name="player_potion_drink"
     default_importance="player"/>
@@ -50,7 +50,7 @@
     default_importance="player"/>
   <sound name="player_interact_failed"
     default_importance="player"/>
-  <sound name="player_toxic_pain" file_name="doom/dsplpain.wav"
+  <sound name="player_toxic_pain" url="doom/dsplpain.wav"
     default_importance="player"/>
 
   <!-- From
@@ -64,7 +64,7 @@
     default_importance="player"/>
   <sound name="sword_attack_start"
     default_importance="player"/>
-  <sound name="arrow_fired" file_name=""
+  <sound name="arrow_fired" url=""
     default_importance="default_creature"/>
   <sound name="arrow_hit"
     default_importance="default_creature"/>
@@ -73,9 +73,9 @@
     default_importance="player"/>
   <sound name="key_door_use"
     default_importance="player"/>
-  <sound name="bow_equipping" file_name=""
+  <sound name="bow_equipping" url=""
     default_importance="player"/>
-  <sound name="bow_attack_start" file_name=""
+  <sound name="bow_attack_start" url=""
     default_importance="player"/>
 
   <!-- Levels sounds. -->
@@ -97,12 +97,12 @@
     default_importance="player"/>
   <sound name="evil_laugh"
     default_importance="level_event"/>
-  <sound name="doom_e1m1" file_name="doom/e1m1.ogg"
+  <sound name="doom_e1m1" url="doom/e1m1.ogg"
     default_importance="max"/>
   <sound name="door_open" default_importance="level_event"/>
   <sound name="door_close" default_importance="level_event"/>
   <sound name="elevator" default_importance="level_event"/>
-  <sound name="doom_exit_button" file_name="doom/dsswtchn.wav"
+  <sound name="doom_exit_button" url="doom/dsswtchn.wav"
     default_importance="level_event"/>
   <!-- From
     http://www.flashkit.com/soundfx/Domestic/Doors/Door_Cre-J_Fairba-8439/index.php
@@ -122,7 +122,7 @@
     gain="0.4" min_gain="0" max_gain="1" default_importance="default_creature"/>
   <sound name="werewolf_attack_start"
     default_importance="default_creature"/>
-  <sound name="werewolf_actual_attack_hit" file_name=""
+  <sound name="werewolf_actual_attack_hit" url=""
     default_importance="default_creature"/>
   <sound name="werewolf_howling"
     gain="1" min_gain="0.8" max_gain="1" default_importance="level_event"/>
@@ -151,10 +151,10 @@
     default_importance="default_creature"/>
   <sound name="spider_dying"
     default_importance="default_creature"/>
-  <sound name="spider_appears" file_name=""
+  <sound name="spider_appears" url=""
     default_importance="default_creature"/>
 
-  <sound name="spider_queen_actual_attack_hit" file_name=""
+  <sound name="spider_queen_actual_attack_hit" url=""
     default_importance="default_creature"/>
   <sound name="spider_queen_sudden_pain"
     default_importance="default_creature"/>
@@ -177,7 +177,7 @@
     default_importance="minor_non_spatial"/>
   <sound name="menu_click"
     default_importance="minor_non_spatial"/>
-  <sound name="save_screen" file_name=""
+  <sound name="save_screen" url=""
     default_importance="minor_non_spatial"/>
   <sound name="game_win_music"
     default_importance="minor_non_spatial"/>

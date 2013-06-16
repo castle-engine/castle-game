@@ -4,6 +4,6 @@
   equality_epsilon="0.01"
   loop="true"
   backwards="true">
-  <frame file_name="cart_1_final.wrl" time="0" />
-  <frame file_name="cart_2_final.wrl" time="5" />
+  <frame url="cart_1_final.wrl" time="0" />
+  <frame url="cart_2_final.wrl" time="5" />
 </animation>

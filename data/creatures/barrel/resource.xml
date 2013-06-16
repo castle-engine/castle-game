@@ -13,7 +13,7 @@
   grow_speed="0"
 >
   <model>
-    <idle file_name="idle.x3d"/>
-    <die file_name="die.kanim"/>
+    <idle url="idle.x3d"/>
+    <die url="die.kanim"/>
   </model>
 </resource>

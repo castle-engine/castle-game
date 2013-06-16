@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <animation loop="false" backwards="false">
-  <!-- While this isn't a real animation (first file_name is the same
+  <!-- While this isn't a real animation (first url is the same
        as the second), it has non-zero time and this way spider_queen
        may get a little knockback. -->
-  <frame file_name="spider_queen_stand.wrl" time="0.00" />
-  <frame file_name="spider_queen_stand.wrl" time="0.10" />
+  <frame url="spider_queen_stand.wrl" time="0.00" />
+  <frame url="spider_queen_stand.wrl" time="0.10" />
 </animation>

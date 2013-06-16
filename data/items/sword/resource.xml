@@ -10,9 +10,9 @@
   equipping_sound="sword_equipping"
 >
   <model>
-    <base file_name="model.wrl"/>
-    <attack file_name="attack.kanim"/>
-    <ready file_name="ready.wrl"/>
+    <base url="model.wrl"/>
+    <attack url="attack.kanim"/>
+    <ready url="ready.wrl"/>
   </model>
   <attack
     time="0.294"

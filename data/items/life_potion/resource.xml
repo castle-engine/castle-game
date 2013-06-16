@@ -8,6 +8,6 @@
   image="image.png"
 >
   <model>
-    <base file_name="model_processed.wrl"/>
+    <base url="model_processed.wrl"/>
   </model>
 </resource>

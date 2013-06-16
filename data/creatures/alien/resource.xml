@@ -43,13 +43,13 @@
   sound_die="alien_dying"
 >
   <model>
-    <idle file_name="alien_still_final.wrl"/>
-    <idle_to_walk file_name="stand_to_walk.kanim"/>
-    <walk file_name="walk.kanim"/>
-    <fire_missile file_name="attack.kanim"/>
-    <die file_name="dying.kanim"/>
-    <die_back file_name="dying_back.kanim"/>
-    <hurt file_name="hurt.kanim"/>
+    <idle url="alien_still_final.wrl"/>
+    <idle_to_walk url="stand_to_walk.kanim"/>
+    <walk url="walk.kanim"/>
+    <fire_missile url="attack.kanim"/>
+    <die url="dying.kanim"/>
+    <die_back url="dying_back.kanim"/>
+    <hurt url="hurt.kanim"/>
   </model>
   <run_away life="1.0"/>
   <fire_missile

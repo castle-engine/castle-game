@@ -23,7 +23,7 @@
   always_prepared="True"
 >
   <model>
-    <fly file_name="arrow.wrl"/>
+    <fly url="arrow.wrl"/>
   </model>
   <attack knockback_distance="1">
     <damage const="20" random="20"/>

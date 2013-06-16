@@ -4,6 +4,6 @@
   equality_epsilon="0.1"
   loop="false"
   backwards="false">
-  <frame file_name="castle_hall_symbol_closed.wrl" time="0" />
-  <frame file_name="castle_hall_symbol_open.wrl" time="1.5" />
+  <frame url="castle_hall_symbol_closed.wrl" time="0" />
+  <frame url="castle_hall_symbol_open.wrl" time="1.5" />
 </animation>

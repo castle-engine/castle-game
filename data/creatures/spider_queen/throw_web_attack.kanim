@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <animation loop="false" backwards="false">
-  <frame file_name="spider_queen_stand.wrl" time="0.00" />
-  <frame file_name="spider_queen_attack_2.wrl" time="0.30" />
-  <frame file_name="spider_queen_attack_alt.wrl" time="0.60" />
-  <frame file_name="spider_queen_stand.wrl" time="1.00" />
+  <frame url="spider_queen_stand.wrl" time="0.00" />
+  <frame url="spider_queen_attack_2.wrl" time="0.30" />
+  <frame url="spider_queen_attack_alt.wrl" time="0.60" />
+  <frame url="spider_queen_stand.wrl" time="1.00" />
 </animation>

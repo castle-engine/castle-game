@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <animation loop="false" backwards="false">
-  <frame file_name="spider_queen_stand.wrl" time="0.00" />
-  <frame file_name="spider_queen_dying_2.wrl" time="0.50" />
-  <frame file_name="spider_queen_dying_3.wrl" time="1.50" />
+  <frame url="spider_queen_stand.wrl" time="0.00" />
+  <frame url="spider_queen_dying_2.wrl" time="0.50" />
+  <frame url="spider_queen_dying_3.wrl" time="1.50" />
 </animation>

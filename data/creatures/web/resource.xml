@@ -14,7 +14,7 @@
   sound_idle="thrown_web_idle"
 >
   <model>
-    <fly file_name="web.wrl"/>
+    <fly url="web.wrl"/>
   </model>
   <attack knockback_distance="5">
     <damage const="10" random="10"/>

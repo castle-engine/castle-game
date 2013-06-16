@@ -31,11 +31,11 @@
   radius="0.55"
 >
   <model>
-    <idle file_name="spider_stand.wrl"/>
-    <walk file_name="walk.kanim"/>
-    <attack file_name="attack.kanim"/>
-    <die file_name="dying.kanim"/>
-    <hurt file_name="hurt.kanim"/>
+    <idle url="spider_stand.wrl"/>
+    <walk url="walk.kanim"/>
+    <attack url="attack.kanim"/>
+    <die url="dying.kanim"/>
+    <hurt url="hurt.kanim"/>
   </model>
   <attack
     sound_hit="spider_actual_attack_hit"

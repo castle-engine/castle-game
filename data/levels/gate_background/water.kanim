@@ -4,6 +4,6 @@
   equality_epsilon="0.1"
   loop="true"
   backwards="true">
-  <frame file_name="water_1_processed.wrl" time="0" />
-  <frame file_name="water_2_processed.wrl" time="3" />
+  <frame url="water_1_processed.wrl" time="0" />
+  <frame url="water_2_processed.wrl" time="3" />
 </animation>

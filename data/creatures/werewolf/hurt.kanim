@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <animation loop="false" backwards="true">
-  <frame file_name="werewolf_still_final.wrl" time="0.00" />
-  <frame file_name="werewolf_hurt_final.wrl" time="0.30" />
+  <frame url="werewolf_still_final.wrl" time="0.00" />
+  <frame url="werewolf_hurt_final.wrl" time="0.30" />
 </animation>

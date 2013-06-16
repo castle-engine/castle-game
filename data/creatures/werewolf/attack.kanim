@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <animation loop="false" backwards="false">
-  <frame file_name="werewolf_still_final.wrl" time="0.00" />
-  <frame file_name="werewolf_attack_1_final.wrl" time="0.15" />
-  <frame file_name="werewolf_attack_2_final.wrl" time="0.30" />
-  <frame file_name="werewolf_still_final.wrl" time="0.50" />
+  <frame url="werewolf_still_final.wrl" time="0.00" />
+  <frame url="werewolf_attack_1_final.wrl" time="0.15" />
+  <frame url="werewolf_attack_2_final.wrl" time="0.30" />
+  <frame url="werewolf_still_final.wrl" time="0.50" />
 </animation>

@@ -33,12 +33,12 @@
   max_height_acceptable_to_fall="4.0"
 >
   <model>
-    <idle file_name="spider_queen_stand.wrl"/>
-    <walk file_name="walk.kanim"/>
-    <attack file_name="attack.kanim"/>
-    <die file_name="dying.kanim"/>
-    <hurt file_name="hurt.kanim"/>
-    <fire_missile file_name="throw_web_attack.kanim"/>
+    <idle url="spider_queen_stand.wrl"/>
+    <walk url="walk.kanim"/>
+    <attack url="attack.kanim"/>
+    <die url="dying.kanim"/>
+    <hurt url="hurt.kanim"/>
+    <fire_missile url="throw_web_attack.kanim"/>
   </model>
 
   <fall>
