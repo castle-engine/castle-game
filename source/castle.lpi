@@ -9,8 +9,8 @@
         <MainUnitHasTitleStatement Value="False"/>
         <LRSInOutputDirectory Value="False"/>
       </Flags>
+      <SessionStorage Value="InIDEConfig"/>
       <MainUnit Value="0"/>
-      <ActiveWindowIndexAtStart Value="0"/>
     </General>
     <BuildModes Count="1">
       <Item1 Name="default" Default="True"/>
@@ -35,140 +35,32 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="10">
+    <Units Count="1">
       <Unit0>
         <Filename Value="castle.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="0"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="1"/>
-        <CursorPos X="3" Y="1"/>
-        <UsageCount Value="23"/>
-        <Loaded Value="True"/>
       </Unit0>
-      <Unit1>
-        <Filename Value="gameconfig.pas"/>
-        <UnitName Value="GameConfig"/>
-        <TopLine Value="34"/>
-        <CursorPos X="47" Y="52"/>
-        <UsageCount Value="10"/>
-      </Unit1>
-      <Unit2>
-        <Filename Value="gameitems.pas"/>
-        <UnitName Value="GameItems"/>
-        <TopLine Value="1"/>
-        <CursorPos X="1" Y="1"/>
-        <UsageCount Value="10"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="gameinitialbackground.pas"/>
-        <UnitName Value="GameInitialBackground"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="16"/>
-        <CursorPos X="1" Y="1"/>
-        <UsageCount Value="10"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="gamestartmenu.pas"/>
-        <UnitName Value="GameStartMenu"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="647"/>
-        <CursorPos X="42" Y="660"/>
-        <UsageCount Value="10"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="gamebackgroundlevel.pas"/>
-        <UnitName Value="GameBackgroundLevel"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="42"/>
-        <CursorPos X="3" Y="42"/>
-        <UsageCount Value="10"/>
-      </Unit5>
-      <Unit6>
-        <Filename Value="gameplay.pas"/>
-        <UnitName Value="GamePlay"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="595"/>
-        <CursorPos X="26" Y="610"/>
-        <UsageCount Value="10"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="../../castle_game_engine/src/window/castlewindow.pas"/>
-        <UnitName Value="CastleWindow"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="2230"/>
-        <CursorPos X="38" Y="2257"/>
-        <UsageCount Value="10"/>
-      </Unit7>
-      <Unit8>
-        <Filename Value="../../castle_game_engine/src/opengl/castleglutils.pas"/>
-        <UnitName Value="CastleGLUtils"/>
-        <EditorIndex Value="2"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="32"/>
-        <CursorPos X="25" Y="55"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="../../castle_game_engine/src/game/castlelevels.pas"/>
-        <UnitName Value="CastleLevels"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="756"/>
-        <CursorPos X="16" Y="793"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
-      </Unit9>
     </Units>
-    <JumpHistory Count="5" HistoryIndex="4">
-      <Position1>
-        <Filename Value="castle.lpr"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
-      </Position1>
-      <Position2>
-        <Filename Value="castle.lpr"/>
-        <Caret Line="12" Column="38" TopLine="1"/>
-      </Position2>
-      <Position3>
-        <Filename Value="castle.lpr"/>
-        <Caret Line="12" Column="38" TopLine="187"/>
-      </Position3>
-      <Position4>
-        <Filename Value="castle.lpr"/>
-        <Caret Line="1" Column="3" TopLine="1"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../castle_game_engine/src/game/castlelevels.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
-      </Position5>
-    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
-    <SearchPaths>
-      <IncludeFiles Value="../../castle_game_engine/src/base"/>
-    </SearchPaths>
     <Parsing>
       <SyntaxOptions>
-        <IncludeAssertionCode Value="True"/>
         <CStyleMacros Value="True"/>
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
       <Checks>
         <IOChecks Value="True"/>
-        <RangeChecks Value="True"/>
-        <OverflowChecks Value="True"/>
-        <StackChecks Value="True"/>
       </Checks>
+      <Optimizations>
+        <OptimizationLevel Value="2"/>
+      </Optimizations>
     </CodeGeneration>
     <Other>
       <Verbosity>
         <ShowHints Value="False"/>
       </Verbosity>
-      <CustomOptions Value="-Sh"/>
       <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
@@ -194,5 +86,4 @@
       </Item6>
     </Exceptions>
   </Debugging>
-  <EditorMacros Count="0"/>
 </CONFIG>
