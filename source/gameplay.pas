@@ -250,7 +250,7 @@ procedure TGame2DControls.Draw;
 
   procedure DoShowShadowVolumesCounts;
   begin
-    if GLShadowVolumesPossible and ShadowVolumes then
+    if GLFeatures.ShadowVolumesPossible and ShadowVolumes then
     begin
       glColorv(Vector3Single(0.7, 0.7, 0.7));
       PosLine(LineShadowVolumesCounts);

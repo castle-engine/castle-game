@@ -399,7 +399,7 @@ begin
     2: begin
          ShadowVolumes := not ShadowVolumes;
          ShadowVolumesArgument.Value := ShadowVolumes;
-         if (not GLShadowVolumesPossible) and ShadowVolumes then
+         if (not GLFeatures.ShadowVolumesPossible) and ShadowVolumes then
            MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.', taLeft);
        end;
     3: ;

@@ -195,7 +195,7 @@ var
   ShadersPath: string;
 begin
   inherited Create;
-  if GLTextureCubeMapSupport and (Support <> gsNone) then
+  if GLFeatures.CubeMapSupport and (Support <> gsNone) then
   begin
     WaterEnvMap := LoadWaterEnvMap;
 
