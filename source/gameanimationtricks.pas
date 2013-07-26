@@ -195,7 +195,7 @@ var
   ShadersPath: string;
 begin
   inherited Create;
-  if GL_ARB_texture_cube_map and (Support <> gsNone) then
+  if GLTextureCubeMapSupport and (Support <> gsNone) then
   begin
     WaterEnvMap := LoadWaterEnvMap;
 
