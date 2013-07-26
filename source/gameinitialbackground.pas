@@ -44,7 +44,7 @@ end;
 procedure Draw(Window: TCastleWindowBase);
 begin
   glLoadIdentity;
-  SetWindowPosZero;
+  SetWindowPos(0, 0);
   GLScreenImage.Draw;
 end;
 
