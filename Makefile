@@ -100,7 +100,7 @@ clean:
 	rm -Rf data/levels/fountain/fluidcache/
 
 clean_binaries:
-	rm -f castle castle.exe
+	rm -f castle castle.exe source/castle source/castle.exe
 	rm -Rf castle.app
 
 # Remove private files that Michalis keeps inside his castle/trunk/,
