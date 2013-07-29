@@ -38,12 +38,12 @@ const
 
 var
   { Render shadow volumes.
-    This is meaningfull only if GLShadowVolumesPossible,
+    This is meaningfull only if GLFeatures.ShadowVolumesPossible,
     otherwise we will never render shadow volumes. }
   ShadowVolumes: boolean = DefaultShadowVolumes;
 
   { You can set this to true for debug purposes.
-    This is meaningull only if GLShadowVolumesPossible and ShadowVolumes. }
+    This is meaningull only if GLFeatures.ShadowVolumesPossible and ShadowVolumes. }
   ShadowVolumesDraw: boolean = false;
 
 const
