@@ -26,7 +26,7 @@ unit GameHelp;
 interface
 
 const
-  Version = '1.0.0';
+  Version = '1.0.1';
   CastleURL = 'http://castle-engine.sourceforge.net/castle.php';
 
 function SCastleVersion: string;
