@@ -3,7 +3,7 @@
 <!-- Another entry for fountain level, to load it with water animation -->
 <level
   name="fountain-with-water"
-  scene="../fountain/fountain_final.wrl"
+  scene="../fountain/fountain_final.x3dv"
   title="Fountain"
   title_hint="with costly water animation"
   number="16"
