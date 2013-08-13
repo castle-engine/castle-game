@@ -101,7 +101,7 @@ clean:
 
 clean_binaries:
 	rm -f castle castle.exe source/castle source/castle.exe
-	rm -Rf castle.app
+	rm -Rf castle.app source/castle.app/ macosx/castle.app/
 
 # Remove private files that Michalis keeps inside his castle/trunk/,
 # but he doesn't want to upload them for public.
