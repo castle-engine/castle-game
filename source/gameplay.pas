@@ -215,15 +215,14 @@ procedure TGame2DControls.Draw;
     LineFPS = 5;
     LineShadowVolumesCounts = 6;
 
-  procedure PosLine(const Line: Cardinal);
+  function YLine(const Line: Cardinal): Integer;
   begin
-    SetWindowPos(0, ContainerHeight - UIFont.RowHeight * Line - 10 { margin });
+    Result := ContainerHeight - UIFont.RowHeight * Line - 10 { margin };
   end;
 
   procedure DoShowFPS;
   begin
     glColorv(Vector3Single(0.7, 0.7, 0.7));
-    PosLine(LineFPS);
 
     { Don't display precise Window.FpsFrameTime and Window.FpsRealTime
       each time --- this would cause too much move for player.
@@ -236,7 +235,8 @@ procedure TGame2DControls.Draw;
       DisplayFpsRealTime := Window.Fps.RealTime;
     end;
 
-    UIFont.PrintAndMove(Format('FPS : %f (real : %f). Shapes : %d / %d',
+    UIFont.Print(0, YLine(LineFPS),
+      Format('FPS : %f (real : %f). Shapes : %d / %d',
       [DisplayFpsFrameTime, DisplayFpsRealTime,
        SceneManager.Statistics.ShapesRendered, SceneManager.Statistics.ShapesVisible]));
   end;
@@ -246,8 +246,8 @@ procedure TGame2DControls.Draw;
     if GLFeatures.ShadowVolumesPossible and ShadowVolumes then
     begin
       glColorv(Vector3Single(0.7, 0.7, 0.7));
-      PosLine(LineShadowVolumesCounts);
-      UIFont.PrintAndMove(Format('No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
+      UIFont.Print(0, YLine(LineShadowVolumesCounts),
+        Format('No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
         [ SceneManager.ShadowVolumeRenderer.CountShadowsNotVisible,
           SceneManager.ShadowVolumeRenderer.CountZPass,
           SceneManager.ShadowVolumeRenderer.CountZFailNoLightCap,
@@ -269,25 +269,21 @@ procedure TGame2DControls.Draw;
     end;
 
   begin
-    PosLine(LinePressEscape);
-    UIFont.PrintAndMove(SPressEscapeToExit);
-    PosLine(LinePressAttack);
-    UIFont.PrintAndMove(SPressAttackToRestart);
+    UIFont.Print(0, YLine(LinePressEscape), SPressEscapeToExit);
+    UIFont.Print(0, YLine(LinePressAttack), SPressAttackToRestart);
   end;
 
   procedure DoShowDeadInfo;
   begin
     glColorv(Vector3Single(1, 0, 0));
-    PosLine(LineDeadOrWinner);
-    UIFont.PrintAndMove('You''re dead.');
+    UIFont.Print(0, YLine(LineDeadOrWinner), 'You''re dead.');
     DoShowDeadOrFinishedKeys;
   end;
 
   procedure DoShowGameWinInfo;
   begin
     glColorv(Vector3Single(0.8, 0.8, 0.8));
-    PosLine(LineDeadOrWinner);
-    UIFont.PrintAndMove('Game finished.');
+    UIFont.Print(0, YLine(LineDeadOrWinner), 'Game finished.');
     DoShowDeadOrFinishedKeys;
   end;
 
@@ -338,8 +334,8 @@ procedure TGame2DControls.Draw;
       LifeTextPosition := XMove + IndicatorMargin +
         (IndicatorWidth - UIFont.TextWidth(LifeText)) div 2;
       MaxTo1st(LifeTextPosition, IndicatorMargin);
-      SetWindowPos(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2);
-      UIFont.PrintAndMove(LifeText);
+      UIFont.Print(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2,
+        LifeText);
     end;
   end;
 
@@ -352,10 +348,10 @@ procedure TGame2DControls.Draw;
     if Player.Flying then
     begin
       glColorv(White3Single);
-      SetWindowPos(0, ContainerHeight - UIFont.RowHeight - 5 { margin });
       if Player.FlyingTimeOut > 0 then
         S := Format(' (%d more seconds)', [Floor(Player.FlyingTimeOut)]);
-      UIFont.PrintAndMove('Flying' + S);
+      UIFont.Print(0, ContainerHeight - UIFont.RowHeight - 5 { margin },
+        'Flying' + S);
     end;
 
     glLoadIdentity;
