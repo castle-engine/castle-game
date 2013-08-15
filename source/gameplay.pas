@@ -168,9 +168,8 @@ procedure TGame2DControls.Draw;
       X := ItemSlotX(I);
       Y := ItemSlotY(I);
 
-      SetWindowPos(X, Y);
       GLInventorySlot.Alpha := acFullRange;
-      GLInventorySlot.Draw;
+      GLInventorySlot.Draw(X, Y);
     end;
 
     for I := 0 to Player.Inventory.Count - 1 do
@@ -178,9 +177,9 @@ procedure TGame2DControls.Draw;
       X := ItemSlotX(I);
       Y := ItemSlotY(I);
 
-      SetWindowPos(X + InventorySlotMargin, Y + InventorySlotMargin);
       Player.Inventory[I].Resource.GLImage.Alpha := acSimpleYesNo;
-      Player.Inventory[I].Resource.GLImage.Draw;
+      Player.Inventory[I].Resource.GLImage.Draw(
+        X + InventorySlotMargin, Y + InventorySlotMargin);
     end;
 
     if Between(Player.InventoryCurrentItem, 0, Player.Inventory.Count - 1) then
@@ -201,12 +200,10 @@ procedure TGame2DControls.Draw;
       X := ItemSlotX(I);
       Y := ItemSlotY(I);
 
-      SetWindowPos(X + InventorySlotMargin, Y + InventorySlotMargin);
-
       S := Player.Inventory[I].Resource.Caption;
       if Player.Inventory[I].Quantity <> 1 then
         S += ' (' + IntToStr(Player.Inventory[I].Quantity) + ')';
-      UIFontSmall.PrintAndMove(S);
+      UIFontSmall.Print(X + InventorySlotMargin, Y + InventorySlotMargin, S);
     end;
   end;
 

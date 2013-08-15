@@ -190,15 +190,13 @@ begin
   inherited;
 
   glColorv(SubMenuTextColor);
-
-  SetWindowPos(Position[0], Position[1] - 20);
-  SubMenuTitleFont.PrintAndMove(SubMenuTitle + ' :');
+  SubMenuTitleFont.Print(Position[0], Position[1] - 20, SubMenuTitle + ' :');
 
   if SubMenuAdditionalInfo <> '' then
     SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
       Window.Width - 2 * Round(AllItemsRectangle.X0),
       AllItemsRectangle.X0,
-      AllItemsRectangle.Y0 - SubMenuTitleFont.RowHeight, true, 0, false);
+      AllItemsRectangle.Y0 - SubMenuTitleFont.RowHeight, true, 0);
 end;
 
 { TControlsMenu ------------------------------------------------------------- }

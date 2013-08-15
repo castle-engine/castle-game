@@ -612,10 +612,10 @@ begin
 
   glColorv(SubMenuTextColor);
 
-  SetWindowPos(Position[0],
+  SubMenuTitleFont.Print(Position[0],
     Rectangles.Items[FirstDemoLevelIndex].Y0 +
-    Rectangles.Items[FirstDemoLevelIndex].Height + 5 { margin });
-  SubMenuTitleFont.PrintAndMove('Bonus demo levels :');
+    Rectangles.Items[FirstDemoLevelIndex].Height + 5 { margin },
+    'Bonus demo levels :');
 end;
 
 procedure TChooseNewLevelMenu.Click;
