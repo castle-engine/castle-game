@@ -90,13 +90,7 @@ end;
 
 procedure TBackgroundCaptions.Draw;
 begin
-  glPushAttrib(GL_ENABLE_BIT);
-    SetWindowPos(0, ContainerHeight - GLCaption.Height);
-
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.5);
-    GLCaption.Draw;
-  glPopAttrib;
+  GLCaption.Draw(0, ContainerHeight - GLCaption.Height);
 end;
 
 procedure TBackgroundCaptions.GLContextOpen;

@@ -158,34 +158,30 @@ procedure TGame2DControls.Draw;
   begin
     InventorySlotsVisibleInColumn := ContainerHeight div InventorySlotHeight;
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-      { Draw at least InventorySlotsVisibleInColumn slots,
-        possibly drawing empty slots. This is needed, because
-        otherwise when no items are owned player doesn't see any
-        effect of changing InventoryVisible. }
-      for I := 0 to Max(Player.Inventory.Count - 1,
-        InventorySlotsVisibleInColumn - 1) do
-      begin
-        X := ItemSlotX(I);
-        Y := ItemSlotY(I);
+    { Draw at least InventorySlotsVisibleInColumn slots,
+      possibly drawing empty slots. This is needed, because
+      otherwise when no items are owned player doesn't see any
+      effect of changing InventoryVisible. }
+    for I := 0 to Max(Player.Inventory.Count - 1,
+      InventorySlotsVisibleInColumn - 1) do
+    begin
+      X := ItemSlotX(I);
+      Y := ItemSlotY(I);
 
-        SetWindowPos(X, Y);
-        GLInventorySlot.Draw;
-      end;
-    glDisable(GL_BLEND);
+      SetWindowPos(X, Y);
+      GLInventorySlot.Alpha := acFullRange;
+      GLInventorySlot.Draw;
+    end;
 
-    glAlphaFunc(GL_GREATER, 0.5);
-    glEnable(GL_ALPHA_TEST);
-      for I := 0 to Player.Inventory.Count - 1 do
-      begin
-        X := ItemSlotX(I);
-        Y := ItemSlotY(I);
+    for I := 0 to Player.Inventory.Count - 1 do
+    begin
+      X := ItemSlotX(I);
+      Y := ItemSlotY(I);
 
-        SetWindowPos(X + InventorySlotMargin, Y + InventorySlotMargin);
-        Player.Inventory[I].Resource.GLImage.Draw;
-      end;
-    glDisable(GL_ALPHA_TEST);
+      SetWindowPos(X + InventorySlotMargin, Y + InventorySlotMargin);
+      Player.Inventory[I].Resource.GLImage.Alpha := acSimpleYesNo;
+      Player.Inventory[I].Resource.GLImage.Draw;
+    end;
 
     if Between(Player.InventoryCurrentItem, 0, Player.Inventory.Count - 1) then
     begin
@@ -315,6 +311,10 @@ procedure TGame2DControls.Draw;
     glAlphaFunc(GL_GREATER, 0.5);
 
       LifeMapped := Round(MapRange(ALife, 0, AMaxLife, 0, IndicatorHeight));
+
+      { we control alpha test manually }
+      GLFullIndicatorImage.Alpha := acNone;
+      GLBlankIndicatorImage.Alpha := acNone;
 
       { Note that Life may be > MaxLife, and
         Life may be < 0. }
