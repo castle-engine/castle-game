@@ -146,8 +146,8 @@ begin
   CreditsSceneManager.FullSize := false;
   CreditsSceneManager.Left := 25;
   CreditsSceneManager.Bottom := 20;
-  CreditsSceneManager.Width := Window.Width - CreditsSceneManager.Left * 2;
-  CreditsSceneManager.Height := Window.Height - CreditsSceneManager.Bottom * 2 - 160;
+  CreditsSceneManager.Width := Max(0, Window.Width - CreditsSceneManager.Left * 2);
+  CreditsSceneManager.Height := Max(0, Window.Height - CreditsSceneManager.Bottom * 2 - 160);
   CreditsSceneManager.Transparent := true;
 
   CreditsSceneManager.Items.Add(Credits);
