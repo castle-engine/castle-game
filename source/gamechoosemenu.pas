@@ -60,7 +60,7 @@ end;
 var
   ChooseMenu: TChooseMenu;
 
-procedure CloseQuery(Window: TCastleWindowBase);
+procedure CloseQuery(Sender: TCastleWindowBase);
 begin
   MessageOK(Window, 'You can''t exit now.');
 end;
