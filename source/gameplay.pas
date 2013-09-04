@@ -26,7 +26,7 @@ unit GamePlay;
 
 interface
 
-uses Classes, CastleLevels, CastlePlayer, Castle3D;
+uses Classes, CastleLevels, CastlePlayer, Castle3D, CastleControlsImages;
 
 { Play the game.
   SceneManager and Player global variables must be already initialized.
@@ -609,7 +609,7 @@ begin
     GameEnded := false;
     GameEndedWantsRestart := '';
 
-    MessagesTheme.RectColor[3] := 0.4;
+    Theme.Window := Window_Transparent;
 
     if PrepareNewPlayer then
       SceneManager.Logic.PrepareNewPlayer(Player);

@@ -31,11 +31,12 @@ procedure ShowGameMenu(AControlsUnder: TUIControlList);
 
 implementation
 
-uses SysUtils, Classes, CastleUtils, CastleStringUtils, CastleWindowModes,
+uses CastleControlsImages,
+  SysUtils, Classes, CastleUtils, CastleStringUtils, CastleWindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, GameWindow, CastleVectors,
   CastleWindow, GameHelp, GamePlay, GameGeneralMenu, GameControlsMenu,
   CastleInputs, X3DNodes, CastleClassUtils, CastleSoundMenu, CastleKeysMouse,
-  CastleGameNotifications;
+  CastleGameNotifications, CastleControls;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -160,7 +161,7 @@ begin
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
-    MessagesTheme.RectColor[3] := 1.0;
+    Theme.Window := Window_Dark;
 
     Window.OnPress := @Press;
     Window.OnDrawStyle := ds3D;

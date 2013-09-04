@@ -34,9 +34,10 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 
 implementation
 
-uses SysUtils, CastleWindowModes, CastleGLUtils, CastleInputs, CastleMessages, 
+uses SysUtils, CastleControlsImages,
+  CastleWindowModes, CastleGLUtils, CastleInputs, CastleMessages,
   CastleOnScreenMenu, GameWindow, GameGeneralMenu, CastleVectors, CastleGameNotifications,
-  CastleKeysMouse;
+  CastleKeysMouse, CastleControls;
 
 var
   Selected: boolean;
@@ -89,7 +90,7 @@ begin
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
-    MessagesTheme.RectColor[3] := 1.0;
+    Theme.Window := Window_Dark;
 
     Window.Controls.MakeSingle(TCastleOnScreenMenu, ChooseMenu);
 

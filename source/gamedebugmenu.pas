@@ -31,13 +31,14 @@ procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 
 implementation
 
-uses SysUtils, Classes, CastleUtils, CastleStringUtils, CastleWindowModes,
+uses SysUtils, Classes, CastleControlsImages,
+  CastleUtils, CastleStringUtils, CastleWindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, GameWindow, Castle3D,
   CastleVectors, CastleWindow, GamePlay, GameGeneralMenu,
   CastleInputs, CastleCreatures, GameChooseMenu,
   CastleItems, CastleOnScreenMenu, CastleRays, GameVideoOptions, CastleSoundEngine,
   X3DNodes, CastleClassUtils, CastleGameNotifications,
-  CastleLevels, CastleKeysMouse, CastleResources;
+  CastleLevels, CastleKeysMouse, CastleResources, CastleControls;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -479,7 +480,7 @@ begin
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
-    MessagesTheme.RectColor[3] := 1.0;
+    Theme.Window := Window_Dark;
 
     Window.OnPress := @Press;
     Window.OnDrawStyle := ds3D;
