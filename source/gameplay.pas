@@ -609,7 +609,7 @@ begin
     GameEnded := false;
     GameEndedWantsRestart := '';
 
-    Theme.Window := Window_Transparent;
+    Theme.Window := WindowDarkTransparent;
 
     if PrepareNewPlayer then
       SceneManager.Logic.PrepareNewPlayer(Player);

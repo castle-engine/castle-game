@@ -480,7 +480,7 @@ begin
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
-    Theme.Window := Window_Dark;
+    Theme.Window := WindowDark;
 
     Window.OnPress := @Press;
     Window.OnDrawStyle := ds3D;
