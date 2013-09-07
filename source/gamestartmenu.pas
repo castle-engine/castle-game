@@ -613,8 +613,7 @@ begin
   glColorv(SubMenuTextColor);
 
   SubMenuTitleFont.Print(Position[0],
-    Rectangles.Items[FirstDemoLevelIndex].Y0 +
-    Rectangles.Items[FirstDemoLevelIndex].Height + 5 { margin },
+    Rectangles.Items[FirstDemoLevelIndex].Top + 5 { margin },
     'Bonus demo levels :');
 end;
 

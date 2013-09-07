@@ -194,9 +194,9 @@ begin
 
   if SubMenuAdditionalInfo <> '' then
     SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
-      Window.Width - 2 * Round(AllItemsRectangle.X0),
-      AllItemsRectangle.X0,
-      AllItemsRectangle.Y0 - SubMenuTitleFont.RowHeight, true, 0);
+      Window.Width - 2 * Round(AllItemsRectangle.Left),
+      AllItemsRectangle.Left,
+      AllItemsRectangle.Bottom - SubMenuTitleFont.RowHeight, true, 0);
 end;
 
 { TControlsMenu ------------------------------------------------------------- }
@@ -335,8 +335,10 @@ procedure TControlsSubMenu.Click;
     NewEvent: TInputPressRelease;
   begin
     MessageKeyMouse(Window, Format(
-      'Press the new key or mouse button or mouse wheel for "%s".', [InputShortcut.Caption]),
-      'Cancel [Escape]' + nl + 'Clear [Backspace]', taLeft, NewEvent);
+      'Press the new key or mouse button or mouse wheel for "%s".' + NL + NL +
+      '[Escape] cancels.' + NL +
+      '[Backspace] clears the shortcut.',
+      [InputShortcut.Caption]), taLeft, NewEvent);
 
     if NewEvent.IsKey(K_Backspace) then
     begin
