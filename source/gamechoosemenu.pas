@@ -80,7 +80,7 @@ begin
     ChooseMenu.Items.Objects[I] := nil;
   ChooseMenu.FixItemsRectangles;
 
-  SavedMode := TGLMode.CreateReset(Window, 0, true,
+  SavedMode := TGLMode.CreateReset(Window, 0,
     nil, Window.OnResize, @CloseQuery);
   try
     { This shouldn't change projection matrix anyway. }
@@ -90,7 +90,7 @@ begin
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
-    Theme.Window := WindowDark;
+    Theme.Images[tiWindow] := WindowDark;
 
     Window.Controls.MakeSingle(TCastleOnScreenMenu, ChooseMenu);
 

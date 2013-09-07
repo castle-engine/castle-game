@@ -151,7 +151,7 @@ begin
   GameSoundMenu.SoundVolume.RefreshAccessory;
   GameSoundMenu.MusicVolume.RefreshAccessory;
 
-  SavedMode := TGLMode.CreateReset(Window, 0, true,
+  SavedMode := TGLMode.CreateReset(Window, 0,
     nil, Window.OnResize, @CloseQuery);
   try
     { This is needed, because when changing ViewAngleDegX we will call
@@ -161,7 +161,7 @@ begin
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
-    Theme.Window := WindowDark;
+    Theme.Images[tiWindow] := WindowDark;
 
     Window.OnPress := @Press;
     Window.OnDrawStyle := ds3D;

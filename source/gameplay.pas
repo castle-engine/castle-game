@@ -593,7 +593,7 @@ begin
 
   LevelFinishedSchedule := false;
 
-  SavedMode := TGLMode.CreateReset(Window, 0, true, nil, nil, @CloseQuery);
+  SavedMode := TGLMode.CreateReset(Window, 0, nil, nil, @CloseQuery);
   try
     Window.AutoRedisplay := true;
 
@@ -609,7 +609,7 @@ begin
     GameEnded := false;
     GameEndedWantsRestart := '';
 
-    Theme.Window := WindowDarkTransparent;
+    Theme.Images[tiWindow] := WindowDarkTransparent;
 
     if PrepareNewPlayer then
       SceneManager.Logic.PrepareNewPlayer(Player);

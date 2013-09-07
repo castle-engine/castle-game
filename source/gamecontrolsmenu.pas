@@ -536,7 +536,7 @@ begin
 
   FadeRect := nil;
 
-  SavedMode := TGLMode.CreateReset(Window, 0, false,
+  SavedMode := TGLMode.CreateReset(Window, 0,
     nil, Window.OnResize, @CloseQuery);
   try
     SavedMode.RestoreProjectionMatrix := false;
