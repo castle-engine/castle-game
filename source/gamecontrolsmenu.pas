@@ -338,7 +338,7 @@ procedure TControlsSubMenu.Click;
       'Press the new key or mouse button or mouse wheel for "%s".' + NL + NL +
       '[Escape] cancels.' + NL +
       '[Backspace] clears the shortcut.',
-      [InputShortcut.Caption]), taLeft, NewEvent);
+      [InputShortcut.Caption]), NewEvent);
 
     if NewEvent.IsKey(K_Backspace) then
     begin

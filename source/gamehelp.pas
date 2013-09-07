@@ -52,7 +52,7 @@ begin
     SList.Assign(Notifications.History);
     SList.Insert(0, Format('%d messages :', [Notifications.History.Count]));
     SList.Insert(1, '');
-    MessageOK(Window, SList, taLeft);
+    MessageOK(Window, SList);
   finally SList.Free end;
 end;
 

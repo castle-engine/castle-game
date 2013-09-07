@@ -242,7 +242,7 @@ procedure TDebugPlayerMenu.Click;
   procedure PlayerSetMaxLife;
   begin
     if Player.Dead then
-      MessageOK(Window, 'No can do. You are dead.', taLeft) else
+      MessageOK(Window, 'No can do. You are dead.') else
     begin
       Player.MaxLife := 10000;
       Player.Life := Player.MaxLife;

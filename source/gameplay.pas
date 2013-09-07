@@ -512,7 +512,7 @@ end;
 procedure GameCancel(RequireConfirmation: boolean);
 begin
   if Player.Dead or GameWin or (not RequireConfirmation) or
-    MessageYesNo(Window, 'Are you sure you want to end the game ?', taLeft) then
+    MessageYesNo(Window, 'Are you sure you want to end the game ?') then
   begin
     GameEndedWantsRestart := '';
     GameEnded := true;

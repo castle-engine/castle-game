@@ -235,7 +235,7 @@ begin
     2: SetCurrentMenu(CurrentMenu, VideoMenu);
     3: SetCurrentMenu(CurrentMenu, SoundMenu);
     4: ShowCredits(BackgroundControls, BackgroundSceneManager);
-    5: if not OpenURL(CastleURL) then MessageOK(Window, SCannotOpenURL, taMiddle);
+    5: if not OpenURL(CastleURL) then MessageOK(Window, SCannotOpenURL);
     6: UserQuit := true;
     else raise EInternalError.Create('Menu item unknown');
   end;
@@ -356,8 +356,7 @@ procedure TVideoMenu.Click;
       Format('Field of view horizontal : %f', [ViewAngleDegX]) +nl+
       Format('Field of view vertical : %f', [ViewAngleDegY]) +nl+
       nl+
-      GLInformationString,
-      taLeft);
+      GLInformationString);
   end;
 
   procedure ChangeColorBits;
@@ -378,7 +377,7 @@ procedure TVideoMenu.Click;
     Value := VideoFrequency;
     if MessageInputQueryCardinal(Window,
       'What display frequency to use ?' +nl+ '("0" means "system default")',
-      Value, taLeft) and
+      Value) and
       (Value <> VideoFrequency) then
     begin
       VideoFrequency := Value;
@@ -400,7 +399,7 @@ begin
          ShadowVolumes := not ShadowVolumes;
          ShadowVolumesArgument.Value := ShadowVolumes;
          if (not GLFeatures.ShadowVolumesPossible) and ShadowVolumes then
-           MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.', taLeft);
+           MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.');
        end;
     3: ;
     4: ChangeColorBits;
@@ -440,7 +439,7 @@ begin
 
          VisibleChange;
 
-         MessageOK(Window, 'All video settings restored to defaults.', taLeft);
+         MessageOK(Window, 'All video settings restored to defaults.');
        end;
     8 : SetCurrentMenu(CurrentMenu, MainMenu);
     else raise EInternalError.Create('Menu item unknown');
@@ -533,7 +532,7 @@ begin
     { ALCDevice value changed now to new value. }
     SoundMenu.OpenALDeviceArgument.Value := SoundEngine.Devices[CurrentItem].NiceName;
     if not SoundEngine.ALActive then
-      MessageOK(Window, SoundEngine.SoundInitializationReport, taLeft);
+      MessageOK(Window, SoundEngine.SoundInitializationReport);
   end;
 
   SetCurrentMenu(CurrentMenu, SoundMenu);

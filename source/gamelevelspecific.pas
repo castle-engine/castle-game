@@ -1186,7 +1186,7 @@ begin
       'So check out for updates on our WWW page ' +
       '[http://castle-engine.sourceforge.net/castle.php]. ' +
       'Oh, and this is open-source game, so if you can, ' +
-      'you''re most welcome to contribute!', taLeft);
+      'you''re most welcome to contribute!');
     ExitMessagePending := false;
   end;
 end;
