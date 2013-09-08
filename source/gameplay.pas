@@ -190,7 +190,7 @@ procedure TGame2DControls.Draw;
         ItemSlotY(Player.InventoryCurrentItem) + InventorySlotMargin,
         InventorySlotWidth - 2 * InventorySlotMargin,
         InventorySlotHeight - 2 * InventorySlotMargin),
-        tiMenuActive);
+        tiActiveFrame);
     end;
 
     glColor4f(1, 1, 0.5, 1);
