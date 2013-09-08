@@ -26,7 +26,8 @@ unit GamePlay;
 
 interface
 
-uses Classes, CastleLevels, CastlePlayer, Castle3D, CastleControlsImages;
+uses Classes, CastleLevels, CastlePlayer, Castle3D, CastleControlsImages,
+  CastleRectangles;
 
 { Play the game.
   SceneManager and Player global variables must be already initialized.
@@ -184,14 +185,12 @@ procedure TGame2DControls.Draw;
 
     if Between(Player.InventoryCurrentItem, 0, Player.Inventory.Count - 1) then
     begin
-      GLRectangleBorder(
+      Theme.Draw(Rectangle(
         ItemSlotX(Player.InventoryCurrentItem) + InventorySlotMargin,
         ItemSlotY(Player.InventoryCurrentItem) + InventorySlotMargin,
-        ItemSlotX(Player.InventoryCurrentItem)
-          + InventorySlotWidth - InventorySlotMargin,
-        ItemSlotY(Player.InventoryCurrentItem)
-          + InventorySlotHeight - InventorySlotMargin,
-        Vector4Single(0.8, 0.8, 0.8, 1));
+        InventorySlotWidth - 2 * InventorySlotMargin,
+        InventorySlotHeight - 2 * InventorySlotMargin),
+        tiMenuActive);
     end;
 
     glColor4f(1, 1, 0.5, 1);
