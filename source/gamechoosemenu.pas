@@ -34,7 +34,7 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
 
 implementation
 
-uses SysUtils, CastleControlsImages,
+uses SysUtils, CastleControlsImages, CastleImages,
   CastleWindowModes, CastleGLUtils, CastleInputs, CastleMessages,
   CastleOnScreenMenu, GameWindow, GameGeneralMenu, CastleVectors, CastleGameNotifications,
   CastleKeysMouse, CastleControls;
@@ -70,6 +70,7 @@ function ChooseByMenu(ControlsUnder: TUIControlList;
   MenuItems: TStringList): Integer;
 var
   SavedMode: TGLMode;
+  OldThemeWindow: TCastleImage;
   I: Integer;
 begin
   ChooseMenu.Items.Assign(MenuItems);
@@ -80,8 +81,8 @@ begin
     ChooseMenu.Items.Objects[I] := nil;
   ChooseMenu.FixItemsRectangles;
 
-  SavedMode := TGLMode.CreateReset(Window, 0,
-    nil, Window.OnResize, @CloseQuery);
+  OldThemeWindow := Theme.Images[tiWindow];
+  SavedMode := TGLMode.CreateReset(Window, 0, nil, Window.OnResize, @CloseQuery);
   try
     { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;
@@ -103,7 +104,10 @@ begin
     until Selected;
 
     Result := SelectedIndex;
-  finally FreeAndNil(SavedMode); end;
+  finally
+    FreeAndNil(SavedMode);
+    Theme.Images[tiWindow] := OldThemeWindow;
+  end;
 end;
 
 { initialization / finalization ---------------------------------------------- }

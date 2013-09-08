@@ -31,7 +31,7 @@ procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 
 implementation
 
-uses SysUtils, Classes, CastleControlsImages,
+uses SysUtils, Classes, CastleControlsImages, CastleImages,
   CastleUtils, CastleStringUtils, CastleWindowModes,
   GL, GLU, CastleGLUtils, CastleMessages, GameWindow, Castle3D,
   CastleVectors, CastleWindow, GamePlay, GameGeneralMenu,
@@ -461,6 +461,7 @@ end;
 procedure ShowDebugMenu(AControlsUnder: TUIControlList);
 var
   SavedMode: TGLMode;
+  OldThemeWindow: TCastleImage;
 begin
   ControlsUnder := AControlsUnder;
 
@@ -470,8 +471,8 @@ begin
     Player.Camera.RotationVerticalSpeed;
   DebugPlayerMenu.PlayerSpeedSlider.Value := Player.Camera.MoveSpeed;
 
-  SavedMode := TGLMode.CreateReset(Window, 0,
-    nil, Window.OnResize, @CloseQuery);
+  OldThemeWindow := Theme.Images[tiWindow];
+  SavedMode := TGLMode.CreateReset(Window, 0, nil, Window.OnResize, @CloseQuery);
   try
     { This is needed, because when changing ViewAngleDegX we will call
       Window.OnResize to set new projection matrix, and this
@@ -493,7 +494,10 @@ begin
     repeat
       Application.ProcessMessage(true, true);
     until GameEnded or UserQuit;
-  finally FreeAndNil(SavedMode); end;
+  finally
+    FreeAndNil(SavedMode);
+    Theme.Images[tiWindow] := OldThemeWindow;
+  end;
 end;
 
 { initialization / finalization ---------------------------------------------- }
