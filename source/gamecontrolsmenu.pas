@@ -72,7 +72,7 @@ implementation
 uses SysUtils, CastleWindowModes, CastleGLUtils, CastleMessages,
   CastleOnScreenMenu, CastleBitmapFont_BVSansMono_m18, CastleConfig,
   CastleInputs, CastleKeysMouse, CastleVectors, CastleUtils,
-  CastleStringUtils, CastleGameNotifications, GameWindow;
+  CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors;
 
 const
   DefaultMouseLook = true;
@@ -185,18 +185,19 @@ end;
 
 procedure TSubMenu.Draw;
 const
-  SubMenuTextColor: TVector3Single = (0.9, 0.9, 0.9);
+  SubMenuTextColor: TCastleColor = (230, 230, 230, 255);
 begin
   inherited;
 
-  glColorv(SubMenuTextColor);
-  SubMenuTitleFont.Print(Position[0], Position[1] - 20, SubMenuTitle + ' :');
+  SubMenuTitleFont.Print(Position[0], Position[1] - 20,
+    SubMenuTextColor, SubMenuTitle + ' :');
 
   if SubMenuAdditionalInfo <> '' then
-    SubMenuTitleFont.PrintBrokenString(SubMenuAdditionalInfo,
-      Window.Width - 2 * Round(AllItemsRectangle.Left),
+    SubMenuTitleFont.PrintBrokenString(
       AllItemsRectangle.Left,
-      AllItemsRectangle.Bottom - SubMenuTitleFont.RowHeight, true, 0);
+      AllItemsRectangle.Bottom - SubMenuTitleFont.RowHeight, SubMenuTextColor,
+      SubMenuAdditionalInfo,
+      Window.Width - 2 * Round(AllItemsRectangle.Left), true, 0);
 end;
 
 { TControlsMenu ------------------------------------------------------------- }

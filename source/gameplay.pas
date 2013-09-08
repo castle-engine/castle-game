@@ -153,6 +153,8 @@ procedure TGame2DControls.Draw;
         - 1 - (I mod InventorySlotsVisibleInColumn));
     end;
 
+  const
+    NameColor: TCastleColor = (255, 255, 128, 255);
   var
     I, X, Y: Integer;
     S: string;
@@ -193,7 +195,6 @@ procedure TGame2DControls.Draw;
         tiActiveFrame);
     end;
 
-    glColor4f(1, 1, 0.5, 1);
     for I := 0 to Player.Inventory.Count - 1 do
     begin
       X := ItemSlotX(I);
@@ -202,7 +203,8 @@ procedure TGame2DControls.Draw;
       S := Player.Inventory[I].Resource.Caption;
       if Player.Inventory[I].Quantity <> 1 then
         S += ' (' + IntToStr(Player.Inventory[I].Quantity) + ')';
-      UIFontSmall.Print(X + InventorySlotMargin, Y + InventorySlotMargin, S);
+      UIFontSmall.Print(X + InventorySlotMargin, Y + InventorySlotMargin,
+        NameColor, S);
     end;
   end;
 
@@ -220,9 +222,9 @@ procedure TGame2DControls.Draw;
   end;
 
   procedure DoShowFPS;
+  const
+    Color: TCastleColor = (179, 179, 179, 255);
   begin
-    glColorv(Vector3Single(0.7, 0.7, 0.7));
-
     { Don't display precise Window.FpsFrameTime and Window.FpsRealTime
       each time --- this would cause too much move for player.
       Instead, display DisplayFpsXxxTime that are updated each second. }
@@ -234,18 +236,19 @@ procedure TGame2DControls.Draw;
       DisplayFpsRealTime := Window.Fps.RealTime;
     end;
 
-    UIFont.Print(0, YLine(LineFPS),
+    UIFont.Print(0, YLine(LineFPS), Color,
       Format('FPS : %f (real : %f). Shapes : %d / %d',
       [DisplayFpsFrameTime, DisplayFpsRealTime,
        SceneManager.Statistics.ShapesRendered, SceneManager.Statistics.ShapesVisible]));
   end;
 
   procedure DoShowShadowVolumesCounts;
+  const
+    Color: TCastleColor = (179, 179, 179, 255);
   begin
     if GLFeatures.ShadowVolumesPossible and ShadowVolumes then
     begin
-      glColorv(Vector3Single(0.7, 0.7, 0.7));
-      UIFont.Print(0, YLine(LineShadowVolumesCounts),
+      UIFont.Print(0, YLine(LineShadowVolumesCounts), Color,
         Format('No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
         [ SceneManager.ShadowVolumeRenderer.CountShadowsNotVisible,
           SceneManager.ShadowVolumeRenderer.CountZPass,
@@ -255,7 +258,7 @@ procedure TGame2DControls.Draw;
     end;
   end;
 
-  procedure DoShowDeadOrFinishedKeys;
+  procedure DoShowDeadOrFinishedKeys(const Color: TCastleColor);
 
     const
       SPressEscapeToExit = 'Press [Escape] to exit to menu.';
@@ -268,22 +271,22 @@ procedure TGame2DControls.Draw;
     end;
 
   begin
-    UIFont.Print(0, YLine(LinePressEscape), SPressEscapeToExit);
-    UIFont.Print(0, YLine(LinePressAttack), SPressAttackToRestart);
+    UIFont.Print(0, YLine(LinePressEscape), Color, SPressEscapeToExit);
+    UIFont.Print(0, YLine(LinePressAttack), Color, SPressAttackToRestart);
   end;
 
   procedure DoShowDeadInfo;
   begin
-    glColorv(Vector3Single(1, 0, 0));
-    UIFont.Print(0, YLine(LineDeadOrWinner), 'You''re dead.');
-    DoShowDeadOrFinishedKeys;
+    UIFont.Print(0, YLine(LineDeadOrWinner), Red, 'You''re dead.');
+    DoShowDeadOrFinishedKeys(Red);
   end;
 
   procedure DoShowGameWinInfo;
+  const
+    Color: TCastleColor = (204, 204, 204, 255);
   begin
-    glColorv(Vector3Single(0.8, 0.8, 0.8));
-    UIFont.Print(0, YLine(LineDeadOrWinner), 'Game finished.');
-    DoShowDeadOrFinishedKeys;
+    UIFont.Print(0, YLine(LineDeadOrWinner), Color, 'Game finished.');
+    DoShowDeadOrFinishedKeys(Color);
   end;
 
   procedure RenderLifeIndicator(const ALife, AMaxLife: Single;
@@ -293,6 +296,7 @@ procedure TGame2DControls.Draw;
     IndicatorHeight = 120;
     IndicatorWidth = 40;
     IndicatorMargin = 5;
+    Color: TCastleColor = (204, 204, 204, 255);
   var
     LifeMapped: Integer;
     LifeTextPosition: Integer;
@@ -328,13 +332,12 @@ procedure TGame2DControls.Draw;
 
     if PrintText and (ALife > 0) then
     begin
-      glColorv(Vector3Single(0.8, 0.8, 0.8));
       LifeText := Format('%d', [Round(ALife)]);
       LifeTextPosition := XMove + IndicatorMargin +
         (IndicatorWidth - UIFont.TextWidth(LifeText)) div 2;
       MaxTo1st(LifeTextPosition, IndicatorMargin);
       UIFont.Print(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2,
-        LifeText);
+        Color, LifeText);
     end;
   end;
 
@@ -346,11 +349,10 @@ procedure TGame2DControls.Draw;
 
     if Player.Flying then
     begin
-      glColorv(White3Single);
       if Player.FlyingTimeOut > 0 then
         S := Format(' (%d more seconds)', [Floor(Player.FlyingTimeOut)]);
       UIFont.Print(0, ContainerHeight - UIFont.RowHeight - 5 { margin },
-        'Flying' + S);
+        White, 'Flying' + S);
     end;
 
     glLoadIdentity;
