@@ -33,9 +33,9 @@ procedure ShowStartMenu;
 
 implementation
 
-uses SysUtils, Classes, CastleUtils, CastleWindowModes, GL, GLU,
+uses SysUtils, Classes, CastleUtils, CastleWindowModes,
   CastleGLUtils, CastleMessages, GameWindow, CastleVectors, CastleImages, CastleFilesUtils,
-  CastleLevels, GamePlay, GameSound, CastlePlayer,
+  CastleLevels, GamePlay, GameSound, CastlePlayer, CastleColors,
   GameGeneralMenu, CastleOnScreenMenu, GameControlsMenu, CastleInputs, GameVideoOptions,
   GameHelp, CastleStringUtils, CastleClassUtils, CastleGameNotifications,
   GameBackgroundLevel, CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes,
@@ -605,15 +605,12 @@ end;
 
 procedure TChooseNewLevelMenu.Draw;
 const
-  SubMenuTextColor: TVector3Single = (0.7, 0.7, 0.7);
+  SubMenuTextColor: TCastleColor = (179, 179, 179, 255);
 begin
   inherited;
-
-  glColorv(SubMenuTextColor);
-
   SubMenuTitleFont.Print(Position[0],
     Rectangles.Items[FirstDemoLevelIndex].Top + 5 { margin },
-    'Bonus demo levels :');
+    SubMenuTextColor, 'Bonus demo levels :');
 end;
 
 procedure TChooseNewLevelMenu.Click;
