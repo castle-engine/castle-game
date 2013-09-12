@@ -605,7 +605,7 @@ end;
 
 procedure TChooseNewLevelMenu.Draw;
 const
-  SubMenuTextColor: TCastleColor = (179, 179, 179, 255);
+  SubMenuTextColor: TCastleColor = (0.7, 0.7, 0.7, 1.0);
 begin
   inherited;
   SubMenuTitleFont.Print(Position[0],

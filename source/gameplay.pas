@@ -154,7 +154,7 @@ procedure TGame2DControls.Draw;
     end;
 
   const
-    NameColor: TCastleColor = (255, 255, 128, 255);
+    NameColor: TCastleColor = (1.0, 1.0, 0.5, 1.0);
   var
     I, X, Y: Integer;
     S: string;
@@ -215,6 +215,8 @@ procedure TGame2DControls.Draw;
     LinePressAttack = 4;
     LineFPS = 5;
     LineShadowVolumesCounts = 6;
+    Gray07: TCastleColor = (0.7, 0.7, 0.7, 1.0);
+    Gray08: TCastleColor = (0.8, 0.8, 0.8, 1.0);
 
   function YLine(const Line: Cardinal): Integer;
   begin
@@ -222,8 +224,6 @@ procedure TGame2DControls.Draw;
   end;
 
   procedure DoShowFPS;
-  const
-    Color: TCastleColor = (179, 179, 179, 255);
   begin
     { Don't display precise Window.FpsFrameTime and Window.FpsRealTime
       each time --- this would cause too much move for player.
@@ -236,26 +236,22 @@ procedure TGame2DControls.Draw;
       DisplayFpsRealTime := Window.Fps.RealTime;
     end;
 
-    UIFont.Print(0, YLine(LineFPS), Color,
+    UIFont.Print(0, YLine(LineFPS), Gray07,
       Format('FPS : %f (real : %f). Shapes : %d / %d',
       [DisplayFpsFrameTime, DisplayFpsRealTime,
        SceneManager.Statistics.ShapesRendered, SceneManager.Statistics.ShapesVisible]));
   end;
 
   procedure DoShowShadowVolumesCounts;
-  const
-    Color: TCastleColor = (179, 179, 179, 255);
   begin
     if GLFeatures.ShadowVolumesPossible and ShadowVolumes then
-    begin
-      UIFont.Print(0, YLine(LineShadowVolumesCounts), Color,
+      UIFont.Print(0, YLine(LineShadowVolumesCounts), Gray07,
         Format('No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
         [ SceneManager.ShadowVolumeRenderer.CountShadowsNotVisible,
           SceneManager.ShadowVolumeRenderer.CountZPass,
           SceneManager.ShadowVolumeRenderer.CountZFailNoLightCap,
           SceneManager.ShadowVolumeRenderer.CountZFailAndLightCap,
           SceneManager.ShadowVolumeRenderer.CountScenes ]));
-    end;
   end;
 
   procedure DoShowDeadOrFinishedKeys(const Color: TCastleColor);
@@ -282,11 +278,9 @@ procedure TGame2DControls.Draw;
   end;
 
   procedure DoShowGameWinInfo;
-  const
-    Color: TCastleColor = (204, 204, 204, 255);
   begin
-    UIFont.Print(0, YLine(LineDeadOrWinner), Color, 'Game finished.');
-    DoShowDeadOrFinishedKeys(Color);
+    UIFont.Print(0, YLine(LineDeadOrWinner), Gray08, 'Game finished.');
+    DoShowDeadOrFinishedKeys(Gray08);
   end;
 
   procedure RenderLifeIndicator(const ALife, AMaxLife: Single;
@@ -296,7 +290,6 @@ procedure TGame2DControls.Draw;
     IndicatorHeight = 120;
     IndicatorWidth = 40;
     IndicatorMargin = 5;
-    Color: TCastleColor = (204, 204, 204, 255);
   var
     LifeMapped: Integer;
     LifeTextPosition: Integer;
@@ -337,7 +330,7 @@ procedure TGame2DControls.Draw;
         (IndicatorWidth - UIFont.TextWidth(LifeText)) div 2;
       MaxTo1st(LifeTextPosition, IndicatorMargin);
       UIFont.Print(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2,
-        Color, LifeText);
+        Gray08, LifeText);
     end;
   end;
 

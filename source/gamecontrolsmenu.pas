@@ -185,7 +185,7 @@ end;
 
 procedure TSubMenu.Draw;
 const
-  SubMenuTextColor: TCastleColor = (230, 230, 230, 255);
+  SubMenuTextColor: TCastleColor = (0.9, 0.9, 0.9, 1.0);
 begin
   inherited;
 
