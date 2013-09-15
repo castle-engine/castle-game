@@ -88,7 +88,7 @@ var
 implementation
 
 uses SysUtils, CastleUtils, CastleWindow, GameInputs,
-  CastleWindowModes, GL, GLU, GLExt, CastleGLUtils, CastleMessages, GameWindow,
+  CastleWindowModes, CastleGLUtils, CastleMessages, GameWindow,
   CastleVectors, CastleImages, Math, GameHelp, CastleUIControls, CastleSoundEngine,
   GameItems, CastleStringUtils, CastleCreatures, CastleItems,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
@@ -97,7 +97,7 @@ uses SysUtils, CastleUtils, CastleWindow, GameInputs,
   GameLevelSpecific, CastleTimeUtils, CastleGLImages, CastleKeysMouse;
 
 var
-  GLList_NotificationsBackground: TGLuint;
+  GLNotificationsFade: TGLImage;
   GLInventorySlot: TGLImage;
   GLBlankIndicatorImage: TGLImage;
   GLRedIndicatorImage: TGLImage;
@@ -292,36 +292,30 @@ procedure TGame2DControls.Draw;
     IndicatorMargin = 5;
   var
     LifeMapped: Integer;
-    LifeTextPosition: Integer;
+    LifeTextPosition, X, Y: Integer;
     LifeText: string;
   begin
-    SetWindowPos(XMove + IndicatorMargin, IndicatorMargin);
-    glEnable(GL_ALPHA_TEST);
-    glAlphaFunc(GL_GREATER, 0.5);
+    X := XMove + IndicatorMargin;
+    Y := IndicatorMargin;
+    LifeMapped := Round(MapRange(ALife, 0, AMaxLife, 0, IndicatorHeight));
 
-      LifeMapped := Round(MapRange(ALife, 0, AMaxLife, 0, IndicatorHeight));
+    { Note that Life may be > MaxLife, and
+      Life may be < 0. }
+    if LifeMapped >= IndicatorHeight then
+      GLFullIndicatorImage.Draw(X, Y) else
+    if LifeMapped < 0 then
+      GLBlankIndicatorImage.Draw(X, Y) else
+    begin
+      ScissorEnable(Rectangle(IndicatorMargin, IndicatorMargin,
+        ContainerWidth, LifeMapped));
+      GLFullIndicatorImage.Draw(X, Y);
 
-      { we control alpha test manually }
-      GLFullIndicatorImage.Alpha := acNone;
-      GLBlankIndicatorImage.Alpha := acNone;
+      ScissorEnable(Rectangle(IndicatorMargin, IndicatorMargin + LifeMapped,
+        ContainerWidth, ContainerHeight));
+      GLBlankIndicatorImage.Draw(X, Y);
 
-      { Note that Life may be > MaxLife, and
-        Life may be < 0. }
-      if LifeMapped >= IndicatorHeight then
-        GLFullIndicatorImage.Draw else
-      if LifeMapped < 0 then
-        GLBlankIndicatorImage.Draw else
-      begin
-        glEnable(GL_SCISSOR_TEST);
-          glScissor(IndicatorMargin, IndicatorMargin, ContainerWidth, LifeMapped);
-          GLFullIndicatorImage.Draw;
-          glScissor(IndicatorMargin, IndicatorMargin + LifeMapped,
-            ContainerWidth, ContainerHeight);
-          GLBlankIndicatorImage.Draw;
-        glDisable(GL_SCISSOR_TEST);
-      end;
-
-    glDisable(GL_ALPHA_TEST);
+      ScissorDisable;
+    end;
 
     if PrintText and (ALife > 0) then
     begin
@@ -348,18 +342,15 @@ procedure TGame2DControls.Draw;
         White, 'Flying' + S);
     end;
 
-    glLoadIdentity;
     if Player.Dead then
-      GLFadeRectangle(0, 0, ContainerWidth, ContainerHeight, Red3Single, 1.0) else
+      GLFadeRectangle(ContainerRect, Red, 1.0) else
     begin
       if Player.Swimming = psUnderWater then
-        GLBlendRectangle(0, 0, ContainerWidth, ContainerHeight,
-          GL_ONE, GL_SRC_ALPHA, Vector4Single(0, 0, 0.1, 0.5));
+        GLBlendRectangle(ContainerRect, Vector4Single(0, 0, 0.1, 0.5));
 
       { Possibly, Player.FadeOut* will be applied on top of water effect,
         that's Ok --- they'll mix. }
-      GLFadeRectangle(0, 0, ContainerWidth, ContainerHeight,
-        Player.FadeOutColor, Player.FadeOutIntensity);
+      GLFadeRectangle(ContainerRect, Player.FadeOutColor, Player.FadeOutIntensity);
     end;
   end;
 
@@ -370,7 +361,8 @@ begin
   if DebugRenderForLevelScreenshot then Exit;
 
   if Notifications.DrawStyle <> dsNone then
-    glCallList(GLList_NotificationsBackground);
+    GLNotificationsFade.Draw(
+      Rectangle(0, 0, ContainerWidth, GLNotificationsFade.Height));
 
   if Player.InventoryVisible then
     DoDrawInventory;
@@ -673,32 +665,8 @@ procedure WindowOpen(const Container: IUIContainer);
     Result := TGLImage.Create(PlayerControlURL(BaseName), [TRGBAlphaImage]);
   end;
 
-const
-  { Note: this constant must be synchronized with
-    NotificationsManager.MaxMessagesCount }
-  DarkAreaHeight = 80;
-
-  DarkAreaFadeHeight = 20;
-  DarkAreaAlpha = 0.3;
-var
-  I: Integer;
 begin
-  GLList_NotificationsBackground := glGenListsCheck(1, 'CastlePlay.WindowOpen');
-  glNewList(GLList_NotificationsBackground, GL_COMPILE);
-  try
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-      glColor4f(0, 0, 0, DarkAreaAlpha);
-      glRecti(0, 0, Window.Width, DarkAreaHeight);
-      for I := 0 to DarkAreaFadeHeight - 1 do
-      begin
-        glColor4f(0, 0, 0,
-          DarkAreaAlpha * (DarkAreaFadeHeight - 1 - I) / DarkAreaFadeHeight);
-        glRecti(0, DarkAreaHeight + I, Window.Width, DarkAreaHeight + I + 1);
-      end;
-    glDisable(GL_BLEND);
-  finally glEndList end;
-
+  GLNotificationsFade := LoadPlayerControlToGL('fade.png');
   GLInventorySlot := LoadPlayerControlToGL('item_slot.png');
   GLBlankIndicatorImage := LoadPlayerControlToGL('blank.png');
   GLRedIndicatorImage := LoadPlayerControlToGL('red.png');
@@ -708,7 +676,7 @@ end;
 
 procedure WindowClose(const Container: IUIContainer);
 begin
-  glFreeDisplayList(GLList_NotificationsBackground);
+  FreeAndNil(GLNotificationsFade);
   FreeAndNil(GLInventorySlot);
   FreeAndNil(GLBlankIndicatorImage);
   FreeAndNil(GLRedIndicatorImage);

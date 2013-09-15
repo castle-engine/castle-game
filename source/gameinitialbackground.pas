@@ -30,7 +30,7 @@ procedure DrawInitialBackground;
 
 implementation
 
-uses SysUtils, GL, GLU, CastleWindow, CastleGLUtils, CastleGLImages, CastleUIControls,
+uses SysUtils, CastleWindow, CastleGLUtils, CastleGLImages, CastleUIControls,
   GameWindow, CastleFilesUtils, CastleImages;
 
 var
@@ -43,7 +43,6 @@ end;
 
 procedure Draw(Window: TCastleWindowBase);
 begin
-  glLoadIdentity;
   GLScreenImage.Draw(0, 0);
 end;
 

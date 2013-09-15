@@ -25,7 +25,7 @@ unit GameControlsMenu;
 
 interface
 
-uses Classes, CastleWindow, GL, GLU, GameGeneralMenu, CastleCameras,
+uses Classes, CastleWindow, GameGeneralMenu, CastleCameras,
   CastleGLBitmapFonts, CastleUIControls, CastlePlayer;
 
 type
@@ -71,7 +71,7 @@ implementation
 
 uses SysUtils, CastleWindowModes, CastleGLUtils, CastleMessages,
   CastleOnScreenMenu, CastleBitmapFont_BVSansMono_m18, CastleConfig,
-  CastleInputs, CastleKeysMouse, CastleVectors, CastleUtils,
+  CastleInputs, CastleKeysMouse, CastleVectors, CastleUtils, CastleRectangles,
   CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors;
 
 const
@@ -492,18 +492,11 @@ procedure TFadeRect.Draw;
 const
   Width = 780;
   Height = 390;
-var
-  X0, Y0, X1, Y1: Integer;
 begin
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_BLEND);
-    glColor4f(0, 0, 0, 0.4);
-    X0 := (ContainerWidth - Width) div 2;
-    X1 := (ContainerWidth + Width) div 2;
-    Y0 := (ContainerHeight - Height) div 2;
-    Y1 := (ContainerHeight + Height) div 2;
-    glRectf(X0, Y0, X1, Y1);
-  glDisable(GL_BLEND);
+  GLBlendRectangle(Rectangle(
+    (ContainerRect.Width - Width) div 2,
+    (ContainerRect.Height - Height) div 2, Width, Height),
+    Vector4Single(0, 0, 0, 0.4));
 end;
 
 procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);

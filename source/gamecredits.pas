@@ -33,7 +33,7 @@ procedure ShowCredits(ControlsUnder: TUIControlList;
 
 implementation
 
-uses SysUtils, Classes, GL, GLU, CastleGLUtils, CastleMessages,
+uses SysUtils, Classes, CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils, CastleWindowModes,
   GamePlay, GameWindow,
   GameVideoOptions, CastleVectors, CastleScene, CastleFilesUtils,

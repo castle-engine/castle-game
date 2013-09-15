@@ -25,7 +25,7 @@ unit GameChooseMenu;
 
 interface
 
-uses Classes, CastleWindow, GL, GLU, CastleUIControls;
+uses Classes, CastleWindow, CastleUIControls;
 
 { Allows user to choose one item from MenuItems.
   Displays menu using TCastleGameMenu with ControlsUnder background. }
