@@ -171,10 +171,10 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
       DDS.LoadFromFile(ApplicationData(
         'levels/fountain/water_reflections/water_environment_map.dds'));
 
-      glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, Result);
-      SetTextureFilter(GL_TEXTURE_CUBE_MAP_ARB, Attributes.TextureFilter);
-      glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      glBindTexture(GL_TEXTURE_CUBE_MAP, Result);
+      SetTextureFilter(GL_TEXTURE_CUBE_MAP, Attributes.TextureFilter);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
       glTextureCubeMap(
         DDS.CubeMapImage(dcsPositiveX),
@@ -216,7 +216,7 @@ begin
   Result := inherited SetupUniforms(BoundTextureUnits);
 
   glActiveTexture(GL_TEXTURE0 + BoundTextureUnits);
-  glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, WaterEnvMap);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, WaterEnvMap);
   SetUniform('envMap', TGLint(BoundTextureUnits));
   Inc(BoundTextureUnits);
 
