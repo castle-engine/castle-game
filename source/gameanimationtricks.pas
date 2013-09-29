@@ -23,10 +23,12 @@
 { Tricks with precalculated animation for "The Castle". }
 unit GameAnimationTricks;
 
+{$I castleconf.inc}
+
 interface
 
 uses Classes, CastlePrecalculatedAnimation, CastleFrustum, CastleVectors,
-  CastleGLShaders, GL, Castle3D;
+  CastleGLShaders, Castle3D;
 
 type
   { Animation forced to seamlessly loop by blending the beginning frames
@@ -67,7 +69,7 @@ type
 implementation
 
 uses Math, CastleUtils, CastleGLUtils, CastleStringUtils, SysUtils,
-  CastleFilesUtils, CastleRenderingCamera, CastleDDS, GLExt, CastleGLImages, CastleRenderer;
+  CastleFilesUtils, CastleRenderingCamera, CastleDDS, CastleGL, CastleGLImages, CastleRenderer;
 
 { TBlendedLoopingAnimation --------------------------------------------------- }
 
