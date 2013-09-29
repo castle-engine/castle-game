@@ -23,9 +23,11 @@
 { Variables and utilities for things in "Video options" menu. }
 unit GameVideoOptions;
 
+{$I castleconf.inc}
+
 interface
 
-uses GL, CastleGLUtils, CastleScene, X3DNodes;
+uses CastleGLUtils, CastleScene, X3DNodes;
 
 const
   DefaultAllowScreenChange = true;
@@ -67,7 +69,8 @@ function ViewAngleDegY: Single;
 
 implementation
 
-uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow;
+uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow,
+  CastleGL;
 
 type
   TGameVideoOptions = class
