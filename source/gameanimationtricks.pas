@@ -172,10 +172,7 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
         'levels/fountain/water_reflections/water_environment_map.dds'));
 
       glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, Result);
-
-      glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, Attributes.TextureMagFilter);
-      glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, Attributes.TextureMinFilter);
-
+      SetTextureFilter(GL_TEXTURE_CUBE_MAP_ARB, Attributes.TextureFilter);
       glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -189,7 +186,7 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
         DDS.CubeMapImage(dcsPositiveZ),
         DDS.CubeMapImage(dcsNegativeZ),
         DDS,
-        TextureMinFilterNeedsMipmaps(Attributes.TextureMinFilter));
+        Attributes.TextureFilter.NeedsMipmaps);
     finally FreeAndNil(DDS); end;
   end;
 
