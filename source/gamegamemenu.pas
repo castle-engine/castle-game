@@ -153,7 +153,7 @@ begin
   GameSoundMenu.MusicVolume.RefreshAccessory;
 
   OldThemeWindow := Theme.Images[tiWindow];
-  SavedMode := TGLMode.CreateReset(Window, 0, nil, Window.OnResize, @CloseQuery);
+  SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
   try
     { This is needed, because when changing ViewAngleDegX we will call
       Window.OnResize to set new projection matrix, and this

@@ -579,7 +579,7 @@ begin
 
   LevelFinishedSchedule := false;
 
-  SavedMode := TGLMode.CreateReset(Window, 0, nil, nil, @CloseQuery);
+  SavedMode := TGLMode.CreateReset(Window, nil, nil, @CloseQuery);
   try
     Window.AutoRedisplay := true;
 

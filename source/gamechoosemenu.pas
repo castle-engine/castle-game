@@ -82,7 +82,7 @@ begin
   ChooseMenu.FixItemsRectangles;
 
   OldThemeWindow := Theme.Images[tiWindow];
-  SavedMode := TGLMode.CreateReset(Window, 0, nil, Window.OnResize, @CloseQuery);
+  SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
   try
     { This shouldn't change projection matrix anyway. }
     SavedMode.RestoreProjectionMatrix := false;

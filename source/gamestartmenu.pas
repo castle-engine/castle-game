@@ -647,7 +647,7 @@ begin
   try
     SoundEngine.MusicPlayer.Sound := stIntroMusic;
     try
-      SavedMode := TGLMode.CreateReset(Window, 0, nil, nil, @CloseQuery);
+      SavedMode := TGLMode.CreateReset(Window, nil, nil, @CloseQuery);
       try
         SavedMode.RestoreProjectionMatrix := false;
 

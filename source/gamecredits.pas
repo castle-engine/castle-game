@@ -110,7 +110,7 @@ procedure ShowCredits(ControlsUnder: TUIControlList;
 var
   SavedMode: TGLMode;
 begin
-  SavedMode := TGLMode.CreateReset(Window, 0, nil, nil, @CloseQuery);
+  SavedMode := TGLMode.CreateReset(Window, nil, nil, @CloseQuery);
   try
     Window.AutoRedisplay := true; { scrolling text animation }
 
