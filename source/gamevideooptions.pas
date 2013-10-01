@@ -60,13 +60,6 @@ var
   { 0 means "use system default" }
   VideoFrequency: Cardinal;
 
-{ ViewAngleDegX and ViewAngleDegY specify field of view in the game.
-  You can freely change ViewAngleDegX at runtime, just make sure
-  that our OnResize will be called after. }
-var
-  ViewAngleDegX: Single = 70.0;
-function ViewAngleDegY: Single;
-
 implementation
 
 uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow,
@@ -124,12 +117,6 @@ begin
     VideoFrequency, DefaultVideoFrequency);
   Config.SetDeleteValue('video_options/anti_aliasing',
     Ord(Window.AntiAliasing), Ord(DefaultAntiAliasing));
-end;
-
-function ViewAngleDegY: Single;
-begin
-  Result := AdjustViewAngleDegToAspectRatio(ViewAngleDegX,
-    Window.Height / Window.Width);
 end;
 
 initialization

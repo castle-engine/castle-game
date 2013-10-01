@@ -532,8 +532,6 @@ begin
 
   SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
   try
-    SavedMode.RestoreProjectionMatrix := false;
-
     Window.OnPress := @Press;
 
     SetCurrentMenu(CurrentMenu, ControlsMenu);

@@ -84,9 +84,6 @@ begin
   OldThemeWindow := Theme.Images[tiWindow];
   SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
   try
-    { This shouldn't change projection matrix anyway. }
-    SavedMode.RestoreProjectionMatrix := false;
-
     Window.OnDrawStyle := ds3D;
 
     { Otherwise messages don't look good, because the text is mixed

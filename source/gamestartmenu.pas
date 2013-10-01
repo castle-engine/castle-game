@@ -350,13 +350,7 @@ procedure TVideoMenu.Click;
 
   procedure ViewVideoInfo;
   begin
-    MessageOK(Window,
-      'Video information:' +nl+
-      nl+
-      Format('Field of view horizontal : %f', [ViewAngleDegX]) +nl+
-      Format('Field of view vertical : %f', [ViewAngleDegY]) +nl+
-      nl+
-      GLInformationString);
+    MessageOK(Window, GLInformationString);
   end;
 
   procedure ChangeColorBits;
@@ -649,8 +643,6 @@ begin
     try
       SavedMode := TGLMode.CreateReset(Window, nil, nil, @CloseQuery);
       try
-        SavedMode.RestoreProjectionMatrix := false;
-
         SetCurrentMenu(CurrentMenu, MainMenu);
 
         Window.Controls.Add(Notifications);

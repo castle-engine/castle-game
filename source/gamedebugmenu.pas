@@ -43,12 +43,6 @@ uses SysUtils, Classes, CastleControlsImages, CastleImages,
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
 type
-  TViewAngleSlider = class(TMenuFloatSlider)
-  public
-    constructor Create;
-    function ValueToStr(const AValue: Single): string; override;
-  end;
-
   TDebugMenu = class(TCastleGameMenu)
   public
     RenderDebug3DArgument: TMenuBooleanArgument;
@@ -61,7 +55,6 @@ type
 
   TDebugPlayerMenu = class(TCastleGameMenu)
   public
-    ViewAngleSlider: TViewAngleSlider;
     RotationHorizontalSpeedSlider: TMenuFloatSlider;
     RotationVerticalSpeedSlider: TMenuFloatSlider;
     PlayerSpeedSlider: TMenuFloatSlider;
@@ -89,19 +82,6 @@ type
     procedure Click; override;
     procedure AccessoryValueChanged; override;
   end;
-
-{ TViewAngleSlider ----------------------------------------------------------- }
-
-constructor TViewAngleSlider.Create;
-begin
-  inherited Create(10, 170, ViewAngleDegX);
-end;
-
-function TViewAngleSlider.ValueToStr(const AValue: Single): string;
-begin
-  Result := Format('horiz %f, vert %f', [AValue,
-    AdjustViewAngleDegToAspectRatio(AValue, Window.Height / Window.Width)]);
-end;
 
 { ----------------------------------------------------------------------------
   global vars (used by TCastleGameMenu descendants implementation) }
@@ -219,8 +199,6 @@ constructor TDebugPlayerMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  ViewAngleSlider := TViewAngleSlider.Create;
-
   { Note that Player is not created at this point.
     We will init Value of these sliders later. }
   RotationHorizontalSpeedSlider := TMenuFloatSlider.Create(25, 500, 1);
@@ -229,7 +207,6 @@ begin
 
   Items.Add('Infinite Life');
   Items.Add('Fly (indefinitely)');
-  Items.AddObject('Set view angle', ViewAngleSlider);
   Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
   Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
   Items.AddObject('Set player speed', PlayerSpeedSlider);
@@ -259,23 +236,17 @@ begin
     2: ;
     3: ;
     4: ;
-    5: ;
-    6: Player.LoadFromFile;
-    7: SetCurrentMenu(CurrentMenu, DebugMenu);
+    5: Player.LoadFromFile;
+    6: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
 end;
 
 procedure TDebugPlayerMenu.AccessoryValueChanged;
 begin
   case CurrentItem of
-    2: begin
-         ViewAngleDegX := ViewAngleSlider.Value;
-         { After changing ViewAngleDegX, game's OnResize must be called. }
-         Window.EventResize;
-       end;
-    3: Player.Camera.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
-    4: Player.Camera.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
-    5: Player.Camera.MoveSpeed := PlayerSpeedSlider.Value;
+    2: Player.Camera.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
+    3: Player.Camera.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
+    4: Player.Camera.MoveSpeed := PlayerSpeedSlider.Value;
   end;
 end;
 
@@ -474,11 +445,6 @@ begin
   OldThemeWindow := Theme.Images[tiWindow];
   SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
   try
-    { This is needed, because when changing ViewAngleDegX we will call
-      Window.OnResize to set new projection matrix, and this
-      new projection matrix should stay for the game. }
-    SavedMode.RestoreProjectionMatrix := false;
-
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
     Theme.Images[tiWindow] := WindowDark;

@@ -155,11 +155,6 @@ begin
   OldThemeWindow := Theme.Images[tiWindow];
   SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
   try
-    { This is needed, because when changing ViewAngleDegX we will call
-      Window.OnResize to set new projection matrix, and this
-      new projection matrix should stay for the game. }
-    SavedMode.RestoreProjectionMatrix := false;
-
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }
     Theme.Images[tiWindow] := WindowDark;
