@@ -1,0 +1,148 @@
+All the data files not mentioned below were made by "The Castle" team:
+
+  Michalis Kamburelis, Szymon Stoma, Kaśka Zaremba,
+  Grzegorz Hermanowicz, Michał Wojtkiewicz.
+
+They are copyright by us, and the license is GNU GPL >= 2,
+just like the game source code. The tools used in the development
+are listed on http://castle-engine.sourceforge.net/castle-credits.php ,
+if you're interested.
+
+------------------------------------------------------------------------------
+Data from other sources: 3D models:
+
+creatures/alien/
+creatures/werewolf/
+creatures/spider_queen/face
+(only 3D meshes; textures or animations are from elsewhere):
+
+    From www.3dcafe.com "free models".
+
+    License: TODO: not really FOSS.
+
+data/levels/gate/cart
+
+    Origin lost in time. Most that I could find was a note in email:
+    "Found among the first 10 google results for "free 3d models".
+    Terms are some open license (like artistic or gpl)."
+
+    License: TODO: unknown.
+
+creatures/ghost/ (only teeth --- the rest of ours)
+
+    Based on vampire teeth from http://www.katorlegaz.com/ .
+    Although the models currently available there are explicitly under
+    http://creativecommons.org/licenses/by/3.0/us/ license,
+    the old "vampire teeth" model is not available there anymore.
+
+    License: TODO: the license of the model is lost in time...
+
+------------------------------------------------------------------------------
+Data from other sources: textures:
+
+TODO: which ones:
+
+    From Golgotha project.
+    The resources were hosted on various websites throughout the years.
+    The current one alive is http://opengameart.org/content/golgotha-textures .
+
+    License: public domain.
+
+TODO: list which ones:
+
+    From LeMog - 3d Textures:
+    http://www.lemog.fr/lemog_textures/index.php
+
+    License: TODO: Unfortunately, the license is not explicitly stated,
+    site merely says "Free Tiled Textures".
+
+skies/stars.jpg:
+
+    From http://www.astrooptik.com/Bildergalerie/latest_namibia/pictures.htm .
+
+    License: TODO: unknown.
+
+----------------------------------------------------------------------------
+Data from other sources: sound effects:
+
+TODO: list which ones:
+
+    http://www.flashkit.com/soundfx/
+
+----------------------------------------------------------------------------
+Data from other sources: music:
+
+data/sounds/intro_music:
+
+    By Edgen http://www.edgen.com/
+    Downloaded from http://www.flashkit.com/loops/
+    License: public domain.
+
+data/sounds/gate_music:
+
+    By Calpomatt http://calpomatt.lavista.org/
+    Downloaded from http://www.flashkit.com/loops/
+    License: public domain.
+
+data/sounds/castle_hall:
+
+    By Adam Goh http://www.sades.com/
+    Downloaded from http://www.flashkit.com/soundfx/Ambience/TEMPLE-Adam_Goh-7394/index.php (Temple)
+    License: public domain.
+
+data/sounds/cages_music_with_rain:
+
+    By Mark http://reaction.roxr.com/
+    Downloaded from http://www.flashkit.com/loops/Ambient/Soundscapes/Cath-Mark-9479/index.php (Cathedral)
+    License: public domain.
+
+data/sounds/game_win_music:
+
+    By Calpomatt http://calpomatt.lavista.org/
+    Downloaded from http://www.flashkit.com/loops/Ambient/Ambient/Quiet-calpomat-5053/index.php (Quiet)
+    License: public domain.
+
+data/sounds/sacrilege_ambush:
+
+    Based on tomb.wav from http://rasmus.uib.no/~st01369/filarkiv/lyder.html
+
+    License: TODO: unknown (website no longer exists).
+
+data/sounds/werewolf_howling:
+
+    From http://www.acs.ucalgary.ca/~mmusiani/
+
+    License: TODO: unknown (website exists, but does not seem to host
+    sounds anymore).
+
+data/sounds/menu_current_item_changed.wav:
+
+    Based on installed /usr/share/sounds/KDE_TypeWriter_Key_2.ogg
+    from kdebase package around version 3.5.
+
+    License: GNU GPL >= 2.
+
+------------------------------------------------------------------------------
+Data from other sources: DOOM E1M1 data:
+
+levels/doom/e1m1/
+sounds/doom/
+textures/doom/
+
+    This data comes from id Software shareware DOOM data.
+
+    The VRML 1.0 version of the mesh and tex coords comes from
+    http://www.ocnus.com/models/ , presumably from original doom.wad.
+    Textures were extracted from doom.wad with the help of
+    XWE (eXtendable WAD editor) and Waded.
+    Sounds come also from original DOOM data.
+    Music (in sounds/doom/e1m1.ogg) from
+    http://www.sirgalahad.org/paul/doom/ , also based on original DOOM data.
+
+    License: proprietary license, copyright by id Software.
+    Most likely not freely redistributable (although it's available
+    in thousand forms on many websites and included in various games
+    as a tribute to DOOM :).
+
+    Do not include these directories in your distribution, if you want
+    to have a pure FOSS game!
