@@ -18,9 +18,10 @@ creatures/spider_queen/face
 
     From www.3dcafe.com "free models".
 
-    License: TODO: not really FOSS.
+    License: TODO: unclear, most probably not really OSI-compatible
+    (some notes suggest that "commercial use" is not allowed).
 
-data/levels/gate/cart
+levels/gate/cart
 
     Origin lost in time. Most that I could find was a note in email:
     "Found among the first 10 google results for "free 3d models".
@@ -35,25 +36,68 @@ creatures/ghost/ (only teeth --- the rest of ours)
     http://creativecommons.org/licenses/by/3.0/us/ license,
     the old "vampire teeth" model is not available there anymore.
 
-    License: TODO: the license of the model is lost in time...
+    License: TODO: unknown.
 
 ------------------------------------------------------------------------------
 Data from other sources: textures:
 
-TODO: which ones:
+textures/airbase_radar_panels.jpg
+         bricksmokeside.jpg
+         bricksmokesidebot.jpg
+         bricksmokesidebotwindo.jpg
+         bridgerock512side.jpg
+         buldrockroof.jpg
+         cabin_walls.jpg
+         decursio_top_seamless.png
+         dirtfrancecornergrass.jpg
+         egyptstreetfull.jpg
+         fire4.jpg
+         france_housered.jpg
+         grassfull.jpg
+         hhroofgray.jpg
+         misslescararm.jpg
+         punch_through_symbols.jpg
+         symbol (original name: punch_through_top.jpg)
+         water2.jpg
+         water_grayscale.png
+         waterwall.jpg
 
     From Golgotha project.
-    The resources were hosted on various websites throughout the years.
-    The current one alive is http://opengameart.org/content/golgotha-textures .
+    The resources were hosted on various websites throughout the years, like
+    http://jonathanclark.com/golgotha/browse.html
+    http://jonathanclark.com/textures/
+    http://www.wolfiesden.com/golgotha/golgotha.asp
+
+    The current one alive is http://opengameart.org/content/golgotha-textures ,
+    although it only contains a subset of the original images.
+    There is also http://sourceforge.net/projects/golgotha/ ,
+    but it doesn't seem to contain textures (at least not in any normal format).
 
     License: public domain.
 
-TODO: list which ones:
+textures/001acajou.jpg
+         006bois.jpg
+         012marbre.jpg
+         016marbre.jpg
+         023bois.jpg
+         023pierres.jpg
+         023roche.jpg
+         042roche.jpg
+         042roche_lighter.png
+         047pierres.jpg
+         047roche.jpg
+         059_plombieresgbr.jpg
+         085pierres_darker.png
+         085pierres.jpg
+         f023ours.jpg
+         flesh016.jpg
+         flesh049.jpg
+         flesh060.jpg
 
     From LeMog - 3d Textures:
     http://www.lemog.fr/lemog_textures/index.php
 
-    License: TODO: Unfortunately, the license is not explicitly stated,
+    License: TODO: unknown. The license is not explicitly stated on the website,
     site merely says "Free Tiled Textures".
 
 skies/stars.jpg:
@@ -62,60 +106,85 @@ skies/stars.jpg:
 
     License: TODO: unknown.
 
+textures/green020.jpg
+         metal047.jpg
+    From http://www.grsites.com/ (
+      http://www.grsites.com/archive/textures/view/source=archive/id=1326/
+      http://www.grsites.com/archive/textures/view/source=archive/id=3847/
+    ).
+    License: according to the website, a link back is Ok.
+
+textures/industrie4.jpg
+         marble21t.jpg
+         marble.jpg
+         web.png
+         wood062.jpg
+         wood_clear.jpg
+         17_gris_vert.jpg
+         bois5.jpg
+         bois10.jpg
+
+    Origin lost in time.
+    License: TODO: unknown.
+
 ----------------------------------------------------------------------------
 Data from other sources: sound effects:
 
-TODO: list which ones:
+sounds/thunder:
+    From http://www.a1freesoundeffects.com/
+    License: TODO: unknown.
 
-    http://www.flashkit.com/soundfx/
+sounds/*.wav (all sounds/*.wav filed not mentioned explicitly here):
+    From http://www.flashkit.com/soundfx/
+    License: public domain.
 
 ----------------------------------------------------------------------------
 Data from other sources: music:
 
-data/sounds/intro_music:
+sounds/intro_music:
 
     By Edgen http://www.edgen.com/
     Downloaded from http://www.flashkit.com/loops/
     License: public domain.
 
-data/sounds/gate_music:
+sounds/gate_music:
 
     By Calpomatt http://calpomatt.lavista.org/
     Downloaded from http://www.flashkit.com/loops/
     License: public domain.
 
-data/sounds/castle_hall:
+sounds/castle_hall:
 
     By Adam Goh http://www.sades.com/
     Downloaded from http://www.flashkit.com/soundfx/Ambience/TEMPLE-Adam_Goh-7394/index.php (Temple)
     License: public domain.
 
-data/sounds/cages_music_with_rain:
+sounds/cages_music_with_rain:
 
     By Mark http://reaction.roxr.com/
     Downloaded from http://www.flashkit.com/loops/Ambient/Soundscapes/Cath-Mark-9479/index.php (Cathedral)
     License: public domain.
 
-data/sounds/game_win_music:
+sounds/game_win_music:
 
     By Calpomatt http://calpomatt.lavista.org/
     Downloaded from http://www.flashkit.com/loops/Ambient/Ambient/Quiet-calpomat-5053/index.php (Quiet)
     License: public domain.
 
-data/sounds/sacrilege_ambush:
+sounds/sacrilege_ambush:
 
     Based on tomb.wav from http://rasmus.uib.no/~st01369/filarkiv/lyder.html
 
     License: TODO: unknown (website no longer exists).
 
-data/sounds/werewolf_howling:
+sounds/werewolf_howling:
 
     From http://www.acs.ucalgary.ca/~mmusiani/
 
     License: TODO: unknown (website exists, but does not seem to host
     sounds anymore).
 
-data/sounds/menu_current_item_changed.wav:
+sounds/menu_current_item_changed.wav:
 
     Based on installed /usr/share/sounds/KDE_TypeWriter_Key_2.ogg
     from kdebase package around version 3.5.
@@ -128,6 +197,7 @@ Data from other sources: DOOM E1M1 data:
 levels/doom/e1m1/
 sounds/doom/
 textures/doom/
+skies/doom/
 
     This data comes from id Software shareware DOOM data.
 
