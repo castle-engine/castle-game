@@ -873,7 +873,7 @@ end;
 procedure TCagesLevel.SetGameWinAnimation(Value: TGameWinAnimation);
 var
   OldGameWinBackground, NewGameWinBackground: boolean;
-  GameWinBackground: TBackgroundNode;
+  GameWinBackground: TAbstractBackgroundNode;
 begin
   OldGameWinBackground := FEndSequence.Exists;
 
@@ -886,7 +886,7 @@ begin
   if (not OldGameWinBackground) and NewGameWinBackground then
   begin
     GameWinBackground := SceneManager.MainScene.RootNode.FindNodeByName(
-      TBackgroundNode, 'GameWinBackground', false) as TBackgroundNode;
+      TAbstractBackgroundNode, 'GameWinBackground', false) as TAbstractBackgroundNode;
     GameWinBackground.EventSet_bind.Send(true);
   end;
 end;
