@@ -39,9 +39,8 @@ type
 
     Note that the normal blending control (for rendering transparent materials)
     has to be disabled for this, as this requires full control over blending.
-    So Attributes.Blending and Attributes.ControlBlending must always remain
-    @false. We also have to modify the alpha value, using
-    Attributes.Opacity.
+    So Attributes.Blending must always remain @false.
+    We also have to modify the alpha value, using Attributes.Opacity.
 
     Attributes.BlendingSourceFactor and Attributes.BlendingDestinationFactor
     are used, to control our blending. So you can e.g.
@@ -77,7 +76,6 @@ constructor TBlendedLoopingAnimation.Create(AOwner: TComponent);
 begin
   inherited;
   Attributes.Blending := false;
-  Attributes.ControlBlending := false;
 end;
 
 procedure TBlendedLoopingAnimation.Render(const Frustum: TFrustum;
