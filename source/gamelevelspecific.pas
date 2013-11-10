@@ -766,6 +766,7 @@ const
 
 procedure TSpiderAppearing.Render(const Frustum: TFrustum; const Params: TRenderParams);
 begin
+  {$ifndef OpenGLES} //TODO-es
   if (not Params.Transparent) and Params.ShadowVolumesReceivers then
   begin
     glPushAttrib(GL_ENABLE_BIT);
@@ -778,6 +779,7 @@ begin
       glEnd;
     glPopAttrib;
   end;
+  {$endif}
 
   inherited;
 end;

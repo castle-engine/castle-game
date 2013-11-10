@@ -346,7 +346,7 @@ procedure TGame2DControls.Draw;
       GLFadeRectangle(ContainerRect, Red, 1.0) else
     begin
       if Player.Swimming = psUnderWater then
-        GLBlendRectangle(ContainerRect, Vector4Single(0, 0, 0.1, 0.5));
+        DrawRectangle(ContainerRect, Vector4Single(0, 0, 0.1, 0.5));
 
       { Possibly, Player.FadeOut* will be applied on top of water effect,
         that's Ok --- they'll mix. }

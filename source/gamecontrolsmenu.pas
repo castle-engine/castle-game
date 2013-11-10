@@ -493,7 +493,7 @@ const
   Width = 780;
   Height = 390;
 begin
-  GLBlendRectangle(Rectangle(
+  DrawRectangle(Rectangle(
     (ContainerRect.Width - Width) div 2,
     (ContainerRect.Height - Height) div 2, Width, Height),
     Vector4Single(0, 0, 0, 0.4));
