@@ -179,13 +179,13 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen;
+procedure ContextOpen;
 begin
   GameMenu := TGameMenu.Create(Application);
   GameSoundMenu := TGameSoundMenu.Create(Application);
 end;
 
 initialization
-  OnGLContextOpen.Add(@WindowOpen);
+  OnGLContextOpen.Add(@ContextOpen);
 finalization
 end.

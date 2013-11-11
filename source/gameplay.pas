@@ -653,7 +653,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen;
+procedure ContextOpen;
 
   function PlayerControlURL(const BaseName: string): string;
   begin
@@ -674,7 +674,7 @@ begin
   GLBossIndicatorImage := LoadPlayerControlToGL('boss.png');
 end;
 
-procedure WindowClose;
+procedure ContextClose;
 begin
   FreeAndNil(GLNotificationsFade);
   FreeAndNil(GLInventorySlot);
@@ -686,8 +686,8 @@ end;
 
 initialization
   ShowDebugInfo := false;
-  OnGLContextOpen.Add(@WindowOpen);
-  OnGLContextClose.Add(@WindowClose);
+  OnGLContextOpen.Add(@ContextOpen);
+  OnGLContextClose.Add(@ContextClose);
   OnCreatureExists := @TGamePlay(nil).CreatureExists;
   OnItemOnWorldExists := @TGamePlay(nil).ItemOnWorldExists;
   T3DOrient.DefaultOrientation := otUpZDirectionX;

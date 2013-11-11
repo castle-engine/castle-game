@@ -57,20 +57,20 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen;
+procedure ContextOpen;
 begin
   GLScreenImage := TGLImage.Create(
     ApplicationData('menu_bg/initial_background.png'),
     [TRGBImage], Window.Width, Window.Height, riBilinear);
 end;
 
-procedure WindowClose;
+procedure ContextClose;
 begin
   FreeAndNil(GLScreenImage);
 end;
 
 initialization
-  OnGLContextOpen.Add(@WindowOpen);
-  OnGLContextClose.Add(@WindowClose);
+  OnGLContextOpen.Add(@ContextOpen);
+  OnGLContextClose.Add(@ContextClose);
 finalization
 end.

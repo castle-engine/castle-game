@@ -109,17 +109,17 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen;
+procedure ContextOpen;
 begin
   ChooseMenu := TChooseMenu.Create(nil);
 end;
 
-procedure WindowClose;
+procedure ContextClose;
 begin
   FreeAndNil(ChooseMenu);
 end;
 
 initialization
-  OnGLContextOpen.Add(@WindowOpen);
-  OnGLContextClose.Add(@WindowClose);
+  OnGLContextOpen.Add(@ContextOpen);
+  OnGLContextClose.Add(@ContextClose);
 end.

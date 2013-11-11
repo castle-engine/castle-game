@@ -132,7 +132,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen;
+procedure ContextOpen;
 begin
   Credits := TCredits.Create(nil);
 
@@ -157,13 +157,13 @@ begin
   CreditsSceneManager.Camera.Input := [];
 end;
 
-procedure WindowClose;
+procedure ContextClose;
 begin
   FreeAndNil(Credits);
   FreeAndNil(CreditsSceneManager);
 end;
 
 initialization
-  OnGLContextOpen.Add(@WindowOpen);
-  OnGLContextClose.Add(@WindowClose);
+  OnGLContextOpen.Add(@ContextOpen);
+  OnGLContextClose.Add(@ContextClose);
 end.

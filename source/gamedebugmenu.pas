@@ -468,7 +468,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen;
+procedure ContextOpen;
 begin
   { Although base TCastleOnScreenMenu doesn't require OpenGL context at constructor,
     our descendants initialize some arguments that require font initialized
@@ -482,5 +482,5 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@WindowOpen);
+  OnGLContextOpen.Add(@ContextOpen);
 end.

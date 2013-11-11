@@ -576,7 +576,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen;
+procedure ContextOpen;
 begin
   ControlsMenu := TControlsMenu.Create(Application);
   BasicControlsMenu := TBasicControlsMenu.Create(Application);
@@ -585,7 +585,7 @@ begin
   SubMenuTitleFont := TGLBitmapFont.Create(BitmapFont_BVSansMono_m18);
 end;
 
-procedure WindowClose;
+procedure ContextClose;
 begin
   FreeAndNil(SubMenuTitleFont);
 end;
@@ -623,8 +623,8 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@WindowOpen);
-  OnGLContextClose.Add(@WindowClose);
+  OnGLContextOpen.Add(@ContextOpen);
+  OnGLContextClose.Add(@ContextClose);
 
   Config.OnLoad.Add(@TConfigOptions(nil).LoadFromConfig);
   Config.OnSave.Add(@TConfigOptions(nil).SaveToConfig);

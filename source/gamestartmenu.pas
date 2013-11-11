@@ -661,7 +661,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen;
+procedure ContextOpen;
 begin
   MainMenu := TMainMenu.Create(Application);
   VideoMenu := TVideoMenu.Create(Application);
@@ -670,6 +670,6 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@WindowOpen);
+  OnGLContextOpen.Add(@ContextOpen);
 finalization
 end.
