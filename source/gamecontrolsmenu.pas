@@ -576,7 +576,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen(const Container: IUIContainer);
+procedure WindowOpen;
 begin
   ControlsMenu := TControlsMenu.Create(Application);
   BasicControlsMenu := TBasicControlsMenu.Create(Application);
@@ -585,7 +585,7 @@ begin
   SubMenuTitleFont := TGLBitmapFont.Create(BitmapFont_BVSansMono_m18);
 end;
 
-procedure WindowClose(const Container: IUIContainer);
+procedure WindowClose;
 begin
   FreeAndNil(SubMenuTitleFont);
 end;

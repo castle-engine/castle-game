@@ -653,7 +653,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen(const Container: IUIContainer);
+procedure WindowOpen;
 
   function PlayerControlURL(const BaseName: string): string;
   begin
@@ -674,7 +674,7 @@ begin
   GLBossIndicatorImage := LoadPlayerControlToGL('boss.png');
 end;
 
-procedure WindowClose(const Container: IUIContainer);
+procedure WindowClose;
 begin
   FreeAndNil(GLNotificationsFade);
   FreeAndNil(GLInventorySlot);

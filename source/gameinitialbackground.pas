@@ -57,14 +57,14 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen(const Container: IUIContainer);
+procedure WindowOpen;
 begin
   GLScreenImage := TGLImage.Create(
     ApplicationData('menu_bg/initial_background.png'),
     [TRGBImage], Window.Width, Window.Height, riBilinear);
 end;
 
-procedure WindowClose(const Container: IUIContainer);
+procedure WindowClose;
 begin
   FreeAndNil(GLScreenImage);
 end;

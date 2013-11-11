@@ -468,7 +468,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen(const Container: IUIContainer);
+procedure WindowOpen;
 begin
   { Although base TCastleOnScreenMenu doesn't require OpenGL context at constructor,
     our descendants initialize some arguments that require font initialized

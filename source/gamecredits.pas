@@ -132,7 +132,7 @@ end;
 
 { initialization / finalization ---------------------------------------------- }
 
-procedure WindowOpen(const Container: IUIContainer);
+procedure WindowOpen;
 begin
   Credits := TCredits.Create(nil);
 
@@ -157,7 +157,7 @@ begin
   CreditsSceneManager.Camera.Input := [];
 end;
 
-procedure WindowClose(const Container: IUIContainer);
+procedure WindowClose;
 begin
   FreeAndNil(Credits);
   FreeAndNil(CreditsSceneManager);
