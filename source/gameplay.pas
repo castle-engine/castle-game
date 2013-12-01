@@ -637,16 +637,16 @@ end;
 
 type
   TGamePlay = class
-    class function CreatureExists(const Item: T3D): boolean;
-    class function ItemOnWorldExists(const Item: T3D): boolean;
+    class function CreatureExists(const Creature: TCreature): boolean;
+    class function ItemOnWorldExists(const Item: TItemOnWorld): boolean;
   end;
 
-class function TGamePlay.CreatureExists(const Item: T3D): boolean;
+class function TGamePlay.CreatureExists(const Creature: TCreature): boolean;
 begin
   Result := not GameWin;
 end;
 
-class function TGamePlay.ItemOnWorldExists(const Item: T3D): boolean;
+class function TGamePlay.ItemOnWorldExists(const Item: TItemOnWorld): boolean;
 begin
   Result := (not GameWin) and (not DebugRenderForLevelScreenshot);
 end;
