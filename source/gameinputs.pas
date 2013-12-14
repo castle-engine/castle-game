@@ -45,6 +45,7 @@ initialization
     with other 3D games. }
   Input_Attack.Assign(K_Ctrl, K_None, #0, true, mbLeft);
   Input_Interact.Assign(K_E, K_None, #0, false, mbLeft);
+  PlayerInput_Jump.Assign(K_Space, K_None, #0, true, mbRight); // add rmb for jump
   { These by default don't have any shortcut }
   Input_InventoryShow.Assign(K_I, K_None, #0, false, mbLeft);
   Input_DropItem.Assign(K_R, K_None, #0, false, mbLeft);
