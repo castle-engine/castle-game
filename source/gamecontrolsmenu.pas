@@ -60,7 +60,7 @@ procedure ShowControlsMenuEscape(ControlsUnder: TUIControlList;
 
 var
   { Font used for menu SubMenuTitle.
-    Initialized / finalized in CastleWindow Open/Close here. }
+    Initialized / finalized here. }
   SubMenuTitleFont: TGLBitmapFontAbstract;
 
 { Update MouseLook-related player settings, based on what is chosen
@@ -70,9 +70,10 @@ procedure PlayerUpdateMouseLook(Player: TPlayer);
 implementation
 
 uses SysUtils, CastleWindowModes, CastleGLUtils, CastleMessages,
-  CastleOnScreenMenu, CastleBitmapFont_BVSansMono_m18, CastleConfig,
+  CastleOnScreenMenu, CastleConfig,
   CastleInputs, CastleKeysMouse, CastleVectors, CastleUtils, CastleRectangles,
-  CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors;
+  CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors,
+  CastleControls;
 
 const
   DefaultMouseLook = true;
@@ -582,12 +583,7 @@ begin
   BasicControlsMenu := TBasicControlsMenu.Create(Application);
   ItemsControlsMenu := TItemsControlsMenu.Create(Application);
   OtherControlsMenu := TOtherControlsMenu.Create(Application);
-  SubMenuTitleFont := TGLBitmapFont.Create(BitmapFont_BVSansMono_m18);
-end;
-
-procedure ContextClose;
-begin
-  FreeAndNil(SubMenuTitleFont);
+  SubMenuTitleFont := Theme.GLMessageFont;
 end;
 
 { TConfigOptions ------------------------------------------------------------- }
@@ -624,7 +620,6 @@ end;
 
 initialization
   OnGLContextOpen.Add(@ContextOpen);
-  OnGLContextClose.Add(@ContextClose);
 
   Config.OnLoad.Add(@TConfigOptions(nil).LoadFromConfig);
   Config.OnSave.Add(@TConfigOptions(nil).SaveToConfig);
