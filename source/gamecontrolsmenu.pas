@@ -26,7 +26,7 @@ unit GameControlsMenu;
 interface
 
 uses Classes, CastleWindow, GameGeneralMenu, CastleCameras,
-  CastleGLBitmapFonts, CastleUIControls, CastlePlayer;
+  CastleFonts, CastleUIControls, CastlePlayer;
 
 type
   TSubMenu = class(TCastleGameMenu)
@@ -61,7 +61,7 @@ procedure ShowControlsMenuEscape(ControlsUnder: TUIControlList;
 var
   { Font used for menu SubMenuTitle.
     Initialized / finalized here. }
-  SubMenuTitleFont: TGLBitmapFontAbstract;
+  SubMenuTitleFont: TCastleFont;
 
 { Update MouseLook-related player settings, based on what is chosen
   in "Confgure controls" menu. }
