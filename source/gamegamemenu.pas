@@ -160,7 +160,7 @@ begin
     Theme.Images[tiWindow] := WindowDark;
 
     Window.OnPress := @Press;
-    Window.OnDrawStyle := ds3D;
+    Window.RenderStyle := rs3D;
 
     SetCurrentMenu(CurrentMenu, GameMenu);
 

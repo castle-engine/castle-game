@@ -25,8 +25,8 @@ unit GameInitialBackground;
 
 interface
 
-{ Sets initial OnResize and OnDraw and draws intro. }
-procedure DrawInitialBackground;
+{ Sets initial OnResize and OnRender and draws intro. }
+procedure RenderInitialBackground;
 
 implementation
 
@@ -41,15 +41,15 @@ begin
   OrthoProjection(0, Window.Width, 0, Window.Height);
 end;
 
-procedure Draw(Window: TCastleWindowBase);
+procedure Render(Window: TCastleWindowBase);
 begin
   GLScreenImage.Draw(0, 0);
 end;
 
-procedure DrawInitialBackground;
+procedure RenderInitialBackground;
 begin
   Window.OnResize := @Resize;
-  Window.OnDraw := @Draw;
+  Window.OnRender := @Render;
   Window.EventResize;
   Window.PostRedisplay;
   Window.FlushRedisplay;

@@ -47,7 +47,7 @@ type
   public
     RenderDebug3DArgument: TMenuBooleanArgument;
     RenderDebugCaptionsArgument: TMenuBooleanArgument;
-    ShadowVolumesDrawArgument: TMenuBooleanArgument;
+    ShadowVolumesRenderArgument: TMenuBooleanArgument;
     DebugRenderForLevelScreenshotArgument: TMenuBooleanArgument;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
@@ -127,7 +127,7 @@ begin
 
   RenderDebug3DArgument := TMenuBooleanArgument.Create(RenderDebug3D);
   RenderDebugCaptionsArgument := TMenuBooleanArgument.Create(RenderDebugCaptions);
-  ShadowVolumesDrawArgument := TMenuBooleanArgument.Create(ShadowVolumesDraw);
+  ShadowVolumesRenderArgument := TMenuBooleanArgument.Create(ShadowVolumesRender);
   DebugRenderForLevelScreenshotArgument := TMenuBooleanArgument.Create(
     DebugRenderForLevelScreenshot);
 
@@ -139,7 +139,7 @@ begin
   Items.Add('Reload resource animation ...');
   Items.AddObject('Render debug 3D information', RenderDebug3DArgument);
   Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
-  Items.AddObject('Render shadow volumes', ShadowVolumesDrawArgument);
+  Items.AddObject('Render shadow volumes', ShadowVolumesRenderArgument);
   Items.AddObject('Render for level screenshot', DebugRenderForLevelScreenshotArgument);
   Items.Add('Reload sounds/index.xml');
   Items.Add('Back to game');
@@ -179,8 +179,8 @@ begin
          RenderDebugCaptionsArgument.Value := RenderDebugCaptions;
        end;
     8: begin
-         ShadowVolumesDraw := not ShadowVolumesDraw;
-         ShadowVolumesDrawArgument.Value := ShadowVolumesDraw;
+         ShadowVolumesRender := not ShadowVolumesRender;
+         ShadowVolumesRenderArgument.Value := ShadowVolumesRender;
        end;
     9: begin
          DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
@@ -450,7 +450,7 @@ begin
     Theme.Images[tiWindow] := WindowDark;
 
     Window.OnPress := @Press;
-    Window.OnDrawStyle := ds3D;
+    Window.RenderStyle := rs3D;
 
     SetCurrentMenu(CurrentMenu, DebugMenu);
 

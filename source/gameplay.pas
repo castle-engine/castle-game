@@ -122,18 +122,18 @@ var
 type
   TGame2DControls = class(TUIControl)
   public
-    procedure Draw; override;
-    function DrawStyle: TUIControlDrawStyle; override;
+    procedure Render; override;
+    function RenderStyle: TRenderStyle; override;
   end;
 
-function TGame2DControls.DrawStyle: TUIControlDrawStyle;
+function TGame2DControls.RenderStyle: TRenderStyle;
 begin
-  Result := ds2D;
+  Result := rs2D;
 end;
 
-procedure TGame2DControls.Draw;
+procedure TGame2DControls.Render;
 
-  procedure DoDrawInventory;
+  procedure DoRenderInventory;
   const
     InventorySlotWidth = 100;
     InventorySlotHeight = 100;
@@ -161,7 +161,7 @@ procedure TGame2DControls.Draw;
   begin
     InventorySlotsVisibleInColumn := ContainerHeight div InventorySlotHeight;
 
-    { Draw at least InventorySlotsVisibleInColumn slots,
+    { Render at least InventorySlotsVisibleInColumn slots,
       possibly drawing empty slots. This is needed, because
       otherwise when no items are owned player doesn't see any
       effect of changing InventoryVisible. }
@@ -209,7 +209,7 @@ procedure TGame2DControls.Draw;
   end;
 
   const
-    { line number 1 is for "flying" text in Player.Draw2D }
+    { line number 1 is for "flying" text }
     LineDeadOrWinner = 2;
     LinePressEscape = 3;
     LinePressAttack = 4;
@@ -360,12 +360,12 @@ var
 begin
   if DebugRenderForLevelScreenshot then Exit;
 
-  if Notifications.DrawStyle <> dsNone then
+  if Notifications.GetExists then
     GLNotificationsFade.Draw(
       Rectangle(0, 0, ContainerWidth, GLNotificationsFade.Height));
 
   if Player.InventoryVisible then
-    DoDrawInventory;
+    DoRenderInventory;
 
   if ShowDebugInfo then
   begin
@@ -585,7 +585,7 @@ begin
 
     Window.OnUpdate := @Update;
     Window.OnPress := @Press;
-    Window.OnDrawStyle := ds3D;
+    Window.RenderStyle := rs3D;
 
     C2D := TGame2DControls.Create(nil);
     GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, SceneManager]);

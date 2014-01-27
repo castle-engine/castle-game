@@ -170,7 +170,7 @@ begin
 
   { init OpenAL (after initing Glw and Progress, because ALContextOpen
     wants to display progress of "Loading sounds") }
-  DrawInitialBackground;
+  RenderInitialBackground;
   SoundEngine.ALContextOpen;
   try
     ShowStartMenu;

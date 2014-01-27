@@ -37,7 +37,7 @@ type
       the value of this property. }
     SubMenuAdditionalInfo: string;
     constructor Create(AOwner: TComponent); override;
-    procedure Draw; override;
+    procedure Render; override;
 
     { Sets Position and PositionRelative* parameters.
       If Center = @false then sets position suitable for the background
@@ -184,7 +184,7 @@ begin
   if DoFixItemsRectangles then FixItemsRectangles;
 end;
 
-procedure TSubMenu.Draw;
+procedure TSubMenu.Render;
 const
   SubMenuTextColor: TCastleColor = (0.9, 0.9, 0.9, 1.0);
 begin
@@ -480,16 +480,16 @@ var
 
 type
   TFadeRect = class(TUIControl)
-    function DrawStyle: TUIControlDrawStyle; override;
-    procedure Draw; override;
+    function RenderStyle: TRenderStyle; override;
+    procedure Render; override;
   end;
 
-function TFadeRect.DrawStyle: TUIControlDrawStyle;
+function TFadeRect.RenderStyle: TRenderStyle;
 begin
-  Result := ds2D;
+  Result := rs2D;
 end;
 
-procedure TFadeRect.Draw;
+procedure TFadeRect.Render;
 const
   Width = 780;
   Height = 390;

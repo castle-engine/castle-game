@@ -77,18 +77,18 @@ type
   private
     GLCaption: TGLImage;
   public
-    function DrawStyle: TUIControlDrawStyle; override;
-    procedure Draw; override;
+    function RenderStyle: TRenderStyle; override;
+    procedure Render; override;
     procedure GLContextOpen; override;
     procedure GLContextClose; override;
   end;
 
-function TBackgroundCaptions.DrawStyle: TUIControlDrawStyle;
+function TBackgroundCaptions.RenderStyle: TRenderStyle;
 begin
-  Result := ds2D;
+  Result := rs2D;
 end;
 
-procedure TBackgroundCaptions.Draw;
+procedure TBackgroundCaptions.Render;
 begin
   GLCaption.Draw(0, ContainerHeight - GLCaption.Height);
 end;

@@ -66,7 +66,7 @@ end;
 
 initialization
   Window := TGameWindow.Create(nil);
-  Window.OnDrawStyle := ds3D;
+  Window.RenderStyle := rs3D;
 finalization
   FreeAndNil(Window);
 end.

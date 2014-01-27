@@ -84,7 +84,7 @@ begin
   OldThemeWindow := Theme.Images[tiWindow];
   SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
   try
-    Window.OnDrawStyle := ds3D;
+    Window.RenderStyle := rs3D;
 
     { Otherwise messages don't look good, because the text is mixed
       with the menu text. }

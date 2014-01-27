@@ -100,7 +100,7 @@ type
     destructor Destroy; override;
     procedure Click; override;
     function SpaceBetweenItems(const NextItemIndex: Cardinal): Cardinal; override;
-    procedure Draw; override;
+    procedure Render; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ begin
   SceneManager := TCastle1SceneManager.Create(nil);
   try
     SceneManager.ShadowVolumes := ShadowVolumes;
-    SceneManager.ShadowVolumesDraw := ShadowVolumesDraw;
+    SceneManager.ShadowVolumesRender := ShadowVolumesRender;
     SceneManager.ApproximateActivation := true;
     repeat
       Notifications.Clear;
@@ -597,7 +597,7 @@ begin
     Result += 10;
 end;
 
-procedure TChooseNewLevelMenu.Draw;
+procedure TChooseNewLevelMenu.Render;
 const
   SubMenuTextColor: TCastleColor = (0.7, 0.7, 0.7, 1.0);
 begin

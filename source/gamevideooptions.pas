@@ -46,7 +46,7 @@ var
 
   { You can set this to true for debug purposes.
     This is meaningull only if GLFeatures.ShadowVolumesPossible and ShadowVolumes. }
-  ShadowVolumesDraw: boolean = false;
+  ShadowVolumesRender: boolean = false;
 
 const
   DefaultColorBits = 0;
