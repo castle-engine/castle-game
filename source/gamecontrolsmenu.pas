@@ -175,10 +175,10 @@ begin
   end else
   begin
     Position := Vector2Integer(20, -120);
-    PositionRelativeScreenX := prLowerBorder;
-    PositionRelativeScreenY := prHigherBorder;
-    PositionRelativeMenuX := prLowerBorder;
-    PositionRelativeMenuY := prHigherBorder;
+    PositionRelativeScreenX := prLow;
+    PositionRelativeScreenY := prHigh;
+    PositionRelativeMenuX := prLow;
+    PositionRelativeMenuY := prHigh;
   end;
 
   if DoFixItemsRectangles then FixItemsRectangles;

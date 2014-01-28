@@ -175,10 +175,10 @@ begin
   Items.Add('Quit');
 
   Position := Vector2Integer(20, -120);
-  PositionRelativeScreenX := prLowerBorder;
-  PositionRelativeScreenY := prHigherBorder;
-  PositionRelativeMenuX := prLowerBorder;
-  PositionRelativeMenuY := prHigherBorder;
+  PositionRelativeScreenX := prLow;
+  PositionRelativeScreenY := prHigh;
+  PositionRelativeMenuX := prLow;
+  PositionRelativeMenuY := prHigh;
 
   DrawBackgroundRectangle := false;
 end;
