@@ -1,9 +1,9 @@
-procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
+procedure Press(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.IsKey(CharEscape) then UserQuit := true;
 end;
 
-procedure CloseQuery(Window: TCastleWindowBase);
+procedure CloseQuery(Container: TUIContainer);
 begin
   GameCancel(true);
 end;

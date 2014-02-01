@@ -434,7 +434,7 @@ begin
   end;
 end;
 
-procedure Update(Window: TCastleWindowBase);
+procedure Update(Container: TUIContainer);
 const
   GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
   GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
@@ -505,7 +505,7 @@ begin
   end;
 end;
 
-procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
+procedure Press(Container: TUIContainer; const Event: TInputPressRelease);
 
   procedure UseLifePotion;
   var
@@ -565,7 +565,7 @@ begin
     DoDebugMenu;
 end;
 
-procedure CloseQuery(Window: TCastleWindowBase);
+procedure CloseQuery(Container: TUIContainer);
 begin
   GameCancel(true);
 end;

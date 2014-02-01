@@ -500,7 +500,7 @@ begin
     Vector4Single(0, 0, 0, 0.4));
 end;
 
-procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
+procedure Press(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if ExitWithEscapeAllowed and Event.IsKey(CharEscape) then
   begin
@@ -509,7 +509,7 @@ begin
   end;
 end;
 
-procedure CloseQuery(Sender: TCastleWindowBase);
+procedure CloseQuery(Container: TUIContainer);
 begin
   MessageOK(Window, 'You can''t exit now.');
 end;

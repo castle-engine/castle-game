@@ -36,12 +36,12 @@ uses SysUtils, CastleWindow, CastleGLUtils, CastleGLImages, CastleUIControls,
 var
   GLScreenImage: TGLImage;
 
-procedure Resize(Window: TCastleWindowBase);
+procedure Resize(Container: TUIContainer);
 begin
   OrthoProjection(0, Window.Width, 0, Window.Height);
 end;
 
-procedure Render(Window: TCastleWindowBase);
+procedure Render(Container: TUIContainer);
 begin
   GLScreenImage.Draw(0, 0);
 end;
@@ -50,7 +50,7 @@ procedure RenderInitialBackground;
 begin
   Window.OnResize := @Resize;
   Window.OnRender := @Render;
-  Window.EventResize;
+  Window.Container.EventResize;
   Window.PostRedisplay;
   Window.FlushRedisplay;
 end;

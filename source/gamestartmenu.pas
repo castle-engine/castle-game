@@ -627,7 +627,7 @@ end;
 
 { global things -------------------------------------------------------------- }
 
-procedure CloseQuery(Sender: TCastleWindowBase);
+procedure CloseQuery(Container: TUIContainer);
 begin
   if MessageYesNo(Window, 'Are you sure you want to quit ?') then
     UserQuit := true;

@@ -90,12 +90,12 @@ var
   Credits: TCredits;
   CreditsSceneManager: TCastleSceneManager;
 
-procedure CloseQuery(Sender: TCastleWindowBase);
+procedure CloseQuery(Container: TUIContainer);
 begin
   MessageOK(Window, 'You can''t exit now.');
 end;
 
-procedure Press(Window: TCastleWindowBase; const Event: TInputPressRelease);
+procedure Press(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.IsKey(CharEscape) or
      Event.IsKey(CharEnter) or

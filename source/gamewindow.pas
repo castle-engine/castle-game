@@ -33,7 +33,7 @@ type
     and such. }
   TGameWindow = class(TCastleWindowCustom)
   public
-    procedure EventPress(const Event: TInputPressRelease); override;
+    //TODO:procedure EventPress(const Event: TInputPressRelease); override;
   end;
 
 var
@@ -45,6 +45,7 @@ implementation
 uses SysUtils, CastleInputs, CastleUIControls, CastleGameNotifications, CastleFilesUtils,
   CastleSoundEngine, GameSound, GameInputs;
 
+(*
 procedure TGameWindow.EventPress(const Event: TInputPressRelease);
 
   { Saves a screen, causing also appropriate Notification and sound. }
@@ -63,6 +64,7 @@ begin
     AutoSaveScreen;
   inherited;
 end;
+*)
 
 initialization
   Window := TGameWindow.Create(nil);
