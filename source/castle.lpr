@@ -157,7 +157,7 @@ begin
   Window.Open;
 
   { init progress }
-  WindowProgressInterface.Window := Window;
+  Application.MainWindow := Window;
   Progress.UserInterface := WindowProgressInterface;
 
   { load game data from XML files }
@@ -168,22 +168,12 @@ begin
   Levels.LoadFromFiles;
   Levels.LoadFromConfig;
 
-  { init OpenAL (after initing Glw and Progress, because ALContextOpen
+  { init OpenAL (after initing Window and Progress, because ALContextOpen
     wants to display progress of "Loading sounds") }
   RenderInitialBackground;
   SoundEngine.ALContextOpen;
-  try
-    ShowStartMenu;
-  finally
-    { Usually Window.Closed = false here.
-      But this is finally...end clause so we try hard to avoid raising
-      another exception here --- so we safeguard and eventually change
-      Progress.UserInterface here. }
-    if Window.Closed then
-      Progress.UserInterface := ProgressNullInterface;
 
-    SoundEngine.ALContextClose;
-  end;
+  ShowStartMenu;
 
   Config.Save;
 end.
