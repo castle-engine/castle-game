@@ -45,7 +45,7 @@ procedure RenderInitialBackground;
 begin
   Window.OnRender := @Render;
   Window.RenderStyle := rs2D;
-  Window.PostRedisplay;
+  Window.Invalidate;
   Window.FlushRedisplay;
 end;
 
