@@ -25,7 +25,7 @@ unit GameInitialBackground;
 
 interface
 
-{ Sets initial OnResize and OnRender and draws intro. }
+{ Sets initial OnRender to draw intro image. }
 procedure RenderInitialBackground;
 
 implementation
@@ -46,7 +46,6 @@ begin
   Window.OnRender := @Render;
   Window.RenderStyle := rs2D;
   Window.Invalidate;
-  Window.FlushRedisplay;
 end;
 
 { initialization / finalization ---------------------------------------------- }
