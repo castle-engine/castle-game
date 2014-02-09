@@ -118,6 +118,7 @@ begin
 
     UserQuit := false;
     Credits.AnimationTime := 0;
+    Credits.Translation := ZeroVector3Single;
 
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
@@ -152,7 +153,7 @@ begin
 
   CreditsSceneManager.Items.Add(Credits);
   CreditsSceneManager.MainScene := Credits.Scene;
-  
+
   CreditsSceneManager.Camera := CreditsSceneManager.CreateDefaultCamera;
   CreditsSceneManager.Camera.Input := [];
 end;
