@@ -25,7 +25,7 @@ unit GameGeneralMenu;
 
 interface
 
-uses Classes, CastleOnScreenMenu;
+uses Classes, CastleVectors, CastleOnScreenMenu;
 
 type
   { On-screen menu suitable for castle.
@@ -40,7 +40,7 @@ type
     constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
     property DrawFocusedBorder default false;
-    function PositionInside(const X, Y: Integer): boolean; override;
+    function PositionInside(const Point: TVector2Single): boolean; override;
   end;
 
 var
@@ -69,7 +69,7 @@ begin
   DrawFocusedBorder := false;
 end;
 
-function TCastleGameMenu.PositionInside(const X, Y: Integer): boolean;
+function TCastleGameMenu.PositionInside(const Point: TVector2Single): boolean;
 begin
   Result := true;
 end;
