@@ -122,7 +122,7 @@ begin
 
 {    CM := TGeneratedCubeMapTextureNode.Create('', '');
     CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
-    CM.FdUpdate.Value := 'NEXT_FRAME_ONLY';
+    CM.FdUpdate.Value := upNextFrameOnly;
     CM.FdSize.Value := 512;}
 
     CM := TImageCubeMapTextureNode.Create('', RootNode.BaseUrl);
