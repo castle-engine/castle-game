@@ -73,7 +73,7 @@ uses SysUtils, CastleWindowModes, CastleGLUtils, CastleMessages,
   CastleOnScreenMenu, CastleConfig,
   CastleInputs, CastleKeysMouse, CastleVectors, CastleUtils, CastleRectangles,
   CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors,
-  CastleControls;
+  CastleControls, CastleTextureFont_DejaVuSansMono_18;
 
 const
   DefaultMouseLook = true;
@@ -583,7 +583,9 @@ begin
   BasicControlsMenu := TBasicControlsMenu.Create(Application);
   ItemsControlsMenu := TItemsControlsMenu.Create(Application);
   OtherControlsMenu := TOtherControlsMenu.Create(Application);
-  SubMenuTitleFont := Theme.GLMessageFont;
+
+  Theme.MessageFont := TTextureFont.Create(TextureFont_DejaVuSansMono_18);
+  SubMenuTitleFont := Theme.MessageFont;
 end;
 
 { TConfigOptions ------------------------------------------------------------- }
