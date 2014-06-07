@@ -1365,7 +1365,7 @@ begin
 
   LevelFountainProcess(MainScene.RootNode);
 
-  if DOMGetBooleanAttribute(DOMElement, 'load_water_animation', LoadWaterAnimation)
+  if DOMElement.AttributeBoolean('load_water_animation', LoadWaterAnimation)
     and LoadWaterAnimation then
   begin
     { load Fountain animation, following the similar code as LoadLevelAnimation }
