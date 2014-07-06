@@ -4,6 +4,7 @@
   <package>
     <include path="README.txt" />
     <include path="COPYING.GPL2.txt" />
+    <include path="doc/*" />
 
     <exclude path="*/Makefile" />
     <exclude path="*/Makefile.common" />
