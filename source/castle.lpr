@@ -177,9 +177,3 @@ begin
 
   Config.Save;
 end.
-
-{
-  Local Variables:
-  compile-command: "fpcdebug castle.lpr --exe-output-dir ../"
-  End:
-}
