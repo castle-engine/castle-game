@@ -15,7 +15,7 @@ default: build
 #TODO: pass this -dCASTLE_WINDOW_BEST_NOGUI
 #TODO: clean-window to force rebuilding CastleWindow unit with proper backend.
 build:
-	castle-engine compile
+	castle-engine compile $(CASTLE_ENGINE_TOOL_OPTIONS)
 
 clean:
 	castle-engine clean
