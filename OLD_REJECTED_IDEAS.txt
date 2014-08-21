@@ -25,6 +25,9 @@ Fountain level:
 - fountain: water sparkling (use blender's particle animation)
 - sounds: some birds, water sparkling
 
+* Planned: To celebrate that we can use VRML/X3D in level pieces: new animated eye-candy to the "The Fountain" level (one of the "demo" levels, unlocked from the beginning for anyone). There's some animated water with reflections + refractions by shaders (actually taken from a similar demo_models demo), there's KambiScript usage (this fountain droplets, aka "poor man's particle engine"), there's some demo of VRML/X3D events providing interactive behavior of the level (TODO) etc. Enjoy!
+
+  (For people with poor GPUs, a short video showing walking around the level is here TODO. But of course I encourage you to actually play the game, as it feels even better when you're inside the game. You can get the game from SVN, or wait for the next release.)
 ------------------------------------------------------------------------------
 Creatures:
 
