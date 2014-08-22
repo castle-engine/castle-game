@@ -77,16 +77,10 @@ type
   private
     GLCaption: TGLImage;
   public
-    function RenderStyle: TRenderStyle; override;
     procedure Render; override;
     procedure GLContextOpen; override;
     procedure GLContextClose; override;
   end;
-
-function TBackgroundCaptions.RenderStyle: TRenderStyle;
-begin
-  Result := rs2D;
-end;
 
 procedure TBackgroundCaptions.Render;
 begin

@@ -480,14 +480,8 @@ var
 
 type
   TFadeRect = class(TUIControl)
-    function RenderStyle: TRenderStyle; override;
     procedure Render; override;
   end;
-
-function TFadeRect.RenderStyle: TRenderStyle;
-begin
-  Result := rs2D;
-end;
 
 procedure TFadeRect.Render;
 const
