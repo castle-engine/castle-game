@@ -175,7 +175,7 @@ Gate level:
 Background level:
 - add some shadow, with moving light source
 - camera floating around level with fog ?
-
+* remake water on castle1 bg level to use single x3d file, and have mirrors by cubes?
 ------------------------------------------------------------------------------
 Weapons:
 
