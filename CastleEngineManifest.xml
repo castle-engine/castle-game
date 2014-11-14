@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="castle" standalone_source="source/castle.lpr">
-  <version executable_option="--version" />
+  <version name="1.0.1" />
   <package>
     <include path="README.txt" />
     <include path="COPYING.GPL2.txt" />
