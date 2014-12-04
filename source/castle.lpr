@@ -24,6 +24,10 @@
 
 program castle;
 
+{$ifdef MSWINDOWS}
+  {$R ../automatic-windows-resources.res}
+{$endif MSWINDOWS}
+
 uses CastleWindow, SysUtils, CastleUtils, CastleProgress, CastleWindowProgress,
   Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
   CastleLog, GameWindow, GameStartMenu, GameHelp, CastleFilesUtils,
