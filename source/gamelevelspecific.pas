@@ -772,7 +772,7 @@ begin
     glPushAttrib(GL_ENABLE_BIT);
       glDisable(GL_LIGHTING);
       glEnable(GL_DEPTH_TEST);
-      glColorv(Black3Single);
+      glColorv(BlackRGB);
       glBegin(GL_LINES);
         glVertex3f(Translation[0], Translation[1], SpiderZ);
         glVertexv(Translation);
