@@ -34,12 +34,14 @@ procedure ShowStartMenu;
 implementation
 
 uses SysUtils, Classes, CastleUtils, CastleWindowModes,
-  CastleGLUtils, CastleMessages, GameWindow, CastleVectors, CastleImages, CastleFilesUtils,
-  CastleLevels, GamePlay, GameSound, CastlePlayer, CastleColors,
-  GameGeneralMenu, CastleOnScreenMenu, GameControlsMenu, CastleInputs, GameVideoOptions,
-  GameHelp, CastleStringUtils, CastleClassUtils, CastleGameNotifications,
-  GameBackgroundLevel, CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes,
-  GameCredits, CastleKeysMouse, CastleOpenDocument, CastlePrecalculatedAnimation;
+  CastleGLUtils, CastleMessages, GameWindow, CastleVectors, CastleImages,
+  CastleFilesUtils, CastleLevels, CastlePlayer, CastleColors,
+  CastleOnScreenMenu, CastleInputs, CastleRectangles,
+  CastleKeysMouse, CastleOpenDocument, CastlePrecalculatedAnimation,
+  CastleStringUtils, CastleClassUtils, CastleGameNotifications,
+  CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes,
+  GamePlay, GameSound, GameGeneralMenu, GameControlsMenu, GameVideoOptions,
+  GameHelp, GameBackgroundLevel, GameCredits;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -175,10 +177,10 @@ begin
   Items.Add('Quit');
 
   Position := Vector2Integer(20, -120);
-  PositionRelativeScreenX := prLow;
-  PositionRelativeScreenY := prHigh;
-  PositionRelativeMenuX := prLow;
-  PositionRelativeMenuY := prHigh;
+  PositionRelativeScreenX := hpLeft;
+  PositionRelativeScreenY := vpTop;
+  PositionRelativeMenuX := hpLeft;
+  PositionRelativeMenuY := vpTop;
 
   DrawBackgroundRectangle := false;
 end;

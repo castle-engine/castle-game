@@ -168,17 +168,17 @@ begin
   if Center then
   begin
     Position := Vector2Integer(0, 0);
-    PositionRelativeScreenX := prMiddle;
-    PositionRelativeScreenY := prMiddle;
-    PositionRelativeMenuX := prMiddle;
-    PositionRelativeMenuY := prMiddle;
+    PositionRelativeScreenX := hpMiddle;
+    PositionRelativeScreenY := vpMiddle;
+    PositionRelativeMenuX := hpMiddle;
+    PositionRelativeMenuY := vpMiddle;
   end else
   begin
     Position := Vector2Integer(20, -120);
-    PositionRelativeScreenX := prLow;
-    PositionRelativeScreenY := prHigh;
-    PositionRelativeMenuX := prLow;
-    PositionRelativeMenuY := prHigh;
+    PositionRelativeScreenX := hpLeft;
+    PositionRelativeScreenY := vpTop;
+    PositionRelativeMenuX := hpLeft;
+    PositionRelativeMenuY := vpTop;
   end;
 
   if DoFixItemsRectangles then FixItemsRectangles;
