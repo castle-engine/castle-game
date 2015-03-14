@@ -175,7 +175,7 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
       glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-      glTextureCubeMap(
+      glTextureCubeMap(Result,
         DDS.CubeMapImage(dcsPositiveX),
         DDS.CubeMapImage(dcsNegativeX),
         { Swap meaning of positive/negative Y faces from DDS,
