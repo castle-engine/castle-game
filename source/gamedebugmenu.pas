@@ -454,6 +454,7 @@ begin
 
     SetCurrentMenu(CurrentMenu, DebugMenu);
 
+    Window.Controls.Add(GlobalCatchInput);
     Window.Controls.AddList(ControlsUnder);
 
     UserQuit := false;

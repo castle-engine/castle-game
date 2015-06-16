@@ -92,6 +92,7 @@ begin
 
     Window.Controls.MakeSingle(TCastleOnScreenMenu, ChooseMenu);
 
+    Window.Controls.Add(GlobalCatchInput);
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 

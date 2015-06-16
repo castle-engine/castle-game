@@ -647,6 +647,7 @@ begin
       try
         SetCurrentMenu(CurrentMenu, MainMenu);
 
+        Window.Controls.Add(GlobalCatchInput);
         Window.Controls.Add(Notifications);
         Window.Controls.AddList(BackgroundControls);
 

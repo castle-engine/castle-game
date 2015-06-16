@@ -120,6 +120,7 @@ begin
     Credits.AnimationTime := 0;
     Credits.Translation := ZeroVector3Single;
 
+    Window.Controls.Add(GlobalCatchInput);
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 

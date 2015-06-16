@@ -537,6 +537,7 @@ begin
       Window.Controls.Add(FadeRect);
     end;
 
+    Window.Controls.Add(GlobalCatchInput);
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 

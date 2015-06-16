@@ -584,6 +584,7 @@ begin
     C2D := TGame2DControls.Create(nil);
     GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, SceneManager]);
 
+    Window.Controls.Add(GlobalCatchInput);
     Window.Controls.AddList(GameControls);
 
     GameEnded := false;

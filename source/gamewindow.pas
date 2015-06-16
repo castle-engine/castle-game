@@ -25,28 +25,40 @@ unit GameWindow;
 
 interface
 
-uses CastleWindow, CastleKeysMouse;
+uses Classes,
+  CastleVectors, CastleWindow, CastleUIControls, CastleKeysMouse;
 
 type
-  { Window that automatically, always, can do save screen on CastleInput_SaveScreen
-    press. This way our "save screen" button works in game, all menus, credits
-    and such. }
   TGameWindow = class(TCastleWindowCustom)
   public
-    //TODO:procedure EventPress(const Event: TInputPressRelease); override;
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+  TGlobalCatchInput = class(TUIControl)
+    function Press(const Event: TInputPressRelease): boolean; override;
+    function PositionInside(const Position: TVector2Single): boolean; override;
   end;
 
 var
   { @noAutoLinkHere }
   Window: TGameWindow;
 
+  { Make sure this is always on Window.Controls list. It's initially
+    there; add it there after TGLMode.CreateReset or other things doing
+    Window.Controls.Clear.
+    This way our "save screen" button works in game, all menus, credits
+    and such. }
+  GlobalCatchInput: TGlobalCatchInput;
+
 implementation
 
-uses SysUtils, CastleInputs, CastleUIControls, CastleGameNotifications, CastleFilesUtils,
-  CastleSoundEngine, GameSound, GameInputs;
+uses SysUtils,
+  CastleInputs, CastleGameNotifications, CastleFilesUtils, CastleSoundEngine,
+  GameSound, GameInputs;
 
-(*
-procedure TGameWindow.EventPress(const Event: TInputPressRelease);
+{ TGlobalCatchInput ---------------------------------------------------------- }
+
+function TGlobalCatchInput.Press(const Event: TInputPressRelease): boolean;
 
   { Saves a screen, causing also appropriate Notification and sound. }
   procedure AutoSaveScreen;
@@ -54,17 +66,35 @@ procedure TGameWindow.EventPress(const Event: TInputPressRelease);
     URL: string;
   begin
     URL := FileNameAutoInc(ApplicationName + '_screen_%d.png');
-    SaveScreen(URL);
+    Window.SaveScreen(URL);
     Notifications.Show('Screen saved to ' + URL);
     SoundEngine.Sound(stSaveScreen);
   end;
 
 begin
+  Result := inherited;
+  if Result then Exit;
+
   if Input_SaveScreen.IsEvent(Event) then
+  begin
     AutoSaveScreen;
-  inherited;
+    Result := true;
+  end;
 end;
-*)
+
+function TGlobalCatchInput.PositionInside(const Position: TVector2Single): boolean;
+begin
+  Result := true; // always catch input
+end;
+
+{ TGameWindow ---------------------------------------------------------------- }
+
+constructor TGameWindow.Create(AOwner: TComponent);
+begin
+  inherited;
+  GlobalCatchInput := TGlobalCatchInput.Create(Self);
+  Controls.InsertBack(GlobalCatchInput);
+end;
 
 initialization
   Window := TGameWindow.Create(nil);

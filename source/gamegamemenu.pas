@@ -164,6 +164,7 @@ begin
 
     SetCurrentMenu(CurrentMenu, GameMenu);
 
+    Window.Controls.Add(GlobalCatchInput);
     Window.Controls.Add(Notifications);
     Window.Controls.AddList(ControlsUnder);
 
