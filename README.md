@@ -9,3 +9,5 @@ Complete documentation for users is on http://castle-engine.sourceforge.net/cast
 ## License
 
 GNU GPL >= 2.
+
+Except some data files that are on other licenses, see the data/AUTHORS.txt file for details.
