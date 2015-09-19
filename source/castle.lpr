@@ -76,11 +76,11 @@ begin
            '  --debug-log           Write various log info on stdout' +nl+
            '  --debug-log-cache     Write log info, including cache, on stdout' +nl+
            '  --debug-menu-designer   Run menus is designer mode');
-         ProgramBreak;
+         Halt;
        end;
     1: begin
          WritelnStr(Version);
-         ProgramBreak;
+         Halt;
        end;
     2: { --debug-no-creatures not implemented for now };
     3: InitializeLog(Version);
