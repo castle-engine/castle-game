@@ -1023,7 +1023,7 @@ begin
       begin
         { calculate SpiderMoveDistance }
         SpiderMoveDistance := SpidersFallingSpeed * SecondsPassed;
-        MinTo1st(SpiderMoveDistance, AboveHeight - Spider.Radius);
+        MinVar(SpiderMoveDistance, AboveHeight - Spider.Radius);
         SpiderPosition[2] -= SpiderMoveDistance;
         SA.Translation := SpiderPosition;
         Inc(I);

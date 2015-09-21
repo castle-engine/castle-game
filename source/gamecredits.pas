@@ -61,9 +61,9 @@ begin
   inherited;
 
   VRMLContents := FileToString(ApplicationData('menu_bg/credits.wrl'));
-  StringReplaceAllTo1st(VRMLContents, '$SCastleVersion', SCastleVersion);
-  StringReplaceAllTo1st(VRMLContents, '$SCastleWWW', 'WWW: ' + CastleURL);
-  StringReplaceAllTo1st(VRMLContents, '$SCompilerDescription', SCompilerDescription);
+  StringReplaceAllVar(VRMLContents, '$SCastleVersion', SCastleVersion);
+  StringReplaceAllVar(VRMLContents, '$SCastleWWW', 'WWW: ' + CastleURL);
+  StringReplaceAllVar(VRMLContents, '$SCompilerDescription', SCompilerDescription);
 
   Scene := TCastleScene.Create(Self);
   Scene.Load(LoadX3DClassicFromString(VRMLContents, ''), true);

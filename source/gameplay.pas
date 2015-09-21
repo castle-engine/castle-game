@@ -316,7 +316,7 @@ procedure TGame2DControls.Render;
       LifeText := Format('%d', [Round(ALife)]);
       LifeTextPosition := XMove + IndicatorMargin +
         (IndicatorWidth - UIFont.TextWidth(LifeText)) div 2;
-      MaxTo1st(LifeTextPosition, IndicatorMargin);
+      MaxVar(LifeTextPosition, IndicatorMargin);
       UIFont.Print(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2,
         Gray08, LifeText);
     end;

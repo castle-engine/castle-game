@@ -116,7 +116,7 @@ begin
       { Note that when ScenesCount is odd, SceneIndex may be (at max)
         ScenesCount - 1 = (MiddleIndex * 2 + 1) - 1 = MiddleIndex * 2.
         Then HalfIndex is calculated as -1 above. Fix it. }
-      MaxTo1st(HalfIndex, 0);
+      MaxVar(HalfIndex, 0);
     end else
       HalfIndex := SceneIndex;
     Assert((ScenesCount <= 1) or ((0 <= HalfIndex) and (HalfIndex < MiddleIndex)));
