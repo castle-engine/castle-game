@@ -121,6 +121,6 @@ end;
 
 initialization
   TSceneRenderingAttributes.OnCreate := @TGameVideoOptions(nil).AttributesSet;
-  Config.OnLoad.Add(@TGameVideoOptions(nil).LoadFromConfig);
-  Config.OnSave.Add(@TGameVideoOptions(nil).SaveToConfig);
+  Config.AddLoadListener(@TGameVideoOptions(nil).LoadFromConfig);
+  Config.AddSaveListener(@TGameVideoOptions(nil).SaveToConfig);
 end.

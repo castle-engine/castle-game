@@ -618,6 +618,6 @@ end;
 initialization
   OnGLContextOpen.Add(@ContextOpen);
 
-  Config.OnLoad.Add(@TConfigOptions(nil).LoadFromConfig);
-  Config.OnSave.Add(@TConfigOptions(nil).SaveToConfig);
+  Config.AddLoadListener(@TConfigOptions(nil).LoadFromConfig);
+  Config.AddSaveListener(@TConfigOptions(nil).SaveToConfig);
 end.

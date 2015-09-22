@@ -107,6 +107,7 @@ begin
     - ParamStr(0) is unsure for Unixes.
     - ApplicationConfig and ApplicationData use this. }
   OnGetApplicationName := @MyGetApplicationName;
+
   Config.Load;
 
   { configure Notifications }
