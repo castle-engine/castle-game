@@ -63,7 +63,7 @@ var
 implementation
 
 uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow,
-  CastleGL;
+  CastleGL, CastlePrecalculatedAnimation, CastlePlayer;
 
 type
   TGameVideoOptions = class
@@ -99,6 +99,12 @@ begin
     'video_options/frequency', DefaultVideoFrequency);
   Window.AntiAliasing := TAntiAliasing(Config.GetValue(
     'video_options/anti_aliasing', Ord(DefaultAntiAliasing)));
+  AnimationSmoothness := Config.GetFloat(
+    'video_options/animation_smoothness', DefaultAnimationSmoothness);
+
+  { not really a "video option", but for now there's no better place to put this }
+  AutoOpenInventory := Config.GetValue(
+    'auto_open_inventory', DefaultAutoOpenInventory);
 end;
 
 class procedure TGameVideoOptions.SaveToConfig(const Config: TCastleConfig);
@@ -117,10 +123,17 @@ begin
     VideoFrequency, DefaultVideoFrequency);
   Config.SetDeleteValue('video_options/anti_aliasing',
     Ord(Window.AntiAliasing), Ord(DefaultAntiAliasing));
+  Config.SetDeleteFloat(
+    'video_options/animation_smoothness',
+    AnimationSmoothness, DefaultAnimationSmoothness);
+
+  { not really a "video option", but for now there's no better place to put this }
+  Config.SetDeleteValue('auto_open_inventory',
+    AutoOpenInventory, DefaultAutoOpenInventory);
 end;
 
 initialization
   TSceneRenderingAttributes.OnCreate := @TGameVideoOptions(nil).AttributesSet;
-  Config.AddLoadListener(@TGameVideoOptions(nil).LoadFromConfig);
-  Config.AddSaveListener(@TGameVideoOptions(nil).SaveToConfig);
+  UserConfig.AddLoadListener(@TGameVideoOptions(nil).LoadFromConfig);
+  UserConfig.AddSaveListener(@TGameVideoOptions(nil).SaveToConfig);
 end.

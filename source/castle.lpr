@@ -34,7 +34,7 @@ uses CastleWindow, SysUtils, CastleUtils, CastleProgress, CastleWindowProgress,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, CastleLevels, CastleMaterialProperties,
   CastleSoundEngine, CastleConfig, CastleRenderer, CastleResources, GameItems,
-  CastleGameNotifications;
+  CastleGameNotifications, CastleInputs;
 
 { suggested screen size ------------------------------------------------------ }
 
@@ -108,7 +108,9 @@ begin
     - ApplicationConfig and ApplicationData use this. }
   OnGetApplicationName := @MyGetApplicationName;
 
-  Config.Load;
+  UserConfig.Load;
+  SoundEngine.LoadFromConfig(UserConfig);
+  InputsAll.LoadFromConfig(UserConfig);
 
   { configure Notifications }
   Notifications.CollectHistory := true;
@@ -171,7 +173,7 @@ begin
   ItemsResourcesInit;
   CreaturesResourcesInit;
   Levels.LoadFromFiles;
-  Levels.LoadFromConfig;
+  Levels.LoadFromConfig(UserConfig);
 
   { init OpenAL (after initing Window and Progress, because ALContextOpen
     wants to display progress of "Loading sounds") }
@@ -180,5 +182,8 @@ begin
 
   ShowStartMenu;
 
-  Config.Save;
+  SoundEngine.SaveToConfig(UserConfig);
+  InputsAll.SaveToConfig(UserConfig);
+  Levels.SaveToConfig(UserConfig);
+  UserConfig.Save;
 end.
