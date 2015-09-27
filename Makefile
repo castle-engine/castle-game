@@ -23,7 +23,7 @@ clean:
 
 # make sure that various files are up-to-date
 update:
-	$(MAKE) -C source/
+	$(MAKE) -C code/
 	$(MAKE) -C data/items/life_potion/
 	$(MAKE) -C data/items/sword/
 	$(MAKE) -C data/levels/
