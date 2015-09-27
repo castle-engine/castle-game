@@ -1380,7 +1380,7 @@ begin
     Fountain.CastShadowVolumes := false; { not manifold }
     Fountain.Collides := false;
 
-    Fountain.Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA;
+    Fountain.Attributes.BlendingDestinationFactor := bdOneMinusSrcAlpha;
 
     Fountain.TimePlayingSpeed := 1.5;
     Fountain.TimePlaying := true;

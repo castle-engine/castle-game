@@ -92,7 +92,9 @@ begin
     MiddleIndex := ScenesCount div 2;
 
     glEnable(GL_BLEND); // saved by GL_COLOR_BUFFER_BIT
-    glBlendFunc(Attributes.BlendingSourceFactor, Attributes.BlendingDestinationFactor); // saved by GL_COLOR_BUFFER_BIT
+    GLBlendFunction(
+      Attributes.BlendingSourceFactor,
+      Attributes.BlendingDestinationFactor); // saved by GL_COLOR_BUFFER_BIT
     glDepthMask(GL_FALSE); // saved by GL_DEPTH_BUFFER_BIT
 
     { calculate Amount.

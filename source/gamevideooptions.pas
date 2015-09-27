@@ -23,21 +23,17 @@
 { Variables and utilities for things in "Video options" menu. }
 unit GameVideoOptions;
 
-{$I castleconf.inc}
-
 interface
 
-uses CastleGLUtils, CastleScene, X3DNodes;
+uses CastleScene, X3DNodes;
 
 const
   DefaultAllowScreenChange = true;
-
 var
   AllowScreenChange: boolean;
 
 const
   DefaultShadowVolumes = true;
-
 var
   { Render shadow volumes.
     This is meaningfull only if GLFeatures.ShadowVolumesPossible,
@@ -63,7 +59,7 @@ var
 implementation
 
 uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow,
-  CastleGL, CastlePrecalculatedAnimation, CastlePlayer;
+  CastleGLUtils, CastlePrecalculatedAnimation, CastlePlayer;
 
 type
   TGameVideoOptions = class
@@ -77,8 +73,8 @@ begin
   { Disadvantage: it only increases the image color, so partially
     transparent objects have a tendency to look all white on the level.
     Advantage: no sorting problems. }
-  Attributes.BlendingSourceFactor := GL_SRC_ALPHA;
-  Attributes.BlendingDestinationFactor := GL_ONE;
+  Attributes.BlendingSourceFactor := bsSrcAlpha;
+  Attributes.BlendingDestinationFactor := bdOne;
 
   { Disadvantage: it has a tendency to make color of the level
     (things behind the partially transparent object) seem too dark
