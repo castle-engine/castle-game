@@ -86,7 +86,7 @@ begin
   begin
     HasHorizontalAnchor := true;
     HorizontalAnchor := hpLeft;
-    HorizontalAnchorDelta := 20;
+    HorizontalAnchorDelta := 100;
 
     HasVerticalAnchor := true;
     VerticalAnchor := vpTop;

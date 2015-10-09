@@ -177,13 +177,7 @@ begin
   Add('Visit our website');
   Add('Quit');
 
-  HasHorizontalAnchor := true;
-  HorizontalAnchor := hpLeft;
-  HorizontalAnchorDelta := 20;
-
-  HasVerticalAnchor := true;
-  VerticalAnchor := vpTop;
-  VerticalAnchorDelta := -120;
+  SetPosition(false);
 
   DrawBackgroundRectangle := false;
 end;
