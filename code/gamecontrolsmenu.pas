@@ -164,7 +164,7 @@ var
 begin
   inherited;
 
-  R := Rect;
+  R := ScreenRect;
   SubMenuTitleFont.Print(R.Left, R.Top - 20,
     SubMenuTextColor, SubMenuTitle + ' :');
 
@@ -400,8 +400,12 @@ var
   I: Integer;
 begin
   for I := 0 to InputsGroup[Group].Count - 1 do
-    (Controls[I] as TCastleLabel).Text.Text :=
+  begin
+    (Controls[I].Controls[0] as TCastleLabel).Text.Text :=
       InputsGroup[Group].Items[I].Description(SNoneInput);
+    { text changed, maybe stuff should be wider / narrower now }
+    RecalculateSize;
+  end;
 end;
 
 { TBasicControlsMenu ------------------------------------------------------------- }
@@ -459,14 +463,10 @@ type
   end;
 
 procedure TFadeRect.Render;
-const
-  Width = 780;
-  Height = 390;
 begin
-  DrawRectangle(Rectangle(
-    (ParentRect.Width - Width) div 2,
-    (ParentRect.Height - Height) div 2, Width, Height),
-    Vector4Single(0, 0, 0, 0.4));
+  inherited;
+  DrawRectangle(CurrentMenu.ScreenRect.Grow(150),
+    Vector4Single(0, 0, 0, CurrentMenu.BackgroundOpacityFocused));
 end;
 
 procedure Press(Container: TUIContainer; const Event: TInputPressRelease);

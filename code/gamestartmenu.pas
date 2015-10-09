@@ -598,10 +598,13 @@ end;
 procedure TChooseNewLevelMenu.Render;
 const
   SubMenuTextColor: TCastleColor = (0.7, 0.7, 0.7, 1.0);
+var
+  R: TRectangle;
 begin
   inherited;
-  SubMenuTitleFont.Print(Left,
-    ScreenRect.Top - (FirstDemoLevelIndex + 2) *
+  R := ScreenRect;
+  SubMenuTitleFont.Print(R.Left,
+    R.Top - (FirstDemoLevelIndex + 2) *
       (UIFont.RowHeight + RegularSpaceBetweenItems) - 15 { margin },
     SubMenuTextColor, 'Bonus demo levels :');
 end;
