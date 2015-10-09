@@ -102,18 +102,20 @@ end;
 
 { routines ------------------------------------------------------------------- }
 
-procedure BackgroundCreate;
 var
   BackgroundCaptions: TUIControl;
+
+procedure BackgroundCreate;
+var
   BackgroundPlayer: TPlayer;
 begin
-  BackgroundControls := TUIControlList.Create(true);
+  BackgroundControls := TUIControlList.Create(nil);
 
   { initialize BackgroundSceneManager }
   BackgroundSceneManager := TGameSceneManager.Create(nil);
 
   BackgroundSceneManager.LoadLevel(MenuBackgroundLevelName);
-  BackgroundControls.Add(BackgroundSceneManager);
+  BackgroundControls.InsertFront(BackgroundSceneManager);
 
   { Do not allow to move the camera in any way. }
   BackgroundSceneManager.Camera.Input := [];
@@ -126,12 +128,14 @@ begin
   BackgroundSceneManager.Items.Add(BackgroundPlayer);
 
   BackgroundCaptions := TBackgroundCaptions.Create(nil);
-  BackgroundControls.Add(BackgroundCaptions);
+  BackgroundControls.InsertFront(BackgroundCaptions);
 end;
 
 procedure BackgroundDestroy;
 begin
   FreeAndNil(BackgroundControls);
+  FreeAndNil(BackgroundCaptions);
+  FreeAndNil(BackgroundSceneManager);
 end;
 
 end.

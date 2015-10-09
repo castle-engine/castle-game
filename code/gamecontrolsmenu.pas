@@ -32,19 +32,10 @@ type
   TSubMenu = class(TCastleGameMenu)
   public
     SubMenuTitle: string;
-    { Note that you can freely change this at runtime. No need to call
-      things like FixItemsRectangles or something like that when you change
-      the value of this property. }
+    { Note that you can freely change this at runtime. }
     SubMenuAdditionalInfo: string;
     constructor Create(AOwner: TComponent); override;
     procedure Render; override;
-
-    { Sets Position and PositionRelative* parameters.
-      If Center = @false then sets position suitable for the background
-      under start menu. Otherwise menu is shifted to be roughly in the center
-      of the screen.
-      If DoFixItemsRectangles, then FixItemsRectangles will be called afterwards. }
-    procedure SetPosition(const Center, DoFixItemsRectangles: boolean);
   end;
 
 { Show menu that allows player to configure controls. }
@@ -107,15 +98,17 @@ end;
 
 type
   TControlsMenu = class(TSubMenu)
+  private
+    procedure MouseLookHorizontalSensitivityChanged(Sender: TObject);
+    procedure MouseLookVerticalSensitivityChanged(Sender: TObject);
   public
-    MouseLookHorizontalSensitivitySlider: TMenuFloatSlider;
-    MouseLookVerticalSensitivitySlider: TMenuFloatSlider;
-    AutoOpenInventoryArgument: TMenuBooleanArgument;
-    MouseLookArgument: TMenuBooleanArgument;
-    InvertVerticalMouseLookArgument: TMenuBooleanArgument;
+    MouseLookHorizontalSensitivitySlider: TCastleFloatSlider;
+    MouseLookVerticalSensitivitySlider: TCastleFloatSlider;
+    AutoOpenInventoryArgument: TCastleBooleanLabel;
+    MouseLookArgument: TCastleBooleanLabel;
+    InvertVerticalMouseLookArgument: TCastleBooleanLabel;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
-    procedure AccessoryValueChanged; override;
   end;
 
   TControlsSubMenu = class(TSubMenu)
@@ -159,46 +152,28 @@ var
 constructor TSubMenu.Create(AOwner: TComponent);
 begin
   inherited;
-  SetPosition(false, false);
+  SetPosition(false);
   DrawBackgroundRectangle := false;
-end;
-
-procedure TSubMenu.SetPosition(const Center, DoFixItemsRectangles: boolean);
-begin
-  if Center then
-  begin
-    Position := Vector2Integer(0, 0);
-    PositionRelativeScreenX := hpMiddle;
-    PositionRelativeScreenY := vpMiddle;
-    PositionRelativeMenuX := hpMiddle;
-    PositionRelativeMenuY := vpMiddle;
-  end else
-  begin
-    Position := Vector2Integer(20, -120);
-    PositionRelativeScreenX := hpLeft;
-    PositionRelativeScreenY := vpTop;
-    PositionRelativeMenuX := hpLeft;
-    PositionRelativeMenuY := vpTop;
-  end;
-
-  if DoFixItemsRectangles then FixItemsRectangles;
 end;
 
 procedure TSubMenu.Render;
 const
   SubMenuTextColor: TCastleColor = (0.9, 0.9, 0.9, 1.0);
+var
+  R: TRectangle;
 begin
   inherited;
 
-  SubMenuTitleFont.Print(Position[0], Position[1] - 20,
+  R := Rect;
+  SubMenuTitleFont.Print(R.Left, R.Top - 20,
     SubMenuTextColor, SubMenuTitle + ' :');
 
   if SubMenuAdditionalInfo <> '' then
     SubMenuTitleFont.PrintBrokenString(
-      AllItemsRectangle.Left,
-      AllItemsRectangle.Bottom - SubMenuTitleFont.RowHeight, SubMenuTextColor,
+      R.Left,
+      R.Bottom - SubMenuTitleFont.RowHeight, SubMenuTextColor,
       SubMenuAdditionalInfo,
-      Window.Width - 2 * Round(AllItemsRectangle.Left), true, 0);
+      Window.Width - 2 * Round(R.Left), true, 0);
 end;
 
 { TControlsMenu ------------------------------------------------------------- }
@@ -207,28 +182,37 @@ constructor TControlsMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  MouseLookHorizontalSensitivitySlider := TMenuFloatSlider.Create(
-    0.01, 0.3, MouseLookHorizontalSensitivity);
-  MouseLookVerticalSensitivitySlider := TMenuFloatSlider.Create(
-    0.01, 0.3, MouseLookVerticalSensitivity);
-  AutoOpenInventoryArgument := TMenuBooleanArgument.Create(AutoOpenInventory);
-  MouseLookArgument := TMenuBooleanArgument.Create(MouseLook);
-  InvertVerticalMouseLookArgument :=
-    TMenuBooleanArgument.Create(InvertVerticalMouseLook);
+  MouseLookHorizontalSensitivitySlider := TCastleFloatSlider.Create(Self);
+  MouseLookHorizontalSensitivitySlider.Min := 0.01;
+  MouseLookHorizontalSensitivitySlider.Max := 0.3;
+  MouseLookHorizontalSensitivitySlider.Value := MouseLookHorizontalSensitivity;
+  MouseLookHorizontalSensitivitySlider.OnChange := @MouseLookHorizontalSensitivityChanged;
 
-  Items.Add('Configure basic controls');
-  Items.Add('Configure items controls');
-  Items.Add('Configure other controls');
-  Items.AddObject('Use mouse look', MouseLookArgument);
-  Items.AddObject('Mouse look horizontal sensitivity',
-    MouseLookHorizontalSensitivitySlider);
-  Items.AddObject('Mouse look vertical sensitivity',
-    MouseLookVerticalSensitivitySlider);
-  Items.AddObject('Invert vertical mouse look', InvertVerticalMouseLookArgument);
-  Items.AddObject('Auto show inventory on pickup',
-    AutoOpenInventoryArgument);
-  Items.Add('Restore to defaults');
-  Items.Add('Back to main menu');
+  MouseLookVerticalSensitivitySlider := TCastleFloatSlider.Create(Self);
+  MouseLookVerticalSensitivitySlider.Min := 0.01;
+  MouseLookVerticalSensitivitySlider.Max := 0.3;
+  MouseLookVerticalSensitivitySlider.Value := MouseLookVerticalSensitivity;
+  MouseLookVerticalSensitivitySlider.OnChange := @MouseLookVerticalSensitivityChanged;
+
+  AutoOpenInventoryArgument := TCastleBooleanLabel.Create(Self);
+  AutoOpenInventoryArgument.Value := AutoOpenInventory;
+
+  MouseLookArgument := TCastleBooleanLabel.Create(Self);
+  MouseLookArgument.Value := MouseLook;
+
+  InvertVerticalMouseLookArgument := TCastleBooleanLabel.Create(Self);
+  InvertVerticalMouseLookArgument.Value := InvertVerticalMouseLook;
+
+  Add('Configure basic controls');
+  Add('Configure items controls');
+  Add('Configure other controls');
+  Add('Use mouse look', MouseLookArgument);
+  Add('Mouse look horizontal sensitivity', MouseLookHorizontalSensitivitySlider);
+  Add('Mouse look vertical sensitivity', MouseLookVerticalSensitivitySlider);
+  Add('Invert vertical mouse look', InvertVerticalMouseLookArgument);
+  Add('Auto show inventory on pickup', AutoOpenInventoryArgument);
+  Add('Restore to defaults');
+  Add('Back to main menu');
 
   SubMenuTitle := 'Configure controls';
 end;
@@ -279,16 +263,14 @@ begin
   end;
 end;
 
-procedure TControlsMenu.AccessoryValueChanged;
+procedure TControlsMenu.MouseLookHorizontalSensitivityChanged(Sender: TObject);
 begin
-  inherited;
+  MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivitySlider.Value;
+end;
 
-  case CurrentItem of
-    4: MouseLookHorizontalSensitivity :=
-         MouseLookHorizontalSensitivitySlider.Value;
-    5: MouseLookVerticalSensitivity :=
-         MouseLookVerticalSensitivitySlider.Value;
-  end;
+procedure TControlsMenu.MouseLookVerticalSensitivityChanged(Sender: TObject);
+begin
+  MouseLookVerticalSensitivity := MouseLookVerticalSensitivitySlider.Value;
 end;
 
 { TControlsSubMenu ----------------------------------------------------------- }
@@ -299,16 +281,10 @@ const
 constructor TControlsSubMenu.CreateControlsSubMenu(AOwner: TComponent;
   AGroup: TInputGroup);
 
-  function InputArgument(const S: string): TMenuArgument;
+  function InputArgument(const S: string): TCastleLabel;
   begin
-    Result := TMenuArgument.Create(
-      400
-      { This used to be
-        TMenuArgument.TextWidth(
-          'key "Page Down" or "Page Up" or mouse "medium"')
-        But this is too long... Unfortunately, it seems that some
-        key configurations just will not fit on screen. });
-    Result.Value := S;
+    Result := TCastleLabel.Create(Self);
+    Result.Text.Text := S;
   end;
 
 var
@@ -319,12 +295,11 @@ begin
   FGroup := AGroup;
 
   for I := 0 to InputsGroup[Group].Count - 1 do
-    Items.AddObject(
-      InputsGroup[Group].Items[I].Caption,
+    Add(InputsGroup[Group].Items[I].Caption,
       InputArgument(InputsGroup[Group].Items[I].
         Description(SNoneInput)));
 
-  Items.Add('Back to controls menu');
+  Add('Back to controls menu');
 
   RegularSpaceBetweenItems := 2;
 end;
@@ -425,7 +400,7 @@ var
   I: Integer;
 begin
   for I := 0 to InputsGroup[Group].Count - 1 do
-    TMenuArgument(Items.Objects[I]).Value :=
+    (Controls[I] as TCastleLabel).Text.Text :=
       InputsGroup[Group].Items[I].Description(SNoneInput);
 end;
 
@@ -489,8 +464,8 @@ const
   Height = 390;
 begin
   DrawRectangle(Rectangle(
-    (ContainerRect.Width - Width) div 2,
-    (ContainerRect.Height - Height) div 2, Width, Height),
+    (ParentRect.Width - Width) div 2,
+    (ParentRect.Height - Height) div 2, Width, Height),
     Vector4Single(0, 0, 0, 0.4));
 end;
 
@@ -518,10 +493,10 @@ begin
   ExitWithEscapeAllowed := AExitWithEscapeAllowed;
   ExitWithEscape := false;
 
-  ControlsMenu     .SetPosition(ADrawCentered, true);
-  BasicControlsMenu.SetPosition(ADrawCentered, true);
-  ItemsControlsMenu.SetPosition(ADrawCentered, true);
-  OtherControlsMenu.SetPosition(ADrawCentered, true);
+  ControlsMenu     .SetPosition(ADrawCentered);
+  BasicControlsMenu.SetPosition(ADrawCentered);
+  ItemsControlsMenu.SetPosition(ADrawCentered);
+  OtherControlsMenu.SetPosition(ADrawCentered);
 
   FadeRect := nil;
 
@@ -534,12 +509,12 @@ begin
     if ADrawFadeRect then
     begin
       FadeRect := TFadeRect.Create(nil);
-      Window.Controls.Add(FadeRect);
+      Window.Controls.InsertBack(FadeRect);
     end;
 
-    Window.Controls.Add(GlobalCatchInput);
-    Window.Controls.Add(Notifications);
-    Window.Controls.AddList(ControlsUnder);
+    Window.Controls.InsertBack(GlobalCatchInput);
+    Window.Controls.InsertBack(Notifications);
+    Window.Controls.InsertBack(ControlsUnder);
 
     UserQuit := false;
     repeat

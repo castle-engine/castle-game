@@ -26,7 +26,8 @@ unit GameWindow;
 interface
 
 uses Classes,
-  CastleVectors, CastleWindow, CastleUIControls, CastleKeysMouse;
+  CastleVectors, CastleWindow, CastleUIControls, CastleKeysMouse,
+  CastleRectangles;
 
 type
   TGameWindow = class(TCastleWindowCustom)
@@ -36,7 +37,7 @@ type
 
   TGlobalCatchInput = class(TUIControl)
     function Press(const Event: TInputPressRelease): boolean; override;
-    function PositionInside(const Position: TVector2Single): boolean; override;
+    function CapturesEventsAtPosition(const Position: TVector2Single): boolean; override;
   end;
 
 var
@@ -82,7 +83,8 @@ begin
   end;
 end;
 
-function TGlobalCatchInput.PositionInside(const Position: TVector2Single): boolean;
+function TGlobalCatchInput.CapturesEventsAtPosition(
+  const Position: TVector2Single): boolean;
 begin
   Result := true; // always catch input
 end;

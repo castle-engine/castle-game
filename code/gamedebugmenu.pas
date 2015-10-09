@@ -45,22 +45,25 @@ uses SysUtils, Classes, CastleControlsImages, CastleImages,
 type
   TDebugMenu = class(TCastleGameMenu)
   public
-    RenderDebug3DArgument: TMenuBooleanArgument;
-    RenderDebugCaptionsArgument: TMenuBooleanArgument;
-    ShadowVolumesRenderArgument: TMenuBooleanArgument;
-    DebugRenderForLevelScreenshotArgument: TMenuBooleanArgument;
+    RenderDebug3DArgument: TCastleBooleanLabel;
+    RenderDebugCaptionsArgument: TCastleBooleanLabel;
+    ShadowVolumesRenderArgument: TCastleBooleanLabel;
+    DebugRenderForLevelScreenshotArgument: TCastleBooleanLabel;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
   end;
 
   TDebugPlayerMenu = class(TCastleGameMenu)
+  private
+    procedure RotationHorizontalSpeedChanged(Sender: TObject);
+    procedure RotationVerticalSpeedChanged(Sender: TObject);
+    procedure PlayerSpeedChanged(Sender: TObject);
   public
-    RotationHorizontalSpeedSlider: TMenuFloatSlider;
-    RotationVerticalSpeedSlider: TMenuFloatSlider;
-    PlayerSpeedSlider: TMenuFloatSlider;
+    RotationHorizontalSpeedSlider: TCastleFloatSlider;
+    RotationVerticalSpeedSlider: TCastleFloatSlider;
+    PlayerSpeedSlider: TCastleFloatSlider;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
-    procedure AccessoryValueChanged; override;
   end;
 
   TDebugItemsMenu = class(TCastleGameMenu)
@@ -71,7 +74,7 @@ type
 
   TDebugCreaturesMenu = class(TCastleGameMenu)
   public
-    DebugTimeStopForCreaturesArgument: TMenuBooleanArgument;
+    DebugTimeStopForCreaturesArgument: TCastleBooleanLabel;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
   end;
@@ -80,7 +83,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
-    procedure AccessoryValueChanged; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -125,24 +127,30 @@ constructor TDebugMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  RenderDebug3DArgument := TMenuBooleanArgument.Create(RenderDebug3D);
-  RenderDebugCaptionsArgument := TMenuBooleanArgument.Create(RenderDebugCaptions);
-  ShadowVolumesRenderArgument := TMenuBooleanArgument.Create(ShadowVolumesRender);
-  DebugRenderForLevelScreenshotArgument := TMenuBooleanArgument.Create(
-    DebugRenderForLevelScreenshot);
+  RenderDebug3DArgument := TCastleBooleanLabel.Create(Self);
+  RenderDebug3DArgument.Value := RenderDebug3D;
 
-  Items.Add('Player debug menu ...');
-  Items.Add('Creatures debug menu ...');
-  Items.Add('Items debug menu ...');
-  Items.Add('Level debug menu ...');
-  Items.Add('Reload resources resource.xml files');
-  Items.Add('Reload resource animation ...');
-  Items.AddObject('Render debug 3D information', RenderDebug3DArgument);
-  Items.AddObject('Render debug captions', RenderDebugCaptionsArgument);
-  Items.AddObject('Render shadow volumes', ShadowVolumesRenderArgument);
-  Items.AddObject('Render for level screenshot', DebugRenderForLevelScreenshotArgument);
-  Items.Add('Reload sounds/index.xml');
-  Items.Add('Back to game');
+  RenderDebugCaptionsArgument := TCastleBooleanLabel.Create(Self);
+  RenderDebugCaptionsArgument.Value := RenderDebugCaptions;
+
+  ShadowVolumesRenderArgument := TCastleBooleanLabel.Create(Self);
+  ShadowVolumesRenderArgument.Value := ShadowVolumesRender;
+
+  DebugRenderForLevelScreenshotArgument := TCastleBooleanLabel.Create(Self);
+  DebugRenderForLevelScreenshotArgument.Value := DebugRenderForLevelScreenshot;
+
+  Add('Player debug menu ...');
+  Add('Creatures debug menu ...');
+  Add('Items debug menu ...');
+  Add('Level debug menu ...');
+  Add('Reload resources resource.xml files');
+  Add('Reload resource animation ...');
+  Add('Render debug 3D information', RenderDebug3DArgument);
+  Add('Render debug captions', RenderDebugCaptionsArgument);
+  Add('Render shadow volumes', ShadowVolumesRenderArgument);
+  Add('Render for level screenshot', DebugRenderForLevelScreenshotArgument);
+  Add('Reload sounds/index.xml');
+  Add('Back to game');
 end;
 
 procedure TDebugMenu.Click;
@@ -201,17 +209,31 @@ begin
 
   { Note that Player is not created at this point.
     We will init Value of these sliders later. }
-  RotationHorizontalSpeedSlider := TMenuFloatSlider.Create(25, 500, 1);
-  RotationVerticalSpeedSlider := TMenuFloatSlider.Create(25, 500, 1);
-  PlayerSpeedSlider := TMenuFloatSlider.Create(0.1, 5, 1);
+  RotationHorizontalSpeedSlider := TCastleFloatSlider.Create(Self);
+  RotationHorizontalSpeedSlider.Min := 25;
+  RotationHorizontalSpeedSlider.Max := 500;
+  RotationHorizontalSpeedSlider.Value := 1;
+  RotationHorizontalSpeedSlider.OnChange := @RotationHorizontalSpeedChanged;
 
-  Items.Add('Infinite Life');
-  Items.Add('Fly (indefinitely)');
-  Items.AddObject('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
-  Items.AddObject('Set vertical rotation speed', RotationVerticalSpeedSlider);
-  Items.AddObject('Set player speed', PlayerSpeedSlider);
-  Items.Add('Reload player.xml file');
-  Items.Add('Back');
+  RotationVerticalSpeedSlider := TCastleFloatSlider.Create(Self);
+  RotationVerticalSpeedSlider.Min := 25;
+  RotationVerticalSpeedSlider.Max := 500;
+  RotationVerticalSpeedSlider.Value := 1;
+  RotationVerticalSpeedSlider.OnChange := @RotationVerticalSpeedChanged;
+
+  PlayerSpeedSlider := TCastleFloatSlider.Create(Self);
+  PlayerSpeedSlider.Min := 0.1;
+  PlayerSpeedSlider.Max := 5;
+  PlayerSpeedSlider.Value := 1;
+  PlayerSpeedSlider.OnChange := @PlayerSpeedChanged;
+
+  Add('Infinite Life');
+  Add('Fly (indefinitely)');
+  Add('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
+  Add('Set vertical rotation speed', RotationVerticalSpeedSlider);
+  Add('Set player speed', PlayerSpeedSlider);
+  Add('Reload player.xml file');
+  Add('Back');
 end;
 
 procedure TDebugPlayerMenu.Click;
@@ -241,13 +263,19 @@ begin
   end;
 end;
 
-procedure TDebugPlayerMenu.AccessoryValueChanged;
+procedure TDebugPlayerMenu.RotationHorizontalSpeedChanged(Sender: TObject);
 begin
-  case CurrentItem of
-    2: Player.Camera.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
-    3: Player.Camera.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
-    4: Player.Camera.MoveSpeed := PlayerSpeedSlider.Value;
-  end;
+  Player.Camera.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
+end;
+
+procedure TDebugPlayerMenu.RotationVerticalSpeedChanged(Sender: TObject);
+begin
+  Player.Camera.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
+end;
+
+procedure TDebugPlayerMenu.PlayerSpeedChanged(Sender: TObject);
+begin
+  Player.Camera.MoveSpeed := PlayerSpeedSlider.Value;
 end;
 
 { TDebugCreaturesMenu -------------------------------------------------------- }
@@ -256,14 +284,14 @@ constructor TDebugCreaturesMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  DebugTimeStopForCreaturesArgument := TMenuBooleanArgument.Create(
-    DebugTimeStopForCreatures);
+  DebugTimeStopForCreaturesArgument := TCastleBooleanLabel.Create(Self);
+  DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
 
-  Items.Add('Kill all creatures');
-  Items.Add('Kill all non-still creatures');
-  Items.Add('Add creature to level before player');
-  Items.AddObject('Time stop for creatures', DebugTimeStopForCreaturesArgument);
-  Items.Add('Back');
+  Add('Kill all creatures');
+  Add('Kill all non-still creatures');
+  Add('Add creature to level before player');
+  Add('Time stop for creatures', DebugTimeStopForCreaturesArgument);
+  Add('Back');
 end;
 
 procedure TDebugCreaturesMenu.Click;
@@ -320,9 +348,9 @@ constructor TDebugLevelMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  Items.Add('Change to level');
-  Items.Add('Restart current level (preserving camera)');
-  Items.Add('Back');
+  Add('Change to level');
+  Add('Restart current level (preserving camera)');
+  Add('Back');
 end;
 
 procedure TDebugLevelMenu.Click;
@@ -389,19 +417,14 @@ begin
   end;
 end;
 
-procedure TDebugLevelMenu.AccessoryValueChanged;
-begin
-  inherited;
-end;
-
 { TDebugItemsMenu ------------------------------------------------------------ }
 
 constructor TDebugItemsMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  Items.Add('Give me 20 instances of every possible item');
-  Items.Add('Back');
+  Add('Give me 20 instances of every possible item');
+  Add('Back');
 end;
 
 procedure TDebugItemsMenu.Click;
@@ -454,8 +477,8 @@ begin
 
     SetCurrentMenu(CurrentMenu, DebugMenu);
 
-    Window.Controls.Add(GlobalCatchInput);
-    Window.Controls.AddList(ControlsUnder);
+    Window.Controls.InsertBack(GlobalCatchInput);
+    Window.Controls.InsertBack(ControlsUnder);
 
     UserQuit := false;
     repeat

@@ -25,7 +25,8 @@ unit GameGeneralMenu;
 
 interface
 
-uses Classes, CastleVectors, CastleOnScreenMenu;
+uses Classes,
+  CastleVectors, CastleOnScreenMenu, CastleRectangles;
 
 type
   { On-screen menu suitable for castle.
@@ -40,11 +41,13 @@ type
     constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
     property DrawFocusedBorder default false;
-    function PositionInside(const Point: TVector2Single): boolean; override;
-  end;
+    property CaptureAllEvents default true;
 
-var
-  DebugMenuDesigner: boolean = false;
+    { Sets position parameters.
+      If Center = @false then sets position suitable for the background
+      under start menu. Otherwise menu is in the center of the screen. }
+    procedure SetPosition(const ACenter: boolean);
+  end;
 
 { Sets CurrentValue, taking care of adding this menu / removing existing menu
   (when new value is @nil) from Window.Controls.
@@ -62,17 +65,36 @@ uses SysUtils, CastleWindow, CastleUIControls, GameWindow;
 constructor TCastleGameMenu.Create(AOwner: TComponent);
 begin
   inherited;
-  { Don't set DesignerModeWindow, we do tricks that make setting mouse
-    position in OnScreenMenu not working. See TCastleOnScreenMenu.DesignerMode comments. }
-  DesignerMode := DebugMenuDesigner;
   ExclusiveEvents := false;
   DrawFocusedBorder := false;
+  CaptureAllEvents := true;
+  SetPosition(true); // center by default
 end;
 
-function TCastleGameMenu.PositionInside(const Point: TVector2Single): boolean;
+procedure TCastleGameMenu.SetPosition(const ACenter: boolean);
 begin
-  Result := true;
+  if ACenter then
+  begin
+    HasHorizontalAnchor := true;
+    HorizontalAnchor := hpMiddle;
+    HorizontalAnchorDelta := 0;
+
+    HasVerticalAnchor := true;
+    VerticalAnchor := vpMiddle;
+    VerticalAnchorDelta := 0;
+  end else
+  begin
+    HasHorizontalAnchor := true;
+    HorizontalAnchor := hpLeft;
+    HorizontalAnchorDelta := 20;
+
+    HasVerticalAnchor := true;
+    VerticalAnchor := vpTop;
+    VerticalAnchorDelta := -120;
+  end;
 end;
+
+{ globals -------------------------------------------------------------------- }
 
 function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
   const NewValue: TCastleGameMenu): TCastleGameMenu;

@@ -47,13 +47,12 @@ const
 { parsing parameters --------------------------------------------------------- }
 
 const
-  Options: array [0..5] of TOption =
+  Options: array [0..4] of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
     (Short:'v'; Long: 'version'; Argument: oaNone),
     (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
     (Short: #0; Long: 'debug-log'; Argument: oaNone),
-    (Short: #0; Long: 'debug-log-cache'; Argument: oaNone),
-    (Short: #0; Long: 'debug-menu-designer'; Argument: oaNone)
+    (Short: #0; Long: 'debug-log-cache'; Argument: oaNone)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -74,8 +73,7 @@ begin
            nl+
            'Debug options (don''t use unless you know what you''re doing):' +nl+
            '  --debug-log           Write various log info on stdout' +nl+
-           '  --debug-log-cache     Write log info, including cache, on stdout' +nl+
-           '  --debug-menu-designer   Run menus is designer mode');
+           '  --debug-log-cache     Write log info, including cache, on stdout');
          Halt;
        end;
     1: begin
@@ -88,7 +86,6 @@ begin
          InitializeLog(Version);
          LogRendererCache := true;
        end;
-    5: DebugMenuDesigner := true;
     else raise EInternalError.Create('OptionProc');
   end;
 end;

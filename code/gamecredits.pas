@@ -120,9 +120,9 @@ begin
     Credits.AnimationTime := 0;
     Credits.Translation := ZeroVector3Single;
 
-    Window.Controls.Add(GlobalCatchInput);
-    Window.Controls.Add(Notifications);
-    Window.Controls.AddList(ControlsUnder);
+    Window.Controls.InsertBack(GlobalCatchInput);
+    Window.Controls.InsertBack(Notifications);
+    Window.Controls.InsertBack(ControlsUnder);
 
     Window.Controls.InsertFront(CreditsSceneManager);
 

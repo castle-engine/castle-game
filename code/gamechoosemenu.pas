@@ -73,13 +73,8 @@ var
   OldThemeWindow: TCastleImage;
   I: Integer;
 begin
-  ChooseMenu.Items.Assign(MenuItems);
-  { MenuItems.Objects may be used by called to store some information.
-    Remove them now from ChooseMenu.Items, otherwise TOnScreenMenu
-    would treat them as accessories. }
-  for I := 0 to ChooseMenu.Items.Count - 1 do
-    ChooseMenu.Items.Objects[I] := nil;
-  ChooseMenu.FixItemsRectangles;
+  for I := 0 to MenuItems.Count - 1 do
+    ChooseMenu.Add(MenuItems[I]);
 
   OldThemeWindow := Theme.Images[tiWindow];
   SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
@@ -92,9 +87,9 @@ begin
 
     Window.Controls.MakeSingle(TCastleOnScreenMenu, ChooseMenu);
 
-    Window.Controls.Add(GlobalCatchInput);
-    Window.Controls.Add(Notifications);
-    Window.Controls.AddList(ControlsUnder);
+    Window.Controls.InsertBack(GlobalCatchInput);
+    Window.Controls.InsertBack(Notifications);
+    Window.Controls.InsertBack(ControlsUnder);
 
     Selected := false;
     repeat

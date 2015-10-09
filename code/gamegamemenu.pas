@@ -54,7 +54,6 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Click; override;
-    procedure AccessoryValueChanged; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -73,11 +72,11 @@ constructor TGameMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  Items.Add('Back to game');
-  Items.Add('View last game messages');
-  Items.Add('Configure controls');
-  Items.Add('Sound options');
-  Items.Add('End game');
+  Add('Back to game');
+  Add('View last game messages');
+  Add('Configure controls');
+  Add('Sound options');
+  Add('End game');
 end;
 
 procedure TGameMenu.Click;
@@ -106,7 +105,7 @@ begin
   SoundInfo := TSoundInfoMenuItem.Create(Window, Self);
   SoundVolume := TSoundVolumeMenuItem.Create(Window, Self);
   MusicVolume := TMusicVolumeMenuItem.Create(Window, Self);
-  Items.Add('Back to game menu');
+  Add('Back to game menu');
 end;
 
 destructor TGameSoundMenu.Destroy;
@@ -130,14 +129,6 @@ begin
   end;
 end;
 
-procedure TGameSoundMenu.AccessoryValueChanged;
-begin
-  case CurrentItem of
-    1: SoundVolume.AccessoryValueChanged;
-    2: MusicVolume.AccessoryValueChanged;
-  end;
-end;
-
 { global things -------------------------------------------------------------- }
 
 {$I gamemenucallbacks.inc}
@@ -149,8 +140,8 @@ var
 begin
   ControlsUnder := AControlsUnder;
 
-  GameSoundMenu.SoundVolume.RefreshAccessory;
-  GameSoundMenu.MusicVolume.RefreshAccessory;
+  GameSoundMenu.SoundVolume.Refresh;
+  GameSoundMenu.MusicVolume.Refresh;
 
   OldThemeWindow := Theme.Images[tiWindow];
   SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
@@ -164,9 +155,9 @@ begin
 
     SetCurrentMenu(CurrentMenu, GameMenu);
 
-    Window.Controls.Add(GlobalCatchInput);
-    Window.Controls.Add(Notifications);
-    Window.Controls.AddList(ControlsUnder);
+    Window.Controls.InsertBack(GlobalCatchInput);
+    Window.Controls.InsertBack(Notifications);
+    Window.Controls.InsertBack(ControlsUnder);
 
     UserQuit := false;
     repeat

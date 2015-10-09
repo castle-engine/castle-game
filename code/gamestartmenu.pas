@@ -39,7 +39,7 @@ uses SysUtils, Classes, CastleUtils, CastleWindowModes,
   CastleOnScreenMenu, CastleInputs, CastleRectangles,
   CastleKeysMouse, CastleOpenDocument, CastlePrecalculatedAnimation,
   CastleStringUtils, CastleClassUtils, CastleGameNotifications,
-  CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes,
+  CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes, CastleControls,
   GamePlay, GameSound, GameGeneralMenu, GameControlsMenu, GameVideoOptions,
   GameHelp, GameBackgroundLevel, GameCredits;
 
@@ -52,26 +52,28 @@ type
     procedure Click; override;
   end;
 
-  TAntiAliasingSlider = class(TMenuIntegerSlider)
-    constructor Create;
+  TAntiAliasingSlider = class(TCastleIntegerSlider)
+    constructor Create(AOwner: TComponent); override;
     function ValueToStr(const AValue: Integer): string; override;
   end;
 
   TVideoMenu = class(TSubMenu)
+  private
+    procedure AnimationSmoothnessChanged(Sender: TObject);
+    procedure AntiAliasingChanged(Sender: TObject);
   public
-    AllowScreenChangeArgument: TMenuBooleanArgument;
-    ShadowVolumesArgument: TMenuBooleanArgument;
-    AnimationSmoothnessSlider: TMenuFloatSlider;
-    ColorBitsArgument: TMenuArgument;
-    VideoFrequencyArgument: TMenuArgument;
-    ConserveResourcesArgument: TMenuBooleanArgument;
+    AllowScreenChangeArgument: TCastleBooleanLabel;
+    ShadowVolumesArgument: TCastleBooleanLabel;
+    AnimationSmoothnessSlider: TCastleFloatSlider;
+    ColorBitsArgument: TCastleLabel;
+    VideoFrequencyArgument: TCastleLabel;
+    ConserveResourcesArgument: TCastleBooleanLabel;
     AntiAliasingSlider: TAntiAliasingSlider;
     constructor Create(AOwner: TComponent); override;
     procedure SetAntiAliasing(
       Value: TAntiAliasing;
       UpdateSlider: boolean);
     procedure Click; override;
-    procedure AccessoryValueChanged; override;
   end;
 
   TSoundMenu = class(TSubMenu)
@@ -80,11 +82,10 @@ type
     SoundVolume: TSoundVolumeMenuItem;
     MusicVolume: TMusicVolumeMenuItem;
 
-    OpenALDeviceArgument: TMenuArgument;
+    OpenALDeviceArgument: TCastleLabel;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Click; override;
-    procedure AccessoryValueChanged; override;
   end;
 
   TChangeOpenALDeviceMenu = class(TSubMenu)
@@ -157,8 +158,8 @@ begin
   finally FreeAndNil(SceneManager) end;
 
   SoundEngine.MusicPlayer.Sound := stIntroMusic;
-  SoundMenu.SoundVolume.RefreshAccessory;
-  SoundMenu.MusicVolume.RefreshAccessory;
+  SoundMenu.SoundVolume.Refresh;
+  SoundMenu.MusicVolume.Refresh;
   Notifications.Clear;
 end;
 
@@ -168,19 +169,21 @@ constructor TMainMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  Items.Add('New game');
-  Items.Add('Configure controls');
-  Items.Add('Video options');
-  Items.Add('Sound options');
-  Items.Add('Credits');
-  Items.Add('Visit our website');
-  Items.Add('Quit');
+  Add('New game');
+  Add('Configure controls');
+  Add('Video options');
+  Add('Sound options');
+  Add('Credits');
+  Add('Visit our website');
+  Add('Quit');
 
-  Position := Vector2Integer(20, -120);
-  PositionRelativeScreenX := hpLeft;
-  PositionRelativeScreenY := vpTop;
-  PositionRelativeMenuX := hpLeft;
-  PositionRelativeMenuY := vpTop;
+  HasHorizontalAnchor := true;
+  HorizontalAnchor := hpLeft;
+  HorizontalAnchorDelta := 20;
+
+  HasVerticalAnchor := true;
+  VerticalAnchor := vpTop;
+  VerticalAnchorDelta := -120;
 
   DrawBackgroundRectangle := false;
 end;
@@ -245,10 +248,12 @@ end;
 
 { TAntiAliasingSlider ------------------------------------------ }
 
-constructor TAntiAliasingSlider.Create;
+constructor TAntiAliasingSlider.Create(AOwner: TComponent);
 begin
-  inherited Create(Ord(Low(TAntiAliasing)), Ord(High(TAntiAliasing)),
-    Ord(Window.AntiAliasing));
+  inherited;
+  Min := Ord(Low(TAntiAliasing));
+  Max := Ord(High(TAntiAliasing));
+  Value := Ord(Window.AntiAliasing);
 end;
 
 function TAntiAliasingSlider.ValueToStr(
@@ -286,32 +291,35 @@ constructor TVideoMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  AllowScreenChangeArgument := TMenuBooleanArgument.Create(AllowScreenChange);
-  ShadowVolumesArgument := TMenuBooleanArgument.Create(ShadowVolumes);
-  AnimationSmoothnessSlider := TMenuFloatSlider.Create(
-    MinAnimationSmoothness,
-    MaxAnimationSmoothness,
-    AnimationSmoothness);
+  AllowScreenChangeArgument := TCastleBooleanLabel.Create(Self);
+  AllowScreenChangeArgument.Value := AllowScreenChange;
 
-  ColorBitsArgument := TMenuArgument.Create(
-    TMenuArgument.TextWidth(SSystemDefault));
-  ColorBitsArgument.Value := ColorBitsToStr(ColorBits);
+  ShadowVolumesArgument := TCastleBooleanLabel.Create(Self);
+  ShadowVolumesArgument.Value := ShadowVolumes;
 
-  VideoFrequencyArgument := TMenuArgument.Create(
-    TMenuArgument.TextWidth(SSystemDefault));
-  VideoFrequencyArgument.Value := VideoFrequencyToStr(VideoFrequency);
+  AnimationSmoothnessSlider := TCastleFloatSlider.Create(Self);
+  AnimationSmoothnessSlider.Min := MinAnimationSmoothness;
+  AnimationSmoothnessSlider.Max := MaxAnimationSmoothness;
+  AnimationSmoothnessSlider.Value := AnimationSmoothness;
+  AnimationSmoothnessSlider.OnChange := @AnimationSmoothnessChanged;
 
-  AntiAliasingSlider := TAntiAliasingSlider.Create;
+  ColorBitsArgument := TCastleLabel.Create(Self);
+  ColorBitsArgument.Text.Text := ColorBitsToStr(ColorBits);
 
-  Items.Add('View video information');
-  Items.AddObject('Allow screen settings change on startup', AllowScreenChangeArgument);
-  Items.AddObject('Shadow volumes', ShadowVolumesArgument);
-  Items.AddObject('Animation smoothness', AnimationSmoothnessSlider);
-  Items.AddObject('Color bits', ColorBitsArgument);
-  Items.AddObject('Display frequency', VideoFrequencyArgument);
-  Items.AddObject('Anti-aliasing', AntiAliasingSlider);
-  Items.Add('Restore to defaults');
-  Items.Add('Back to main menu');
+  VideoFrequencyArgument := TCastleLabel.Create(Self);
+  VideoFrequencyArgument.Text.Text := VideoFrequencyToStr(VideoFrequency);
+
+  AntiAliasingSlider := TAntiAliasingSlider.Create(Self);
+
+  Add('View video information');
+  Add('Allow screen settings change on startup', AllowScreenChangeArgument);
+  Add('Shadow volumes', ShadowVolumesArgument);
+  Add('Animation smoothness', AnimationSmoothnessSlider);
+  Add('Color bits', ColorBitsArgument);
+  Add('Display frequency', VideoFrequencyArgument);
+  Add('Anti-aliasing', AntiAliasingSlider);
+  Add('Restore to defaults');
+  Add('Back to main menu');
 
   { Resigned ideas for menu options:
 
@@ -362,7 +370,7 @@ procedure TVideoMenu.Click;
     if ColorBits = 16 then
       ColorBits := 24 else
       ColorBits := 0;
-    ColorBitsArgument.Value := ColorBitsToStr(ColorBits);
+    ColorBitsArgument.Text.Text := ColorBitsToStr(ColorBits);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
 
@@ -377,7 +385,7 @@ procedure TVideoMenu.Click;
       (Value <> VideoFrequency) then
     begin
       VideoFrequency := Value;
-      VideoFrequencyArgument.Value := VideoFrequencyToStr(VideoFrequency);
+      VideoFrequencyArgument.Text.Text := VideoFrequencyToStr(VideoFrequency);
       SubMenuAdditionalInfo := SRestartTheGame;
     end;
   end;
@@ -420,14 +428,14 @@ begin
          if ColorBits <> DefaultColorBits then
          begin
            ColorBits := DefaultColorBits;
-           ColorBitsArgument.Value := ColorBitsToStr(DefaultColorBits);
+           ColorBitsArgument.Text.Text := ColorBitsToStr(DefaultColorBits);
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
          if VideoFrequency <> DefaultVideoFrequency then
          begin
            VideoFrequency := DefaultVideoFrequency;
-           VideoFrequencyArgument.Value := VideoFrequencyToStr(DefaultVideoFrequency);
+           VideoFrequencyArgument.Text.Text := VideoFrequencyToStr(DefaultVideoFrequency);
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
@@ -442,12 +450,14 @@ begin
   end;
 end;
 
-procedure TVideoMenu.AccessoryValueChanged;
+procedure TVideoMenu.AnimationSmoothnessChanged(Sender: TObject);
 begin
-  case CurrentItem of
-    3: AnimationSmoothness := AnimationSmoothnessSlider.Value;
-    6: SetAntiAliasing(TAntiAliasing(AntiAliasingSlider.Value), false);
-  end;
+  AnimationSmoothness := AnimationSmoothnessSlider.Value;
+end;
+
+procedure TVideoMenu.AntiAliasingChanged(Sender: TObject);
+begin
+  SetAntiAliasing(TAntiAliasing(AntiAliasingSlider.Value), false);
 end;
 
 { TSoundMenu ------------------------------------------------------------- }
@@ -456,14 +466,14 @@ constructor TSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  OpenALDeviceArgument := TMenuArgument.Create(450);
-  OpenALDeviceArgument.Value := SoundEngine.DeviceNiceName;
+  OpenALDeviceArgument := TCastleLabel.Create(Self);
+  OpenALDeviceArgument.Text.Text := SoundEngine.DeviceNiceName;
 
   SoundInfo := TSoundInfoMenuItem.Create(Window, Self);
   SoundVolume := TSoundVolumeMenuItem.Create(Window, Self);
   MusicVolume := TMusicVolumeMenuItem.Create(Window, Self);
-  Items.AddObject('Sound output device', OpenALDeviceArgument);
-  Items.Add('Back to main menu');
+  Add('Sound output device', OpenALDeviceArgument);
+  Add('Back to main menu');
 
   SubMenuTitle := 'Sound options';
 end;
@@ -490,14 +500,6 @@ begin
   end;
 end;
 
-procedure TSoundMenu.AccessoryValueChanged;
-begin
-  case CurrentItem of
-    1: SoundVolume.AccessoryValueChanged;
-    2: MusicVolume.AccessoryValueChanged;
-  end;
-end;
-
 { TChangeOpenALDeviceMenu ---------------------------------------------------- }
 
 constructor TChangeOpenALDeviceMenu.Create(AOwner: TComponent);
@@ -507,8 +509,8 @@ begin
   inherited;
 
   for I := 0 to SoundEngine.Devices.Count - 1 do
-    Items.Add(SoundEngine.Devices[I].NiceName);
-  Items.Add('Cancel');
+    Add(SoundEngine.Devices[I].NiceName);
+  Add('Cancel');
 
   SubMenuTitle := 'Change sound output device';
 end;
@@ -526,7 +528,7 @@ begin
   begin
     SoundEngine.Device := SoundEngine.Devices[CurrentItem].Name;
     { ALCDevice value changed now to new value. }
-    SoundMenu.OpenALDeviceArgument.Value := SoundEngine.Devices[CurrentItem].NiceName;
+    SoundMenu.OpenALDeviceArgument.Text.Text := SoundEngine.Devices[CurrentItem].NiceName;
     if not SoundEngine.ALActive then
       MessageOK(Window, SoundEngine.SoundInitializationReport);
   end;
@@ -550,7 +552,7 @@ constructor TChooseNewLevelMenu.Create(AOwner: TComponent);
     S := Format('%d: %s', [ L.Number, L.Title ]);
     if L.TitleHint <> '' then
       S += ' (' + L.TitleHint + ')';
-    Items.Add(S);
+    Add(S);
   end;
 
 var
@@ -576,7 +578,7 @@ begin
        Levels[I].Demo then
       AddLevel(I);
 
-  Items.Add('Cancel');
+  Add('Cancel');
 
   SubMenuTitle := 'Choose initial level';
 end;
@@ -593,7 +595,7 @@ begin
   Result := inherited SpaceBetweenItems(NextItemIndex);
   if NextItemIndex = FirstDemoLevelIndex then
     Result += Cardinal(SubMenuTitleFont.RowHeight) * 2 else
-  if NextItemIndex = Items.Count - 1 then
+  if NextItemIndex = ControlsCount - 1 then
     { some separator is needed before "cancel" button now,
       since otherwise it seems to attached to "demo" levels section. }
     Result += 10;
@@ -604,8 +606,9 @@ const
   SubMenuTextColor: TCastleColor = (0.7, 0.7, 0.7, 1.0);
 begin
   inherited;
-  SubMenuTitleFont.Print(Position[0],
-    Rectangles.Items[FirstDemoLevelIndex].Top + 5 { margin },
+  SubMenuTitleFont.Print(Left,
+    ScreenRect.Top - (FirstDemoLevelIndex + 2) *
+      (UIFont.RowHeight + RegularSpaceBetweenItems) - 15 { margin },
     SubMenuTextColor, 'Bonus demo levels :');
 end;
 
@@ -647,9 +650,9 @@ begin
       try
         SetCurrentMenu(CurrentMenu, MainMenu);
 
-        Window.Controls.Add(GlobalCatchInput);
-        Window.Controls.Add(Notifications);
-        Window.Controls.AddList(BackgroundControls);
+        Window.Controls.InsertBack(GlobalCatchInput);
+        Window.Controls.InsertBack(Notifications);
+        Window.Controls.InsertBack(BackgroundControls);
 
         UserQuit := false;
         repeat

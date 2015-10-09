@@ -337,14 +337,14 @@ procedure TGame2DControls.Render;
     end;
 
     if Player.Dead then
-      GLFadeRectangle(ContainerRect, Red, 1.0) else
+      GLFadeRectangle(ParentRect, Red, 1.0) else
     begin
       if Player.Swimming = psUnderWater then
-        DrawRectangle(ContainerRect, Vector4Single(0, 0, 0.1, 0.5));
+        DrawRectangle(ParentRect, Vector4Single(0, 0, 0.1, 0.5));
 
       { Possibly, Player.FadeOut* will be applied on top of water effect,
         that's Ok --- they'll mix. }
-      GLFadeRectangle(ContainerRect, Player.FadeOutColor, Player.FadeOutIntensity);
+      GLFadeRectangle(ParentRect, Player.FadeOutColor, Player.FadeOutIntensity);
     end;
   end;
 
@@ -479,7 +479,7 @@ begin
     try
       { TODO: nicer image background: blur or such? }
       ImageBackground.Image := Window.SaveScreen;
-      Window.Controls.Add(ImageBackground);
+      Window.Controls.InsertBack(ImageBackground);
 
       SceneManager.LoadLevel(LevelFinishedNextLevelName);
     finally
@@ -582,10 +582,13 @@ begin
     Window.RenderStyle := rs3D;
 
     C2D := TGame2DControls.Create(nil);
-    GameControls := TUIControlList.CreateFromArray(false, [Notifications, C2D, SceneManager]);
+    GameControls := TUIControlList.Create(nil);
+    GameControls.InsertFront(SceneManager);
+    GameControls.InsertFront(C2D);
+    GameControls.InsertFront(Notifications);
 
-    Window.Controls.Add(GlobalCatchInput);
-    Window.Controls.AddList(GameControls);
+    Window.Controls.InsertBack(GlobalCatchInput);
+    Window.Controls.InsertBack(GameControls);
 
     GameEnded := false;
     GameEndedWantsRestart := '';
