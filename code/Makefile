@@ -3,8 +3,6 @@
 default:
 	@echo 'Nothing to do by default in this Makefile right now'
 
-UNITS_BASE_PATH := /home/michalis/sources/castle-engine/trunk/castle_game_engine/
-
 # Generate docs.
 # This is just for fun (I'm a pasdoc developer after all...),
 # this documentation is not really polished now (@noAutoLinkHere
@@ -12,12 +10,14 @@ UNITS_BASE_PATH := /home/michalis/sources/castle-engine/trunk/castle_game_engine
 apidoc:
 	mkdir -p apidoc/
 	pasdoc --output=apidoc/ \
+	  --include $(CASTLE_ENGINE_PATH)/castle_game_engine/src/base/ \
+	  --define PASDOC \
 	  --define LINUX \
 	  --define UNIX \
 	  --define FPC \
 	  --define VER2 \
-	  --define VER2_0 \
-	  --define VER2_0_4 \
+	  --define VER2_6 \
+	  --define VER2_6_4 \
 	  --write-uses-list \
 	  --title 'The Castle units' \
 	  --auto-abstract \
