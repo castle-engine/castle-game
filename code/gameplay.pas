@@ -354,7 +354,7 @@ var
 begin
   if DebugRenderForLevelScreenshot then Exit;
 
-  if Notifications.GetExists then
+  if not Notifications.Rect.IsEmpty then
     GLNotificationsFade.Draw(
       Rectangle(0, 0, ContainerWidth, GLNotificationsFade.Height));
 

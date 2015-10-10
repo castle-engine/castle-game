@@ -28,13 +28,14 @@ program castle;
   {$R ../automatic-windows-resources.res}
 {$endif MSWINDOWS}
 
-uses CastleWindow, SysUtils, CastleUtils, CastleProgress, CastleWindowProgress,
+uses CastleWindow,
+  SysUtils, CastleUtils, CastleProgress, CastleWindowProgress,
   Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
   CastleLog, GameWindow, GameStartMenu, GameHelp, CastleFilesUtils,
   CastleClassUtils, GameVideoOptions, GameInitialBackground,
   GameCreatures, GamePlay, GameGeneralMenu, CastleLevels, CastleMaterialProperties,
   CastleSoundEngine, CastleConfig, CastleRenderer, CastleResources, GameItems,
-  CastleGameNotifications, CastleInputs;
+  CastleGameNotifications, CastleInputs, CastleRectangles, CastleColors;
 
 { suggested screen size ------------------------------------------------------ }
 
@@ -111,6 +112,10 @@ begin
 
   { configure Notifications }
   Notifications.CollectHistory := true;
+  Notifications.Anchor(hpMiddle);
+  Notifications.Anchor(vpBottom, 10);
+  Notifications.TextAlignment := hpMiddle;
+  Notifications.Color := Yellow;
 
   { By default, run in FullScreen with DefaultScreenWidth x DefaultScreenHeight.
     User can change it with options like --geometry,
