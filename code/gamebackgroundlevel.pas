@@ -109,7 +109,7 @@ procedure BackgroundCreate;
 var
   BackgroundPlayer: TPlayer;
 begin
-  BackgroundControls := TUIControlList.Create(nil);
+  BackgroundControls := TUIControlList.Create(false);
 
   { initialize BackgroundSceneManager }
   BackgroundSceneManager := TGameSceneManager.Create(nil);

@@ -582,7 +582,7 @@ begin
     Window.RenderStyle := rs3D;
 
     C2D := TGame2DControls.Create(nil);
-    GameControls := TUIControlList.Create(nil);
+    GameControls := TUIControlList.Create(false);
     GameControls.InsertFront(SceneManager);
     GameControls.InsertFront(C2D);
     GameControls.InsertFront(Notifications);
