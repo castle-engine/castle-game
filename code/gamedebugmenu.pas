@@ -45,10 +45,10 @@ uses SysUtils, Classes, CastleControlsImages, CastleImages,
 type
   TDebugMenu = class(TCastleGameMenu)
   public
-    RenderDebug3DArgument: TCastleBooleanLabel;
-    RenderDebugCaptionsArgument: TCastleBooleanLabel;
-    ShadowVolumesRenderArgument: TCastleBooleanLabel;
-    DebugRenderForLevelScreenshotArgument: TCastleBooleanLabel;
+    RenderDebug3DToggle: TCastleMenuToggle;
+    RenderDebugCaptionsToggle: TCastleMenuToggle;
+    ShadowVolumesRenderToggle: TCastleMenuToggle;
+    DebugRenderForLevelScreenshotToggle: TCastleMenuToggle;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
   end;
@@ -74,7 +74,7 @@ type
 
   TDebugCreaturesMenu = class(TCastleGameMenu)
   public
-    DebugTimeStopForCreaturesArgument: TCastleBooleanLabel;
+    DebugTimeStopForCreaturesToggle: TCastleMenuToggle;
     constructor Create(AOwner: TComponent); override;
     procedure Click; override;
   end;
@@ -127,17 +127,17 @@ constructor TDebugMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  RenderDebug3DArgument := TCastleBooleanLabel.Create(Self);
-  RenderDebug3DArgument.Value := RenderDebug3D;
+  RenderDebug3DToggle := TCastleMenuToggle.Create(Self);
+  RenderDebug3DToggle.Pressed := RenderDebug3D;
 
-  RenderDebugCaptionsArgument := TCastleBooleanLabel.Create(Self);
-  RenderDebugCaptionsArgument.Value := RenderDebugCaptions;
+  RenderDebugCaptionsToggle := TCastleMenuToggle.Create(Self);
+  RenderDebugCaptionsToggle.Pressed := RenderDebugCaptions;
 
-  ShadowVolumesRenderArgument := TCastleBooleanLabel.Create(Self);
-  ShadowVolumesRenderArgument.Value := ShadowVolumesRender;
+  ShadowVolumesRenderToggle := TCastleMenuToggle.Create(Self);
+  ShadowVolumesRenderToggle.Pressed := ShadowVolumesRender;
 
-  DebugRenderForLevelScreenshotArgument := TCastleBooleanLabel.Create(Self);
-  DebugRenderForLevelScreenshotArgument.Value := DebugRenderForLevelScreenshot;
+  DebugRenderForLevelScreenshotToggle := TCastleMenuToggle.Create(Self);
+  DebugRenderForLevelScreenshotToggle.Pressed := DebugRenderForLevelScreenshot;
 
   Add('Player debug menu ...');
   Add('Creatures debug menu ...');
@@ -145,10 +145,10 @@ begin
   Add('Level debug menu ...');
   Add('Reload resources resource.xml files');
   Add('Reload resource animation ...');
-  Add('Render debug 3D information', RenderDebug3DArgument);
-  Add('Render debug captions', RenderDebugCaptionsArgument);
-  Add('Render shadow volumes', ShadowVolumesRenderArgument);
-  Add('Render for level screenshot', DebugRenderForLevelScreenshotArgument);
+  Add('Render debug 3D information', RenderDebug3DToggle);
+  Add('Render debug captions', RenderDebugCaptionsToggle);
+  Add('Render shadow volumes', ShadowVolumesRenderToggle);
+  Add('Render for level screenshot', DebugRenderForLevelScreenshotToggle);
   Add('Reload sounds/index.xml');
   Add('Back to game');
 end;
@@ -180,19 +180,19 @@ begin
     5: ReloadResource;
     6: begin
          RenderDebug3D := not RenderDebug3D;
-         RenderDebug3DArgument.Value := RenderDebug3D;
+         RenderDebug3DToggle.Pressed := RenderDebug3D;
        end;
     7: begin
          RenderDebugCaptions := not RenderDebugCaptions;
-         RenderDebugCaptionsArgument.Value := RenderDebugCaptions;
+         RenderDebugCaptionsToggle.Pressed := RenderDebugCaptions;
        end;
     8: begin
          ShadowVolumesRender := not ShadowVolumesRender;
-         ShadowVolumesRenderArgument.Value := ShadowVolumesRender;
+         ShadowVolumesRenderToggle.Pressed := ShadowVolumesRender;
        end;
     9: begin
          DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
-         DebugRenderForLevelScreenshotArgument.Value :=
+         DebugRenderForLevelScreenshotToggle.Pressed :=
            DebugRenderForLevelScreenshot;
        end;
     10:SoundEngine.ReloadSounds;
@@ -284,13 +284,13 @@ constructor TDebugCreaturesMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  DebugTimeStopForCreaturesArgument := TCastleBooleanLabel.Create(Self);
-  DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
+  DebugTimeStopForCreaturesToggle := TCastleMenuToggle.Create(Self);
+  DebugTimeStopForCreaturesToggle.Pressed := DebugTimeStopForCreatures;
 
   Add('Kill all creatures');
   Add('Kill all non-still creatures');
   Add('Add creature to level before player');
-  Add('Time stop for creatures', DebugTimeStopForCreaturesArgument);
+  Add('Time stop for creatures', DebugTimeStopForCreaturesToggle);
   Add('Back');
 end;
 
@@ -336,7 +336,7 @@ begin
     2: AddLevelCreature(10);
     3: begin
          DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
-         DebugTimeStopForCreaturesArgument.Value := DebugTimeStopForCreatures;
+         DebugTimeStopForCreaturesToggle.Pressed := DebugTimeStopForCreatures;
        end;
     4: SetCurrentMenu(CurrentMenu, DebugMenu);
   end;
@@ -495,7 +495,7 @@ end;
 procedure ContextOpen;
 begin
   { Although base TCastleOnScreenMenu doesn't require OpenGL context at constructor,
-    our descendants initialize some arguments that require font initialized
+    our descendants initialize some Toggles that require font initialized
     that requires font display lists created. That's why code below is in
     OnOpen callback, not unit's initialization. }
   DebugMenu := TDebugMenu.Create(Application);

@@ -62,12 +62,12 @@ type
     procedure AnimationSmoothnessChanged(Sender: TObject);
     procedure AntiAliasingChanged(Sender: TObject);
   public
-    AllowScreenChangeArgument: TCastleBooleanLabel;
-    ShadowVolumesArgument: TCastleBooleanLabel;
+    AllowScreenChangeToggle: TCastleMenuToggle;
+    ShadowVolumesToggle: TCastleMenuToggle;
     AnimationSmoothnessSlider: TCastleFloatSlider;
-    ColorBitsArgument: TCastleLabel;
-    VideoFrequencyArgument: TCastleLabel;
-    ConserveResourcesArgument: TCastleBooleanLabel;
+    ColorBitsToggle: TCastleMenuButton;
+    VideoFrequencyToggle: TCastleMenuButton;
+    ConserveResourcesToggle: TCastleMenuToggle;
     AntiAliasingSlider: TAntiAliasingSlider;
     constructor Create(AOwner: TComponent); override;
     procedure SetAntiAliasing(
@@ -82,7 +82,7 @@ type
     SoundVolume: TSoundVolumeMenuItem;
     MusicVolume: TMusicVolumeMenuItem;
 
-    OpenALDeviceArgument: TCastleLabel;
+    OpenALDeviceToggle: TCastleMenuButton;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Click; override;
@@ -285,11 +285,11 @@ constructor TVideoMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  AllowScreenChangeArgument := TCastleBooleanLabel.Create(Self);
-  AllowScreenChangeArgument.Value := AllowScreenChange;
+  AllowScreenChangeToggle := TCastleMenuToggle.Create(Self);
+  AllowScreenChangeToggle.Pressed := AllowScreenChange;
 
-  ShadowVolumesArgument := TCastleBooleanLabel.Create(Self);
-  ShadowVolumesArgument.Value := ShadowVolumes;
+  ShadowVolumesToggle := TCastleMenuToggle.Create(Self);
+  ShadowVolumesToggle.Pressed := ShadowVolumes;
 
   AnimationSmoothnessSlider := TCastleFloatSlider.Create(Self);
   AnimationSmoothnessSlider.Min := MinAnimationSmoothness;
@@ -297,20 +297,20 @@ begin
   AnimationSmoothnessSlider.Value := AnimationSmoothness;
   AnimationSmoothnessSlider.OnChange := @AnimationSmoothnessChanged;
 
-  ColorBitsArgument := TCastleLabel.Create(Self);
-  ColorBitsArgument.Text.Text := ColorBitsToStr(ColorBits);
+  ColorBitsToggle := TCastleMenuButton.Create(Self);
+  ColorBitsToggle.Caption := ColorBitsToStr(ColorBits);
 
-  VideoFrequencyArgument := TCastleLabel.Create(Self);
-  VideoFrequencyArgument.Text.Text := VideoFrequencyToStr(VideoFrequency);
+  VideoFrequencyToggle := TCastleMenuButton.Create(Self);
+  VideoFrequencyToggle.Caption := VideoFrequencyToStr(VideoFrequency);
 
   AntiAliasingSlider := TAntiAliasingSlider.Create(Self);
 
   Add('View video information');
-  Add('Allow screen settings change on startup', AllowScreenChangeArgument);
-  Add('Shadow volumes', ShadowVolumesArgument);
+  Add('Allow screen settings change on startup', AllowScreenChangeToggle);
+  Add('Shadow volumes', ShadowVolumesToggle);
   Add('Animation smoothness', AnimationSmoothnessSlider);
-  Add('Color bits', ColorBitsArgument);
-  Add('Display frequency', VideoFrequencyArgument);
+  Add('Color bits', ColorBitsToggle);
+  Add('Display frequency', VideoFrequencyToggle);
   Add('Anti-aliasing', AntiAliasingSlider);
   Add('Restore to defaults');
   Add('Back to main menu');
@@ -364,7 +364,7 @@ procedure TVideoMenu.Click;
     if ColorBits = 16 then
       ColorBits := 24 else
       ColorBits := 0;
-    ColorBitsArgument.Text.Text := ColorBitsToStr(ColorBits);
+    ColorBitsToggle.Caption := ColorBitsToStr(ColorBits);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
 
@@ -379,7 +379,7 @@ procedure TVideoMenu.Click;
       (Value <> VideoFrequency) then
     begin
       VideoFrequency := Value;
-      VideoFrequencyArgument.Text.Text := VideoFrequencyToStr(VideoFrequency);
+      VideoFrequencyToggle.Caption := VideoFrequencyToStr(VideoFrequency);
       SubMenuAdditionalInfo := SRestartTheGame;
     end;
   end;
@@ -391,11 +391,11 @@ begin
     0: ViewVideoInfo;
     1: begin
          AllowScreenChange := not AllowScreenChange;
-         AllowScreenChangeArgument.Value := AllowScreenChange;
+         AllowScreenChangeToggle.Pressed := AllowScreenChange;
        end;
     2: begin
          ShadowVolumes := not ShadowVolumes;
-         ShadowVolumesArgument.Value := ShadowVolumes;
+         ShadowVolumesToggle.Pressed := ShadowVolumes;
          if (not GLFeatures.ShadowVolumesPossible) and ShadowVolumes then
            MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.');
        end;
@@ -405,10 +405,10 @@ begin
     6: ;
     7: begin
          AllowScreenChange := DefaultAllowScreenChange;
-         AllowScreenChangeArgument.Value := AllowScreenChange;
+         AllowScreenChangeToggle.Pressed := AllowScreenChange;
 
          ShadowVolumes := DefaultShadowVolumes;
-         ShadowVolumesArgument.Value := ShadowVolumes;
+         ShadowVolumesToggle.Pressed := ShadowVolumes;
 
          if AnimationSmoothness <> DefaultAnimationSmoothness then
          begin
@@ -422,14 +422,14 @@ begin
          if ColorBits <> DefaultColorBits then
          begin
            ColorBits := DefaultColorBits;
-           ColorBitsArgument.Text.Text := ColorBitsToStr(DefaultColorBits);
+           ColorBitsToggle.Caption := ColorBitsToStr(DefaultColorBits);
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
          if VideoFrequency <> DefaultVideoFrequency then
          begin
            VideoFrequency := DefaultVideoFrequency;
-           VideoFrequencyArgument.Text.Text := VideoFrequencyToStr(DefaultVideoFrequency);
+           VideoFrequencyToggle.Caption := VideoFrequencyToStr(DefaultVideoFrequency);
            SubMenuAdditionalInfo := SRestartTheGame;
          end;
 
@@ -460,13 +460,13 @@ constructor TSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  OpenALDeviceArgument := TCastleLabel.Create(Self);
-  OpenALDeviceArgument.Text.Text := SoundEngine.DeviceNiceName;
+  OpenALDeviceToggle := TCastleMenuButton.Create(Self);
+  OpenALDeviceToggle.Caption := SoundEngine.DeviceNiceName;
 
   SoundInfo := TSoundInfoMenuItem.Create(Window, Self);
   SoundVolume := TSoundVolumeMenuItem.Create(Window, Self);
   MusicVolume := TMusicVolumeMenuItem.Create(Window, Self);
-  Add('Sound output device', OpenALDeviceArgument);
+  Add('Sound output device', OpenALDeviceToggle);
   Add('Back to main menu');
 
   SubMenuTitle := 'Sound options';
@@ -522,7 +522,7 @@ begin
   begin
     SoundEngine.Device := SoundEngine.Devices[CurrentItem].Name;
     { ALCDevice value changed now to new value. }
-    SoundMenu.OpenALDeviceArgument.Text.Text := SoundEngine.Devices[CurrentItem].NiceName;
+    SoundMenu.OpenALDeviceToggle.Caption := SoundEngine.Devices[CurrentItem].NiceName;
     if not SoundEngine.ALActive then
       MessageOK(Window, SoundEngine.SoundInitializationReport);
   end;
