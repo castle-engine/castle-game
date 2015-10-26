@@ -197,8 +197,11 @@ procedure TGame2DControls.Render;
       S := Player.Inventory[I].Resource.Caption;
       if Player.Inventory[I].Quantity <> 1 then
         S += ' (' + IntToStr(Player.Inventory[I].Quantity) + ')';
-      UIFontSmall.Print(X + InventorySlotMargin, Y + InventorySlotMargin,
-        NameColor, S);
+      UIFont.PushProperties;
+        UIFont.Size := UIFont.Size / 2;
+        UIFont.Print(X + InventorySlotMargin, Y + InventorySlotMargin,
+          NameColor, S);
+      UIFont.PopProperties;
     end;
   end;
 
