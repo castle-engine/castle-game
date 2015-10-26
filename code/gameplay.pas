@@ -590,8 +590,10 @@ begin
     GameControls.InsertFront(C2D);
     GameControls.InsertFront(Notifications);
 
-    Window.Controls.InsertBack(GlobalCatchInput);
     Window.Controls.InsertBack(GameControls);
+    // GlobalCatchInput behind GameControls, to not cause Cursor be visible
+    // even in mouse look
+    Window.Controls.InsertBack(GlobalCatchInput);
 
     GameEnded := false;
     GameEndedWantsRestart := '';
