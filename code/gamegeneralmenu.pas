@@ -75,22 +75,12 @@ procedure TCastleGameMenu.SetPosition(const ACenter: boolean);
 begin
   if ACenter then
   begin
-    HasHorizontalAnchor := true;
-    HorizontalAnchor := hpMiddle;
-    HorizontalAnchorDelta := 0;
-
-    HasVerticalAnchor := true;
-    VerticalAnchor := vpMiddle;
-    VerticalAnchorDelta := 0;
+    Anchor(hpMiddle);
+    Anchor(vpMiddle);
   end else
   begin
-    HasHorizontalAnchor := true;
-    HorizontalAnchor := hpLeft;
-    HorizontalAnchorDelta := 100;
-
-    HasVerticalAnchor := true;
-    VerticalAnchor := vpTop;
-    VerticalAnchorDelta := -120;
+    Anchor(hpLeft, 100);
+    Anchor(vpTop, -120);
   end;
 end;
 
