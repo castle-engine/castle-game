@@ -40,6 +40,7 @@ uses SysUtils, Classes, CastleUtils, CastleWindowModes,
   CastleKeysMouse, CastleOpenDocument, CastlePrecalculatedAnimation,
   CastleStringUtils, CastleClassUtils, CastleGameNotifications,
   CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes, CastleControls,
+  CastleApplicationProperties,
   GamePlay, GameSound, GameGeneralMenu, GameControlsMenu, GameVideoOptions,
   GameHelp, GameBackgroundLevel, GameCredits;
 
@@ -673,6 +674,6 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@ContextOpen);
+  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
 finalization
 end.

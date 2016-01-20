@@ -94,6 +94,7 @@ uses SysUtils, CastleUtils, CastleWindow, GameInputs,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, CastleColors, CastleSceneManager,
   CastleGameNotifications, GameControlsMenu, CastleControls,
+  CastleApplicationProperties,
   GameLevelSpecific, CastleTimeUtils, CastleGLImages, CastleKeysMouse;
 
 var
@@ -689,8 +690,8 @@ end;
 
 initialization
   ShowDebugInfo := false;
-  OnGLContextOpen.Add(@ContextOpen);
-  OnGLContextClose.Add(@ContextClose);
+  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
+  ApplicationProperties.OnGLContextClose.Add(@ContextClose);
   OnCreatureExists := @TGamePlay(nil).CreatureExists;
   OnItemOnWorldExists := @TGamePlay(nil).ItemOnWorldExists;
   T3DOrient.DefaultOrientation := otUpZDirectionX;

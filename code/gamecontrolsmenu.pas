@@ -64,7 +64,8 @@ uses SysUtils, CastleWindowModes, CastleGLUtils, CastleMessages,
   CastleOnScreenMenu, CastleConfig,
   CastleInputs, CastleKeysMouse, CastleVectors, CastleUtils, CastleRectangles,
   CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors,
-  CastleControls, CastleTextureFont_DejaVuSansMono_18;
+  CastleControls, CastleTextureFont_DejaVuSansMono_18,
+  CastleApplicationProperties;
 
 const
   DefaultMouseLook = true;
@@ -591,7 +592,7 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@ContextOpen);
+  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
 
   UserConfig.AddLoadListener(@TConfigOptions(nil).LoadFromConfig);
   UserConfig.AddSaveListener(@TConfigOptions(nil).SaveToConfig);

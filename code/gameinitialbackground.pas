@@ -31,6 +31,7 @@ procedure RenderInitialBackground;
 implementation
 
 uses SysUtils, CastleWindow, CastleGLUtils, CastleGLImages, CastleUIControls,
+  CastleApplicationProperties,
   GameWindow, CastleFilesUtils, CastleImages;
 
 var
@@ -63,7 +64,7 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@ContextOpen);
-  OnGLContextClose.Add(@ContextClose);
+  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
+  ApplicationProperties.OnGLContextClose.Add(@ContextClose);
 finalization
 end.

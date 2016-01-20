@@ -38,7 +38,8 @@ uses SysUtils, Classes, CastleControlsImages, CastleImages,
   CastleInputs, CastleCreatures, GameChooseMenu,
   CastleItems, CastleOnScreenMenu, CastleRays, GameVideoOptions, CastleSoundEngine,
   X3DNodes, CastleClassUtils, CastleGameNotifications,
-  CastleLevels, CastleKeysMouse, CastleResources, CastleControls;
+  CastleLevels, CastleKeysMouse, CastleResources, CastleControls,
+  CastleApplicationProperties;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -506,5 +507,5 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@ContextOpen);
+  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
 end.

@@ -36,7 +36,7 @@ uses CastleControlsImages, CastleImages,
   CastleGLUtils, CastleMessages, GameWindow, CastleVectors,
   CastleWindow, GameHelp, GamePlay, GameGeneralMenu, GameControlsMenu,
   CastleInputs, X3DNodes, CastleClassUtils, CastleSoundMenu, CastleKeysMouse,
-  CastleGameNotifications, CastleControls;
+  CastleGameNotifications, CastleControls, CastleApplicationProperties;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -178,6 +178,6 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@ContextOpen);
+  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
 finalization
 end.

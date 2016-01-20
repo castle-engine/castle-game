@@ -35,6 +35,7 @@ implementation
 
 uses SysUtils, Classes, CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils, CastleWindowModes,
+  CastleApplicationProperties,
   GamePlay, GameWindow,
   GameVideoOptions, CastleVectors, CastleScene, CastleFilesUtils,
   GameHelp, CastleUtils, X3DFields, CastleTimeUtils, CastleKeysMouse, Castle3D;
@@ -166,6 +167,6 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@ContextOpen);
-  OnGLContextClose.Add(@ContextClose);
+  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
+  ApplicationProperties.OnGLContextClose.Add(@ContextClose);
 end.

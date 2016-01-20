@@ -37,7 +37,7 @@ implementation
 uses SysUtils, CastleControlsImages, CastleImages,
   CastleWindowModes, CastleGLUtils, CastleInputs, CastleMessages,
   CastleOnScreenMenu, GameWindow, GameGeneralMenu, CastleVectors, CastleGameNotifications,
-  CastleKeysMouse, CastleControls;
+  CastleKeysMouse, CastleControls, CastleApplicationProperties;
 
 var
   Selected: boolean;
@@ -116,6 +116,6 @@ begin
 end;
 
 initialization
-  OnGLContextOpen.Add(@ContextOpen);
-  OnGLContextClose.Add(@ContextClose);
+  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
+  ApplicationProperties.OnGLContextClose.Add(@ContextClose);
 end.
