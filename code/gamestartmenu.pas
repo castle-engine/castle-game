@@ -48,9 +48,16 @@ uses SysUtils, Classes, CastleUtils, CastleWindowModes,
 
 type
   TMainMenu = class(TCastleGameMenu)
+  strict private
+    procedure ClickNewGame(Sender: TObject);
+    procedure ClickConfigureControls(Sender: TObject);
+    procedure ClickVideoOptions(Sender: TObject);
+    procedure ClickSoundOptions(Sender: TObject);
+    procedure ClickCredits(Sender: TObject);
+    procedure ClickVisitWebsite(Sender: TObject);
+    procedure ClickQuit(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Click; override;
   end;
 
   TAntiAliasingSlider = class(TCastleIntegerSlider)
@@ -170,75 +177,96 @@ constructor TMainMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  Add('New game');
-  Add('Configure controls');
-  Add('Video options');
-  Add('Sound options');
-  Add('Credits');
-  Add('Visit our website');
-  Add('Quit');
+  Add('New game', @ClickNewGame);
+  Add('Configure controls', @ClickConfigureControls);
+  Add('Video options', @ClickVideoOptions);
+  Add('Sound options', @ClickSoundOptions);
+  Add('Credits', @ClickCredits);
+  Add('Visit our website', @ClickVisitWebsite);
+  Add('Quit', @ClickQuit);
 
   SetPosition(false);
 
   DrawBackgroundRectangle := false;
 end;
 
-procedure TMainMenu.Click;
+procedure TMainMenu.ClickNewGame(Sender: TObject);
 
-  procedure ChooseNewGame;
-
-    procedure SetChooseNewLevelMenu;
-    begin
-      { Recreate ChooseNewLevelMenu now, to refresh list of LevelsNewGame. }
-      FreeAndNil(ChooseNewLevelMenu);
-      ChooseNewLevelMenu := TChooseNewLevelMenu.Create(Application);
-
-      SetCurrentMenu(CurrentMenu, ChooseNewLevelMenu);
-    end;
-
+  procedure SetChooseNewLevelMenu;
   begin
-    { Initially I had here code to show SetChooseNewLevelMenu only
-      if I had more than 1 level with Played.
+    { Recreate ChooseNewLevelMenu now, to refresh list of LevelsNewGame. }
+    FreeAndNil(ChooseNewLevelMenu);
+    ChooseNewLevelMenu := TChooseNewLevelMenu.Create(Application);
 
-      But it turns out that this was confusing for users:
-      they thought that each "New Level" will always restart from the 1st
-      level. So they complained that "there is no restart from level
-      functionality", before even trying to do "New Game" next time...
-
-      This may be related to the fact that my game is small and some
-      of the "quick testers" only run the game once, and they didn't
-      even manage to get to 2nd level, or they assumed (wrong) that
-      "Loading creatures" will be done again so they didn't even
-      "risk" calling "New Game" again... In any case, I think that
-      this falls under one of the UI usability rules:
-
-      "Avoid hiding some functionality at runtime, based on some
-      gllobal state, because this will confuse users (they don't know
-      that there are some rules at runtime that will "unlock" some
-      funtionality). It's better to make some items disabled
-      (but still visible). It's even acceptable to show them
-      a menu or a dialog or a combobox etc. where only 1 choice
-      is possible --- this way users will know that *the choice
-      is here always, just currently there is only 1 possibility*."
-
-      So it was a bad idea to hide "Choose new level" menu. }
-
-    SetChooseNewLevelMenu;
+    SetCurrentMenu(CurrentMenu, ChooseNewLevelMenu);
   end;
 
 begin
-  inherited;
+  SoundEngine.Sound(stMenuClick);
 
-  case CurrentItem of
-    0: ChooseNewGame;
-    1: ShowControlsMenu(BackgroundControls, false, false);
-    2: SetCurrentMenu(CurrentMenu, VideoMenu);
-    3: SetCurrentMenu(CurrentMenu, SoundMenu);
-    4: ShowCredits(BackgroundControls, BackgroundSceneManager);
-    5: if not OpenURL(CastleURL) then MessageOK(Window, SCannotOpenURL);
-    6: UserQuit := true;
-    else raise EInternalError.Create('Menu item unknown');
-  end;
+  { Initially I had here code to show SetChooseNewLevelMenu only
+    if I had more than 1 level with Played.
+
+    But it turns out that this was confusing for users:
+    they thought that each "New Level" will always restart from the 1st
+    level. So they complained that "there is no restart from level
+    functionality", before even trying to do "New Game" next time...
+
+    This may be related to the fact that my game is small and some
+    of the "quick testers" only run the game once, and they didn't
+    even manage to get to 2nd level, or they assumed (wrong) that
+    "Loading creatures" will be done again so they didn't even
+    "risk" calling "New Game" again... In any case, I think that
+    this falls under one of the UI usability rules:
+
+    "Avoid hiding some functionality at runtime, based on some
+    gllobal state, because this will confuse users (they don't know
+    that there are some rules at runtime that will "unlock" some
+    funtionality). It's better to make some items disabled
+    (but still visible). It's even acceptable to show them
+    a menu or a dialog or a combobox etc. where only 1 choice
+    is possible --- this way users will know that *the choice
+    is here always, just currently there is only 1 possibility*."
+
+    So it was a bad idea to hide "Choose new level" menu. }
+
+  SetChooseNewLevelMenu;
+end;
+
+procedure TMainMenu.ClickConfigureControls(Sender: TObject);
+begin
+  SoundEngine.Sound(stMenuClick);
+  ShowControlsMenu(BackgroundControls, false, false);
+end;
+
+procedure TMainMenu.ClickVideoOptions(Sender: TObject);
+begin
+  SoundEngine.Sound(stMenuClick);
+  SetCurrentMenu(CurrentMenu, VideoMenu);
+end;
+
+procedure TMainMenu.ClickSoundOptions(Sender: TObject);
+begin
+  SoundEngine.Sound(stMenuClick);
+  SetCurrentMenu(CurrentMenu, SoundMenu);
+end;
+
+procedure TMainMenu.ClickCredits(Sender: TObject);
+begin
+  SoundEngine.Sound(stMenuClick);
+  ShowCredits(BackgroundControls, BackgroundSceneManager);
+end;
+
+procedure TMainMenu.ClickVisitWebsite(Sender: TObject);
+begin
+  SoundEngine.Sound(stMenuClick);
+  if not OpenURL(CastleURL) then MessageOK(Window, SCannotOpenURL);
+end;
+
+procedure TMainMenu.ClickQuit(Sender: TObject);
+begin
+  SoundEngine.Sound(stMenuClick);
+  UserQuit := true;
 end;
 
 { TAntiAliasingSlider ------------------------------------------ }
