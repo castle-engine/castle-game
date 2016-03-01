@@ -68,7 +68,7 @@ type
 implementation
 
 uses Math, CastleUtils, CastleGLUtils, CastleStringUtils, SysUtils,
-  CastleFilesUtils, CastleRenderingCamera, CastleDDS, CastleGL, CastleGLImages, CastleRenderer;
+  CastleFilesUtils, CastleRenderingCamera, CastleCompositeImage, CastleGL, CastleGLImages, CastleRenderer;
 
 { TBlendedLoopingAnimation --------------------------------------------------- }
 
@@ -163,13 +163,13 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
 
   function LoadWaterEnvMap: TGLuint;
   var
-    DDS: TDDSImage;
+    Image: TCompositeImage;
   begin
     glGenTextures(1, @Result);
 
-    DDS := TDDSImage.Create;
+    Image := TCompositeImage.Create;
     try
-      DDS.LoadFromFile(ApplicationData(
+      Image.LoadFromFile(ApplicationData(
         'levels/fountain/water_reflections/water_environment_map.dds'));
 
       glBindTexture(GL_TEXTURE_CUBE_MAP, Result);
@@ -178,17 +178,15 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
       glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
       glTextureCubeMap(Result,
-        DDS.CubeMapImage(dcsPositiveX),
-        DDS.CubeMapImage(dcsNegativeX),
-        { Swap meaning of positive/negative Y faces from DDS,
-          see TDDSCubeMapSide for explanation. }
-        DDS.CubeMapImage(dcsNegativeY),
-        DDS.CubeMapImage(dcsPositiveY),
-        DDS.CubeMapImage(dcsPositiveZ),
-        DDS.CubeMapImage(dcsNegativeZ),
-        DDS,
+        Image.CubeMapImage(csPositiveX),
+        Image.CubeMapImage(csNegativeX),
+        Image.CubeMapImage(csPositiveY),
+        Image.CubeMapImage(csNegativeY),
+        Image.CubeMapImage(csPositiveZ),
+        Image.CubeMapImage(csNegativeZ),
+        Image,
         Attributes.TextureFilter.NeedsMipmaps);
-    finally FreeAndNil(DDS); end;
+    finally FreeAndNil(Image); end;
   end;
 
 var
