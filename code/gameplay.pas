@@ -249,7 +249,7 @@ procedure TGame2DControls.Render;
           SceneManager.ShadowVolumeRenderer.CountZPass,
           SceneManager.ShadowVolumeRenderer.CountZFailNoLightCap,
           SceneManager.ShadowVolumeRenderer.CountZFailAndLightCap,
-          SceneManager.ShadowVolumeRenderer.CountScenes ]));
+          SceneManager.ShadowVolumeRenderer.CountCasters ]));
   end;
 
   procedure DoShowDeadOrFinishedKeys(const Color: TCastleColor);
