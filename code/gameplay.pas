@@ -227,9 +227,9 @@ procedure TGame2DControls.Render;
       each time --- this would cause too much move for player.
       Instead, display DisplayFpsXxxTime that are updated each second. }
     if (DisplayFpsUpdateTick = 0) or
-       (TimeTickDiff(DisplayFpsUpdateTick, GetTickCount) >= 1000) then
+       (TimeTickDiff(DisplayFpsUpdateTick, CastleTimeUtils.GetTickCount64) >= 1000) then
     begin
-      DisplayFpsUpdateTick := GetTickCount;
+      DisplayFpsUpdateTick := CastleTimeUtils.GetTickCount64;
       DisplayFpsFrameTime := Window.Fps.FrameTime;
       DisplayFpsRealTime := Window.Fps.RealTime;
     end;
