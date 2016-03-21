@@ -652,7 +652,7 @@ begin
   R := ScreenRect;
   SubMenuTitleFont.Print(R.Left,
     R.Top - (FirstDemoLevelIndex + 2) *
-      (UIFont.RowHeight + RegularSpaceBetweenItems) - 15 { margin },
+      (Font.RowHeight + RegularSpaceBetweenItems) + 10,
     SubMenuTextColor, 'Bonus demo levels :');
 end;
 

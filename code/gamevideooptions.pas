@@ -33,7 +33,11 @@ var
   AllowScreenChange: boolean;
 
 const
-  DefaultShadowVolumes = true;
+  DefaultShadowVolumes =
+    {$ifdef ANDROID} false {$else}
+    {$ifdef IOS}     false {$else}
+                     true {$endif}
+                          {$endif};
 var
   { Render shadow volumes.
     This is meaningfull only if GLFeatures.ShadowVolumesPossible,

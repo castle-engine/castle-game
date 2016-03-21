@@ -8,6 +8,8 @@
   number="3"
   type="Cages"
   placeholders="blender"
+  
+  default_played="True"
 
   music_sound="cages_music_with_rain"
 >

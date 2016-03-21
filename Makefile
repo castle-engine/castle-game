@@ -21,7 +21,7 @@ build:
 
 .PHONY: android
 android:
-	castle-engine package --os=android --cpu=arm --mode=$(MODE) --verbose --leave-temp
+	castle-engine package --os=android --cpu=arm --mode=$(MODE) --verbose
 	castle-engine install --os=android --cpu=arm
 	castle-engine run --os=android --cpu=arm
 

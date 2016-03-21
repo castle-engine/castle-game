@@ -34,9 +34,10 @@ uses SysUtils, Classes,
   CastleLog, CastleClassUtils, CastleLevels, CastleMaterialProperties,
   CastleSoundEngine, CastleConfig, CastleUIState, CastleResources,
   CastleGameNotifications, CastleInputs, CastleRectangles, CastleColors,
+  CastleImages,
   { castle GameXxx units }
   GameWindow, GameStartMenu, GameHelp, CastleFilesUtils, GameControlsMenu,
-  GameVideoOptions, GameInitialBackground, GameItems, GameDebugMenu,
+  GameVideoOptions, GameItems, GameDebugMenu,
   GameCreatures, GamePlay, GameGeneralMenu, GameCredits, GameGameMenu,
   GameChooseMenu, GameSound;
 
@@ -57,6 +58,11 @@ begin
   Notifications.Anchor(vpBottom, 10);
   Notifications.TextAlignment := hpMiddle;
   Notifications.Color := Yellow;
+
+  { configure progress }
+  Progress.UserInterface.Image :=
+    LoadImage(ApplicationData('menu_bg/initial_background.png'));
+  Progress.UserInterface.OwnsImage := true;
 
   { load game data from XML files }
   MaterialProperties.URL := ApplicationData('textures/material_properties.xml');
@@ -90,13 +96,10 @@ begin
   Levels.AddFromFile(ApplicationData('levels/fountain/level.xml'));
   Levels.AddFromFile(ApplicationData('levels/hello_world_shadow/level.xml'));
   Levels.AddFromFile(ApplicationData('levels/cages/level.xml'));
+  Levels.SortByNumber;
   Levels.LoadFromConfig(UserConfig);
 
-  { init OpenAL (after setting StateInitial, because ALContextOpen
-    wants to display progress of "Loading sounds") }
-  StateInitial := TStateInitial.Create(Application);
-  TUIState.Current := StateInitial;
-
+  { init sound. This displays progress of "Loading sounds". }
   InitializeSound;
   SoundEngine.ALContextOpen;
 

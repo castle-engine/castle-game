@@ -38,10 +38,14 @@ type
     to ExclusiveEvents being @false. }
   TCastleGameMenu = class(TCastleOnScreenMenu)
   public
+  const
+    DefaultCastleFontSize = 40;
+
     constructor Create(AOwner: TComponent); override;
     property ExclusiveEvents default false;
     property DrawFocusedBorder default false;
     property CaptureAllEvents default true;
+    property FontSize default DefaultCastleFontSize;
 
     { Sets position parameters.
       If Center = @false then sets position suitable for the background
@@ -68,6 +72,7 @@ begin
   ExclusiveEvents := false;
   DrawFocusedBorder := false;
   CaptureAllEvents := true;
+  FontSize := DefaultCastleFontSize;
   SetPosition(true); // center by default
 end;
 
