@@ -8,6 +8,8 @@
 
 default: build
 
+MODE:=debug
+
 # Building target.
 # You may wish to call target `clean' before
 # calling build. This will make sure that everything is
@@ -15,10 +17,10 @@ default: build
 #TODO: pass this -dCASTLE_WINDOW_BEST_NOGUI
 #TODO: clean-window to force rebuilding CastleWindow unit with proper backend.
 build:
-	castle-engine compile $(CASTLE_ENGINE_TOOL_OPTIONS)
+	castle-engine compile --mode=$(MODE) $(CASTLE_ENGINE_TOOL_OPTIONS)
 
 .PHONY: android
-android: prebuild
+android:
 	castle-engine package --os=android --cpu=arm --mode=$(MODE) --verbose --leave-temp
 	castle-engine install --os=android --cpu=arm
 	castle-engine run --os=android --cpu=arm

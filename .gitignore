@@ -3,3 +3,5 @@
 *.ppu
 castle
 castle.exe
+*.apk
+code/libcastle_android.so

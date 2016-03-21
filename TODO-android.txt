@@ -1,3 +1,13 @@
+- android crash in AAssetManager_open when reading sounds/index.xml:
+
+  03-21 05:19:50.194   779   885 I OpenGLRenderer: Initialized EGL, version 1.4
+  03-21 05:19:50.249 21978 21978 I app_process32: Reading from "sounds/index.xml"
+  03-21 05:19:50.249 21978 21978 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x4 in tid 21978 (astrophe.castle)
+  ...
+  03-21 05:19:50.319 26435 21997 I UpdateIcingCorporaServi: Updating corpora: APPS=com.games.cat.astrophe.castle, CONTACTS=MAYBE
+  03-21 05:19:50.350   199   199 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+  03-21 05:19:50.350   199   199 F DEBUG   : Build fingerprint: 'google/hammerhead/hammerhead:6.0.1/MMB29V/2554798:user/release-keys'
+
 - credits enter/exit too quickly now.
   Hm, they accidentally get enter/mouse click that was used to enter the state, so they exit immediately...
 
@@ -45,3 +55,5 @@
 - remove delays when moving by menus and something gets initialized.
 
 - moon on background skybox is in bad place, often right under menu
+
+- remove CGE deprecation warnings
