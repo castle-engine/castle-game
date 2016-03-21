@@ -73,8 +73,8 @@ var
   UseTouchInterface: boolean =
     {$ifdef ANDROID} true {$else}
     {$ifdef IOS}     true {$else}
-                     true {$endif}
-                          {$endif};
+                     false {$endif}
+                           {$endif};
 
 { Update MouseLook-related player settings, based on what is chosen
   in "Confgure controls" menu. }

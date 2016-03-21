@@ -35,11 +35,10 @@ uses SysUtils, Classes,
   CastleLog, CastleClassUtils, CastleLevels, CastleMaterialProperties,
   CastleSoundEngine, CastleConfig, CastleRenderer, CastleResources,
   CastleGameNotifications, CastleInputs, CastleRectangles, CastleColors,
-  CastleUIState,
+  CastleUIState, CastleFilesUtils,
   { castle GameXxx units }
-  GameWindow, GameStartMenu, GameHelp, CastleFilesUtils,
-  GameVideoOptions, GameInitialBackground, GameItems,
-  GameCreatures, GamePlay, GameGeneralMenu, Game;
+  GameWindow, GameHelp, GameVideoOptions, GameControlsMenu,
+  GameGeneralMenu, Game;
 
 { suggested screen size ------------------------------------------------------ }
 
@@ -52,9 +51,10 @@ const
 { parsing parameters --------------------------------------------------------- }
 
 const
-  Options: array [0..1] of TOption =
+  Options: array [0..2] of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
-    (Short:'v'; Long: 'version'; Argument: oaNone)
+    (Short:'v'; Long: 'version'; Argument: oaNone),
+    (Short:#0 ; Long: 'touch'; Argument: oaNone)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -78,6 +78,7 @@ begin
          WritelnStr(Version);
          Halt;
        end;
+    2: UseTouchInterface := true;
     else raise EInternalError.Create('OptionProc');
   end;
 end;
