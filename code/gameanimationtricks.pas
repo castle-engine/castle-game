@@ -236,11 +236,14 @@ end;
 procedure TBlendedLoopingAnimationShader.Render(const Frustum: TFrustum;
   const Params: TRenderParams);
 begin
+  {$ifndef OpenGLES}
+  { our shader cannot work with OpenGLES }
   if Attributes.CustomShader = nil then
   begin
     CustomShader := TWaterShader.Create(Attributes);
     Attributes.CustomShader := CustomShader;
   end;
+  {$endif}
   inherited;
 end;
 

@@ -1,3 +1,8 @@
+- shader water on fountain level adjust to GLES.
+  Why it still crashes? should be disabled!
+
+- progress image - sometimes still doesn't show?
+
 - secure in CGE:
   - Add to CGE nice warning when reading from assets before activ:
     It seems you're trying to read game data (stuff in ApplicationData() on Android) before the activity has started, that is: before we called Application.OnInitialize. Usually this happens if you try to read some file from Pascal unit's "initialization" section (like SoundEngine.RepositoryURL or MaterialProperties.URL). You have to change your code to do this later, in Application.OnInitialize or later, it is impossible to read files earlier.
@@ -10,6 +15,8 @@
     and read file list from there?
 
 - Android: different walk touch control (rotate on drag), and special button to attack?
+  obracanie szybciej.
+
   Also buttons to enter menu, show items, use items (just click on them) etc.
 
 - Allow scaling touch control size to screen size?

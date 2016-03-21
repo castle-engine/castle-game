@@ -5,3 +5,5 @@ castle
 castle.exe
 *.apk
 code/libcastle_android.so
+AndroidAntProperties.txt
+
