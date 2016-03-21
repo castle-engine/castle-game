@@ -44,14 +44,17 @@ NavigationInfo {
 }
 
 Transform {
-  rotation 1 0 0 1.57
-  children Background {
-    backUrl "../../skies/sky_back.png"
-    bottomUrl "../../skies/sky_bottom.png"
-    frontUrl "../../skies/sky_front.png"
-    leftUrl "../../skies/sky_left.png"
-    rightUrl "../../skies/sky_right.png"
-    topUrl "../../skies/sky_top.png"
+  rotation 0 0 1 -1 # move the moon to the right, otherwise it's often under start menu
+  children Transform {
+    rotation 1 0 0 1.57
+    children Background {
+      backUrl "../../skies/sky_back.png"
+      bottomUrl "../../skies/sky_bottom.png"
+      frontUrl "../../skies/sky_front.png"
+      leftUrl "../../skies/sky_left.png"
+      rightUrl "../../skies/sky_right.png"
+      topUrl "../../skies/sky_top.png"
+    }
   }
 }
 
