@@ -1,4 +1,6 @@
 *~
+*.blend1
+*.blend2
 *.o
 *.ppu
 castle
@@ -6,4 +8,3 @@ castle.exe
 *.apk
 code/libcastle_android.so
 AndroidAntProperties.txt
-
