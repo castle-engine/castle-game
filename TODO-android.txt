@@ -15,6 +15,9 @@
 - Allow scaling touch control size to screen size?
   Allow scaling it by user preference?
 
+  then remove:
+  NewControl.Scale := 2; // TODO: hardcoded
+
 - credits enter/exit too quickly now.
   Hm, they accidentally get enter/mouse click that was used to enter the state, so they exit immediately...
 
@@ -50,7 +53,7 @@
   // Window.Container.UIScaling := usEncloseReferenceSize;
   // Window.Container.UIReferenceWidth := ViewportWidth;
   // Window.Container.UIReferenceHeight := 1600;
-  
+
   then remove FontSize force in gamegeneralmenu.pas
   and fix "bonus demo levels" string
 

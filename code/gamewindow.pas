@@ -160,6 +160,7 @@ procedure TGameWindow.SetTouchInterface(const Value: TTouchInterface; const Came
     begin
       NewControl := TCastleTouchControl.Create(self);
       NewControl.TouchMode := Mode;
+      NewControl.Scale := 2; // TODO: hardcoded
       if not RightSide then
         NewControl.Position := tpLeft else
         NewControl.Position := tpRight;
