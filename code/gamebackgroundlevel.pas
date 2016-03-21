@@ -52,7 +52,7 @@ interface
 uses CastleWindow, CastleUIControls, CastleLevels;
 
 var
-  BackgroundControls: TUIControlList;
+  BackgroundControls: TUIControl;
   BackgroundSceneManager: TGameSceneManager;
 
 const
@@ -109,7 +109,7 @@ procedure BackgroundCreate;
 var
   BackgroundPlayer: TPlayer;
 begin
-  BackgroundControls := TUIControlList.Create(false);
+  BackgroundControls := TUIControlSizeable.Create(nil);
 
   { initialize BackgroundSceneManager }
   BackgroundSceneManager := TGameSceneManager.Create(nil);

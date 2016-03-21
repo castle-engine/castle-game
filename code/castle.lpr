@@ -28,14 +28,18 @@ program castle;
   {$R ../automatic-windows-resources.res}
 {$endif MSWINDOWS}
 
-uses CastleWindow,
-  SysUtils, CastleUtils, CastleProgress, CastleWindowProgress,
-  Classes, CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
-  CastleLog, GameWindow, GameStartMenu, GameHelp, CastleFilesUtils,
-  CastleClassUtils, GameVideoOptions, GameInitialBackground,
-  GameCreatures, GamePlay, GameGeneralMenu, CastleLevels, CastleMaterialProperties,
-  CastleSoundEngine, CastleConfig, CastleRenderer, CastleResources, GameItems,
-  CastleGameNotifications, CastleInputs, CastleRectangles, CastleColors;
+uses SysUtils, Classes,
+  { CGE units }
+  CastleWindow, CastleUtils, CastleProgress, CastleWindowProgress,
+  CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
+  CastleLog, CastleClassUtils, CastleLevels, CastleMaterialProperties,
+  CastleSoundEngine, CastleConfig, CastleRenderer, CastleResources,
+  CastleGameNotifications, CastleInputs, CastleRectangles, CastleColors,
+  CastleUIState,
+  { castle GameXxx units }
+  GameWindow, GameStartMenu, GameHelp, CastleFilesUtils,
+  GameVideoOptions, GameInitialBackground, GameItems,
+  GameCreatures, GamePlay, GameGeneralMenu, Game;
 
 { suggested screen size ------------------------------------------------------ }
 
@@ -48,12 +52,9 @@ const
 { parsing parameters --------------------------------------------------------- }
 
 const
-  Options: array [0..4] of TOption =
+  Options: array [0..1] of TOption =
   ( (Short:'h'; Long: 'help'; Argument: oaNone),
-    (Short:'v'; Long: 'version'; Argument: oaNone),
-    (Short: #0; Long: 'debug-no-creatures'; Argument: oaNone),
-    (Short: #0; Long: 'debug-log'; Argument: oaNone),
-    (Short: #0; Long: 'debug-log-cache'; Argument: oaNone)
+    (Short:'v'; Long: 'version'; Argument: oaNone)
   );
 
 procedure OptionProc(OptionNum: Integer; HasArgument: boolean;
@@ -70,53 +71,20 @@ begin
            VersionOptionHelp +nl+
            SoundEngine.ParseParametersHelp +nl+
            nl+
-           Window.ParseParametersHelp(WindowParameters, true) +nl+
-           nl+
-           'Debug options (don''t use unless you know what you''re doing):' +nl+
-           '  --debug-log           Write various log info on stdout' +nl+
-           '  --debug-log-cache     Write log info, including cache, on stdout');
+           Window.ParseParametersHelp(WindowParameters, true));
          Halt;
        end;
     1: begin
          WritelnStr(Version);
          Halt;
        end;
-    2: { --debug-no-creatures not implemented for now };
-    3: InitializeLog(Version);
-    4: begin
-         InitializeLog(Version);
-         LogRendererCache := true;
-       end;
     else raise EInternalError.Create('OptionProc');
   end;
-end;
-
-function MyGetApplicationName: string;
-begin
-  Result := 'castle';
 end;
 
 { main -------------------------------------------------------------------- }
 
 begin
-  { This is needed because
-    - I sometimes display ApplicationName for user, and under Windows
-      ParamStr(0) is ugly uppercased.
-    - ParamStr(0) is unsure for Unixes.
-    - ApplicationConfig and ApplicationData use this. }
-  OnGetApplicationName := @MyGetApplicationName;
-
-  UserConfig.Load;
-  SoundEngine.LoadFromConfig(UserConfig);
-  InputsAll.LoadFromConfig(UserConfig);
-
-  { configure Notifications }
-  Notifications.CollectHistory := true;
-  Notifications.Anchor(hpMiddle);
-  Notifications.Anchor(vpBottom, 10);
-  Notifications.TextAlignment := hpMiddle;
-  Notifications.Color := Yellow;
-
   { By default, run in FullScreen with DefaultScreenWidth x DefaultScreenHeight.
     User can change it with options like --geometry,
     see TCastleWindow.ParseParameters docs. }
@@ -129,9 +97,8 @@ begin
   Window.ColorBits := ColorBits;
 
   { parse parameters }
-  SoundEngine.ParseParameters;
   Window.ParseParameters(WindowParameters);
-  Parameters.Parse(Options, @OptionProc, nil);
+  Parameters.Parse(Options, @OptionProc, nil, true); // allow future SoundEngine.ParseParameters
 
   if AllowScreenChange and Window.FullScreen and
      ( (Application.ScreenWidth <> DefaultScreenWidth) or
@@ -165,24 +132,13 @@ begin
   Window.StencilBits := 8;
   Window.Open;
 
-  { init progress }
-  Application.MainWindow := Window;
-  Progress.UserInterface := WindowProgressInterface;
+  Application.Run;
 
-  { load game data from XML files }
-  MaterialProperties.URL := ApplicationData('textures/material_properties.xml');
-  Resources.LoadFromFiles;
-  ItemsResourcesInit;
-  CreaturesResourcesInit;
-  Levels.LoadFromFiles;
-  Levels.LoadFromConfig(UserConfig);
-
-  { init OpenAL (after initing Window and Progress, because ALContextOpen
-    wants to display progress of "Loading sounds") }
-  RenderInitialBackground;
-  SoundEngine.ALContextOpen;
-
-  ShowStartMenu;
+  { stopping any currently started state now.
+    This makes destruction order predictable (as opposed to just letting
+    TComponent destructors recursively call children destruction),
+    and makes it easier to write crash-free exit. }
+  TUIState.Current := nil;
 
   SoundEngine.SaveToConfig(UserConfig);
   InputsAll.SaveToConfig(UserConfig);

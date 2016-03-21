@@ -17,6 +17,16 @@ default: build
 build:
 	castle-engine compile $(CASTLE_ENGINE_TOOL_OPTIONS)
 
+.PHONY: android
+android: prebuild
+	castle-engine package --os=android --cpu=arm --mode=$(MODE) --verbose --leave-temp
+	castle-engine install --os=android --cpu=arm
+	castle-engine run --os=android --cpu=arm
+
+.PHONY: release-android
+release-android:
+	$(MAKE) android MODE=release
+
 clean:
 	castle-engine clean
 	rm -Rf data/levels/fountain/fluidcache/
@@ -28,13 +38,24 @@ update:
 	$(MAKE) -C data/items/sword/
 	$(MAKE) -C data/levels/
 
-# Simple install.
-# You may as well symlink data to /usr/local/share/castle,
-# for system-wide install.
-install:
-	rm -f $(HOME)/.local/share/castle
-	ln -s $(shell pwd)/data $(HOME)/.local/share/castle
+# install --------------------------------------------------------------------
 
-system-install:
-	sudo rm -f /usr/local/share/castle
-	sudo ln -s $(shell pwd)/data /usr/local/share/castle
+# Standard installation dirs, following conventions on
+# http://www.gnu.org/prep/standards/html_node/Directory-Variables.html#Directory-Variables
+PREFIX=$(DESTDIR)/usr/local
+EXEC_PREFIX=$(PREFIX)
+BINDIR=$(EXEC_PREFIX)/bin
+DATAROOTDIR=$(PREFIX)/share
+DATADIR=$(DATAROOTDIR)
+
+# Simple install.
+.PHONY: install
+install:
+	install castle $(BINDIR)
+	cd data/ && \
+	  find . -type f -exec install -D '{}' $(DATADIR)/castle/'{}' ';'
+
+.PHONY: uninstall
+uninstall:
+	rm -f  $(BINDIR)/castle
+	rm -Rf $(DATADIR)/castle

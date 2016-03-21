@@ -25,18 +25,30 @@ unit GameChooseMenu;
 
 interface
 
-uses Classes, CastleWindow, CastleUIControls;
+uses Classes, CastleWindow, CastleUIControls, CastleUIState, CastleImages;
 
 { Allows user to choose one item from MenuItems.
-  Displays menu using TCastleGameMenu with ControlsUnder background. }
-function ChooseByMenu(ControlsUnder: TUIControlList;
-  MenuItems: TStringList): Integer;
+  Displays menu using TCastleGameMenu. }
+function ChooseByMenu(MenuItems: TStringList): Integer;
+
+type
+  TStateChooseMenu = class(TUIState)
+  strict private
+    OldThemeWindow: TCastleImage;
+  public
+    procedure Start; override;
+    procedure Stop; override;
+  end;
+
+var
+  StateChooseMenu: TStateChooseMenu;
 
 implementation
 
-uses SysUtils, CastleControlsImages, CastleImages,
+uses SysUtils, CastleControlsImages,
   CastleWindowModes, CastleGLUtils, CastleInputs, CastleMessages,
-  CastleOnScreenMenu, GameWindow, GameGeneralMenu, CastleVectors, CastleGameNotifications,
+  CastleOnScreenMenu, GameWindow, GameGeneralMenu, CastleVectors,
+  CastleGameNotifications,
   CastleKeysMouse, CastleControls, CastleApplicationProperties;
 
 var
@@ -58,64 +70,52 @@ end;
 
 { global things -------------------------------------------------------------- }
 
+procedure TStateChooseMenu.Start;
+begin
+  inherited;
+
+  OldThemeWindow := Theme.Images[tiWindow];
+  { Otherwise messages don't look good, because the text is mixed
+    with the menu text. }
+  Theme.Images[tiWindow] := WindowDark;
+end;
+
+procedure TStateChooseMenu.Stop;
+begin
+  Theme.Images[tiWindow] := OldThemeWindow;
+  inherited;
+end;
+
 var
   ChooseMenu: TChooseMenu;
 
-procedure CloseQuery(Container: TUIContainer);
-begin
-  MessageOK(Window, 'You can''t exit now.');
-end;
-
-function ChooseByMenu(ControlsUnder: TUIControlList;
-  MenuItems: TStringList): Integer;
+function ChooseByMenu(MenuItems: TStringList): Integer;
 var
-  SavedMode: TGLMode;
-  OldThemeWindow: TCastleImage;
   I: Integer;
+  PreviousMenu: TCastleOnScreenMenu;
 begin
+  ChooseMenu.ClearControls;
   for I := 0 to MenuItems.Count - 1 do
     ChooseMenu.Add(MenuItems[I]);
 
-  OldThemeWindow := Theme.Images[tiWindow];
-  SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
+  TUIState.Push(StateChooseMenu);
   try
-    Window.RenderStyle := rs3D;
-
-    { Otherwise messages don't look good, because the text is mixed
-      with the menu text. }
-    Theme.Images[tiWindow] := WindowDark;
-
-    Window.Controls.MakeSingle(TCastleOnScreenMenu, ChooseMenu);
-
-    Window.Controls.InsertBack(GlobalCatchInput);
-    Window.Controls.InsertBack(Notifications);
-    Window.Controls.InsertBack(ControlsUnder);
+    PreviousMenu := Window.Controls.MakeSingle(TCastleOnScreenMenu, ChooseMenu)
+      as TCastleOnScreenMenu;
 
     Selected := false;
     repeat
       Application.ProcessMessage(true, true);
     until Selected;
 
+    Window.Controls.MakeSingle(TCastleOnScreenMenu, PreviousMenu);
+
     Result := SelectedIndex;
-  finally
-    FreeAndNil(SavedMode);
-    Theme.Images[tiWindow] := OldThemeWindow;
-  end;
-end;
-
-{ initialization / finalization ---------------------------------------------- }
-
-procedure ContextOpen;
-begin
-  ChooseMenu := TChooseMenu.Create(nil);
-end;
-
-procedure ContextClose;
-begin
-  FreeAndNil(ChooseMenu);
+  finally TUIState.Pop(StateChooseMenu) end;
 end;
 
 initialization
-  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
-  ApplicationProperties.OnGLContextClose.Add(@ContextClose);
+  ChooseMenu := TChooseMenu.Create(nil);
+finalization
+  FreeAndNil(ChooseMenu);
 end.

@@ -31,9 +31,9 @@ uses Classes,
 type
   { On-screen menu suitable for castle.
 
-    Full-screen display: PositioInside makes all events captured
-    (covers the whole screen), as we don't need the focus / non-focus stuff,
-    menu is the only control used here.
+    Note that CaptureAllEvents makes all events captured
+    (covers the whole screen), as we don't need the focus / non-focus logic,
+    menu is the only control used on the screen.
     Also, it let's events further down to our callbacks, thanks
     to ExclusiveEvents being @false. }
   TCastleGameMenu = class(TCastleOnScreenMenu)

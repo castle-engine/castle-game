@@ -26,7 +26,8 @@ unit GameControlsMenu;
 interface
 
 uses Classes, CastleWindow, GameGeneralMenu, CastleCameras,
-  CastleFonts, CastleUIControls, CastlePlayer;
+  CastleFonts, CastleUIControls, CastlePlayer, CastleUIState,
+  CastleKeysMouse;
 
 type
   TSubMenu = class(TCastleGameMenu)
@@ -38,16 +39,30 @@ type
     procedure Render; override;
   end;
 
-{ Show menu that allows player to configure controls. }
-procedure ShowControlsMenu(ControlsUnder: TUIControlList;
-  ADrawFadeRect, ADrawCentered: boolean);
+  { Show menu that allows player to configure controls. }
+  TStateControlsMenu = class(TUIState)
+  strict private
+    type
+      TFadeRect = class(TUIControl)
+        procedure Render; override;
+      end;
+    var
+    FadeRect: TFadeRect;
+  public
+    { User can quit with the escape key. }
+    ExitWithEscapeAllowed: boolean;
+    { If ExitWithEscapeAllowed, this will be set to @true or @false,
+      depending on whether user used escape to exit. }
+    ExitWithEscape: boolean;
+    DrawFadeRect, DrawCentered: boolean;
+    constructor Create(AOwner: TComponent); override;
+    procedure Start; override;
+    procedure Stop; override;
+   function Press(const Event: TInputPressRelease): boolean; override;
+  end;
 
-{ Like ShowControlsMenu, but user can quit with
-  the escape key. AExitWithEscape will be set to @true or @false,
-  depending on whether user used escape to exit. }
-procedure ShowControlsMenuEscape(ControlsUnder: TUIControlList;
-  ADrawFadeRect, ADrawCentered: boolean;
-  out AExitWithEscape: boolean);
+var
+  StateControlsMenu: TStateControlsMenu;
 
 var
   { Font used for menu SubMenuTitle.
@@ -62,7 +77,7 @@ implementation
 
 uses SysUtils, CastleWindowModes, CastleGLUtils, CastleMessages,
   CastleOnScreenMenu, CastleConfig,
-  CastleInputs, CastleKeysMouse, CastleVectors, CastleUtils, CastleRectangles,
+  CastleInputs, CastleVectors, CastleUtils, CastleRectangles,
   CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors,
   CastleControls, CastleTextureFont_DejaVuSansMono_18,
   CastleApplicationProperties;
@@ -141,7 +156,6 @@ type
   global vars (used by TCastleGameMenu descendants implementation) }
 
 var
-  UserQuit: boolean;
   CurrentMenu: TCastleGameMenu;
   ControlsMenu: TControlsMenu;
   BasicControlsMenu: TBasicControlsMenu;
@@ -259,7 +273,7 @@ begin
 
          MessageOK(Window, 'All keys and settings restored to defaults.');
        end;
-    9: UserQuit := true;
+    9: TUIState.Pop(StateControlsMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -452,104 +466,21 @@ begin
     'before flying spell will automatically wear off.'; }
 end;
 
-{ global things -------------------------------------------------------------- }
+{ TFadeRect ------------------------------------------------------------------ }
 
-var
-  ExitWithEscapeAllowed: boolean;
-  ExitWithEscape: boolean;
-
-type
-  TFadeRect = class(TUIControl)
-    procedure Render; override;
-  end;
-
-procedure TFadeRect.Render;
+procedure TStateControlsMenu.TFadeRect.Render;
 begin
   inherited;
   DrawRectangle(CurrentMenu.ScreenRect.Grow(150),
     Vector4Single(0, 0, 0, CurrentMenu.BackgroundOpacityFocused));
 end;
 
-procedure Press(Container: TUIContainer; const Event: TInputPressRelease);
+{ TStateControlsMenu --------------------------------------------------------- }
+
+constructor TStateControlsMenu.Create(AOwner: TComponent);
 begin
-  if ExitWithEscapeAllowed and Event.IsKey(CharEscape) then
-  begin
-    UserQuit := true;
-    ExitWithEscape := true;
-  end;
-end;
+  inherited;
 
-procedure CloseQuery(Container: TUIContainer);
-begin
-  MessageOK(Window, 'You can''t exit now.');
-end;
-
-procedure ShowControlsMenuCore(ControlsUnder: TUIControlList;
-  ADrawFadeRect, ADrawCentered, AExitWithEscapeAllowed: boolean;
-  out AExitWithEscape: boolean);
-var
-  SavedMode: TGLMode;
-  FadeRect: TFadeRect;
-begin
-  ExitWithEscapeAllowed := AExitWithEscapeAllowed;
-  ExitWithEscape := false;
-
-  ControlsMenu     .SetPosition(ADrawCentered);
-  BasicControlsMenu.SetPosition(ADrawCentered);
-  ItemsControlsMenu.SetPosition(ADrawCentered);
-  OtherControlsMenu.SetPosition(ADrawCentered);
-
-  FadeRect := nil;
-
-  SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
-  try
-    Window.OnPress := @Press;
-
-    SetCurrentMenu(CurrentMenu, ControlsMenu);
-
-    if ADrawFadeRect then
-    begin
-      FadeRect := TFadeRect.Create(nil);
-      Window.Controls.InsertBack(FadeRect);
-    end;
-
-    Window.Controls.InsertBack(GlobalCatchInput);
-    Window.Controls.InsertBack(Notifications);
-    Window.Controls.InsertBack(ControlsUnder);
-
-    UserQuit := false;
-    repeat
-      Application.ProcessMessage(true, true);
-    until UserQuit;
-  finally
-    FreeAndNil(SavedMode);
-    FreeAndNil(FadeRect);
-  end;
-
-  AExitWithEscape := ExitWithEscape;
-end;
-
-procedure ShowControlsMenu(ControlsUnder: TUIControlList;
-  ADrawFadeRect, ADrawCentered: boolean);
-var
-  Dummy: boolean;
-begin
-  ShowControlsMenuCore(ControlsUnder, ADrawFadeRect, ADrawCentered,
-    false, Dummy);
-end;
-
-procedure ShowControlsMenuEscape(ControlsUnder: TUIControlList;
-  ADrawFadeRect, ADrawCentered: boolean;
-  out AExitWithEscape: boolean);
-begin
-  ShowControlsMenuCore(ControlsUnder, ADrawFadeRect, ADrawCentered,
-    true, AExitWithEscape);
-end;
-
-{ initialization / finalization ---------------------------------------------- }
-
-procedure ContextOpen;
-begin
   ControlsMenu := TControlsMenu.Create(Application);
   BasicControlsMenu := TBasicControlsMenu.Create(Application);
   ItemsControlsMenu := TItemsControlsMenu.Create(Application);
@@ -557,6 +488,45 @@ begin
 
   Theme.MessageFont := TTextureFont.Create(TextureFont_DejaVuSansMono_18);
   SubMenuTitleFont := Theme.MessageFont;
+end;
+
+function TStateControlsMenu.Press(const Event: TInputPressRelease): boolean;
+begin
+  Result := inherited;
+  if Result then Exit;
+
+  if ExitWithEscapeAllowed and Event.IsKey(CharEscape) then
+  begin
+    ExitWithEscape := true;
+    TUIState.Pop(StateControlsMenu);
+  end;
+end;
+
+procedure TStateControlsMenu.Start;
+begin
+  inherited;
+
+  ExitWithEscape := false;
+
+  ControlsMenu     .SetPosition(DrawCentered);
+  BasicControlsMenu.SetPosition(DrawCentered);
+  ItemsControlsMenu.SetPosition(DrawCentered);
+  OtherControlsMenu.SetPosition(DrawCentered);
+
+  SetCurrentMenu(CurrentMenu, ControlsMenu);
+
+  if DrawFadeRect then
+  begin
+    FadeRect := TFadeRect.Create(nil);
+    InsertBack(FadeRect);
+  end;
+end;
+
+procedure TStateControlsMenu.Stop;
+begin
+  FreeAndNil(FadeRect);
+  SetCurrentMenu(CurrentMenu, nil);
+  inherited;
 end;
 
 { TConfigOptions ------------------------------------------------------------- }
@@ -592,8 +562,6 @@ begin
 end;
 
 initialization
-  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
-
   UserConfig.AddLoadListener(@TConfigOptions(nil).LoadFromConfig);
   UserConfig.AddSaveListener(@TConfigOptions(nil).SaveToConfig);
 end.

@@ -27,7 +27,7 @@ unit GamePlay;
 interface
 
 uses Classes, CastleLevels, CastlePlayer, Castle3D, CastleControlsImages,
-  CastleRectangles;
+  CastleRectangles, CastleUIState, CastleKeysMouse, CastleUIControls;
 
 { Play the game.
   SceneManager and Player global variables must be already initialized.
@@ -85,17 +85,41 @@ procedure GameCancel(RequireConfirmation: boolean);
 var
   DebugRenderForLevelScreenshot: boolean = false;
 
+type
+  TStatePlay = class(TUIState)
+  strict private
+    type
+      TGame2DControls = class(TUIControl)
+      public
+        procedure Render; override;
+      end;
+    var
+    C2D: TGame2DControls;
+  public
+    PrepareNewPlayer: boolean;
+    procedure Start; override;
+    procedure Stop; override;
+    function Press(const Event: TInputPressRelease): boolean; override;
+    procedure Update(const SecondsPassed: Single;
+      var HandleInput: boolean); override;
+    procedure Resume; override;
+    procedure Pause; override;
+  end;
+
+var
+  StatePlay: TStatePlay;
+
 implementation
 
 uses SysUtils, CastleUtils, CastleWindow, GameInputs,
   CastleWindowModes, CastleGLUtils, CastleMessages, GameWindow,
-  CastleVectors, CastleImages, Math, GameHelp, CastleUIControls, CastleSoundEngine,
+  CastleVectors, CastleImages, Math, GameHelp, CastleSoundEngine,
   GameItems, CastleStringUtils, CastleCreatures, CastleItems,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, CastleColors, CastleSceneManager,
   CastleGameNotifications, GameControlsMenu, CastleControls,
   CastleApplicationProperties,
-  GameLevelSpecific, CastleTimeUtils, CastleGLImages, CastleKeysMouse;
+  GameLevelSpecific, CastleTimeUtils, CastleGLImages;
 
 var
   GLNotificationsFade: TGLImage;
@@ -116,17 +140,9 @@ var
     of next Level to load. }
   LevelFinishedNextLevelName: string;
 
-  GameControls: TUIControlList;
-
 { TGame2DControls ------------------------------------------------------------ }
 
-type
-  TGame2DControls = class(TUIControl)
-  public
-    procedure Render; override;
-  end;
-
-procedure TGame2DControls.Render;
+procedure TStatePlay.TGame2DControls.Render;
 
   procedure DoRenderInventory;
   const
@@ -432,40 +448,7 @@ begin
   end;
 end;
 
-procedure Update(Container: TUIContainer);
-const
-  GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
-  GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
-  GameWinDirection: TVector3Single = (0, 1, 0);
-  GameWinUp: TVector3Single = (0, 0, 1);
-var
-  Cages: TCagesLevel;
-begin
-  LevelFinishedFlush;
-
-  if GameWin and (SceneManager.Logic is TCagesLevel) then
-  begin
-    Cages := TCagesLevel(SceneManager.Logic);
-    case Cages.GameWinAnimation of
-      gwaNone:
-        begin
-          Assert(not Player.Camera.Animation);
-          Player.Camera.AnimateTo(GameWinPosition1, GameWinDirection, GameWinUp, 4);
-          Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
-        end;
-      gwaAnimateTo1:
-        if not Player.Camera.Animation then
-        begin
-          SoundEngine.Sound(stKeyDoorUse);
-          Player.Camera.AnimateTo(GameWinPosition2, GameWinDirection, GameWinUp, 4);
-          Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
-        end;
-      gwaAnimateTo2:
-        if not Player.Camera.Animation then
-          Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
-    end;
-  end;
-end;
+{ other ---------------------------------------------------------------------- }
 
 procedure LevelFinishedFlush;
 var
@@ -503,7 +486,47 @@ begin
   end;
 end;
 
-procedure Press(Container: TUIContainer; const Event: TInputPressRelease);
+{ TStatePlay ----------------------------------------------------------------- }
+
+procedure TStatePlay.Update(const SecondsPassed: Single;
+  var HandleInput: boolean);
+const
+  GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
+  GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
+  GameWinDirection: TVector3Single = (0, 1, 0);
+  GameWinUp: TVector3Single = (0, 0, 1);
+var
+  Cages: TCagesLevel;
+begin
+  inherited;
+
+  LevelFinishedFlush;
+
+  if GameWin and (SceneManager.Logic is TCagesLevel) then
+  begin
+    Cages := TCagesLevel(SceneManager.Logic);
+    case Cages.GameWinAnimation of
+      gwaNone:
+        begin
+          Assert(not Player.Camera.Animation);
+          Player.Camera.AnimateTo(GameWinPosition1, GameWinDirection, GameWinUp, 4);
+          Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
+        end;
+      gwaAnimateTo1:
+        if not Player.Camera.Animation then
+        begin
+          SoundEngine.Sound(stKeyDoorUse);
+          Player.Camera.AnimateTo(GameWinPosition2, GameWinDirection, GameWinUp, 4);
+          Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
+        end;
+      gwaAnimateTo2:
+        if not Player.Camera.Animation then
+          Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
+    end;
+  end;
+end;
+
+function TStatePlay.Press(const Event: TInputPressRelease): boolean;
 
   procedure UseLifePotion;
   var
@@ -517,9 +540,7 @@ procedure Press(Container: TUIContainer; const Event: TInputPressRelease);
 
   procedure DoDebugMenu;
   begin
-    SceneManager.Paused := true;
-    ShowDebugMenu(GameControls);
-    SceneManager.Paused := false;
+    TUIState.Push(StateDebugMenu);
   end;
 
   procedure RestartLevel;
@@ -534,89 +555,107 @@ procedure Press(Container: TUIContainer; const Event: TInputPressRelease);
   end;
 
 begin
+  Result := inherited;
+  if Result then Exit;
+
   if Event.IsKey(CharEscape) then
   begin
     if Player.Dead or GameWin then
       GameCancel(false) else
-    begin
-      SceneManager.Paused := true;
-      ShowGameMenu(GameControls);
-      PlayerUpdateMouseLook(Player);
-      SceneManager.Paused := false;
-    end;
+      TUIState.Push(StateGameMenu);
+    Result := true;
   end;
 
   if (Player <> nil) and not (Player.Blocked or Player.Dead) then
   begin
     if Input_UseLifePotion.IsEvent(Event) then
+    begin
       UseLifePotion;
+      Result := true;
+    end;
   end;
 
   { Other keys. }
   if Input_ViewMessages.IsEvent(Event) then
-    ViewGameMessages else
+  begin
+    ViewGameMessages;
+    Result := true;
+  end else
   if Input_FPSShow.IsEvent(Event) then
-    ShowDebugInfo := not ShowDebugInfo else
+  begin
+    ShowDebugInfo := not ShowDebugInfo;
+    Result := true;
+  end else
   if Input_Interact.IsEvent(Event) then
-    RestartLevel else
+  begin
+    RestartLevel;
+    Result := true;
+  end else
   if Input_DebugMenu.IsEvent(Event) then
+  begin
     DoDebugMenu;
+    Result := true;
+  end;
 end;
 
-procedure CloseQuery(Container: TUIContainer);
+procedure TStatePlay.Start;
 begin
-  GameCancel(true);
-end;
-
-procedure PlayGame(PrepareNewPlayer: boolean);
-var
-  SavedMode: TGLMode;
-  C2D: TGame2DControls;
-begin
+  inherited;
   GameWin := false;
 
   LevelFinishedSchedule := false;
 
-  SavedMode := TGLMode.CreateReset(Window, nil, nil, @CloseQuery);
+  C2D := TGame2DControls.Create(nil);
+
+  GameEnded := false;
+  GameEndedWantsRestart := '';
+
+  Theme.Images[tiWindow] := WindowDarkTransparent;
+
+  if PrepareNewPlayer then
+    SceneManager.Logic.PrepareNewPlayer(Player);
+
+  Notifications.Show('Hint: press "Escape" for game menu');
+
+  InsertFront(SceneManager);
+  InsertFront(C2D);
+end;
+
+procedure TStatePlay.Stop;
+begin
+  RemoveControl(SceneManager);
+  RemoveControl(C2D);
+
+  { Clear some Player.Camera callbacks. }
+  SceneManager.OnCameraChanged := nil;
+
+  FreeAndNil(C2D);
+  inherited;
+end;
+
+procedure TStatePlay.Resume;
+begin
+  inherited;
+  PlayerUpdateMouseLook(Player);
+  SceneManager.Paused := false;
+end;
+
+procedure TStatePlay.Pause;
+begin
+  SceneManager.Paused := true;
+  inherited;
+end;
+
+procedure PlayGame(PrepareNewPlayer: boolean);
+begin
+  StatePlay.PrepareNewPlayer := PrepareNewPlayer;
+  TUIState.Push(StatePlay);
   try
-    Window.AutoRedisplay := true;
-
-    Window.OnUpdate := @Update;
-    Window.OnPress := @Press;
-    Window.RenderStyle := rs3D;
-
-    C2D := TGame2DControls.Create(nil);
-    GameControls := TUIControlList.Create(false);
-    GameControls.InsertFront(SceneManager);
-    GameControls.InsertFront(C2D);
-    GameControls.InsertFront(Notifications);
-
-    Window.Controls.InsertBack(GameControls);
-    // GlobalCatchInput behind GameControls, to not cause Cursor be visible
-    // even in mouse look
-    Window.Controls.InsertBack(GlobalCatchInput);
-
     GameEnded := false;
-    GameEndedWantsRestart := '';
-
-    Theme.Images[tiWindow] := WindowDarkTransparent;
-
-    if PrepareNewPlayer then
-      SceneManager.Logic.PrepareNewPlayer(Player);
-
-    Notifications.Show('Hint: press "Escape" for game menu');
-
     repeat
       Application.ProcessMessage(true, true);
     until GameEnded;
-  finally
-    { Clear some Player.Camera callbacks. }
-    SceneManager.OnCameraChanged := nil;
-
-    FreeAndNil(GameControls);
-    FreeAndNil(C2D);
-    FreeAndNil(SavedMode);
-  end;
+  finally TUIState.Pop(StatePlay) end;
 end;
 
 procedure LevelFinished(NextLevelName: string);

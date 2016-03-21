@@ -25,36 +25,49 @@ unit GameCredits;
 
 interface
 
-uses CastleWindow, CastleUIControls, X3DNodes, CastleSceneManager;
+uses Classes,
+  CastleWindow, CastleUIControls, X3DNodes, CastleSceneManager,
+  CastleUIState, Castle3D, CastleTimeUtils, CastleScene, CastleKeysMouse;
 
-{ Show credits. }
-procedure ShowCredits(ControlsUnder: TUIControlList;
-  SceneManagerUnder: TCastleSceneManager);
+type
+  TStateCredits = class(TUIState)
+  strict private
+    type
+      T3DCredits = class(T3DTransform)
+      public
+        AnimationTime, AnimationSpeed, AnimationEnd: TFloatTime;
+        Scene: TCastleScene;
+        constructor Create(AOwner: TComponent); override;
+        procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
+      end;
+    var
+    Credits: T3DCredits;
+    CreditsSceneManager: TCastleSceneManager;
+  public
+    ControlsUnder: TUIControl;
+    SceneManagerUnder: TCastleSceneManager;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Start; override;
+    procedure Stop; override;
+    function Press(const Event: TInputPressRelease): boolean; override;
+  end;
+
+var
+  StateCredits: TStateCredits;
 
 implementation
 
-uses SysUtils, Classes, CastleGLUtils, CastleMessages,
+uses SysUtils,
+  CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils, CastleWindowModes,
-  CastleApplicationProperties,
-  GamePlay, GameWindow,
-  GameVideoOptions, CastleVectors, CastleScene, CastleFilesUtils,
-  GameHelp, CastleUtils, X3DFields, CastleTimeUtils, CastleKeysMouse, Castle3D;
+  CastleApplicationProperties, CastleUtils, X3DFields,
+  CastleVectors, CastleFilesUtils,
+  GamePlay, GameWindow, GameVideoOptions, GameHelp;
 
-var
-  UserQuit: boolean;
+{ T3DCredits ------------------------------------------------------------------- }
 
-{ TCredits ------------------------------------------------------------------- }
-
-type
-  TCredits = class(T3DTransform)
-  public
-    AnimationTime, AnimationSpeed, AnimationEnd: TFloatTime;
-    Scene: TCastleScene;
-    constructor Create(AOwner: TComponent); override;
-    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
-  end;
-
-constructor TCredits.Create(AOwner: TComponent);
+constructor TStateCredits.T3DCredits.Create(AOwner: TComponent);
 var
   VRMLContents: string;
   Info: TMFString;
@@ -77,67 +90,22 @@ begin
   AnimationEnd := StrToFloat(Info.Items[2]);
 end;
 
-procedure TCredits.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
+procedure TStateCredits.T3DCredits.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 begin
+  inherited;
   AnimationTime := AnimationTime + SecondsPassed;
   Translation := Vector3Single(0, AnimationSpeed * AnimationTime, 0);
   if AnimationTime > AnimationEnd then
-    UserQuit := true;
+    TUIState.Pop(StateCredits);
 end;
 
-{ others --------------------------------------------------------------------- }
+{ TStateCredits -------------------------------------------------------------- }
 
-var
-  Credits: TCredits;
-  CreditsSceneManager: TCastleSceneManager;
-
-procedure CloseQuery(Container: TUIContainer);
+constructor TStateCredits.Create(AOwner: TComponent);
 begin
-  MessageOK(Window, 'You can''t exit now.');
-end;
+  inherited;
 
-procedure Press(Container: TUIContainer; const Event: TInputPressRelease);
-begin
-  if Event.IsKey(CharEscape) or
-     Event.IsKey(CharEnter) or
-     Event.IsKey(' ') or
-     { any mouse press ends credits }
-     (Event.EventType = itMouseButton) then
-    UserQuit := true;
-end;
-
-procedure ShowCredits(ControlsUnder: TUIControlList;
-  SceneManagerUnder: TCastleSceneManager);
-var
-  SavedMode: TGLMode;
-begin
-  SavedMode := TGLMode.CreateReset(Window, nil, nil, @CloseQuery);
-  try
-    Window.AutoRedisplay := true; { scrolling text animation }
-
-    Window.OnPress := @Press;
-
-    UserQuit := false;
-    Credits.AnimationTime := 0;
-    Credits.Translation := ZeroVector3Single;
-
-    Window.Controls.InsertBack(GlobalCatchInput);
-    Window.Controls.InsertBack(Notifications);
-    Window.Controls.InsertBack(ControlsUnder);
-
-    Window.Controls.InsertFront(CreditsSceneManager);
-
-    repeat
-      Application.ProcessMessage(true, true);
-    until UserQuit;
-  finally FreeAndNil(SavedMode) end;
-end;
-
-{ initialization / finalization ---------------------------------------------- }
-
-procedure ContextOpen;
-begin
-  Credits := TCredits.Create(nil);
+  Credits := T3DCredits.Create(nil);
 
   { We want to create separate scene manager for credits display because:
     - we want it displayed always on top (so depth buffer should be cleared)
@@ -160,13 +128,44 @@ begin
   CreditsSceneManager.Camera.Input := [];
 end;
 
-procedure ContextClose;
+destructor TStateCredits.Destroy;
 begin
   FreeAndNil(Credits);
   FreeAndNil(CreditsSceneManager);
+  inherited;
 end;
 
-initialization
-  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
-  ApplicationProperties.OnGLContextClose.Add(@ContextClose);
+function TStateCredits.Press(const Event: TInputPressRelease): boolean;
+begin
+  Result := inherited;
+  if Result then Exit;
+
+  if Event.IsKey(CharEscape) or
+     Event.IsKey(CharEnter) or
+     Event.IsKey(' ') or
+     { any mouse press ends credits }
+     (Event.EventType = itMouseButton) then
+  begin
+    TUIState.Pop(StateCredits);
+    Result := true;
+  end;
+end;
+
+procedure TStateCredits.Start;
+begin
+  inherited;
+  Credits.AnimationTime := 0;
+  Credits.Translation := ZeroVector3Single;
+
+  InsertBack(ControlsUnder);
+  InsertFront(CreditsSceneManager);
+end;
+
+procedure TStateCredits.Stop;
+begin
+  RemoveControl(ControlsUnder);
+  RemoveControl(CreditsSceneManager);
+  inherited;
+end;
+
 end.

@@ -20,27 +20,39 @@
   ----------------------------------------------------------------------------
 }
 
-{ }
+{ Show start menu, ask user what to do (new game, exit...),
+  do what the user wants (e.g. load level and call PlayGame). }
 unit GameStartMenu;
 
 interface
 
-uses CastleWindow;
+uses Classes, CastleUIState;
 
-{ Show menu, ask user what to do, do what the user wants
-  (e.g. load level and call PlayGame), when user wants to quit --- return. }
-procedure ShowStartMenu;
+type
+  TStateStartMenu = class(TUIState)
+  private
+    GoingToAnotherMenu: boolean;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure Start; override;
+    procedure Stop; override;
+    procedure Resume; override;
+    procedure Pause; override;
+  end;
+
+var
+  StateStartMenu: TStateStartMenu;
 
 implementation
 
-uses SysUtils, Classes, CastleUtils, CastleWindowModes,
+uses SysUtils, CastleUtils, CastleWindowModes,
   CastleGLUtils, CastleMessages, GameWindow, CastleVectors, CastleImages,
   CastleFilesUtils, CastleLevels, CastlePlayer, CastleColors,
   CastleOnScreenMenu, CastleInputs, CastleRectangles,
   CastleKeysMouse, CastleOpenDocument, CastlePrecalculatedAnimation,
   CastleStringUtils, CastleClassUtils, CastleGameNotifications,
   CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes, CastleControls,
-  CastleApplicationProperties,
+  CastleApplicationProperties, CastleWindow,
   GamePlay, GameSound, GameGeneralMenu, GameControlsMenu, GameVideoOptions,
   GameHelp, GameBackgroundLevel, GameCredits;
 
@@ -118,7 +130,6 @@ type
   global vars (used by TCastleGameMenu descendants implementation) }
 
 var
-  UserQuit: boolean;
   CurrentMenu: TCastleGameMenu;
   MainMenu: TMainMenu;
   VideoMenu: TVideoMenu;
@@ -236,7 +247,12 @@ end;
 procedure TMainMenu.ClickConfigureControls(Sender: TObject);
 begin
   SoundEngine.Sound(stMenuClick);
-  ShowControlsMenu(BackgroundControls, false, false);
+
+  StateControlsMenu.DrawFadeRect := false;
+  StateControlsMenu.DrawCentered := false;
+  StateControlsMenu.ExitWithEscapeAllowed := false;
+  StateStartMenu.GoingToAnotherMenu := true;
+  TUIState.Push(StateControlsMenu);
 end;
 
 procedure TMainMenu.ClickVideoOptions(Sender: TObject);
@@ -254,7 +270,9 @@ end;
 procedure TMainMenu.ClickCredits(Sender: TObject);
 begin
   SoundEngine.Sound(stMenuClick);
-  ShowCredits(BackgroundControls, BackgroundSceneManager);
+  StateCredits.ControlsUnder := BackgroundControls;
+  StateCredits.SceneManagerUnder := BackgroundSceneManager;
+  TUIState.Push(StateCredits);
 end;
 
 procedure TMainMenu.ClickVisitWebsite(Sender: TObject);
@@ -266,7 +284,7 @@ end;
 procedure TMainMenu.ClickQuit(Sender: TObject);
 begin
   SoundEngine.Sound(stMenuClick);
-  UserQuit := true;
+  Application.Terminate;
 end;
 
 { TAntiAliasingSlider ------------------------------------------ }
@@ -658,50 +676,43 @@ end;
 
 { global things -------------------------------------------------------------- }
 
-procedure CloseQuery(Container: TUIContainer);
+constructor TStateStartMenu.Create(AOwner: TComponent);
 begin
-  if MessageYesNo(Window, 'Are you sure you want to quit ?') then
-    UserQuit := true;
-end;
-
-procedure ShowStartMenu;
-var
-  SavedMode: TGLMode;
-begin
-  BackgroundCreate;
-  try
-    SoundEngine.MusicPlayer.Sound := stIntroMusic;
-    try
-      SavedMode := TGLMode.CreateReset(Window, nil, nil, @CloseQuery);
-      try
-        SetCurrentMenu(CurrentMenu, MainMenu);
-
-        Window.Controls.InsertBack(GlobalCatchInput);
-        Window.Controls.InsertBack(Notifications);
-        Window.Controls.InsertBack(BackgroundControls);
-
-        UserQuit := false;
-        repeat
-          Application.ProcessMessage(true, true);
-        until UserQuit;
-      finally FreeAndNil(SavedMode); end;
-    finally SoundEngine.MusicPlayer.Sound := stNone; end;
-  finally
-    BackgroundDestroy;
-  end;
-end;
-
-{ initialization / finalization ---------------------------------------------- }
-
-procedure ContextOpen;
-begin
+  inherited;
   MainMenu := TMainMenu.Create(Application);
   VideoMenu := TVideoMenu.Create(Application);
   SoundMenu := TSoundMenu.Create(Application);
   ChangeOpenALDeviceMenu := TChangeOpenALDeviceMenu.Create(Application);
 end;
 
-initialization
-  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
-finalization
+procedure TStateStartMenu.Start;
+begin
+  inherited;
+  BackgroundCreate;
+  SoundEngine.MusicPlayer.Sound := stIntroMusic;
+end;
+
+procedure TStateStartMenu.Stop;
+begin
+  BackgroundDestroy;
+  inherited;
+end;
+
+procedure TStateStartMenu.Resume;
+begin
+  inherited;
+  SetCurrentMenu(CurrentMenu, MainMenu);
+  if not GoingToAnotherMenu then
+    InsertBack(BackgroundControls);
+  GoingToAnotherMenu := false;
+end;
+
+procedure TStateStartMenu.Pause;
+begin
+  SetCurrentMenu(CurrentMenu, nil);
+  if not GoingToAnotherMenu then
+    RemoveControl(BackgroundControls);
+  inherited;
+end;
+
 end.

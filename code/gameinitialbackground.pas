@@ -25,46 +25,43 @@ unit GameInitialBackground;
 
 interface
 
-{ Sets initial OnRender to draw intro image. }
-procedure RenderInitialBackground;
+uses CastleGLImages, CastleUIState;
+
+type
+  TStateInitial = class(TUIState)
+  strict private
+    GLScreenImage: TGLImage;
+  public
+    procedure Start; override;
+    procedure Stop; override;
+    procedure Render; override;
+  end;
+
+var
+  StateInitial: TStateInitial;
 
 implementation
 
-uses SysUtils, CastleWindow, CastleGLUtils, CastleGLImages, CastleUIControls,
-  CastleApplicationProperties,
-  GameWindow, CastleFilesUtils, CastleImages;
+uses SysUtils, CastleUIControls,
+  CastleFilesUtils;
 
-var
-  GLScreenImage: TGLImage;
-
-procedure Render(Container: TUIContainer);
+procedure TStateInitial.Start;
 begin
-  GLScreenImage.Draw(0, 0);
+  inherited;
+  GLScreenImage := TGLImageManaged.Create(
+    ApplicationData('menu_bg/initial_background.png'), []);
 end;
 
-procedure RenderInitialBackground;
-begin
-  Window.OnRender := @Render;
-  Window.RenderStyle := rs2D;
-  Window.Invalidate;
-end;
-
-{ initialization / finalization ---------------------------------------------- }
-
-procedure ContextOpen;
-begin
-  GLScreenImage := TGLImage.Create(
-    ApplicationData('menu_bg/initial_background.png'),
-    [TRGBImage], Window.Width, Window.Height, riBilinear);
-end;
-
-procedure ContextClose;
+procedure TStateInitial.Stop;
 begin
   FreeAndNil(GLScreenImage);
+  inherited;
 end;
 
-initialization
-  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
-  ApplicationProperties.OnGLContextClose.Add(@ContextClose);
-finalization
+procedure TStateInitial.Render;
+begin
+  inherited;
+  GLScreenImage.Draw(ScreenRect);
+end;
+
 end.

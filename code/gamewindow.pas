@@ -44,11 +44,8 @@ var
   { @noAutoLinkHere }
   Window: TGameWindow;
 
-  { Make sure this is always on Window.Controls list. It's initially
-    there; add it there after TGLMode.CreateReset or other things doing
-    Window.Controls.Clear.
-    This way our "save screen" button works in game, all menus, credits
-    and such. }
+  { This way our "save screen" button works in game, all menus, credits
+    and such. Make sure this is always on Window.Controls list. }
   GlobalCatchInput: TGlobalCatchInput;
 
 implementation
@@ -96,6 +93,8 @@ begin
   inherited;
   GlobalCatchInput := TGlobalCatchInput.Create(Self);
   Controls.InsertBack(GlobalCatchInput);
+  Controls.InsertFront(Notifications);
+  Notifications.KeepInFront := true;
 end;
 
 initialization

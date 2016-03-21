@@ -1,0 +1,44 @@
+- credits enter/exit too quickly now
+
+- add touch controls on android
+
+- enter over paused scene manager (game menu on hello world leve)
+  still causes "notifications" dark area appear
+
+- SetCurrentMenu can become local utility of particular states.
+    we should not modify Window.Controls all the time for this.
+
+- game menu:
+         // TODO:
+         if StateControlsMenu.ExitWithEscape
+           then pop self
+
+- restore ability to close window after asking:
+
+  procedure CloseQuery(Container: TUIContainer);
+  begin
+    if MessageYesNo(Window, 'Are you sure you want to quit ?') then
+      UserQuit := true;
+  end;
+
+- Application.Quit
+  does nothing on Android. just remove? or implement on android?
+
+- in game.pas initialization:
+
+  // TODO
+  // Window.Container.UIScaling := usEncloseReferenceSize;
+  // Window.Container.UIReferenceWidth := ViewportWidth;
+  // Window.Container.UIReferenceHeight := 1600;
+
+  // TODO, test results, also compress textures on Android
+  // TextureMemoryProfiler.Enabled := true;
+
+- // TODO: when to save config on Android? (these 4 lines at the end
+  of lpr)
+
+- make all textures already scaled to po2
+
+- remove delays when moving by menus and something gets initialized.
+
+- moon on background skybox is in bad place, often right under menu

@@ -25,21 +25,33 @@ unit GameDebugMenu;
 
 interface
 
-uses CastleUIControls;
+uses Classes,
+  CastleUIState, CastleUIControls, CastleKeysMouse, CastleImages;
 
-procedure ShowDebugMenu(AControlsUnder: TUIControlList);
+type
+  TStateDebugMenu = class(TUIState)
+  strict private
+    OldThemeWindow: TCastleImage;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure Start; override;
+    procedure Stop; override;
+   function Press(const Event: TInputPressRelease): boolean; override;
+  end;
+
+var
+  StateDebugMenu: TStateDebugMenu;
 
 implementation
 
-uses SysUtils, Classes, CastleControlsImages, CastleImages,
-  CastleUtils, CastleStringUtils, CastleWindowModes,
+uses SysUtils,
+  CastleControlsImages, CastleUtils, CastleStringUtils, CastleWindowModes,
   CastleGLUtils, CastleMessages, GameWindow, Castle3D,
   CastleVectors, CastleWindow, GamePlay, GameGeneralMenu,
   CastleInputs, CastleCreatures, GameChooseMenu,
   CastleItems, CastleOnScreenMenu, CastleRays, GameVideoOptions, CastleSoundEngine,
   X3DNodes, CastleClassUtils, CastleGameNotifications,
-  CastleLevels, CastleKeysMouse, CastleResources, CastleControls,
-  CastleApplicationProperties;
+  CastleLevels, CastleResources, CastleControls, CastleApplicationProperties;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
@@ -90,8 +102,6 @@ type
   global vars (used by TCastleGameMenu descendants implementation) }
 
 var
-  UserQuit: boolean;
-  ControlsUnder: TUIControlList;
   CurrentMenu: TCastleGameMenu;
 
   DebugMenu: TDebugMenu;
@@ -115,7 +125,7 @@ begin
         S.AddObject(Format('Resource %s (%d users)',
           [Resources[I].Name, Resources[I].UsageCount]), Resources[I]);
     S.Append('Cancel');
-    ResultIndex := ChooseByMenu(ControlsUnder, S);
+    ResultIndex := ChooseByMenu(S);
     Result := ResultIndex <> S.Count - 1;
     if Result then
       Resource := S.Objects[ResultIndex] as T3DResource;
@@ -197,7 +207,7 @@ begin
            DebugRenderForLevelScreenshot;
        end;
     10:SoundEngine.ReloadSounds;
-    11:UserQuit := true;
+    11:TUIState.Pop(StateDebugMenu);
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -246,7 +256,7 @@ procedure TDebugPlayerMenu.Click;
     begin
       Player.MaxLife := 10000;
       Player.Life := Player.MaxLife;
-      UserQuit := true;
+      TUIState.Pop(StateDebugMenu);
     end;
   end;
 
@@ -324,7 +334,7 @@ procedure TDebugCreaturesMenu.Click;
         Player.Position + Player.Direction * DirectionAttenuation,
         Player.Direction);
 
-      UserQuit := true;
+      TUIState.Pop(StateDebugMenu);
     end;
   end;
 
@@ -370,7 +380,7 @@ procedure TDebugLevelMenu.Click;
       end;
       S.Append('Cancel');
 
-      Index := ChooseByMenu(ControlsUnder, S);
+      Index := ChooseByMenu(S);
 
       if Index <> Levels.Count then
       begin
@@ -381,7 +391,7 @@ procedure TDebugLevelMenu.Click;
           which sounds awkward for player. }
         LevelFinishedFlush;
         SceneManager.Logic.PrepareNewPlayer(Player);
-        UserQuit := true;
+        TUIState.Pop(StateDebugMenu);
       end;
     finally S.Free end;
   end;
@@ -405,7 +415,7 @@ procedure TDebugLevelMenu.Click;
     Player.Camera.Direction := Dir;
     Player.Camera.Up := Up;
 
-    UserQuit := true;
+    TUIState.Pop(StateDebugMenu);
   end;
 
 begin
@@ -437,7 +447,7 @@ procedure TDebugItemsMenu.Click;
     for I := 0 to Resources.Count - 1 do
       if Resources[I] is TItemResource then
         Player.PickItem(TItemResource(Resources[I]).CreateItem(20));
-    UserQuit := true;
+    TUIState.Pop(StateDebugMenu);
   end;
 
 begin
@@ -449,56 +459,11 @@ begin
   end;
 end;
 
-{ global things -------------------------------------------------------------- }
+{ TStateDebugMenu ------------------------------------------------------------ }
 
-{$I gamemenucallbacks.inc}
-
-procedure ShowDebugMenu(AControlsUnder: TUIControlList);
-var
-  SavedMode: TGLMode;
-  OldThemeWindow: TCastleImage;
+constructor TStateDebugMenu.Create(AOwner: TComponent);
 begin
-  ControlsUnder := AControlsUnder;
-
-  DebugPlayerMenu.RotationHorizontalSpeedSlider.Value :=
-    Player.Camera.RotationHorizontalSpeed;
-  DebugPlayerMenu.RotationVerticalSpeedSlider.Value :=
-    Player.Camera.RotationVerticalSpeed;
-  DebugPlayerMenu.PlayerSpeedSlider.Value := Player.Camera.MoveSpeed;
-
-  OldThemeWindow := Theme.Images[tiWindow];
-  SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
-  try
-    { Otherwise messages don't look good, because the text is mixed
-      with the menu text. }
-    Theme.Images[tiWindow] := WindowDark;
-
-    Window.OnPress := @Press;
-    Window.RenderStyle := rs3D;
-
-    SetCurrentMenu(CurrentMenu, DebugMenu);
-
-    Window.Controls.InsertBack(GlobalCatchInput);
-    Window.Controls.InsertBack(ControlsUnder);
-
-    UserQuit := false;
-    repeat
-      Application.ProcessMessage(true, true);
-    until GameEnded or UserQuit;
-  finally
-    FreeAndNil(SavedMode);
-    Theme.Images[tiWindow] := OldThemeWindow;
-  end;
-end;
-
-{ initialization / finalization ---------------------------------------------- }
-
-procedure ContextOpen;
-begin
-  { Although base TCastleOnScreenMenu doesn't require OpenGL context at constructor,
-    our descendants initialize some Toggles that require font initialized
-    that requires font display lists created. That's why code below is in
-    OnOpen callback, not unit's initialization. }
+  inherited;
   DebugMenu := TDebugMenu.Create(Application);
   DebugPlayerMenu := TDebugPlayerMenu.Create(Application);
   DebugCreaturesMenu := TDebugCreaturesMenu.Create(Application);
@@ -506,6 +471,40 @@ begin
   DebugItemsMenu := TDebugItemsMenu.Create(Application);
 end;
 
-initialization
-  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
+procedure TStateDebugMenu.Start;
+begin
+  inherited;
+  DebugPlayerMenu.RotationHorizontalSpeedSlider.Value :=
+    Player.Camera.RotationHorizontalSpeed;
+  DebugPlayerMenu.RotationVerticalSpeedSlider.Value :=
+    Player.Camera.RotationVerticalSpeed;
+  DebugPlayerMenu.PlayerSpeedSlider.Value := Player.Camera.MoveSpeed;
+
+  OldThemeWindow := Theme.Images[tiWindow];
+  { Otherwise messages don't look good, because the text is mixed
+    with the menu text. }
+  Theme.Images[tiWindow] := WindowDark;
+
+  SetCurrentMenu(CurrentMenu, DebugMenu);
+end;
+
+procedure TStateDebugMenu.Stop;
+begin
+  SetCurrentMenu(CurrentMenu, nil);
+  Theme.Images[tiWindow] := OldThemeWindow;
+  inherited;
+end;
+
+function TStateDebugMenu.Press(const Event: TInputPressRelease): boolean;
+begin
+  Result := inherited;
+  if Result then Exit;
+
+  if Event.IsKey(CharEscape) then
+  begin
+    TUIState.Pop(StateDebugMenu);
+    Result := true;
+  end;
+end;
+
 end.

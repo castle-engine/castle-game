@@ -25,17 +25,32 @@ unit GameGameMenu;
 
 interface
 
-uses CastleUIControls;
+uses Classes, CastleUIControls, CastleUIState, CastleKeysMouse,
+  CastleImages;
 
-procedure ShowGameMenu(AControlsUnder: TUIControlList);
+type
+  TStateGameMenu = class(TUIState)
+  strict private
+    OldThemeWindow: TCastleImage;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure Start; override;
+    procedure Stop; override;
+    procedure Resume; override;
+    procedure Pause; override;
+   function Press(const Event: TInputPressRelease): boolean; override;
+  end;
+
+var
+  StateGameMenu: TStateGameMenu;
 
 implementation
 
-uses CastleControlsImages, CastleImages,
-  SysUtils, Classes, CastleUtils, CastleStringUtils, CastleWindowModes,
+uses SysUtils,
+  CastleControlsImages, CastleUtils, CastleStringUtils, CastleWindowModes,
   CastleGLUtils, CastleMessages, GameWindow, CastleVectors,
   CastleWindow, GameHelp, GamePlay, GameGeneralMenu, GameControlsMenu,
-  CastleInputs, X3DNodes, CastleClassUtils, CastleSoundMenu, CastleKeysMouse,
+  CastleInputs, X3DNodes, CastleClassUtils, CastleSoundMenu,
   CastleGameNotifications, CastleControls, CastleApplicationProperties;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
@@ -60,11 +75,9 @@ type
   global vars (used by TCastleGameMenu descendants implementation) }
 
 var
-  UserQuit: boolean;
   CurrentMenu: TCastleGameMenu;
   GameMenu: TGameMenu;
   GameSoundMenu: TGameSoundMenu;
-  ControlsUnder: TUIControlList;
 
 { TGameMenu ------------------------------------------------------------ }
 
@@ -84,14 +97,22 @@ begin
   inherited;
 
   case CurrentItem of
-    0: UserQuit := true;
+    0: TUIState.Pop(StateGameMenu);
     1: ViewGameMessages;
-    2: ShowControlsMenuEscape(ControlsUnder, true, true, UserQuit);
+    2: begin
+         StateControlsMenu.DrawFadeRect := true;
+         StateControlsMenu.DrawCentered := true;
+         StateControlsMenu.ExitWithEscapeAllowed := true;
+         TUIState.Push(StateControlsMenu);
+       end;
     3: SetCurrentMenu(CurrentMenu, GameSoundMenu);
-    4: { At first I did here GameCancel(false), but tests (with Mama)
-         show that it's too easy to select this and accidentaly
-         end the game. }
-       GameCancel(true);
+    4: begin
+         { At first I did here GameCancel(false), but tests (with Mama)
+           show that it's too easy to select this and accidentaly
+           end the game. }
+         GameCancel(true);
+         TUIState.Pop(StateGameMenu);
+       end;
     else raise EInternalError.Create('Menu item unknown');
   end;
 end;
@@ -129,55 +150,56 @@ begin
   end;
 end;
 
-{ global things -------------------------------------------------------------- }
+{ TStateGameMenu -------------------------------------------------------------- }
 
-{$I gamemenucallbacks.inc}
-
-procedure ShowGameMenu(AControlsUnder: TUIControlList);
-var
-  SavedMode: TGLMode;
-  OldThemeWindow: TCastleImage;
+constructor TStateGameMenu.Create(AOwner: TComponent);
 begin
-  ControlsUnder := AControlsUnder;
+  inherited;
+  GameMenu := TGameMenu.Create(Application);
+  GameSoundMenu := TGameSoundMenu.Create(Application);
+end;
+
+function TStateGameMenu.Press(const Event: TInputPressRelease): boolean;
+begin
+  Result := inherited;
+  if Result then Exit;
+
+  if Event.IsKey(CharEscape) then
+  begin
+    TUIState.Pop(StateGameMenu);
+    Result := true;
+  end;
+end;
+
+procedure TStateGameMenu.Start;
+begin
+  inherited;
 
   GameSoundMenu.SoundVolume.Refresh;
   GameSoundMenu.MusicVolume.Refresh;
 
   OldThemeWindow := Theme.Images[tiWindow];
-  SavedMode := TGLMode.CreateReset(Window, nil, Window.OnResize, @CloseQuery);
-  try
-    { Otherwise messages don't look good, because the text is mixed
-      with the menu text. }
-    Theme.Images[tiWindow] := WindowDark;
-
-    Window.OnPress := @Press;
-    Window.RenderStyle := rs3D;
-
-    SetCurrentMenu(CurrentMenu, GameMenu);
-
-    Window.Controls.InsertBack(GlobalCatchInput);
-    Window.Controls.InsertBack(Notifications);
-    Window.Controls.InsertBack(ControlsUnder);
-
-    UserQuit := false;
-    repeat
-      Application.ProcessMessage(true, true);
-    until GameEnded or UserQuit;
-  finally
-    FreeAndNil(SavedMode);
-    Theme.Images[tiWindow] := OldThemeWindow;
-  end;
+  { Otherwise messages don't look good, because the text is mixed
+    with the menu text. }
+  Theme.Images[tiWindow] := WindowDark;
 end;
 
-{ initialization / finalization ---------------------------------------------- }
-
-procedure ContextOpen;
+procedure TStateGameMenu.Stop;
 begin
-  GameMenu := TGameMenu.Create(Application);
-  GameSoundMenu := TGameSoundMenu.Create(Application);
+  Theme.Images[tiWindow] := OldThemeWindow;
+  inherited;
 end;
 
-initialization
-  ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
-finalization
+procedure TStateGameMenu.Resume;
+begin
+  inherited;
+  SetCurrentMenu(CurrentMenu, GameMenu);
+end;
+
+procedure TStateGameMenu.Pause;
+begin
+  SetCurrentMenu(CurrentMenu, nil);
+  inherited;
+end;
+
 end.
