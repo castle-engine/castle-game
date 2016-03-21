@@ -29,18 +29,6 @@ controls:
 
 - progress image - sometimes still doesn't show?
 
-- CGE: improve in CGE API:
-  - Add to CGE nice warning when reading from assets before activ:
-    It seems you're trying to read game data (stuff in ApplicationData() on Android) before the activity has started, that is: before we called Application.OnInitialize. Usually this happens if you try to read some file from Pascal unit's "initialization" section (like SoundEngine.RepositoryURL or MaterialProperties.URL). You have to change your code to do this later, in Application.OnInitialize or later, it is impossible to read files earlier.
-
-  - mark
-    Resources.LoadFromFiles
-    Levels.LoadFromFiles
-    undefined on Android? Marked with "platform" everywhere?
-
-    hmm, or maybe we should generate our own hidden "Table of contents" when creating apk,
-    and read file list from there?
-
 - credits enter/exit too quickly now.
   Hm, they accidentally get enter/mouse click that was used to enter the state, so they exit immediately...
 
@@ -91,3 +79,37 @@ controls:
 - remove delays when moving by menus and something gets initialized.
 
 - remove CGE deprecation warnings
+
+- Remove jumping on 1st level?
+
+- ifdef out shadow option for now
+
+- add ads from time to time
+
+- werewolves on doom level too fast anims? (bug KAnim->castle scene? or not?)
+------------------------------------------------------------------------------
+- CGE: API improvements ideas:
+  - Add to CGE nice warning when reading from assets before activ:
+    It seems you're trying to read game data (stuff in ApplicationData() on Android) before the activity has started, that is: before we called Application.OnInitialize. Usually this happens if you try to read some file from Pascal unit's "initialization" section (like SoundEngine.RepositoryURL or MaterialProperties.URL). You have to change your code to do this later, in Application.OnInitialize or later, it is impossible to read files earlier.
+
+  - mark
+    Resources.LoadFromFiles
+    Levels.LoadFromFiles
+    undefined on Android? Marked with "platform" everywhere?
+
+    hmm, or maybe we should generate our own hidden "Table of contents" when creating apk,
+    and read file list from there?
+
+  - Move touch device ctrl to SceneManager?
+
+    Initializing touch controls here, as opposed to using TCastleWindowTouch, makes them 1. working also in cases of custom scene managers, viewports and cameras. Whereas, TCastleWindowTouch assumes a central scene manager and camera. 2. connects this with speciic SceneManager.Camera. So you can have >1 viewport with touch control and this will still work.
+
+    Also, this way touch control may be positioned within viewport (if TouchInterfaceWithinViewport, default true because it's better for multiple viewports), not just within window. Which (may) be an advantage.
+
+    TODO: Size touch interface to always fit within viewport, in the 1st case.
+------------------------------------------------------------------------------
+possible kanim optimizations:
+
+- If necessary, limit kanim smoothness.
+
+- If needed, add interpolation at runtime to TNodeInterpolator. Make it possible to avoid at least half of ForceAnimationPose for blended objects with all opaque? Or maybe use Clone() like in Escape?
