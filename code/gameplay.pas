@@ -500,6 +500,9 @@ var
 begin
   inherited;
 
+  { don't process this when some other state, like a menu, is on top }
+  if TUIState.CurrentTop <> Self then Exit;
+
   LevelFinishedFlush;
 
   if GameWin and (SceneManager.Logic is TCagesLevel) then
@@ -557,6 +560,9 @@ function TStatePlay.Press(const Event: TInputPressRelease): boolean;
 begin
   Result := inherited;
   if Result then Exit;
+
+  { don't process keys when some other state, like a menu, is on top }
+  if TUIState.CurrentTop <> Self then Exit;
 
   if Event.IsKey(CharEscape) then
   begin

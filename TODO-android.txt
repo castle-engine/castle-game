@@ -6,7 +6,9 @@
   still causes "notifications" dark area appear
 
 - SetCurrentMenu can become local utility of particular states.
-    we should not modify Window.Controls all the time for this.
+  we should not modify Window.Controls all the time for this.
+
+  - then fix the bug: FadeRect of controls menu may be over menu.
 
 - game menu:
          // TODO:
