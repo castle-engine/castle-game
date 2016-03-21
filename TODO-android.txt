@@ -1,21 +1,15 @@
-- shader water on fountain level adjust to GLES.
-  Why it still crashes? should be disabled!
+controls:
 
-- progress image - sometimes still doesn't show?
+- cannot use items now.
+  cannot solve gate1 level in consequence, cannot heal.
 
-- secure in CGE:
-  - Add to CGE nice warning when reading from assets before activ:
-    It seems you're trying to read game data (stuff in ApplicationData() on Android) before the activity has started, that is: before we called Application.OnInitialize. Usually this happens if you try to read some file from Pascal unit's "initialization" section (like SoundEngine.RepositoryURL or MaterialProperties.URL). You have to change your code to do this later, in Application.OnInitialize or later, it is impossible to read files earlier.
-  - mark
-    Resources.LoadFromFiles
-    Levels.LoadFromFiles
-    undefined on Android? Marked with "platform" everywhere?
+- cannot enter menu from game. So cannot enter menu, cannot enter debug menu.
 
-    hmm, or maybe we should generate our own hidden "Table of contents" when creating apk,
-    and read file list from there?
+- cannot restart game / back to menu.
 
-- Android: different walk touch control (rotate on drag), and special button to attack?
-  obracanie szybciej.
+- Android: different walk touch control (rotate on drag),  and then rotate faster.
+
+  special button to attack?
 
   Also buttons to enter menu, show items, use items (just click on them) etc.
 
@@ -24,6 +18,28 @@
 
   then remove:
   NewControl.Scale := 2; // TODO: hardcoded
+
+------------------------------------------------------------------------------
+- CGE: music:
+  - on OggVorbis
+  - doesn't stop when activity paused.
+
+- shader water on fountain level adjust to GLES.
+  Why it still crashes? should be disabled!
+
+- progress image - sometimes still doesn't show?
+
+- CGE: improve in CGE API:
+  - Add to CGE nice warning when reading from assets before activ:
+    It seems you're trying to read game data (stuff in ApplicationData() on Android) before the activity has started, that is: before we called Application.OnInitialize. Usually this happens if you try to read some file from Pascal unit's "initialization" section (like SoundEngine.RepositoryURL or MaterialProperties.URL). You have to change your code to do this later, in Application.OnInitialize or later, it is impossible to read files earlier.
+
+  - mark
+    Resources.LoadFromFiles
+    Levels.LoadFromFiles
+    undefined on Android? Marked with "platform" everywhere?
+
+    hmm, or maybe we should generate our own hidden "Table of contents" when creating apk,
+    and read file list from there?
 
 - credits enter/exit too quickly now.
   Hm, they accidentally get enter/mouse click that was used to enter the state, so they exit immediately...
@@ -43,7 +59,7 @@
          if StateControlsMenu.ExitWithEscape
            then pop self
 
-- restore ability to close window after asking:
+- restore ability to close window after asking on desktop?
 
   procedure CloseQuery(Container: TUIContainer);
   begin
@@ -73,7 +89,5 @@
 - make all textures already scaled to po2
 
 - remove delays when moving by menus and something gets initialized.
-
-- moon on background skybox is in bad place, often right under menu
 
 - remove CGE deprecation warnings
