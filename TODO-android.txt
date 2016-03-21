@@ -1,4 +1,5 @@
-- credits enter/exit too quickly now
+- credits enter/exit too quickly now.
+  Hm, they accidentally get enter/mouse click that was used to enter the state, so they exit immediately...
 
 - add touch controls on android
 
