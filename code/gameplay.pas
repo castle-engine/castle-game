@@ -500,6 +500,14 @@ var
 begin
   inherited;
 
+  if UseTouchInterface and (TUIState.CurrentTop = Self) then
+  begin
+    if Player.Flying then
+      Window.SetTouchInterface(tiCtlFlyCtlWalkDragRotate, Player.Camera) else
+      Window.SetTouchInterface(tiCtlWalkCtlRotate, Player.Camera);
+  end else
+    Window.SetTouchInterface(tiNone, Player.Camera);
+
   { don't process this when some other state, like a menu, is on top }
   if TUIState.CurrentTop <> Self then Exit;
 
@@ -634,6 +642,7 @@ begin
 
   { Clear some Player.Camera callbacks. }
   SceneManager.OnCameraChanged := nil;
+  Window.SetTouchInterface(tiNone, Player.Camera);
 
   FreeAndNil(C2D);
   inherited;

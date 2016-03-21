@@ -73,11 +73,14 @@ var
   { @groupEnd }
     :TSoundType;
 
+procedure InitializeSound;
+
 implementation
 
 uses CastleFilesUtils;
 
-initialization
+procedure InitializeSound;
+begin
   SoundEngine.RepositoryURL := ApplicationData('sounds/index.xml');
 
   stPlayerPotionDrink          := SoundEngine.SoundFromName('player_potion_drink');
@@ -105,4 +108,6 @@ initialization
   SoundEngine.DistanceModel := dmInverseDistanceClamped; //< OpenAL default
   SoundEngine.DefaultRolloffFactor := 0.1;
   SoundEngine.DefaultReferenceDistance := 2.0;
+end;
+
 end.

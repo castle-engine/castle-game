@@ -38,7 +38,7 @@ uses SysUtils, Classes,
   GameWindow, GameStartMenu, GameHelp, CastleFilesUtils, GameControlsMenu,
   GameVideoOptions, GameInitialBackground, GameItems, GameDebugMenu,
   GameCreatures, GamePlay, GameGeneralMenu, GameCredits, GameGameMenu,
-  GameChooseMenu;
+  GameChooseMenu, GameSound;
 
 { One-time initialization of resources. }
 procedure ApplicationInitialize;
@@ -60,10 +60,36 @@ begin
 
   { load game data from XML files }
   MaterialProperties.URL := ApplicationData('textures/material_properties.xml');
-  Resources.LoadFromFiles;
+  //Resources.LoadFromFiles; // cannot search recursively in Android assets
+  Resources.AddFromFile(ApplicationData('creatures/arrow/resource.xml'));
+  Resources.AddFromFile(ApplicationData('creatures/werewolf/resource.xml'));
+  Resources.AddFromFile(ApplicationData('creatures/spider_queen/resource.xml'));
+  Resources.AddFromFile(ApplicationData('creatures/web/resource.xml'));
+  Resources.AddFromFile(ApplicationData('creatures/barrel/resource.xml'));
+  Resources.AddFromFile(ApplicationData('creatures/spider/resource.xml'));
+  Resources.AddFromFile(ApplicationData('creatures/ball_missile/resource.xml'));
+  Resources.AddFromFile(ApplicationData('creatures/ghost/resource.xml'));
+  Resources.AddFromFile(ApplicationData('creatures/alien/resource.xml'));
+  Resources.AddFromFile(ApplicationData('items/sword/resource.xml'));
+  Resources.AddFromFile(ApplicationData('items/bow/resource.xml'));
+  Resources.AddFromFile(ApplicationData('items/key/resource.xml'));
+  Resources.AddFromFile(ApplicationData('items/life_potion/resource.xml'));
+  Resources.AddFromFile(ApplicationData('items/red_key/resource.xml'));
+  Resources.AddFromFile(ApplicationData('items/scroll/resource.xml'));
+  Resources.AddFromFile(ApplicationData('items/quiver/resource.xml'));
   ItemsResourcesInit;
   CreaturesResourcesInit;
-  Levels.LoadFromFiles;
+  //Levels.LoadFromFiles; // cannot search recursively in Android assets
+  Levels.AddFromFile(ApplicationData('levels/doom/level.xml'));
+  Levels.AddFromFile(ApplicationData('levels/castle_hall/level.xml'));
+  Levels.AddFromFile(ApplicationData('levels/gate_background/level.xml'));
+  Levels.AddFromFile(ApplicationData('levels/fountain_with_water/level.xml'));
+  Levels.AddFromFile(ApplicationData('levels/hello_world/level.xml'));
+  Levels.AddFromFile(ApplicationData('levels/tower/level.xml'));
+  Levels.AddFromFile(ApplicationData('levels/gate/level.xml'));
+  Levels.AddFromFile(ApplicationData('levels/fountain/level.xml'));
+  Levels.AddFromFile(ApplicationData('levels/hello_world_shadow/level.xml'));
+  Levels.AddFromFile(ApplicationData('levels/cages/level.xml'));
   Levels.LoadFromConfig(UserConfig);
 
   { init OpenAL (after setting StateInitial, because ALContextOpen
@@ -71,6 +97,7 @@ begin
   StateInitial := TStateInitial.Create(Application);
   TUIState.Current := StateInitial;
 
+  InitializeSound;
   SoundEngine.ALContextOpen;
 
   { create states }

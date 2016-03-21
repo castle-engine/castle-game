@@ -1,12 +1,25 @@
-- android crash in AAssetManager_open when reading sounds/index.xml:
+- test it still works with mouse look on desktop with UseTouchDevice = false on desktop.
 
-  03-21 05:19:50.194   779   885 I OpenGLRenderer: Initialized EGL, version 1.4
-  03-21 05:19:50.249 21978 21978 I app_process32: Reading from "sounds/index.xml"
-  03-21 05:19:50.249 21978 21978 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x4 in tid 21978 (astrophe.castle)
-  ...
-  03-21 05:19:50.319 26435 21997 I UpdateIcingCorporaServi: Updating corpora: APPS=com.games.cat.astrophe.castle, CONTACTS=MAYBE
-  03-21 05:19:50.350   199   199 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
-  03-21 05:19:50.350   199   199 F DEBUG   : Build fingerprint: 'google/hammerhead/hammerhead:6.0.1/MMB29V/2554798:user/release-keys'
+- secure in CGE:
+  - Add to CGE nice warning when reading from assets before activ:
+    It seems you're trying to read game data (stuff in ApplicationData() on Android) before the activity has started, that is: before we called Application.OnInitialize. Usually this happens if you try to read some file from Pascal unit's "initialization" section (like SoundEngine.RepositoryURL or MaterialProperties.URL). You have to change your code to do this later, in Application.OnInitialize or later, it is impossible to read files earlier.
+  - mark
+    Resources.LoadFromFiles
+    Levels.LoadFromFiles
+    undefined on Android? Marked with "platform" everywhere?
+
+    hmm, or maybe we should generate our own hidden "Table of contents" when creating apk,
+    and read file list from there?
+
+- Android: no background under initial progress bar?
+
+- Android: different walk touch control (rotate on drag), and special button to attack?
+  Also buttons to enter menu, show items, use items (just click on them) etc.
+
+- levels order may be broken on the list? visible in castle1 on river.
+
+- Allow scaling touch control size to screen size?
+  Allow scaling it by user preference?
 
 - credits enter/exit too quickly now.
   Hm, they accidentally get enter/mouse click that was used to enter the state, so they exit immediately...
