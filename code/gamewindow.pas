@@ -34,6 +34,7 @@ type
     tiNone,
     tiCtlWalkCtlRotate,
     tiCtlWalkDragRotate,
+    tiDragRotate,
     tiCtlFlyCtlWalkDragRotate,
     tiCtlPanXYDragRotate);
 
@@ -205,6 +206,8 @@ begin
         UpdateTouchControllers(mdNone, true, true, ctcmWalking, ctcmHeadRotation);
       tiCtlWalkDragRotate:
         UpdateTouchControllers(mdRotate, false, true, ctcmWalking, ctcmWalking);
+      tiDragRotate:
+        UpdateTouchControllers(mdRotate, false, false, ctcmWalking, ctcmWalking);
       tiCtlFlyCtlWalkDragRotate:
         UpdateTouchControllers(mdRotate, true, true, ctcmFlyUpdown, ctcmWalking);
       tiCtlPanXYDragRotate:

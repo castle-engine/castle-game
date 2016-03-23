@@ -19,6 +19,7 @@ controls:
   then remove:
   NewControl.Scale := 2; // TODO: hardcoded
 
+- when dead: now even dragging not possible
 ------------------------------------------------------------------------------
 - CGE: music:
   - on OggVorbis

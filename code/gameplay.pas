@@ -502,6 +502,10 @@ begin
 
   if UseTouchInterface and (TUIState.CurrentTop = Self) then
   begin
+    if Player.Blocked then
+      Window.SetTouchInterface(tiNone, Player.Camera) else
+    if Player.Dead then
+      Window.SetTouchInterface(tiDragRotate, Player.Camera) else
     if Player.Flying then
       Window.SetTouchInterface(tiCtlFlyCtlWalkDragRotate, Player.Camera) else
       Window.SetTouchInterface(tiCtlWalkCtlRotate, Player.Camera);
