@@ -33,16 +33,13 @@ type
 
     Note that CaptureAllEvents makes all events captured
     (covers the whole screen), as we don't need the focus / non-focus logic,
-    menu is the only control used on the screen.
-    Also, it let's events further down to our callbacks, thanks
-    to ExclusiveEvents being @false. }
+    menu is the only control used on the screen. }
   TCastleGameMenu = class(TCastleOnScreenMenu)
   public
   const
     DefaultCastleFontSize = 40;
 
     constructor Create(AOwner: TComponent); override;
-    property ExclusiveEvents default false;
     property DrawFocusedBorder default false;
     property CaptureAllEvents default true;
     property FontSize default DefaultCastleFontSize;
@@ -69,7 +66,6 @@ uses SysUtils, CastleWindow, CastleUIControls, GameWindow;
 constructor TCastleGameMenu.Create(AOwner: TComponent);
 begin
   inherited;
-  ExclusiveEvents := false;
   DrawFocusedBorder := false;
   CaptureAllEvents := true;
   FontSize := DefaultCastleFontSize;
