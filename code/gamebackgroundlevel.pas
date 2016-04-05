@@ -110,6 +110,7 @@ var
   BackgroundPlayer: TPlayer;
 begin
   BackgroundControls := TUIControlSizeable.Create(nil);
+  (BackgroundControls as TUIControlSizeable).FullSize := true;
 
   { initialize BackgroundSceneManager }
   BackgroundSceneManager := TGameSceneManager.Create(nil);
