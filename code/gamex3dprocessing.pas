@@ -159,7 +159,7 @@ begin
       Route.SetDestinationDirectly(ShaderCamMatrix);
       Route.PositionInParent := 100000; { at the end of the file }
 
-      RootNode.Routes.Add(Route);
+      RootNode.AddRoute(Route);
     end;
   end;
 end;
