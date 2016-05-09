@@ -123,17 +123,20 @@ constructor TGameSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  SoundInfo := TSoundInfoMenuItem.Create(Window, Self);
-  SoundVolume := TSoundVolumeMenuItem.Create(Window, Self);
-  MusicVolume := TMusicVolumeMenuItem.Create(Window, Self);
+  SoundInfo := TSoundInfoMenuItem.Create(Self);
+  Add(SoundInfo);
+
+  SoundVolume := TSoundVolumeMenuItem.Create(Self);
+  Add(SoundVolume);
+
+  MusicVolume := TMusicVolumeMenuItem.Create(Self);
+  Add(MusicVolume);
+
   Add('Back to game menu');
 end;
 
 destructor TGameSoundMenu.Destroy;
 begin
-  FreeAndNil(SoundInfo);
-  FreeAndNil(SoundVolume);
-  FreeAndNil(MusicVolume);
   inherited;
 end;
 
@@ -142,7 +145,7 @@ begin
   inherited;
 
   case CurrentItem of
-    0: SoundInfo.Selected;
+    0: ;
     1: ;
     2: ;
     3: SetCurrentMenu(CurrentMenu, GameMenu);
