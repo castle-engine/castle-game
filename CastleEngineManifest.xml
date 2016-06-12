@@ -3,7 +3,7 @@
   standalone_source="code/castle.lpr"
   android_source="code/castle_android.lpr"
   caption="The Castle"
-  qualified_name="com.games.cat.astrophe.castle"
+  qualified_name="com.catastrophe.games.castle"
   screen_orientation="landscape"
   author="Cat-astrophe Games">
   <version value="1.1.0" />

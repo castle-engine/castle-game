@@ -21,9 +21,15 @@ controls:
 
 - when dead: now even dragging not possible
 ------------------------------------------------------------------------------
-- CGE: music:
-  - on OggVorbis
-  - doesn't stop when activity paused.
+- CGE: sound: hm, various sounds just don't play.
+  - footsteps
+  - sword swing
+  - music on gate, on castle_hall, on e1m1 (but loads ok, from wav or vorbis).
+  Possibly some mixing problem? Available sound sources more limited?
+
+  Also on some phones (miu) some 3d stuff (balls, alien eyes) is not displayed.
+  But this is not reproducible on Nexus 5.
+  Maybe we just exhaust memory?
 
 - shader water on fountain level adjust to GLES.
   Why it still crashes? should be disabled!
