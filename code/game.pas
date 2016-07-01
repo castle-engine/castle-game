@@ -64,6 +64,10 @@ begin
     LoadImage(ApplicationData('menu_bg/initial_background.png'));
   Progress.UserInterface.OwnsImage := true;
 
+  { set sound configuration. Must be done before loading resources,
+    since they initialize the sounds by looking up their names. }
+  InitializeSound;
+
   { load game data from XML files }
   MaterialProperties.URL := ApplicationData('textures/material_properties.xml');
   //Resources.LoadFromFiles; // cannot search recursively in Android assets
@@ -100,7 +104,6 @@ begin
   Levels.LoadFromConfig(UserConfig);
 
   { init sound. This displays progress of "Loading sounds". }
-  InitializeSound;
   SoundEngine.ALContextOpen;
 
   { create states }

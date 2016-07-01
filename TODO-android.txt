@@ -27,7 +27,13 @@ controls:
   - music on gate, on castle_hall, on e1m1 (but loads ok, from wav or vorbis).
   Possibly some mixing problem? Available sound sources more limited?
 
-  Also on some phones (miu) some 3d stuff (balls, alien eyes) is not displayed.
+  Or maybe we set sound.xml too late? We have lots of warnings in log:
+    Warning: Sound: Unknown sound name "player_footsteps_default"
+  ... yeah, we just initialize sound.xml too late. Not related to Android at all.
+
+  SHOULD BE FIXED NOW, recheck on Android to be sure.
+
+- on some phones (miu) some 3d stuff (balls, alien eyes) is not displayed.
   But this is not reproducible on Nexus 5.
   Maybe we just exhaust memory?
 
