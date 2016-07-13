@@ -115,12 +115,12 @@ begin
     Mat := M as TMaterialNode;
     Mat.FdDiffuseColor.Value := Vector3Single(0.5, 0.5, 1.0);
 
-    CS := TComposedShaderNode.Create('', '');
+    CS := TComposedShaderNode.Create;
     CS.NodeName := 'WaterShader';
     (Node as TAppearanceNode).FdShaders.Add(CS);
     CS.FdLanguage.Value := 'GLSL';
 
-{    CM := TGeneratedCubeMapTextureNode.Create('', '');
+{    CM := TGeneratedCubeMapTextureNode.Create;
     CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
     CM.FdUpdate.Value := upNextFrameOnly;
     CM.FdSize.Value := 512;}
