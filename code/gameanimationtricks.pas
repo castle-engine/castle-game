@@ -28,7 +28,7 @@ unit GameAnimationTricks;
 interface
 
 uses Classes, CastlePrecalculatedAnimation, CastleFrustum, CastleVectors,
-  CastleGLShaders, Castle3D;
+  CastleGLShaders, Castle3D, CastleRendererInternalShader;
 
 type
   { Animation forced to seamlessly loop by blending the beginning frames
@@ -59,7 +59,7 @@ type
   { TBlendedLoopingAnimation with a GLSL shader with a cubemap. }
   TBlendedLoopingAnimationShader = class(TBlendedLoopingAnimation)
   private
-    CustomShader: TGLSLProgram;
+    CustomShader: TX3DShaderProgramBase;
   public
     procedure GLContextClose; override;
     procedure Render(const Frustum: TFrustum; const Params: TRenderParams); override;
@@ -68,7 +68,8 @@ type
 implementation
 
 uses Math, CastleUtils, CastleGLUtils, CastleStringUtils, SysUtils,
-  CastleFilesUtils, CastleRenderingCamera, CastleCompositeImage, CastleGL, CastleGLImages, CastleRenderer;
+  CastleFilesUtils, CastleRenderingCamera, CastleCompositeImage, CastleGL,
+  CastleGLImages, CastleRenderer;
 
 { TBlendedLoopingAnimation --------------------------------------------------- }
 
@@ -150,7 +151,7 @@ end;
 { TWaterShader --------------------------------------------------------------- }
 
 type
-  TWaterShader = class(TGLSLProgram)
+  TWaterShader = class(TX3DShaderProgramBase)
   private
     WaterEnvMap: TGLuint;
   public
@@ -201,7 +202,7 @@ begin
     ShadersPath := ApplicationData('levels/fountain/water_reflections/water_reflections.');
     AttachVertexShader(FileToString(ShadersPath + 'vs'));
     AttachFragmentShader(FileToString(ShadersPath + 'fs'));
-    Link(true);
+    Link;
   end;
 end;
 
