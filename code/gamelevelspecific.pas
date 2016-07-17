@@ -1031,7 +1031,7 @@ begin
     end;
   end else
     { No longer any need to show this hint. }
-    (HintOpenDoorScript.Fields.ByName['done'] as TSFBool).Send(true);
+    (HintOpenDoorScript.Field('done') as TSFBool).Send(true);
 end;
 
 procedure TCagesLevel.PrepareNewPlayer(NewPlayer: TPlayer);
