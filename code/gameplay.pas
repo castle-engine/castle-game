@@ -320,15 +320,15 @@ procedure TStatePlay.TGame2DControls.Render;
     if LifeMapped < 0 then
       GLBlankIndicatorImage.Draw(X, Y) else
     begin
-      ScissorEnable(Rectangle(IndicatorMargin, IndicatorMargin,
+      RenderContext.ScissorEnable(Rectangle(IndicatorMargin, IndicatorMargin,
         ContainerWidth, LifeMapped));
       GLFullIndicatorImage.Draw(X, Y);
 
-      ScissorEnable(Rectangle(IndicatorMargin, IndicatorMargin + LifeMapped,
+      RenderContext.ScissorEnable(Rectangle(IndicatorMargin, IndicatorMargin + LifeMapped,
         ContainerWidth, ContainerHeight));
       GLBlankIndicatorImage.Draw(X, Y);
 
-      ScissorDisable;
+      RenderContext.ScissorDisable;
     end;
 
     if PrintText and (ALife > 0) then
