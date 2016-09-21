@@ -357,14 +357,14 @@ procedure TStatePlay.TGame2DControls.Render;
     end;
 
     if Player.Dead then
-      GLFadeRectangle(ParentRect, Red, 1.0) else
+      GLFadeRectangleDark(ParentRect, Red, 1.0) else
     begin
       if Player.Swimming = psUnderWater then
         DrawRectangle(ParentRect, Vector4Single(0, 0, 0.1, 0.5));
 
       { Possibly, Player.FadeOut* will be applied on top of water effect,
         that's Ok --- they'll mix. }
-      GLFadeRectangle(ParentRect, Player.FadeOutColor, Player.FadeOutIntensity);
+      GLFadeRectangleDark(ParentRect, Player.FadeOutColor, Player.FadeOutIntensity);
     end;
   end;
 
