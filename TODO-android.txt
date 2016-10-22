@@ -123,3 +123,8 @@ possible kanim optimizations:
 - If necessary, limit kanim smoothness.
 
 - If needed, add interpolation at runtime to TNodeInterpolator. Make it possible to avoid at least half of ForceAnimationPose for blended objects with all opaque? Or maybe use Clone() like in Escape?
+
+------------------------------------------------------------------------------
+get new gate level geometry from warsztaty-blender.
+fix back wall of house on top.
+readd CGE special placeholders.
