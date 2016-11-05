@@ -52,8 +52,8 @@ type
 
 { Sets CurrentValue, taking care of adding this menu / removing existing menu
   (when new value is @nil) from Window.Controls.
-  Also, returns previous TCastleOnScreenMenu present in Window.Controls (there can be
-  only one). }
+  Also, returns previous TCastleOnScreenMenu present in Window.Controls
+  (there can be only one). }
 function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
   const NewValue: TCastleGameMenu): TCastleGameMenu;
 

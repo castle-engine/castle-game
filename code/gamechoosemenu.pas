@@ -46,7 +46,7 @@ var
 implementation
 
 uses SysUtils, CastleControlsImages,
-  CastleWindowModes, CastleGLUtils, CastleInputs, CastleMessages,
+  CastleGLUtils, CastleInputs, CastleMessages,
   CastleOnScreenMenu, GameWindow, GameGeneralMenu, CastleVectors,
   CastleGameNotifications,
   CastleKeysMouse, CastleControls, CastleApplicationProperties;

@@ -60,7 +60,7 @@ implementation
 
 uses SysUtils,
   CastleGLUtils, CastleMessages,
-  CastleGameNotifications, CastleStringUtils, CastleWindowModes,
+  CastleGameNotifications, CastleStringUtils,
   CastleApplicationProperties, CastleUtils, X3DFields,
   CastleVectors, CastleFilesUtils,
   GamePlay, GameWindow, GameVideoOptions, GameHelp;

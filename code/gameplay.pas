@@ -112,7 +112,7 @@ var
 implementation
 
 uses SysUtils, CastleUtils, CastleWindow, GameInputs,
-  CastleWindowModes, CastleGLUtils, CastleMessages, GameWindow,
+  CastleGLUtils, CastleMessages, GameWindow,
   CastleVectors, CastleImages, Math, GameHelp, CastleSoundEngine,
   GameItems, CastleStringUtils, CastleCreatures, CastleItems,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
