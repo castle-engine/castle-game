@@ -219,7 +219,6 @@ end;
 
 initialization
   Window := TGameWindow.Create(nil);
-  Window.RenderStyle := rs3D;
 finalization
   FreeAndNil(Window);
 end.

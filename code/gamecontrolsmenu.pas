@@ -48,6 +48,8 @@ type
       end;
     var
     FadeRect: TFadeRect;
+  protected
+    function InsertAtPosition: Integer; override;
   public
     { User can quit with the escape key. }
     ExitWithEscapeAllowed: boolean;
@@ -82,7 +84,7 @@ procedure PlayerUpdateMouseLook(Player: TPlayer);
 
 implementation
 
-uses SysUtils, CastleWindowModes, CastleGLUtils, CastleMessages,
+uses SysUtils, CastleGLUtils, CastleMessages,
   CastleOnScreenMenu, CastleConfig,
   CastleInputs, CastleVectors, CastleUtils, CastleRectangles,
   CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors,
@@ -507,6 +509,14 @@ begin
     ExitWithEscape := true;
     TUIState.Pop(StateControlsMenu);
   end;
+end;
+
+function TStateControlsMenu.InsertAtPosition: Integer;
+begin
+  { insert before ControlsMenu
+    (that was just inserted in TStateControlsMenu.Start),
+    to make our FadeRect be underneath the menu. }
+  Result := StateContainer.Controls.IndexOf(ControlsMenu);
 end;
 
 procedure TStateControlsMenu.Start;
