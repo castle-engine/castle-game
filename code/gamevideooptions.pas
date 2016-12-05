@@ -63,7 +63,7 @@ var
 implementation
 
 uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow,
-  CastleGLUtils, CastlePrecalculatedAnimation, CastlePlayer;
+  CastleGLUtils, X3DLoad, CastlePlayer;
 
 type
   TGameVideoOptions = class
@@ -99,8 +99,8 @@ begin
     'video_options/frequency', DefaultVideoFrequency);
   Window.AntiAliasing := TAntiAliasing(Config.GetValue(
     'video_options/anti_aliasing', Ord(DefaultAntiAliasing)));
-  AnimationSmoothness := Config.GetFloat(
-    'video_options/animation_smoothness', DefaultAnimationSmoothness);
+  BakedAnimationSmoothness := Config.GetFloat(
+    'video_options/animation_smoothness', DefaultBakedAnimationSmoothness);
 
   { not really a "video option", but for now there's no better place to put this }
   AutoOpenInventory := Config.GetValue(
@@ -125,7 +125,7 @@ begin
     Ord(Window.AntiAliasing), Ord(DefaultAntiAliasing));
   Config.SetDeleteFloat(
     'video_options/animation_smoothness',
-    AnimationSmoothness, DefaultAnimationSmoothness);
+    BakedAnimationSmoothness, DefaultBakedAnimationSmoothness);
 
   { not really a "video option", but for now there's no better place to put this }
   Config.SetDeleteValue('auto_open_inventory',

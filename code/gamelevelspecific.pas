@@ -1370,7 +1370,7 @@ begin
   begin
     { load Fountain animation, following the similar code as LoadLevelAnimation }
     Fountain := TBlendedLoopingAnimationShader.Create(Self);
-    Fountain.LoadFromFile(LevelsPath + 'fountain/water_stream/fountain.kanim', false, true, 1);
+    Fountain.LoadFromFile(LevelsPath + 'fountain/water_stream/fountain.kanim', false, true);
     { progress is being already done }
     {Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
     try}

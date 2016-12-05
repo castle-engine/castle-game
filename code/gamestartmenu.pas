@@ -52,7 +52,7 @@ uses SysUtils, CastleUtils,
   CastleKeysMouse, CastleOpenDocument, CastlePrecalculatedAnimation,
   CastleStringUtils, CastleClassUtils, CastleGameNotifications,
   CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes, CastleControls,
-  CastleApplicationProperties, CastleWindow,
+  CastleApplicationProperties, CastleWindow, X3DLoad,
   GamePlay, GameSound, GameGeneralMenu, GameControlsMenu, GameVideoOptions,
   GameHelp, GameBackgroundLevel, GameCredits;
 
@@ -79,12 +79,12 @@ type
 
   TVideoMenu = class(TSubMenu)
   private
-    procedure AnimationSmoothnessChanged(Sender: TObject);
+    procedure BakedAnimationSmoothnessChanged(Sender: TObject);
     procedure AntiAliasingChanged(Sender: TObject);
   public
     AllowScreenChangeToggle: TCastleMenuToggle;
     ShadowVolumesToggle: TCastleMenuToggle;
-    AnimationSmoothnessSlider: TCastleFloatSlider;
+    BakedAnimationSmoothnessSlider: TCastleFloatSlider;
     ColorBitsToggle: TCastleMenuButton;
     VideoFrequencyToggle: TCastleMenuButton;
     ConserveResourcesToggle: TCastleMenuToggle;
@@ -311,8 +311,8 @@ const
 
   SSystemDefault = 'System default';
 
-  MinAnimationSmoothness = 0.2;
-  MaxAnimationSmoothness = 1.2;
+  MinBakedAnimationSmoothness = 0.2;
+  MaxBakedAnimationSmoothness = 1.2;
 
 function ColorBitsToStr(const Value: Cardinal): string;
 begin
@@ -338,11 +338,11 @@ begin
   ShadowVolumesToggle := TCastleMenuToggle.Create(Self);
   ShadowVolumesToggle.Pressed := ShadowVolumes;
 
-  AnimationSmoothnessSlider := TCastleFloatSlider.Create(Self);
-  AnimationSmoothnessSlider.Min := MinAnimationSmoothness;
-  AnimationSmoothnessSlider.Max := MaxAnimationSmoothness;
-  AnimationSmoothnessSlider.Value := AnimationSmoothness;
-  AnimationSmoothnessSlider.OnChange := @AnimationSmoothnessChanged;
+  BakedAnimationSmoothnessSlider := TCastleFloatSlider.Create(Self);
+  BakedAnimationSmoothnessSlider.Min := MinBakedAnimationSmoothness;
+  BakedAnimationSmoothnessSlider.Max := MaxBakedAnimationSmoothness;
+  BakedAnimationSmoothnessSlider.Value := BakedAnimationSmoothness;
+  BakedAnimationSmoothnessSlider.OnChange := @BakedAnimationSmoothnessChanged;
 
   ColorBitsToggle := TCastleMenuButton.Create(Self);
   ColorBitsToggle.Caption := ColorBitsToStr(ColorBits);
@@ -355,7 +355,7 @@ begin
   Add('View video information');
   Add('Allow screen settings change on startup', AllowScreenChangeToggle);
   Add('Shadow volumes', ShadowVolumesToggle);
-  Add('Animation smoothness', AnimationSmoothnessSlider);
+  Add('Animation smoothness', BakedAnimationSmoothnessSlider);
   Add('Color bits', ColorBitsToggle);
   Add('Display frequency', VideoFrequencyToggle);
   Add('Anti-aliasing', AntiAliasingSlider);
@@ -457,10 +457,10 @@ begin
          ShadowVolumes := DefaultShadowVolumes;
          ShadowVolumesToggle.Pressed := ShadowVolumes;
 
-         if AnimationSmoothness <> DefaultAnimationSmoothness then
+         if BakedAnimationSmoothness <> DefaultBakedAnimationSmoothness then
          begin
-           AnimationSmoothness := DefaultAnimationSmoothness;
-           AnimationSmoothnessSlider.Value := AnimationSmoothness;
+           BakedAnimationSmoothness := DefaultBakedAnimationSmoothness;
+           BakedAnimationSmoothnessSlider.Value := BakedAnimationSmoothness;
            { You should SRestartTheGame to see the effect fully,
              also on items. But for most typical result, to see it on creatures,
              there's no need to restart the game. }
@@ -491,9 +491,9 @@ begin
   end;
 end;
 
-procedure TVideoMenu.AnimationSmoothnessChanged(Sender: TObject);
+procedure TVideoMenu.BakedAnimationSmoothnessChanged(Sender: TObject);
 begin
-  AnimationSmoothness := AnimationSmoothnessSlider.Value;
+  BakedAnimationSmoothness := BakedAnimationSmoothnessSlider.Value;
 end;
 
 procedure TVideoMenu.AntiAliasingChanged(Sender: TObject);
