@@ -1,9 +1,8 @@
-This is a DOOM e1m1 level remade in VRML for "The Castle".
-A lot of things were changed from the actual DOOM, but the
-level geometry and textures are original.
-This file contains some internal notes: how this is done.
+This is a DOOM e1m1 level remade in VRML/X3D for "The Castle".
+A lot of things were changed from the actual DOOM,
+but the level geometry and textures are original.
 
-First of all, this is *not* the best example how "The Castle"
+Note that this is *not* the best example how "The Castle"
 levels should be done. If you want to educate yourself how to
 create new levels, go see any other level (like ../../hello_world/).
 
@@ -26,7 +25,7 @@ This level needed some tricks to get things working.
 
 - So I imported DOOM model into blender --- but not to export this model !
   I imported it and placed it on layer 0, and by default this layer
-  will *not* be exported to VRML model. This geometry is used only to
+  should *not* be exported to X3D model. This geometry is used only to
   create new faces in blender and connect them to actual level geometry.
 
 - Summary: e1m1 level geometry is the sum of two files:

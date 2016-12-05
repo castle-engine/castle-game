@@ -88,15 +88,18 @@ Transform {
 Transform {
   # rotate to make up vector as +Z
   rotation 1 0 0 1.57
-  children Transform {
-    # proper scaling - original model is scaled down to fit
-    # sizes of my items and creatures
-    scale 0.05 0.05 0.05
-    children [
-      Inline { url "e1m1.wrl" }
-      Inline { url "e1m1_blender.wrl" }
-    ]
-  }
+  children [
+    Transform {
+      # proper scaling - we scale original VRML 1 model down,
+      # to fit to sizes of my items and creatures
+      scale 0.05 0.05 0.05
+      children [
+        Inline { url "e1m1.wrl" }
+      ]
+    }
+    # This is already scaled OK
+    Inline { url "e1m1_blender.x3d" }
+  ]
 }
 
 # hints ----------------------------------------------------------------------
