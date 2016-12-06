@@ -165,8 +165,6 @@ type
 
   TDoomE1M1Level = class(TLevelLogic)
   private
-    procedure RenameCreatures(Node: TX3DNode);
-  private
     FakeWall: TCastleScene;
 
     MovingElevator49: T3DLinearMoving;
@@ -1219,7 +1217,6 @@ var
 begin
   inherited;
 
-  MainScene.RootNode.EnumerateNodes(@RenameCreatures, true);
   DoomDoorsPathPrefix := LevelsPath + 'doom/e1m1/';
 
   World.Add(MakeDoor('door2_3_closed.wrl'));
@@ -1288,21 +1285,6 @@ begin
     TElevator9a9b(Elevator9a9b).Elevator9a9bPickBox := Shape.BoundingBox;
     Exit(true);
   end;
-end;
-
-procedure TDoomE1M1Level.RenameCreatures(Node: TX3DNode);
-const
-  SCreaDoomZomb = 'CreaDoomZomb_';
-  SCreaDoomSerg = 'CreaDoomSerg_';
-begin
-  { This is just a trick to rename all creatures 'DoomZomb' and 'DoomSerg'
-    on level just to our 'Alien' creature. In the future maybe we will
-    have real (and different) DoomZomb/Serg creatures, then the trick
-    below will be removed. }
-  if IsPrefix(SCreaDoomZomb, Node.NodeName) then
-    Node.NodeName := 'CreaAlien_' + SEnding(Node.NodeName, Length(SCreaDoomZomb) + 1) else
-  if IsPrefix(SCreaDoomSerg, Node.NodeName) then
-    Node.NodeName := 'CreaAlien_' + SEnding(Node.NodeName, Length(SCreaDoomSerg) + 1);
 end;
 
 procedure TDoomE1M1Level.PrepareNewPlayer(NewPlayer: TPlayer);

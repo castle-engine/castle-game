@@ -17,12 +17,12 @@
 		            skyColor="0.100 0.100 0.100, 0.057 0.221 0.400"
 		            skyAngle="1.57"
 		            />
-		<Transform DEF="Cube_014_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_016_TRANSFORM"
 		           translation="-166.066193 2.908295 -154.262421"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_014_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_016_ifs_TRANSFORM"
 			           translation="-0.000022 0.000240 0.000003"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -45,12 +45,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_013_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_015_TRANSFORM"
 		           translation="-165.441925 1.306946 -153.950165"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_013_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_015_ifs_TRANSFORM"
 			           translation="0.000221 0.000237 0.000002"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -73,12 +73,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_012_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_014_TRANSFORM"
 		           translation="-165.686066 -0.280838 -153.950165"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_012_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_014_ifs_TRANSFORM"
 			           translation="0.000221 0.000231 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -101,12 +101,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_011_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_013_TRANSFORM"
 		           translation="-166.134064 1.306946 -155.157928"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_011_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_013_ifs_TRANSFORM"
 			           translation="0.000224 0.000235 0.000003"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -129,12 +129,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_010_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_012_TRANSFORM"
 		           translation="-166.907501 -0.280838 -155.225800"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_010_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_012_ifs_TRANSFORM"
 			           translation="0.000225 -0.000017 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -157,12 +157,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_009_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_011_TRANSFORM"
 		           translation="-166.680206 -0.280838 -156.710175"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_009_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_011_ifs_TRANSFORM"
 			           translation="-0.000015 0.000228 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -185,12 +185,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_008_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_010_TRANSFORM"
 		           translation="-165.496124 -0.280838 -155.375214"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_008_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_010_ifs_TRANSFORM"
 			           translation="-0.000019 0.000232 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -213,12 +213,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_007_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_009_TRANSFORM"
 		           translation="-166.017609 -1.837341 -157.533905"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_007_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_009_ifs_TRANSFORM"
 			           translation="-0.000013 -0.000019 -0.000003"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -241,12 +241,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_006_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_008_TRANSFORM"
 		           translation="-164.790802 -1.837341 -156.105682"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_006_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_008_ifs_TRANSFORM"
 			           translation="-0.000017 -0.000015 -0.000006"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -269,12 +269,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_005_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_007_TRANSFORM"
 		           translation="-164.631134 -1.837341 -158.278046"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_005_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_007_ifs_TRANSFORM"
 			           translation="-0.000010 -0.000014 -0.000005"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -297,12 +297,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_004_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_006_TRANSFORM"
 		           translation="-163.109161 -1.837341 -156.594208"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_004_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_006_ifs_TRANSFORM"
 			           translation="0.000229 0.000234 -0.000004"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -325,12 +325,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_003_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_005_TRANSFORM"
 		           translation="-166.529083 -1.837341 -155.853729"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_003_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_005_ifs_TRANSFORM"
 			           translation="0.000227 0.000224 -0.000005"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -353,12 +353,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_002_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_004_TRANSFORM"
 		           translation="-168.061798 -1.837341 -157.141327"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_002_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_004_ifs_TRANSFORM"
 			           translation="0.000230 -0.000025 -0.000005"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -381,12 +381,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_001_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_003_TRANSFORM"
 		           translation="-165.500519 -1.837341 -154.202362"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_001_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_003_ifs_TRANSFORM"
 			           translation="0.000222 -0.000017 -0.000004"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -409,12 +409,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_TRANSFORM"
+		<Transform DEF="CasResAlien20_012_003_TRANSFORM"
 		           translation="-150.563507 -0.604431 -222.711914"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_012_003_ifs_TRANSFORM"
 			           translation="0.000184 0.000032 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -434,12 +434,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjCreaWerewolf60_TRANSFORM"
+		<Transform DEF="CasResWerewolf60_TRANSFORM"
 		           translation="-150.509552 -0.604431 -237.838867"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjCreaWerewolf60_ifs_TRANSFORM"
+			<Transform DEF="CasResWerewolf60_ifs_TRANSFORM"
 			           translation="-0.000014 0.000520 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -459,12 +459,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjItemLifePotion_3_TRANSFORM"
+		<Transform DEF="CasResLifePotion_3_TRANSFORM"
 		           translation="-137.243927 -0.604431 -208.191650"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjItemLifePotion_3_ifs_TRANSFORM"
+			<Transform DEF="CasResLifePotion_3_ifs_TRANSFORM"
 			           translation="-0.000104 0.000560 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -484,12 +484,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjItemLifePotion_2_TRANSFORM"
+		<Transform DEF="CasResLifePotion_2_TRANSFORM"
 		           translation="-163.491730 -0.604431 -208.191620"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjItemLifePotion_2_ifs_TRANSFORM"
+			<Transform DEF="CasResLifePotion_2_ifs_TRANSFORM"
 			           translation="-0.000104 -0.000007 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -509,12 +509,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_074_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_002_TRANSFORM"
 		           translation="-139.944122 -0.533798 -208.173828"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_074_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_002_ifs_TRANSFORM"
 			           translation="-0.000104 0.000552 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -537,12 +537,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_073_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_2_001_TRANSFORM"
 		           translation="-160.709747 -0.533798 -208.173798"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_073_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_2_001_ifs_TRANSFORM"
 			           translation="-0.000104 0.000001 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -565,240 +565,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_072_TRANSFORM"
-		           translation="-154.355255 -0.533798 -215.776337"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_072_ifs_TRANSFORM"
-			           translation="-0.000081 0.000509 -0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_CreaDoomBarrel_2">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                texCoordIndex="0 1 2 3 -1 4 5 6 7 -1 8 9 10 11 -1 12 13 14 15 -1 16 17 18 19 -1 20 21 22 23 -1 "
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_CreaDoomBarrel_2"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-							<TextureCoordinate point="0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 " />
-							<Color color="1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 " />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjDoomBlueArmor_TRANSFORM"
-		           translation="-90.678619 -2.776627 -163.142578"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjDoomBlueArmor_ifs_TRANSFORM"
-			           translation="0.000249 0.000206 -0.000001"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomBlueArmor">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomBlueArmor"
-							            point="12.099999 12.100003 -12.100002 12.099999 -12.100000 -12.100002 -12.100003 -12.099998 -12.100002 -12.099997 12.100008 -12.100002 12.100006 12.099997 12.100002 12.099992 -12.100008 12.100002 -12.100006 -12.099997 12.100002 -12.100000 12.100003 12.100002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_071_TRANSFORM"
-		           translation="-171.980713 6.076492 -148.179657"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_071_ifs_TRANSFORM"
-			           translation="0.000203 0.000231 0.000018"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_2_006">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_2_006"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_070_TRANSFORM"
-		           translation="-179.047607 6.076492 -149.924530"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_070_ifs_TRANSFORM"
-			           translation="-0.000036 -0.000034 0.000013"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_2_005">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_2_005"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_069_TRANSFORM"
-		           translation="-182.634308 6.076492 -156.559784"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_069_ifs_TRANSFORM"
-			           translation="0.000229 0.000199 0.000008"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_2_004">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_2_004"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_068_TRANSFORM"
-		           translation="-186.041779 6.076492 -162.119354"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_068_ifs_TRANSFORM"
-			           translation="0.000245 -0.000055 -0.000001"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_2_003">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_2_003"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_067_TRANSFORM"
-		           translation="-182.454865 6.076492 -168.216766"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_067_ifs_TRANSFORM"
-			           translation="0.000264 -0.000044 0.000011"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_2_002">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_2_002"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_066_TRANSFORM"
-		           translation="-181.020294 6.076492 -175.390106"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_066_ifs_TRANSFORM"
-			           translation="0.000041 0.000204 -0.000003"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_2_001">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_2_001"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_065_TRANSFORM"
-		           translation="-182.275665 6.076492 -183.460175"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_065_ifs_TRANSFORM"
-			           translation="0.000310 -0.000044 -0.000005"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_2">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_2"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjElev9a9bPickBox_TRANSFORM"
+		<Transform DEF="Elev9a9bPickBox_TRANSFORM"
 		           translation="-171.116730 -0.477417 -193.469940"
 		           scale="0.120000 0.120000 0.120000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjElev9a9bPickBox_ifs_TRANSFORM"
+			<Transform DEF="Elev9a9bPickBox_ifs_TRANSFORM"
 			           translation="-0.000123 0.000028 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 0.000000 0.000000 0.000000"
@@ -818,12 +590,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjAroundElev9a9b_TRANSFORM"
+		<Transform DEF="AroundElev9a9b_TRANSFORM"
 		           translation="-76.000031 3.199982 -172.800049"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="-0.000000 0.000000 0.000000 0.000000"
 		           >
-			<Transform DEF="ObjAroundElev9a9b_ifs_TRANSFORM"
+			<Transform DEF="AroundElev9a9b_ifs_TRANSFORM"
 			           translation="0.000034 0.000002 0.000019"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 -0.000000 0.000000"
@@ -848,12 +620,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjElevator49DownBo_TRANSFORM"
+		<Transform DEF="Elevator49DownBox_TRANSFORM"
 		           translation="-150.191437 3.458420 -222.351562"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjElevator49DownBo_ifs_TRANSFORM"
+			<Transform DEF="Elevator49DownBox_ifs_TRANSFORM"
 			           translation="0.000183 0.000533 0.000008"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -873,12 +645,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_063_TRANSFORM"
+		<Transform DEF="CasResQuiver5__002_TRANSFORM"
 		           translation="-163.072540 -1.745621 -196.163300"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_063_ifs_TRANSFORM"
+			<Transform DEF="CasResQuiver5__002_ifs_TRANSFORM"
 			           translation="0.000348 0.000235 -0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -898,12 +670,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_062_TRANSFORM"
+		<Transform DEF="CasResLifePotion1__001_TRANSFORM"
 		           translation="-163.373566 -1.702560 -189.283173"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_062_ifs_TRANSFORM"
+			<Transform DEF="CasResLifePotion1__001_ifs_TRANSFORM"
 			           translation="0.000083 -0.000010 0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -923,12 +695,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_061_TRANSFORM"
+		<Transform DEF="CasResAlien20_008_001_TRANSFORM"
 		           translation="-163.349152 -1.735611 -192.586395"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_061_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_008_001_ifs_TRANSFORM"
 			           translation="0.000093 0.000234 -0.000002"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1080,12 +852,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_060_TRANSFORM"
+		<Transform DEF="CasResQuiver5__001_TRANSFORM"
 		           translation="-122.308136 -5.924713 -199.114746"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_060_ifs_TRANSFORM"
+			<Transform DEF="CasResQuiver5__001_ifs_TRANSFORM"
 			           translation="-0.000131 0.000345 -0.000014"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1105,12 +877,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_059_TRANSFORM"
+		<Transform DEF="CasResLifePotion_0_TRANSFORM"
 		           translation="-106.562042 -6.070175 -197.399170"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_059_ifs_TRANSFORM"
+			<Transform DEF="CasResLifePotion_0_ifs_TRANSFORM"
 			           translation="0.000108 -0.000096 0.000007"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1130,12 +902,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_058_TRANSFORM"
+		<Transform DEF="CasResAlien20_012_002_TRANSFORM"
 		           translation="-115.562042 -6.070175 -201.399170"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_058_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_012_002_ifs_TRANSFORM"
 			           translation="-0.000124 0.000121 0.000002"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1155,12 +927,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_057_TRANSFORM"
+		<Transform DEF="CasResAlien20_012_001_TRANSFORM"
 		           translation="-129.375763 -6.070160 -195.056152"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_057_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_012_001_ifs_TRANSFORM"
 			           translation="0.000345 0.000079 -0.000009"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1180,12 +952,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_056_TRANSFORM"
+		<Transform DEF="CasResGhost40_TRANSFORM"
 		           translation="-105.380280 8.121506 -166.431152"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_056_ifs_TRANSFORM"
+			<Transform DEF="CasResGhost40_ifs_TRANSFORM"
 			           translation="0.000014 0.000195 0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1205,12 +977,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_052_TRANSFORM"
+		<Transform DEF="CasResAlien20_013_TRANSFORM"
 		           translation="-163.037628 -0.604431 -212.957489"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_052_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_013_ifs_TRANSFORM"
 			           translation="-0.000089 0.000482 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1230,12 +1002,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_051_TRANSFORM"
+		<Transform DEF="CasResAlien20_012_TRANSFORM"
 		           translation="-138.537628 -0.604431 -212.957520"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_051_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_012_ifs_TRANSFORM"
 			           translation="0.000155 0.000556 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1255,12 +1027,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_050_TRANSFORM"
+		<Transform DEF="CasResAlien20_011_TRANSFORM"
 		           translation="-150.537628 -0.604431 -204.957520"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_050_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_011_ifs_TRANSFORM"
 			           translation="-0.000113 0.000032 0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1280,12 +1052,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_049_TRANSFORM"
+		<Transform DEF="CasResAlien20_010_TRANSFORM"
 		           translation="-169.354279 5.480499 -175.358856"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_049_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_010_ifs_TRANSFORM"
 			           translation="0.000285 0.000238 -0.000003"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1305,12 +1077,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_047_TRANSFORM"
+		<Transform DEF="CasResAlien20_008_TRANSFORM"
 		           translation="-150.537628 -0.604431 -179.203125"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_047_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_008_ifs_TRANSFORM"
 			           translation="0.000053 0.000276 0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1330,12 +1102,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_046_TRANSFORM"
+		<Transform DEF="CasResAlien20_007_TRANSFORM"
 		           translation="-155.931183 -0.519501 -171.652313"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_046_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_007_ifs_TRANSFORM"
 			           translation="0.000274 0.000260 -0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1355,12 +1127,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_045_TRANSFORM"
+		<Transform DEF="CasResAlien20_006_TRANSFORM"
 		           translation="-144.784668 -0.317337 -137.853760"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_045_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_006_ifs_TRANSFORM"
 			           translation="-0.000072 0.000050 -0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1380,12 +1152,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_044_TRANSFORM"
+		<Transform DEF="CasResWerewolf60_2_002_TRANSFORM"
 		           translation="-151.531769 -0.529068 -152.188477"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_044_ifs_TRANSFORM"
+			<Transform DEF="CasResWerewolf60_2_002_ifs_TRANSFORM"
 			           translation="0.000215 0.000029 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1435,37 +1207,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_042_TRANSFORM"
-		           translation="-75.178360 2.390686 -124.929932"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="-0.000000 0.000000 0.000000 0.000000"
-		           >
-			<Transform DEF="Cube_042_ifs_TRANSFORM"
-			           translation="0.000133 0.000002 0.000021"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 -0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_HintOpenDoorBox">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_HintOpenDoorBox"
-							            point="117.749557 46.080002 -96.080002 117.749557 -56.079994 -96.080002 -36.080009 -56.079987 -96.080002 -36.079987 46.080017 -96.080002 117.749588 46.079983 76.080002 117.749542 -56.080017 76.080002 -36.080017 -56.079983 76.080002 -36.080002 46.080006 76.080002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_041_TRANSFORM"
+		<Transform DEF="CasResQuiver5__TRANSFORM"
 		           translation="-5.829523 0.610809 -168.667480"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_041_ifs_TRANSFORM"
+			<Transform DEF="CasResQuiver5__ifs_TRANSFORM"
 			           translation="0.000006 0.000228 0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1485,12 +1232,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_040_TRANSFORM"
+		<Transform DEF="CasResQuiver10_TRANSFORM"
 		           translation="-5.829521 0.610809 -154.667480"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_040_ifs_TRANSFORM"
+			<Transform DEF="CasResQuiver10_ifs_TRANSFORM"
 			           translation="0.000002 -0.000016 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1510,12 +1257,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_039_TRANSFORM"
+		<Transform DEF="CasResLifePotion__TRANSFORM"
 		           translation="-85.087921 0.560806 -136.221680"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_039_ifs_TRANSFORM"
+			<Transform DEF="CasResLifePotion__ifs_TRANSFORM"
 			           translation="0.000167 -0.000011 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1535,37 +1282,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_038_TRANSFORM"
-		           translation="-50.747398 0.560806 -145.561035"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_038_ifs_TRANSFORM"
-			           translation="-0.000049 0.000093 -0.000001"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_037_TRANSFORM"
+		<Transform DEF="CasResSword_1_TRANSFORM"
 		           translation="11.279089 7.110809 -161.481689"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_037_ifs_TRANSFORM"
+			<Transform DEF="CasResSword_1_ifs_TRANSFORM"
 			           translation="-0.000001 0.000300 0.000016"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1614,12 +1336,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_036_TRANSFORM"
+		<Transform DEF="CasResAlien20_TRANSFORM"
 		           translation="-134.646973 0.431290 -131.995361"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_036_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_ifs_TRANSFORM"
 			           translation="-0.000090 0.000327 0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1639,12 +1361,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_035_TRANSFORM"
+		<Transform DEF="CasResAlien20_2_TRANSFORM"
 		           translation="-119.537369 0.545578 -121.920883"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_035_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_2_ifs_TRANSFORM"
 			           translation="0.000124 0.000129 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1664,74 +1386,24 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_034_TRANSFORM"
-		           translation="-84.614151 0.560814 -106.756943"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_034_ifs_TRANSFORM"
-			           translation="0.000078 -0.000010 -0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1_010">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1_010"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_033_TRANSFORM"
-		           translation="-85.087921 0.560806 -136.221680"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_033_ifs_TRANSFORM"
-			           translation="0.000167 -0.000011 -0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1_009">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1_009"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_032_TRANSFORM"
+		<Transform DEF="CasResQuiver5_TRANSFORM"
 		           translation="-111.630875 1.760376 -126.271469"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_032_ifs_TRANSFORM"
+			<Transform DEF="CasResQuiver5_ifs_TRANSFORM"
 			           translation="-0.000107 -0.000088 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
 			           >
-				<Group DEF="group_ME_ItemArrow5">
+				<Group DEF="group_ME_CasResArrow5">
 					<Shape>
 						<Appearance>
 						</Appearance>
 						<IndexedFaceSet solid="false"
 						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
 						                >
-							<Coordinate DEF="coords_ME_ItemArrow5"
+							<Coordinate DEF="coords_ME_CasResArrow5"
 							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
 							            />
 						</IndexedFaceSet>
@@ -1739,99 +1411,24 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_031_TRANSFORM"
-		           translation="-113.320831 1.760818 -127.031723"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_031_ifs_TRANSFORM"
-			           translation="-0.000105 0.000151 0.000002"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1_007">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1_007"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_030_TRANSFORM"
-		           translation="-113.320816 1.760811 -116.031723"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_030_ifs_TRANSFORM"
-			           translation="0.000350 -0.000093 0.000004"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1_006">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1_006"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_029_TRANSFORM"
-		           translation="-111.820816 1.760384 -116.031723"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_029_ifs_TRANSFORM"
-			           translation="-0.000138 -0.000088 0.000001"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1_005">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1_005"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_028_TRANSFORM"
+		<Transform DEF="CasResAlien20_001_TRANSFORM"
 		           translation="-86.590485 0.545578 -135.158447"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_028_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_001_ifs_TRANSFORM"
 			           translation="0.000164 0.000228 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
 			           >
-				<Group DEF="group_ME_CreaAlien20_001">
+				<Group DEF="group_ME_CasResAlien20_001">
 					<Shape>
 						<Appearance>
 						</Appearance>
 						<IndexedFaceSet solid="false"
 						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
 						                >
-							<Coordinate DEF="coords_ME_CreaAlien20_001"
+							<Coordinate DEF="coords_ME_CasResAlien20_001"
 							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
 							            />
 						</IndexedFaceSet>
@@ -1839,12 +1436,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_027_TRANSFORM"
+		<Transform DEF="CasResAlien20__TRANSFORM"
 		           translation="-86.034317 0.545578 -107.730576"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_027_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20__ifs_TRANSFORM"
 			           translation="-0.000041 -0.000014 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1864,24 +1461,24 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_026_TRANSFORM"
+		<Transform DEF="CasResWerewolf60_1_TRANSFORM"
 		           translation="-112.729019 1.795143 -120.142807"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_026_ifs_TRANSFORM"
+			<Transform DEF="CasResWerewolf60_1_ifs_TRANSFORM"
 			           translation="0.000119 -0.000091 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
 			           >
-				<Group DEF="group_ME_CreaWerewolf60_1">
+				<Group DEF="group_ME_CasResWerewolf60_1">
 					<Shape>
 						<Appearance>
 						</Appearance>
 						<IndexedFaceSet solid="false"
 						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
 						                >
-							<Coordinate DEF="coords_ME_CreaWerewolf60_1"
+							<Coordinate DEF="coords_ME_CasResWerewolf60_1"
 							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
 							            />
 						</IndexedFaceSet>
@@ -1889,24 +1486,24 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_025_TRANSFORM"
+		<Transform DEF="CasResWerewolf60_2_TRANSFORM"
 		           translation="-112.878922 1.745148 -124.142807"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_025_ifs_TRANSFORM"
+			<Transform DEF="CasResWerewolf60_2_ifs_TRANSFORM"
 			           translation="0.000131 -0.000091 0.000003"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
 			           >
-				<Group DEF="group_ME_CreaWerewolf60_2">
+				<Group DEF="group_ME_CasResWerewolf60_2">
 					<Shape>
 						<Appearance>
 						</Appearance>
 						<IndexedFaceSet solid="false"
 						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
 						                >
-							<Coordinate DEF="coords_ME_CreaWerewolf60_2"
+							<Coordinate DEF="coords_ME_CasResWerewolf60_2"
 							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
 							            />
 						</IndexedFaceSet>
@@ -1914,24 +1511,24 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_024_TRANSFORM"
+		<Transform DEF="CasResAlien20_1_TRANSFORM"
 		           translation="-112.678970 1.745148 -122.142807"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_024_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_1_ifs_TRANSFORM"
 			           translation="-0.000119 -0.000091 0.000001"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
 			           >
-				<Group DEF="group_ME_CreaAlien20_1">
+				<Group DEF="group_ME_CasResAlien20_1">
 					<Shape>
 						<Appearance>
 						</Appearance>
 						<IndexedFaceSet solid="false"
 						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
 						                >
-							<Coordinate DEF="coords_ME_CreaAlien20_1"
+							<Coordinate DEF="coords_ME_CasResAlien20_1"
 							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
 							            />
 						</IndexedFaceSet>
@@ -1939,24 +1536,24 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_023_TRANSFORM"
+		<Transform DEF="CasResAlien20_004_TRANSFORM"
 		           translation="5.771048 5.895569 -163.642822"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_023_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_004_ifs_TRANSFORM"
 			           translation="-0.000009 0.000524 0.000002"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
 			           >
-				<Group DEF="group_ME_CreaAlien20_004">
+				<Group DEF="group_ME_CasResAlien20_004">
 					<Shape>
 						<Appearance>
 						</Appearance>
 						<IndexedFaceSet solid="false"
 						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
 						                >
-							<Coordinate DEF="coords_ME_CreaAlien20_004"
+							<Coordinate DEF="coords_ME_CasResAlien20_004"
 							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
 							            />
 						</IndexedFaceSet>
@@ -1964,12 +1561,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_022_TRANSFORM"
+		<Transform DEF="CasResAlien20_005_TRANSFORM"
 		           translation="5.771049 5.895569 -158.642822"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_022_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_005_ifs_TRANSFORM"
 			           translation="-0.000002 0.000035 0.000002"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -1989,12 +1586,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="Cube_020_TRANSFORM"
+		<Transform DEF="CasResAlien20_002_TRANSFORM"
 		           translation="-9.606667 0.610809 -154.667480"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="Cube_020_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien20_002_ifs_TRANSFORM"
 			           translation="0.000009 -0.000027 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -2039,343 +1636,6 @@
 							            />
 							<TextureCoordinate point="0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 " />
 							<Color color="1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 " />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="Cube_019_TRANSFORM"
-		           translation="11.279089 7.110809 -161.481689"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="Cube_019_ifs_TRANSFORM"
-			           translation="-0.000001 0.000300 0.000016"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomArmor_1_005">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomArmor_1_005"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmArmo_001_TRANSFORM"
-		           translation="7.279089 5.810944 -161.481689"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmArmo_001_ifs_TRANSFORM"
-			           translation="-0.000016 0.000284 0.000008"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1_004">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1_004"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmArmor__TRANSFORM"
-		           translation="4.779089 5.810944 -161.481689"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmArmor__ifs_TRANSFORM"
-			           translation="0.000007 0.000276 0.000008"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1_003">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1_003"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmHeal_003_TRANSFORM"
-		           translation="-5.829521 0.610809 -154.667480"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmHeal_003_ifs_TRANSFORM"
-			           translation="0.000002 -0.000016 0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmHeal_1_005">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmHeal_1_005"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmHeal_002_TRANSFORM"
-		           translation="-6.829522 0.610809 -157.667480"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmHeal_002_ifs_TRANSFORM"
-			           translation="0.000003 0.000225 -0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmHeal_1_004">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmHeal_1_004"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmHeal_2_TRANSFORM"
-		           translation="-6.829523 0.610809 -165.667480"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmHeal_2_ifs_TRANSFORM"
-			           translation="-0.000003 0.000225 0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmHeal_1_003">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmHeal_1_003"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmHeal__TRANSFORM"
-		           translation="-5.829523 0.610809 -168.667480"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmHeal__ifs_TRANSFORM"
-			           translation="0.000006 0.000228 0.000001"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmHeal_1_002">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmHeal_1_002"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmArmo_TRANSFORM"
-		           translation="-21.220913 0.610809 -171.481689"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmArmo_ifs_TRANSFORM"
-			           translation="-0.000001 -0.000062 -0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1_002">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1_002"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmArmor_TRANSFORM"
-		           translation="-21.220909 0.610809 -151.481689"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmArmor_ifs_TRANSFORM"
-			           translation="0.000061 -0.000062 0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmArmor_1_001">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmArmor_1_001"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="SpecDoomCore_001_TRANSFORM"
-		           translation="-14.342278 2.610809 -155.070801"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="SpecDoomCore_001_ifs_TRANSFORM"
-			           translation="0.000011 -0.000035 0.000001"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_SpecDoomCore_1_001">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                texCoordIndex="0 1 2 3 -1 4 5 6 7 -1 8 9 10 11 -1 12 13 14 15 -1 16 17 18 19 -1 20 21 22 23 -1 "
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_SpecDoomCore_1_001"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-							<TextureCoordinate point="0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 " />
-							<Color color="1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 " />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="SpecDoomCore_TRANSFORM"
-		           translation="-14.342281 2.610809 -167.923828"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="SpecDoomCore_ifs_TRANSFORM"
-			           translation="-0.000012 0.000209 0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_SpecDoomCore_1">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                texCoordIndex="0 1 2 3 -1 4 5 6 7 -1 8 9 10 11 -1 12 13 14 15 -1 16 17 18 19 -1 20 21 22 23 -1 "
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_SpecDoomCore_1"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-							<TextureCoordinate point="0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 " />
-							<Color color="1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 " />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="SpecDoomLight_001_TRANSFORM"
-		           translation="-26.842278 0.610809 -164.923828"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="SpecDoomLight_001_ifs_TRANSFORM"
-			           translation="0.000010 -0.000079 -0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_SpecDoomLight_1_001">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                texCoordIndex="0 1 2 3 -1 4 5 6 7 -1 8 9 10 11 -1 12 13 14 15 -1 16 17 18 19 -1 20 21 22 23 -1 "
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_SpecDoomLight_1_001"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-							<TextureCoordinate point="0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 " />
-							<Color color="1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 " />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="SpecDoomLight_TRANSFORM"
-		           translation="-26.842278 0.610809 -157.923828"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="SpecDoomLight_ifs_TRANSFORM"
-			           translation="-0.000011 0.000165 -0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_SpecDoomLight_1">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                texCoordIndex="0 1 2 3 -1 4 5 6 7 -1 8 9 10 11 -1 12 13 14 15 -1 16 17 18 19 -1 20 21 22 23 -1 "
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_SpecDoomLight_1"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-							<TextureCoordinate point="0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 " />
-							<Color color="1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 " />
 						</IndexedFaceSet>
 					</Shape>
 				</Group>
@@ -2432,17 +1692,17 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjCreaAlien0_1_TRANSFORM"
+		<Transform DEF="CasResAlien0_1_TRANSFORM"
 		           translation="-54.468773 0.610809 -161.292969"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjCreaAlien0_1_ifs_TRANSFORM"
+			<Transform DEF="CasResAlien0_1_ifs_TRANSFORM"
 			           translation="-0.000001 0.000570 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
 			           >
-				<Group DEF="group_ME_CreaAlien0_">
+				<Group DEF="group_ME_CreaAlien0_1">
 					<Shape>
 						<Appearance>
 						</Appearance>
@@ -2450,7 +1710,7 @@
 						                texCoordIndex="0 1 2 3 -1 4 5 6 7 -1 8 9 10 11 -1 12 13 14 15 -1 16 17 18 19 -1 20 21 22 23 -1 "
 						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
 						                >
-							<Coordinate DEF="coords_ME_CreaAlien0_"
+							<Coordinate DEF="coords_ME_CreaAlien0_1"
 							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
 							            />
 							<TextureCoordinate point="0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 0.0000 1.0000 0.0000 0.0000 1.0000 0.0000 1.0000 1.0000 " />
@@ -2460,12 +1720,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjCreaDoomBarrel_002_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_1_002_TRANSFORM"
 		           translation="-43.342316 0.610809 -164.923828"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjCreaDoomBarrel_002_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_1_002_ifs_TRANSFORM"
 			           translation="0.000071 0.000115 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -2488,12 +1748,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjCreaDoomBarrel_001_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_1_001_TRANSFORM"
 		           translation="-65.829498 0.610809 -163.166992"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjCreaDoomBarrel_001_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_1_001_ifs_TRANSFORM"
 			           translation="0.000127 0.000291 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -2516,12 +1776,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjCreaDoomBarrel_TRANSFORM"
+		<Transform DEF="CasResDoomBarrel_1_TRANSFORM"
 		           translation="-57.748192 0.610809 -145.481689"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjCreaDoomBarrel_ifs_TRANSFORM"
+			<Transform DEF="CasResDoomBarrel_1_ifs_TRANSFORM"
 			           translation="-0.000049 0.000072 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -2541,12 +1801,12 @@
 				</Group>
 			</Transform>
 		</Transform>
-		<Transform DEF="ObjItemLifePotion_TRANSFORM"
+		<Transform DEF="CasResLifePotion_1_TRANSFORM"
 		           translation="-50.720909 0.610809 -145.481689"
 		           scale="0.050000 0.050000 0.050000"
 		           rotation="1.000000 0.000000 -0.000000 1.570796"
 		           >
-			<Transform DEF="ObjItemLifePotion_ifs_TRANSFORM"
+			<Transform DEF="CasResLifePotion_1_ifs_TRANSFORM"
 			           translation="-0.000049 0.000093 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="0.000000 -0.000000 0.000000 0.000000"
@@ -2559,56 +1819,6 @@
 						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
 						                >
 							<Coordinate DEF="coords_ME_ItemLifePotion_1"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmHeal_001_TRANSFORM"
-		           translation="-36.829498 0.610809 -176.167480"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmHeal_001_ifs_TRANSFORM"
-			           translation="0.000044 0.000135 0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmHeal_1_001">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmHeal_1_001"
-							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
-							            />
-						</IndexedFaceSet>
-					</Shape>
-				</Group>
-			</Transform>
-		</Transform>
-		<Transform DEF="ObjItemDoomSmHeal_TRANSFORM"
-		           translation="-65.829498 0.610809 -176.167480"
-		           scale="0.050000 0.050000 0.050000"
-		           rotation="1.000000 0.000000 -0.000000 1.570796"
-		           >
-			<Transform DEF="ObjItemDoomSmHeal_ifs_TRANSFORM"
-			           translation="0.000166 0.000291 0.000000"
-			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000000 0.000000 0.000000"
-			           >
-				<Group DEF="group_ME_ItemDoomSmHeal_1">
-					<Shape>
-						<Appearance>
-						</Appearance>
-						<IndexedFaceSet solid="false"
-						                coordIndex="0 1 2 3 -1 4 7 6 5 -1 0 4 5 1 -1 1 5 6 2 -1 2 6 7 3 -1 4 0 3 7 -1 "
-						                >
-							<Coordinate DEF="coords_ME_ItemDoomSmHeal_1"
 							            point="10.400000 10.400003 -10.400002 10.400000 -10.400001 -10.400002 -10.400003 -10.399998 -10.400002 -10.399998 10.400007 -10.400002 10.400005 10.399998 10.400002 10.399993 -10.400007 10.400002 -10.400005 -10.399998 10.400002 -10.400001 10.400003 10.400002 "
 							            />
 						</IndexedFaceSet>
