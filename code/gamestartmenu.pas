@@ -112,10 +112,10 @@ type
   end;
 
   TChangeOpenALDeviceMenu = class(TSubMenu)
+  strict private
+    procedure ClickBack(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure Click; override;
   end;
 
   TChooseNewLevelMenu = class(TSubMenu)
@@ -509,7 +509,7 @@ begin
   inherited;
 
   OpenALDeviceToggle := TCastleMenuButton.Create(Self);
-  OpenALDeviceToggle.Caption := SoundEngine.DeviceNiceName;
+  OpenALDeviceToggle.Caption := SoundEngine.DeviceCaption;
   OpenALDeviceToggle.OnClick := @ClickOpenALDeviceToggle;
 
   Add(TSoundInfoMenuItem.Create(Self));
@@ -533,39 +533,50 @@ begin
   SetCurrentMenu(CurrentMenu, MainMenu);
 end;
 
+{ TOpenALDeviceMenuButton ---------------------------------------------------- }
+
+type
+  TOpenALDeviceMenuButton = class(TCastleMenuButton)
+  public
+    Device: TSoundDevice;
+    procedure DoClick; override;
+  end;
+
+procedure TOpenALDeviceMenuButton.DoClick;
+begin
+  inherited;
+
+  SoundEngine.Device := Device.Name;
+  SoundMenu.OpenALDeviceToggle.Caption := SoundEngine.DeviceCaption;
+  if not SoundEngine.ALActive then
+    MessageOK(Window, SoundEngine.SoundInitializationReport);
+
+  SetCurrentMenu(CurrentMenu, SoundMenu);
+end;
+
 { TChangeOpenALDeviceMenu ---------------------------------------------------- }
 
 constructor TChangeOpenALDeviceMenu.Create(AOwner: TComponent);
 var
   I: Integer;
+  D: TOpenALDeviceMenuButton;
 begin
   inherited;
 
   for I := 0 to SoundEngine.Devices.Count - 1 do
-    Add(SoundEngine.Devices[I].NiceName);
-  Add('Cancel');
+  begin
+    D := TOpenALDeviceMenuButton.Create(Self);
+    D.Device := SoundEngine.Devices[I];
+    Add(D.Device.Caption, D);
+  end;
+
+  Add('Cancel', @ClickBack);
 
   SubMenuTitle := 'Change sound output device';
 end;
 
-destructor TChangeOpenALDeviceMenu.Destroy;
+procedure TChangeOpenALDeviceMenu.ClickBack(Sender: TObject);
 begin
-  inherited;
-end;
-
-procedure TChangeOpenALDeviceMenu.Click;
-begin
-  inherited;
-
-  if CurrentItem < SoundEngine.Devices.Count then
-  begin
-    SoundEngine.Device := SoundEngine.Devices[CurrentItem].Name;
-    { ALCDevice value changed now to new value. }
-    SoundMenu.OpenALDeviceToggle.Caption := SoundEngine.Devices[CurrentItem].NiceName;
-    if not SoundEngine.ALActive then
-      MessageOK(Window, SoundEngine.SoundInitializationReport);
-  end;
-
   SetCurrentMenu(CurrentMenu, SoundMenu);
 end;
 
