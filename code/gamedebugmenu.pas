@@ -57,17 +57,33 @@ uses SysUtils,
 
 type
   TDebugMenu = class(TCastleGameMenu)
+  strict private
+    procedure ClickPlayerMenu(Sender: TObject);
+    procedure ClickCreaturesMenu(Sender: TObject);
+    procedure ClickItemsMenu(Sender: TObject);
+    procedure ClickLevelsMenu(Sender: TObject);
+    procedure ClickReloadResources(Sender: TObject);
+    procedure ClickReloadResourceAnimation(Sender: TObject);
+    procedure ClickRenderDebug3D(Sender: TObject);
+    procedure ClickRenderDebugCaptions(Sender: TObject);
+    procedure ClickShadowVolumesRender(Sender: TObject);
+    procedure ClickDebugRenderForLevelScreenshot(Sender: TObject);
+    procedure ClickReloadSounds(Sender: TObject);
+    procedure ClickBack(Sender: TObject);
   public
     RenderDebug3DToggle: TCastleMenuToggle;
     RenderDebugCaptionsToggle: TCastleMenuToggle;
     ShadowVolumesRenderToggle: TCastleMenuToggle;
     DebugRenderForLevelScreenshotToggle: TCastleMenuToggle;
     constructor Create(AOwner: TComponent); override;
-    procedure Click; override;
   end;
 
   TDebugPlayerMenu = class(TCastleGameMenu)
-  private
+  strict private
+    procedure ClickInfiniteLife(Sender: TObject);
+    procedure ClickFly(Sender: TObject);
+    procedure ClickReloadPlayerXml(Sender: TObject);
+    procedure ClickBack(Sender: TObject);
     procedure RotationHorizontalSpeedChanged(Sender: TObject);
     procedure RotationVerticalSpeedChanged(Sender: TObject);
     procedure PlayerSpeedChanged(Sender: TObject);
@@ -76,26 +92,36 @@ type
     RotationVerticalSpeedSlider: TCastleFloatSlider;
     PlayerSpeedSlider: TCastleFloatSlider;
     constructor Create(AOwner: TComponent); override;
-    procedure Click; override;
-  end;
-
-  TDebugItemsMenu = class(TCastleGameMenu)
-  public
-    constructor Create(AOwner: TComponent); override;
-    procedure Click; override;
   end;
 
   TDebugCreaturesMenu = class(TCastleGameMenu)
+  strict private
+    procedure KillAllCore(const IncludeStill: boolean);
+    procedure ClickKillAll(Sender: TObject);
+    procedure ClickKillAllNonStill(Sender: TObject);
+    procedure ClickAddCreature(Sender: TObject);
+    procedure ClickDebugTimeStopForCreatures(Sender: TObject);
+    procedure ClickBack(Sender: TObject);
   public
     DebugTimeStopForCreaturesToggle: TCastleMenuToggle;
     constructor Create(AOwner: TComponent); override;
-    procedure Click; override;
+  end;
+
+  TDebugItemsMenu = class(TCastleGameMenu)
+  strict private
+    procedure ClickGiveAll(Sender: TObject);
+    procedure ClickBack(Sender: TObject);
+  public
+    constructor Create(AOwner: TComponent); override;
   end;
 
   TDebugLevelMenu = class(TCastleGameMenu)
+  strict private
+    procedure ClickChangeLevel(Sender: TObject);
+    procedure ClickRestart(Sender: TObject);
+    procedure ClickBack(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Click; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -140,76 +166,104 @@ begin
 
   RenderDebug3DToggle := TCastleMenuToggle.Create(Self);
   RenderDebug3DToggle.Pressed := RenderDebug3D;
+  RenderDebug3DToggle.OnClick := @ClickRenderDebug3D;
 
   RenderDebugCaptionsToggle := TCastleMenuToggle.Create(Self);
   RenderDebugCaptionsToggle.Pressed := RenderDebugCaptions;
+  RenderDebugCaptionsToggle.OnClick := @ClickRenderDebugCaptions;
 
   ShadowVolumesRenderToggle := TCastleMenuToggle.Create(Self);
   ShadowVolumesRenderToggle.Pressed := ShadowVolumesRender;
+  ShadowVolumesRenderToggle.OnClick := @ClickShadowVolumesRender;
 
   DebugRenderForLevelScreenshotToggle := TCastleMenuToggle.Create(Self);
   DebugRenderForLevelScreenshotToggle.Pressed := DebugRenderForLevelScreenshot;
+  DebugRenderForLevelScreenshotToggle.OnClick := @ClickDebugRenderForLevelScreenshot;
 
-  Add('Player debug menu ...');
-  Add('Creatures debug menu ...');
-  Add('Items debug menu ...');
-  Add('Level debug menu ...');
-  Add('Reload resources resource.xml files');
-  Add('Reload resource animation ...');
+  Add('Player debug menu ...', @ClickPlayerMenu);
+  Add('Creatures debug menu ...', @ClickCreaturesMenu);
+  Add('Items debug menu ...', @ClickItemsMenu);
+  Add('Level debug menu ...', @ClickLevelsMenu);
+  Add('Reload resources resource.xml files', @ClickReloadResources);
+  Add('Reload resource animation ...', @ClickReloadResourceAnimation);
   Add('Render debug 3D information', RenderDebug3DToggle);
   Add('Render debug captions', RenderDebugCaptionsToggle);
   Add('Render shadow volumes', ShadowVolumesRenderToggle);
   Add('Render for level screenshot', DebugRenderForLevelScreenshotToggle);
-  Add('Reload sounds/index.xml');
-  Add('Back to game');
+  Add('Reload sounds/index.xml', @ClickReloadSounds);
+  Add('Back to game', @ClickBack);
 end;
 
-procedure TDebugMenu.Click;
-
-  procedure ReloadResource;
-  var
-    Resource: T3DResource;
-  begin
-    if ChooseResource(Resource, false) then
-    begin
-      if Resource.UsageCount = 0 then
-        MessageOK(Window, Format('Resource "%s" is not used by anything, ' +
-          'cannot reload',  [Resource.Name])) else
-        Resource.RedoPrepare(SceneManager.BaseLights, SceneManager.GravityUp);
-    end;
-  end;
-
+procedure TDebugMenu.ClickPlayerMenu(Sender: TObject);
 begin
-  inherited;
+  SetCurrentMenu(CurrentMenu, DebugPlayerMenu);
+end;
 
-  case CurrentItem of
-    0: SetCurrentMenu(CurrentMenu, DebugPlayerMenu);
-    1: SetCurrentMenu(CurrentMenu, DebugCreaturesMenu);
-    2: SetCurrentMenu(CurrentMenu, DebugItemsMenu);
-    3: SetCurrentMenu(CurrentMenu, DebugLevelMenu);
-    4: Resources.LoadFromFiles(true);
-    5: ReloadResource;
-    6: begin
-         RenderDebug3D := not RenderDebug3D;
-         RenderDebug3DToggle.Pressed := RenderDebug3D;
-       end;
-    7: begin
-         RenderDebugCaptions := not RenderDebugCaptions;
-         RenderDebugCaptionsToggle.Pressed := RenderDebugCaptions;
-       end;
-    8: begin
-         ShadowVolumesRender := not ShadowVolumesRender;
-         ShadowVolumesRenderToggle.Pressed := ShadowVolumesRender;
-       end;
-    9: begin
-         DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
-         DebugRenderForLevelScreenshotToggle.Pressed :=
-           DebugRenderForLevelScreenshot;
-       end;
-    10:SoundEngine.ReloadSounds;
-    11:TUIState.Pop(StateDebugMenu);
-    else raise EInternalError.Create('Menu item unknown');
+procedure TDebugMenu.ClickCreaturesMenu(Sender: TObject);
+begin
+  SetCurrentMenu(CurrentMenu, DebugCreaturesMenu);
+end;
+
+procedure TDebugMenu.ClickItemsMenu(Sender: TObject);
+begin
+  SetCurrentMenu(CurrentMenu, DebugItemsMenu);
+end;
+
+procedure TDebugMenu.ClickLevelsMenu(Sender: TObject);
+begin
+  SetCurrentMenu(CurrentMenu, DebugLevelMenu);
+end;
+
+procedure TDebugMenu.ClickReloadResources(Sender: TObject);
+begin
+  Resources.LoadFromFiles(true);
+end;
+
+procedure TDebugMenu.ClickReloadResourceAnimation(Sender: TObject);
+var
+  Resource: T3DResource;
+begin
+  if ChooseResource(Resource, false) then
+  begin
+    if Resource.UsageCount = 0 then
+      MessageOK(Window, Format('Resource "%s" is not used by anything, ' +
+        'cannot reload',  [Resource.Name])) else
+      Resource.RedoPrepare(SceneManager.BaseLights, SceneManager.GravityUp);
   end;
+end;
+
+procedure TDebugMenu.ClickRenderDebug3D(Sender: TObject);
+begin
+  RenderDebug3D := not RenderDebug3D;
+  RenderDebug3DToggle.Pressed := RenderDebug3D;
+end;
+
+procedure TDebugMenu.ClickRenderDebugCaptions(Sender: TObject);
+begin
+  RenderDebugCaptions := not RenderDebugCaptions;
+  RenderDebugCaptionsToggle.Pressed := RenderDebugCaptions;
+end;
+
+procedure TDebugMenu.ClickShadowVolumesRender(Sender: TObject);
+begin
+  ShadowVolumesRender := not ShadowVolumesRender;
+  ShadowVolumesRenderToggle.Pressed := ShadowVolumesRender;
+end;
+
+procedure TDebugMenu.ClickDebugRenderForLevelScreenshot(Sender: TObject);
+begin
+  DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
+  DebugRenderForLevelScreenshotToggle.Pressed := DebugRenderForLevelScreenshot;
+end;
+
+procedure TDebugMenu.ClickReloadSounds(Sender: TObject);
+begin
+  SoundEngine.ReloadSounds;
+end;
+
+procedure TDebugMenu.ClickBack(Sender: TObject);
+begin
+  TUIState.Pop(StateDebugMenu);
 end;
 
 { TDebugPlayerMenu ----------------------------------------------------------- }
@@ -238,40 +292,39 @@ begin
   PlayerSpeedSlider.Value := 1;
   PlayerSpeedSlider.OnChange := @PlayerSpeedChanged;
 
-  Add('Infinite Life');
-  Add('Fly (indefinitely)');
+  Add('Infinite Life', @ClickInfiniteLife);
+  Add('Fly (indefinitely)', @ClickFly);
   Add('Set horizontal rotation speed', RotationHorizontalSpeedSlider);
   Add('Set vertical rotation speed', RotationVerticalSpeedSlider);
   Add('Set player speed', PlayerSpeedSlider);
-  Add('Reload player.xml file');
-  Add('Back');
+  Add('Reload player.xml file', @ClickReloadPlayerXml);
+  Add('Back', @ClickBack);
 end;
 
-procedure TDebugPlayerMenu.Click;
-
-  procedure PlayerSetMaxLife;
-  begin
-    if Player.Dead then
-      MessageOK(Window, 'No can do. You are dead.') else
-    begin
-      Player.MaxLife := 10000;
-      Player.Life := Player.MaxLife;
-      TUIState.Pop(StateDebugMenu);
-    end;
-  end;
-
+procedure TDebugPlayerMenu.ClickInfiniteLife(Sender: TObject);
 begin
-  inherited;
-
-  case CurrentItem of
-    0: PlayerSetMaxLife;
-    1: Player.Flying := true;
-    2: ;
-    3: ;
-    4: ;
-    5: Player.LoadFromFile;
-    6: SetCurrentMenu(CurrentMenu, DebugMenu);
+  if Player.Dead then
+    MessageOK(Window, 'No can do. You are dead.') else
+  begin
+    Player.MaxLife := 10000;
+    Player.Life := Player.MaxLife;
+    TUIState.Pop(StateDebugMenu);
   end;
+end;
+
+procedure TDebugPlayerMenu.ClickFly(Sender: TObject);
+begin
+  Player.Flying := true;
+end;
+
+procedure TDebugPlayerMenu.ClickReloadPlayerXml(Sender: TObject);
+begin
+  Player.LoadFromFile;
+end;
+
+procedure TDebugPlayerMenu.ClickBack(Sender: TObject);
+begin
+  SetCurrentMenu(CurrentMenu, DebugMenu);
 end;
 
 procedure TDebugPlayerMenu.RotationHorizontalSpeedChanged(Sender: TObject);
@@ -297,135 +350,67 @@ begin
 
   DebugTimeStopForCreaturesToggle := TCastleMenuToggle.Create(Self);
   DebugTimeStopForCreaturesToggle.Pressed := DebugTimeStopForCreatures;
+  DebugTimeStopForCreaturesToggle.OnClick := @ClickDebugTimeStopForCreatures;
 
-  Add('Kill all creatures');
-  Add('Kill all non-still creatures');
-  Add('Add creature to level before player');
+  Add('Kill all creatures', @ClickKillAll);
+  Add('Kill all non-still creatures', @ClickKillAllNonStill);
+  Add('Add creature to level before player', @ClickAddCreature);
   Add('Time stop for creatures', DebugTimeStopForCreaturesToggle);
-  Add('Back');
+  Add('Back', @ClickBack);
 end;
 
-procedure TDebugCreaturesMenu.Click;
-
-  procedure KillAll(const IncludeStill: boolean);
-  var
-    I: Integer;
-    C: TCreature;
-  begin
-    for I := 0 to SceneManager.Items.Count - 1 do
-      if SceneManager.Items[I] is TCreature then
-      begin
-        C := TCreature(SceneManager.Items[I]);
-        if (C.Life > 0) and (IncludeStill or (not (C is TStillCreature))) then
-        begin
-          C.SoundDieEnabled := false;
-          C.Hurt(1000 * 1000, ZeroVector3Single, 0, nil);
-        end;
-      end;
-  end;
-
-  procedure AddLevelCreature(DirectionAttenuation: Single);
-  var
-    Resource: T3DResource;
-  begin
-    if ChooseResource(Resource, true) then
+procedure TDebugCreaturesMenu.KillAllCore(const IncludeStill: boolean);
+var
+  I: Integer;
+  C: TCreature;
+begin
+  for I := 0 to SceneManager.Items.Count - 1 do
+    if SceneManager.Items[I] is TCreature then
     begin
-      (Resource as TCreatureResource).CreateCreature(SceneManager.Items,
-        Player.Position + Player.Direction * DirectionAttenuation,
-        Player.Direction);
-
-      TUIState.Pop(StateDebugMenu);
+      C := TCreature(SceneManager.Items[I]);
+      if (C.Life > 0) and (IncludeStill or (not (C is TStillCreature))) then
+      begin
+        C.SoundDieEnabled := false;
+        C.Hurt(1000 * 1000, ZeroVector3Single, 0, nil);
+      end;
     end;
-  end;
-
-begin
-  inherited;
-
-  case CurrentItem of
-    0: KillAll(true);
-    1: KillAll(false);
-    2: AddLevelCreature(10);
-    3: begin
-         DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
-         DebugTimeStopForCreaturesToggle.Pressed := DebugTimeStopForCreatures;
-       end;
-    4: SetCurrentMenu(CurrentMenu, DebugMenu);
-  end;
 end;
 
-{ TDebugLevelMenu -------------------------------------------------------- }
-
-constructor TDebugLevelMenu.Create(AOwner: TComponent);
+procedure TDebugCreaturesMenu.ClickKillAll(Sender: TObject);
 begin
-  inherited;
-
-  Add('Change to level');
-  Add('Restart current level (preserving camera)');
-  Add('Back');
+  KillAllCore(true);
 end;
 
-procedure TDebugLevelMenu.Click;
+procedure TDebugCreaturesMenu.ClickKillAllNonStill(Sender: TObject);
+begin
+  KillAllCore(false);
+end;
 
-  procedure ChangeToLevel;
-  var
-    S: TStringList;
-    I, Index: Integer;
+procedure TDebugCreaturesMenu.ClickAddCreature(Sender: TObject);
+const
+  DirectionAttenuation = 10.0;
+var
+  Resource: T3DResource;
+begin
+  if ChooseResource(Resource, true) then
   begin
-    S := TStringList.Create;
-    try
-      for I := 0 to Levels.Count - 1 do
-      begin
-        S.Append(Format('Level %d "%s"',
-          [ Levels[I].Number, Levels[I].Title ]));
-      end;
-      S.Append('Cancel');
-
-      Index := ChooseByMenu(S);
-
-      if Index <> Levels.Count then
-      begin
-        LevelFinished(Levels[Index].Name);
-        { Flush LevelFinished now, to give new items when new level is loaded.
-          Otherwise, some sounds (like equipping the sword, if player gets
-          his first weapon) could be done before loading level progress,
-          which sounds awkward for player. }
-        LevelFinishedFlush;
-        SceneManager.Logic.PrepareNewPlayer(Player);
-        TUIState.Pop(StateDebugMenu);
-      end;
-    finally S.Free end;
-  end;
-
-  procedure RestartLevel;
-  var
-    Pos, Dir, Up: TVector3Single;
-  begin
-    Pos := Player.Camera.Position;
-    Dir := Player.Camera.Direction;
-    Up := Player.Camera.Up;
-
-    LevelFinished(SceneManager.Info.Name);
-    LevelFinishedFlush;
-
-    { Change Player.Camera, they will be automatically set also for Player
-      properties by TCastleSceneManager.CameraVisibleChange.
-      TODO: maybe different one day? }
-
-    Player.Camera.Position := Pos;
-    Player.Camera.Direction := Dir;
-    Player.Camera.Up := Up;
+    (Resource as TCreatureResource).CreateCreature(SceneManager.Items,
+      Player.Position + Player.Direction * DirectionAttenuation,
+      Player.Direction);
 
     TUIState.Pop(StateDebugMenu);
   end;
+end;
 
+procedure TDebugCreaturesMenu.ClickDebugTimeStopForCreatures(Sender: TObject);
 begin
-  inherited;
+  DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
+  DebugTimeStopForCreaturesToggle.Pressed := DebugTimeStopForCreatures;
+end;
 
-  case CurrentItem of
-    0: ChangeToLevel;
-    1: RestartLevel;
-    2: SetCurrentMenu(CurrentMenu, DebugMenu);
-  end;
+procedure TDebugCreaturesMenu.ClickBack(Sender: TObject);
+begin
+  SetCurrentMenu(CurrentMenu, DebugMenu);
 end;
 
 { TDebugItemsMenu ------------------------------------------------------------ }
@@ -434,29 +419,91 @@ constructor TDebugItemsMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  Add('Give me 20 instances of every possible item');
-  Add('Back');
+  Add('Give me 20 instances of every possible item', @ClickGiveAll);
+  Add('Back', @ClickBack);
 end;
 
-procedure TDebugItemsMenu.Click;
+procedure TDebugItemsMenu.ClickGiveAll(Sender: TObject);
+var
+  I: Integer;
+begin
+  for I := 0 to Resources.Count - 1 do
+    if Resources[I] is TItemResource then
+      Player.PickItem(TItemResource(Resources[I]).CreateItem(20));
+  TUIState.Pop(StateDebugMenu);
+end;
 
-  procedure GiveItems;
-  var
-    I: Integer;
-  begin
-    for I := 0 to Resources.Count - 1 do
-      if Resources[I] is TItemResource then
-        Player.PickItem(TItemResource(Resources[I]).CreateItem(20));
-    TUIState.Pop(StateDebugMenu);
-  end;
+procedure TDebugItemsMenu.ClickBack(Sender: TObject);
+begin
+  SetCurrentMenu(CurrentMenu, DebugMenu);
+end;
 
+{ TDebugLevelMenu -------------------------------------------------------- }
+
+constructor TDebugLevelMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  case CurrentItem of
-    0: GiveItems;
-    1: SetCurrentMenu(CurrentMenu, DebugMenu);
-  end;
+  Add('Change to level', @ClickChangeLevel);
+  Add('Restart current level (preserving camera)', @ClickRestart);
+  Add('Back', @ClickBack);
+end;
+
+procedure TDebugLevelMenu.ClickChangeLevel(Sender: TObject);
+var
+  S: TStringList;
+  I, Index: Integer;
+begin
+  S := TStringList.Create;
+  try
+    for I := 0 to Levels.Count - 1 do
+    begin
+      S.Append(Format('Level %d "%s"',
+        [ Levels[I].Number, Levels[I].Title ]));
+    end;
+    S.Append('Cancel');
+
+    Index := ChooseByMenu(S);
+
+    if Index <> Levels.Count then
+    begin
+      LevelFinished(Levels[Index].Name);
+      { Flush LevelFinished now, to give new items when new level is loaded.
+        Otherwise, some sounds (like equipping the sword, if player gets
+        his first weapon) could be done before loading level progress,
+        which sounds awkward for player. }
+      LevelFinishedFlush;
+      SceneManager.Logic.PrepareNewPlayer(Player);
+      TUIState.Pop(StateDebugMenu);
+    end;
+  finally S.Free end;
+end;
+
+procedure TDebugLevelMenu.ClickRestart(Sender: TObject);
+var
+  Pos, Dir, Up: TVector3Single;
+begin
+  Pos := Player.Camera.Position;
+  Dir := Player.Camera.Direction;
+  Up := Player.Camera.Up;
+
+  LevelFinished(SceneManager.Info.Name);
+  LevelFinishedFlush;
+
+  { Change Player.Camera, they will be automatically set also for Player
+    properties by TCastleSceneManager.CameraVisibleChange.
+    TODO: maybe different one day? }
+
+  Player.Camera.Position := Pos;
+  Player.Camera.Direction := Dir;
+  Player.Camera.Up := Up;
+
+  TUIState.Pop(StateDebugMenu);
+end;
+
+procedure TDebugLevelMenu.ClickBack(Sender: TObject);
+begin
+  SetCurrentMenu(CurrentMenu, DebugMenu);
 end;
 
 { TStateDebugMenu ------------------------------------------------------------ }
