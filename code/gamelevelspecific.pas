@@ -27,9 +27,12 @@ unit GameLevelSpecific;
 
 interface
 
-uses CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer, CastleLevels,
-  GameSound, X3DNodes, DOM, Castle3D, CastlePrecalculatedAnimation, CastleSoundEngine,
-  GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors, CastleFrustum;
+uses DOM,
+  CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer,
+  CastleLevels, X3DNodes, X3DFields, X3DTIme, Castle3D, CastleSoundEngine,
+  GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors,
+  CastleFrustum,
+  GameSound;
 
 type
   { Level that may have a boss life indicator. }
@@ -42,21 +45,21 @@ type
   TCastleHallLevel = class(TBossLevel)
   private
     const
-      CastleHallWerewolvesCount = 4;
+      WerewolvesCount = 4;
+      WerewolfFirstLight = 1;
     var
-      Symbol: TCastlePrecalculatedAnimation;
-      Button: TCastlePrecalculatedAnimation;
-
+      Symbol: TCastleScene;
+      Button: TCastleScene;
       StairsBlocker: TCastleScene;
       StairsBlockerMiddle: TVector3Single;
-
       FLevelExitBox: TBox3D;
-
-      WerewolfAppearPosition: array [0..CastleHallWerewolvesCount - 1] of TVector3Single;
+      WerewolfAppearPosition: array [0..WerewolvesCount - 1] of TVector3Single;
       WerewolfAppeared: boolean;
-      WerewolfCreature: array [0..CastleHallWerewolvesCount - 1] of TWerewolfCreature;
+      WerewolfCreature: array [0..WerewolvesCount - 1] of TWerewolfCreature;
   protected
     function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
+    procedure ButtonAnimationIsActiveChanged(
+      Event: TX3DEvent; Value: TX3DField; const ATime: TX3DTime);
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -97,7 +100,7 @@ type
   private
     MovingElevator: T3DLinearMoving;
     Elevator: TCastleScene;
-    ElevatorButton: TCastlePrecalculatedAnimation;
+    ElevatorButton: TCastleScene;
   public
     constructor Create(AOwner: TComponent; AWorld: T3DWorld;
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
@@ -204,7 +207,7 @@ uses CastleFilesUtils, SysUtils, CastleUtils,
   GamePlay, CastleGameNotifications, CastleInputs,
   GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, CastleProgress,
-  CastleXMLUtils, GameItems, X3DFields;
+  CastleXMLUtils, GameItems;
 
 function LevelsPath: string;
 begin
@@ -244,7 +247,7 @@ end;
 { TCastleHallButton ---------------------------------------------------------- }
 
 type
-  TCastleHallButton = class(TCastlePrecalculatedAnimation)
+  TCastleHallButton = class(TCastleScene)
     function PointingDeviceActivate(const Active: boolean;
       const Distance: Single): boolean; override;
   end;
@@ -257,10 +260,10 @@ begin
 
   if Distance < 10.0 then
   begin
-    if TimePlaying then
+    if CurrentAnimation <> nil then
       NotificationInteractFailed('Button is already pressed') else
     begin
-      TimePlaying := true;
+      PlayAnimation('animation', paForceNotLooping);
       Notifications.Show('You press the button');
     end;
   end else
@@ -278,13 +281,22 @@ begin
 
   CastleHallLevelPath := LevelsPath + 'castle_hall/';
 
-  Symbol := LoadLevelAnimation(CastleHallLevelPath + 'symbol.kanim', true, false);
+  { Do not build collisions structure, let it collide as a bounding box.
+    Doing it properly (with PrepareForCollisions = true) would require
+    reexporting as castle-anim-frames (with it's bbox recorded). }
+  Symbol := LoadLevelScene(CastleHallLevelPath + 'symbol.kanim', false);
   Symbol.CastShadowVolumes := false; { shadow would not be visible anyway }
   World.Add(Symbol);
 
-  Button := LoadLevelAnimation(CastleHallLevelPath + 'button.kanim', true, false,
+  { Do not build collisions structure, let it collide as a bounding box.
+    Doing it properly (with PrepareForCollisions = true) would require
+    reexporting as castle-anim-frames (with it's bbox recorded). }
+  Button := LoadLevelScene(CastleHallLevelPath + 'button.kanim', false,
     TCastleHallButton);
   Button.CastShadowVolumes := false; { strange ghost shadow on symbol would be visible }
+  Button.AnimationTimeSensor('animation').EventIsActive.OnReceive.Add(
+    @ButtonAnimationIsActiveChanged);
+
   World.Add(Button);
 
   StairsBlocker := LoadLevelScene(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl',
@@ -319,7 +331,7 @@ begin
     Exit(true);
   end;
 
-  for I := 0 to CastleHallWerewolvesCount - 1 do
+  for I := 0 to WerewolvesCount - 1 do
     if PlaceholderName = 'WerewolfAppear_' + IntToStr(I) then
     begin
       WerewolfAppearPosition[I] := BoxDownPosition(Shape.BoundingBox);
@@ -328,51 +340,6 @@ begin
 end;
 
 procedure TCastleHallLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
-const
-  WerewolfFirstLight = 1;
-
-  procedure WerewolfAppear;
-  var
-    I: Integer;
-    LightNode: TAbstractPositionalLightNode;
-    Headlight: TLightInstance;
-    ShadowLight: PLightInstance;
-  begin
-    Assert(not WerewolfAppeared);
-
-    for I := 0 to CastleHallWerewolvesCount - 1 do
-      WerewolfCreature[I] := Werewolf.CreateCreature(World,
-        WerewolfAppearPosition[I],
-        VectorSubtract(Player.Position, WerewolfAppearPosition[I]))
-        as TWerewolfCreature;
-
-    WerewolfAppeared := true;
-
-    WerewolfCreature[0].Howl(true);
-
-    { change the lights }
-    if SceneManager.HeadlightInstance(Headlight) then
-    begin
-      Headlight.Node.FdAmbientIntensity.Send(0.8);
-      Headlight.Node.FdColor.Send(Vector3Single(1, 0, 0));
-      Headlight.Node.FdIntensity.Send(0.2);
-    end;
-
-    for I := 0 to CastleHallWerewolvesCount - 1 do
-    begin
-      LightNode := SceneManager.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
-        TAbstractPositionalLightNode;
-      LightNode.FdColor.Send(Vector3Single(1, 0, 0));
-      LightNode.FdAttenuation.Send(Vector3Single(1, 0.1, 0));
-      LightNode.FdShadowVolumes.Send(true);
-    end;
-
-    ShadowLight := SceneManager.MainScene.GlobalLights.FindName('FakeShadowPosition');
-    Check(ShadowLight <> nil, 'FakeShadowPosition light not found on castle_hall level');
-    ShadowLight^.Node.FdShadowVolumes.Send(true);
-    ShadowLight^.Node.FdShadowVolumesMain.Send(true);
-  end;
-
 var
   WerewolfAliveCount: Cardinal;
 
@@ -395,24 +362,24 @@ var
       { turn light over stairs to next level }
       LightNode := SceneManager.MainScene.GlobalLights.Items[WerewolfFirstLight].Node as
         TAbstractPositionalLightNode;
-      LightNode.FdLocation.Value := StairsBlockerMiddle;
-      LightNode.FdOn.Value := true;
+      LightNode.Location := StairsBlockerMiddle;
+      LightNode.IsOn := true;
 
-      for I := 1 to CastleHallWerewolvesCount - 1 do
+      for I := 1 to WerewolvesCount - 1 do
       begin
         LightNode := SceneManager.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
           TAbstractPositionalLightNode;
-        LightNode.FdOn.Value := false;
+        LightNode.IsOn := false;
       end;
     end else
     begin
       { turn light for each alive werewolf }
-      for I := 0 to CastleHallWerewolvesCount - 1 do
+      for I := 0 to WerewolvesCount - 1 do
       begin
         LightNode := SceneManager.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
           TAbstractPositionalLightNode;
-        LightNode.FdOn.Send(not WerewolfCreature[I].Dead);
-        LightNode.FdLocation.Send(WerewolfCreature[I].Middle);
+        LightNode.IsOn := not WerewolfCreature[I].Dead;
+        LightNode.Location := WerewolfCreature[I].Middle;
       end;
     end;
   end;
@@ -422,7 +389,7 @@ var
     I: Integer;
   begin
     Result := 0;
-    for I := 0 to CastleHallWerewolvesCount - 1 do
+    for I := 0 to WerewolvesCount - 1 do
       if not WerewolfCreature[I].Dead then
         Inc(Result);
   end;
@@ -437,19 +404,6 @@ begin
     LevelFinished('cages');
   end;
 
-  if Button.TimePlaying and
-    (Button.Time > Button.TimeDuration) then
-  begin
-    if not Symbol.TimePlaying then
-    begin
-      Symbol.TimePlaying := true;
-      Symbol.Collides := false;
-      SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
-
-      WerewolfAppear;
-    end;
-  end;
-
   if WerewolfAppeared then
   begin
     WerewolfAliveCount := GetWerewolfAliveCount;
@@ -457,6 +411,63 @@ begin
     if WerewolfAliveCount = 0 then
       DestroyStairsBlocker;
   end;
+end;
+
+procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
+  Event: TX3DEvent; Value: TX3DField; const ATime: TX3DTime);
+
+  procedure WerewolfAppear;
+  var
+    I: Integer;
+    LightNode: TAbstractPositionalLightNode;
+    Headlight: TLightInstance;
+    ShadowLight: PLightInstance;
+  begin
+    Assert(not WerewolfAppeared);
+
+    for I := 0 to WerewolvesCount - 1 do
+      WerewolfCreature[I] := Werewolf.CreateCreature(World,
+        WerewolfAppearPosition[I],
+        VectorSubtract(Player.Position, WerewolfAppearPosition[I]))
+        as TWerewolfCreature;
+
+    WerewolfAppeared := true;
+
+    WerewolfCreature[0].Howl(true);
+
+    { change the lights }
+    if SceneManager.HeadlightInstance(Headlight) then
+    begin
+      Headlight.Node.AmbientIntensity := 0.8;
+      Headlight.Node.Color := Vector3Single(1, 0, 0);
+      Headlight.Node.Intensity := 0.2;
+    end;
+
+    for I := 0 to WerewolvesCount - 1 do
+    begin
+      LightNode := SceneManager.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
+        TAbstractPositionalLightNode;
+      LightNode.Color := Vector3Single(1, 0, 0);
+      LightNode.Attenuation := Vector3Single(1, 0.1, 0);
+      LightNode.ShadowVolumes := true;
+    end;
+
+    ShadowLight := SceneManager.MainScene.GlobalLights.FindName('FakeShadowPosition');
+    Check(ShadowLight <> nil, 'FakeShadowPosition light not found on castle_hall level');
+    ShadowLight^.Node.ShadowVolumes := true;
+    ShadowLight^.Node.ShadowVolumesMain := true;
+  end;
+
+begin
+  if not (Value as TSFBool).Value then // if isActive changed to false...
+    if Symbol.CurrentAnimation = nil then
+    begin
+      Symbol.PlayAnimation('animation', paForceNotLooping);
+      Symbol.Collides := false;
+      SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
+
+      WerewolfAppear;
+    end;
 end;
 
 procedure TCastleHallLevel.PrepareNewPlayer(NewPlayer: TPlayer);
@@ -481,7 +492,7 @@ begin
     Life := 0;
     MaxLife := 0;
     AliveCount := 0;
-    for I := 0 to CastleHallWerewolvesCount - 1 do
+    for I := 0 to WerewolvesCount - 1 do
     begin
       MaxLife += WerewolfCreature[I].MaxLife;
       if not WerewolfCreature[I].Dead then
@@ -499,7 +510,7 @@ end;
 constructor TGateLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
   MainScene: TCastleScene; DOMElement: TDOMElement);
 var
-  Cart: TCastlePrecalculatedAnimation;
+  Cart: TCastleScene;
   GateLevelPath: string;
 begin
   inherited;
@@ -520,12 +531,14 @@ begin
   Teleport2.Add(Teleport);
   World.Add(Teleport2);
 
-  Cart := LoadLevelAnimation(GateLevelPath + 'cart.kanim', true, true);
-  Cart.CollisionUseLastScene := true;
+  { Do not build collisions structure, let it collide as a bounding box.
+    Doing it properly (with PrepareForCollisions = true) would require
+    reexporting as castle-anim-frames (with it's bbox recorded). }
+  Cart := LoadLevelScene(GateLevelPath + 'cart.kanim', false);
+  Cart.PlayAnimation('animation', paForceLooping);
   World.Add(Cart);
-  Cart.TimePlaying := true;
 
-  CartSoundPosition := Cart.FirstScene.BoundingBox.Middle;
+  CartSoundPosition := Cart.BoundingBox.Middle;
 
   SacrilegeAmbushDone := false;
   SwordAmbushDone := false;
@@ -701,7 +714,7 @@ end;
 { TTowerElevatorButton ------------------------------------------------------- }
 
 type
-  TTowerElevatorButton = class(TCastlePrecalculatedAnimation)
+  TTowerElevatorButton = class(TCastleScene)
     MovingElevator: T3DLinearMoving;
     function PointingDeviceActivate(const Active: boolean;
       const Distance: Single): boolean; override;
@@ -718,8 +731,7 @@ begin
       'You see a button. You''re too far to reach it from here') else
   begin
     { play from the beginning }
-    ResetTimeAtLoad;
-    TimePlaying := true;
+    PlayAnimation('animation', paForceNotLooping);
     MovingElevator.GoOtherPosition;
   end;
 end;
@@ -737,7 +749,10 @@ begin
 
   Elevator := LoadLevelScene(TowerLevelPath + 'elevator.wrl', true);
 
-  ElevatorButton := LoadLevelAnimation(TowerLevelPath + 'elevator_button.kanim', true, false,
+  { Do not build collisions structure, let it collide as a bounding box.
+    Doing it properly (with PrepareForCollisions = true) would require
+    reexporting as castle-anim-frames (with it's bbox recorded). }
+  ElevatorButton := LoadLevelScene(TowerLevelPath + 'elevator_button.kanim', false,
     TTowerElevatorButton);
 
   MovingElevator := T3DLinearMoving.Create(Self);
@@ -972,10 +987,10 @@ begin
     { Torch light modify, to make an illusion of unstable light }
     TorchLight := SceneManager.MainScene.GlobalLights.FindName('MainHallTorchLight');
     Check(TorchLight <> nil, 'Torch light not found on cages level');
-    TorchLight^.Node.FdIntensity.Send(Clamped(
-        TorchLight^.Node.FdIntensity.Value +
+    TorchLight^.Node.Intensity := Clamped(
+        TorchLight^.Node.Intensity +
           MapRange(Random, 0, 1, -5.0, 5.0) * SecondsPassed,
-        0.5, 1));
+        0.5, 1);
 
     { Maybe appear new spiders }
     if { Spider.Prepared may be false here only if
@@ -1320,19 +1335,18 @@ end;
 constructor TGateBackgroundLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
   MainScene: TCastleScene; DOMElement: TDOMElement);
 var
-  Water: TCastlePrecalculatedAnimation;
+  Water: TCastleScene;
 begin
   inherited;
 
-  Water := LoadLevelAnimation(LevelsPath + 'gate_background/water.kanim', false, false);
+  Water := LoadLevelScene(LevelsPath + 'gate_background/water.kanim', false);
   Water.CastShadowVolumes := false; { water shadow would look awkward }
   { No octrees created for water (because in normal usage, player will not
     walk on this level). For safety, Collides set to @false, in case
     user enters this level by debug menu. }
   Water.Collides := false;
+  Water.PlayAnimation('animation', paForceLooping);
   World.Add(Water);
-
-  Water.TimePlaying := true;
 end;
 
 { TFountainLevel ------------------------------------------------------------- }
