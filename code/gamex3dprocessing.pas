@@ -58,8 +58,8 @@ begin
   if Node is TAppearanceNode then
   begin
     A := TAppearanceNode(Node);
-    if (A.FdTexture.Value <> nil) and
-       (A.FdTexture.Value.NodeName = TextureName) then
+    if (A.Texture <> nil) and
+       (A.Texture.Name = TextureName) then
     begin
       { add NormalMap }
       A.FdNormalMap.Value := NormalMap;
@@ -108,7 +108,7 @@ begin
   M := (Node as TAppearanceNode).FdMaterial.Value;
   if (M <> nil) and
      (M is TMaterialNode) and
-     (TMaterialNode(M).NodeName = MatName) then
+     (TMaterialNode(M).Name = MatName) then
   begin
     { we could set mat diffuse in Blender and export to VRML,
       but it's easier for now to hardcode it here. }
@@ -116,7 +116,7 @@ begin
     Mat.FdDiffuseColor.Value := Vector3Single(0.5, 0.5, 1.0);
 
     CS := TComposedShaderNode.Create;
-    CS.NodeName := 'WaterShader';
+    CS.Name := 'WaterShader';
     (Node as TAppearanceNode).FdShaders.Add(CS);
     CS.FdLanguage.Value := 'GLSL';
 
@@ -150,9 +150,9 @@ begin
     V := RootNode.TryFindNode(TViewpointNode, true) as TViewpointNode;
     if V <> nil then
     begin
-      { Add V.NodeName, to allow saving the route to file.
+      { Add V.Name, to allow saving the route to file.
         Not really useful for now, as we don't save the processed level. }
-      if V.NodeName = '' then V.NodeName := 'DefaultViewport';
+      if V.Name = '' then V.Name := 'DefaultViewport';
 
       Route := TX3DRoute.Create;
       Route.SetSourceDirectly(V.EventCameraRotationInverseMatrix);
