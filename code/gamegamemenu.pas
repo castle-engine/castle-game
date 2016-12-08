@@ -57,18 +57,23 @@ uses SysUtils,
 
 type
   TGameMenu = class(TCastleGameMenu)
+  strict private
+    procedure ClickBack(Sender: TObject);
+    procedure ClickViewMessages(Sender: TObject);
+    procedure ClickControls(Sender: TObject);
+    procedure ClickSoundOptions(Sender: TObject);
+    procedure ClickEndGame(Sender: TObject);
+  public
     constructor Create(AOwner: TComponent); override;
-    procedure Click; override;
   end;
 
   TGameSoundMenu = class(TCastleGameMenu)
+  strict private
+    procedure ClickBack(Sender: TObject);
   public
-    SoundInfo: TSoundInfoMenuItem;
     SoundVolume: TSoundVolumeMenuItem;
     MusicVolume: TMusicVolumeMenuItem;
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure Click; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -85,36 +90,40 @@ constructor TGameMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  Add('Back to game');
-  Add('View last game messages');
-  Add('Configure controls');
-  Add('Sound options');
-  Add('End game');
+  Add('Back to game', @ClickBack);
+  Add('View last game messages', @ClickViewMessages);
+  Add('Configure controls', @ClickControls);
+  Add('Sound options', @ClickSoundOptions);
+  Add('End game', @ClickEndGame);
 end;
 
-procedure TGameMenu.Click;
+procedure TGameMenu.ClickBack(Sender: TObject);
 begin
-  inherited;
+  TUIState.Pop(StateGameMenu);
+end;
 
-  case CurrentItem of
-    0: TUIState.Pop(StateGameMenu);
-    1: ViewGameMessages;
-    2: begin
-         StateControlsMenu.DrawFadeRect := true;
-         StateControlsMenu.DrawCentered := true;
-         StateControlsMenu.ExitWithEscapeAllowed := true;
-         TUIState.Push(StateControlsMenu);
-       end;
-    3: SetCurrentMenu(CurrentMenu, GameSoundMenu);
-    4: begin
-         { At first I did here GameCancel(false), but tests (with Mama)
-           show that it's too easy to select this and accidentaly
-           end the game. }
-         GameCancel(true);
-         TUIState.Pop(StateGameMenu);
-       end;
-    else raise EInternalError.Create('Menu item unknown');
-  end;
+procedure TGameMenu.ClickViewMessages(Sender: TObject);
+begin
+  ViewGameMessages;
+end;
+
+procedure TGameMenu.ClickControls(Sender: TObject);
+begin
+  StateControlsMenu.DrawFadeRect := true;
+  StateControlsMenu.DrawCentered := true;
+  StateControlsMenu.ExitWithEscapeAllowed := true;
+  TUIState.Push(StateControlsMenu);
+end;
+
+procedure TGameMenu.ClickSoundOptions(Sender: TObject);
+begin
+  SetCurrentMenu(CurrentMenu, GameSoundMenu);
+end;
+
+procedure TGameMenu.ClickEndGame(Sender: TObject);
+begin
+  GameCancel(true);
+  TUIState.Pop(StateGameMenu);
 end;
 
 { TGameSoundMenu ------------------------------------------------------------- }
@@ -122,35 +131,17 @@ end;
 constructor TGameSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
-
-  SoundInfo := TSoundInfoMenuItem.Create(Self);
-  Add(SoundInfo);
-
+  Add(TSoundInfoMenuItem.Create(Self));
   SoundVolume := TSoundVolumeMenuItem.Create(Self);
   Add(SoundVolume);
-
   MusicVolume := TMusicVolumeMenuItem.Create(Self);
   Add(MusicVolume);
-
-  Add('Back to game menu');
+  Add('Back to game menu', @ClickBack);
 end;
 
-destructor TGameSoundMenu.Destroy;
+procedure TGameSoundMenu.ClickBack(Sender: TObject);
 begin
-  inherited;
-end;
-
-procedure TGameSoundMenu.Click;
-begin
-  inherited;
-
-  case CurrentItem of
-    0: ;
-    1: ;
-    2: ;
-    3: SetCurrentMenu(CurrentMenu, GameMenu);
-    else raise EInternalError.Create('Menu item unknown');
-  end;
+  SetCurrentMenu(CurrentMenu, GameMenu);
 end;
 
 { TStateGameMenu -------------------------------------------------------------- }

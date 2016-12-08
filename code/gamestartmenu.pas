@@ -78,7 +78,14 @@ type
   end;
 
   TVideoMenu = class(TSubMenu)
-  private
+  strict private
+    procedure ClickViewVideoInfo(Sender: TObject);
+    procedure ClickAllowScreenChange(Sender: TObject);
+    procedure ClickShadowVolumes(Sender: TObject);
+    procedure ClickColorBits(Sender: TObject);
+    procedure ClickVideoFrequency(Sender: TObject);
+    procedure ClickRestoreDefaults(Sender: TObject);
+    procedure ClickBack(Sender: TObject);
     procedure BakedAnimationSmoothnessChanged(Sender: TObject);
     procedure AntiAliasingChanged(Sender: TObject);
   public
@@ -90,22 +97,18 @@ type
     ConserveResourcesToggle: TCastleMenuToggle;
     AntiAliasingSlider: TAntiAliasingSlider;
     constructor Create(AOwner: TComponent); override;
-    procedure SetAntiAliasing(
-      Value: TAntiAliasing;
-      UpdateSlider: boolean);
-    procedure Click; override;
+    procedure SetAntiAliasing(Value: TAntiAliasing; UpdateSlider: boolean);
   end;
 
   TSoundMenu = class(TSubMenu)
+  strict private
+    procedure ClickOpenALDeviceToggle(Sender: TObject);
+    procedure ClickBack(Sender: TObject);
   public
-    SoundInfo: TSoundInfoMenuItem;
     SoundVolume: TSoundVolumeMenuItem;
     MusicVolume: TMusicVolumeMenuItem;
-
     OpenALDeviceToggle: TCastleMenuButton;
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure Click; override;
   end;
 
   TChangeOpenALDeviceMenu = class(TSubMenu)
@@ -334,9 +337,11 @@ begin
 
   AllowScreenChangeToggle := TCastleMenuToggle.Create(Self);
   AllowScreenChangeToggle.Pressed := AllowScreenChange;
+  AllowScreenChangeToggle.OnClick := @ClickAllowScreenChange;
 
   ShadowVolumesToggle := TCastleMenuToggle.Create(Self);
   ShadowVolumesToggle.Pressed := ShadowVolumes;
+  ShadowVolumesToggle.OnClick := @ClickShadowVolumes;
 
   BakedAnimationSmoothnessSlider := TCastleFloatSlider.Create(Self);
   BakedAnimationSmoothnessSlider.Min := MinBakedAnimationSmoothness;
@@ -346,21 +351,23 @@ begin
 
   ColorBitsToggle := TCastleMenuButton.Create(Self);
   ColorBitsToggle.Caption := ColorBitsToStr(ColorBits);
+  ColorBitsToggle.OnClick := @ClickColorBits;
 
   VideoFrequencyToggle := TCastleMenuButton.Create(Self);
   VideoFrequencyToggle.Caption := VideoFrequencyToStr(VideoFrequency);
+  VideoFrequencyToggle.OnClick := @ClickVideoFrequency;
 
   AntiAliasingSlider := TAntiAliasingSlider.Create(Self);
 
-  Add('View video information');
+  Add('View video information', @ClickViewVideoInfo);
   Add('Allow screen settings change on startup', AllowScreenChangeToggle);
   Add('Shadow volumes', ShadowVolumesToggle);
   Add('Animation smoothness', BakedAnimationSmoothnessSlider);
   Add('Color bits', ColorBitsToggle);
   Add('Display frequency', VideoFrequencyToggle);
   Add('Anti-aliasing', AntiAliasingSlider);
-  Add('Restore to defaults');
-  Add('Back to main menu');
+  Add('Restore to defaults', @ClickRestoreDefaults);
+  Add('Back to main menu', @ClickBack);
 
   { Resigned ideas for menu options:
 
@@ -384,8 +391,7 @@ begin
   RegularSpaceBetweenItems := 5;
 end;
 
-procedure TVideoMenu.SetAntiAliasing(
-  Value: TAntiAliasing;
+procedure TVideoMenu.SetAntiAliasing(Value: TAntiAliasing;
   UpdateSlider: boolean);
 begin
   if Window.AntiAliasing <> Value then
@@ -397,98 +403,93 @@ begin
   end;
 end;
 
-procedure TVideoMenu.Click;
+procedure TVideoMenu.ClickViewVideoInfo(Sender: TObject);
+begin
+  MessageOK(Window, GLInformationString);
+end;
 
-  procedure ViewVideoInfo;
+procedure TVideoMenu.ClickAllowScreenChange(Sender: TObject);
+begin
+  AllowScreenChange := not AllowScreenChange;
+  AllowScreenChangeToggle.Pressed := AllowScreenChange;
+end;
+
+procedure TVideoMenu.ClickShadowVolumes(Sender: TObject);
+begin
+  ShadowVolumes := not ShadowVolumes;
+  ShadowVolumesToggle.Pressed := ShadowVolumes;
+  if (not GLFeatures.ShadowVolumesPossible) and ShadowVolumes then
+    MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.');
+end;
+
+procedure TVideoMenu.ClickColorBits(Sender: TObject);
+begin
+  if ColorBits = 0 then
+    ColorBits := 16 else
+  if ColorBits = 16 then
+    ColorBits := 24 else
+    ColorBits := 0;
+  ColorBitsToggle.Caption := ColorBitsToStr(ColorBits);
+  SubMenuAdditionalInfo := SRestartTheGame;
+end;
+
+procedure TVideoMenu.ClickVideoFrequency(Sender: TObject);
+var
+  Value: Cardinal;
+begin
+  Value := VideoFrequency;
+  if MessageInputQueryCardinal(Window,
+    'What display frequency to use ?' +nl+ '("0" means "system default")',
+    Value) and
+    (Value <> VideoFrequency) then
   begin
-    MessageOK(Window, GLInformationString);
+    VideoFrequency := Value;
+    VideoFrequencyToggle.Caption := VideoFrequencyToStr(VideoFrequency);
+    SubMenuAdditionalInfo := SRestartTheGame;
+  end;
+end;
+
+procedure TVideoMenu.ClickRestoreDefaults(Sender: TObject);
+begin
+  AllowScreenChange := DefaultAllowScreenChange;
+  AllowScreenChangeToggle.Pressed := AllowScreenChange;
+
+  ShadowVolumes := DefaultShadowVolumes;
+  ShadowVolumesToggle.Pressed := ShadowVolumes;
+
+  if BakedAnimationSmoothness <> DefaultBakedAnimationSmoothness then
+  begin
+    BakedAnimationSmoothness := DefaultBakedAnimationSmoothness;
+    BakedAnimationSmoothnessSlider.Value := BakedAnimationSmoothness;
+    { You should SRestartTheGame to see the effect fully,
+      also on items. But for most typical result, to see it on creatures,
+      there's no need to restart the game. }
   end;
 
-  procedure ChangeColorBits;
+  if ColorBits <> DefaultColorBits then
   begin
-    if ColorBits = 0 then
-      ColorBits := 16 else
-    if ColorBits = 16 then
-      ColorBits := 24 else
-      ColorBits := 0;
-    ColorBitsToggle.Caption := ColorBitsToStr(ColorBits);
+    ColorBits := DefaultColorBits;
+    ColorBitsToggle.Caption := ColorBitsToStr(DefaultColorBits);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
 
-  procedure ChangeVideoFrequency;
-  var
-    Value: Cardinal;
+  if VideoFrequency <> DefaultVideoFrequency then
   begin
-    Value := VideoFrequency;
-    if MessageInputQueryCardinal(Window,
-      'What display frequency to use ?' +nl+ '("0" means "system default")',
-      Value) and
-      (Value <> VideoFrequency) then
-    begin
-      VideoFrequency := Value;
-      VideoFrequencyToggle.Caption := VideoFrequencyToStr(VideoFrequency);
-      SubMenuAdditionalInfo := SRestartTheGame;
-    end;
+    VideoFrequency := DefaultVideoFrequency;
+    VideoFrequencyToggle.Caption := VideoFrequencyToStr(DefaultVideoFrequency);
+    SubMenuAdditionalInfo := SRestartTheGame;
   end;
 
+  SetAntiAliasing(DefaultAntiAliasing, true);
+
+  VisibleChange;
+
+  MessageOK(Window, 'All video settings restored to defaults.');
+end;
+
+procedure TVideoMenu.ClickBack(Sender: TObject);
 begin
-  inherited;
-
-  case CurrentItem of
-    0: ViewVideoInfo;
-    1: begin
-         AllowScreenChange := not AllowScreenChange;
-         AllowScreenChangeToggle.Pressed := AllowScreenChange;
-       end;
-    2: begin
-         ShadowVolumes := not ShadowVolumes;
-         ShadowVolumesToggle.Pressed := ShadowVolumes;
-         if (not GLFeatures.ShadowVolumesPossible) and ShadowVolumes then
-           MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.');
-       end;
-    3: ;
-    4: ChangeColorBits;
-    5: ChangeVideoFrequency;
-    6: ;
-    7: begin
-         AllowScreenChange := DefaultAllowScreenChange;
-         AllowScreenChangeToggle.Pressed := AllowScreenChange;
-
-         ShadowVolumes := DefaultShadowVolumes;
-         ShadowVolumesToggle.Pressed := ShadowVolumes;
-
-         if BakedAnimationSmoothness <> DefaultBakedAnimationSmoothness then
-         begin
-           BakedAnimationSmoothness := DefaultBakedAnimationSmoothness;
-           BakedAnimationSmoothnessSlider.Value := BakedAnimationSmoothness;
-           { You should SRestartTheGame to see the effect fully,
-             also on items. But for most typical result, to see it on creatures,
-             there's no need to restart the game. }
-         end;
-
-         if ColorBits <> DefaultColorBits then
-         begin
-           ColorBits := DefaultColorBits;
-           ColorBitsToggle.Caption := ColorBitsToStr(DefaultColorBits);
-           SubMenuAdditionalInfo := SRestartTheGame;
-         end;
-
-         if VideoFrequency <> DefaultVideoFrequency then
-         begin
-           VideoFrequency := DefaultVideoFrequency;
-           VideoFrequencyToggle.Caption := VideoFrequencyToStr(DefaultVideoFrequency);
-           SubMenuAdditionalInfo := SRestartTheGame;
-         end;
-
-         SetAntiAliasing(DefaultAntiAliasing, true);
-
-         VisibleChange;
-
-         MessageOK(Window, 'All video settings restored to defaults.');
-       end;
-    8 : SetCurrentMenu(CurrentMenu, MainMenu);
-    else raise EInternalError.Create('Menu item unknown');
-  end;
+  SetCurrentMenu(CurrentMenu, MainMenu);
 end;
 
 procedure TVideoMenu.BakedAnimationSmoothnessChanged(Sender: TObject);
@@ -509,39 +510,27 @@ begin
 
   OpenALDeviceToggle := TCastleMenuButton.Create(Self);
   OpenALDeviceToggle.Caption := SoundEngine.DeviceNiceName;
+  OpenALDeviceToggle.OnClick := @ClickOpenALDeviceToggle;
 
-  SoundInfo := TSoundInfoMenuItem.Create(Self);
-  Add(SoundInfo);
-
+  Add(TSoundInfoMenuItem.Create(Self));
   SoundVolume := TSoundVolumeMenuItem.Create(Self);
   Add(SoundVolume);
-
   MusicVolume := TMusicVolumeMenuItem.Create(Self);
   Add(MusicVolume);
-
   Add('Sound output device', OpenALDeviceToggle);
-  Add('Back to main menu');
+  Add('Back to main menu', @ClickBack);
 
   SubMenuTitle := 'Sound options';
 end;
 
-destructor TSoundMenu.Destroy;
+procedure TSoundMenu.ClickOpenALDeviceToggle(Sender: TObject);
 begin
-  inherited;
+  SetCurrentMenu(CurrentMenu, ChangeOpenALDeviceMenu);
 end;
 
-procedure TSoundMenu.Click;
+procedure TSoundMenu.ClickBack(Sender: TObject);
 begin
-  inherited;
-
-  case CurrentItem of
-    0: ;
-    1: ;
-    2: ;
-    3: SetCurrentMenu(CurrentMenu, ChangeOpenALDeviceMenu);
-    4: SetCurrentMenu(CurrentMenu, MainMenu);
-    else raise EInternalError.Create('Menu item unknown');
-  end;
+  SetCurrentMenu(CurrentMenu, MainMenu);
 end;
 
 { TChangeOpenALDeviceMenu ---------------------------------------------------- }
