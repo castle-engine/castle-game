@@ -247,6 +247,9 @@ procedure TDebugMenu.ClickShadowVolumesRender(Sender: TObject);
 begin
   ShadowVolumesRender := not ShadowVolumesRender;
   ShadowVolumesRenderToggle.Pressed := ShadowVolumesRender;
+  { apply to SceneManager.ShadowVolumesRender }
+  if SceneManager <> nil then
+    SceneManager.ShadowVolumesRender := ShadowVolumesRender;
 end;
 
 procedure TDebugMenu.ClickDebugRenderForLevelScreenshot(Sender: TObject);
