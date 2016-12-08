@@ -88,9 +88,7 @@ controls:
 
 - remove delays when moving by menus and something gets initialized.
 
-- remove CGE deprecation warnings
-
-- Remove jumping on 1st level?
+- Remove jumping puzzle on 1st level, too difficult on Android?
 
 - ifdef out shadow option for now
 
@@ -99,9 +97,6 @@ controls:
 - werewolves on doom level too fast anims? (bug KAnim->castle scene? or not?)
 ------------------------------------------------------------------------------
 - CGE: API improvements ideas:
-  - Add to CGE nice warning when reading from assets before activ:
-    It seems you're trying to read game data (stuff in ApplicationData() on Android) before the activity has started, that is: before we called Application.OnInitialize. Usually this happens if you try to read some file from Pascal unit's "initialization" section (like SoundEngine.RepositoryURL or MaterialProperties.URL). You have to change your code to do this later, in Application.OnInitialize or later, it is impossible to read files earlier.
-
   - mark
     Resources.LoadFromFiles
     Levels.LoadFromFiles
