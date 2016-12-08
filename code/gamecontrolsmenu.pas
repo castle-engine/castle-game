@@ -123,7 +123,15 @@ end;
 
 type
   TControlsMenu = class(TSubMenu)
-  private
+  strict private
+    procedure ClickBasicControls(Sender: TObject);
+    procedure ClickItemsControls(Sender: TObject);
+    procedure ClickOtherControls(Sender: TObject);
+    procedure ClickMouseLook(Sender: TObject);
+    procedure ClickInvertVerticalMouseLook(Sender: TObject);
+    procedure ClickAutoOpenInventory(Sender: TObject);
+    procedure ClickRestoreDefaults(Sender: TObject);
+    procedure ClickBack(Sender: TObject);
     procedure MouseLookHorizontalSensitivityChanged(Sender: TObject);
     procedure MouseLookVerticalSensitivityChanged(Sender: TObject);
   public
@@ -133,20 +141,19 @@ type
     MouseLookToggle: TCastleMenuToggle;
     InvertVerticalMouseLookToggle: TCastleMenuToggle;
     constructor Create(AOwner: TComponent); override;
-    procedure Click; override;
   end;
 
   TControlsSubMenu = class(TSubMenu)
-  private
+  strict private
     FGroup: TInputGroup;
+    procedure ClickBack(Sender: TObject);
+  private
     { Refresh shortcuts descriptions displayed in the menu
       from current values of CastleInput_Xxx variables. }
     procedure RefreshShortcuts;
   public
     constructor CreateControlsSubMenu(AOwner: TComponent; AGroup: TInputGroup);
-
     property Group: TInputGroup read FGroup;
-    procedure Click; override;
   end;
 
   TBasicControlsMenu = class(TControlsSubMenu)
@@ -218,73 +225,92 @@ begin
   MouseLookVerticalSensitivitySlider.Value := MouseLookVerticalSensitivity;
   MouseLookVerticalSensitivitySlider.OnChange := @MouseLookVerticalSensitivityChanged;
 
-  AutoOpenInventoryToggle := TCastleMenuToggle.Create(Self);
-  AutoOpenInventoryToggle.Pressed := AutoOpenInventory;
-
   MouseLookToggle := TCastleMenuToggle.Create(Self);
   MouseLookToggle.Pressed := MouseLook;
+  MouseLookToggle.OnClick := @ClickMouseLook;
 
   InvertVerticalMouseLookToggle := TCastleMenuToggle.Create(Self);
   InvertVerticalMouseLookToggle.Pressed := InvertVerticalMouseLook;
+  InvertVerticalMouseLookToggle.OnClick := @ClickInvertVerticalMouseLook;
 
-  Add('Configure basic controls');
-  Add('Configure items controls');
-  Add('Configure other controls');
+  AutoOpenInventoryToggle := TCastleMenuToggle.Create(Self);
+  AutoOpenInventoryToggle.Pressed := AutoOpenInventory;
+  AutoOpenInventoryToggle.OnClick := @ClickAutoOpenInventory;
+
+  Add('Customize basic controls', @ClickBasicControls);
+  Add('Customize items controls', @ClickItemsControls);
+  Add('Customize other controls', @ClickOtherControls);
   Add('Use mouse look', MouseLookToggle);
   Add('Mouse look horizontal sensitivity', MouseLookHorizontalSensitivitySlider);
   Add('Mouse look vertical sensitivity', MouseLookVerticalSensitivitySlider);
   Add('Invert vertical mouse look', InvertVerticalMouseLookToggle);
   Add('Auto show inventory on pickup', AutoOpenInventoryToggle);
-  Add('Restore to defaults');
-  Add('Back to main menu');
+  Add('Restore to defaults', @ClickRestoreDefaults);
+  Add('Back to main menu', @ClickBack);
 
   SubMenuTitle := 'Configure controls';
 end;
 
-procedure TControlsMenu.Click;
+procedure TControlsMenu.ClickBasicControls(Sender: TObject);
 begin
-  inherited;
+  BasicControlsMenu.RefreshShortcuts;
+  SetCurrentMenu(CurrentMenu, BasicControlsMenu);
+end;
 
-  case CurrentItem of
-    0: begin BasicControlsMenu.RefreshShortcuts; SetCurrentMenu(CurrentMenu, BasicControlsMenu); end;
-    1: begin ItemsControlsMenu.RefreshShortcuts; SetCurrentMenu(CurrentMenu, ItemsControlsMenu); end;
-    2: begin OtherControlsMenu.RefreshShortcuts; SetCurrentMenu(CurrentMenu, OtherControlsMenu); end;
-    3: begin
-         MouseLook := not MouseLook;
-         MouseLookToggle.Pressed := MouseLook;
-       end;
-    4: ;
-    5: ;
-    6: begin
-         InvertVerticalMouseLook := not InvertVerticalMouseLook;
-         InvertVerticalMouseLookToggle.Pressed := InvertVerticalMouseLook;
-       end;
-    7: begin
-         AutoOpenInventory := not AutoOpenInventory;
-         AutoOpenInventoryToggle.Pressed := AutoOpenInventory;
-       end;
-    8: begin
-         InputsAll.RestoreDefaults;
+procedure TControlsMenu.ClickItemsControls(Sender: TObject);
+begin
+  ItemsControlsMenu.RefreshShortcuts;
+  SetCurrentMenu(CurrentMenu, ItemsControlsMenu);
+end;
 
-         MouseLook := DefaultMouseLook;
-         MouseLookToggle.Pressed := MouseLook;
+procedure TControlsMenu.ClickOtherControls(Sender: TObject);
+begin
+  OtherControlsMenu.RefreshShortcuts;
+  SetCurrentMenu(CurrentMenu, OtherControlsMenu);
+end;
 
-         InvertVerticalMouseLook := DefaultInvertVerticalMouseLook;
-         InvertVerticalMouseLookToggle.Pressed := InvertVerticalMouseLook;
+procedure TControlsMenu.ClickMouseLook(Sender: TObject);
+begin
+  MouseLook := not MouseLook;
+  MouseLookToggle.Pressed := MouseLook;
+end;
 
-         MouseLookHorizontalSensitivity := TWalkCamera.DefaultMouseLookHorizontalSensitivity;
-         MouseLookVerticalSensitivity   := TWalkCamera.DefaultMouseLookVerticalSensitivity  ;
-         MouseLookHorizontalSensitivitySlider.Value := MouseLookHorizontalSensitivity;
-         MouseLookVerticalSensitivitySlider  .Value := MouseLookVerticalSensitivity  ;
+procedure TControlsMenu.ClickInvertVerticalMouseLook(Sender: TObject);
+begin
+  InvertVerticalMouseLook := not InvertVerticalMouseLook;
+  InvertVerticalMouseLookToggle.Pressed := InvertVerticalMouseLook;
+end;
 
-         AutoOpenInventory := DefaultAutoOpenInventory;
-         AutoOpenInventoryToggle.Pressed := AutoOpenInventory;
+procedure TControlsMenu.ClickAutoOpenInventory(Sender: TObject);
+begin
+  AutoOpenInventory := not AutoOpenInventory;
+  AutoOpenInventoryToggle.Pressed := AutoOpenInventory;
+end;
 
-         MessageOK(Window, 'All keys and settings restored to defaults.');
-       end;
-    9: TUIState.Pop(StateControlsMenu);
-    else raise EInternalError.Create('Menu item unknown');
-  end;
+procedure TControlsMenu.ClickRestoreDefaults(Sender: TObject);
+begin
+  InputsAll.RestoreDefaults;
+
+  MouseLook := DefaultMouseLook;
+  MouseLookToggle.Pressed := MouseLook;
+
+  InvertVerticalMouseLook := DefaultInvertVerticalMouseLook;
+  InvertVerticalMouseLookToggle.Pressed := InvertVerticalMouseLook;
+
+  MouseLookHorizontalSensitivity := TWalkCamera.DefaultMouseLookHorizontalSensitivity;
+  MouseLookVerticalSensitivity   := TWalkCamera.DefaultMouseLookVerticalSensitivity  ;
+  MouseLookHorizontalSensitivitySlider.Value := MouseLookHorizontalSensitivity;
+  MouseLookVerticalSensitivitySlider  .Value := MouseLookVerticalSensitivity  ;
+
+  AutoOpenInventory := DefaultAutoOpenInventory;
+  AutoOpenInventoryToggle.Pressed := AutoOpenInventory;
+
+  MessageOK(Window, 'All keys and settings restored to defaults.');
+end;
+
+procedure TControlsMenu.ClickBack(Sender: TObject);
+begin
+  TUIState.Pop(StateControlsMenu);
 end;
 
 procedure TControlsMenu.MouseLookHorizontalSensitivityChanged(Sender: TObject);
@@ -297,126 +323,150 @@ begin
   MouseLookVerticalSensitivity := MouseLookVerticalSensitivitySlider.Value;
 end;
 
-{ TControlsSubMenu ----------------------------------------------------------- }
+{ TCustomizeInputMenuButton -------------------------------------------------------- }
 
+type
+  { Button inside a menu to customize input shortcut. }
+  TCustomizeInputMenuButton = class(TCastleMenuButton)
+  strict private
+    FInputShortcut: TInputShortcut;
+    procedure SetInputShortcut(const Value: TInputShortcut);
+  public
+    property InputShortcut: TInputShortcut read FInputShortcut write SetInputShortcut;
+    procedure DoClick; override;
+    { Call when InputShortcut value inside was changed. }
+    procedure Refresh;
+  end;
+
+procedure TCustomizeInputMenuButton.SetInputShortcut(const Value: TInputShortcut);
+begin
+  if FInputShortcut <> Value then
+  begin
+    FInputShortcut := Value;
+    Refresh;
+  end;
+end;
+
+procedure TCustomizeInputMenuButton.Refresh;
 const
-  SNoneInput = '<none>';
+  EmptyInputShortcut = '<not assigned>';
+begin
+  if InputShortcut <> nil then
+    Caption := InputShortcut.Description(EmptyInputShortcut)
+  else
+    // when InputShortcut not set, we don't have anything to show
+    Caption := EmptyInputShortcut;
+end;
+
+procedure TCustomizeInputMenuButton.DoClick;
+var
+  ConflictingInput: TInputShortcut;
+  NewEvent: TInputPressRelease;
+begin
+  inherited;
+
+  MessageKeyMouse(Window, Format(
+    'Press the new key or mouse button or mouse wheel for "%s".' + NL + NL +
+    '[Escape] cancels.' + NL +
+    '[Backspace] clears the shortcut.',
+    [InputShortcut.Caption]), NewEvent);
+
+  if NewEvent.IsKey(K_Backspace) then
+  begin
+    InputShortcut.MakeClear;
+  end else
+  if NewEvent.IsKey(K_Escape) then
+  begin
+    { Don't do anything. }
+  end else
+  { We silently ignore situation when NewEvent already
+    matches InputShortcut. This is meaningless,
+    and otherwise could unnecessarily swap Key1 and Key2 in InputShortcut. }
+  if not InputShortcut.IsEvent(NewEvent) then
+  begin
+    ConflictingInput := InputsAll.SeekMatchingShortcut(NewEvent);
+
+    if ConflictingInput <> nil then
+    begin
+      { I used to have here a confirmation before clearing ConflictingInput.
+        But this was bad for user experience, as the message would have
+        to be either about "clearing the whole shortcut" or just
+        "clearing part of the shortcut" --- as each shortcut is
+        2 key shortcuts and 1 mouse shortcut.
+        Also, one of the rules is to avoid modal dialog boxes...
+        So now I just uncoditionally remove conflicting key,
+        and make a Notification informing user about it. }
+      case NewEvent.EventType of
+        itMouseButton:
+          begin
+            Notifications.Show(Format('Note: "%s" mouse shortcut cleared for action "%s"',
+              [ MouseButtonStr[ConflictingInput.MouseButton],
+                ConflictingInput.Caption ]));
+            ConflictingInput.MouseButtonUse := false;
+          end;
+        itMouseWheel:
+          begin
+            Notifications.Show(Format('Note: "%s" mouse wheel cleared for action "%s"',
+              [ MouseWheelDirectionStr[ConflictingInput.MouseWheel],
+                ConflictingInput.Caption ]));
+            ConflictingInput.MouseWheel := mwNone;
+          end;
+        itKey:
+          if ConflictingInput.Key1 = NewEvent.Key then
+          begin
+            Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
+              [ KeyToStr(ConflictingInput.Key1),
+                ConflictingInput.Caption ]));
+            ConflictingInput.Key1 := K_None;
+          end else
+          begin
+            Assert(ConflictingInput.Key2 = NewEvent.Key);
+
+            Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
+              [ KeyToStr(ConflictingInput.Key2),
+                ConflictingInput.Caption ]));
+            ConflictingInput.Key2 := K_None;
+          end;
+        else raise EInternalError.Create('ConflictingInput: NewEvent.EventType?');
+      end;
+    end;
+
+    InputShortcut.Add(NewEvent);
+  end;
+
+  { possibly, not only this shortcut, but also others changed now }
+  (Owner as TControlsSubMenu).RefreshShortcuts;
+end;
+
+{ TControlsSubMenu ----------------------------------------------------------- }
 
 constructor TControlsSubMenu.CreateControlsSubMenu(AOwner: TComponent;
   AGroup: TInputGroup);
-
-  function InputToggle(const S: string): TCastleMenuButton;
-  begin
-    Result := TCastleMenuButton.Create(Self);
-    Result.Caption := S;
-  end;
-
 var
   I: Integer;
+  InputShortcut: TInputShortcut;
+  InputMenuButton: TCustomizeInputMenuButton;
 begin
   inherited Create(AOwner);
 
   FGroup := AGroup;
 
   for I := 0 to InputsGroup[Group].Count - 1 do
-    Add(InputsGroup[Group].Items[I].Caption,
-      InputToggle(InputsGroup[Group].Items[I].
-        Description(SNoneInput)));
+  begin
+    InputShortcut := InputsGroup[Group].Items[I];
+    InputMenuButton := TCustomizeInputMenuButton.Create(Self);
+    InputMenuButton.InputShortcut := InputShortcut;
+    Add(InputShortcut.Caption, InputMenuButton);
+  end;
 
-  Add('Back to controls menu');
+  Add('Back to controls menu', @ClickBack);
 
   RegularSpaceBetweenItems := 2;
 end;
 
-procedure TControlsSubMenu.Click;
-
-  procedure ChangeKey(InputShortcut: TInputShortcut);
-  var
-    ConflictingInput: TInputShortcut;
-    NewEvent: TInputPressRelease;
-  begin
-    MessageKeyMouse(Window, Format(
-      'Press the new key or mouse button or mouse wheel for "%s".' + NL + NL +
-      '[Escape] cancels.' + NL +
-      '[Backspace] clears the shortcut.',
-      [InputShortcut.Caption]), NewEvent);
-
-    if NewEvent.IsKey(K_Backspace) then
-    begin
-      InputShortcut.MakeClear;
-    end else
-    if NewEvent.IsKey(K_Escape) then
-    begin
-      { Don't do anything. }
-    end else
-    { We silently ignore situation when NewEvent already
-      matches InputShortcut. This is meaningless,
-      and otherwise could unnecessarily swap Key1 and Key2 in InputShortcut. }
-    if not InputShortcut.IsEvent(NewEvent) then
-    begin
-      ConflictingInput := InputsAll.SeekMatchingShortcut(NewEvent);
-
-      if ConflictingInput <> nil then
-      begin
-        { I used to have here a confirmation before clearing ConflictingInput.
-          But this was bad for user experience, as the message would have
-          to be either about "clearing the whole shortcut" or just
-          "clearing part of the shortcut" --- as each shortcut is
-          2 key shortcuts and 1 mouse shortcut.
-          Also, one of the rules is to avoid modal dialog boxes...
-          So now I just uncoditionally remove conflicting key,
-          and make a Notification informing user about it. }
-        case NewEvent.EventType of
-          itMouseButton:
-            begin
-              Notifications.Show(Format('Note: "%s" mouse shortcut cleared for action "%s"',
-                [ MouseButtonStr[ConflictingInput.MouseButton],
-                  ConflictingInput.Caption ]));
-              ConflictingInput.MouseButtonUse := false;
-            end;
-          itMouseWheel:
-            begin
-              Notifications.Show(Format('Note: "%s" mouse wheel cleared for action "%s"',
-                [ MouseWheelDirectionStr[ConflictingInput.MouseWheel],
-                  ConflictingInput.Caption ]));
-              ConflictingInput.MouseWheel := mwNone;
-            end;
-          itKey:
-            if ConflictingInput.Key1 = NewEvent.Key then
-            begin
-              Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
-                [ KeyToStr(ConflictingInput.Key1),
-                  ConflictingInput.Caption ]));
-              ConflictingInput.Key1 := K_None;
-            end else
-            begin
-              Assert(ConflictingInput.Key2 = NewEvent.Key);
-
-              Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
-                [ KeyToStr(ConflictingInput.Key2),
-                  ConflictingInput.Caption ]));
-              ConflictingInput.Key2 := K_None;
-            end;
-          else raise EInternalError.Create('ConflictingInput: NewEvent.EventType?');
-        end;
-      end;
-
-      InputShortcut.Add(NewEvent);
-    end;
-
-    RefreshShortcuts;
-  end;
-
+procedure TControlsSubMenu.ClickBack(Sender: TObject);
 begin
-  inherited;
-
-  if Between(CurrentItem, 0, InputsGroup[Group].Count - 1) then
-    ChangeKey(InputsGroup[Group].Items[CurrentItem]) else
-  if CurrentItem = InputsGroup[Group].Count then
-  begin
-    SetCurrentMenu(CurrentMenu, ControlsMenu);
-  end else
-    raise EInternalError.Create('Menu item unknown');
+  SetCurrentMenu(CurrentMenu, ControlsMenu);
 end;
 
 procedure TControlsSubMenu.RefreshShortcuts;
@@ -425,8 +475,7 @@ var
 begin
   for I := 0 to InputsGroup[Group].Count - 1 do
   begin
-    (Controls[I].Controls[0] as TCastleMenuButton).Caption :=
-      InputsGroup[Group].Items[I].Description(SNoneInput);
+    (Controls[I].Controls[0] as TCustomizeInputMenuButton).Refresh;
     { text changed, maybe stuff should be wider / narrower now }
     RecalculateSize;
   end;
