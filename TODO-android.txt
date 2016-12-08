@@ -79,7 +79,7 @@ controls:
 - // TODO: when to save config on Android? (these 4 lines at the end
   of lpr)
 
-- make all textures already scaled to po2
+- make all textures already scaled on disk to power of 2
 
 - remove delays when moving by menus and something gets initialized.
 
@@ -89,7 +89,10 @@ controls:
 
 - add ads from time to time
 
-- werewolves on doom level too fast anims? (bug KAnim->castle scene? or not?)
+- RenderDebugCaptions, RenderDebug3D effects are not visible immediately
+  when clicking in debug menu.
+  They are applied only in Update for each creature, which doesn't happen
+  if SceneManager is paused under menu.
 ------------------------------------------------------------------------------
 - CGE: API improvements ideas:
   - mark
