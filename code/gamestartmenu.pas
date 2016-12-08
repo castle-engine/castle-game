@@ -119,12 +119,11 @@ type
   end;
 
   TChooseNewLevelMenu = class(TSubMenu)
+  strict private
+    procedure ClickBack(Sender: TObject);
   public
-    LevelsNewGame: TLevelInfoList;
     FirstDemoLevelIndex: Cardinal;
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure Click; override;
     function SpaceBetweenItems(const NextItemIndex: Cardinal): Cardinal; override;
     procedure Render; override;
   end;
@@ -208,7 +207,7 @@ procedure TMainMenu.ClickNewGame(Sender: TObject);
 
   procedure SetChooseNewLevelMenu;
   begin
-    { Recreate ChooseNewLevelMenu now, to refresh list of LevelsNewGame. }
+    { Recreate ChooseNewLevelMenu now, to refresh list of new levels. }
     FreeAndNil(ChooseNewLevelMenu);
     ChooseNewLevelMenu := TChooseNewLevelMenu.Create(Application);
 
@@ -580,57 +579,73 @@ begin
   SetCurrentMenu(CurrentMenu, SoundMenu);
 end;
 
+{ TNewLevelButton ---------------------------------------------------- }
+
+type
+  TNewLevelButton = class(TCastleMenuButton)
+  strict private
+    Level: TLevelInfo;
+  public
+    constructor Create(AOwner: TComponent; ALevel: TLevelInfo); reintroduce;
+    procedure DoClick; override;
+  end;
+
+constructor TNewLevelButton.Create(AOwner: TComponent; ALevel: TLevelInfo);
+begin
+  inherited Create(AOwner);
+  Level := ALevel;
+end;
+
+procedure TNewLevelButton.DoClick;
+begin
+  inherited;
+  NewGame(Level);
+  SetCurrentMenu(CurrentMenu, MainMenu);
+end;
+
 { TChooseNewLevelMenu ------------------------------------------------------- }
 
 constructor TChooseNewLevelMenu.Create(AOwner: TComponent);
 
-  { Add level to LevelsNewGame and Items lists.
-    Index is an index into Levels array for this level. }
-  procedure AddLevel(Index: Integer);
-  var
-    S: string;
-    L: TLevelInfo;
+  function LevelCaption(const Level: TLevelInfo): string;
   begin
-    L := Levels[Index];
-    LevelsNewGame.Add(L);
-    S := Format('%d: %s', [ L.Number, L.Title ]);
-    if L.TitleHint <> '' then
-      S += ' (' + L.TitleHint + ')';
-    Add(S);
+    { calculate nice Caption }
+    Result := Format('%d: %s', [Level.Number, Level.Title]);
+    if Level.TitleHint <> '' then
+      Result += ' (' + Level.TitleHint + ')';
   end;
 
 var
   I: Integer;
+  Level: TLevelInfo;
 begin
   inherited;
-
-  LevelsNewGame := TLevelInfoList.Create(false);
 
   { Add non-demo levels }
   for I := 0 to Levels.Count - 1 do
-    if Levels[I].Played and
-       (Levels[I].Name <> MenuBackgroundLevelName) and
-       not Levels[I].Demo then
-      AddLevel(I);
+  begin
+    Level := Levels[I];
+    if Level.Played and
+       (Level.Name <> MenuBackgroundLevelName) and
+       not Level.Demo then
+      Add(LevelCaption(Level), TNewLevelButton.Create(Self, Level));
+  end;
 
-  FirstDemoLevelIndex := LevelsNewGame.Count;
+  FirstDemoLevelIndex := ControlsCount;
 
   { Add demo levels }
   for I := 0 to Levels.Count - 1 do
-    if Levels[I].Played and
-       (Levels[I].Name <> MenuBackgroundLevelName) and
-       Levels[I].Demo then
-      AddLevel(I);
+  begin
+    Level := Levels[I];
+    if Level.Played and
+       (Level.Name <> MenuBackgroundLevelName) and
+       Level.Demo then
+      Add(LevelCaption(Level), TNewLevelButton.Create(Self, Level));
+  end;
 
-  Add('Cancel');
+  Add('Cancel', @ClickBack);
 
   SubMenuTitle := 'Choose initial level';
-end;
-
-destructor TChooseNewLevelMenu.Destroy;
-begin
-  FreeAndNil(LevelsNewGame);
-  inherited;
 end;
 
 function TChooseNewLevelMenu.SpaceBetweenItems(
@@ -659,22 +674,9 @@ begin
     SubMenuTextColor, 'Bonus demo levels :');
 end;
 
-procedure TChooseNewLevelMenu.Click;
+procedure TChooseNewLevelMenu.ClickBack(Sender: TObject);
 begin
-  inherited;
-
-  if CurrentItem = LevelsNewGame.Count then
-  begin
-    SetCurrentMenu(CurrentMenu, MainMenu);
-  end else
-  if LevelsNewGame[CurrentItem] = nil then
-  begin
-    { separator between non-demo and demo levels, do nothing }
-  end else
-  begin
-    NewGame(LevelsNewGame[CurrentItem]);
-    SetCurrentMenu(CurrentMenu, MainMenu);
-  end;
+  SetCurrentMenu(CurrentMenu, MainMenu);
 end;
 
 { global things -------------------------------------------------------------- }
