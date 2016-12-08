@@ -57,13 +57,12 @@ var
 
 type
   TChooseMenu = class(TCastleGameMenu)
-    procedure Click; override;
+  private
+    procedure ClickItem(Sender: TObject);
   end;
 
-procedure TChooseMenu.Click;
+procedure TChooseMenu.ClickItem(Sender: TObject);
 begin
-  inherited;
-
   Selected := true;
   SelectedIndex := CurrentItem;
 end;
@@ -96,7 +95,7 @@ var
 begin
   ChooseMenu.ClearControls;
   for I := 0 to MenuItems.Count - 1 do
-    ChooseMenu.Add(MenuItems[I]);
+    ChooseMenu.Add(MenuItems[I], @ChooseMenu.ClickItem);
 
   TUIState.Push(StateChooseMenu);
   try
