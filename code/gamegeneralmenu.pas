@@ -26,7 +26,7 @@ unit GameGeneralMenu;
 interface
 
 uses Classes,
-  CastleVectors, CastleOnScreenMenu, CastleRectangles;
+  CastleVectors, CastleOnScreenMenu, CastleRectangles, CastleUIState;
 
 type
   { On-screen menu suitable for castle.
@@ -50,12 +50,14 @@ type
     procedure SetPosition(const ACenter: boolean);
   end;
 
-{ Sets CurrentValue, taking care of adding this menu / removing existing menu
-  (when new value is @nil) from Window.Controls.
-  Also, returns previous TCastleOnScreenMenu present in Window.Controls
-  (there can be only one). }
-function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
-  const NewValue: TCastleGameMenu): TCastleGameMenu;
+  TAbstractMenuState = class(TUIState)
+  strict private
+    FCurrentMenu: TCastleGameMenu;
+    procedure SetCurrentMenu(const Value: TCastleGameMenu);
+  protected
+    { Set this to change currently displayed menu. }
+    property CurrentMenu: TCastleGameMenu read FCurrentMenu write SetCurrentMenu;
+  end;
 
 implementation
 
@@ -85,13 +87,18 @@ begin
   end;
 end;
 
-{ globals -------------------------------------------------------------------- }
+{ TAbstractMenuState --------------------------------------------------------- }
 
-function SetCurrentMenu(var CurrentValue: TCastleGameMenu;
-  const NewValue: TCastleGameMenu): TCastleGameMenu;
+procedure TAbstractMenuState.SetCurrentMenu(const Value: TCastleGameMenu);
 begin
-  CurrentValue := NewValue;
-  Result := Window.Controls.MakeSingle(TCastleGameMenu, NewValue) as TCastleGameMenu;
+  if FCurrentMenu <> Value then
+  begin
+    if FCurrentMenu <> nil then
+      RemoveControl(FCurrentMenu);
+    FCurrentMenu := Value;
+    if FCurrentMenu <> nil then
+      InsertFront(FCurrentMenu);
+  end;
 end;
 
 end.

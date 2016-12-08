@@ -26,10 +26,11 @@ unit GameDebugMenu;
 interface
 
 uses Classes,
-  CastleUIState, CastleUIControls, CastleKeysMouse, CastleImages;
+  CastleUIState, CastleUIControls, CastleKeysMouse, CastleImages,
+  GameGeneralMenu;
 
 type
-  TStateDebugMenu = class(TUIState)
+  TStateDebugMenu = class(TAbstractMenuState)
   strict private
     OldThemeWindow: TCastleImage;
   public
@@ -47,7 +48,7 @@ implementation
 uses SysUtils,
   CastleControlsImages, CastleUtils, CastleStringUtils,
   CastleGLUtils, CastleMessages, GameWindow, Castle3D,
-  CastleVectors, CastleWindow, GamePlay, GameGeneralMenu,
+  CastleVectors, CastleWindow, GamePlay,
   CastleInputs, CastleCreatures, GameChooseMenu,
   CastleItems, CastleOnScreenMenu, CastleRays, GameVideoOptions, CastleSoundEngine,
   X3DNodes, CastleClassUtils, CastleGameNotifications,
@@ -128,8 +129,6 @@ type
   global vars (used by TCastleGameMenu descendants implementation) }
 
 var
-  CurrentMenu: TCastleGameMenu;
-
   DebugMenu: TDebugMenu;
   DebugPlayerMenu: TDebugPlayerMenu;
   DebugCreaturesMenu: TDebugCreaturesMenu;
@@ -196,22 +195,22 @@ end;
 
 procedure TDebugMenu.ClickPlayerMenu(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, DebugPlayerMenu);
+  StateDebugMenu.CurrentMenu := DebugPlayerMenu;
 end;
 
 procedure TDebugMenu.ClickCreaturesMenu(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, DebugCreaturesMenu);
+  StateDebugMenu.CurrentMenu := DebugCreaturesMenu;
 end;
 
 procedure TDebugMenu.ClickItemsMenu(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, DebugItemsMenu);
+  StateDebugMenu.CurrentMenu := DebugItemsMenu;
 end;
 
 procedure TDebugMenu.ClickLevelsMenu(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, DebugLevelMenu);
+  StateDebugMenu.CurrentMenu := DebugLevelMenu;
 end;
 
 procedure TDebugMenu.ClickReloadResources(Sender: TObject);
@@ -324,7 +323,7 @@ end;
 
 procedure TDebugPlayerMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, DebugMenu);
+  StateDebugMenu.CurrentMenu := DebugMenu;
 end;
 
 procedure TDebugPlayerMenu.RotationHorizontalSpeedChanged(Sender: TObject);
@@ -410,7 +409,7 @@ end;
 
 procedure TDebugCreaturesMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, DebugMenu);
+  StateDebugMenu.CurrentMenu := DebugMenu;
 end;
 
 { TDebugItemsMenu ------------------------------------------------------------ }
@@ -435,7 +434,7 @@ end;
 
 procedure TDebugItemsMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, DebugMenu);
+  StateDebugMenu.CurrentMenu := DebugMenu;
 end;
 
 { TDebugLevelMenu -------------------------------------------------------- }
@@ -503,7 +502,7 @@ end;
 
 procedure TDebugLevelMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, DebugMenu);
+  StateDebugMenu.CurrentMenu := DebugMenu;
 end;
 
 { TStateDebugMenu ------------------------------------------------------------ }
@@ -532,12 +531,12 @@ begin
     with the menu text. }
   Theme.Images[tiWindow] := WindowDark;
 
-  SetCurrentMenu(CurrentMenu, DebugMenu);
+  CurrentMenu := DebugMenu;
 end;
 
 procedure TStateDebugMenu.Stop;
 begin
-  SetCurrentMenu(CurrentMenu, nil);
+  CurrentMenu := nil;
   Theme.Images[tiWindow] := OldThemeWindow;
   inherited;
 end;

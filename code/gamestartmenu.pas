@@ -26,10 +26,12 @@ unit GameStartMenu;
 
 interface
 
-uses Classes, CastleUIState;
+uses Classes,
+  CastleUIState,
+  GameGeneralMenu;
 
 type
-  TStateStartMenu = class(TUIState)
+  TStateStartMenu = class(TAbstractMenuState)
   private
     GoingToAnotherMenu: boolean;
   public
@@ -53,7 +55,7 @@ uses SysUtils, CastleUtils,
   CastleStringUtils, CastleClassUtils, CastleGameNotifications,
   CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes, CastleControls,
   CastleApplicationProperties, CastleWindow, X3DLoad,
-  GamePlay, GameSound, GameGeneralMenu, GameControlsMenu, GameVideoOptions,
+  GamePlay, GameSound, GameControlsMenu, GameVideoOptions,
   GameHelp, GameBackgroundLevel, GameCredits;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
@@ -132,7 +134,6 @@ type
   global vars (used by TCastleGameMenu descendants implementation) }
 
 var
-  CurrentMenu: TCastleGameMenu;
   MainMenu: TMainMenu;
   VideoMenu: TVideoMenu;
   SoundMenu: TSoundMenu;
@@ -211,7 +212,7 @@ procedure TMainMenu.ClickNewGame(Sender: TObject);
     FreeAndNil(ChooseNewLevelMenu);
     ChooseNewLevelMenu := TChooseNewLevelMenu.Create(Application);
 
-    SetCurrentMenu(CurrentMenu, ChooseNewLevelMenu);
+    StateStartMenu.CurrentMenu := ChooseNewLevelMenu;
   end;
 
 begin
@@ -260,13 +261,13 @@ end;
 procedure TMainMenu.ClickVideoOptions(Sender: TObject);
 begin
   SoundEngine.Sound(stMenuClick);
-  SetCurrentMenu(CurrentMenu, VideoMenu);
+  StateStartMenu.CurrentMenu := VideoMenu;
 end;
 
 procedure TMainMenu.ClickSoundOptions(Sender: TObject);
 begin
   SoundEngine.Sound(stMenuClick);
-  SetCurrentMenu(CurrentMenu, SoundMenu);
+  StateStartMenu.CurrentMenu := SoundMenu;
 end;
 
 procedure TMainMenu.ClickCredits(Sender: TObject);
@@ -488,7 +489,7 @@ end;
 
 procedure TVideoMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, MainMenu);
+  StateStartMenu.CurrentMenu := MainMenu;
 end;
 
 procedure TVideoMenu.BakedAnimationSmoothnessChanged(Sender: TObject);
@@ -524,12 +525,12 @@ end;
 
 procedure TSoundMenu.ClickOpenALDeviceToggle(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, ChangeOpenALDeviceMenu);
+  StateStartMenu.CurrentMenu := ChangeOpenALDeviceMenu;
 end;
 
 procedure TSoundMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, MainMenu);
+  StateStartMenu.CurrentMenu := MainMenu;
 end;
 
 { TOpenALDeviceMenuButton ---------------------------------------------------- }
@@ -550,7 +551,7 @@ begin
   if not SoundEngine.ALActive then
     MessageOK(Window, SoundEngine.SoundInitializationReport);
 
-  SetCurrentMenu(CurrentMenu, SoundMenu);
+  StateStartMenu.CurrentMenu := SoundMenu;
 end;
 
 { TChangeOpenALDeviceMenu ---------------------------------------------------- }
@@ -576,7 +577,7 @@ end;
 
 procedure TChangeOpenALDeviceMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, SoundMenu);
+  StateStartMenu.CurrentMenu := SoundMenu;
 end;
 
 { TNewLevelButton ---------------------------------------------------- }
@@ -600,7 +601,7 @@ procedure TNewLevelButton.DoClick;
 begin
   inherited;
   NewGame(Level);
-  SetCurrentMenu(CurrentMenu, MainMenu);
+  StateStartMenu.CurrentMenu := MainMenu;
 end;
 
 { TChooseNewLevelMenu ------------------------------------------------------- }
@@ -676,7 +677,7 @@ end;
 
 procedure TChooseNewLevelMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, MainMenu);
+  StateStartMenu.CurrentMenu := MainMenu;
 end;
 
 { global things -------------------------------------------------------------- }
@@ -706,7 +707,7 @@ end;
 procedure TStateStartMenu.Resume;
 begin
   inherited;
-  SetCurrentMenu(CurrentMenu, MainMenu);
+  CurrentMenu := MainMenu;
   if not GoingToAnotherMenu then
     InsertBack(BackgroundControls);
   GoingToAnotherMenu := false;
@@ -714,7 +715,7 @@ end;
 
 procedure TStateStartMenu.Pause;
 begin
-  SetCurrentMenu(CurrentMenu, nil);
+  CurrentMenu := nil;
   if not GoingToAnotherMenu then
     RemoveControl(BackgroundControls);
   inherited;

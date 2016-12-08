@@ -40,7 +40,7 @@ type
   end;
 
   { Show menu that allows player to configure controls. }
-  TStateControlsMenu = class(TUIState)
+  TStateControlsMenu = class(TAbstractMenuState)
   strict private
     type
       TFadeRect = class(TUIControl)
@@ -48,8 +48,6 @@ type
       end;
     var
     FadeRect: TFadeRect;
-  protected
-    function InsertAtPosition: Integer; override;
   public
     { User can quit with the escape key. }
     ExitWithEscapeAllowed: boolean;
@@ -172,7 +170,6 @@ type
   global vars (used by TCastleGameMenu descendants implementation) }
 
 var
-  CurrentMenu: TCastleGameMenu;
   ControlsMenu: TControlsMenu;
   BasicControlsMenu: TBasicControlsMenu;
   ItemsControlsMenu: TItemsControlsMenu;
@@ -254,19 +251,19 @@ end;
 procedure TControlsMenu.ClickBasicControls(Sender: TObject);
 begin
   BasicControlsMenu.RefreshShortcuts;
-  SetCurrentMenu(CurrentMenu, BasicControlsMenu);
+  StateControlsMenu.CurrentMenu := BasicControlsMenu;
 end;
 
 procedure TControlsMenu.ClickItemsControls(Sender: TObject);
 begin
   ItemsControlsMenu.RefreshShortcuts;
-  SetCurrentMenu(CurrentMenu, ItemsControlsMenu);
+  StateControlsMenu.CurrentMenu := ItemsControlsMenu;
 end;
 
 procedure TControlsMenu.ClickOtherControls(Sender: TObject);
 begin
   OtherControlsMenu.RefreshShortcuts;
-  SetCurrentMenu(CurrentMenu, OtherControlsMenu);
+  StateControlsMenu.CurrentMenu := OtherControlsMenu;
 end;
 
 procedure TControlsMenu.ClickMouseLook(Sender: TObject);
@@ -466,7 +463,7 @@ end;
 
 procedure TControlsSubMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, ControlsMenu);
+  StateControlsMenu.CurrentMenu := ControlsMenu;
 end;
 
 procedure TControlsSubMenu.RefreshShortcuts;
@@ -527,10 +524,13 @@ end;
 { TFadeRect ------------------------------------------------------------------ }
 
 procedure TStateControlsMenu.TFadeRect.Render;
+var
+  Menu: TCastleGameMenu;
 begin
   inherited;
-  DrawRectangle(CurrentMenu.ScreenRect.Grow(150),
-    Vector4Single(0, 0, 0, CurrentMenu.BackgroundOpacityFocused));
+  Menu := (Owner as TStateControlsMenu).CurrentMenu;
+  DrawRectangle(Menu.ScreenRect.Grow(150),
+    Vector4Single(0, 0, 0, Menu.BackgroundOpacityFocused));
 end;
 
 { TStateControlsMenu --------------------------------------------------------- }
@@ -560,14 +560,6 @@ begin
   end;
 end;
 
-function TStateControlsMenu.InsertAtPosition: Integer;
-begin
-  { insert before ControlsMenu
-    (that was just inserted in TStateControlsMenu.Start),
-    to make our FadeRect be underneath the menu. }
-  Result := StateContainer.Controls.IndexOf(ControlsMenu);
-end;
-
 procedure TStateControlsMenu.Start;
 begin
   inherited;
@@ -579,11 +571,11 @@ begin
   ItemsControlsMenu.SetPosition(DrawCentered);
   OtherControlsMenu.SetPosition(DrawCentered);
 
-  SetCurrentMenu(CurrentMenu, ControlsMenu);
+  CurrentMenu := ControlsMenu;
 
   if DrawFadeRect then
   begin
-    FadeRect := TFadeRect.Create(nil);
+    FadeRect := TFadeRect.Create(Self);
     InsertBack(FadeRect);
   end;
 end;
@@ -591,7 +583,7 @@ end;
 procedure TStateControlsMenu.Stop;
 begin
   FreeAndNil(FadeRect);
-  SetCurrentMenu(CurrentMenu, nil);
+  CurrentMenu := nil;
   inherited;
 end;
 

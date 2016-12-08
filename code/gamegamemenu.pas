@@ -25,11 +25,12 @@ unit GameGameMenu;
 
 interface
 
-uses Classes, CastleUIControls, CastleUIState, CastleKeysMouse,
-  CastleImages;
+uses Classes,
+  CastleUIControls, CastleUIState, CastleKeysMouse, CastleImages,
+  GameGeneralMenu;
 
 type
-  TStateGameMenu = class(TUIState)
+  TStateGameMenu = class(TAbstractMenuState)
   strict private
     OldThemeWindow: TCastleImage;
   public
@@ -49,7 +50,7 @@ implementation
 uses SysUtils,
   CastleControlsImages, CastleUtils, CastleStringUtils,
   CastleGLUtils, CastleMessages, GameWindow, CastleVectors,
-  CastleWindow, GameHelp, GamePlay, GameGeneralMenu, GameControlsMenu,
+  CastleWindow, GameHelp, GamePlay, GameControlsMenu,
   CastleInputs, X3DNodes, CastleClassUtils, CastleSoundMenu,
   CastleGameNotifications, CastleControls, CastleApplicationProperties;
 
@@ -80,7 +81,6 @@ type
   global vars (used by TCastleGameMenu descendants implementation) }
 
 var
-  CurrentMenu: TCastleGameMenu;
   GameMenu: TGameMenu;
   GameSoundMenu: TGameSoundMenu;
 
@@ -117,7 +117,7 @@ end;
 
 procedure TGameMenu.ClickSoundOptions(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, GameSoundMenu);
+  StateGameMenu.CurrentMenu := GameSoundMenu;
 end;
 
 procedure TGameMenu.ClickEndGame(Sender: TObject);
@@ -141,7 +141,7 @@ end;
 
 procedure TGameSoundMenu.ClickBack(Sender: TObject);
 begin
-  SetCurrentMenu(CurrentMenu, GameMenu);
+  StateGameMenu.CurrentMenu := GameMenu;
 end;
 
 { TStateGameMenu -------------------------------------------------------------- }
@@ -187,12 +187,12 @@ end;
 procedure TStateGameMenu.Resume;
 begin
   inherited;
-  SetCurrentMenu(CurrentMenu, GameMenu);
+  CurrentMenu := GameMenu;
 end;
 
 procedure TStateGameMenu.Pause;
 begin
-  SetCurrentMenu(CurrentMenu, nil);
+  CurrentMenu := nil;
   inherited;
 end;
 
