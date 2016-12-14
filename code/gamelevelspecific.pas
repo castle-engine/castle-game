@@ -304,10 +304,10 @@ begin
   StairsBlocker.CastShadowVolumes := false; { shadow would not be visible anyway }
   World.Add(StairsBlocker);
 
-  { get StairsBlocker.BoundingBox.Middle when it GetExists.
+  { get StairsBlocker.BoundingBox.Center when it GetExists.
     Later StairsBlocker will have Exists = false, so bbox will be empty,
     but we'll need StairsBlockerMiddle position. }
-  StairsBlockerMiddle := StairsBlocker.BoundingBox.Middle;
+  StairsBlockerMiddle := StairsBlocker.BoundingBox.Center;
 end;
 
 function BoxDownPosition(const Box: TBox3D): TVector3Single;
@@ -538,7 +538,7 @@ begin
   Cart.PlayAnimation('animation', paForceLooping);
   World.Add(Cart);
 
-  CartSoundPosition := Cart.BoundingBox.Middle;
+  CartSoundPosition := Cart.BoundingBox.Center;
 
   SacrilegeAmbushDone := false;
   SwordAmbushDone := false;
@@ -560,8 +560,8 @@ begin
   if PlaceholderName = 'Teleport1Box' then
   begin
     Teleport1Box := Shape.BoundingBox;
-    Teleport1.Translation := Teleport1Box.Middle;
-    Teleport2Destination := Teleport1Box.Middle;
+    Teleport1.Translation := Teleport1Box.Center;
+    Teleport2Destination := Teleport1Box.Center;
     Teleport2Destination[0] -= 2;
     Teleport2Destination[1] -= 2;
     Exit(true);
@@ -570,8 +570,8 @@ begin
   if PlaceholderName = 'Teleport2Box' then
   begin
     Teleport2Box := Shape.BoundingBox;
-    Teleport2.Translation := Teleport2Box.Middle;
-    Teleport1Destination := Teleport2Box.Middle;
+    Teleport2.Translation := Teleport2Box.Center;
+    Teleport1Destination := Teleport2Box.Center;
     Teleport1Destination[0] += 2;
     Teleport1Destination[1] += 2;
     Exit(true);

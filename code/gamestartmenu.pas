@@ -104,16 +104,16 @@ type
 
   TSoundMenu = class(TSubMenu)
   strict private
-    procedure ClickOpenALDeviceToggle(Sender: TObject);
+    procedure ClickSoundDeviceToggle(Sender: TObject);
     procedure ClickBack(Sender: TObject);
   public
     SoundVolume: TSoundVolumeMenuItem;
     MusicVolume: TMusicVolumeMenuItem;
-    OpenALDeviceToggle: TCastleMenuButton;
+    SoundDeviceToggle: TCastleMenuButton;
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TChangeOpenALDeviceMenu = class(TSubMenu)
+  TChangeSoundDeviceMenu = class(TSubMenu)
   strict private
     procedure ClickBack(Sender: TObject);
   public
@@ -138,7 +138,7 @@ var
   VideoMenu: TVideoMenu;
   SoundMenu: TSoundMenu;
   ChooseNewLevelMenu: TChooseNewLevelMenu;
-  ChangeOpenALDeviceMenu: TChangeOpenALDeviceMenu;
+  ChangeSoundDeviceMenu: TChangeSoundDeviceMenu;
 
 { NewGame -------------------------------------------------------------------- }
 
@@ -508,24 +508,24 @@ constructor TSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  OpenALDeviceToggle := TCastleMenuButton.Create(Self);
-  OpenALDeviceToggle.Caption := SoundEngine.DeviceCaption;
-  OpenALDeviceToggle.OnClick := @ClickOpenALDeviceToggle;
+  SoundDeviceToggle := TCastleMenuButton.Create(Self);
+  SoundDeviceToggle.Caption := SoundEngine.DeviceCaption;
+  SoundDeviceToggle.OnClick := @ClickSoundDeviceToggle;
 
   Add(TSoundInfoMenuItem.Create(Self));
   SoundVolume := TSoundVolumeMenuItem.Create(Self);
   Add(SoundVolume);
   MusicVolume := TMusicVolumeMenuItem.Create(Self);
   Add(MusicVolume);
-  Add('Sound output device', OpenALDeviceToggle);
+  Add('Sound output device', SoundDeviceToggle);
   Add('Back to main menu', @ClickBack);
 
   SubMenuTitle := 'Sound options';
 end;
 
-procedure TSoundMenu.ClickOpenALDeviceToggle(Sender: TObject);
+procedure TSoundMenu.ClickSoundDeviceToggle(Sender: TObject);
 begin
-  StateStartMenu.CurrentMenu := ChangeOpenALDeviceMenu;
+  StateStartMenu.CurrentMenu := ChangeSoundDeviceMenu;
 end;
 
 procedure TSoundMenu.ClickBack(Sender: TObject);
@@ -533,39 +533,39 @@ begin
   StateStartMenu.CurrentMenu := MainMenu;
 end;
 
-{ TOpenALDeviceMenuButton ---------------------------------------------------- }
+{ TSoundDeviceMenuButton ---------------------------------------------------- }
 
 type
-  TOpenALDeviceMenuButton = class(TCastleMenuButton)
+  TSoundDeviceMenuButton = class(TCastleMenuButton)
   public
     Device: TSoundDevice;
     procedure DoClick; override;
   end;
 
-procedure TOpenALDeviceMenuButton.DoClick;
+procedure TSoundDeviceMenuButton.DoClick;
 begin
   inherited;
 
   SoundEngine.Device := Device.Name;
-  SoundMenu.OpenALDeviceToggle.Caption := SoundEngine.DeviceCaption;
+  SoundMenu.SoundDeviceToggle.Caption := SoundEngine.DeviceCaption;
   if not SoundEngine.ALActive then
     MessageOK(Window, SoundEngine.SoundInitializationReport);
 
   StateStartMenu.CurrentMenu := SoundMenu;
 end;
 
-{ TChangeOpenALDeviceMenu ---------------------------------------------------- }
+{ TChangeSoundDeviceMenu ---------------------------------------------------- }
 
-constructor TChangeOpenALDeviceMenu.Create(AOwner: TComponent);
+constructor TChangeSoundDeviceMenu.Create(AOwner: TComponent);
 var
   I: Integer;
-  D: TOpenALDeviceMenuButton;
+  D: TSoundDeviceMenuButton;
 begin
   inherited;
 
   for I := 0 to SoundEngine.Devices.Count - 1 do
   begin
-    D := TOpenALDeviceMenuButton.Create(Self);
+    D := TSoundDeviceMenuButton.Create(Self);
     D.Device := SoundEngine.Devices[I];
     Add(D.Device.Caption, D);
   end;
@@ -575,7 +575,7 @@ begin
   SubMenuTitle := 'Change sound output device';
 end;
 
-procedure TChangeOpenALDeviceMenu.ClickBack(Sender: TObject);
+procedure TChangeSoundDeviceMenu.ClickBack(Sender: TObject);
 begin
   StateStartMenu.CurrentMenu := SoundMenu;
 end;
@@ -688,7 +688,7 @@ begin
   MainMenu := TMainMenu.Create(Application);
   VideoMenu := TVideoMenu.Create(Application);
   SoundMenu := TSoundMenu.Create(Application);
-  ChangeOpenALDeviceMenu := TChangeOpenALDeviceMenu.Create(Application);
+  ChangeSoundDeviceMenu := TChangeSoundDeviceMenu.Create(Application);
 end;
 
 procedure TStateStartMenu.Start;
