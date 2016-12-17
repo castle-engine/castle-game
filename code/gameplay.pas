@@ -129,10 +129,6 @@ var
   GLBlueIndicatorImage: TGLImage;
   GLBossIndicatorImage: TGLImage;
 
-  DisplayFpsUpdateTick: TMilisecTime;
-  DisplayFpsFrameTime: Single;
-  DisplayFpsRealTime: Single;
-
   ShowDebugInfo: boolean;
 
   LevelFinishedSchedule: boolean = false;
@@ -239,20 +235,10 @@ procedure TStatePlay.TGame2DControls.Render;
 
   procedure DoShowFPS;
   begin
-    { Don't display precise Window.FpsFrameTime and Window.FpsRealTime
-      each time --- this would cause too much move for player.
-      Instead, display DisplayFpsXxxTime that are updated each second. }
-    if (DisplayFpsUpdateTick = 0) or
-       (TimeTickDiff(DisplayFpsUpdateTick, CastleTimeUtils.GetTickCount64) >= 1000) then
-    begin
-      DisplayFpsUpdateTick := CastleTimeUtils.GetTickCount64;
-      DisplayFpsFrameTime := Window.Fps.FrameTime;
-      DisplayFpsRealTime := Window.Fps.RealTime;
-    end;
-
     UIFont.Print(0, YLine(LineFPS), Gray07,
       Format('FPS : %f (real : %f). Shapes : %d / %d',
-      [DisplayFpsFrameTime, DisplayFpsRealTime,
+      [Window.Fps.FrameTime,
+       Window.Fps.RealTime,
        SceneManager.Statistics.ShapesRendered, SceneManager.Statistics.ShapesVisible]));
   end;
 
