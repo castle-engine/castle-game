@@ -182,7 +182,7 @@ procedure TStatePlay.TGame2DControls.Render;
       X := ItemSlotX(I);
       Y := ItemSlotY(I);
 
-      GLInventorySlot.Alpha := acFullRange;
+      GLInventorySlot.Alpha := acBlending;
       GLInventorySlot.Draw(X, Y);
     end;
 
@@ -191,7 +191,7 @@ procedure TStatePlay.TGame2DControls.Render;
       X := ItemSlotX(I);
       Y := ItemSlotY(I);
 
-      Player.Inventory[I].Resource.GLImage.Alpha := acSimpleYesNo;
+      Player.Inventory[I].Resource.GLImage.Alpha := acTest;
       Player.Inventory[I].Resource.GLImage.Draw(
         X + InventorySlotMargin, Y + InventorySlotMargin);
     end;
