@@ -82,9 +82,6 @@ var
   confirmation will never be required anyway. }
 procedure GameCancel(RequireConfirmation: boolean);
 
-var
-  DebugRenderForLevelScreenshot: boolean = false;
-
 type
   TStatePlay = class(TUIState)
   strict private

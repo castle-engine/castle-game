@@ -69,83 +69,22 @@ implementation
 
 uses Math, CastleUtils, CastleGLUtils, CastleStringUtils, SysUtils,
   CastleFilesUtils, CastleRenderingCamera, CastleCompositeImage, CastleGL,
-  CastleGLImages, CastleRenderer;
+  CastleGLImages, CastleRenderer,
+  GameVideoOptions;
 
 { TBlendedLoopingAnimation --------------------------------------------------- }
 
 constructor TBlendedLoopingAnimation.Create(AOwner: TComponent);
 begin
   inherited;
-  Attributes.Blending := false;
+  //Attributes.Blending := false;
 end;
 
 procedure TBlendedLoopingAnimation.Render(const Frustum: TFrustum;
   const Params: TRenderParams);
-var
-  SceneIndex, MiddleIndex, HalfIndex: Integer;
-  Amount: Single;
 begin
-  if Loaded and GetExists and
-    Params.Transparent and Params.ShadowVolumesReceivers then
-  begin
-    SceneIndex := Floor(MapRange(Time, TimeBegin, TimeEnd, 0, ScenesCount)) mod ScenesCount;
-    if SceneIndex < 0 then SceneIndex += ScenesCount; { we wanted "unsigned mod" above }
-    MiddleIndex := ScenesCount div 2;
-
-    glEnable(GL_BLEND); // saved by GL_COLOR_BUFFER_BIT
-    GLBlendFunction(
-      Attributes.BlendingSourceFactor,
-      Attributes.BlendingDestinationFactor); // saved by GL_COLOR_BUFFER_BIT
-    glDepthMask(GL_FALSE); // saved by GL_DEPTH_BUFFER_BIT
-
-    { calculate Amount.
-
-      On TimeBegin (ModResult = 0) and
-      TimeEnd (ModResult = ScenesCount - 1), it's 0.
-      Exactly in the middle (ModResult = MiddleIndex), it's 1.
-      Between, it's linearly interpolated.
-      This is the visibility of the 1st (unshifted) copy of animation.
-      Since it's not visible at TimeBegin and TimeEnd, the looping seam
-      is not visible.
-
-      The second (shifted) copy of the animation has always visibility
-      1-Amount. And it's shifted by half time range (MiddleIndex).
-      This way the seam happens at MiddleIndex, when the shifted animation
-      is not visible, so the looping seam is again not visible. }
-    if SceneIndex >= MiddleIndex then
-    begin
-      HalfIndex := MiddleIndex - 1 - (SceneIndex - MiddleIndex);
-
-      { Note that when ScenesCount is odd, SceneIndex may be (at max)
-        ScenesCount - 1 = (MiddleIndex * 2 + 1) - 1 = MiddleIndex * 2.
-        Then HalfIndex is calculated as -1 above. Fix it. }
-      MaxVar(HalfIndex, 0);
-    end else
-      HalfIndex := SceneIndex;
-    Assert((ScenesCount <= 1) or ((0 <= HalfIndex) and (HalfIndex < MiddleIndex)));
-    Amount := HalfIndex / (MiddleIndex - 1);
-
-    { Since we use alpha < 1 here (and disable material control by scenes),
-      actually everything renderer here is a transparent object
-      (that's why we check Params.Transparent above).
-
-      However, with Blending := false, TCastleScene will assume that
-      everything is opaque and should be rendered only when Transparent = false.
-      So temporarily switch Transparent. }
-    Params.Transparent := false;
-
-      Attributes.Opacity := Amount;
-      Scenes[SceneIndex].Render(Frustum, Params);
-
-      Attributes.Opacity := 1 - Amount;
-      Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(Frustum, Params);
-
-    Params.Transparent := true;
-
-    { restore glDepthMask and blending state to default values }
-    glDepthMask(GL_TRUE);
-    glDisable(GL_BLEND);
-  end;
+  { on a still screenshot, the trick is easily visible and looks bad }
+  inherited;
 end;
 
 { TWaterShader --------------------------------------------------------------- }
