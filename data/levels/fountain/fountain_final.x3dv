@@ -72,12 +72,27 @@ Transform {
   rotation 1 0 0 1.5707963705062866
 
   children Background {
-    backUrl "../../skies/sunset/sunset_back.png"
-    bottomUrl "../../skies/sunset/sunset_bottom.png"
-    frontUrl "../../skies/sunset/sunset_front.png"
-    leftUrl "../../skies/sunset/sunset_left.png"
-    rightUrl "../../skies/sunset/sunset_right.png"
-    topUrl "../../skies/sunset/sunset_top.png"
+    # backUrl "../../skies/sunset/sunset_back.png"
+    # bottomUrl "../../skies/sunset/sunset_bottom.png"
+    # frontUrl "../../skies/sunset/sunset_front.png"
+    # leftUrl "../../skies/sunset/sunset_left.png"
+    # rightUrl "../../skies/sunset/sunset_right.png"
+    # topUrl "../../skies/sunset/sunset_top.png"
+
+      # backUrl "../../skies/foggy_sky_back.png"
+      # bottomUrl "../../skies/foggy_sky_bottom.png"
+      # frontUrl "../../skies/foggy_sky_front.png"
+      # leftUrl "../../skies/foggy_sky_left.png"
+      # rightUrl "../../skies/foggy_sky_right.png"
+      # topUrl "../../skies/foggy_sky_top.png"
+
+      backUrl "../../skies/sky_nicer_lake_back.png"
+      bottomUrl "../../skies/sky_nicer_lake_bottom.png"
+      frontUrl "../../skies/sky_nicer_lake_front.png"
+      leftUrl "../../skies/sky_nicer_lake_left.png"
+      rightUrl "../../skies/sky_nicer_lake_right.png"
+      topUrl "../../skies/sky_nicer_lake_top.png"
+
   }
 
 #   children Background {
