@@ -101,6 +101,10 @@ begin
   Window.ParseParameters(WindowParameters);
   Parameters.Parse(Options, @OptionProc, nil, true); // allow future SoundEngine.ParseParameters
 
+  { Activate log only now on desktops,
+    to make --version command-line parameter working without any extra output }
+  InitializeLog;
+
   if AllowScreenChange and Window.FullScreen and
      ( (Application.ScreenWidth <> DefaultScreenWidth) or
        (Application.ScreenHeight <> DefaultScreenHeight) or
