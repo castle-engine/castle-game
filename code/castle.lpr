@@ -43,8 +43,8 @@ uses SysUtils, Classes,
 { suggested screen size ------------------------------------------------------ }
 
 const
-  DefaultScreenWidth = 800;
-  DefaultScreenHeight = 600;
+  DefaultScreenWidth = 1280;
+  DefaultScreenHeight = 1024;
 
   WindowParameters = [poDisplay, poGeometry];
 
@@ -100,6 +100,10 @@ begin
   { parse parameters }
   Window.ParseParameters(WindowParameters);
   Parameters.Parse(Options, @OptionProc, nil, true); // allow future SoundEngine.ParseParameters
+
+  { Hack: load UserConfig.Load early (it will be reloaded in ApplicationInitialize
+    in Game unit), to initialize AllowScreenChange }
+  UserConfig.Load;
 
   if AllowScreenChange and Window.FullScreen and
      ( (Application.ScreenWidth <> DefaultScreenWidth) or
