@@ -105,6 +105,10 @@ begin
     in Game unit), to initialize AllowScreenChange }
   UserConfig.Load;
 
+  { Activate log only now on desktops,
+    to make --version command-line parameter working without any extra output }
+  InitializeLog;
+
   if AllowScreenChange and Window.FullScreen and
      ( (Application.ScreenWidth <> DefaultScreenWidth) or
        (Application.ScreenHeight <> DefaultScreenHeight) or

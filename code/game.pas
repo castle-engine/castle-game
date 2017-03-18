@@ -129,7 +129,13 @@ initialization
     as our log routines use it. }
   OnGetApplicationName := @MyGetApplicationName;
 
+  { Hack to not activate log yet on desktops, 
+    only to make --version command-line parameter working without any extra output }
+  {$ifndef LINUX}
+  {$ifndef MSWINDOWS}
   InitializeLog;
+  {$endif}
+  {$endif}
 
   Application.OnInitialize := @ApplicationInitialize;
   Application.MainWindow := Window;
