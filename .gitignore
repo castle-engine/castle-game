@@ -8,3 +8,4 @@ castle.exe
 *.apk
 code/libcastle_android.so
 AndroidAntProperties.txt
+castle-engine-output
