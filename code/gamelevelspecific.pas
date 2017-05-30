@@ -918,12 +918,12 @@ end;
 
 procedure TCagesLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 const
-  { Some SpiderRadius is used to not put spider inside the wall. }
-  SpiderRadius = 2;
-  MinSpiderX = -11.0  + SpiderRadius;
-  MaxSpiderX = 69.0   - SpiderRadius;
-  MinSpiderY = -123.0 + SpiderRadius;
-  MaxSpiderY = 162.0  - SpiderRadius;
+  { Some SpiderLargeRadius is used to not put spider inside the wall. }
+  SpiderLargeRadius = 2;
+  MinSpiderX = -11.0  + SpiderLargeRadius;
+  MaxSpiderX = 69.0   - SpiderLargeRadius;
+  MinSpiderY = -123.0 + SpiderLargeRadius;
+  MaxSpiderY = 162.0  - SpiderLargeRadius;
 
   procedure AppearSpider(const Position: TVector3Single);
   var
@@ -974,7 +974,7 @@ var
   I: Integer;
   SpiderCreature: TCreature;
   SpiderPosition, SpiderDirection: TVector3Single;
-  SpiderMoveDistance: Single;
+  SpiderMoveDistance, SpiderRadius: Single;
   SA: TSpiderAppearing;
   TorchLight: PLightInstance;
 begin
@@ -1018,13 +1018,14 @@ begin
 
     { Move spiders down }
     I := 0;
+    SpiderRadius := Spider.Radius(World.GravityUp);
     AboveHeight := MaxSingle;
     while I < SpidersAppearing.Count do
     begin
       SA := SpidersAppearing[I] as TSpiderAppearing;
       SpiderPosition := SA.Translation;
       SA.Height(SpiderPosition, AboveHeight);
-      if AboveHeight < Spider.Radius * 2 then
+      if AboveHeight < SpiderRadius * 2 then
       begin
         SpiderDirection :=
           VectorSubtract(Player.Position, SpiderPosition);
@@ -1036,7 +1037,7 @@ begin
       begin
         { calculate SpiderMoveDistance }
         SpiderMoveDistance := SpidersFallingSpeed * SecondsPassed;
-        MinVar(SpiderMoveDistance, AboveHeight - Spider.Radius);
+        MinVar(SpiderMoveDistance, AboveHeight - SpiderRadius);
         SpiderPosition[2] -= SpiderMoveDistance;
         SA.Translation := SpiderPosition;
         Inc(I);
