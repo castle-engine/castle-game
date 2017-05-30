@@ -399,7 +399,7 @@ begin
 
   if (Player = nil) then Exit;
 
-  if FLevelExitBox.PointInside(Player.Position) then
+  if FLevelExitBox.Contains(Player.Position) then
   begin
     LevelFinished('cages');
   end;
@@ -622,7 +622,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     Rot[3] += 0.175 * SecondsPassed;
     Teleport.Rotation := Rot;
 
-    if TeleportBox.PointInside(Player.Position) then
+    if TeleportBox.Contains(Player.Position) then
     begin
       Player.Position := Destination;
       GamePlay.Player.Camera.CancelFalling;
@@ -668,7 +668,7 @@ begin
 
   if (Player = nil) then Exit;
 
-  if FGateExitBox.PointInside(Player.Position) then
+  if FGateExitBox.Contains(Player.Position) then
   begin
     if GamePlay.Player.Inventory.FindResource(KeyItemResource) = -1 then
     begin
@@ -690,7 +690,7 @@ begin
     TeleportWork(Teleport2, Teleport2Box, Teleport2Destination);
 
     if (not SacrilegeAmbushDone) and
-      FSacrilegeBox.PointInside(Player.Position) then
+      FSacrilegeBox.Contains(Player.Position) then
     begin
       SacrilegeAmbushDone := true;
       SacrilegeAmbush;
@@ -1144,7 +1144,7 @@ begin
   if not Result then Exit;
 
   Result := MovingElevator9a9b.CompletelyBeginPosition and
-    Elevator9a9bPickBox.PointInside(Player.Position);
+    Elevator9a9bPickBox.Contains(Player.Position);
 
   if Result then
   begin
@@ -1318,7 +1318,7 @@ begin
   if Player = nil then Exit;
 
   if MovingElevator49.CompletelyBeginPosition and
-     Elevator49DownBox.PointInside(Player.Position) then
+     Elevator49DownBox.Contains(Player.Position) then
   begin
     MovingElevator49.GoEndPosition;
   end;
