@@ -24,9 +24,7 @@
 
 program castle;
 
-{$ifdef MSWINDOWS}
-  {$R ../automatic-windows-resources.res}
-{$endif MSWINDOWS}
+{$ifdef MSWINDOWS} {$R automatic-windows-resources.res} {$endif MSWINDOWS}
 
 uses SysUtils, Classes,
   { CGE units }
