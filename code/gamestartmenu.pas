@@ -663,7 +663,7 @@ end;
 
 procedure TChooseNewLevelMenu.Render;
 const
-  SubMenuTextColor: TCastleColor = (0.7, 0.7, 0.7, 1.0);
+  SubMenuTextColor: TCastleColor = (Data: (0.7, 0.7, 0.7, 1.0));
 var
   R: TRectangle;
 begin

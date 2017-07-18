@@ -51,9 +51,9 @@ type
       Symbol: TCastleScene;
       Button: TCastleScene;
       StairsBlocker: TCastleScene;
-      StairsBlockerMiddle: TVector3Single;
+      StairsBlockerMiddle: TVector3;
       FLevelExitBox: TBox3D;
-      WerewolfAppearPosition: array [0..WerewolvesCount - 1] of TVector3Single;
+      WerewolfAppearPosition: array [0..WerewolvesCount - 1] of TVector3;
       WerewolfAppeared: boolean;
       WerewolfCreature: array [0..WerewolvesCount - 1] of TWerewolfCreature;
   protected
@@ -75,11 +75,11 @@ type
     Teleport: TCastleScene;
     Teleport1, Teleport2: T3DTransform;
     Teleport1Box, Teleport2Box: TBox3D;
-    Teleport1Destination: TVector3Single;
-    Teleport2Destination: TVector3Single;
+    Teleport1Destination: TVector3;
+    Teleport2Destination: TVector3;
 
-    SacrilegeAmbushStartingPosition: array [0..5] of TVector3Single;
-    SwordAmbushStartingPosition: array [0..2] of TVector3Single;
+    SacrilegeAmbushStartingPosition: array [0..5] of TVector3;
+    SwordAmbushStartingPosition: array [0..2] of TVector3;
 
     SacrilegeAmbushDone: boolean;
     SwordAmbushDone: boolean;
@@ -87,7 +87,7 @@ type
     FSacrilegeBox: TBox3D;
 
     CartLastSoundTime: Single;
-    CartSoundPosition: TVector3Single;
+    CartSoundPosition: TVector3;
   protected
     function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
   public
@@ -310,11 +310,11 @@ begin
   StairsBlockerMiddle := StairsBlocker.BoundingBox.Center;
 end;
 
-function BoxDownPosition(const Box: TBox3D): TVector3Single;
+function BoxDownPosition(const Box: TBox3D): TVector3;
 begin
-  Result[0] := (Box.Data[0, 0] + Box.Data[1, 0]) / 2;
-  Result[1] := (Box.Data[0, 1] + Box.Data[1, 1]) / 2;
-  Result[2] := Box.Data[0, 2];
+  Result[0] := (Box.Data[0].Data[0] + Box.Data[1].Data[0]) / 2;
+  Result[1] := (Box.Data[0].Data[1] + Box.Data[1].Data[1]) / 2;
+  Result[2] :=  Box.Data[0].Data[2];
 end;
 
 function TCastleHallLevel.Placeholder(const Shape: TShape;
@@ -428,7 +428,7 @@ procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
     for I := 0 to WerewolvesCount - 1 do
       WerewolfCreature[I] := Werewolf.CreateCreature(World,
         WerewolfAppearPosition[I],
-        VectorSubtract(Player.Position, WerewolfAppearPosition[I]))
+        Player.Position - WerewolfAppearPosition[I])
         as TWerewolfCreature;
 
     WerewolfAppeared := true;
@@ -439,7 +439,7 @@ procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
     if SceneManager.HeadlightInstance(Headlight) then
     begin
       Headlight.Node.AmbientIntensity := 0.8;
-      Headlight.Node.Color := Vector3Single(1, 0, 0);
+      Headlight.Node.Color := Vector3(1, 0, 0);
       Headlight.Node.Intensity := 0.2;
     end;
 
@@ -447,8 +447,8 @@ procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
     begin
       LightNode := SceneManager.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
         TAbstractPositionalLightNode;
-      LightNode.Color := Vector3Single(1, 0, 0);
-      LightNode.Attenuation := Vector3Single(1, 0.1, 0);
+      LightNode.Color := Vector3(1, 0, 0);
+      LightNode.Attenuation := Vector3(1, 0.1, 0);
       LightNode.ShadowVolumes := true;
     end;
 
@@ -464,7 +464,7 @@ begin
     begin
       Symbol.PlayAnimation('animation', paForceNotLooping);
       Symbol.Collides := false;
-      SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3Single(0, 0, 0));
+      SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3(0, 0, 0));
 
       WerewolfAppear;
     end;
@@ -522,12 +522,12 @@ begin
 
   Teleport1 := T3DTransform.Create(Self);
   { set rotation axis. Rotation angle will be increased in each Update }
-  Teleport1.Rotation :=  Vector4Single(1, 1, 0, 0);
+  Teleport1.Rotation :=  Vector4(1, 1, 0, 0);
   Teleport1.Add(Teleport);
   World.Add(Teleport1);
 
   Teleport2 := T3DTransform.Create(Self);
-  Teleport2.Rotation :=  Vector4Single(1, 1, 0, 0);
+  Teleport2.Rotation :=  Vector4(1, 1, 0, 0);
   Teleport2.Add(Teleport);
   World.Add(Teleport2);
 
@@ -562,8 +562,8 @@ begin
     Teleport1Box := Shape.BoundingBox;
     Teleport1.Translation := Teleport1Box.Center;
     Teleport2Destination := Teleport1Box.Center;
-    Teleport2Destination[0] -= 2;
-    Teleport2Destination[1] -= 2;
+    Teleport2Destination.Data[0] -= 2;
+    Teleport2Destination.Data[1] -= 2;
     Exit(true);
   end;
 
@@ -572,8 +572,8 @@ begin
     Teleport2Box := Shape.BoundingBox;
     Teleport2.Translation := Teleport2Box.Center;
     Teleport1Destination := Teleport2Box.Center;
-    Teleport1Destination[0] += 2;
-    Teleport1Destination[1] += 2;
+    Teleport1Destination.Data[0] += 2;
+    Teleport1Destination.Data[1] += 2;
     Exit(true);
   end;
 
@@ -602,24 +602,24 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
 
   procedure RejectGateExitBox;
   var
-    NewPosition: TVector3Single;
+    NewPosition: TVector3;
   begin
     NewPosition := Player.Position;
     { Although I do him knockback, I also change the position
       to make sure that he is thrown outside of FGateExitBox. }
-    NewPosition[1] := FGateExitBox.Data[0, 1] - 0.1;
+    NewPosition.Data[1] := FGateExitBox.Data[0].Data[1] - 0.1;
     Player.Position := NewPosition;
 
-    GamePlay.Player.Hurt(0, Vector3Single(0, -1, 0), 2, nil);
+    GamePlay.Player.Hurt(0, Vector3(0, -1, 0), 2, nil);
   end;
 
   procedure TeleportWork(Teleport: T3DTransform; const TeleportBox: TBox3D;
-    const Destination: TVector3Single);
+    const Destination: TVector3);
   var
-    Rot: TVector4Single;
+    Rot: TVector4;
   begin
     Rot := Teleport.Rotation;
-    Rot[3] += 0.175 * SecondsPassed;
+    Rot.Data[3] += 0.175 * SecondsPassed;
     Teleport.Rotation := Rot;
 
     if TeleportBox.Contains(Player.Position) then
@@ -636,7 +636,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
   procedure SacrilegeAmbush;
   var
     I: Integer;
-    CreaturePosition, CreatureDirection: TVector3Single;
+    CreaturePosition, CreatureDirection: TVector3;
   begin
     SoundEngine.Sound(stSacrilegeAmbush);
     for I := 0 to High(SacrilegeAmbushStartingPosition) do
@@ -650,7 +650,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
   procedure SwordAmbush;
   var
     I: Integer;
-    CreaturePosition, CreatureDirection: TVector3Single;
+    CreaturePosition, CreatureDirection: TVector3;
   begin
     for I := 0 to High(SwordAmbushStartingPosition) do
     begin
@@ -759,7 +759,7 @@ begin
   MovingElevator.Add(Elevator);
   MovingElevator.Add(ElevatorButton);
   MovingElevator.MoveTime := 10.0;
-  MovingElevator.TranslationEnd := Vector3Single(0, 0, 122);
+  MovingElevator.TranslationEnd := Vector3(0, 0, 122);
   MovingElevator.SoundGoEndPosition := stElevator;
   MovingElevator.SoundGoEndPositionLooping := true;
   MovingElevator.SoundGoBeginPosition := stElevator;
@@ -820,7 +820,7 @@ begin
     begin
       if (Boss <> nil) and (not Boss.Dead) then
       begin
-        Player.Hurt(2 + Random(5), Vector3Single(0, -1, 0), 2, nil);
+        Player.Hurt(2 + Random(5), Vector3(0, -1, 0), 2, nil);
         SoundEngine.Sound(stEvilLaugh);
         Notifications.Show('No exit for the one who does not fight');
       end else
@@ -925,7 +925,7 @@ const
   MinSpiderY = -123.0 + SpiderLargeRadius;
   MaxSpiderY = 162.0  - SpiderLargeRadius;
 
-  procedure AppearSpider(const Position: TVector3Single);
+  procedure AppearSpider(const Position: TVector3);
   var
     SA: TSpiderAppearing;
   begin
@@ -936,14 +936,14 @@ const
     SpidersAppearing.Add(SA);
   end;
 
-  function RandomSpiderXY: TVector3Single;
+  function RandomSpiderXY: TVector3;
   begin
     Result[0] := MapRange(Random, 0.0, 1.0, MinSpiderX, MaxSpiderX);
     Result[1] := MapRange(Random, 0.0, 1.0, MinSpiderY, MaxSpiderY);
     Result[2] := SpiderZ;
   end;
 
-  function RandomSpiderXYAroundPlayer: TVector3Single;
+  function RandomSpiderXYAroundPlayer: TVector3;
   const
     RandomDist = 10.0;
   begin
@@ -973,7 +973,7 @@ var
   AboveHeight: Single;
   I: Integer;
   SpiderCreature: TCreature;
-  SpiderPosition, SpiderDirection: TVector3Single;
+  SpiderPosition, SpiderDirection: TVector3;
   SpiderMoveDistance, SpiderRadius: Single;
   SA: TSpiderAppearing;
   TorchLight: PLightInstance;
@@ -1038,7 +1038,7 @@ begin
         { calculate SpiderMoveDistance }
         SpiderMoveDistance := SpidersFallingSpeed * SecondsPassed;
         MinVar(SpiderMoveDistance, AboveHeight - SpiderRadius);
-        SpiderPosition[2] -= SpiderMoveDistance;
+        SpiderPosition.Data[2] -= SpiderMoveDistance;
         SA.Translation := SpiderPosition;
         Inc(I);
       end;
@@ -1226,7 +1226,7 @@ var
       on Doom E1M1 level (maybe all doors totally ?) have the same
       values for parameters below. }
     Result.MoveTime := 1.0;
-    Result.TranslationEnd := Vector3Single(0, 0, 3.5);
+    Result.TranslationEnd := Vector3(0, 0, 3.5);
     Result.StayOpenTime := 5.0;
   end;
 
@@ -1252,7 +1252,7 @@ begin
   MovingElevator49 := T3DLinearMoving.Create(Self);
   MovingElevator49.Add(Elevator49);
   MovingElevator49.MoveTime := 3.0;
-  MovingElevator49.TranslationEnd := Vector3Single(0, 0, -6.7);
+  MovingElevator49.TranslationEnd := Vector3(0, 0, -6.7);
   MovingElevator49.SoundGoEndPosition := stElevator;
   MovingElevator49.SoundGoEndPositionLooping := true;
   MovingElevator49.SoundGoBeginPosition := stElevator;
@@ -1267,7 +1267,7 @@ begin
   MovingElevator9a9b := T3DLinearMoving.Create(Self);
   MovingElevator9a9b.Add(Elevator9a9b);
   MovingElevator9a9b.MoveTime := 3.0;
-  MovingElevator9a9b.TranslationEnd := Vector3Single(0, 0, -7.5);
+  MovingElevator9a9b.TranslationEnd := Vector3(0, 0, -7.5);
   MovingElevator9a9b.SoundGoEndPosition := stElevator;
   MovingElevator9a9b.SoundGoEndPositionLooping := true;
   MovingElevator9a9b.SoundGoBeginPosition := stElevator;

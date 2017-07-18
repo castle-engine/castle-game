@@ -186,7 +186,7 @@ end;
 
 procedure TSubMenu.Render;
 const
-  SubMenuTextColor: TCastleColor = (0.9, 0.9, 0.9, 1.0);
+  SubMenuTextColor: TCastleColor = (Data: (0.9, 0.9, 0.9, 1.0));
 var
   R: TRectangle;
 begin

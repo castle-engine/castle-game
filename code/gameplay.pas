@@ -161,7 +161,7 @@ procedure TStatePlay.TGame2DControls.Render;
     end;
 
   const
-    NameColor: TCastleColor = (1.0, 1.0, 0.5, 1.0);
+    NameColor: TCastleColor = (Data: (1.0, 1.0, 0.5, 1.0));
   var
     I, X, Y: Integer;
     S: string;
@@ -225,8 +225,8 @@ procedure TStatePlay.TGame2DControls.Render;
     LinePressAttack = 4;
     LineFPS = 5;
     LineShadowVolumesCounts = 6;
-    Gray07: TCastleColor = (0.7, 0.7, 0.7, 1.0);
-    Gray08: TCastleColor = (0.8, 0.8, 0.8, 1.0);
+    Gray07: TCastleColor = (Data: (0.7, 0.7, 0.7, 1.0));
+    Gray08: TCastleColor = (Data: (0.8, 0.8, 0.8, 1.0));
 
   function YLine(const Line: Cardinal): Integer;
   begin
@@ -346,7 +346,7 @@ procedure TStatePlay.TGame2DControls.Render;
       GLFadeRectangleDark(ParentRect, Red, 1.0) else
     begin
       if Player.Swimming = psUnderWater then
-        DrawRectangle(ParentRect, Vector4Single(0, 0, 0.1, 0.5));
+        DrawRectangle(ParentRect, Vector4(0, 0, 0.1, 0.5));
 
       { Possibly, Player.FadeOut* will be applied on top of water effect,
         that's Ok --- they'll mix. }
@@ -477,10 +477,10 @@ end;
 procedure TStatePlay.Update(const SecondsPassed: Single;
   var HandleInput: boolean);
 const
-  GameWinPosition1: TVector3Single = (30.11, 146.27, 1.80);
-  GameWinPosition2: TVector3Single = (30.11, 166.27, 1.80);
-  GameWinDirection: TVector3Single = (0, 1, 0);
-  GameWinUp: TVector3Single = (0, 0, 1);
+  GameWinPosition1: TVector3 = (Data: (30.11, 146.27, 1.80));
+  GameWinPosition2: TVector3 = (Data: (30.11, 166.27, 1.80));
+  GameWinDirection: TVector3 = (Data: (0, 1, 0));
+  GameWinUp: TVector3 = (Data: (0, 0, 1));
 var
   Cages: TCagesLevel;
 begin
