@@ -373,7 +373,7 @@ begin
       if (C.Life > 0) and (IncludeStill or (not (C is TStillCreature))) then
       begin
         C.SoundDieEnabled := false;
-        C.Hurt(1000 * 1000, ZeroVector3Single, 0, nil);
+        C.Hurt(1000 * 1000, TVector3.Zero, 0, nil);
       end;
     end;
 end;
@@ -483,7 +483,7 @@ end;
 
 procedure TDebugLevelMenu.ClickRestart(Sender: TObject);
 var
-  Pos, Dir, Up: TVector3Single;
+  Pos, Dir, Up: TVector3;
 begin
   Pos := Player.Camera.Position;
   Dir := Player.Camera.Direction;

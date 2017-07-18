@@ -530,7 +530,7 @@ begin
   inherited;
   Menu := (Owner as TStateControlsMenu).CurrentMenu;
   DrawRectangle(Menu.ScreenRect.Grow(150),
-    Vector4Single(0, 0, 0, Menu.BackgroundOpacityFocused));
+    Vector4(0, 0, 0, Menu.BackgroundOpacityFocused));
 end;
 
 { TStateControlsMenu --------------------------------------------------------- }

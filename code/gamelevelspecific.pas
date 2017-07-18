@@ -1027,8 +1027,7 @@ begin
       SA.Height(SpiderPosition, AboveHeight);
       if AboveHeight < SpiderRadius * 2 then
       begin
-        SpiderDirection :=
-          VectorSubtract(Player.Position, SpiderPosition);
+        SpiderDirection := Player.Position - SpiderPosition;
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, World.GravityUp);
         SpiderCreature := Spider.CreateCreature(World, SpiderPosition, SpiderDirection);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);

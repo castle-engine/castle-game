@@ -113,7 +113,7 @@ begin
     { we could set mat diffuse in Blender and export to VRML,
       but it's easier for now to hardcode it here. }
     Mat := M as TMaterialNode;
-    Mat.FdDiffuseColor.Value := Vector3Single(0.5, 0.5, 1.0);
+    Mat.FdDiffuseColor.Value := Vector3(0.5, 0.5, 1.0);
 
     CS := TComposedShaderNode.Create;
     CS.X3DName := 'WaterShader';
@@ -134,7 +134,7 @@ begin
     MT.FdUrl.Items.Add('water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png');
     MT.FdLoop.Value := true;
 
-    ShaderCamMatrix := TSFMatrix3f.Create(CS, 'cameraRotationInverseMatrix', IdentityMatrix3Single);
+    ShaderCamMatrix := TSFMatrix3f.Create(CS, 'cameraRotationInverseMatrix', TMatrix3.Identity);
     CS.AddCustomField(ShaderCamMatrix, true);
 
     Part := TShaderPartNode.Create('', RootNode.BaseUrl);

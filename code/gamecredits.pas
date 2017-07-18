@@ -94,7 +94,7 @@ procedure TStateCredits.T3DCredits.Update(const SecondsPassed: Single; var Remov
 begin
   inherited;
   AnimationTime := AnimationTime + SecondsPassed;
-  Translation := Vector3Single(0, AnimationSpeed * AnimationTime, 0);
+  Translation := Vector3(0, AnimationSpeed * AnimationTime, 0);
   if AnimationTime > AnimationEnd then
     TUIState.Pop(StateCredits);
 end;
@@ -155,7 +155,7 @@ procedure TStateCredits.Start;
 begin
   inherited;
   Credits.AnimationTime := 0;
-  Credits.Translation := ZeroVector3Single;
+  Credits.Translation := TVector3.Zero;
 
   InsertBack(ControlsUnder);
   InsertFront(CreditsSceneManager);
