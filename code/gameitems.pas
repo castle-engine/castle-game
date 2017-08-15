@@ -60,7 +60,8 @@ procedure ItemsResourcesInit;
 
 implementation
 
-uses SysUtils, GamePlay, CastleGameNotifications;
+uses SysUtils, Math,
+  GamePlay, CastleGameNotifications;
 
 { TItemPotionOfLifeResource ------------------------------------------------------ }
 
