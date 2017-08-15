@@ -58,7 +58,7 @@ var
 
 implementation
 
-uses SysUtils,
+uses SysUtils, Math,
   CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils,
   CastleApplicationProperties, CastleUtils, X3DFields,
