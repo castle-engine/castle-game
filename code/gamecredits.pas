@@ -26,7 +26,7 @@ unit GameCredits;
 interface
 
 uses Classes,
-  CastleWindow, CastleUIControls, X3DNodes, CastleSceneManager,
+  CastleWindow, CastleUIControls, X3DNodes, CastleSceneManager, CastleCameras,
   CastleUIState, Castle3D, CastleTimeUtils, CastleScene, CastleKeysMouse;
 
 type
@@ -124,8 +124,7 @@ begin
   CreditsSceneManager.Items.Add(Credits);
   CreditsSceneManager.MainScene := Credits.Scene;
 
-  CreditsSceneManager.Camera := CreditsSceneManager.CreateDefaultCamera;
-  CreditsSceneManager.Camera.Input := [];
+  CreditsSceneManager.NavigationType := ntNone;
 end;
 
 destructor TStateCredits.Destroy;

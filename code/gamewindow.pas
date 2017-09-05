@@ -52,7 +52,8 @@ type
       TCastleTouchControl instances, placing them at suitable positions
       and handling their operations. }
     property TouchInterface: TTouchInterface read FTouchInterface;
-    procedure SetTouchInterface(const Value: TTouchInterface; const Camera: TCamera);
+    procedure SetTouchInterface(const Value: TTouchInterface;
+      const WalkCamera: TWalkCamera);
   end;
 
   TGlobalCatchInput = class(TUIControl)
@@ -144,7 +145,8 @@ begin
   end;
 end;
 
-procedure TGameWindow.SetTouchInterface(const Value: TTouchInterface; const Camera: TCamera);
+procedure TGameWindow.SetTouchInterface(const Value: TTouchInterface;
+  const WalkCamera: TWalkCamera);
 
   procedure UpdateTouchController(
     const RightSide, CtlVisible: boolean; const Mode: TCastleTouchCtlMode);
@@ -170,9 +172,6 @@ procedure TGameWindow.SetTouchInterface(const Value: TTouchInterface; const Came
     end;
   end;
 
-var
-  WalkCamera: TWalkCamera;
-
   procedure UpdateTouchControllers(
     const MouseDragMode: TMouseDragMode;
     const LeftVisible, RightVisible: boolean;
@@ -189,15 +188,6 @@ begin
   if FTouchInterface <> Value then
   begin
     FTouchInterface := Value;
-
-    WalkCamera := nil;
-    if Camera <> nil then
-    begin
-      if Camera is TUniversalCamera then
-        WalkCamera := (Camera as TUniversalCamera).Walk else
-      if Camera is TWalkCamera then
-        WalkCamera := Camera as TWalkCamera;
-    end;
 
     case Value of
       tiNone:
