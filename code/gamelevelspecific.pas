@@ -294,7 +294,7 @@ begin
   Button := LoadLevelScene(CastleHallLevelPath + 'button.kanim', false,
     TCastleHallButton);
   Button.CastShadowVolumes := false; { strange ghost shadow on symbol would be visible }
-  Button.AnimationTimeSensor('animation').EventIsActive.OnReceive.Add(
+  Button.AnimationTimeSensor('animation').EventIsActive.AddNotification(
     @ButtonAnimationIsActiveChanged);
 
   World.Add(Button);

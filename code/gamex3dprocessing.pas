@@ -38,7 +38,8 @@ procedure LevelFountainProcess(Node: TX3DNode);
 
 implementation
 
-uses SysUtils, X3DFields, CastleVectors;
+uses SysUtils,
+  X3DFields, CastleVectors, CastleRendererBaseTypes;
 
 { AddNormalMapToTexture ------------------------------------------------------ }
 
@@ -126,26 +127,26 @@ begin
     CM.FdSize.Value := 512;}
 
     CM := TImageCubeMapTextureNode.Create('', RootNode.BaseUrl);
-    CS.AddCustomField(TSFNode.Create(CS, 'envMap', [], CM));
-    CM.FdUrl.Items.Add('water_reflections/water_environment_map.dds');
+    CS.AddCustomField(TSFNode.Create(CS, false, 'envMap', [], CM));
+    CM.SetUrl(['water_reflections/water_environment_map.dds']);
 
     MT := TMovieTextureNode.Create('', RootNode.BaseUrl);
-    CS.AddCustomField(TSFNode.Create(CS, 'normalMap', [], MT));
-    MT.FdUrl.Items.Add('water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png');
-    MT.FdLoop.Value := true;
+    CS.AddCustomField(TSFNode.Create(CS, false, 'normalMap', [], MT));
+    MT.SetUrl(['water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png']);
+    MT.Loop := true;
 
-    ShaderCamMatrix := TSFMatrix3f.Create(CS, 'cameraRotationInverseMatrix', TMatrix3.Identity);
+    ShaderCamMatrix := TSFMatrix3f.Create(CS, false, 'cameraRotationInverseMatrix', TMatrix3.Identity);
     CS.AddCustomField(ShaderCamMatrix, true);
 
     Part := TShaderPartNode.Create('', RootNode.BaseUrl);
     CS.FdParts.Add(Part);
-    Part.FdType.Value := 'FRAGMENT';
-    Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.fs');
+    Part.ShaderType := stFragment;
+    Part.SetUrl(['water_reflections/water_reflections_normalmap.fs']);
 
     Part := TShaderPartNode.Create('', RootNode.BaseUrl);
     CS.FdParts.Add(Part);
-    Part.FdType.Value := 'VERTEX';
-    Part.FdUrl.Items.Add('water_reflections/water_reflections_normalmap.vs');
+    Part.ShaderType := stVertex;
+    Part.SetUrl(['water_reflections/water_reflections_normalmap.vs']);
 
     V := RootNode.TryFindNode(TViewpointNode, true) as TViewpointNode;
     if V <> nil then
