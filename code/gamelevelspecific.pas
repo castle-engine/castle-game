@@ -163,7 +163,7 @@ type
     }
 
     function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single): boolean; override;
+      const Distance: Single; const CancelAction: boolean = false): boolean; override;
   end;
 
   TDoomE1M1Level = class(TLevelLogic)
@@ -232,11 +232,11 @@ end;
 type
   TStairsBlocker = class(TCastleScene)
     function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single): boolean; override;
+      const Distance: Single; const CancelAction: boolean = false): boolean; override;
   end;
 
 function TStairsBlocker.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single): boolean;
+  const Distance: Single; const CancelAction: boolean = false): boolean;
 begin
   Result := Active;
   if not Result then Exit;
@@ -249,11 +249,11 @@ end;
 type
   TCastleHallButton = class(TCastleScene)
     function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single): boolean; override;
+      const Distance: Single; const CancelAction: boolean = false): boolean; override;
   end;
 
 function TCastleHallButton.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single): boolean;
+  const Distance: Single; const CancelAction: boolean = false): boolean;
 begin
   Result := Active;
   if not Result then Exit;
@@ -717,11 +717,11 @@ type
   TTowerElevatorButton = class(TCastleScene)
     MovingElevator: T3DLinearMoving;
     function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single): boolean; override;
+      const Distance: Single; const CancelAction: boolean = false): boolean; override;
   end;
 
 function TTowerElevatorButton.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single): boolean;
+  const Distance: Single; const CancelAction: boolean = false): boolean;
 begin
   Result := Active;
   if not Result then Exit;
@@ -803,11 +803,11 @@ type
   TGateExit = class(TCastleScene)
     Boss: TCreature;
     function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single): boolean; override;
+      const Distance: Single; const CancelAction: boolean = false): boolean; override;
   end;
 
 function TGateExit.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single): boolean;
+  const Distance: Single; const CancelAction: boolean = false): boolean;
 begin
   Result := Active;
   if not Result then Exit;
@@ -1111,7 +1111,7 @@ begin
 end;
 
 function TDoomLevelDoor.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single): boolean;
+  const Distance: Single; const CancelAction: boolean = false): boolean;
 begin
   Result := Active;
   if not Result then Exit;
@@ -1133,11 +1133,11 @@ type
     MovingElevator9a9b: T3DLinearMoving;
     Elevator9a9bPickBox: TBox3D;
     function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single): boolean; override;
+      const Distance: Single; const CancelAction: boolean = false): boolean; override;
   end;
 
 function TElevator9a9b.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single): boolean;
+  const Distance: Single; const CancelAction: boolean = false): boolean;
 begin
   Result := Active;
   if not Result then Exit;
@@ -1161,12 +1161,12 @@ type
   public
     ExitMessagePending: boolean;
     function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single): boolean; override;
+      const Distance: Single; const CancelAction: boolean = false): boolean; override;
     procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
   end;
 
 function TExitButton.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single): boolean;
+  const Distance: Single; const CancelAction: boolean = false): boolean;
 begin
   Result := Active;
   if not Result then Exit;
