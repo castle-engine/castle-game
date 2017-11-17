@@ -1075,7 +1075,7 @@ procedure TDoomLevelDoor.BeforeTimeIncrease(const NewTime: TFloatTime);
     I: Integer;
   begin
     DoorBox := (inherited BoundingBox).Translate(
-      GetTranslationFromTime(NewTime) - GetTranslation);
+      GetTranslationFromTime(NewTime) - Translation);
 
     Result := false;
 
