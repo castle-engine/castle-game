@@ -25,7 +25,7 @@ unit GameCreatures;
 
 interface
 
-uses Classes, CastleVectors, CastlePrecalculatedAnimation, CastleClassUtils, CastleUtils,
+uses Classes, CastleVectors, CastleClassUtils, CastleUtils,
   CastleScene, CastleResources, CastleXMLConfig, Castle3D, X3DNodes, CastleCreatures;
 
 type

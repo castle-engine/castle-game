@@ -27,13 +27,13 @@ interface
 
 uses Classes,
   CastleWindow, CastleUIControls, X3DNodes, CastleSceneManager, CastleCameras,
-  CastleUIState, Castle3D, CastleTimeUtils, CastleScene, CastleKeysMouse;
+  CastleUIState, CastleTransform, CastleTimeUtils, CastleScene, CastleKeysMouse;
 
 type
   TStateCredits = class(TUIState)
   strict private
     type
-      T3DCredits = class(T3DTransform)
+      T3DCredits = class(TCastleTransform)
       public
         AnimationTime, AnimationSpeed, AnimationEnd: TFloatTime;
         Scene: TCastleScene;

@@ -29,9 +29,9 @@ interface
 
 uses DOM,
   CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer,
-  CastleLevels, X3DNodes, X3DFields, X3DTIme, Castle3D, CastleSoundEngine,
+  CastleLevels, X3DNodes, X3DFields, X3DTIme, CastleTransform, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors,
-  CastleFrustum,
+  CastleFrustum, Castle3D,
   GameSound;
 
 type
@@ -73,7 +73,7 @@ type
     FGateExitBox: TBox3D;
 
     Teleport: TCastleScene;
-    Teleport1, Teleport2: T3DTransform;
+    Teleport1, Teleport2: TCastleTransform;
     Teleport1Box, Teleport2Box: TBox3D;
     Teleport1Destination: TVector3;
     Teleport2Destination: TVector3;
@@ -106,7 +106,7 @@ type
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
   end;
 
-  TSpiderAppearing = class(T3DTransform)
+  TSpiderAppearing = class(TCastleTransform)
     procedure Render(const Frustum: TFrustum; const Params: TRenderParams); override;
   end;
 
@@ -399,7 +399,7 @@ begin
 
   if (Player = nil) then Exit;
 
-  if FLevelExitBox.Contains(Player.Position) then
+  if FLevelExitBox.Contains(Player.Translation) then
   begin
     LevelFinished('cages');
   end;
@@ -428,7 +428,7 @@ procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
     for I := 0 to WerewolvesCount - 1 do
       WerewolfCreature[I] := Werewolf.CreateCreature(World,
         WerewolfAppearPosition[I],
-        Player.Position - WerewolfAppearPosition[I])
+        Player.Translation - WerewolfAppearPosition[I])
         as TWerewolfCreature;
 
     WerewolfAppeared := true;
@@ -520,13 +520,13 @@ begin
   Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false);
   Teleport.Collides := false;
 
-  Teleport1 := T3DTransform.Create(Self);
+  Teleport1 := TCastleTransform.Create(Self);
   { set rotation axis. Rotation angle will be increased in each Update }
   Teleport1.Rotation :=  Vector4(1, 1, 0, 0);
   Teleport1.Add(Teleport);
   World.Add(Teleport1);
 
-  Teleport2 := T3DTransform.Create(Self);
+  Teleport2 := TCastleTransform.Create(Self);
   Teleport2.Rotation :=  Vector4(1, 1, 0, 0);
   Teleport2.Add(Teleport);
   World.Add(Teleport2);
@@ -604,16 +604,16 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
   var
     NewPosition: TVector3;
   begin
-    NewPosition := Player.Position;
+    NewPosition := Player.Translation;
     { Although I do him knockback, I also change the position
       to make sure that he is thrown outside of FGateExitBox. }
     NewPosition.Data[1] := FGateExitBox.Data[0].Data[1] - 0.1;
-    Player.Position := NewPosition;
+    Player.Translation := NewPosition;
 
     GamePlay.Player.Hurt(0, Vector3(0, -1, 0), 2, nil);
   end;
 
-  procedure TeleportWork(Teleport: T3DTransform; const TeleportBox: TBox3D;
+  procedure TeleportWork(Teleport: TCastleTransform; const TeleportBox: TBox3D;
     const Destination: TVector3);
   var
     Rot: TVector4;
@@ -622,9 +622,9 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     Rot.Data[3] += 0.175 * SecondsPassed;
     Teleport.Rotation := Rot;
 
-    if TeleportBox.Contains(Player.Position) then
+    if TeleportBox.Contains(Player.Translation) then
     begin
-      Player.Position := Destination;
+      Player.Translation := Destination;
       GamePlay.Player.Camera.CancelFalling;
 
       SceneManager.MainScene.ViewChangedSuddenly;
@@ -642,7 +642,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     for I := 0 to High(SacrilegeAmbushStartingPosition) do
     begin
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
-      CreatureDirection := Player.Position - CreaturePosition;
+      CreatureDirection := Player.Translation - CreaturePosition;
       Ghost.CreateCreature(World, CreaturePosition, CreatureDirection);
     end;
   end;
@@ -655,7 +655,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     for I := 0 to High(SwordAmbushStartingPosition) do
     begin
       CreaturePosition := SwordAmbushStartingPosition[I];
-      CreatureDirection := Player.Position - CreaturePosition;
+      CreatureDirection := Player.Translation - CreaturePosition;
       Ghost.CreateCreature(World, CreaturePosition, CreatureDirection);
     end;
   end;
@@ -668,7 +668,7 @@ begin
 
   if (Player = nil) then Exit;
 
-  if FGateExitBox.Contains(Player.Position) then
+  if FGateExitBox.Contains(Player.Translation) then
   begin
     if GamePlay.Player.Inventory.FindResource(KeyItemResource) = -1 then
     begin
@@ -690,7 +690,7 @@ begin
     TeleportWork(Teleport2, Teleport2Box, Teleport2Destination);
 
     if (not SacrilegeAmbushDone) and
-      FSacrilegeBox.Contains(Player.Position) then
+      FSacrilegeBox.Contains(Player.Translation) then
     begin
       SacrilegeAmbushDone := true;
       SacrilegeAmbush;
@@ -947,10 +947,10 @@ const
   const
     RandomDist = 10.0;
   begin
-    Result[0] := Player.Position[0] +
+    Result[0] := Player.Translation[0] +
       MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
     Result[0] := Clamped(Result[0], MinSpiderX, MaxSpiderX);
-    Result[1] := Player.Position[1] +
+    Result[1] := Player.Translation[1] +
       MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
     Result[1] := Clamped(Result[1], MinSpiderY, MaxSpiderY);
     Result[2] := SpiderZ;
@@ -1027,7 +1027,7 @@ begin
       SA.Height(SpiderPosition, AboveHeight);
       if AboveHeight < SpiderRadius * 2 then
       begin
-        SpiderDirection := Player.Position - SpiderPosition;
+        SpiderDirection := Player.Translation - SpiderPosition;
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, World.GravityUp);
         SpiderCreature := Spider.CreateCreature(World, SpiderPosition, SpiderDirection);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
@@ -1143,7 +1143,7 @@ begin
   if not Result then Exit;
 
   Result := MovingElevator9a9b.CompletelyBeginPosition and
-    Elevator9a9bPickBox.Contains(Player.Position);
+    Elevator9a9bPickBox.Contains(Player.Translation);
 
   if Result then
   begin
@@ -1317,7 +1317,7 @@ begin
   if Player = nil then Exit;
 
   if MovingElevator49.CompletelyBeginPosition and
-     Elevator49DownBox.Contains(Player.Position) then
+     Elevator49DownBox.Contains(Player.Translation) then
   begin
     MovingElevator49.GoEndPosition;
   end;
@@ -1354,7 +1354,7 @@ end;
 constructor TFountainLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
   MainScene: TCastleScene; DOMElement: TDOMElement);
 var
-  Fountain: TBlendedLoopingAnimation;
+  Fountain: TSceneWaterShader;
   LoadWaterAnimation: boolean;
 begin
   inherited;
@@ -1364,20 +1364,14 @@ begin
   if DOMElement.AttributeBoolean('load_water_animation', LoadWaterAnimation)
     and LoadWaterAnimation then
   begin
-    { load Fountain animation, following the similar code as LoadLevelAnimation }
-    Fountain := TBlendedLoopingAnimationShader.Create(Self);
-    Fountain.LoadFromFile(LevelsPath + 'fountain/water_stream/fountain.kanim', false, true);
-    { progress is being already done }
-    {Progress.Init(Fountain.PrepareResourcesSteps, 'Loading water');
-    try}
-      Fountain.PrepareResources([prRender, prBoundingBox], {true}false, SceneManager.BaseLights);
-    {finally Progress.Fini end;}
+    { load Fountain animation }
+    Fountain := TSceneWaterShader.Create(Self);
+    Fountain.Load(LevelsPath + 'fountain/water_stream/fountain.kanim');
+    Fountain.PrepareResources([prRender, prBoundingBox], false, SceneManager.BaseLights);
     Fountain.FreeResources([frTextureDataInNodes]);
     Fountain.CastShadowVolumes := false; { not manifold }
     Fountain.Collides := false;
-
     Fountain.Attributes.BlendingDestinationFactor := bdOneMinusSrcAlpha;
-
     Fountain.TimePlayingSpeed := 1.5;
     Fountain.TimePlaying := true;
 

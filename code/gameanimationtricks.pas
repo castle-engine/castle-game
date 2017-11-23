@@ -27,10 +27,12 @@ unit GameAnimationTricks;
 
 interface
 
-uses Classes, CastlePrecalculatedAnimation, CastleFrustum, CastleVectors,
+uses Classes,
+  CastleFrustum, CastleVectors, CastleScene,
   CastleGLShaders, Castle3D, CastleRendererInternalShader;
 
 type
+(*
   { Animation forced to seamlessly loop by blending the beginning frames
     with end frames. This is a really brutal (often looking bad),
     but universal way to make animation seamlessly loop (works
@@ -55,9 +57,10 @@ type
     procedure Render(const Frustum: TFrustum;
       const Params: TRenderParams); override;
   end;
+*)
 
-  { TBlendedLoopingAnimation with a GLSL shader with a cubemap. }
-  TBlendedLoopingAnimationShader = class(TBlendedLoopingAnimation)
+  { Scene with a GLSL shader with a cubemap. }
+  TSceneWaterShader = class(TCastleScene)
   private
     CustomShader: TX3DShaderProgramBase;
   public
@@ -71,6 +74,7 @@ uses Math, CastleUtils, CastleGLUtils, CastleStringUtils, SysUtils,
   CastleFilesUtils, CastleRenderingCamera, CastleCompositeImage, CastleGL,
   CastleGLImages, CastleRenderer;
 
+(*
 { TBlendedLoopingAnimation --------------------------------------------------- }
 
 constructor TBlendedLoopingAnimation.Create(AOwner: TComponent);
@@ -147,6 +151,7 @@ begin
     glDisable(GL_BLEND);
   end;
 end;
+*)
 
 { TWaterShader --------------------------------------------------------------- }
 
@@ -225,20 +230,20 @@ begin
   SetUniform('cameraRotationInverseMatrix', RenderingCamera.RotationInverseMatrix3);
 end;
 
-{ TBlendedLoopingAnimationShader --------------------------------------------- }
+{ TSceneWaterShader --------------------------------------------- }
 
-procedure TBlendedLoopingAnimationShader.GLContextClose;
+procedure TSceneWaterShader.GLContextClose;
 begin
   if CustomShader <> nil then
     FreeAndNil(CustomShader);
   inherited;
 end;
 
-procedure TBlendedLoopingAnimationShader.Render(const Frustum: TFrustum;
+procedure TSceneWaterShader.Render(const Frustum: TFrustum;
   const Params: TRenderParams);
 begin
   {$ifndef OpenGLES}
-  { our shader cannot work with OpenGLES }
+  { TODO: our shader cannot work with OpenGLES yet }
   if Attributes.CustomShader = nil then
   begin
     CustomShader := TWaterShader.Create(Attributes);

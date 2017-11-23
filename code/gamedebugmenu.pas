@@ -397,7 +397,7 @@ begin
   if ChooseResource(Resource, true) then
   begin
     (Resource as TCreatureResource).CreateCreature(SceneManager.Items,
-      Player.Position + Player.Direction * DirectionAttenuation,
+      Player.Translation + Player.Direction * DirectionAttenuation,
       Player.Direction);
 
     TUIState.Pop(StateDebugMenu);
