@@ -1,0 +1,8 @@
+- water shaders in data/levels/fountain/water_reflections/
+  are broken now on desktop,
+  not adjusted 100% to use castle_Xxx uniforms.
+
+  Why are there two shader sets?
+
+- GameAnimationTricks simply renders one animation, instead of animating
+  two scenes simultaneously.
