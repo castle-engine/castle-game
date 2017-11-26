@@ -65,7 +65,7 @@ type
     CustomShader: TX3DShaderProgramBase;
   public
     procedure GLContextClose; override;
-    procedure Render(const Frustum: TFrustum; const Params: TRenderParams); override;
+    procedure LocalRender(const Frustum: TFrustum; const Params: TRenderParams); override;
   end;
 
 implementation
@@ -239,7 +239,7 @@ begin
   inherited;
 end;
 
-procedure TSceneWaterShader.Render(const Frustum: TFrustum;
+procedure TSceneWaterShader.LocalRender(const Frustum: TFrustum;
   const Params: TRenderParams);
 begin
   {$ifndef OpenGLES}

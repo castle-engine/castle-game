@@ -26,7 +26,7 @@ unit GamePlay;
 
 interface
 
-uses Classes, CastleLevels, CastlePlayer, Castle3D, CastleControlsImages,
+uses Classes, CastleLevels, CastlePlayer, CastleTransform, CastleControlsImages,
   CastleRectangles, CastleUIState, CastleKeysMouse, CastleUIControls;
 
 { Play the game.
@@ -38,7 +38,7 @@ procedure PlayGame(PrepareNewPlayer: boolean);
 type
   TCastle1SceneManager = class(TGameSceneManager)
   protected
-    function PointingDeviceActivate3D(const Item: T3D; const Active: boolean;
+    function PointingDeviceActivate3D(const Item: TCastleTransform; const Active: boolean;
       const Distance: Single): boolean; override;
   end;
 
@@ -392,7 +392,7 @@ end;
 
 { TCastle1SceneManager ------------------------------------------------------- }
 
-function TCastle1SceneManager.PointingDeviceActivate3D(const Item: T3D;
+function TCastle1SceneManager.PointingDeviceActivate3D(const Item: TCastleTransform;
   const Active: boolean; const Distance: Single): boolean;
 const
   VisibleDistance = 60.0;
@@ -738,5 +738,5 @@ initialization
   ApplicationProperties.OnGLContextClose.Add(@ContextClose);
   OnCreatureExists := @TGamePlay(nil).CreatureExists;
   OnItemOnWorldExists := @TGamePlay(nil).ItemOnWorldExists;
-  T3DOrient.DefaultOrientation := otUpZDirectionX;
+  TCastleTransform.DefaultOrientation := otUpZDirectionX;
 end.

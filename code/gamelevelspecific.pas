@@ -107,7 +107,7 @@ type
   end;
 
   TSpiderAppearing = class(TCastleTransform)
-    procedure Render(const Frustum: TFrustum; const Params: TRenderParams); override;
+    procedure LocalRender(const Frustum: TFrustum; const Params: TRenderParams); override;
   end;
 
   TGameWinAnimation = (
@@ -119,7 +119,7 @@ type
   TCagesLevel = class(TBossLevel)
   private
     { List of TSpiderAppearing instances }
-    SpidersAppearing: T3DList;
+    SpidersAppearing: TCastleTransform;
     NextSpidersAppearingTime: Single;
     { Instance of boss creature, if any, on the level. @nil if no boss creature
       exists on this level. }
@@ -777,7 +777,7 @@ const
     otherwise the spiders will be created on the ceiling of the model... }
   SpiderZ = 69.0;
 
-procedure TSpiderAppearing.Render(const Frustum: TFrustum; const Params: TRenderParams);
+procedure TSpiderAppearing.LocalRender(const Frustum: TFrustum; const Params: TRenderParams);
 begin
   {$ifndef OpenGLES} //TODO-es
   if (not Params.Transparent) and Params.ShadowVolumesReceivers then
@@ -839,7 +839,7 @@ constructor TCagesLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
 begin
   inherited;
 
-  SpidersAppearing := T3DList.Create(Self);
+  SpidersAppearing := TCastleTransform.Create(Self);
   World.Add(SpidersAppearing);
   NextSpidersAppearingTime := 0;
 

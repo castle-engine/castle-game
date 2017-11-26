@@ -6,3 +6,5 @@
 
 - GameAnimationTricks simply renders one animation, instead of animating
   two scenes simultaneously.
+
+- "cages" level got awfully slow with EnableFixedFunction = false.
