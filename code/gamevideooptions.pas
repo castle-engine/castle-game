@@ -60,6 +60,9 @@ var
   { 0 means "use system default" }
   VideoFrequency: Cardinal;
 
+var
+  RenderDebug: boolean;
+
 implementation
 
 uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow,

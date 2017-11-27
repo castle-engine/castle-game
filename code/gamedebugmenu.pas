@@ -65,15 +65,13 @@ type
     procedure ClickLevelsMenu(Sender: TObject);
     procedure ClickReloadResources(Sender: TObject);
     procedure ClickReloadResourceAnimation(Sender: TObject);
-    procedure ClickRenderDebug3D(Sender: TObject);
-    procedure ClickRenderDebugCaptions(Sender: TObject);
+    procedure ClickRenderDebug(Sender: TObject);
     procedure ClickShadowVolumesRender(Sender: TObject);
     procedure ClickDebugRenderForLevelScreenshot(Sender: TObject);
     procedure ClickReloadSounds(Sender: TObject);
     procedure ClickBack(Sender: TObject);
   public
-    RenderDebug3DToggle: TCastleMenuToggle;
-    RenderDebugCaptionsToggle: TCastleMenuToggle;
+    RenderDebugToggle: TCastleMenuToggle;
     ShadowVolumesRenderToggle: TCastleMenuToggle;
     DebugRenderForLevelScreenshotToggle: TCastleMenuToggle;
     constructor Create(AOwner: TComponent); override;
@@ -163,13 +161,9 @@ constructor TDebugMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  RenderDebug3DToggle := TCastleMenuToggle.Create(Self);
-  RenderDebug3DToggle.Pressed := RenderDebug3D;
-  RenderDebug3DToggle.OnClick := @ClickRenderDebug3D;
-
-  RenderDebugCaptionsToggle := TCastleMenuToggle.Create(Self);
-  RenderDebugCaptionsToggle.Pressed := RenderDebugCaptions;
-  RenderDebugCaptionsToggle.OnClick := @ClickRenderDebugCaptions;
+  RenderDebugToggle := TCastleMenuToggle.Create(Self);
+  RenderDebugToggle.Pressed := RenderDebug;
+  RenderDebugToggle.OnClick := @ClickRenderDebug;
 
   ShadowVolumesRenderToggle := TCastleMenuToggle.Create(Self);
   ShadowVolumesRenderToggle.Pressed := ShadowVolumesRender;
@@ -185,8 +179,7 @@ begin
   Add('Level debug menu ...', @ClickLevelsMenu);
   Add('Reload resources resource.xml files', @ClickReloadResources);
   Add('Reload resource animation ...', @ClickReloadResourceAnimation);
-  Add('Render debug 3D information', RenderDebug3DToggle);
-  Add('Render debug captions', RenderDebugCaptionsToggle);
+  Add('Render debug information', RenderDebugToggle);
   Add('Render shadow volumes', ShadowVolumesRenderToggle);
   Add('Render for level screenshot', DebugRenderForLevelScreenshotToggle);
   Add('Reload sounds/index.xml', @ClickReloadSounds);
@@ -231,16 +224,15 @@ begin
   end;
 end;
 
-procedure TDebugMenu.ClickRenderDebug3D(Sender: TObject);
+procedure TDebugMenu.ClickRenderDebug(Sender: TObject);
 begin
-  RenderDebug3D := not RenderDebug3D;
-  RenderDebug3DToggle.Pressed := RenderDebug3D;
-end;
-
-procedure TDebugMenu.ClickRenderDebugCaptions(Sender: TObject);
-begin
-  RenderDebugCaptions := not RenderDebugCaptions;
-  RenderDebugCaptionsToggle.Pressed := RenderDebugCaptions;
+  { toggle our RenderDebug variable }
+  RenderDebug := not RenderDebug;
+  { set CastleCreatures and CastleItems debugging }
+  TCreature.RenderDebug := RenderDebug;
+  TItemOnWorld.RenderDebug := RenderDebug;
+  { update UI }
+  RenderDebugToggle.Pressed := RenderDebug;
 end;
 
 procedure TDebugMenu.ClickShadowVolumesRender(Sender: TObject);
