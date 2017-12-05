@@ -1367,7 +1367,7 @@ begin
     { load Fountain animation }
     Fountain := TSceneWaterShader.Create(Self);
     Fountain.Load(LevelsPath + 'fountain/water_stream/fountain.kanim');
-    Fountain.PrepareResources([prRender, prBoundingBox], false, SceneManager.BaseLights);
+    Fountain.PrepareResources([prRender, prBoundingBox], false, SceneManager.PrepareParams);
     Fountain.FreeResources([frTextureDataInNodes]);
     Fountain.CastShadowVolumes := false; { not manifold }
     Fountain.Collides := false;

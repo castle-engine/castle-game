@@ -135,8 +135,8 @@ begin
     MT.SetUrl(['water_reflections/baked_normals_low_res_seamless/baked_normals_%4d.png']);
     MT.Loop := true;
 
-    ShaderCamMatrix := TSFMatrix3f.Create(CS, false, 'cameraRotationInverseMatrix', TMatrix3.Identity);
-    CS.AddCustomField(ShaderCamMatrix, true);
+    ShaderCamMatrix := TSFMatrix3f.Create(CS, true, 'cameraRotationInverseMatrix', TMatrix3.Identity);
+    CS.AddCustomField(ShaderCamMatrix);
 
     Part := TShaderPartNode.Create('', RootNode.BaseUrl);
     CS.FdParts.Add(Part);

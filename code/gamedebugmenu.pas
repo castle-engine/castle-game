@@ -220,7 +220,7 @@ begin
     if Resource.UsageCount = 0 then
       MessageOK(Window, Format('Resource "%s" is not used by anything, ' +
         'cannot reload',  [Resource.Name])) else
-      Resource.RedoPrepare(SceneManager.BaseLights);
+      Resource.RedoPrepare(SceneManager.PrepareParams);
   end;
 end;
 
