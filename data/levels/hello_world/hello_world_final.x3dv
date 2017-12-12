@@ -30,4 +30,4 @@ NavigationInfo {
   type "WALK"
 }
 
-Inline { url "hello_world.wrl" }
+Inline { url "hello_world.x3d" }
