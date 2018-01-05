@@ -103,9 +103,6 @@ begin
   Levels.SortByNumber;
   Levels.LoadFromConfig(UserConfig);
 
-  { init sound. This displays progress of "Loading sounds". }
-  SoundEngine.ALContextOpen;
-
   { create states }
   StateStartMenu := TStateStartMenu.Create(Application);
   StateCredits := TStateCredits.Create(Application);
@@ -129,7 +126,7 @@ initialization
     as our log routines use it. }
   OnGetApplicationName := @MyGetApplicationName;
 
-  { Hack to not activate log yet on desktops, 
+  { Hack to not activate log yet on desktops,
     only to make --version command-line parameter working without any extra output }
   {$ifndef LINUX}
   {$ifndef MSWINDOWS}
