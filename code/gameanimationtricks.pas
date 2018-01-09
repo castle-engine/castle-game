@@ -54,8 +54,7 @@ type
   TBlendedLoopingAnimation = class(TCastlePrecalculatedAnimation)
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Render(const Frustum: TFrustum;
-      const Params: TRenderParams); override;
+    procedure LocalRender(const Params: TRenderParams); override;
   end;
 *)
 
@@ -65,7 +64,7 @@ type
     CustomShader: TX3DShaderProgramBase;
   public
     procedure GLContextClose; override;
-    procedure LocalRender(const Frustum: TFrustum; const Params: TRenderParams); override;
+    procedure LocalRender(const Params: TRenderParams); override;
   end;
 
 implementation
@@ -83,8 +82,7 @@ begin
   Attributes.Blending := false;
 end;
 
-procedure TBlendedLoopingAnimation.Render(const Frustum: TFrustum;
-  const Params: TRenderParams);
+procedure TBlendedLoopingAnimation.LocalRender(const Params: TRenderParams);
 var
   SceneIndex, MiddleIndex, HalfIndex: Integer;
   Amount: Single;
@@ -139,10 +137,10 @@ begin
     Params.Transparent := false;
 
       Attributes.Opacity := Amount;
-      Scenes[SceneIndex].Render(Frustum, Params);
+      Scenes[SceneIndex].LocalRender(Params);
 
       Attributes.Opacity := 1 - Amount;
-      Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].Render(Frustum, Params);
+      Scenes[(SceneIndex + MiddleIndex) mod ScenesCount].LocalRender(Params);
 
     Params.Transparent := true;
 
@@ -239,8 +237,7 @@ begin
   inherited;
 end;
 
-procedure TSceneWaterShader.LocalRender(const Frustum: TFrustum;
-  const Params: TRenderParams);
+procedure TSceneWaterShader.LocalRender(const Params: TRenderParams);
 begin
   {$ifndef OpenGLES}
   { TODO: our shader cannot work with OpenGLES yet }

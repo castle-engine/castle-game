@@ -107,7 +107,7 @@ type
   end;
 
   TSpiderAppearing = class(TCastleTransform)
-    procedure LocalRender(const Frustum: TFrustum; const Params: TRenderParams); override;
+    procedure LocalRender(const Params: TRenderParams); override;
   end;
 
   TGameWinAnimation = (
@@ -203,7 +203,7 @@ type
 implementation
 
 uses CastleFilesUtils, SysUtils, CastleUtils,
-  CastleGL, CastleGLUtils, CastleStringUtils, CastleMessages, CastleRenderingCamera,
+  CastleGL, CastleGLUtils, CastleStringUtils, CastleMessages,
   GamePlay, CastleGameNotifications, CastleInputs,
   GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, CastleProgress,
@@ -777,7 +777,7 @@ const
     otherwise the spiders will be created on the ceiling of the model... }
   SpiderZ = 69.0;
 
-procedure TSpiderAppearing.LocalRender(const Frustum: TFrustum; const Params: TRenderParams);
+procedure TSpiderAppearing.LocalRender(const Params: TRenderParams);
 begin
   {$ifndef OpenGLES} //TODO-es
   if (not Params.Transparent) and Params.ShadowVolumesReceivers then
