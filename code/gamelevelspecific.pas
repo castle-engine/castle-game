@@ -31,7 +31,7 @@ uses DOM,
   CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer,
   CastleLevels, X3DNodes, X3DFields, X3DTIme, CastleTransform, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors,
-  CastleFrustum, Castle3D, CastleGL,
+  CastleFrustum, Castle3D,
   GameSound;
 
 type
@@ -204,7 +204,7 @@ implementation
 
 uses CastleFilesUtils, SysUtils, CastleUtils,
   CastleGLUtils, CastleStringUtils, CastleMessages,
-  GamePlay, CastleGameNotifications, CastleInputs,
+  GamePlay, CastleGameNotifications, CastleInputs, CastleGL,
   GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, CastleProgress,
   CastleXMLUtils, GameItems;
