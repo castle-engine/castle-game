@@ -236,10 +236,10 @@ procedure TStatePlay.TGame2DControls.Render;
   procedure DoShowFPS;
   begin
     UIFont.Print(0, YLine(LineFPS), Gray07,
-      Format('FPS : %f (real : %f). Shapes : %d / %d',
-      [Window.Fps.FrameTime,
-       Window.Fps.RealTime,
-       SceneManager.Statistics.ShapesRendered, SceneManager.Statistics.ShapesVisible]));
+      Format('FPS : %s. Shapes : %d / %d',
+      [Window.Fps.ToString,
+       SceneManager.Statistics.ShapesRendered,
+       SceneManager.Statistics.ShapesVisible]));
   end;
 
   procedure DoShowShadowVolumesCounts;

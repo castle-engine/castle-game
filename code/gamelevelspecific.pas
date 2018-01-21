@@ -23,7 +23,7 @@
 { Level logic. TLevelLogic descendants specialized for castle1 levels. }
 unit GameLevelSpecific;
 
-{$I castleconf.inc}
+{$I castlegameconf.inc}
 
 interface
 
@@ -31,7 +31,7 @@ uses DOM,
   CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer,
   CastleLevels, X3DNodes, X3DFields, X3DTIme, CastleTransform, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors,
-  CastleFrustum, Castle3D,
+  CastleFrustum, Castle3D, CastleGL,
   GameSound;
 
 type
@@ -203,7 +203,7 @@ type
 implementation
 
 uses CastleFilesUtils, SysUtils, CastleUtils,
-  CastleGL, CastleGLUtils, CastleStringUtils, CastleMessages,
+  CastleGLUtils, CastleStringUtils, CastleMessages,
   GamePlay, CastleGameNotifications, CastleInputs,
   GameWindow, GameX3DProcessing,
   GameAnimationTricks, GameVideoOptions, CastleSceneCore, CastleProgress,

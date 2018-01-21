@@ -23,7 +23,7 @@
 { Tricks with precalculated animation for "The Castle". }
 unit GameAnimationTricks;
 
-{$I castleconf.inc}
+{$I castlegameconf.inc}
 
 interface
 
