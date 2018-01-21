@@ -8,3 +8,5 @@
   two scenes simultaneously.
 
 - "cages" level got awfully slow with EnableFixedFunction = false.
+
+- "gate" - one grave is floating in the air
