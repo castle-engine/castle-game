@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<title>CastleDialogStates: Klasse TStateDialog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.15.0">
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-15">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<table class="container"><tr><td class="navigation">
+<p><a href="AllUnits.html" class="navigation">Units</a></p><p><a href="ClassHierarchy.html" class="navigation">Klassenhierarchie</a></p><p><a href="AllClasses.html" class="navigation">Klassen, Interfaces und Objects</a></p><p><a href="AllTypes.html" class="navigation">Datentypen</a></p><p><a href="AllVariables.html" class="navigation">Variablen</a></p><p><a href="AllConstants.html" class="navigation">Konstanten</a></p><p><a href="AllFunctions.html" class="navigation">Funktionen und Prozeduren</a></p><p><a href="AllIdentifiers.html" class="navigation">Bezeichner</a></p></td><td class="content">
+<span id="TStateDialog"></span><h1 class="cio">Klasse TStateDialog</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Beschreibung</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarchie</a></div><div class="one_section"><a class="section" href="#PasDoc-InternalTypes">Interne Typen</a></div><div class="one_section"><a class="section" href="#PasDoc-Fields">Felder</a></div><div class="one_section"><a class="section" href="#PasDoc-Methods">Methoden</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Eigenschaften</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a  href="CastleDialogStates.html">CastleDialogStates</a></p>
+<h2 class="declaration">Deklaration</h2>
+<p class="declaration">
+<code>type TStateDialog = class abstract(TUIState)</code></p>
+<h2 class="description">Beschreibung</h2>
+<p>
+Abstract class for a modal dialog user-interface state. See unit <a class="normal" href="CastleDialogStates.html">CastleDialogStates</a> documentation for example usage.</p>
+<span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarchie</h2>
+<ul class="hierarchy"><li class="ancestor">TUIState</li>
+<li class="thisitem">TStateDialog</li></ul><h2 class="overview">Übersicht</h2>
+<span id="PasDoc-InternalTypes"></span><h3 class="summary">Interne Typen</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code><b><a  href="CastleDialogStates.TStateDialog.html#TButtonArray">TButtonArray</a></b> = array of TCastleButton;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Fields"></span><h3 class="summary">Felder</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>intern const <b><a  href="CastleDialogStates.TStateDialog.html#DefaultAlignment">DefaultAlignment</a></b> = hpLeft;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Methods"></span><h3 class="summary">Methoden</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>function <b><a  href="CastleDialogStates.TStateDialog.html#StateContainer">StateContainer</a></b>: TUIContainer; override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>procedure <b><a  href="CastleDialogStates.TStateDialog.html#InitializeButtons">InitializeButtons</a></b>(var Buttons: <a  href="CastleDialogStates.TStateDialog.html#TButtonArray">TButtonArray</a>); virtual;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>function <b><a  href="CastleDialogStates.TStateDialog.html#DrawInputText">DrawInputText</a></b>: boolean; virtual;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>procedure <b><a  href="CastleDialogStates.TStateDialog.html#DoAnswered">DoAnswered</a></b>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>constructor <b><a  href="CastleDialogStates.TStateDialog.html#Create">Create</a></b>(AOwner: TComponent); override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>destructor <b><a  href="CastleDialogStates.TStateDialog.html#Destroy">Destroy</a></b>; override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a  href="CastleDialogStates.TStateDialog.html#Start">Start</a></b>; override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a  href="CastleDialogStates.TStateDialog.html#Stop">Stop</a></b>; override;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Eigenschaften</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#InputText">InputText</a></b>: string read GetInputText write SetInputText;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#InterceptInput">InterceptInput</a></b> default true;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#Answered">Answered</a></b>: boolean read FAnswered;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#Text">Text</a></b>: TStrings read FText;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#Caption">Caption</a></b>: string read GetCaption write SetCaption stored false;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#Alignment">Alignment</a></b>: THorizontalPosition
+      read FAlignment write FAlignment default <a  href="CastleDialogStates.TStateDialog.html#DefaultAlignment">DefaultAlignment</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#Html">Html</a></b>: boolean read FHtml write FHtml default false;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#Background">Background</a></b>: boolean read FBackground write FBackground default false;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#BackgroundColor">BackgroundColor</a></b>: TCastleColor read FBackgroundColor write FBackgroundColor;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#BackgroundScreenshot">BackgroundScreenshot</a></b>: boolean
+      read FBackgroundScreenshot write FBackgroundScreenshot default false;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#PopOnAnswered">PopOnAnswered</a></b>: boolean
+      read FPopOnAnswered write FPopOnAnswered default true;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialog.html#OverrrideContainer">OverrrideContainer</a></b>: TUIContainer
+      read FOverrrideContainer write FOverrrideContainer;</code></td>
+</tr>
+</table>
+<h2 class="description">Beschreibung</h2>
+<h3 class="detail">Interne Typen</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="TButtonArray"></span><code><b>TButtonArray</b> = array of TCastleButton;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Felder</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="DefaultAlignment"></span><code>intern const <b>DefaultAlignment</b> = hpLeft;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Methoden</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="StateContainer"></span><code>function <b>StateContainer</b>: TUIContainer; override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="InitializeButtons"></span><code>procedure <b>InitializeButtons</b>(var Buttons: <a  href="CastleDialogStates.TStateDialog.html#TButtonArray">TButtonArray</a>); virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="DrawInputText"></span><code>function <b>DrawInputText</b>: boolean; virtual;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="DoAnswered"></span><code>procedure <b>DoAnswered</b>;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Create"></span><code>constructor <b>Create</b>(AOwner: TComponent); override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Destroy"></span><code>destructor <b>Destroy</b>; override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Start"></span><code>procedure <b>Start</b>; override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Stop"></span><code>procedure <b>Stop</b>; override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Eigenschaften</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="InputText"></span><code>property <b>InputText</b>: string read GetInputText write SetInputText;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="InterceptInput"></span><code>property <b>InterceptInput</b> default true;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Answered"></span><code>property <b>Answered</b>: boolean read FAnswered;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+When user answers the dialog, this is set to <code>True</code>. The state also normally does TUIState.Pop, so there's no need to check this property, unless you set <a class="normal" href="CastleDialogStates.TStateDialog.html#PopOnAnswered">PopOnAnswered</a> to <code>False</code>.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Text"></span><code>property <b>Text</b>: TStrings read FText;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Caption displayed in the dialog.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Caption"></span><code>property <b>Caption</b>: string read GetCaption write SetCaption stored false;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Caption displayed in the dialog, as a simple string. This is just a shortcut to get/set <a class="normal" href="CastleDialogStates.TStateDialog.html#Text">Text</a> as a single string.
+
+<p>Use LineEnding or NL constant when setting this to indicate a newline. The two examples below are equivalent:
+
+<p></p>
+
+<pre class="longcode">
+<span class="pascal_comment">// one way</span>
+StateDialogOK.Text.Clear;
+StateDialogOK.Text.Add(<span class="pascal_string">'First line'</span>);
+StateDialogOK.Text.Add(<span class="pascal_string">'Second line'</span>);
+
+<span class="pascal_comment">// alternative way to do the same</span>
+StateDialogOK.Caption := <span class="pascal_string">'First line'</span> + LineEnding + <span class="pascal_string">'Second line'</span>;</pre>
+
+<p></p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Alignment"></span><code>property <b>Alignment</b>: THorizontalPosition
+      read FAlignment write FAlignment default <a  href="CastleDialogStates.TStateDialog.html#DefaultAlignment">DefaultAlignment</a>;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Horizontal alignment of the text.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Html"></span><code>property <b>Html</b>: boolean read FHtml write FHtml default false;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Enable a subset of HTML to mark font changes inside the text. See the TCastleFont.PrintStrings for a description of supported HTML constructs.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Background"></span><code>property <b>Background</b>: boolean read FBackground write FBackground default false;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Obscure the state underneath with our own background (using a color or screenshot).
+
+<p>The obscuring background is defined by <a class="normal" href="CastleDialogStates.TStateDialog.html#BackgroundColor">BackgroundColor</a>. It may be just a solid opaque color. Or it may be a partially-transparent or even completely transparent color, showing the state underneath (or showing the screenshot of the state underneath, if <a class="normal" href="CastleDialogStates.TStateDialog.html#BackgroundScreenshot">BackgroundScreenshot</a>).</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="BackgroundColor"></span><code>property <b>BackgroundColor</b>: TCastleColor read FBackgroundColor write FBackgroundColor;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Color of the background obscuring the state underneath, if <a class="normal" href="CastleDialogStates.TStateDialog.html#Background">Background</a> is <code>True</code>. This color may be partially-transparent (e.g. to visually &quot;dim&quot; the state underneath) or even completely transparent (alpha 0).
+
+<p>Default is Theme.BackgroundColor, which is dark with alpha = 0.5, so it will dim the state underneath. Sometimes (under exception handler) it's Theme.BackgroundOpaqueColor.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="BackgroundScreenshot"></span><code>property <b>BackgroundScreenshot</b>: boolean
+      read FBackgroundScreenshot write FBackgroundScreenshot default false;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Initialize the background by taking a screenshot of the current screen when the state was started. This screenshot is shown, instead of actually rendering the state underneath, under the <a class="normal" href="CastleDialogStates.TStateDialog.html#BackgroundColor">BackgroundColor</a>, when <a class="normal" href="CastleDialogStates.TStateDialog.html#Background">Background</a> is <code>True</code>.
+
+<p>This is less functional (when the user scales the window, the screenshot is stretched too), but is safer: it means that the state underneath does not need to be &quot;renderable&quot; anymore.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="PopOnAnswered"></span><code>property <b>PopOnAnswered</b>: boolean
+      read FPopOnAnswered write FPopOnAnswered default true;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Should the state do <code>TUIState.Pop</code> when answered. This is usually most natural.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="OverrrideContainer"></span><code>property <b>OverrrideContainer</b>: TUIContainer
+      read FOverrrideContainer write FOverrrideContainer;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Force state to use indicated TUIContainer to insert itself and get screenshot. By default it uses Application.MainWindow.</p>
+</td></tr>
+</table>
+<hr><span class="appinfo"><em>Erstellt mit <a  href="https://github.com/pasdoc/pasdoc/wiki">PasDoc 0.15.0</a>. </em>
+</span>
+</td></tr></table></body></html>

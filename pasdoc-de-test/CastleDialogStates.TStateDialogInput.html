@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<title>CastleDialogStates: Klasse TStateDialogInput</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.15.0">
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-15">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<table class="container"><tr><td class="navigation">
+<p><a href="AllUnits.html" class="navigation">Units</a></p><p><a href="ClassHierarchy.html" class="navigation">Klassenhierarchie</a></p><p><a href="AllClasses.html" class="navigation">Klassen, Interfaces und Objects</a></p><p><a href="AllTypes.html" class="navigation">Datentypen</a></p><p><a href="AllVariables.html" class="navigation">Variablen</a></p><p><a href="AllConstants.html" class="navigation">Konstanten</a></p><p><a href="AllFunctions.html" class="navigation">Funktionen und Prozeduren</a></p><p><a href="AllIdentifiers.html" class="navigation">Bezeichner</a></p></td><td class="content">
+<span id="TStateDialogInput"></span><h1 class="cio">Klasse TStateDialogInput</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Beschreibung</a></div><div class="one_section"><a class="section" href="#PasDoc-Hierarchy">Hierarchie</a></div><div class="one_section">Felder</div><div class="one_section"><a class="section" href="#PasDoc-Methods">Methoden</a></div><div class="one_section"><a class="section" href="#PasDoc-Properties">Eigenschaften</a></div></div>
+<span id="PasDoc-Description"></span><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a  href="CastleDialogStates.html">CastleDialogStates</a></p>
+<h2 class="declaration">Deklaration</h2>
+<p class="declaration">
+<code>type TStateDialogInput = class(<a class="normal" href="CastleDialogStates.TStateDialog.html">TStateDialog</a>)</code></p>
+<h2 class="description">Beschreibung</h2>
+<p>
+Ask user to input a string, or cancel. See unit <a class="normal" href="CastleDialogStates.html">CastleDialogStates</a> documentation for example usage.</p>
+<span id="PasDoc-Hierarchy"></span><h2 class="hierarchy">Hierarchie</h2>
+<ul class="hierarchy"><li class="ancestor">TUIState</li>
+<li class="ancestor"><a class="normal" href="CastleDialogStates.TStateDialog.html">TStateDialog</a></li>
+<li class="thisitem">TStateDialogInput</li></ul><h2 class="overview">Übersicht</h2>
+<span id="PasDoc-Methods"></span><h3 class="summary">Methoden</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>procedure <b><a  href="CastleDialogStates.TStateDialogInput.html#InitializeButtons">InitializeButtons</a></b>(var Buttons: <a  href="CastleDialogStates.TStateDialog.html#TButtonArray">TButtonArray</a>); override;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><code>function <b><a  href="CastleDialogStates.TStateDialogInput.html#DrawInputText">DrawInputText</a></b>: boolean; override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a  href="CastleDialogStates.TStateDialogInput.html#Press">Press</a></b>(const Event: TInputPressRelease): boolean; override;</code></td>
+</tr>
+</table>
+<span id="PasDoc-Properties"></span><h3 class="summary">Eigenschaften</h3>
+<table class="summary wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialogInput.html#AllowedChars">AllowedChars</a></b>: TSetOfChars read FAllowedChars write FAllowedChars;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialogInput.html#MinLength">MinLength</a></b>: Cardinal read FMinLength write FMinLength default 0;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialogInput.html#MaxLength">MaxLength</a></b>: Cardinal read FMaxLength write FMaxLength default 0;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialogInput.html#CanCancel">CanCancel</a></b>: boolean read FCanCancel write FCanCancel default false;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialogInput.html#AnswerCancelled">AnswerCancelled</a></b>: boolean read FAnswerCancelled;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a  href="CastleDialogStates.TStateDialogInput.html#Answer">Answer</a></b>: string read GetAnswer write SetAnswer;</code></td>
+</tr>
+</table>
+<h2 class="description">Beschreibung</h2>
+<h3 class="detail">Methoden</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="InitializeButtons"></span><code>procedure <b>InitializeButtons</b>(var Buttons: <a  href="CastleDialogStates.TStateDialog.html#TButtonArray">TButtonArray</a>); override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="protected.gif" alt="Protected" title="Protected"></a></td>
+<td class="itemcode"><span id="DrawInputText"></span><code>function <b>DrawInputText</b>: boolean; override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Press"></span><code>function <b>Press</b>(const Event: TInputPressRelease): boolean; override;</code></td>
+</tr>
+<tr><td colspan="2">
+&nbsp;</td></tr>
+</table>
+<h3 class="detail">Eigenschaften</h3>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="AllowedChars"></span><code>property <b>AllowedChars</b>: TSetOfChars read FAllowedChars write FAllowedChars;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Allowed characters that user can input.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="MinLength"></span><code>property <b>MinLength</b>: Cardinal read FMinLength write FMinLength default 0;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Min length of user input.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="MaxLength"></span><code>property <b>MaxLength</b>: Cardinal read FMaxLength write FMaxLength default 0;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+Max length of user input. Value of 0 (default) means &quot;no limit&quot;.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="CanCancel"></span><code>property <b>CanCancel</b>: boolean read FCanCancel write FCanCancel default false;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+User can cancel the input by pressing a button like &quot;cancel&quot;.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="AnswerCancelled"></span><code>property <b>AnswerCancelled</b>: boolean read FAnswerCancelled;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+User clicked &quot;cancel&quot; instead of accepting an answer. This is defined only when <a class="normal" href="CastleDialogStates.TStateDialog.html#Answered">Answered</a>. This is possible only if <a class="normal" href="CastleDialogStates.TStateDialogInput.html#CanCancel">CanCancel</a>.</p>
+</td></tr>
+</table>
+<table class="detail wide_list">
+<tr class="list">
+<td class="visibility"><a  href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><span id="Answer"></span><code>property <b>Answer</b>: string read GetAnswer write SetAnswer;</code></td>
+</tr>
+<tr><td colspan="2">
+<p>
+The user input. May be set before starting the state. After the state stopped, if <a class="normal" href="CastleDialogStates.TStateDialog.html#Answered">Answered</a>, then this contains user answer. You should ignore it if <a class="normal" href="CastleDialogStates.TStateDialogInput.html#AnswerCancelled">AnswerCancelled</a>.</p>
+</td></tr>
+</table>
+<hr><span class="appinfo"><em>Erstellt mit <a  href="https://github.com/pasdoc/pasdoc/wiki">PasDoc 0.15.0</a>. </em>
+</span>
+</td></tr></table></body></html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<title>CastleDialogStates</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="PasDoc 0.15.0">
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-15">
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body>
+<table class="container"><tr><td class="navigation">
+<p><a href="AllUnits.html" class="navigation">Units</a></p><p><a href="ClassHierarchy.html" class="navigation">Klassenhierarchie</a></p><p><a href="AllClasses.html" class="navigation">Klassen, Interfaces und Objects</a></p><p><a href="AllTypes.html" class="navigation">Datentypen</a></p><p><a href="AllVariables.html" class="navigation">Variablen</a></p><p><a href="AllConstants.html" class="navigation">Konstanten</a></p><p><a href="AllFunctions.html" class="navigation">Funktionen und Prozeduren</a></p><p><a href="AllIdentifiers.html" class="navigation">Bezeichner</a></p></td><td class="content">
+<h1 class="unit">Unit CastleDialogStates</h1>
+<div class="sections">
+<div class="one_section"><a class="section" href="#PasDoc-Description">Beschreibung</a></div><div class="one_section">Uses</div><div class="one_section"><a class="section" href="#PasDoc-Classes">Klassen, Interfaces und Objects</a></div><div class="one_section">Funktionen und Prozeduren</div><div class="one_section">Datentypen</div><div class="one_section">Konstanten</div><div class="one_section">Variablen</div></div>
+<span id="PasDoc-Description"></span><h2 class="description">Beschreibung</h2>
+<p>
+Dialog windows (to display some information, or ask user for confirmation, or ask user to input a simple value) as a user-interface state (<code>TUIState</code>). This unit defines the user-interface state classes (<code>TUIState</code> descendants) to display given dialog.
+
+<p>If you use <code>TCastleWindow</code> with most platforms (but not iOS), then it's usually more comfortable to use the unit <code>CastleMessages</code> instead of this unit. Using the <code>CastleMessages</code>, you get comfortable functions like <code>MessageOK</code> and <code>MessageYesNo</code> that wait until user presses a button (like &quot;OK&quot;, &quot;Yes&quot;, &quot;No&quot;) to close the dialog. This is comfortable to use, as you can write code like this:
+
+<p></p>
+
+<pre class="longcode">
+<span class="pascal_keyword">if</span> MessageYesNo(Window, <span class="pascal_string">'Are you sure you want to delete this file?'</span>) <span class="pascal_keyword">then</span>
+  DeleteFile(<span class="pascal_numeric"></span>...);</pre>
+
+<p>
+
+<p>Underneath, the <code>MessageYesNo</code> will use a <a class="normal" href="CastleDialogStates.TStateDialogYesNo.html">TStateDialogYesNo</a>, making sure that your normal window callbacks are redirected as appropriate. But you don't need to be concerned with this.
+
+<p>However, if you need to work on iOS, then you cannot use most of routines from the <code>CastleMessages</code> unit. You can use <code>MessageOK</code> if you turn on the <code>MessageOKPushesState</code> flag, but nothing else. E.g. <code>MessageYesNo</code> cannot work on iOS now. Making modal boxes like that is not supported on iOS.
+
+<p>In this case you should use this unit and instantiate the user-interface classes yourself, and you need to <i>organize your whole game using TUIState classes</i>. See <a  href="https://castle-engine.io/manual_2d_user_interface.php#section_ui_state">https://castle-engine.io/manual_2d_user_interface.php#section_ui_state</a> about how to use <code>TUIState</code>. Like this:
+
+<p></p>
+
+<pre class="longcode">
+<span class="pascal_keyword">type</span>
+  TMyGameState = <span class="pascal_keyword">class</span>(TUIState)
+  <span class="pascal_keyword">private</span>
+    DialogAskDeleteFile: TStateDialogYesNo;
+  <span class="pascal_keyword">public</span>
+    <span class="pascal_keyword">function</span> Press(<span class="pascal_keyword">const</span> Event: TInputPressRelease): boolean; <span class="pascal_keyword">override</span>;
+    <span class="pascal_keyword">procedure</span> Resume; <span class="pascal_keyword">override</span>;
+  <span class="pascal_keyword">end</span>;
+
+<span class="pascal_keyword">function</span> Press(<span class="pascal_keyword">const</span> Event: TInputPressRelease): boolean; <span class="pascal_keyword">override</span>;
+<span class="pascal_keyword">begin</span>
+  Result := <span class="pascal_keyword">inherited</span>;
+  <span class="pascal_keyword">if</span> Result <span class="pascal_keyword">then</span> Exit;
+
+  <span class="pascal_keyword">if</span> Event.IsKey(K_Enter) <span class="pascal_keyword">then</span>
+  <span class="pascal_keyword">begin</span>
+    DialogAskDeleteFile := TStateDialogYesNo.Create(Self);
+    DialogAskDeleteFile.Caption := <span class="pascal_string">'Are you sure you want to delete this file?'</span>;
+    TUIState.Push(DialogAskDeleteFile);
+  <span class="pascal_keyword">end</span>;
+<span class="pascal_keyword">end</span>;
+
+<span class="pascal_keyword">procedure</span> TStatePlay.Resume;
+<span class="pascal_keyword">begin</span>
+  <span class="pascal_keyword">inherited</span>;
+  <span class="pascal_keyword">if</span> DialogAskDeleteFile &lt;&gt; <span class="pascal_keyword">nil</span> <span class="pascal_keyword">then</span> <span class="pascal_comment">// returning from DialogAskDeleteFile</span>
+  <span class="pascal_keyword">begin</span>
+    <span class="pascal_keyword">if</span> DialogAskDeleteFile.Answer <span class="pascal_keyword">then</span>
+      DeleteFile(<span class="pascal_numeric"></span>...);
+    FreeAndNil(DialogAskDeleteFile);
+  <span class="pascal_keyword">end</span>;
+<span class="pascal_keyword">end</span>;</pre>
+
+<p></p>
+<span id="PasDoc-Uses"></span><h2 class="overview">Übersicht</h2>
+<span id="PasDoc-Classes"></span><h3 class="cio">Klassen, Interfaces und Objects</h3>
+<table class="classestable wide_list">
+<tr class="listheader">
+<th class="itemname">Name</th>
+<th class="itemdesc">Beschreibung</th>
+</tr>
+<tr class="list">
+<td class="itemname">Klasse&nbsp;<a class="bold" href="CastleDialogStates.TStateDialog.html"><code>TStateDialog</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Klasse&nbsp;<a class="bold" href="CastleDialogStates.TStateDialogOK.html"><code>TStateDialogOK</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Klasse&nbsp;<a class="bold" href="CastleDialogStates.TStateDialogYesNo.html"><code>TStateDialogYesNo</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Klasse&nbsp;<a class="bold" href="CastleDialogStates.TStateDialogChoice.html"><code>TStateDialogChoice</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Klasse&nbsp;<a class="bold" href="CastleDialogStates.TStateDialogInput.html"><code>TStateDialogInput</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Klasse&nbsp;<a class="bold" href="CastleDialogStates.TStateDialogKey.html"><code>TStateDialogKey</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+<tr class="list">
+<td class="itemname">Klasse&nbsp;<a class="bold" href="CastleDialogStates.TStateDialogPressEvent.html"><code>TStateDialogPressEvent</code></a></td>
+<td class="itemdesc">&nbsp;</td>
+</tr>
+</table>
+<hr><span class="appinfo"><em>Erstellt mit <a  href="https://github.com/pasdoc/pasdoc/wiki">PasDoc 0.15.0</a>. </em>
+</span>
+</td></tr></table></body></html>
