@@ -482,7 +482,7 @@ begin
 
   SetAntiAliasing(DefaultAntiAliasing, true);
 
-  VisibleChange;
+  VisibleChange([chRender]);
 
   MessageOK(Window, 'All video settings restored to defaults.');
 end;

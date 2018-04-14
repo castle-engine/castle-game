@@ -263,7 +263,7 @@ begin
     if CurrentAnimation <> nil then
       NotificationInteractFailed('Button is already pressed') else
     begin
-      PlayAnimation('animation', paForceNotLooping);
+      PlayAnimation('animation', false);
       Notifications.Show('You press the button');
     end;
   end else
@@ -462,7 +462,7 @@ begin
   if not (Value as TSFBool).Value then // if isActive changed to false...
     if Symbol.CurrentAnimation = nil then
     begin
-      Symbol.PlayAnimation('animation', paForceNotLooping);
+      Symbol.PlayAnimation('animation', false);
       Symbol.Collides := false;
       SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3(0, 0, 0));
 
@@ -535,7 +535,7 @@ begin
     Doing it properly (with PrepareForCollisions = true) would require
     reexporting as castle-anim-frames (with it's bbox recorded). }
   Cart := LoadLevelScene(GateLevelPath + 'cart.kanim', false);
-  Cart.PlayAnimation('animation', paForceLooping);
+  Cart.PlayAnimation('animation', true);
   World.Add(Cart);
 
   CartSoundPosition := Cart.BoundingBox.Center;
@@ -731,7 +731,7 @@ begin
       'You see a button. You''re too far to reach it from here') else
   begin
     { play from the beginning }
-    PlayAnimation('animation', paForceNotLooping);
+    PlayAnimation('animation', false);
     MovingElevator.GoOtherPosition;
   end;
 end;
@@ -1345,7 +1345,7 @@ begin
     walk on this level). For safety, Collides set to @false, in case
     user enters this level by debug menu. }
   Water.Collides := false;
-  Water.PlayAnimation('animation', paForceLooping);
+  Water.PlayAnimation('animation', true);
   World.Add(Water);
 end;
 

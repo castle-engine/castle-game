@@ -58,7 +58,7 @@ type
 
   TGlobalCatchInput = class(TUIControl)
     function Press(const Event: TInputPressRelease): boolean; override;
-    function CapturesEventsAtPosition(const Position: TVector2Single): boolean; override;
+    function CapturesEventsAtPosition(const Position: TVector2): boolean; override;
   end;
 
 var
@@ -103,7 +103,7 @@ begin
 end;
 
 function TGlobalCatchInput.CapturesEventsAtPosition(
-  const Position: TVector2Single): boolean;
+  const Position: TVector2): boolean;
 begin
   Result := true; // always catch input
 end;
@@ -140,8 +140,8 @@ begin
       end;
 
     { send to all 2D controls, including viewports }
-    Container.EventSensorTranslation(Tx, Ty, Tz, TLength, Fps.UpdateSecondsPassed);
-    Container.EventSensorRotation(Rx, Ry, Rz, RAngle, Fps.UpdateSecondsPassed);
+    Container.EventSensorTranslation(Tx, Ty, Tz, TLength, Fps.SecondsPassed);
+    Container.EventSensorRotation(Rx, Ry, Rz, RAngle, Fps.SecondsPassed);
   end;
 end;
 

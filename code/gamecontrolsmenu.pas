@@ -362,11 +362,11 @@ var
 begin
   inherited;
 
-  MessageKeyMouse(Window, Format(
+  NewEvent := MessageKeyMouse(Window, Format(
     'Press the new key or mouse button or mouse wheel for "%s".' + NL + NL +
     '[Escape] cancels.' + NL +
     '[Backspace] clears the shortcut.',
-    [InputShortcut.Caption]), NewEvent);
+    [InputShortcut.Caption]));
 
   if NewEvent.IsKey(K_Backspace) then
   begin
