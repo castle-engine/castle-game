@@ -126,7 +126,7 @@ type
   public
     FirstDemoLevelIndex: Cardinal;
     constructor Create(AOwner: TComponent); override;
-    function SpaceBetweenItems(const NextItemIndex: Cardinal): Cardinal; override;
+    function SpaceBetweenItems(const NextItemIndex: Cardinal): Single; override;
     procedure Render; override;
   end;
 
@@ -650,7 +650,7 @@ begin
 end;
 
 function TChooseNewLevelMenu.SpaceBetweenItems(
-  const NextItemIndex: Cardinal): Cardinal;
+  const NextItemIndex: Cardinal): Single;
 begin
   Result := inherited SpaceBetweenItems(NextItemIndex);
   if NextItemIndex = FirstDemoLevelIndex then
