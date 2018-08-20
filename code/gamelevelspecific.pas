@@ -436,12 +436,9 @@ procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
     WerewolfCreature[0].Howl(true);
 
     { change the lights }
-    if SceneManager.HeadlightInstance(Headlight) then
-    begin
-      Headlight.Node.AmbientIntensity := 0.8;
-      Headlight.Node.Color := Vector3(1, 0, 0);
-      Headlight.Node.Intensity := 0.2;
-    end;
+    SceneManager.HeadlightNode.AmbientIntensity := 0.8;
+    SceneManager.HeadlightNode.Color := Vector3(1, 0, 0);
+    SceneManager.HeadlightNode.Intensity := 0.2;
 
     for I := 0 to WerewolvesCount - 1 do
     begin
