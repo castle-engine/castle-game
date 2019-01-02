@@ -71,9 +71,9 @@ type
     procedure ClickReloadSounds(Sender: TObject);
     procedure ClickBack(Sender: TObject);
   public
-    RenderDebugToggle: TCastleMenuToggle;
-    ShadowVolumesRenderToggle: TCastleMenuToggle;
-    DebugRenderForLevelScreenshotToggle: TCastleMenuToggle;
+    RenderDebugToggle: TCastleOnScreenMenuItemToggle;
+    ShadowVolumesRenderToggle: TCastleOnScreenMenuItemToggle;
+    DebugRenderForLevelScreenshotToggle: TCastleOnScreenMenuItemToggle;
     constructor Create(AOwner: TComponent); override;
   end;
 
@@ -102,7 +102,7 @@ type
     procedure ClickDebugTimeStopForCreatures(Sender: TObject);
     procedure ClickBack(Sender: TObject);
   public
-    DebugTimeStopForCreaturesToggle: TCastleMenuToggle;
+    DebugTimeStopForCreaturesToggle: TCastleOnScreenMenuItemToggle;
     constructor Create(AOwner: TComponent); override;
   end;
 
@@ -161,16 +161,19 @@ constructor TDebugMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  RenderDebugToggle := TCastleMenuToggle.Create(Self);
-  RenderDebugToggle.Pressed := RenderDebug;
+  RenderDebugToggle := TCastleOnScreenMenuItemToggle.Create(Self);
+  RenderDebugToggle.Caption := 'Render debug information';
+  RenderDebugToggle.Checked := RenderDebug;
   RenderDebugToggle.OnClick := @ClickRenderDebug;
 
-  ShadowVolumesRenderToggle := TCastleMenuToggle.Create(Self);
-  ShadowVolumesRenderToggle.Pressed := ShadowVolumesRender;
+  ShadowVolumesRenderToggle := TCastleOnScreenMenuItemToggle.Create(Self);
+  ShadowVolumesRenderToggle.Caption := 'Render shadow volumes';
+  ShadowVolumesRenderToggle.Checked := ShadowVolumesRender;
   ShadowVolumesRenderToggle.OnClick := @ClickShadowVolumesRender;
 
-  DebugRenderForLevelScreenshotToggle := TCastleMenuToggle.Create(Self);
-  DebugRenderForLevelScreenshotToggle.Pressed := DebugRenderForLevelScreenshot;
+  DebugRenderForLevelScreenshotToggle := TCastleOnScreenMenuItemToggle.Create(Self);
+  DebugRenderForLevelScreenshotToggle.Caption := 'Render for level screenshot';
+  DebugRenderForLevelScreenshotToggle.Checked := DebugRenderForLevelScreenshot;
   DebugRenderForLevelScreenshotToggle.OnClick := @ClickDebugRenderForLevelScreenshot;
 
   Add('Player debug menu ...', @ClickPlayerMenu);
@@ -179,9 +182,9 @@ begin
   Add('Level debug menu ...', @ClickLevelsMenu);
   Add('Reload resources resource.xml files', @ClickReloadResources);
   Add('Reload resource animation ...', @ClickReloadResourceAnimation);
-  Add('Render debug information', RenderDebugToggle);
-  Add('Render shadow volumes', ShadowVolumesRenderToggle);
-  Add('Render for level screenshot', DebugRenderForLevelScreenshotToggle);
+  Add(RenderDebugToggle);
+  Add(ShadowVolumesRenderToggle);
+  Add(DebugRenderForLevelScreenshotToggle);
   Add('Reload sounds/index.xml', @ClickReloadSounds);
   Add('Back to game', @ClickBack);
 end;
@@ -232,13 +235,13 @@ begin
   TCreature.RenderDebug := RenderDebug;
   TItemOnWorld.RenderDebug := RenderDebug;
   { update UI }
-  RenderDebugToggle.Pressed := RenderDebug;
+  RenderDebugToggle.Checked := RenderDebug;
 end;
 
 procedure TDebugMenu.ClickShadowVolumesRender(Sender: TObject);
 begin
   ShadowVolumesRender := not ShadowVolumesRender;
-  ShadowVolumesRenderToggle.Pressed := ShadowVolumesRender;
+  ShadowVolumesRenderToggle.Checked := ShadowVolumesRender;
   { apply to SceneManager.ShadowVolumesRender }
   if SceneManager <> nil then
     SceneManager.ShadowVolumesRender := ShadowVolumesRender;
@@ -247,7 +250,7 @@ end;
 procedure TDebugMenu.ClickDebugRenderForLevelScreenshot(Sender: TObject);
 begin
   DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
-  DebugRenderForLevelScreenshotToggle.Pressed := DebugRenderForLevelScreenshot;
+  DebugRenderForLevelScreenshotToggle.Checked := DebugRenderForLevelScreenshot;
 end;
 
 procedure TDebugMenu.ClickReloadSounds(Sender: TObject);
@@ -342,14 +345,15 @@ constructor TDebugCreaturesMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  DebugTimeStopForCreaturesToggle := TCastleMenuToggle.Create(Self);
-  DebugTimeStopForCreaturesToggle.Pressed := DebugTimeStopForCreatures;
+  DebugTimeStopForCreaturesToggle := TCastleOnScreenMenuItemToggle.Create(Self);
+  DebugTimeStopForCreaturesToggle.Caption := 'Time stop for creatures';
+  DebugTimeStopForCreaturesToggle.Checked := DebugTimeStopForCreatures;
   DebugTimeStopForCreaturesToggle.OnClick := @ClickDebugTimeStopForCreatures;
 
   Add('Kill all creatures', @ClickKillAll);
   Add('Kill all non-still creatures', @ClickKillAllNonStill);
   Add('Add creature to level before player', @ClickAddCreature);
-  Add('Time stop for creatures', DebugTimeStopForCreaturesToggle);
+  Add(DebugTimeStopForCreaturesToggle);
   Add('Back', @ClickBack);
 end;
 
@@ -399,7 +403,7 @@ end;
 procedure TDebugCreaturesMenu.ClickDebugTimeStopForCreatures(Sender: TObject);
 begin
   DebugTimeStopForCreatures := not DebugTimeStopForCreatures;
-  DebugTimeStopForCreaturesToggle.Pressed := DebugTimeStopForCreatures;
+  DebugTimeStopForCreaturesToggle.Checked := DebugTimeStopForCreatures;
 end;
 
 procedure TDebugCreaturesMenu.ClickBack(Sender: TObject);

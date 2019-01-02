@@ -91,12 +91,11 @@ type
     procedure BakedAnimationSmoothnessChanged(Sender: TObject);
     procedure AntiAliasingChanged(Sender: TObject);
   public
-    AllowScreenChangeToggle: TCastleMenuToggle;
-    ShadowVolumesToggle: TCastleMenuToggle;
+    AllowScreenChangeToggle: TCastleOnScreenMenuItemToggle;
+    ShadowVolumesToggle: TCastleOnScreenMenuItemToggle;
     BakedAnimationSmoothnessSlider: TCastleFloatSlider;
-    ColorBitsToggle: TCastleMenuButton;
-    VideoFrequencyToggle: TCastleMenuButton;
-    ConserveResourcesToggle: TCastleMenuToggle;
+    ColorBitsToggle: TCastleOnScreenMenuItem;
+    VideoFrequencyToggle: TCastleOnScreenMenuItem;
     AntiAliasingSlider: TAntiAliasingSlider;
     constructor Create(AOwner: TComponent); override;
     procedure SetAntiAliasing(Value: TAntiAliasing; UpdateSlider: boolean);
@@ -109,7 +108,7 @@ type
   public
     SoundVolume: TSoundVolumeMenuItem;
     MusicVolume: TMusicVolumeMenuItem;
-    SoundDeviceToggle: TCastleMenuButton;
+    SoundDeviceToggle: TCastleOnScreenMenuItem;
     constructor Create(AOwner: TComponent); override;
   end;
 
@@ -335,12 +334,14 @@ constructor TVideoMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  AllowScreenChangeToggle := TCastleMenuToggle.Create(Self);
-  AllowScreenChangeToggle.Pressed := AllowScreenChange;
+  AllowScreenChangeToggle := TCastleOnScreenMenuItemToggle.Create(Self);
+  AllowScreenChangeToggle.Caption := 'Allow screen settings change on startup';
+  AllowScreenChangeToggle.Checked := AllowScreenChange;
   AllowScreenChangeToggle.OnClick := @ClickAllowScreenChange;
 
-  ShadowVolumesToggle := TCastleMenuToggle.Create(Self);
-  ShadowVolumesToggle.Pressed := ShadowVolumes;
+  ShadowVolumesToggle := TCastleOnScreenMenuItemToggle.Create(Self);
+  ShadowVolumesToggle.Caption := 'Shadow volumes';
+  ShadowVolumesToggle.Checked := ShadowVolumes;
   ShadowVolumesToggle.OnClick := @ClickShadowVolumes;
 
   BakedAnimationSmoothnessSlider := TCastleFloatSlider.Create(Self);
@@ -349,22 +350,24 @@ begin
   BakedAnimationSmoothnessSlider.Value := BakedAnimationSmoothness;
   BakedAnimationSmoothnessSlider.OnChange := @BakedAnimationSmoothnessChanged;
 
-  ColorBitsToggle := TCastleMenuButton.Create(Self);
-  ColorBitsToggle.Caption := ColorBitsToStr(ColorBits);
+  ColorBitsToggle := TCastleOnScreenMenuItem.Create(Self);
+  ColorBitsToggle.Caption := 'Color bits';
+  ColorBitsToggle.RightCaption := ColorBitsToStr(ColorBits);
   ColorBitsToggle.OnClick := @ClickColorBits;
 
-  VideoFrequencyToggle := TCastleMenuButton.Create(Self);
-  VideoFrequencyToggle.Caption := VideoFrequencyToStr(VideoFrequency);
+  VideoFrequencyToggle := TCastleOnScreenMenuItem.Create(Self);
+  VideoFrequencyToggle.Caption := 'Display frequency';
+  VideoFrequencyToggle.RightCaption := VideoFrequencyToStr(VideoFrequency);
   VideoFrequencyToggle.OnClick := @ClickVideoFrequency;
 
   AntiAliasingSlider := TAntiAliasingSlider.Create(Self);
 
   Add('View video information', @ClickViewVideoInfo);
-  Add('Allow screen settings change on startup', AllowScreenChangeToggle);
-  Add('Shadow volumes', ShadowVolumesToggle);
+  Add(AllowScreenChangeToggle);
+  Add(ShadowVolumesToggle);
   Add('Animation smoothness', BakedAnimationSmoothnessSlider);
-  Add('Color bits', ColorBitsToggle);
-  Add('Display frequency', VideoFrequencyToggle);
+  Add(ColorBitsToggle);
+  Add(VideoFrequencyToggle);
   Add('Anti-aliasing', AntiAliasingSlider);
   Add('Restore to defaults', @ClickRestoreDefaults);
   Add('Back to main menu', @ClickBack);
@@ -411,13 +414,13 @@ end;
 procedure TVideoMenu.ClickAllowScreenChange(Sender: TObject);
 begin
   AllowScreenChange := not AllowScreenChange;
-  AllowScreenChangeToggle.Pressed := AllowScreenChange;
+  AllowScreenChangeToggle.Checked := AllowScreenChange;
 end;
 
 procedure TVideoMenu.ClickShadowVolumes(Sender: TObject);
 begin
   ShadowVolumes := not ShadowVolumes;
-  ShadowVolumesToggle.Pressed := ShadowVolumes;
+  ShadowVolumesToggle.Checked := ShadowVolumes;
   if (not GLFeatures.ShadowVolumesPossible) and ShadowVolumes then
     MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.');
 end;
@@ -429,7 +432,7 @@ begin
   if ColorBits = 16 then
     ColorBits := 24 else
     ColorBits := 0;
-  ColorBitsToggle.Caption := ColorBitsToStr(ColorBits);
+  ColorBitsToggle.RightCaption := ColorBitsToStr(ColorBits);
   SubMenuAdditionalInfo := SRestartTheGame;
 end;
 
@@ -444,7 +447,7 @@ begin
     (Value <> VideoFrequency) then
   begin
     VideoFrequency := Value;
-    VideoFrequencyToggle.Caption := VideoFrequencyToStr(VideoFrequency);
+    VideoFrequencyToggle.RightCaption := VideoFrequencyToStr(VideoFrequency);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
 end;
@@ -452,10 +455,10 @@ end;
 procedure TVideoMenu.ClickRestoreDefaults(Sender: TObject);
 begin
   AllowScreenChange := DefaultAllowScreenChange;
-  AllowScreenChangeToggle.Pressed := AllowScreenChange;
+  AllowScreenChangeToggle.Checked := AllowScreenChange;
 
   ShadowVolumes := DefaultShadowVolumes;
-  ShadowVolumesToggle.Pressed := ShadowVolumes;
+  ShadowVolumesToggle.Checked := ShadowVolumes;
 
   if BakedAnimationSmoothness <> DefaultBakedAnimationSmoothness then
   begin
@@ -469,14 +472,14 @@ begin
   if ColorBits <> DefaultColorBits then
   begin
     ColorBits := DefaultColorBits;
-    ColorBitsToggle.Caption := ColorBitsToStr(DefaultColorBits);
+    ColorBitsToggle.RightCaption := ColorBitsToStr(DefaultColorBits);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
 
   if VideoFrequency <> DefaultVideoFrequency then
   begin
     VideoFrequency := DefaultVideoFrequency;
-    VideoFrequencyToggle.Caption := VideoFrequencyToStr(DefaultVideoFrequency);
+    VideoFrequencyToggle.RightCaption := VideoFrequencyToStr(DefaultVideoFrequency);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
 
@@ -508,8 +511,9 @@ constructor TSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  SoundDeviceToggle := TCastleMenuButton.Create(Self);
-  SoundDeviceToggle.Caption := SoundEngine.DeviceCaption;
+  SoundDeviceToggle := TCastleOnScreenMenuItem.Create(Self);
+  SoundDeviceToggle.Caption := 'Sound output device';
+  SoundDeviceToggle.RightCaption := SoundEngine.DeviceCaption;
   SoundDeviceToggle.OnClick := @ClickSoundDeviceToggle;
 
   Add(TSoundInfoMenuItem.Create(Self));
@@ -517,7 +521,7 @@ begin
   Add(SoundVolume);
   MusicVolume := TMusicVolumeMenuItem.Create(Self);
   Add(MusicVolume);
-  Add('Sound output device', SoundDeviceToggle);
+  Add(SoundDeviceToggle);
   Add('Back to main menu', @ClickBack);
 
   SubMenuTitle := 'Sound options';
@@ -536,7 +540,7 @@ end;
 { TSoundDeviceMenuButton ---------------------------------------------------- }
 
 type
-  TSoundDeviceMenuButton = class(TCastleMenuButton)
+  TSoundDeviceMenuButton = class(TCastleOnScreenMenuItem)
   public
     Device: TSoundDevice;
     procedure DoClick; override;
@@ -547,7 +551,7 @@ begin
   inherited;
 
   SoundEngine.Device := Device.Name;
-  SoundMenu.SoundDeviceToggle.Caption := SoundEngine.DeviceCaption;
+  SoundMenu.SoundDeviceToggle.RightCaption := SoundEngine.DeviceCaption;
   if not SoundEngine.ALActive then
     MessageOK(Window, SoundEngine.Information);
 
@@ -567,7 +571,8 @@ begin
   begin
     D := TSoundDeviceMenuButton.Create(Self);
     D.Device := SoundEngine.Devices[I];
-    Add(D.Device.Caption, D);
+    D.Caption := D.Device.Caption;
+    Add(D);
   end;
 
   Add('Cancel', @ClickBack);
@@ -583,7 +588,7 @@ end;
 { TNewLevelButton ---------------------------------------------------- }
 
 type
-  TNewLevelButton = class(TCastleMenuButton)
+  TNewLevelButton = class(TCastleOnScreenMenuItem)
   strict private
     Level: TLevelInfo;
   public
@@ -592,9 +597,19 @@ type
   end;
 
 constructor TNewLevelButton.Create(AOwner: TComponent; ALevel: TLevelInfo);
+
+  function LevelCaption(const Level: TLevelInfo): string;
+  begin
+    { calculate nice Caption }
+    Result := Format('%d: %s', [Level.Number, Level.Title]);
+    if Level.TitleHint <> '' then
+      Result += ' (' + Level.TitleHint + ')';
+  end;
+
 begin
   inherited Create(AOwner);
   Level := ALevel;
+  Caption := LevelCaption(Level);
 end;
 
 procedure TNewLevelButton.DoClick;
@@ -607,15 +622,6 @@ end;
 { TChooseNewLevelMenu ------------------------------------------------------- }
 
 constructor TChooseNewLevelMenu.Create(AOwner: TComponent);
-
-  function LevelCaption(const Level: TLevelInfo): string;
-  begin
-    { calculate nice Caption }
-    Result := Format('%d: %s', [Level.Number, Level.Title]);
-    if Level.TitleHint <> '' then
-      Result += ' (' + Level.TitleHint + ')';
-  end;
-
 var
   I: Integer;
   Level: TLevelInfo;
@@ -629,7 +635,7 @@ begin
     if Level.Played and
        (Level.Name <> MenuBackgroundLevelName) and
        not Level.Demo then
-      Add(LevelCaption(Level), TNewLevelButton.Create(Self, Level));
+      Add(TNewLevelButton.Create(Self, Level));
   end;
 
   FirstDemoLevelIndex := ControlsCount;
@@ -641,7 +647,7 @@ begin
     if Level.Played and
        (Level.Name <> MenuBackgroundLevelName) and
        Level.Demo then
-      Add(LevelCaption(Level), TNewLevelButton.Create(Self, Level));
+      Add(TNewLevelButton.Create(Self, Level));
   end;
 
   Add('Cancel', @ClickBack);

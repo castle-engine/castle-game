@@ -93,7 +93,7 @@ var
   I: Integer;
   PreviousMenu: TCastleOnScreenMenu;
 begin
-  ChooseMenu.ClearControls;
+  ChooseMenu.MenuItems.ClearControls;
   for I := 0 to MenuItems.Count - 1 do
     ChooseMenu.Add(MenuItems[I], @ChooseMenu.ClickItem);
 

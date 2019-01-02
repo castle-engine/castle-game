@@ -135,9 +135,9 @@ type
   public
     MouseLookHorizontalSensitivitySlider: TCastleFloatSlider;
     MouseLookVerticalSensitivitySlider: TCastleFloatSlider;
-    AutoOpenInventoryToggle: TCastleMenuToggle;
-    MouseLookToggle: TCastleMenuToggle;
-    InvertVerticalMouseLookToggle: TCastleMenuToggle;
+    AutoOpenInventoryToggle: TCastleOnScreenMenuItemToggle;
+    MouseLookToggle: TCastleOnScreenMenuItemToggle;
+    InvertVerticalMouseLookToggle: TCastleOnScreenMenuItemToggle;
     constructor Create(AOwner: TComponent); override;
   end;
 
@@ -222,26 +222,29 @@ begin
   MouseLookVerticalSensitivitySlider.Value := MouseLookVerticalSensitivity;
   MouseLookVerticalSensitivitySlider.OnChange := @MouseLookVerticalSensitivityChanged;
 
-  MouseLookToggle := TCastleMenuToggle.Create(Self);
-  MouseLookToggle.Pressed := MouseLook;
+  MouseLookToggle := TCastleOnScreenMenuItemToggle.Create(Self);
+  MouseLookToggle.Caption := 'Use mouse look';
+  MouseLookToggle.Checked := MouseLook;
   MouseLookToggle.OnClick := @ClickMouseLook;
 
-  InvertVerticalMouseLookToggle := TCastleMenuToggle.Create(Self);
-  InvertVerticalMouseLookToggle.Pressed := InvertVerticalMouseLook;
+  InvertVerticalMouseLookToggle := TCastleOnScreenMenuItemToggle.Create(Self);
+  InvertVerticalMouseLookToggle.Caption := 'Invert vertical mouse look';
+  InvertVerticalMouseLookToggle.Checked := InvertVerticalMouseLook;
   InvertVerticalMouseLookToggle.OnClick := @ClickInvertVerticalMouseLook;
 
-  AutoOpenInventoryToggle := TCastleMenuToggle.Create(Self);
-  AutoOpenInventoryToggle.Pressed := AutoOpenInventory;
+  AutoOpenInventoryToggle := TCastleOnScreenMenuItemToggle.Create(Self);
+  AutoOpenInventoryToggle.Caption := 'Auto show inventory on pickup';
+  AutoOpenInventoryToggle.Checked := AutoOpenInventory;
   AutoOpenInventoryToggle.OnClick := @ClickAutoOpenInventory;
 
   Add('Customize basic controls', @ClickBasicControls);
   Add('Customize items controls', @ClickItemsControls);
   Add('Customize other controls', @ClickOtherControls);
-  Add('Use mouse look', MouseLookToggle);
+  Add(MouseLookToggle);
   Add('Mouse look horizontal sensitivity', MouseLookHorizontalSensitivitySlider);
   Add('Mouse look vertical sensitivity', MouseLookVerticalSensitivitySlider);
-  Add('Invert vertical mouse look', InvertVerticalMouseLookToggle);
-  Add('Auto show inventory on pickup', AutoOpenInventoryToggle);
+  Add(InvertVerticalMouseLookToggle);
+  Add(AutoOpenInventoryToggle);
   Add('Restore to defaults', @ClickRestoreDefaults);
   Add('Back to main menu', @ClickBack);
 
@@ -269,19 +272,19 @@ end;
 procedure TControlsMenu.ClickMouseLook(Sender: TObject);
 begin
   MouseLook := not MouseLook;
-  MouseLookToggle.Pressed := MouseLook;
+  MouseLookToggle.Checked := MouseLook;
 end;
 
 procedure TControlsMenu.ClickInvertVerticalMouseLook(Sender: TObject);
 begin
   InvertVerticalMouseLook := not InvertVerticalMouseLook;
-  InvertVerticalMouseLookToggle.Pressed := InvertVerticalMouseLook;
+  InvertVerticalMouseLookToggle.Checked := InvertVerticalMouseLook;
 end;
 
 procedure TControlsMenu.ClickAutoOpenInventory(Sender: TObject);
 begin
   AutoOpenInventory := not AutoOpenInventory;
-  AutoOpenInventoryToggle.Pressed := AutoOpenInventory;
+  AutoOpenInventoryToggle.Checked := AutoOpenInventory;
 end;
 
 procedure TControlsMenu.ClickRestoreDefaults(Sender: TObject);
@@ -289,10 +292,10 @@ begin
   InputsAll.RestoreDefaults;
 
   MouseLook := DefaultMouseLook;
-  MouseLookToggle.Pressed := MouseLook;
+  MouseLookToggle.Checked := MouseLook;
 
   InvertVerticalMouseLook := DefaultInvertVerticalMouseLook;
-  InvertVerticalMouseLookToggle.Pressed := InvertVerticalMouseLook;
+  InvertVerticalMouseLookToggle.Checked := InvertVerticalMouseLook;
 
   MouseLookHorizontalSensitivity := TWalkCamera.DefaultMouseLookHorizontalSensitivity;
   MouseLookVerticalSensitivity   := TWalkCamera.DefaultMouseLookVerticalSensitivity  ;
@@ -300,7 +303,7 @@ begin
   MouseLookVerticalSensitivitySlider  .Value := MouseLookVerticalSensitivity  ;
 
   AutoOpenInventory := DefaultAutoOpenInventory;
-  AutoOpenInventoryToggle.Pressed := AutoOpenInventory;
+  AutoOpenInventoryToggle.Checked := AutoOpenInventory;
 
   MessageOK(Window, 'All keys and settings restored to defaults.');
 end;
@@ -324,7 +327,7 @@ end;
 
 type
   { Button inside a menu to customize input shortcut. }
-  TCustomizeInputMenuButton = class(TCastleMenuButton)
+  TCustomizeInputMenuButton = class(TCastleOnScreenMenuItem)
   strict private
     FInputShortcut: TInputShortcut;
     procedure SetInputShortcut(const Value: TInputShortcut);
@@ -349,10 +352,10 @@ const
   EmptyInputShortcut = '<not assigned>';
 begin
   if InputShortcut <> nil then
-    Caption := InputShortcut.Description(EmptyInputShortcut)
+    RightCaption := InputShortcut.Description(EmptyInputShortcut)
   else
     // when InputShortcut not set, we don't have anything to show
-    Caption := EmptyInputShortcut;
+    RightCaption := EmptyInputShortcut;
 end;
 
 procedure TCustomizeInputMenuButton.DoClick;
@@ -452,8 +455,9 @@ begin
   begin
     InputShortcut := InputsGroup[Group].Items[I];
     InputMenuButton := TCustomizeInputMenuButton.Create(Self);
+    InputMenuButton.Caption := InputShortcut.Caption;
     InputMenuButton.InputShortcut := InputShortcut;
-    Add(InputShortcut.Caption, InputMenuButton);
+    Add(InputMenuButton);
   end;
 
   Add('Back to controls menu', @ClickBack);
@@ -472,9 +476,7 @@ var
 begin
   for I := 0 to InputsGroup[Group].Count - 1 do
   begin
-    (Controls[I].Controls[0] as TCustomizeInputMenuButton).Refresh;
-    { text changed, maybe stuff should be wider / narrower now }
-    RecalculateSize;
+    (MenuItems.Controls[I] as TCustomizeInputMenuButton).Refresh;
   end;
 end;
 
