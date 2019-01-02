@@ -400,10 +400,14 @@ begin
   if Window.AntiAliasing <> Value then
   begin
     Window.AntiAliasing := Value;
-    if UpdateSlider then
-      AntiAliasingSlider.Value := Ord(Window.AntiAliasing);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
+
+  { do this regardless of "Window.AntiAliasing <> Value",
+    since AntiAliasingSlider.Value doesn't have to be synchronized with
+    Window.AntiAliasing now. }
+  if UpdateSlider then
+    AntiAliasingSlider.Value := Ord(Window.AntiAliasing);
 end;
 
 procedure TVideoMenu.ClickViewVideoInfo(Sender: TObject);
