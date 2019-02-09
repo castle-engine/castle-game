@@ -228,7 +228,7 @@ procedure TStatePlay.TGame2DControls.Render;
     Gray07: TCastleColor = (Data: (0.7, 0.7, 0.7, 1.0));
     Gray08: TCastleColor = (Data: (0.8, 0.8, 0.8, 1.0));
 
-  function YLine(const Line: Cardinal): Integer;
+  function YLine(const Line: Cardinal): Single;
   begin
     Result := ContainerHeight - UIFont.RowHeight * Line - 10 { margin };
   end;
@@ -292,7 +292,7 @@ procedure TStatePlay.TGame2DControls.Render;
     IndicatorMargin = 5;
   var
     LifeMapped: Integer;
-    LifeTextPosition, X, Y: Integer;
+    LifeTextPosition, X, Y: Single;
     LifeText: string;
   begin
     X := XMove + IndicatorMargin;
@@ -321,9 +321,9 @@ procedure TStatePlay.TGame2DControls.Render;
     begin
       LifeText := Format('%d', [Round(ALife)]);
       LifeTextPosition := XMove + IndicatorMargin +
-        (IndicatorWidth - UIFont.TextWidth(LifeText)) div 2;
+        (IndicatorWidth - UIFont.TextWidth(LifeText)) / 2;
       MaxVar(LifeTextPosition, IndicatorMargin);
-      UIFont.Print(LifeTextPosition, IndicatorMargin + IndicatorHeight div 2,
+      UIFont.Print(LifeTextPosition, IndicatorMargin + IndicatorHeight / 2,
         Gray08, LifeText);
     end;
   end;

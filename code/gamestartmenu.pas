@@ -675,10 +675,10 @@ procedure TChooseNewLevelMenu.Render;
 const
   SubMenuTextColor: TCastleColor = (Data: (0.7, 0.7, 0.7, 1.0));
 var
-  R: TRectangle;
+  R: TFloatRectangle;
 begin
   inherited;
-  R := ScreenRect;
+  R := RenderRect;
   SubMenuTitleFont.Print(R.Left,
     R.Top - (FirstDemoLevelIndex + 2) *
       (Font.RowHeight + RegularSpaceBetweenItems) + 10,

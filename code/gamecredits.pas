@@ -44,7 +44,7 @@ type
     Credits: T3DCredits;
     CreditsSceneManager: TCastleSceneManager;
   public
-    ControlsUnder: TUIControl;
+    ControlsUnder: TCastleUserInterface;
     SceneManagerUnder: TCastleSceneManager;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;

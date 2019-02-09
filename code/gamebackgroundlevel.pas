@@ -52,7 +52,7 @@ interface
 uses CastleWindow, CastleUIControls, CastleLevels;
 
 var
-  BackgroundControls: TUIControl;
+  BackgroundControls: TCastleUserInterface;
   BackgroundSceneManager: TGameSceneManager;
 
 const
@@ -73,7 +73,7 @@ uses SysUtils, CastleGLUtils, CastleGLImages,
 { TBackgroundCaptions -------------------------------------------------------- }
 
 type
-  TBackgroundCaptions = class(TUIControl)
+  TBackgroundCaptions = class(TCastleUserInterface)
   private
     GLCaption: TGLImage;
   public
@@ -103,14 +103,14 @@ end;
 { routines ------------------------------------------------------------------- }
 
 var
-  BackgroundCaptions: TUIControl;
+  BackgroundCaptions: TCastleUserInterface;
 
 procedure BackgroundCreate;
 var
   BackgroundPlayer: TPlayer;
 begin
-  BackgroundControls := TUIControlSizeable.Create(nil);
-  (BackgroundControls as TUIControlSizeable).FullSize := true;
+  BackgroundControls := TCastleUserInterface.Create(nil);
+  (BackgroundControls as TCastleUserInterface).FullSize := true;
 
   { initialize BackgroundSceneManager }
   BackgroundSceneManager := TGameSceneManager.Create(nil);
