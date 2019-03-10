@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="castle"
   standalone_source="code/castle.lpr"
-  android_source="code/castle_android.lpr"
+  game_units="Game"
   caption="The Castle"
-  qualified_name="com.catastrophe.games.castle"
+  qualified_name="io.castleengine.castlegame"
   screen_orientation="landscape"
-  author="Cat-astrophe Games">
+  author="Michalis Kamburelis and Contributors (see Credits)"
+>
   <version value="1.1.0" />
-  <!-- the "sound" component will be automatically added -->
-  <android project_type="integrated" />
+  <compiler_options>
+    <search_paths>
+      <path value="code/" />
+    </search_paths>
+  </compiler_options>
   <package>
     <include path="README.txt" />
     <include path="COPYING.GPL2.txt" />
