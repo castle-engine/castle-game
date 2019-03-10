@@ -451,9 +451,9 @@ begin
 
   FGroup := AGroup;
 
-  for I := 0 to InputsGroup[Group].Count - 1 do
+  for I := 0 to InputsGroup(Group).Count - 1 do
   begin
-    InputShortcut := InputsGroup[Group].Items[I];
+    InputShortcut := InputsGroup(Group).Items[I];
     InputMenuButton := TCustomizeInputMenuButton.Create(Self);
     InputMenuButton.Caption := InputShortcut.Caption;
     InputMenuButton.InputShortcut := InputShortcut;
@@ -474,7 +474,7 @@ procedure TControlsSubMenu.RefreshShortcuts;
 var
   I: Integer;
 begin
-  for I := 0 to InputsGroup[Group].Count - 1 do
+  for I := 0 to InputsGroup(Group).Count - 1 do
   begin
     (MenuItems.Controls[I] as TCustomizeInputMenuButton).Refresh;
   end;
