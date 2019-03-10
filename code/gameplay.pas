@@ -89,7 +89,7 @@ type
   TStatePlay = class(TUIState)
   strict private
     type
-      TGame2DControls = class(TUIControl)
+      TGame2DControls = class(TCastleUserInterface)
       public
         procedure Render; override;
       end;
@@ -122,12 +122,12 @@ uses SysUtils, CastleUtils, CastleWindow, GameInputs,
   GameLevelSpecific, CastleTimeUtils, CastleGLImages;
 
 var
-  GLNotificationsFade: TGLImage;
-  GLInventorySlot: TGLImage;
-  GLBlankIndicatorImage: TGLImage;
-  GLRedIndicatorImage: TGLImage;
-  GLBlueIndicatorImage: TGLImage;
-  GLBossIndicatorImage: TGLImage;
+  GLNotificationsFade: TDrawableImage;
+  GLInventorySlot: TDrawableImage;
+  GLBlankIndicatorImage: TDrawableImage;
+  GLRedIndicatorImage: TDrawableImage;
+  GLBlueIndicatorImage: TDrawableImage;
+  GLBossIndicatorImage: TDrawableImage;
 
   ShowDebugInfo: boolean;
 
@@ -187,8 +187,8 @@ procedure TStatePlay.TGame2DControls.Render;
       X := ItemSlotX(I);
       Y := ItemSlotY(I);
 
-      Player.Inventory[I].Resource.GLImage.Alpha := acTest;
-      Player.Inventory[I].Resource.GLImage.Draw(
+      Player.Inventory[I].Resource.DrawableImage.Alpha := acTest;
+      Player.Inventory[I].Resource.DrawableImage.Draw(
         X + InventorySlotMargin, Y + InventorySlotMargin);
     end;
 
@@ -284,7 +284,7 @@ procedure TStatePlay.TGame2DControls.Render;
   end;
 
   procedure RenderLifeIndicator(const ALife, AMaxLife: Single;
-    const GLFullIndicatorImage: TGLImage;
+    const GLFullIndicatorImage: TDrawableImage;
     const XMove: Integer; const PrintText: boolean);
   const
     IndicatorHeight = 120;
@@ -708,9 +708,9 @@ procedure ContextOpen;
     Result := ApplicationData('player_controls/' + BaseName);
   end;
 
-  function LoadPlayerControlToGL(const BaseName: string): TGLImage;
+  function LoadPlayerControlToGL(const BaseName: string): TDrawableImage;
   begin
-    Result := TGLImage.Create(PlayerControlURL(BaseName), [TRGBAlphaImage]);
+    Result := TDrawableImage.Create(PlayerControlURL(BaseName), [TRGBAlphaImage]);
   end;
 
 begin

@@ -75,7 +75,7 @@ uses SysUtils, CastleGLUtils, CastleGLImages,
 type
   TBackgroundCaptions = class(TCastleUserInterface)
   private
-    GLCaption: TGLImage;
+    GLCaption: TDrawableImage;
   public
     procedure Render; override;
     procedure GLContextOpen; override;
@@ -91,7 +91,7 @@ procedure TBackgroundCaptions.GLContextOpen;
 begin
   inherited;
   if GLCaption = nil then
-    GLCaption := TGLImage.Create(ApplicationData('menu_bg/caption.png'), []);
+    GLCaption := TDrawableImage.Create('castle-data:/menu_bg/caption.png', []);
 end;
 
 procedure TBackgroundCaptions.GLContextClose;
