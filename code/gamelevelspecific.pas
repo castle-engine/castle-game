@@ -106,10 +106,6 @@ type
       MainScene: TCastleScene; DOMElement: TDOMElement); override;
   end;
 
-  TSpiderAppearing = class(TCastleTransform)
-    procedure LocalRender(const Params: TRenderParams); override;
-  end;
-
   TGameWinAnimation = (
     gwaNone,
     gwaAnimateTo1,
@@ -118,7 +114,6 @@ type
 
   TCagesLevel = class(TBossLevel)
   private
-    { List of TSpiderAppearing instances }
     SpidersAppearing: TCastleTransform;
     NextSpidersAppearingTime: Single;
     { Instance of boss creature, if any, on the level. @nil if no boss creature
@@ -767,33 +762,6 @@ begin
   TTowerElevatorButton(ElevatorButton).MovingElevator := MovingElevator;
 end;
 
-{ TSpiderAppearing ----------------------------------------------------------- }
-
-const
-  { Remember to make it -1 lower than actual ceiling geometry,
-    otherwise the spiders will be created on the ceiling of the model... }
-  SpiderZ = 69.0;
-
-procedure TSpiderAppearing.LocalRender(const Params: TRenderParams);
-begin
-  {$ifndef OpenGLES} //TODO-es
-  if (not Params.Transparent) and Params.ShadowVolumesReceivers then
-  begin
-    glPushAttrib(GL_ENABLE_BIT);
-      glDisable(GL_LIGHTING);
-      glEnable(GL_DEPTH_TEST);
-      glColorv(BlackRGB);
-      glBegin(GL_LINES);
-        glVertex3f(Translation[0], Translation[1], SpiderZ);
-        glVertexv(Translation);
-      glEnd;
-    glPopAttrib;
-  end;
-  {$endif}
-
-  inherited;
-end;
-
 { TGateExit ------------------------------------------------------------------ }
 
 type
@@ -922,15 +890,20 @@ const
   MinSpiderY = -123.0 + SpiderLargeRadius;
   MaxSpiderY = 162.0  - SpiderLargeRadius;
 
+  { Remember to make it -1 lower than actual ceiling geometry,
+    otherwise the spiders will be created on the ceiling of the model... }
+  SpiderZ = 69.0;
+
   procedure AppearSpider(const Position: TVector3);
   var
-    SA: TSpiderAppearing;
+    SpiderAppearing: TCastleScene;
   begin
-    SA := TSpiderAppearing.Create(Self);
-    SA.Add(Spider.IdleAnimation.Scene(Time, true));
-    SA.Collides := false;
-    SA.Translation := Position;
-    SpidersAppearing.Add(SA);
+    SpiderAppearing := TCastleScene.Create(Self);
+    SpiderAppearing.Load('castle-data:/creatures/spider/appearing.x3dv');
+    SpiderAppearing.Add(Spider.IdleAnimation.Scene(Time, true));
+    SpiderAppearing.Collides := false;
+    SpiderAppearing.Translation := Position;
+    SpidersAppearing.Add(SpiderAppearing);
   end;
 
   function RandomSpiderXY: TVector3;
@@ -972,7 +945,7 @@ var
   SpiderCreature: TCreature;
   SpiderPosition, SpiderDirection: TVector3;
   SpiderMoveDistance, SpiderRadius: Single;
-  SA: TSpiderAppearing;
+  SpiderAppearing: TCastleTransform;
   TorchLight: PLightInstance;
 begin
   inherited;
@@ -1019,23 +992,23 @@ begin
     AboveHeight := MaxSingle;
     while I < SpidersAppearing.Count do
     begin
-      SA := SpidersAppearing[I] as TSpiderAppearing;
-      SpiderPosition := SA.Translation;
-      SA.Height(SpiderPosition, AboveHeight);
+      SpiderAppearing := SpidersAppearing[I];
+      SpiderPosition := SpiderAppearing.Translation;
+      SpiderAppearing.Height(SpiderPosition, AboveHeight);
       if AboveHeight < SpiderRadius * 2 then
       begin
         SpiderDirection := Player.Translation - SpiderPosition;
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, World.GravityUp);
         SpiderCreature := Spider.CreateCreature(World, SpiderPosition, SpiderDirection);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
-        FreeAndNil(SA); { it will be automatically removed from SpidersAppearing list }
+        FreeAndNil(SpiderAppearing); { it will be automatically removed from SpidersAppearing list }
       end else
       begin
         { calculate SpiderMoveDistance }
         SpiderMoveDistance := SpidersFallingSpeed * SecondsPassed;
         MinVar(SpiderMoveDistance, AboveHeight - SpiderRadius);
         SpiderPosition.Data[2] -= SpiderMoveDistance;
-        SA.Translation := SpiderPosition;
+        SpiderAppearing.Translation := SpiderPosition;
         Inc(I);
       end;
     end;
