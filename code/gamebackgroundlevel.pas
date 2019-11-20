@@ -119,7 +119,8 @@ begin
   BackgroundControls.InsertFront(BackgroundSceneManager);
 
   { Do not allow to move the camera in any way. }
-  BackgroundSceneManager.Camera.Input := [];
+  BackgroundSceneManager.AutoNavigation := false;
+  BackgroundSceneManager.Navigation := nil;
 
   { Disable interaction with the scene pointing device sensors by having
     player with Blocked = true. }
