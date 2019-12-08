@@ -1,3 +1,6 @@
+- looks like shadow volumes rendering for werewolves renders their older frame than
+  what is rendered? Sometimes their shadow is weird.
+
 - water shaders in data/levels/fountain/water_reflections/
   are broken now on desktop,
   not adjusted 100% to use castle_Xxx uniforms.

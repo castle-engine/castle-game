@@ -37,7 +37,7 @@ var
 
 implementation
 
-uses CastleKeysMouse, CastleSceneManager, CastlePlayer;
+uses CastleKeysMouse, CastleSceneManager, CastlePlayer, CastleLevels;
 
 initialization
   { Change defaults, to make "attack" on mouse click.

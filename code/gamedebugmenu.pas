@@ -392,7 +392,7 @@ var
 begin
   if ChooseResource(Resource, true) then
   begin
-    (Resource as TCreatureResource).CreateCreature(SceneManager.Items,
+    (Resource as TCreatureResource).CreateCreature(SceneManager.LevelProperties,
       Player.Translation + Player.Direction * DirectionAttenuation,
       Player.Direction);
 

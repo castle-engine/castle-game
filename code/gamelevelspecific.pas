@@ -421,7 +421,7 @@ procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
     Assert(not WerewolfAppeared);
 
     for I := 0 to WerewolvesCount - 1 do
-      WerewolfCreature[I] := Werewolf.CreateCreature(World,
+      WerewolfCreature[I] := Werewolf.CreateCreature(SceneManager.LevelProperties,
         WerewolfAppearPosition[I],
         Player.Translation - WerewolfAppearPosition[I])
         as TWerewolfCreature;
@@ -635,7 +635,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     begin
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
       CreatureDirection := Player.Translation - CreaturePosition;
-      Ghost.CreateCreature(World, CreaturePosition, CreatureDirection);
+      Ghost.CreateCreature(SceneManager.LevelProperties, CreaturePosition, CreatureDirection);
     end;
   end;
 
@@ -648,7 +648,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     begin
       CreaturePosition := SwordAmbushStartingPosition[I];
       CreatureDirection := Player.Translation - CreaturePosition;
-      Ghost.CreateCreature(World, CreaturePosition, CreatureDirection);
+      Ghost.CreateCreature(SceneManager.LevelProperties, CreaturePosition, CreatureDirection);
     end;
   end;
 
@@ -999,7 +999,7 @@ begin
       begin
         SpiderDirection := Player.Translation - SpiderPosition;
         MakeVectorsOrthoOnTheirPlane(SpiderDirection, World.GravityUp);
-        SpiderCreature := Spider.CreateCreature(World, SpiderPosition, SpiderDirection);
+        SpiderCreature := Spider.CreateCreature(SceneManager.LevelProperties, SpiderPosition, SpiderDirection);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
         FreeAndNil(SpiderAppearing); { it will be automatically removed from SpidersAppearing list }
       end else
