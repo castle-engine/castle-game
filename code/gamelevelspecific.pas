@@ -235,6 +235,7 @@ function TStairsBlocker.PointingDeviceActivate(const Active: boolean;
 begin
   Result := Active;
   if not Result then Exit;
+  if SceneManager.PlayerBlocked then Exit;
 
   NotificationInteractFailed('You are not able to open it');
 end;
@@ -252,6 +253,7 @@ function TCastleHallButton.PointingDeviceActivate(const Active: boolean;
 begin
   Result := Active;
   if not Result then Exit;
+  if SceneManager.PlayerBlocked then Exit;
 
   if Distance < 10.0 then
   begin
@@ -717,6 +719,7 @@ function TTowerElevatorButton.PointingDeviceActivate(const Active: boolean;
 begin
   Result := Active;
   if not Result then Exit;
+  if SceneManager.PlayerBlocked then Exit;
 
   if Distance > 10 then
     NotificationInteractFailed(
@@ -776,6 +779,7 @@ function TGateExit.PointingDeviceActivate(const Active: boolean;
 begin
   Result := Active;
   if not Result then Exit;
+  if SceneManager.PlayerBlocked then Exit;
 
   if Distance > 10 then
     NotificationInteractFailed(
@@ -1085,6 +1089,7 @@ function TDoomLevelDoor.PointingDeviceActivate(const Active: boolean;
 begin
   Result := Active;
   if not Result then Exit;
+  if SceneManager.PlayerBlocked then Exit;
 
   if Distance > 7 then
     NotificationInteractFailed('You see a door. You''re too far to open it from here') else
@@ -1111,6 +1116,7 @@ function TElevator9a9b.PointingDeviceActivate(const Active: boolean;
 begin
   Result := Active;
   if not Result then Exit;
+  if SceneManager.PlayerBlocked then Exit;
 
   Result := MovingElevator9a9b.CompletelyBeginPosition and
     Elevator9a9bPickBox.Contains(Player.Translation);
@@ -1140,6 +1146,7 @@ function TExitButton.PointingDeviceActivate(const Active: boolean;
 begin
   Result := Active;
   if not Result then Exit;
+  if SceneManager.PlayerBlocked then Exit;
 
   if Distance > 5 then
     NotificationInteractFailed(

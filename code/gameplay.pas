@@ -40,6 +40,8 @@ type
   protected
     function PointingDeviceActivate3D(const Item: TCastleTransform; const Active: boolean;
       const Distance: Single): boolean; override;
+  public
+    function PlayerBlocked: Boolean;
   end;
 
 var
@@ -392,6 +394,11 @@ end;
 
 { TCastle1SceneManager ------------------------------------------------------- }
 
+function TCastle1SceneManager.PlayerBlocked: Boolean;
+begin
+  Result := (Player <> nil) and (Player.Blocked or Player.Dead);
+end;
+
 function TCastle1SceneManager.PointingDeviceActivate3D(const Item: TCastleTransform;
   const Active: boolean; const Distance: Single): boolean;
 const
@@ -403,6 +410,7 @@ var
 begin
   Result := inherited;
   if Result then Exit;
+  if PlayerBlocked then Exit;
 
   if Active and
      ( (Item is TItemOnWorld) or
