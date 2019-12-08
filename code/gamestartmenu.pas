@@ -125,8 +125,6 @@ type
   public
     FirstDemoLevelIndex: Cardinal;
     constructor Create(AOwner: TComponent); override;
-    function SpaceBetweenItems(const NextItemIndex: Cardinal): Single; override;
-    procedure Render; override;
   end;
 
 { ----------------------------------------------------------------------------
@@ -629,6 +627,7 @@ constructor TChooseNewLevelMenu.Create(AOwner: TComponent);
 var
   I: Integer;
   Level: TLevelInfo;
+  Spacer: TCastleUserInterface;
 begin
   inherited;
 
@@ -642,7 +641,11 @@ begin
       Add(TNewLevelButton.Create(Self, Level));
   end;
 
-  FirstDemoLevelIndex := ControlsCount;
+  Spacer := TCastleUserInterface.Create(Self);
+  Spacer.Height := 10;
+  Add(Spacer);
+
+  Add('Bonus demo levels :');
 
   { Add demo levels }
   for I := 0 to Levels.Count - 1 do
@@ -654,35 +657,15 @@ begin
       Add(TNewLevelButton.Create(Self, Level));
   end;
 
+  { Separator is needed before "Cancel" button,
+    otherwise the button seems attached to the "demo" levels section. }
+  Spacer := TCastleUserInterface.Create(Self);
+  Spacer.Height := 10;
+  Add(Spacer);
+
   Add('Cancel', @ClickBack);
 
   SubMenuTitle := 'Choose initial level';
-end;
-
-function TChooseNewLevelMenu.SpaceBetweenItems(
-  const NextItemIndex: Cardinal): Single;
-begin
-  Result := inherited SpaceBetweenItems(NextItemIndex);
-  if NextItemIndex = FirstDemoLevelIndex then
-    Result += Cardinal(SubMenuTitleFont.RowHeight) * 2 else
-  if NextItemIndex = ControlsCount - 1 then
-    { some separator is needed before "cancel" button now,
-      since otherwise it seems to attached to "demo" levels section. }
-    Result += 10;
-end;
-
-procedure TChooseNewLevelMenu.Render;
-const
-  SubMenuTextColor: TCastleColor = (Data: (0.7, 0.7, 0.7, 1.0));
-var
-  R: TFloatRectangle;
-begin
-  inherited;
-  R := RenderRect;
-  SubMenuTitleFont.Print(R.Left,
-    R.Top - (FirstDemoLevelIndex + 2) *
-      (Font.RowHeight + RegularSpaceBetweenItems) + 10,
-    SubMenuTextColor, 'Bonus demo levels :');
 end;
 
 procedure TChooseNewLevelMenu.ClickBack(Sender: TObject);
