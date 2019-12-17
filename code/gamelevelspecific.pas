@@ -31,7 +31,7 @@ uses DOM,
   CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer,
   CastleLevels, X3DNodes, X3DFields, X3DTIme, CastleTransform, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors,
-  CastleFrustum, Castle3D,
+  CastleFrustum, Castle3D, CastleResources,
   GameSound;
 
 type
@@ -61,8 +61,9 @@ type
     procedure ButtonAnimationIsActiveChanged(
       Event: TX3DEvent; Value: TX3DField; const ATime: TX3DTime);
   public
-    constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TCastleScene; DOMElement: TDOMElement); override;
+    constructor Create(const AOwner: TComponent;
+      const ALevelProperties: TLevelProperties;
+      const MainScene: TCastleScene; const DOMElement: TDOMElement); override;
     procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
     function BossIndicator(out Life, MaxLife: Single): boolean; override;
@@ -91,8 +92,9 @@ type
   protected
     function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
   public
-    constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TCastleScene; DOMElement: TDOMElement); override;
+    constructor Create(const AOwner: TComponent;
+      const ALevelProperties: TLevelProperties;
+      const MainScene: TCastleScene; const DOMElement: TDOMElement); override;
     procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
   end;
 
@@ -102,8 +104,9 @@ type
     Elevator: TCastleScene;
     ElevatorButton: TCastleScene;
   public
-    constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TCastleScene; DOMElement: TDOMElement); override;
+    constructor Create(const AOwner: TComponent;
+      const ALevelProperties: TLevelProperties;
+      const MainScene: TCastleScene; const DOMElement: TDOMElement); override;
   end;
 
   TGameWinAnimation = (
@@ -127,8 +130,9 @@ type
   protected
     procedure PlaceholdersEnd; override;
   public
-    constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TCastleScene; DOMElement: TDOMElement); override;
+    constructor Create(const AOwner: TComponent;
+      const ALevelProperties: TLevelProperties;
+      const MainScene: TCastleScene; const DOMElement: TDOMElement); override;
 
     procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
 
@@ -176,22 +180,25 @@ type
   protected
     function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
   public
-    constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TCastleScene; DOMElement: TDOMElement); override;
+    constructor Create(const AOwner: TComponent;
+      const ALevelProperties: TLevelProperties;
+      const MainScene: TCastleScene; const DOMElement: TDOMElement); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
     procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
   end;
 
   TGateBackgroundLevel = class(TLevelLogic)
   public
-    constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TCastleScene; DOMElement: TDOMElement); override;
+    constructor Create(const AOwner: TComponent;
+      const ALevelProperties: TLevelProperties;
+      const MainScene: TCastleScene; const DOMElement: TDOMElement); override;
   end;
 
   TFountainLevel = class(TLevelLogic)
   public
-    constructor Create(AOwner: TComponent; AWorld: T3DWorld;
-      MainScene: TCastleScene; DOMElement: TDOMElement); override;
+    constructor Create(const AOwner: TComponent;
+      const ALevelProperties: TLevelProperties;
+      const MainScene: TCastleScene; const DOMElement: TDOMElement); override;
     procedure PrepareNewPlayer(NewPlayer: TPlayer); override;
   end;
 
@@ -269,8 +276,9 @@ end;
 
 { TCastleHallLevel ----------------------------------------------------------- }
 
-constructor TCastleHallLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TCastleScene; DOMElement: TDOMElement);
+constructor TCastleHallLevel.Create(const AOwner: TComponent;
+  const ALevelProperties: TLevelProperties;
+  const MainScene: TCastleScene; const DOMElement: TDOMElement);
 var
   CastleHallLevelPath: string;
 begin
@@ -501,8 +509,9 @@ end;
 
 { TGateLevel ----------------------------------------------------------------- }
 
-constructor TGateLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TCastleScene; DOMElement: TDOMElement);
+constructor TGateLevel.Create(const AOwner: TComponent;
+  const ALevelProperties: TLevelProperties;
+  const MainScene: TCastleScene; const DOMElement: TDOMElement);
 var
   Cart: TCastleScene;
   GateLevelPath: string;
@@ -733,8 +742,9 @@ end;
 
 { TTowerLevel ---------------------------------------------------------------- }
 
-constructor TTowerLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TCastleScene; DOMElement: TDOMElement);
+constructor TTowerLevel.Create(const AOwner: TComponent;
+  const ALevelProperties: TLevelProperties;
+  const MainScene: TCastleScene; const DOMElement: TDOMElement);
 var
   TowerLevelPath: string;
 begin
@@ -803,8 +813,9 @@ end;
 
 { TCagesLevel ---------------------------------------------------------------- }
 
-constructor TCagesLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TCastleScene; DOMElement: TDOMElement);
+constructor TCagesLevel.Create(const AOwner: TComponent;
+  const ALevelProperties: TLevelProperties;
+  const MainScene: TCastleScene; const DOMElement: TDOMElement);
 begin
   inherited;
 
@@ -1187,8 +1198,9 @@ end;
 
 { TDoomE1M1Level ------------------------------------------------------------- }
 
-constructor TDoomE1M1Level.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TCastleScene; DOMElement: TDOMElement);
+constructor TDoomE1M1Level.Create(const AOwner: TComponent;
+  const ALevelProperties: TLevelProperties;
+  const MainScene: TCastleScene; const DOMElement: TDOMElement);
 var
   DoomDoorsPathPrefix: string;
 
@@ -1309,8 +1321,9 @@ end;
 
 { TGateBackgroundLevel ------------------------------------------------------- }
 
-constructor TGateBackgroundLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TCastleScene; DOMElement: TDOMElement);
+constructor TGateBackgroundLevel.Create(const AOwner: TComponent;
+  const ALevelProperties: TLevelProperties;
+  const MainScene: TCastleScene; const DOMElement: TDOMElement);
 var
   Water: TCastleScene;
 begin
@@ -1328,8 +1341,9 @@ end;
 
 { TFountainLevel ------------------------------------------------------------- }
 
-constructor TFountainLevel.Create(AOwner: TComponent; AWorld: T3DWorld;
-  MainScene: TCastleScene; DOMElement: TDOMElement);
+constructor TFountainLevel.Create(const AOwner: TComponent;
+  const ALevelProperties: TLevelProperties;
+  const MainScene: TCastleScene; const DOMElement: TDOMElement);
 var
   Fountain: TSceneWaterShader;
   LoadWaterAnimation: boolean;
