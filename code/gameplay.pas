@@ -246,6 +246,7 @@ procedure TStatePlay.TGame2DControls.Render;
 
   procedure DoShowShadowVolumesCounts;
   begin
+(* TODO: No longer exposed by CGE:
     if GLFeatures.ShadowVolumesPossible and ShadowVolumes then
       UIFont.Print(0, YLine(LineShadowVolumesCounts), Gray07,
         Format('No shadow %d + zpass %d + zfail (no l cap) %d + zfail (l cap) %d = all %d',
@@ -254,6 +255,7 @@ procedure TStatePlay.TGame2DControls.Render;
           SceneManager.ShadowVolumeRenderer.CountZFailNoLightCap,
           SceneManager.ShadowVolumeRenderer.CountZFailAndLightCap,
           SceneManager.ShadowVolumeRenderer.CountCasters ]));
+*)
   end;
 
   procedure DoShowDeadOrFinishedKeys(const Color: TCastleColor);
