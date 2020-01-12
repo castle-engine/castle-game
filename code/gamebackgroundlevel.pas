@@ -115,19 +115,23 @@ begin
   { initialize BackgroundSceneManager }
   BackgroundSceneManager := TGameSceneManager.Create(nil);
 
-  BackgroundSceneManager.LoadLevel(MenuBackgroundLevelName);
-  BackgroundControls.InsertFront(BackgroundSceneManager);
-
-  { Do not allow to move the camera in any way. }
-  BackgroundSceneManager.AutoNavigation := false;
-  BackgroundSceneManager.Navigation := nil;
-
   { Disable interaction with the scene pointing device sensors by having
     player with Blocked = true. }
   BackgroundPlayer := TPlayer.Create(BackgroundSceneManager);
   BackgroundPlayer.Blocked := true;
   BackgroundSceneManager.Player := BackgroundPlayer;
-  BackgroundSceneManager.Items.Add(BackgroundPlayer);
+
+  BackgroundSceneManager.LoadLevel(MenuBackgroundLevelName);
+  BackgroundControls.InsertFront(BackgroundSceneManager);
+
+  { Do not allow to move the camera in any way.
+    Later: commented out, using BackgroundPlayer with
+    "BackgroundPlayer.Blocked := true" achieves this too.
+    And having both BackgroundPlayer and these lines below would cause warnings
+    from TPlayer (as TPlayer tries to synchronize view between TPlayer transformation
+    and TPlayer.Navigation.Viewport.Camera, which breaks if TPlayer.Navigation is unused). }
+  // BackgroundSceneManager.AutoNavigation := false;
+  // BackgroundSceneManager.Navigation := nil;
 
   BackgroundCaptions := TBackgroundCaptions.Create(nil);
   BackgroundControls.InsertFront(BackgroundCaptions);

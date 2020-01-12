@@ -164,7 +164,6 @@ begin
         PlayerUpdateMouseLook(Player);
 
         SceneManager.Player := Player;
-        SceneManager.Items.Add(Player);
 
         SceneManager.LoadLevel(Level);
         PlayGame(true);
