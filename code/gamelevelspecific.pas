@@ -457,7 +457,7 @@ procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
     ShadowLight := SceneManager.MainScene.GlobalLights.FindName('FakeShadowPosition');
     Check(ShadowLight <> nil, 'FakeShadowPosition light not found on castle_hall level');
     ShadowLight^.Node.ShadowVolumes := true;
-    ShadowLight^.Node.ShadowVolumesMain := true;
+    (ShadowLight^.Node as TAbstractPunctualLightNode).ShadowVolumesMain := true;
   end;
 
 begin
