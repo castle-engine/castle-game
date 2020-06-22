@@ -211,16 +211,18 @@ begin
   inherited;
 
   MouseLookHorizontalSensitivitySlider := TCastleFloatSlider.Create(Self);
-  MouseLookHorizontalSensitivitySlider.Min := 0.01;
-  MouseLookHorizontalSensitivitySlider.Max := 0.3;
+  MouseLookHorizontalSensitivitySlider.Min := Pi * 0.01 / 180;
+  MouseLookHorizontalSensitivitySlider.Max := Pi * 0.3 / 180;
   MouseLookHorizontalSensitivitySlider.Value := MouseLookHorizontalSensitivity;
   MouseLookHorizontalSensitivitySlider.OnChange := @MouseLookHorizontalSensitivityChanged;
+  MouseLookHorizontalSensitivitySlider.DisplayValue := false; // nonsense small number
 
   MouseLookVerticalSensitivitySlider := TCastleFloatSlider.Create(Self);
-  MouseLookVerticalSensitivitySlider.Min := 0.01;
-  MouseLookVerticalSensitivitySlider.Max := 0.3;
+  MouseLookVerticalSensitivitySlider.Min := Pi * 0.01 / 180;
+  MouseLookVerticalSensitivitySlider.Max := Pi * 0.3 / 180;
   MouseLookVerticalSensitivitySlider.Value := MouseLookVerticalSensitivity;
   MouseLookVerticalSensitivitySlider.OnChange := @MouseLookVerticalSensitivityChanged;
+  MouseLookVerticalSensitivitySlider.DisplayValue := false; // nonsense small number
 
   MouseLookToggle := TCastleOnScreenMenuItemToggle.Create(Self);
   MouseLookToggle.Caption := 'Use mouse look';
