@@ -38,8 +38,10 @@ procedure PlayGame(PrepareNewPlayer: boolean);
 type
   TCastle1SceneManager = class(TGameSceneManager)
   protected
+    (* TODO
     function PointingDeviceActivate3D(const Item: TCastleTransform; const Active: boolean;
       const Distance: Single): boolean; override;
+    *)
   public
     function PlayerBlocked: Boolean;
   end;
@@ -401,6 +403,7 @@ begin
   Result := (Player <> nil) and (Player.Blocked or Player.Dead);
 end;
 
+(* TODO
 function TCastle1SceneManager.PointingDeviceActivate3D(const Item: TCastleTransform;
   const Active: boolean; const Distance: Single): boolean;
 const
@@ -443,6 +446,7 @@ begin
     Result := true;
   end;
 end;
+*)
 
 { other ---------------------------------------------------------------------- }
 

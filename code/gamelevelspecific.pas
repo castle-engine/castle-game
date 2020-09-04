@@ -161,8 +161,8 @@ type
     property SoundGoEndPosition default stDoorOpen;
     }
 
-    function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single; const CancelAction: boolean = false): boolean; override;
+    function PointingDevicePress(const Pick: TRayCollisionNode;
+      const Distance: Single): Boolean; override;
   end;
 
   TDoomE1M1Level = class(TLevelLogic)
@@ -233,15 +233,15 @@ end;
 
 type
   TStairsBlocker = class(TCastleScene)
-    function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single; const CancelAction: boolean = false): boolean; override;
+    function PointingDevicePress(const Pick: TRayCollisionNode;
+      const Distance: Single): Boolean; override;
   end;
 
-function TStairsBlocker.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single; const CancelAction: boolean = false): boolean;
+function TStairsBlocker.PointingDevicePress(const Pick: TRayCollisionNode;
+  const Distance: Single): Boolean;
 begin
-  Result := Active;
-  if not Result then Exit;
+  Result := inherited;
+  if Result then Exit;
   if SceneManager.PlayerBlocked then Exit;
 
   NotificationInteractFailed('You are not able to open it');
@@ -251,15 +251,15 @@ end;
 
 type
   TCastleHallButton = class(TCastleScene)
-    function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single; const CancelAction: boolean = false): boolean; override;
+    function PointingDevicePress(const Pick: TRayCollisionNode;
+      const Distance: Single): Boolean; override;
   end;
 
-function TCastleHallButton.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single; const CancelAction: boolean = false): boolean;
+function TCastleHallButton.PointingDevicePress(const Pick: TRayCollisionNode;
+  const Distance: Single): Boolean;
 begin
-  Result := Active;
-  if not Result then Exit;
+  Result := inherited;
+  if Result then Exit;
   if SceneManager.PlayerBlocked then Exit;
 
   if Distance < 10.0 then
@@ -719,15 +719,15 @@ end;
 type
   TTowerElevatorButton = class(TCastleScene)
     MovingElevator: T3DLinearMoving;
-    function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single; const CancelAction: boolean = false): boolean; override;
+    function PointingDevicePress(const Pick: TRayCollisionNode;
+      const Distance: Single): Boolean; override;
   end;
 
-function TTowerElevatorButton.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single; const CancelAction: boolean = false): boolean;
+function TTowerElevatorButton.PointingDevicePress(const Pick: TRayCollisionNode;
+  const Distance: Single): Boolean;
 begin
-  Result := Active;
-  if not Result then Exit;
+  Result := inherited;
+  if Result then Exit;
   if SceneManager.PlayerBlocked then Exit;
 
   if Distance > 10 then
@@ -780,15 +780,15 @@ end;
 type
   TGateExit = class(TCastleScene)
     Boss: TCreature;
-    function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single; const CancelAction: boolean = false): boolean; override;
+    function PointingDevicePress(const Pick: TRayCollisionNode;
+      const Distance: Single): Boolean; override;
   end;
 
-function TGateExit.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single; const CancelAction: boolean = false): boolean;
+function TGateExit.PointingDevicePress(const Pick: TRayCollisionNode;
+  const Distance: Single): Boolean;
 begin
-  Result := Active;
-  if not Result then Exit;
+  Result := inherited;
+  if Result then Exit;
   if SceneManager.PlayerBlocked then Exit;
 
   if Distance > 10 then
@@ -1095,11 +1095,11 @@ begin
     GoBeginPosition;
 end;
 
-function TDoomLevelDoor.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single; const CancelAction: boolean = false): boolean;
+function TDoomLevelDoor.PointingDevicePress(const Pick: TRayCollisionNode;
+  const Distance: Single): Boolean;
 begin
-  Result := Active;
-  if not Result then Exit;
+  Result := inherited;
+  if Result then Exit;
   if SceneManager.PlayerBlocked then Exit;
 
   if Distance > 7 then
@@ -1118,15 +1118,15 @@ type
   public
     MovingElevator9a9b: T3DLinearMoving;
     Elevator9a9bPickBox: TBox3D;
-    function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single; const CancelAction: boolean = false): boolean; override;
+    function PointingDevicePress(const Pick: TRayCollisionNode;
+      const Distance: Single): Boolean; override;
   end;
 
-function TElevator9a9b.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single; const CancelAction: boolean = false): boolean;
+function TElevator9a9b.PointingDevicePress(const Pick: TRayCollisionNode;
+  const Distance: Single): Boolean;
 begin
-  Result := Active;
-  if not Result then Exit;
+  Result := inherited;
+  if Result then Exit;
   if SceneManager.PlayerBlocked then Exit;
 
   Result := MovingElevator9a9b.CompletelyBeginPosition and
@@ -1147,16 +1147,16 @@ type
   TExitButton = class(TCastleScene)
   public
     ExitMessagePending: boolean;
-    function PointingDeviceActivate(const Active: boolean;
-      const Distance: Single; const CancelAction: boolean = false): boolean; override;
+    function PointingDevicePress(const Pick: TRayCollisionNode;
+      const Distance: Single): Boolean; override;
     procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
   end;
 
-function TExitButton.PointingDeviceActivate(const Active: boolean;
-  const Distance: Single; const CancelAction: boolean = false): boolean;
+function TExitButton.PointingDevicePress(const Pick: TRayCollisionNode;
+  const Distance: Single): Boolean;
 begin
-  Result := Active;
-  if not Result then Exit;
+  Result := inherited;
+  if Result then Exit;
   if SceneManager.PlayerBlocked then Exit;
 
   if Distance > 5 then
