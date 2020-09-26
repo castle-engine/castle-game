@@ -122,7 +122,7 @@ uses SysUtils, CastleUtils, CastleWindow, GameInputs,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
   GameVideoOptions, CastleColors, CastleSceneManager,
   CastleGameNotifications, GameControlsMenu, CastleControls,
-  CastleApplicationProperties,
+  CastleApplicationProperties, CastleRenderContext,
   GameLevelSpecific, CastleTimeUtils, CastleGLImages;
 
 var
