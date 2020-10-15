@@ -366,7 +366,7 @@ var
 begin
   if DebugRenderForLevelScreenshot then Exit;
 
-  if not Notifications.Rect.IsEmpty then
+  if not Notifications.RenderRect.IsEmpty then
     GLNotificationsFade.Draw(
       Rectangle(0, 0, ContainerWidth, GLNotificationsFade.Height));
 
@@ -503,14 +503,14 @@ begin
   if UseTouchInterface and (TUIState.CurrentTop = Self) then
   begin
     if Player.Blocked then
-      Window.SetTouchInterface(tiNone, Player.Camera) else
+      Window.SetTouchInterface(tiNone, Player.WalkNavigation) else
     if Player.Dead then
-      Window.SetTouchInterface(tiDragRotate, Player.Camera) else
+      Window.SetTouchInterface(tiDragRotate, Player.WalkNavigation) else
     if Player.Flying then
-      Window.SetTouchInterface(tiCtlFlyCtlWalkDragRotate, Player.Camera) else
-      Window.SetTouchInterface(tiCtlWalkCtlRotate, Player.Camera);
+      Window.SetTouchInterface(tiCtlFlyCtlWalkDragRotate, Player.WalkNavigation) else
+      Window.SetTouchInterface(tiCtlWalkCtlRotate, Player.WalkNavigation);
   end else
-    Window.SetTouchInterface(tiNone, Player.Camera);
+    Window.SetTouchInterface(tiNone, Player.WalkNavigation);
 
   { don't process this when some other state, like a menu, is on top }
   if TUIState.CurrentTop <> Self then Exit;

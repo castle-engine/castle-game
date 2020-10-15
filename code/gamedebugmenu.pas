@@ -326,17 +326,17 @@ end;
 
 procedure TDebugPlayerMenu.RotationHorizontalSpeedChanged(Sender: TObject);
 begin
-  Player.Camera.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
+  Player.WalkNavigation.RotationHorizontalSpeed := RotationHorizontalSpeedSlider.Value;
 end;
 
 procedure TDebugPlayerMenu.RotationVerticalSpeedChanged(Sender: TObject);
 begin
-  Player.Camera.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
+  Player.WalkNavigation.RotationVerticalSpeed := RotationVerticalSpeedSlider.Value;
 end;
 
 procedure TDebugPlayerMenu.PlayerSpeedChanged(Sender: TObject);
 begin
-  Player.Camera.MoveSpeed := PlayerSpeedSlider.Value;
+  Player.WalkNavigation.MoveSpeed := PlayerSpeedSlider.Value;
 end;
 
 { TDebugCreaturesMenu -------------------------------------------------------- }
@@ -481,20 +481,16 @@ procedure TDebugLevelMenu.ClickRestart(Sender: TObject);
 var
   Pos, Dir, Up: TVector3;
 begin
-  Pos := Player.Camera.Position;
-  Dir := Player.Camera.Direction;
-  Up := Player.Camera.Up;
+  Pos := SceneManager.Camera.Position;
+  Dir := SceneManager.Camera.Direction;
+  Up := SceneManager.Camera.Up;
 
   LevelFinished(SceneManager.Info.Name);
   LevelFinishedFlush;
 
-  { Change Player.Camera, they will be automatically set also for Player
-    properties by TCastleSceneManager.CameraVisibleChange.
-    TODO: maybe different one day? }
-
-  Player.Camera.Position := Pos;
-  Player.Camera.Direction := Dir;
-  Player.Camera.Up := Up;
+  SceneManager.Camera.Position := Pos;
+  SceneManager.Camera.Direction := Dir;
+  SceneManager.Camera.Up := Up;
 
   TUIState.Pop(StateDebugMenu);
 end;

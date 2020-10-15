@@ -43,7 +43,7 @@ type
   TStateControlsMenu = class(TAbstractMenuState)
   strict private
     type
-      TFadeRect = class(TUIControl)
+      TFadeRect = class(TCastleUserInterface)
         procedure Render; override;
       end;
     var
@@ -105,16 +105,16 @@ var
 
 procedure PlayerUpdateMouseLook(Player: TPlayer);
 begin
-  Player.Camera.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
-  Player.Camera.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
-  Player.Camera.InvertVerticalMouseLook := InvertVerticalMouseLook;
+  Player.WalkNavigation.MouseLookHorizontalSensitivity := MouseLookHorizontalSensitivity;
+  Player.WalkNavigation.MouseLookVerticalSensitivity := MouseLookVerticalSensitivity;
+  Player.WalkNavigation.InvertVerticalMouseLook := InvertVerticalMouseLook;
   { MouseLook is allowed always, even when player is dead.
     Just like rotation keys.
     Note that when Blocked, rotating will actually
     be disabled by Input := []. But still mouse look will cause mouse
     to remain hidden, which is good (why pop the mouse cursor on game
     win animation?). }
-  Player.Camera.MouseLook := MouseLook and not UseTouchInterface;
+  Player.WalkNavigation.MouseLook := MouseLook and not UseTouchInterface;
 end;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
@@ -188,11 +188,11 @@ procedure TSubMenu.Render;
 const
   SubMenuTextColor: TCastleColor = (Data: (0.9, 0.9, 0.9, 1.0));
 var
-  R: TRectangle;
+  R: TFloatRectangle;
 begin
   inherited;
 
-  R := ScreenRect;
+  R := RenderRect;
   SubMenuTitleFont.Print(R.Left, R.Top - 20,
     SubMenuTextColor, SubMenuTitle + ' :');
 
@@ -299,8 +299,8 @@ begin
   InvertVerticalMouseLook := DefaultInvertVerticalMouseLook;
   InvertVerticalMouseLookToggle.Checked := InvertVerticalMouseLook;
 
-  MouseLookHorizontalSensitivity := TWalkCamera.DefaultMouseLookHorizontalSensitivity;
-  MouseLookVerticalSensitivity   := TWalkCamera.DefaultMouseLookVerticalSensitivity  ;
+  MouseLookHorizontalSensitivity := TCastleWalkNavigation.DefaultMouseLookHorizontalSensitivity;
+  MouseLookVerticalSensitivity   := TCastleWalkNavigation.DefaultMouseLookVerticalSensitivity  ;
   MouseLookHorizontalSensitivitySlider.Value := MouseLookHorizontalSensitivity;
   MouseLookVerticalSensitivitySlider  .Value := MouseLookVerticalSensitivity  ;
 
@@ -373,11 +373,11 @@ begin
     '[Backspace] clears the shortcut.',
     [InputShortcut.Caption]));
 
-  if NewEvent.IsKey(K_Backspace) then
+  if NewEvent.IsKey(keyBackspace) then
   begin
     InputShortcut.MakeClear;
   end else
-  if NewEvent.IsKey(K_Escape) then
+  if NewEvent.IsKey(keyEscape) then
   begin
     { Don't do anything. }
   end else
@@ -419,7 +419,7 @@ begin
             Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
               [ KeyToStr(ConflictingInput.Key1),
                 ConflictingInput.Caption ]));
-            ConflictingInput.Key1 := K_None;
+            ConflictingInput.Key1 := keyNone;
           end else
           begin
             Assert(ConflictingInput.Key2 = NewEvent.Key);
@@ -427,7 +427,7 @@ begin
             Notifications.Show(Format('Note: "%s" key shortcut cleared for action "%s"',
               [ KeyToStr(ConflictingInput.Key2),
                 ConflictingInput.Caption ]));
-            ConflictingInput.Key2 := K_None;
+            ConflictingInput.Key2 := keyNone;
           end;
         else raise EInternalError.Create('ConflictingInput: NewEvent.EventType?');
       end;
@@ -533,7 +533,7 @@ var
 begin
   inherited;
   Menu := (Owner as TStateControlsMenu).CurrentMenu;
-  DrawRectangle(Menu.ScreenRect.Grow(150),
+  DrawRectangle(Menu.RenderRect.Grow(150),
     Vector4(0, 0, 0, Menu.BackgroundOpacityFocused));
 end;
 
@@ -602,9 +602,9 @@ type
 class procedure TConfigOptions.LoadFromConfig(const Config: TCastleConfig);
 begin
   MouseLookHorizontalSensitivity := Config.GetFloat(
-    'mouse/horizontal_sensitivity', TWalkCamera.DefaultMouseLookHorizontalSensitivity);
+    'mouse/horizontal_sensitivity', TCastleWalkNavigation.DefaultMouseLookHorizontalSensitivity);
   MouseLookVerticalSensitivity := Config.GetFloat(
-    'mouse/vertical_sensitivity', TWalkCamera.DefaultMouseLookVerticalSensitivity);
+    'mouse/vertical_sensitivity', TCastleWalkNavigation.DefaultMouseLookVerticalSensitivity);
   MouseLook := Config.GetValue(
     'mouse/use_mouse_look', DefaultMouseLook);
   InvertVerticalMouseLook := Config.GetValue(
@@ -614,9 +614,9 @@ end;
 class procedure TConfigOptions.SaveToConfig(const Config: TCastleConfig);
 begin
   Config.SetDeleteFloat('mouse/horizontal_sensitivity',
-    MouseLookHorizontalSensitivity, TWalkCamera.DefaultMouseLookHorizontalSensitivity);
+    MouseLookHorizontalSensitivity, TCastleWalkNavigation.DefaultMouseLookHorizontalSensitivity);
   Config.SetDeleteFloat('mouse/vertical_sensitivity',
-    MouseLookVerticalSensitivity, TWalkCamera.DefaultMouseLookVerticalSensitivity);
+    MouseLookVerticalSensitivity, TCastleWalkNavigation.DefaultMouseLookVerticalSensitivity);
   Config.SetDeleteValue('mouse/use_mouse_look',
     MouseLook, DefaultMouseLook);
   Config.SetDeleteValue('mouse/invert_vertical_mouse_look',

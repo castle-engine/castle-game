@@ -43,26 +43,26 @@ initialization
   { Change defaults, to make "attack" on mouse click.
     Consequently, interact must be something else --- key "e" is consistent
     with other 3D games. }
-  PlayerInput_Attack.Assign(K_Ctrl, K_None, #0, true, mbLeft);
-  Input_Interact.Assign(K_E, K_None, #0, false, mbLeft);
-  PlayerInput_Jump.Assign(K_Space, K_None, #0, true, mbRight); // add rmb for jump
+  PlayerInput_Attack.Assign(keyCtrl, keyNone, #0, true, mbLeft);
+  Input_Interact.Assign(keyE, keyNone, #0, false, mbLeft);
+  PlayerInput_Jump.Assign(keySpace, keyNone, #0, true, mbRight); // add rmb for jump
   { These by default don't have any shortcut }
-  PlayerInput_InventoryShow.Assign(K_I, K_None, #0, false, mbLeft);
-  PlayerInput_DropItem.Assign(K_R, K_None, #0, false, mbLeft);
-  PlayerInput_CancelFlying.Assign(K_Q, K_None, #0, false, mbLeft);
+  PlayerInput_InventoryShow.Assign(keyI, keyNone, #0, false, mbLeft);
+  PlayerInput_DropItem.Assign(keyR, keyNone, #0, false, mbLeft);
+  PlayerInput_CancelFlying.Assign(keyQ, keyNone, #0, false, mbLeft);
 
   { Items shortcuts. }
   Input_UseLifePotion := TInputShortcut.Create(nil, 'Use life potion', 'life_potion_use', igItems);
-  Input_UseLifePotion.Assign(K_L, K_None, #0, false, mbLeft);
+  Input_UseLifePotion.Assign(keyL, keyNone, #0, false, mbLeft);
 
   { Other shortcuts. }
   Input_ViewMessages := TInputShortcut.Create(nil, 'View all messages', 'view_messages', igOther);
-  Input_ViewMessages.Assign(K_M, K_None, #0, false, mbLeft);
+  Input_ViewMessages.Assign(keyM, keyNone, #0, false, mbLeft);
   Input_SaveScreen := TInputShortcut.Create(nil, 'Save screen', 'save_screen', igOther);
-  Input_SaveScreen.Assign(K_F5, K_None, #0, false, mbLeft);
+  Input_SaveScreen.Assign(keyF5, keyNone, #0, false, mbLeft);
   Input_FPSShow := TInputShortcut.Create(nil, 'FPS show / hide', 'fps_toggle', igOther);
-  Input_FPSShow.Assign(K_Tab, K_None, #0, false, mbLeft);
+  Input_FPSShow.Assign(keyTab, keyNone, #0, false, mbLeft);
   Input_DebugMenu := TInputShortcut.Create(nil, 'Debug menu', 'debug_menu', igOther);
-  Input_DebugMenu.Assign(K_BackQuote, K_None, #0, false, mbLeft);
+  Input_DebugMenu.Assign(keyBackQuote, keyNone, #0, false, mbLeft);
 end.
 

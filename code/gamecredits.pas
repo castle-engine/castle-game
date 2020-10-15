@@ -122,7 +122,7 @@ begin
   CreditsSceneManager.Transparent := true;
 
   CreditsSceneManager.Items.Add(Credits);
-  CreditsSceneManager.MainScene := Credits.Scene;
+  CreditsSceneManager.Items.MainScene := Credits.Scene;
 
   CreditsSceneManager.NavigationType := ntNone;
 end;

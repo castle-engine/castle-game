@@ -553,7 +553,7 @@ begin
 
   SoundEngine.Device := Device.Name;
   SoundMenu.SoundDeviceToggle.RightCaption := SoundEngine.DeviceCaption;
-  if not SoundEngine.ALActive then
+  if not SoundEngine.IsContextOpenSuccess then
     MessageOK(Window, SoundEngine.Information);
 
   StateStartMenu.CurrentMenu := SoundMenu;
