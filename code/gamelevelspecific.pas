@@ -911,11 +911,15 @@ const
 
   procedure AppearSpider(const Position: TVector3);
   var
+    SpiderScene: TCastleScene;
     SpiderAppearing: TCastleScene;
   begin
+    SpiderScene := TCastleScene.Create(Self);
+    SpiderScene.Url := 'castle-data:/creatures/spider/spider_stand.wrl';
+
     SpiderAppearing := TCastleScene.Create(Self);
     SpiderAppearing.Load('castle-data:/creatures/spider/appearing.x3dv');
-    SpiderAppearing.Add(Spider.IdleAnimation.Scene(Time, true));
+    SpiderAppearing.Add(SpiderScene);
     SpiderAppearing.Collides := false;
     SpiderAppearing.Translation := Position;
     SpidersAppearing.Add(SpiderAppearing);
