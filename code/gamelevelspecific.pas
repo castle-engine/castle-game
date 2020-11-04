@@ -31,7 +31,7 @@ uses DOM,
   CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer,
   CastleLevels, X3DNodes, X3DFields, X3DTIme, CastleTransform, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors,
-  CastleFrustum, Castle3D, CastleResources,
+  CastleFrustum, Castle3D, CastleResources, CastleRenderOptions,
   GameSound;
 
 type

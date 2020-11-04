@@ -516,10 +516,10 @@ procedure TStateDebugMenu.Start;
 begin
   inherited;
   DebugPlayerMenu.RotationHorizontalSpeedSlider.Value :=
-    Player.Camera.RotationHorizontalSpeed;
+    Player.WalkNavigation.RotationHorizontalSpeed;
   DebugPlayerMenu.RotationVerticalSpeedSlider.Value :=
-    Player.Camera.RotationVerticalSpeed;
-  DebugPlayerMenu.PlayerSpeedSlider.Value := Player.Camera.MoveSpeed;
+    Player.WalkNavigation.RotationVerticalSpeed;
+  DebugPlayerMenu.PlayerSpeedSlider.Value := Player.WalkNavigation.MoveSpeed;
 
   OldThemeWindow := Theme.Images[tiWindow];
   { Otherwise messages don't look good, because the text is mixed

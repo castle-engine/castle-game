@@ -29,7 +29,7 @@ interface
 
 uses Classes,
   CastleFrustum, CastleVectors, CastleScene,
-  CastleGLShaders, Castle3D, CastleRendererInternalShader;
+  CastleGLShaders, CastleTransform, CastleRendererInternalShader;
 
 type
 (*
@@ -168,16 +168,17 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
   function LoadWaterEnvMap: TGLuint;
   var
     Image: TCompositeImage;
+    TexFilter: TTextureFilter;
   begin
     glGenTextures(1, @Result);
 
     Image := TCompositeImage.Create;
     try
-      Image.LoadFromFile(ApplicationData(
-        'levels/fountain/water_reflections/water_environment_map.dds'));
+      Image.LoadFromFile('castle-data:/levels/fountain/water_reflections/water_environment_map.dds');
 
       glBindTexture(GL_TEXTURE_CUBE_MAP, Result);
-      SetTextureFilter(GL_TEXTURE_CUBE_MAP, Attributes.TextureFilter);
+      TexFilter := TextureFilter(minLinearMipmapLinear, magLinear);
+      SetTextureFilter(GL_TEXTURE_CUBE_MAP, TexFilter);
       glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -189,7 +190,7 @@ constructor TWaterShader.Create(Attributes: TRenderingAttributes);
         Image.CubeMapImage(csPositiveZ),
         Image.CubeMapImage(csNegativeZ),
         Image,
-        Attributes.TextureFilter.NeedsMipmaps);
+        TexFilter.NeedsMipmaps);
     finally FreeAndNil(Image); end;
   end;
 
@@ -202,7 +203,7 @@ begin
   begin
     WaterEnvMap := LoadWaterEnvMap;
 
-    ShadersPath := ApplicationData('levels/fountain/water_reflections/water_reflections.');
+    ShadersPath := 'castle-data:/levels/fountain/water_reflections/water_reflections.';
     AttachVertexShader(FileToString(ShadersPath + 'vs'));
     AttachFragmentShader(FileToString(ShadersPath + 'fs'));
     Link;

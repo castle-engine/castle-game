@@ -31,7 +31,7 @@ uses SysUtils, Classes,
   CastleWindow, CastleUtils, CastleProgress, CastleWindowProgress,
   CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
   CastleLog, CastleClassUtils, CastleLevels, CastleMaterialProperties,
-  CastleSoundEngine, CastleConfig, CastleRenderer, CastleResources,
+  CastleSoundEngine, CastleConfig, CastleRenderOptions, CastleResources,
   CastleGameNotifications, CastleInputs, CastleRectangles, CastleColors,
   CastleUIState, CastleFilesUtils,
   { castle GameXxx units }

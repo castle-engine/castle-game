@@ -66,28 +66,28 @@ var
 implementation
 
 uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow,
-  CastleGLUtils, X3DLoad, CastlePlayer;
+  CastleGLUtils, X3DLoad, CastlePlayer, CastleRenderOptions;
 
 type
   TGameVideoOptions = class
-    class procedure AttributesSet(Attributes: TSceneRenderingAttributes);
+    class procedure RenderOptionsSet(const RenderOptions: TCastleRenderOptions);
     class procedure LoadFromConfig(const Config: TCastleConfig);
     class procedure SaveToConfig(const Config: TCastleConfig);
   end;
 
-class procedure TGameVideoOptions.AttributesSet(Attributes: TSceneRenderingAttributes);
+class procedure TGameVideoOptions.RenderOptionsSet(const RenderOptions: TCastleRenderOptions);
 begin
   { Disadvantage: it only increases the image color, so partially
     transparent objects have a tendency to look all white on the level.
     Advantage: no sorting problems. }
-  Attributes.BlendingSourceFactor := bsSrcAlpha;
-  Attributes.BlendingDestinationFactor := bdOne;
+  RenderOptions.BlendingSourceFactor := bsSrcAlpha;
+  RenderOptions.BlendingDestinationFactor := bdOne;
 
   { Disadvantage: it has a tendency to make color of the level
     (things behind the partially transparent object) seem too dark
     (since it scales image color down).
-  Attributes.BlendingSourceFactor := GL_SRC_ALPHA;
-  Attributes.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA; }
+  RenderOptions.BlendingSourceFactor := GL_SRC_ALPHA;
+  RenderOptions.BlendingDestinationFactor := GL_ONE_MINUS_SRC_ALPHA; }
 end;
 
 class procedure TGameVideoOptions.LoadFromConfig(const Config: TCastleConfig);
@@ -136,7 +136,7 @@ begin
 end;
 
 initialization
-  TSceneRenderingAttributes.OnCreate := @TGameVideoOptions(nil).AttributesSet;
+  TCastleRenderOptions.OnCreate := @TGameVideoOptions(nil).RenderOptionsSet;
   UserConfig.AddLoadListener(@TGameVideoOptions(nil).LoadFromConfig);
   UserConfig.AddSaveListener(@TGameVideoOptions(nil).SaveToConfig);
 end.
