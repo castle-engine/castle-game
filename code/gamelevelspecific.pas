@@ -290,23 +290,28 @@ begin
   { Do not build collisions structure, let it collide as a bounding box.
     Doing it properly (with PrepareForCollisions = true) would require
     reexporting as castle-anim-frames (with it's bbox recorded). }
-  Symbol := LoadLevelScene(CastleHallLevelPath + 'symbol.kanim', false);
+  Symbol := TCastleScene.Create(Self);
+  Symbol.Load(CastleHallLevelPath + 'symbol.kanim');
+  Symbol.ProcessEvents := true;
   Symbol.CastShadowVolumes := false; { shadow would not be visible anyway }
   Level.RootTransform.Add(Symbol);
 
   { Do not build collisions structure, let it collide as a bounding box.
     Doing it properly (with PrepareForCollisions = true) would require
     reexporting as castle-anim-frames (with it's bbox recorded). }
-  Button := LoadLevelScene(CastleHallLevelPath + 'button.kanim', false,
-    TCastleHallButton);
+  Button := TCastleHallButton.Create(Self);
+  Button.Load(CastleHallLevelPath + 'button.kanim');
+  Button.ProcessEvents := true;
   Button.CastShadowVolumes := false; { strange ghost shadow on symbol would be visible }
   Button.AnimationTimeSensor('animation').EventIsActive.AddNotification(
     @ButtonAnimationIsActiveChanged);
 
   Level.RootTransform.Add(Button);
 
-  StairsBlocker := LoadLevelScene(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl',
-    true { create octrees }, TStairsBlocker);
+  StairsBlocker := TStairsBlocker.Create(Self);
+  StairsBlocker.Load(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl');
+  StairsBlocker.ProcessEvents := true;
+  StairsBlocker.Spatial := [ssDynamicCollisions];
   StairsBlocker.CastShadowVolumes := false; { shadow would not be visible anyway }
   Level.RootTransform.Add(StairsBlocker);
 
@@ -520,7 +525,9 @@ begin
 
   GateLevelPath := LevelsPath + 'gate/';
 
-  Teleport := LoadLevelScene(GateLevelPath + 'teleport.wrl', false);
+  Teleport := TCastleScene.Create(Self);
+  Teleport.Load(GateLevelPath + 'teleport.wrl');
+  Teleport.ProcessEvents := true;
   Teleport.Collides := false;
 
   Teleport1 := TCastleTransform.Create(Self);
@@ -537,7 +544,9 @@ begin
   { Do not build collisions structure, let it collide as a bounding box.
     Doing it properly (with PrepareForCollisions = true) would require
     reexporting as castle-anim-frames (with it's bbox recorded). }
-  Cart := LoadLevelScene(GateLevelPath + 'cart.kanim', false);
+  Cart := TCastleScene.Create(Self);
+  Cart.Load(GateLevelPath + 'cart.kanim');
+  Cart.ProcessEvents := true;
   Cart.PlayAnimation('animation', true);
   Level.RootTransform.Add(Cart);
 
@@ -752,13 +761,17 @@ begin
 
   TowerLevelPath := LevelsPath + 'tower/';
 
-  Elevator := LoadLevelScene(TowerLevelPath + 'elevator.wrl', true);
+  Elevator := TCastleScene.Create(Self);
+  Elevator.Load(TowerLevelPath + 'elevator.wrl');
+  Elevator.ProcessEvents := true;
+  Elevator.Spatial := [ssDynamicCollisions];
 
   { Do not build collisions structure, let it collide as a bounding box.
     Doing it properly (with PrepareForCollisions = true) would require
     reexporting as castle-anim-frames (with it's bbox recorded). }
-  ElevatorButton := LoadLevelScene(TowerLevelPath + 'elevator_button.kanim', false,
-    TTowerElevatorButton);
+  ElevatorButton := TTowerElevatorButton.Create(Self);
+  ElevatorButton.Load(TowerLevelPath + 'elevator_button.kanim');
+  ElevatorButton.ProcessEvents := true;
 
   MovingElevator := TCastleLinearMoving.Create(Self);
   MovingElevator.Add(Elevator);
@@ -825,9 +838,10 @@ begin
 
   HintOpenDoorScript := MainScene.Node('HintOpenDoorBoxScript');
 
-  FEndSequence := LoadLevelScene(
-    LevelsPath + 'end_sequence/end_sequence_final.wrl',
-    true { create octrees });
+  FEndSequence := TCastleScene.Create(Self);
+  FEndSequence.Load(LevelsPath + 'end_sequence/end_sequence_final.wrl');
+  FEndSequence.ProcessEvents := true;
+  FEndSequence.Spatial := [ssDynamicCollisions];
   FEndSequence.Exists := false;
   { Even when FEndSequence will exist, we will not check for collisions
     with it --- no reason to waste time, no collisions will be possible
@@ -836,9 +850,9 @@ begin
   FEndSequence.CastShadowVolumes := false; { shadow is not visible anyway }
   Level.RootTransform.Add(FEndSequence);
 
-  FGateExit := LoadLevelScene(
-    LevelsPath + 'cages/cages_gate_exit.wrl',
-    true { create octrees }, TGateExit);
+  FGateExit := TGateExit.Create(Self);
+  FGateExit.Load(LevelsPath + 'cages/cages_gate_exit.wrl');
+  FGateExit.ProcessEvents := true;
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
   Level.RootTransform.Add(FGateExit);
 end;
@@ -1209,10 +1223,16 @@ var
   DoomDoorsPathPrefix: string;
 
   function MakeDoor(const URL: string): TDoomLevelDoor;
+  var
+    Scene: TCastleScene;
   begin
+    Scene := TCastleScene.Create(Self);
+    Scene.Load(DoomDoorsPathPrefix + URL);
+    Scene.ProcessEvents := true;
+    Scene.Spatial := [ssDynamicCollisions];
+
     Result := TDoomLevelDoor.Create(Self);
-    Result.Add(LoadLevelScene(DoomDoorsPathPrefix + URL,
-      true { create octrees }));
+    Result.Add(Scene);
 
     { Although I didn't know it initially, it turns out that all doors
       on Doom E1M1 level (maybe all doors totally ?) have the same
@@ -1232,14 +1252,16 @@ begin
   Level.RootTransform.Add(MakeDoor('door4_7_closed.wrl'));
   Level.RootTransform.Add(MakeDoor('door5_6_closed.wrl'));
 
-  FakeWall := LoadLevelScene( DoomDoorsPathPrefix + 'fake_wall_final.wrl',
-    false { no need for octrees, does never collide });
+  FakeWall := TCastleScene.Create(Self);
+  FakeWall.Load(DoomDoorsPathPrefix + 'fake_wall_final.wrl');
+  FakeWall.ProcessEvents := true;
   FakeWall.Collides := false;
   FakeWall.CastShadowVolumes := false;
   Level.RootTransform.Add(FakeWall);
 
-  Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
-    true { create octrees });
+  Elevator49 := TCastleScene.Create(Self);
+  Elevator49.Load(DoomDoorsPathPrefix + 'elevator4_9_final.wrl');
+  Elevator49.ProcessEvents := true;
 
   MovingElevator49 := TCastleLinearMoving.Create(Self);
   MovingElevator49.Add(Elevator49);
@@ -1253,8 +1275,9 @@ begin
   MovingElevator49.CastShadowVolumes := false;
   Level.RootTransform.Add(MovingElevator49);
 
-  Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
-    true { create octrees }, TElevator9a9b);
+  Elevator9a9b := TElevator9a9b.Create(Self);
+  Elevator9a9b.Load(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl');
+  Elevator9a9b.ProcessEvents := true;
 
   MovingElevator9a9b := TCastleLinearMoving.Create(Self);
   MovingElevator9a9b.Add(Elevator9a9b);
@@ -1268,8 +1291,9 @@ begin
   MovingElevator9a9b.CastShadowVolumes := false;
   Level.RootTransform.Add(MovingElevator9a9b);
 
-  ExitButton := LoadLevelScene(DoomDoorsPathPrefix + 'exit_button_final.wrl',
-    true { create octrees }, TExitButton);
+  ExitButton := TExitButton.Create(Self);
+  ExitButton.Load(DoomDoorsPathPrefix + 'exit_button_final.wrl');
+  ExitButton.ProcessEvents := true;
   ExitButton.CastShadowVolumes := false;
   Level.RootTransform.Add(ExitButton);
 
@@ -1333,7 +1357,9 @@ var
 begin
   inherited;
 
-  Water := LoadLevelScene(LevelsPath + 'gate_background/water.kanim', false);
+  Water := TCastleScene.Create(Self);
+  Water.Load(LevelsPath + 'gate_background/water.kanim');
+  Water.ProcessEvents := true;
   Water.CastShadowVolumes := false; { water shadow would look awkward }
   { No octrees created for water (because in normal usage, player will not
     walk on this level). For safety, Collides set to @false, in case
