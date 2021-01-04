@@ -543,19 +543,19 @@ begin
     case Cages.GameWinAnimation of
       gwaNone:
         begin
-          Assert(not Player.Camera.Animation);
-          Player.Camera.AnimateTo(GameWinPosition1, GameWinDirection, GameWinUp, 4);
+          Assert(not SceneManager.Camera.Animation);
+          SceneManager.Camera.AnimateTo(GameWinPosition1, GameWinDirection, GameWinUp, 4);
           Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
         end;
       gwaAnimateTo1:
-        if not Player.Camera.Animation then
+        if not SceneManager.Camera.Animation then
         begin
           SoundEngine.Sound(stKeyDoorUse);
-          Player.Camera.AnimateTo(GameWinPosition2, GameWinDirection, GameWinUp, 4);
+          SceneManager.Camera.AnimateTo(GameWinPosition2, GameWinDirection, GameWinUp, 4);
           Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
         end;
       gwaAnimateTo2:
-        if not Player.Camera.Animation then
+        if not SceneManager.Camera.Animation then
           Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
     end;
   end;
@@ -664,7 +664,6 @@ begin
   RemoveControl(SceneManager);
   RemoveControl(C2D);
 
-  { Clear some Player.Camera callbacks. }
   SceneManager.OnCameraChanged := nil;
   SceneManager.TouchNavigation.TouchInterface := tiNone;
 
@@ -676,12 +675,12 @@ procedure TStatePlay.Resume;
 begin
   inherited;
   PlayerUpdateMouseLook(Player);
-  SceneManager.Paused := false;
+  SceneManager.Items.Paused := false;
 end;
 
 procedure TStatePlay.Pause;
 begin
-  SceneManager.Paused := true;
+  SceneManager.Items.Paused := true;
   inherited;
 end;
 

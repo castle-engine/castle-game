@@ -160,7 +160,7 @@ begin
       Player := TPlayer.Create(nil);
       try
         Player.LoadFromFile;
-        Player.Camera.Input_Run.MakeClear; { speed in castle1 is so fast that we're always running }
+        Player.WalkNavigation.Input_Run.MakeClear; { speed in castle1 is so fast that we're always running }
         PlayerUpdateMouseLook(Player);
 
         SceneManager.Player := Player;
