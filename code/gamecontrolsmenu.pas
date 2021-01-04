@@ -548,7 +548,8 @@ begin
   ItemsControlsMenu := TItemsControlsMenu.Create(Application);
   OtherControlsMenu := TOtherControlsMenu.Create(Application);
 
-  Theme.MessageFont := TTextureFont.Create(TextureFont_DejaVuSansMono_18);
+  Theme.MessageFont := TTextureFont.Create(TComponent(nil));
+  (Theme.MessageFont as TTextureFont).Load(TextureFont_DejaVuSansMono_18);
   SubMenuTitleFont := Theme.MessageFont;
 end;
 

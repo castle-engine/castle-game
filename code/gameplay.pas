@@ -27,7 +27,8 @@ unit GamePlay;
 interface
 
 uses Classes, CastleLevels, CastlePlayer, CastleTransform, CastleControlsImages,
-  CastleRectangles, CastleUIState, CastleKeysMouse, CastleUIControls;
+  CastleRectangles, CastleUIState, CastleKeysMouse, CastleUIControls,
+  CastleViewport;
 
 { Play the game.
   SceneManager and Player global variables must be already initialized.
@@ -43,6 +44,11 @@ type
       const Distance: Single): boolean; override;
     *)
   public
+    { Allows to navigate using touch controls on mobile (but can also be used on non-mobile). }
+    TouchNavigation: TCastleTouchNavigation;
+
+    constructor Create(AOwner: TComponent); override;
+
     function PlayerBlocked: Boolean;
   end;
 
@@ -398,6 +404,17 @@ end;
 
 { TCastle1SceneManager ------------------------------------------------------- }
 
+constructor TCastle1SceneManager.Create(AOwner: TComponent);
+begin
+  inherited;
+  TouchNavigation := TCastleTouchNavigation.Create(Self);
+  TouchNavigation.FullSize := true;
+  TouchNavigation.Viewport := Self;
+  TouchNavigation.ControlMouseDragMode := true;
+  TouchNavigation.Scale := 2;
+  InsertFront(TouchNavigation);
+end;
+
 function TCastle1SceneManager.PlayerBlocked: Boolean;
 begin
   Result := (Player <> nil) and (Player.Blocked or Player.Dead);
@@ -503,14 +520,17 @@ begin
   if UseTouchInterface and (TUIState.CurrentTop = Self) then
   begin
     if Player.Blocked then
-      Window.SetTouchInterface(tiNone, Player.WalkNavigation) else
+      SceneManager.TouchNavigation.TouchInterface := tiNone
+    else
     if Player.Dead then
-      Window.SetTouchInterface(tiDragRotate, Player.WalkNavigation) else
+      SceneManager.TouchNavigation.TouchInterface := tiWalkRotate // TODO: test: movement should be blocked actually
+    else
     if Player.Flying then
-      Window.SetTouchInterface(tiCtlFlyCtlWalkDragRotate, Player.WalkNavigation) else
-      Window.SetTouchInterface(tiCtlWalkCtlRotate, Player.WalkNavigation);
+      SceneManager.TouchNavigation.TouchInterface := tiFlyWalk
+    else
+      SceneManager.TouchNavigation.TouchInterface := tiWalkRotate;
   end else
-    Window.SetTouchInterface(tiNone, Player.WalkNavigation);
+    SceneManager.TouchNavigation.TouchInterface := tiNone;
 
   { don't process this when some other state, like a menu, is on top }
   if TUIState.CurrentTop <> Self then Exit;
@@ -646,7 +666,7 @@ begin
 
   { Clear some Player.Camera callbacks. }
   SceneManager.OnCameraChanged := nil;
-  Window.SetTouchInterface(tiNone, Player.Camera);
+  SceneManager.TouchNavigation.TouchInterface := tiNone;
 
   FreeAndNil(C2D);
   inherited;

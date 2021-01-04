@@ -31,7 +31,7 @@ uses DOM,
   CastleScene, CastleBoxes, CastleVectors, CastleShapes, CastlePlayer,
   CastleLevels, X3DNodes, X3DFields, X3DTIme, CastleTransform, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors,
-  CastleFrustum, Castle3D, CastleResources, CastleRenderOptions,
+  CastleFrustum, CastleTransformExtra, CastleResources, CastleRenderOptions,
   GameSound;
 
 type
@@ -100,7 +100,7 @@ type
 
   TTowerLevel = class(TLevelLogic)
   private
-    MovingElevator: T3DLinearMoving;
+    MovingElevator: TCastleLinearMoving;
     Elevator: TCastleScene;
     ElevatorButton: TCastleScene;
   public
@@ -145,7 +145,7 @@ type
       read FGameWinAnimation write SetGameWinAnimation default gwaNone;
   end;
 
-  TDoomLevelDoor = class(T3DLinearMoving)
+  TDoomLevelDoor = class(TCastleLinearMoving)
   public
     StayOpenTime: Single;
 
@@ -169,11 +169,11 @@ type
   private
     FakeWall: TCastleScene;
 
-    MovingElevator49: T3DLinearMoving;
+    MovingElevator49: TCastleLinearMoving;
     Elevator49: TCastleScene;
     Elevator49DownBox: TBox3D;
 
-    MovingElevator9a9b: T3DLinearMoving;
+    MovingElevator9a9b: TCastleLinearMoving;
     Elevator9a9b: TCastleScene;
 
     ExitButton: TCastleScene;
@@ -204,7 +204,8 @@ type
 
 implementation
 
-uses CastleFilesUtils, SysUtils, CastleUtils,
+uses SysUtils, Math,
+  CastleFilesUtils, CastleUtils,
   CastleGLUtils, CastleStringUtils, CastleMessages,
   GamePlay, CastleGameNotifications, CastleInputs, CastleGL,
   GameWindow, GameX3DProcessing,
@@ -718,7 +719,7 @@ end;
 
 type
   TTowerElevatorButton = class(TCastleScene)
-    MovingElevator: T3DLinearMoving;
+    MovingElevator: TCastleLinearMoving;
     function PointingDevicePress(const Pick: TRayCollisionNode;
       const Distance: Single): Boolean; override;
   end;
@@ -760,7 +761,7 @@ begin
   ElevatorButton := LoadLevelScene(TowerLevelPath + 'elevator_button.kanim', false,
     TTowerElevatorButton);
 
-  MovingElevator := T3DLinearMoving.Create(Self);
+  MovingElevator := TCastleLinearMoving.Create(Self);
   MovingElevator.Add(Elevator);
   MovingElevator.Add(ElevatorButton);
   MovingElevator.MoveTime := 10.0;
@@ -1120,7 +1121,7 @@ end;
 type
   TElevator9a9b = class(TCastleScene)
   public
-    MovingElevator9a9b: T3DLinearMoving;
+    MovingElevator9a9b: TCastleLinearMoving;
     Elevator9a9bPickBox: TBox3D;
     function PointingDevicePress(const Pick: TRayCollisionNode;
       const Distance: Single): Boolean; override;
@@ -1241,7 +1242,7 @@ begin
   Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
     true { create octrees });
 
-  MovingElevator49 := T3DLinearMoving.Create(Self);
+  MovingElevator49 := TCastleLinearMoving.Create(Self);
   MovingElevator49.Add(Elevator49);
   MovingElevator49.MoveTime := 3.0;
   MovingElevator49.TranslationEnd := Vector3(0, 0, -6.7);
@@ -1256,7 +1257,7 @@ begin
   Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
     true { create octrees }, TElevator9a9b);
 
-  MovingElevator9a9b := T3DLinearMoving.Create(Self);
+  MovingElevator9a9b := TCastleLinearMoving.Create(Self);
   MovingElevator9a9b.Add(Elevator9a9b);
   MovingElevator9a9b.MoveTime := 3.0;
   MovingElevator9a9b.TranslationEnd := Vector3(0, 0, -7.5);
@@ -1362,7 +1363,7 @@ begin
     { load Fountain animation }
     Fountain := TSceneWaterShader.Create(Self);
     Fountain.Load(LevelsPath + 'fountain/water_stream/fountain.kanim');
-    Fountain.PrepareResources([prRender, prBoundingBox], false, SceneManager.PrepareParams);
+    Fountain.PrepareResources([prRenderSelf, prBoundingBox], false, SceneManager.PrepareParams);
     Fountain.FreeResources([frTextureDataInNodes]);
     Fountain.CastShadowVolumes := false; { not manifold }
     Fountain.Collides := false;
