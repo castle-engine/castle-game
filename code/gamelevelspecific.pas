@@ -291,7 +291,7 @@ begin
     reexporting as castle-anim-frames (with it's bbox recorded). }
   Symbol := LoadLevelScene(CastleHallLevelPath + 'symbol.kanim', false);
   Symbol.CastShadowVolumes := false; { shadow would not be visible anyway }
-  World.Add(Symbol);
+  Level.RootTransform.Add(Symbol);
 
   { Do not build collisions structure, let it collide as a bounding box.
     Doing it properly (with PrepareForCollisions = true) would require
@@ -302,12 +302,12 @@ begin
   Button.AnimationTimeSensor('animation').EventIsActive.AddNotification(
     @ButtonAnimationIsActiveChanged);
 
-  World.Add(Button);
+  Level.RootTransform.Add(Button);
 
   StairsBlocker := LoadLevelScene(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl',
     true { create octrees }, TStairsBlocker);
   StairsBlocker.CastShadowVolumes := false; { shadow would not be visible anyway }
-  World.Add(StairsBlocker);
+  Level.RootTransform.Add(StairsBlocker);
 
   { get StairsBlocker.BoundingBox.Center when it GetExists.
     Later StairsBlocker will have Exists = false, so bbox will be empty,
@@ -527,19 +527,19 @@ begin
   { set rotation axis. Rotation angle will be increased in each Update }
   Teleport1.Rotation :=  Vector4(1, 1, 0, 0);
   Teleport1.Add(Teleport);
-  World.Add(Teleport1);
+  Level.RootTransform.Add(Teleport1);
 
   Teleport2 := TCastleTransform.Create(Self);
   Teleport2.Rotation :=  Vector4(1, 1, 0, 0);
   Teleport2.Add(Teleport);
-  World.Add(Teleport2);
+  Level.RootTransform.Add(Teleport2);
 
   { Do not build collisions structure, let it collide as a bounding box.
     Doing it properly (with PrepareForCollisions = true) would require
     reexporting as castle-anim-frames (with it's bbox recorded). }
   Cart := LoadLevelScene(GateLevelPath + 'cart.kanim', false);
   Cart.PlayAnimation('animation', true);
-  World.Add(Cart);
+  Level.RootTransform.Add(Cart);
 
   CartSoundPosition := Cart.BoundingBox.Center;
 
@@ -770,7 +770,7 @@ begin
   MovingElevator.SoundGoBeginPosition := stElevator;
   MovingElevator.SoundGoBeginPositionLooping := true;
   MovingElevator.SoundTracksCurrentPosition := true;
-  World.Add(MovingElevator);
+  Level.RootTransform.Add(MovingElevator);
 
   TTowerElevatorButton(ElevatorButton).MovingElevator := MovingElevator;
 end;
@@ -820,7 +820,7 @@ begin
   inherited;
 
   SpidersAppearing := TCastleTransform.Create(Self);
-  World.Add(SpidersAppearing);
+  Level.RootTransform.Add(SpidersAppearing);
   NextSpidersAppearingTime := 0;
 
   HintOpenDoorScript := MainScene.Node('HintOpenDoorBoxScript');
@@ -834,13 +834,13 @@ begin
     as player's move along the EndSequence will be programmed. }
   FEndSequence.Collides := false;
   FEndSequence.CastShadowVolumes := false; { shadow is not visible anyway }
-  World.Add(FEndSequence);
+  Level.RootTransform.Add(FEndSequence);
 
   FGateExit := LoadLevelScene(
     LevelsPath + 'cages/cages_gate_exit.wrl',
     true { create octrees }, TGateExit);
   FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
-  World.Add(FGateExit);
+  Level.RootTransform.Add(FGateExit);
 end;
 
 procedure TCagesLevel.PlaceholdersEnd;
@@ -849,10 +849,10 @@ procedure TCagesLevel.PlaceholdersEnd;
   var
     I: Integer;
   begin
-    for I := 0 to World.Count - 1 do
-      if World[I] is TCreature then
+    for I := 0 to Level.RootTransform.Count - 1 do
+      if Level.RootTransform[I] is TCreature then
       begin
-        Result := TCreature(World[I]);
+        Result := TCreature(Level.RootTransform[I]);
         if Result.Resource = Resource then
           Exit;
       end;
@@ -950,8 +950,8 @@ const
     I: Integer;
   begin
     Result := 0;
-    for I := 0 to World.Count - 1 do
-      if World[I] is TCreature then
+    for I := 0 to Level.RootTransform.Count - 1 do
+      if Level.RootTransform[I] is TCreature then
         Inc(Result);
   end;
 
@@ -1007,7 +1007,7 @@ begin
 
     { Move spiders down }
     I := 0;
-    SpiderRadius := Spider.Radius(World.GravityUp);
+    SpiderRadius := Spider.Radius(Level.RootTransform.GravityUp);
     AboveHeight := MaxSingle;
     while I < SpidersAppearing.Count do
     begin
@@ -1017,7 +1017,7 @@ begin
       if AboveHeight < SpiderRadius * 2 then
       begin
         SpiderDirection := Player.Translation - SpiderPosition;
-        MakeVectorsOrthoOnTheirPlane(SpiderDirection, World.GravityUp);
+        MakeVectorsOrthoOnTheirPlane(SpiderDirection, Level.RootTransform.GravityUp);
         SpiderCreature := Spider.CreateCreature(SceneManager.LevelProperties, SpiderPosition, SpiderDirection);
         SpiderCreature.Sound3d(stSpiderAppears, 1.0);
         FreeAndNil(SpiderAppearing); { it will be automatically removed from SpidersAppearing list }
@@ -1227,16 +1227,16 @@ begin
 
   DoomDoorsPathPrefix := LevelsPath + 'doom/e1m1/';
 
-  World.Add(MakeDoor('door2_3_closed.wrl'));
-  World.Add(MakeDoor('door4_5_closed.wrl'));
-  World.Add(MakeDoor('door4_7_closed.wrl'));
-  World.Add(MakeDoor('door5_6_closed.wrl'));
+  Level.RootTransform.Add(MakeDoor('door2_3_closed.wrl'));
+  Level.RootTransform.Add(MakeDoor('door4_5_closed.wrl'));
+  Level.RootTransform.Add(MakeDoor('door4_7_closed.wrl'));
+  Level.RootTransform.Add(MakeDoor('door5_6_closed.wrl'));
 
   FakeWall := LoadLevelScene( DoomDoorsPathPrefix + 'fake_wall_final.wrl',
     false { no need for octrees, does never collide });
   FakeWall.Collides := false;
   FakeWall.CastShadowVolumes := false;
-  World.Add(FakeWall);
+  Level.RootTransform.Add(FakeWall);
 
   Elevator49 := LoadLevelScene(DoomDoorsPathPrefix + 'elevator4_9_final.wrl',
     true { create octrees });
@@ -1251,7 +1251,7 @@ begin
   MovingElevator49.SoundGoBeginPositionLooping := true;
   MovingElevator49.SoundTracksCurrentPosition := true;
   MovingElevator49.CastShadowVolumes := false;
-  World.Add(MovingElevator49);
+  Level.RootTransform.Add(MovingElevator49);
 
   Elevator9a9b := LoadLevelScene(DoomDoorsPathPrefix + 'elevator_9a_9b_final.wrl',
     true { create octrees }, TElevator9a9b);
@@ -1266,12 +1266,12 @@ begin
   MovingElevator9a9b.SoundGoBeginPositionLooping := true;
   MovingElevator9a9b.SoundTracksCurrentPosition := true;
   MovingElevator9a9b.CastShadowVolumes := false;
-  World.Add(MovingElevator9a9b);
+  Level.RootTransform.Add(MovingElevator9a9b);
 
   ExitButton := LoadLevelScene(DoomDoorsPathPrefix + 'exit_button_final.wrl',
     true { create octrees }, TExitButton);
   ExitButton.CastShadowVolumes := false;
-  World.Add(ExitButton);
+  Level.RootTransform.Add(ExitButton);
 
   TElevator9a9b(Elevator9a9b).MovingElevator9a9b := MovingElevator9a9b;
 end;
@@ -1340,7 +1340,7 @@ begin
     user enters this level by debug menu. }
   Water.Collides := false;
   Water.PlayAnimation('animation', true);
-  World.Add(Water);
+  Level.RootTransform.Add(Water);
 end;
 
 { TFountainLevel ------------------------------------------------------------- }
@@ -1370,7 +1370,7 @@ begin
     Fountain.TimePlayingSpeed := 1.5;
     Fountain.TimePlaying := true;
 
-    World.Add(Fountain);
+    Level.RootTransform.Add(Fountain);
   end;
 end;
 
