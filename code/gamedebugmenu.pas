@@ -47,7 +47,7 @@ implementation
 
 uses SysUtils,
   CastleControlsImages, CastleUtils, CastleStringUtils,
-  CastleGLUtils, CastleMessages, GameWindow, Castle3D,
+  CastleGLUtils, CastleMessages, GameWindow,
   CastleVectors, CastleWindow, GamePlay,
   CastleInputs, CastleCreatures, GameChooseMenu,
   CastleItems, CastleOnScreenMenu, CastleRays, GameVideoOptions, CastleSoundEngine,

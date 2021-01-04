@@ -1,5 +1,5 @@
 {
-  Copyright 2010-2017 Michalis Kamburelis.
+  Copyright 2010-2021 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -39,7 +39,7 @@ procedure LevelFountainProcess(Node: TX3DNode);
 implementation
 
 uses SysUtils,
-  X3DFields, CastleVectors, CastleRendererBaseTypes;
+  X3DFields, CastleVectors, CastleRenderOptions;
 
 { AddNormalMapToTexture ------------------------------------------------------ }
 

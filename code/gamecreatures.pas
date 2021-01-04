@@ -26,7 +26,8 @@ unit GameCreatures;
 interface
 
 uses Classes, CastleVectors, CastleClassUtils, CastleUtils,
-  CastleScene, CastleResources, CastleXMLConfig, Castle3D, X3DNodes, CastleCreatures;
+  CastleScene, CastleResources, CastleXMLConfig, CastleTransform, CastleTransformExtra,
+  X3DNodes, CastleCreatures;
 
 type
   TWerewolfResource = class(TWalkAttackCreatureResource)
