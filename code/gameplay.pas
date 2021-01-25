@@ -692,7 +692,9 @@ begin
     GameEnded := false;
     repeat
       Application.ProcessMessage(true, true);
-    until GameEnded;
+    until GameEnded or
+      { watch Window.Closed, to break in case user exits with Alt+F4 in the middle of game }
+      Window.Closed;
   finally TUIState.Pop(StatePlay) end;
 end;
 
