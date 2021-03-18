@@ -6,7 +6,7 @@
 pipeline {
   triggers {
     pollSCM('H/4 * * * *')
-    upstream(upstreamProjects: 'castle_game_engine_update_docker_image/master', threshold: hudson.model.Result.SUCCESS)
+    upstream(upstreamProjects: 'castle_game_engine_organization/castle-engine-cloud-builds-tools/master', threshold: hudson.model.Result.SUCCESS)
   }
   agent {
     docker {
