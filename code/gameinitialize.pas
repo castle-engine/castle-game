@@ -68,8 +68,7 @@ begin
   Notifications.Color := Yellow;
 
   { configure progress }
-  Progress.UserInterface.Image :=
-    LoadImage(ApplicationData('menu_bg/initial_background.png'));
+  Progress.UserInterface.Image := LoadImage('castle-data:/menu_bg/initial_background.png');
   Progress.UserInterface.OwnsImage := true;
 
   { set sound configuration. Must be done before loading resources,
@@ -77,7 +76,7 @@ begin
   InitializeSound;
 
   { load game data from XML files }
-  MaterialProperties.URL := ApplicationData('textures/material_properties.xml');
+  MaterialProperties.URL := 'castle-data:/textures/material_properties.xml';
   Resources.LoadFromFiles;
   ItemsResourcesInit;
   CreaturesResourcesInit;

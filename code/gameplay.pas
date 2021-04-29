@@ -740,7 +740,7 @@ procedure ContextOpen;
 
   function PlayerControlURL(const BaseName: string): string;
   begin
-    Result := ApplicationData('player_controls/' + BaseName);
+    Result := 'castle-data:/player_controls/' + BaseName;
   end;
 
   function LoadPlayerControlToGL(const BaseName: string): TDrawableImage;

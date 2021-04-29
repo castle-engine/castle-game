@@ -85,7 +85,7 @@ var
 begin
   inherited;
 
-  VRMLContents := FileToString(ApplicationData('menu_bg/credits.wrl'));
+  VRMLContents := FileToString('castle-data:/menu_bg/credits.wrl');
   StringReplaceAllVar(VRMLContents, '$SCastleVersion', SCastleVersion);
   StringReplaceAllVar(VRMLContents, '$SCastleWWW', 'WWW: ' + CastleURL);
   StringReplaceAllVar(VRMLContents, '$SCompilerDescription', SCompilerDescription);

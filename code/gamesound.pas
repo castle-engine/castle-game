@@ -81,7 +81,7 @@ uses CastleFilesUtils;
 
 procedure InitializeSound;
 begin
-  SoundEngine.RepositoryURL := ApplicationData('sounds/index.xml');
+  SoundEngine.RepositoryURL := 'castle-data:/sounds/index.xml';
 
   stPlayerPotionDrink          := SoundEngine.SoundFromName('player_potion_drink');
   stPlayerCastFlyingSpell      := SoundEngine.SoundFromName('player_cast_flying_spell');

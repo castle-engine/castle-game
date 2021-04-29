@@ -214,7 +214,7 @@ uses SysUtils, Math,
 
 function LevelsPath: string;
 begin
-  Result := ApplicationData('levels/');
+  Result := 'castle-data:/levels/';
 end;
 
 procedure NotificationInteractFailed(const S: string);
