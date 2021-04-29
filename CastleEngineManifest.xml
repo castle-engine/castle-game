@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="castle"
-  standalone_source="code/castle.lpr"
-  game_units="Game"
+  standalone_source="castle.lpr"
+  game_units="GameInitialize"
   caption="The Castle"
   qualified_name="io.castleengine.castlegame"
   screen_orientation="landscape"

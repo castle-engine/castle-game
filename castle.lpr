@@ -36,7 +36,7 @@ uses SysUtils, Classes,
   CastleUIState, CastleFilesUtils,
   { castle GameXxx units }
   GameWindow, GameHelp, GameVideoOptions, GameControlsMenu,
-  GameGeneralMenu, Game;
+  GameGeneralMenu, GameInitialize;
 
 { suggested screen size ------------------------------------------------------ }
 

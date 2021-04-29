@@ -62,8 +62,19 @@ uses SysUtils, Math,
   CastleGLUtils, CastleMessages,
   CastleGameNotifications, CastleStringUtils,
   CastleApplicationProperties, CastleUtils, X3DFields,
-  CastleVectors, CastleFilesUtils,
+  CastleVectors, CastleFilesUtils, X3DLoad,
   GamePlay, GameWindow, GameVideoOptions, GameHelp;
+
+function LoadX3DClassicFromString(const FileContents: string;
+  const BaseUrl: string): TX3DRootNode;
+var
+  Stream: TStringStream;
+begin
+  Stream := TStringStream.Create(FileContents);
+  try
+    Result := LoadNode(Stream, BaseUrl, 'model/x3d+vrml');
+  finally FreeAndNil(Stream) end;
+end;
 
 { T3DCredits ------------------------------------------------------------------- }
 

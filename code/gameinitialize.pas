@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2021 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -21,7 +21,7 @@
 }
 
 { Implements the game logic, independent from mobile / standalone. }
-unit Game;
+unit GameInitialize;
 
 interface
 
@@ -34,12 +34,20 @@ uses SysUtils, Classes,
   CastleLog, CastleClassUtils, CastleLevels, CastleMaterialProperties,
   CastleSoundEngine, CastleConfig, CastleUIState, CastleResources,
   CastleGameNotifications, CastleInputs, CastleRectangles, CastleColors,
-  CastleImages,
+  CastleImages, CastleFilesUtils,
   { castle GameXxx units }
-  GameWindow, GameStartMenu, GameHelp, CastleFilesUtils, GameControlsMenu,
-  GameVideoOptions, GameItems, GameDebugMenu,
-  GameCreatures, GamePlay, GameGeneralMenu, GameCredits, GameGameMenu,
-  GameChooseMenu, GameSound;
+  GameWindow, GameHelp,  GameVideoOptions, GameItems, GameCreatures,
+  GameGeneralMenu, GameSound
+  {$region 'Castle Initialization Uses'}
+  // The content here may be automatically updated by CGE editor.
+  , GameStartMenu
+  , GameCredits
+  , GameDebugMenu
+  , GameControlsMenu
+  , GameGameMenu
+  , GamePlay
+  , GameChooseMenu
+  {$endregion 'Castle Initialization Uses'};
 
 { One-time initialization of resources. }
 procedure ApplicationInitialize;
@@ -70,40 +78,16 @@ begin
 
   { load game data from XML files }
   MaterialProperties.URL := ApplicationData('textures/material_properties.xml');
-  //Resources.LoadFromFiles; // cannot search recursively in Android assets
-  Resources.AddFromFile(ApplicationData('creatures/arrow/resource.xml'));
-  Resources.AddFromFile(ApplicationData('creatures/werewolf/resource.xml'));
-  Resources.AddFromFile(ApplicationData('creatures/spider_queen/resource.xml'));
-  Resources.AddFromFile(ApplicationData('creatures/web/resource.xml'));
-  Resources.AddFromFile(ApplicationData('creatures/barrel/resource.xml'));
-  Resources.AddFromFile(ApplicationData('creatures/spider/resource.xml'));
-  Resources.AddFromFile(ApplicationData('creatures/ball_missile/resource.xml'));
-  Resources.AddFromFile(ApplicationData('creatures/ghost/resource.xml'));
-  Resources.AddFromFile(ApplicationData('creatures/alien/resource.xml'));
-  Resources.AddFromFile(ApplicationData('items/sword/resource.xml'));
-  Resources.AddFromFile(ApplicationData('items/bow/resource.xml'));
-  Resources.AddFromFile(ApplicationData('items/key/resource.xml'));
-  Resources.AddFromFile(ApplicationData('items/life_potion/resource.xml'));
-  Resources.AddFromFile(ApplicationData('items/red_key/resource.xml'));
-  Resources.AddFromFile(ApplicationData('items/scroll/resource.xml'));
-  Resources.AddFromFile(ApplicationData('items/quiver/resource.xml'));
+  Resources.LoadFromFiles;
   ItemsResourcesInit;
   CreaturesResourcesInit;
-  //Levels.LoadFromFiles; // cannot search recursively in Android assets
-  Levels.AddFromFile(ApplicationData('levels/doom/level.xml'));
-  Levels.AddFromFile(ApplicationData('levels/castle_hall/level.xml'));
-  Levels.AddFromFile(ApplicationData('levels/gate_background/level.xml'));
-  Levels.AddFromFile(ApplicationData('levels/fountain_with_water/level.xml'));
-  Levels.AddFromFile(ApplicationData('levels/hello_world/level.xml'));
-  Levels.AddFromFile(ApplicationData('levels/tower/level.xml'));
-  Levels.AddFromFile(ApplicationData('levels/gate/level.xml'));
-  Levels.AddFromFile(ApplicationData('levels/fountain/level.xml'));
-  Levels.AddFromFile(ApplicationData('levels/hello_world_shadow/level.xml'));
-  Levels.AddFromFile(ApplicationData('levels/cages/level.xml'));
+  Levels.LoadFromFiles;
   Levels.SortByNumber;
   Levels.LoadFromConfig(UserConfig);
 
-  { create states }
+  { Create game states and set initial state }
+  {$region 'Castle State Creation'}
+  // The content here may be automatically updated by CGE editor.
   StateStartMenu := TStateStartMenu.Create(Application);
   StateCredits := TStateCredits.Create(Application);
   StateDebugMenu := TStateDebugMenu.Create(Application);
@@ -111,6 +95,7 @@ begin
   StateGameMenu := TStateGameMenu.Create(Application);
   StatePlay:= TStatePlay.Create(Application);
   StateChooseMenu := TStateChooseMenu.Create(Application);
+  {$endregion 'Castle State Creation'}
 
   TUIState.Current := StateStartMenu;
 end;
