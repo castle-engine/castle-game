@@ -67,7 +67,7 @@ var
 var
   { Font used for menu SubMenuTitle.
     Initialized / finalized here. }
-  SubMenuTitleFont: TCastleFont;
+  SubMenuTitleFont: TCastleAbstractFont;
 
 var
   UseTouchInterface: boolean =
@@ -548,8 +548,8 @@ begin
   ItemsControlsMenu := TItemsControlsMenu.Create(Application);
   OtherControlsMenu := TOtherControlsMenu.Create(Application);
 
-  Theme.MessageFont := TTextureFont.Create(TComponent(nil));
-  (Theme.MessageFont as TTextureFont).Load(TextureFont_DejaVuSansMono_18);
+  Theme.MessageFont := TCastleFont.Create(TComponent(nil));
+  (Theme.MessageFont as TCastleFont).Load(TextureFont_DejaVuSansMono_18);
   SubMenuTitleFont := Theme.MessageFont;
 end;
 
