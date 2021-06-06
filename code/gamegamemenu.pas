@@ -32,7 +32,7 @@ uses Classes,
 type
   TStateGameMenu = class(TAbstractMenuState)
   strict private
-    OldThemeWindow: TCastleImage;
+    OldThemeWindow: String;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Start; override;
@@ -172,15 +172,15 @@ begin
   GameSoundMenu.SoundVolume.Refresh;
   GameSoundMenu.MusicVolume.Refresh;
 
-  OldThemeWindow := Theme.Images[tiWindow];
-  { Otherwise messages don't look good, because the text is mixed
-    with the menu text. }
-  Theme.Images[tiWindow] := WindowDark;
+  OldThemeWindow := Theme.ImagesPersistent[tiWindow].Url;
+  { Otherwise CastleMessages don't look good,
+    as mesage text would be mixed with the menu text underneath. }
+  Theme.ImagesPersistent[tiWindow].Url := 'castle-data:/theme/WindowDark.png';
 end;
 
 procedure TStateGameMenu.Stop;
 begin
-  Theme.Images[tiWindow] := OldThemeWindow;
+  Theme.ImagesPersistent[tiWindow].Url := OldThemeWindow;
   inherited;
 end;
 

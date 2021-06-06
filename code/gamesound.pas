@@ -71,7 +71,7 @@ var
   stSaveScreen,
   stGameWinMusic
   { @groupEnd }
-    :TSoundType;
+    :TCastleSound;
 
 procedure InitializeSound;
 

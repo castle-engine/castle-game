@@ -34,7 +34,7 @@ function ChooseByMenu(MenuItems: TStringList): Integer;
 type
   TStateChooseMenu = class(TUIState)
   strict private
-    OldThemeWindow: TCastleImage;
+    OldThemeWindow: String;
   public
     procedure Start; override;
     procedure Stop; override;
@@ -73,15 +73,15 @@ procedure TStateChooseMenu.Start;
 begin
   inherited;
 
-  OldThemeWindow := Theme.Images[tiWindow];
-  { Otherwise messages don't look good, because the text is mixed
-    with the menu text. }
-  Theme.Images[tiWindow] := WindowDark;
+  OldThemeWindow := Theme.ImagesPersistent[tiWindow].Url;
+  { Otherwise CastleMessages don't look good,
+    as mesage text would be mixed with the menu text underneath. }
+  Theme.ImagesPersistent[tiWindow].Url := 'castle-data:/theme/WindowDark.png';
 end;
 
 procedure TStateChooseMenu.Stop;
 begin
-  Theme.Images[tiWindow] := OldThemeWindow;
+  Theme.ImagesPersistent[tiWindow].Url := OldThemeWindow;
   inherited;
 end;
 

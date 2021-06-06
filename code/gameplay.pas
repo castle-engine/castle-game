@@ -648,7 +648,7 @@ begin
   GameEnded := false;
   GameEndedWantsRestart := '';
 
-  Theme.Images[tiWindow] := WindowDarkTransparent;
+  Theme.ImagesPersistent[tiWindow].Url := 'castle-data:/theme/WindowDarkTransparent.png';
 
   if PrepareNewPlayer then
     SceneManager.Logic.PrepareNewPlayer(Player);

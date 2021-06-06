@@ -32,7 +32,7 @@ uses Classes,
 type
   TStateDebugMenu = class(TAbstractMenuState)
   strict private
-    OldThemeWindow: TCastleImage;
+    OldThemeWindow: String;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Start; override;
@@ -521,10 +521,10 @@ begin
     Player.WalkNavigation.RotationVerticalSpeed;
   DebugPlayerMenu.PlayerSpeedSlider.Value := Player.WalkNavigation.MoveSpeed;
 
-  OldThemeWindow := Theme.Images[tiWindow];
-  { Otherwise messages don't look good, because the text is mixed
-    with the menu text. }
-  Theme.Images[tiWindow] := WindowDark;
+  OldThemeWindow := Theme.ImagesPersistent[tiWindow].Url;
+  { Otherwise CastleMessages don't look good,
+    as mesage text would be mixed with the menu text underneath. }
+  Theme.ImagesPersistent[tiWindow].Url := 'castle-data:/theme/WindowDark.png';
 
   CurrentMenu := DebugMenu;
 end;
@@ -532,7 +532,7 @@ end;
 procedure TStateDebugMenu.Stop;
 begin
   CurrentMenu := nil;
-  Theme.Images[tiWindow] := OldThemeWindow;
+  Theme.ImagesPersistent[tiWindow].Url := OldThemeWindow;
   inherited;
 end;
 
