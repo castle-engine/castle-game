@@ -31,7 +31,7 @@
   <sound name="player_cast_flying_spell"
     default_importance="player"/>
   <sound name="player_pick_item"
-    gain="0.5" min_gain="0" max_gain="1" default_importance="player"/>
+    volume="0.5" min_gain="0" max_gain="1" default_importance="player"/>
   <sound name="player_drop_item"
     default_importance="player"/>
   <sound name="player_dies"
@@ -80,15 +80,15 @@
 
   <!-- Levels sounds. -->
   <sound name="gate_music"
-    default_importance="max"/>
+    default_importance="max" stream="true" />
   <sound name="castle_hall_symbol_moving"
     default_importance="level_event"/>
   <sound name="castle_hall_music"
-    default_importance="max"/>
+    default_importance="max" stream="true" />
   <sound name="cages_music_with_rain"
-    default_importance="max"/>
+    default_importance="max" stream="true" />
   <sound name="thunder"
-    default_importance="level_event"/>
+    default_importance="level_event" stream="true" />
   <sound name="stairs_blocker_destroyed"
     default_importance="level_event"/>
   <sound name="teleport"
@@ -98,7 +98,7 @@
   <sound name="evil_laugh"
     default_importance="level_event"/>
   <sound name="doom_e1m1" url="doom/e1m1.ogg"
-    default_importance="max"/>
+    default_importance="max" stream="true" />
   <sound name="door_open" default_importance="level_event"/>
   <sound name="door_close" default_importance="level_event"/>
   <sound name="elevator" default_importance="level_event"/>
@@ -107,7 +107,7 @@
   <!-- From
     http://www.flashkit.com/soundfx/Domestic/Doors/Door_Cre-J_Fairba-8439/index.php
   -->
-  <sound name="creak" default_importance="level_event" gain="0.3" />
+  <sound name="creak" default_importance="level_event" volume="0.3" />
 
   <!-- Creatures sounds. -->
   <sound name="creature_fall"
@@ -119,13 +119,13 @@
     default_importance="default_creature"/>
 
   <sound name="werewolf_sudden_pain"
-    gain="0.4" min_gain="0" max_gain="1" default_importance="default_creature"/>
+    volume="0.4" min_gain="0" max_gain="1" default_importance="default_creature"/>
   <sound name="werewolf_attack_start"
     default_importance="default_creature"/>
   <sound name="werewolf_actual_attack_hit" url=""
     default_importance="default_creature"/>
   <sound name="werewolf_howling"
-    gain="1" min_gain="0.8" max_gain="1" default_importance="level_event"/>
+    volume="1" min_gain="0.8" max_gain="1" default_importance="level_event"/>
   <sound name="werewolf_dying"
     default_importance="default_creature"/>
 
@@ -172,7 +172,7 @@
 
   <!-- Other sounds. -->
   <sound name="intro_music"
-    default_importance="max"/>
+    default_importance="max" stream="true" />
   <sound name="menu_current_item_changed"
     default_importance="minor_non_spatial"/>
   <sound name="menu_click"
@@ -180,5 +180,5 @@
   <sound name="save_screen" url=""
     default_importance="minor_non_spatial"/>
   <sound name="game_win_music"
-    default_importance="minor_non_spatial"/>
+    default_importance="minor_non_spatial" stream="true" />
 </sounds>

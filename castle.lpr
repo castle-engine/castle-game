@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2021 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -26,7 +26,12 @@ program castle;
 
 {$ifdef MSWINDOWS} {$R automatic-windows-resources.res} {$endif MSWINDOWS}
 
-uses SysUtils, Classes,
+uses
+  {$ifndef CASTLE_DISABLE_THREADS}
+    {$info Thread support enabled.}
+    {$ifdef UNIX} CThreads, {$endif}
+  {$endif}
+  SysUtils, Classes,
   { CGE units }
   CastleWindow, CastleUtils, CastleProgress, CastleWindowProgress,
   CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
