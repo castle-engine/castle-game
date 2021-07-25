@@ -1,15 +1,13 @@
 *~
 *.blend1
 *.blend2
-*.o
-*.ppu
 castle
 castle.exe
+*.dll
+*.res
 *.apk
-code/libcastle_android.so
 AndroidAntProperties.txt
 castle-engine-output
 backup
 *.log
-*.or
 *.compiled
