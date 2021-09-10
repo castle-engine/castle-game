@@ -103,11 +103,6 @@ begin
   stIntroMusic                 := SoundEngine.SoundFromName('intro_music');
   stSaveScreen                 := SoundEngine.SoundFromName('save_screen');
   stGameWinMusic               := SoundEngine.SoundFromName('game_win_music');
-
-  { These were chosen experimentally for castle }
-  SoundEngine.DistanceModel := dmInverseDistanceClamped; //< OpenAL default
-  SoundEngine.DefaultRolloffFactor := 0.1;
-  SoundEngine.DefaultReferenceDistance := 2.0;
 end;
 
 end.

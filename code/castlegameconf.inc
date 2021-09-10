@@ -8,7 +8,7 @@
 {$ifdef ANDROID} {$define OpenGLES} {$endif}
 {$ifdef CASTLE_IOS} {$define OpenGLES} {$endif}
 {$ifdef OpenGLES}
-  {$define CastleGL := CastleGLES20}
+  {$define CastleGL := CastleGLES}
 {$else}
   {$define CastleGL := GL, GLU, GLExt}
 {$endif}
