@@ -58,8 +58,7 @@ type
       WerewolfCreature: array [0..WerewolvesCount - 1] of TWerewolfCreature;
   protected
     function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
-    procedure ButtonAnimationIsActiveChanged(
-      Event: TX3DEvent; Value: TX3DField; const ATime: TX3DTime);
+    procedure ButtonAnimationStopped(Sender: TObject);
   public
     constructor Create(const AOwner: TComponent;
       const ALevelProperties: TLevelProperties;
@@ -252,12 +251,27 @@ end;
 
 type
   TCastleHallButton = class(TCastleScene)
+  strict private
+    Pressed: Boolean;
+    procedure ButtonAnimationStopped(const AScene: TCastleSceneCore;
+      const Animation: TTimeSensorNode);
+  public
+    OnAnimationStopped: TNotifyEvent;
     function PointingDevicePress(const Pick: TRayCollisionNode;
       const Distance: Single): Boolean; override;
   end;
 
+procedure TCastleHallButton.ButtonAnimationStopped(const AScene: TCastleSceneCore;
+  const Animation: TTimeSensorNode);
+begin
+  if Assigned(OnAnimationStopped) then
+    OnAnimationStopped(Self);
+end;
+
 function TCastleHallButton.PointingDevicePress(const Pick: TRayCollisionNode;
   const Distance: Single): Boolean;
+var
+  PlayAnimationParams: TPlayAnimationParameters;
 begin
   Result := inherited;
   if Result then Exit;
@@ -265,10 +279,15 @@ begin
 
   if Distance < 10.0 then
   begin
-    if CurrentAnimation <> nil then
-      NotificationInteractFailed('Button is already pressed') else
+    if not Pressed then
     begin
-      PlayAnimation('animation', false);
+      Pressed := true;
+      PlayAnimationParams := TPlayAnimationParameters.Create;
+      try
+        PlayAnimationParams.Name := 'animation';
+        PlayAnimationParams.StopNotification := @ButtonAnimationStopped;
+        PlayAnimation(PlayAnimationParams);
+      finally FreeAndNil(PlayAnimationParams) end;
       Notifications.Show('You press the button');
     end;
   end else
@@ -303,8 +322,7 @@ begin
   Button.Load(CastleHallLevelPath + 'button.kanim');
   Button.ProcessEvents := true;
   Button.CastShadowVolumes := false; { strange ghost shadow on symbol would be visible }
-  Button.AnimationTimeSensor('animation').EventIsActive.AddNotification(
-    @ButtonAnimationIsActiveChanged);
+  TCastleHallButton(Button).OnAnimationStopped := @ButtonAnimationStopped;
 
   Level.RootTransform.Add(Button);
 
@@ -424,8 +442,7 @@ begin
   end;
 end;
 
-procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
-  Event: TX3DEvent; Value: TX3DField; const ATime: TX3DTime);
+procedure TCastleHallLevel.ButtonAnimationStopped(Sender: TObject);
 
   procedure WerewolfAppear;
   var
@@ -466,15 +483,14 @@ procedure TCastleHallLevel.ButtonAnimationIsActiveChanged(
   end;
 
 begin
-  if not (Value as TSFBool).Value then // if isActive changed to false...
-    if Symbol.CurrentAnimation = nil then
-    begin
-      Symbol.PlayAnimation('animation', false);
-      Symbol.Collides := false;
-      SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3(0, 0, 0));
+  if Symbol.CurrentAnimation = nil then
+  begin
+    Symbol.PlayAnimation('animation', false);
+    Symbol.Collides := false;
+    SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3(0, 0, 0));
 
-      WerewolfAppear;
-    end;
+    WerewolfAppear;
+  end;
 end;
 
 procedure TCastleHallLevel.PrepareNewPlayer(NewPlayer: TPlayer);
