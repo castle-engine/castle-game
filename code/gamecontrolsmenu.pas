@@ -77,7 +77,7 @@ var
                            {$endif};
 
 { Update MouseLook-related player settings, based on what is chosen
-  in "Confgure controls" menu. }
+  in "Configure controls" menu. }
 procedure PlayerUpdateMouseLook(Player: TPlayer);
 
 implementation

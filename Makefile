@@ -1,5 +1,5 @@
 # This Makefile uses castle-engine build tool for most operations.
-# See https://github.com/castle-engine/castle-engine/wiki/Build-Tool .
+# See https://castle-engine.io/build_tool .
 #
 # Use this Makefile only with GNU make
 # (GNU make is the standard make on Linux,
