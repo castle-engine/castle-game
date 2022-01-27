@@ -1,5 +1,5 @@
 {
-  Copyright 2010-2017 Michalis Kamburelis.
+  Copyright 2010-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -44,7 +44,7 @@ type
 implementation
 
 uses Math, CastleUtils, CastleGLUtils, CastleStringUtils, SysUtils,
-  CastleFilesUtils, CastleRenderingCamera, CastleCompositeImage, CastleGL,
+  CastleFilesUtils, CastleRenderingCamera, CastleInternalCompositeImage, CastleGL,
   CastleGLImages, CastleRenderOptions;
 
 { TWaterShader --------------------------------------------------------------- }

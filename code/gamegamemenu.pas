@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -48,7 +48,7 @@ var
 implementation
 
 uses SysUtils,
-  CastleControlsImages, CastleUtils, CastleStringUtils,
+  CastleUtils, CastleStringUtils,
   CastleGLUtils, CastleMessages, GameWindow, CastleVectors,
   CastleWindow, GameHelp, GamePlay, GameControlsMenu,
   CastleInputs, X3DNodes, CastleClassUtils, CastleSoundMenu,

@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -26,7 +26,7 @@ unit GamePlay;
 
 interface
 
-uses Classes, CastleLevels, CastlePlayer, CastleTransform, CastleControlsImages,
+uses Classes, CastleLevels, CastlePlayer, CastleTransform,
   CastleRectangles, CastleUIState, CastleKeysMouse, CastleUIControls,
   CastleViewport;
 
