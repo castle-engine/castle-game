@@ -50,7 +50,7 @@ uses SysUtils,
   CastleGLUtils, CastleMessages, GameWindow,
   CastleVectors, CastleWindow, GamePlay,
   CastleInputs, CastleCreatures, GameChooseMenu,
-  CastleItems, CastleOnScreenMenu, CastleRays, GameVideoOptions, CastleSoundEngine,
+  CastleItems, CastleOnScreenMenu, GameVideoOptions, CastleSoundEngine,
   X3DNodes, CastleClassUtils, CastleGameNotifications,
   CastleLevels, CastleResources, CastleControls, CastleApplicationProperties;
 

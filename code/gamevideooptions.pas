@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -65,7 +65,7 @@ var
 
 implementation
 
-uses SysUtils, CastleUtils, CastleRays, GameWindow, CastleConfig, CastleWindow,
+uses SysUtils, CastleUtils, GameWindow, CastleConfig, CastleWindow,
   CastleGLUtils, X3DLoad, CastlePlayer, CastleRenderOptions;
 
 type
