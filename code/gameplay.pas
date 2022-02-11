@@ -171,7 +171,7 @@ procedure TStatePlay.TGame2DControls.Render;
     end;
 
   const
-    NameColor: TCastleColor = (Data: (1.0, 1.0, 0.5, 1.0));
+    NameColor: TCastleColor = (X: 1.0; Y: 1.0; Z: 0.5; W: 1.0);
   var
     I, X, Y: Integer;
     S: string;
@@ -235,8 +235,8 @@ procedure TStatePlay.TGame2DControls.Render;
     LinePressAttack = 4;
     LineFPS = 5;
     LineShadowVolumesCounts = 6;
-    Gray07: TCastleColor = (Data: (0.7, 0.7, 0.7, 1.0));
-    Gray08: TCastleColor = (Data: (0.8, 0.8, 0.8, 1.0));
+    Gray07: TCastleColor = (X: 0.7; Y: 0.7; Z: 0.7; W: 1.0);
+    Gray08: TCastleColor = (X: 0.8; Y: 0.8; Z: 0.8; W: 1.0);
 
   function YLine(const Line: Cardinal): Single;
   begin
@@ -508,10 +508,10 @@ end;
 procedure TStatePlay.Update(const SecondsPassed: Single;
   var HandleInput: boolean);
 const
-  GameWinPosition1: TVector3 = (Data: (30.11, 146.27, 1.80));
-  GameWinPosition2: TVector3 = (Data: (30.11, 166.27, 1.80));
-  GameWinDirection: TVector3 = (Data: (0, 1, 0));
-  GameWinUp: TVector3 = (Data: (0, 0, 1));
+  GameWinPosition1: TVector3 = (X: 30.11; Y: 146.27; Z: 1.80);
+  GameWinPosition2: TVector3 = (X: 30.11; Y: 166.27; Z: 1.80);
+  GameWinDirection: TVector3 = (X: 0; Y: 1; Z: 0);
+  GameWinUp: TVector3 = (X: 0; Y: 0; Z: 1);
 var
   Cages: TCagesLevel;
 begin

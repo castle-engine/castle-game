@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -186,7 +186,7 @@ end;
 
 procedure TSubMenu.Render;
 const
-  SubMenuTextColor: TCastleColor = (Data: (0.9, 0.9, 0.9, 1.0));
+  SubMenuTextColor: TCastleColor = (X: 0.9; Y: 0.9; Z: 0.9; W: 1.0);
 var
   R: TFloatRectangle;
 begin

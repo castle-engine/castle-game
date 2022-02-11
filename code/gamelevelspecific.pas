@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -341,9 +341,9 @@ end;
 
 function BoxDownPosition(const Box: TBox3D): TVector3;
 begin
-  Result[0] := (Box.Data[0].Data[0] + Box.Data[1].Data[0]) / 2;
-  Result[1] := (Box.Data[0].Data[1] + Box.Data[1].Data[1]) / 2;
-  Result[2] :=  Box.Data[0].Data[2];
+  Result.X := (Box.Data[0].X + Box.Data[1].X) / 2;
+  Result.Y := (Box.Data[0].Y + Box.Data[1].Y) / 2;
+  Result.Z :=  Box.Data[0].Z;
 end;
 
 function TCastleHallLevel.Placeholder(const Shape: TShape;
@@ -389,14 +389,14 @@ var
     if WerewolfAliveCount = 0 then
     begin
       { turn light over stairs to next level }
-      LightNode := SceneManager.Items.MainScene.GlobalLights.Items[WerewolfFirstLight].Node as
+      LightNode := SceneManager.Items.MainScene.InternalGlobalLights.Items[WerewolfFirstLight].Node as
         TAbstractPositionalLightNode;
       LightNode.Location := StairsBlockerMiddle;
       LightNode.IsOn := true;
 
       for I := 1 to WerewolvesCount - 1 do
       begin
-        LightNode := SceneManager.Items.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
+        LightNode := SceneManager.Items.MainScene.InternalGlobalLights.Items[I + WerewolfFirstLight].Node as
           TAbstractPositionalLightNode;
         LightNode.IsOn := false;
       end;
@@ -405,7 +405,7 @@ var
       { turn light for each alive werewolf }
       for I := 0 to WerewolvesCount - 1 do
       begin
-        LightNode := SceneManager.Items.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
+        LightNode := SceneManager.Items.MainScene.InternalGlobalLights.Items[I + WerewolfFirstLight].Node as
           TAbstractPositionalLightNode;
         LightNode.IsOn := not WerewolfCreature[I].Dead;
         LightNode.Location := WerewolfCreature[I].Middle;
@@ -469,14 +469,14 @@ procedure TCastleHallLevel.ButtonAnimationStopped(Sender: TObject);
 
     for I := 0 to WerewolvesCount - 1 do
     begin
-      LightNode := SceneManager.Items.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
+      LightNode := SceneManager.Items.MainScene.InternalGlobalLights.Items[I + WerewolfFirstLight].Node as
         TAbstractPositionalLightNode;
       LightNode.Color := Vector3(1, 0, 0);
       LightNode.Attenuation := Vector3(1, 0.1, 0);
       LightNode.ShadowVolumes := true;
     end;
 
-    ShadowLight := SceneManager.Items.MainScene.GlobalLights.FindName('FakeShadowPosition');
+    ShadowLight := SceneManager.Items.MainScene.InternalGlobalLights.FindName('FakeShadowPosition');
     Check(ShadowLight <> nil, 'FakeShadowPosition light not found on castle_hall level');
     ShadowLight^.Node.ShadowVolumes := true;
     (ShadowLight^.Node as TAbstractPunctualLightNode).ShadowVolumesMain := true;
@@ -590,8 +590,8 @@ begin
     Teleport1Box := Shape.BoundingBox;
     Teleport1.Translation := Teleport1Box.Center;
     Teleport2Destination := Teleport1Box.Center;
-    Teleport2Destination.Data[0] -= 2;
-    Teleport2Destination.Data[1] -= 2;
+    Teleport2Destination.X -= 2;
+    Teleport2Destination.Y -= 2;
     Exit(true);
   end;
 
@@ -600,8 +600,8 @@ begin
     Teleport2Box := Shape.BoundingBox;
     Teleport2.Translation := Teleport2Box.Center;
     Teleport1Destination := Teleport2Box.Center;
-    Teleport1Destination.Data[0] += 2;
-    Teleport1Destination.Data[1] += 2;
+    Teleport1Destination.X += 2;
+    Teleport1Destination.Y += 2;
     Exit(true);
   end;
 
@@ -635,7 +635,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     NewPosition := Player.Translation;
     { Although I do him knockback, I also change the position
       to make sure that he is thrown outside of FGateExitBox. }
-    NewPosition.Data[1] := FGateExitBox.Data[0].Data[1] - 0.1;
+    NewPosition.Y := FGateExitBox.Data[0].Y - 0.1;
     Player.Translation := NewPosition;
 
     GamePlay.Player.Hurt(0, Vector3(0, -1, 0), 2, nil);
@@ -647,7 +647,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     Rot: TVector4;
   begin
     Rot := Teleport.Rotation;
-    Rot.Data[3] += 0.175 * SecondsPassed;
+    Rot.W += 0.175 * SecondsPassed;
     Teleport.Rotation := Rot;
 
     if TeleportBox.Contains(Player.Translation) then
@@ -957,22 +957,22 @@ const
 
   function RandomSpiderXY: TVector3;
   begin
-    Result[0] := MapRange(Random, 0.0, 1.0, MinSpiderX, MaxSpiderX);
-    Result[1] := MapRange(Random, 0.0, 1.0, MinSpiderY, MaxSpiderY);
-    Result[2] := SpiderZ;
+    Result.X := MapRange(Random, 0.0, 1.0, MinSpiderX, MaxSpiderX);
+    Result.Y := MapRange(Random, 0.0, 1.0, MinSpiderY, MaxSpiderY);
+    Result.Z := SpiderZ;
   end;
 
   function RandomSpiderXYAroundPlayer: TVector3;
   const
     RandomDist = 10.0;
   begin
-    Result[0] := Player.Translation[0] +
+    Result.X := Player.Translation.X +
       MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
-    Result[0] := Clamped(Result[0], MinSpiderX, MaxSpiderX);
-    Result[1] := Player.Translation[1] +
+    Result.X := Clamped(Result.X, MinSpiderX, MaxSpiderX);
+    Result.Y := Player.Translation.Y +
       MapRange(Random, 0.0, 1.0, -RandomDist, RandomDist);
-    Result[1] := Clamped(Result[1], MinSpiderY, MaxSpiderY);
-    Result[2] := SpiderZ;
+    Result.Y := Clamped(Result.Y, MinSpiderY, MaxSpiderY);
+    Result.Z := SpiderZ;
   end;
 
   function CreaturesCount: Cardinal;
@@ -1004,7 +1004,7 @@ begin
   if not GameWin then
   begin
     { Torch light modify, to make an illusion of unstable light }
-    TorchLight := SceneManager.Items.MainScene.GlobalLights.FindName('MainHallTorchLight');
+    TorchLight := SceneManager.Items.MainScene.InternalGlobalLights.FindName('MainHallTorchLight');
     Check(TorchLight <> nil, 'Torch light not found on cages level');
     TorchLight^.Node.Intensity := Clamped(
         TorchLight^.Node.Intensity +
@@ -1056,7 +1056,7 @@ begin
         { calculate SpiderMoveDistance }
         SpiderMoveDistance := SpidersFallingSpeed * SecondsPassed;
         MinVar(SpiderMoveDistance, AboveHeight - SpiderRadius);
-        SpiderPosition.Data[2] -= SpiderMoveDistance;
+        SpiderPosition.Z -= SpiderMoveDistance;
         SpiderAppearing.Translation := SpiderPosition;
         Inc(I);
       end;
@@ -1223,7 +1223,7 @@ begin
       '--- you know, with real storyline, and just everything much ' +
       'much better. ' +
       'So check out for updates on our WWW page ' +
-      '[http://castle-engine.sourceforge.net/castle.php]. ' +
+      '[https://castle-engine.io/castle.php]. ' +
       'Oh, and this is open-source game, so if you can, ' +
       'you''re most welcome to contribute!');
     ExitMessagePending := false;
