@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -93,7 +93,7 @@ end;
 procedure TWerewolfCreature.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 begin
   inherited;
-  if (not GetExists) or DebugTimeStopForCreatures then Exit;
+  if DebugTimeStopForCreatures then Exit;
 
   if (not Dead) and (LifeTime > NextHowlTime) then
     Howl(false);

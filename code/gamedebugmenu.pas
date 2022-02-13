@@ -251,6 +251,8 @@ procedure TDebugMenu.ClickDebugRenderForLevelScreenshot(Sender: TObject);
 begin
   DebugRenderForLevelScreenshot := not DebugRenderForLevelScreenshot;
   DebugRenderForLevelScreenshotToggle.Checked := DebugRenderForLevelScreenshot;
+
+  SceneManager.LevelProperties.ItemsRoot.Exists := not DebugRenderForLevelScreenshot;
 end;
 
 procedure TDebugMenu.ClickReloadSounds(Sender: TObject);

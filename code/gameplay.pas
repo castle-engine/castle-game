@@ -718,22 +718,6 @@ begin
   end;
 end;
 
-type
-  TGamePlay = class
-    class function CreatureExists(const Creature: TCreature): boolean;
-    class function ItemOnWorldExists(const Item: TItemOnWorld): boolean;
-  end;
-
-class function TGamePlay.CreatureExists(const Creature: TCreature): boolean;
-begin
-  Result := not GameWin;
-end;
-
-class function TGamePlay.ItemOnWorldExists(const Item: TItemOnWorld): boolean;
-begin
-  Result := (not GameWin) and (not DebugRenderForLevelScreenshot);
-end;
-
 { initialization / finalization ---------------------------------------------- }
 
 procedure ContextOpen;
@@ -771,7 +755,5 @@ initialization
   ShowDebugInfo := false;
   ApplicationProperties.OnGLContextOpen.Add(@ContextOpen);
   ApplicationProperties.OnGLContextClose.Add(@ContextClose);
-  OnCreatureExists := @TGamePlay(nil).CreatureExists;
-  OnItemOnWorldExists := @TGamePlay(nil).ItemOnWorldExists;
   TCastleTransform.DefaultOrientation := otUpZDirectionX;
 end.
