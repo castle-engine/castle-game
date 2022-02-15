@@ -46,7 +46,7 @@ var
 implementation
 
 uses SysUtils,
-  CastleUtils, CastleStringUtils,
+  CastleUtils, CastleStringUtils, CastleTransform,
   CastleGLUtils, CastleMessages, GameWindow,
   CastleVectors, CastleWindow, GamePlay,
   CastleInputs, CastleCreatures, GameChooseMenu,
@@ -363,11 +363,13 @@ procedure TDebugCreaturesMenu.KillAllCore(const IncludeStill: boolean);
 var
   I: Integer;
   C: TCreature;
+  CreaturesRoot: TCastleTransform;
 begin
-  for I := 0 to SceneManager.Items.Count - 1 do
-    if SceneManager.Items[I] is TCreature then
+  CreaturesRoot := SceneManager.LevelProperties.CreaturesRoot;
+  for I := 0 to CreaturesRoot.Count - 1 do
+    if CreaturesRoot[I] is TCreature then
     begin
-      C := TCreature(SceneManager.Items[I]);
+      C := TCreature(CreaturesRoot[I]);
       if (C.Life > 0) and (IncludeStill or (not (C is TStillCreature))) then
       begin
         C.SoundDieEnabled := false;
