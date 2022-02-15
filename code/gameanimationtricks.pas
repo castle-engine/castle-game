@@ -28,14 +28,26 @@ unit GameAnimationTricks;
 interface
 
 uses Classes,
-  CastleFrustum, CastleVectors, CastleScene,
-  CastleGLShaders, CastleTransform, CastleRendererInternalShader;
+  CastleFrustum, CastleVectors, CastleScene, CastleGL,
+  CastleGLShaders, CastleTransform, CastleRendererInternalShader,
+  CastleRenderOptions, CastleCameras;
 
 type
   { Scene with a GLSL shader with a cubemap. }
   TSceneWaterShader = class(TCastleScene)
-  private
-    CustomShader: TX3DShaderProgramBase;
+  strict private
+    type
+      TWaterShader = class(TX3DShaderProgramBase)
+      private
+        WaterEnvMap: TGLuint;
+        Camera: TCastleCamera;
+      public
+        constructor Create(RenderOptions: TCastleRenderOptions);
+        destructor Destroy; override;
+        function SetupUniforms(var BoundTextureUnits: Cardinal): boolean; override;
+      end;
+    var
+      CustomShader: TWaterShader;
   public
     procedure GLContextClose; override;
     procedure LocalRender(const Params: TRenderParams); override;
@@ -44,22 +56,12 @@ type
 implementation
 
 uses Math, CastleUtils, CastleGLUtils, CastleStringUtils, SysUtils,
-  CastleFilesUtils, CastleRenderingCamera, CastleInternalCompositeImage, CastleGL,
-  CastleGLImages, CastleRenderOptions;
+  CastleFilesUtils, CastleInternalCompositeImage, CastleLog,
+  CastleGLImages;
 
 { TWaterShader --------------------------------------------------------------- }
 
-type
-  TWaterShader = class(TX3DShaderProgramBase)
-  private
-    WaterEnvMap: TGLuint;
-  public
-    constructor Create(RenderOptions: TCastleRenderOptions);
-    destructor Destroy; override;
-    function SetupUniforms(var BoundTextureUnits: Cardinal): boolean; override;
-  end;
-
-constructor TWaterShader.Create(RenderOptions: TCastleRenderOptions);
+constructor TSceneWaterShader.TWaterShader.Create(RenderOptions: TCastleRenderOptions);
 
   function LoadWaterEnvMap: TGLuint;
   var
@@ -106,13 +108,24 @@ begin
   end;
 end;
 
-destructor TWaterShader.Destroy;
+destructor TSceneWaterShader.TWaterShader.Destroy;
 begin
   glFreeTexture(WaterEnvMap);
   inherited;
 end;
 
-function TWaterShader.SetupUniforms(var BoundTextureUnits: Cardinal): boolean;
+function TSceneWaterShader.TWaterShader.SetupUniforms(var BoundTextureUnits: Cardinal): boolean;
+
+  function ToMatrix3(const M: TMatrix4): TMatrix3;
+  begin
+    System.Move(M.Data[0], Result.Data[0], SizeOf(Single) * 3);
+    System.Move(M.Data[1], Result.Data[1], SizeOf(Single) * 3);
+    System.Move(M.Data[2], Result.Data[2], SizeOf(Single) * 3);
+  end;
+
+var
+  RotationInverseMatrix: TMatrix4;
+  RotationInverseMatrix3: TMatrix3;
 begin
   Result := inherited SetupUniforms(BoundTextureUnits);
 
@@ -121,8 +134,13 @@ begin
   SetUniform('envMap', TGLint(BoundTextureUnits));
   Inc(BoundTextureUnits);
 
-  RenderingCamera.RotationInverseMatrixNeeded;
-  SetUniform('cameraRotationInverseMatrix', RenderingCamera.RotationInverseMatrix3);
+  if not Camera.RotationMatrix.TryInverse(RotationInverseMatrix) then
+  begin
+    WritelnWarning('Camera rotation matrix cannot be inverted');
+    Exit;
+  end;
+  RotationInverseMatrix3 := ToMatrix3(RotationInverseMatrix);
+  SetUniform('cameraRotationInverseMatrix', RotationInverseMatrix3);
 end;
 
 { TSceneWaterShader --------------------------------------------- }
@@ -143,6 +161,7 @@ begin
     CustomShader := TWaterShader.Create(RenderOptions);
     RenderOptions.CustomShader := CustomShader;
   end;
+  CustomShader.Camera := World.MainCamera;
   {$endif}
   inherited;
 end;

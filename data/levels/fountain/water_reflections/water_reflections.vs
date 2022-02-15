@@ -21,9 +21,9 @@ void main(void)
   gl_Position = castle_ProjectionMatrix * vertex_eye;
 
   vec3 light_position = vec3(0.0, 0.0, 0.0);
-  vertex_to_light = normalize(light_position - vertex_eye);
+  vertex_to_light = normalize(light_position - vec3(vertex_eye));
   /* That's easy, since in eye space camera position is always (0, 0, 0). */
-  vertex_to_camera = normalize(- vertex);
+  vertex_to_camera = normalize(- vertex_eye);
 
   normal = normalize(castle_NormalMatrix * castle_Normal);
 }
