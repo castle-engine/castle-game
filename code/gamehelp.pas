@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -27,7 +27,7 @@ interface
 
 const
   Version = '1.0.1';
-  CastleURL = 'http://castle-engine.sourceforge.net/castle.php';
+  CastleURL = 'https://castle-engine.io/castle.php';
 
 function SCastleVersion: string;
 
