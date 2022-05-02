@@ -17,7 +17,7 @@ Transform {
 # lights -------------------------------------------------------------------
 
 PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         color 0.899999976158142 0.899999976158142 1
         location 10 10 100
         shadowVolumes TRUE
@@ -25,7 +25,7 @@ PointLight {
         radius 100000 # infinity
 }
 DEF FakeShadowPosition PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         on FALSE
         shadowVolumes TRUE
         shadowVolumesMain TRUE

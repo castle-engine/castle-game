@@ -17,7 +17,7 @@ Transform {
 # lights -------------------------------------------------------------------
 
 DEF MainHallTorchLight PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         color 1 0.91880339384079 0.034188035875559
         location 32.704708099365234 102.3721923828125 3.367592811584473
         attenuation 1 0 0.001000000047497
@@ -25,14 +25,14 @@ DEF MainHallTorchLight PointLight {
         radius 100000
 }
 DirectionalLight {
-        ambientIntensity 0.44017094373703
+        ambientIntensity 0.044017094373703
         intensity 0.44017094373703
         shadowVolumes TRUE
         direction 0.010538369417191 0.197130039334297 -0.347894430160522
         global TRUE
 }
 SpotLight {
-        ambientIntensity 0.478632479906082
+        ambientIntensity 0.0478632479906082
         intensity 0.478632479906082
         color 1 1 0.286324799060822
         location 31.351716995239258 83.689231872558594 62.185035705566406
@@ -46,14 +46,14 @@ SpotLight {
         radius 100000
 }
 PointLight {
-        ambientIntensity 0.307692319154739
+        ambientIntensity 0.0307692319154739
         intensity 0.307692319154739
         location 35.100299835205078 -108.72051239013672 1.799999952316284
         global TRUE
         radius 100000
 }
 DEF RightRoomTorchLigh PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         color 1 0.91880339384079 0.034188035875559
         location 86.841522216796875 130.67515563964844 3.222983360290527
         attenuation 1 0 0.009999999776483
@@ -61,7 +61,7 @@ DEF RightRoomTorchLigh PointLight {
         radius 100000
 }
 DEF FakeShadowPosition PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         on FALSE
         shadowVolumes TRUE
         shadowVolumesMain TRUE

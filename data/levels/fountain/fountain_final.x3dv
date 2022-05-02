@@ -14,7 +14,7 @@ PROFILE Interactive
 PointLight {
 	intensity 0.4337606728076934
 	color 1 1 0.7948718070983886
-	ambientIntensity 0.2991453409194946
+	ambientIntensity 0.02991453409194946
 	shadowVolumes TRUE
 	shadowVolumesMain TRUE
 	location -10 100 90

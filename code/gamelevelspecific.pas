@@ -463,7 +463,7 @@ procedure TCastleHallLevel.ButtonAnimationStopped(Sender: TObject);
     WerewolfCreature[0].Howl(true);
 
     { change the lights }
-    SceneManager.Items.HeadlightNode.AmbientIntensity := 0.8;
+    SceneManager.Items.HeadlightNode.AmbientIntensity := 0.08;
     SceneManager.Items.HeadlightNode.Color := Vector3(1, 0, 0);
     SceneManager.Items.HeadlightNode.Intensity := 0.2;
 

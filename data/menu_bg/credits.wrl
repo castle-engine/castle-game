@@ -18,12 +18,12 @@ EXTERNPROTO Text3D [
 
 # PointLight {
 #   location 0 0 0
-#   ambientIntensity 0.2
+#   ambientIntensity 0.02
 # }
 
 DirectionalLight {
   direction 0 0 -1
-  ambientIntensity 0.5
+  ambientIntensity 0.05
 }
 
 Transform {
@@ -31,7 +31,7 @@ Transform {
   scale 1.1 1 1
   children Shape {
     appearance Appearance { material Material {
-      ambientIntensity 0.5
+      ambientIntensity 0.05
       diffuseColor 1 1 0.5
       transparency 0.4
     } }

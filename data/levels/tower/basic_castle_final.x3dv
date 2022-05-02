@@ -17,7 +17,7 @@ Transform {
 # lights ---------------------------------------------------------------------
 
 PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         color 0.800000011920929 0.400000005960464 0.400000005960464
         shadowVolumes TRUE
         location -0.484244674444199 2.030553579330444 5.987204074859619
@@ -25,7 +25,7 @@ PointLight {
         radius 100000 # infinity
 }
 PointLight {
-        ambientIntensity 0.512820541858673
+        ambientIntensity 0.0512820541858673
         intensity 0.512820541858673
         color 0.400000005960464 0.400000005960464 0.400000005960464
         shadowVolumes TRUE
@@ -34,7 +34,7 @@ PointLight {
         radius 100000 # infinity
 }
 DEF FakeShadowPosition PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         on FALSE
         shadowVolumes TRUE
         shadowVolumesMain TRUE
@@ -63,7 +63,7 @@ KambiNavigationInfo {
   headlight TRUE
   type "WALK"
   headlightNode DirectionalLight {
-    ambientIntensity 0.5
+    ambientIntensity 0.05
     intensity 0.5
     color 1 1 1
   }

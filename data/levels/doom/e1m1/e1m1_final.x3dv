@@ -17,30 +17,30 @@ Transform {
 # lights -------------------------------------------------------------------
 
 DirectionalLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         on FALSE
         direction -1 -1 -1
         global TRUE
 }
 DirectionalLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         on FALSE
         direction 1 1 1
         global TRUE
 }
 DirectionalLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         shadowVolumes TRUE
         direction 1 -1 -1
         global TRUE
 }
 DirectionalLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         direction -1 1 1
         global TRUE
 }
 DEF FakeShadowPosition PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         on FALSE
         shadowVolumes TRUE
         shadowVolumesMain TRUE

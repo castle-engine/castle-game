@@ -4,7 +4,7 @@ PROFILE Interactive
 # lights -------------------------------------------------------------------
 
 PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         color 0.899999976158142 0.899999976158142 1
         location 10 10 100
         shadowVolumes TRUE
@@ -13,7 +13,6 @@ PointLight {
 }
 PointLight {
         on FALSE
-        ambientIntensity 0.300000011920929
         intensity 0.300000011920929
         color 1 0 0
         ambientIntensity 0.020000416785479
@@ -23,7 +22,7 @@ PointLight {
 }
 DEF FakeShadowPosition PointLight {
         on FALSE
-        ambientIntensity 1
+        ambientIntensity 0.1
         shadowVolumes TRUE
         shadowVolumesMain TRUE
         location 0 0 1000

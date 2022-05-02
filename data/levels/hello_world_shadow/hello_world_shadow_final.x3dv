@@ -15,7 +15,7 @@ Transform {
 }
 
 PointLight {
-        ambientIntensity 1
+        ambientIntensity 0.1
         shadowVolumes TRUE
         shadowVolumesMain TRUE
         location 0 0 10
