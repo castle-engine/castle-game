@@ -8,8 +8,9 @@ Separator {
 Switch {
 	DEF MatWater
 	Material {
-		diffuseColor 0.000000 0.000000 1.000000
-		specularColor 0.000000 0.000000 0.000000
+		# material adjusted manually in VRML by Michalis
+		diffuseColor 0.5 0.5 1
+		specularColor 0.1 0.1 0.1
 		shininess 0.500000 
 		transparency 0.284406 
 	}
