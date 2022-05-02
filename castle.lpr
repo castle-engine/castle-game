@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2021 Michalis Kamburelis.
+  Copyright 2006-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -24,7 +24,7 @@
 
 program castle;
 
-{$ifdef MSWINDOWS} {$R automatic-windows-resources.res} {$endif MSWINDOWS}
+{$ifdef CASTLE_AUTO_GENERATED_RESOURCES} {$R castle-auto-generated-resources.res} {$endif}
 
 uses
   {$ifndef CASTLE_DISABLE_THREADS}
