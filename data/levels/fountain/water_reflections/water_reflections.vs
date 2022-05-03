@@ -23,7 +23,7 @@ void main(void)
   vec3 light_position = vec3(0.0, 0.0, 0.0);
   vertex_to_light = normalize(light_position - vec3(vertex_eye));
   /* That's easy, since in eye space camera position is always (0, 0, 0). */
-  vertex_to_camera = normalize(- vertex_eye);
+  vertex_to_camera = normalize(- vertex_eye.xyz);
 
   normal = normalize(castle_NormalMatrix * castle_Normal);
 }
