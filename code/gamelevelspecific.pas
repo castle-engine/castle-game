@@ -1410,7 +1410,8 @@ begin
     Fountain.Collides := false;
     Fountain.RenderOptions.BlendingDestinationFactor := bdOneMinusSrcAlpha;
     Fountain.TimePlayingSpeed := 1.5;
-    Fountain.TimePlaying := true;
+    Fountain.AutoAnimationLoop := true;
+    Fountain.AutoAnimation := 'animation';
 
     Level.RootTransform.Add(Fountain);
   end;
