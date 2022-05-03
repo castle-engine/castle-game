@@ -208,7 +208,7 @@ uses SysUtils, Math,
   CastleGLUtils, CastleStringUtils, CastleMessages,
   GamePlay, CastleGameNotifications, CastleInputs, CastleGL,
   GameWindow, GameX3DProcessing,
-  GameAnimationTricks, GameVideoOptions, CastleSceneCore, CastleProgress,
+  GameVideoOptions, CastleSceneCore, CastleProgress,
   CastleXMLUtils, GameItems;
 
 function LevelsPath: string;
@@ -1391,7 +1391,7 @@ constructor TFountainLevel.Create(const AOwner: TComponent;
   const ALevelProperties: TLevelProperties;
   const MainScene: TCastleScene; const DOMElement: TDOMElement);
 var
-  Fountain: TSceneWaterShader;
+  Fountain: TCastleScene;
   LoadWaterAnimation: boolean;
 begin
   inherited;
@@ -1402,7 +1402,7 @@ begin
     and LoadWaterAnimation then
   begin
     { load Fountain animation }
-    Fountain := TSceneWaterShader.Create(Self);
+    Fountain := TCastleScene.Create(Self);
     Fountain.Load(LevelsPath + 'fountain/water_stream/fountain.kanim');
     Fountain.PrepareResources([prRenderSelf, prBoundingBox], false, SceneManager.PrepareParams);
     Fountain.FreeResources([frTextureDataInNodes]);
