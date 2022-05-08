@@ -1,5 +1,5 @@
 {
-  Copyright 2007-2017 Michalis Kamburelis.
+  Copyright 2007-2022 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -42,7 +42,7 @@ type
       end;
     var
     Credits: T3DCredits;
-    CreditsSceneManager: TCastleSceneManager;
+    CreditsSceneManager: TCastleViewport;
   public
     ControlsUnder: TCastleUserInterface;
     SceneManagerUnder: TCastleSceneManager;
@@ -124,7 +124,7 @@ begin
     - ignoring UseGlobalLights of the background level.
     - with own projection, regardles of the background level projection.
     - with own size. }
-  CreditsSceneManager := TCastleSceneManager.Create(nil);
+  CreditsSceneManager := TCastleViewport.Create(nil);
   CreditsSceneManager.FullSize := false;
   CreditsSceneManager.Left := 25;
   CreditsSceneManager.Bottom := 20;
@@ -134,8 +134,6 @@ begin
 
   CreditsSceneManager.Items.Add(Credits);
   CreditsSceneManager.Items.MainScene := Credits.Scene;
-
-  CreditsSceneManager.NavigationType := ntNone;
 end;
 
 destructor TStateCredits.Destroy;
