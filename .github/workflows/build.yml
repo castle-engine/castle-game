@@ -7,6 +7,10 @@
 # GitHub provides it all for free for open-source projects.
 #
 # See https://docs.github.com/en/actions for docs.
+#
+# TODO: wrap in new GH action,
+# https://docs.github.com/en/actions/creating-actions/about-custom-actions
+#
 # ----------------------------------------------------------------------------
 
 name: Build
@@ -27,9 +31,9 @@ jobs:
       - name: Castle Game Engine - Clone snapshot
         run: git clone --depth 1 --single-branch --branch snapshot https://github.com/castle-engine/castle-engine/
       - name: Castle Game Engine - Build
-        run: cd castle-engine/tools/build-tool/ && ./castle-engine_compile.sh
+        run: cd $CASTLE_ENGINE_PATH/tools/build-tool/ && ./castle-engine_compile.sh
       - name: Package
-        run: castle-engine package --os=win64 --cpu=x86_64
+        run: $CASTLE_ENGINE_PATH/tools/build-tool/castle-engine package --os=win64 --cpu=x86_64 --verbose
       - name: Archive Artifact
         uses: actions/upload-artifact@v3
         with:
