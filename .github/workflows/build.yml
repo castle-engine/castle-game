@@ -7,8 +7,10 @@
 #
 # See https://docs.github.com/en/actions for docs.
 #
-# TODO: wrap in new GH action,
-# https://docs.github.com/en/actions/creating-actions/about-custom-actions
+# TODO:
+# - TODO can we build for iOS using GitHub-hosted macOS machine?
+# - wrap in new GH action, https://docs.github.com/en/actions/creating-actions/about-custom-actions
+# - release artifacts as GH release (with some tag, or draft, to clearly communicate this is snapshot)
 #
 # ----------------------------------------------------------------------------
 
@@ -68,4 +70,31 @@ jobs:
         with:
           name: android-build
           path: "*.apk"
+          if-no-files-found: error
+
+  # Build for platforms supported from macOS.
+  # This means to build for macOS and (maybe in the future) iOS.
+  build-macos:
+    name: Build Using macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install FPC+Lazarus
+        uses: gcarreno/setup-lazarus@v3.0.16
+        with:
+          lazarus-version: stable
+      - name: Castle Game Engine - Setup environment
+        run: echo "CASTLE_ENGINE_PATH=$GITHUB_WORKSPACE/castle-engine" >> $GITHUB_ENV
+      - name: Castle Game Engine - Clone snapshot
+        run: git clone --depth 1 --single-branch --branch snapshot https://github.com/castle-engine/castle-engine/
+      - name: Castle Game Engine - Build
+        run: cd $CASTLE_ENGINE_PATH/tools/build-tool/ && ./castle-engine_compile.sh
+
+      - name: Package macOS
+        run: $CASTLE_ENGINE_PATH/tools/build-tool/castle-engine package --os=darwin --cpu=x86_64 --verbose
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-build
+          path: "*-darwin-x86_64.app"
           if-no-files-found: error
