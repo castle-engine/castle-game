@@ -2,7 +2,6 @@
 # GitHub Action workflow to build using latest Castle Game Engine snapshot
 # for multiple platforms.
 #
-# Uses CGE Docker image https://hub.docker.com/r/kambi/castle-engine-cloud-builds-tools/ .
 # Uses GitHub-hosted runners, i.e. you don't need to set up any server infrastructure,
 # GitHub provides it all for free for open-source projects.
 #
@@ -17,8 +16,15 @@ name: Build
 on: [push]
 
 jobs:
-  build-windows:
-    name: Build Windows
+  # Build for platforms supported by
+  # CGE Docker image https://hub.docker.com/r/kambi/castle-engine-cloud-builds-tools/ .
+  #
+  # Since setting up Docker image takes majority of time (5-6 mins)
+  # compared to actually getting and compiling CGE (1 min)
+  # and building application (~1 min for each platform),
+  # we build all platforms possible within one job.
+  build-using-docker:
+    name: Build Using Docker
     runs-on: ubuntu-latest
     container: kambi/castle-engine-cloud-builds-tools:cge-none
     steps:
@@ -32,10 +38,21 @@ jobs:
         run: git clone --depth 1 --single-branch --branch snapshot https://github.com/castle-engine/castle-engine/
       - name: Castle Game Engine - Build
         run: cd $CASTLE_ENGINE_PATH/tools/build-tool/ && ./castle-engine_compile.sh
-      - name: Package
+      - name: Package Windows
         run: $CASTLE_ENGINE_PATH/tools/build-tool/castle-engine package --os=win64 --cpu=x86_64 --verbose
-      - name: Archive Artifact
+      - name: Package Linux
+        run: $CASTLE_ENGINE_PATH/tools/build-tool/castle-engine package --os=linux --cpu=x86_64 --verbose
+      - name: Package Android
+        run: $CASTLE_ENGINE_PATH/tools/build-tool/castle-engine package --target=android --verbose
+      - name: Archive Artifacts
+        # See https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@v3
         with:
-          name: windows-build
-          path: "*-win64-x86_64.zip"
+          name: build
+          # Note: Keep paths that start with asterisk in double qoutes, to avoid misinterpreting as YAML reference.
+          # See https://stackoverflow.com/questions/19109912/yaml-do-i-need-quotes-for-strings-in-yaml
+          # https://yamlchecker.com/
+          path: |
+            "*-win64-x86_64.zip"
+            "*-linux-x86_64.tar.gz"
+            "*.apk"
