@@ -8,9 +8,14 @@
 # See https://docs.github.com/en/actions for docs.
 #
 # TODO:
-# - TODO can we build for iOS using GitHub-hosted macOS machine?
 # - wrap in new GH action, https://docs.github.com/en/actions/creating-actions/about-custom-actions
 # - release artifacts as GH release (with some tag, or draft, to clearly communicate this is snapshot)
+#   Use GH cli for release?
+#   https://cli.github.com/manual/gh_release_upload
+#     gh release upload --clobber snapshot *-win64-x86_64.zip *-linux-x86_64.tar.gz
+#     but it will not work in our Docker?
+#     and it will not clobber files when version number or project name changes. Remove version number?
+#   https://docs.github.com/en/actions/using-workflows/using-github-cli-in-workflows
 #
 # ----------------------------------------------------------------------------
 
