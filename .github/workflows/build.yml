@@ -101,5 +101,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: macos-build
-          path: "*.app"
+          path: "*-darwin-x86_64.zip"
           if-no-files-found: error
