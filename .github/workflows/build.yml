@@ -1,11 +1,11 @@
 # ----------------------------------------------------------------------------
-# GitHub Action workflow to build using latest Castle Game Engine snapshot
-# for multiple platforms.
+# GitHub Actions workflow to build this application
+# using latest Castle Game Engine snapshot for multiple platforms.
 #
 # Uses GitHub-hosted runners, i.e. you don't need to set up any server infrastructure,
 # GitHub provides it all for free for open-source projects.
 #
-# See https://docs.github.com/en/actions for docs.
+# See https://castle-engine.io/github_actions and https://docs.github.com/en/actions for docs.
 #
 # TODO:
 # - wrap in new GH action, https://docs.github.com/en/actions/creating-actions/about-custom-actions
