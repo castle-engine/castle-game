@@ -1,26 +1,18 @@
 # ----------------------------------------------------------------------------
-# GitHub Actions workflow to build this application
-# using latest Castle Game Engine snapshot for multiple platforms.
+# GitHub Actions workflow to build this application.
+# Using latest Castle Game Engine ( https://castle-engine.io/ ) snapshot.
+# For multiple platforms (Linux, Windows, macOS, Android).
 #
-# Uses GitHub-hosted runners, i.e. you don't need to set up any server infrastructure,
-# GitHub provides it all for free for open-source projects.
+# This uses GitHub-hosted runners, that is: you don't need to set up any server
+# infrastructure, GitHub provides it all for free for open-source projects.
 #
-# See https://castle-engine.io/github_actions and https://docs.github.com/en/actions for docs.
-#
-# TODO:
-# - wrap in new GH action, https://docs.github.com/en/actions/creating-actions/about-custom-actions
-# - release artifacts as GH release (with some tag, or draft, to clearly communicate this is snapshot)
-#   Use GH cli for release?
-#   https://cli.github.com/manual/gh_release_upload
-#     gh release upload --clobber snapshot *-win64-x86_64.zip *-linux-x86_64.tar.gz
-#     but it will not work in our Docker?
-#     and it will not clobber files when version number or project name changes. Remove version number?
-#   https://docs.github.com/en/actions/using-workflows/using-github-cli-in-workflows
-#
+# See docs:
+# - https://castle-engine.io/github_actions
+# - https://docs.github.com/en/actions
 # ----------------------------------------------------------------------------
 
 name: Build
-on: [push]
+on: [push, pull_request]
 
 jobs:
   # Build for platforms supported by
