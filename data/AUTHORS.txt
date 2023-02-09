@@ -118,10 +118,10 @@ textures/industrie4.jpg
          marble21t.jpg
          marble.jpg
          web.png
-         wood062.jpg
-         wood_clear.jpg
+         wood062.png
+         wood_clear.png
          17_gris_vert.jpg
-         bois5.jpg
+         bois5.png
          bois10.jpg
 
     Origin lost in time.

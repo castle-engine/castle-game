@@ -9,7 +9,7 @@ Switch {
 	DEF Cylinder
 	Separator {
 		Texture2 {
-			filename //../../textures/wood_clear.jpg
+			filename //../../textures/wood_clear.png
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
@@ -4012,7 +4012,7 @@ Switch {
 	DEF Sphere
 	Separator {
 		Texture2 {
-			filename //../../textures/wood062.jpg
+			filename //../../textures/wood062.png
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}

@@ -353,7 +353,7 @@ Switch {
 	DEF MeshButtonBase
 	Separator {
 		Texture2 {
-			filename ../../textures/wood_clear.jpg
+			filename ../../textures/wood_clear.png
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}

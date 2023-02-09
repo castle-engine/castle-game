@@ -23,7 +23,7 @@ Switch {
 	DEF MeshExitGate
 	Separator {
 		Texture2 {
-			filename ../../textures/bois5.jpg
+			filename ../../textures/bois5.png
 			wrapS REPEAT 
 			wrapT REPEAT 
 		}
