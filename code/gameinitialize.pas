@@ -68,6 +68,7 @@ begin
   Notifications.Color := Yellow;
 
   { configure progress }
+  Progress.UserInterface := WindowProgressInterface;
   Progress.UserInterface.Image := LoadImage('castle-data:/menu_bg/initial_background.png');
   Progress.UserInterface.OwnsImage := true;
 
