@@ -1,15 +1,5 @@
-- looks like shadow volumes rendering for werewolves renders their older frame than
-  what is rendered? Sometimes their shadow is weird.
-
-- water shaders in data/levels/fountain/water_reflections/
-  are broken now on desktop,
-  not adjusted 100% to use castle_Xxx uniforms.
-
-  Why are there two shader sets?
-
-- GameAnimationTricks simply renders one animation, instead of animating
-  two scenes simultaneously.
-
-- "cages" level got awfully slow with EnableFixedFunction = false.
+- footsteps sound no longer customized based on terrain
 
 - "gate" - one grave is floating in the air
+
+- "e" to restart level makes beep, because TCastleViewport plays stPlayerInteractFailed
