@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2022 Michalis Kamburelis.
+  Copyright 2006-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -26,7 +26,7 @@ unit GameControlsMenu;
 interface
 
 uses Classes, CastleWindow, GameGeneralMenu, CastleCameras,
-  CastleFonts, CastleUIControls, CastlePlayer, CastleUIState,
+  CastleFonts, CastleUIControls, CastlePlayer,
   CastleKeysMouse;
 
 type
@@ -312,7 +312,7 @@ end;
 
 procedure TControlsMenu.ClickBack(Sender: TObject);
 begin
-  TUIState.Pop(StateControlsMenu);
+  Container.PopView(StateControlsMenu);
 end;
 
 procedure TControlsMenu.MouseLookHorizontalSensitivityChanged(Sender: TObject);
@@ -561,7 +561,7 @@ begin
   if ExitWithEscapeAllowed and Event.IsKey(CharEscape) then
   begin
     ExitWithEscape := true;
-    TUIState.Pop(StateControlsMenu);
+    Container.PopView(StateControlsMenu);
   end;
 end;
 

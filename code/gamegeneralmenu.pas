@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -26,7 +26,7 @@ unit GameGeneralMenu;
 interface
 
 uses Classes,
-  CastleVectors, CastleOnScreenMenu, CastleRectangles, CastleUIState;
+  CastleVectors, CastleOnScreenMenu, CastleRectangles, CastleUIControls;
 
 type
   { On-screen menu suitable for castle.
@@ -50,7 +50,7 @@ type
     procedure SetPosition(const ACenter: boolean);
   end;
 
-  TAbstractMenuState = class(TUIState)
+  TAbstractMenuState = class(TCastleView)
   strict private
     FCurrentMenu: TCastleGameMenu;
     procedure SetCurrentMenu(const Value: TCastleGameMenu);
@@ -61,7 +61,7 @@ type
 
 implementation
 
-uses SysUtils, CastleWindow, CastleUIControls, GameWindow;
+uses SysUtils, CastleWindow, GameWindow;
 
 { TCastleGameMenu ---------------------------------------------------------------- }
 

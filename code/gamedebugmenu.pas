@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2022 Michalis Kamburelis.
+  Copyright 2006-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -26,7 +26,7 @@ unit GameDebugMenu;
 interface
 
 uses Classes,
-  CastleUIState, CastleUIControls, CastleKeysMouse, CastleImages,
+  CastleUIControls, CastleKeysMouse, CastleImages,
   GameGeneralMenu;
 
 type
@@ -262,7 +262,7 @@ end;
 
 procedure TDebugMenu.ClickBack(Sender: TObject);
 begin
-  TUIState.Pop(StateDebugMenu);
+  Container.PopView(StateDebugMenu);
 end;
 
 { TDebugPlayerMenu ----------------------------------------------------------- }
@@ -307,7 +307,7 @@ begin
   begin
     Player.MaxLife := 10000;
     Player.Life := Player.MaxLife;
-    TUIState.Pop(StateDebugMenu);
+    Container.PopView(StateDebugMenu);
   end;
 end;
 
@@ -400,7 +400,7 @@ begin
       Player.Translation + Player.Direction * DirectionAttenuation,
       Player.Direction);
 
-    TUIState.Pop(StateDebugMenu);
+    Container.PopView(StateDebugMenu);
   end;
 end;
 
@@ -432,7 +432,7 @@ begin
   for I := 0 to Resources.Count - 1 do
     if Resources[I] is TItemResource then
       Player.PickItem(TItemResource(Resources[I]).CreateItem(20));
-  TUIState.Pop(StateDebugMenu);
+  Container.PopView(StateDebugMenu);
 end;
 
 procedure TDebugItemsMenu.ClickBack(Sender: TObject);
@@ -476,7 +476,7 @@ begin
         which sounds awkward for player. }
       LevelFinishedFlush;
       SceneManager.Logic.PrepareNewPlayer(Player);
-      TUIState.Pop(StateDebugMenu);
+      Container.PopView(StateDebugMenu);
     end;
   finally S.Free end;
 end;
@@ -496,7 +496,7 @@ begin
   SceneManager.Camera.Direction := Dir;
   SceneManager.Camera.Up := Up;
 
-  TUIState.Pop(StateDebugMenu);
+  Container.PopView(StateDebugMenu);
 end;
 
 procedure TDebugLevelMenu.ClickBack(Sender: TObject);
@@ -547,7 +547,7 @@ begin
 
   if Event.IsKey(CharEscape) then
   begin
-    TUIState.Pop(StateDebugMenu);
+    Container.PopView(StateDebugMenu);
     Result := true;
   end;
 end;

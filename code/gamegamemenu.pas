@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2022 Michalis Kamburelis.
+  Copyright 2006-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -26,7 +26,7 @@ unit GameGameMenu;
 interface
 
 uses Classes,
-  CastleUIControls, CastleUIState, CastleKeysMouse, CastleImages,
+  CastleUIControls, CastleKeysMouse, CastleImages,
   GameGeneralMenu;
 
 type
@@ -99,7 +99,7 @@ end;
 
 procedure TGameMenu.ClickBack(Sender: TObject);
 begin
-  TUIState.Pop(StateGameMenu);
+  Container.PopView(StateGameMenu);
 end;
 
 procedure TGameMenu.ClickViewMessages(Sender: TObject);
@@ -112,7 +112,7 @@ begin
   StateControlsMenu.DrawFadeRect := true;
   StateControlsMenu.DrawCentered := true;
   StateControlsMenu.ExitWithEscapeAllowed := true;
-  TUIState.Push(StateControlsMenu);
+  Container.PushView(StateControlsMenu);
 end;
 
 procedure TGameMenu.ClickSoundOptions(Sender: TObject);
@@ -123,7 +123,7 @@ end;
 procedure TGameMenu.ClickEndGame(Sender: TObject);
 begin
   GameCancel(true);
-  TUIState.Pop(StateGameMenu);
+  Container.PopView(StateGameMenu);
 end;
 
 { TGameSoundMenu ------------------------------------------------------------- }
@@ -160,7 +160,7 @@ begin
 
   if Event.IsKey(CharEscape) then
   begin
-    TUIState.Pop(StateGameMenu);
+    Container.PopView(StateGameMenu);
     Result := true;
   end;
 end;

@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2022 Michalis Kamburelis.
+  Copyright 2006-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -27,7 +27,7 @@ unit GamePlay;
 interface
 
 uses Classes, CastleLevels, CastlePlayer, CastleTransform,
-  CastleRectangles, CastleUIState, CastleKeysMouse, CastleUIControls,
+  CastleRectangles, CastleKeysMouse, CastleUIControls,
   CastleViewport;
 
 { Play the game.
@@ -96,7 +96,7 @@ var
   DebugRenderForLevelScreenshot: boolean = false;
 
 type
-  TStatePlay = class(TUIState)
+  TStatePlay = class(TCastleView)
   strict private
     type
       TGame2DControls = class(TCastleUserInterface)
@@ -517,7 +517,7 @@ var
 begin
   inherited;
 
-  if UseTouchInterface and (TUIState.CurrentTop = Self) then
+  if UseTouchInterface and (Container.FrontView = Self) then
   begin
     if Player.Blocked then
       SceneManager.TouchNavigation.TouchInterface := tiNone
@@ -533,7 +533,7 @@ begin
     SceneManager.TouchNavigation.TouchInterface := tiNone;
 
   { don't process this when some other state, like a menu, is on top }
-  if TUIState.CurrentTop <> Self then Exit;
+  if Container.FrontView <> Self then Exit;
 
   LevelFinishedFlush;
 
@@ -575,7 +575,7 @@ function TStatePlay.Press(const Event: TInputPressRelease): boolean;
 
   procedure DoDebugMenu;
   begin
-    TUIState.Push(StateDebugMenu);
+    Container.PushView(StateDebugMenu);
   end;
 
   procedure RestartLevel;
@@ -594,13 +594,13 @@ begin
   if Result then Exit;
 
   { don't process keys when some other state, like a menu, is on top }
-  if TUIState.CurrentTop <> Self then Exit;
+  if Container.FrontView <> Self then Exit;
 
   if Event.IsKey(CharEscape) then
   begin
     if Player.Dead or GameWin then
       GameCancel(false) else
-      TUIState.Push(StateGameMenu);
+      Container.PushView(StateGameMenu);
     Result := true;
   end;
 
@@ -685,9 +685,13 @@ begin
 end;
 
 procedure PlayGame(PrepareNewPlayer: boolean);
+var
+  Container: TCastleContainer;
 begin
+  Container := Application.MainWindow.Container;
+
   StatePlay.PrepareNewPlayer := PrepareNewPlayer;
-  TUIState.Push(StatePlay);
+  Container.PushView(StatePlay);
   try
     GameEnded := false;
     repeat
@@ -695,7 +699,7 @@ begin
     until GameEnded or
       { watch Window.Closed, to break in case user exits with Alt+F4 in the middle of game }
       Window.Closed;
-  finally TUIState.Pop(StatePlay) end;
+  finally Container.PopView(StatePlay) end;
 end;
 
 procedure LevelFinished(NextLevelName: string);
@@ -705,7 +709,7 @@ begin
     Notifications.Show('Congratulations, game finished');
     GameWin := true;
     Player.Blocked := true;
-    SoundEngine.MusicPlayer.Sound := stGameWinMusic;
+    SoundEngine.LoopingChannel[0].Sound := stGameWinMusic;
   end else
   begin
     if LevelFinishedSchedule and

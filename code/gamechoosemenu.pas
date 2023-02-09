@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2022 Michalis Kamburelis.
+  Copyright 2006-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -25,14 +25,14 @@ unit GameChooseMenu;
 
 interface
 
-uses Classes, CastleWindow, CastleUIControls, CastleUIState, CastleImages;
+uses Classes, CastleWindow, CastleUIControls, CastleImages;
 
 { Allows user to choose one item from MenuItems.
   Displays menu using TCastleGameMenu. }
 function ChooseByMenu(MenuItems: TStringList): Integer;
 
 type
-  TStateChooseMenu = class(TUIState)
+  TStateChooseMenu = class(TCastleView)
   strict private
     OldThemeWindow: String;
   public
@@ -92,12 +92,15 @@ function ChooseByMenu(MenuItems: TStringList): Integer;
 var
   I: Integer;
   PreviousMenu: TCastleOnScreenMenu;
+  Container: TCastleContainer;
 begin
   ChooseMenu.MenuItems.ClearControls;
   for I := 0 to MenuItems.Count - 1 do
     ChooseMenu.Add(MenuItems[I], @ChooseMenu.ClickItem);
 
-  TUIState.Push(StateChooseMenu);
+  Container := Application.MainWindow.Container;
+
+  Container.PushView(StateChooseMenu);
   try
     PreviousMenu := Window.Controls.MakeSingle(TCastleOnScreenMenu, ChooseMenu)
       as TCastleOnScreenMenu;
@@ -110,7 +113,7 @@ begin
     Window.Controls.MakeSingle(TCastleOnScreenMenu, PreviousMenu);
 
     Result := SelectedIndex;
-  finally TUIState.Pop(StateChooseMenu) end;
+  finally Container.PopView(StateChooseMenu) end;
 end;
 
 initialization

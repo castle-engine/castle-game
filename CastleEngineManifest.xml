@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="castle"
-  standalone_source="castle.lpr"
+  standalone_source="castle.dpr"
   game_units="GameInitialize"
   caption="The Castle"
   qualified_name="io.castleengine.castlegame"

@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2022 Michalis Kamburelis.
+  Copyright 2006-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -26,11 +26,6 @@ unit GameVideoOptions;
 interface
 
 uses CastleScene, X3DNodes;
-
-const
-  DefaultAllowScreenChange = true;
-var
-  AllowScreenChange: boolean;
 
 const
   DefaultShadowVolumes =
@@ -92,8 +87,6 @@ end;
 
 class procedure TGameVideoOptions.LoadFromConfig(const Config: TCastleConfig);
 begin
-  AllowScreenChange := Config.GetValue(
-    'video_options/allow_screen_change', DefaultAllowScreenChange);
   ShadowVolumes := Config.GetValue(
     'video_options/shadows', DefaultShadowVolumes);
   ColorBits := Config.GetValue(
@@ -112,9 +105,6 @@ end;
 
 class procedure TGameVideoOptions.SaveToConfig(const Config: TCastleConfig);
 begin
-  Config.SetDeleteValue(
-    'video_options/allow_screen_change',
-    AllowScreenChange, DefaultAllowScreenChange);
   Config.SetDeleteValue(
     'video_options/shadows',
     ShadowVolumes, DefaultShadowVolumes);

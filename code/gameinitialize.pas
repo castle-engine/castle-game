@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2021 Michalis Kamburelis.
+  Copyright 2006-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -32,7 +32,7 @@ uses SysUtils, Classes,
   CastleWindow, CastleUtils, CastleProgress, CastleWindowProgress,
   CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
   CastleLog, CastleClassUtils, CastleLevels, CastleMaterialProperties,
-  CastleSoundEngine, CastleConfig, CastleUIState, CastleResources,
+  CastleSoundEngine, CastleConfig, CastleResources,
   CastleGameNotifications, CastleInputs, CastleRectangles, CastleColors,
   CastleImages, CastleFilesUtils,
   { castle GameXxx units }
@@ -96,32 +96,53 @@ begin
   StateChooseMenu := TStateChooseMenu.Create(Application);
   {$endregion 'Castle State Creation'}
 
-  TUIState.Current := StateStartMenu;
-end;
-
-function MyGetApplicationName: string;
-begin
-  Result := 'castle';
+  Window.Container.View := StateStartMenu;
 end;
 
 initialization
-  { This sets SysUtils.ApplicationName.
-    It is useful to make sure it is correct (as early as possible)
-    as our log routines use it. }
-  OnGetApplicationName := @MyGetApplicationName;
+  { This initialization section configures:
+    - Application.OnInitialize
+    - Application.MainWindow
+    - determines initial window size
 
-  { Hack to not activate log yet on desktops,
-    only to make --version command-line parameter working without any extra output }
-  {$ifndef LINUX}
-  {$ifndef MSWINDOWS}
-  InitializeLog;
-  {$endif}
-  {$endif}
+    You should not need to do anything more in this initialization section.
+    Most of your actual application initialization (in particular, any file reading)
+    should happen inside ApplicationInitialize. }
 
   Application.OnInitialize := @ApplicationInitialize;
-  Application.MainWindow := Window;
-  Progress.UserInterface := WindowProgressInterface;
 
-  { for state credits (scrolling text animation), for state game }
-  Window.AutoRedisplay := true;
+  Window := TGameWindow.Create(Application);
+  Application.MainWindow := Window;
+
+  { Optionally, adjust window fullscreen state and size at this point.
+    Examples:
+
+    Run fullscreen:
+
+      Window.FullScreen := true;
+
+    Run in a 600x400 window:
+
+      Window.FullScreen := false; // default
+      Window.Width := 600;
+      Window.Height := 400;
+
+    Run in a window taking 2/3 of screen (width and height):
+
+      Window.FullScreen := false; // default
+      Window.Width := Application.ScreenWidth * 2 div 3;
+      Window.Height := Application.ScreenHeight * 2 div 3;
+
+    Note that some platforms (like mobile) ignore these window sizes.
+  }
+  Window.FullScreen := true;
+
+  { Handle command-line parameters like --fullscreen and --window.
+    By doing this last, you let user to override your fullscreen / mode setup. }
+  Window.ParseParameters;
+finalization
+  SoundEngine.SaveToConfig(UserConfig);
+  InputsAll.SaveToConfig(UserConfig);
+  Levels.SaveToConfig(UserConfig);
+  UserConfig.Save;
 end.

@@ -1,5 +1,5 @@
 {
-  Copyright 2007-2022 Michalis Kamburelis.
+  Copyright 2007-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -27,16 +27,17 @@ interface
 
 uses Classes,
   CastleWindow, CastleUIControls, X3DNodes, CastleSceneManager, CastleCameras,
-  CastleUIState, CastleTransform, CastleTimeUtils, CastleScene, CastleKeysMouse;
+  CastleTransform, CastleTimeUtils, CastleScene, CastleKeysMouse;
 
 type
-  TStateCredits = class(TUIState)
+  TStateCredits = class(TCastleView)
   strict private
     type
       T3DCredits = class(TCastleTransform)
       public
         AnimationTime, AnimationSpeed, AnimationEnd: TFloatTime;
         Scene: TCastleScene;
+        View: TStateCredits;
         constructor Create(AOwner: TComponent); override;
         procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
       end;
@@ -107,7 +108,7 @@ begin
   AnimationTime := AnimationTime + SecondsPassed;
   Translation := Vector3(0, AnimationSpeed * AnimationTime, 0);
   if AnimationTime > AnimationEnd then
-    TUIState.Pop(StateCredits);
+    View.Container.PopView(StateCredits);
 end;
 
 { TStateCredits -------------------------------------------------------------- }
@@ -117,6 +118,7 @@ begin
   inherited;
 
   Credits := T3DCredits.Create(nil);
+  Credits.View := Self;
 
   { We want to create separate scene manager for credits display because:
     - we want it displayed always on top (so depth buffer should be cleared)
@@ -154,7 +156,7 @@ begin
      { any mouse press ends credits }
      (Event.EventType = itMouseButton) then
   begin
-    TUIState.Pop(StateCredits);
+    Container.PopView(StateCredits);
     Result := true;
   end;
 end;

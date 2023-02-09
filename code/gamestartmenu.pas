@@ -1,5 +1,5 @@
 {
-  Copyright 2006-2017 Michalis Kamburelis.
+  Copyright 2006-2023 Michalis Kamburelis.
 
   This file is part of "castle".
 
@@ -27,7 +27,6 @@ unit GameStartMenu;
 interface
 
 uses Classes,
-  CastleUIState,
   GameGeneralMenu;
 
 type
@@ -82,7 +81,6 @@ type
   TVideoMenu = class(TSubMenu)
   strict private
     procedure ClickViewVideoInfo(Sender: TObject);
-    procedure ClickAllowScreenChange(Sender: TObject);
     procedure ClickShadowVolumes(Sender: TObject);
     procedure ClickColorBits(Sender: TObject);
     procedure ClickVideoFrequency(Sender: TObject);
@@ -91,7 +89,6 @@ type
     procedure BakedAnimationSmoothnessChanged(Sender: TObject);
     procedure AntiAliasingChanged(Sender: TObject);
   public
-    AllowScreenChangeToggle: TCastleOnScreenMenuItemToggle;
     ShadowVolumesToggle: TCastleOnScreenMenuItemToggle;
     BakedAnimationSmoothnessSlider: TCastleFloatSlider;
     ColorBitsToggle: TCastleOnScreenMenuItem;
@@ -175,7 +172,7 @@ begin
     until false;
   finally FreeAndNil(SceneManager) end;
 
-  SoundEngine.MusicPlayer.Sound := stIntroMusic;
+  SoundEngine.LoopingChannel[0].Sound := stIntroMusic;
   SoundMenu.SoundVolume.Refresh;
   SoundMenu.MusicVolume.Refresh;
   Notifications.Clear;
@@ -251,7 +248,7 @@ begin
   StateControlsMenu.DrawCentered := false;
   StateControlsMenu.ExitWithEscapeAllowed := false;
   StateStartMenu.GoingToAnotherMenu := true;
-  TUIState.Push(StateControlsMenu);
+  Container.PushView(StateControlsMenu);
 end;
 
 procedure TMainMenu.ClickVideoOptions(Sender: TObject);
@@ -271,7 +268,7 @@ begin
   SoundEngine.Sound(stMenuClick);
   StateCredits.ControlsUnder := BackgroundControls;
   StateCredits.SceneManagerUnder := BackgroundSceneManager;
-  TUIState.Push(StateCredits);
+  Container.PushView(StateCredits);
 end;
 
 procedure TMainMenu.ClickVisitWebsite(Sender: TObject);
@@ -331,11 +328,6 @@ constructor TVideoMenu.Create(AOwner: TComponent);
 begin
   inherited;
 
-  AllowScreenChangeToggle := TCastleOnScreenMenuItemToggle.Create(Self);
-  AllowScreenChangeToggle.Caption := 'Allow screen settings change on startup';
-  AllowScreenChangeToggle.Checked := AllowScreenChange;
-  AllowScreenChangeToggle.OnClick := @ClickAllowScreenChange;
-
   ShadowVolumesToggle := TCastleOnScreenMenuItemToggle.Create(Self);
   ShadowVolumesToggle.Caption := 'Shadow volumes';
   ShadowVolumesToggle.Checked := ShadowVolumes;
@@ -360,7 +352,6 @@ begin
   AntiAliasingSlider := TAntiAliasingSlider.Create(Self);
 
   Add('View video information', @ClickViewVideoInfo);
-  Add(AllowScreenChangeToggle);
   Add(ShadowVolumesToggle);
   Add('Animation smoothness', BakedAnimationSmoothnessSlider);
   Add(ColorBitsToggle);
@@ -412,12 +403,6 @@ begin
   MessageOK(Window, GLInformationString);
 end;
 
-procedure TVideoMenu.ClickAllowScreenChange(Sender: TObject);
-begin
-  AllowScreenChange := not AllowScreenChange;
-  AllowScreenChangeToggle.Checked := AllowScreenChange;
-end;
-
 procedure TVideoMenu.ClickShadowVolumes(Sender: TObject);
 begin
   ShadowVolumes := not ShadowVolumes;
@@ -455,9 +440,6 @@ end;
 
 procedure TVideoMenu.ClickRestoreDefaults(Sender: TObject);
 begin
-  AllowScreenChange := DefaultAllowScreenChange;
-  AllowScreenChangeToggle.Checked := AllowScreenChange;
-
   ShadowVolumes := DefaultShadowVolumes;
   ShadowVolumesToggle.Checked := ShadowVolumes;
 
@@ -687,7 +669,7 @@ procedure TStateStartMenu.Start;
 begin
   inherited;
   BackgroundCreate;
-  SoundEngine.MusicPlayer.Sound := stIntroMusic;
+  SoundEngine.LoopingChannel[0].Sound := stIntroMusic;
 end;
 
 procedure TStateStartMenu.Stop;
