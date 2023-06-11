@@ -53,7 +53,7 @@ uses SysUtils, Classes,
 procedure ApplicationInitialize;
 begin
   UserConfig.Load;
-  SoundEngine.LoadFromConfig(UserConfig);
+  SoundEngine.Volume := UserConfig.GetFloat('sound/volume', 1.0);
   InputsAll.LoadFromConfig(UserConfig);
 
   { parse SoundEngine parameters, should override things read by
@@ -142,7 +142,7 @@ initialization
     By doing this last, you let user to override your fullscreen / mode setup. }
   Window.ParseParameters;
 finalization
-  SoundEngine.SaveToConfig(UserConfig);
+  UserConfig.SetDeleteFloat('sound/volume', SoundEngine.Volume, 1.0);
   InputsAll.SaveToConfig(UserConfig);
   Levels.SaveToConfig(UserConfig);
   UserConfig.Save;
