@@ -389,14 +389,14 @@ var
     if WerewolfAliveCount = 0 then
     begin
       { turn light over stairs to next level }
-      LightNode := SceneManager.Items.MainScene.GlobalLights.Items[WerewolfFirstLight].Node as
+      LightNode := SceneManager.Items.MainScene.InternalGlobalLights.Items[WerewolfFirstLight].Node as
         TAbstractPositionalLightNode;
       LightNode.Location := StairsBlockerMiddle;
       LightNode.IsOn := true;
 
       for I := 1 to WerewolvesCount - 1 do
       begin
-        LightNode := SceneManager.Items.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
+        LightNode := SceneManager.Items.MainScene.InternalGlobalLights.Items[I + WerewolfFirstLight].Node as
           TAbstractPositionalLightNode;
         LightNode.IsOn := false;
       end;
@@ -405,7 +405,7 @@ var
       { turn light for each alive werewolf }
       for I := 0 to WerewolvesCount - 1 do
       begin
-        LightNode := SceneManager.Items.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
+        LightNode := SceneManager.Items.MainScene.InternalGlobalLights.Items[I + WerewolfFirstLight].Node as
           TAbstractPositionalLightNode;
         LightNode.IsOn := not WerewolfCreature[I].Dead;
         LightNode.Location := WerewolfCreature[I].Middle;
@@ -469,14 +469,14 @@ procedure TCastleHallLevel.ButtonAnimationStopped(Sender: TObject);
 
     for I := 0 to WerewolvesCount - 1 do
     begin
-      LightNode := SceneManager.Items.MainScene.GlobalLights.Items[I + WerewolfFirstLight].Node as
+      LightNode := SceneManager.Items.MainScene.InternalGlobalLights.Items[I + WerewolfFirstLight].Node as
         TAbstractPositionalLightNode;
       LightNode.Color := Vector3(1, 0, 0);
       LightNode.Attenuation := Vector3(1, 0.1, 0);
       LightNode.ShadowVolumes := true;
     end;
 
-    ShadowLight := SceneManager.Items.MainScene.GlobalLights.FindName('FakeShadowPosition');
+    ShadowLight := SceneManager.Items.MainScene.InternalGlobalLights.FindName('FakeShadowPosition');
     Check(ShadowLight <> nil, 'FakeShadowPosition light not found on castle_hall level');
     ShadowLight^.Node.ShadowVolumes := true;
     (ShadowLight^.Node as TAbstractPunctualLightNode).ShadowVolumesMain := true;
@@ -654,9 +654,6 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     begin
       Player.Translation := Destination;
       GamePlay.Player.WalkNavigation.CancelFalling;
-
-      SceneManager.Items.MainScene.ViewChangedSuddenly;
-
       SoundEngine.Sound(stTeleport);
     end;
   end;
@@ -1004,7 +1001,7 @@ begin
   if not GameWin then
   begin
     { Torch light modify, to make an illusion of unstable light }
-    TorchLight := SceneManager.Items.MainScene.GlobalLights.FindName('MainHallTorchLight');
+    TorchLight := SceneManager.Items.MainScene.InternalGlobalLights.FindName('MainHallTorchLight');
     Check(TorchLight <> nil, 'Torch light not found on cages level');
     TorchLight^.Node.Intensity := Clamped(
         TorchLight^.Node.Intensity +
