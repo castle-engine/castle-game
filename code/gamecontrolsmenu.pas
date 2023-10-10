@@ -86,7 +86,7 @@ uses SysUtils, CastleGLUtils, CastleMessages,
   CastleOnScreenMenu, CastleConfig,
   CastleInputs, CastleVectors, CastleUtils, CastleRectangles,
   CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors,
-  CastleControls, CastleTextureFont_DejaVuSansMono_18,
+  CastleControls,
   CastleApplicationProperties;
 
 const
@@ -548,9 +548,7 @@ begin
   ItemsControlsMenu := TItemsControlsMenu.Create(Application);
   OtherControlsMenu := TOtherControlsMenu.Create(Application);
 
-  Theme.MessageFont := TCastleFont.Create(TComponent(nil));
-  (Theme.MessageFont as TCastleFont).Load(TextureFont_DejaVuSansMono_18);
-  SubMenuTitleFont := Theme.MessageFont;
+  SubMenuTitleFont := FallbackFont;
 end;
 
 function TStateControlsMenu.Press(const Event: TInputPressRelease): boolean;
