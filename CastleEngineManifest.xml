@@ -12,6 +12,18 @@
     <search_paths>
       <path value="code/" />
     </search_paths>
+    <custom_options>
+      <!--
+        Disable some deprecation warnings from CGE, we knowingly use some
+        deprecated stuff.
+        We should eventually fix (upgrade) them, but it's not a priority for now,
+        I can just fix deprecated stuff when it breaks,
+        and castle-game project code is not advised to learn CGE now.
+      -->
+      <option>-vm5066</option> <!-- Symbol "$1" is deprecated: "$2" -->
+      <option>-vm5074</option> <!-- unit deprecated -->
+      <option>-vm5075</option> <!-- unit deprecated alt -->
+    </custom_options>
   </compiler_options>
   <package>
     <include path="README.txt" />

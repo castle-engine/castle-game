@@ -79,7 +79,7 @@ begin
     Player.Life := Min(Player.Life + 50, Player.MaxLife);
     Notifications.Show(Format('You drink "%s"', [Resource.Caption]));
     Quantity := Quantity - 1;
-    SoundEngine.Sound(stPlayerPotionDrink);
+    SoundEngine.Play(stPlayerPotionDrink);
   end else
     Notifications.Show('You feel quite alright, no need to waste this potion');
 end;
@@ -98,7 +98,7 @@ begin
   Notifications.Show(Format('You cast spell from "%s"', [Resource.Caption]));
   Player.FlyingTimeOut := 30.0;
   Quantity := Quantity - 1;
-  SoundEngine.Sound(stPlayerCastFlyingSpell);
+  SoundEngine.Play(stPlayerCastFlyingSpell);
 end;
 
 { initialization / finalization ---------------------------------------- }

@@ -209,7 +209,7 @@ procedure TMainMenu.ClickNewGame(Sender: TObject);
   end;
 
 begin
-  SoundEngine.Sound(stMenuClick);
+  SoundEngine.Play(stMenuClick);
 
   { Initially I had here code to show SetChooseNewLevelMenu only
     if I had more than 1 level with Played.
@@ -242,7 +242,7 @@ end;
 
 procedure TMainMenu.ClickConfigureControls(Sender: TObject);
 begin
-  SoundEngine.Sound(stMenuClick);
+  SoundEngine.Play(stMenuClick);
 
   StateControlsMenu.DrawFadeRect := false;
   StateControlsMenu.DrawCentered := false;
@@ -253,19 +253,19 @@ end;
 
 procedure TMainMenu.ClickVideoOptions(Sender: TObject);
 begin
-  SoundEngine.Sound(stMenuClick);
+  SoundEngine.Play(stMenuClick);
   StateStartMenu.CurrentMenu := VideoMenu;
 end;
 
 procedure TMainMenu.ClickSoundOptions(Sender: TObject);
 begin
-  SoundEngine.Sound(stMenuClick);
+  SoundEngine.Play(stMenuClick);
   StateStartMenu.CurrentMenu := SoundMenu;
 end;
 
 procedure TMainMenu.ClickCredits(Sender: TObject);
 begin
-  SoundEngine.Sound(stMenuClick);
+  SoundEngine.Play(stMenuClick);
   StateCredits.ControlsUnder := BackgroundControls;
   StateCredits.SceneManagerUnder := BackgroundSceneManager;
   Container.PushView(StateCredits);
@@ -273,13 +273,13 @@ end;
 
 procedure TMainMenu.ClickVisitWebsite(Sender: TObject);
 begin
-  SoundEngine.Sound(stMenuClick);
+  SoundEngine.Play(stMenuClick);
   if not OpenURL(CastleURL) then MessageOK(Window, SCannotOpenURL);
 end;
 
 procedure TMainMenu.ClickQuit(Sender: TObject);
 begin
-  SoundEngine.Sound(stMenuClick);
+  SoundEngine.Play(stMenuClick);
   Application.Terminate;
 end;
 

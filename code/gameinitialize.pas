@@ -29,7 +29,7 @@ implementation
 
 uses SysUtils, Classes,
   { CGE units }
-  CastleWindow, CastleUtils, CastleProgress, CastleWindowProgress,
+  CastleWindow, CastleUtils,
   CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
   CastleLog, CastleClassUtils, CastleLevels, CastleMaterialProperties,
   CastleSoundEngine, CastleConfig, CastleResources,
@@ -66,11 +66,6 @@ begin
   Notifications.Anchor(vpBottom, 10);
   Notifications.TextAlignment := hpMiddle;
   Notifications.Color := Yellow;
-
-  { configure progress }
-  Progress.UserInterface := WindowProgressInterface;
-  Progress.UserInterface.Image := LoadImage('castle-data:/menu_bg/initial_background.png');
-  Progress.UserInterface.OwnsImage := true;
 
   { set sound configuration. Must be done before loading resources,
     since they initialize the sounds by looking up their names. }

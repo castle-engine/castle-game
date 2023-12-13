@@ -32,6 +32,7 @@ uses DOM,
   CastleLevels, X3DNodes, X3DFields, X3DTIme, CastleTransform, CastleSoundEngine,
   GameCreatures, CastleCreatures, Classes, CastleTimeUtils, CastleColors,
   CastleFrustum, CastleTransformExtra, CastleResources, CastleRenderOptions,
+  CastleBehaviors,
   GameSound;
 
 type
@@ -52,6 +53,7 @@ type
       Button: TCastleScene;
       StairsBlocker: TCastleScene;
       StairsBlockerMiddle: TVector3;
+      SymbolMovingSoundSource, StairsBlockerSoundSource: TCastleSoundSource;
       FLevelExitBox: TBox3D;
       WerewolfAppearPosition: array [0..WerewolvesCount - 1] of TVector3;
       WerewolfAppeared: boolean;
@@ -88,6 +90,7 @@ type
 
     CartLastSoundTime: Single;
     CartSoundPosition: TVector3;
+    CartSoundSource: TCastleSoundSource;
   protected
     function Placeholder(const Shape: TShape; const PlaceholderName: string): boolean; override;
   public
@@ -219,7 +222,7 @@ end;
 procedure NotificationInteractFailed(const S: string);
 begin
   Notifications.Show(S);
-  SoundEngine.Sound(stPlayerInteractFailed);
+  SoundEngine.Play(stPlayerInteractFailed);
 end;
 
 { TBossLevel ----------------------------------------------------------------- }
@@ -301,6 +304,8 @@ constructor TCastleHallLevel.Create(const AOwner: TComponent;
   const MainScene: TCastleScene; const DOMElement: TDOMElement);
 var
   CastleHallLevelPath: string;
+  StairsBlockerSoundSourceParent: TCastleTransform;
+  SymbolMovingSoundSourceParent: TCastleTransform;
 begin
   inherited;
 
@@ -312,7 +317,7 @@ begin
   Symbol := TCastleScene.Create(Self);
   Symbol.Load(CastleHallLevelPath + 'symbol.kanim');
   Symbol.ProcessEvents := true;
-  Symbol.CastShadowVolumes := false; { shadow would not be visible anyway }
+  Symbol.CastShadows := false; { shadow would not be visible anyway }
   Level.RootTransform.Add(Symbol);
 
   { Do not build collisions structure, let it collide as a bounding box.
@@ -321,7 +326,7 @@ begin
   Button := TCastleHallButton.Create(Self);
   Button.Load(CastleHallLevelPath + 'button.kanim');
   Button.ProcessEvents := true;
-  Button.CastShadowVolumes := false; { strange ghost shadow on symbol would be visible }
+  Button.CastShadows := false; { strange ghost shadow on symbol would be visible }
   TCastleHallButton(Button).OnAnimationStopped := @ButtonAnimationStopped;
 
   Level.RootTransform.Add(Button);
@@ -329,14 +334,28 @@ begin
   StairsBlocker := TStairsBlocker.Create(Self);
   StairsBlocker.Load(CastleHallLevelPath + 'castle_hall_stairs_blocker.wrl');
   StairsBlocker.ProcessEvents := true;
-  StairsBlocker.Spatial := [ssDynamicCollisions];
-  StairsBlocker.CastShadowVolumes := false; { shadow would not be visible anyway }
+  StairsBlocker.PreciseCollisions := true;
+  StairsBlocker.CastShadows := false; { shadow would not be visible anyway }
   Level.RootTransform.Add(StairsBlocker);
 
   { get StairsBlocker.BoundingBox.Center when it GetExists.
     Later StairsBlocker will have Exists = false, so bbox will be empty,
     but we'll need StairsBlockerMiddle position. }
   StairsBlockerMiddle := StairsBlocker.BoundingBox.Center;
+
+  { setup StairsBlockerSoundSource }
+  StairsBlockerSoundSource := TCastleSoundSource.Create(Self);
+  StairsBlockerSoundSource.Spatial := true;
+  StairsBlockerSoundSourceParent := TCastleTransform.Create(Self);
+  StairsBlockerSoundSourceParent.AddBehavior(StairsBlockerSoundSource);
+  Level.RootTransform.Add(StairsBlockerSoundSourceParent);
+
+  { setup SymbolMovingSoundSource }
+  SymbolMovingSoundSource := TCastleSoundSource.Create(Self);
+  SymbolMovingSoundSource.Spatial := true;
+  SymbolMovingSoundSourceParent := TCastleTransform.Create(Self);
+  SymbolMovingSoundSourceParent.AddBehavior(SymbolMovingSoundSource);
+  Level.RootTransform.Add(SymbolMovingSoundSourceParent);
 end;
 
 function BoxDownPosition(const Box: TBox3D): TVector3;
@@ -376,7 +395,8 @@ var
   begin
     if StairsBlocker.Exists then
     begin
-      SoundEngine.Sound3d(stStairsBlockerDestroyed, StairsBlockerMiddle);
+      StairsBlockerSoundSource.Parent.Translation := StairsBlockerMiddle;
+      StairsBlockerSoundSource.Play(stStairsBlockerDestroyed);
       StairsBlocker.Exists := false;
     end;
   end;
@@ -487,8 +507,8 @@ begin
   begin
     Symbol.PlayAnimation('animation', false);
     Symbol.Collides := false;
-    SoundEngine.Sound3d(stCastleHallSymbolMoving, Vector3(0, 0, 0));
-
+    SymbolMovingSoundSource.Parent.Translation := Vector3(0, 0, 0);
+    SymbolMovingSoundSource.Play(stCastleHallSymbolMoving);
     WerewolfAppear;
   end;
 end;
@@ -535,7 +555,8 @@ constructor TGateLevel.Create(const AOwner: TComponent;
   const MainScene: TCastleScene; const DOMElement: TDOMElement);
 var
   Cart: TCastleScene;
-  GateLevelPath: string;
+  GateLevelPath: String;
+  CartSoundSourceParent: TCastleTransform;
 begin
   inherited;
 
@@ -570,6 +591,13 @@ begin
 
   SacrilegeAmbushDone := false;
   SwordAmbushDone := false;
+
+  { setup CartSoundSource }
+  CartSoundSource := TCastleSoundSource.Create(Self);
+  CartSoundSource.Spatial := true;
+  CartSoundSourceParent := TCastleTransform.Create(Self);
+  CartSoundSourceParent.AddBehavior(CartSoundSource);
+  Level.RootTransform.Add(CartSoundSourceParent);
 end;
 
 function TGateLevel.Placeholder(const Shape: TShape; const PlaceholderName: string): boolean;
@@ -654,7 +682,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     begin
       Player.Translation := Destination;
       GamePlay.Player.WalkNavigation.CancelFalling;
-      SoundEngine.Sound(stTeleport);
+      SoundEngine.Play(stTeleport);
     end;
   end;
 
@@ -663,7 +691,7 @@ procedure TGateLevel.Update(const SecondsPassed: Single; var RemoveMe: TRemoveTy
     I: Integer;
     CreaturePosition, CreatureDirection: TVector3;
   begin
-    SoundEngine.Sound(stSacrilegeAmbush);
+    SoundEngine.Play(stSacrilegeAmbush);
     for I := 0 to High(SacrilegeAmbushStartingPosition) do
     begin
       CreaturePosition := SacrilegeAmbushStartingPosition[I];
@@ -706,7 +734,7 @@ begin
       RejectGateExitBox;
     end else
     begin
-      SoundEngine.Sound(stKeyDoorUse);
+      SoundEngine.Play(stKeyDoorUse);
       LevelFinished('castle_hall');
     end;
   end else
@@ -732,7 +760,8 @@ begin
   if Time - CartLastSoundTime > CartSoundRepeatTime then
   begin
     CartLastSoundTime := Time;
-    SoundEngine.Sound3d(stCreak, CartSoundPosition);
+    CartSoundSource.Parent.Translation := CartSoundPosition;
+    CartSoundSource.Play(stCreak);
   end;
 end;
 
@@ -777,7 +806,7 @@ begin
   Elevator := TCastleScene.Create(Self);
   Elevator.Load(TowerLevelPath + 'elevator.wrl');
   Elevator.ProcessEvents := true;
-  Elevator.Spatial := [ssDynamicCollisions];
+  Elevator.PreciseCollisions := true;
 
   { Do not build collisions structure, let it collide as a bounding box.
     Doing it properly (with PrepareForCollisions = true) would require
@@ -826,7 +855,7 @@ begin
       if (Boss <> nil) and (not Boss.Dead) then
       begin
         Player.Hurt(2 + Random(5), Vector3(0, -1, 0), 2, nil);
-        SoundEngine.Sound(stEvilLaugh);
+        SoundEngine.Play(stEvilLaugh);
         Notifications.Show('No exit for the one who does not fight');
       end else
       begin
@@ -854,19 +883,19 @@ begin
   FEndSequence := TCastleScene.Create(Self);
   FEndSequence.Load(LevelsPath + 'end_sequence/end_sequence_final.wrl');
   FEndSequence.ProcessEvents := true;
-  FEndSequence.Spatial := [ssDynamicCollisions];
+  FEndSequence.PreciseCollisions := true;
   FEndSequence.Exists := false;
   { Even when FEndSequence will exist, we will not check for collisions
     with it --- no reason to waste time, no collisions will be possible
     as player's move along the EndSequence will be programmed. }
   FEndSequence.Collides := false;
-  FEndSequence.CastShadowVolumes := false; { shadow is not visible anyway }
+  FEndSequence.CastShadows := false; { shadow is not visible anyway }
   Level.RootTransform.Add(FEndSequence);
 
   FGateExit := TGateExit.Create(Self);
   FGateExit.Load(LevelsPath + 'cages/cages_gate_exit.wrl');
   FGateExit.ProcessEvents := true;
-  FGateExit.CastShadowVolumes := false; { shadow is not visible anyway }
+  FGateExit.CastShadows := false; { shadow is not visible anyway }
   Level.RootTransform.Add(FGateExit);
 end;
 
@@ -1080,7 +1109,7 @@ begin
   Pushes := false;
   SoundGoEndPosition := stDoorOpen;
   SoundGoBeginPosition := stDoorClose;
-  CastShadowVolumes := false; { looks bad }
+  CastShadows := false; { looks bad }
 end;
 
 procedure TDoomLevelDoor.BeforeTimeIncrease(const NewTime: TFloatTime);
@@ -1194,7 +1223,7 @@ begin
     NotificationInteractFailed(
       'You''re too far to reach it from here') else
     begin
-      SoundEngine.Sound(stDoomExitButton);
+      SoundEngine.Play(stDoomExitButton);
       Player.Life := 0;
       ExitMessagePending := true;
     end;
@@ -1242,7 +1271,7 @@ var
     Scene := TCastleScene.Create(Self);
     Scene.Load(DoomDoorsPathPrefix + URL);
     Scene.ProcessEvents := true;
-    Scene.Spatial := [ssDynamicCollisions];
+    Scene.PreciseCollisions := true;
 
     Result := TDoomLevelDoor.Create(Self);
     Result.Add(Scene);
@@ -1269,7 +1298,7 @@ begin
   FakeWall.Load(DoomDoorsPathPrefix + 'fake_wall_final.wrl');
   FakeWall.ProcessEvents := true;
   FakeWall.Collides := false;
-  FakeWall.CastShadowVolumes := false;
+  FakeWall.CastShadows := false;
   Level.RootTransform.Add(FakeWall);
 
   Elevator49 := TCastleScene.Create(Self);
@@ -1285,7 +1314,7 @@ begin
   MovingElevator49.SoundGoBeginPosition := stElevator;
   MovingElevator49.SoundGoBeginPositionLooping := true;
   MovingElevator49.SoundTracksCurrentPosition := true;
-  MovingElevator49.CastShadowVolumes := false;
+  MovingElevator49.CastShadows := false;
   Level.RootTransform.Add(MovingElevator49);
 
   Elevator9a9b := TElevator9a9b.Create(Self);
@@ -1301,13 +1330,13 @@ begin
   MovingElevator9a9b.SoundGoBeginPosition := stElevator;
   MovingElevator9a9b.SoundGoBeginPositionLooping := true;
   MovingElevator9a9b.SoundTracksCurrentPosition := true;
-  MovingElevator9a9b.CastShadowVolumes := false;
+  MovingElevator9a9b.CastShadows := false;
   Level.RootTransform.Add(MovingElevator9a9b);
 
   ExitButton := TExitButton.Create(Self);
   ExitButton.Load(DoomDoorsPathPrefix + 'exit_button_final.wrl');
   ExitButton.ProcessEvents := true;
-  ExitButton.CastShadowVolumes := false;
+  ExitButton.CastShadows := false;
   Level.RootTransform.Add(ExitButton);
 
   TElevator9a9b(Elevator9a9b).MovingElevator9a9b := MovingElevator9a9b;
@@ -1373,7 +1402,7 @@ begin
   Water := TCastleScene.Create(Self);
   Water.Load(LevelsPath + 'gate_background/water.kanim');
   Water.ProcessEvents := true;
-  Water.CastShadowVolumes := false; { water shadow would look awkward }
+  Water.CastShadows := false; { water shadow would look awkward }
   { No octrees created for water (because in normal usage, player will not
     walk on this level). For safety, Collides set to @false, in case
     user enters this level by debug menu. }
@@ -1401,9 +1430,9 @@ begin
     { load Fountain animation }
     Fountain := TCastleScene.Create(Self);
     Fountain.Load(LevelsPath + 'fountain/water_stream/fountain.kanim');
-    Fountain.PrepareResources([prRenderSelf, prBoundingBox], false, SceneManager.PrepareParams);
+    SceneManager.PrepareResources(Fountain, [prRenderSelf, prBoundingBox]);
     Fountain.FreeResources([frTextureDataInNodes]);
-    Fountain.CastShadowVolumes := false; { not manifold }
+    Fountain.CastShadows := false; { not manifold }
     Fountain.Collides := false;
     Fountain.RenderOptions.BlendingDestinationFactor := bdOneMinusSrcAlpha;
     Fountain.TimePlayingSpeed := 1.5;

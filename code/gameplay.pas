@@ -550,7 +550,7 @@ begin
       gwaAnimateTo1:
         if not SceneManager.Camera.Animation then
         begin
-          SoundEngine.Sound(stKeyDoorUse);
+          SoundEngine.Play(stKeyDoorUse);
           SceneManager.Camera.AnimateTo(GameWinPosition2, GameWinDirection, GameWinUp, 4);
           Cages.GameWinAnimation := Succ(Cages.GameWinAnimation);
         end;

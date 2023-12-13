@@ -67,7 +67,7 @@ function TGlobalCatchInput.Press(const Event: TInputPressRelease): boolean;
     URL := FileNameAutoInc(ApplicationName + '_screen_%d.png');
     Window.SaveScreen(URL);
     Notifications.Show('Screen saved to ' + URL);
-    SoundEngine.Sound(stSaveScreen);
+    SoundEngine.Play(stSaveScreen);
   end;
 
 begin

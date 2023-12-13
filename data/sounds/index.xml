@@ -107,7 +107,7 @@
   <!-- From
     http://www.flashkit.com/soundfx/Domestic/Doors/Door_Cre-J_Fairba-8439/index.php
   -->
-  <sound name="creak" default_importance="level_event" volume="0.3" />
+  <sound name="creak" default_importance="level_event" />
 
   <!-- Creatures sounds. -->
   <sound name="creature_fall"
