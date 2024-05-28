@@ -31,15 +31,17 @@ jobs:
       # Set env CASTLE_ENGINE_PATH following
       # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
       # https://brandur.org/fragments/github-actions-env-vars-in-env-vars
-      - name: Castle Game Engine - Setup environment
+      - name: Castle Game Engine - Env CASTLE_ENGINE_PATH
         run: echo "CASTLE_ENGINE_PATH=$GITHUB_WORKSPACE/castle-engine" >> $GITHUB_ENV
+      - name: Castle Game Engine - Env PATH (non-Windows)
+        run: echo "PATH=$PATH:$CASTLE_ENGINE_PATH/tools/build-tool/" >> $GITHUB_ENV
       - name: Castle Game Engine - Clone snapshot
         run: git clone --depth 1 --single-branch --branch snapshot https://github.com/castle-engine/castle-engine/
       - name: Castle Game Engine - Build
         run: cd $CASTLE_ENGINE_PATH/tools/build-tool/ && ./castle-engine_compile.sh
 
       - name: Package Windows
-        run: $CASTLE_ENGINE_PATH/tools/build-tool/castle-engine package --os=win64 --cpu=x86_64 --verbose
+        run: castle-engine package --os=win64 --cpu=x86_64 --verbose
       - name: Archive Artifacts
         # See https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@v4
@@ -52,7 +54,7 @@ jobs:
           if-no-files-found: error
 
       - name: Package Linux
-        run: $CASTLE_ENGINE_PATH/tools/build-tool/castle-engine package --os=linux --cpu=x86_64 --verbose
+        run: castle-engine package --os=linux --cpu=x86_64 --verbose
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -61,7 +63,7 @@ jobs:
           if-no-files-found: error
 
       - name: Package Android
-        run: $CASTLE_ENGINE_PATH/tools/build-tool/castle-engine package --target=android --verbose
+        run: castle-engine package --target=android --verbose
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -80,15 +82,17 @@ jobs:
         uses: gcarreno/setup-lazarus@v3.2.17
         with:
           lazarus-version: stable
-      - name: Castle Game Engine - Setup environment
+      - name: Castle Game Engine - Env CASTLE_ENGINE_PATH
         run: echo "CASTLE_ENGINE_PATH=$GITHUB_WORKSPACE/castle-engine" >> $GITHUB_ENV
+      - name: Castle Game Engine - Env PATH (non-Windows)
+        run: echo "PATH=$PATH:$CASTLE_ENGINE_PATH/tools/build-tool/" >> $GITHUB_ENV
       - name: Castle Game Engine - Clone snapshot
         run: git clone --depth 1 --single-branch --branch snapshot https://github.com/castle-engine/castle-engine/
       - name: Castle Game Engine - Build
         run: cd $CASTLE_ENGINE_PATH/tools/build-tool/ && ./castle-engine_compile.sh
 
       - name: Package macOS
-        run: $CASTLE_ENGINE_PATH/tools/build-tool/castle-engine package --os=darwin --cpu=x86_64 --verbose
+        run: castle-engine package --os=darwin --cpu=x86_64 --verbose
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
         with:
