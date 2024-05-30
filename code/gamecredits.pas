@@ -98,8 +98,8 @@ begin
 
   Info := (Scene.RootNode.FindNodeByName(TWorldInfoNode,
     'MainInfo', true) as TWorldInfoNode).FdInfo;
-  AnimationSpeed := StrToFloat(Info.Items[1]);
-  AnimationEnd := StrToFloat(Info.Items[2]);
+  AnimationSpeed := StrToFloatDot(Info.Items[1]);
+  AnimationEnd := StrToFloatDot(Info.Items[2]);
 end;
 
 procedure TStateCredits.T3DCredits.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
