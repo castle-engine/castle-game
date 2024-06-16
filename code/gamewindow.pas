@@ -94,8 +94,10 @@ begin
   inherited;
   GlobalCatchInput := TGlobalCatchInput.Create(Self);
   Controls.InsertBack(GlobalCatchInput);
-  Controls.InsertFront(Notifications);
+
+  // Note that we have to set KeepInFront *before* inserting to Controls
   Notifications.KeepInFront := true;
+  Controls.InsertFront(Notifications);
 end;
 
 initialization
