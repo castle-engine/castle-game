@@ -653,7 +653,8 @@ begin
   if PrepareNewPlayer then
     SceneManager.Logic.PrepareNewPlayer(Player);
 
-  Notifications.Show('Hint: press "Escape" for game menu');
+  if not ApplicationProperties.TouchDevice then
+    Notifications.Show('Hint: press "Escape" for game menu');
 
   InsertFront(SceneManager);
   InsertFront(C2D);
