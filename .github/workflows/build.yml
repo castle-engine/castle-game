@@ -21,6 +21,8 @@ on:
   push:
     branches:
       - '**'
+  repository_dispatch:
+    types: [cge-docker-unstable-changed]
 
 jobs:
   # Build for platforms supported by
