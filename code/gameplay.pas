@@ -410,7 +410,6 @@ begin
   TouchNavigation := TCastleTouchNavigation.Create(Self);
   TouchNavigation.FullSize := true;
   TouchNavigation.Viewport := Self;
-  TouchNavigation.ControlMouseDragMode := true;
   TouchNavigation.Scale := 2;
   InsertFront(TouchNavigation);
 end;
@@ -517,7 +516,7 @@ var
 begin
   inherited;
 
-  if UseTouchInterface and (Container.FrontView = Self) then
+  if ApplicationProperties.TouchDevice and (Container.FrontView = Self) then
   begin
     if Player.Blocked then
       SceneManager.TouchNavigation.TouchInterface := tiNone

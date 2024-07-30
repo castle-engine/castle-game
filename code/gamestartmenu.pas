@@ -49,7 +49,7 @@ implementation
 uses SysUtils, CastleUtils,
   CastleGLUtils, CastleMessages, GameWindow, CastleVectors, CastleImages,
   CastleFilesUtils, CastleLevels, CastlePlayer, CastleColors,
-  CastleOnScreenMenu, CastleInputs, CastleRectangles,
+  CastleOnScreenMenu, CastleInputs, CastleRectangles, CastleCameras,
   CastleKeysMouse, CastleOpenDocument,
   CastleStringUtils, CastleClassUtils, CastleGameNotifications,
   CastleUIControls, CastleSoundEngine, CastleSoundMenu, X3DNodes, CastleControls,
@@ -158,6 +158,11 @@ begin
       try
         Player.LoadFromFile;
         Player.WalkNavigation.Input_Run.MakeClear; { speed in castle1 is so fast that we're always running }
+        if ApplicationProperties.TouchDevice then
+          { We already use TCastleTouchNavigation for movement,
+            moving using WalkNavigation.MouseDragMode is too imprecise.
+            See https://castle-engine.io/touch_input }
+          Player.WalkNavigation.MouseDragMode := mdRotate;
         PlayerUpdateMouseLook(Player);
 
         SceneManager.Player := Player;

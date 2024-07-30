@@ -69,13 +69,6 @@ var
     Initialized / finalized here. }
   SubMenuTitleFont: TCastleAbstractFont;
 
-var
-  UseTouchInterface: boolean =
-    {$ifdef ANDROID} true {$else}
-    {$ifdef IOS}     true {$else}
-                     false {$endif}
-                           {$endif};
-
 { Update MouseLook-related player settings, based on what is chosen
   in "Configure controls" menu. }
 procedure PlayerUpdateMouseLook(Player: TPlayer);
@@ -114,7 +107,7 @@ begin
     be disabled by Input := []. But still mouse look will cause mouse
     to remain hidden, which is good (why pop the mouse cursor on game
     win animation?). }
-  Player.WalkNavigation.MouseLook := MouseLook and not UseTouchInterface;
+  Player.WalkNavigation.MouseLook := MouseLook and not ApplicationProperties.TouchDevice;
 end;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }
