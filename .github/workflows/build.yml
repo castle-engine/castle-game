@@ -96,9 +96,10 @@ jobs:
 
   # Build for platforms supported from macOS.
   # This means to build for macOS and (maybe in the future) iOS.
+  # TODO: macos-13, not macos-latest (14 now) to avoid linking issues from LSOpenCFURLRef
   build-macos:
     name: Build Using macOS
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
       - name: Install FPC+Lazarus
