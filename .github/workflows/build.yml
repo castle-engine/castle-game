@@ -96,16 +96,13 @@ jobs:
 
   # Build for platforms supported from macOS.
   # This means to build for macOS and (maybe in the future) iOS.
-  # TODO: macos-13, not macos-latest (14 now) to avoid linking issues from LSOpenCFURLRef
   build-macos:
     name: Build Using macOS
-    runs-on: macos-13
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v5
-      - name: Install FPC+Lazarus
-        uses: gcarreno/setup-lazarus@v3.3.1
-        with:
-          lazarus-version: stable
+      - name: Install FPC
+        run: brew install fpc
 
       - name: Castle Game Engine - Env CASTLE_ENGINE_PATH
         run: echo "CASTLE_ENGINE_PATH=$GITHUB_WORKSPACE/castle-engine" >> $GITHUB_ENV
@@ -117,12 +114,12 @@ jobs:
         run: cd $CASTLE_ENGINE_PATH/tools/build-tool/ && ./castle-engine_compile.sh
 
       - name: Package macOS
-        run: castle-engine package --os=darwin --cpu=x86_64 --verbose
+        run: castle-engine package --verbose
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: macos-build
-          path: "*-darwin-x86_64.zip"
+          path: "*-darwin-*.zip"
           if-no-files-found: error
 
   release:
