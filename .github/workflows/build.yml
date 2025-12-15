@@ -60,7 +60,7 @@ jobs:
         run: castle-engine package --os=win64 --cpu=x86_64 --verbose
       - name: Archive Artifacts
         # See https://github.com/actions/upload-artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: windows-build
           # Note: Keep paths that start with asterisk in double qoutes, to avoid misinterpreting as YAML reference.
@@ -72,7 +72,7 @@ jobs:
       - name: Package Linux
         run: castle-engine package --os=linux --cpu=x86_64 --verbose
       - name: Archive Artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: linux-build
           path: "*-linux-x86_64.tar.gz"
@@ -88,7 +88,7 @@ jobs:
       - name: Package Android
         run: castle-engine package --target=android --verbose
       - name: Archive Artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: android-build
           path: "*.apk"
@@ -116,7 +116,7 @@ jobs:
       - name: Package macOS
         run: castle-engine package --verbose
       - name: Archive Artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: macos-build
           path: "*-darwin-*.zip"
