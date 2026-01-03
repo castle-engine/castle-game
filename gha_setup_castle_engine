@@ -1,0 +1,128 @@
+#!/bin/bash
+set -euo pipefail
+
+# -----------------------------------------------------------------------------
+# Use this script in your own GitHub Actions workflows to easily setup
+# - FPC (Free Pascal Compiler)
+# - and CGE (Castle Game Engine)
+#
+# Arguments: OS and CPU, in the FPC naming conventions.
+# Like "setup_castle_engine linux x86_64" .
+#
+# Current directory when this is called matters:
+# we assume it is the workspace, we will create fpc/ and castle-engine/ subdirs
+# there.
+#
+# After this is called, calling "castle-engine package" will package your project.
+# It enhances the PATH variable to include FPC and CGE build tool
+# by enhancing $GITHUB_ENV.
+#
+# Details what it does:
+#
+# - Get and setup FPC recommended to use with CGE.
+#
+#   This downloads FPC (to fpc/ subdir) from our
+#   https://github.com/castle-engine/cge-fpc releases
+#   which have prebuild FPC binary + FPC sources.
+#   And sets up fpc.cfg to use it properly (see cge-fpc/README.md docs).
+#
+# - Get and setup CGE in recommended way for CI/CD.
+#
+#   This downloads CGE sources from the "snapshot" tag
+#   (latest engine that passed automatic tests)
+#   and builds our build tool ("castle-engine")
+#   and sets CASTLE_ENGINE_PATH and PATH to put it on PATH.
+#
+# Feel free to use this merely as an inspiration for your projects.
+# Things can be tweaked, e.g.
+# - You can take different engine version
+#   (e.g. to stick to last stable release using proper tag).
+# - You could also download CGE binary release (with bundled FPC),
+#   so that building our build tool each time is not necessary.
+#
+# This changes ~/.fpc.cfg on Unix, so what it does is not completely isolated.
+# This is not a problem when running in ephemeral CI/CD environment like
+# GH-hosted runner.
+# This script is specific to GitHub Actions usage (not other CI/CD)
+# due to how it uses $GITHUB_ENV and relies on $GITHUB_WORKSPACE.
+# -----------------------------------------------------------------------------
+
+OS=$1
+CPU=$2
+shift 2
+
+WORKSPACE_ROOT="`pwd`"
+
+CASTLE_ENGINE_VERSION='snapshot'
+
+# ----------------------------------------------------------------------------
+# bash functions
+
+# Get FPC from cge-fpc
+do_get_fpc()
+{
+  echo '-------------------------------------------------------------------'
+  echo 'Setting up FPC'
+
+  # Using --progress=... below because default wget progress
+  # (default or --progress=dot) causes hard to read output in GHA logs.
+  wget --progress=bar:force:noscroll \
+    https://github.com/castle-engine/cge-fpc/releases/download/snapshot/fpc-${OS}-${CPU}.zip
+
+  # Use -q for more readable output in logs.
+  unzip -q fpc-${OS}-${CPU}.zip
+
+  if [ "$OS" = "win32" -or "$OS" = "win64" ] ; then
+    FPC_CFG="${WORKSPACE_ROOT}/fpc/bin/fpc.cfg"
+  else
+    FPC_CFG="${HOME}/.fpc.cfg"
+  fi
+
+  # Define fpc.cfg following https://github.com/castle-engine/cge-fpc docs
+  echo '# Minimal fpc.cfg for FPC from https://github.com/castle-engine/cge-fpc' > "${FPC_CFG}"
+  echo "-Fu${WORKSPACE_ROOT}/fpc/units/${CPU}-${OS}/*" >> "${FPC_CFG}"
+  if [ "$OS" = "darwin" ] ; then
+    echo "-XR/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" >> "${FPC_CFG}"
+    echo "-Fl/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib" >> "${FPC_CFG}"
+    echo "-FD/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin" >> "${FPC_CFG}"
+  fi
+
+  echo "Defined FPC config in ${FPC_CFG}:"
+  echo "==================================================================="
+  cat ~/.fpc.cfg
+  echo "==================================================================="
+
+  export PATH="${WORKSPACE_ROOT}/fpc/bin:${PATH}"
+  echo "PATH=$PATH" >> $GITHUB_ENV # preserve new PATH for later GHA steps
+
+  echo "FPC version info:"
+  fpc -iV # version
+  fpc -iTO # target os
+  fpc -iTP # target cpu
+}
+
+# Get Castle Game Engine
+do_get_castle_engine()
+{
+  export CASTLE_ENGINE_PATH="${WORKSPACE_ROOT}/castle-engine"
+  export PATH="${CASTLE_ENGINE_PATH}/tools/build-tool/:${PATH}"
+
+  # preserve new environment variables for later GHA steps following
+  # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
+  # https://brandur.org/fragments/github-actions-env-vars-in-env-vars
+  echo "CASTLE_ENGINE_PATH=$CASTLE_ENGINE_PATH" >> $GITHUB_ENV
+  echo "PATH=$PATH" >> $GITHUB_ENV
+
+  git clone --depth 1 --single-branch \
+    --branch "${CASTLE_ENGINE_VERSION}" \
+    https://github.com/castle-engine/castle-engine/
+
+  cd $CASTLE_ENGINE_PATH/tools/build-tool/
+  ./castle-engine_compile.sh
+}
+
+# ----------------------------------------------------------------------------
+# main: call functions
+
+do_get_fpc
+do_get_castle_engine
