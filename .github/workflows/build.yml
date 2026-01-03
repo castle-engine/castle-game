@@ -120,12 +120,13 @@ jobs:
           #macos-latest
         ]
         include:
-          - build_os: darwin
-            build_cpu: aarch64
           # TODO:
-          # - runner: macos-15-intel
+          # - runner: macos-latest
           #   build_os: darwin
-          #   build_cpu: x86_64
+          #   build_cpu: aarch64
+          - runner: macos-15-intel
+            build_os: darwin
+            build_cpu: x86_64
 
     runs-on: ${{ matrix.runner }}
     steps:
