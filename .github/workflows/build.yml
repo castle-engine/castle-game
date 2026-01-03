@@ -114,18 +114,24 @@ jobs:
     name: Build Using macOS
     strategy:
       matrix:
-        runner: [macos-15-intel, macos-latest]
+        runner: [
+          macos-15-intel
+          # TODO:
+          #macos-latest
+        ]
         include:
           - build_os: darwin
             build_cpu: aarch64
-          - runner: macos-15-intel
-            build_os: darwin
-            build_cpu: x86_64
+          # TODO:
+          # - runner: macos-15-intel
+          #   build_os: darwin
+          #   build_cpu: x86_64
 
     runs-on: ${{ matrix.runner }}
     steps:
       # Checkout to app/ directory, to not collide (and not clean)
-      # repos castle-engine/ and fpc/ which we will also place in $GITHUB_WORKSPACE.
+      # repos castle-engine/ and fpc/ which we will also place in
+      # $GITHUB_WORKSPACE.
       - name: Checkout to app/
         uses: actions/checkout@v6
         with:
