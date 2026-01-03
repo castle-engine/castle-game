@@ -117,7 +117,7 @@ jobs:
           path: app
 
       - name: Setup FPC and CGE
-        run: ./app/gha_setup_castle_engine
+        run: ./app/gha_setup_castle_engine ${{ matrix.build_os }} ${{ matrix.build_cpu }}
 
       - name: Package macOS
         run: cd app && castle-engine package --verbose
