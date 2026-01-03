@@ -24,6 +24,20 @@ on:
   repository_dispatch:
     types: [cge-docker-unstable-changed]
 
+env:
+  # To which GitHub release tag should we upload artifacts.
+  # Can be "snapshot" or "vX.Y.Z" (latter when we make stable release).
+  release_tag: snapshot
+  #release_tag: vX.Y.Z
+
+  # Which Castle Game Engine tag/branch to use for building.
+  # This *should* be "snapshot", which is our latest CGE that passed automatic tests.
+  # But for quick hotfix in exceptional situation, you may want to use "master"
+  # or any other branch/tag.
+  #engine_tag: snapshot
+  # TODO:
+  engine_tag: master
+
 jobs:
   # Build for platforms supported by
   # CGE Docker image https://hub.docker.com/r/kambi/castle-engine-cloud-builds-tools/ .
@@ -51,8 +65,8 @@ jobs:
       #   run: echo "CASTLE_ENGINE_PATH=$GITHUB_WORKSPACE/castle-engine" >> $GITHUB_ENV
       # - name: Castle Game Engine - Env PATH (non-Windows)
       #   run: echo "PATH=$PATH:$CASTLE_ENGINE_PATH/tools/build-tool/" >> $GITHUB_ENV
-      # - name: Castle Game Engine - Clone snapshot
-      #   run: git clone --depth 1 --single-branch --branch snapshot https://github.com/castle-engine/castle-engine/
+      # - name: Castle Game Engine - Clone ${{ env.engine_tag }}
+      #   run: git clone --depth 1 --single-branch --branch ${{ env.engine_tag }} https://github.com/castle-engine/castle-engine/
       # - name: Castle Game Engine - Build
       #   run: cd $CASTLE_ENGINE_PATH/tools/build-tool/ && ./castle-engine_compile.sh
 
@@ -98,7 +112,10 @@ jobs:
   # This means to build for macOS and (maybe in the future) iOS.
   build-macos:
     name: Build Using macOS
-    runs-on: macos-15-intel
+    strategy:
+      matrix:
+        os: [macos-15-intel, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
       - name: Install FPC
@@ -108,8 +125,8 @@ jobs:
         run: echo "CASTLE_ENGINE_PATH=$GITHUB_WORKSPACE/castle-engine" >> $GITHUB_ENV
       - name: Castle Game Engine - Env PATH (non-Windows)
         run: echo "PATH=$PATH:$CASTLE_ENGINE_PATH/tools/build-tool/" >> $GITHUB_ENV
-      - name: Castle Game Engine - Clone snapshot
-        run: git clone --depth 1 --single-branch --branch snapshot https://github.com/castle-engine/castle-engine/
+      - name: Castle Game Engine - Clone ${{ env.engine_tag }}
+        run: git clone --depth 1 --single-branch --branch ${{ env.engine_tag }} https://github.com/castle-engine/castle-engine/
       - name: Castle Game Engine - Build
         run: cd $CASTLE_ENGINE_PATH/tools/build-tool/ && ./castle-engine_compile.sh
 
@@ -138,15 +155,15 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: gh auth status
-    # Releases files in the "snapshot" release.
+    # Releases files release.
     - name: Release Artifacts
       if: ${{ github.ref == 'refs/heads/master' }}
-      run: gh release --repo ${{ github.repository }} upload snapshot --clobber *.zip *.tar.gz *.apk
+      run: gh release --repo ${{ github.repository }} upload ${{ env.release_tag }} --clobber *.zip *.tar.gz *.apk
       env:
         GH_TOKEN: ${{ github.token }}
 
   update-release-tag:
-    name: Update Release Tag (make snapshot tag point to the build commit on master branch)
+    name: Update Release Tag (make release tag point to the build commit on master branch)
     runs-on: ubuntu-latest
     needs: [release]
     steps:
@@ -155,6 +172,6 @@ jobs:
       if: ${{ github.ref == 'refs/heads/master' }}
       run: |
         # --force allows to overwrite previous tag
-        git tag --force snapshot
+        git tag --force ${{ env.release_tag }}
         # --force allows to push with overwritten tag
-        git push --force origin snapshot
+        git push --force origin ${{ env.release_tag }}
