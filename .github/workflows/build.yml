@@ -124,14 +124,20 @@ jobs:
 
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v6
+      # Checkout to app/ directory, to not collide (and not clean)
+      # repos castle-engine/ and fpc/ which we will also place in $GITHUB_WORKSPACE.
+      - name: Checkout to app/
+        uses: actions/checkout@v6
+        with:
+          path: app
+
       # - name: Install FPC
       #   run: brew install fpc
       # TODO: Test getting fpc from cge-fpc
       - name: Install FPC (from cge-fpc)
         run: |
           wget --progress=bar:force:noscroll https://github.com/castle-engine/cge-fpc/releases/download/snapshot/fpc-${{ matrix.build_os }}-${{ matrix.build_cpu }}.zip
-          unzip fpc-${{ matrix.build_os }}-${{ matrix.build_cpu }}.zip
+          unzip -q fpc-${{ matrix.build_os }}-${{ matrix.build_cpu }}.zip
 
           # Define fpc.cfg following https://github.com/castle-engine/cge-fpc docs
           echo "-Fu${GITHUB_WORKSPACE}/fpc/units/${{ matrix.build_cpu }}-${{ matrix.build_os }}/*" >> ~/.fpc.cfg
@@ -157,12 +163,12 @@ jobs:
         run: cd $CASTLE_ENGINE_PATH/tools/build-tool/ && ./castle-engine_compile.sh
 
       - name: Package macOS
-        run: castle-engine package --verbose
+        run: cd app && castle-engine package --verbose
       - name: Archive Artifacts
         uses: actions/upload-artifact@v6
         with:
           name: macos-build
-          path: "*-darwin-*.zip"
+          path: "app/*-darwin-*.zip"
           if-no-files-found: error
 
   release:
