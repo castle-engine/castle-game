@@ -81,10 +81,19 @@ do_get_fpc()
   # Define fpc.cfg following https://github.com/castle-engine/cge-fpc docs
   echo '# Minimal fpc.cfg for FPC from https://github.com/castle-engine/cge-fpc' > "${FPC_CFG}"
   echo "-Fu${WORKSPACE_ROOT}/fpc/units/${CPU}-${OS}/*" >> "${FPC_CFG}"
+
+  # Add macOS specific flags, see cge-fpc/README.md for reasons.
+  # Otherwise, linking on newer macOS versions fails.
   if [ "$OS" = "darwin" ] ; then
-    echo "-XR/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" >> "${FPC_CFG}"
-    echo "-Fl/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib" >> "${FPC_CFG}"
-    echo "-FD/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin" >> "${FPC_CFG}"
+    MAC_SDK="`xcrun --show-sdk-path`"
+    MAC_XCODE="`xcode-select --print-path`"
+    # Typical results:
+    # MAC_SDK=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+    # MAC_XCODE=/Applications/Xcode.app/Contents/Developer
+
+    echo "-XR${MAC_SDK}" >> "${FPC_CFG}"
+    echo "-Fl${MAC_SDK}/usr/lib" >> "${FPC_CFG}"
+    echo "-FD${MAC_XCODE}/Toolchains/XcodeDefault.xctoolchain/usr/bin" >> "${FPC_CFG}"
   fi
 
   echo "Defined FPC config in ${FPC_CFG}:"
