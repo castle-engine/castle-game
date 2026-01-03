@@ -72,7 +72,7 @@ do_get_fpc()
   # Use -q for more readable output in logs.
   unzip -q fpc-${OS}-${CPU}.zip
 
-  if [ "$OS" = "win32" -or "$OS" = "win64" ] ; then
+  if [ "$OS" = "win32" -o "$OS" = "win64" ] ; then
     FPC_CFG="${WORKSPACE_ROOT}/fpc/bin/fpc.cfg"
   else
     FPC_CFG="${HOME}/.fpc.cfg"
