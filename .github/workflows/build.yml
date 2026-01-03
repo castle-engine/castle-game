@@ -114,12 +114,38 @@ jobs:
     name: Build Using macOS
     strategy:
       matrix:
-        os: [macos-15-intel, macos-latest]
-    runs-on: ${{ matrix.os }}
+        runner: [macos-15-intel, macos-latest]
+        include:
+          - build_os: darwin
+            build_cpu: aarch64
+          - runner: macos-15-intel
+            build_os: darwin
+            build_cpu: x86_64
+
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v6
-      - name: Install FPC
-        run: brew install fpc
+      # - name: Install FPC
+      #   run: brew install fpc
+      # TODO: Test getting fpc from cge-fpc
+      - name: Install FPC (from cge-fpc)
+        run: |
+          wget --progress=bar:force:noscroll https://github.com/castle-engine/cge-fpc/releases/download/snapshot/fpc-${{ matrix.build_os }}-${{ matrix.build_cpu }}.zip
+          unzip fpc-${{ matrix.build_os }}-${{ matrix.build_cpu }}.zip
+
+          # Define fpc.cfg following https://github.com/castle-engine/cge-fpc docs
+          echo "-Fu${GITHUB_WORKSPACE}/fpc/units/${{ matrix.build_cpu }}-${{ matrix.build_os }}/*" >> ~/.fpc.cfg
+          echo "-XR/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" >> ~/.fpc.cfg
+          echo "-Fl/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib" >> ~/.fpc.cfg
+          echo "-FD/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin" >> ~/.fpc.cfg
+          echo 'Contents of ~/.fpc.cfg:'
+          cat ~/.fpc.cfg
+
+          export PATH="${GITHUB_WORKSPACE}/fpc/bin:${PATH}"
+          echo "PATH=$PATH" >> $GITHUB_ENV # preserve new PATH for later steps
+          fpc -iV # version
+          fpc -iTO # target os
+          fpc -iTP # target cpu
 
       - name: Castle Game Engine - Env CASTLE_ENGINE_PATH
         run: echo "CASTLE_ENGINE_PATH=$GITHUB_WORKSPACE/castle-engine" >> $GITHUB_ENV
