@@ -30,6 +30,11 @@ env:
   release_tag: snapshot
   #release_tag: vX.Y.Z
 
+# Explicitly set permissions for GITHUB_TOKEN.
+# See https://docs.github.com/en/actions/tutorials/authenticate-with-github_token .
+permissions:
+  contents: read
+
 jobs:
   # Build for platforms supported by
   # CGE Docker image https://hub.docker.com/r/kambi/castle-engine-cloud-builds-tools/ .
@@ -152,6 +157,8 @@ jobs:
     runs-on: ubuntu-latest
     # Only upload release if all builds, on all runners, succeeded.
     needs: [build-using-docker, build-macos]
+    permissions:
+      contents: write
     steps:
     - name: Download packaged releases
       uses: actions/download-artifact@v7
@@ -174,6 +181,8 @@ jobs:
     name: Update Release Tag (make release tag point to the build commit on master branch)
     runs-on: ubuntu-latest
     needs: [release]
+    permissions:
+      contents: write
     steps:
     - uses: actions/checkout@v6
     - name: Update Release Tag
