@@ -151,9 +151,19 @@ begin
       moving using WalkNavigation.MouseDragMode is too imprecise.
       See https://castle-engine.io/touch_input }
     Player.WalkNavigation.MouseDragMode := mdRotate;
-  PlayerUpdateMouseLook(Player);
 
   SceneManager.Player := Player;
+
+  { Grab the pointer lock before loading the level, while we are still shortly
+    after the user click that started the game. Loading takes a few seconds,
+    and on the web the browser would reject the pointer lock request done
+    only afterwards (when TStatePlay.Resume sets MouseLook).
+
+    Note that we deliberately don't call PlayerUpdateMouseLook here:
+    leaving MouseLook = false until TStatePlay.Resume makes the assignment
+    there an actual change, so the navigation really (re)grabs
+    the pointer lock then. }
+  RequestPointerLockEarly;
 
   SceneManager.LoadLevel(Level);
   PlayGame(true);

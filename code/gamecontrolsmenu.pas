@@ -73,6 +73,21 @@ var
   in "Configure controls" menu. }
 procedure PlayerUpdateMouseLook(Player: TPlayer);
 
+{ Grab the pointer lock (used by mouse look) right now, if the user wants
+  mouse look at all.
+
+  Call this while still handling a user interaction (key press, mouse click)
+  and right before something long-lasting, like loading a level.
+  Reason: on the web, the browser grants the pointer lock only during
+  "transient activation", which is a short period after a user interaction.
+  Loading a level takes long enough to lose it, and then the pointer lock
+  request done later (when TStatePlay resumes) is rejected by the browser.
+  See https://castle-engine.io/web , section "Pointer lock".
+
+  Once the pointer lock is active, TCastleWalkNavigation.MouseLook set later
+  just adopts it, without requesting anything from the browser again. }
+procedure RequestPointerLockEarly;
+
 implementation
 
 uses SysUtils, CastleGLUtils, GameDialogs,
@@ -108,6 +123,12 @@ begin
     to remain hidden, which is good (why pop the mouse cursor on game
     win animation?). }
   Player.WalkNavigation.MouseLook := MouseLook and not ApplicationProperties.TouchDevice;
+end;
+
+procedure RequestPointerLockEarly;
+begin
+  if MouseLook and not ApplicationProperties.TouchDevice then
+    Window.Container.PointerLock.Active := true;
 end;
 
 { TCastleGameMenu descendants interface ------------------------------------------ }

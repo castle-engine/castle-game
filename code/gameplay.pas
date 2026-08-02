@@ -127,6 +127,10 @@ type
       end;
     var
     C2D: TGame2DControls;
+    { Do what the Escape key does: show the game menu, or (when the game is
+      already over) just end the game. }
+    procedure EscapeAction;
+    procedure PointerLockUserCancelled(Sender: TObject);
   public
     PrepareNewPlayer: boolean;
     procedure Start; override;
@@ -645,9 +649,7 @@ begin
 
   if Event.IsKey(CharEscape) then
   begin
-    if Player.Dead or GameWin then
-      GameCancel else
-      Container.PushView(StateGameMenu);
+    EscapeAction;
     Result := true;
   end;
 
@@ -683,6 +685,25 @@ begin
   end;
 end;
 
+procedure TStatePlay.EscapeAction;
+begin
+  if Player.Dead or GameWin then
+    GameCancel
+  else
+    Container.PushView(StateGameMenu);
+end;
+
+procedure TStatePlay.PointerLockUserCancelled(Sender: TObject);
+begin
+  { On the web, the browser handles the Escape key itself: it cancels
+    the pointer lock, and the key event never reaches our Press.
+    So react to the pointer lock cancellation here, to make Escape behave
+    the same as on desktop (instead of requiring a 2nd Escape press).
+    See https://castle-engine.io/web , section "Pointer lock". }
+  if Container.PendingFrontView = Self then
+    EscapeAction;
+end;
+
 procedure TStatePlay.Start;
 begin
   inherited;
@@ -706,10 +727,16 @@ begin
 
   InsertFront(SceneManager);
   InsertFront(C2D);
+
+  Container.PointerLock.AddUserCancelledListener(
+    {$ifdef FPC}@{$endif} PointerLockUserCancelled);
 end;
 
 procedure TStatePlay.Stop;
 begin
+  Container.PointerLock.RemoveUserCancelledListener(
+    {$ifdef FPC}@{$endif} PointerLockUserCancelled);
+
   RemoveControl(SceneManager);
   RemoveControl(C2D);
 
@@ -723,8 +750,16 @@ end;
 procedure TStatePlay.Resume;
 begin
   inherited;
-  PlayerUpdateMouseLook(Player);
+  { Unpause before PlayerUpdateMouseLook.
+    Mouse look is ineffective on a paused viewport, so setting MouseLook
+    while we're still paused would not grab the pointer lock now,
+    it would only happen at the next frame (in navigation Update). }
   SceneManager.Items.Paused := false;
+  { Enable mouse look, both when the game starts (Resume is called right after
+    Start) and when we get back from the game menu. The latter matters on the
+    web: when the user cancelled the pointer lock (by Escape), the engine set
+    MouseLook to false and will never restore it automatically. }
+  PlayerUpdateMouseLook(Player);
 end;
 
 procedure TStatePlay.Pause;
