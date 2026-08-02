@@ -50,6 +50,18 @@ type
     procedure SetPosition(const ACenter: boolean);
   end;
 
+  { Menu item to show the sound information.
+
+    This is the same as TSoundInfoMenuItem from the CastleSoundMenu unit,
+    except it shows the information using a dialog that doesn't block
+    the main loop (see GameDialogs unit), so it also works on the web. }
+  TGameSoundInfoMenuItem = class(TCastleOnScreenMenuItem)
+  protected
+    procedure DoClick; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
   TAbstractMenuState = class(TCastleView)
   strict private
     FCurrentMenu: TCastleGameMenu;
@@ -61,7 +73,9 @@ type
 
 implementation
 
-uses SysUtils, CastleWindow, GameWindow;
+uses SysUtils,
+  CastleClassUtils, CastleSoundEngine, CastleUtils, CastleWindow,
+  GameDialogs, GameWindow;
 
 { TCastleGameMenu ---------------------------------------------------------------- }
 
@@ -85,6 +99,28 @@ begin
     Anchor(hpLeft, 100);
     Anchor(vpTop, -120);
   end;
+end;
+
+{ TGameSoundInfoMenuItem ----------------------------------------------------- }
+
+constructor TGameSoundInfoMenuItem.Create(AOwner: TComponent);
+begin
+  inherited;
+  Caption := 'View sound information';
+end;
+
+procedure TGameSoundInfoMenuItem.DoClick;
+var
+  S: TStringList;
+begin
+  inherited;
+  S := TStringList.Create;
+  try
+    S.Append('Sound library (OpenAL) status:');
+    S.Append('');
+    Strings_AddSplittedString(S, SoundEngine.Information, nl);
+    DialogOK(S);
+  finally S.Free end;
 end;
 
 { TAbstractMenuState --------------------------------------------------------- }

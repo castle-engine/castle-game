@@ -30,11 +30,27 @@ uses Classes, CastleLevels, CastlePlayer, CastleTransform,
   CastleRectangles, CastleKeysMouse, CastleUIControls,
   CastleViewport;
 
-{ Play the game.
+{ Start playing the game.
   SceneManager and Player global variables must be already initialized.
   If PrepareNewPlayer then it will call SceneManager.Logic.PrepareNewPlayer
-  right before starting the actual game. }
+  right before starting the actual game.
+
+  This returns immediately, the game runs "in the background" (as StatePlay
+  view). When the game ends, OnGameEnded is called.
+  We cannot wait here for the game to end, in a
+  "repeat Application.ProcessMessage until GameEnded" loop:
+  such loop would just hang on the web, where the browser must control
+  the main loop. See https://castle-engine.io/web , "Known problems". }
 procedure PlayGame(PrepareNewPlayer: boolean);
+
+type
+  TGameEndedEvent = procedure;
+
+var
+  { Called when the game ended, so when PlayGame is effectively done.
+    At this point StatePlay is already popped from the views stack,
+    so it is safe to free Player and SceneManager, or to load a new level. }
+  OnGameEnded: TGameEndedEvent;
 
 type
   TCastle1SceneManager = class(TGameSceneManager)
@@ -88,9 +104,15 @@ var
     PlayGame. }
   GameWin: boolean;
 
-{ Note that when Player.Dead or GameWin,
-  confirmation will never be required anyway. }
-procedure GameCancel(RequireConfirmation: boolean);
+{ End the game, which means: go back to the main menu.
+
+  The game doesn't end immediately when you call this. We merely record that
+  it should end, and the actual work (popping StatePlay, calling OnGameEnded)
+  happens later, in TStatePlay.Update.
+
+  If you want to ask the user for a confirmation before ending the game,
+  do it before calling this, using GameDialogs. }
+procedure GameCancel;
 
 var
   DebugRenderForLevelScreenshot: boolean = false;
@@ -122,7 +144,7 @@ var
 implementation
 
 uses SysUtils, CastleUtils, CastleWindow, GameInputs,
-  CastleGLUtils, CastleMessages, GameWindow,
+  CastleGLUtils, GameDialogs, GameWindow,
   CastleVectors, CastleImages, Math, GameHelp, CastleSoundEngine,
   GameItems, CastleStringUtils, CastleCreatures, CastleItems,
   CastleFilesUtils, CastleInputs, GameGameMenu, GameDebugMenu, GameSound,
@@ -145,6 +167,10 @@ var
   { If LevelFinishedSchedule, then this is not-'', and should be the name
     of next Level to load. }
   LevelFinishedNextLevelName: string;
+
+  { Set once we scheduled the end-of-game work (GameEndedNow),
+    to not schedule it again on the next frame. }
+  GameEndedScheduled: boolean = false;
 
 { TGame2DControls ------------------------------------------------------------ }
 
@@ -492,14 +518,24 @@ begin
   end;
 end;
 
-procedure GameCancel(RequireConfirmation: boolean);
+procedure GameCancel;
 begin
-  if Player.Dead or GameWin or (not RequireConfirmation) or
-    MessageYesNo(Window, 'Are you sure you want to end the game ?') then
-  begin
-    GameEndedWantsRestart := '';
-    GameEnded := true;
-  end;
+  GameEndedWantsRestart := '';
+  GameEnded := true;
+end;
+
+{ Actually finish the game: pop StatePlay and notify OnGameEnded.
+
+  This must run outside of any event processing (so it is always called
+  through GameDialogs.CallDeferred), because OnGameEnded frees Player and
+  SceneManager -- and TStatePlay.Stop still uses them. Inside event processing,
+  TCastleContainer only queues the PopView, so Stop would run after the free. }
+procedure GameEndedNow;
+begin
+  GameEndedScheduled := false;
+  Window.Container.PopView(StatePlay);
+  if Assigned(OnGameEnded) then
+    OnGameEnded();
 end;
 
 { TStatePlay ----------------------------------------------------------------- }
@@ -515,6 +551,18 @@ var
   Cages: TCagesLevel;
 begin
   inherited;
+
+  { React to the game end here, instead of in a
+    "repeat Application.ProcessMessage until GameEnded" loop inside PlayGame
+    (such loop would hang on the web).
+    Note that we check this before the "Container.FrontView <> Self" test below,
+    as the game may also be ended from the game menu shown on top of us. }
+  if GameEnded and not GameEndedScheduled then
+  begin
+    GameEndedScheduled := true;
+    CallDeferred(@GameEndedNow);
+    Exit;
+  end;
 
   if ApplicationProperties.TouchDevice and (Container.FrontView = Self) then
   begin
@@ -598,7 +646,7 @@ begin
   if Event.IsKey(CharEscape) then
   begin
     if Player.Dead or GameWin then
-      GameCancel(false) else
+      GameCancel else
       Container.PushView(StateGameMenu);
     Result := true;
   end;
@@ -645,6 +693,7 @@ begin
   C2D := TGame2DControls.Create(nil);
 
   GameEnded := false;
+  GameEndedScheduled := false;
   GameEndedWantsRestart := '';
 
   Theme.ImagesPersistent[tiWindow].Url := 'castle-data:/theme/WindowDarkTransparent.png';
@@ -685,21 +734,10 @@ begin
 end;
 
 procedure PlayGame(PrepareNewPlayer: boolean);
-var
-  Container: TCastleContainer;
 begin
-  Container := Application.MainWindow.Container;
-
   StatePlay.PrepareNewPlayer := PrepareNewPlayer;
-  Container.PushView(StatePlay);
-  try
-    GameEnded := false;
-    repeat
-      Application.ProcessMessage(true, true);
-    until GameEnded or
-      { watch Window.Closed, to break in case user exits with Alt+F4 in the middle of game }
-      Window.Closed;
-  finally Container.PopView(StatePlay) end;
+  Window.Container.PushView(StatePlay);
+  { Note: we do not wait here until the game ends. See PlayGame docs. }
 end;
 
 procedure LevelFinished(NextLevelName: string);

@@ -47,7 +47,7 @@ var
 implementation
 
 uses SysUtils, CastleUtils,
-  CastleGLUtils, CastleMessages, GameWindow, CastleVectors, CastleImages,
+  CastleGLUtils, GameDialogs, GameWindow, CastleVectors, CastleImages,
   CastleFilesUtils, CastleLevels, CastlePlayer, CastleColors,
   CastleOnScreenMenu, CastleInputs, CastleRectangles, CastleCameras,
   CastleKeysMouse, CastleOpenDocument,
@@ -84,6 +84,7 @@ type
     procedure ClickShadowVolumes(Sender: TObject);
     procedure ClickColorBits(Sender: TObject);
     procedure ClickVideoFrequency(Sender: TObject);
+    procedure VideoFrequencyChosen(const Answer: Cardinal);
     procedure ClickRestoreDefaults(Sender: TObject);
     procedure ClickBack(Sender: TObject);
     procedure BakedAnimationSmoothnessChanged(Sender: TObject);
@@ -136,11 +137,65 @@ var
 
 { NewGame -------------------------------------------------------------------- }
 
+{ Create the player and start playing given level.
+  SceneManager must be already created (see NewGame). }
+procedure StartLevel(const Level: TLevelInfo);
+begin
+  Notifications.Clear;
+
+  Player := TPlayer.Create(nil);
+  Player.LoadFromFile;
+  Player.WalkNavigation.Input_Run.MakeClear; { speed in castle1 is so fast that we're always running }
+  if ApplicationProperties.TouchDevice then
+    { We already use TCastleTouchNavigation for movement,
+      moving using WalkNavigation.MouseDragMode is too imprecise.
+      See https://castle-engine.io/touch_input }
+    Player.WalkNavigation.MouseDragMode := mdRotate;
+  PlayerUpdateMouseLook(Player);
+
+  SceneManager.Player := Player;
+
+  SceneManager.LoadLevel(Level);
+  PlayGame(true);
+end;
+
+{ Called (through GamePlay.OnGameEnded) once the game ended.
+
+  This used to be simply the code that followed PlayGame call, when PlayGame
+  was blocking. Now PlayGame returns immediately, so everything that has to
+  happen "after the game" happens here:
+  either we restart on another level, or we clean up after the game
+  and go back to the main menu. }
+procedure AfterGame;
+begin
+  FreeAndNil(Player);
+
+  if GameEndedWantsRestart <> '' then
+  begin
+    StartLevel(Levels.FindName(GameEndedWantsRestart));
+    Exit;
+  end;
+
+  OnGameEnded := nil;
+  FreeAndNil(SceneManager);
+
+  SoundEngine.LoopingChannel[0].Sound := stIntroMusic;
+  SoundMenu.SoundVolume.Refresh;
+  SoundMenu.MusicVolume.Refresh;
+  Notifications.Clear;
+
+  StateStartMenu.CurrentMenu := MainMenu;
+end;
+
 { Just a wrapper that calls PlayGame.
 
   Before calling PlayGame it prepares some things (creating player)
-  and after calling PlayGame is restores some things
+  and after the game it restores some things
   (menu item's values that could change during the game and music).
+
+  Note that this returns immediately, it doesn't wait for the game to end
+  (such waiting would hang on the web, see PlayGame docs).
+  The "after the game" part happens in AfterGame.
 
   The idea is that in the future there will be LoadGame procedure,
   that will also call PlayGame, but initializing player and level
@@ -148,39 +203,12 @@ var
 procedure NewGame(Level: TLevelInfo);
 begin
   SceneManager := TCastle1SceneManager.Create(nil);
-  try
-    SceneManager.ShadowVolumes := ShadowVolumes;
-    SceneManager.ShadowVolumesRender := ShadowVolumesRender;
-    SceneManager.ApproximateActivation := true;
-    repeat
-      Notifications.Clear;
-      Player := TPlayer.Create(nil);
-      try
-        Player.LoadFromFile;
-        Player.WalkNavigation.Input_Run.MakeClear; { speed in castle1 is so fast that we're always running }
-        if ApplicationProperties.TouchDevice then
-          { We already use TCastleTouchNavigation for movement,
-            moving using WalkNavigation.MouseDragMode is too imprecise.
-            See https://castle-engine.io/touch_input }
-          Player.WalkNavigation.MouseDragMode := mdRotate;
-        PlayerUpdateMouseLook(Player);
+  SceneManager.ShadowVolumes := ShadowVolumes;
+  SceneManager.ShadowVolumesRender := ShadowVolumesRender;
+  SceneManager.ApproximateActivation := true;
 
-        SceneManager.Player := Player;
-
-        SceneManager.LoadLevel(Level);
-        PlayGame(true);
-      finally FreeAndNil(Player) end;
-
-      if GameEnded and (GameEndedWantsRestart <> '') then
-        Level := Levels.FindName(GameEndedWantsRestart) else
-        Break;
-    until false;
-  finally FreeAndNil(SceneManager) end;
-
-  SoundEngine.LoopingChannel[0].Sound := stIntroMusic;
-  SoundMenu.SoundVolume.Refresh;
-  SoundMenu.MusicVolume.Refresh;
-  Notifications.Clear;
+  OnGameEnded := @AfterGame;
+  StartLevel(Level);
 end;
 
 { TMainMenu ------------------------------------------------------------ }
@@ -279,7 +307,7 @@ end;
 procedure TMainMenu.ClickVisitWebsite(Sender: TObject);
 begin
   SoundEngine.Play(stMenuClick);
-  if not OpenURL(CastleURL) then MessageOK(Window, SCannotOpenURL);
+  if not OpenURL(CastleURL) then DialogOK(SCannotOpenURL);
 end;
 
 procedure TMainMenu.ClickQuit(Sender: TObject);
@@ -405,7 +433,7 @@ end;
 
 procedure TVideoMenu.ClickViewVideoInfo(Sender: TObject);
 begin
-  MessageOK(Window, GLInformationString);
+  DialogOK(GLInformationString);
 end;
 
 procedure TVideoMenu.ClickShadowVolumes(Sender: TObject);
@@ -413,7 +441,7 @@ begin
   ShadowVolumes := not ShadowVolumes;
   ShadowVolumesToggle.Checked := ShadowVolumes;
   if (not GLFeatures.ShadowVolumesPossible) and ShadowVolumes then
-    MessageOK(Window, 'Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.');
+    DialogOK('Your OpenGL implementation doesn''t support stencil buffer necessary for shadow volumes. Shadows (by shadow volumes) will not actually work. Try updating graphic card drivers.');
 end;
 
 procedure TVideoMenu.ClickColorBits(Sender: TObject);
@@ -428,16 +456,19 @@ begin
 end;
 
 procedure TVideoMenu.ClickVideoFrequency(Sender: TObject);
-var
-  Value: Cardinal;
 begin
-  Value := VideoFrequency;
-  if MessageInputQueryCardinal(Window,
+  { We cannot wait for the answer here (it would hang on the web),
+    so we continue in VideoFrequencyChosen. }
+  DialogCardinal(
     'What display frequency to use ?' +nl+ '("0" means "system default")',
-    Value) and
-    (Value <> VideoFrequency) then
+    VideoFrequency, @VideoFrequencyChosen);
+end;
+
+procedure TVideoMenu.VideoFrequencyChosen(const Answer: Cardinal);
+begin
+  if Answer <> VideoFrequency then
   begin
-    VideoFrequency := Value;
+    VideoFrequency := Answer;
     VideoFrequencyToggle.RightCaption := VideoFrequencyToStr(VideoFrequency);
     SubMenuAdditionalInfo := SRestartTheGame;
   end;
@@ -475,7 +506,7 @@ begin
 
   VisibleChange([chRender]);
 
-  MessageOK(Window, 'All video settings restored to defaults.');
+  DialogOK('All video settings restored to defaults.');
 end;
 
 procedure TVideoMenu.ClickBack(Sender: TObject);
@@ -504,7 +535,7 @@ begin
   SoundDeviceToggle.RightCaption := SoundEngine.DeviceCaption;
   SoundDeviceToggle.OnClick := @ClickSoundDeviceToggle;
 
-  Add(TSoundInfoMenuItem.Create(Self));
+  Add(TGameSoundInfoMenuItem.Create(Self));
   SoundVolume := TSoundVolumeMenuItem.Create(Self);
   Add(SoundVolume);
   MusicVolume := TMusicVolumeMenuItem.Create(Self);
@@ -541,7 +572,7 @@ begin
   SoundEngine.Device := Device.Name;
   SoundMenu.SoundDeviceToggle.RightCaption := SoundEngine.DeviceCaption;
   if not SoundEngine.IsContextOpenSuccess then
-    MessageOK(Window, SoundEngine.Information);
+    DialogOK(SoundEngine.Information);
 
   StateStartMenu.CurrentMenu := SoundMenu;
 end;
@@ -603,8 +634,9 @@ end;
 procedure TNewLevelButton.DoClick;
 begin
   inherited;
+  { Note: this returns immediately, the game runs "in the background".
+    Going back to MainMenu happens in AfterGame. }
   NewGame(Level);
-  StateStartMenu.CurrentMenu := MainMenu;
 end;
 
 { TChooseNewLevelMenu ------------------------------------------------------- }

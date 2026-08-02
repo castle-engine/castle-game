@@ -49,7 +49,7 @@ implementation
 
 uses SysUtils,
   CastleUtils, CastleStringUtils,
-  CastleGLUtils, CastleMessages, GameWindow, CastleVectors,
+  CastleGLUtils, GameDialogs, GameWindow, CastleVectors,
   CastleWindow, GameHelp, GamePlay, GameControlsMenu,
   CastleInputs, X3DNodes, CastleClassUtils, CastleSoundMenu,
   CastleGameNotifications, CastleControls, CastleApplicationProperties;
@@ -64,6 +64,7 @@ type
     procedure ClickControls(Sender: TObject);
     procedure ClickSoundOptions(Sender: TObject);
     procedure ClickEndGame(Sender: TObject);
+    procedure EndGameAnswered(const Answer: Boolean);
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -122,8 +123,24 @@ end;
 
 procedure TGameMenu.ClickEndGame(Sender: TObject);
 begin
-  GameCancel(true);
-  Container.PopView(StateGameMenu);
+  { Asking for a confirmation cannot block (it would hang on the web),
+    so we continue in EndGameAnswered.
+    When the game is already over, asking anything would be pointless. }
+  if Player.Dead or GameWin then
+    EndGameAnswered(true)
+  else
+    DialogYesNo('Are you sure you want to end the game ?', @EndGameAnswered);
+end;
+
+procedure TGameMenu.EndGameAnswered(const Answer: Boolean);
+begin
+  if Answer then
+    GameCancel;
+  { Close the game menu regardless of the answer, just like the older
+    (blocking) version of this code did.
+    Note: we cannot use our Container here, as this menu is already removed
+    from the view (TStateGameMenu.Pause) when the dialog is shown on top. }
+  Window.Container.PopView(StateGameMenu);
 end;
 
 { TGameSoundMenu ------------------------------------------------------------- }
@@ -131,7 +148,7 @@ end;
 constructor TGameSoundMenu.Create(AOwner: TComponent);
 begin
   inherited;
-  Add(TSoundInfoMenuItem.Create(Self));
+  Add(TGameSoundInfoMenuItem.Create(Self));
   SoundVolume := TSoundVolumeMenuItem.Create(Self);
   Add(SoundVolume);
   MusicVolume := TMusicVolumeMenuItem.Create(Self);
@@ -173,7 +190,7 @@ begin
   GameSoundMenu.MusicVolume.Refresh;
 
   OldThemeWindow := Theme.ImagesPersistent[tiWindow].Url;
-  { Otherwise CastleMessages don't look good,
+  { Otherwise the dialogs don't look good,
     as mesage text would be mixed with the menu text underneath. }
   Theme.ImagesPersistent[tiWindow].Url := 'castle-data:/theme/WindowDark.png';
 end;

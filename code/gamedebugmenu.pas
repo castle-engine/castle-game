@@ -47,7 +47,7 @@ implementation
 
 uses SysUtils,
   CastleUtils, CastleStringUtils, CastleTransform,
-  CastleGLUtils, CastleMessages, GameWindow,
+  CastleGLUtils, GameDialogs, GameWindow,
   CastleVectors, CastleWindow, GamePlay,
   CastleInputs, CastleCreatures, GameChooseMenu,
   CastleItems, CastleOnScreenMenu, GameVideoOptions, CastleSoundEngine,
@@ -57,6 +57,9 @@ uses SysUtils,
 { TCastleGameMenu descendants interface ------------------------------------------ }
 
 type
+  { Resource chosen by the user in ChooseResource. }
+  TChosenResourceEvent = procedure (const Resource: T3DResource) of object;
+
   TDebugMenu = class(TCastleGameMenu)
   strict private
     procedure ClickPlayerMenu(Sender: TObject);
@@ -65,6 +68,7 @@ type
     procedure ClickLevelsMenu(Sender: TObject);
     procedure ClickReloadResources(Sender: TObject);
     procedure ClickReloadResourceAnimation(Sender: TObject);
+    procedure ReloadResourceAnimationChosen(const Resource: T3DResource);
     procedure ClickRenderDebug(Sender: TObject);
     procedure ClickShadowVolumesRender(Sender: TObject);
     procedure ClickDebugRenderForLevelScreenshot(Sender: TObject);
@@ -99,6 +103,7 @@ type
     procedure ClickKillAll(Sender: TObject);
     procedure ClickKillAllNonStill(Sender: TObject);
     procedure ClickAddCreature(Sender: TObject);
+    procedure AddCreatureChosen(const Resource: T3DResource);
     procedure ClickDebugTimeStopForCreatures(Sender: TObject);
     procedure ClickBack(Sender: TObject);
   public
@@ -117,6 +122,7 @@ type
   TDebugLevelMenu = class(TCastleGameMenu)
   strict private
     procedure ClickChangeLevel(Sender: TObject);
+    procedure ChangeLevelChosen(const ChosenIndex: Integer);
     procedure ClickRestart(Sender: TObject);
     procedure ClickBack(Sender: TObject);
   public
@@ -135,24 +141,55 @@ var
 
 { utility -------------------------------------------------------------------- }
 
-function ChooseResource(out Resource: T3DResource;
-  const OnlyCreatures: boolean): boolean;
+type
+  { Translates the index chosen in ChooseByMenu into a resource. }
+  TChooseResourceHelper = class
+    { Menu items, with T3DResource instances as Objects.
+      The last item is "Cancel", without a resource. }
+    List: TStringList;
+    Event: TChosenResourceEvent;
+    destructor Destroy; override;
+    procedure Chosen(const ChosenIndex: Integer);
+  end;
+
 var
-  S: TStringList;
-  I, ResultIndex: Integer;
+  ChooseResourceHelper: TChooseResourceHelper;
+
+destructor TChooseResourceHelper.Destroy;
 begin
-  S := TStringList.Create;
-  try
-    for I := 0 to Resources.Count - 1 do
-      if (not OnlyCreatures) or (Resources[I] is TCreatureResource) then
-        S.AddObject(Format('Resource %s (%d users)',
-          [Resources[I].Name, Resources[I].UsageCount]), Resources[I]);
-    S.Append('Cancel');
-    ResultIndex := ChooseByMenu(S);
-    Result := ResultIndex <> S.Count - 1;
-    if Result then
-      Resource := S.Objects[ResultIndex] as T3DResource;
-  finally S.Free end;
+  FreeAndNil(List);
+  inherited;
+end;
+
+procedure TChooseResourceHelper.Chosen(const ChosenIndex: Integer);
+var
+  EventToCall: TChosenResourceEvent;
+begin
+  EventToCall := Event;
+  Event := nil;
+  { The last item is "Cancel", then we do nothing. }
+  if (ChosenIndex < List.Count - 1) and Assigned(EventToCall) then
+    EventToCall(List.Objects[ChosenIndex] as T3DResource);
+end;
+
+{ Allow user to choose a resource. Returns immediately, ChosenEvent is called
+  once the user chooses (and not called at all if the user cancels).
+  We cannot wait for the choice here, it would hang on the web,
+  see GameDialogs unit docs. }
+procedure ChooseResource(const OnlyCreatures: boolean;
+  const ChosenEvent: TChosenResourceEvent);
+var
+  I: Integer;
+begin
+  FreeAndNil(ChooseResourceHelper.List);
+  ChooseResourceHelper.List := TStringList.Create;
+  for I := 0 to Resources.Count - 1 do
+    if (not OnlyCreatures) or (Resources[I] is TCreatureResource) then
+      ChooseResourceHelper.List.AddObject(Format('Resource %s (%d users)',
+        [Resources[I].Name, Resources[I].UsageCount]), Resources[I]);
+  ChooseResourceHelper.List.Append('Cancel');
+  ChooseResourceHelper.Event := ChosenEvent;
+  ChooseByMenu(ChooseResourceHelper.List, @ChooseResourceHelper.Chosen);
 end;
 
 { TDebugMenu ------------------------------------------------------------ }
@@ -215,16 +252,16 @@ begin
 end;
 
 procedure TDebugMenu.ClickReloadResourceAnimation(Sender: TObject);
-var
-  Resource: T3DResource;
 begin
-  if ChooseResource(Resource, false) then
-  begin
-    if Resource.UsageCount = 0 then
-      MessageOK(Window, Format('Resource "%s" is not used by anything, ' +
-        'cannot reload',  [Resource.Name])) else
-      Resource.RedoPrepare(SceneManager.PrepareParams);
-  end;
+  ChooseResource(false, @ReloadResourceAnimationChosen);
+end;
+
+procedure TDebugMenu.ReloadResourceAnimationChosen(const Resource: T3DResource);
+begin
+  if Resource.UsageCount = 0 then
+    DialogOK(Format('Resource "%s" is not used by anything, ' +
+      'cannot reload',  [Resource.Name])) else
+    Resource.RedoPrepare(SceneManager.PrepareParams);
 end;
 
 procedure TDebugMenu.ClickRenderDebug(Sender: TObject);
@@ -303,7 +340,7 @@ end;
 procedure TDebugPlayerMenu.ClickInfiniteLife(Sender: TObject);
 begin
   if Player.Dead then
-    MessageOK(Window, 'No can do. You are dead.') else
+    DialogOK('No can do. You are dead.') else
   begin
     Player.MaxLife := 10000;
     Player.Life := Player.MaxLife;
@@ -389,19 +426,19 @@ begin
 end;
 
 procedure TDebugCreaturesMenu.ClickAddCreature(Sender: TObject);
+begin
+  ChooseResource(true, @AddCreatureChosen);
+end;
+
+procedure TDebugCreaturesMenu.AddCreatureChosen(const Resource: T3DResource);
 const
   DirectionAttenuation = 10.0;
-var
-  Resource: T3DResource;
 begin
-  if ChooseResource(Resource, true) then
-  begin
-    (Resource as TCreatureResource).CreateCreature(SceneManager.LevelProperties,
-      Player.Translation + Player.Direction * DirectionAttenuation,
-      Player.Direction);
+  (Resource as TCreatureResource).CreateCreature(SceneManager.LevelProperties,
+    Player.Translation + Player.Direction * DirectionAttenuation,
+    Player.Direction);
 
-    Container.PopView(StateDebugMenu);
-  end;
+  Window.Container.PopView(StateDebugMenu);
 end;
 
 procedure TDebugCreaturesMenu.ClickDebugTimeStopForCreatures(Sender: TObject);
@@ -454,7 +491,7 @@ end;
 procedure TDebugLevelMenu.ClickChangeLevel(Sender: TObject);
 var
   S: TStringList;
-  I, Index: Integer;
+  I: Integer;
 begin
   S := TStringList.Create;
   try
@@ -465,20 +502,24 @@ begin
     end;
     S.Append('Cancel');
 
-    Index := ChooseByMenu(S);
-
-    if Index <> Levels.Count then
-    begin
-      LevelFinished(Levels[Index].Name);
-      { Flush LevelFinished now, to give new items when new level is loaded.
-        Otherwise, some sounds (like equipping the sword, if player gets
-        his first weapon) could be done before loading level progress,
-        which sounds awkward for player. }
-      LevelFinishedFlush;
-      SceneManager.Logic.PrepareNewPlayer(Player);
-      Container.PopView(StateDebugMenu);
-    end;
+    ChooseByMenu(S, @ChangeLevelChosen);
   finally S.Free end;
+end;
+
+procedure TDebugLevelMenu.ChangeLevelChosen(const ChosenIndex: Integer);
+begin
+  { The last item, with index Levels.Count, is "Cancel". }
+  if ChosenIndex <> Levels.Count then
+  begin
+    LevelFinished(Levels[ChosenIndex].Name);
+    { Flush LevelFinished now, to give new items when new level is loaded.
+      Otherwise, some sounds (like equipping the sword, if player gets
+      his first weapon) could be done before loading level progress,
+      which sounds awkward for player. }
+    LevelFinishedFlush;
+    SceneManager.Logic.PrepareNewPlayer(Player);
+    Window.Container.PopView(StateDebugMenu);
+  end;
 end;
 
 procedure TDebugLevelMenu.ClickRestart(Sender: TObject);
@@ -526,7 +567,7 @@ begin
   DebugPlayerMenu.PlayerSpeedSlider.Value := Player.WalkNavigation.MoveSpeed;
 
   OldThemeWindow := Theme.ImagesPersistent[tiWindow].Url;
-  { Otherwise CastleMessages don't look good,
+  { Otherwise the dialogs don't look good,
     as mesage text would be mixed with the menu text underneath. }
   Theme.ImagesPersistent[tiWindow].Url := 'castle-data:/theme/WindowDark.png';
 
@@ -552,4 +593,8 @@ begin
   end;
 end;
 
+initialization
+  ChooseResourceHelper := TChooseResourceHelper.Create;
+finalization
+  FreeAndNil(ChooseResourceHelper);
 end.

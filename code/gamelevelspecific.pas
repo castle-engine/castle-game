@@ -206,7 +206,7 @@ implementation
 
 uses SysUtils, Math,
   CastleFilesUtils, CastleUtils,
-  CastleGLUtils, CastleStringUtils, CastleMessages,
+  CastleGLUtils, CastleStringUtils, GameDialogs,
   GamePlay, CastleGameNotifications, CastleInputs,
   GameWindow, GameX3DProcessing,
   GameVideoOptions, CastleSceneCore, CastleProgress,
@@ -1233,7 +1233,7 @@ begin
   begin
     { ExitMessagePending is displayed when player FallOnTheGround effect
       (when dying) ended. }
-    MessageOK(Window,
+    DialogOK(
       'Congratulations ! You finished the game. ' +
       'Now you can just die and go to hell.' +nl+
       nl+

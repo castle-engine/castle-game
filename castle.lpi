@@ -127,8 +127,9 @@
         <UnitName Value="gamelevelspecific"/>
       </Unit20>
       <Unit21>
-        <Filename Value="code/castlegameconf.inc"/>
+        <Filename Value="code/gamedialogs.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="gamedialogs"/>
       </Unit21>
     </Units>
   </ProjectOptions>

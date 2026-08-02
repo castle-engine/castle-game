@@ -60,7 +60,7 @@ var
 implementation
 
 uses SysUtils, Math,
-  CastleGLUtils, CastleMessages,
+  CastleGLUtils,
   CastleGameNotifications, CastleStringUtils,
   CastleApplicationProperties, CastleUtils, X3DFields,
   CastleVectors, CastleFilesUtils, X3DLoad,

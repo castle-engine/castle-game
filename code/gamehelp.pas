@@ -35,7 +35,7 @@ procedure ViewGameMessages;
 
 implementation
 
-uses SysUtils, Classes, CastleMessages, GameWindow, CastleUtils,
+uses SysUtils, Classes, GameDialogs, CastleUtils,
   CastleGameNotifications;
 
 function SCastleVersion: string;
@@ -52,7 +52,7 @@ begin
     SList.Assign(Notifications.History);
     SList.Insert(0, Format('%d messages :', [Notifications.History.Count]));
     SList.Insert(1, '');
-    MessageOK(Window, SList);
+    DialogOK(SList);
   finally SList.Free end;
 end;
 

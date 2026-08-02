@@ -30,7 +30,7 @@ implementation
 uses SysUtils, Classes,
   { CGE units }
   CastleWindow, CastleUtils,
-  CastleParameters, CastleMessages, CastleGLUtils, CastleStringUtils,
+  CastleParameters, CastleGLUtils, CastleStringUtils,
   CastleLog, CastleClassUtils, CastleLevels, CastleMaterialProperties,
   CastleSoundEngine, CastleConfig, CastleResources,
   CastleGameNotifications, CastleInputs, CastleRectangles, CastleColors,

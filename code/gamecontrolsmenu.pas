@@ -75,7 +75,7 @@ procedure PlayerUpdateMouseLook(Player: TPlayer);
 
 implementation
 
-uses SysUtils, CastleGLUtils, CastleMessages,
+uses SysUtils, CastleGLUtils, GameDialogs,
   CastleOnScreenMenu, CastleConfig,
   CastleInputs, CastleVectors, CastleUtils, CastleRectangles,
   CastleStringUtils, CastleGameNotifications, GameWindow, CastleColors,
@@ -300,7 +300,7 @@ begin
   AutoOpenInventory := DefaultAutoOpenInventory;
   AutoOpenInventoryToggle.Checked := AutoOpenInventory;
 
-  MessageOK(Window, 'All keys and settings restored to defaults.');
+  DialogOK('All keys and settings restored to defaults.');
 end;
 
 procedure TControlsMenu.ClickBack(Sender: TObject);
@@ -329,6 +329,8 @@ type
   public
     property InputShortcut: TInputShortcut read FInputShortcut write SetInputShortcut;
     procedure DoClick; override;
+    { Called when the user pressed the new shortcut (asked for in DoClick). }
+    procedure NewEventChosen(const NewEvent: TInputPressRelease);
     { Call when InputShortcut value inside was changed. }
     procedure Refresh;
   end;
@@ -354,18 +356,22 @@ begin
 end;
 
 procedure TCustomizeInputMenuButton.DoClick;
-var
-  ConflictingInput: TInputShortcut;
-  NewEvent: TInputPressRelease;
 begin
   inherited;
 
-  NewEvent := MessageKeyMouse(Window, Format(
+  { We cannot wait for the new shortcut here (it would hang on the web),
+    so we continue in NewEventChosen. }
+  DialogPressEvent(Format(
     'Press the new key or mouse button or mouse wheel for "%s".' + NL + NL +
     '[Escape] cancels.' + NL +
     '[Backspace] clears the shortcut.',
-    [InputShortcut.Caption]));
+    [InputShortcut.Caption]), @NewEventChosen);
+end;
 
+procedure TCustomizeInputMenuButton.NewEventChosen(const NewEvent: TInputPressRelease);
+var
+  ConflictingInput: TInputShortcut;
+begin
   if NewEvent.IsKey(keyBackspace) then
   begin
     InputShortcut.MakeClear;
