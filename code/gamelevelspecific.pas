@@ -23,8 +23,6 @@
 { Level logic. TLevelLogic descendants specialized for castle1 levels. }
 unit GameLevelSpecific;
 
-{$I castlegameconf.inc}
-
 interface
 
 uses DOM,
@@ -209,7 +207,7 @@ implementation
 uses SysUtils, Math,
   CastleFilesUtils, CastleUtils,
   CastleGLUtils, CastleStringUtils, CastleMessages,
-  GamePlay, CastleGameNotifications, CastleInputs, CastleGL,
+  GamePlay, CastleGameNotifications, CastleInputs,
   GameWindow, GameX3DProcessing,
   GameVideoOptions, CastleSceneCore, CastleProgress,
   CastleXMLUtils, GameItems;
